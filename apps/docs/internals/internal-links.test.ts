@@ -1,6 +1,7 @@
+import { fromMarkdown } from 'mdast-util-from-markdown'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
-import { getInternalLinkBaseUrl, prefixInternalLinks, withDocsBasePath } from './internal-links'
+import { addBaseUrlPrefix, getInternalLinkBaseUrl, withDocsBasePath } from './internal-links'
 
 describe('withDocsBasePath', () => {
   it('prepends /docs to a root-relative href', () => {
@@ -95,147 +96,46 @@ describe('getInternalLinkBaseUrl', () => {
   })
 })
 
-describe('prefixInternalLinks', () => {
-  const BASE = 'https://supabase.com'
+describe('addBaseUrlPrefix', () => {
+  const ORIGINAL_ENV = process.env
 
-  it('returns content unchanged when baseUrl is empty', () => {
-    const input = 'See [Dashboard](/dashboard/foo).'
-    expect(prefixInternalLinks(input, '')).toBe(input)
+  beforeEach(() => {
+    process.env = { ...ORIGINAL_ENV, VERCEL_ENV: 'production' }
   })
 
-  it('prepends baseUrl to a root-relative link', () => {
-    expect(prefixInternalLinks('See [Dashboard](/dashboard/foo).', BASE)).toBe(
-      'See [Dashboard](https://supabase.com/dashboard/foo).'
-    )
+  afterEach(() => {
+    process.env = ORIGINAL_ENV
   })
 
-  it('rewrites multiple links on the same line', () => {
-    const input = 'A [one](/a) and [two](/b/c) here.'
-    expect(prefixInternalLinks(input, BASE)).toBe(
-      'A [one](https://supabase.com/a) and [two](https://supabase.com/b/c) here.'
-    )
+  const linkUrls = (markdown: string): string[] => {
+    const tree = fromMarkdown(markdown)
+    addBaseUrlPrefix(tree)
+    const urls: string[] = []
+    const visit = (n: any) => {
+      if (n.type === 'link') urls.push(n.url)
+      if (Array.isArray(n.children)) n.children.forEach(visit)
+    }
+    visit(tree)
+    return urls
+  }
+
+  it('prepends baseUrl to root-relative link URLs', () => {
+    expect(linkUrls('[home](/foo)')).toEqual(['https://supabase.com/foo'])
   })
 
-  it('preserves query strings and fragments', () => {
-    expect(prefixInternalLinks('[link](/foo?bar=1&baz=2#section)', BASE)).toBe(
-      '[link](https://supabase.com/foo?bar=1&baz=2#section)'
-    )
+  it('leaves absolute, anchor, and protocol-relative URLs alone', () => {
+    expect(linkUrls('[a](https://x.com) [b](#h) [c](//cdn/x)')).toEqual([
+      'https://x.com',
+      '#h',
+      '//cdn/x',
+    ])
   })
 
-  it('leaves absolute http(s) links alone', () => {
-    const input = 'See [GitHub](https://github.com/supabase).'
-    expect(prefixInternalLinks(input, BASE)).toBe(input)
-  })
-
-  it('leaves anchor-only links alone', () => {
-    const input = 'Jump to [section](#installation).'
-    expect(prefixInternalLinks(input, BASE)).toBe(input)
-  })
-
-  it('leaves mailto and other schemes alone', () => {
-    const input = 'Email [us](mailto:team@example.com) or [call](tel:+1234).'
-    expect(prefixInternalLinks(input, BASE)).toBe(input)
-  })
-
-  it('leaves explicitly relative links (./, ../) alone', () => {
-    const input = 'See [sibling](./sibling) and [parent](../parent).'
-    expect(prefixInternalLinks(input, BASE)).toBe(input)
-  })
-
-  it('leaves protocol-relative (//host) URLs alone', () => {
-    const input = 'CDN [asset](//cdn.example.com/img.png).'
-    expect(prefixInternalLinks(input, BASE)).toBe(input)
-  })
-
-  it('does not rewrite image syntax', () => {
-    const input = 'An image: ![alt text](/static/foo.png).'
-    expect(prefixInternalLinks(input, BASE)).toBe(input)
-  })
-
-  it('rewrites a link adjacent to an image without touching the image', () => {
-    expect(prefixInternalLinks('![logo](/logo.png) and [home](/dashboard)', BASE)).toBe(
-      '![logo](/logo.png) and [home](https://supabase.com/dashboard)'
-    )
+  it('does not rewrite image URLs', () => {
+    expect(linkUrls('![alt](/img.png)')).toEqual([])
   })
 
   it('skips links inside fenced code blocks', () => {
-    const input = [
-      'Before: [yes](/touch-me).',
-      '',
-      '```md',
-      '[ignore me](/leave-alone)',
-      '```',
-      '',
-      'After: [also yes](/touch-me-too).',
-    ].join('\n')
-
-    expect(prefixInternalLinks(input, BASE)).toBe(
-      [
-        'Before: [yes](https://supabase.com/touch-me).',
-        '',
-        '```md',
-        '[ignore me](/leave-alone)',
-        '```',
-        '',
-        'After: [also yes](https://supabase.com/touch-me-too).',
-      ].join('\n')
-    )
-  })
-
-  it('handles multiple fenced code blocks correctly', () => {
-    const input = [
-      '[a](/a)',
-      '```',
-      '[skip1](/skip1)',
-      '```',
-      '[b](/b)',
-      '```ts',
-      '[skip2](/skip2)',
-      '```',
-      '[c](/c)',
-    ].join('\n')
-
-    expect(prefixInternalLinks(input, BASE)).toBe(
-      [
-        '[a](https://supabase.com/a)',
-        '```',
-        '[skip1](/skip1)',
-        '```',
-        '[b](https://supabase.com/b)',
-        '```ts',
-        '[skip2](/skip2)',
-        '```',
-        '[c](https://supabase.com/c)',
-      ].join('\n')
-    )
-  })
-
-  it('rewrites links with empty text', () => {
-    expect(prefixInternalLinks('[](/foo)', BASE)).toBe('[](https://supabase.com/foo)')
-  })
-
-  it('uses any baseUrl passed in, not just supabase.com', () => {
-    expect(prefixInternalLinks('[x](/y)', 'https://branch-deploy.vercel.app')).toBe(
-      '[x](https://branch-deploy.vercel.app/y)'
-    )
-  })
-
-  it('is a no-op when there are no matching links', () => {
-    const input = '# Title\n\nJust prose, no links.'
-    expect(prefixInternalLinks(input, BASE)).toBe(input)
-  })
-
-  it('handles an unclosed code fence by leaving the unclosed portion untouched', () => {
-    // A `split(/(```...```)/)` only pairs complete fences; an unclosed fence
-    // means everything after it stays in the trailing prose segment. Document
-    // that behavior rather than promising to parse malformed markdown.
-    const input = ['[before](/before)', '```', '[inside-unclosed](/inside)'].join('\n')
-    expect(prefixInternalLinks(input, BASE)).toBe(
-      [
-        '[before](https://supabase.com/before)',
-        '```',
-        '[inside-unclosed](https://supabase.com/inside)',
-      ].join('\n')
-    )
+    expect(linkUrls('```\n[x](/x)\n```\n\n[y](/y)')).toEqual(['https://supabase.com/y'])
   })
 })

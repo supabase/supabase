@@ -5,3 +5,11 @@ export type DestinationType =
   | 'DuckLake'
   | 'Snowflake'
   | 'ClickHouse'
+
+export type ExistingDestination = {
+  sourceId?: number
+  destinationId: number
+  pipelineId?: number
+  enabled: boolean
+  statusName?: string
+}

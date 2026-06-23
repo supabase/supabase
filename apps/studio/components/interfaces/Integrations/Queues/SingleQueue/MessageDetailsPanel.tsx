@@ -1,7 +1,7 @@
 import { useEscapeKeydown } from '@radix-ui/react-use-escape-keydown'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { isNil, noop } from 'lodash'
+import { isNil } from 'lodash'
 import { Archive, Clock12, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
 import {
@@ -14,8 +14,8 @@ import {
   TabsTrigger_Shadcn_,
 } from 'ui'
 
-import { MonacoEditor } from '@/components/grid/components/common/MonacoEditor'
 import { RowAction, RowData } from '@/components/interfaces/Auth/Users/UserOverview'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { useDatabaseQueueMessageArchiveMutation } from '@/data/database-queues/database-queue-messages-archive-mutation'
 import { useDatabaseQueueMessageDeleteMutation } from '@/data/database-queues/database-queue-messages-delete-mutation'
 import { PostgresQueueMessage } from '@/data/database-queues/database-queue-messages-infinite-query'
@@ -123,15 +123,15 @@ export const MessageDetailsPanel = ({
             />
             <RowData property="Retries" value={`${selectedMessage.read_ct}`} />
 
-            <div>
-              <h3 className="text-foreground-light py-1">Payload</h3>
-              <MonacoEditor
-                key={selectedMessage.msg_id}
-                onChange={noop}
-                width="100%"
+            <div className="mt-2">
+              <h4 className="text-foreground-light py-1">Payload</h4>
+              <CodeEditor
+                isReadOnly
+                hideLineNumbers
+                id={selectedMessage.msg_id.toString()}
                 value={jsonString || 'NULL'}
                 language="json"
-                readOnly
+                className="h-[200px]"
               />
             </div>
           </div>
