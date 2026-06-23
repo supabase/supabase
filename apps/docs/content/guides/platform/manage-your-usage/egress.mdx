@@ -63,6 +63,12 @@ Cached and uncached egress have independent quotas and independent pricing. Cach
 
 Egress is charged by gigabyte. Charges apply only for usage exceeding your subscription plan's quota. This quota is called the Unified Egress Quota because it can be used across all services (Database, Auth, Storage etc.).
 
+<Admonition type="note">
+
+Egress accumulates over the billing cycle and resets at the start of the next cycle. Usage that has already been served cannot be reduced retroactively, so the optimizations below lower future egress only. If your organization is restricted for egress, the restriction clears at the start of the next billing cycle, or immediately if you upgrade your plan or disable your Spend Cap.
+
+</Admonition>
+
 ### Usage on your invoice
 
 Usage is shown as "Egress GB" and "Cached Egress GB" on your invoice.
