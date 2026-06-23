@@ -129,6 +129,7 @@ import { Route as ProjectRefLogsPostgresLogsRouteImport } from './routes/project
 import { Route as ProjectRefLogsPoolerLogsRouteImport } from './routes/project/$ref/logs/pooler-logs'
 import { Route as ProjectRefLogsPgcronLogsRouteImport } from './routes/project/$ref/logs/pgcron-logs'
 import { Route as ProjectRefLogsPgUpgradeLogsRouteImport } from './routes/project/$ref/logs/pg-upgrade-logs'
+import { Route as ProjectRefLogsMultigresLogsRouteImport } from './routes/project/$ref/logs/multigres-logs'
 import { Route as ProjectRefLogsEdgeLogsRouteImport } from './routes/project/$ref/logs/edge-logs'
 import { Route as ProjectRefLogsEdgeFunctionsLogsRouteImport } from './routes/project/$ref/logs/edge-functions-logs'
 import { Route as ProjectRefLogsDedicatedPoolerLogsRouteImport } from './routes/project/$ref/logs/dedicated-pooler-logs'
@@ -191,6 +192,7 @@ import { Route as AppOrgSlugIntegrationsRouteImport } from './routes/_app/org/$s
 import { Route as AppOrgSlugGeneralRouteImport } from './routes/_app/org/$slug/general'
 import { Route as AppOrgSlugDocumentsRouteImport } from './routes/_app/org/$slug/documents'
 import { Route as AppOrgSlugBillingRouteImport } from './routes/_app/org/$slug/billing'
+import { Route as AppOrgSlugAuditLogDrainsRouteImport } from './routes/_app/org/$slug/audit-log-drains'
 import { Route as AppOrgSlugAuditRouteImport } from './routes/_app/org/$slug/audit'
 import { Route as AppOrgSlugAppsRouteImport } from './routes/_app/org/$slug/apps'
 import { Route as AppAccountTokensScopedRouteImport } from './routes/_app/account/tokens/scoped'
@@ -954,6 +956,12 @@ const ProjectRefLogsPgUpgradeLogsRoute =
     path: '/pg-upgrade-logs',
     getParentRoute: () => ProjectRefLogsRoute,
   } as any)
+const ProjectRefLogsMultigresLogsRoute =
+  ProjectRefLogsMultigresLogsRouteImport.update({
+    id: '/multigres-logs',
+    path: '/multigres-logs',
+    getParentRoute: () => ProjectRefLogsRoute,
+  } as any)
 const ProjectRefLogsEdgeLogsRoute = ProjectRefLogsEdgeLogsRouteImport.update({
   id: '/edge-logs',
   path: '/edge-logs',
@@ -1287,6 +1295,12 @@ const AppOrgSlugBillingRoute = AppOrgSlugBillingRouteImport.update({
   path: '/$slug/billing',
   getParentRoute: () => AppOrgRoute,
 } as any)
+const AppOrgSlugAuditLogDrainsRoute =
+  AppOrgSlugAuditLogDrainsRouteImport.update({
+    id: '/$slug/audit-log-drains',
+    path: '/$slug/audit-log-drains',
+    getParentRoute: () => AppOrgRoute,
+  } as any)
 const AppOrgSlugAuditRoute = AppOrgSlugAuditRouteImport.update({
   id: '/$slug/audit',
   path: '/$slug/audit',
@@ -2088,6 +2102,7 @@ export interface FileRoutesByFullPath {
   '/account/tokens/scoped': typeof AppAccountTokensScopedRoute
   '/org/$slug/apps': typeof AppOrgSlugAppsRoute
   '/org/$slug/audit': typeof AppOrgSlugAuditRoute
+  '/org/$slug/audit-log-drains': typeof AppOrgSlugAuditLogDrainsRoute
   '/org/$slug/billing': typeof AppOrgSlugBillingRoute
   '/org/$slug/documents': typeof AppOrgSlugDocumentsRoute
   '/org/$slug/general': typeof AppOrgSlugGeneralRoute
@@ -2150,6 +2165,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/logs/dedicated-pooler-logs': typeof ProjectRefLogsDedicatedPoolerLogsRoute
   '/project/$ref/logs/edge-functions-logs': typeof ProjectRefLogsEdgeFunctionsLogsRoute
   '/project/$ref/logs/edge-logs': typeof ProjectRefLogsEdgeLogsRoute
+  '/project/$ref/logs/multigres-logs': typeof ProjectRefLogsMultigresLogsRoute
   '/project/$ref/logs/pg-upgrade-logs': typeof ProjectRefLogsPgUpgradeLogsRoute
   '/project/$ref/logs/pgcron-logs': typeof ProjectRefLogsPgcronLogsRoute
   '/project/$ref/logs/pooler-logs': typeof ProjectRefLogsPoolerLogsRoute
@@ -2383,6 +2399,7 @@ export interface FileRoutesByTo {
   '/account/tokens/scoped': typeof AppAccountTokensScopedRoute
   '/org/$slug/apps': typeof AppOrgSlugAppsRoute
   '/org/$slug/audit': typeof AppOrgSlugAuditRoute
+  '/org/$slug/audit-log-drains': typeof AppOrgSlugAuditLogDrainsRoute
   '/org/$slug/billing': typeof AppOrgSlugBillingRoute
   '/org/$slug/documents': typeof AppOrgSlugDocumentsRoute
   '/org/$slug/general': typeof AppOrgSlugGeneralRoute
@@ -2443,6 +2460,7 @@ export interface FileRoutesByTo {
   '/project/$ref/logs/dedicated-pooler-logs': typeof ProjectRefLogsDedicatedPoolerLogsRoute
   '/project/$ref/logs/edge-functions-logs': typeof ProjectRefLogsEdgeFunctionsLogsRoute
   '/project/$ref/logs/edge-logs': typeof ProjectRefLogsEdgeLogsRoute
+  '/project/$ref/logs/multigres-logs': typeof ProjectRefLogsMultigresLogsRoute
   '/project/$ref/logs/pg-upgrade-logs': typeof ProjectRefLogsPgUpgradeLogsRoute
   '/project/$ref/logs/pgcron-logs': typeof ProjectRefLogsPgcronLogsRoute
   '/project/$ref/logs/pooler-logs': typeof ProjectRefLogsPoolerLogsRoute
@@ -2687,6 +2705,7 @@ export interface FileRoutesById {
   '/_app/account/tokens/scoped': typeof AppAccountTokensScopedRoute
   '/_app/org/$slug/apps': typeof AppOrgSlugAppsRoute
   '/_app/org/$slug/audit': typeof AppOrgSlugAuditRoute
+  '/_app/org/$slug/audit-log-drains': typeof AppOrgSlugAuditLogDrainsRoute
   '/_app/org/$slug/billing': typeof AppOrgSlugBillingRoute
   '/_app/org/$slug/documents': typeof AppOrgSlugDocumentsRoute
   '/_app/org/$slug/general': typeof AppOrgSlugGeneralRoute
@@ -2749,6 +2768,7 @@ export interface FileRoutesById {
   '/project/$ref/logs/dedicated-pooler-logs': typeof ProjectRefLogsDedicatedPoolerLogsRoute
   '/project/$ref/logs/edge-functions-logs': typeof ProjectRefLogsEdgeFunctionsLogsRoute
   '/project/$ref/logs/edge-logs': typeof ProjectRefLogsEdgeLogsRoute
+  '/project/$ref/logs/multigres-logs': typeof ProjectRefLogsMultigresLogsRoute
   '/project/$ref/logs/pg-upgrade-logs': typeof ProjectRefLogsPgUpgradeLogsRoute
   '/project/$ref/logs/pgcron-logs': typeof ProjectRefLogsPgcronLogsRoute
   '/project/$ref/logs/pooler-logs': typeof ProjectRefLogsPoolerLogsRoute
@@ -2993,6 +3013,7 @@ export interface FileRouteTypes {
     | '/account/tokens/scoped'
     | '/org/$slug/apps'
     | '/org/$slug/audit'
+    | '/org/$slug/audit-log-drains'
     | '/org/$slug/billing'
     | '/org/$slug/documents'
     | '/org/$slug/general'
@@ -3055,6 +3076,7 @@ export interface FileRouteTypes {
     | '/project/$ref/logs/dedicated-pooler-logs'
     | '/project/$ref/logs/edge-functions-logs'
     | '/project/$ref/logs/edge-logs'
+    | '/project/$ref/logs/multigres-logs'
     | '/project/$ref/logs/pg-upgrade-logs'
     | '/project/$ref/logs/pgcron-logs'
     | '/project/$ref/logs/pooler-logs'
@@ -3288,6 +3310,7 @@ export interface FileRouteTypes {
     | '/account/tokens/scoped'
     | '/org/$slug/apps'
     | '/org/$slug/audit'
+    | '/org/$slug/audit-log-drains'
     | '/org/$slug/billing'
     | '/org/$slug/documents'
     | '/org/$slug/general'
@@ -3348,6 +3371,7 @@ export interface FileRouteTypes {
     | '/project/$ref/logs/dedicated-pooler-logs'
     | '/project/$ref/logs/edge-functions-logs'
     | '/project/$ref/logs/edge-logs'
+    | '/project/$ref/logs/multigres-logs'
     | '/project/$ref/logs/pg-upgrade-logs'
     | '/project/$ref/logs/pgcron-logs'
     | '/project/$ref/logs/pooler-logs'
@@ -3591,6 +3615,7 @@ export interface FileRouteTypes {
     | '/_app/account/tokens/scoped'
     | '/_app/org/$slug/apps'
     | '/_app/org/$slug/audit'
+    | '/_app/org/$slug/audit-log-drains'
     | '/_app/org/$slug/billing'
     | '/_app/org/$slug/documents'
     | '/_app/org/$slug/general'
@@ -3653,6 +3678,7 @@ export interface FileRouteTypes {
     | '/project/$ref/logs/dedicated-pooler-logs'
     | '/project/$ref/logs/edge-functions-logs'
     | '/project/$ref/logs/edge-logs'
+    | '/project/$ref/logs/multigres-logs'
     | '/project/$ref/logs/pg-upgrade-logs'
     | '/project/$ref/logs/pgcron-logs'
     | '/project/$ref/logs/pooler-logs'
@@ -4785,6 +4811,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefLogsPgUpgradeLogsRouteImport
       parentRoute: typeof ProjectRefLogsRoute
     }
+    '/project/$ref/logs/multigres-logs': {
+      id: '/project/$ref/logs/multigres-logs'
+      path: '/multigres-logs'
+      fullPath: '/project/$ref/logs/multigres-logs'
+      preLoaderRoute: typeof ProjectRefLogsMultigresLogsRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
+    }
     '/project/$ref/logs/edge-logs': {
       id: '/project/$ref/logs/edge-logs'
       path: '/edge-logs'
@@ -5217,6 +5250,13 @@ declare module '@tanstack/react-router' {
       path: '/$slug/billing'
       fullPath: '/org/$slug/billing'
       preLoaderRoute: typeof AppOrgSlugBillingRouteImport
+      parentRoute: typeof AppOrgRoute
+    }
+    '/_app/org/$slug/audit-log-drains': {
+      id: '/_app/org/$slug/audit-log-drains'
+      path: '/$slug/audit-log-drains'
+      fullPath: '/org/$slug/audit-log-drains'
+      preLoaderRoute: typeof AppOrgSlugAuditLogDrainsRouteImport
       parentRoute: typeof AppOrgRoute
     }
     '/_app/org/$slug/audit': {
@@ -6100,6 +6140,7 @@ interface AppOrgRouteChildren {
   AppOrgIndexRoute: typeof AppOrgIndexRoute
   AppOrgSlugAppsRoute: typeof AppOrgSlugAppsRoute
   AppOrgSlugAuditRoute: typeof AppOrgSlugAuditRoute
+  AppOrgSlugAuditLogDrainsRoute: typeof AppOrgSlugAuditLogDrainsRoute
   AppOrgSlugBillingRoute: typeof AppOrgSlugBillingRoute
   AppOrgSlugDocumentsRoute: typeof AppOrgSlugDocumentsRoute
   AppOrgSlugGeneralRoute: typeof AppOrgSlugGeneralRoute
@@ -6118,6 +6159,7 @@ const AppOrgRouteChildren: AppOrgRouteChildren = {
   AppOrgIndexRoute: AppOrgIndexRoute,
   AppOrgSlugAppsRoute: AppOrgSlugAppsRoute,
   AppOrgSlugAuditRoute: AppOrgSlugAuditRoute,
+  AppOrgSlugAuditLogDrainsRoute: AppOrgSlugAuditLogDrainsRoute,
   AppOrgSlugBillingRoute: AppOrgSlugBillingRoute,
   AppOrgSlugDocumentsRoute: AppOrgSlugDocumentsRoute,
   AppOrgSlugGeneralRoute: AppOrgSlugGeneralRoute,
@@ -6467,6 +6509,7 @@ interface ProjectRefLogsRouteChildren {
   ProjectRefLogsDedicatedPoolerLogsRoute: typeof ProjectRefLogsDedicatedPoolerLogsRoute
   ProjectRefLogsEdgeFunctionsLogsRoute: typeof ProjectRefLogsEdgeFunctionsLogsRoute
   ProjectRefLogsEdgeLogsRoute: typeof ProjectRefLogsEdgeLogsRoute
+  ProjectRefLogsMultigresLogsRoute: typeof ProjectRefLogsMultigresLogsRoute
   ProjectRefLogsPgUpgradeLogsRoute: typeof ProjectRefLogsPgUpgradeLogsRoute
   ProjectRefLogsPgcronLogsRoute: typeof ProjectRefLogsPgcronLogsRoute
   ProjectRefLogsPoolerLogsRoute: typeof ProjectRefLogsPoolerLogsRoute
@@ -6489,6 +6532,7 @@ const ProjectRefLogsRouteChildren: ProjectRefLogsRouteChildren = {
     ProjectRefLogsDedicatedPoolerLogsRoute,
   ProjectRefLogsEdgeFunctionsLogsRoute: ProjectRefLogsEdgeFunctionsLogsRoute,
   ProjectRefLogsEdgeLogsRoute: ProjectRefLogsEdgeLogsRoute,
+  ProjectRefLogsMultigresLogsRoute: ProjectRefLogsMultigresLogsRoute,
   ProjectRefLogsPgUpgradeLogsRoute: ProjectRefLogsPgUpgradeLogsRoute,
   ProjectRefLogsPgcronLogsRoute: ProjectRefLogsPgcronLogsRoute,
   ProjectRefLogsPoolerLogsRoute: ProjectRefLogsPoolerLogsRoute,
