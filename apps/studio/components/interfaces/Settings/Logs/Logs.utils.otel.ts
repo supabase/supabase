@@ -176,7 +176,8 @@ const OTEL_SOURCES: Record<LogsTableName, OtelSourceDescriptor> = {
       col('parsed.query', safeSql`query`),
     ],
     error: PG_ERROR,
-    warning: PG_WARNING,
+    // No warning bucket: BigQuery's getWarningCondition has no pg_cron case, so
+    // WARNING rows count as ok there. Match that for flag parity.
     basePredicate: PG_CRON_PREDICATE,
   },
   [LogsTableName.FUNCTIONS]: {

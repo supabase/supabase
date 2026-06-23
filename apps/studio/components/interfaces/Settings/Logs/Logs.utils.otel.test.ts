@@ -142,6 +142,16 @@ describe('genChartQueryOtel', () => {
     expect(q).toContain("JSONExtractString(event_message, 'level') IN ('ERROR', 'FATAL', 'PANIC')")
   })
 
+  it('counts pg_cron errors but never warnings, matching BigQuery (no pg_cron warning case)', () => {
+    const q = sql(genChartQueryOtel(LogsTableName.PG_CRON, params, {}))
+    // Errors use the postgres severity predicate...
+    expect(q).toContain(
+      "countIf(log_attributes['parsed.error_severity'] IN ('ERROR', 'FATAL', 'PANIC')) AS error_count"
+    )
+    // ...but warnings are constant-false, so a WARNING cron row counts as ok (BQ parity).
+    expect(q).toContain('countIf(0) AS warning_count')
+  })
+
   it('emits constant-false severity for tables without a severity concept', () => {
     const q = sql(genChartQueryOtel(LogsTableName.STORAGE, params, {}))
     expect(q).toContain("source = 'storage_logs'")
