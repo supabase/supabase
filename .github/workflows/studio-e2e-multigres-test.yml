@@ -165,3 +165,6 @@ jobs:
         with:
           report-file: e2e/studio/test-results/test-results.json
           comment-title: '🎭 Playwright Test Results (Multigres)'
+          # Distinct tag so this comment never overwrites the canonical
+          # e2e workflow's comment (the tag defaults to the workflow name).
+          report-tag: studio-e2e-multigres
