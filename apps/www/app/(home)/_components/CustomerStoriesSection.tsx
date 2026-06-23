@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, cn } from 'ui'
+import { cn } from 'ui'
 
 import SectionContainer from '@/components/Layouts/SectionContainer'
 
@@ -92,36 +92,6 @@ const customerStories = [
     textColor: 'light' as 'light' | 'dark',
   },
 ]
-
-const aiBuilderStories = [
-  {
-    name: 'Lovable',
-    logo: '/images/logos/publicity/lovable.svg',
-    description: 'We store embeddings in a PostgreSQL database.',
-    slug: 'lovable',
-    photo: '/images/logos/publicity/lovable-team.png',
-  },
-  {
-    name: 'Bolt',
-    logo: '/images/logos/publicity/bolt.svg',
-    description: 'We store embeddings in a PostgreSQL database, hosted by Supabase.',
-    slug: 'bolt',
-    photo: '/images/logos/publicity/bolt-team.png',
-  },
-]
-
-function LovableLogo({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 121 122" fill="none" className={className}>
-      <path
-        fill="white"
-        fillRule="evenodd"
-        d="M36.069 0c19.92 0 36.068 16.155 36.068 36.084v13.713h12.004c19.92 0 36.069 16.156 36.069 36.084 0 19.928-16.149 36.083-36.069 36.083H0v-85.88C0 16.155 16.148 0 36.069 0Z"
-        clipRule="evenodd"
-      />
-    </svg>
-  )
-}
 
 function IconChip({
   story,
@@ -365,65 +335,6 @@ export function CustomerStoriesSection() {
           })}
         </div>
       </SectionContainer>
-
-      {/* AI Builder stories */}
-      <div className="mt-10">
-        <SectionContainer className="py-0!">
-          <div className="grid grid-cols-1 items-end lg:grid-cols-[420px_1fr] gap-8">
-            <div className="flex flex-col md:min-h-[320px] gap-4 justify-between">
-              <h3 className="text-xl md:text-3xl text-foreground-lighter">
-                Powering the next wave
-                <br />
-                <span className="text-foreground">of AI builders</span>
-              </h3>
-              <p className="text-sm text-foreground-lighter leading-relaxed text-pretty max-w-sm">
-                Create full backend experiences on behalf of your users with Supabase for Platforms,
-                the all-in-one solution for building AI-native platforms and marketplaces.
-              </p>
-
-              <Button variant="default" size="medium" asChild className="w-fit mt-auto">
-                <Link href="/partners/integrations">Explore Supabase for Platforms</Link>
-              </Button>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-              {aiBuilderStories.map((story) => (
-                <Link
-                  key={story.slug}
-                  href={`/customers/${story.slug}`}
-                  aria-label={`Read the ${story.name} customer story`}
-                  className="group relative overflow-hidden rounded-lg w-full aspect-[4/3] border border-white/10 flex flex-col justify-end p-5"
-                >
-                  {/* Photo background — decorative */}
-                  <img
-                    src={story.photo}
-                    alt=""
-                    aria-hidden="true"
-                    className="absolute inset-0 w-full h-full object-cover select-none scale-[1.015]"
-                  />
-                  {/* Dark gradient overlay — heavier at bottom */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-[background-color] duration-300" />
-
-                  {/* Logo + description at bottom */}
-                  <div className="relative z-10 flex flex-col gap-2">
-                    {/* Logo is decorative — the link itself is already labelled */}
-                    <img
-                      src={story.logo}
-                      alt=""
-                      aria-hidden="true"
-                      className="h-6 w-auto object-contain object-left brightness-0 invert select-none"
-                    />
-                    <p className="text-white/75 text-sm leading-relaxed text-pretty">
-                      {story.description}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </SectionContainer>
-      </div>
     </div>
   )
 }

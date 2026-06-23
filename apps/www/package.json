@@ -86,6 +86,7 @@
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.1",
     "shared-data": "workspace:*",
+    "shiki": "^4.0.1",
     "swiper": "^12.1.2",
     "typed.js": "^2.0.16",
     "typescript": "catalog:",

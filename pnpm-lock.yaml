@@ -1797,6 +1797,9 @@ importers:
       shared-data:
         specifier: workspace:*
         version: link:../../packages/shared-data
+      shiki:
+        specifier: ^4.0.1
+        version: 4.0.1
       swiper:
         specifier: ^12.1.2
         version: 12.1.2

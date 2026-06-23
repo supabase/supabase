@@ -48,7 +48,7 @@ export function CommunitySectionV2() {
             Discover what our community has to say about their Supabase experience.
           </p>
           <Button asChild variant="default" size="small" className="mt-2">
-            <Link href="https://discord.supabase.com/" target="_blank">
+            <Link href="https://discord.supabase.com/" target="_blank" rel="noopener noreferrer">
               Join us on Discord
             </Link>
           </Button>
@@ -90,6 +90,7 @@ export function CommunitySectionV2() {
                       <Link
                         href={tweet.url}
                         target="_blank"
+                        rel="noopener noreferrer"
                         tabIndex={-1}
                         className="block group/tweet-card"
                       >
