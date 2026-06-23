@@ -2,6 +2,8 @@ import Examples from 'data/Examples'
 import Link from 'next/link'
 import { cn } from 'ui'
 
+import SectionContainer from '@/components/Layouts/SectionContainer'
+
 const EXAMPLE_LOGO: Record<string, { src: string; invert?: boolean }> = {
   'Stripe Subscriptions Starter': { src: '/images/logos/frameworks/stripe.svg' },
   'Next.js Starter': { src: '/images/logos/frameworks/nextjs.svg', invert: true },
@@ -99,24 +101,22 @@ export function BuiltWithSupabaseSection() {
   const gridExamples = Examples.slice(2, 6)
 
   return (
-    <div className="py-24 flex flex-col gap-16">
+    <SectionContainer className="flex flex-col gap-16 py-24!">
       {/* Header row */}
-      <div className="section-container w-full">
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
-            Kickstart your next project <br />
-            <span className="text-foreground">with production ready templates</span>
-          </h3>
-          <Link
-            href="/docs/guides/examples"
-            className="text-sm text-foreground-light hover:text-foreground underline"
-          >
-            View all examples
-          </Link>
-        </div>
+      <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+        <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
+          Kickstart your next project <br />
+          <span className="text-foreground">with production ready templates</span>
+        </h3>
+        <Link
+          href="/docs/guides/examples"
+          className="text-sm text-foreground-light hover:text-foreground underline"
+        >
+          View all examples
+        </Link>
       </div>
 
-      <div className="section-container w-full">
+      <div>
         {/* Featured row - 2 large cells */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {featuredExamples.map((example) => {
@@ -195,6 +195,6 @@ export function BuiltWithSupabaseSection() {
           })}
         </div>
       </div>
-    </div>
+    </SectionContainer>
   )
 }

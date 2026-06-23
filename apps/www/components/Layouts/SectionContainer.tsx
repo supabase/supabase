@@ -1,7 +1,7 @@
 'use client'
 
 import classNames from 'classnames'
-import { forwardRef, Ref } from 'react'
+import { Ref, forwardRef } from 'react'
 
 interface Props {
   children: React.ReactNode
@@ -19,7 +19,7 @@ const SectionContainer = forwardRef(
       ref={ref}
       id={id}
       className={classNames(
-        `section-container sm:py-18 relative py-16 md:py-24 lg:py-24`,
+        `sm:py-18 container relative mx-auto px-6 py-16 md:py-24 lg:px-16 lg:py-24 xl:px-20`,
         className
       )}
     >

@@ -6,6 +6,8 @@ import Link from 'next/link'
 import { useRef } from 'react'
 import { Button } from 'ui'
 
+import SectionContainer from '@/components/Layouts/SectionContainer'
+
 // ── Pixel font (5×7 per glyph) ─────────────────────────────────────────────
 
 const GLYPHS: Record<string, string[]> = {
@@ -139,7 +141,7 @@ export function OpenSourceSection() {
   const starsNum = 98400
 
   return (
-    <div className="relative border-b border-border overflow-hidden">
+    <div className="relative">
       {/* Contrib graph — right half, full-height bleed (desktop) */}
       <div
         className="hidden md:block absolute inset-y-0 right-0 w-1/2"
@@ -152,7 +154,7 @@ export function OpenSourceSection() {
         <ContribGraph />
       </div>
 
-      <div className="section-container relative z-10 w-full py-24">
+      <SectionContainer className="z-10 py-24!">
         <div className="flex flex-col mx-auto md:mx-0 items-center md:items-start gap-6 w-full max-w-lg">
           <div className="flex flex-col items-center text-center md:items-start md:text-left gap-6 w-full">
             <div>
@@ -203,7 +205,7 @@ export function OpenSourceSection() {
             <ContribGraph />
           </div>
         </div>
-      </div>
+      </SectionContainer>
     </div>
   )
 }

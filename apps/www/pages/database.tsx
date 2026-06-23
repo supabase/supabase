@@ -366,7 +366,7 @@ function Database() {
             <div className="section--bg-masked">
               <div className="section--bg border-t border-b border-control"></div>
             </div>
-            <div className="relative pt-12 pb-0">
+            <div className="section-container pt-12 pb-0">
               <div className="overflow-x-hidden">
                 <SectionContainer className="mb-0 pb-8 lg:pt-32">
                   <GithubExamples />

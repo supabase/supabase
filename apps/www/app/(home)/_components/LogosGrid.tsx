@@ -29,6 +29,7 @@ import {
   TempoLogo,
   V0Logo,
 } from './logos/PublicityLogos'
+import SectionContainer from '@/components/Layouts/SectionContainer'
 
 const gridLogos: { name: string; Logo: (props: ComponentProps<'svg'>) => React.JSX.Element }[] = [
   { name: 'betashares', Logo: BetasharesLogo },
@@ -75,14 +76,14 @@ export function LogosGrid() {
 
   return (
     <div>
-      <div className="section-container py-6">
+      <SectionContainer className="py-6!">
         <p className="text-sm text-foreground-lighter">
           Trusted by fast-growing companies worldwide
         </p>
-      </div>
+      </SectionContainer>
 
       <div className="border-y border-border">
-        <div className="section-container border-x border-border py-10">
+        <SectionContainer className="border-x border-border py-10!">
           <AnimatePresence mode="popLayout" initial={false}>
             <motion.div
               key={page}
@@ -106,7 +107,7 @@ export function LogosGrid() {
               ))}
             </motion.div>
           </AnimatePresence>
-        </div>
+        </SectionContainer>
       </div>
     </div>
   )

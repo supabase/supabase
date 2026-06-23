@@ -4,11 +4,13 @@ import { useSendTelemetryEvent } from '~/lib/telemetry'
 import Link from 'next/link'
 import { Button } from 'ui'
 
+import SectionContainer from '@/components/Layouts/SectionContainer'
+
 export function Hero() {
   const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
-    <div className="section-container pt-12 pb-24 lg:pt-40 md:pb-32">
+    <SectionContainer className="pt-12 pb-24 md:pt-40 md:pb-32">
       <div className="flex flex-col gap-6 lg:gap-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
           <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none">
@@ -49,6 +51,6 @@ export function Hero() {
           </Button>
         </div>
       </div>
-    </div>
+    </SectionContainer>
   )
 }

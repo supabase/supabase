@@ -14,45 +14,41 @@ import { OpenSourceSection } from './OpenSourceSection'
 
 const Products = dynamic(() => import('~/components/Products/index'))
 
-function SectionBlock({ children, className }: { children: React.ReactNode; className?: string }) {
-  return <section className={`border-b border-border ${className ?? ''}`}>{children}</section>
-}
-
 export function HomeContent({ frameworksSlot }: { frameworksSlot: React.ReactNode }) {
   const content = getContent()
 
   return (
-    <div className="[&_.container]:max-w-7xl! [&_.container]:px-6!">
-      <section>
+    <>
+      <header>
         <Hero />
-      </section>
-      <SectionBlock className="border-b-0 relative">
+      </header>
+      <section id="products" className="relative">
         <div className="-translate-y-16">
           <Products {...content.productsSection} />
         </div>
-      </SectionBlock>
-      <section>
+      </section>
+      <section id="social-proof">
         <LogosGrid />
       </section>
-      <section>
+      <section id="dashboard" className="border-b border-border">
         <DashboardFeaturesSection {...content.dashboardFeatures} />
       </section>
-      <section>{frameworksSlot}</section>
-      <section className="border-b border-border">
+      <section id="frameworks">{frameworksSlot}</section>
+      <section id="examples" className="border-b border-border">
         <BuiltWithSupabaseSection />
       </section>
-      <section>
+      <section id="customer-stories">
         <CustomerStoriesSection />
       </section>
-      <section>
+      <section id="community">
         <CommunitySection />
       </section>
-      <section>
+      <section id="open-source" className="border-b border-border overflow-hidden">
         <OpenSourceSection />
       </section>
-      <section>
+      <section id="cta">
         <CTASection />
       </section>
-    </div>
+    </>
   )
 }

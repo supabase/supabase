@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Button, cn } from 'ui'
 
+import SectionContainer from '@/components/Layouts/SectionContainer'
+
 const customerStories = [
   {
     name: 'Firecrawl',
@@ -155,25 +157,23 @@ export function CustomerStoriesSection() {
   return (
     <div className="py-24 flex flex-col gap-16">
       {/* Header row */}
-      <div className="">
-        <div className="section-container">
-          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
-              How industry leaders <br />{' '}
-              <span className="text-foreground">are building with Supabase</span>
-            </h3>
-            <Link
-              href="/customers"
-              className="text-sm text-foreground-light hover:text-foreground underline"
-            >
-              More customer stories
-            </Link>
-          </div>
+      <SectionContainer className="py-0!">
+        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
+            How industry leaders <br />{' '}
+            <span className="text-foreground">are building with Supabase</span>
+          </h3>
+          <Link
+            href="/customers"
+            className="text-sm text-foreground-light hover:text-foreground underline"
+          >
+            More customer stories
+          </Link>
         </div>
-      </div>
+      </SectionContainer>
 
       {/* Cards row */}
-      <div className="section-container w-full">
+      <SectionContainer className="py-0!">
         {/* Mobile: stacked cards */}
         <div className="flex flex-col gap-2 md:hidden">
           {customerStories.map((story, index) => {
@@ -358,11 +358,11 @@ export function CustomerStoriesSection() {
             )
           })}
         </div>
-      </div>
+      </SectionContainer>
 
       {/* AI Builder stories */}
       <div className="mt-10">
-        <div className="section-container">
+        <SectionContainer className="py-0!">
           <div className="grid grid-cols-1 items-end lg:grid-cols-[420px_1fr] gap-8">
             <div className="flex flex-col md:min-h-[320px] gap-4 justify-between">
               <h3 className="text-xl md:text-3xl text-foreground-lighter">
@@ -412,7 +412,7 @@ export function CustomerStoriesSection() {
               ))}
             </div>
           </div>
-        </div>
+        </SectionContainer>
       </div>
     </div>
   )

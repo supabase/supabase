@@ -7,6 +7,8 @@ import Link from 'next/link'
 import React, { useRef, useState } from 'react'
 import { cn } from 'ui'
 
+import SectionContainer from '@/components/Layouts/SectionContainer'
+
 const dashboardStories = [
   {
     logo: '/images/customers/logos/hyper-icon.svg',
@@ -56,11 +58,8 @@ export function DashboardFeaturesSection({
   const story = dashboardStories[activeTabIdx] ?? dashboardStories[0]
 
   return (
-    <div className="border-b border-border">
-      <div
-        ref={sectionRef}
-        className="mx-auto section-container relative pt-10 pb-4 overflow-hidden"
-      >
+    <>
+      <SectionContainer ref={sectionRef} className="pt-10! pb-4! overflow-hidden">
         <div className="pt-12 flex flex-col gap-8">
           <h3 className="text-2xl md:text-4xl text-foreground-lighter">{title}</h3>
           <div className="flex gap-2" role="tablist">
@@ -103,11 +102,11 @@ export function DashboardFeaturesSection({
             </AnimatePresence>
           )}
         </BrowserFrame>
-      </div>
+      </SectionContainer>
 
       {/* Customer story banner */}
       <div className="border-t border-border">
-        <div className="section-container py-4">
+        <SectionContainer className="py-4!">
           <AnimatePresence mode="wait">
             <motion.div
               key={story.slug}
@@ -138,8 +137,8 @@ export function DashboardFeaturesSection({
               </Link>
             </motion.div>
           </AnimatePresence>
-        </div>
+        </SectionContainer>
       </div>
-    </div>
+    </>
   )
 }
