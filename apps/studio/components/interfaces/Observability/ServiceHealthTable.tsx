@@ -5,12 +5,12 @@ import {
   Button,
   Card,
   CardContent,
-  type ChartConfig,
   cn,
   Skeleton,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  type ChartConfig,
 } from 'ui'
 import { ChartEmptyState, ChartLoadingState } from 'ui-patterns/Chart'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
