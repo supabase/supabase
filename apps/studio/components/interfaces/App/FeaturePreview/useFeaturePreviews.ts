@@ -57,7 +57,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           isNew: false,
           isPlatformOnly: true,
           isDefaultOptIn: false,
-          getRoute: (ref?: string) => `/project/${ref}/advisors/rules`,
+          getRoute: (ref?: string) => `/project/${ref}/advisors/rules/security`,
         },
 
         {
