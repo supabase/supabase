@@ -3236,6 +3236,7 @@ export interface UnifiedLogsRowClickedEvent {
      * reaching the table; anything else is rejected upstream so the union here is exhaustive.
      */
     logType:
+      | 'edge'
       | 'postgres'
       | 'postgrest'
       | 'auth'

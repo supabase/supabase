@@ -28,11 +28,9 @@ export const LOG_TYPES_LABELS = {
   pgbouncer: 'PgBouncer',
 }
 
-export const LOG_TYPES = Object.keys(LOG_TYPES_LABELS) as [
-  keyof typeof LOG_TYPES_LABELS,
-  ...(keyof typeof LOG_TYPES_LABELS)[],
-]
-export const DEFAULT_LOG_TYPES = ['postgres', 'postgrest'] as const
+type LogType = keyof typeof LOG_TYPES_LABELS
+export const LOG_TYPES = Object.keys(LOG_TYPES_LABELS) as [LogType, ...LogType[]]
+export const DEFAULT_LOG_TYPES = ['postgres', 'edge'] as const
 
 const parseAsSort = createParser({
   parse(queryValue: string) {
