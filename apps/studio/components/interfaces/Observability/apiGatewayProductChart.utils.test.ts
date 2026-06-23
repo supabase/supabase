@@ -44,10 +44,7 @@ describe('buildApiGatewayProductData', () => {
       },
     })
 
-    expect(result.map((r) => r.timestamp)).toEqual([
-      '2024-01-01T01:00:00Z',
-      '2024-01-01T02:00:00Z',
-    ])
+    expect(result.map((r) => r.timestamp)).toEqual(['2024-01-01T01:00:00Z', '2024-01-01T02:00:00Z'])
     expect(result[0].db).toBe(2)
     expect(result[0].storage).toBe(1)
     expect(result[1].db).toBe(3)
@@ -68,7 +65,12 @@ describe('buildApiGatewayProductData', () => {
     expect(result).toHaveLength(1)
     const bucket = result[0]
     const stackedHeight =
-      bucket.db + bucket.postgrest + bucket.auth + bucket.functions + bucket.storage + bucket.realtime
+      bucket.db +
+      bucket.postgrest +
+      bucket.auth +
+      bucket.functions +
+      bucket.storage +
+      bucket.realtime
     // 10 + 6 + 4 + 4 + 2 + 1
     expect(stackedHeight).toBe(27)
   })
