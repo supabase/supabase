@@ -85,8 +85,10 @@ const isSourceColumn = (node: any, source: string): boolean =>
 
 export async function rewriteBqLogsSqlToClickhouse(input: string): Promise<RewriteResult> {
   const sdk = await loadSdk()
+  const BQ = sdk.Dialect.BigQuery
+  const CH = sdk.Dialect.ClickHouse
 
-  const parsed = sdk.parse(input, 'bigquery')
+  const parsed = sdk.parse(input, BQ)
   if (!parsed.success || !parsed.ast) {
     throw new Error(parsed.error || 'Could not parse the query.')
   }
@@ -97,8 +99,7 @@ export async function rewriteBqLogsSqlToClickhouse(input: string): Promise<Rewri
     const expr = NUMERIC_KEYS.has(key)
       ? `toInt32OrZero(log_attributes['${key}'])`
       : `log_attributes['${key}']`
-    return sdk.parse(`select ${expr} as x from t`, 'clickhouse').ast[0].select.expressions[0].alias
-      .this
+    return sdk.parse(`select ${expr} as x from t`, CH).ast[0].select.expressions[0].alias.this
   }
 
   const rewriteColumns = (node: any, source: string): void => {
@@ -112,14 +113,13 @@ export async function rewriteBqLogsSqlToClickhouse(input: string): Promise<Rewri
   }
 
   const injectSourceFilter = (select: any, source: string): void => {
-    const srcWhere = sdk.parse(`select 1 from t where source = '${source}'`, 'clickhouse').ast[0]
-      .select.where_clause
+    const srcWhere = sdk.parse(`select 1 from t where source = '${source}'`, CH).ast[0].select
+      .where_clause
     if (!select.where_clause) {
       select.where_clause = srcWhere
       return
     }
-    const andWhere = sdk.parse(`select 1 from t where x and y`, 'clickhouse').ast[0].select
-      .where_clause
+    const andWhere = sdk.parse(`select 1 from t where x and y`, CH).ast[0].select.where_clause
     const conj = Object.keys(andWhere.this)[0]
     andWhere.this[conj].left = srcWhere.this
     andWhere.this[conj].right = select.where_clause.this
@@ -141,8 +141,7 @@ export async function rewriteBqLogsSqlToClickhouse(input: string): Promise<Rewri
     select.expressions = select.expressions.map((expr: any) => {
       if (isUnnestColumn(expr)) {
         const leaf = expr.column.name.name
-        const aliased = sdk.parse(`select x as ${leaf} from t`, 'clickhouse').ast[0].select
-          .expressions[0]
+        const aliased = sdk.parse(`select x as ${leaf} from t`, CH).ast[0].select.expressions[0]
         aliased.alias.this = attrExpr(otelKey(expr))
         return aliased
       }
@@ -169,7 +168,7 @@ export async function rewriteBqLogsSqlToClickhouse(input: string): Promise<Rewri
   }
   if (!changed) return { sql: input, changed: false }
 
-  const generated = sdk.generate(parsed.ast, 'clickhouse')
+  const generated = sdk.generate(parsed.ast, CH)
   if (!generated.success || !generated.sql?.[0]) {
     throw new Error(generated.error || 'Could not generate ClickHouse SQL.')
   }

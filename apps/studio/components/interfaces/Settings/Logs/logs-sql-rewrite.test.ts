@@ -22,8 +22,8 @@ limit 100`)
     // unnest joins folded into map access
     expect(out.toLowerCase()).not.toContain('unnest')
     expect(out.toLowerCase()).not.toContain('arrayjoin')
-    // column refs rewritten, alias preserved
-    expect(out).toContain("log_attributes['request.method'] AS method")
+    // column refs rewritten, alias preserved (polyglot emits lowercase `as`)
+    expect(out).toContain("log_attributes['request.method'] as method")
     expect(out).toContain("log_attributes['response.status_code']")
     // numeric field cast for the comparison
     expect(out).toContain("toInt32OrZero(log_attributes['response.status_code']) >= 500")
