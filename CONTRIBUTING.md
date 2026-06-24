@@ -10,6 +10,20 @@ Thank you for contributing to Supabase! We’re a big, exciting open source proj
 
 To ensure a positive and inclusive environment, please read our [code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md) before contributing. For help setting up the code in this repo, please follow our [DEVELOPERS.md](https://github.com/supabase/supabase/blob/master/DEVELOPERS.md) file. For the [docs](https://supabase.com/docs) site, follow this [CONTRIBUTING.md](https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md) guide.
 
+Optional: if you use [Ota](https://ota.run), this repository includes an `ota.yaml` contract that can help verify readiness (`ota doctor`) and run workflow setup paths (`ota up`) as a complement to the setup flow in `DEVELOPERS.md`.
+
+Useful Ota commands (optional):
+
+-   Native readiness:
+    -   `ota tasks --workflow instant .`
+    -   `ota validate .`
+    -   `ota doctor --workflow instant --native .`
+    -   `ota up --workflow instant --native --dry-run .`
+-   Container readiness:
+    -   `ota tasks --workflow instant:container .`
+    -   `ota doctor --workflow instant:container --container .`
+    -   `ota up --workflow instant:container --container --dry-run .`
+
 ## Issues
 
 If you find a bug, please create an Issue and we’ll triage it.
