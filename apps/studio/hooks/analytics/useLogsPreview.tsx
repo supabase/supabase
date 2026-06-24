@@ -138,7 +138,6 @@ function useLogsPreview({
         signal,
       })
       const logs = data as unknown as Logs
-      // Normalize OTEL timestamps to the microsecond number the renderers expect.
       if (useOtel && logs?.result) {
         return { ...logs, result: logs.result.map(mapOtelPreviewRow) } as Logs
       }

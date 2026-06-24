@@ -84,8 +84,8 @@ const defaultResolveUnknownClause = (dotKey: string, value: unknown): SafeLogSql
  * Builds the AND-joined WHERE clauses for a table's filters. Top-level keys are
  * ANDed, nested keys under one key are ORed.
  *
- * `filterTemplates` and `resolveUnknownClause` are injectable so the OTEL builders
- * reuse this grouping with their own ClickHouse conditions. Defaults keep the
+ * `filterTemplates` and `resolveUnknownClause` can be passed in so the OTEL
+ * builders reuse this with their own ClickHouse conditions. Defaults keep the
  * BigQuery behavior.
  */
 export const buildWhereClauses = (

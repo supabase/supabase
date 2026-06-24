@@ -34,10 +34,8 @@ const AUTH_INFO: SafeLogSqlFragment = safeSql`NOT (${AUTH_ERROR}) AND NOT (${AUT
 // Tables with no severity: every row counts as ok.
 const NO_MATCH: SafeLogSqlFragment = safeSql`0`
 
-// pg_cron logs are postgres_logs rows from the pg_cron extension.
 const PG_CRON_CONDITION: SafeLogSqlFragment = safeSql`(${attr('parsed.application_name')} = 'pg_cron' OR event_message ILIKE '%cron job%')`
 
-// Free-text search over event_message, used by every table.
 const COMMON_FILTERS: Record<string, SqlFilterEntry> = {
   search_query: (value: string) => safeSql`event_message ILIKE ${lit('%' + value + '%')}`,
 }
@@ -231,7 +229,6 @@ const resolveUnknownOtelClause = (dotKey: string, value: unknown): SafeLogSqlFra
   }
 }
 
-// WHERE = source filter (+ any base condition) AND the user's filters.
 const genOtelWhere = (table: LogsTableName, filters: Filters): SafeLogSqlFragment => {
   const desc = OTEL_SOURCES[table]
   const conditions: SafeLogSqlFragment[] = [safeSql`source = ${lit(desc.source)}`]
@@ -308,7 +305,7 @@ GROUP BY timestamp
 ORDER BY timestamp ASC`
 }
 
-// Fetch one log by id. Reject non-uuid input before putting it in the query.
+// Reject non-uuid ids before putting them in the query (injection guard).
 export const genSingleLogQueryOtel = (id: string): SafeLogSqlFragment => {
   if (!/^[0-9a-fA-F-]{1,64}$/.test(id)) {
     throw new Error('Invalid logId')
@@ -345,8 +342,8 @@ const SINGLE_LOG_METADATA: Partial<Record<QueryType, (attrs: Record<string, any>
     response: [
       {
         status_code: attrs['response.status_code'] ?? null,
-        // OTEL exposes the gateway error code as `sb_error_code`; BigQuery used
-        // `x_sb_error_code`. Coalesce so the panel resolves it either way.
+        // OTEL uses `sb_error_code`; BigQuery used `x_sb_error_code`. Fall back
+        // to the old key so the panel works during the migration.
         headers: [
           {
             x_sb_error_code:

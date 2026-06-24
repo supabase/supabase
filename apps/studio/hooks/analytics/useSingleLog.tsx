@@ -101,7 +101,6 @@ function useSingleLog({
 
   let error: null | string | object = rcError ? (rcError as any).message : null
   const rawResult = data?.result ? data.result[0] : undefined
-  // Map the OTEL row to the legacy LogData shape the panel reads.
   const result =
     rawResult && useOtel
       ? mapOtelSingleLogToLegacy(rawResult as unknown as OtelLogRow, queryType)
