@@ -56,7 +56,7 @@ For AI apps, a common split is to keep small, frequently queried fields (status,
 If the data belongs in Postgres, model it to limit bloat:
 
 - **Prefer `jsonb` over `json`** for structured payloads (see [Managing JSON data](/docs/guides/database/json)).
-- **Don't store the same payload twice.** Duplicate columns (e.g. a truncated and a full copy of the same response) double TOAST size.
+- **Don't store the same payload twice.** Don't duplicate columns to double TOAST size. Duplicated columns are truncated and full copies of the same response.
 - **Split cold, large columns into a side table** keyed by the primary key. Keeping the hot, frequently-updated row narrow reduces churn and keeps the main table fast:
 
   ```sql
