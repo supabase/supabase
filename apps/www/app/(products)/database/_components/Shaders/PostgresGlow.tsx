@@ -87,7 +87,7 @@ const frag = /* glsl */ `
 
     vec3  col   = GREEN * dithered;
     float alpha = dithered * uHover;
-
+  
     gl_FragColor = vec4(col * alpha, alpha);
   }
 `

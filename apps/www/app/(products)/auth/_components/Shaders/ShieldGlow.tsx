@@ -82,7 +82,7 @@ const frag = /* glsl */ `
     float dithered  = smoothstep(dither - 0.04, dither + 0.04, value);
 
     vec3  col   = GREEN * dithered;
-    float alpha = dithered;
+    float alpha = dithered * uHover;
 
     gl_FragColor = vec4(col * alpha, alpha);
   }
