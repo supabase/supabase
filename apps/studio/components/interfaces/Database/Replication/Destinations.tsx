@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
@@ -43,6 +43,7 @@ import { replicationKeys } from '@/data/replication/keys'
 import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -98,7 +99,17 @@ export const Destinations = () => {
     isError: isDatabasesError,
     isSuccess: isDatabasesSuccess,
   } = useReadReplicasQuery({ projectRef }, { refetchInterval: statusRefetchInterval })
-  const readReplicas = databases.filter((x) => x.identifier !== projectRef)
+  // Memoise so the array reference is stable across renders. Without this
+  // the polling useEffect below has an unstable dep, runs every render, and
+  // its `setStatusRefetchInterval(false)` churn keeps the parent re-rendering
+  // — which trips a latent ref-instability bug in @radix-ui/react-slot
+  // (`composeRefs` is called per render instead of `useComposedRefs`) and
+  // tanks the page with "Maximum update depth exceeded" via the Tooltip
+  // trigger refs.
+  const readReplicas = useMemo(
+    () => databases.filter((x) => x.identifier !== projectRef),
+    [databases, projectRef]
+  )
   const hasReplicas = isDatabasesSuccess && readReplicas.length > 0
   const filteredReplicas =
     filterString.length === 0
@@ -144,7 +155,9 @@ export const Destinations = () => {
     pipelines.length === 0
 
   const isLoading = isDestinationsLoading || isDatabasesLoading
-  const hasErrorsFetchingData = isDestinationsError || isDatabasesError
+
+  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
+  const hasErrorsFetchingData = (!isLocalETLNotSetUp && isDestinationsError) || isDatabasesError
 
   const openDestinationPanel = () => {
     if (!newDestinationDefaultType) return
@@ -267,6 +280,13 @@ export const Destinations = () => {
           <AlertError
             error={destinationsError || databasesError}
             subject="Failed to retrieve destinations"
+          />
+        )}
+
+        {isLocalETLNotSetUp && (
+          <Admonition
+            type="default"
+            title="ETL API not set up locally — destinations cannot be managed"
           />
         )}
 

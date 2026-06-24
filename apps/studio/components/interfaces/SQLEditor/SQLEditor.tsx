@@ -96,7 +96,10 @@ import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from '@/stat
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 // Load the monaco editor client-side only (does not behave well server-side)
-const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
+const MonacoEditor = dynamic(
+  () => import('./MonacoEditor').then(({ MonacoEditor }) => MonacoEditor),
+  { ssr: false }
+)
 const DiffEditor = dynamic(
   () => import('../../ui/DiffEditor').then(({ DiffEditor }) => DiffEditor),
   { ssr: false }
@@ -120,6 +123,9 @@ export const SQLEditor = () => {
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const { aiOptInLevel } = useOrgAiOptInLevel()
   const showPrettyExplain = useFlag('ShowPrettyExplain')
+
+  // [Ali] Kill switch to hide the SQL Editor Explain tab and its entry points
+  const disablePrettyExplain = useFlag('DisablePrettyExplainOnSqlEditor')
 
   const {
     sourceSqlDiff,
@@ -223,7 +229,7 @@ export const SQLEditor = () => {
       if (id) {
         snapV2.addResult(id, data.result, vars.autoLimit)
 
-        if (showPrettyExplain && isExplainQuery(data.result)) {
+        if (!disablePrettyExplain && showPrettyExplain && isExplainQuery(data.result)) {
           snapV2.addExplainResult(id, data.result)
           setActiveUtilityTab('explain')
         } else if (activeUtilityTab === 'explain') {
@@ -535,6 +541,7 @@ export const SQLEditor = () => {
   ])
 
   useShortcut(SHORTCUT_IDS.SQL_EDITOR_EXPLAIN, executeExplainQuery, {
+    enabled: !disablePrettyExplain,
     registerInCommandMenu: true,
   })
 
@@ -958,6 +965,7 @@ export const SQLEditor = () => {
                       monacoRef={monacoRef}
                       executeQuery={executeQuery}
                       executeExplainQuery={executeExplainQuery}
+                      showExplainAction={!disablePrettyExplain}
                       prettifyQuery={prettifyQuery}
                       onHasSelection={setHasSelection}
                       onMount={onMount}
@@ -1022,6 +1030,7 @@ export const SQLEditor = () => {
                 prettifyQuery={prettifyQuery}
                 executeQuery={executeQueryFromButton}
                 executeExplainQuery={executeExplainQuery}
+                showExplainTab={!disablePrettyExplain}
                 onDebug={onDebug}
                 buildDebugPrompt={buildDebugPrompt}
                 activeTab={activeUtilityTab}
