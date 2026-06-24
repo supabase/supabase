@@ -9,7 +9,7 @@ Applications that store large values in a single column — LLM prompts and resp
 
 ## How Postgres stores large values (TOAST)
 
-When a row is wider than ~2 KB, Postgres automatically moves large column values out of the main table into a companion **TOAST** table, compressing them first. This is transparent — your queries don't change — but it means a table's size is often dominated by its hidden TOAST relation, not by the columns you see.
+When a row is wider than ~2 KB, Postgres automatically moves large column values out of the main table into a companion The Oversized-Attribute Storage Technique (**TOAST**) table, compressing them first. This is transparent — your queries don't change — but it means a table's size is often dominated by its hidden TOAST relation, not by the columns you see.
 
 Each large value is compressed, then split into ~2 KB chunks stored as rows in the TOAST table. See the Postgres docs on [TOAST](https://www.postgresql.org/docs/current/storage-toast.html) for details.
 
