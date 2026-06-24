@@ -11,7 +11,7 @@ import { useMemo, useState } from 'react'
 import type PostTypes from 'types/post'
 import { Button, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 
-import SectionContainer from '@/components/Layouts/SectionContainer'
+import SectionContainerWithCn from '@/components/Layouts/SectionContainerWithCn'
 
 export type BlogView = 'list' | 'grid'
 
@@ -56,8 +56,8 @@ export default function AuthorClient({ author, authorId, blogs }: AuthorClientPr
 
   return (
     <DefaultLayout>
-      <SectionContainer className="py-8! xl:py-10!">
-        <div className="text-foreground-lighter flex space-x-1 mb-8">
+      <SectionContainerWithCn height="narrow" className="space-y-6">
+        <div className="text-foreground-lighter flex space-x-1">
           <h1 className="cursor-pointer">
             <Link href="/blog">Blog</Link>
             <span className="px-2">/</span>
@@ -98,10 +98,10 @@ export default function AuthorClient({ author, authorId, blogs }: AuthorClientPr
             </div>
           </div>
         )}
-      </SectionContainer>
+      </SectionContainerWithCn>
 
       <div className="border-default border-t">
-        <SectionContainer className="py-8! xl:py-10!">
+        <SectionContainerWithCn height="narrow">
           <div className="flex flex-row items-center justify-between gap-2 mb-6">
             <div className="flex-1 max-w-[280px]">
               <InputGroup className="w-full">
@@ -164,7 +164,7 @@ export default function AuthorClient({ author, authorId, blogs }: AuthorClientPr
                 : 'No posts found by this author.'}
             </p>
           )}
-        </SectionContainer>
+        </SectionContainerWithCn>
       </div>
     </DefaultLayout>
   )

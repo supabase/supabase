@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown'
 import type { PostReturnType, ProcessedBlogData, StaticAuthor, Tag } from 'types/post'
 import { Badge } from 'ui'
 
-import SectionContainer from '../Layouts/SectionContainer'
+import SectionContainerWithCn from '../Layouts/SectionContainerWithCn'
 import DraftModeBanner from '@/components/Blog/DraftModeBanner'
 import ShareArticleActions from '@/components/Blog/ShareArticleActions'
 import CTABanner from '@/components/CTABanner'
@@ -104,7 +104,7 @@ const BlogPostRenderer = async ({
     <>
       {isDraftMode && <DraftModeBanner />}
       <DefaultLayout className="overflow-x-hidden">
-        <SectionContainer className="py-4! md:py-8! xl:py-10!">
+        <SectionContainerWithCn height="narrow">
           <div className="grid grid-cols-12 gap-4">
             <div className="hidden col-span-12 xl:block lg:col-span-2">
               {/* Back button */}
@@ -273,7 +273,7 @@ const BlogPostRenderer = async ({
               </div>
             </div>
           </div>
-        </SectionContainer>
+        </SectionContainerWithCn>
 
         <CTABanner />
       </DefaultLayout>
