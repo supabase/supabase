@@ -3,9 +3,9 @@
   animation: shimmer 2s infinite linear;
   background: linear-gradient(
     to right,
-    hsl(var(--border-default)) 4%,
-    hsl(var(--background-surface-200)) 25%,
-    hsl(var(--border-default)) 36%
+    var(--border-default) 4%,
+    var(--background-surface-200) 25%,
+    var(--border-default) 36%
   );
   background-size: 1000px 100%;
 }
@@ -14,9 +14,9 @@
   animation: shimmer 2s infinite linear;
   background: linear-gradient(
     to right,
-    hsl(var(--border-default)) 4%,
-    hsl(var(--border-control)) 25%,
-    hsl(var(--border-default)) 36%
+    var(--border-default) 4%,
+    var(--border-control) 25%,
+    var(--border-default) 36%
   );
   background-size: 1000px 100%;
 }

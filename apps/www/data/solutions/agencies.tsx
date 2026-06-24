@@ -270,7 +270,7 @@ const data: {
                 absolute pointer-events-none
                 w-full h-full
                 inset-0 top-auto
-                bg-[linear-gradient(to_bottom,transparent_0%,hsl(var(--background-default))_100%)]
+                bg-[linear-gradient(to_bottom,transparent_0%,var(--background-default)_100%)]
               "
             />
           </div>
@@ -335,7 +335,7 @@ const data: {
         ),
         className: 'border-l-0! sm:border-l!',
         image: (
-          <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]" />
+          <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]" />
         ),
       },
       {
@@ -466,7 +466,7 @@ const data: {
               >
                 <path
                   d="M11.8949 2.39344C12.5051 1.78324 13.4944 1.78324 14.1046 2.39344L22.9106 11.1994C23.5208 11.8096 23.5208 12.7989 22.9106 13.4091L14.1046 22.2151C13.4944 22.8253 12.5051 22.8253 11.8949 22.2151L3.08892 13.4091C2.47872 12.7989 2.47872 11.8096 3.08892 11.1994L11.8949 2.39344Z M16.5408 12.3043C16.5408 14.2597 14.9556 15.8449 13.0002 15.8449C11.0448 15.8449 9.45961 14.2597 9.45961 12.3043C9.45961 10.3489 11.0448 8.76371 13.0002 8.76371C14.9556 8.76371 16.5408 10.3489 16.5408 12.3043Z"
-                  stroke="hsl(var(--brand-default))"
+                  stroke="var(--brand-default)"
                   strokeMiterlimit="10"
                   strokeLinejoin="bevel"
                   strokeLinecap="square"
@@ -592,7 +592,7 @@ const data: {
                 absolute pointer-events-none
                 w-full h-full
                 inset-0 top-auto
-                bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]
+                bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]
               "
             />
             <Image
@@ -623,7 +623,7 @@ const data: {
           <RealtimeLogs
             isActive={false}
             isInView={true}
-            className="h-3/5 bottom-0 top-auto [&_.visual-overlay]:bg-[linear-gradient(to_top,hsl(var(--background-default))_0%,transparent_100%)]!"
+            className="h-3/5 bottom-0 top-auto [&_.visual-overlay]:bg-[linear-gradient(to_top,var(--background-default)_0%,transparent_100%)]!"
           />
         ),
       },

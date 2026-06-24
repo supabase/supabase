@@ -1,0 +1,234 @@
+/*
+ * Core semantic color system.
+ *
+ * Themes only override the small set of inputs below. Every application color
+ * is then derived in OKLCH so hue, chroma, surface depth, and contrast can be
+ * tuned without maintaining separate hand-authored palettes.
+ */
+
+:root {
+  --hue: 160;
+  --chroma: 0.018;
+  --surface: 0.985;
+  --foreground-lightness: 0.16;
+  --contrast: 1;
+  --muted-foreground-opacity: 68%;
+  --tertiary-foreground-opacity: 48%;
+
+  /*
+   * Contrast is a multiplier with 1 as the baseline. It is deliberately
+   * clamped so a future user preference cannot collapse or invert the theme.
+   */
+  --contrast-scale: clamp(0.75, var(--contrast), 1.25);
+  --surface-compression: clamp(0.75, calc(2 - var(--contrast-scale)), 1.25);
+  --surface-lightness: clamp(0, calc(0.5 + (var(--surface) - 0.5) * var(--contrast-scale)), 1);
+  --foreground-contrast-lightness: clamp(
+    0,
+    calc(0.5 + (var(--foreground-lightness) - 0.5) * var(--contrast-scale)),
+    1
+  );
+
+  /*
+   * Alpha fades text toward the surface beneath it. Lower emphasis therefore
+   * becomes lighter in a light theme and darker in a dark theme without a
+   * directional lightness calculation. Themes own the starting opacities so
+   * their hierarchy can still be tuned independently.
+   */
+  --tertiary-foreground-alpha: clamp(
+    36%,
+    calc(var(--tertiary-foreground-opacity) * var(--contrast-scale)),
+    70%
+  );
+  --muted-foreground-alpha: clamp(
+    52%,
+    calc(var(--muted-foreground-opacity) * var(--contrast-scale)),
+    92%
+  );
+  --border-muted-alpha: clamp(6%, calc(8% * var(--contrast-scale)), 14%);
+  --border-overlay-alpha: clamp(7%, calc(10% * var(--contrast-scale)), 18%);
+  --border-alpha: clamp(8%, calc(12% * var(--contrast-scale)), 22%);
+  --input-alpha: clamp(10%, calc(16% * var(--contrast-scale)), 28%);
+  --border-stronger-alpha: clamp(16%, calc(24% * var(--contrast-scale)), 38%);
+  --ring-alpha: clamp(40%, calc(55% * var(--contrast-scale)), 80%);
+
+  --warning-hue: calc(var(--hue) - 75);
+  --destructive-hue: calc(var(--hue) - 135);
+
+  /* shadcn semantic pairs */
+  --background: oklch(var(--surface-lightness) calc(var(--chroma) * 0.35) var(--hue));
+  --foreground: oklch(var(--foreground-contrast-lightness) calc(var(--chroma) * 0.55) var(--hue));
+
+  --card: color-mix(
+    in oklch,
+    var(--background),
+    var(--foreground) calc(3% * var(--surface-compression))
+  );
+  --card-foreground: var(--foreground);
+  --popover: color-mix(
+    in oklch,
+    var(--background),
+    var(--foreground) calc(4.5% * var(--surface-compression))
+  );
+  --popover-foreground: var(--foreground);
+
+  --primary: oklch(0.72 calc(var(--chroma) * 9) var(--hue));
+  --primary-foreground: oklch(
+    min(var(--surface-lightness), var(--foreground-contrast-lightness)) calc(var(--chroma) * 0.45)
+      var(--hue)
+  );
+
+  --secondary: color-mix(
+    in oklch,
+    var(--background),
+    var(--foreground) calc(6% * var(--surface-compression))
+  );
+  --secondary-foreground: var(--foreground);
+  --tertiary: color-mix(
+    in oklch,
+    var(--background),
+    var(--foreground) calc(9% * var(--surface-compression))
+  );
+  --tertiary-foreground: oklch(from var(--foreground) l c h / var(--tertiary-foreground-alpha));
+  --muted: color-mix(
+    in oklch,
+    var(--background),
+    var(--foreground) calc(4.5% * var(--surface-compression))
+  );
+  --muted-foreground: oklch(from var(--foreground) l c h / var(--muted-foreground-alpha));
+  --accent: color-mix(
+    in oklch,
+    var(--background),
+    var(--foreground) calc(9% * var(--surface-compression))
+  );
+  --accent-foreground: var(--foreground);
+
+  --warning: oklch(0.78 calc(var(--chroma) * 8) var(--warning-hue));
+  --warning-foreground: oklch(
+    calc(min(var(--surface-lightness), var(--foreground-contrast-lightness)) + 0.06)
+      calc(var(--chroma) * 2) var(--warning-hue)
+  );
+  --destructive: oklch(0.62 calc(var(--chroma) * 10) var(--destructive-hue));
+  --destructive-foreground: oklch(
+    max(var(--surface-lightness), var(--foreground-contrast-lightness)) calc(var(--chroma) * 0.5)
+      var(--destructive-hue)
+  );
+
+  --border: oklch(from var(--foreground) l calc(c * 0.5) h / var(--border-alpha));
+  --input: oklch(from var(--foreground) l calc(c * 0.5) h / var(--input-alpha));
+  --ring: oklch(from var(--primary) l c h / var(--ring-alpha));
+
+  /* Legacy foreground aliases */
+  --foreground-default: var(--foreground);
+  --foreground-light: var(--muted-foreground);
+  --foreground-lighter: var(--tertiary-foreground);
+  --foreground-muted: oklch(from var(--tertiary-foreground) l c h / calc(alpha * 0.6));
+  --foreground-contrast: var(--primary-foreground);
+
+  /* Legacy background aliases */
+  --background-default: var(--background);
+  --background-200: var(--card);
+  --background-alternative-default: var(--background);
+  --background-alternative-200: var(--card);
+  --background-selection: var(--accent);
+  --background-control: var(--muted);
+  --background-surface-75: var(--background);
+  --background-surface-100: var(--card);
+  --background-surface-200: var(--muted);
+  --background-surface-300: var(--secondary);
+  --background-surface-400: var(--tertiary);
+  --background-overlay-default: var(--secondary);
+  --background-overlay-hover: var(--accent);
+  --background-muted: var(--muted);
+  --background-button-default: var(--secondary);
+  --background-dialog-default: var(--popover);
+  --background-dash-sidebar: var(--card);
+  --background-dash-canvas: var(--background);
+
+  /* Legacy border aliases */
+  --border-default: var(--border);
+  --border-muted: oklch(from var(--foreground) l calc(c * 0.5) h / var(--border-muted-alpha));
+  --border-secondary: var(--border-muted);
+  --border-overlay: oklch(from var(--foreground) l calc(c * 0.5) h / var(--border-overlay-alpha));
+  --border-control: var(--input);
+  --border-alternative: var(--border);
+  --border-strong: var(--input);
+  --border-stronger: oklch(from var(--foreground) l calc(c * 0.5) h / var(--border-stronger-alpha));
+  --border-button-default: var(--border);
+  --border-button-hover: var(--border-stronger);
+
+  /* Legacy brand aliases */
+  --brand-link: var(--primary);
+  --brand-default: var(--primary);
+  --brand-600: color-mix(in oklch, var(--primary), var(--foreground) 18%);
+  --brand-500: color-mix(
+    in oklch,
+    var(--background),
+    var(--primary) calc(35% * var(--surface-compression))
+  );
+  --brand-400: color-mix(
+    in oklch,
+    var(--background),
+    var(--primary) calc(20% * var(--surface-compression))
+  );
+  --brand-300: color-mix(
+    in oklch,
+    var(--background),
+    var(--primary) calc(12% * var(--surface-compression))
+  );
+  --brand-200: color-mix(
+    in oklch,
+    var(--background),
+    var(--primary) calc(6% * var(--surface-compression))
+  );
+
+  /* Legacy status aliases */
+  --warning-default: var(--warning);
+  --warning-600: var(--warning);
+  --warning-500: color-mix(
+    in oklch,
+    var(--background),
+    var(--warning) calc(35% * var(--surface-compression))
+  );
+  --warning-400: color-mix(
+    in oklch,
+    var(--background),
+    var(--warning) calc(20% * var(--surface-compression))
+  );
+  --warning-300: color-mix(
+    in oklch,
+    var(--background),
+    var(--warning) calc(12% * var(--surface-compression))
+  );
+  --warning-200: color-mix(
+    in oklch,
+    var(--background),
+    var(--warning) calc(6% * var(--surface-compression))
+  );
+  --destructive-default: var(--destructive);
+  --destructive-600: color-mix(in oklch, var(--destructive), var(--foreground) 12%);
+  --destructive-500: color-mix(
+    in oklch,
+    var(--background),
+    var(--destructive) calc(35% * var(--surface-compression))
+  );
+  --destructive-400: color-mix(
+    in oklch,
+    var(--background),
+    var(--destructive) calc(20% * var(--surface-compression))
+  );
+  --destructive-300: color-mix(
+    in oklch,
+    var(--background),
+    var(--destructive) calc(12% * var(--surface-compression))
+  );
+  --destructive-200: color-mix(
+    in oklch,
+    var(--background),
+    var(--destructive) calc(6% * var(--surface-compression))
+  );
+
+  /* Pre-shadcn secondary namespace */
+  --secondary-default: var(--secondary);
+  --secondary-400: var(--tertiary);
+  --secondary-200: var(--muted);
+}

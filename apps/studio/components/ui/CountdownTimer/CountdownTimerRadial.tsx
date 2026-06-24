@@ -8,11 +8,11 @@ interface CountdownTimerRadialProps {
 const chartConfig = {
   timeRemaining: {
     label: 'timeRemaining',
-    color: 'hsl(var(--warning-default))',
+    color: 'var(--warning-default)',
   },
   hand: {
     label: 'hand',
-    color: 'hsl(var(--warning-default))',
+    color: 'var(--warning-default)',
   },
 } satisfies ChartConfig
 

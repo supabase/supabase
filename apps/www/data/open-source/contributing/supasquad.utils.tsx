@@ -216,8 +216,8 @@ export const getEditors: (isXs: boolean) => FrameworkLinkProps[] = (isXs) => [
             y2="-11.8172"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor="hsl(var(--foreground-default))" stopOpacity="0.5" />
-            <stop offset="1" stopColor="hsl(var(--foreground-default))" />
+            <stop stopColor="var(--foreground-default)" stopOpacity="0.5" />
+            <stop offset="1" stopColor="var(--foreground-default)" />
           </linearGradient>
           <image
             id="image0_2981_701"

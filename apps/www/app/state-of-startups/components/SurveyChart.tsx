@@ -120,7 +120,7 @@ export function SurveyChart({
   const resolvedFunctionName = rpcNameForYear(functionName, year)
   const { get, fetchAndCache } = useSurveyDataCache()
   const accent = useAccent()
-  const accentBg = 'hsl(var(--brand-300))'
+  const accentBg = 'var(--brand-300)'
   const accentBarFg = 'bg-brand'
   const accentBarText = 'text-brand-link dark:text-brand'
 
@@ -230,7 +230,7 @@ export function SurveyChart({
     <div
       className="w-full bg-200 border-t border-muted"
       style={{
-        background: `radial-gradient(circle at center -150%, ${accentBg}, transparent 80%), radial-gradient(ellipse at center 230%, hsl(var(--background-surface-200)), transparent 75%)`,
+        background: `radial-gradient(circle at center -150%, ${accentBg}, transparent 80%), radial-gradient(ellipse at center 230%, var(--background-surface-200), transparent 75%)`,
       }}
     >
       <header className="px-8 py-8">

@@ -96,20 +96,20 @@ const DeveloperGrowthChart = () => {
         <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="developerGrowthFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="hsl(var(--brand-600))" stopOpacity={0.3} />
-              <stop offset="100%" stopColor="hsl(var(--brand-600))" stopOpacity={0.02} />
+              <stop offset="0%" stopColor="var(--brand-600)" stopOpacity={0.3} />
+              <stop offset="100%" stopColor="var(--brand-600)" stopOpacity={0.02} />
             </linearGradient>
           </defs>
           <XAxis
             dataKey="month"
-            tick={{ fontSize: 12, fill: 'hsl(var(--foreground-lighter))' }}
+            tick={{ fontSize: 12, fill: 'var(--foreground-lighter)' }}
             tickLine={false}
-            axisLine={{ stroke: 'hsl(var(--border-default))' }}
+            axisLine={{ stroke: 'var(--border-default)' }}
             tickFormatter={(value) => value.substring(0, 4)}
             ticks={data.filter((d, i) => isYearBoundary(d.month, i)).map((d) => d.month)}
           />
           <YAxis
-            tick={{ fontSize: 12, fill: 'hsl(var(--foreground-lighter))' }}
+            tick={{ fontSize: 12, fill: 'var(--foreground-lighter)' }}
             tickLine={false}
             axisLine={false}
             tickFormatter={formatYAxis}
@@ -118,7 +118,7 @@ const DeveloperGrowthChart = () => {
           <Area
             type="monotone"
             dataKey="cumulativeDevelopers"
-            stroke="hsl(var(--brand-600))"
+            stroke="var(--brand-600)"
             strokeWidth={2}
             fill="url(#developerGrowthFill)"
           />

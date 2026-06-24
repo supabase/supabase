@@ -113,7 +113,7 @@ export const SqlSnippet = ({
                 cursor={false}
                 content={<ChartTooltipContent className="w-[150px]" />}
               />
-              <Bar dataKey="value" fill="hsl(var(--brand-default))" />
+              <Bar dataKey="value" fill="var(--brand-default)" />
             </BarChart>
           </ChartContainer>
         </div>

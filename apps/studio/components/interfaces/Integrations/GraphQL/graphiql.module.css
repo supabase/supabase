@@ -90,7 +90,7 @@
   /* HSL form of #1f1f1f, matches the editor.background returned by getTheme('dark') */
   --color-base: 0, 0%, 12%;
   --color-primary: 153, 50%, 50%;
-  --graphiql-response-bg: hsl(var(--background-surface-300));
+  --graphiql-response-bg: var(--background-surface-300);
 }
 
 :global(body.graphiql-light) .root {
@@ -100,5 +100,5 @@
   --color-primary: 153, 50%, 50%;
   /* Drop the response below the editor in light mode (inverse of dark) so it reads as
    * the lower / "data" surface rather than the lifted one. */
-  --graphiql-response-bg: hsl(var(--background-surface-300));
+  --graphiql-response-bg: var(--background-surface-300);
 }

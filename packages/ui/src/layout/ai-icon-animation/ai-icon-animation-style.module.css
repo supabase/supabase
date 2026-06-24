@@ -450,7 +450,7 @@
 .ai-icon__grid__square {
   position: absolute;
   transition: all 0.2s;
-  border: 1px solid hsl(var(--brand-default));
+  border: 1px solid var(--brand-default);
 }
 
 .ai-icon__grid__square--static:nth-child(1) {

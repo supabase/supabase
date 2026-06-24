@@ -222,7 +222,7 @@ const FeaturedCover = ({ integration, categoryLabel }: FeaturedCoverProps) => (
       className="absolute inset-0 opacity-60"
       style={{
         backgroundImage:
-          'radial-gradient(circle at 1px 1px, hsl(var(--border-default)/0.6) 1px, transparent 0)',
+          'radial-gradient(circle at 1px 1px, oklch(from var(--border-default) l c h / 0.6) 1px, transparent 0)',
         backgroundSize: '14px 14px',
       }}
     />

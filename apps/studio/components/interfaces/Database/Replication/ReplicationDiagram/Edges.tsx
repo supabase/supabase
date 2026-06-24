@@ -46,7 +46,7 @@ const getEdgeVisual = ({ isComingUp, isReplicating, isFailed }: ReplicationState
   if (isFailed) {
     return {
       Icon: X,
-      color: 'hsl(var(--destructive-default))',
+      color: 'var(--destructive-default)',
       opacity: 1,
       dashArray: '5 5',
       shouldAnimate: false,
@@ -56,7 +56,7 @@ const getEdgeVisual = ({ isComingUp, isReplicating, isFailed }: ReplicationState
   if (isComingUp) {
     return {
       Icon: Loader2,
-      color: 'hsl(var(--foreground-light))',
+      color: 'var(--foreground-light)',
       opacity: 1,
       dashArray: '5',
       shouldAnimate: true,
@@ -66,7 +66,7 @@ const getEdgeVisual = ({ isComingUp, isReplicating, isFailed }: ReplicationState
   if (isReplicating) {
     return {
       Icon: ArrowRight,
-      color: 'hsl(var(--brand-default))',
+      color: 'var(--brand-default)',
       opacity: 1,
       dashArray: '5',
       shouldAnimate: true,
@@ -74,7 +74,7 @@ const getEdgeVisual = ({ isComingUp, isReplicating, isFailed }: ReplicationState
   }
   return {
     Icon: Square,
-    color: 'hsl(var(--foreground-lighter))',
+    color: 'var(--foreground-lighter)',
     opacity: 0.5,
     dashArray: '5 5',
     shouldAnimate: false,

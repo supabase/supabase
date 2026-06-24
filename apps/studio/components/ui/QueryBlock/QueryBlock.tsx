@@ -348,12 +348,12 @@ export const QueryBlock = ({
                       )
                     }
                   />
-                  <Bar radius={1} dataKey={yKey} fill="hsl(var(--chart-1))">
+                  <Bar radius={1} dataKey={yKey} fill="var(--chart-1)">
                     {chartData?.map((_: any, index: number) => (
                       <Cell
                         key={`cell-${index}`}
                         className="transition-all duration-100"
-                        fill="hsl(var(--chart-1))"
+                        fill="var(--chart-1)"
                         opacity={focusDataIndex === undefined || focusDataIndex === index ? 1 : 0.4}
                         enableBackground={12}
                       />

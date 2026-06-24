@@ -6,7 +6,7 @@
  * and gray in dark (scale-1100 dark is the hard-coded #bbbbbb override that
  * predates the migration).
  *
- * Brand steps 200..600 stay as hsl(var(--brand-{step})) because those tokens
+ * Brand steps 200..600 stay as var(--brand-{step}) because those tokens
  * are semantic — light/dark values live in the theme files (light.css /
  * dark.css), not here.
  *
@@ -208,11 +208,11 @@
   --color-scale-1100: hsl(206, 6%, 43.5%);
   --color-scale-1200: hsl(206, 24%, 9%);
   --color-brand-100: hsla(153, 80%, 99%, 1);
-  --color-brand-200: hsl(var(--brand-200));
-  --color-brand-300: hsl(var(--brand-300));
-  --color-brand-400: hsl(var(--brand-400));
-  --color-brand-500: hsl(var(--brand-500));
-  --color-brand-600: hsl(var(--brand-600));
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
   --color-brand-700: hsla(149, 43%, 69%, 1);
   --color-brand-800: hsla(154, 55%, 45%, 1);
   --color-brand-900: hsla(153, 60%, 53%, 1);
@@ -415,11 +415,11 @@
   --color-scale-1100: #bbbbbb;
   --color-scale-1200: hsl(0, 0%, 93%);
   --color-brand-100: hsla(153, 75%, 6%, 1);
-  --color-brand-200: hsl(var(--brand-200));
-  --color-brand-300: hsl(var(--brand-300));
-  --color-brand-400: hsl(var(--brand-400));
-  --color-brand-500: hsl(var(--brand-500));
-  --color-brand-600: hsl(var(--brand-600));
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
   --color-brand-700: hsla(154, 62%, 22%, 1);
   --color-brand-800: hsla(153, 60%, 28%, 1);
   --color-brand-900: hsla(153, 60%, 53%, 1);

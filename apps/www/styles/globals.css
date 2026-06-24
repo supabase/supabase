@@ -109,7 +109,7 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: hsl(var(--border-default, currentColor));
+    border-color: var(--border-default, currentColor);
   }
 }
 
@@ -300,7 +300,7 @@ h6:not(.overwrite) {
 .stroke-text {
   -webkit-text-fill-color: transparent; /* Will override color (regardless of order) */
   -webkit-text-stroke-width: 1px;
-  -webkit-text-stroke-color: hsl(var(--background-selection));
+  -webkit-text-stroke-color: var(--background-selection);
 }
 
 .stroke-text.fill {
@@ -458,8 +458,7 @@ launch week
 */
 
 .launch-week-timeline-border--approaching {
-  border-image: linear-gradient(to bottom, hsl(var(--brand-default)), var(--color-purple-700)) 1
-    100%;
+  border-image: linear-gradient(to bottom, var(--brand-default), var(--color-purple-700)) 1 100%;
 }
 
 .video-container {
@@ -563,9 +562,9 @@ launch week
   filter: blur(calc(var(--auth-ui-card-height) / 6));
   background-image: linear-gradient(
     var(--rotate),
-    hsl(var(--brand-default)),
+    var(--brand-default),
     #3c67e3 43%,
-    hsl(var(--brand-default))
+    var(--brand-default)
   );
   opacity: 1;
   transition: opacity 0.5s;
@@ -632,8 +631,8 @@ launch week
     rgba(57, 97, 125, 0.32) 0%,
     rgba(57, 97, 125, 0.32) 5%,
     rgba(0, 222, 209, 0.75) 8%,
-    hsl(var(--background-default)) 65%,
-    hsl(var(--background-default)) 100%
+    var(--background-default) 65%,
+    var(--background-default) 100%
   );
 }
 
@@ -655,7 +654,7 @@ launch week
   background: radial-gradient(
     circle at 50% -60%,
     rgba(255, 255, 255, 0) 0%,
-    hsl(var(--background-default)) 65%
+    var(--background-default) 65%
   );
 }
 
@@ -664,7 +663,7 @@ launch week
     background: radial-gradient(
       circle at 50% -40%,
       rgba(255, 255, 255, 0) 0%,
-      hsl(var(--background-default)) 65%
+      var(--background-default) 65%
     );
   }
 }
@@ -684,7 +683,7 @@ launch week
 /* The inside of the circle */
 .flair-mask-b {
   position: absolute;
-  background-color: hsl(var(--background-default));
+  background-color: var(--background-default);
   top: 0px;
   width: 182%;
   left: -41%;
@@ -739,25 +738,17 @@ launch week
 }
 
 [class*='gradient-text-']::selection {
-  background-color: hsl(var(--brand-default));
+  background-color: var(--brand-default);
   background-clip: unset;
   -webkit-text-fill-color: white;
 }
 
 @layer utilities {
   .gradient-text-brand-100 {
-    background-image: linear-gradient(
-      45deg,
-      hsl(var(--brand-500)) 0%,
-      hsl(var(--brand-default)) 100%
-    );
+    background-image: linear-gradient(45deg, var(--brand-500) 0%, var(--brand-default) 100%);
   }
   .gradient-text-brand-300 {
-    background-image: linear-gradient(
-      45deg,
-      hsl(var(--brand-500)) 0%,
-      hsl(var(--brand-default)) 100%
-    );
+    background-image: linear-gradient(45deg, var(--brand-500) 0%, var(--brand-default) 100%);
   }
   .gradient-text-100 {
     background-image: -webkit-linear-gradient(45deg, #fff 0%, var(--color-green-1200) 100%);
@@ -766,8 +757,8 @@ launch week
   .gradient-text-500 {
     background-image: -webkit-linear-gradient(
       45deg,
-      hsl(var(--foreground-lighter)) 0%,
-      hsl(var(--foreground-default)) 100%
+      var(--foreground-lighter) 0%,
+      var(--foreground-default) 100%
     );
   }
 

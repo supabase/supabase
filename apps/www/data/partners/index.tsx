@@ -17,7 +17,7 @@ export default {
         <div
           className="w-12 h-12 rounded-xl bg-brand border border-brand-900 flex items-center justify-center"
           style={{
-            boxShadow: '0 0 20px hsl(var(--brand-300)), 0 0 30px hsl(var(--brand-200))',
+            boxShadow: '0 0 20px var(--brand-300), 0 0 30px var(--brand-200)',
           }}
         >
           <svg

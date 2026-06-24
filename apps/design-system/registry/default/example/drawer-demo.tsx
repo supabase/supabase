@@ -111,7 +111,7 @@ export default function DrawerDemo() {
                     dataKey="goal"
                     style={
                       {
-                        fill: 'hsl(var(--foreground-default))',
+                        fill: 'var(--foreground-default)',
                         opacity: 0.9,
                       } as React.CSSProperties
                     }

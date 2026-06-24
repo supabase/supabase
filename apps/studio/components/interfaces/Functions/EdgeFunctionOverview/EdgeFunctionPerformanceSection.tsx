@@ -86,7 +86,7 @@ export const EdgeFunctionPerformanceSection = ({
                   {
                     y: averageExecutionTime,
                     label: 'average',
-                    stroke: 'hsl(var(--foreground-default))',
+                    stroke: 'var(--foreground-default)',
                     strokeWidth: 1.5,
                   },
                 ]}

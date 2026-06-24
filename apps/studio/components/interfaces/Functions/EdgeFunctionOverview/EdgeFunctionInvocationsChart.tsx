@@ -86,7 +86,7 @@ export const EdgeFunctionInvocationsChart = ({
             {updateAnnotation && (
               <ReferenceLine
                 x={updateAnnotation.timestamp}
-                stroke="hsl(var(--foreground-default))"
+                stroke="var(--foreground-default)"
                 strokeDasharray="4 4"
                 strokeWidth={1.5}
               />
