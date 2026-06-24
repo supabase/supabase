@@ -30,7 +30,10 @@ LLM payloads are usually high-entropy and unique, so Postgres's default compress
 
 </Admonition>
 
-## Symptoms you have a TOAST problem
+## Diagnosing a TOAST problem
+
+
+Symptoms you have a TOAST problem:
 
 - A table is far larger than its row count suggests, and `pg_total_relation_size` is dominated by TOAST.
 - Disk usage doesn't drop after deleting many rows. This is expected Postgres behavior — see [Reclaiming space](#reclaiming-space) below for why, and how to recover it.
