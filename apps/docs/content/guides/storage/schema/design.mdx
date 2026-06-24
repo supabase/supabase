@@ -18,7 +18,37 @@ This is important because the storage schema only stores the metadata and the ac
 
 Here is the schema that represents the Storage service:
 
-<img alt="Storage schema design" src="/docs/img/storage/schema-design.png" />
+```mermaid
+erDiagram
+  buckets ||--o{ objects : "buckets_id:id"
+  buckets {
+    text id PK
+    text name
+    timestamptz created_at
+    timestamptz updated_at
+    boolean public
+    bigint file_size_limit
+    text[] allowed_mime_types
+    text owner_id
+  }
+  objects {
+    uuid id PK
+    text bucket_id FK
+    text name
+    timestamptz created_at
+    timestamptz updated_at
+    jsonb metadata
+    text[] path_tokens
+    text version
+    text owner_id
+  }
+  migrations {
+    integer id PK
+    varchar(100) name
+    varchar(40) hash
+    timestamp executed_at
+  }
+```
 
 You have the option to query this table directly to retrieve information about your files in Storage without the need to go through our API.
 

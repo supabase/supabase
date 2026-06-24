@@ -1183,12 +1183,12 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/database/replication' },
         {
-          name: 'External replication',
-          url: '/guides/database/replication/external-replication-setup' as `/${string}`,
+          name: 'Pipelines',
+          url: '/guides/database/replication/pipelines' as `/${string}`,
           items: [
             {
               name: 'Setting up',
-              url: '/guides/database/replication/external-replication-setup' as `/${string}`,
+              url: '/guides/database/replication/pipelines' as `/${string}`,
               items: [
                 {
                   name: 'BigQuery',
@@ -1198,9 +1198,9 @@ export const database: NavMenuConstant = {
             },
             {
               name: 'Monitoring',
-              url: '/guides/database/replication/external-replication-monitoring' as `/${string}`,
+              url: '/guides/database/replication/pipelines-monitoring' as `/${string}`,
             },
-            { name: 'FAQ', url: '/guides/database/replication/external-replication-faq' },
+            { name: 'FAQ', url: '/guides/database/replication/pipelines-faq' },
           ],
         },
         {

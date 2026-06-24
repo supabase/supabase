@@ -19,6 +19,7 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { wasNeverPersisted } from '@/state/sql-editor/sql-editor-lifecycle'
 import { canEditSnippet } from '@/state/sql-editor/sql-editor-rules'
 import { useTabsStateSnapshot } from '@/state/tabs'
 
@@ -237,7 +238,7 @@ export const MonacoEditor = ({
 
   useEffect(() => {
     if (debouncedValue.length > 0 && snippet) {
-      const shouldInvalidate = snippet.snippet.isNotSavedInDatabaseYet
+      const shouldInvalidate = wasNeverPersisted(snippet.snippet.status)
       snapV2.setSql({ id, sql: value, shouldInvalidate })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
