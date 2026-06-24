@@ -1,6 +1,6 @@
 import { cn } from 'ui'
 
-import { LOG_TYPES, METHODS, STATUS_CODE_LABELS } from './UnifiedLogs.constants'
+import { LOG_TYPES_LABELS, METHODS, STATUS_CODE_LABELS } from './UnifiedLogs.constants'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { getLevelLabel } from './UnifiedLogs.utils'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
@@ -22,12 +22,12 @@ export const filterFields = [
     value: 'log_type',
     type: 'checkbox',
     defaultOpen: true,
-    options: LOG_TYPES.map((type) => ({ label: type, value: type })),
+    options: Object.entries(LOG_TYPES_LABELS).map(([value, label]) => ({ label, value })),
     component: (props: Option) => {
       return (
         <div className="flex w-full items-center justify-between gap-2">
-          <span className="capitalize text-foreground/70 group-hover:text-accent-foreground text-xs">
-            {props.label.replace('_', ' ')}
+          <span className="text-foreground/70 group-hover:text-accent-foreground text-xs">
+            {props.label}
           </span>
         </div>
       )
