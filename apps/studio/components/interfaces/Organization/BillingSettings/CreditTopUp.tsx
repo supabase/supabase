@@ -198,9 +198,13 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
         amount,
         payment_method_id: paymentMethodResult.paymentMethod.id,
         hcaptchaToken: token,
-        address: paymentMethodResult.address,
-        tax_id: paymentMethodResult.taxId ?? undefined,
-        billing_name: paymentMethodResult.customerName,
+        ...(paymentMethodResult.isNewPaymentMethod
+          ? {
+              address: paymentMethodResult.address,
+              tax_id: paymentMethodResult.taxId ?? undefined,
+              billing_name: paymentMethodResult.customerName,
+            }
+          : {}),
       },
       {
         onSuccess: (data) => {

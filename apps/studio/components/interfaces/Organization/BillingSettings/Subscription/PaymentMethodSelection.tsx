@@ -230,7 +230,6 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
     return true
   }
 
-  // If createPaymentMethod already exists, use it. Otherwise, define it here.
   const createPaymentMethod = async (): ReturnType<
     PaymentMethodElementRef['createPaymentMethod']
   > => {
@@ -244,6 +243,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
         customerName: useAsDefaultBillingAddress ? paymentResult.customerName : null,
         address: useAsDefaultBillingAddress ? paymentResult.address : null,
         taxId: useAsDefaultBillingAddress ? paymentResult.taxId : null,
+        isNewPaymentMethod: true,
       }
     } else {
       return {
@@ -251,6 +251,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
         customerName: useAsDefaultBillingAddress ? customerProfile?.billing_name || '' : null,
         address: useAsDefaultBillingAddress ? (customerProfile?.address ?? null) : null,
         taxId: useAsDefaultBillingAddress ? (taxId ?? null) : null,
+        isNewPaymentMethod: false,
       }
     }
   }
