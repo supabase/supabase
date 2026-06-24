@@ -3,7 +3,14 @@
   --helpers-os-appearance: Light;
   --hue: 160;
   --chroma: 0.018;
-  --surface: 0.985;
+  /*
+   * Soft-gray canvas (not pure white) so elevated surfaces have headroom to
+   * brighten toward white. --elevation-step is positive here: higher surfaces
+   * get lighter, matching dark mode's direction. Derived from the remaining
+   * headroom (1 - surface) so it auto-fits if --surface is retuned.
+   */
+  --surface: 0.98;
+  --elevation-step: calc((1 - var(--surface)) * 0.3);
   --foreground-lightness: 0.16;
   --muted-foreground-opacity: 68%;
   --tertiary-foreground-opacity: 48%;

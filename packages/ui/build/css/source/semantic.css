@@ -15,16 +15,50 @@
   --muted-foreground-opacity: 68%;
   --tertiary-foreground-opacity: 48%;
 
-  --warning-hue: calc(var(--hue) - 75);
-  --destructive-hue: calc(var(--hue) - 135);
+  /*
+   * Surface elevation. Each surface steps its lightness away from --background
+   * by `--elevation-step * ratio`, where the ratios are shared across themes and
+   * the step is signed: positive brightens as surfaces rise, negative darkens.
+   *
+   * The default step reproduces the historical behavior (≈3% per level mixed
+   * toward the foreground): dark themes brighten and the light baseline darkens.
+   * The light theme overrides --elevation-step (and lowers --surface for
+   * headroom) so its higher surfaces brighten toward white instead — giving a
+   * single "higher = lighter" model in both modes. 0 = flat (no elevation).
+   */
+  --elevation-1: 1;
+  --elevation-2: 1.5;
+  --elevation-3: 2;
+  --elevation-4: 3;
+  --elevation-step: calc((var(--foreground-lightness) - var(--surface)) * 0.03);
+
+  /*
+   * Status hues stay anchored to amber / red but pull a fraction of the way
+   * toward the brand --hue for harmony, then clamp to their perceptual category
+   * so "warning" always reads amber and "destructive" always reads red no matter
+   * what --hue is. --status-hue-pull: 0 = fixed amber/red, 1 = fully brand-relative.
+   * At --hue: 160 the pull term is 0, so these resolve to the original 85 / 25.
+   */
+  --brand-hue-reference: 160;
+  --status-hue-pull: 0.15;
+  --warning-hue: clamp(
+    75,
+    calc(85 + (var(--hue) - var(--brand-hue-reference)) * var(--status-hue-pull)),
+    110
+  );
+  --destructive-hue: clamp(
+    12,
+    calc(25 + (var(--hue) - var(--brand-hue-reference)) * var(--status-hue-pull)),
+    42
+  );
 
   /* shadcn semantic pairs */
   --background: oklch(var(--surface) calc(var(--chroma) * 0.35) var(--hue));
   --foreground: oklch(var(--foreground-lightness) calc(var(--chroma) * 0.55) var(--hue));
 
-  --card: color-mix(in oklch, var(--background), var(--foreground) 3%);
+  --card: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-1)) c h);
   --card-foreground: var(--foreground);
-  --popover: color-mix(in oklch, var(--background), var(--foreground) 4.5%);
+  --popover: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-2)) c h);
   --popover-foreground: var(--foreground);
 
   --primary: oklch(0.72 calc(var(--chroma) * 9) var(--hue));
@@ -32,13 +66,27 @@
     min(var(--surface), var(--foreground-lightness)) calc(var(--chroma) * 0.45) var(--hue)
   );
 
-  --secondary: color-mix(in oklch, var(--background), var(--foreground) 6%);
+  --secondary: oklch(
+    from var(--background) calc(l + var(--elevation-step) * var(--elevation-3)) c h
+  );
   --secondary-foreground: var(--foreground);
-  --tertiary: color-mix(in oklch, var(--background), var(--foreground) 9%);
+  --tertiary: oklch(
+    from var(--background) calc(l + var(--elevation-step) * var(--elevation-4)) c h
+  );
   --tertiary-foreground: oklch(from var(--foreground) l c h / var(--tertiary-foreground-opacity));
-  --muted: color-mix(in oklch, var(--background), var(--foreground) 4.5%);
+  --muted: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-2)) c h);
   --muted-foreground: oklch(from var(--foreground) l c h / var(--muted-foreground-opacity));
-  --accent: color-mix(in oklch, var(--background), var(--foreground) 9%);
+  /*
+   * Accent is a contrast / hover-selection fill, not an elevation surface, so it
+   * always steps toward the foreground: slightly darker than --background in
+   * light, slightly lighter in dark — regardless of the elevation direction.
+   * The (foreground-lightness - surface) term carries the sign per theme.
+   */
+  --accent-step: 0.09;
+  --accent: oklch(
+    from var(--background)
+      calc(l + (var(--foreground-lightness) - var(--surface)) * var(--accent-step)) c h
+  );
   --accent-foreground: var(--foreground);
 
   --warning: oklch(0.78 calc(var(--chroma) * 8) var(--warning-hue));
@@ -57,15 +105,15 @@
   --border-warning: oklch(from var(--warning) l c h / 30%);
   --border-brand: oklch(from var(--primary) l c h / 30%);
 
-  --border: oklch(from var(--foreground) l calc(c * 0.5) h / 12%);
-  --input: oklch(from var(--foreground) l calc(c * 0.5) h / 16%);
+  --border: oklch(from var(--foreground) l calc(c * 0.5) h / 8%);
+  --input: oklch(from var(--foreground) l calc(c * 0.5) h / 12%);
   --ring: oklch(from var(--primary) l c h / 55%);
 
   /* Legacy foreground aliases */
   --foreground-default: var(--foreground);
   --foreground-light: var(--muted-foreground);
   --foreground-lighter: var(--tertiary-foreground);
-  --foreground-muted: oklch(from var(--tertiary-foreground) l c h / calc(alpha * 0.6));
+  --foreground-muted: var(--tertiary-foreground);
   --foreground-contrast: var(--primary-foreground);
 
   /* Legacy background aliases */
@@ -85,7 +133,7 @@
   --background-muted: var(--muted);
   --background-button-default: var(--secondary);
   --background-dialog-default: var(--popover);
-  --background-dash-sidebar: var(--card);
+  --background-dash-sidebar: var(--background);
   --background-dash-canvas: var(--background);
 
   /* Legacy border aliases */
