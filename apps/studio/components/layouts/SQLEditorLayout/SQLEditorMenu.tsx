@@ -135,9 +135,9 @@ export const SQLEditorMenu = () => {
             </InnerSideBarFilterSearchInput>
           </InnerSideBarFilters>
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Tooltip>
-                <TooltipTrigger asChild>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
                   <Button
                     data-testid="sql-editor-new-query-button"
                     variant="default"
@@ -145,10 +145,10 @@ export const SQLEditorMenu = () => {
                     className="w-[26px]"
                     aria-label="Create a new query"
                   />
-                </TooltipTrigger>
-                <TooltipContent side="bottom">Create a new query</TooltipContent>
-              </Tooltip>
-            </DropdownMenuTrigger>
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Create a new query</TooltipContent>
+            </Tooltip>
             <DropdownMenuContent align="end" side="bottom" className="w-48">
               <DropdownMenuItem className="gap-x-2" onClick={() => handleNewQuery()}>
                 <FilePlus size={14} />
