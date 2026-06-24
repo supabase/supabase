@@ -131,7 +131,7 @@ export const TextEditor = ({
             <CodeEditor
               key={value}
               language="markdown"
-              value={strValue}
+              value={strValue ?? ''}
               onInputChange={(val) => setStrValue(val ?? '')}
             />
           </div>
