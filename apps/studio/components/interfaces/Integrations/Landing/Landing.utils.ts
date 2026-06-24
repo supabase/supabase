@@ -47,15 +47,15 @@ function usePermissionSafeQuery<T>({
   enabled = true,
 }: {
   queryKey: (string | undefined)[]
-  queryFn: () => Promise<T>
+  queryFn: (opts: { signal?: AbortSignal }) => Promise<T>
   defaultVal: T
   enabled: boolean
 }) {
   return useQuery({
     queryKey,
-    queryFn: async () => {
+    queryFn: async (opts) => {
       try {
-        return await queryFn()
+        return await queryFn(opts)
       } catch (error) {
         if (error instanceof ResponseError && error.code === 403) {
           return defaultVal
@@ -86,31 +86,31 @@ export const useProjectOAuthIntegrationData = (
   const queries = {
     apiKeys: usePermissionSafeQuery({
       queryKey: ['project-data', projectRef, 'api-keys'],
-      queryFn: () => getAPIKeys({ projectRef, reveal: false }),
+      queryFn: ({ signal }) => getAPIKeys({ projectRef, reveal: false }, signal),
       defaultVal: [],
       enabled: enabled && !!projectRef,
     }),
     edgeFunctionSecrets: usePermissionSafeQuery({
       queryKey: ['project-data', projectRef, 'secrets'],
-      queryFn: () => getSecrets({ projectRef }),
+      queryFn: ({ signal }) => getSecrets({ projectRef }, signal),
       defaultVal: [],
       enabled: enabled && !!projectRef,
     }),
     authConfig: usePermissionSafeQuery({
       queryKey: ['project-data', projectRef, 'auth-config'],
-      queryFn: () => getProjectAuthConfig({ projectRef }),
+      queryFn: ({ signal }) => getProjectAuthConfig({ projectRef }, signal),
       defaultVal: null,
       enabled: enabled && !!projectRef,
     }),
     partnerIntegrations: usePermissionSafeQuery({
       queryKey: ['project-data', projectRef, 'partner-integrations'],
-      queryFn: () => getIntegrations({ projectRef }),
+      queryFn: ({ signal }) => getIntegrations({ projectRef }, signal),
       defaultVal: [],
       enabled: enabled && !!projectRef,
     }),
     oauthApps: usePermissionSafeQuery({
       queryKey: ['project-data', org?.slug, 'oauth-apps'],
-      queryFn: () => getAuthorizedApps({ slug: org?.slug }),
+      queryFn: ({ signal }) => getAuthorizedApps({ slug: org?.slug }, signal),
       defaultVal: [],
       enabled: enabled && !!org,
     }),
