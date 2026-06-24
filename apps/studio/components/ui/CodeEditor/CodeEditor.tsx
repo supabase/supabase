@@ -97,6 +97,7 @@ export const CodeEditor = ({
     {
       tabSize: 2,
       fontSize: 13,
+      domReadOnly: isReadOnly,
       readOnly: isReadOnly,
       minimap: { enabled: false },
       wordWrap: 'on',
