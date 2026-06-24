@@ -30,6 +30,7 @@ interface CodeEditorProps {
   isReadOnly?: boolean
   hideLineNumbers?: boolean
   className?: string
+  wrapperClassName?: string
   loading?: boolean
   options?: EditorProps['options']
   value?: string
@@ -58,6 +59,7 @@ export const CodeEditor = ({
   isReadOnly = false,
   hideLineNumbers = false,
   className,
+  wrapperClassName,
   loading,
   options,
   value,
@@ -248,6 +250,7 @@ export const CodeEditor = ({
         path={id}
         theme="supabase"
         className={cn(className, 'monaco-editor')}
+        wrapperProps={{ className: wrapperClassName }}
         value={value ?? undefined}
         language={language}
         defaultValue={defaultValue ?? undefined}
