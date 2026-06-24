@@ -74,6 +74,7 @@ export const REFERENCES = {
     library: 'supabase-swift',
     libPath: 'swift',
     versions: ['v2', 'v1'],
+    typeSpec: true,
     icon: 'reference-swift',
     meta: {
       v2: {
