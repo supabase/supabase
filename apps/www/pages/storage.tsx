@@ -339,7 +339,7 @@ function StoragePage() {
             <div className="section--bg-masked">
               <div className="section--bg border-t border-control"></div>
             </div>
-            <div className="section-container pt-12 pb-0">
+            <div className="relative pt-12 pb-0">
               <div className="overflow-x-hidden">
                 <SectionContainer>
                   <div className="grid grid-cols-12 lg:gap-16">
