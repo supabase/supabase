@@ -1,19 +1,20 @@
 import { useParams } from 'common'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { ColumnList } from '@/components/interfaces/Database/Tables/ColumnList'
-import { TableDetailColumnsTab } from '@/components/interfaces/Database/Tables/TableDetailColumnsTab'
+import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
+import { TableDetailOverviewTab } from '@/components/interfaces/Database/Tables/TableDetailOverviewTab'
 import { TableDetailLayout } from '@/components/layouts/DatabaseLayout/TableDetailLayout'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import type { NextPageWithLayout } from '@/types'
 
-const TableDetailColumnsPage: NextPageWithLayout = () => {
-  const snap = useTableEditorStateSnapshot()
-  const { id: _id } = useParams()
+const TableDetailOverviewPage: NextPageWithLayout = () => {
+  const router = useRouter()
+  const { id: _id, ref } = useParams()
   const id = _id ? Number(_id) : undefined
   const { data: project } = useSelectedProjectQuery()
   const { data: selectedTable, isPending } = useTableEditorQuery({
@@ -21,6 +22,11 @@ const TableDetailColumnsPage: NextPageWithLayout = () => {
     connectionString: project?.connectionString,
     id,
   })
+
+  useEffect(() => {
+    if (isPending || selectedTable === undefined || isTableLike(selectedTable)) return
+    router.replace(`/project/${ref}/database/tables/${id}/columns`)
+  }, [id, isPending, ref, router, selectedTable])
 
   if (isPending) {
     return <ShimmeringLoader />
@@ -30,29 +36,23 @@ const TableDetailColumnsPage: NextPageWithLayout = () => {
     return null
   }
 
-  if (isTableLike(selectedTable)) {
-    return (
-      <TableDetailColumnsTab
-        onAddColumn={snap.onAddColumn}
-        onEditColumn={snap.onEditColumn}
-        onDeleteColumn={snap.onDeleteColumn}
-      />
-    )
+  if (!isTableLike(selectedTable)) {
+    return <ShimmeringLoader />
   }
 
-  return (
-    <ColumnList
-      onAddColumn={snap.onAddColumn}
-      onEditColumn={snap.onEditColumn}
-      onDeleteColumn={snap.onDeleteColumn}
-    />
-  )
+  const tableEditorUrl = buildTableEditorUrl({
+    projectRef: ref,
+    tableId: selectedTable.id,
+    schema: selectedTable.schema,
+  })
+
+  return <TableDetailOverviewTab table={selectedTable} tableEditorUrl={tableEditorUrl} />
 }
 
-TableDetailColumnsPage.getLayout = (page) => (
+TableDetailOverviewPage.getLayout = (page) => (
   <DefaultLayout>
-    <TableDetailLayout section="columns">{page}</TableDetailLayout>
+    <TableDetailLayout section="overview">{page}</TableDetailLayout>
   </DefaultLayout>
 )
 
-export default TableDetailColumnsPage
+export default TableDetailOverviewPage

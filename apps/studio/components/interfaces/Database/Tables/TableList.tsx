@@ -5,7 +5,6 @@ import { noop } from 'lodash'
 import {
   Check,
   ChevronRight,
-  Columns2,
   Copy,
   Edit,
   Eye,
@@ -13,6 +12,7 @@ import {
   MoreVertical,
   Plus,
   Search,
+  Settings,
   Trash,
   X,
 } from 'lucide-react'
@@ -690,12 +690,6 @@ export const TableList = ({
                                   />
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent side="bottom" align="end" className="w-48">
-                                  <DropdownMenuItem className="flex items-center space-x-2" asChild>
-                                    <Link href={tableDetailUrl}>
-                                      <Columns2 size={12} />
-                                      <p>Table details</p>
-                                    </Link>
-                                  </DropdownMenuItem>
                                   <DropdownMenuItem
                                     className="flex items-center space-x-2"
                                     onClick={() =>
@@ -736,6 +730,12 @@ export const TableList = ({
                                         <Edit size={12} />
                                         <p>Edit definitions</p>
                                       </DropdownMenuItemTooltip>
+                                      <DropdownMenuItem className="flex items-center space-x-2" asChild>
+                                        <Link href={`${tableDetailUrl}/settings`}>
+                                          <Settings size={12} />
+                                          <p>Edit settings</p>
+                                        </Link>
+                                      </DropdownMenuItem>
                                       <DropdownMenuItemTooltip
                                         key="duplicate-table"
                                         className="gap-x-2"

@@ -10,6 +10,7 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
+import { TableDetailGeneralSettingsCard } from '@/components/interfaces/Database/Tables/TableDetailGeneralSettingsCard'
 import { TableDetailDataApiSection } from '@/components/interfaces/Database/Tables/TableDetailDataApiSection'
 import { TableDetailDeleteTableSection } from '@/components/interfaces/Database/Tables/TableDetailDeleteTableSection'
 import { TableDetailIndexAdvisorSection } from '@/components/interfaces/Database/Tables/TableDetailIndexAdvisorSection'
@@ -34,6 +35,17 @@ export function TableDetailSettingsTab({ table }: TableDetailSettingsTabProps) {
   return (
     <>
       <div className="flex flex-col gap-8">
+        <PageSection>
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>General</PageSectionTitle>
+            </PageSectionSummary>
+          </PageSectionMeta>
+          <PageSectionContent>
+            <TableDetailGeneralSettingsCard table={table} />
+          </PageSectionContent>
+        </PageSection>
+
         {showStorage && (
           <PageSection>
             <PageSectionMeta>

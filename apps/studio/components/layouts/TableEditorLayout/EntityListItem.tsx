@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Columns2, Copy, Download, Edit, Globe, Lock, MoreVertical, Trash } from 'lucide-react'
+import { Columns2, Copy, Download, Edit, Globe, Lock, MoreVertical, Settings, Trash } from 'lucide-react'
 import Link from 'next/link'
 import { type CSSProperties, type MouseEvent } from 'react'
 import { toast } from 'sonner'
@@ -338,13 +338,6 @@ export const EntityListItem = ({
 
               {entity.type === ENTITY_TYPE.TABLE && (
                 <>
-                  <DropdownMenuItem key="table-details" className="space-x-2" asChild>
-                    <Link href={`/project/${projectRef}/database/tables/${entity.id}`}>
-                      <Columns2 size={12} className="shrink-0" />
-                      <span>Table details</span>
-                    </Link>
-                  </DropdownMenuItem>
-
                   <DropdownMenuSeparator />
 
                   <DropdownMenuItem
@@ -357,6 +350,12 @@ export const EntityListItem = ({
                   >
                     <Edit size={12} className="shrink-0" />
                     <span>Edit definitions</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem key="edit-settings" className="space-x-2" asChild>
+                    <Link href={`/project/${projectRef}/database/tables/${entity.id}/settings`}>
+                      <Settings size={12} className="shrink-0" />
+                      <span>Edit settings</span>
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     key="duplicate-table"

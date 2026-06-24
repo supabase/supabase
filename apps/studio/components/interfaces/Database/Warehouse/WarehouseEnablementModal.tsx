@@ -1,17 +1,17 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
+  Badge,
   Button,
-  Checkbox,
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
 } from 'ui'
+import { Admonition } from 'ui-patterns'
 
 import { setTableMode } from './warehouseDemoStore'
 import { WarehouseProgressSteps } from './WarehouseProgressSteps'
@@ -46,7 +46,6 @@ export function WarehouseEnablementModal({
 }: WarehouseEnablementModalProps) {
   const [isRunning, setIsRunning] = useState(false)
   const [progressIndex, setProgressIndex] = useState(0)
-  const [acknowledged, setAcknowledged] = useState(false)
 
   const isMove = variant === 'move'
   const steps = isMove ? MOVE_PROGRESS : ATTACH_PROGRESS
@@ -56,7 +55,6 @@ export function WarehouseEnablementModal({
     if (!open) {
       setIsRunning(false)
       setProgressIndex(0)
-      setAcknowledged(false)
     }
   }, [open])
 
@@ -87,42 +85,51 @@ export function WarehouseEnablementModal({
         if (!val && !isRunning) onOpenChange(false)
       }}
     >
-      <DialogContent>
+      <DialogContent size="small">
         <DialogHeader>
           <DialogTitle>{isMove ? 'Move to Warehouse' : 'Create Warehouse copy'}</DialogTitle>
-          <DialogDescription>
-            {isMove
-              ? 'Relocate this table’s storage to Warehouse. Best for large, append-only tables like events or logs.'
-              : 'Keep Postgres as the source of truth and sync a Warehouse copy for analytics.'}
-          </DialogDescription>
         </DialogHeader>
 
         {isRunning ? (
-          <DialogSection className="py-5">
+          <DialogSection>
             <WarehouseProgressSteps steps={steps} activeIndex={progressIndex} />
           </DialogSection>
         ) : (
           <>
             <DialogSectionSeparator />
-            <DialogSection className="flex flex-col gap-5">
-              <div className="rounded-md border bg-surface-75 text-sm">
+            <DialogSection className="flex flex-col gap-4">
+              <p className="text-sm text-foreground-light">
+                {isMove
+                  ? 'This table’s storage will be permanently moved to Warehouse.'
+                  : 'The Postgres heap will remain the source of truth. Changes in Postgres will continuously sync to a Warehouse copy.'}
+              </p>
+
+              <div className="rounded-lg border bg-surface-75 text-sm">
                 <div className="flex items-center justify-between gap-4 px-4 py-2.5">
-                  <span className="text-foreground-lighter">Table</span>
+                  <span className="text-foreground-lighter">Postgres</span>
                   <code className="text-code-inline">{tableKey}</code>
                 </div>
-                {!isMove && (
+                {isMove ? (
                   <div className="flex items-center justify-between gap-4 border-t px-4 py-2.5">
-                    <span className="text-foreground-lighter">Warehouse copy</span>
+                    <span className="text-foreground-lighter">Storage</span>
+                    <span className="text-foreground-light">Warehouse only</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between gap-4 border-t px-4 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-foreground-lighter">Warehouse</span>
+                      <Badge variant="success">New</Badge>
+                    </div>
                     <code className="text-code-inline">{warehouseCopyName}</code>
                   </div>
                 )}
               </div>
 
-              {isMove && (
+              {isMove ? (
                 <>
                   <div className="flex flex-col gap-2">
-                    <p className="text-sm text-foreground">
-                      Once moved, this table no longer supports:
+                    <p className="text-sm text-foreground-light">
+                      Once moved, this table will no longer support:
                     </p>
                     <ul className="flex flex-col gap-1.5">
                       {MOVE_TRADE_OFFS.map((item) => (
@@ -137,20 +144,12 @@ export function WarehouseEnablementModal({
                     </ul>
                   </div>
 
-                  <label className="flex cursor-pointer items-start gap-3 rounded-md border border-warning-400 bg-warning-200 px-4 py-3">
-                    <Checkbox
-                      id="warehouse-move-ack"
-                      checked={acknowledged}
-                      onCheckedChange={(val) => setAcknowledged(Boolean(val))}
-                      className="mt-0.5"
-                    />
-                    <span className="text-sm text-foreground">
-                      <span className="font-medium">This can’t be undone.</span> The Postgres copy
-                      is dropped once the move completes.
-                    </span>
-                  </label>
+                  <Admonition
+                    type="warning"
+                    description="The Postgres copy will be deleted after the move. This action cannot be undone."
+                  />
                 </>
-              )}
+              ) : null}
             </DialogSection>
             <DialogFooter>
               <Button variant="default" onClick={() => onOpenChange(false)}>
@@ -162,7 +161,6 @@ export function WarehouseEnablementModal({
                   setProgressIndex(0)
                   setIsRunning(true)
                 }}
-                disabled={isMove && !acknowledged}
               >
                 {isMove ? 'Move to Warehouse' : 'Create copy'}
               </Button>

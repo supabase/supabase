@@ -60,8 +60,12 @@ export function WarehouseDetachModal({
             data in Postgres is unaffected.
           </DialogDescription>
         </DialogHeader>
-        <DialogSection className="py-5">
-          <WarehouseProgressSteps steps={DETACH_PROGRESS} activeIndex={progressIndex} />
+        <DialogSection>
+          <WarehouseProgressSteps
+            steps={DETACH_PROGRESS}
+            activeIndex={progressIndex}
+            showProgressHeader
+          />
         </DialogSection>
       </DialogContent>
     </Dialog>

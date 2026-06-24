@@ -1,4 +1,5 @@
 import { ChevronDown, History } from 'lucide-react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useState, type ReactNode } from 'react'
 import {
   Button,
@@ -22,8 +23,8 @@ import { WarehouseTimeTravelFlow } from './WarehouseTimeTravelFlow'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 
 const MODE_LABELS: Record<WarehouseMode, string> = {
-  postgres: 'Postgres',
-  has_warehouse_copy: 'Postgres + Warehouse',
+  postgres: 'Postgres heap',
+  has_warehouse_copy: 'Postgres heap + Warehouse copy',
   warehouse_backed: 'Warehouse',
 }
 
@@ -80,7 +81,15 @@ export function WarehouseTableStoragePanel({
   const [detachProgress, setDetachProgress] = useState(false)
   const [timeTravelOpen, setTimeTravelOpen] = useState(false)
 
+  const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
+  const [, setConnectTab] = useQueryState('connectTab', parseAsString)
+
   const tableName = tableKey.split('.').pop() ?? tableKey
+
+  const openCatalogConnect = () => {
+    setConnectTab('catalog')
+    setShowConnect(true)
+  }
 
   return (
     <>
@@ -132,6 +141,7 @@ export function WarehouseTableStoragePanel({
           <div className="flex">
             <Button
               type="button"
+              variant="default"
               className="rounded-r-none"
               onClick={() => setEnablementModal('attach')}
             >
@@ -141,12 +151,13 @@ export function WarehouseTableStoragePanel({
               <DropdownMenuTrigger asChild>
                 <Button
                   type="button"
+                  variant="default"
                   icon={<ChevronDown />}
-                  className="rounded-l-none border-l-0 px-2"
+                  className="rounded-l-none border-l-0 px-1"
                   aria-label="More storage actions"
                 />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent className="w-48" align="end">
                 <DropdownMenuItem onClick={() => setEnablementModal('move')}>
                   Move to Warehouse
                 </DropdownMenuItem>
@@ -156,44 +167,53 @@ export function WarehouseTableStoragePanel({
         )}
 
         {mode === 'has_warehouse_copy' && (
-          <div className="flex">
-            <Button
-              type="button"
-              variant="default"
-              className="rounded-r-none"
-              onClick={() => setEnablementModal('move')}
-            >
-              Move fully to Warehouse
+          <div className="flex flex-wrap gap-2">
+            <div className="flex">
+              <Button
+                type="button"
+                variant="default"
+                className="rounded-r-none"
+                onClick={() => setEnablementModal('move')}
+              >
+                Move fully to Warehouse
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="default"
+                    icon={<ChevronDown />}
+                    className="rounded-l-none border-l-0 px-1"
+                    aria-label="More storage actions"
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => setDetachConfirm(true)}>
+                    Detach Warehouse copy
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+            <Button type="button" variant="default" onClick={openCatalogConnect}>
+              Connect externally
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  type="button"
-                  variant="default"
-                  icon={<ChevronDown />}
-                  className="rounded-l-none border-l-0 px-2"
-                  aria-label="More storage actions"
-                />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setDetachConfirm(true)}>
-                  Detach Warehouse copy
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
           </div>
         )}
 
         {mode === 'warehouse_backed' && (
-          <Button
-            type="button"
-            variant="default"
-            className="w-fit"
-            icon={<History />}
-            onClick={() => setTimeTravelOpen(true)}
-          >
-            View snapshots
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="default"
+              icon={<History />}
+              onClick={() => setTimeTravelOpen(true)}
+            >
+              View snapshots
+            </Button>
+            <Button type="button" variant="default" onClick={openCatalogConnect}>
+              Connect externally
+            </Button>
+          </div>
         )}
       </div>
 

@@ -46,7 +46,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { TableEditorTableStateContextProvider } from '@/state/table-editor-table'
 
-export type TableDetailSection = 'columns' | 'policies' | 'settings'
+export type TableDetailSection = 'overview' | 'columns' | 'policies' | 'settings'
 
 interface TableDetailLayoutProps {
   section: TableDetailSection
@@ -95,6 +95,8 @@ export function TableDetailLayout({
   const showPoliciesTab = isTable
   const showSettingsTab = isTable
   const storageSyncError = warehouseState?.syncState === 'error'
+  const hasWarehouseStorage =
+    warehouseState?.mode === 'has_warehouse_copy' || warehouseState?.mode === 'warehouse_backed'
   const tableSizeLabel =
     isTable && selectedTable.size !== undefined
       ? (getWarehouseStorageSummaryLabel(warehouseState, selectedTable.size) ?? selectedTable.size)
@@ -114,8 +116,12 @@ export function TableDetailLayout({
   const navigationItems = id
     ? [
         {
-          label: 'Columns',
+          label: 'Overview',
           href: `/project/${ref}/database/tables/${id}`,
+        },
+        {
+          label: 'Columns',
+          href: `/project/${ref}/database/tables/${id}/columns`,
         },
         ...(showPoliciesTab
           ? [
@@ -170,9 +176,6 @@ export function TableDetailLayout({
 
               {selectedTable && !isLoading && (
                 <PageHeaderDescription className="flex flex-col gap-1 text-sm!">
-                  {selectedTable.comment && (
-                    <p className="text-foreground-lighter mb-1">{selectedTable.comment}</p>
-                  )}
                   <div className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 text-foreground-light">
                     <code className="text-code-inline">{selectedTable.schema}</code>
                     {isTable && selectedTable.live_rows_estimate !== undefined && (
@@ -197,6 +200,12 @@ export function TableDetailLayout({
                         ) : (
                           <X size={14} className="text-foreground-muted" />
                         )}
+                      </span>
+                    )}
+                    {isTable && hasWarehouseStorage && (
+                      <span className="inline-flex items-center gap-1">
+                        Warehouse
+                        <Check size={14} className="text-brand-link" />
                       </span>
                     )}
                   </div>

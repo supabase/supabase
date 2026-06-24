@@ -401,40 +401,40 @@ export const TableEditor = ({
       }
     >
       <>
-        <SidePanel.Content className="space-y-10 py-6">
-          <FormItemLayout
-            id="name"
-            isReactForm={false}
-            layout="horizontal"
-            label="Name"
-            error={errors.name ? String(errors.name) : undefined}
-          >
-            <Input
-              data-testid="table-name-input"
-              id="name"
-              type="text"
-              value={tableFields?.name}
-              onChange={(event) => onUpdateField({ name: event.target.value })}
-            />
-          </FormItemLayout>
-          <FormItemLayout
-            id="description"
-            isReactForm={false}
-            layout="horizontal"
-            label="Description"
-          >
-            <Input
-              id="description"
-              placeholder="Optional"
-              type="text"
-              value={tableFields?.comment ?? ''}
-              onChange={(event) => onUpdateField({ comment: event.target.value })}
-            />
-          </FormItemLayout>
-        </SidePanel.Content>
-
         {!isDefinitionEdit && (
           <>
+            <SidePanel.Content className="space-y-10 py-6">
+              <FormItemLayout
+                id="name"
+                isReactForm={false}
+                layout="horizontal"
+                label="Name"
+                error={errors.name ? String(errors.name) : undefined}
+              >
+                <Input
+                  data-testid="table-name-input"
+                  id="name"
+                  type="text"
+                  value={tableFields?.name}
+                  onChange={(event) => onUpdateField({ name: event.target.value })}
+                />
+              </FormItemLayout>
+              <FormItemLayout
+                id="description"
+                isReactForm={false}
+                layout="horizontal"
+                label="Description"
+              >
+                <Input
+                  id="description"
+                  placeholder="Optional"
+                  type="text"
+                  value={tableFields?.comment ?? ''}
+                  onChange={(event) => onUpdateField({ comment: event.target.value })}
+                />
+              </FormItemLayout>
+            </SidePanel.Content>
+
             <SidePanel.Separator />
 
             <SidePanel.Content className="space-y-10 py-6">
@@ -443,8 +443,6 @@ export const TableEditor = ({
                   id="enable-rls"
                   checked={tableFields.isRLSEnabled}
                   onCheckedChange={() => {
-                    // if isEnabled, show confirm modal to turn off
-                    // if not enabled, allow turning on without modal confirmation
                     tableFields.isRLSEnabled
                       ? setRlsConfirmVisible(true)
                       : onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
