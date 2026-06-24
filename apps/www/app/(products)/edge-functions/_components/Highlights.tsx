@@ -1,3 +1,4 @@
+import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import { Globe } from 'lucide-react'
 
 const highlights = [
@@ -85,7 +86,7 @@ const highlights = [
 export function Highlights() {
   return (
     <div className="border-t border-border">
-      <div className="mx-auto max-w-(--container-max-w,75rem) px-6">
+      <SectionContainerWithCn height="none">
         <div className="-translate-y-16">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {highlights.map((highlight) => (
@@ -100,7 +101,7 @@ export function Highlights() {
             ))}
           </div>
         </div>
-      </div>
+      </SectionContainerWithCn>
     </div>
   )
 }

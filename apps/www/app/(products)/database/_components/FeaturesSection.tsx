@@ -1,5 +1,6 @@
 'use client'
 
+import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Key } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -562,8 +563,8 @@ export function FeaturesSection() {
   return (
     <div className="py-24 flex flex-col gap-24">
       {/* Header */}
-      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-end">
+      <SectionContainerWithCn height="none">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
           <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
             Everything you need
             <br />
@@ -574,10 +575,10 @@ export function FeaturesSection() {
             fine-grained access controls, and instant APIs — no extra configuration required.
           </p>
         </div>
-      </div>
+      </SectionContainerWithCn>
 
       {/* 3-col grid */}
-      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 w-full">
+      <SectionContainerWithCn height="none">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {FEATURES.map((feature) => {
             const Visual = feature.visual
@@ -599,7 +600,7 @@ export function FeaturesSection() {
             )
           })}
         </div>
-      </div>
+      </SectionContainerWithCn>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 'use client'
 
+import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -124,8 +125,8 @@ export function LocalDXSection() {
   return (
     <div className="py-24 flex flex-col gap-16">
       {/* Header */}
-      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-end">
+      <SectionContainerWithCn height="none">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
           <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
             Delightful DX from <br />
             <span className="text-foreground">local to production</span>
@@ -144,17 +145,17 @@ export function LocalDXSection() {
             in and out at any time with no vendor lock-in.
           </p>
         </div>
-      </div>
+      </SectionContainerWithCn>
 
       {/* Bento grid */}
-      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 w-full">
+      <SectionContainerWithCn height="none">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-flow-dense gap-3">
           <LocalDXCard />
           <ParityCard />
           <CICard />
           <EcosystemCard />
         </div>
-      </div>
+      </SectionContainerWithCn>
     </div>
   )
 }

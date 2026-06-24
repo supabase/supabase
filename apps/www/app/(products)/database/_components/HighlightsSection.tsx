@@ -1,3 +1,4 @@
+import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import { Check } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -46,15 +47,15 @@ export function HighlightsSection() {
   return (
     <div className="py-24 flex flex-col gap-24">
       {/* Header */}
-      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 w-full">
+      <SectionContainerWithCn height="none">
         <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
           Built for scale
           <br />
           <span className="text-foreground">with powerful new features</span>
         </h3>
-      </div>
+      </SectionContainerWithCn>
 
-      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 w-full">
+      <SectionContainerWithCn height="none">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
           {HIGHLIGHTS.map((highlight) => (
             <div
@@ -102,7 +103,7 @@ export function HighlightsSection() {
             </div>
           ))}
         </div>
-      </div>
+      </SectionContainerWithCn>
     </div>
   )
 }

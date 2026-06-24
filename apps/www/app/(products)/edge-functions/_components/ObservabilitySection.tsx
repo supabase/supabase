@@ -1,5 +1,6 @@
 'use client'
 
+import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { cn } from 'ui'
@@ -60,8 +61,8 @@ export function ObservabilitySection() {
   return (
     <div className="py-24 flex flex-col gap-16">
       {/* Header */}
-      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-end">
+      <SectionContainerWithCn height="none">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
           <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
             Debug and monitor with <br />
             <span className="text-foreground">built-in observability</span>
@@ -71,16 +72,16 @@ export function ObservabilitySection() {
             explorer, and health dashboards — all built into the Supabase Dashboard.
           </p>
         </div>
-      </div>
+      </SectionContainerWithCn>
 
       {/* 3-column grid */}
-      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 w-full">
+      <SectionContainerWithCn height="none">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {cards.map((card) => (
             <ObservabilityCard key={card.id} card={card} />
           ))}
         </div>
-      </div>
+      </SectionContainerWithCn>
     </div>
   )
 }

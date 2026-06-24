@@ -1,5 +1,6 @@
 'use client'
 
+import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import { AnimatePresence, motion, useInView } from 'framer-motion'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
@@ -64,8 +65,8 @@ function TerminalAnimation() {
 
 export function CTASection() {
   return (
-    <div className="mx-auto max-w-(--container-max-w,75rem)">
-      <div className="flex flex-col items-center text-center gap-10 py-24 md:py-32 px-6">
+    <SectionContainerWithCn height="none">
+      <div className="flex flex-col items-center text-center gap-10 py-24 md:py-32">
         <div className="flex flex-col items-center gap-4">
           <h2 className="text-2xl md:text-4xl text-foreground">
             Deploy your first function
@@ -87,6 +88,6 @@ export function CTASection() {
           </Button>
         </div>
       </div>
-    </div>
+    </SectionContainerWithCn>
   )
 }

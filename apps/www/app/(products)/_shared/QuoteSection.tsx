@@ -1,3 +1,4 @@
+import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -15,7 +16,7 @@ interface QuoteSectionProps {
 export function QuoteSection({ quote, highlight, author }: QuoteSectionProps) {
   return (
     <div>
-      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 border-x border-border bg-surface-200">
+      <SectionContainerWithCn height="none" className="border-x border-border bg-surface-200">
         <div className="flex flex-col items-center text-center gap-8 md:gap-12 py-16 md:py-24">
           <q className="text-2xl xl:text-4xl tracking-tight max-w-screen-lg text-foreground-lighter text-balance">
             {quote}
@@ -45,7 +46,7 @@ export function QuoteSection({ quote, highlight, author }: QuoteSectionProps) {
             </div>
           </Link>
         </div>
-      </div>
+      </SectionContainerWithCn>
     </div>
   )
 }

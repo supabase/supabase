@@ -1,3 +1,4 @@
+import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import Examples from 'data/Examples'
 import Link from 'next/link'
 import { PRODUCT_NAMES } from 'shared-data/products'
@@ -19,7 +20,7 @@ export function ExamplesSection() {
   return (
     <div className="py-24 flex flex-col gap-16">
       {/* Header */}
-      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 w-full">
+      <SectionContainerWithCn height="none">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
             What you can build <br />
@@ -32,10 +33,10 @@ export function ExamplesSection() {
             View all examples
           </Link>
         </div>
-      </div>
+      </SectionContainerWithCn>
 
       {/* Cards */}
-      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 w-full">
+      <SectionContainerWithCn height="none">
         {/* Featured row - 2 large cells */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {featuredExamples.map((example) => {
@@ -97,7 +98,7 @@ export function ExamplesSection() {
             )
           })}
         </div>
-      </div>
+      </SectionContainerWithCn>
     </div>
   )
 }

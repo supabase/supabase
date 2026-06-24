@@ -1,5 +1,6 @@
 'use client'
 
+import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import { AnimatePresence, motion, useInView } from 'framer-motion'
 import { Database, HardDrive, Shield, Webhook, Zap } from 'lucide-react'
 import Link from 'next/link'
@@ -94,8 +95,8 @@ export function IntegratesSectionClient({ useCases }: { useCases: UseCase[] }) {
   return (
     <div ref={inViewRef} className="py-24 flex flex-col gap-16">
       {/* Header */}
-      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-end">
+      <SectionContainerWithCn height="none">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
           <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
             Integrates with the <span className="text-foreground">Supabase ecosystem</span>
           </h3>
@@ -104,10 +105,10 @@ export function IntegratesSectionClient({ useCases }: { useCases: UseCase[] }) {
             configuration.
           </p>
         </div>
-      </div>
+      </SectionContainerWithCn>
 
       {/* Content */}
-      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 w-full">
+      <SectionContainerWithCn height="none">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {/* Left: tab cards */}
           <div className="flex flex-col gap-1 items-start justify-end">
@@ -212,7 +213,7 @@ export function IntegratesSectionClient({ useCases }: { useCases: UseCase[] }) {
             </div>
           </div>
         </div>
-      </div>
+      </SectionContainerWithCn>
     </div>
   )
 }
