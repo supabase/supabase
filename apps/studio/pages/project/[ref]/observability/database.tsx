@@ -4,7 +4,7 @@ import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, Button } from 'ui'
 
@@ -43,6 +43,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
+import { MemoryPatternCallout } from '@/components/interfaces/Reports/MemoryPatternCallout'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -284,9 +285,8 @@ const DatabaseUsage = () => {
               !chart.entitlement ||
               isEntitlementLoading ||
               entitledFeatures.includes(chart.entitlement)
-            return chartAvailable ? (
+            const chartElement = chartAvailable ? (
               <LazyComposedChartHandler
-                key={chart.id}
                 {...chart}
                 attributes={chart.attributes as MultiAttribute[]}
                 interval={selectedDateRange.interval}
@@ -305,10 +305,15 @@ const DatabaseUsage = () => {
               />
             ) : (
               <ReportChartUpsell
-                key={chart.id}
                 report={{ label: chart.label, requiredPlan: chart.requiredPlan }}
                 orgSlug={org?.slug ?? ''}
               />
+            )
+            return (
+              <Fragment key={chart.id}>
+                {chartElement}
+                {chart.id === 'ram-usage' && <MemoryPatternCallout />}
+              </Fragment>
             )
           })}
         {selectedDateRange && isReplicaSelected && (
@@ -470,3 +475,4 @@ const DatabaseUsage = () => {
     </>
   )
 }
+
