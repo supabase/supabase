@@ -67,11 +67,8 @@ const getDotKeys = (obj: { [k: string]: unknown }, parent?: string): string[] =>
   })
 }
 
-/**
- * Default resolver for filter keys that have no template entry — used for unknown
- * filters coming from a filterOverride. Emits a generic BigQuery equality predicate
- * and drops the clause on non-scalar / un-encodable input.
- */
+// Fallback for filter keys with no template: a plain `key = value`.
+// Drops the clause on non-scalar or un-encodable input.
 const defaultResolveUnknownClause = (dotKey: string, value: unknown): SafeLogSqlFragment | null => {
   if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
     return null
@@ -84,18 +81,12 @@ const defaultResolveUnknownClause = (dotKey: string, value: unknown): SafeLogSql
 }
 
 /**
- * Builds the list of AND-joined WHERE clauses for a table's filters.
+ * Builds the AND-joined WHERE clauses for a table's filters. Top-level keys are
+ * ANDed, nested keys under one key are ORed.
  *
- * Root keys in the filter object are considered to be AND filters; nested keys
- * under a root key are considered to be OR filters. For example
- * `{my_value: 'something', nested: {id: 123, test: 123 }}` becomes
- * `WHERE (my_value = 'something') and (id = 123 or test = 123)`. The template of
- * the filter determines the actual statement; if no template is provided, the
- * `resolveUnknownClause` fallback is used (generic equality by default).
- *
- * `filterTemplates` and `resolveUnknownClause` are injectable so the OTEL/ClickHouse
- * builders can reuse the exact same nested AND/OR grouping logic while swapping in
- * their own dialect-specific predicates. Defaults preserve the BigQuery behavior.
+ * `filterTemplates` and `resolveUnknownClause` are injectable so the OTEL builders
+ * reuse this grouping with their own ClickHouse conditions. Defaults keep the
+ * BigQuery behavior.
  */
 export const buildWhereClauses = (
   table: LogsTableName,

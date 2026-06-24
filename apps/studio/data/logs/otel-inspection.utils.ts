@@ -12,18 +12,8 @@ export type OtelLogRow = {
   log_attributes?: Record<string, any>
 }
 
-/**
- * Parses an OTEL timestamp into a Date. The endpoint serializes timestamps as
- * ISO-like strings (`2024-01-01T00:00:00.000Z` or, from ClickHouse,
- * `2024-01-01 00:00:00.000000` with a space and no zone) or as numeric
- * microseconds-since-epoch.
- *
- * Disambiguate by format, not by `Number.isFinite` — a numeric string of
- * microseconds is always finite, so finiteness can't tell us whether the value
- * is microseconds or an ISO string. ISO-like strings contain `T` or `-`; the
- * space variant is normalized to `T` and assumed UTC when no zone is present.
- * Anything else is treated as numeric microseconds.
- */
+// OTEL timestamps arrive as an ISO string (sometimes space-separated, no zone)
+// or as numeric microseconds. Strings have a `T` or `-`; anything else is micros.
 export function parseOtelTimestamp(timestamp: unknown): Date {
   const ts = String(timestamp ?? '')
   const looksLikeIso = /[T-]/.test(ts)

@@ -63,11 +63,8 @@ function useLogsPreview({
   const defaultHelper = getDefaultHelper(PREVIEWER_DATEPICKER_HELPERS)
   const [latestRefresh, setLatestRefresh] = useState(new Date().toISOString())
 
-  // When enabled, route the legacy logs pages through the OTEL ClickHouse
-  // endpoint (logs.all.otel) instead of the BigQuery-backed logs.all endpoint.
-  // `logsAllEndpointUrl(useOtel)` is inlined in each queryFn (rather than hoisted
-  // to a const) so the only query dependency is `useOtel`, which is already part
-  // of every query key — keeping @tanstack/query/exhaustive-deps satisfied.
+  // When on, query the OTEL endpoint instead of BigQuery. logsAllEndpointUrl is
+  // inlined in each queryFn (not hoisted) so useOtel stays the only query dep.
   const useOtel = useFlag('otelLegacyLogs')
 
   const {
@@ -141,8 +138,7 @@ function useLogsPreview({
         signal,
       })
       const logs = data as unknown as Logs
-      // OTEL rows carry an ISO/microsecond timestamp; normalize to the
-      // microsecond-number shape the renderers and pagination cursor expect.
+      // Normalize OTEL timestamps to the microsecond number the renderers expect.
       if (useOtel && logs?.result) {
         return { ...logs, result: logs.result.map(mapOtelPreviewRow) } as Logs
       }

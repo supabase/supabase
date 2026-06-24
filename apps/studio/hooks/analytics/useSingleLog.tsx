@@ -40,8 +40,7 @@ function useSingleLog({
 }: SingleLogParams): SingleLogHook {
   const table = queryType ? LOGS_TABLES[queryType] : undefined
 
-  // When enabled, fetch the single log from the OTEL ClickHouse endpoint
-  // (id-only lookup) instead of the BigQuery per-service query.
+  // When on, fetch the log from the OTEL endpoint instead of BigQuery.
   const useOtel = useFlag('otelLegacyLogs')
   const endpoint = logsAllEndpointUrl(useOtel)
 
@@ -102,8 +101,7 @@ function useSingleLog({
 
   let error: null | string | object = rcError ? (rcError as any).message : null
   const rawResult = data?.result ? data.result[0] : undefined
-  // OTEL returns a flat `log_attributes` row; map it back to the legacy LogData
-  // shape (nested metadata for api/database, flat otherwise) the panel reads.
+  // Map the OTEL row to the legacy LogData shape the panel reads.
   const result =
     rawResult && useOtel
       ? mapOtelSingleLogToLegacy(rawResult as unknown as OtelLogRow, queryType)
