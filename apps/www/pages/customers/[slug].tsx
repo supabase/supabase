@@ -15,6 +15,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Button } from 'ui'
 
+import SectionContainer from '@/components/Layouts/SectionContainer'
+
 // table of contents extractor
 const toc = require('markdown-toc')
 
@@ -128,12 +130,7 @@ function CaseStudyPage(props: any) {
         />
       </Head>
       <DefaultLayout>
-        <div
-          className="
-            container mx-auto p-8 sm:py-16 sm:px-16
-            xl:px-20
-          "
-        >
+        <SectionContainer className="py-8 sm:py-16!">
           <div className="grid grid-cols-12 gap-4">
             <div className="hidden xl:block col-span-12 mb-2 xl:col-span-2">
               {/* Back button */}
@@ -235,7 +232,7 @@ function CaseStudyPage(props: any) {
               </div>
             </div>
           </div>
-        </div>
+        </SectionContainer>
 
         <CTABanner />
       </DefaultLayout>
