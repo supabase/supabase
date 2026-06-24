@@ -953,6 +953,45 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 </$Show>
 </Tabs>
 
+### Selecting specific columns
+
+Use the `select` parameter to limit which columns are included in the change payload. Pass a comma-separated list of column names. When omitted, all columns are returned.
+
+This is useful for reducing payload size, especially on wide tables where you only need a few fields.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const changes = supabase
+  .channel('table-select-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'notes',
+      filter: 'id=gt.0',
+      select: 'id,body',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+</Tabs>
+
+When the client joins, the `phx_reply` echoes back the full subscription params — including `select` — with a generated `id` computed as `phash2` of those params. Two subscriptions on the same table with different `select` values produce different IDs and receive independent payloads.
+
+The `select` parameter filters all three fields in the change payload: `columns`, `record`, and `old_record`. Primary key columns are always included regardless of what is specified in `select`.
+
 ## Available filters
 
 Realtime offers filters so you can specify the data your client receives at a more granular level.
