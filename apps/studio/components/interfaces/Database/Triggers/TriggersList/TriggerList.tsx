@@ -177,19 +177,19 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
               <div className="flex items-center justify-end">
                 {canUpdateTriggers ? (
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button
-                            aria-label="More options"
-                            variant="default"
-                            className="px-1"
-                            icon={<MoreVertical />}
-                          />
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom">More options</TooltipContent>
-                      </Tooltip>
-                    </DropdownMenuTrigger>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                              aria-label="More options"
+                              variant="default"
+                              className="px-1"
+                              icon={<MoreVertical />}
+                            />
+                        </DropdownMenuTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">More options</TooltipContent>
+                    </Tooltip>
                     <DropdownMenuContent side="bottom" align="end" className="w-52">
                       <DropdownMenuItem
                         className="space-x-2"
