@@ -177,12 +177,27 @@ export const SQLEditorTreeViewItem = ({
     }
   }
 
-  const onToggleFavorite = () => {
+  const onToggleFavorite = async () => {
     const snippetId = element.metadata.id
-    if (snippetId) {
-      if (isFavorite) snapV2.removeFavorite(snippetId)
-      else snapV2.addFavorite(snippetId)
+    if (!snippetId) return
+    if (!projectRef) return console.error('Project ref is required')
+
+    // Persisting a favorite goes through the full content upsert, so the
+    // snippet's content must be loaded first — otherwise the PUT endpoint
+    // rejects the update. Snippets listed in the nav that have never been
+    // opened have no content loaded yet, so fetch it before toggling.
+    const storeSnippet = snapV2.snippets[snippetId]
+    if (!storeSnippet?.snippet.content) {
+      const data = await getContentById({ projectRef, id: snippetId })
+      // getContentById returns a union content; narrow to the SQL variant (the
+      // only kind the SQL editor loads) via its discriminating field.
+      if ('unchecked_sql' in data.content) {
+        snapV2.setSnippet(projectRef, { ...data, content: data.content })
+      }
     }
+
+    if (isFavorite) snapV2.removeFavorite(snippetId)
+    else snapV2.addFavorite(snippetId)
   }
 
   const onSelectDuplicate = async () => {

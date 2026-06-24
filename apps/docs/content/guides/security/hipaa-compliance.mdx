@@ -51,6 +51,10 @@ The main differentiator comes down to purpose and scope.
 
 Yes. Supabase applies the same SOC 2 controls to all environments, with additional controls being applied to HIPAA environments.
 
+**Does Supabase log database connections by default?**
+
+No. Supabase sets Postgres `log_connections` to off by default for new projects. HIPAA and high-compliance projects should keep [connection logging](/docs/guides/platform/postgres-connection-logging) enabled. The Security Advisor warns if it is disabled.
+
 **How often is Supabase audited?**
 
 Supabase undergoes annual audits. The HIPAA controls are audited during the same audit period as the SOC 2 controls.
@@ -64,3 +68,4 @@ Supabase undergoes annual audits. The HIPAA controls are audited during the same
 5. [Configuring HIPAA projects](/docs/guides/platform/hipaa-projects) on Supabase
 6. [Shared Responsibility Model](/docs/guides/deployment/shared-responsibility-model)
 7. [HIPAA shared responsibility](/docs/guides/deployment/shared-responsibility-model#managing-healthcare-data)
+8. [Postgres connection logging](/docs/guides/platform/postgres-connection-logging)

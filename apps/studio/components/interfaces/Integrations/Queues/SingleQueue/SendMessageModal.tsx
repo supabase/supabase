@@ -23,7 +23,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { useDatabaseQueueMessageSendMutation } from '@/data/database-queues/database-queue-messages-send-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
