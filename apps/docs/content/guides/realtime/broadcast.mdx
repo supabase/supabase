@@ -1044,7 +1044,7 @@ You can configure replay with the following options:
 
 <Admonition type="note">
 
-Message retention is capped at 72 hours. A `since` value older than 72h skips older messages. See [Realtime Limits](/docs/guides/realtime/limits) for details.
+Messages are stored in daily partitions, and partitions older than 72 hours are dropped. Because whole days are removed at once, a message stays available for at least 72 hours and at most 4 days, depending on the time of day it was sent. Setting `since` further back than the retained window does not recover deleted messages. See [Realtime Limits](/docs/guides/realtime/limits) for details.
 
 </Admonition>
 
