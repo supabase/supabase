@@ -191,6 +191,20 @@ You can obtain your connection info and Server root certificate from your applic
 
 Below are answers to common challenges and queries.
 
+
+### Why am I experiencing `System.TimeoutException` with Npgsql (.NET)?
+
+If you are seeing intermittent timeout errors using Npgsql with a connection pooler from external environments, it is likely due to idle connections being dropped by network proxies or load balancers before the client is aware. 
+
+To resolve transient timeouts, update your connection string to use TCP keepalives. For `.NET` and `Npgsql`, append `Keepalive=1` (or another low value in seconds) and consider increasing `Command Timeout` if your queries take longer:
+
+```text
+Server=aws-0-[REGION].pooler.supabase.com;Port=5432;Database=postgres;User Id=postgres.[TENANT_ID];Password=[YOUR-PASSWORD];Keepalive=1;Command Timeout=60;
+```
+
+**Note on Pooler Ports for Npgsql:**
+- **Port 6543 (Transaction Mode):** Serverless and transient functions should use transaction mode. However, Npgsql uses [Prepared Statements](https://www.npgsql.org/doc/prepare.html) by default, which can cause errors in transaction mode. To use port `6543`, you may need to disable auto-preparation or multiplexing depending on your Npgsql configuration.
+- **Port 5432 (Session Mode):** If you are running a persistent backend and prefer the default behavior of Npgsql, use Session Mode on port `5432`.
 ### What is a “connection refused” error?
 
 A “Connection refused” error typically means your database isn’t reachable. Ensure your Supabase project is running, confirm your database’s connection string, check firewall settings, and validate network permissions.
