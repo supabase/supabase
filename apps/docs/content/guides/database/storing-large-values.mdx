@@ -115,6 +115,6 @@ A high `approx_free_percent` means reclaimable bloat; a high `approx_tuple_perce
 
 ## Reclaiming space
 
-Plain `VACUUM` reclaims dead tuples into reusable free space but [does not return space to the OS](https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-SPACE-RECOVERY). To shrink the files, rewrite the table with [`pg_repack`](/docs/guides/database/extensions/pg_repack) (online, recommended) or `VACUUM FULL` (takes an exclusive lock — maintenance window only). Both need roughly 2× the table's size in free disk during the operation.
+Plain `VACUUM` reclaims dead tuples into reusable free space; it only returns space to the OS when entirely-empty pages sit at the end of the table, so it can't shrink a file that's bloated in the middle ([PG docs](https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-SPACE-RECOVERY)). To shrink the files, rewrite the table with [`pg_repack`](/docs/guides/database/extensions/pg_repack) (online, recommended) or `VACUUM FULL` (takes an exclusive lock — maintenance window only). Both need roughly 2× the table's size in free disk during the operation.
 
 Reclaiming lowers your **used** space immediately, but the **provisioned** disk doesn't shrink on its own — it's right-sized to 1.2× your database size during the next [Postgres version upgrade](/docs/guides/platform/upgrading#disk-sizing).
