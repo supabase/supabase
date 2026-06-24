@@ -29,6 +29,17 @@ Choose one of these Vercel Deploy Templates which use our [Vercel Deploy Integra
         and Tailwind CSS.
       </GlassPanel>
     </Link>
+
+    <Link
+      href="https://supabase.link/nextjs-supabase-drizzle"
+      className="col-span-12 md:col-span-4"
+      passHref
+    >
+      <GlassPanel title="Drizzle" hasLightIcon={true} background={false} showIconBg={true}>
+        Simple Next.js template that uses Supabase as the database and Drizzle as the ORM.
+      </GlassPanel>
+    </Link>
+
     <Link
       href="https://supabase.link/nextjs-supabase-kysely"
       className="col-span-12 md:col-span-4"
@@ -75,8 +86,8 @@ export const UsersTable = pgTable(
   }
 )
 
-export type User = InferSelectModel<typeof UsersTable>
-export type NewUser = InferInsertModel<typeof UsersTable>
+export type User = InferSelectModel< typeof UsersTable>
+export type NewUser = InferInsertModel< typeof UsersTable>
 
 // Connect to Vercel Postgres
 export const db = drizzle(sql)
