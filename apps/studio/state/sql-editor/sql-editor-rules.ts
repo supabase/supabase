@@ -1,5 +1,5 @@
-import type { SnippetWithContent } from './types'
 import type { UpsertContentPayload } from '@/data/content/content-upsert-mutation'
+import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 
 /**
  *
