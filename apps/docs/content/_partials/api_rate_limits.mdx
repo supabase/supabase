@@ -59,9 +59,9 @@ Some endpoints have stricter rate limits than the standard 120 requests per minu
 
 Some endpoints have the standard 120 requests per minute but with different timeout durations:
 
-| Endpoint                                        | Limit          | Duration   | Reason                                               |
-| ------------------------------------------------| -------------- | ---------- | ---------------------------------------------------- |
-| `POST /v1/projects/:ref/database/migrations`    | 120 requests   | 3 minutes  | Database migrations may require more processing time |
+| Endpoint                                     | Limit        | Duration  | Reason                                               |
+| -------------------------------------------- | ------------ | --------- | ---------------------------------------------------- |
+| `POST /v1/projects/:ref/database/migrations` | 120 requests | 3 minutes | Database migrations may require more processing time |
 
 ### Best practices
 
