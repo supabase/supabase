@@ -372,7 +372,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                         <InlineLink
                           href={`${DOCS_URL}${AUTH_EMAIL_TEMPLATES_DOCS_PATH}#${AUTH_EMAIL_TEMPLATES_TERMINOLOGY_ANCHOR}`}
                         >
-                          Terminology
+                          Learn more
                         </InlineLink>
                       </p>
                     </div>
