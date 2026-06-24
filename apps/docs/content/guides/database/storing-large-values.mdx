@@ -111,7 +111,7 @@ select 'toast' as scope, s.* from t, lateral pgstattuple_approx(
   (select reltoastrelid from pg_class where oid = t.rel)::regclass) s;
 ```
 
-A high `approx_free_percent` means reclaimable bloat; a high `approx_tuple_percent` means the data is genuinely large and you should reduce what you store. See [`pgstattuple`](https://www.postgresql.org/docs/current/pgstattuple.html).
+A high `approx_free_percent` means reclaimable bloat. A high `approx_tuple_percent` means the data is genuinely large, and you should reduce what you store. See [`pgstattuple`](https://www.postgresql.org/docs/current/pgstattuple.html).
 
 `pgstattuple_approx` samples the table, so it stays cheap on large relations. The exact `pgstattuple()` function does a full-table scan — avoid running it on a large or busy database under heavy load.
 
