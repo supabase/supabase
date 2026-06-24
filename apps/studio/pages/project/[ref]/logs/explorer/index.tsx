@@ -1,6 +1,6 @@
 import { useMonaco } from '@monaco-editor/react'
 import { useLocalStorage } from '@uidotdev/usehooks'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import type { editor } from 'monaco-editor'
 import { useRouter } from 'next/router'
@@ -105,10 +105,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     []
   )
 
-  const [useOtelEndpoint, setUseOtelEndpoint] = useLocalStorage<boolean>(
-    `logs-explorer-use-otel-endpoint-${projectRef}`,
-    false
-  )
+  // When the otelLegacyLogs flag is on, the explorer queries the ClickHouse-backed
+  // logs.all.otel endpoint; otherwise it stays on the BigQuery logs.all endpoint.
+  const useOtelEndpoint = useFlag('otelLegacyLogs')
 
   const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToAuditLogDays = getEntitlementNumericValue()
@@ -386,8 +385,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             templates={allTemplates.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
             warnings={warnings}
-            useOtel={useOtelEndpoint}
-            onUseOtelChange={setUseOtelEndpoint}
           />
           <ShimmerLine active={isLoading} />
           <CodeEditor
