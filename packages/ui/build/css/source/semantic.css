@@ -12,8 +12,38 @@
   --chroma: 0.018;
   --surface: 0.985;
   --foreground-lightness: 0.16;
-  --muted-foreground-opacity: 68%;
+  --muted-foreground-opacity: 68%; /* base at --contrast: 0.5; themes may override */
   --tertiary-foreground-opacity: 48%;
+
+  /*
+   * Global contrast knob, 0 to 1. Default 0.5 is the comfortable baseline; 0 keeps
+   * borders and accent barely visible over muted surfaces; 1 pushes them to full
+   * strength. Foreground hits --foreground-lightness at 0.5; below that it eases
+   * toward the surface down to --contrast-text-floor at 0. Muted and tertiary
+   * foreground opacities use the theme base values at 0.5 and scale up toward
+   * foreground or down toward half that base as contrast moves away from baseline.
+   *
+   * --contrast-delta is -1 at 0, 0 at 0.5, +1 at 1 — shared offset from baseline.
+   * --contrast-border remaps delta into [floor, 1] and squares it so 0.5 is the
+   * design baseline and most of the ramp lives toward 1.
+   */
+  --contrast: 0.5;
+  --contrast-delta: calc((var(--contrast) - 0.5) / 0.5);
+  --contrast-text-floor: 0.8;
+  --contrast-border-floor: 0.05;
+  --contrast-text: calc(
+    1 - (1 - var(--contrast-text-floor)) * max(0, calc(var(--contrast-delta) * -1))
+  );
+  --contrast-border: calc(
+    (
+        var(--contrast-border-floor) + (1 - var(--contrast-border-floor)) *
+          calc((var(--contrast-delta) + 1) / 2)
+      ) *
+      (
+        var(--contrast-border-floor) + (1 - var(--contrast-border-floor)) *
+          calc((var(--contrast-delta) + 1) / 2)
+      )
+  );
 
   /*
    * Surface elevation. Each surface steps its lightness away from --background
@@ -30,7 +60,7 @@
   --elevation-2: 1.5;
   --elevation-3: 2;
   --elevation-4: 3;
-  --elevation-step: calc((var(--foreground-lightness) - var(--surface)) * 0.03);
+  --elevation-step: calc((var(--foreground-lightness) - var(--surface)) * 0.035);
 
   /*
    * Status hues stay anchored to amber / red but pull a fraction of the way
@@ -54,7 +84,10 @@
 
   /* shadcn semantic pairs */
   --background: oklch(var(--surface) calc(var(--chroma) * 0.35) var(--hue));
-  --foreground: oklch(var(--foreground-lightness) calc(var(--chroma) * 0.55) var(--hue));
+  --foreground: oklch(
+    calc(var(--surface) + (var(--foreground-lightness) - var(--surface)) * var(--contrast-text))
+      calc(var(--chroma) * 0.55) var(--hue)
+  );
 
   --card: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-1)) c h);
   --card-foreground: var(--foreground);
@@ -73,16 +106,30 @@
   --tertiary: oklch(
     from var(--background) calc(l + var(--elevation-step) * var(--elevation-4)) c h
   );
-  --tertiary-foreground: oklch(from var(--foreground) l c h / var(--tertiary-foreground-opacity));
+  --tertiary-foreground: oklch(
+    from var(--foreground) l c h /
+      calc(
+        var(--tertiary-foreground-opacity) + (100% - var(--tertiary-foreground-opacity)) *
+          max(0, var(--contrast-delta)) - var(--tertiary-foreground-opacity) * 0.5 *
+          max(0, calc(var(--contrast-delta) * -1))
+      )
+  );
   --muted: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-2)) c h);
-  --muted-foreground: oklch(from var(--foreground) l c h / var(--muted-foreground-opacity));
+  --muted-foreground: oklch(
+    from var(--foreground) l c h /
+      calc(
+        var(--muted-foreground-opacity) + (100% - var(--muted-foreground-opacity)) *
+          max(0, var(--contrast-delta)) - var(--muted-foreground-opacity) * 0.5 *
+          max(0, calc(var(--contrast-delta) * -1))
+      )
+  );
   /*
    * Accent is a contrast / hover-selection fill, not an elevation surface, so it
    * always steps toward the foreground: slightly darker than --background in
    * light, slightly lighter in dark — regardless of the elevation direction.
    * The (foreground-lightness - surface) term carries the sign per theme.
    */
-  --accent-step: 0.09;
+  --accent-step: calc(0.012 + 0.17 * var(--contrast-border));
   --accent: oklch(
     from var(--background)
       calc(l + (var(--foreground-lightness) - var(--surface)) * var(--accent-step)) c h
@@ -105,8 +152,8 @@
   --border-warning: oklch(from var(--warning) l c h / 30%);
   --border-brand: oklch(from var(--primary) l c h / 30%);
 
-  --border: oklch(from var(--foreground) l calc(c * 0.5) h / 8%);
-  --input: oklch(from var(--foreground) l calc(c * 0.5) h / 12%);
+  --border: oklch(from var(--foreground) l calc(c * 0.5) h / calc(2% + 30% * var(--contrast-border)));
+  --input: oklch(from var(--foreground) l calc(c * 0.5) h / calc(3% + 38% * var(--contrast-border)));
   --ring: oklch(from var(--primary) l c h / 55%);
 
   /* Legacy foreground aliases */
@@ -138,13 +185,13 @@
 
   /* Legacy border aliases */
   --border-default: var(--border);
-  --border-muted: oklch(from var(--foreground) l calc(c * 0.5) h / 8%);
+  --border-muted: oklch(from var(--foreground) l calc(c * 0.5) h / calc(2% + 30% * var(--contrast-border)));
   --border-secondary: var(--border-muted);
-  --border-overlay: oklch(from var(--foreground) l calc(c * 0.5) h / 10%);
+  --border-overlay: oklch(from var(--foreground) l calc(c * 0.5) h / calc(4% + 34% * var(--contrast-border)));
   --border-control: var(--input);
   --border-alternative: var(--border);
   --border-strong: var(--input);
-  --border-stronger: oklch(from var(--foreground) l calc(c * 0.5) h / 24%);
+  --border-stronger: oklch(from var(--foreground) l calc(c * 0.5) h / calc(5% + 45% * var(--contrast-border)));
   --border-button-default: var(--border);
   --border-button-hover: var(--border-stronger);
 }
