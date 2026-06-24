@@ -66,14 +66,6 @@ const default__padding_and_text = {
   xlarge: `${defaults.size.text.xlarge} ${defaults.size.padding.xlarge}`,
 }
 
-const with_icon_spacing_sizes = {
-  tiny: 'pl-7',
-  small: 'pl-8',
-  medium: 'pl-8',
-  large: 'pl-10',
-  xlarge: 'pl-11',
-}
-
 /*
  * Main tailwind utility classes output
  *
