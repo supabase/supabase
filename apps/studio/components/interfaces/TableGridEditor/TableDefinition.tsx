@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import Link from 'next/link'
-import { useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import { Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -11,7 +11,6 @@ import { useViewDefinitionQuery } from '@/data/database/view-definition-query'
 import { Entity, isTableLike, isViewLike } from '@/data/table-editor/table-editor-types'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
-import { timeout } from '@/lib/helpers'
 
 export interface TableDefinitionProps {
   entity?: Entity
@@ -19,8 +18,6 @@ export interface TableDefinitionProps {
 
 export const TableDefinition = ({ entity }: TableDefinitionProps) => {
   const { ref } = useParams()
-  const editorRef = useRef(null)
-  const monacoRef = useRef(null)
   const { data: project } = useSelectedProjectQuery()
 
   const viewResult = useViewDefinitionQuery(
