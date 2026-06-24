@@ -45,6 +45,7 @@ import * as z from 'zod'
 import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/EmailTemplates/AuthTemplatesValidation'
 import { CustomEmailTemplateRestrictionAdmonition } from '@/components/interfaces/Auth/EmailTemplates/CustomEmailTemplateRestrictionAdmonition'
 import { EMAIL_TEMPLATE_DOCS_ANCHORS } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.constants'
+import { supportsTemplateFlowPicker } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.flowVariants'
 import {
   isCustomEmailTemplateEditingRestricted,
   isCustomEmailTemplateRestrictionStatusKnown,
@@ -114,6 +115,9 @@ const RedirectToTemplates = () => {
     templateId && typeof templateId === 'string'
       ? TEMPLATES_SCHEMAS.find((template) => slugifyTitle(template.title) === templateId)
       : null
+
+  const showTemplateFlowPicker =
+    !!template && supportsTemplateFlowPicker(template.id) && isTemplateEditBlocked
 
   // Determine if this is a security notification template
   const isSecurityTemplate = template?.misc?.emailTemplateType === 'security'
@@ -300,7 +304,11 @@ const RedirectToTemplates = () => {
                   </div>
                 )}
                 <Card>
-                  <TemplateEditor template={template} isReadOnly={isTemplateEditorReadOnly} />
+                  <TemplateEditor
+                    template={template}
+                    isReadOnly={isTemplateEditorReadOnly}
+                    showFlowPicker={showTemplateFlowPicker}
+                  />
                 </Card>
               </PageSectionContent>
             </PageSection>

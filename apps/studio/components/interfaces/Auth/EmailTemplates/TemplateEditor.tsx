@@ -23,10 +23,16 @@ import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
+import {
+  getTemplateFlowVariant,
+  supportsTemplateFlowPicker,
+  type TemplateFlowMode,
+} from './EmailTemplates.flowVariants'
 import type { AuthTemplate } from './EmailTemplates.types'
 import { hasCustomEmailSender } from './EmailTemplates.utils'
 import { ResetTemplateDialog } from './ResetTemplateDialog'
 import { SpamValidation } from './SpamValidation'
+import { TemplateFlowPicker } from './TemplateFlowPicker'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
@@ -43,6 +49,7 @@ import { DOCS_URL } from '@/lib/constants'
 interface TemplateEditorProps {
   template: AuthTemplate
   isReadOnly?: boolean
+  showFlowPicker?: boolean
 }
 
 type EmailTemplateContentKey = Extract<
@@ -83,13 +90,18 @@ const getPreviewSrcDoc = (html: string) => {
   return `<!doctype html><html><head>${previewBaseStyles}</head><body>${html}</body></html>`
 }
 
-export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorProps) => {
+export const TemplateEditor = ({
+  template,
+  isReadOnly = false,
+  showFlowPicker = false,
+}: TemplateEditorProps) => {
   const { ref: projectRef } = useParams()
   const { can: canUpdateConfig } = useAsyncCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_gotrue'
   )
   const canEdit = canUpdateConfig && !isReadOnly
+  const supportsFlowPicker = showFlowPicker && supportsTemplateFlowPicker(template.id)
 
   const { id, properties } = template
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
@@ -102,6 +114,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
   const [, setHasUnsavedChanges] = useState(false)
   const [isSavingTemplate, setIsSavingTemplate] = useState(false)
   const [activeView, setActiveView] = useState<'source' | 'preview'>('source')
+  const [flowMode, setFlowMode] = useState<TemplateFlowMode>('link')
   const previewSrcDoc = useMemo(() => getPreviewSrcDoc(bodyValue), [bodyValue])
 
   const { mutate: validateSpam } = useValidateSpamMutation()
@@ -203,7 +216,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
     (subjectSlug !== undefined &&
       authConfig?.MAILER_SUBJECTS_CUSTOM_CONTENTS?.[subjectSlug] === true)
   const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(baselineValues)
-  const hasChanges = hasFormChanges || baselineBodyValue !== bodyValue
+  const hasChanges = supportsFlowPicker ? false : hasFormChanges || baselineBodyValue !== bodyValue
   const saveChangesTooltip = !canUpdateConfig
     ? 'You need additional permissions to edit templates'
     : isReadOnly
@@ -240,13 +253,32 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
     }
   }
 
+  const applyFlowVariant = useCallback(
+    (mode: TemplateFlowMode) => {
+      if (!supportsTemplateFlowPicker(template.id)) return
+
+      const variant = getTemplateFlowVariant(template.id, mode)
+      setBodyValue(variant.body)
+
+      if (subjectSlug) {
+        form.setValue(subjectSlug, variant.subject, { shouldDirty: false, shouldTouch: false })
+      }
+    },
+    [form, subjectSlug, template.id]
+  )
+
+  useEffect(() => {
+    if (!supportsFlowPicker) return
+    applyFlowVariant(flowMode)
+  }, [applyFlowVariant, flowMode, supportsFlowPicker])
+
   // Update form values when authConfig changes
   useEffect(() => {
-    if (authConfig) {
+    if (authConfig && !supportsFlowPicker) {
       form.reset(getFormValuesFromConfig(authConfig))
       setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
     }
-  }, [authConfig, getFormValuesFromConfig, messageSlug, form])
+  }, [authConfig, getFormValuesFromConfig, messageSlug, form, supportsFlowPicker])
 
   useEffect(() => {
     if (projectRef && id && !!authConfig) {
@@ -279,6 +311,11 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
+        {supportsFlowPicker && (
+          <CardContent className="border-b">
+            <TemplateFlowPicker value={flowMode} onValueChange={setFlowMode} />
+          </CardContent>
+        )}
         <CardContent>
           {Object.keys(properties).map((x: string) => {
             const property = properties[x]
