@@ -285,4 +285,55 @@ describe('mapOtelSingleLogToLegacy', () => {
     expect(log.level).toBe('info')
     expect(log.event_message).toBe('object uploaded')
   })
+
+  it('tolerates a nullish row', () => {
+    const log = mapOtelSingleLogToLegacy(undefined) as any
+    expect(log.id).toBeUndefined()
+    expect(log.metadata).toBeUndefined()
+  })
+
+  it('fills api metadata with null when attributes are missing', () => {
+    const log = mapOtelSingleLogToLegacy({ log_attributes: {} }, 'api') as any
+    expect(log.metadata[0].request[0].method).toBeNull()
+    expect(log.metadata[0].response[0].status_code).toBeNull()
+    expect(log.metadata[0].response[0].headers[0].x_sb_error_code).toBeNull()
+  })
+
+  it('falls back to the legacy x_sb_error_code key for api rows', () => {
+    const log = mapOtelSingleLogToLegacy(
+      { log_attributes: { 'response.headers.x_sb_error_code': 'pgrst' } },
+      'api'
+    ) as any
+    expect(log.metadata[0].response[0].headers[0].x_sb_error_code).toBe('pgrst')
+  })
+
+  it('fills database metadata with null when attributes are missing', () => {
+    const log = mapOtelSingleLogToLegacy({ log_attributes: {} }, 'database') as any
+    expect(log.metadata[0].parsed[0].hint).toBeNull()
+    expect(log.metadata[0].parsed[0].detail).toBeNull()
+    expect(log.metadata[0].parsed[0].query).toBeNull()
+  })
+})
+
+describe('OTEL filter translation and chart defaults', () => {
+  it('translates the database filter for postgres and supavisor', () => {
+    expect(sql(genDefaultQueryOtel(LogsTableName.POSTGRES, { database: 'replica-1' }))).toContain(
+      "log_attributes['identifier'] = 'replica-1'"
+    )
+    expect(sql(genDefaultQueryOtel(LogsTableName.SUPAVISOR, { database: 'proj' }))).toContain(
+      "log_attributes['project'] LIKE 'proj%'"
+    )
+  })
+
+  it('translates the etl pipeline_id filter', () => {
+    expect(sql(genDefaultQueryOtel(LogsTableName.ETL, { pipeline_id: 42 }))).toContain(
+      "log_attributes['pipeline_id'] = 42"
+    )
+  })
+
+  it('defaults the chart bucket to minute when no time range is given', () => {
+    expect(sql(genChartQueryOtel(LogsTableName.EDGE, {}, {}))).toContain(
+      'toStartOfMinute(timestamp)'
+    )
+  })
 })
