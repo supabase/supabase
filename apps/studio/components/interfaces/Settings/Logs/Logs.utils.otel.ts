@@ -1,7 +1,8 @@
 import dayjs from 'dayjs'
+import { z } from 'zod'
 
 import { LogsTableName, type SqlFilterEntry } from './Logs.constants'
-import type { Filters, LogData, LogsEndpointParams, QueryType } from './Logs.types'
+import type { Filters, LogData, LogsEndpointParams, Metadata, QueryType } from './Logs.types'
 import { buildWhereClauses } from './Logs.utils'
 import { parseOtelTimestamp } from '@/data/logs/otel-inspection.utils'
 import {
@@ -329,55 +330,65 @@ export const mapOtelPreviewRow = (row: Record<string, any>): LogData => {
 // from the flat attributes. Other tables use a flat row.
 // TODO: edge logs also carry the JWT/apikey keys, so the panel's API key / role
 // rows could be rebuilt here later.
-const SINGLE_LOG_METADATA: Partial<Record<QueryType, (attrs: Record<string, any>) => unknown>> = {
-  api: (attrs) => ({
-    request: [
-      {
-        method: attrs['request.method'] ?? null,
-        path: attrs['request.path'] ?? null,
-        search: attrs['request.search'] ?? null,
-        headers: [{ user_agent: attrs['request.headers.user_agent'] ?? null }],
-      },
-    ],
-    response: [
-      {
-        status_code: attrs['response.status_code'] ?? null,
-        // OTEL uses `sb_error_code`; BigQuery used `x_sb_error_code`. Fall back
-        // to the old key so the panel works during the migration.
-        headers: [
-          {
-            x_sb_error_code:
-              attrs['response.headers.sb_error_code'] ??
-              attrs['response.headers.x_sb_error_code'] ??
-              null,
-          },
-        ],
-      },
-    ],
-  }),
-  database: (attrs) => ({
-    parsed: [
-      {
-        hint: attrs['parsed.hint'] ?? null,
-        detail: attrs['parsed.detail'] ?? null,
-        query: attrs['parsed.query'] ?? null,
-      },
-    ],
-  }),
-}
+const SINGLE_LOG_METADATA: Partial<Record<QueryType, (attrs: Record<string, string>) => Metadata>> =
+  {
+    api: (attrs) => ({
+      request: [
+        {
+          method: attrs['request.method'] ?? null,
+          path: attrs['request.path'] ?? null,
+          search: attrs['request.search'] ?? null,
+          headers: [{ user_agent: attrs['request.headers.user_agent'] ?? null }],
+        },
+      ],
+      response: [
+        {
+          status_code: attrs['response.status_code'] ?? null,
+          // OTEL uses `sb_error_code`; BigQuery used `x_sb_error_code`. Fall back
+          // to the old key so the panel works during the migration.
+          headers: [
+            {
+              x_sb_error_code:
+                attrs['response.headers.sb_error_code'] ??
+                attrs['response.headers.x_sb_error_code'] ??
+                null,
+            },
+          ],
+        },
+      ],
+    }),
+    database: (attrs) => ({
+      parsed: [
+        {
+          hint: attrs['parsed.hint'] ?? null,
+          detail: attrs['parsed.detail'] ?? null,
+          query: attrs['parsed.query'] ?? null,
+        },
+      ],
+    }),
+  }
+
+// OTEL rows come back untyped from the analytics endpoint; validate the shape we
+// read instead of casting. log_attributes is a string-keyed string map.
+const OtelLogRowSchema = z.object({
+  id: z.string().optional(),
+  timestamp: z.union([z.string(), z.number()]).optional(),
+  event_message: z.string().optional(),
+  log_attributes: z.record(z.string(), z.string()).optional(),
+})
 
 export const mapOtelSingleLogToLegacy = (row: unknown, queryType?: QueryType): LogData => {
-  const r = (row ?? {}) as Record<string, any>
-  const attrs: Record<string, any> = r.log_attributes ?? {}
-  const base = {
-    id: r.id,
-    timestamp: otelTimestampToMicros(r.timestamp),
-    event_message: r.event_message,
+  const parsed = OtelLogRowSchema.safeParse(row)
+  if (!parsed.success) {
+    console.error('Unexpected OTEL log row shape:', parsed.error.message)
+    return { id: '', timestamp: 0, event_message: '' }
   }
+  const { id = '', timestamp, event_message = '', log_attributes = {} } = parsed.data
+  const base: LogData = { id, timestamp: otelTimestampToMicros(timestamp), event_message }
 
   const buildMetadata = queryType ? SINGLE_LOG_METADATA[queryType] : undefined
   if (buildMetadata) {
-    return { ...base, metadata: [buildMetadata(attrs)] } as unknown as LogData
+    return { ...base, metadata: [buildMetadata(log_attributes)] }
   }
-  return { ...base, ...attrs } as LogData
+  return { ...base, ...log_attributes }
 }

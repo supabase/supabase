@@ -286,9 +286,9 @@ describe('mapOtelSingleLogToLegacy', () => {
     expect(log.event_message).toBe('object uploaded')
   })
 
-  it('tolerates a nullish row', () => {
+  it('returns a safe empty row for an invalid (non-object) input', () => {
     const log = mapOtelSingleLogToLegacy(undefined) as any
-    expect(log.id).toBeUndefined()
+    expect(log.id).toBe('')
     expect(log.metadata).toBeUndefined()
   })
 
@@ -326,8 +326,8 @@ describe('OTEL filter translation and chart defaults', () => {
   })
 
   it('translates the etl pipeline_id filter', () => {
-    expect(sql(genDefaultQueryOtel(LogsTableName.ETL, { pipeline_id: 42 }))).toContain(
-      "log_attributes['pipeline_id'] = 42"
+    expect(sql(genDefaultQueryOtel(LogsTableName.ETL, { pipeline_id: '42' }))).toContain(
+      "log_attributes['pipeline_id'] = '42'"
     )
   })
 
