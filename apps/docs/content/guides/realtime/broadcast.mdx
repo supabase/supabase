@@ -1042,6 +1042,12 @@ You can configure replay with the following options:
 - **`since`** (Required): The epoch timestamp in milliseconds (for example, `1697472000000`), specifying the earliest point from which messages should be retrieved.
 - **`limit`** (Optional): The number of messages to return. This must be a positive integer, with a maximum value of 25.
 
+<Admonition type="note">
+
+Message retention is capped at 72 hours. A `since` value older than 72h skips older messages. See [Realtime Limits](/docs/guides/realtime/limits) for details.
+
+</Admonition>
+
 <Tabs
   scrollable
   size="small"
