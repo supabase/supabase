@@ -9,6 +9,7 @@ import {
   Checkbox,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogSectionSeparator,
   DialogTitle,
@@ -66,6 +67,10 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
       <DialogContent size="small">
         <DialogHeader>
           <DialogTitle>Create a new user</DialogTitle>
+          <DialogDescription className="sr-only">
+            Create a new auth user by entering their email address, password, and confirmation
+            preference.
+          </DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
         <Form {...form}>
