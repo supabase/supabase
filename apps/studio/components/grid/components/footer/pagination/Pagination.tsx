@@ -87,6 +87,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
   const [isConfirmPreviousModalOpen, setIsConfirmPreviousModalOpen] = useState(false)
   const [isConfirmFetchExactCountModalOpen, setIsConfirmFetchExactCountModalOpen] = useState(false)
+  const [pendingPage, setPendingPage] = useState<number | null>(null)
 
   const {
     data,
@@ -178,6 +179,14 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
     snap.setPage(pageNum || 1)
   }
 
+  const onJumpToPage = (targetPage: number) => {
+    if (snap.selectedRows.size >= 1) {
+      setPendingPage(targetPage)
+    } else {
+      onPageChange(targetPage)
+    }
+  }
+
   const onRowsPerPageChange = (value: string | number) => {
     const rowsPerPage = Number(value)
     tableEditorSnap.setRowsPerPage(isNaN(rowsPerPage) ? 100 : rowsPerPage)
@@ -251,7 +260,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
           variant="outline"
           className="px-1.5"
           disabled={page <= 1 || isLoading}
-          onClick={() => onPageChange(1)}
+          onClick={() => onJumpToPage(1)}
         />
 
         <Button
@@ -279,7 +288,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
               !Number.isNaN(parsedValue) &&
               parsedValue >= 1
             ) {
-              onPageChange(parsedValue)
+              onJumpToPage(parsedValue)
             }
           }}
         />
@@ -303,7 +312,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
           variant="outline"
           className="px-1.5"
           disabled={page >= totalPages || isLoading}
-          onClick={() => onPageChange(totalPages)}
+          onClick={() => onJumpToPage(totalPages)}
         />
 
         <RowCountSelector onRowsPerPageChange={onRowsPerPageChange} />
@@ -389,6 +398,21 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
         onCancel={() => setIsConfirmNextModalOpen(false)}
         onConfirm={() => {
           onConfirmNextPage()
+        }}
+      >
+        <p className="text-sm text-foreground-light">
+          The currently selected lines will be deselected, do you want to proceed?
+        </p>
+      </ConfirmationModal>
+
+      <ConfirmationModal
+        visible={pendingPage !== null}
+        title="Confirm changing page"
+        confirmLabel="Confirm"
+        onCancel={() => setPendingPage(null)}
+        onConfirm={() => {
+          if (pendingPage !== null) onPageChange(pendingPage)
+          setPendingPage(null)
         }}
       >
         <p className="text-sm text-foreground-light">
