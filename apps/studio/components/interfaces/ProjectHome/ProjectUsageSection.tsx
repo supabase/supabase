@@ -135,6 +135,7 @@ export const ProjectUsageSection = () => {
       {
         key: 'realtime',
         title: 'Realtime requests',
+        href: `/project/${projectRef}/realtime/inspector`,
         route: '/logs/realtime-logs',
         enabled: true,
       },

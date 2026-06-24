@@ -34,7 +34,7 @@ import { useContentCountQuery } from '@/data/content/content-count-query'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
 import { useSQLSnippetFoldersDeleteMutation } from '@/data/content/sql-folders-delete-mutation'
 import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from '@/data/content/sql-folders-query'
-import { useSqlSnippetsQuery, type SqlSnippet } from '@/data/content/sql-snippets-query'
+import { useSqlSnippetsQuery } from '@/data/content/sql-snippets-query'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
@@ -204,7 +204,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     let snippets = favoriteSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? []
 
     if (snippet && snippet.favorite && !snippets.find((x) => x.id === snippet.id)) {
-      snippets.push(snippet as SqlSnippet)
+      snippets.push(snippet)
     }
 
     return (
@@ -255,7 +255,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     let snippets = sharedSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? []
 
     if (snippet && snippet.visibility === 'project' && !snippets.find((x) => x.id === snippet.id)) {
-      snippets.push(snippet as SqlSnippet)
+      snippets.push(snippet)
     }
 
     return (
@@ -420,7 +420,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   useEffect(() => {
     if (projectRef && privateSnippetsPages?.pages) {
       privateSnippetsPages.pages.forEach((page) => {
-        page.contents?.forEach((snippet: Snippet) => {
+        page.contents?.forEach((snippet) => {
           snapV2.addSnippet({ projectRef, snippet })
         })
         page.folders?.forEach((folder) => snapV2.addFolder({ projectRef, folder }))
