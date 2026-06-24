@@ -85,7 +85,7 @@ const lineVariants = {
   visible: { opacity: 1, x: 0, transition: { duration: 0.15, ease: 'easeOut' } },
 }
 
-const CI = ({ isHovered = false }: { isHovered?: boolean }) => {
+export const CI = ({ isHovered = false }: { isHovered?: boolean }) => {
   const [hoverCount, setHoverCount] = useState(0)
 
   useEffect(() => {
