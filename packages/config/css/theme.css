@@ -53,26 +53,26 @@
   --color-background-dialog: var(--background-dialog-default);
   --color-background-dash-sidebar: var(--background-dash-sidebar);
   --color-background-dash-canvas: var(--background-dash-canvas);
-  --color-destructive-200: var(--destructive-200);
-  --color-destructive-300: var(--destructive-300);
-  --color-destructive-400: var(--destructive-400);
-  --color-destructive-500: var(--destructive-500);
-  --color-destructive-600: var(--destructive-600);
-  --color-warning-200: var(--warning-200);
-  --color-warning-300: var(--warning-300);
-  --color-warning-400: var(--warning-400);
-  --color-warning-500: var(--warning-500);
-  --color-warning-600: var(--warning-600);
-  --color-brand-200: var(--brand-200);
-  --color-brand-300: var(--brand-300);
-  --color-brand-400: var(--brand-400);
-  --color-brand-500: var(--brand-500);
-  --color-brand-600: var(--brand-600);
-  --color-brand: var(--brand-default);
-  --color-brand-link: var(--brand-link);
-  --color-_secondary-200: var(--secondary-200);
-  --color-_secondary-400: var(--secondary-400);
-  --color-_secondary: var(--secondary-default);
+  --color-destructive-200: hsl(var(--destructive-200));
+  --color-destructive-300: hsl(var(--destructive-300));
+  --color-destructive-400: hsl(var(--destructive-400));
+  --color-destructive-500: hsl(var(--destructive-500));
+  --color-destructive-600: hsl(var(--destructive-600));
+  --color-warning-200: hsl(var(--warning-200));
+  --color-warning-300: hsl(var(--warning-300));
+  --color-warning-400: hsl(var(--warning-400));
+  --color-warning-500: hsl(var(--warning-500));
+  --color-warning-600: hsl(var(--warning-600));
+  --color-brand-200: hsl(var(--brand-200));
+  --color-brand-300: hsl(var(--brand-300));
+  --color-brand-400: hsl(var(--brand-400));
+  --color-brand-500: hsl(var(--brand-500));
+  --color-brand-600: hsl(var(--brand-600));
+  --color-brand: hsl(var(--brand-default));
+  --color-brand-link: hsl(var(--brand-link));
+  --color-_secondary-200: hsl(var(--secondary-200));
+  --color-_secondary-400: hsl(var(--secondary-400));
+  --color-_secondary: hsl(var(--secondary-default));
   --color-code_block-1: hsl(var(--code-block-1));
   --color-code_block-2: hsl(var(--code-block-2));
   --color-code_block-3: hsl(var(--code-block-3));
@@ -320,6 +320,9 @@
   --color-border-control: var(--border-control);
   --color-border-strong: var(--border-strong);
   --color-border-stronger: var(--border-stronger);
+  --color-border-destructive: var(--border-destructive);
+  --color-border-warning: var(--border-warning);
+  --color-border-brand: var(--border-brand);
   /*
    * This will generate colors only for border utilities
    * i.e. bg-muted and they'll only have border-color: var(--border-muted) rule

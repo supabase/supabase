@@ -5,7 +5,6 @@
   --chroma: 0.018;
   --surface: 0.985;
   --foreground-lightness: 0.16;
-  --contrast: 1;
   --muted-foreground-opacity: 68%;
   --tertiary-foreground-opacity: 48%;
 
@@ -14,4 +13,28 @@
   --code-block-3: 83.8deg 61.6% 48%;
   --code-block-2: 33.1deg 80% 52.9%;
   --code-block-1: 170.6deg 43.2% 51%;
+
+  /* Stepped numeric scales (per-theme literals; mapped in theme.css) */
+  --secondary-default: 247.8deg 100% 70%;
+  --secondary-400: 248.3deg 54.5% 25.9%;
+  --secondary-200: 248deg 53.6% 11%;
+  --brand-link: 153.4deg 100% 36.7%;
+  --brand-default: 152.9deg 60% 52.9%;
+  --brand-600: 156.5deg 86.5% 26.1%;
+  --brand-500: 155.3deg 78.4% 40%;
+  --brand-400: 151.3deg 66.9% 66.9%;
+  --brand-300: 147.5deg 72% 80.4%;
+  --brand-200: 147.6deg 72.5% 90%;
+  --warning-default: 30.3deg 80.3% 47.8%;
+  --warning-600: 30.3deg 80.3% 47.8%;
+  --warning-500: 36.3deg 85.7% 67.1%;
+  --warning-400: 41.9deg 100% 81.8%;
+  --warning-300: 44.3deg 100% 91.8%;
+  --warning-200: 40deg 81.8% 97.8%;
+  --destructive-default: 10.2deg 77.9% 53.9%;
+  --destructive-600: 9.9deg 82% 43.5%;
+  --destructive-500: 10.4deg 77.1% 79.4%;
+  --destructive-400: 7.1deg 91.3% 91%;
+  --destructive-300: 7.1deg 100% 96.7%;
+  --destructive-200: 0deg 100% 99.4%;
 }

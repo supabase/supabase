@@ -109,21 +109,21 @@ const buttonVariants = cva(
         danger: `
           text-foreground
           bg-destructive-300 dark:bg-destructive-400 hover:bg-destructive-400 dark:hover:bg-destructive/50
-          border-destructive-500 hover:border-destructive
+          border-border-destructive hover:border-destructive
           hover:text-hi-contrast
-          focus-visible:outline-amber-700
+          focus-visible:outline-destructive
           data-[state=open]:border-destructive
-          data-[state=open]:bg-destructive-400 dark:data-[state=open]:bg-destructive-/50
+          data-[state=open]:bg-destructive-400 dark:data-[state=open]:bg-destructive/50
           data-[state=open]:outline-destructive
         `,
         warning: `
           text-foreground
           bg-warning-300 dark:bg-warning-400 hover:bg-warning-400 dark:hover:bg-warning/50
-          border-warning-500 hover:border-warning
+          border-border-warning hover:border-warning
           hover:text-hi-contrast
-          focus-visible:outline-amber-700
+          focus-visible:outline-warning
           data-[state=open]:border-warning
-          data-[state=open]:bg-warning-400 dark:data-[state=open]:bg-warning-/50
+          data-[state=open]:bg-warning-400 dark:data-[state=open]:bg-warning/50
           data-[state=open]:outline-warning
         `,
       },
@@ -174,7 +174,7 @@ const IconContainerVariants = cva('inline-flex items-center justify-center shrin
       dashed: 'text-foreground-lighter',
       link: 'text-brand-600',
       text: 'text-foreground-lighter',
-      danger: 'text-destructive-600',
+      danger: 'text-destructive',
       warning: 'text-warning',
     },
   },
@@ -192,7 +192,7 @@ const loadingVariants = cva('', {
       dashed: 'text-foreground-lighter',
       link: 'text-brand-600',
       text: 'text-foreground-muted',
-      danger: 'text-destructive-600',
+      danger: 'text-destructive',
       warning: 'text-warning',
     },
     loading: {
