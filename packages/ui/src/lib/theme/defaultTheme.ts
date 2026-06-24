@@ -200,50 +200,6 @@ export default {
     content: `focus:outline-hidden transition-height`,
   },
 
-  /*
-   * Input
-   */
-
-  input: {
-    base: `
-      block
-      box-border
-      w-full
-      rounded-md
-      shadow-xs
-      transition-all
-      text-foreground
-      border
-      focus-visible:shadow-md
-      ${defaults.focus}
-      focus-visible:border-foreground-muted
-      focus-visible:ring-background-control
-      ${defaults.placeholder}
-      group
-    `,
-    variants: {
-      standard: `
-        bg-foreground/[.026]
-        border border-control
-        `,
-      error: `
-        bg-destructive-200
-        border border-destructive-500
-        focus:ring-destructive-400
-        placeholder:text-destructive-400
-       `,
-    },
-    container: 'relative',
-    with_icon: with_icon_spacing_sizes,
-    size: {
-      ...default__padding_and_text,
-    },
-    disabled: 'opacity-50',
-    actions_container: 'absolute inset-y-0 right-0 pl-3 pr-1 flex space-x-1 items-center',
-    textarea_actions_container: 'absolute inset-y-1.5 right-0 pl-3 pr-1 flex space-x-1 items-start',
-    textarea_actions_container_items: 'flex items-center',
-  },
-
   sidepanel: {
     base: `
       z-50
