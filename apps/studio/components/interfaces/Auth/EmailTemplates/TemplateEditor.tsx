@@ -23,10 +23,7 @@ import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
-import {
-  AUTH_EMAIL_TEMPLATES_DOCS_PATH,
-  AUTH_EMAIL_TEMPLATES_TERMINOLOGY_ANCHOR,
-} from './EmailTemplates.constants'
+import { getEmailTemplateVariablesDocsPath } from './EmailTemplates.constants'
 import type { AuthTemplate } from './EmailTemplates.types'
 import { hasCustomEmailSender } from './EmailTemplates.utils'
 import { ResetTemplateDialog } from './ResetTemplateDialog'
@@ -42,7 +39,7 @@ import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-muta
 import { useValidateSpamMutation, ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
-import { DOCS_URL } from '@/lib/constants'
+import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
 
 interface TemplateEditorProps {
   template: AuthTemplate
@@ -370,9 +367,9 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                       <p className="text-sm text-foreground-lighter">
                         Data placeholders that can be inserted into the subject or body.{' '}
                         <InlineLink
-                          href={`${DOCS_URL}${AUTH_EMAIL_TEMPLATES_DOCS_PATH}#${AUTH_EMAIL_TEMPLATES_TERMINOLOGY_ANCHOR}`}
+                          href={`${DOCS_URL}${getEmailTemplateVariablesDocsPath(IS_PLATFORM)}`}
                         >
-                          Terminology
+                          Learn more
                         </InlineLink>
                       </p>
                     </div>

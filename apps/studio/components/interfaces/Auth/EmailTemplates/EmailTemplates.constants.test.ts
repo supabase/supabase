@@ -1,8 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  AUTH_EMAIL_TEMPLATES_DOCS_PATH,
   AUTH_EMAIL_TEMPLATES_TERMINOLOGY_ANCHOR,
   EMAIL_TEMPLATE_DOCS_ANCHORS,
+  getEmailTemplatesDocsPath,
+  getEmailTemplateVariablesDocsPath,
+  LOCAL_EMAIL_TEMPLATES_DOCS_PATH,
+  LOCAL_EMAIL_TEMPLATES_VARIABLES_ANCHOR,
 } from './EmailTemplates.constants'
 import { AUTH_TEMPLATE_TYPES, type AuthTemplateType } from './EmailTemplates.types'
 
@@ -38,6 +43,28 @@ function docsHeadingToAnchor(heading: string) {
 describe('EmailTemplates.constants: AUTH_EMAIL_TEMPLATES_TERMINOLOGY_ANCHOR', () => {
   it('matches auth-email-templates.mdx heading slug', () => {
     expect(AUTH_EMAIL_TEMPLATES_TERMINOLOGY_ANCHOR).toBe(docsHeadingToAnchor('Terminology'))
+  })
+})
+
+describe('EmailTemplates.constants: LOCAL_EMAIL_TEMPLATES_VARIABLES_ANCHOR', () => {
+  it('matches customizing-email-templates.mdx heading slug', () => {
+    expect(LOCAL_EMAIL_TEMPLATES_VARIABLES_ANCHOR).toBe(docsHeadingToAnchor('Template variables'))
+  })
+})
+
+describe('EmailTemplates.constants: docs path helpers', () => {
+  it('returns hosted docs paths on platform', () => {
+    expect(getEmailTemplatesDocsPath(true)).toBe(AUTH_EMAIL_TEMPLATES_DOCS_PATH)
+    expect(getEmailTemplateVariablesDocsPath(true)).toBe(
+      `${AUTH_EMAIL_TEMPLATES_DOCS_PATH}#${AUTH_EMAIL_TEMPLATES_TERMINOLOGY_ANCHOR}`
+    )
+  })
+
+  it('returns local development docs paths off platform', () => {
+    expect(getEmailTemplatesDocsPath(false)).toBe(LOCAL_EMAIL_TEMPLATES_DOCS_PATH)
+    expect(getEmailTemplateVariablesDocsPath(false)).toBe(
+      `${LOCAL_EMAIL_TEMPLATES_DOCS_PATH}#${LOCAL_EMAIL_TEMPLATES_VARIABLES_ANCHOR}`
+    )
   })
 })
 
