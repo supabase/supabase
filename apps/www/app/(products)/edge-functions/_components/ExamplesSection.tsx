@@ -34,66 +34,68 @@ export function ExamplesSection() {
       </div>
 
       {/* Cards */}
-      {/* Featured row - 2 large cells */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {featuredExamples.map((example) => {
-          const tag = example.tags?.[0]
-          const icon = tag ? EXAMPLE_ICON[tag] : undefined
-          return (
-            <Link
-              key={example.title}
-              href={example.repo_url ?? '#'}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex flex-col bg-surface-75 border border-border rounded-lg px-6 py-8 "
-            >
-              <div className="flex items-center gap-2 mb-4">
-                {icon && (
-                  <img
-                    src={icon.src}
-                    alt=""
-                    className={`${icon.className} object-contain${icon.invert ? ' dark:invert' : ''}`}
-                  />
-                )}
-              </div>
-              <h4 className="text-foreground text-sm font-medium">{example.title}</h4>
-              <p className="text-foreground-lighter text-sm mt-1 line-clamp-2">
-                {example.description}
-              </p>
-            </Link>
-          )
-        })}
-      </div>
+      <div>
+        {/* Featured row - 2 large cells */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          {featuredExamples.map((example) => {
+            const tag = example.tags?.[0]
+            const icon = tag ? EXAMPLE_ICON[tag] : undefined
+            return (
+              <Link
+                key={example.title}
+                href={example.repo_url ?? '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex flex-col bg-surface-75 border border-border rounded-lg px-6 py-8 "
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  {icon && (
+                    <img
+                      src={icon.src}
+                      alt=""
+                      className={`${icon.className} object-contain${icon.invert ? ' dark:invert' : ''}`}
+                    />
+                  )}
+                </div>
+                <h4 className="text-foreground text-sm font-medium">{example.title}</h4>
+                <p className="text-foreground-lighter text-sm mt-1 line-clamp-2">
+                  {example.description}
+                </p>
+              </Link>
+            )
+          })}
+        </div>
 
-      {/* Grid row - 4 smaller cells */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
-        {gridExamples.map((example) => {
-          const tag = example.tags?.[0]
-          const icon = tag ? EXAMPLE_ICON[tag] : undefined
-          return (
-            <Link
-              key={example.title}
-              href={example.repo_url ?? '#'}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group flex flex-col bg-surface-75 border border-border rounded-lg px-6 py-10 "
-            >
-              <div className="flex items-center gap-2 mb-4">
-                {icon && (
-                  <img
-                    src={icon.src}
-                    alt=""
-                    className={`${icon.className} object-contain${icon.invert ? ' dark:invert' : ''}`}
-                  />
-                )}
-              </div>
-              <h4 className="text-foreground text-sm font-medium">{example.title}</h4>
-              <p className="text-foreground-lighter text-sm mt-1 line-clamp-2">
-                {example.description}
-              </p>
-            </Link>
-          )
-        })}
+        {/* Grid row - 4 smaller cells */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-3">
+          {gridExamples.map((example) => {
+            const tag = example.tags?.[0]
+            const icon = tag ? EXAMPLE_ICON[tag] : undefined
+            return (
+              <Link
+                key={example.title}
+                href={example.repo_url ?? '#'}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex flex-col bg-surface-75 border border-border rounded-lg px-6 py-10 "
+              >
+                <div className="flex items-center gap-2 mb-4">
+                  {icon && (
+                    <img
+                      src={icon.src}
+                      alt=""
+                      className={`${icon.className} object-contain${icon.invert ? ' dark:invert' : ''}`}
+                    />
+                  )}
+                </div>
+                <h4 className="text-foreground text-sm font-medium">{example.title}</h4>
+                <p className="text-foreground-lighter text-sm mt-1 line-clamp-2">
+                  {example.description}
+                </p>
+              </Link>
+            )
+          })}
+        </div>
       </div>
     </SectionContainerWithCn>
   )

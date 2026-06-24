@@ -2,9 +2,11 @@ import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
 import Link from 'next/link'
 import { Button } from 'ui'
 
+import { Highlights } from './Highlights'
+
 export function Hero() {
   return (
-    <SectionContainerWithCn height="none" className="pt-32 pb-16 md:pt-40 md:pb-32">
+    <SectionContainerWithCn spacing="sections">
       <div className="flex flex-col gap-6 lg:gap-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
           <h1 className="text-foreground text-3xl sm:text-5xl sm:leading-none">

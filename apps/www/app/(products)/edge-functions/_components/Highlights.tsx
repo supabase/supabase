@@ -86,20 +86,18 @@ const highlights = [
 export function Highlights() {
   return (
     <div className="border-t border-border">
-      <SectionContainerWithCn height="none">
-        <div className="-translate-y-16">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {highlights.map((highlight) => (
-              <div
-                key={highlight.title}
-                className="bg-surface-75 border border-border rounded-lg p-6 flex flex-col gap-3"
-              >
-                <div className="text-foreground-lighter">{highlight.icon}</div>
-                <h3 className="text-foreground text-base font-medium">{highlight.title}</h3>
-                <p className="text-foreground-lighter text-sm">{highlight.paragraph}</p>
-              </div>
-            ))}
-          </div>
+      <SectionContainerWithCn height="none" className="-mt-8 md:-mt-16 mb-16 md:mb-32">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {highlights.map((highlight) => (
+            <div
+              key={highlight.title}
+              className="bg-surface-75 border border-border rounded-lg p-6 flex flex-col gap-3"
+            >
+              <div className="text-foreground-lighter">{highlight.icon}</div>
+              <h3 className="text-foreground text-base font-medium">{highlight.title}</h3>
+              <p className="text-foreground-lighter text-sm">{highlight.paragraph}</p>
+            </div>
+          ))}
         </div>
       </SectionContainerWithCn>
     </div>

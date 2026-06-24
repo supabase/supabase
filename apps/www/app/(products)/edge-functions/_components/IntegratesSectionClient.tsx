@@ -96,7 +96,7 @@ export function IntegratesSectionClient({ useCases }: { useCases: UseCase[] }) {
     <SectionContainerWithCn ref={inViewRef} spacing="sections">
       {/* Header */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
-        <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
+        <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl text-balance">
           Integrates with the <span className="text-foreground">Supabase ecosystem</span>
         </h3>
         <p className="text-foreground-lighter text-sm lg:text-base">
