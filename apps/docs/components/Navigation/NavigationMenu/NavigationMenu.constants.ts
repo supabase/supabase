@@ -1179,12 +1179,12 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/database/replication' },
         {
-          name: 'Supabase Pipelines',
-          url: '/guides/database/replication/supabase-pipelines' as `/${string}`,
+          name: 'Pipelines',
+          url: '/guides/database/replication/pipelines' as `/${string}`,
           items: [
             {
               name: 'Setting up',
-              url: '/guides/database/replication/supabase-pipelines' as `/${string}`,
+              url: '/guides/database/replication/pipelines' as `/${string}`,
               items: [
                 {
                   name: 'BigQuery',
@@ -1194,9 +1194,9 @@ export const database: NavMenuConstant = {
             },
             {
               name: 'Monitoring',
-              url: '/guides/database/replication/supabase-pipelines-monitoring' as `/${string}`,
+              url: '/guides/database/replication/pipelines-monitoring' as `/${string}`,
             },
-            { name: 'FAQ', url: '/guides/database/replication/supabase-pipelines-faq' },
+            { name: 'FAQ', url: '/guides/database/replication/pipelines-faq' },
           ],
         },
         {

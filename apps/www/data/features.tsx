@@ -670,7 +670,7 @@ Pipelines provides a powerful alternative to Read Replicas for analytics workloa
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/database/replication/supabase-pipelines',
+    docsUrl: 'https://supabase.com/docs/guides/database/replication/pipelines',
     slug: 'supabase-pipelines',
     status: {
       stage: PRODUCT_STAGES.PUBLIC_ALPHA,
@@ -2867,7 +2867,7 @@ Pipelines provides the real-time data pipeline required for modern analytics arc
     icon: DatabaseZap,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/database/replication/supabase-pipelines',
+    docsUrl: 'https://supabase.com/docs/guides/database/replication/pipelines',
     slug: 'replication',
     status: {
       stage: PRODUCT_STAGES.PRIVATE_ALPHA,

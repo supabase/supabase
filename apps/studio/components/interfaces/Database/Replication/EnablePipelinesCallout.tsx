@@ -108,7 +108,7 @@ export const EnablePipelinesCallout = ({
         ) : (
           <UpgradePlanButton source="replication" featureProposition="use replication" />
         )}
-        <DocsButton href={`${DOCS_URL}/guides/database/replication#supabase-pipelines`} />
+        <DocsButton href={`${DOCS_URL}/guides/database/replication#pipelines`} />
       </div>
     </div>
   )

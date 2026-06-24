@@ -2724,42 +2724,42 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/database/replication/etl-destinations',
-    destination: '/docs/guides/database/replication/supabase-pipelines',
+    destination: '/docs/guides/database/replication/pipelines',
   },
   {
     permanent: true,
     source: '/docs/guides/storage/analytics/replication',
-    destination: '/docs/guides/database/replication/supabase-pipelines',
+    destination: '/docs/guides/database/replication/pipelines',
   },
   {
     permanent: true,
     source: '/docs/guides/database/replication/external-replication-setup',
-    destination: '/docs/guides/database/replication/supabase-pipelines',
+    destination: '/docs/guides/database/replication/pipelines',
   },
   {
     permanent: true,
     source: '/docs/guides/database/replication/external-replication-monitoring',
-    destination: '/docs/guides/database/replication/supabase-pipelines-monitoring',
+    destination: '/docs/guides/database/replication/pipelines-monitoring',
   },
   {
     permanent: true,
     source: '/docs/guides/database/replication/external-replication-faq',
-    destination: '/docs/guides/database/replication/supabase-pipelines-faq',
+    destination: '/docs/guides/database/replication/pipelines-faq',
   },
   {
     permanent: true,
     source: '/docs/guides/database/replication/replication-setup',
-    destination: '/docs/guides/database/replication/supabase-pipelines',
+    destination: '/docs/guides/database/replication/pipelines',
   },
   {
     permanent: true,
     source: '/docs/guides/database/replication/replication-monitoring',
-    destination: '/docs/guides/database/replication/supabase-pipelines-monitoring',
+    destination: '/docs/guides/database/replication/pipelines-monitoring',
   },
   {
     permanent: true,
     source: '/docs/guides/database/replication/replication-faq',
-    destination: '/docs/guides/database/replication/supabase-pipelines-faq',
+    destination: '/docs/guides/database/replication/pipelines-faq',
   },
   {
     permanent: true,

@@ -1,6 +1,6 @@
 ---
-id: 'supabase-pipelines-faq'
-title: 'Supabase Pipelines FAQ'
+id: 'pipelines-faq'
+title: 'Pipelines FAQ'
 description: 'Frequently asked questions about Supabase Pipelines.'
 subtitle: 'Common questions and answers about managed replication pipelines.'
 sidebar_label: 'FAQ'
@@ -8,7 +8,7 @@ sidebar_label: 'FAQ'
 
 <Admonition type="caution" title="Private Alpha">
 
-Pipelines is currently in private alpha. Private alpha features can be unstable and may introduce breaking changes while we evaluate the product direction, refine the feature set, and incorporate customer feedback.
+Supabase Pipelines is currently in private alpha. Private alpha features can be unstable and may introduce breaking changes while we evaluate the product direction, refine the feature set, and incorporate customer feedback.
 
 </Admonition>
 
@@ -63,7 +63,7 @@ Pipelines does not currently support changing column data types, adding `NOT NUL
 
 Disabling Pipelines removes the database objects that were installed in your source database, including the replication state tables in the `etl` schema and the DDL event trigger.
 
-To remove Pipelines from a project, delete all replication pipelines first. After all pipelines are deleted, the disable action becomes available. For the Dashboard steps, see [Disabling Supabase Pipelines](/docs/guides/database/replication/supabase-pipelines#disabling-supabase-pipelines).
+To remove Pipelines from a project, delete all replication pipelines first. After all pipelines are deleted, the disable action becomes available. For the Dashboard steps, see [Disabling Pipelines](/docs/guides/database/replication/pipelines#disabling-pipelines).
 
 Disabling Pipelines stops Supabase from managing replication for the project. It does not delete tables or data that were already written to your destination.
 
@@ -85,7 +85,7 @@ Postgres controls this with the publication's `publish_via_partition_root` setti
 
 Publications created from the Dashboard replication flow use `publish_via_partition_root = true`.
 
-See [Partitioned tables](/docs/guides/database/replication/supabase-pipelines#partitioned-tables) for examples and the full behavior.
+See [Partitioned tables](/docs/guides/database/replication/pipelines#partitioned-tables) for examples and the full behavior.
 
 ## How does replica identity affect updates and deletes?
 
@@ -137,7 +137,7 @@ After changing replica identity, restart each pipeline that includes the affecte
 
 ## Why aren't publication changes reflected after adding or removing tables?
 
-After modifying your Postgres publication, you must restart the replication pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/supabase-pipelines#adding-or-removing-tables) for instructions.
+After modifying your Postgres publication, you must restart the replication pipeline for changes to take effect. See [Adding or removing tables](/docs/guides/database/replication/pipelines#adding-or-removing-tables) for instructions.
 
 ## Why is a pipeline in failed state?
 
@@ -148,7 +148,7 @@ Pipeline failures occur during the streaming phase when an error happens while r
 3. Fix the underlying issue (e.g., schema mismatches, destination connectivity)
 4. Restart the pipeline
 
-See [Handling errors](/docs/guides/database/replication/supabase-pipelines-monitoring#handling-errors) for more details.
+See [Handling errors](/docs/guides/database/replication/pipelines-monitoring#handling-errors) for more details.
 
 ## Why was the pipeline stopped?
 
@@ -162,13 +162,13 @@ To recover:
 2. Fix the underlying issue, such as destination connectivity, schema mismatches, permissions, or rate limits
 3. Restart the pipeline manually from the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
 
-If the same error continues after restart, the pipeline may stop again. Review [Monitor pipeline status](/docs/guides/database/replication/supabase-pipelines-monitoring) for troubleshooting steps.
+If the same error continues after restart, the pipeline may stop again. Review [Monitor pipeline status](/docs/guides/database/replication/pipelines-monitoring) for troubleshooting steps.
 
 ## Why is replication lag increasing?
 
 Lag increases when Postgres produces WAL faster than the pipeline can confirm it has processed. Common causes include a slow or rate-limited destination, a pipeline issue, heavy source database activity, long transactions, network latency between the pipeline and source database, or a stopped/disconnected pipeline.
 
-Open [**Database > Replication**](/dashboard/project/_/database/replication), click **View pipeline**, and check **Waiting to sync**, **Room before pausing**, **Last check-in**, **Connected**, and **Slot status**. See [Dealing with replication lag](/docs/guides/database/replication/supabase-pipelines-monitoring#dealing-with-replication-lag) for the full investigation and response flow.
+Open [**Database > Replication**](/dashboard/project/_/database/replication), click **View pipeline**, and check **Waiting to sync**, **Room before pausing**, **Last check-in**, **Connected**, and **Slot status**. See [Dealing with replication lag](/docs/guides/database/replication/pipelines-monitoring#dealing-with-replication-lag) for the full investigation and response flow.
 
 ## What does a `Lost` slot status mean?
 
@@ -176,7 +176,7 @@ Open [**Database > Replication**](/dashboard/project/_/database/replication), cl
 
 You can recreate the pipeline, or open the pipeline's **Advanced settings**, set **Invalidated slot behavior** to **Recreate**, and restart the pipeline. On restart, the pipeline creates a new replication slot and starts replication from scratch for all tables. This is required for consistency because the old slot can no longer provide every change the pipeline missed.
 
-See [Slot statuses](/docs/guides/database/replication/supabase-pipelines-monitoring#slot-statuses) for all slot states and what to do next.
+See [Slot statuses](/docs/guides/database/replication/pipelines-monitoring#slot-statuses) for all slot states and what to do next.
 
 ## Why is a table in error state?
 
@@ -191,11 +191,11 @@ Check the [**Database > Replication**](/dashboard/project/_/database/replication
 3. Ensure all tables show **Live** state (actively replicating)
 4. Monitor replication lag metrics
 
-See [Monitor pipeline status](/docs/guides/database/replication/supabase-pipelines-monitoring) for comprehensive monitoring instructions.
+See [Monitor pipeline status](/docs/guides/database/replication/pipelines-monitoring) for comprehensive monitoring instructions.
 
 ## How to stop or pause replication
 
-You can manage your pipeline using the actions menu in the destinations list. See [Managing your pipeline](/docs/guides/database/replication/supabase-pipelines#managing-your-pipeline) for details on available actions.
+You can manage your pipeline using the actions menu in the destinations list. See [Managing your pipeline](/docs/guides/database/replication/pipelines#managing-your-pipeline) for details on available actions.
 
 <Admonition type="note">
 
@@ -265,6 +265,6 @@ Navigate to the [**Logs > Replication**](/dashboard/project/_/logs/explorer) sec
 
 If you need assistance:
 
-1. Check [Set up Supabase Pipelines](/docs/guides/database/replication/supabase-pipelines) and [Monitor pipeline status](/docs/guides/database/replication/supabase-pipelines-monitoring)
+1. Check [Set up Pipelines](/docs/guides/database/replication/pipelines) and [Monitor pipeline status](/docs/guides/database/replication/pipelines-monitoring)
 2. Review this FAQ for common issues
 3. Contact support with your error details and logs

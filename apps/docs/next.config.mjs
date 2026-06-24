@@ -159,32 +159,32 @@ const nextConfig = {
       // Redirect old managed pipeline slugs in dev/preview envs
       {
         source: '/guides/database/replication/external-replication-setup',
-        destination: '/guides/database/replication/supabase-pipelines',
+        destination: '/guides/database/replication/pipelines',
         permanent: true,
       },
       {
         source: '/guides/database/replication/external-replication-monitoring',
-        destination: '/guides/database/replication/supabase-pipelines-monitoring',
+        destination: '/guides/database/replication/pipelines-monitoring',
         permanent: true,
       },
       {
         source: '/guides/database/replication/external-replication-faq',
-        destination: '/guides/database/replication/supabase-pipelines-faq',
+        destination: '/guides/database/replication/pipelines-faq',
         permanent: true,
       },
       {
         source: '/guides/database/replication/replication-setup',
-        destination: '/guides/database/replication/supabase-pipelines',
+        destination: '/guides/database/replication/pipelines',
         permanent: true,
       },
       {
         source: '/guides/database/replication/replication-monitoring',
-        destination: '/guides/database/replication/supabase-pipelines-monitoring',
+        destination: '/guides/database/replication/pipelines-monitoring',
         permanent: true,
       },
       {
         source: '/guides/database/replication/replication-faq',
-        destination: '/guides/database/replication/supabase-pipelines-faq',
+        destination: '/guides/database/replication/pipelines-faq',
         permanent: true,
       },
     ]

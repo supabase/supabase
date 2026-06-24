@@ -140,7 +140,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
                       </Link>
                     </Button>
                     <DocsButton
-                      href={`${DOCS_URL}/guides/database/replication#supabase-pipelines`}
+                      href={`${DOCS_URL}/guides/database/replication#pipelines`}
                     />
                   </div>
                 </div>

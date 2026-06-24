@@ -1,6 +1,6 @@
 ---
-id: 'supabase-pipelines'
-title: 'Set up Supabase Pipelines'
+id: 'pipelines'
+title: 'Set up Pipelines'
 description: 'Create a managed replication pipeline using Postgres logical replication.'
 subtitle: 'Configure publications, destinations, and managed replication pipelines.'
 sidebar_label: 'Setting up'
@@ -8,7 +8,7 @@ sidebar_label: 'Setting up'
 
 <Admonition type="caution" title="Private Alpha">
 
-Pipelines is currently in private alpha. Private alpha features can be unstable and may introduce breaking changes while we evaluate the product direction, refine the feature set, and incorporate customer feedback.
+Supabase Pipelines is currently in private alpha. Private alpha features can be unstable and may introduce breaking changes while we evaluate the product direction, refine the feature set, and incorporate customer feedback.
 
 </Admonition>
 
@@ -20,7 +20,7 @@ Pipelines requires two main components: a **Postgres publication** (defines what
 
 <Admonition type="tip">
 
-If you already have a Postgres publication set up, you can skip to [Step 2: Enable Supabase Pipelines](#step-2-enable-supabase-pipelines).
+If you already have a Postgres publication set up, you can skip to [Step 2: Enable Pipelines](#step-2-enable-pipelines).
 
 </Admonition>
 
@@ -135,7 +135,7 @@ After creating a publication via SQL, you can view it in the Dashboard:
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
-### Step 2: Enable Supabase Pipelines
+### Step 2: Enable Pipelines
 
 Before creating a managed replication pipeline, enable Pipelines for your project:
 
@@ -199,7 +199,7 @@ After you create and start the pipeline, its destination appears in the destinat
 
 />
 
-For comprehensive monitoring instructions including pipeline states, metrics, and logs, see [Monitor pipeline status](/docs/guides/database/replication/supabase-pipelines-monitoring).
+For comprehensive monitoring instructions including pipeline states, metrics, and logs, see [Monitor pipeline status](/docs/guides/database/replication/pipelines-monitoring).
 
 ### Managing your pipeline
 
@@ -223,7 +223,7 @@ Available actions:
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
-### Disabling Supabase Pipelines
+### Disabling Pipelines
 
 To turn off Pipelines for a project, delete all replication pipelines first. After all pipelines are removed, open the three-dot actions menu on the Replication page and click **Disable Pipelines**.
 
@@ -234,7 +234,7 @@ To turn off Pipelines for a project, delete all replication pipelines first. Aft
   height={2156}
 />
 
-For cleanup details, see [What happens when you disable Supabase Pipelines?](/docs/guides/database/replication/supabase-pipelines-faq#what-happens-when-you-disable-supabase-pipelines).
+For cleanup details, see [What happens when you disable Pipelines?](/docs/guides/database/replication/pipelines-faq#what-happens-when-you-disable-pipelines).
 
 ### Adding or removing tables
 
@@ -276,7 +276,7 @@ If your Postgres publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, ne
 
 <Admonition type="note">
 
-When a table is deleted at the destination, the behavior depends on the destination. In general, the pipeline tries to recreate the table so replication can continue. To permanently delete a table, pause the pipeline first or remove it from the publication before deleting. See the [Supabase Pipelines FAQ](/docs/guides/database/replication/supabase-pipelines-faq#what-happens-if-a-table-is-deleted-at-the-destination) for details.
+When a table is deleted at the destination, the behavior depends on the destination. In general, the pipeline tries to recreate the table so replication can continue. To permanently delete a table, pause the pipeline first or remove it from the publication before deleting. See the [Pipelines FAQ](/docs/guides/database/replication/pipelines-faq#what-happens-if-a-table-is-deleted-at-the-destination) for details.
 
 </Admonition>
 
@@ -303,7 +303,7 @@ If you encounter issues during setup:
 - **Pipeline failed to start**: Check the error message in the status view for specific details
 - **No data being replicated**: Verify your Postgres publication includes the correct tables and event types
 
-For more troubleshooting help, see the [Supabase Pipelines FAQ](/docs/guides/database/replication/supabase-pipelines-faq).
+For more troubleshooting help, see the [Pipelines FAQ](/docs/guides/database/replication/pipelines-faq).
 
 ### Limitations
 
@@ -315,12 +315,12 @@ Pipelines has the following limitations:
 - **Replica identity**: `REPLICA IDENTITY FULL` is strongly recommended. Updates and deletes need enough row data to apply changes correctly at the destination.
 - **Schema changes**: Currently in beta and limited to BigQuery
 - **No data transformation**: Data is replicated as-is without transformation
-- **Data duplicates**: Duplicates can occur when stopping a pipeline if your database has transactions that take longer than a few minutes to complete. See [Can data duplicates occur during pipeline operations?](/docs/guides/database/replication/supabase-pipelines-faq#can-data-duplicates-occur-during-pipeline-operations) for details
+- **Data duplicates**: Duplicates can occur when stopping a pipeline if your database has transactions that take longer than a few minutes to complete. See [Can data duplicates occur during pipeline operations?](/docs/guides/database/replication/pipelines-faq#can-data-duplicates-occur-during-pipeline-operations) for details
 
 Destination-specific limitations, such as BigQuery's row size limits, are documented in each destination guide.
 
 ### Next steps
 
 - [Set up BigQuery](/docs/guides/database/replication/bigquery)
-- [Monitor pipeline status](/docs/guides/database/replication/supabase-pipelines-monitoring)
-- [View the Supabase Pipelines FAQ](/docs/guides/database/replication/supabase-pipelines-faq)
+- [Monitor pipeline status](/docs/guides/database/replication/pipelines-monitoring)
+- [View the Pipelines FAQ](/docs/guides/database/replication/pipelines-faq)
