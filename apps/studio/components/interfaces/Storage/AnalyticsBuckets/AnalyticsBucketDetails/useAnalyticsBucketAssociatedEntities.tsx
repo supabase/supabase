@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { toast } from 'sonner'
 
 import {
   getAnalyticsBucketPublicationName,
@@ -98,17 +99,31 @@ export const useAnalyticsBucketDeleteCleanUp = ({
     destination,
   } = useAnalyticsBucketAssociatedEntities({ projectRef, bucketId: bucketId })
 
-  // Default error handlers from all mutations will be silenced
+  // Default error handlers from all mutations were previously silenced, now reporting via toast
   const { mutateAsync: deleteFDW, isPending: isDeletingWrapper } = useFDWDeleteMutation({
-    onError: () => {},
+    onError: (error: any) => {
+      toast.error(`Failed to delete FDW wrapper: ${error.message}`)
+    },
   })
   const { mutateAsync: deleteS3AccessKey, isPending: isDeletingKey } = useS3AccessKeyDeleteMutation(
-    { onError: () => {} }
+    {
+      onError: (error: any) => {
+        toast.error(`Failed to delete S3 access key: ${error.message}`)
+      },
+    }
   )
   const { mutateAsync: deletePublication, isPending: isDeletingPublication } =
-    useDeletePublicationMutation({ onError: () => {} })
+    useDeletePublicationMutation({
+      onError: (error: any) => {
+        toast.error(`Failed to delete publication: ${error.message}`)
+      },
+    })
   const { mutateAsync: deletePipeline, isPending: isDeletingPipeline } =
-    useDeleteDestinationPipelineMutation({ onError: () => {} })
+    useDeleteDestinationPipelineMutation({
+      onError: (error: any) => {
+        toast.error(`Failed to delete pipeline: ${error.message}`)
+      },
+    })
 
   const isDeleting =
     isDeletingWrapper || isDeletingKey || isDeletingPublication || isDeletingPipeline
