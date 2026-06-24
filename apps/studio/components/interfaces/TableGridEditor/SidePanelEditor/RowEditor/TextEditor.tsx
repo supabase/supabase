@@ -130,6 +130,7 @@ export const TextEditor = ({
           <div className="w-full h-full grow">
             <CodeEditor
               key={value}
+              isReadOnly={readOnly}
               language="markdown"
               value={strValue ?? ''}
               onInputChange={(val) => setStrValue(val ?? '')}
