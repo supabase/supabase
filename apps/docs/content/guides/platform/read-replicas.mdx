@@ -45,10 +45,21 @@ You can only read data from a Read Replica. This is in contrast to a Primary dat
 
     When your database starts slowing down, you face a choice: make your existing database bigger (scale vertically), or spread the load across multiple databases (scale horizontally). Both approaches work. Neither is universally correct. The right answer depends on your workload, your budget, and where the bottleneck actually is.
 
-    <Image
-      src="/docs/img/guides/platform/read-replicas/read-replicas-flow.svg"
-      alt="Read Replicas decision flowchart"
-    />
+```mermaid
+flowchart TD
+  A[Database slowing down] --> B{CPU above 70% sustained?}
+  B -->|No| C[Monitor, do not scale yet]
+  B -->|Yes| D{Queries optimized? Indexes in place?}
+  D -->|No| E[Run EXPLAIN ANALYZE<br/>Add missing indexes<br/>Optimize first]
+  E --> D
+  D -->|Yes| F{Workload 80%+ reads?}
+  F -->|No| G[Upgrade compute<br/>Replicas will not help writes]
+  F -->|Yes| H{Already at 16XL?}
+  H -->|Yes| I[Read Replicas<br/>Only horizontal option left]
+  H -->|No| J{Need workload isolation<br/>or geo-distribution?}
+  J -->|Yes| K[Read Replicas]
+  J -->|No| L[Either works<br/>Compute is simpler<br/>Replicas scale further]
+```
 
     </AccordionItem>
 
