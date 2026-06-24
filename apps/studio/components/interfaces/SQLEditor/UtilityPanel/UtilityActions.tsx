@@ -133,19 +133,19 @@ export const UtilityActions = ({
 
       <div className={cn('items-center gap-x-2', isAiOpen ? 'hidden 2xl:flex' : 'flex')}>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Tooltip>
-              <TooltipTrigger asChild>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
                 <Button
                   variant="text"
                   className="px-1"
                   icon={<Keyboard className="text-foreground-light" />}
                   aria-label="Enable Intellisense"
                 />
-              </TooltipTrigger>
-              <TooltipContent side="bottom">Enable Intellisense</TooltipContent>
-            </Tooltip>
-          </DropdownMenuTrigger>
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Enable Intellisense</TooltipContent>
+          </Tooltip>
           <DropdownMenuContent className="w-48">
             <DropdownMenuItem className="justify-between" onClick={toggleIntellisense}>
               Intellisense enabled
