@@ -79,7 +79,7 @@ describe('DestinationTypeSelection', () => {
     expect(screen.getByText('Read Replica')).toBeInTheDocument()
   })
 
-  test('renders the Supabase Pipelines group with BigQuery when the flag is enabled', async () => {
+  test('renders the Pipelines group with BigQuery when the flag is enabled', async () => {
     mockBigQueryEnabled.mockReturnValue(true)
     mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
@@ -90,7 +90,7 @@ describe('DestinationTypeSelection', () => {
 
     fireEvent.click(await screen.findByRole('combobox'))
 
-    expect(await screen.findByText('Supabase Pipelines')).toBeInTheDocument()
+    expect(await screen.findByText('Pipelines')).toBeInTheDocument()
     expect(screen.getByText('BigQuery')).toBeInTheDocument()
   })
 
@@ -110,7 +110,7 @@ describe('DestinationTypeSelection', () => {
     expect(screen.queryByText('BigQuery')).not.toBeInTheDocument()
     expect(screen.queryByText('DuckLake')).not.toBeInTheDocument()
     expect(screen.queryByText('Analytics Bucket')).not.toBeInTheDocument()
-    expect(screen.queryByText('Supabase Pipelines')).not.toBeInTheDocument()
+    expect(screen.queryByText('Pipelines')).not.toBeInTheDocument()
   })
 
   test('shows alpha warning when an alpha destination type is selected', async () => {

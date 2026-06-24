@@ -3,7 +3,7 @@ import { useFlag } from 'common'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 /**
- * Organization-level access for Supabase Pipelines alpha destinations. The flag names still use
+ * Organization-level access for Pipelines alpha destinations. The flag names still use
  * the original ETL identifiers, but the UI checks whether the org has access to at least one
  * destination type.
  */

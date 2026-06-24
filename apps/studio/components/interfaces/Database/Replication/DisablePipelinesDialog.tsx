@@ -16,22 +16,19 @@ import { Admonition } from 'ui-patterns/admonition'
 
 import { useDeleteReplicationTenantMutation } from '@/data/replication/delete-tenant-mutation'
 
-interface DisableSupabasePipelinesDialogProps {
+interface DisablePipelinesDialogProps {
   open: boolean
   setOpen: (value: boolean) => void
 }
 
-export const DisableSupabasePipelinesDialog = ({
-  open,
-  setOpen,
-}: DisableSupabasePipelinesDialogProps) => {
+export const DisablePipelinesDialog = ({ open, setOpen }: DisablePipelinesDialogProps) => {
   const { ref: projectRef } = useParams()
   const [error, setError] = useState<string | null>(null)
 
   const { mutateAsync: deleteReplicationTenant, isPending: isSubmitting } =
     useDeleteReplicationTenantMutation({
       onSuccess: () => {
-        toast.success('Supabase Pipelines has been disabled')
+        toast.success('Pipelines has been disabled')
         setOpen(false)
       },
       onError: () => {},
@@ -53,7 +50,7 @@ export const DisableSupabasePipelinesDialog = ({
     <AlertDialog open={open} onOpenChange={(open) => !isSubmitting && setOpen(open)}>
       <AlertDialogContent size="small">
         <AlertDialogHeader>
-          <AlertDialogTitle>Disable Supabase Pipelines</AlertDialogTitle>
+          <AlertDialogTitle>Disable Pipelines</AlertDialogTitle>
           <AlertDialogDescription className="space-y-2 text-sm">
             <p>
               This will remove the <code className="text-code-inline">etl</code> schema and all
@@ -67,7 +64,7 @@ export const DisableSupabasePipelinesDialog = ({
           <AlertDialogBody>
             <Admonition
               type="destructive"
-              title="Unable to disable Supabase Pipelines"
+              title="Unable to disable Pipelines"
               description={error}
             />
           </AlertDialogBody>

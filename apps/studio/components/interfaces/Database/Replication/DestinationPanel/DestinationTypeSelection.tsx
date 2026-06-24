@@ -89,7 +89,7 @@ export const DestinationTypeSelection = () => {
       ],
     },
     {
-      label: 'Supabase Pipelines',
+      label: 'Pipelines',
       options: [
         {
           value: 'Analytics Bucket',

@@ -15,7 +15,7 @@ import {
   SheetTitle,
 } from 'ui'
 
-import { EnableReplicationCallout } from '../EnableReplicationCallout'
+import { EnablePipelinesCallout } from '../EnablePipelinesCallout'
 import { PipelineStatusName } from '../Replication.constants'
 import { useDestinationInformation } from '../useDestinationInformation'
 import { useIsETLPrivateAlpha } from '../useIsETLPrivateAlpha'
@@ -118,11 +118,11 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
               <SheetSection>
                 <div className={cn('border rounded-md p-6 flex flex-col gap-y-4')}>
                   <div className="flex flex-col gap-y-1">
-                    <h4>Request Supabase Pipelines access</h4>
+                    <h4>Request Pipelines access</h4>
                     <p className="text-sm text-foreground-light">
-                      Supabase Pipelines is in <span className="text-foreground">alpha</span> and
-                      being rolled out gradually. Request access below to join the waitlist. Read
-                      replicas are available now.
+                      Pipelines is in <span className="text-foreground">alpha</span> and being
+                      rolled out gradually. Request access below to join the waitlist. Read replicas
+                      are available now.
                     </p>
                   </div>
                   <div className="flex gap-x-2">
@@ -132,9 +132,9 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
                       iconRight={<ArrowUpRight size={16} strokeWidth={1.5} />}
                     >
                       <Link
-                        href="https://forms.supabase.com/pg_replicate"
                         target="_blank"
                         rel="noreferrer"
+                        href="https://forms.supabase.com/pg_replicate"
                       >
                         Request alpha access
                       </Link>
@@ -147,7 +147,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
               </SheetSection>
             ) : replicationNotEnabled ? (
               <SheetSection>
-                <EnableReplicationCallout
+                <EnablePipelinesCallout
                   className="p-6!"
                   type={destinationType}
                   hasAccess={hasETLReplicationAccess}
