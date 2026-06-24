@@ -25,6 +25,7 @@ import z from 'zod'
 
 import {
   getTemplateFlowVariant,
+  inferTemplateFlowMode,
   supportsTemplateFlowPicker,
   type TemplateFlowMode,
 } from './EmailTemplates.flowVariants'
@@ -102,6 +103,7 @@ export const TemplateEditor = ({
   )
   const canEdit = canUpdateConfig && !isReadOnly
   const supportsFlowPicker = showFlowPicker && supportsTemplateFlowPicker(template.id)
+  const canSaveTemplate = canUpdateConfig && (canEdit || supportsFlowPicker)
 
   const { id, properties } = template
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
@@ -157,7 +159,7 @@ export const TemplateEditor = ({
 
   const onSubmit = (values: z.infer<typeof template.validationSchema>) => {
     if (!projectRef) return console.error('Project ref is required')
-    if (!canEdit) return
+    if (!canSaveTemplate) return
 
     setIsSavingTemplate(true)
 
@@ -216,10 +218,10 @@ export const TemplateEditor = ({
     (subjectSlug !== undefined &&
       authConfig?.MAILER_SUBJECTS_CUSTOM_CONTENTS?.[subjectSlug] === true)
   const hasFormChanges = JSON.stringify(formValues) !== JSON.stringify(baselineValues)
-  const hasChanges = supportsFlowPicker ? false : hasFormChanges || baselineBodyValue !== bodyValue
+  const hasChanges = hasFormChanges || baselineBodyValue !== bodyValue
   const saveChangesTooltip = !canUpdateConfig
     ? 'You need additional permissions to edit templates'
-    : isReadOnly
+    : !canSaveTemplate
       ? 'Set up custom SMTP to edit and save templates'
       : !hasChanges
         ? 'Make a change before saving'
@@ -267,18 +269,38 @@ export const TemplateEditor = ({
     [form, subjectSlug, template.id]
   )
 
-  useEffect(() => {
-    if (!supportsFlowPicker) return
-    applyFlowVariant(flowMode)
-  }, [applyFlowVariant, flowMode, supportsFlowPicker])
+  const handleFlowModeChange = (mode: TemplateFlowMode) => {
+    setFlowMode(mode)
+    applyFlowVariant(mode)
+  }
+
+  const resetFlowModeFromSavedTemplate = useCallback(() => {
+    if (!supportsFlowPicker || !supportsTemplateFlowPicker(template.id) || !subjectSlug) return
+
+    const savedSubject = (authConfig?.[subjectSlug] as string | undefined) ?? ''
+    const savedBody = (authConfig?.[messageSlug] as string | undefined) ?? ''
+
+    setFlowMode(inferTemplateFlowMode(template.id, savedSubject, savedBody) ?? 'link')
+  }, [authConfig, messageSlug, subjectSlug, supportsFlowPicker, template.id])
 
   // Update form values when authConfig changes
   useEffect(() => {
-    if (authConfig && !supportsFlowPicker) {
-      form.reset(getFormValuesFromConfig(authConfig))
-      setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
+    if (!authConfig) return
+
+    form.reset(getFormValuesFromConfig(authConfig))
+    setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
+
+    if (supportsFlowPicker) {
+      resetFlowModeFromSavedTemplate()
     }
-  }, [authConfig, getFormValuesFromConfig, messageSlug, form, supportsFlowPicker])
+  }, [
+    authConfig,
+    getFormValuesFromConfig,
+    messageSlug,
+    form,
+    supportsFlowPicker,
+    resetFlowModeFromSavedTemplate,
+  ])
 
   useEffect(() => {
     if (projectRef && id && !!authConfig) {
@@ -313,7 +335,7 @@ export const TemplateEditor = ({
       <form onSubmit={form.handleSubmit(onSubmit)}>
         {supportsFlowPicker && (
           <CardContent className="border-b">
-            <TemplateFlowPicker value={flowMode} onValueChange={setFlowMode} />
+            <TemplateFlowPicker value={flowMode} onValueChange={handleFlowModeChange} />
           </CardContent>
         )}
         <CardContent>
@@ -484,6 +506,17 @@ export const TemplateEditor = ({
                     setBodyValue((config && config[messageSlug]) ?? '')
                     setValidationResult(undefined)
                     setHasUnsavedChanges(false)
+                    if (
+                      supportsFlowPicker &&
+                      supportsTemplateFlowPicker(template.id) &&
+                      subjectSlug
+                    ) {
+                      const savedSubject = (config[subjectSlug] as string | undefined) ?? ''
+                      const savedBody = (config[messageSlug] as string | undefined) ?? ''
+                      setFlowMode(
+                        inferTemplateFlowMode(template.id, savedSubject, savedBody) ?? 'link'
+                      )
+                    }
                   }}
                 />
               )}
@@ -494,7 +527,8 @@ export const TemplateEditor = ({
                     type="button"
                     onClick={() => {
                       form.reset(INITIAL_VALUES)
-                      setBodyValue((authConfig && authConfig[messageSlug]) ?? '')
+                      setBodyValue(baselineBodyValue)
+                      resetFlowModeFromSavedTemplate()
                       setHasUnsavedChanges(false)
                     }}
                   >
@@ -504,7 +538,7 @@ export const TemplateEditor = ({
                 <ButtonTooltip
                   variant="primary"
                   type="submit"
-                  disabled={!canEdit || isSavingTemplate || !hasChanges}
+                  disabled={!canSaveTemplate || isSavingTemplate || !hasChanges}
                   loading={isSavingTemplate}
                   tooltip={{ content: { side: 'bottom', text: saveChangesTooltip } }}
                 >

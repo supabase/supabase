@@ -15,7 +15,7 @@ export const TemplateFlowPicker = ({ value, onValueChange }: TemplateFlowPickerP
     <FormItemLayout
       isReactForm={false}
       layout="vertical"
-      label="Authentication method"
+      label="Confirmation"
       description={selectedOption?.helperText}
     >
       <Select

@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { getTemplateFlowVariant, supportsTemplateFlowPicker } from './EmailTemplates.flowVariants'
+import {
+  getTemplateFlowVariant,
+  inferTemplateFlowMode,
+  supportsTemplateFlowPicker,
+} from './EmailTemplates.flowVariants'
 
 describe('EmailTemplates.flowVariants', () => {
   it('supports flow picker on the four auth templates only', () => {
@@ -27,5 +31,12 @@ describe('EmailTemplates.flowVariants', () => {
 
     expect(both.body).toContain('{{ .ConfirmationURL }}')
     expect(both.body).toContain('Alternatively, enter this code: {{ .Token }}')
+  })
+
+  it('infers the saved flow mode from subject and body', () => {
+    const otp = getTemplateFlowVariant('MAGIC_LINK', 'otp')
+
+    expect(inferTemplateFlowMode('MAGIC_LINK', otp.subject, otp.body)).toBe('otp')
+    expect(inferTemplateFlowMode('MAGIC_LINK', 'Custom subject', '<p>Custom body</p>')).toBeNull()
   })
 })

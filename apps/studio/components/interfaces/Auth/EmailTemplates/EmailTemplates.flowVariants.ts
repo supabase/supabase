@@ -21,8 +21,8 @@ export const TEMPLATE_FLOW_MODE_OPTIONS: {
 }[] = [
   {
     value: 'link',
-    label: 'Confirmation link',
-    helperText: 'Users click a link in the email.',
+    label: 'Link',
+    helperText: 'Users click a confirmation link in the email.',
   },
   {
     value: 'otp',
@@ -121,4 +121,20 @@ export const getTemplateFlowVariant = (
   mode: TemplateFlowMode
 ): TemplateFlowVariant => {
   return TEMPLATE_FLOW_VARIANTS[templateId][mode]
+}
+
+export const inferTemplateFlowMode = (
+  templateId: FlowPickerTemplateId,
+  subject: string,
+  body: string
+): TemplateFlowMode | null => {
+  const variants = TEMPLATE_FLOW_VARIANTS[templateId]
+
+  for (const mode of ['link', 'otp', 'both'] as const) {
+    if (variants[mode].subject === subject && variants[mode].body === body) {
+      return mode
+    }
+  }
+
+  return null
 }
