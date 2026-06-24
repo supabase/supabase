@@ -1,0 +1,271 @@
+---
+title: 'SvelteKit Server-Side Auth'
+description: 'Configure Supabase Auth to use cookies in SvelteKit.'
+---
+
+<Admonition type="tip">
+
+This guide assumes you've already set up a Supabase client in your SvelteKit application using the `@supabase/ssr` package. If you haven't, check out the [SvelteKit quickstart guide](/docs/guides/getting-started/quickstarts/sveltekit).
+
+</Admonition>
+
+## Creating a Supabase client for SSR
+
+To use Supabase with SvelteKit's server-side rendering, you need to create a client that can access cookies on both the server and client side:
+
+```typescript
+// src/lib/server/supabase.ts
+import { createServerClient } from '@supabase/ssr'
+import type { Cookies } from '@sveltejs/kit'
+
+export const createSupabaseServerClient = (cookies: Cookies) =>
+  createServerClient(
+    process.env.PUBLIC_SUPABASE_URL!,
+    process.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    {
+      cookies: {
+        get: (key) => cookies.get(key),
+        set: (key, value, options) => {
+          cookies.set(key, value, { ...options, path: '/' })
+        },
+        remove: (key, options) => {
+          cookies.delete(key, { ...options, path: '/' })
+        },
+      },
+    }
+  )
+```
+
+## OAuth Authentication
+
+OAuth authentication allows users to sign in with third-party providers like Google, GitHub, and others. Here's how to implement it in SvelteKit:
+
+### Setting up OAuth providers
+
+First, configure your OAuth providers in your [Supabase Dashboard](https://app.supabase.com/):
+
+1. Go to Authentication â†’ Providers
+2. Enable your desired OAuth providers (e.g., Google, GitHub, GitLab, etc.)
+3. Add the OAuth credentials from each provider's developer console
+4. Set the redirect URL to `https://your-domain.com/auth/callback`
+
+### Creating the login page
+
+Create a login page with OAuth sign-in options:
+
+```svelte
+<!-- src/routes/auth/login/+page.svelte -->
+<script lang="ts">
+  import type { ActionData } from './$types'
+
+  export let form: ActionData
+</script>
+
+<h1>Sign In</h1>
+
+{#if form?.error}
+  <p class="error">{form.error}</p>
+{/if}
+
+<form method="POST" action="?/oauth">
+  <h2>Sign in with a provider</h2>
+  <div class="oauth-providers">
+    <button name="provider" value="google" type="submit">
+      <svg><!-- Google icon --></svg>
+      Sign in with Google
+    </button>
+    <button name="provider" value="github" type="submit">
+      <svg><!-- GitHub icon --></svg>
+      Sign in with GitHub
+    </button>
+    <button name="provider" value="gitlab" type="submit">
+      <svg><!-- GitLab icon --></svg>
+      Sign in with GitLab
+    </button>
+  </div>
+</form>
+
+<style>
+  .oauth-providers {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 0.25rem;
+    background: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  button:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .error {
+    color: #ef4444;
+    margin-bottom: 1rem;
+  }
+</style>
+```
+
+### Handling the OAuth flow server-side
+
+Create the server-side handler for the OAuth authentication:
+
+```typescript
+// src/routes/auth/login/+page.server.ts
+import { redirect, fail } from '@sveltejs/kit'
+import type { Actions } from './$types'
+import { createSupabaseServerClient } from '$lib/server/supabase'
+
+export const actions: Actions = {
+  oauth: async ({ request, url, cookies }) => {
+    const formData = await request.formData()
+    const provider = formData.get('provider') as string
+
+    if (!provider) {
+      return fail(400, {
+        error: 'Provider is required'
+      })
+    }
+
+    const supabase = createSupabaseServerClient(cookies)
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: provider as any,
+      options: {
+        redirectTo: `${url.origin}/auth/callback`,
+        scopes: provider === 'github' ? 'read:user user:email' : undefined
+      }
+    })
+
+    if (error) {
+      console.error('OAuth error:', error)
+      return fail(400, {
+        error: 'Authentication failed. Please try again.'
+      })
+    }
+
+    if (data.url) {
+      // Redirect to OAuth provider
+      throw redirect(303, data.url)
+    }
+
+    return fail(400, {
+      error: 'Failed to get authentication URL'
+    })
+  }
+}
+```
+
+### Creating the OAuth callback handler
+
+After the user authenticates with the OAuth provider, they'll be redirected back to your application. Create a callback handler to complete the authentication:
+
+```typescript
+// src/routes/auth/callback/+server.ts
+import { redirect, error } from '@sveltejs/kit'
+import type { RequestHandler } from './$types'
+import { createSupabaseServerClient } from '$lib/server/supabase'
+
+export const GET: RequestHandler = async ({ url, cookies }) => {
+  const code = url.searchParams.get('code')
+  const next = url.searchParams.get('next') ?? '/dashboard'
+  const error_description = url.searchParams.get('error_description')
+
+  if (error_description) {
+    throw error(400, error_description)
+  }
+
+  if (code) {
+    const supabase = createSupabaseServerClient(cookies)
+    
+    const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
+    
+    if (!exchangeError) {
+      throw redirect(303, next)
+    }
+  }
+
+  // Return the user to an error page with instructions
+  throw redirect(303, '/auth/auth-error')
+}
+```
+
+## Protecting routes
+
+Ensure users are authenticated before accessing protected pages:
+
+```typescript
+// src/routes/dashboard/+page.server.ts
+import { redirect } from '@sveltejs/kit'
+import type { PageServerLoad } from './$types'
+import { createSupabaseServerClient } from '$lib/server/supabase'
+
+export const load: PageServerLoad = async ({ cookies }) => {
+  const supabase = createSupabaseServerClient(cookies)
+
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (!session) {
+    throw redirect(303, '/auth/login')
+  }
+
+  return {
+    session,
+    user: session.user
+  }
+}
+```
+
+## Signing out
+
+Implement a sign-out action:
+
+```typescript
+// src/routes/auth/signout/+page.server.ts
+import { redirect } from '@sveltejs/kit'
+import type { Actions } from './$types'
+import { createSupabaseServerClient } from '$lib/server/supabase'
+
+export const actions: Actions = {
+  default: async ({ cookies }) => {
+    const supabase = createSupabaseServerClient(cookies)
+    
+    await supabase.auth.signOut()
+    
+    throw redirect(303, '/auth/login')
+  }
+}
+```
+
+## Best practices
+
+1. **Error handling**: Always handle authentication errors gracefully and provide clear feedback to users
+2. **Session validation**: Validate sessions on the server side for protected routes
+3. **Redirect URLs**: Configure allowed redirect URLs in your Supabase dashboard for security
+4. **PKCE flow**: The `@supabase/ssr` package automatically uses the PKCE flow for enhanced security
+5. **Environment variables**: Never expose your service role key on the client side
+
+## Testing OAuth locally
+
+For local development:
+
+1. Use `http://localhost:5173/auth/callback` as your redirect URL in the OAuth provider settings
+2. Some providers (like Google) may require additional configuration for localhost URLs
+3. Consider using a service like [ngrok](https://ngrok.com/) to test OAuth with a public URL
+
+## Next steps
+
+- Learn about [Row Level Security](/docs/guides/auth/row-level-security) to secure your data
+- Explore [Auth Helpers](/docs/guides/auth/auth-helpers/sveltekit) for additional authentication patterns
+- Set up [Multi-Factor Authentication](/docs/guides/auth/auth-mfa) for enhanced security
