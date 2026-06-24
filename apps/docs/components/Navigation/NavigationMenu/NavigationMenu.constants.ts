@@ -2716,6 +2716,10 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/clone-project',
         },
         {
+          name: 'Project Pausing',
+          url: '/guides/platform/free-project-pausing' as `/${string}`,
+        },
+        {
           name: 'Single Sign-On',
           url: '/guides/platform/sso',
           enabled: fullPlatformEnabled,
