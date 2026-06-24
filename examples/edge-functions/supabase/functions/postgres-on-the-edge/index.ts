@@ -1,17 +1,7 @@
 import { Pool } from 'jsr:@db/postgres@^0'
 
 // Create a database pool with one connection.
-const pool = new Pool(
-  {
-    tls: { enabled: false },
-    database: 'postgres',
-    hostname: Deno.env.get('DB_HOSTNAME'),
-    user: Deno.env.get('DB_USER'),
-    port: 6543,
-    password: Deno.env.get('DB_PASSWORD'),
-  },
-  1
-)
+const pool = new Pool(Deno.env.get('SUPABASE_DB_URL')!, 1)
 
 export default {
   fetch: async (_req) => {
