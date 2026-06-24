@@ -1,4 +1,5 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { useFlag } from 'common'
 import dayjs from 'dayjs'
 import { useCallback, useMemo, useState } from 'react'
 
@@ -24,7 +25,14 @@ import {
   genCountQuery,
   genDefaultQuery,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import {
+  genChartQueryOtel,
+  genCountQueryOtel,
+  genDefaultQueryOtel,
+  mapOtelPreviewRow,
+} from '@/components/interfaces/Settings/Logs/Logs.utils.otel'
 import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
+import { logsAllEndpointUrl, pickLogsQueryBuilder } from '@/data/logs/logs-endpoint'
 
 interface LogsPreviewHook {
   logData: LogData[]
@@ -55,6 +63,13 @@ function useLogsPreview({
   const defaultHelper = getDefaultHelper(PREVIEWER_DATEPICKER_HELPERS)
   const [latestRefresh, setLatestRefresh] = useState(new Date().toISOString())
 
+  // When enabled, route the legacy logs pages through the OTEL ClickHouse
+  // endpoint (logs.all.otel) instead of the BigQuery-backed logs.all endpoint.
+  // `logsAllEndpointUrl(useOtel)` is inlined in each queryFn (rather than hoisted
+  // to a const) so the only query dependency is `useOtel`, which is already part
+  // of every query key — keeping @tanstack/query/exhaustive-deps satisfied.
+  const useOtel = useFlag('otelLegacyLogs')
+
   const {
     timestampStart: urlTimestampStart,
     timestampEnd: urlTimestampEnd,
@@ -81,8 +96,13 @@ function useLogsPreview({
   )
 
   const defaultSql = useMemo(
-    () => genDefaultQuery(table, mergedFilters, limit),
-    [table, mergedFilters, limit]
+    () =>
+      pickLogsQueryBuilder(useOtel, genDefaultQueryOtel, genDefaultQuery)(
+        table,
+        mergedFilters,
+        limit
+      ),
+    [useOtel, table, mergedFilters, limit]
   )
 
   const params: LogsEndpointParams = useMemo(
@@ -95,8 +115,8 @@ function useLogsPreview({
   )
 
   const queryKey = useMemo(
-    () => ['projects', projectRef, 'logs', params, defaultSql],
-    [projectRef, params, defaultSql]
+    () => ['projects', projectRef, 'logs', params, defaultSql, { otel: useOtel }],
+    [projectRef, params, defaultSql, useOtel]
   )
 
   const {
@@ -113,14 +133,20 @@ function useLogsPreview({
     queryFn: async ({ signal, pageParam }) => {
       const data = await executeAnalyticsSql({
         projectRef,
-        endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
+        endpoint: logsAllEndpointUrl(useOtel),
         sql: defaultSql,
         iso_timestamp_start: params.iso_timestamp_start ?? '',
         iso_timestamp_end: (pageParam || params.iso_timestamp_end) ?? '',
         method: 'get',
         signal,
       })
-      return data as unknown as Logs
+      const logs = data as unknown as Logs
+      // OTEL rows carry an ISO/microsecond timestamp; normalize to the
+      // microsecond-number shape the renderers and pagination cursor expect.
+      if (useOtel && logs?.result) {
+        return { ...logs, result: logs.result.map(mapOtelPreviewRow) } as Logs
+      }
+      return logs
     },
     refetchOnWindowFocus: false,
     initialPageParam: undefined as string | undefined,
@@ -153,7 +179,10 @@ function useLogsPreview({
     return { logData, error, oldestTimestamp }
   }, [data?.pages])
 
-  const countQuerySql = useMemo(() => genCountQuery(table, mergedFilters), [table, mergedFilters])
+  const countQuerySql = useMemo(
+    () => pickLogsQueryBuilder(useOtel, genCountQueryOtel, genCountQuery)(table, mergedFilters),
+    [useOtel, table, mergedFilters]
+  )
   const countQueryKey = useMemo(
     () => [
       'projects',
@@ -166,9 +195,10 @@ function useLogsPreview({
         iso_timestamp_end: timestampEnd,
         table,
         mergedFilters,
+        otel: useOtel,
       },
     ],
-    [projectRef, countQuerySql, latestRefresh, timestampEnd, table, mergedFilters]
+    [projectRef, countQuerySql, latestRefresh, timestampEnd, table, mergedFilters, useOtel]
   )
 
   const { data: countData } = useQuery({
@@ -176,7 +206,7 @@ function useLogsPreview({
     queryFn: async ({ signal }) => {
       const data = await executeAnalyticsSql({
         projectRef,
-        endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
+        endpoint: logsAllEndpointUrl(useOtel),
         sql: countQuerySql,
         iso_timestamp_start: latestRefresh,
         iso_timestamp_end: timestampEnd ?? '',
@@ -193,8 +223,9 @@ function useLogsPreview({
   const newCount = countData?.result?.[0]?.count ?? 0
 
   const chartQuery = useMemo(
-    () => genChartQuery(table, params, mergedFilters),
-    [table, params, mergedFilters]
+    () =>
+      pickLogsQueryBuilder(useOtel, genChartQueryOtel, genChartQuery)(table, params, mergedFilters),
+    [useOtel, table, params, mergedFilters]
   )
   const chartQueryKey = useMemo(
     () => [
@@ -206,9 +237,10 @@ function useLogsPreview({
         sql: chartQuery,
         iso_timestamp_start: timestampStart,
         iso_timestamp_end: timestampEnd,
+        otel: useOtel,
       },
     ],
-    [projectRef, chartQuery, timestampStart, timestampEnd]
+    [projectRef, chartQuery, timestampStart, timestampEnd, useOtel]
   )
 
   const { data: eventChartResponse, refetch: refreshEventChart } = useQuery({
@@ -216,7 +248,7 @@ function useLogsPreview({
     queryFn: async ({ signal }) => {
       const data = await executeAnalyticsSql({
         projectRef,
-        endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
+        endpoint: logsAllEndpointUrl(useOtel),
         sql: chartQuery,
         iso_timestamp_start: timestampStart,
         iso_timestamp_end: timestampEnd ?? '',
