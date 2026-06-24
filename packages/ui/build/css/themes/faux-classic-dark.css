@@ -9,8 +9,8 @@
   --chroma: 0.018;
   --surface: 0.16;
   --foreground-lightness: 0.985;
-  --muted-foreground-opacity: 72%;
-  --tertiary-foreground-opacity: 52%;
+  --muted-foreground-level: 0.72;
+  --tertiary-foreground-level: 0.52;
 
   --code-block-5: 13.8deg 89.7% 69.6%;
   --code-block-4: 276.1deg 67.7% 74.5%;

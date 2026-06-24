@@ -12,8 +12,8 @@
   --surface: 0.95;
   --elevation-step: calc((1 - var(--surface)) * 0.4);
   --foreground-lightness: 0.16;
-  --muted-foreground-opacity: 68%;
-  --tertiary-foreground-opacity: 48%;
+  --muted-foreground-level: 0.68;
+  --tertiary-foreground-level: 0.48;
 
   --code-block-5: 14deg 80.4% 58%;
   --code-block-4: 276.3deg 60% 52.9%;

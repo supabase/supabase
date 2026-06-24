@@ -11,39 +11,38 @@
   --hue: 160;
   --chroma: 0.018;
   --surface: 0.985;
+
   --foreground-lightness: 0.16;
-  --muted-foreground-opacity: 68%; /* base at --contrast: 0.5; themes may override */
-  --tertiary-foreground-opacity: 48%;
+  /* How far muted/tertiary text sits from --surface toward --foreground-lightness
+     (0 = surface, 1 = full foreground) at --contrast 0.5; themes override. */
+  --muted-foreground-level: 0.68;
+  --tertiary-foreground-level: 0.48;
 
   /*
    * Global contrast knob, 0 to 1. Default 0.5 is the comfortable baseline; 0 keeps
    * borders and accent barely visible over muted surfaces; 1 pushes them to full
    * strength. Foreground hits --foreground-lightness at 0.5; below that it eases
    * toward the surface down to --contrast-text-floor at 0. Muted and tertiary
-   * foreground opacities use the theme base values at 0.5 and scale up toward
-   * foreground or down toward half that base as contrast moves away from baseline.
+   * foreground lightness sits at the theme base level (a surface→foreground mix) at
+   * 0.5 and eases up toward foreground or down toward half that base as contrast moves.
    *
-   * --contrast-delta is -1 at 0, 0 at 0.5, +1 at 1 — shared offset from baseline.
-   * --contrast-border remaps delta into [floor, 1] and squares it so 0.5 is the
-   * design baseline and most of the ramp lives toward 1.
+   * --contrast-delta is -1 at 0, 0 at 0.5, +1 at 1 — shared offset from baseline;
+   * --contrast-up / --contrast-down are its positive / negative halves.
+   * --contrast-border ramps [floor, 1] over --contrast and squares it so most of
+   * the range lives toward full strength. ((delta + 1) / 2 simplifies to contrast.)
    */
   --contrast: 0.5;
   --contrast-delta: calc((var(--contrast) - 0.5) / 0.5);
-  --contrast-text-floor: 0.8;
+  /* positive and negative halves of the delta, reused below */
+  --contrast-up: max(0, var(--contrast-delta));
+  --contrast-down: max(0, calc(var(--contrast-delta) * -1));
+  --contrast-text-floor: 0.9;
   --contrast-border-floor: 0.05;
-  --contrast-text: calc(
-    1 - (1 - var(--contrast-text-floor)) * max(0, calc(var(--contrast-delta) * -1))
+  --contrast-text: calc(1 - (1 - var(--contrast-text-floor)) * var(--contrast-down));
+  --contrast-border-linear: calc(
+    var(--contrast-border-floor) + (1 - var(--contrast-border-floor)) * var(--contrast)
   );
-  --contrast-border: calc(
-    (
-        var(--contrast-border-floor) + (1 - var(--contrast-border-floor)) *
-          calc((var(--contrast-delta) + 1) / 2)
-      ) *
-      (
-        var(--contrast-border-floor) + (1 - var(--contrast-border-floor)) *
-          calc((var(--contrast-delta) + 1) / 2)
-      )
-  );
+  --contrast-border: calc(var(--contrast-border-linear) * var(--contrast-border-linear));
 
   /*
    * Surface elevation. Each surface steps its lightness away from --background
@@ -60,7 +59,9 @@
   --elevation-2: 1.5;
   --elevation-3: 2;
   --elevation-4: 3;
-  --elevation-step: calc((var(--foreground-lightness) - var(--surface)) * 0.035);
+  /* Signed span surface→foreground (+ in dark, − in light); also used by accent. */
+  --tone-span: calc(var(--foreground-lightness) - var(--surface));
+  --elevation-step: calc(var(--tone-span) * 0.04);
 
   /*
    * Status hues stay anchored to amber / red but pull a fraction of the way
@@ -81,12 +82,21 @@
     calc(25 + (var(--hue) - var(--brand-hue-reference)) * var(--status-hue-pull)),
     42
   );
+  /*
+   * Status chroma is bounded the same way. It scales with the brand --chroma so
+   * status colors share the theme's saturation level, but clamps to a floor — so
+   * warning/destructive never wash out to gray when --chroma is near 0 — and a
+   * ceiling that keeps them inside the displayable amber/red gamut. The band is set
+   * so the currently tuned themes are unchanged; it only rescues very low --chroma.
+   */
+  --warning-chroma: clamp(0.15, calc(var(--chroma) * 8), 0.2);
+  --destructive-chroma: clamp(0.19, calc(var(--chroma) * 10), 0.25);
 
   /* shadcn semantic pairs */
-  --background: oklch(var(--surface) calc(var(--chroma) * 0.35) var(--hue));
+  --background: oklch(var(--surface) calc(var(--chroma) * 0.5) var(--hue));
   --foreground: oklch(
-    calc(var(--surface) + (var(--foreground-lightness) - var(--surface)) * var(--contrast-text))
-      calc(var(--chroma) * 0.55) var(--hue)
+    calc(var(--surface) + var(--tone-span) * var(--contrast-text)) calc(var(--chroma) * 0.55)
+      var(--hue)
   );
 
   --card: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-1)) c h);
@@ -106,42 +116,38 @@
   --tertiary: oklch(
     from var(--background) calc(l + var(--elevation-step) * var(--elevation-4)) c h
   );
+  --tertiary-foreground-mix: calc(
+    var(--tertiary-foreground-level) + (1 - var(--tertiary-foreground-level)) * var(--contrast-up) -
+      var(--tertiary-foreground-level) * 0.5 * var(--contrast-down)
+  );
   --tertiary-foreground: oklch(
-    from var(--foreground) l c h /
-      calc(
-        var(--tertiary-foreground-opacity) + (100% - var(--tertiary-foreground-opacity)) *
-          max(0, var(--contrast-delta)) - var(--tertiary-foreground-opacity) * 0.5 *
-          max(0, calc(var(--contrast-delta) * -1))
-      )
+    from var(--foreground) calc(var(--surface) + var(--tone-span) * var(--tertiary-foreground-mix))
+      c h
   );
   --muted: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-2)) c h);
+  --muted-foreground-mix: calc(
+    var(--muted-foreground-level) + (1 - var(--muted-foreground-level)) * var(--contrast-up) -
+      var(--muted-foreground-level) * 0.5 * var(--contrast-down)
+  );
   --muted-foreground: oklch(
-    from var(--foreground) l c h /
-      calc(
-        var(--muted-foreground-opacity) + (100% - var(--muted-foreground-opacity)) *
-          max(0, var(--contrast-delta)) - var(--muted-foreground-opacity) * 0.5 *
-          max(0, calc(var(--contrast-delta) * -1))
-      )
+    from var(--foreground) calc(var(--surface) + var(--tone-span) * var(--muted-foreground-mix)) c h
   );
   /*
    * Accent is a contrast / hover-selection fill, not an elevation surface, so it
    * always steps toward the foreground: slightly darker than --background in
    * light, slightly lighter in dark — regardless of the elevation direction.
-   * The (foreground-lightness - surface) term carries the sign per theme.
+   * The --tone-span term carries the sign per theme.
    */
   --accent-step: calc(0.012 + 0.17 * var(--contrast-border));
-  --accent: oklch(
-    from var(--background)
-      calc(l + (var(--foreground-lightness) - var(--surface)) * var(--accent-step)) c h
-  );
+  --accent: oklch(from var(--background) calc(l + var(--tone-span) * var(--accent-step)) c h);
   --accent-foreground: var(--foreground);
 
-  --warning: oklch(0.78 calc(var(--chroma) * 8) var(--warning-hue));
+  --warning: oklch(0.78 var(--warning-chroma) var(--warning-hue));
   --warning-foreground: oklch(
     calc(min(var(--surface), var(--foreground-lightness)) + 0.06) calc(var(--chroma) * 2)
       var(--warning-hue)
   );
-  --destructive: oklch(0.62 calc(var(--chroma) * 10) var(--destructive-hue));
+  --destructive: oklch(0.62 var(--destructive-chroma) var(--destructive-hue));
   --destructive-foreground: oklch(
     max(var(--surface), var(--foreground-lightness)) calc(var(--chroma) * 0.5)
       var(--destructive-hue)
@@ -152,8 +158,12 @@
   --border-warning: oklch(from var(--warning) l c h / 30%);
   --border-brand: oklch(from var(--primary) l c h / 30%);
 
-  --border: oklch(from var(--foreground) l calc(c * 0.5) h / calc(2% + 30% * var(--contrast-border)));
-  --input: oklch(from var(--foreground) l calc(c * 0.5) h / calc(3% + 38% * var(--contrast-border)));
+  --border: oklch(
+    from var(--foreground) l calc(c * 0.54) h / calc(2% + 25% * var(--contrast-border))
+  );
+  --input: oklch(
+    from var(--foreground) l calc(c * 0.5) h / calc(3% + 38% * var(--contrast-border))
+  );
   --ring: oklch(from var(--primary) l c h / 55%);
 
   /* Legacy foreground aliases */
@@ -185,13 +195,17 @@
 
   /* Legacy border aliases */
   --border-default: var(--border);
-  --border-muted: oklch(from var(--foreground) l calc(c * 0.5) h / calc(2% + 30% * var(--contrast-border)));
+  --border-muted: var(--border);
   --border-secondary: var(--border-muted);
-  --border-overlay: oklch(from var(--foreground) l calc(c * 0.5) h / calc(4% + 34% * var(--contrast-border)));
+  --border-overlay: oklch(
+    from var(--foreground) l calc(c * 0.5) h / calc(4% + 34% * var(--contrast-border))
+  );
   --border-control: var(--input);
   --border-alternative: var(--border);
   --border-strong: var(--input);
-  --border-stronger: oklch(from var(--foreground) l calc(c * 0.5) h / calc(5% + 45% * var(--contrast-border)));
+  --border-stronger: oklch(
+    from var(--foreground) l calc(c * 0.5) h / calc(5% + 45% * var(--contrast-border))
+  );
   --border-button-default: var(--border);
   --border-button-hover: var(--border-stronger);
 }
