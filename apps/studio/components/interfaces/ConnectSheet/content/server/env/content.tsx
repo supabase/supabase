@@ -13,7 +13,8 @@ import CopyButton from '@/components/ui/CopyButton'
 
 function ServerEnvContent() {
   const { ref } = useParams()
-  const { apiUrl, publishableKey, jwksUrl, secret, buildEnv } = useConnectServerEnv()
+  const { apiUrl, publishableKey, jwksUrl, secret, buildEnv, canReadAPIKeys } =
+    useConnectServerEnv()
 
   return (
     <div className="flex flex-col gap-y-4">
@@ -25,6 +26,7 @@ function ServerEnvContent() {
             size="tiny"
             asyncText={buildEnv}
             aria-label="Copy all variables"
+            disabled={!canReadAPIKeys}
           />
         </div>
         <div className="divide-y">
@@ -44,6 +46,7 @@ function ServerEnvContent() {
               iconOnly
               aria-label="Copy publishable key"
               text={publishableKey}
+              disabled={!canReadAPIKeys}
             />
           </EnvRow>
           <SecretEnvRow secret={secret} />
