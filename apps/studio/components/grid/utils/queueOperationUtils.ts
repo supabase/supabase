@@ -1,13 +1,12 @@
-import { isTableLike, type Entity } from 'data/table-editor/table-editor-types'
-import type { Dictionary } from 'types'
-
 import { isPendingAddRow, PendingAddRow, SupaRow } from '../types'
+import { isTableLike, type Entity } from '@/data/table-editor/table-editor-types'
 import {
   EditCellContentOperation,
   NewQueuedOperation,
   QueuedOperation,
   QueuedOperationType,
 } from '@/state/table-editor-operation-queue.types'
+import type { Dictionary } from '@/types'
 
 interface EditCellKeyOperation extends Omit<
   EditCellContentOperation,
@@ -152,9 +151,9 @@ export const formatGridDataWithOperationValues = ({
   operations.forEach((op) => {
     if (op.type === QueuedOperationType.EDIT_CELL_CONTENT) {
       const { rowIdentifiers, columnName, newValue } = op.payload
-      const rowMatches = rows.find((row) => rowMatchesIdentifiers(row, rowIdentifiers))
-      if (rowMatches) {
-        formattedRows[rowMatches.idx] = { ...rowMatches, [columnName]: newValue }
+      const rowIdx = formattedRows.findIndex((row) => rowMatchesIdentifiers(row, rowIdentifiers))
+      if (rowIdx !== -1) {
+        formattedRows[rowIdx] = { ...formattedRows[rowIdx], [columnName]: newValue }
       }
     } else if (op.type === QueuedOperationType.ADD_ROW) {
       const { tempId, rowData } = op.payload
@@ -177,9 +176,9 @@ export const formatGridDataWithOperationValues = ({
       }
     } else if (op.type === QueuedOperationType.DELETE_ROW) {
       const { rowIdentifiers } = op.payload
-      const rowMatches = rows.find((row) => rowMatchesIdentifiers(row, rowIdentifiers))
-      if (rowMatches) {
-        formattedRows[rowMatches.idx] = { ...rowMatches, __isDeleted: true }
+      const rowIdx = formattedRows.findIndex((row) => rowMatchesIdentifiers(row, rowIdentifiers))
+      if (rowIdx !== -1) {
+        formattedRows[rowIdx] = { ...formattedRows[rowIdx], __isDeleted: true }
       }
     }
   })

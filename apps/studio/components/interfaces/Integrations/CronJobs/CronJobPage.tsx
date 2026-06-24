@@ -1,25 +1,22 @@
 import { useParams } from 'common'
 import { toString as CronToString } from 'cronstrue'
-import { useCronJobQuery } from 'data/database-cron-jobs/database-cron-job-query'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { Edit3, List } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
-  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
-  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
-  BreadcrumbList_Shadcn_ as BreadcrumbList,
-  BreadcrumbPage_Shadcn_ as BreadcrumbPage,
-  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
   Button,
   cn,
-  CodeBlock,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import {
   PageHeader,
   PageHeaderAside,
@@ -34,6 +31,9 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { CreateCronJobSheet } from './CreateCronJobSheet/CreateCronJobSheet'
 import { isSecondsFormat, parseCronJobCommand } from './CronJobs.utils'
 import { PreviousRunsTab } from './PreviousRunsTab'
+import { useCronJobQuery } from '@/data/database-cron-jobs/database-cron-job-query'
+import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const CronJobPage = () => {
   const router = useRouter()
@@ -70,7 +70,7 @@ export const CronJobPage = () => {
           <span className="cursor-pointer underline decoration-dotted lowercase">
             {isSecondsFormat(job.schedule)
               ? job.schedule.toLowerCase()
-              : CronToString(job.schedule.toLowerCase())}
+              : CronToString(job.schedule.toLowerCase().replace(/\$/g, 'L'))}
           </span>
         </TooltipTrigger>
         <TooltipContent side="bottom" align="center">
@@ -114,13 +114,13 @@ export const CronJobPage = () => {
   const secondaryActions = [
     <Button
       key="edit"
-      type="outline"
+      variant="outline"
       icon={<Edit3 strokeWidth={1.5} size="14" />}
       onClick={() => setIsEditSheetOpen(true)}
     >
       Edit
     </Button>,
-    <Button key="view-logs" asChild type="outline" icon={<List strokeWidth={1.5} size="14" />}>
+    <Button key="view-logs" asChild variant="outline" icon={<List strokeWidth={1.5} size="14" />}>
       <Link
         target="_blank"
         rel="noopener noreferrer"
@@ -131,7 +131,7 @@ export const CronJobPage = () => {
     </Button>,
     ...(isValidEdgeFunction
       ? [
-          <Button key="view-edge-logs" asChild type="outline">
+          <Button key="view-edge-logs" asChild variant="outline">
             <Link
               target="_blank"
               rel="noopener noreferrer"

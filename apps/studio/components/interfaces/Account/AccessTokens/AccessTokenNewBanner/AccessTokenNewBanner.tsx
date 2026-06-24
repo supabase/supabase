@@ -3,8 +3,9 @@ import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { TokenPermissionsSection } from './TokenPermissionSection'
+
 import { useGroupedPermissions } from '../hooks/useGroupedPermissions'
+import { TokenPermissionsSection } from './TokenPermissionSection'
 
 interface AccessTokenNewBannerProps<T> {
   token: T
@@ -33,7 +34,7 @@ export const AccessTokenNewBanner = <T,>({
       className="mb-6 relative"
       actions={
         <Button
-          type="text"
+          variant="text"
           icon={<X />}
           className="w-7 h-7 absolute top-2.5 right-2.5"
           onClick={onClose}

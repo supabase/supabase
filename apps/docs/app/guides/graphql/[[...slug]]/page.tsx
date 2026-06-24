@@ -1,17 +1,16 @@
-import { notFound } from 'next/navigation'
 import { isAbsolute, relative } from 'path'
-import rehypeSlug from 'rehype-slug'
-
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
-import { REVALIDATION_TAGS } from '~/features/helpers.fetch'
-import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
+import { getEmptyArray } from '~/features/helpers.fn'
+import { IS_DEV } from '~/lib/constants'
+import { linkTransform, UrlTransformFunction } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
+import { getGitHubFileContents } from '~/lib/octokit'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
-import { IS_PROD } from 'common'
-import { getEmptyArray } from '~/features/helpers.fn'
+import { notFound } from 'next/navigation'
+import rehypeSlug from 'rehype-slug'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -136,23 +135,12 @@ const getContent = async ({ slug }: Params) => {
 
   const editLink = newEditLink(`${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`)
 
-  let response: Response
-  try {
-    response = await fetch(
-      `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`,
-      { cache: 'force-cache', next: { tags: [REVALIDATION_TAGS.GRAPHQL] } }
-    )
-  } catch (err) {
-    throw new Error(`Failed to fetch GraphQL docs from GitHub (network error): ${err}`)
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch GraphQL docs from GitHub: ${response.status} ${response.statusText}`
-    )
-  }
-
-  const content = await response.text()
+  const content = await getGitHubFileContents({
+    org,
+    repo,
+    path: `${docsDir}/${remoteFile}`,
+    branch,
+  })
 
   return {
     pathname: `/guides/graphql${slug?.length ? `/${slug.join('/')}` : ''}` satisfies `/${string}`,
@@ -201,7 +189,7 @@ const urlTransform: UrlTransformFunction = (url) => {
   }
 }
 
-const generateStaticParams = IS_PROD
+const generateStaticParams = !IS_DEV
   ? async () => pageMap.map(({ slug }) => ({ slug: slug ? [slug] : [] }))
   : getEmptyArray
 const generateMetadata = genGuideMeta(getContent)

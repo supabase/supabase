@@ -1,13 +1,15 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, getByText, render as originalRender, screen } from '@testing-library/react'
+import { platformComponents as components } from 'api-types'
 import type React from 'react'
 import { useState } from 'react'
-
-// End of third-party imports
-
-import { ProjectInfoInfinite } from 'data/projects/projects-infinite-query'
-import type { Organization } from 'types'
 import { TooltipProvider } from 'ui'
+import { CommandProvider } from 'ui-patterns/CommandMenu'
+
+import { ProjectInfoInfinite } from '@/data/projects/projects-infinite-query'
+import type { Organization } from '@/types'
+
+type OrganizationResponse = components['schemas']['OrganizationResponse']
 
 interface SelectorOptions {
   container?: HTMLElement
@@ -56,6 +58,41 @@ export const createMockOrganization = (details: Partial<Organization>): Organiza
     is_owner: true,
     billing_email: 'billing@example.com',
     billing_partner: null,
+    integration_source: null,
+    usage_billing_enabled: false,
+    stripe_customer_id: 'stripe-1',
+    subscription_id: 'subscription-1',
+    organization_requires_mfa: false,
+    opt_in_tags: [],
+    restriction_status: null,
+    restriction_data: null,
+    organization_missing_address: false,
+    organization_missing_tax_id: false,
+  }
+
+  return Object.assign(base, details)
+}
+
+/**
+ * Returns the raw OpenAPI `OrganizationResponse` shape — without the
+ * frontend-derived fields (`managed_by`, `partner_id`) that
+ * `castOrganizationResponseToOrganization` attaches in the query layer.
+ *
+ * Use this for MSW mocks at the network boundary (e.g. `/platform/organizations`).
+ * Use `createMockOrganization` for in-app fixtures that need the cast shape.
+ */
+export const createMockOrganizationResponse = (
+  details: Partial<OrganizationResponse> = {}
+): OrganizationResponse => {
+  const base: OrganizationResponse = {
+    id: 1,
+    name: 'Organization 1',
+    slug: 'abcdefghijklmnopqrst',
+    plan: { id: 'free', name: 'Free' },
+    is_owner: true,
+    billing_email: 'billing@example.com',
+    billing_partner: null,
+    integration_source: null,
     usage_billing_enabled: false,
     stripe_customer_id: 'stripe-1',
     subscription_id: 'subscription-1',
@@ -108,7 +145,9 @@ const ReactQueryTestConfig: React.FC<React.PropsWithChildren> = ({ children }) =
 
   return (
     <TooltipProvider>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <CommandProvider openKey="">{children}</CommandProvider>
+      </QueryClientProvider>
     </TooltipProvider>
   )
 }

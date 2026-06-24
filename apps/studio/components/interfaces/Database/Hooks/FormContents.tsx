@@ -1,24 +1,24 @@
-import type { PostgresTrigger } from '@supabase/postgres-meta'
+import type { PGTrigger } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Image from 'next/legacy/image'
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
-  Checkbox_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Label_Shadcn_,
+  Checkbox,
+  FormControl,
+  FormField,
+  Input,
+  Label,
   RadioGroupStacked,
   RadioGroupStackedItem,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   SidePanel,
-  useWatch_Shadcn_,
+  useWatch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -35,14 +35,14 @@ import {
 } from '@/components/ui/Forms/FormSection'
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
-import { useTablesQuery } from '@/data/tables/tables-query'
+import { useTableNamesQuery } from '@/data/tables/table-names-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { uuidv4 } from '@/lib/helpers'
 
 export interface FormContentsProps {
   form: UseFormReturn<WebhookFormValues>
-  selectedHook?: PostgresTrigger
+  selectedHook?: PGTrigger
 }
 
 export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
@@ -63,18 +63,13 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
 
   const legacyServiceRole = keys.find((x) => x.name === 'service_role')?.api_key ?? '[YOUR API KEY]'
 
-  const httpUrl = useWatch_Shadcn_({ control: form.control, name: 'http_url' })
-  const httpHeaders = useWatch_Shadcn_({ control: form.control, name: 'httpHeaders' })
+  const httpUrl = useWatch({ control: form.control, name: 'http_url' })
+  const httpHeaders = useWatch({ control: form.control, name: 'httpHeaders' })
 
-  const { data } = useTablesQuery({
+  const { data: tables = [] } = useTableNamesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-
-  const tables = useMemo(
-    () => [...(data ?? [])].sort((a, b) => (a.schema > b.schema ? 0 : -1)),
-    [data]
-  )
 
   // Handle auth header auto-add for edge functions
   useEffect(() => {
@@ -108,16 +103,16 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
 
   return (
     <div>
-      <FormSection header={<FormSectionLabel className="lg:!col-span-4">General</FormSectionLabel>}>
-        <FormSectionContent loading={false} className="lg:!col-span-8">
-          <FormField_Shadcn_
+      <FormSection header={<FormSectionLabel className="lg:col-span-4!">General</FormSectionLabel>}>
+        <FormSectionContent loading={false} className="lg:col-span-8!">
+          <FormField
             control={form.control}
             name="name"
             render={({ field }) => (
               <FormItemLayout label="Name" layout="vertical" className="gap-1">
-                <FormControl_Shadcn_>
-                  <Input_Shadcn_ {...field} placeholder="my_webhook" />
-                </FormControl_Shadcn_>
+                <FormControl>
+                  <Input {...field} placeholder="my_webhook" />
+                </FormControl>
                 <p className="mt-2 text-xs text-foreground-lighter">
                   Do not use spaces/whitespaces
                 </p>
@@ -130,7 +125,7 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
       <FormSection
         header={
           <FormSectionLabel
-            className="lg:!col-span-4"
+            className="lg:col-span-4!"
             description={
               <p className="text-sm text-foreground-light">
                 Select which table and events will trigger your webhook
@@ -141,8 +136,8 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
           </FormSectionLabel>
         }
       >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
-          <FormField_Shadcn_
+        <FormSectionContent loading={false} className="lg:col-span-8!">
+          <FormField
             control={form.control}
             name="table_id"
             render={({ field }) => (
@@ -152,28 +147,28 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                 className="gap-1"
                 description="This is the table the trigger will watch for changes. You can only select 1 table for a trigger."
               >
-                <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                  <FormControl_Shadcn_>
-                    <SelectTrigger_Shadcn_>
-                      <SelectValue_Shadcn_ placeholder="Select a table" />
-                    </SelectTrigger_Shadcn_>
-                  </FormControl_Shadcn_>
-                  <SelectContent_Shadcn_>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a table" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
                     {tables.map((table) => (
-                      <SelectItem_Shadcn_ key={table.id} value={table.id.toString()}>
+                      <SelectItem key={table.id} value={table.id.toString()}>
                         <div className="flex items-center space-x-2">
                           <span className="text-foreground-light">{table.schema}</span>
                           <span className="text-foreground">{table.name}</span>
                         </div>
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     ))}
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                  </SelectContent>
+                </Select>
               </FormItemLayout>
             )}
           />
 
-          <FormField_Shadcn_
+          <FormField
             control={form.control}
             name="events"
             render={({ field }) => (
@@ -186,7 +181,7 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                 <div className="space-y-3">
                   {HOOK_EVENTS.map((event) => (
                     <div key={event.value} className="flex items-start space-x-3">
-                      <Checkbox_Shadcn_
+                      <Checkbox
                         id={`event-${event.value}`}
                         checked={field.value.includes(event.value)}
                         onCheckedChange={(checked) => {
@@ -198,12 +193,12 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                         }}
                       />
                       <div className="grid gap-1.5 leading-none">
-                        <Label_Shadcn_
+                        <Label
                           htmlFor={`event-${event.value}`}
                           className="text-sm font-normal cursor-pointer"
                         >
                           {event.label}
-                        </Label_Shadcn_>
+                        </Label>
                         <p className="text-xs text-foreground-lighter">{event.description}</p>
                       </div>
                     </div>
@@ -217,16 +212,16 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
       <SidePanel.Separator />
       <FormSection
         header={
-          <FormSectionLabel className="lg:!col-span-4">Webhook configuration</FormSectionLabel>
+          <FormSectionLabel className="lg:col-span-4!">Webhook configuration</FormSectionLabel>
         }
       >
-        <FormSectionContent loading={false} className="lg:!col-span-8">
-          <FormField_Shadcn_
+        <FormSectionContent loading={false} className="lg:col-span-8!">
+          <FormField
             control={form.control}
             name="function_type"
             render={({ field }) => (
               <FormItemLayout label="Type of webhook" layout="vertical" className="gap-1">
-                <FormControl_Shadcn_>
+                <FormControl>
                   <RadioGroupStacked
                     value={field.value}
                     onValueChange={(functionType) => {
@@ -257,7 +252,7 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                         label=""
                         showIndicator={false}
                       >
-                        <div className="flex items-center space-x-5">
+                        <div className="flex items-center gap-5">
                           <Image
                             alt={webhook.label}
                             src={webhook.icon}
@@ -275,7 +270,7 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
                       </RadioGroupStackedItem>
                     ))}
                   </RadioGroupStacked>
-                </FormControl_Shadcn_>
+                </FormControl>
               </FormItemLayout>
             )}
           />

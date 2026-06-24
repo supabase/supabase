@@ -12,7 +12,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  RadioGroup_Shadcn_,
+  RadioGroup,
   singleThemes,
   Theme,
 } from 'ui'
@@ -37,26 +37,26 @@ const ThemeSwitcherDropdown = () => {
   function SingleThemeSelection() {
     return (
       <form>
-        <RadioGroup_Shadcn_
+        <RadioGroup
           name="theme"
           onValueChange={setTheme}
           aria-label="Choose a theme"
           defaultValue={theme}
           value={theme}
           className="flex flex-wrap gap-3"
-        ></RadioGroup_Shadcn_>
+        ></RadioGroup>
       </form>
     )
   }
 
-  const iconClasses = 'text-foreground-light group-data-[state=open]:text-foreground'
+  const iconClasses = 'text-foreground-light group-data-open:text-foreground'
 
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            type="text"
+            variant="text"
             size="tiny"
             className="px-1 group"
             icon={

@@ -1,4 +1,4 @@
-import type { ChartIntervals } from 'types'
+import type { ChartIntervals } from '@/types'
 
 export const CHART_INTERVALS: ChartIntervals[] = [
   {

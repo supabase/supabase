@@ -14,6 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
+
 import { CreateTableInstructions } from './CreateTableInstructions'
 import { CreateTableSheet } from './CreateTableSheet'
 
@@ -27,7 +28,7 @@ export const CreateTableInstructionsDialog = () => {
     <>
       <div className="flex items-center">
         <Button
-          type="primary"
+          variant="primary"
           icon={<Plus />}
           className={cn(enableCreationOfTablesFromDashboard && 'rounded-r-none hover:z-10')}
           onClick={() => {
@@ -41,8 +42,8 @@ export const CreateTableInstructionsDialog = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="primary"
-                className="w-7 rounded-l-none -ml-[1px]"
+                variant="primary"
+                className="w-7 rounded-l-none -ml-px"
                 icon={<ChevronDown />}
               />
             </DropdownMenuTrigger>

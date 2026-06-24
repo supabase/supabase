@@ -1,5 +1,3 @@
-import { InlineLink } from 'components/ui/InlineLink'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { ChevronDown } from 'lucide-react'
 import {
   Button,
@@ -14,6 +12,8 @@ import {
 } from 'ui'
 
 import { CHART_INTERVALS } from './logs.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 
 function getDaysRequired(startValue: number, startUnit: string): number {
   if (startUnit === 'day') return startValue
@@ -27,6 +27,8 @@ interface ChartIntervalDropdownProps {
   organizationSlug?: string
   dropdownAlign?: 'start' | 'center' | 'end'
   tooltipSide?: 'left' | 'right' | 'top' | 'bottom'
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 export const ChartIntervalDropdown = ({
@@ -35,6 +37,8 @@ export const ChartIntervalDropdown = ({
   organizationSlug,
   dropdownAlign = 'start',
   tooltipSide = 'right',
+  open,
+  onOpenChange,
 }: ChartIntervalDropdownProps) => {
   const selectedInterval = CHART_INTERVALS.find((i) => i.key === value) || CHART_INTERVALS[1]
 
@@ -42,9 +46,9 @@ export const ChartIntervalDropdown = ({
   const retentionDays = getEntitlementMax()
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
-        <Button type="default" iconRight={<ChevronDown size={14} />}>
+        <Button variant="default" iconRight={<ChevronDown size={14} />}>
           <span>{selectedInterval.label}</span>
         </Button>
       </DropdownMenuTrigger>
@@ -58,7 +62,7 @@ export const ChartIntervalDropdown = ({
               return (
                 <Tooltip key={i.key}>
                   <TooltipTrigger asChild>
-                    <DropdownMenuRadioItem disabled value={i.key} className="!pointer-events-auto">
+                    <DropdownMenuRadioItem disabled value={i.key} className="pointer-events-auto!">
                       {i.label}
                     </DropdownMenuRadioItem>
                   </TooltipTrigger>

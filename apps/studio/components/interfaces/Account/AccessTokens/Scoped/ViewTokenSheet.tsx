@@ -1,10 +1,13 @@
 import dayjs from 'dayjs'
+import { useMemo } from 'react'
 import {
+  Card,
+  CardContent,
+  cn,
+  ScrollArea,
   Sheet,
   SheetContent,
   SheetHeader,
-  ScrollArea,
-  cn,
   Table,
   TableBody,
   TableCell,
@@ -12,14 +15,13 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { useScopedAccessTokenQuery } from 'data/scoped-access-tokens/scoped-access-token-query'
-import { DocsButton } from 'components/ui/DocsButton'
-import { Card, CardContent } from 'ui'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
 import { ACCESS_TOKEN_RESOURCES } from '../AccessToken.constants'
-import { useMemo } from 'react'
 import { formatAccessText, getRealAccess } from '../AccessToken.utils'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
-import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useScopedAccessTokenQuery } from '@/data/scoped-access-tokens/scoped-access-token-query'
 
 interface ViewTokenSheetProps {
   visible: boolean
@@ -100,7 +102,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
         <SheetContent
           showClose={false}
           size="default"
-          className="!min-w-[600px] flex flex-col h-full gap-0"
+          className="min-w-[600px]! flex flex-col h-full gap-0"
         >
           <SheetHeader
             className={cn('flex flex-row justify-between gap-x-4 items-center border-b')}
@@ -229,11 +231,16 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                               <TableRow>
                                 <TableCell colSpan={2}>
                                   <p className="text-foreground-light text-center py-4">
-                                    {(token?.organization_slugs &&
-                                      token.organization_slugs.length > 0) ||
-                                    (token?.project_refs && token.project_refs.length > 0)
-                                      ? 'This token has access to specific organizations and projects.'
-                                      : 'This token has access to all resources.'}
+                                    {token?.scope === 'organization'
+                                      ? token.organization_slugs &&
+                                        token.organization_slugs.length > 0
+                                        ? 'This token has access to specific organizations.'
+                                        : 'This token has no accessible organizations.'
+                                      : token?.scope === 'project'
+                                        ? token.project_refs && token.project_refs.length > 0
+                                          ? 'This token has access to specific projects.'
+                                          : 'This token has no accessible projects.'
+                                        : 'This token has access to all resources.'}
                                   </p>
                                 </TableCell>
                               </TableRow>

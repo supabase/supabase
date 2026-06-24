@@ -1,10 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useDatabaseExtensionDisableMutation } from 'data/database-extensions/database-extension-disable-mutation'
-import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsOrioleDb, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { AlertTriangle, Book, Github, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -16,6 +10,12 @@ import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { EnableExtensionModal } from './EnableExtensionModal'
 import { EXTENSION_DISABLE_WARNINGS } from './Extensions.constants'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useDatabaseExtensionDisableMutation } from '@/data/database-extensions/database-extension-disable-mutation'
+import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 interface ExtensionRowProps {
   extension: DatabaseExtension
@@ -68,7 +68,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
             </span>
             {extensionMeta?.deprecated && extensionMeta?.deprecated.length > 0 && (
               <ButtonTooltip
-                type="warning"
+                variant="warning"
                 icon={<AlertTriangle />}
                 className="rounded-full"
                 tooltip={{
@@ -83,14 +83,14 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
           </div>
         </TableCell>
 
-        <TableCell className="font-mono tracking-tighter">
+        <TableCell className="w-28 font-mono tracking-tighter">
           {extension?.installed_version ?? extension.default_version}
         </TableCell>
 
         <TableCell className="truncate">{isOn ? extension.schema : '-'}</TableCell>
 
         <TableCell className="text-foreground-light">
-          <p className="block max-w-96" title={extension.comment ?? undefined}>
+          <p className="block" title={extension.comment ?? undefined}>
             {extension.comment}
           </p>
         </TableCell>
@@ -122,7 +122,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
         <TableCell>
           <div className="flex gap-2 items-center">
             {extensionMeta?.github_url && (
-              <Button asChild type="default" icon={<Github />} className="rounded-full">
+              <Button asChild variant="default" icon={<Github />} className="rounded-full">
                 <a
                   target="_blank"
                   rel="noreferrer"
@@ -134,7 +134,7 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
               </Button>
             )}
             {docsUrl !== undefined && (
-              <Button asChild type="default" icon={<Book />} className="rounded-full">
+              <Button asChild variant="default" icon={<Book />} className="rounded-full">
                 <a
                   target="_blank"
                   rel="noreferrer"
@@ -148,9 +148,9 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
           </div>
         </TableCell>
 
-        {/* 
+        {/*
           [Joshen] The div child here and all these classes is to properly add a left border
-          to make the sticky column more distinct 
+          to make the sticky column more distinct
         */}
         <TableCell className="w-20 sticky bg-surface-100 right-0 relative">
           <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l">

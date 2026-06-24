@@ -1,14 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag, useParams } from 'common'
-import { AlertError } from 'components/ui/AlertError'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { NoPermission } from 'components/ui/NoPermission'
-import { useAPIKeyDeleteMutation } from 'data/api-keys/api-key-delete-mutation'
-import type { APIKeysData } from 'data/api-keys/api-keys-query'
-import { useAPIKeysQuery } from 'data/api-keys/api-keys-query'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
-import { useLogsQuery } from 'hooks/analytics/useLogsQuery'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
 import { toast } from 'sonner'
@@ -24,6 +16,14 @@ import {
 
 import { APIKeyRow } from './APIKeyRow'
 import { CreateSecretAPIKeyDialog } from './CreateSecretAPIKeyDialog'
+import { AlertError } from '@/components/ui/AlertError'
+import { FormHeader } from '@/components/ui/Forms/FormHeader'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation'
+import type { APIKeysData } from '@/data/api-keys/api-keys-query'
+import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useLogsQuery } from '@/hooks/analytics/useLogsQuery'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 interface LastSeenData {
   [hash: string]: { timestamp: number; relative: string }
@@ -130,7 +130,7 @@ export const SecretAPIKeys = () => {
       <FormHeader
         title="Secret keys"
         description="These API keys allow privileged access to your project's APIs. Use in servers, functions, workers or other backend components of your application."
-        actions={<CreateSecretAPIKeyDialog />}
+        actions={IS_PLATFORM ? <CreateSecretAPIKeyDialog /> : null}
       />
 
       {!canReadAPIKeys && !isLoadingPermissions ? (
@@ -141,7 +141,7 @@ export const SecretAPIKeys = () => {
         <AlertError error={error} subject="Failed to load secret API keys" />
       ) : empty ? (
         <Card>
-          <div className="!rounded-b-md overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
+          <div className="rounded-b-md! overflow-hidden py-12 flex flex-col gap-1 items-center justify-center">
             <p className="text-sm text-foreground">No secret API keys found</p>
             <p className="text-sm text-foreground-light">
               Your project is not accessible via secret keys—there are no active secret keys
@@ -159,7 +159,7 @@ export const SecretAPIKeys = () => {
                 {showApiKeysLastUsed && (
                   <TableHead className="hidden lg:table-cell">Last Used</TableHead>
                 )}
-                <TableHead />
+                {IS_PLATFORM && <TableHead />}
               </TableRow>
             </TableHeader>
             <TableBody>

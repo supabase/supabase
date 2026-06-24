@@ -1,15 +1,15 @@
 import { useParams } from 'common'
 import { Save } from 'lucide-react'
 import Link from 'next/link'
-
-import LogsSavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
-import Table from 'components/to-be-cleaned/Table'
-import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
-import { useContentQuery } from 'data/content/content-query'
-import type { NextPageWithLayout } from 'types'
 import { Loading } from 'ui'
+
+import LogsSavedQueriesItem from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
+import Table from '@/components/to-be-cleaned/Table'
+import LogsExplorerHeader from '@/components/ui/Logs/LogsExplorerHeader'
+import { useContentQuery } from '@/data/content/content-query'
+import type { NextPageWithLayout } from '@/types'
 
 // [Joshen] This page looks like its not longer in use from a UI POV - double checking and deprecate + add redirects
 export const LogsSavedPage: NextPageWithLayout = () => {
@@ -50,7 +50,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
         </div>
       )}
       {saved.length === 0 && (
-        <div className="my-auto flex h-full flex-grow flex-col items-center justify-center gap-1">
+        <div className="my-auto flex h-full grow flex-col items-center justify-center gap-1">
           <Save className="animate-bounce" />
           <h3 className="text-lg text-foreground">No Saved Queries Yet</h3>
           <p className="text-sm text-foreground-lighter">

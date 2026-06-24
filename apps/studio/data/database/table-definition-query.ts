@@ -1,9 +1,9 @@
 import { getTableDefinitionSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { UseCustomQueryOptions } from 'types'
 
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type GetTableDefinitionArgs = {
   id?: number
@@ -35,7 +35,7 @@ export async function getTableDefinition(
 }
 
 export type TableDefinitionData = string
-export type TableDefinitionError = ExecuteSqlError
+export type TableDefinitionError = ResponseError
 
 export const useTableDefinitionQuery = <TData = TableDefinitionData>(
   { projectRef, connectionString, id }: TableDefinitionVariables,

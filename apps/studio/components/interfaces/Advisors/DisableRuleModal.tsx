@@ -1,9 +1,7 @@
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useLintRuleCreateMutation } from 'data/lint/create-lint-rule-mutation'
 import {
   Button,
   Dialog,
@@ -15,8 +13,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
+
 import { LintInfo } from '../Linter/Linter.constants'
 import { lintInfoMap } from '../Linter/Linter.utils'
+import { useLintRuleCreateMutation } from '@/data/lint/create-lint-rule-mutation'
 
 interface DisableRuleModalProps {
   lint: LintInfo
@@ -63,7 +63,7 @@ export const DisableRuleModal = ({ lint }: DisableRuleModalProps) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button type="default">Disable rule</Button>
+        <Button variant="default">Disable rule</Button>
       </DialogTrigger>
       <DialogContent size="small">
         <DialogHeader>
@@ -77,10 +77,10 @@ export const DisableRuleModal = ({ lint }: DisableRuleModalProps) => {
           </p>
         </DialogSection>
         <DialogFooter>
-          <Button disabled={isCreating} type="default" onClick={() => setOpen(false)}>
+          <Button disabled={isCreating} variant="default" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button loading={isCreating} type="primary" onClick={onCreateRule}>
+          <Button loading={isCreating} variant="primary" onClick={onCreateRule}>
             Disable
           </Button>
         </DialogFooter>

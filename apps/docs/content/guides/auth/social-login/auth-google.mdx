@@ -169,7 +169,7 @@ Follow the same configuration guide as if your app was a Web application when bu
   </TabPanel>
   </$Show>
 
-  <TabPanel id="android" label="Android (Kotlin)">
+  <TabPanel id="android" label="Kotlin (Android and iOS)">
 
 1. [Create a new OAuth client ID](https://console.cloud.google.com/auth/clients/create) and choose **Android** or **iOS** if also building an iOS app with Kotlin Multiplatform.
    - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
@@ -238,7 +238,8 @@ To use your own application code for the signin button, call the `signInWithOAut
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('url', 'anonKey')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 supabase.auth.signInWithOAuth({
@@ -262,7 +263,8 @@ Google does not send out a refresh token by default, so you will need to pass pa
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 const { data, error } = await supabase.auth.signInWithOAuth({
@@ -278,7 +280,7 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 
 ### Google pre-built [#google-pre-built]
 
-Most web apps and websites can utilize Google's [personalized sign-in buttons](https://developers.google.com/identity/gsi/web/guides/personalized-button), [One Tap](https://developers.google.com/identity/gsi/web/guides/features) or [automatic sign-in](https://developers.google.com/identity/gsi/web/guides/automatic-sign-in-sign-out) for the best user experience.
+Most web apps and websites can use Google's [personalized sign-in buttons](https://developers.google.com/identity/gsi/web/guides/personalized-button), [One Tap](https://developers.google.com/identity/gsi/web/guides/features) or [automatic sign-in](https://developers.google.com/identity/gsi/web/guides/automatic-sign-in-sign-out) for the best user experience.
 
 1. Load the Google client library in your app by including the third-party script:
 
@@ -366,10 +368,11 @@ If you're integrating Google One-Tap with your Next.js application, you can refe
 ```tsx
 'use client'
 
-import Script from 'next/script'
-import { createClient } from '@/utils/supabase/client'
 import type { accounts, CredentialResponse } from 'google-one-tap'
 import { useRouter } from 'next/navigation'
+import Script from 'next/script'
+
+import { createClient } from '@/utils/supabase/client'
 
 declare const google: { accounts: accounts }
 
@@ -462,6 +465,7 @@ import {
   GoogleSigninButton,
   statusCodes,
 } from '@react-native-google-signin/google-signin'
+
 import { supabase } from '../utils/supabase'
 
 export default function () {
@@ -600,7 +604,7 @@ This call takes the user to Google's consent screen. Once the flow ends, the use
 
 </TabPanel>
 
-<TabPanel id="android" label="Android (Kotlin)">
+<TabPanel id="android" label="Kotlin (Android)">
 
 ### Using Google sign-in on Android
 
@@ -699,13 +703,21 @@ fun GoogleSignInButton() {
 }
 ```
 
+</TabPanel>
+
+<TabPanel id="kotlin-mp" label="Kotlin (Multiplatform)">
+
 ### Using Google sign-in with Kotlin Multiplatform
 
-When using [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/), you can use the [compose-auth](/docs/reference/kotlin/installing) plugin. On Android it uses the Credential Manager automatically and on other platforms it uses `auth.signInWith(Google)`.
+When using [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/), you can use the [compose-auth](https://github.com/supabase-community/supabase-kt-plugins/tree/main/ComposeAuth) plugin.
+
+- On Android it uses the system's [Credential Manager](https://developer.android.com/identity/sign-in/credential-manager-siwg). [Setup guide](https://github.com/supabase-community/supabase-kt-plugins/blob/main/ComposeAuth/README.md#native-google-auth-on-android)
+- On iOS it uses the [`GoogleSignIn-iOS` library](https://github.com/google/GoogleSignIn-iOS). [Setup guide](https://github.com/supabase-community/supabase-kt-plugins/blob/main/ComposeAuth/README.md#native-google-auth-on-ios)
+- On other platforms it uses normal OAuth via `supabase.auth.signInWith(Google)`
 
 **Initialize the Supabase Client**
 
-**Note:** You have to create OAuth credentials for both a Web and Android application. [Learn more](https://developer.android.com/identity/legacy/one-tap/legacy-get-started)
+**Note:** You have to create OAuth credentials for both a Web and Android application. [Learn more](https://developer.android.com/identity/sign-in/credential-manager-siwg#set-google)
 
 ```kotlin
 val supabaseClient = createSupabaseClient(
@@ -728,7 +740,12 @@ val authState = supabaseClient.composeAuth.rememberSignInWithGoogle(
             NativeSignInResult.ClosedByUser -> TODO()
             is NativeSignInResult.Error -> TODO()
             is NativeSignInResult.NetworkError -> TODO()
-            NativeSignInResult.Success -> TODO()
+            is NativeSignInResult.Success -> {
+                val credential = it.data.google.credential
+                credential.displayName
+                credential.phoneNumber
+                // ...
+            }
         }
     }
 )

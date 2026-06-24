@@ -189,6 +189,8 @@ Here's how to build a minimal authorization page at your configured path (e.g., 
 >
 <TabPanel id="nextjs" label="Next.js">
 
+<$Partial path="auth_methods.mdx" />
+
 ```tsx
 // app/oauth/consent/page.tsx
 import { createServerClient } from '@supabase/ssr'
@@ -208,11 +210,11 @@ export default async function ConsentPage({
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll: async () => (await cookies()).getAll(),
-        setAll: async (cookiesToSet) => {
+        setAll: async (cookiesToSet, _headers) => {
           const cookieStore = await cookies()
           cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
         },
@@ -221,11 +223,10 @@ export default async function ConsentPage({
   )
 
   // Check if user is authenticated
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data } = await supabase.auth.getClaims()
+  const claims = data?.claims
 
-  if (!user) {
+  if (!claims) {
     // Redirect to login, preserving authorization_id
     redirect(`/login?redirect=/oauth/consent?authorization_id=${authorizationId}`)
   }
@@ -236,6 +237,11 @@ export default async function ConsentPage({
 
   if (error || !authDetails) {
     return <div>Error: {error?.message || 'Invalid authorization request'}</div>
+  }
+
+  // if no authorization_id returned, user has previously consented, redirect them
+  if (!('authorization_id' in authDetails)) {
+    redirect(authDetails['redirect_url'])
   }
 
   return (
@@ -293,11 +299,11 @@ export async function POST(request: Request) {
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
     {
       cookies: {
         getAll: async () => (await cookies()).getAll(),
-        setAll: async (cookiesToSet) => {
+        setAll: async (cookiesToSet, _headers) => {
           const cookieStore = await cookies()
           cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options))
         },
@@ -313,7 +319,7 @@ export async function POST(request: Request) {
     }
 
     // Redirect back to the client with authorization code
-    return NextResponse.redirect(data.redirect_to)
+    return NextResponse.redirect(data.redirect_url)
   } else {
     const { data, error } = await supabase.auth.oauth.denyAuthorization(authorizationId)
 
@@ -322,7 +328,7 @@ export async function POST(request: Request) {
     }
 
     // Redirect back to the client with error
-    return NextResponse.redirect(data.redirect_to)
+    return NextResponse.redirect(data.redirect_url)
   }
 }
 ```
@@ -334,6 +340,7 @@ export async function POST(request: Request) {
 // src/pages/OAuthConsent.tsx
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+
 import { supabase } from './supabaseClient'
 
 export function OAuthConsent() {
@@ -387,7 +394,7 @@ export function OAuthConsent() {
       setError(error.message)
     } else {
       // Redirect to client app
-      window.location.href = data.redirect_to
+      window.location.href = data.redirect_url
     }
   }
 
@@ -400,7 +407,7 @@ export function OAuthConsent() {
       setError(error.message)
     } else {
       // Redirect to client app with error
-      window.location.href = data.redirect_to
+      window.location.href = data.redirect_url
     }
   }
 
@@ -454,8 +461,8 @@ export function OAuthConsent() {
 6. **Handle decision** - When the user clicks approve/deny:
    - Call `supabase.auth.oauth.approveAuthorization(authorization_id)` or `denyAuthorization(authorization_id)`
    - These methods handle all OAuth logic internally (generating authorization codes, etc.)
-   - They return a `redirect_to` URL
-7. **Redirect back** - Redirect the user to the `redirect_to` URL, which sends them back to the third-party app with either an authorization code (approved) or error (denied)
+   - They return a `redirect_url` URL
+7. **Redirect back** - Redirect the user to the `redirect_url` URL, which sends them back to the third-party app with either an authorization code (approved) or error (denied)
 
 ## Register an OAuth client
 
@@ -525,8 +532,8 @@ You can register clients programmatically using the SDK admin endpoints or by ca
 import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(
-  'https://your-project.supabase.co',
-  'your-service-role-key' // Use service_role key for admin operations
+  'https://your-project-id.supabase.co',
+  'sb_secret_...' // Use the secret key for admin operations
 )
 
 // Create an OAuth client
@@ -555,8 +562,8 @@ if (error) {
 from supabase import create_client
 
 supabase = create_client(
-    'https://your-project.supabase.co',
-    'your-service-role-key'  # Use service_role key for admin operations
+    'https://your-project-id.supabase.co',
+    'sb_secret_...'  # Use the secret key for admin operations
 )
 
 # Create an OAuth client
@@ -693,7 +700,7 @@ curl 'http://localhost:54321/auth/v1/admin/oauth/clients' \
 
 ## Customizing tokens (optional)
 
-By default, OAuth access tokens include standard claims like `user_id`, `role`, and `client_id`. If you need to customize tokens—for example, to set a specific `audience` claim for third-party validation or add client-specific metadata—use [Custom Access Token Hooks](/docs/guides/auth/auth-hooks/access-token-hook).
+By default, OAuth access tokens include standard claims like `user_id`, `role`, and `client_id`. If you need to customize tokens—for example, to set a specific `audience` claim for third-party validation or add client-specific metadata—use [Custom Access Token Hooks](/docs/guides/auth/auth-hooks/custom-access-token-hook).
 
 Custom Access Token Hooks are triggered for all token issuance, including OAuth flows. You can use the `client_id` parameter to customize tokens based on which OAuth client is requesting them.
 

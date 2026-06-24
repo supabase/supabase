@@ -1,26 +1,26 @@
 'use client'
 
 import {
-  type DocsSearchResult as Page,
-  type DocsSearchResultSection as PageSection,
   DocsSearchResultType as PageType,
   useDocsSearch,
+  type DocsSearchResult as Page,
+  type DocsSearchResultSection as PageSection,
 } from 'common'
 import { Book, ChevronRight, Github, Hash, Loader2, MessageSquare, Search } from 'lucide-react'
 import { useCallback, useEffect, useRef } from 'react'
-import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, CommandList_Shadcn_, cn } from 'ui'
+import { Button, cn, CommandGroup, CommandItem, CommandList } from 'ui'
 import { StatusIcon } from 'ui/src/components/StatusIcon'
 
 import {
   Breadcrumb,
   CommandHeader,
-  CommandInput,
+  CommandMenuInput,
   CommandWrapper,
   escapeAttributeSelector,
   generateCommandClassNames,
   TextHighlighter,
-  useCrossCompatRouter,
   useCommandMenuTelemetryContext,
+  useCrossCompatRouter,
   useQuery,
   useSetCommandMenuOpen,
   useSetQuery,
@@ -55,7 +55,7 @@ const IconContainer = (
   <div
     className={cn(
       'w-6 h-6',
-      'bg-surface-100 border rounded',
+      'bg-surface-100 border rounded-sm',
       'flex items-center justify-center',
       'text-foreground-muted',
       'group-aria-selected:bg-surface-200 group-aria-selected:text-foreground-lighter group-aria-selected:[&_svg]:scale-[103%]',
@@ -100,36 +100,42 @@ const DocsSearchPage = () => {
   )
 
   async function openLink(pageType: PageType, link: string) {
+    // A simple way to achieve opening links in new tab but room for improvement including support for middle clicks
+    let openInNewTab =
+      (window.event as KeyboardEvent)?.metaKey || (window.event as KeyboardEvent)?.ctrlKey
+    let finalLink: string = link
     switch (pageType) {
       case PageType.Markdown:
       case PageType.Reference:
       case PageType.Troubleshooting:
         if (BASE_PATH === '/docs') {
-          router.push(link)
-          setIsOpen(false)
+          if (openInNewTab) {
+            finalLink = `/docs${link}`
+          }
         } else if (!BASE_PATH) {
-          router.push(`/docs${link}`)
-          setIsOpen(false)
+          finalLink = `/docs${link}`
         } else {
-          window.open(`https://supabase.com/docs${link}`, '_blank', 'noreferrer,noopener')
-          setIsOpen(false)
+          finalLink = `https://supabase.com/docs${link}`
+          openInNewTab = true
         }
         break
       case PageType.Integration:
-        if (!BASE_PATH) {
-          router.push(link)
-          setIsOpen(false)
-        } else {
-          window.open(`https://supabase.com${link}`, '_blank', 'noreferrer,noopener')
-          setIsOpen(false)
+        if (BASE_PATH) {
+          openInNewTab = true
+          finalLink = `https://supabase.com${link}`
         }
         break
       case PageType.GithubDiscussion:
-        window.open(link, '_blank', 'noreferrer,noopener')
-        setIsOpen(false)
+        openInNewTab = true
         break
       default:
         throw new Error(`Unknown page type '${pageType}'`)
+    }
+    if (openInNewTab) {
+      window.open(finalLink, '_blank', 'noreferrer,noopener')
+    } else {
+      router.push(finalLink)
+      setIsOpen(false)
     }
   }
 
@@ -185,20 +191,20 @@ const DocsSearchPage = () => {
     <CommandWrapper>
       <CommandHeader>
         <Breadcrumb />
-        <CommandInput placeholder="Search..." ref={inputRef} />
+        <CommandMenuInput placeholder="Search..." ref={inputRef} />
       </CommandHeader>
-      <CommandList_Shadcn_ className="max-h-[initial]">
+      <CommandList className="max-h-[initial]">
         {hasResults &&
           ('results' in state ? state.results : state.staleResults).map((page, i) => {
             return (
-              <CommandGroup_Shadcn_
+              <CommandGroup
                 heading=""
                 key={`${page.path}-group`}
                 value={`${escapeAttributeSelector(page.title)}-group-index-${i}`}
                 forceMount={true}
-                className="overflow-hidden py-3 px-2 text-border-strong [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted"
+                className="overflow-hidden py-3 px-2 text-border-strong **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-1.5 **:[[cmdk-group-heading]]:text-sm **:[[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted"
               >
-                <CommandItem_Shadcn_
+                <CommandItem
                   key={`${page.path}-item`}
                   value={`${escapeAttributeSelector(page.title)}-item-index-${i}`}
                   onSelect={() => {
@@ -221,11 +227,11 @@ const DocsSearchPage = () => {
                   </div>
 
                   <ChevronArrow />
-                </CommandItem_Shadcn_>
+                </CommandItem>
                 {page.sections.length > 0 && (
                   <div className="border-l border-muted ml-3 pt-3">
                     {page.sections.map((section, i) => (
-                      <CommandItem_Shadcn_
+                      <CommandItem
                         className={cn(
                           generateCommandClassNames(true),
                           'border border-overlay/90',
@@ -256,19 +262,19 @@ const DocsSearchPage = () => {
                           </div>
                         </div>
                         <ChevronArrow />
-                      </CommandItem_Shadcn_>
+                      </CommandItem>
                     ))}
                   </div>
                 )}
-              </CommandGroup_Shadcn_>
+              </CommandGroup>
             )
           })}
         {state.status === 'initial' && (
-          <CommandGroup_Shadcn_ className="overflow-hidden py-3 px-2 text-border-strong [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted">
+          <CommandGroup className="overflow-hidden py-3 px-2 text-border-strong **:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:pb-1.5 **:[[cmdk-group-heading]]:text-sm **:[[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted">
             {questions.map((question) => {
               const key = question.replace(/\s+/g, '_')
               return (
-                <CommandItem_Shadcn_
+                <CommandItem
                   className={generateCommandClassNames(false)}
                   disabled={hasResults}
                   onSelect={() => {
@@ -281,10 +287,10 @@ const DocsSearchPage = () => {
                 >
                   <Search />
                   {question}
-                </CommandItem_Shadcn_>
+                </CommandItem>
               )
             })}
-          </CommandGroup_Shadcn_>
+          </CommandGroup>
         )}
         {state.status === 'loading' && state.staleResults.length === 0 && (
           <div className="flex items-center gap-3 my-4 justify-center">
@@ -296,7 +302,7 @@ const DocsSearchPage = () => {
           <div className="p-6 flex flex-col items-center gap-6 mt-4 text-foreground-light">
             <StatusIcon variant="default" />
             <p className="text-sm text-foreground-light text-center">No results found.</p>
-            <Button size="tiny" type="default" onClick={handleResetPrompt}>
+            <Button size="tiny" variant="default" onClick={handleResetPrompt}>
               Try again?
             </Button>
           </div>
@@ -308,12 +314,12 @@ const DocsSearchPage = () => {
               Sorry, looks like we&apos;re having some issues with search!
             </p>
             <p className="text-sm text-foreground-lighter">Please try again in a bit.</p>
-            <Button size="tiny" type="default" onClick={handleResetPrompt}>
+            <Button size="tiny" variant="default" onClick={handleResetPrompt}>
               Try again?
             </Button>
           </div>
         )}
-      </CommandList_Shadcn_>
+      </CommandList>
     </CommandWrapper>
   )
 }
@@ -340,9 +346,9 @@ export function getPageIcon(page: Page) {
     case PageType.Reference:
     case PageType.Integration:
     case PageType.Troubleshooting:
-      return <Book strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Book strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <Github strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Github strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
@@ -354,9 +360,9 @@ export function getPageSectionIcon(page: Page) {
     case PageType.Reference:
     case PageType.Integration:
     case PageType.Troubleshooting:
-      return <Hash strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Hash strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <MessageSquare strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <MessageSquare strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }

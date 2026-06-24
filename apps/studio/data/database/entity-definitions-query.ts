@@ -1,9 +1,9 @@
 import { getEntityDefinitionsSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { UseCustomQueryOptions } from 'types'
 
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type EntityDefinitionsVariables = {
   limit?: number
@@ -32,7 +32,7 @@ export async function getEntityDefinitions(
 
 type EntityDefinition = { id: number; sql: string }
 export type EntityDefinitionsData = EntityDefinition[]
-export type EntityDefinitionsError = ExecuteSqlError
+export type EntityDefinitionsError = ResponseError
 
 export const useEntityDefinitionsQuery = <TData = EntityDefinitionsData>(
   { projectRef, connectionString, schemas, limit }: EntityDefinitionsVariables,

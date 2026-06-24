@@ -1,11 +1,12 @@
-import { type ImportDataFileDroppedEvent } from 'common/telemetry-constants'
-import { flagInvalidFileImport } from 'components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport.utils'
+import { type ImportDataDropzoneFileAddedEvent } from 'common/telemetry-constants'
 import { useCallback, useState, type DragEvent } from 'react'
+
+import { flagInvalidFileImport } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SpreadsheetImport/SpreadsheetImport.utils'
 
 interface UseCsvFileDropOptions {
   enabled: boolean
   onFileDropped: (file: File) => void
-  onTelemetryEvent?: (eventName: ImportDataFileDroppedEvent['action']) => void
+  onTelemetryEvent?: (eventName: ImportDataDropzoneFileAddedEvent['action']) => void
 }
 
 interface UseCsvFileDropReturn {

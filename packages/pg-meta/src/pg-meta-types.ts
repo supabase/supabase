@@ -2,6 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
+import { literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { TYPES_SQL } from './sql/types'
 
 const pgTypeZod = z.object({
@@ -36,12 +37,12 @@ function list({
   limit?: number
   offset?: number
 } = {}): {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgTypeArrayZod
 } {
   let sql = TYPES_SQL
   if (!includeArrayTypes) {
-    sql += ` and not exists (
+    sql = safeSql`${sql} and not exists (
       select from pg_type el
       where el.oid = t.typelem
         and el.typarray = t.oid
@@ -53,13 +54,13 @@ function list({
     !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
   )
   if (filter) {
-    sql += ` and n.nspname ${filter}`
+    sql = safeSql`${sql} and n.nspname ${filter}`
   }
   if (limit) {
-    sql += ` limit ${limit}`
+    sql = safeSql`${sql} limit ${literal(limit)}`
   }
   if (offset) {
-    sql += ` offset ${offset}`
+    sql = safeSql`${sql} offset ${literal(offset)}`
   }
   return {
     sql,

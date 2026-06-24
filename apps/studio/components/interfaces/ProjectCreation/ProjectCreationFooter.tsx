@@ -1,17 +1,10 @@
+import { useFlag } from 'common'
 import { useRouter } from 'next/router'
 import { UseFormReturn } from 'react-hook-form'
-
-import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { DesiredInstanceSize, instanceSizeSpecs } from 'data/projects/new-project.constants'
-import { OrgProject } from 'data/projects/org-projects-infinite-query'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { DOCS_URL } from 'lib/constants'
 import {
   Badge,
   Button,
-  PopoverSeparator_Shadcn_,
+  PopoverSeparator,
   Table,
   TableBody,
   TableCell,
@@ -20,8 +13,14 @@ import {
   TableRow,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { instanceLabel, monthlyInstancePrice } from './ProjectCreation.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { OrgProject } from '@/data/projects/org-projects-infinite-query'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { DOCS_URL } from '@/lib/constants'
 
 interface ProjectCreationFooterProps {
   form: UseFormReturn<CreateProjectForm>
@@ -43,18 +42,14 @@ export const ProjectCreationFooter = ({
   const router = useRouter()
   const { data: currentOrg } = useSelectedOrganizationQuery()
   const isFreePlan = currentOrg?.plan?.id === 'free'
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
-
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
 
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
   const additionalMonthlySpend = isFreePlan
     ? 0
-    : instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly - availableComputeCredits
+    : monthlyInstancePrice(instanceSize) - availableComputeCredits
 
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
   const monthlyComputeCosts =
@@ -135,7 +130,7 @@ export const ProjectCreationFooter = ({
                       </TableRow>
                     </TableBody>
                   </Table>
-                  <PopoverSeparator_Shadcn_ />
+                  <PopoverSeparator />
                   <Table>
                     <TableHeader className="[&_th]:h-7">
                       <TableRow>
@@ -173,7 +168,7 @@ export const ProjectCreationFooter = ({
 
       <div className="flex items-end col-span-8 space-x-2 ml-auto">
         <Button
-          type="default"
+          variant="default"
           disabled={isCreatingNewProject || isSuccessNewProject}
           onClick={() => {
             if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
@@ -183,7 +178,7 @@ export const ProjectCreationFooter = ({
           Cancel
         </Button>
         <Button
-          htmlType="submit"
+          type="submit"
           loading={isCreatingNewProject || isSuccessNewProject}
           disabled={!canCreateProject}
         >

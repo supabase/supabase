@@ -44,7 +44,7 @@ This constant can be any positive number, but is typically small. A constant of 
 
 ## Hybrid search in Postgres
 
-Let's implement hybrid search in Postgres using `tsvector` (keyword search) and `pgvector` (semantic search).
+Implement hybrid search in Postgres using `tsvector` (keyword search) and `pgvector` (semantic search).
 
 First we'll create a `documents` table to store the documents that we will search over. This is just an example - adjust this to match the structure of your application.
 
@@ -131,7 +131,7 @@ limit
 $$;
 ```
 
-Let's break this down:
+Where:
 
 - **Parameters:** The function accepts quite a few parameters, but the main (required) ones are `query_text`, `query_embedding`, and `match_count`.
   - `query_text` is the user's query text (more on this shortly)
@@ -168,7 +168,7 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 import OpenAI from 'npm:openai'
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')!
-const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+const supabaseSecretKey = Deno.env.get('SUPABASE_SECRET_KEY')!
 const openaiApiKey = Deno.env.get('OPENAI_API_KEY')!
 
 Deno.serve(async (req) => {

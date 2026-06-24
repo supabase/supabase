@@ -84,15 +84,22 @@ const page: GoPageInput = {
               </div>
             )}
           </div>
-          <Button asChild type="default" size="medium">
-            <Link
-              href="https://supabase.link/postgresconf-sjc-2026-slides"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Download Slides
-            </Link>
-          </Button>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Button asChild variant="primary" size="medium">
+              <Link href="https://www.multigres.com" target="_blank" rel="noopener noreferrer">
+                Learn about Multigres
+              </Link>
+            </Button>
+            <Button asChild variant="default" size="medium">
+              <Link
+                href="https://supabase.link/postgresconf-sjc-2026-slides"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Download slides
+              </Link>
+            </Button>
+          </div>
         </div>
       ),
     },
@@ -108,7 +115,7 @@ const page: GoPageInput = {
             <li>Fill out the entry form below</li>
             <li>Complete these steps by Monday, May 4, 2026 at 12:00 PM PST</li>
           </ol>
-          <Button asChild type="default" size="medium">
+          <Button asChild variant="default" size="medium">
             <Link href="https://supabase.com/dashboard">Create your account</Link>
           </Button>
           <p className="text-xs text-foreground-lighter mt-4">

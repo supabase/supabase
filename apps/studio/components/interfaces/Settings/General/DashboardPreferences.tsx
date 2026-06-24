@@ -17,13 +17,19 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
@@ -80,11 +86,17 @@ export const DashboardPreferences = () => {
 
   return (
     <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle id="queries">Queries</PageSectionTitle>
+        </PageSectionSummary>
+      </PageSectionMeta>
+
       <PageSectionContent className="flex flex-col gap-y-4">
         {/* [Joshen] Ideally we're able to persist this for all users in the project, but will need support in our middleware */}
         <Admonition
           type="note"
-          title="Preferences currently do not affect other members of this project"
+          description="These preferences control only your experience in the dashboard. Other members of this project will not be affected."
         />
 
         {isLoading ? (
@@ -94,11 +106,11 @@ export const DashboardPreferences = () => {
             </CardContent>
           </Card>
         ) : (
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <Card>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="defaultDatabase"
                     render={({ field }) => (
@@ -117,7 +129,7 @@ export const DashboardPreferences = () => {
                         {isPending ? (
                           <ShimmeringLoader />
                         ) : (
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             {/* [Joshen] Need to disable unhealthy replicas */}
                             <DatabaseSelector
                               isForm
@@ -127,7 +139,7 @@ export const DashboardPreferences = () => {
                                 field.onChange(id === projectRef ? undefined : id)
                               }
                             />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         )}
                       </FormItemLayout>
                     )}
@@ -136,20 +148,20 @@ export const DashboardPreferences = () => {
                 <CardFooter className="justify-end space-x-2">
                   {form.formState.isDirty && (
                     <Button
-                      type="default"
-                      htmlType="button"
+                      variant="default"
+                      type="button"
                       onClick={() => form.reset(dashboardPreferences)}
                     >
                       Cancel
                     </Button>
                   )}
-                  <Button type="primary" htmlType="submit" disabled={!form.formState.isDirty}>
+                  <Button variant="primary" type="submit" disabled={!form.formState.isDirty}>
                     Save changes
                   </Button>
                 </CardFooter>
               </Card>
             </form>
-          </Form_Shadcn_>
+          </Form>
         )}
       </PageSectionContent>
     </PageSection>
@@ -185,7 +197,7 @@ const DashboardQueriesDialog = () => {
 
         <DialogFooter>
           <DialogClose asChild className="opacity-100">
-            <Button type="default">Understood</Button>
+            <Button variant="default">Understood</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

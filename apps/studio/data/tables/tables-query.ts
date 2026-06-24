@@ -1,23 +1,25 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import pgMeta, { getTablesPaginatedSql, type PGTable } from '@supabase/pg-meta'
+import { InfiniteData, useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query'
 import { sortBy } from 'lodash'
 import { useCallback } from 'react'
+import { z } from 'zod'
 
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 import { tableKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { SafePostgresTable } from '@/lib/postgres-types'
+import type { ResponseError, UseCustomInfiniteQueryOptions, UseCustomQueryOptions } from '@/types'
 
 export type TablesVariables = {
   projectRef?: string
   connectionString?: string | null
   schema?: string
-  /**
-   * Defaults to false
-   */
+  /** Defaults to false */
   includeColumns?: boolean
-  sortByProperty?: keyof PostgresTable
+  sortByProperty?: keyof PGTable
 }
+
+const pgMetaTablesList = pgMeta.tables.list()
+export type TablesData = z.infer<typeof pgMetaTablesList.zod>
 
 export async function getTables(
   {
@@ -29,55 +31,31 @@ export async function getTables(
   }: TablesVariables,
   signal?: AbortSignal
 ) {
-  if (!projectRef) {
-    throw new Error('projectRef is required')
-  }
+  if (!projectRef) throw new Error('projectRef is required')
+  const sql = pgMeta.tables.list({
+    includeColumns,
+    includedSchemas: schema ? [schema] : undefined,
+  }).sql
+  const queryKey = ['tables', schema]
 
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  let queryParams: Record<string, string> = {
-    //include_columns is a string, even though it's true or false
-    include_columns: `${includeColumns}`,
-  }
-  if (schema) {
-    queryParams.included_schemas = schema
-  }
-
-  const { data, error } = await get('/platform/pg-meta/{ref}/tables', {
-    params: {
-      header: {
-        'x-connection-encrypted': connectionString!,
-        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
-      },
-      path: { ref: projectRef },
-      query: queryParams as any,
-    },
-    headers,
-    signal,
-  })
-
-  if (!Array.isArray(data) && error) handleError(error)
-
+  const { result } = await executeSql({ projectRef, connectionString, sql, queryKey }, signal)
   // Sort the data if the sortByName option is true
-  if (Array.isArray(data) && sortByProperty) {
-    return sortBy(data, (t) => t[sortByProperty]) as PostgresTable[]
+  if (Array.isArray(result) && sortByProperty) {
+    return sortBy(result, (t) => t[sortByProperty]) as SafePostgresTable[]
   }
-
-  return data as PostgresTable[]
+  return result as SafePostgresTable[]
 }
 
-export type TablesData = Awaited<ReturnType<typeof getTables>>
 export type TablesError = ResponseError
 
 export const useTablesQuery = <TData = TablesData>(
-  { projectRef, connectionString, schema, includeColumns }: TablesVariables,
+  vars: TablesVariables,
   { enabled = true, ...options }: UseCustomQueryOptions<TablesData, TablesError, TData> = {}
 ) => {
+  const { projectRef, schema, includeColumns } = vars
   return useQuery<TablesData, TablesError, TData>({
-    queryKey: tableKeys.list(projectRef, schema, includeColumns),
-    queryFn: ({ signal }) =>
-      getTables({ projectRef, connectionString, schema, includeColumns }, signal),
+    queryKey: tableKeys.list(projectRef, schema, { includeColumns }),
+    queryFn: ({ signal }) => getTables(vars, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...options,
   })
@@ -96,7 +74,7 @@ export function useGetTables({
   return useCallback(
     (schema?: TablesVariables['schema'], includeColumns?: TablesVariables['includeColumns']) => {
       return queryClient.fetchQuery({
-        queryKey: tableKeys.list(projectRef, schema, includeColumns),
+        queryKey: tableKeys.list(projectRef, schema, { includeColumns }),
         queryFn: ({ signal }) =>
           getTables({ projectRef, connectionString, schema, includeColumns }, signal),
       })
@@ -114,11 +92,99 @@ export function usePrefetchTables({
   return useCallback(
     (schema?: TablesVariables['schema'], includeColumns?: TablesVariables['includeColumns']) => {
       return queryClient.prefetchQuery({
-        queryKey: tableKeys.list(projectRef, schema, includeColumns),
+        queryKey: tableKeys.list(projectRef, schema, { includeColumns }),
         queryFn: ({ signal }) =>
           getTables({ projectRef, connectionString, schema, includeColumns }, signal),
       })
     },
     [connectionString, projectRef, queryClient]
   )
+}
+
+export type InfiniteTablesVariables = Pick<
+  TablesVariables,
+  'projectRef' | 'connectionString' | 'schema' | 'includeColumns'
+> & {
+  pageSize?: number
+  nameFilter?: string
+}
+
+export async function getTablesPage(
+  {
+    projectRef,
+    connectionString,
+    schema,
+    includeColumns = false,
+    limit,
+    afterOid,
+    nameFilter,
+  }: Pick<TablesVariables, 'projectRef' | 'connectionString' | 'schema' | 'includeColumns'> & {
+    limit: number
+    afterOid: number
+    nameFilter?: string
+  },
+  signal?: AbortSignal
+) {
+  if (!projectRef) {
+    throw new Error('projectRef is required')
+  }
+
+  const sql = getTablesPaginatedSql({ schema, includeColumns, limit, afterOid, nameFilter })
+
+  const { result } = await executeSql(
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: [
+        `project:${projectRef}`,
+        `schema:${schema}`,
+        `infinite_tables`,
+        includeColumns ? 'with_columns' : null,
+        nameFilter ? `search:${nameFilter}` : null,
+        limit ? `page_size:${limit}` : null,
+        afterOid ? `after:${afterOid}` : null,
+      ],
+    },
+    signal
+  )
+
+  return result as SafePostgresTable[]
+}
+
+export const useInfiniteTablesQuery = <TData = InfiniteData<SafePostgresTable[]>>(
+  {
+    projectRef,
+    connectionString,
+    schema,
+    includeColumns,
+    pageSize = 50,
+    nameFilter,
+  }: InfiniteTablesVariables,
+  {
+    enabled = true,
+    ...options
+  }: UseCustomInfiniteQueryOptions<TablesData, TablesError, TData, readonly unknown[], number> = {}
+) => {
+  return useInfiniteQuery({
+    queryKey: tableKeys.infiniteList(projectRef, schema, { includeColumns, pageSize, nameFilter }),
+    queryFn: ({ signal, pageParam }) =>
+      getTablesPage(
+        {
+          projectRef,
+          connectionString,
+          schema,
+          includeColumns,
+          limit: pageSize,
+          afterOid: pageParam,
+          nameFilter,
+        },
+        signal
+      ),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) =>
+      lastPage.length < pageSize ? undefined : lastPage[lastPage.length - 1].id,
+    ...options,
+  })
 }

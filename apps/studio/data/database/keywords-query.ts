@@ -1,9 +1,9 @@
 import { getKeywordsSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { UseCustomQueryOptions } from 'types'
 
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type KeywordsVariables = {
   projectRef?: string
@@ -25,7 +25,7 @@ export async function getKeywords(
 }
 
 export type KeywordsData = Awaited<ReturnType<typeof getKeywords>>
-export type KeywordsError = ExecuteSqlError
+export type KeywordsError = ResponseError
 
 export const useKeywordsQuery = <TData = KeywordsData>(
   { projectRef, connectionString }: KeywordsVariables,

@@ -1,3 +1,5 @@
+import { getEnableWebhooksSQL } from '@supabase/pg-meta'
+import type { Tables } from 'common/marketplace.types'
 import { Clock5, Code2, Layers, Timer, Vault, Webhook } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
@@ -6,9 +8,19 @@ import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { UpgradeDatabaseAlert } from '../Queues/UpgradeDatabaseAlert'
+import { getStripeSyncSchemaComment } from '../templates/StripeSyncEngine/useStripeSyncStatus'
 import { WRAPPERS } from '../Wrappers/Wrappers.constants'
 import { WrapperMeta } from '../Wrappers/Wrappers.types'
+import { stripeSyncKeys } from '@/data/database-integrations/stripe/keys'
+import { installStripeSync } from '@/data/database-integrations/stripe/stripe-sync-install-mutation'
+import { enableDatabaseWebhooks } from '@/data/database/hooks-enable-mutation'
+import { databaseKeys } from '@/data/database/keys'
+import { getSchemas, invalidateSchemasQuery } from '@/data/database/schemas-query'
+import { getQueryClient } from '@/data/query-client'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+
+export type NavigationContentLayout = 'constrained' | 'full'
 
 export type Navigation = {
   route: string
@@ -16,38 +28,97 @@ export type Navigation = {
   hasChild?: boolean
   childIcon?: React.ReactNode
   children?: Navigation[]
+  layout?: NavigationContentLayout // applies only to the new marketplace
 }
 
-export const Loading = () => (
-  <div className="p-10">
-    <GenericSkeletonLoader />
-  </div>
-)
+// [Joshen] Basing this on template.json for now
+export type IntegrationInputs = {
+  [key: string]: {
+    label: string
+    type: 'text' | 'number' | 'password'
+    description?: string
+    required: boolean
+    actions: {
+      label: string
+      href: string
+    }[]
+  }
+}
 
+type IntegrationStep = {
+  label: string
+  description?: string
+}
+
+type Listing = Tables<'listings'>
+type InstallUrlType = NonNullable<Listing['installation_url_type']>
+type InstallIdentificationMethod = NonNullable<Listing['installation_identification_method']>
+
+export type MarketplaceSource = 'Official' | 'Partner' | 'Community'
+
+/**
+ * [Joshen] For marketplace, we probably need to revisit this definition
+ * What properties are obsolete, what properties we need from remote source
+ */
 export type IntegrationDefinition = {
   id: string
   name: string
   status?: 'alpha' | 'beta'
   categories?: string[]
-  icon: (props?: { className?: string; style?: Record<string, any> }) => ReactNode
+  featured?: boolean
+  icon: (props?: { className?: string; style?: Record<string, string | number> }) => ReactNode
   description: string | null
   content?: string | null
-  files?: string[]
+  files?: { src: string; alt: string }[]
   docsUrl: string | null
   siteUrl?: string | null
   author: {
     name: string
     websiteUrl: string
   }
+  /** Provenance of the integration — Official (built by Supabase), Partner (formal third-party listing), Community (open-source, not officially endorsed). */
+  source: MarketplaceSource
   requiredExtensions: Array<string>
   /** Optional component to render if the integration requires extensions that are not available on the current database image */
   missingExtensionsAlert?: ReactNode
   navigation?: Array<Navigation>
-  navigate: (
-    id: string,
-    pageId: string | undefined,
+  navigate: (props: {
+    id: string | undefined
+    pageId: string | undefined
     childId: string | undefined
-  ) => ComponentType<{}> | null
+  }) => ComponentType<{}> | null
+
+  /** For showing the SQL query in the installation sheet */
+  installationSql?: string
+  /** Custom command to install the integration (if any - none atm) */
+  installationCommand?: (props: {
+    ref: string
+    track?: ReturnType<typeof useTrack>
+    [key: string]: unknown
+  }) => Promise<void>
+  /**
+   * Used for long polling to track the progress of the integration installation if async
+   * The component calling this handles the polling logic, and should terminate the poll depending on the returned value
+   * Depending on how we want this to work, this method will thereafter also call any RQ invalidation if required
+   * */
+  checkInstallationStatus?: (props: {
+    ref?: string
+    connectionString?: string | null
+    [key: string]: unknown
+  }) => Promise<'installed' | 'installing'>
+  /** User inputs for template integrations */
+  inputs?: IntegrationInputs
+  /** Purely visual, just to show what are the changes on the project from installing the integration */
+  steps?: IntegrationStep[]
+
+  /** These are for OAuth Integrations */
+  installUrl?: string | null
+  installUrlType?: InstallUrlType
+  installIdentificationMethod?: InstallIdentificationMethod
+  secretKeyPrefix?: string
+  edgeFunctionSecretName?: string
+  listingId?: string
+  oauthAppId?: string
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }
   | { type: 'postgres_extension' | 'custom' | 'oauth' | 'template' }
@@ -62,6 +133,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
   {
     id: 'queues',
     type: 'postgres_extension' as const,
+    source: 'Community' as const,
     requiredExtensions: ['pgmq'],
     missingExtensionsAlert: <UpgradeDatabaseAlert minimumVersion="15.6.1.143" />,
     name: `Queues`,
@@ -90,9 +162,10 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       {
         route: 'settings',
         label: 'Settings',
+        layout: 'constrained',
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: ({ pageId = 'overview', childId }) => {
       if (childId) {
         return dynamic(() => import('../Queues/QueuePage').then((mod) => mod.QueuePage), {
           loading: Loading,
@@ -102,7 +175,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Queues/OverviewTab').then(
+              import('@/components/interfaces/Integrations/Queues/OverviewTab').then(
                 (mod) => mod.QueuesOverviewTab
               ),
             { loading: Loading }
@@ -123,6 +196,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
   {
     id: 'cron',
     type: 'postgres_extension' as const,
+    source: 'Community' as const,
     requiredExtensions: ['pg_cron'],
     name: `Cron`,
     icon: ({ className, ...props } = {}) => (
@@ -148,7 +222,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         ),
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: ({ pageId = 'overview', childId }) => {
       if (childId) {
         return dynamic(() => import('../CronJobs/CronJobPage').then((mod) => mod.CronJobPage), {
           loading: Loading,
@@ -158,8 +232,8 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Integration/IntegrationOverviewTab').then(
-                (mod) => mod.IntegrationOverviewTab
+              import('@/components/interfaces/Integrations/CronJobs/OverviewTab').then(
+                (mod) => mod.CronOverviewTab
               ),
             {
               loading: Loading,
@@ -176,6 +250,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
   {
     id: 'vault',
     type: 'postgres_extension' as const,
+    source: 'Official' as const,
     requiredExtensions: ['supabase_vault'],
     missingExtensionsAlert: <UpgradeDatabaseAlert />,
     name: `Vault`,
@@ -184,7 +259,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       <Vault className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Application level encryption for your project',
-    docsUrl: DOCS_URL,
+    docsUrl: `${DOCS_URL}/guides/database/vault`,
     author: authorSupabase,
     navigation: [
       {
@@ -196,13 +271,13 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         label: 'Secrets',
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Integration/IntegrationOverviewTab').then(
-                (mod) => mod.IntegrationOverviewTab
+              import('@/components/interfaces/Integrations/Vault/OverviewTab').then(
+                (mod) => mod.VaultOverviewTab
               ),
             {
               loading: Loading,
@@ -222,15 +297,16 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
   {
     id: 'webhooks',
     type: 'postgres_extension' as const,
+    source: 'Official' as const,
     name: `Database Webhooks`,
     icon: ({ className, ...props } = {}) => (
       <Webhook className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description:
       'Send real-time data from your database to another system when a table event occurs',
-    docsUrl: DOCS_URL,
+    docsUrl: `${DOCS_URL}/guides/database/webhooks`,
     author: authorSupabase,
-    requiredExtensions: [],
+    requiredExtensions: ['pg_net'],
     navigation: [
       {
         route: 'overview',
@@ -239,14 +315,15 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       {
         route: 'webhooks',
         label: 'Webhooks',
+        layout: 'constrained',
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Webhooks/OverviewTab').then(
+              import('@/components/interfaces/Integrations/Webhooks/OverviewTab').then(
                 (mod) => mod.WebhooksOverviewTab
               ),
             {
@@ -256,7 +333,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'webhooks':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Webhooks/ListTab').then(
+              import('@/components/interfaces/Integrations/Webhooks/ListTab').then(
                 (mod) => mod.WebhooksListTab
               ),
             {
@@ -266,10 +343,17 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       }
       return null
     },
+    installationSql: getEnableWebhooksSQL(),
+    installationCommand: async ({ ref }: { ref: string }) => {
+      const queryClient = getQueryClient()
+      await enableDatabaseWebhooks({ ref })
+      await invalidateSchemasQuery(queryClient, ref)
+    },
   },
   {
     id: 'data_api',
     type: 'custom' as const,
+    source: 'Official' as const,
     requiredExtensions: [],
     name: `Data API`,
     icon: ({ className, ...props } = {}) => (
@@ -286,18 +370,19 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       {
         route: 'settings',
         label: 'Settings',
+        layout: 'constrained',
       },
       {
         route: 'docs',
         label: 'Docs',
       },
     ],
-    navigate: (_id: string, pageId: string = 'overview', _childId: string | undefined) => {
+    navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/DataApi/OverviewTab').then(
+              import('@/components/interfaces/Integrations/DataApi/OverviewTab').then(
                 (mod) => mod.DataApiOverviewTab
               ),
             {
@@ -307,7 +392,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'settings':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/DataApi/SettingsTab').then(
+              import('@/components/interfaces/Integrations/DataApi/SettingsTab').then(
                 (mod) => mod.DataApiSettingsTab
               ),
             {
@@ -317,7 +402,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'docs':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/DataApi/DocsTab').then(
+              import('@/components/interfaces/Integrations/DataApi/DocsTab').then(
                 (mod) => mod.DataApiDocsTab
               ),
             {
@@ -331,6 +416,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
   {
     id: 'graphiql',
     type: 'postgres_extension' as const,
+    source: 'Official' as const,
     requiredExtensions: ['pg_graphql'],
     name: `GraphQL`,
     icon: ({ className, ...props } = {}) => (
@@ -343,7 +429,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
       />
     ),
     description: 'Run GraphQL queries through our interactive in-browser IDE',
-    docsUrl: DOCS_URL,
+    docsUrl: `${DOCS_URL}/guides/database/extensions/pg_graphql`,
     author: authorSupabase,
     navigation: [
       {
@@ -355,13 +441,13 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         label: 'GraphiQL',
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Integration/IntegrationOverviewTab').then(
-                (mod) => mod.IntegrationOverviewTab
+              import('@/components/interfaces/Integrations/GraphQL/OverviewTab').then(
+                (mod) => mod.GraphQLOverviewTab
               ),
             {
               loading: Loading,
@@ -370,7 +456,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'graphiql':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/GraphQL/GraphiQLTab').then(
+              import('@/components/interfaces/Integrations/GraphQL/GraphiQLTab').then(
                 (mod) => mod.GraphiQLTab
               ),
             {
@@ -387,6 +473,7 @@ const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
   return {
     id: w.name,
     type: 'wrapper' as const,
+    source: 'Official' as const,
     name: `${w.label} Wrapper`,
     icon: ({ className, ...props } = {}) => (
       <Image fill src={w.icon} alt={w.name} className={cn('p-2', className)} {...props} />
@@ -394,6 +481,7 @@ const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
     requiredExtensions: ['wrappers', 'supabase_vault'],
     description: w.description,
     docsUrl: w.docsUrl,
+    categories: w.categories,
     meta: w,
     author: authorSupabase,
     navigation: [
@@ -406,12 +494,12 @@ const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
         label: 'Wrappers',
       },
     ],
-    navigate: (id: string, pageId: string = 'overview', childId: string | undefined) => {
+    navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Wrappers/OverviewTab').then(
+              import('@/components/interfaces/Integrations/Wrappers/OverviewTab').then(
                 (mod) => mod.WrapperOverviewTab
               ),
             {
@@ -421,7 +509,7 @@ const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
         case 'wrappers':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/Wrappers/WrappersTab').then(
+              import('@/components/interfaces/Integrations/Wrappers/WrappersTab').then(
                 (mod) => mod.WrappersTab
               ),
             {
@@ -437,7 +525,8 @@ const WRAPPER_INTEGRATIONS: Array<IntegrationDefinition> = WRAPPERS.map((w) => {
 const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
   {
     id: 'stripe_sync_engine',
-    type: 'custom' as const,
+    type: 'template' as const,
+    source: 'Partner' as const,
     requiredExtensions: ['pgmq', 'supabase_vault', 'pg_cron', 'pg_net'],
     missingExtensionsAlert: <UpgradeDatabaseAlert minimumVersion="15.6.1.143" />,
     name: `Stripe Sync Engine`,
@@ -466,22 +555,23 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
       {
         route: 'settings',
         label: 'Settings',
+        layout: 'constrained',
       },
     ],
-    navigate: (_id: string, pageId: string = 'overview', _childId: string | undefined) => {
+    navigate: ({ pageId = 'overview' }) => {
       switch (pageId) {
         case 'overview':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/templates/StripeSyncEngine/InstallationOverview').then(
-                (mod) => mod.StripeSyncInstallationPage
+              import('@/components/interfaces/Integrations/templates/StripeSyncEngine/OverviewTab').then(
+                (mod) => mod.StripeSyncEngineOverviewTab
               ),
             { loading: Loading }
           )
         case 'settings':
           return dynamic(
             () =>
-              import('components/interfaces/Integrations/templates/StripeSyncEngine/StripeSyncSettingsPage').then(
+              import('@/components/interfaces/Integrations/templates/StripeSyncEngine/StripeSyncSettingsPage').then(
                 (mod) => mod.StripeSyncSettingsPage
               ),
             { loading: Loading }
@@ -489,11 +579,100 @@ const TEMPLATE_INTEGRATIONS: Array<IntegrationDefinition> = [
       }
       return null
     },
+    inputs: {
+      stripe_api_key: {
+        type: 'password',
+        required: true,
+        label: 'Stripe API secret key',
+        description:
+          'Requires write access to Webhook Endpoints and read-only access to all other categories.',
+        actions: [
+          {
+            label: 'Get API key',
+            href: 'https://dashboard.stripe.com/apikeys',
+          },
+          {
+            label: 'What are Stripe API keys?',
+            href: 'https://support.stripe.com/questions/what-are-stripe-api-keys-and-how-to-find-them',
+          },
+        ],
+      },
+    },
+    steps: [
+      { label: 'Creates a new database schema named `stripe`' },
+      { label: 'Creates tables and views in the `stripe` schema for synced Stripe data' },
+      { label: 'Deploys Edge Functions to handle incoming webhooks from Stripe' },
+      { label: 'Schedules automatic Stripe data syncs using Supabase Queues' },
+    ],
+    installationCommand: async ({ ref: projectRef, track, stripe_api_key }) => {
+      const startTime = Date.now()
+      await installStripeSync({ projectRef, startTime, stripeSecretKey: stripe_api_key as string })
+
+      if (track)
+        track('integration_install_submitted', {
+          integrationName: 'stripe_sync_engine',
+          method: 'template',
+        })
+
+      const queryClient = getQueryClient()
+      await queryClient.invalidateQueries({ queryKey: stripeSyncKeys.all })
+    },
+    checkInstallationStatus: async (props) => {
+      const queryClient = getQueryClient()
+      const { projectRef, connectionString } = props || {}
+
+      const schemas = await getSchemas({
+        projectRef: projectRef as string,
+        connectionString: connectionString as string,
+      })
+
+      const { status, errorMessage } = getStripeSyncSchemaComment(schemas)
+
+      if (status === 'install error') {
+        throw new Error(errorMessage ?? 'Stripe Sync installation failed')
+      }
+
+      if (status === 'installed') {
+        await queryClient.invalidateQueries({
+          queryKey: databaseKeys.schemas(projectRef as string),
+        })
+      }
+      return status === 'installed' ? 'installed' : 'installing'
+    },
   },
 ]
 
-export const INTEGRATIONS: Array<IntegrationDefinition> = [
+const INTEGRATIONS_WITH_CATEGORIES = [
   ...WRAPPER_INTEGRATIONS,
-  ...SUPABASE_INTEGRATIONS,
-  ...TEMPLATE_INTEGRATIONS,
+  ...SUPABASE_INTEGRATIONS.map((integration) => {
+    const categoryMap: Record<string, string[]> = {
+      queues: ['devtools'],
+      cron: ['devtools'],
+      vault: ['security'],
+      webhooks: ['api'],
+      data_api: ['api', 'data-platform'],
+      graphiql: ['api', 'devtools'],
+    }
+    return {
+      ...integration,
+      categories: categoryMap[integration.id] || [],
+    }
+  }),
+  ...TEMPLATE_INTEGRATIONS.map((integration) => {
+    const categoryMap: Record<string, string[]> = {
+      stripe_sync_engine: ['billing'],
+    }
+    return {
+      ...integration,
+      categories: categoryMap[integration.id] || [],
+    }
+  }),
 ]
+
+export const INTEGRATIONS: Array<IntegrationDefinition> = INTEGRATIONS_WITH_CATEGORIES
+
+export const Loading = () => (
+  <div className="p-10">
+    <GenericSkeletonLoader />
+  </div>
+)

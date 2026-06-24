@@ -157,6 +157,12 @@ In this example `embedding` would be another embedding you wish to compare again
 
 <Admonition type="tip">
 
+To filter your vector search by another column from the JS client, extend the function above with an extra parameter and `where` clause. See [Filtering vector search by metadata](/docs/guides/ai/semantic-search#filtering-vector-search-by-metadata) for a worked example.
+
+</Admonition>
+
+<Admonition type="tip">
+
 Be sure to use embeddings produced from the same embedding model when calculating distance. Comparing embeddings from two different models will produce no meaningful result.
 
 </Admonition>

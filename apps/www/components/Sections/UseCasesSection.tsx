@@ -64,7 +64,7 @@ const UseCase = ({
 
   return (
     <m.div initial={initial} animate={isInView ? animate : initial} className="flex">
-      <Panel outerClassName="w-full" innerClassName="p-4 md:p-8 h-full !bg-background">
+      <Panel outerClassName="w-full" innerClassName="p-4 md:p-8 h-full bg-background!">
         <div className="h-full flex flex-col gap-4 items-start justify-between">
           <div className="prose">
             <div className="flex items-center gap-2">
@@ -83,11 +83,11 @@ const UseCase = ({
           </div>
           {useCase.cta &&
             (useCase.cta.isDisabled ? (
-              <Button size="tiny" type="default" disabled className="justify-end">
+              <Button size="tiny" variant="default" disabled className="justify-end">
                 {useCase.cta.label ?? 'View example'}
               </Button>
             ) : (
-              <Button asChild size="tiny" type="default" iconRight={<ArrowUpRight />}>
+              <Button asChild size="tiny" variant="default" iconRight={<ArrowUpRight />}>
                 <Link href={useCase.cta.link} target="_blank">
                   {useCase.cta.label ?? 'View example'}
                 </Link>

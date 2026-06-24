@@ -4,15 +4,15 @@ import type { CloudProvider } from 'shared-data'
 import {
   Badge,
   cn,
-  FormField_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectLabel_Shadcn_,
-  SelectSeparator_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  FormField,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -124,7 +124,7 @@ export const RegionSelector = ({
 
   return (
     <Panel.Content>
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="dbRegion"
         render={({ field }) => {
@@ -166,13 +166,9 @@ export const RegionSelector = ({
                   </>
                 }
               >
-                <Select_Shadcn_
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  disabled={isLoading}
-                >
-                  <SelectTrigger_Shadcn_ className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start">
-                    <SelectValue_Shadcn_
+                <Select value={field.value} onValueChange={field.onChange} disabled={isLoading}>
+                  <SelectTrigger className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start">
+                    <SelectValue
                       placeholder={
                         isLoading
                           ? 'Loading available regions...'
@@ -184,7 +180,7 @@ export const RegionSelector = ({
                           {selectedRegion?.code && (
                             <img
                               alt="region icon"
-                              className="w-5 rounded-sm"
+                              className="w-5 rounded-xs"
                               src={`${BASE_PATH}/img/regions/${selectedRegion.code}.svg`}
                             />
                           )}
@@ -195,16 +191,16 @@ export const RegionSelector = ({
                           </span>
                         </div>
                       )}
-                    </SelectValue_Shadcn_>
-                  </SelectTrigger_Shadcn_>
-                  <SelectContent_Shadcn_>
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
                     {smartRegionEnabled && (
                       <>
-                        <SelectGroup_Shadcn_>
-                          <SelectLabel_Shadcn_>General regions</SelectLabel_Shadcn_>
+                        <SelectGroup>
+                          <SelectLabel>General regions</SelectLabel>
                           {smartRegions.map((value) => {
                             return (
-                              <SelectItem_Shadcn_
+                              <SelectItem
                                 key={value.code}
                                 value={value.name}
                                 className="w-full [&>:nth-child(2)]:w-full"
@@ -213,7 +209,7 @@ export const RegionSelector = ({
                                   <div className="flex items-center gap-x-3">
                                     <img
                                       alt="region icon"
-                                      className="w-5 rounded-sm"
+                                      className="w-5 rounded-xs"
                                       src={`${BASE_PATH}/img/regions/${value.code}.svg`}
                                     />
                                     <span className="text-foreground">
@@ -229,24 +225,24 @@ export const RegionSelector = ({
                                     )}
                                   </div>
                                 </div>
-                              </SelectItem_Shadcn_>
+                              </SelectItem>
                             )
                           })}
-                        </SelectGroup_Shadcn_>
-                        <SelectSeparator_Shadcn_ />
+                        </SelectGroup>
+                        <SelectSeparator />
                       </>
                     )}
 
-                    <SelectGroup_Shadcn_>
-                      <SelectLabel_Shadcn_>Specific regions</SelectLabel_Shadcn_>
+                    <SelectGroup>
+                      <SelectLabel>Specific regions</SelectLabel>
                       {regionOptions.map((value) => {
                         return (
-                          <SelectItem_Shadcn_
+                          <SelectItem
                             key={value.code}
                             value={value.name}
                             className={cn(
                               'w-full [&>:nth-child(2)]:w-full',
-                              value.status !== undefined && '!pointer-events-auto'
+                              value.status !== undefined && 'pointer-events-auto!'
                             )}
                             disabled={value.status !== undefined}
                           >
@@ -254,7 +250,7 @@ export const RegionSelector = ({
                               <div className="flex items-center gap-x-3">
                                 <img
                                   alt="region icon"
-                                  className="w-5 rounded-sm"
+                                  className="w-5 rounded-xs"
                                   src={`${BASE_PATH}/img/regions/${value.code}.svg`}
                                 />
                                 <div className="flex items-center gap-x-2">
@@ -283,12 +279,12 @@ export const RegionSelector = ({
                                 </Tooltip>
                               )}
                             </div>
-                          </SelectItem_Shadcn_>
+                          </SelectItem>
                         )
                       })}
-                    </SelectGroup_Shadcn_>
-                  </SelectContent_Shadcn_>
-                </Select_Shadcn_>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
               </FormItemLayout>
 
               {affectingIncidents.length > 0 && (

@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { coalesceRowsToArray, filterByList } from './helpers'
-import { ident, literal } from './pg-format'
+import { ident, literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { pgColumnArrayZod } from './pg-meta-columns'
 import { COLUMNS_SQL } from './sql/columns'
 import { VIEWS_SQL } from './sql/views'
@@ -45,7 +45,7 @@ export function list<T extends boolean | undefined = true>(
     includeColumns?: T
   } = {} as any
 ): {
-  sql: string
+  sql: SafeSqlFragment
   zod: z.ZodType<ViewBasedOnIncludeColumns<T>[]>
 } {
   let sql = generateEnrichedViewsSql({ includeColumns })
@@ -55,13 +55,13 @@ export function list<T extends boolean | undefined = true>(
     !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
   )
   if (filter) {
-    sql += ` where schema ${filter}`
+    sql = safeSql`${sql} where schema ${filter}`
   }
   if (limit) {
-    sql += ` limit ${limit}`
+    sql = safeSql`${sql} limit ${literal(limit)}`
   }
   if (offset) {
-    sql += ` offset ${offset}`
+    sql = safeSql`${sql} offset ${literal(offset)}`
   }
   return {
     sql,
@@ -71,35 +71,35 @@ export function list<T extends boolean | undefined = true>(
 
 type ViewIdentifier = Pick<PGView, 'id'> | Pick<PGView, 'name' | 'schema'>
 
-function getIdentifierWhereClause(identifier: ViewIdentifier): string {
+function getIdentifierWhereClause(identifier: ViewIdentifier): SafeSqlFragment {
   if ('id' in identifier && identifier.id) {
-    return `${ident('id')} = ${literal(identifier.id)}`
+    return safeSql`${ident('id')} = ${literal(identifier.id)}`
   }
   if ('name' in identifier && identifier.name && identifier.schema) {
-    return `${ident('name')} = ${literal(identifier.name)} and ${ident('schema')} = ${literal(identifier.schema)}`
+    return safeSql`${ident('name')} = ${literal(identifier.name)} and ${ident('schema')} = ${literal(identifier.schema)}`
   }
   throw new Error('Must provide either id or name and schema')
 }
 
 export function retrieve(identifier: ViewIdentifier): {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgViewOptionalZod
 } {
   let whereClause = getIdentifierWhereClause(identifier)
 
-  const sql = `${generateEnrichedViewsSql({ includeColumns: true })} where ${whereClause};`
+  const sql = safeSql`${generateEnrichedViewsSql({ includeColumns: true })} where ${whereClause};`
   return {
     sql,
     zod: pgViewOptionalZod,
   }
 }
 
-const generateEnrichedViewsSql = ({ includeColumns }: { includeColumns?: boolean }) => `
+const generateEnrichedViewsSql = ({ includeColumns }: { includeColumns?: boolean }) => safeSql`
 with views as (${VIEWS_SQL})
-  ${includeColumns ? `, columns as (${COLUMNS_SQL})` : ''}
+  ${includeColumns ? safeSql`, columns as (${COLUMNS_SQL})` : safeSql``}
 select
   *
-  ${includeColumns ? `, ${coalesceRowsToArray('columns', 'columns.table_id = views.id')}` : ''}
+  ${includeColumns ? safeSql`, ${coalesceRowsToArray('columns', safeSql`columns.table_id = views.id`)}` : safeSql``}
 from views`
 
 export default {

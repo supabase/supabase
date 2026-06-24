@@ -1,9 +1,9 @@
 import { Trash } from 'lucide-react'
-
-import CopyButton from 'components/ui/CopyButton'
-import type { AuthorizedApp } from 'data/oauth/authorized-apps-query'
 import { Button, TableCell, TableRow } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+
+import CopyButton from '@/components/ui/CopyButton'
+import type { AuthorizedApp } from '@/data/oauth/authorized-apps-query'
 
 export interface AuthorizedAppRowProps {
   app: AuthorizedApp
@@ -32,7 +32,7 @@ export const AuthorizedAppRow = ({ app, onSelectRevoke }: AuthorizedAppRowProps)
           <p className="text-xs font-mono truncate" title={app.app_id}>
             {app.app_id}
           </p>
-          <CopyButton iconOnly type="default" text={app.app_id} className="px-1" />
+          <CopyButton iconOnly variant="default" text={app.app_id} className="px-1" />
         </div>
       </TableCell>
       <TableCell>
@@ -43,7 +43,12 @@ export const AuthorizedAppRow = ({ app, onSelectRevoke }: AuthorizedAppRowProps)
         />
       </TableCell>
       <TableCell className="text-right">
-        <Button type="default" icon={<Trash />} className="px-1" onClick={() => onSelectRevoke()} />
+        <Button
+          variant="default"
+          icon={<Trash />}
+          className="px-1"
+          onClick={() => onSelectRevoke()}
+        />
       </TableCell>
     </TableRow>
   )

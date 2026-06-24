@@ -19,10 +19,13 @@ export const HIDDEN_EXTENSIONS = [
 
 export const SEARCH_TERMS: Record<string, string[]> = {
   vector: ['pgvector', 'pg_vector'],
+  pg_partman: ['partman', 'partition', 'partitioned'],
 }
 
 export const EXTENSION_DISABLE_WARNINGS: Record<string, string> = {
   pg_cron: 'Disabling this extension will delete all scheduled jobs. This cannot be undone.',
+  pg_partman:
+    'Disabling this extension will stop automatic partition management for any partitioned queues. New partitions will no longer be created and retention policies will no longer be enforced.',
 }
 
 // Extensions that have recommended schemas (rather than required schemas)

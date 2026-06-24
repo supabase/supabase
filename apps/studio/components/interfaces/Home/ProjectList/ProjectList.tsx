@@ -1,19 +1,8 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useOrgProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
 import { parseAsArrayOf, parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
-import { useMemo } from 'react'
-import type { Organization } from 'types'
+import { ReactNode, useMemo } from 'react'
 import {
   Card,
   cn,
@@ -26,8 +15,6 @@ import {
   TableRow,
 } from 'ui'
 
-import { ErrorMatcher } from '../../ErrorHandling/ErrorMatcher'
-import { TroubleshootingAccordion } from '../../ErrorHandling/TroubleshootingAccordion'
 import { LoadingCardView, LoadingTableView, NoProjectsState } from './EmptyStates'
 import { LoadMoreRows } from './LoadMoreRow'
 import { ProjectCard } from './ProjectCard'
@@ -38,13 +25,34 @@ import {
   toTableHeadSortValue,
 } from './ProjectListSort.utils'
 import { ProjectTableRow } from './ProjectTableRow'
+import AlertError from '@/components/ui/AlertError'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
+import { useOrgIntegrationsQuery } from '@/data/integrations/integrations-query-org-only'
+import { usePermissionsQuery } from '@/data/permissions/permissions-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { Organization } from '@/types'
 
 export interface ProjectListProps {
   organization?: Organization
   rewriteHref?: (projectRef: string) => string
+  /**
+   * Optional content rendered as the first `<li>` inside the grid view, before the
+   * project cards. Used by the upgrade CTA placement experiment to slot a card-shaped
+   * usage tile in the project list. Ignored in table view.
+   */
+  prependCard?: ReactNode
 }
 
-export const ProjectList = ({ organization: organization_, rewriteHref }: ProjectListProps) => {
+export const ProjectList = ({
+  organization: organization_,
+  rewriteHref,
+  prependCard,
+}: ProjectListProps) => {
   const { slug: urlSlug } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
@@ -152,7 +160,11 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
   }
 
   if (isLoadingPermissions || isLoadingProjects || !organization) {
-    return viewMode === 'table' ? <LoadingTableView /> : <LoadingCardView />
+    return viewMode === 'table' ? (
+      <LoadingTableView />
+    ) : (
+      <LoadingCardView prependCard={prependCard} />
+    )
   }
 
   if (isEmpty) {
@@ -161,7 +173,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
 
   if (viewMode === 'table') {
     return (
-      <Card className="flex-1 min-h-0 overflow-y-auto mb-8">
+      <Card className="flex-1 min-h-0 overflow-y-auto">
         <Table>
           {/* [Joshen] Ideally we can figure out sticky table headers here */}
           <TableHeader>
@@ -279,7 +291,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
       ) : noResultsFromSearch ? (
         <NoSearchResults searchString={search} />
       ) : (
-        <div className="flex flex-col gap-y-2 md:gap-y-4 pb-6">
+        <div className="flex flex-col gap-y-2 md:gap-y-4">
           <ul
             className={cn(
               'min-h-0 w-full mx-auto',
@@ -287,6 +299,7 @@ export const ProjectList = ({ organization: organization_, rewriteHref }: Projec
               'sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3'
             )}
           >
+            {prependCard}
             {orgProjects?.map((project) => (
               <ProjectCard
                 key={project.ref}

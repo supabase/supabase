@@ -1,4 +1,4 @@
-import SchemaSelector from 'components/ui/SchemaSelector'
+import SchemaSelector from '@/components/ui/SchemaSelector'
 
 export const FilterSchema = ({
   value,

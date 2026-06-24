@@ -1,16 +1,17 @@
-import pgMeta from '@supabase/pg-meta'
+import pgMeta, { type SafeSqlFragment } from '@supabase/pg-meta'
+import type { ColumnTypeRef } from '@supabase/pg-meta/src/pg-meta-columns'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type CreateColumnBody = {
   schema: string
   table: string
   name: string
-  type: string
-  check?: string
+  type: ColumnTypeRef
+  check?: SafeSqlFragment
   comment?: string
   defaultValue?: any
   defaultValueFormat?: 'expression' | 'literal'

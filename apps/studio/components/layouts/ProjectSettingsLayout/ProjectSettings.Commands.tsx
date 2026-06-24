@@ -1,11 +1,11 @@
 import { useParams } from 'common'
-import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useRouter } from 'next/router'
 import type { CommandOptions, ICommand } from 'ui-patterns/CommandMenu'
 import { useRegisterCommands, useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
 
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
+import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 export function useProjectSettingsGotoCommands(options?: CommandOptions) {
@@ -16,12 +16,20 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
   ref ||= '_'
   const hasOrgSlug = typeof slug === 'string' && slug.length > 0 && slug !== '_'
 
-  const { projectSettingsLogDrains, projectSettingsCustomDomains, authenticationSignInProviders } =
-    useIsFeatureEnabled([
-      'project_settings:log_drains',
-      'project_settings:custom_domains',
-      'authentication:sign_in_providers',
-    ])
+  const {
+    logsAll,
+    projectSettingsLogDrains,
+    projectSettingsCustomDomains,
+    authenticationSignInProviders,
+  } = useIsFeatureEnabled([
+    'logs:all',
+    'project_settings:log_drains',
+    'project_settings:custom_domains',
+    'authentication:sign_in_providers',
+  ])
+
+  // Log drains depend on the analytics backend, gated by logs:all (see SettingsMenu.utils).
+  const showLogDrains = logsAll && projectSettingsLogDrains
 
   useRegisterCommands(
     COMMAND_MENU_SECTIONS.NAVIGATE,
@@ -97,7 +105,8 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         : []),
       {
         id: 'nav-project-settings-restart-project',
-        name: 'Restart project',
+        name: 'Project availability',
+        value: 'project availability restart project pause project resume project',
         route: `/project/${ref}/settings/general#restart-project`,
         defaultHidden: true,
       },
@@ -122,6 +131,12 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-project-settings-database-password',
         name: 'Database password',
+        route: `/project/${ref}/database/settings#database-password`,
+        defaultHidden: true,
+      },
+      {
+        id: 'nav-project-settings-reset-database-password',
+        name: 'Reset database password',
         route: `/project/${ref}/database/settings#database-password`,
         defaultHidden: true,
       },
@@ -165,7 +180,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         route: `/project/${ref}/database/settings#banned-ips`,
         defaultHidden: true,
       },
-      ...(projectSettingsLogDrains
+      ...(showLogDrains
         ? [
             {
               id: 'nav-project-settings-log-drains',
@@ -176,6 +191,6 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
           ]
         : []),
     ],
-    { ...options, deps: [platformWebhooksEnabled, ref, slug] }
+    { ...options, deps: [platformWebhooksEnabled, showLogDrains, ref, slug] }
   )
 }

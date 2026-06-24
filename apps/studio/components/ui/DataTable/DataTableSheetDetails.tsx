@@ -1,7 +1,7 @@
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
 import { ReactNode, useCallback, useEffect, useMemo } from 'react'
-
 import { Button, cn, Separator, Skeleton, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { Kbd } from './primitives/Kbd'
 import { useDataTable } from './providers/DataTableProvider'
 
@@ -74,7 +74,7 @@ export function DataTableSheetDetails({
             <TooltipTrigger asChild>
               <Button
                 size="tiny"
-                type="text"
+                variant="text"
                 disabled={!prevId}
                 onClick={onPrev}
                 className="px-1"
@@ -92,7 +92,7 @@ export function DataTableSheetDetails({
             <TooltipTrigger asChild>
               <Button
                 size="tiny"
-                type="text"
+                variant="text"
                 disabled={!nextId}
                 onClick={onNext}
                 className="px-1"
@@ -109,7 +109,7 @@ export function DataTableSheetDetails({
 
           <Button
             size="tiny"
-            type="text"
+            variant="text"
             onClick={() => table.resetRowSelection()}
             className="px-1"
             icon={<X />}

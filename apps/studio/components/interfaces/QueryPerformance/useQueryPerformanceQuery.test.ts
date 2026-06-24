@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { QueryPerformanceSort } from './QueryPerformance.types'
 import { generateQueryPerformanceSql } from './useQueryPerformanceQuery'
 
 describe('generateQueryPerformanceSql', () => {
@@ -133,6 +134,88 @@ describe('generateQueryPerformanceSql', () => {
     for (const preset of presets) {
       const result = generateQueryPerformanceSql({ preset })
       expect(result.sql).toBeDefined()
+    }
+  })
+
+  it('clamps page=0 to page=1 (no negative offset)', () => {
+    const result = generateQueryPerformanceSql({ preset: 'unified', page: 0, pageSize: 20 })
+    expect(result.sql).toContain('offset 0')
+    expect(result.sql).not.toMatch(/offset -\d/)
+  })
+
+  it('clamps negative page to page=1', () => {
+    const result = generateQueryPerformanceSql({ preset: 'unified', page: -5, pageSize: 20 })
+    expect(result.sql).toContain('offset 0')
+  })
+
+  it('clamps pageSize above 100 to 100', () => {
+    const result = generateQueryPerformanceSql({ preset: 'unified', page: 1, pageSize: 9999 })
+    expect(result.sql).toContain('limit 100')
+    expect(result.sql).not.toContain('limit 9999')
+  })
+
+  it('applies LIMIT and OFFSET for page 2', () => {
+    const result = generateQueryPerformanceSql({ preset: 'unified', page: 2, pageSize: 20 })
+    expect(result.sql).toContain('limit 20 offset 20')
+  })
+
+  it('does not produce NaN in SQL when page is NaN', () => {
+    const result = generateQueryPerformanceSql({ preset: 'unified', page: NaN, pageSize: 20 })
+    expect(result.sql).not.toContain('NaN')
+    expect(result.sql).toContain('offset 0')
+  })
+
+  it('does not produce NaN in SQL when pageSize is NaN', () => {
+    const result = generateQueryPerformanceSql({ preset: 'unified', page: 1, pageSize: NaN })
+    expect(result.sql).not.toContain('NaN')
+    expect(result.sql).toContain('limit 20')
+  })
+})
+
+describe('generateQueryPerformanceSql - ORDER BY column validation', () => {
+  it('rejects invalid orderBy column containing colon (old URL format)', () => {
+    const result = generateQueryPerformanceSql({
+      preset: 'mostFrequentlyInvoked',
+      orderBy: { column: 'created_at:asc' as any, order: 'desc' },
+    })
+    expect(result.orderBySql).toBeUndefined()
+  })
+
+  it('rejects SQL injection in orderBy column', () => {
+    const result = generateQueryPerformanceSql({
+      preset: 'mostFrequentlyInvoked',
+      orderBy: { column: 'calls; DROP TABLE users--' as any, order: 'asc' },
+    })
+    expect(result.orderBySql).toBeUndefined()
+    expect(result.sql).not.toContain('DROP TABLE')
+  })
+
+  it('falls back to default ORDER BY when column is invalid', () => {
+    const result = generateQueryPerformanceSql({
+      preset: 'mostFrequentlyInvoked',
+      orderBy: { column: 'created_at:asc' as any, order: 'asc' },
+    })
+    expect(result.sql).toContain('order by statements.calls desc')
+  })
+
+  it('accepts all valid sort columns', () => {
+    const columns: QueryPerformanceSort['column'][] = [
+      'query',
+      'rolname',
+      'total_time',
+      'prop_total_time',
+      'calls',
+      'avg_rows',
+      'max_time',
+      'mean_time',
+      'min_time',
+    ]
+    for (const column of columns) {
+      const result = generateQueryPerformanceSql({
+        preset: 'mostFrequentlyInvoked',
+        orderBy: { column, order: 'asc' },
+      })
+      expect(result.orderBySql).toBe(`ORDER BY ${column} asc`)
     }
   })
 })

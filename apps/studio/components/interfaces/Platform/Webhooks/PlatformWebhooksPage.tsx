@@ -1,7 +1,4 @@
-import { useParams } from 'common'
-import { useIsPlatformWebhooksEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { EllipsisVertical, Pencil, RotateCw, Trash2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
@@ -22,7 +19,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Label_Shadcn_,
+  Label,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -52,6 +49,12 @@ import {
   setPendingSigningSecretReveal,
   shouldHandleEndpointNotFound,
 } from './PlatformWebhooksPage.utils'
+import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const PANEL_VALUES = ['create', 'edit'] as const
 
@@ -128,9 +131,18 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     () => endpoints.find((endpoint) => endpoint.id === endpointIdPendingDelete) ?? null,
     [endpoints, endpointIdPendingDelete]
   )
+  const endpointPendingDeleteHasName = endpointPendingDelete
+    ? endpointPendingDelete.name.trim().length > 0
+    : false
   const endpointPendingDeleteDisplayName = endpointPendingDelete
     ? getWebhookEndpointDisplayName(endpointPendingDelete)
     : ''
+  let deleteEndpointDescription = 'This action cannot be undone.'
+  if (endpointPendingDelete) {
+    deleteEndpointDescription = endpointPendingDeleteHasName
+      ? `Deleting “${endpointPendingDeleteDisplayName}” stops all deliveries to the URL below. This can’t be undone.`
+      : 'Deleting this endpoint stops all deliveries to the URL below. This can’t be undone.'
+  }
 
   useEffect(() => {
     if (!platformWebhooksEnabled) {
@@ -233,7 +245,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       setDeliverySearch('')
     }
     setEndpointIdPendingDelete(null)
-    toast.success(`Deleted endpoint "${endpointPendingDeleteDisplayName}"`)
+    toast.success('Endpoint deleted')
   }
 
   const handleUpsertEndpoint = (values: EndpointFormValues) => {
@@ -286,6 +298,12 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
 
   const isEndpointSheetOpen = panel === 'create' || (panel === 'edit' && !!selectedEndpoint)
 
+  useShortcut(
+    SHORTCUT_IDS.PLATFORM_WEBHOOKS_COPY_ENDPOINT_URL,
+    () => selectedEndpoint && handleCopy(selectedEndpoint.url, 'endpoint URL'),
+    { enabled: isEndpointView && !isEndpointSheetOpen }
+  )
+
   useEffect(() => {
     if (!selectedEndpoint && !!deliveryId) {
       setDeliveryId(null)
@@ -307,6 +325,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
       <PlatformWebhooksHeader
         hasSelectedEndpoint={!!selectedEndpoint}
         headerTitle={headerTitle}
+        featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS}
         headerDescription={headerDescription}
         endpointStatus={
           selectedEndpoint ? (selectedEndpoint.enabled ? 'enabled' : 'disabled') : undefined
@@ -314,33 +333,42 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
         endpointActions={
           selectedEndpoint ? (
             <>
-              <Button
-                type="default"
-                icon={<Pencil size={14} />}
-                onClick={() => {
+              <Shortcut
+                id={SHORTCUT_IDS.PLATFORM_WEBHOOKS_EDIT_ENDPOINT}
+                onTrigger={() => {
                   setEditEnabledOverride(null)
                   setPanel('edit')
                 }}
+                options={{ enabled: !isEndpointSheetOpen }}
               >
-                Edit
-              </Button>
+                <Button
+                  variant="default"
+                  icon={<Pencil size={14} />}
+                  onClick={() => {
+                    setEditEnabledOverride(null)
+                    setPanel('edit')
+                  }}
+                >
+                  Edit
+                </Button>
+              </Shortcut>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="default" icon={<EllipsisVertical />} className="w-7" />
+                  <Button variant="default" icon={<EllipsisVertical />} className="w-7" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" side="bottom" className="w-48">
                   <DropdownMenuItem
                     className="gap-x-2"
                     onClick={() => setShowRegenerateSecretConfirm(true)}
                   >
-                    <RotateCw size={14} />
+                    <RotateCw size={14} className="text-foreground-lighter" />
                     <span>Regenerate secret</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="gap-x-2"
                     onClick={() => setEndpointIdPendingDelete(selectedEndpoint.id)}
                   >
-                    <Trash2 size={14} />
+                    <Trash2 size={14} className="text-foreground-lighter" />
                     <span>Delete endpoint</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -373,6 +401,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                 deliverySearch={deliverySearch}
                 filteredDeliveries={filteredDeliveries}
                 selectedEndpoint={selectedEndpoint}
+                onCopyUrl={() => handleCopy(selectedEndpoint.url, 'endpoint URL')}
                 onDeliverySearchChange={setDeliverySearch}
                 onOpenDelivery={(id) => {
                   setDeliveryDetailsTab('event')
@@ -420,14 +449,13 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete endpoint</AlertDialogTitle>
-            <AlertDialogDescription>
-              {endpointPendingDelete
-                ? endpointPendingDelete.name.trim().length > 0
-                  ? `This will delete endpoint "${endpointPendingDeleteDisplayName}" with URL ${endpointPendingDelete.url}. This action cannot be undone.`
-                  : `This will delete endpoint ${endpointPendingDelete.url}. This action cannot be undone.`
-                : 'This action cannot be undone.'}
-            </AlertDialogDescription>
+            <AlertDialogDescription>{deleteEndpointDescription}</AlertDialogDescription>
           </AlertDialogHeader>
+          {endpointPendingDelete && (
+            <pre className="mx-5 -mt-1 mb-5 overflow-auto whitespace-nowrap rounded-md border border-muted bg-surface-200 px-4 py-3 font-mono text-xs tracking-tight text-foreground">
+              {endpointPendingDelete.url}
+            </pre>
+          )}
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction variant="danger" onClick={handleDeleteEndpoint}>
@@ -474,7 +502,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
           {/* Content */}
           <div className="space-y-4 mx-5 pb-5">
             <div className="space-y-1">
-              <Label_Shadcn_>Signing secret</Label_Shadcn_>
+              <Label>Signing secret</Label>
               <Input
                 copy
                 readOnly

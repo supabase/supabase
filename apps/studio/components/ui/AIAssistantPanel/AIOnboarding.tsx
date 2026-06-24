@@ -1,13 +1,13 @@
+import { useParams } from 'common'
 import { motion } from 'framer-motion'
 import { BarChart, FileText, Shield } from 'lucide-react'
-
-import { useParams } from 'common'
-import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import { createLintSummaryPrompt } from 'components/interfaces/Linter/Linter.utils'
-import { type Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { Button, Skeleton } from 'ui'
+
 import { codeSnippetPrompts, defaultPrompts } from './AIAssistant.prompts'
 import type { SqlSnippet } from './AIAssistant.types'
+import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
+import { createLintSummaryPrompt } from '@/components/interfaces/Linter/Linter.utils'
+import { useProjectLintsQuery, type Lint } from '@/data/lint/lint-query'
 
 interface AIOnboardingProps {
   sqlSnippets?: SqlSnippet[]
@@ -29,7 +29,7 @@ export const AIOnboarding = ({
     ? suggestions.prompts.map((suggestion) => ({
         title: suggestion.label,
         prompt: suggestion.description,
-        icon: <FileText strokeWidth={1.25} size={14} className="!w-4 !h-4" />,
+        icon: <FileText strokeWidth={1.25} size={14} className="w-4! h-4!" />,
       }))
     : sqlSnippets && sqlSnippets.length > 0
       ? codeSnippetPrompts
@@ -65,7 +65,7 @@ export const AIOnboarding = ({
                 >
                   <Button
                     size="small"
-                    type="text"
+                    variant="text"
                     className="w-full justify-start border-b hover:border-b-0 hover:rounded-md rounded-none"
                     icon={
                       <FileText strokeWidth={1.5} size={14} className="text-foreground-light" />
@@ -100,7 +100,7 @@ export const AIOnboarding = ({
                           <Button
                             key={`${lint.name}-${index}`}
                             size="small"
-                            type="text"
+                            variant="text"
                             className="w-full justify-start"
                             icon={
                               <BarChart
@@ -131,7 +131,7 @@ export const AIOnboarding = ({
                           <Button
                             key={`${lint.name}-${index}`}
                             size="small"
-                            type="text"
+                            variant="text"
                             className="w-full justify-start"
                             icon={<Shield strokeWidth={1.5} size={14} className="text-warning" />}
                             onClick={() => {
@@ -152,7 +152,7 @@ export const AIOnboarding = ({
                       <Button
                         key={`${item.title}-${index}`}
                         size="small"
-                        type="text"
+                        variant="text"
                         className="w-full justify-start"
                         icon={
                           <FileText strokeWidth={1.5} size={14} className="text-foreground-light" />

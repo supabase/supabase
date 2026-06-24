@@ -1,21 +1,24 @@
-import { useParams } from 'common'
-import { Destinations } from 'components/interfaces/Database/Replication/Destinations'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { PipelineRequestStatusProvider } from 'state/replication-pipeline-request-status'
-import type { NextPageWithLayout } from 'types'
+import { Admonition } from 'ui-patterns/admonition'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { Destinations } from '@/components/interfaces/Database/Replication/Destinations'
 import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
+import { EmptyReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram/EmptyReplicationDiagram'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
+import type { NextPageWithLayout } from '@/types'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
-  const { ref } = useParams()
+  const { data: selectedProject, isPending } = useSelectedProjectQuery()
   const showPgReplicate = useIsFeatureEnabled('database:replication')
 
   if (!showPgReplicate) {
-    return <UnknownInterface urlBack={`/project/${ref}/database/schemas`} />
+    return <UnknownInterface urlBack={`/project/${selectedProject?.ref}/database/schemas`} />
   }
 
   return (
@@ -34,13 +37,45 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
         </ScaffoldSection>
       </ScaffoldContainer>
 
-      <ReplicationDiagram />
+      {isPending ? (
+        <ScaffoldContainer>
+          <GenericSkeletonLoader />
+        </ScaffoldContainer>
+      ) : selectedProject?.high_availability ? (
+        <>
+          <EmptyReplicationDiagram />
 
-      <ScaffoldContainer>
-        <ScaffoldSection isFullWidth className="!pt-6">
-          <Destinations />
-        </ScaffoldSection>
-      </ScaffoldContainer>
+          <ScaffoldContainer>
+            <ScaffoldSection isFullWidth className="pt-6!">
+              <Admonition
+                variant="default"
+                title="Replication is not available for High Availability projects"
+              >
+                Replication is not currently available for projects with High Availability. Please
+                contact{' '}
+                <a
+                  href="https://supabase.com/support"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline"
+                >
+                  support
+                </a>{' '}
+                if you are interested in using this feature with your High Availability project.
+              </Admonition>
+            </ScaffoldSection>
+          </ScaffoldContainer>
+        </>
+      ) : (
+        <>
+          <ReplicationDiagram />
+          <ScaffoldContainer>
+            <ScaffoldSection isFullWidth className="pt-6!">
+              <Destinations />
+            </ScaffoldSection>
+          </ScaffoldContainer>
+        </>
+      )}
     </PipelineRequestStatusProvider>
   )
 }

@@ -1,15 +1,13 @@
 import { ColumnDef } from '@tanstack/react-table'
+import { Checkbox, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { DataTableColumnHeader } from 'components/ui/DataTable/DataTableColumn/DataTableColumnHeader'
-import { DataTableColumnLevelIndicator } from 'components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
-import { DataTableColumnStatusCode } from 'components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
 import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
-import { AuthUserHoverCard } from './AuthUserHoverCard'
+import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
+import { parseAuthLogEventMessage } from '../UnifiedLogs.utils'
 import { HoverCardTimestamp } from './HoverCardTimestamp'
 import { LogTypeIcon } from './LogTypeIcon'
-import { TextWithTooltip } from './TextWithTooltip'
+import { DataTableColumnLevelIndicator } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnLevelIndicator'
+import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 
 /**
  * Determines if a column should be hidden based on its values in the data.
@@ -32,7 +30,7 @@ function shouldHideColumn(data: ColumnSchema[], columnKey: keyof ColumnSchema): 
 }
 
 // Generate dynamic columns based on data
-export function generateDynamicColumns(data: ColumnSchema[]): {
+export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
   columns: ColumnDef<ColumnSchema>[]
   columnVisibility: Record<string, boolean>
 } {
@@ -41,6 +39,32 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
   const hideEventMessage = shouldHideColumn(data, 'event_message')
 
   const columns: ColumnDef<ColumnSchema>[] = [
+    {
+      accessorKey: 'select',
+      header: '',
+      cell: ({ row }) => {
+        return (
+          <div className="flex items-center justify-center">
+            <Checkbox
+              checked={row.getIsSelected()}
+              onCheckedChange={(value) => row.toggleSelected(!!value)}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        )
+      },
+      enableHiding: false,
+      enableResizing: false,
+      enableSorting: false,
+      filterFn: (_row, _columnId, _filterValue) => true,
+      size: 48,
+      minSize: 48,
+      maxSize: 48,
+      meta: {
+        cellClassName: 'w-[32px]',
+        headerClassName: 'w-[32px]',
+      },
+    },
     // Level column - always visible
     {
       accessorKey: 'level',
@@ -52,7 +76,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
       enableHiding: false,
       enableResizing: false,
       enableSorting: false,
-      filterFn: (row, columnId, filterValue) => true,
+      filterFn: (_row, _columnId, _filterValue) => true,
       size: 48,
       minSize: 48,
       maxSize: 48,
@@ -64,20 +88,21 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
     // Date column - always visible
     {
       accessorKey: 'date',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Date" />,
+      header: 'Date',
       cell: ({ row }) => {
         const date = new Date(row.getValue<ColumnSchema['date']>('date'))
         return <HoverCardTimestamp date={date} />
       },
-      filterFn: (row, columnId, filterValue) => true,
+      filterFn: (_row, _columnId, _filterValue) => true,
       enableResizing: false,
       enableSorting: false,
-      size: 130,
-      minSize: 130,
-      maxSize: 130,
+      size: 140,
+      minSize: 140,
+      maxSize: 140,
       meta: {
-        cellClassName: 'font-mono w-[130px]',
-        headerClassName: 'w-[130px]',
+        cellClassName: 'font-mono tracking-tight w-[140px]',
+        headerClassName: 'w-[140px]',
+        dataType: 'date',
       },
     },
     // Log type column - always visible
@@ -93,7 +118,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
         )
       },
       enableHiding: false,
-      filterFn: (row, columnId, filterValue) => true,
+      filterFn: (_row, _columnId, _filterValue) => true,
       enableResizing: false,
       enableSorting: false,
       size: 40,
@@ -144,7 +169,7 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
           </div>
         )
       },
-      filterFn: (row, columnId, filterValue) => true,
+      filterFn: (_row, _columnId, _filterValue) => true,
       enableResizing: false,
       enableSorting: false,
       size: 70,
@@ -159,46 +184,56 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
     {
       accessorKey: 'method',
       header: 'Method',
-      filterFn: 'arrIncludesSome',
+      // Filtering is server-side via the `filter` URL param, like every other
+      // column in this table. The built-in `arrIncludesSome` would receive the
+      // wrapped { operator, values } shape and reject it.
+      filterFn: (_row, _columnId, _filterValue) => true,
       cell: ({ row }) => {
         const value = row.getValue<ColumnSchema['method']>('method')
         return <span className="text-foreground-lighter">{value}</span>
       },
       enableResizing: false,
       enableSorting: false,
-      size: 70,
-      minSize: 70,
-      maxSize: 70,
+      size: 64,
+      minSize: 64,
+      maxSize: 64,
       meta: {
-        cellClassName: 'w-[70px]',
-        headerClassName: 'w-[70px]',
+        cellClassName: 'font-mono tracking-tight w-[64px]',
+        headerClassName: 'w-[64px]',
       },
     },
     // Pathname column - controlled by columnVisibility
     {
       accessorKey: 'pathname',
       header: 'Pathname',
-      cell: ({ row }) => {
-        const value = row.getValue<ColumnFilterSchema['pathname']>('pathname') ?? ''
-        return <TextWithTooltip text={value} />
-      },
       enableSorting: false,
       enableResizing: false,
-      size: 200,
-      minSize: 200,
-      maxSize: 200,
+      size: 250,
+      minSize: 250,
+      maxSize: 250,
       meta: {
-        cellClassName: 'max-w-[320px]',
-        headerClassName: 'max-w-[320px]',
+        cellClassName: 'font-mono tracking-tight w-[250px]',
+        headerClassName: 'w-[250px]',
+      },
+      cell: ({ row }) => {
+        const value = row.getValue<ColumnFilterSchema['pathname']>('pathname') ?? ''
+        return value
       },
     },
     // Event message column - controlled by columnVisibility
     {
       accessorKey: 'event_message',
-      header: ({ column }) => <DataTableColumnHeader column={column} title="Event message" />,
+      header: 'Event message',
+      // No client-side filterFn — event_message uses server-side LIKE/ILIKE via
+      // the `filter` URL param (see translateFilter in UnifiedLogs.queries.ts).
+      // We still need a no-op so TanStack's default `includesString` doesn't run
+      // against the wrapped { operator, values } shape we write.
+      filterFn: () => true,
       cell: ({ row }) => {
         const value = row.getValue<ColumnSchema['event_message']>('event_message')
+        const logType = row.original.log_type
         const logCount = row.original.log_count
+        const displayMessage = logType === 'auth' ? parseAuthLogEventMessage(value) : value
 
         return (
           <div className="flex flex-row gap-2 items-center">
@@ -214,9 +249,11 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
                 </TooltipContent>
               </Tooltip>
             )}
-            {value && (
-              <span className="text-muted-foreground">
-                <TextWithTooltip text={value} />
+            {displayMessage && (
+              <span
+                className={cn('text-muted-foreground', logType === 'auth' && 'capitalize-sentence')}
+              >
+                {displayMessage}
               </span>
             )}
           </div>
@@ -227,6 +264,9 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
       size: 200,
       minSize: 200,
       maxSize: 400,
+      meta: {
+        cellClassName: 'font-mono tracking-tight',
+      },
     },
   ]
 
@@ -241,4 +281,6 @@ export function generateDynamicColumns(data: ColumnSchema[]): {
 }
 
 // Static fallback columns
-export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = generateDynamicColumns([]).columns
+export const UNIFIED_LOGS_COLUMNS: ColumnDef<ColumnSchema>[] = generateDynamicColumns({
+  data: [],
+}).columns

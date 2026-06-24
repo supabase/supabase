@@ -4,7 +4,7 @@ import rehypeSlug from 'rehype-slug'
 
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { genGuideMeta, removeRedundantH1 } from '~/features/docs/GuidesMdx.utils'
-import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
+import { getGitHubFileContents } from '~/lib/octokit'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
@@ -83,23 +83,9 @@ const getContent = async ({ slug }: Params) => {
 
   const editLink = newEditLink(`${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`)
 
-  let response: Response
-  try {
-    response = await fetchRevalidatePerDay(
-      `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
-    )
-  } catch (err) {
-    throw new Error(`Failed to fetch Python vecs docs from GitHub (network error): ${err}`)
-  }
-
-  if (!response.ok) {
-    throw new Error(
-      `Failed to fetch Python vecs docs from GitHub: ${response.status} ${response.statusText}`
-    )
-  }
-
-  let content = await response.text()
-  content = removeRedundantH1(content)
+  const content = removeRedundantH1(
+    await getGitHubFileContents({ org, repo, path: `${docsDir}/${remoteFile}`, branch })
+  )
 
   return {
     pathname: `/guides/ai/python/${slug}` satisfies `/${string}`,

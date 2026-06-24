@@ -1,16 +1,15 @@
 'use client'
 
 import { addDays, format } from 'date-fns'
-import { Calendar as CalendarIcon } from 'lucide-react'
 import * as React from 'react'
 import { DateRange } from 'react-day-picker'
+import { Calendar } from 'ui'
 import {
-  Button,
-  Calendar,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-} from 'ui'
+  DatePicker,
+  DatePickerButton,
+  DatePickerContent,
+  DatePickerTrigger,
+} from 'ui-patterns/DatePicker'
 
 import { cn } from '@/lib/utils'
 
@@ -22,17 +21,9 @@ export default function DatePickerWithRange({ className }: React.HTMLAttributes<
 
   return (
     <div className={cn('grid gap-2', className)}>
-      <Popover_Shadcn_>
-        <PopoverTrigger_Shadcn_ asChild>
-          <Button
-            id="date"
-            type={'outline'}
-            className={cn(
-              'w-[300px] justify-start text-left font-normal',
-              !date && 'text-muted-foreground'
-            )}
-            icon={<CalendarIcon className="h-4 w-4" />}
-          >
+      <DatePicker>
+        <DatePickerTrigger asChild>
+          <DatePickerButton variant="outline" className="w-[300px]">
             {date?.from ? (
               date.to ? (
                 <>
@@ -44,9 +35,9 @@ export default function DatePickerWithRange({ className }: React.HTMLAttributes<
             ) : (
               <span>Pick a date</span>
             )}
-          </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
+          </DatePickerButton>
+        </DatePickerTrigger>
+        <DatePickerContent>
           <Calendar
             initialFocus
             mode="range"
@@ -55,8 +46,8 @@ export default function DatePickerWithRange({ className }: React.HTMLAttributes<
             onSelect={setDate}
             numberOfMonths={2}
           />
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </DatePickerContent>
+      </DatePicker>
     </div>
   )
 }

@@ -1,10 +1,10 @@
-import { getTableIndexAdvisorSql } from '@supabase/pg-meta'
+import { getTableIndexAdvisorSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { filterProtectedSchemaIndexStatements } from 'components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
 
 import { databaseKeys } from './keys'
+import { filterProtectedSchemaIndexStatements } from '@/components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type TableIndexAdvisorVariables = {
   projectRef?: string
@@ -14,11 +14,11 @@ export type TableIndexAdvisorVariables = {
 }
 
 export type IndexAdvisorSuggestion = {
-  query: string
+  query: SafeSqlFragment
   calls: number
   total_time: number
   mean_time: number
-  index_statements: string[]
+  index_statements: SafeSqlFragment[]
   startup_cost_before: number
   startup_cost_after: number
   total_cost_before: number
@@ -66,6 +66,18 @@ function extractColumnsFromIndexStatements(indexStatements: string[]): string[] 
   return Array.from(columns)
 }
 
+interface GetTableIndexAdvisorSuggestionsResponse {
+  query: SafeSqlFragment
+  calls: number
+  total_time: number
+  mean_time: number
+  index_statements: SafeSqlFragment[]
+  startup_cost_before: number
+  startup_cost_after: number
+  total_cost_before: number
+  total_cost_after: number
+}
+
 export async function getTableIndexAdvisorSuggestions({
   projectRef,
   connectionString,
@@ -78,19 +90,7 @@ export async function getTableIndexAdvisorSuggestions({
 
   const sql = getTableIndexAdvisorSql(schema, table)
 
-  const { result } = await executeSql<
-    Array<{
-      query: string
-      calls: number
-      total_time: number
-      mean_time: number
-      index_statements: string[]
-      startup_cost_before: number
-      startup_cost_after: number
-      total_cost_before: number
-      total_cost_after: number
-    }>
-  >({
+  const { result } = await executeSql<Array<GetTableIndexAdvisorSuggestionsResponse>>({
     projectRef,
     connectionString,
     sql,

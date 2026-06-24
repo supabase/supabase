@@ -1,9 +1,4 @@
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { AiAssistantDropdown } from 'components/ui/AiAssistantDropdown'
 import { Check, ChevronDown, Copy, X as XIcon } from 'lucide-react'
-import { useMemo } from 'react'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   Button,
   DropdownMenu,
@@ -14,12 +9,20 @@ import {
 
 import type { LogData, QueryType } from './Logs.types'
 import { buildLogsPrompt } from './Logs.utils'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
+import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+
+export type LogCopyFormat = 'json' | 'markdown' | 'csv'
 
 interface MultiSelectActionBarProps {
   selectedRows: Set<string>
   selectedRowsData: LogData[]
-  copiedFormat: 'json' | 'markdown' | null
-  onCopy: (format: 'json' | 'markdown') => void
+  copiedFormat: LogCopyFormat | null
+  onCopy: (format: LogCopyFormat) => void
   onClear: () => void
   queryType?: QueryType
   sqlQuery?: string
@@ -58,7 +61,7 @@ export function MultiSelectActionBar({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              type="default"
+              variant="default"
               size="tiny"
               icon={copiedFormat ? <Check size={12} className="text-brand" /> : <Copy size={12} />}
               iconRight={<ChevronDown size={11} />}
@@ -66,14 +69,21 @@ export function MultiSelectActionBar({
               {copiedFormat ? 'Copied!' : 'Copy'}
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-44">
-            <DropdownMenuItem onClick={() => onCopy('json')} className="gap-2 text-xs">
+          <DropdownMenuContent align="end" className="w-60">
+            <DropdownMenuItem onClick={() => onCopy('json')} className="gap-x-2">
               <Copy size={13} />
-              Copy as JSON
+              <p>Copy as JSON</p>
+              <ShortcutBadge shortcutId={SHORTCUT_IDS.RESULTS_COPY_JSON} className="ml-auto" />
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => onCopy('markdown')} className="gap-2 text-xs">
+            <DropdownMenuItem onClick={() => onCopy('markdown')} className="gap-x-2">
               <Copy size={13} />
-              Copy as Markdown
+              <p>Copy as Markdown</p>
+              <ShortcutBadge shortcutId={SHORTCUT_IDS.RESULTS_COPY_MARKDOWN} className="ml-auto" />
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onCopy('csv')} className="gap-x-2">
+              <Copy size={13} />
+              <p>Copy as CSV</p>
+              <ShortcutBadge shortcutId={SHORTCUT_IDS.RESULTS_COPY_CSV} className="ml-auto" />
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -86,7 +96,7 @@ export function MultiSelectActionBar({
         />
 
         <Button
-          type="text"
+          variant="text"
           size="tiny"
           icon={<XIcon size={12} />}
           onClick={onClear}

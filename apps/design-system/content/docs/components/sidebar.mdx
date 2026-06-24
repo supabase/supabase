@@ -571,7 +571,7 @@ The following example adds a `<DropdownMenu>` to the `SidebarHeader`.
               <ChevronDown className="ml-auto" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-[--radix-popper-anchor-width]">
+          <DropdownMenuContent className="w-(--radix-popper-anchor-width)">
             <DropdownMenuItem>
               <span>Acme Inc</span>
             </DropdownMenuItem>
@@ -622,7 +622,7 @@ export function AppSidebar() {
                     <ChevronUp className="ml-auto" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
+                <DropdownMenuContent side="top" className="w-(--radix-popper-anchor-width)">
                   <DropdownMenuItem>
                     <span>Account</span>
                   </DropdownMenuItem>
@@ -724,7 +724,7 @@ export function AppSidebar() {
         <SidebarGroupLabel asChild>
           <CollapsibleTrigger>
             Help
-            <ChevronDown className="ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180" />
+            <ChevronDown className="ml-auto transition-transform group-data-open/collapsible:rotate-180" />
           </CollapsibleTrigger>
         </SidebarGroupLabel>
         <CollapsibleContent>

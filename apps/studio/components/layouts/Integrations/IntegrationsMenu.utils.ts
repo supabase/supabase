@@ -1,4 +1,4 @@
-import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
+import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.types'
 
 export function generateIntegrationsMenu({
   projectRef,

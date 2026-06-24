@@ -1,18 +1,19 @@
 import pgMeta from '@supabase/pg-meta'
+import { joinSqlFragments, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { invalidateTablePrivilegesQuery } from './table-privileges-query'
+import type { ConnectionVars } from '@/data/common.types'
+import { lintKeys } from '@/data/lint/keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import {
   API_ACCESS_ROLES,
   API_PRIVILEGE_TYPES,
   type ApiPrivilegesByRole,
 } from '@/lib/data-api-types'
 import type { DeepReadonly } from '@/lib/type-helpers'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { UseCustomMutationOptions } from 'types'
-import type { ConnectionVars } from '../common.types'
-import { lintKeys } from '../lint/keys'
-import { invalidateTablePrivilegesQuery } from './table-privileges-query'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type TableApiAccessPrivilegesVariables = ConnectionVars & {
   relationId: number
@@ -25,7 +26,7 @@ export async function updateTableApiAccessPrivileges({
   relationId,
   privileges,
 }: TableApiAccessPrivilegesVariables) {
-  const sqlStatements: string[] = []
+  const sqlStatements: Array<SafeSqlFragment> = []
 
   for (const role of API_ACCESS_ROLES) {
     const rolePrivileges = privileges[role]
@@ -41,7 +42,7 @@ export async function updateTableApiAccessPrivileges({
         privilegeType,
         relationId,
       }))
-      const revokeSql = pgMeta.tablePrivileges.revoke(revokeGrants).sql.trim()
+      const revokeSql = pgMeta.tablePrivileges.revoke(revokeGrants).sql
       if (revokeSql) sqlStatements.push(revokeSql)
     }
 
@@ -52,7 +53,7 @@ export async function updateTableApiAccessPrivileges({
         privilegeType,
         relationId,
       }))
-      const grantSql = pgMeta.tablePrivileges.grant(grantGrants).sql.trim()
+      const grantSql = pgMeta.tablePrivileges.grant(grantGrants).sql
       if (grantSql) sqlStatements.push(grantSql)
     }
   }
@@ -64,7 +65,7 @@ export async function updateTableApiAccessPrivileges({
   const { result } = await executeSql<[]>({
     projectRef,
     connectionString,
-    sql: sqlStatements.join('\n'),
+    sql: joinSqlFragments(sqlStatements, '\n'),
     queryKey: ['table-api-access', 'update-privileges'],
   })
 

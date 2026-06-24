@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { ident, literal } from './pg-format'
+import { ident, literal, safeSql, type SafeSqlFragment } from './pg-format'
 import { EXTENSIONS_SQL } from './sql/extensions'
 
 const pgExtensionZod = z.object({
@@ -23,15 +23,15 @@ function list({
   limit?: number
   offset?: number
 } = {}): {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgExtensionArrayZod
 } {
   let sql = EXTENSIONS_SQL
   if (limit) {
-    sql = `${sql} LIMIT ${limit}`
+    sql = safeSql`${sql} LIMIT ${literal(limit)}`
   }
   if (offset) {
-    sql = `${sql} OFFSET ${offset}`
+    sql = safeSql`${sql} OFFSET ${literal(offset)}`
   }
   return {
     sql,
@@ -40,10 +40,10 @@ function list({
 }
 
 function retrieve({ name }: { name: string }): {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgExtensionOptionalZod
 } {
-  const sql = `${EXTENSIONS_SQL} WHERE name = ${literal(name)};`
+  const sql = safeSql`${EXTENSIONS_SQL} WHERE name = ${literal(name)};`
   return {
     sql,
     zod: pgExtensionOptionalZod,
@@ -58,13 +58,13 @@ type ExtensionCreateParams = {
 }
 
 function create({ name, schema, version, cascade = false }: ExtensionCreateParams): {
-  sql: string
+  sql: SafeSqlFragment
 } {
-  const sql = `
+  const sql = safeSql`
 CREATE EXTENSION ${ident(name)}
-  ${schema === undefined ? '' : `SCHEMA ${ident(schema)}`}
-  ${version === undefined ? '' : `VERSION ${literal(version)}`}
-  ${cascade ? 'CASCADE' : ''};`
+  ${schema === undefined ? safeSql`` : safeSql`SCHEMA ${ident(schema)}`}
+  ${version === undefined ? safeSql`` : safeSql`VERSION ${literal(version)}`}
+  ${cascade ? safeSql`CASCADE` : safeSql``};`
   return { sql }
 }
 
@@ -77,17 +77,19 @@ type ExtensionUpdateParams = {
 function update(
   name: string,
   { update = false, version, schema }: ExtensionUpdateParams
-): { sql: string } {
-  let updateSql = ''
+): { sql: SafeSqlFragment } {
+  let updateSql = safeSql``
   if (update) {
-    updateSql = `ALTER EXTENSION ${ident(name)} UPDATE ${
-      version === undefined ? '' : `TO ${literal(version)}`
+    updateSql = safeSql`ALTER EXTENSION ${ident(name)} UPDATE ${
+      version === undefined ? safeSql`` : safeSql`TO ${literal(version)}`
     };`
   }
   const schemaSql =
-    schema === undefined ? '' : `ALTER EXTENSION ${ident(name)} SET SCHEMA ${ident(schema)};`
+    schema === undefined
+      ? safeSql``
+      : safeSql`ALTER EXTENSION ${ident(name)} SET SCHEMA ${ident(schema)};`
 
-  const sql = `BEGIN; ${updateSql} ${schemaSql} COMMIT;`
+  const sql = safeSql`BEGIN; ${updateSql} ${schemaSql} COMMIT;`
   return { sql }
 }
 
@@ -95,8 +97,13 @@ type ExtensionRemoveParams = {
   cascade?: boolean
 }
 
-function remove(name: string, { cascade = false }: ExtensionRemoveParams = {}): { sql: string } {
-  const sql = `DROP EXTENSION ${ident(name)} ${cascade ? 'CASCADE' : 'RESTRICT'};`
+function remove(
+  name: string,
+  { cascade = false }: ExtensionRemoveParams = {}
+): {
+  sql: SafeSqlFragment
+} {
+  const sql = safeSql`DROP EXTENSION ${ident(name)} ${cascade ? safeSql`CASCADE` : safeSql`RESTRICT`};`
   return { sql }
 }
 

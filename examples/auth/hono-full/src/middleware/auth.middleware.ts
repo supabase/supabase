@@ -4,9 +4,11 @@ import type { Context, MiddlewareHandler } from 'hono'
 import { env } from 'hono/adapter'
 import { setCookie } from 'hono/cookie'
 
+import type { Database } from '../database.types'
+
 declare module 'hono' {
   interface ContextVariableMap {
-    supabase: SupabaseClient
+    supabase: SupabaseClient<Database>
   }
 }
 
@@ -16,7 +18,7 @@ export const getSupabase = (c: Context) => {
 
 type SupabaseEnv = {
   VITE_SUPABASE_URL: string
-  VITE_SUPABASE_ANON_KEY: string
+  VITE_SUPABASE_PUBLISHABLE_KEY: string
 }
 
 export const supabaseMiddleware = (): MiddlewareHandler => {
@@ -24,14 +26,14 @@ export const supabaseMiddleware = (): MiddlewareHandler => {
     const supabaseEnv = env<SupabaseEnv>(c)
     const supabaseUrl = supabaseEnv.VITE_SUPABASE_URL ?? import.meta.env.VITE_SUPABASE_URL
     const supabasePublishableKey =
-      supabaseEnv.VITE_SUPABASE_ANON_KEY ?? import.meta.env.VITE_SUPABASE_ANON_KEY
+      supabaseEnv.VITE_SUPABASE_PUBLISHABLE_KEY ?? import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 
     if (!supabaseUrl) {
       throw new Error('SUPABASE_URL missing!')
     }
 
     if (!supabasePublishableKey) {
-      throw new Error('SUPABASE_ANON_KEY missing!')
+      throw new Error('SUPABASE_PUBLISHABLE_KEY missing!')
     }
 
     const supabase = createServerClient(supabaseUrl, supabasePublishableKey, {
@@ -39,8 +41,9 @@ export const supabaseMiddleware = (): MiddlewareHandler => {
         getAll() {
           return parseCookieHeader(c.req.header('Cookie') ?? '')
         },
-        setAll(cookiesToSet) {
+        setAll(cookiesToSet, cacheHeaders) {
           cookiesToSet.forEach(({ name, value, options }) => setCookie(c, name, value, options))
+          Object.entries(cacheHeaders).forEach(([key, value]) => c.header(key, value))
         },
       },
     })

@@ -1,7 +1,8 @@
-import { describe, it, expect } from 'vitest'
-import { Service } from 'data/graphql/graphql'
 import { ERROR_CODE_DOCS_URLS } from 'shared-data'
+import { describe, expect, it } from 'vitest'
+
 import { getErrorCodeInfo } from './ErrorCodeTooltip.utils'
+import { Service } from '@/data/graphql/graphql'
 
 describe('getErrorCodeInfo', () => {
   describe('when service is undefined', () => {

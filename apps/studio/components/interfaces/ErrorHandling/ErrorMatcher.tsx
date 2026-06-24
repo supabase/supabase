@@ -1,9 +1,9 @@
 'use client'
 
-import { useTrack } from 'lib/telemetry/track'
-import { ErrorDisplay, SupportFormParams } from 'ui-patterns/ErrorDisplay'
+import { ErrorDisplay, SupportFormParams } from 'ui-patterns/ErrorDisplay/ErrorDisplay'
 
 import { getMappingForError } from './ErrorMatcher.utils'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface ErrorMatcherProps {
   title: string
@@ -26,11 +26,13 @@ export function ErrorMatcher({ title, error, supportFormParams, className }: Err
       supportFormParams={supportFormParams}
       className={className}
       onRender={() => {
-        track('dashboard_error_created', {
-          source: 'error_display',
-          errorType: mapping?.id,
-          hasTroubleshooting: !!mapping,
-        })
+        if (Math.random() < 0.1) {
+          track('dashboard_error_created', {
+            source: 'error_display',
+            errorType: mapping?.id,
+            hasTroubleshooting: !!mapping,
+          })
+        }
         if (mapping) {
           track('inline_error_troubleshooter_exposed', { errorType: mapping.id })
         }

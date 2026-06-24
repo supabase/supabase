@@ -1,20 +1,13 @@
-import { ACCESS_TOKEN_RESOURCES } from 'components/interfaces/Account/AccessTokens/AccessToken.constants'
-import { formatAccessText } from 'components/interfaces/Account/AccessTokens/AccessToken.utils'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
 import { ChevronDown, RotateCcw, X } from 'lucide-react'
 import { Path, PathValue } from 'react-hook-form'
-import {
-  Button,
-  Checkbox_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  WarningIcon,
-} from 'ui'
+import { Button, Checkbox, Popover, PopoverContent, PopoverTrigger, WarningIcon } from 'ui'
 
 import { PermissionResourceSelector } from './PermissionResourceSelector'
 import { PermissionRow, PermissionsFormValues, PermissionsProps } from './Permissions.types'
 import { sortActions } from './Permissions.utils'
+import { ACCESS_TOKEN_RESOURCES } from '@/components/interfaces/Account/AccessTokens/AccessToken.constants'
+import { formatAccessText } from '@/components/interfaces/Account/AccessTokens/AccessToken.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 export const Permissions = <TFormValues extends PermissionsFormValues = PermissionsFormValues>({
   setValue,
@@ -32,7 +25,7 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
           <div className="flex items-center gap-2">
             {permissionRows.length > 0 && (
               <ButtonTooltip
-                type="default"
+                variant="default"
                 size="tiny"
                 className="p-1"
                 onClick={() => {
@@ -86,10 +79,10 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                     </div>
                     <div className="flex items-center gap-2">
                       {selectedResource && (
-                        <Popover_Shadcn_>
-                          <PopoverTrigger_Shadcn_ asChild>
+                        <Popover>
+                          <PopoverTrigger asChild>
                             <Button
-                              type="default"
+                              variant="default"
                               size="tiny"
                               className="w-[150px] flex text-sm justify-between h-7 "
                               iconRight={
@@ -104,15 +97,15 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                                 `${row.actions.length} selected`
                               )}
                             </Button>
-                          </PopoverTrigger_Shadcn_>
-                          <PopoverContent_Shadcn_ className="w-[180px] p-2" align="end">
+                          </PopoverTrigger>
+                          <PopoverContent className="w-[180px] p-2" align="end">
                             <div className="space-y-2">
                               {sortActions(selectedResource.actions).map((action) => (
                                 <label
                                   key={action}
                                   className="flex items-center gap-2 cursor-pointer"
                                 >
-                                  <Checkbox_Shadcn_
+                                  <Checkbox
                                     checked={row.actions.includes(action)}
                                     onCheckedChange={(checked) => {
                                       const newActions = checked
@@ -134,11 +127,11 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                                 </label>
                               ))}
                             </div>
-                          </PopoverContent_Shadcn_>
-                        </Popover_Shadcn_>
+                          </PopoverContent>
+                        </Popover>
                       )}
                       <Button
-                        type="text"
+                        variant="text"
                         size="tiny"
                         className="p-1"
                         onClick={() => {

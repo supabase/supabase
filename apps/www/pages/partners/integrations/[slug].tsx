@@ -1,28 +1,30 @@
-import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
+import { remarkCodeHike, type CodeHikeConfig } from '@code-hike/mdx'
 import { CH } from '@code-hike/mdx/components'
 import { ChevronLeft, ExternalLink } from 'lucide-react'
 import { type GetStaticPaths, type GetStaticProps } from 'next'
-import { MDXRemote, type MDXRemoteSerializeResult } from 'next-mdx-remote'
-import { serialize } from 'next-mdx-remote/serialize'
+import type { SerializeResult as MDXRemoteSerializeResult } from 'next-mdx-remote-client'
+import { MDXClient } from 'next-mdx-remote-client/csr'
+import { serialize } from 'next-mdx-remote-client/serialize'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
-import { type Dispatch, type SetStateAction, useState } from 'react'
+import { useState, type Dispatch, type SetStateAction } from 'react'
 import remarkGfm from 'remark-gfm'
-import 'swiper/css'
-import { Swiper, SwiperSlide } from 'swiper/react'
 
-import { useBreakpoint } from 'common'
-import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
-import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
-import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+import 'swiper/css'
 
 import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import supabase from '~/lib/supabaseMisc'
-import type { Partner } from '~/types/partners'
+import { getPartner, listPartnerSlugs } from '~/lib/marketplaceDb'
+import { type Partner } from '~/types/partners'
+import { useBreakpoint } from 'common'
+import codeHikeTheme from 'config/code-hike.theme.json' with { type: 'json' }
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+
 import Error404 from '../../404'
 
 /**
@@ -38,20 +40,19 @@ function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
     img: (
       props: React.DetailedHTMLProps<React.ImgHTMLAttributes<HTMLImageElement>, HTMLImageElement>
     ) => {
-      return <img {...props} onClick={() => callback(props.src!)} />
+      return <img {...props} onClick={() => callback(props.src!.toString())} />
     },
   }
 
   return components
 }
 
-function Partner({
-  partner,
-  overview,
-}: {
+type PartnerData = {
   partner: Partner
   overview: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>
-}) {
+}
+
+function Partner({ partner, overview }: PartnerData) {
   const [focusedImage, setFocusedImage] = useState<string | null>(null)
   const isNarrow = useBreakpoint('lg')
 
@@ -79,7 +80,7 @@ function Partner({
           visible
           onCancel={() => setFocusedImage(null)}
           size="xxlarge"
-          className="w-full outline-none"
+          className="w-full outline-hidden"
         >
           <Image
             layout="responsive"
@@ -93,7 +94,7 @@ function Partner({
       ) : null}
       <DefaultLayout>
         <SectionContainer>
-          <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-10 lg:col-span-2">
+          <div className="col-span-12 mx-auto mb-2 space-y-10 lg:col-span-2">
             {/* Back button */}
             <Link
               href="/partners/integrations"
@@ -108,7 +109,7 @@ function Partner({
                 layout="fixed"
                 width={56}
                 height={56}
-                className="bg-surface-200 flex-shrink-f0 h-14 w-14 rounded-full"
+                className="bg-surface-200 shrink-f0 h-14 w-14 rounded-full"
                 src={partner.logo}
                 alt={partner.title}
               />
@@ -118,10 +119,10 @@ function Partner({
             </div>
 
             <div
-              className="bg-gradient-to-t from-background-alternative to-background border-b p-6 [&_.swiper-container]:overflow-visible"
+              className="bg-linear-to-t from-background-alternative to-background border-b p-6 [&_.swiper-container]:overflow-visible"
               style={{ marginLeft: 'calc(50% - 50vw)', marginRight: 'calc(50% - 50vw)' }}
             >
-              <SectionContainer className="!py-0 !px-3 lg:!px-12 xl:!p-0 mx-auto max-w-5xl">
+              <SectionContainer className="py-0! px-3! lg:px-12! xl:p-0! mx-auto max-w-5xl">
                 <Swiper
                   initialSlide={0}
                   spaceBetween={20}
@@ -188,20 +189,25 @@ function Partner({
                 </h2>
 
                 <div className="prose">
-                  <MDXRemote {...overview} components={mdxComponents(setFocusedImage)} />
+                  {'error' in overview ? (
+                    <p>Error rendering integration page: {overview.error.message}</p>
+                  ) : (
+                    // @ts-expect-error: Gildas - This is because CodeHide put its components under the CH namespace. It works but the MDXClient types are stricter
+                    <MDXClient {...overview} components={mdxComponents(setFocusedImage)} />
+                  )}
                 </div>
               </div>
 
               {!isNarrow && <PartnerDetails partner={partner} />}
             </div>
-            {partner.call_to_action_link && (
-              <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
+            {partner.installUrl && (
+              <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-xs max-w-5xl mx-auto mt-12">
                 <div className="flex flex-row justify-between">
                   <h1 className="text-2xl font-medium self-center">
                     Get started with {partner.title} and Supabase.
                   </h1>
-                  <a href={partner.call_to_action_link} target="_blank" rel="noreferrer">
-                    <Button size="medium" type="secondary">
+                  <a href={partner.installUrl} target="_blank" rel="noreferrer">
+                    <Button size="medium" variant="secondary">
                       Add integration
                     </Button>
                   </a>
@@ -216,8 +222,8 @@ function Partner({
 }
 
 const PartnerDetails = ({ partner }: { partner: Partner }) => {
-  const videoThumbnail = partner.video
-    ? `https://img.youtube.com/vi/${partner.video}/0.jpg`
+  const videoThumbnail = partner.youtubeId
+    ? `https://img.youtube.com/vi/${partner.youtubeId}/0.jpg`
     : undefined
 
   return (
@@ -227,9 +233,9 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
           Details
         </h2>
 
-        {partner.video && (
+        {partner.youtubeId && (
           <ExpandableVideo
-            videoId={partner.video}
+            videoId={partner.youtubeId}
             // imgUrl={videoThumbnail}
             imgOverlayText="Watch an introductory video"
             triggerContainerClassName="w-full"
@@ -240,37 +246,39 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
           {partner.type === 'technology' && (
             <div className="flex items-center justify-between py-2">
               <span className="text-foreground-lighter">Developer</span>
-              <span className="text-foreground">{partner.developer}</span>
+              <span className="text-foreground">{partner.builtBy}</span>
             </div>
           )}
 
-          <div className="flex items-center justify-between py-2">
-            <span className="text-lighter">Category</span>
-            <Link
-              href={`/partners/integrations#${partner.category.toLowerCase()}`}
-              className="text-brand-link hover:underline transition-colors"
-            >
-              {partner.category}
-            </Link>
-          </div>
+          {partner.categories.map((category) => (
+            <div key={category.slug} className="flex items-center justify-between py-2">
+              <span className="text-lighter">Category</span>
+              <Link
+                href={`/partners/integrations#${category.slug}`}
+                className="text-brand-link hover:underline transition-colors"
+              >
+                {category.name}
+              </Link>
+            </div>
+          ))}
 
           <div className="flex items-center justify-between py-2">
             <span className="text-foreground-lighter">Website</span>
             <a
-              href={partner.website}
+              href={partner.websiteUrl}
               target="_blank"
               rel="noreferrer"
               className="text-brand-link hover:underline transition-colors"
             >
-              {new URL(partner.website).host}
+              {new URL(partner.websiteUrl).host}
             </a>
           </div>
 
-          {partner.type === 'technology' && partner.docs && (
+          {partner.type === 'technology' && partner.docsUrl && (
             <div className="flex items-center justify-between py-2">
               <span className="text-foreground-lighter">Documentation</span>
               <a
-                href={partner.docs}
+                href={partner.docsUrl}
                 target="_blank"
                 rel="noreferrer"
                 className="text-brand-link hover:underline transition-colors"
@@ -293,17 +301,13 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
 
 // This function gets called at build time
 export const getStaticPaths: GetStaticPaths = async () => {
-  const { data: slugs } = await supabase
-    .from('partners')
-    .select('slug')
-    .eq('approved', true)
-    .eq('type', 'technology')
+  const slugs = await listPartnerSlugs()
 
   const paths: {
     params: { slug: string }
     locale?: string | undefined
   }[] =
-    slugs?.map(({ slug }) => ({
+    slugs?.map((slug) => ({
       params: {
         slug,
       },
@@ -316,15 +320,10 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 // This also gets called at build time
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  let { data: partner } = await supabase
-    .from('partners')
-    .select('*')
-    .eq('approved', true)
-    .eq('slug', params!.slug as string)
-    .single()
+export const getStaticProps: GetStaticProps<PartnerData> = async ({ params }) => {
+  const partner = await getPartner(params!.slug as string)
 
-  if (!partner || partner.type === 'expert') {
+  if (!partner) {
     return {
       notFound: true,
     }
@@ -339,13 +338,12 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   // Parse markdown
-  const overview = await serialize(partner.overview, {
-    blockJS: false,
-    scope: {
-      chCodeConfig: codeHikeOptions,
-    },
-    mdxOptions: {
-      remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
+  const overview = await serialize({
+    source: partner.content,
+    options: {
+      mdxOptions: {
+        remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
+      },
     },
   })
 

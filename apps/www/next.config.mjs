@@ -71,6 +71,17 @@ const nextConfig = {
       'public/**/*',
     ],
   },
+  /**
+   * /llms.txt enumerates top-level guide directories at runtime via fs.readdir
+   * on apps/docs/content/guides and reads each <dir>.mdx for its frontmatter
+   * title. /llms-full.txt recursively reads the generated .md files under
+   * apps/docs/public/markdown/. Both directories live in a sibling app, so
+   * they have to be explicitly traced into this lambda's bundle.
+   */
+  outputFileTracingIncludes: {
+    '/llms.txt': ['../docs/content/guides/*'],
+    '/llms-full.txt': ['../docs/public/markdown/guides/**/*.md' ],
+  },
   reactStrictMode: true,
   images: {
     dangerouslyAllowSVG: false,
@@ -78,6 +89,56 @@ const nextConfig = {
   },
   async headers() {
     return [
+      {
+        source: '/changelog-rss.xml',
+        headers: [
+          { key: 'Content-Type', value: 'application/rss+xml; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+        ],
+      },
+      {
+        source: '/changelog-rss/:slug.xml',
+        headers: [
+          { key: 'Content-Type', value: 'application/rss+xml; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+        ],
+      },
+      {
+        source: '/changelog/:slug.md',
+        headers: [
+          { key: 'Content-Type', value: 'text/markdown; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+          { key: 'Vary', value: 'Accept' },
+        ],
+      },
+      {
+        source: '/changelog.md',
+        headers: [
+          { key: 'Content-Type', value: 'text/markdown; charset=utf-8' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Cache-Control', value: 'public, s-maxage=900, stale-while-revalidate=900' },
+          { key: 'Vary', value: 'Accept' },
+        ],
+      },
+      {
+        source: '/',
+        headers: [
+          {
+            key: 'Link',
+            value: '</.well-known/api-catalog>; rel="api-catalog"',
+          },
+        ],
+      },
+      {
+        source: '/.well-known/api-catalog',
+        headers: [
+          { key: 'content-type', value: 'application/linkset+json' },
+          { key: 'access-control-allow-origin', value: '*' },
+        ],
+      },
       {
         source: '/.well-known/vercel/flags',
         headers: [
@@ -121,13 +182,33 @@ const nextConfig = {
           },
         ],
       },
+      {
+        source: '/enterprise-terms',
+        headers: [
+          {
+            key: 'X-Robots-Tag',
+            value: 'noindex, nofollow',
+          },
+        ],
+      },
     ]
   },
   async rewrites() {
     return rewrites
   },
   async redirects() {
-    return redirects
+    // For /docs/guides/ redirects, auto-generate .md variants so renamed/deleted pages
+    // redirect correctly when fetched as markdown
+    const docsMdRedirects = redirects
+      .filter(
+        (r) =>
+          r.source.startsWith('/docs/guides/') &&
+          typeof r.destination === 'string' &&
+          r.destination.startsWith('/')
+      )
+      .map((r) => ({ ...r, source: `${r.source}.md`, destination: `${r.destination}.md` }))
+
+    return [...docsMdRedirects, ...redirects]
   },
   typescript: {
     // On previews, typechecking is run via GitHub Action only for efficiency

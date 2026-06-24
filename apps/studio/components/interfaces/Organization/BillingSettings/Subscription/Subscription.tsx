@@ -1,24 +1,24 @@
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import Link from 'next/link'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { Restriction } from '../Restriction'
+import { InitiateCancellationFlowButton } from './CancellationFlow'
+import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import NoPermission from 'components/ui/NoPermission'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import Link from 'next/link'
-import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
-import { Alert, Button } from 'ui'
-import { Admonition } from 'ui-patterns'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-
-import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
-import { Restriction } from '../Restriction'
-import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
+} from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import NoPermission from '@/components/ui/NoPermission'
+import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const Subscription = () => {
   const { slug } = useParams()
@@ -77,43 +77,48 @@ const Subscription = () => {
               {isError && <AlertError subject="Failed to retrieve subscription" error={error} />}
 
               {isSuccess && (
-                <div className="space-y-6">
-                  <div>
-                    <p className="text-2xl text-brand">{currentPlan?.name ?? 'Unknown'} Plan</p>
-                  </div>
+                <div className="space-y-6 w-full">
+                  <div className="flex justify-between items-center">
+                    <p className="text-2xl text-brand leading-none">
+                      {currentPlan?.name ?? 'Unknown'} Plan
+                    </p>
 
-                  <div>
                     {canChangeTier && (
-                      <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
+                      <div className="flex space-x-2">
                         <Button
-                          type="default"
+                          variant="default"
                           className="pointer-events-auto"
-                          disabled={!canChangeTier}
                           onClick={() => snap.setPanelKey('subscriptionPlan')}
                         >
                           Change subscription plan
                         </Button>
-                      </ProjectUpdateDisabledTooltip>
+                        {currentPlan && currentPlan.id !== 'free' && (
+                          <InitiateCancellationFlowButton variant="danger">
+                            Cancel Subscription
+                          </InitiateCancellationFlowButton>
+                        )}
+                      </div>
                     )}
-                    {!canChangeTier &&
-                      (projectUpdateDisabled ? (
-                        <Alert
-                          className="mt-2"
-                          withIcon
-                          variant="info"
+                  </div>
+
+                  {!canChangeTier && (
+                    <div>
+                      {projectUpdateDisabled ? (
+                        <Admonition
+                          type="default"
+                          layout="horizontal"
                           title={`Unable to update plan from ${planName}`}
-                        >
-                          We have temporarily disabled project and subscription changes - our
-                          engineers are working on a fix.
-                        </Alert>
+                          description="We have temporarily disabled project and subscription changes - our
+                          engineers are working on a fix."
+                        />
                       ) : (
-                        <Alert
-                          withIcon
-                          className="mt-2"
-                          variant="info"
+                        <Admonition
+                          type="default"
+                          layout="horizontal"
                           title={`Unable to update plan from ${planName}`}
-                          actions={[
-                            <Button asChild key="contact-support" type="default">
+                          description="Please contact us if you'd like to change your plan."
+                          actions={
+                            <Button asChild key="contact-support" variant="default">
                               <SupportLink
                                 queryParams={{
                                   category: SupportCategories.SALES_ENQUIRY,
@@ -122,20 +127,19 @@ const Subscription = () => {
                               >
                                 Contact support
                               </SupportLink>
-                            </Button>,
-                          ]}
-                        >
-                          Please contact us if you'd like to change your plan.
-                        </Alert>
-                      ))}
-                  </div>
+                            </Button>
+                          }
+                        />
+                      )}
+                    </div>
+                  )}
 
                   {!subscription?.usage_billing_enabled && (
                     <Admonition
                       type="default"
                       title="This organization is limited by the included usage"
                     >
-                      <div className="[&>p]:!leading-normal prose text-sm">
+                      <div className="[&>p]:leading-normal! prose text-sm">
                         Projects may become unresponsive when this organization exceeds its{' '}
                         <Link href={`/org/${slug}/usage`}>included usage quota</Link>. To scale
                         seamlessly,{' '}

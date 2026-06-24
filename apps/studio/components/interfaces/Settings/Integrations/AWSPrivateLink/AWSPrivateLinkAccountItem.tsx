@@ -1,5 +1,4 @@
 import { Edit, MoreVertical, Trash } from 'lucide-react'
-
 import {
   Badge,
   Button,
@@ -63,7 +62,7 @@ export const AWSPrivateLinkAccountItem = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="text" className="px-1" icon={<MoreVertical />} />
+          <Button variant="text" className="px-1" icon={<MoreVertical />} />
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-40">
           <DropdownMenuItem onClick={onEdit} className="gap-x-2">

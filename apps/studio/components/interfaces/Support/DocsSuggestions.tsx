@@ -1,9 +1,9 @@
-import { Book, Github, Loader2 } from 'lucide-react'
-
 import { useDocsSearch, type DocsSearchResult } from 'common'
-import { useChangedSync } from 'hooks/misc/useChanged'
-import { DOCS_URL } from 'lib/constants'
+import { Book, Github, Loader2 } from 'lucide-react'
 import { cn } from 'ui'
+
+import { useChangedSync } from '@/hooks/misc/useChanged'
+import { DOCS_URL } from '@/lib/constants'
 
 function useDocsSuggestions(subject: string) {
   const { handleDocsSearchDebounced, resetSearch, searchState } = useDocsSearch()
@@ -58,31 +58,36 @@ interface DocsSuggestions_ResultsProps {
 
 function DocsSuggestions_Results({ results, isStale }: DocsSuggestions_ResultsProps) {
   return (
-    <ul
-      className={cn(
-        'flex flex-col gap-y-0.5 transition-opacity duration-200',
-        isStale ? 'opacity-50' : 'opacity-100'
-      )}
-    >
-      {results.slice(0, 5).map((page) => {
-        return (
-          <li key={page.id} className="flex items-center gap-x-1">
-            {page.type === 'github-discussions' ? (
-              <Github size={16} className="text-foreground-muted" />
-            ) : (
-              <Book size={16} className="text-foreground-muted" />
-            )}
-            <a
-              href={page.type === 'github-discussions' ? page.path : `${DOCS_URL}${page.path}`}
-              target="_blank"
-              rel="noreferrer"
-              className="text-sm text-foreground-light hover:text-foreground transition"
-            >
-              {page.title}
-            </a>
-          </li>
-        )
-      })}
-    </ul>
+    <div>
+      <p className="text-sm text-foreground-light">
+        Below are some articles that might help with your issue
+      </p>
+      <ul
+        className={cn(
+          'flex flex-col gap-y-0.5 py-1 transition-opacity duration-200',
+          isStale ? 'opacity-50' : 'opacity-100'
+        )}
+      >
+        {results.slice(0, 5).map((page) => {
+          return (
+            <li key={page.id} className="flex items-center gap-x-1">
+              {page.type === 'github-discussions' ? (
+                <Github size={16} className="text-foreground-muted" />
+              ) : (
+                <Book size={16} className="text-foreground-muted" />
+              )}
+              <a
+                href={page.type === 'github-discussions' ? page.path : `${DOCS_URL}${page.path}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm text-foreground-light hover:text-foreground transition"
+              >
+                {page.title}
+              </a>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
   )
 }

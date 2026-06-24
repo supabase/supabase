@@ -1,19 +1,17 @@
-import { Octokit } from '@octokit/core'
+import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
+import { MDXRemoteBase } from '~/features/docs/MdxBase'
+import { TabPanel, Tabs } from '~/features/ui/Tabs'
+import { linkTransform, UrlTransformFunction } from '~/lib/mdx/plugins/rehypeLinkTransform'
+import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
+import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
+import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
+import { getGitHubFileContents, octokit, OCTOKIT_RETRY_OPTIONS } from '~/lib/octokit'
+import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 import { capitalize } from 'lodash-es'
 import rehypeSlug from 'rehype-slug'
 import { Heading } from 'ui'
 import { Admonition } from 'ui-patterns'
-
-import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
-import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
-import { MDXRemoteBase } from '~/features/docs/MdxBase'
-import { fetchRevalidatePerDay } from '~/features/helpers.fetch'
-import { TabPanel, Tabs } from '~/features/ui/Tabs'
-import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
-import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
-import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
-import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
-import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -27,7 +25,7 @@ const meta = {
 }
 
 const generateMetadata = genGuideMeta(() => ({
-  pathname: '/guides/database/database-linter',
+  pathname: '/guides/database/database-advisors',
   meta,
 }))
 
@@ -65,7 +63,7 @@ const DatabaseAdvisorDocs = async () => {
   } as SerializeOptions
 
   return (
-    <GuideTemplate meta={meta} editLink={editLink}>
+    <GuideTemplate meta={meta} editLink={editLink} pathname="/guides/database/database-advisors">
       <MDXRemoteBase source={markdownIntro} />
       <Heading tag="h2">Available checks</Heading>
 
@@ -88,7 +86,7 @@ const DatabaseAdvisorDocs = async () => {
           .
         </Admonition>
       ) : (
-        <Tabs listClassNames="flex flex-wrap gap-2 [&>button]:!m-0" queryGroup="lint">
+        <Tabs listClassNames="flex flex-wrap gap-2 [&>button]:m-0!" queryGroup="lint">
           {lints.map((lint) => (
             <TabPanel
               key={lint.path}
@@ -144,24 +142,16 @@ const urlTransform: (lints: Array<{ path: string }>) => UrlTransformFunction = (
  * Fetch lint remediation Markdown from external repo
  */
 const getLints = async () => {
-  const octokit = new Octokit({ request: { fetch: fetchRevalidatePerDay } })
-
-  let response: Awaited<ReturnType<typeof octokit.request>>
-  try {
-    response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
-      owner: org,
-      repo: repo,
-      path: docsDir,
-      ref: branch,
-      headers: {
-        'X-GitHub-Api-Version': '2022-11-28',
-      },
-    })
-  } catch (err) {
-    throw new Error(
-      `Failed to fetch database advisors lint list from GitHub (network error): ${err}`
-    )
-  }
+  const response = await octokit().request('GET /repos/{owner}/{repo}/contents/{path}', {
+    owner: org,
+    repo: repo,
+    path: docsDir,
+    ref: branch,
+    headers: {
+      'X-GitHub-Api-Version': '2022-11-28',
+    },
+    request: OCTOKIT_RETRY_OPTIONS,
+  })
 
   if (response.status >= 400) {
     throw new Error(
@@ -179,24 +169,7 @@ const getLints = async () => {
 
   const lints = await Promise.all(
     lintsList.map(async ({ path }) => {
-      let fileResponse: Response
-      try {
-        fileResponse = await fetchRevalidatePerDay(
-          `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${path}`
-        )
-      } catch (err) {
-        throw new Error(
-          `Failed to fetch database advisors lint file ${path} from GitHub (network error): ${err}`
-        )
-      }
-
-      if (response.status >= 400) {
-        throw new Error(
-          `Failed to fetch ${org}/${repo}/${branch}/${path} docs from GitHub: ${response.status}`
-        )
-      }
-
-      const content = await fileResponse.text()
+      const content = await getGitHubFileContents({ org, repo, path, branch })
 
       return {
         path: getBasename(path),

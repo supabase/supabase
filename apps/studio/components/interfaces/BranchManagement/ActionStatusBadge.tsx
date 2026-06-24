@@ -1,6 +1,7 @@
-import { ActionName, ActionStatus, type ActionRunStep } from 'data/actions/action-runs-query'
 import type { PropsWithChildren } from 'react'
 import { Badge, StatusIcon, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
+import { ActionName, ActionStatus, type ActionRunStep } from '@/data/actions/action-runs-query'
 
 export interface ActionStatusBadgeProps {
   name: ActionName

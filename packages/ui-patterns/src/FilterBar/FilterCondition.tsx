@@ -2,14 +2,7 @@
 
 import { X } from 'lucide-react'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  Button,
-  cn,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverAnchor_Shadcn_,
-  PopoverContent_Shadcn_,
-} from 'ui'
+import { Button, cn, Input, Popover, PopoverAnchor, PopoverContent } from 'ui'
 
 import { DefaultCommandList } from './DefaultCommandList'
 import { useFilterBar } from './FilterBarContext'
@@ -37,7 +30,6 @@ export function FilterCondition({
   const {
     filters: rootFilters,
     filterProperties,
-    isLoading,
     propertyOptionsCache,
     loadingOptions,
     handleInputChange,
@@ -185,12 +177,12 @@ export function FilterCondition({
 
   // If the value options are only a custom component, open it immediately
   useEffect(() => {
-    if (!isActive || isLoading) return
+    if (!isActive) return
     const hasOnlyCustom = valueItems.length > 0 && valueItems.every((i) => i.isCustom)
     if (hasOnlyCustom && !showValueCustom) {
       setShowValueCustom(true)
     }
-  }, [isActive, isLoading, valueItems, showValueCustom])
+  }, [isActive, valueItems, showValueCustom])
 
   const handleOperatorBackspace = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -265,24 +257,24 @@ export function FilterCondition({
     <div
       ref={wrapperRef}
       className={cn(
-        'flex items-stretch px-0 py-1 bg-muted group shrink-0',
-        variant === 'pill' ? 'rounded border' : 'border-r',
+        'flex items-stretch px-0 h-[26px] bg-muted group shrink-0',
+        variant === 'pill' ? 'rounded-sm border' : 'border-r',
         isHighlighted && 'ring-2 ring-primary'
       )}
       data-testid={`filter-condition-${property.name}`}
       data-highlighted={isHighlighted}
     >
-      <Popover_Shadcn_ open={isPropertyActive && !isLoading && propertyItems.length > 0}>
-        <PopoverAnchor_Shadcn_ asChild>
+      <Popover open={isPropertyActive && propertyItems.length > 0}>
+        <PopoverAnchor asChild>
           <div ref={propertyLabelRef} className="relative inline-flex items-center shrink-0">
             {isPropertyActive ? (
-              <Input_Shadcn_
+              <Input
                 type="text"
                 value={propertySearchText}
                 onChange={(e) => setPropertySearchText(e.target.value)}
                 onBlur={handlePropertyBlur}
                 onKeyDown={handlePropertyKeyDown}
-                className="h-full border-none bg-transparent py-0 pl-2 pr-1 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground-light w-full absolute left-0 top-0"
+                className="h-full border-none bg-transparent py-0 pl-2 pr-1 text-xs focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground-light w-full absolute left-0 top-0"
                 placeholder={property.label}
                 autoFocus
                 aria-label={`Change property from ${property.label}`}
@@ -304,8 +296,8 @@ export function FilterCondition({
               {property.label}
             </span>
           </div>
-        </PopoverAnchor_Shadcn_>
-        <PopoverContent_Shadcn_
+        </PopoverAnchor>
+        <PopoverContent
           className="min-w-[220px] p-0"
           align="start"
           side="bottom"
@@ -324,12 +316,12 @@ export function FilterCondition({
             onSelect={(item) => handlePropertyChange(path, item.value)}
             includeIcon={false}
           />
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
-      <Popover_Shadcn_ open={isOperatorActive && !isLoading && operatorItems.length > 0}>
-        <PopoverAnchor_Shadcn_ asChild>
+        </PopoverContent>
+      </Popover>
+      <Popover open={isOperatorActive && operatorItems.length > 0}>
+        <PopoverAnchor asChild>
           <div className="relative inline-block">
-            <Input_Shadcn_
+            <Input
               ref={operatorRef}
               type="text"
               value={isOperatorActive ? localOperator : conditionOperator}
@@ -340,8 +332,7 @@ export function FilterCondition({
               }}
               onBlur={handleOperatorBlur}
               onKeyDown={handleOperatorKeyDown}
-              className="h-full border-none bg-transparent py-0 px-1 text-center text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground w-full absolute left-0 top-0"
-              disabled={isLoading}
+              className="h-full border-none bg-transparent py-0 px-1 text-center text-xs md:text-xs focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground w-full absolute left-0 top-0"
               aria-label={`Operator for ${property.label}`}
               data-testid={`filter-operator-${property.name}`}
               tabIndex={-1}
@@ -354,8 +345,8 @@ export function FilterCondition({
               {(isOperatorActive ? localOperator : conditionOperator) || ' '}
             </span>
           </div>
-        </PopoverAnchor_Shadcn_>
-        <PopoverContent_Shadcn_
+        </PopoverAnchor>
+        <PopoverContent
           className="min-w-[220px] p-0"
           align="start"
           side="bottom"
@@ -375,12 +366,12 @@ export function FilterCondition({
             includeIcon={false}
             grouped
           />
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
-      <Popover_Shadcn_ open={isActive && !isLoading && (showValueCustom || valueItems.length > 0)}>
-        <PopoverAnchor_Shadcn_ asChild>
+        </PopoverContent>
+      </Popover>
+      <Popover open={isActive && (showValueCustom || valueItems.length > 0)}>
+        <PopoverAnchor asChild>
           <div className="relative inline-block max-w-[180px]">
-            <Input_Shadcn_
+            <Input
               ref={valueRef}
               type="text"
               value={localValue}
@@ -388,8 +379,7 @@ export function FilterCondition({
               onFocus={() => handleInputFocus(path)}
               onBlur={handleValueBlur}
               onKeyDown={handleValueKeyDown}
-              className="h-full border-none bg-transparent py-0 px-1 text-xs focus:outline-none focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0"
-              disabled={isLoading}
+              className="h-full border-none bg-transparent py-0 px-1 text-xs md:text-xs focus:outline-hidden focus:ring-0 focus:shadow-none focus-visible:ring-0 focus-visible:ring-offset-0 w-full absolute left-0 top-0"
               aria-label={`Value for ${property.label}`}
               data-testid={`filter-value-${property.name}`}
               tabIndex={-1}
@@ -400,8 +390,8 @@ export function FilterCondition({
             />
             <span className="invisible whitespace-pre text-xs block px-1">{localValue || ' '}</span>
           </div>
-        </PopoverAnchor_Shadcn_>
-        <PopoverContent_Shadcn_
+        </PopoverAnchor>
+        <PopoverContent
           className="min-w-[220px] w-fit p-0"
           align="start"
           side="bottom"
@@ -439,10 +429,10 @@ export function FilterCondition({
               includeIcon
             />
           )}
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
       <Button
-        type="text"
+        variant="text"
         size="tiny"
         icon={
           <X

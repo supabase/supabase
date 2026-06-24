@@ -1,11 +1,11 @@
 import { getForeignKeyConstraintsSql } from '@supabase/pg-meta'
 import { QueryClient, useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
-import { UseCustomQueryOptions } from 'types'
 
-import { useConnectionStringForReadOps } from '../read-replicas/replicas-query'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
 import { databaseKeys } from './keys'
+import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type GetForeignKeyConstraintsVariables = {
   schema?: string
@@ -74,7 +74,7 @@ export async function getForeignKeyConstraints(
 }
 
 export type ForeignKeyConstraintsData = Awaited<ReturnType<typeof getForeignKeyConstraints>>
-export type ForeignKeyConstraintsError = ExecuteSqlError
+export type ForeignKeyConstraintsError = ResponseError
 
 export const useForeignKeyConstraintsQuery = <TData = ForeignKeyConstraintsData>(
   {

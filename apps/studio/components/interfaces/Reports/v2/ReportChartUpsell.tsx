@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { useRef, useState } from 'react'
-
-import { LazyComposedChartHandler } from 'components/ui/Charts/ComposedChartHandler'
 import { Button, Card, cn } from 'ui'
+
+import { LazyComposedChartHandler } from '@/components/ui/Charts/ComposedChartHandler'
 
 interface ReportsChartUpsellProps {
   report: {
@@ -48,7 +48,7 @@ export const ReportChartUpsell = ({ report, orgSlug }: ReportsChartUpsellProps) 
         </p>
         <Button
           asChild
-          type="primary"
+          variant="primary"
           onMouseEnter={() => setIsHoveringUpgrade(true)}
           onMouseLeave={() => setIsHoveringUpgrade(false)}
           className="mt-4"

@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useWindowSize } from 'react-use'
-import { CommandEmpty_Shadcn_, Sheet, SheetContent } from 'ui'
+import { CommandEmpty, Sheet, SheetContent } from 'ui'
 import { cn } from 'ui/src/lib/utils'
 
 const MobileSheetNav: React.FC<{
@@ -53,7 +53,7 @@ const MobileSheetNav: React.FC<{
           className
         )}
       >
-        <ErrorBoundary FallbackComponent={() => <CommandEmpty_Shadcn_ />}>{children}</ErrorBoundary>
+        <ErrorBoundary FallbackComponent={() => <CommandEmpty />}>{children}</ErrorBoundary>
       </SheetContent>
     </Sheet>
   )

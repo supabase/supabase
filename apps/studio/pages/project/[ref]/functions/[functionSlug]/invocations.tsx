@@ -1,9 +1,10 @@
 import { useParams } from 'common'
-import { LogsPreviewer } from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import EdgeFunctionDetailsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
-import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
-import type { NextPageWithLayout } from 'types'
+
+import { LogsPreviewer } from '@/components/interfaces/Settings/Logs/LogsPreviewer'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import EdgeFunctionDetailsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
+import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
+import type { NextPageWithLayout } from '@/types'
 
 export const LogPage: NextPageWithLayout = () => {
   const { ref, functionSlug } = useParams()
@@ -20,7 +21,7 @@ export const LogPage: NextPageWithLayout = () => {
         condensedLayout
         projectRef={ref as string}
         queryType="fn_edge"
-        filterOverride={{ function_id: selectedFunction.id }}
+        filterOverride={{ 'request.pathname': `/functions/v1/${selectedFunction.slug}` }}
       />
     </div>
   )

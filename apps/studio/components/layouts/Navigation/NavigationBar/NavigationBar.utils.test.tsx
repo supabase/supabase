@@ -1,4 +1,3 @@
-import type { Project } from 'data/projects/project-detail-query'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -7,6 +6,7 @@ import {
   generateSettingsRoutes,
   generateToolRoutes,
 } from './NavigationBar.utils'
+import type { Project } from '@/data/projects/project-detail-query'
 
 const REF = 'test-project-ref'
 
@@ -140,19 +140,8 @@ describe('generateOtherRoutes', () => {
     expect(keys(routes)).not.toContain('observability')
   })
 
-  it('includes API Docs when apiDocsSidePanel is enabled', () => {
-    const routes = generateOtherRoutes(REF, activeProject, {
-      isPlatform: true,
-      apiDocsSidePanel: true,
-    })
-    expect(keys(routes)).toContain('api')
-  })
-
-  it('excludes API Docs when apiDocsSidePanel is disabled', () => {
-    const routes = generateOtherRoutes(REF, activeProject, {
-      isPlatform: true,
-      apiDocsSidePanel: false,
-    })
+  it('does not include API Docs nav item', () => {
+    const routes = generateOtherRoutes(REF, activeProject, { isPlatform: true })
     expect(keys(routes)).not.toContain('api')
   })
 
@@ -188,20 +177,14 @@ describe('generateOtherRoutes', () => {
 })
 
 describe('generateSettingsRoutes', () => {
-  it('links to general settings on platform', () => {
-    const routes = generateSettingsRoutes(REF, { isPlatform: true })
+  it('links to general settings', () => {
+    const routes = generateSettingsRoutes(REF)
     const settingsRoute = routes.find((r) => r.key === 'settings')
     expect(settingsRoute?.link).toBe(`/project/${REF}/settings/general`)
   })
 
-  it('links to log-drains settings in self-hosted mode', () => {
-    const routes = generateSettingsRoutes(REF, { isPlatform: false })
-    const settingsRoute = routes.find((r) => r.key === 'settings')
-    expect(settingsRoute?.link).toBe(`/project/${REF}/settings/log-drains`)
-  })
-
   it('returns a link as false when ref is undefined', () => {
-    const routes = generateSettingsRoutes(undefined, { isPlatform: true })
+    const routes = generateSettingsRoutes(undefined)
     const settingsRoute = routes.find((r) => r.key === 'settings')
     expect(settingsRoute?.link).toBe(undefined)
   })

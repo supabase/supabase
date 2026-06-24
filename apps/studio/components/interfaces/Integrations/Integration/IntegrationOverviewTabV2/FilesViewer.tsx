@@ -1,28 +1,35 @@
-import { useState } from 'react'
-import { cn } from 'ui'
+'use client'
 
-export const FilesViewer = ({ files }: { files: string[] }) => {
-  const [selected, setSelected] = useState(files[0])
+import 'swiper/css'
 
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Image } from 'ui-patterns/Image'
+
+export const FilesViewer = ({ files }: { files: { src: string; alt: string }[] }) => {
   return (
-    <div className="flex flex-col gap-y-4">
-      <img alt={selected} src={selected} className="rounded-md border" />
-      {files.length > 1 && (
-        <div className="grid grid-cols-10 gap-x-2">
-          {files.map((x) => (
-            <button key={x} onClick={() => setSelected(x)}>
-              <img
-                alt={x}
-                src={x}
-                className={cn(
-                  'col-span-1 bg-surface-100 rounded-md object-cover aspect-square border transition',
-                  selected === x ? 'border-stronger' : 'border-secondary'
-                )}
-              />
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
+    <Swiper
+      className="w-full"
+      spaceBetween={12}
+      slidesPerView={1.4}
+      threshold={2}
+      watchOverflow
+      breakpoints={{
+        640: { slidesPerView: 1.4 },
+        1024: { slidesPerView: 3.2 },
+      }}
+    >
+      {files.map((file, i) => (
+        <SwiperSlide key={`${file.src}-${i}`}>
+          <Image
+            src={file.src}
+            alt={file.alt}
+            zoomable
+            width={400}
+            height={225}
+            className="rounded-md border object-cover w-full"
+          />
+        </SwiperSlide>
+      ))}
+    </Swiper>
   )
 }

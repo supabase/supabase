@@ -1,22 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
-import { PITRNotice } from 'components/interfaces/Database/Backups/PITR/PITRNotice'
-import { PITRSelection } from 'components/interfaces/Database/Backups/PITR/PITRSelection'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import AlertError from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import NoPermission from 'components/ui/NoPermission'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useBackupsQuery } from 'data/database/backups-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useIsOrioleDbInAws, useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import { AlertCircle } from 'lucide-react'
-import type { NextPageWithLayout } from 'types'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
+import { Alert, AlertDescription, AlertTitle } from 'ui'
 import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -29,7 +14,21 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import DatabaseBackupsNav from '@/components/interfaces/Database/Backups/DatabaseBackupsNav'
+import { PITRNotice } from '@/components/interfaces/Database/Backups/PITR/PITRNotice'
+import { PITRSelection } from '@/components/interfaces/Database/Backups/PITR/PITRSelection'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import AlertError from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useBackupsQuery } from '@/data/database/backups-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsOrioleDbInAws, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL, PROJECT_STATUS } from '@/lib/constants'
+import type { NextPageWithLayout } from '@/types'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   return (
@@ -102,6 +101,18 @@ const PITR = () => {
     )
   }
 
+  if (project?.high_availability) {
+    return (
+      <Admonition
+        type="default"
+        title="Database backups are not available for High Availability projects"
+        description="High Availability projects do not support Point-in-Time Recovery (PITR) backups"
+      >
+        <DocsButton abbrev={false} className="mt-2" href={DOCS_URL} />
+      </Admonition>
+    )
+  }
+
   return (
     <>
       {isLoading && <GenericSkeletonLoader />}
@@ -121,15 +132,15 @@ const PITR = () => {
               }
             />
           ) : !isActiveHealthy ? (
-            <Alert_Shadcn_>
+            <Alert>
               <AlertCircle />
-              <AlertTitle_Shadcn_>
+              <AlertTitle>
                 Point in Time Recovery is not available while project is offline
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              </AlertTitle>
+              <AlertDescription>
                 Your project needs to be online to restore your database with Point in Time Recovery
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           ) : (
             <>
               <PITRNotice />

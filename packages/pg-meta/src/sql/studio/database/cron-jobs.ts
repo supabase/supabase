@@ -1,4 +1,4 @@
-import { literal } from '../../../pg-format'
+import { literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
 
 export const getCronJobsMinimalSql = ({
   searchTerm,
@@ -8,21 +8,24 @@ export const getCronJobsMinimalSql = ({
   searchTerm?: string
   page: number
   limit: number
-}) =>
-  `
-SELECT 
+}): SafeSqlFragment => {
+  const searchClause = searchTerm
+    ? safeSql`WHERE job.jobname ILIKE ${literal(`%${searchTerm}%`)}`
+    : safeSql``
+  return safeSql`
+SELECT
   job.jobid,
   job.jobname,
   job.schedule,
   job.command,
   job.active
-FROM 
+FROM
   cron.job job
-${!!searchTerm ? `WHERE job.jobname ILIKE ${literal(`%${searchTerm}%`)}` : ''}
+${searchClause}
 ORDER BY job.jobid
-LIMIT ${limit}
-OFFSET ${page * limit};
-`.trim()
+LIMIT ${literal(limit)}
+OFFSET ${literal(page * limit)};`
+}
 
 export const getCronJobsSql = ({
   searchTerm,
@@ -32,28 +35,31 @@ export const getCronJobsSql = ({
   searchTerm?: string
   page: number
   limit: number
-}) =>
-  `
+}): SafeSqlFragment => {
+  const searchClause = searchTerm
+    ? safeSql`WHERE job.jobname ILIKE ${literal(`%${searchTerm}%`)}`
+    : safeSql``
+  return safeSql`
 WITH latest_runs AS (
-  SELECT 
+  SELECT
     jobid,
     status,
     MAX(start_time) AS latest_run
   FROM cron.job_run_details
   GROUP BY jobid, status
 ), most_recent_runs AS (
-  SELECT 
-    jobid, 
-    status, 
+  SELECT
+    jobid,
+    status,
     latest_run
   FROM latest_runs lr1
   WHERE latest_run = (
-    SELECT MAX(latest_run) 
-    FROM latest_runs lr2 
+    SELECT MAX(latest_run)
+    FROM latest_runs lr2
     WHERE lr2.jobid = lr1.jobid
   )
 )
-SELECT 
+SELECT
   job.jobid,
   job.jobname,
   job.schedule,
@@ -61,14 +67,14 @@ SELECT
   job.active,
   mr.latest_run,
   mr.status
-FROM 
+FROM
   cron.job job
 LEFT JOIN most_recent_runs mr ON job.jobid = mr.jobid
-${!!searchTerm ? `WHERE job.jobname ILIKE ${literal(`%${searchTerm}%`)}` : ''}
+${searchClause}
 ORDER BY job.jobid
-LIMIT ${limit}
-OFFSET ${page * limit};
-`.trim()
+LIMIT ${literal(limit)}
+OFFSET ${literal(page * limit)};`
+}
 
 /**
  * Delete old cron job run details using ctid range filtering.
@@ -86,13 +92,11 @@ export const getDeleteOldCronJobRunDetailsByCtidSql = (
   interval: string,
   startPage: number,
   endPage: number
-) => {
-  // After validation, these are guaranteed to be safe integers
-  // Using literal() on the string representation ensures proper escaping
+): SafeSqlFragment => {
   const safeCtidStart = literal(`(${startPage},0)`)
   const safeCtidEnd = literal(`(${endPage},0)`)
 
-  return `
+  return safeSql`
 WITH deleted AS (
   DELETE FROM cron.job_run_details
   WHERE ctid >= ${safeCtidStart}::tid
@@ -100,30 +104,30 @@ WITH deleted AS (
     AND end_time < now() - interval ${literal(interval)}
   RETURNING 1
 )
-SELECT count(*) as deleted_count FROM deleted;
-`.trim()
+SELECT count(*) as deleted_count FROM deleted;`
 }
 
 const CRON_CLEANUP_SCHEDULE_NAME = 'delete-job-run-details'
 const CRON_CLEANUP_SCHEDULE_EXPRESSION = '0 12 * * *'
 
-export const getScheduleDeleteCronJobRunDetailsSql = (interval: string) =>
-  `
+export const getScheduleDeleteCronJobRunDetailsSql = (interval: string): SafeSqlFragment => {
+  const command = safeSql`DELETE FROM cron.job_run_details WHERE end_time < now() - interval ${literal(interval)};`
+
+  return safeSql`
 SELECT cron.schedule(
   ${literal(CRON_CLEANUP_SCHEDULE_NAME)},
   ${literal(CRON_CLEANUP_SCHEDULE_EXPRESSION)},
-  $$DELETE FROM cron.job_run_details WHERE end_time < now() - interval ${literal(interval)}$$
-);
-`.trim()
+  ${literal(command)}
+);`
+}
 
 /**
  * Get the total number of pages in the job_run_details table.
  * This is used to iterate through the table in batches using ctid ranges.
  */
-export const getJobRunDetailsPageCountSql = () =>
-  `
+export const getJobRunDetailsPageCountSql = (): SafeSqlFragment =>
+  safeSql`
 SELECT pg_relation_size(oid) / current_setting('block_size')::int8 AS num_pages
 FROM pg_class
 WHERE relname = 'job_run_details'
-  AND relnamespace = 'cron'::regnamespace;
-`.trim()
+  AND relnamespace = 'cron'::regnamespace;`

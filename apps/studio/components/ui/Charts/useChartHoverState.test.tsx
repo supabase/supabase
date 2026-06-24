@@ -1,5 +1,5 @@
-import { renderHook, act } from '@testing-library/react'
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { act, renderHook } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -212,11 +212,10 @@ describe('useChartHoverState', () => {
         result.current.setSyncHover(true)
       })
 
+      // State still updates even though persistence failed. The storage error is
+      // swallowed and warned about by safeLocalStorage (covered by its own tests).
       expect(result.current.syncHover).toBe(true)
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        'Failed to save chart hover sync setting to localStorage:',
-        expect.any(Error)
-      )
+      expect(consoleWarnSpy).toHaveBeenCalled()
     })
   })
 

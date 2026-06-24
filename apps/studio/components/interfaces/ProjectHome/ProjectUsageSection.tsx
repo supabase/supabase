@@ -1,24 +1,22 @@
 import { useParams } from 'common'
-import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
-import { ChartIntervalDropdown } from 'components/ui/Logs/ChartIntervalDropdown'
-import { CHART_INTERVALS } from 'components/ui/Logs/logs.utils'
-import {
-  ProjectLogStatsVariables,
-  UsageApiCounts,
-  useProjectLogStatsQuery,
-} from 'data/analytics/project-log-stats-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import dayjs from 'dayjs'
-import { useFillTimeseriesSorted } from 'hooks/analytics/useFillTimeseriesSorted'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle, Loading } from 'ui'
+import { Card, CardContent, CardHeader, CardTitle, Loading, WarningIcon } from 'ui'
 import { Row } from 'ui-patterns'
+import { ChartEmptyState } from 'ui-patterns/Chart'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
+
+import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
+import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
+import { CHART_INTERVALS } from '@/components/ui/Logs/logs.utils'
+import { UsageApiCounts, useProjectLogStatsQuery } from '@/data/analytics/project-log-stats-query'
+import { fillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 type LogsBarChartDatum = {
   timestamp: string
@@ -50,7 +48,7 @@ export const ProjectUsageSection = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { projectAuthAll: authEnabled, projectStorageAll: storageEnabled } = useIsFeatureEnabled([
     'project_auth:all',
     'project_storage:all',
@@ -74,33 +72,42 @@ export const ProjectUsageSection = () => {
   }, [selectedInterval])
 
   // Use V1 data fetching
-  const { data: logStatsData, isPending: isLoading } = useProjectLogStatsQuery({
-    projectRef,
-    interval,
-  })
+  const {
+    data: filledCharts,
+    isPending: isLoading,
+    error,
+  } = useProjectLogStatsQuery(
+    {
+      projectRef,
+      interval,
+    },
+    {
+      select: (data) => {
+        // Calculate date range for gap filling
+        const startDateLocal = dayjs().subtract(
+          selectedInterval.startValue,
+          selectedInterval.startUnit as dayjs.ManipulateType
+        )
+        const endDateLocal = dayjs()
 
-  // Calculate date range for gap filling
-  const startDateLocal = dayjs().subtract(
-    selectedInterval.startValue,
-    selectedInterval.startUnit as dayjs.ManipulateType
+        return fillTimeseriesSorted({
+          data: data.result,
+          timestampKey: 'timestamp',
+          valueKey: [
+            'total_auth_requests',
+            'total_rest_requests',
+            'total_storage_requests',
+            'total_realtime_requests',
+          ],
+          defaultValue: 0,
+          startDate: startDateLocal.toISOString(),
+          endDate: endDateLocal.toISOString(),
+          minPointsToFill: 5,
+        })
+      },
+      refetchOnWindowFocus: false,
+    }
   )
-  const endDateLocal = dayjs()
-
-  // Fill gaps in timeseries data
-  const { data: filledCharts } = useFillTimeseriesSorted({
-    data: logStatsData?.result ?? [],
-    timestampKey: 'timestamp',
-    valueKey: [
-      'total_auth_requests',
-      'total_rest_requests',
-      'total_storage_requests',
-      'total_realtime_requests',
-    ],
-    defaultValue: 0,
-    startDate: startDateLocal.toISOString(),
-    endDate: endDateLocal.toISOString(),
-    minPointsToFill: 5,
-  })
 
   const serviceBase: ServiceEntry[] = useMemo(
     () => [
@@ -128,6 +135,7 @@ export const ProjectUsageSection = () => {
       {
         key: 'realtime',
         title: 'Realtime requests',
+        href: `/project/${projectRef}/realtime/inspector`,
         route: '/logs/realtime-logs',
         enabled: true,
       },
@@ -150,7 +158,7 @@ export const ProjectUsageSection = () => {
 
         // Transform V1 data to LogsBarChart format
         // Since V1 doesn't have error/warning breakdown, we show everything as "ok"
-        const transformedData: LogsBarChartDatum[] = (filledCharts || []).map((item) => ({
+        const transformedData: LogsBarChartDatum[] = (filledCharts?.data || []).map((item) => ({
           timestamp: item.timestamp,
           error_count: 0,
           warning_count: 0,
@@ -165,10 +173,10 @@ export const ProjectUsageSection = () => {
           data: transformedData,
           total,
           isLoading,
-          error: null,
+          error: error || filledCharts?.error || null,
         }
       }),
-    [serviceBase, filledCharts, isLoading]
+    [serviceBase, filledCharts, isLoading, error]
   )
 
   const handleBarClick =
@@ -186,19 +194,10 @@ export const ProjectUsageSection = () => {
 
       router.push(`/project/${projectRef}${logRoute}?${queryParams.toString()}`)
 
-      if (projectRef && organization?.slug) {
-        sendEvent({
-          action: 'home_project_usage_chart_clicked',
-          properties: {
-            service_type: serviceKey,
-            bar_timestamp: datum.timestamp,
-          },
-          groups: {
-            project: projectRef,
-            organization: organization.slug,
-          },
-        })
-      }
+      track('home_project_usage_chart_clicked', {
+        service_type: serviceKey,
+        bar_timestamp: datum.timestamp,
+      })
     }
 
   const enabledServices = services.filter((s) => s.enabled)
@@ -219,7 +218,7 @@ export const ProjectUsageSection = () => {
           tooltipSide="left"
         />
       </div>
-      <Row columns={[3, 2, 1]}>
+      <Row maxColumns={4} minWidth={280}>
         {enabledServices.map((s) => (
           <Card key={s.key} className="mb-0 md:mb-0 h-full flex flex-col h-64">
             <CardHeader className="flex flex-row items-end justify-between gap-2 space-y-0 pb-0 border-b-0">
@@ -230,19 +229,10 @@ export const ProjectUsageSection = () => {
                       <Link
                         href={s.href}
                         onClick={() => {
-                          if (projectRef && organization?.slug) {
-                            sendEvent({
-                              action: 'home_project_usage_service_clicked',
-                              properties: {
-                                service_type: s.key,
-                                total_requests: s.total || 0,
-                              },
-                              groups: {
-                                project: projectRef,
-                                organization: organization.slug,
-                              },
-                            })
-                          }
+                          track('home_project_usage_service_clicked', {
+                            service_type: s.key,
+                            total_requests: s.total || 0,
+                          })
                         }}
                       >
                         {s.title}
@@ -260,6 +250,7 @@ export const ProjectUsageSection = () => {
                 <LogsBarChart
                   isFullHeight
                   data={s.data}
+                  error={s.error}
                   DateTimeFormat={datetimeFormat}
                   onBarClick={handleBarClick(s.route, s.key)}
                   hideZeroValues={true}
@@ -274,6 +265,13 @@ export const ProjectUsageSection = () => {
                       label: 'Requests',
                     },
                   }}
+                  ErrorState={
+                    <ChartEmptyState
+                      icon={<WarningIcon />}
+                      title="Failed to load project usage"
+                      description="Check our Status Page or try again later."
+                    />
+                  }
                   EmptyState={
                     <NoDataPlaceholder
                       size="small"

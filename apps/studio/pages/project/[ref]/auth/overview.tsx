@@ -1,14 +1,6 @@
 import { FeatureFlagContext, useFlag, useParams } from 'common'
-import { OverviewLearnMore } from 'components/interfaces/Auth/Overview/OverviewLearnMore'
-import { OverviewMetrics } from 'components/interfaces/Auth/Overview/OverviewMetrics'
-import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useAuthOverviewQuery } from 'data/auth/auth-overview-query'
-import { DOCS_URL } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
-import { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -17,6 +9,15 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+
+import { OverviewLearnMore } from '@/components/interfaces/Auth/Overview/OverviewLearnMore'
+import { OverviewMetrics } from '@/components/interfaces/Auth/Overview/OverviewMetrics'
+import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useAuthOverviewQuery } from '@/data/auth/auth-overview-query'
+import { DOCS_URL } from '@/lib/constants'
+import { NextPageWithLayout } from '@/types'
 
 const AuthOverview: NextPageWithLayout = () => {
   const router = useRouter()

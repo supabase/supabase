@@ -1,21 +1,11 @@
 import { useDebounce } from '@uidotdev/usehooks'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { toPng } from 'html-to-image'
-import { Camera, CircleCheck, HelpCircle, Image as ImageIcon, Upload, X } from 'lucide-react'
+import { Camera, CircleCheck, Image as ImageIcon, Upload, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
-
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { InlineLinkClassName } from 'components/ui/InlineLink'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { useFeedbackCategoryQuery } from 'data/feedback/feedback-category'
-import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { timeout } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
 import {
   Button,
   cn,
@@ -24,15 +14,24 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  PopoverSeparator_Shadcn_,
-  TextArea_Shadcn_,
+  PopoverSeparator,
+  TextArea,
 } from 'ui'
 import { Admonition } from 'ui-patterns'
+
 import {
   convertB64toBlob,
   isLikelySupportRequest,
   uploadAttachment,
 } from './FeedbackDropdown.utils'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { useFeedbackCategoryQuery } from '@/data/feedback/feedback-category'
+import { useSendFeedbackMutation } from '@/data/feedback/feedback-send'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { timeout } from '@/lib/helpers'
+import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface FeedbackWidgetProps {
   onClose: () => void
@@ -43,7 +42,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, slug } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const uploadButtonRef = useRef(null)
   const [feedback, setFeedback] = useState('')
@@ -68,7 +67,6 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
   const isLikelySupport = isLikelySupportRequest(feedback)
   const effectiveCategory = category ?? (isLikelySupport ? 'support' : null)
 
-  const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: submitFeedback } = useSendFeedbackMutation({
     onSuccess: () => {
       setIsFeedbackSent(true)
@@ -180,12 +178,12 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
           </p>
         </div>
       </div>
-      <PopoverSeparator_Shadcn_ />
+      <PopoverSeparator />
       <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
-        <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
+        <Button variant="default" size="tiny" onClick={onSwitchToIssueOptions}>
           Get help
         </Button>
-        <Button type="default" size="tiny" onClick={onClose}>
+        <Button variant="default" size="tiny" onClick={onClose}>
           Close
         </Button>
       </div>
@@ -197,7 +195,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
   ) : (
     <>
       <div className="p-4">
-        <TextArea_Shadcn_
+        <TextArea
           placeholder="My idea for improving Supabase is..."
           rows={6}
           value={feedback}
@@ -236,10 +234,10 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
         )}
       </AnimatePresence>
 
-      <PopoverSeparator_Shadcn_ />
+      <PopoverSeparator />
 
       <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
-        <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
+        <Button variant="default" size="tiny" onClick={onSwitchToIssueOptions}>
           Get help instead
         </Button>
         <div className="flex items-center gap-2 flex-row">
@@ -251,7 +249,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
                 const blobUrl = URL.createObjectURL(blob)
                 window.open(blobUrl, '_blank')
               }}
-              className="cursor-pointer rounded h-[26px] w-[26px] border border-control relative bg-cover bg-center bg-no-repeat"
+              className="cursor-pointer rounded-sm h-[26px] w-[26px] border border-control relative bg-cover bg-center bg-no-repeat"
             >
               <button
                 className={[
@@ -270,7 +268,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="default"
+                  variant="default"
                   disabled={isSavingScreenshot}
                   loading={isSavingScreenshot}
                   className="w-7"
@@ -312,10 +310,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
             loading={isSending}
             onClick={() => {
               sendFeedback()
-              sendEvent({
-                action: 'send_feedback_button_clicked',
-                groups: { project: ref, organization: org?.slug },
-              })
+              track('send_feedback_button_clicked')
             }}
           >
             Send

@@ -21,13 +21,13 @@ export const CronJobRunDetailsEstimateErrorNotice = ({
     >
       <div className="space-y-3 text-sm">
         {error?.message && (
-          <p className="text-foreground-light break-words">
+          <p className="text-foreground-light wrap-break-word">
             Error message: <code className="text-xs">{error.message}</code>
           </p>
         )}
         {onRetry && (
           <Button
-            type="default"
+            variant="default"
             loading={isRetrying}
             disabled={isRetrying}
             className="mt-1"

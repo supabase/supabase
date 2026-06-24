@@ -6,26 +6,26 @@ import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Card,
   CardContent,
   CardFooter,
   cn,
-  CodeBlock,
   copyToClipboard,
   CriticalIcon,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Switch,
   Tabs_Shadcn_ as Tabs,
   TabsContent_Shadcn_ as TabsContent,
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -42,7 +42,7 @@ import z from 'zod'
 import CommandRender from '../CommandRender'
 import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from '@/data/edge-functions/edge-functions-delete-mutation'
@@ -79,7 +79,8 @@ export const EdgeFunctionDetails = () => {
   const canUpdateEdgeFunction = IS_PLATFORM && canUpdateEdgeFunctionPermission
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
+  const { data: apiKeyData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const { anonKey, publishableKey } = apiKeyData ?? {}
 
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
 
@@ -99,7 +100,6 @@ export const EdgeFunctionDetails = () => {
     defaultValues: { name: '', verify_jwt: false },
   })
 
-  const { anonKey, publishableKey } = getKeys(apiKeys)
   const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
 
   const { managementCommands } = generateCLICommands({
@@ -150,11 +150,11 @@ export const EdgeFunctionDetails = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form onSubmit={form.handleSubmit(onUpdateFunction)}>
               <Card>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="name"
                     render={({ field }) => (
@@ -163,9 +163,9 @@ export const EdgeFunctionDetails = () => {
                         layout="flex-row-reverse"
                         description="Your slug and endpoint URL will remain the same"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Input {...field} className="w-64" disabled={!canUpdateEdgeFunction} />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
@@ -173,7 +173,7 @@ export const EdgeFunctionDetails = () => {
                 {IS_PLATFORM && (
                   <>
                     <CardContent>
-                      <FormField_Shadcn_
+                      <FormField
                         control={form.control}
                         name="verify_jwt"
                         render={({ field }) => (
@@ -182,21 +182,32 @@ export const EdgeFunctionDetails = () => {
                             layout="flex-row-reverse"
                             description={
                               <>
-                                Requires a JWT signed{' '}
-                                <em className="text-brand not-italic">only by the legacy secret</em>{' '}
-                                in the <code>Authorization</code> header. The <code>anon</code> key
-                                satisfies this. Recommended: OFF with JWT and custom auth logic in
-                                your function code.
+                                <p className="mb-2">
+                                  Requires a JWT signed{' '}
+                                  <em className="text-foreground not-italic">
+                                    only by the legacy secret
+                                  </em>{' '}
+                                  in the{' '}
+                                  <code className="text-code-inline break-keep!">
+                                    Authorization
+                                  </code>{' '}
+                                  header. The <code className="text-code-inline">anon</code> key
+                                  satisfies this.
+                                </p>
+                                <p>
+                                  Recommended: OFF with JWT and custom auth logic in your function
+                                  code.
+                                </p>
                               </>
                             }
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Switch
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
                                 disabled={!canUpdateEdgeFunction}
                               />
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
@@ -204,13 +215,13 @@ export const EdgeFunctionDetails = () => {
 
                     <CardFooter className="flex justify-end space-x-2">
                       {form.formState.isDirty && (
-                        <Button type="default" onClick={() => form.reset()}>
+                        <Button variant="default" onClick={() => form.reset()}>
                           Cancel
                         </Button>
                       )}
                       <Button
-                        type="primary"
-                        htmlType="submit"
+                        variant="primary"
+                        type="submit"
                         loading={isUpdating}
                         disabled={!canUpdateEdgeFunction || !form.formState.isDirty}
                       >
@@ -221,7 +232,7 @@ export const EdgeFunctionDetails = () => {
                 )}
               </Card>
             </form>
-          </Form_Shadcn_>
+          </Form>
         </PageSectionContent>
       </PageSection>
 
@@ -248,7 +259,7 @@ export const EdgeFunctionDetails = () => {
                   ))}
                   {selectedTab === 'curl' && (
                     <Button
-                      type="default"
+                      variant="default"
                       className="ml-auto -translate-y-2 translate-x-3"
                       onClick={() => setShowKey(!showKey)}
                     >
@@ -265,15 +276,16 @@ export const EdgeFunctionDetails = () => {
                   })
 
                   return (
-                    <TabsContent key={tab.id} value={tab.id} className="mt-4 px-6">
+                    <TabsContent key={tab.id} value={tab.id}>
                       <CodeBlock
                         value={code}
+                        wrapperClassName="[&>div]:top-0 [&>div]:right-3 px-6"
                         className={cn(
-                          'p-0 text-xs !mt-0 border-none [&>code]:!whitespace-pre-wrap',
-                          showKey ? '[&>code]:break-all' : '[&>code]:break-words'
+                          'p-0 text-xs mt-0! border-none ',
+                          showKey ? '[&>code]:break-all' : '[&>code]:wrap-break-word'
                         )}
                         language={tab.language}
-                        wrapLines={true}
+                        wrapLines={false}
                         hideLineNumbers={tab.hideLineNumbers}
                         handleCopy={() => {
                           copyToClipboard(
@@ -304,7 +316,7 @@ export const EdgeFunctionDetails = () => {
               </PageSectionSummary>
             </PageSectionMeta>
             <PageSectionContent>
-              <div className="rounded border bg-surface-100 px-6 py-4 drop-shadow-sm">
+              <div className="rounded-sm border bg-surface-100 px-6 py-4 drop-shadow-xs">
                 <div className="space-y-6">
                   <CommandRender
                     commands={[
@@ -313,7 +325,7 @@ export const EdgeFunctionDetails = () => {
                         description: 'Download the function to your local machine',
                         jsx: () => (
                           <>
-                            <span className="text-brand-600">supabase</span> functions download{' '}
+                            <span className="text-brand">supabase</span> functions download{' '}
                             {selectedFunction?.slug}
                           </>
                         ),
@@ -334,25 +346,23 @@ export const EdgeFunctionDetails = () => {
               </PageSectionSummary>
             </PageSectionMeta>
             <PageSectionContent>
-              <Alert_Shadcn_ variant="destructive">
+              <Alert variant="destructive">
                 <CriticalIcon />
-                <AlertTitle_Shadcn_>
-                  Once your function is deleted, it can no longer be restored
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
+                <AlertTitle>Once your function is deleted, it can no longer be restored</AlertTitle>
+                <AlertDescription>
                   Make sure you have made a backup if you want to restore your edge function
-                </AlertDescription_Shadcn_>
-                <AlertDescription_Shadcn_ className="mt-3">
+                </AlertDescription>
+                <AlertDescription className="mt-3">
                   <Button
-                    type="danger"
+                    variant="danger"
                     disabled={!canUpdateEdgeFunction}
                     loading={selectedFunction?.id === undefined}
                     onClick={() => setShowDeleteModal(true)}
                   >
                     Delete edge function
                   </Button>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             </PageSectionContent>
           </PageSection>
           <ConfirmationModal

@@ -1,15 +1,15 @@
 import { fireEvent, screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
-import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { customRender } from 'tests/lib/custom-render'
-import { addAPIMock } from 'tests/lib/msw'
-import { routerMock } from 'tests/lib/route-mock'
-import type { VaultSecret } from 'types'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { EditSecretModal } from '../EditSecretModal'
+import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
+import { routerMock } from '@/tests/lib/route-mock'
+import type { VaultSecret } from '@/types'
 
 const secret: VaultSecret = {
   id: '47ca58b4-01c5-4a71-8814-c73856b02e0e',
@@ -47,7 +47,6 @@ describe(`EditSecretModal`, () => {
     addAPIMock({
       method: `post`,
       path: `/platform/pg-meta/:ref/query`,
-      // @ts-expect-error this path erroneously has a `never` return type when it should be `unknown` since it executes a SQL query
       response: async ({ request }) => {
         const body = (await request.json()) as { query: string }
         const query = body.query
@@ -79,7 +78,7 @@ describe(`EditSecretModal`, () => {
 
     await screen.findByRole(`dialog`)
 
-    const nameInput = screen.getByLabelText(`Name`)
+    const nameInput = await screen.findByLabelText(`Name`)
     const descriptionInput = screen.getByLabelText(`Description`)
     const valueInput = screen.getByLabelText(`Secret value`)
     const togglePasswordButton = screen.getByRole(`button`, { name: `Show secret value` })
@@ -87,9 +86,10 @@ describe(`EditSecretModal`, () => {
 
     expect(nameInput).toHaveValue(secret.name)
     expect(descriptionInput).toHaveValue(secret.description)
-    expect(valueInput).toHaveAttribute(`type`, `password`)
+    expect(valueInput.tagName).toBe('TEXTAREA')
+    expect((valueInput as any).style.WebkitTextSecurity).toBe('disc')
     await userEvent.click(togglePasswordButton)
-    expect(valueInput).toHaveAttribute(`type`, `text`)
+    expect((valueInput as any).style.WebkitTextSecurity).toBe('')
 
     await userEvent.type(nameInput, `updated-name`)
     await userEvent.clear(descriptionInput)

@@ -1,10 +1,10 @@
+import { joinSqlFragments, safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { toast } from 'sonner'
 
-import { DatabaseExtension } from 'data/database-extensions/database-extensions-query'
-import { GetIndexAdvisorResultResponse } from 'data/database/retrieve-index-advisor-result-query'
-import { executeSql } from 'data/sql/execute-sql-query'
-
-import { INTERNAL_SCHEMAS } from 'hooks/useProtectedSchemas'
+import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
+import { GetIndexAdvisorResultResponse } from '@/data/database/retrieve-index-advisor-result-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 
 /**
  * Gets the required extensions for index advisor
@@ -28,22 +28,24 @@ export function calculateImprovement(
   costBefore: number | undefined,
   costAfter: number | undefined
 ): number {
-  if (
-    costBefore === undefined ||
-    costAfter === undefined ||
-    costBefore <= 0 ||
-    costBefore <= costAfter
-  ) {
+  if (costBefore === undefined || costAfter === undefined) {
     return 0
   }
 
-  return ((costBefore - costAfter) / costBefore) * 100
+  const before = Number(costBefore)
+  const after = Number(costAfter)
+
+  if (before <= 0 || before <= after) {
+    return 0
+  }
+
+  return ((before - after) / before) * 100
 }
 
 interface CreateIndexParams {
   projectRef?: string
   connectionString?: string | null
-  indexStatements: string[]
+  indexStatements: SafeSqlFragment[]
   onSuccess?: () => void
   onError?: (error: any) => void
 }
@@ -77,7 +79,7 @@ export async function createIndexes({
     await executeSql({
       projectRef,
       connectionString,
-      sql: indexStatements.join(';\n') + ';',
+      sql: safeSql`${joinSqlFragments(indexStatements, ';\n')};`,
     })
 
     toast.success('Successfully created index')
@@ -111,7 +113,9 @@ export function hasIndexRecommendations(
  * @param indexStatements Array of index statement strings
  * @returns Filtered array excluding statements referencing protected schemas
  */
-export function filterProtectedSchemaIndexStatements(indexStatements: string[]): string[] {
+export function filterProtectedSchemaIndexStatements(
+  indexStatements: SafeSqlFragment[]
+): SafeSqlFragment[] {
   if (!indexStatements || indexStatements.length === 0) {
     return []
   }

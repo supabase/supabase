@@ -1,11 +1,11 @@
 import { useCallback } from 'react'
 import { toast } from 'sonner'
-import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { copyToClipboard } from 'ui'
 
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { fetchFileUrl } from './useFetchFileUrlQuery'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export const useCopyUrl = () => {
   const { projectRef, selectedBucket } = useStorageExplorerStateSnapshot()

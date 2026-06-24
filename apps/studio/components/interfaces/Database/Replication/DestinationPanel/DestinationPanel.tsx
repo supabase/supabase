@@ -1,4 +1,3 @@
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
@@ -25,6 +24,7 @@ import { DestinationType } from './DestinationPanel.types'
 import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { ReadReplicaForm } from './ReadReplicaForm'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { DOCS_URL } from '@/lib/constants'
 
 interface DestinationPanelProps {
@@ -41,6 +41,8 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
       'Read Replica',
       'BigQuery',
       'Analytics Bucket',
+      'DuckLake',
+      'Snowflake',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,
@@ -95,14 +97,14 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
   return (
     <>
       <Sheet open={visible} onOpenChange={onClose}>
-        <SheetContent size="default" showClose={false} className="md:!w-[850px]">
+        <SheetContent size="lg" showClose={false}>
           <div className="flex flex-col h-full" tabIndex={-1}>
             <SheetHeader>
               <SheetTitle>{editMode ? 'Edit destination' : 'Create a new destination'}</SheetTitle>
               <SheetDescription>
                 {editMode
                   ? 'Update the configuration for this destination'
-                  : 'A destination is an external platform that automatically receives your database changes in real time.'}
+                  : 'A destination can be a read replica or an external destination that receives your database changes in real time.'}
               </SheetDescription>
             </SheetHeader>
 
@@ -116,17 +118,17 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
               <SheetSection>
                 <div className={cn('border rounded-md p-6 flex flex-col gap-y-4')}>
                   <div className="flex flex-col gap-y-1">
-                    <h4>Replicate data to external destinations in real-time</h4>
+                    <h4>Replicate data to external destinations in real time</h4>
                     <p className="text-sm text-foreground-light">
-                      We are currently in <span className="text-foreground">private alpha</span> and
-                      slowly onboarding new customers to ensure stable data pipelines. Request
-                      access below to join the waitlist. Read replicas are available now.
+                      External destinations are in <span className="text-foreground">alpha</span>{' '}
+                      and are being rolled out gradually. Request access below to join the waitlist.
+                      Read replicas are available now.
                     </p>
                   </div>
                   <div className="flex gap-x-2">
                     <Button
                       asChild
-                      type="secondary"
+                      variant="secondary"
                       iconRight={<ArrowUpRight size={16} strokeWidth={1.5} />}
                     >
                       <Link
@@ -144,7 +146,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
             ) : replicationNotEnabled ? (
               <SheetSection>
                 <EnableReplicationCallout
-                  className="!p-6"
+                  className="p-6!"
                   type={destinationType}
                   hasAccess={hasETLReplicationAccess}
                 />

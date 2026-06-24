@@ -1,24 +1,23 @@
+import dayjs from 'dayjs'
+import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useMemo, useState } from 'react'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, Tooltip, TooltipContent, TooltipTrigger, WarningIcon } from 'ui'
 
-import AreaChart from 'components/ui/Charts/AreaChart'
-import BarChart from 'components/ui/Charts/BarChart'
-import { AnalyticsInterval } from 'data/analytics/constants'
-import { mapMultiResponseToAnalyticsData } from 'data/analytics/infra-monitoring-queries'
+import type { ChartData } from './Charts.types'
+import AreaChart from '@/components/ui/Charts/AreaChart'
+import BarChart from '@/components/ui/Charts/BarChart'
+import { AnalyticsInterval } from '@/data/analytics/constants'
+import { mapMultiResponseToAnalyticsData } from '@/data/analytics/infra-monitoring-queries'
 import {
   InfraMonitoringAttribute,
   useInfraMonitoringAttributesQuery,
-} from 'data/analytics/infra-monitoring-query'
+} from '@/data/analytics/infra-monitoring-query'
 import {
   ProjectDailyStatsAttribute,
   useProjectDailyStatsQuery,
-} from 'data/analytics/project-daily-stats-query'
-import dayjs from 'dayjs'
-import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { WarningIcon } from 'ui'
-import type { ChartData } from './Charts.types'
+} from '@/data/analytics/project-daily-stats-query'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 interface ChartHandlerProps {
   id?: string
@@ -150,7 +149,7 @@ const ChartHandler = ({
 
   if (chartData === undefined) {
     return (
-      <div className="flex h-52 w-full flex-col items-center justify-center gap-y-2">
+      <div className="flex h-64 w-full flex-col items-center justify-center gap-y-2 border border-dashed rounded-md">
         <WarningIcon />
         <p className="text-xs text-foreground-lighter">Unable to load data for {label}</p>
       </div>
@@ -164,7 +163,7 @@ const ChartHandler = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                type="default"
+                variant="default"
                 className="px-1.5"
                 icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
                 onClick={() => setChartStyle(chartStyle === 'bar' ? 'line' : 'bar')}

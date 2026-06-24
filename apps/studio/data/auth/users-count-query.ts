@@ -1,11 +1,11 @@
 import type { OptimizedSearchColumns } from '@supabase/pg-meta'
 import { getUsersCountSQL } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { executeSql, type ExecuteSqlError } from 'data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from 'types'
 
 import { authKeys } from './keys'
 import { type Filter } from './users-infinite-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type UsersCountVariables = {
   projectRef?: string
@@ -57,7 +57,7 @@ export async function getUsersCount(
 }
 
 export type UsersCountData = Awaited<ReturnType<typeof getUsersCount>>
-export type UsersCountError = ExecuteSqlError
+export type UsersCountError = ResponseError
 
 /** [Joshen] Be wary of using this as it could potentially cause a huge load on the user's DB */
 export const useUsersCountQuery = <TData = UsersCountData>(

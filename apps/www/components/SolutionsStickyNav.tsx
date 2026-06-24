@@ -1,7 +1,15 @@
-import React from 'react'
+import SectionContainer from 'components/Layouts/SectionContainer'
+import {
+  appTypeSolutions,
+  migrationSolutions,
+  skillBasedSolutions,
+  SolutionTypes,
+  useCaseSolutions,
+} from 'data/Solutions'
 import { ChevronDown } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import React from 'react'
 import {
   Button,
   cn,
@@ -10,15 +18,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-
-import SectionContainer from 'components/Layouts/SectionContainer'
-import {
-  SolutionTypes,
-  appTypeSolutions,
-  migrationSolutions,
-  skillBasedSolutions,
-  useCaseSolutions,
-} from 'data/Solutions'
 
 interface Props {
   activeItem: SolutionTypes
@@ -50,16 +49,16 @@ function SolutionsStickyNav({ type, activeItem, className }: Props) {
       <div className="absolute inset-0 z-30 h-full w-full pointer-events-none">
         <nav
           className={cn(
-            'sticky z-30 flex items-center bg-background/90 w-full border-b backdrop-blur-sm pointer-events-auto top-[65px]',
+            'sticky z-30 flex items-center bg-background/90 w-full border-b backdrop-blur-xs pointer-events-auto top-[65px]',
             className
           )}
         >
           {/* mobile */}
-          <SectionContainer className="!p-2 flex items-start md:hidden">
+          <SectionContainer className="p-2! flex items-start md:hidden">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="text"
+                  variant="text"
                   iconRight={<ChevronDown />}
                   className="w-full min-w-[200px] flex justify-between items-center py-2"
                 >
@@ -80,7 +79,7 @@ function SolutionsStickyNav({ type, activeItem, className }: Props) {
             </DropdownMenu>
           </SectionContainer>
           {/* desktop */}
-          <SectionContainer className="!py-0 hidden md:flex gap-3 items-center">
+          <SectionContainer className="w-full py-0! hidden md:flex gap-3 items-center">
             {items.map((item: any) => {
               const isActive = item.id === activeItem
 

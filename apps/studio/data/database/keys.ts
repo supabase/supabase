@@ -1,4 +1,4 @@
-import { sqlKeys } from '../sql/keys'
+import { sqlKeys } from '@/data/sql/keys'
 
 export const databaseKeys = {
   schemas: (projectRef: string | undefined) => ['projects', projectRef, 'schemas'] as const,
@@ -9,16 +9,16 @@ export const databaseKeys = {
     schema: string | undefined,
     table: string | undefined
   ) => ['projects', projectRef, 'table-columns', schema, table] as const,
-  databaseFunctions: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'database-functions'] as const,
+  databaseFunctions: (projectRef: string | undefined, schema?: string) =>
+    ['projects', projectRef, 'database-functions', schema].filter(Boolean),
   entityDefinition: (projectRef: string | undefined, id?: number) =>
     ['projects', projectRef, 'entity-definition', id] as const,
   entityDefinitions: (projectRef: string | undefined, schemas: string[]) =>
     ['projects', projectRef, 'entity-definitions', schemas] as const,
   tableDefinition: (projectRef: string | undefined, id?: number) =>
     ['projects', projectRef, 'table-definition', id] as const,
-  viewDefinition: (projectRef: string | undefined, id?: number) =>
-    ['projects', projectRef, 'view-definition', id] as const,
+  viewDefinition: (projectRef: string | undefined, id?: number, includeCreateStatement?: boolean) =>
+    ['projects', projectRef, 'view-definition', id, includeCreateStatement ?? false] as const,
   backups: (projectRef: string | undefined) =>
     ['projects', projectRef, 'database', 'backups'] as const,
   poolingConfiguration: (projectRef: string | undefined) =>
