@@ -180,12 +180,12 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <DropdownMenuTrigger asChild>
-                            <Button
-                              aria-label="More options"
-                              variant="default"
-                              className="px-1"
-                              icon={<MoreVertical />}
-                            />
+                          <Button
+                            aria-label="More options"
+                            variant="default"
+                            className="px-1"
+                            icon={<MoreVertical />}
+                          />
                         </DropdownMenuTrigger>
                       </TooltipTrigger>
                       <TooltipContent side="bottom">More options</TooltipContent>
