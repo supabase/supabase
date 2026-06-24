@@ -17,14 +17,12 @@ interface FilterSideBarProps {
   isFilterBarOpen: boolean
   setIsFilterBarOpen: React.Dispatch<React.SetStateAction<boolean>>
   dateRangeDisabled?: DateRangeDisabled
-  afterFilters?: ReactNode
 }
 
 export function FilterSideBar({
   isFilterBarOpen,
   setIsFilterBarOpen,
   dateRangeDisabled,
-  afterFilters,
 }: FilterSideBarProps) {
   const router = useRouter()
   const { ref } = useParams()
@@ -84,7 +82,6 @@ export function FilterSideBar({
 
       <div className="flex-1 p-2 sm:overflow-y-scroll">
         <DataTableFilterControls dateRangeDisabled={dateRangeDisabled} />
-        {afterFilters}
         <FeaturePreviewSidebarPanel
           className="mx-2 my-4"
           title="Capture your logs"
