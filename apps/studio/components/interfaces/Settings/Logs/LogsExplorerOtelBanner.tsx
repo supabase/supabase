@@ -44,7 +44,7 @@ export const LogsExplorerOtelBanner = ({ projectRef, sql }: LogsExplorerOtelBann
       actions={
         <div className="flex items-center gap-2">
           <Button variant="default" size="tiny" onClick={openRewriteAssistant}>
-            Rewrite with the Assistant
+            Rewrite with AI Assistant
           </Button>
           <Button variant="text" size="tiny" onClick={() => setDismissed(true)}>
             Dismiss

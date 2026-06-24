@@ -106,15 +106,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     []
   )
 
-  // The otelLegacyLogs flag forces the explorer onto the OTEL endpoint; the
-  // manual toggle (shown only behind showChToggleInLogExplorer) can additionally
-  // opt in when the flag is off.
-  const otelLegacyLogsEnabled = useFlag('otelLegacyLogs')
-  const [useOtelEndpointPreference, setUseOtelEndpointPreference] = useLocalStorage<boolean>(
-    `logs-explorer-use-otel-endpoint-${projectRef}`,
-    false
-  )
-  const useOtelEndpoint = otelLegacyLogsEnabled || useOtelEndpointPreference
+  // When the otelLegacyLogs flag is on, the explorer queries the ClickHouse-backed
+  // logs.all.otel endpoint; otherwise it stays on the BigQuery logs.all endpoint.
+  const useOtelEndpoint = useFlag('otelLegacyLogs')
 
   const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToAuditLogDays = getEntitlementNumericValue()
@@ -392,9 +386,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             templates={allTemplates.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
             warnings={warnings}
-            useOtel={useOtelEndpoint}
-            onUseOtelChange={setUseOtelEndpointPreference}
-            otelForced={otelLegacyLogsEnabled}
           />
           {useOtelEndpoint && <LogsExplorerOtelBanner projectRef={projectRef} sql={editorValue} />}
           <ShimmerLine active={isLoading} />
