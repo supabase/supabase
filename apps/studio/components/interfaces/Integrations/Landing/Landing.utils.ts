@@ -10,12 +10,17 @@ import {
   findStripeSchema,
 } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
 import { getAPIKeys, type APIKey } from '@/data/api-keys/api-keys-query'
+import { apiKeysKeys } from '@/data/api-keys/keys'
 import { getProjectAuthConfig, ProjectAuthConfigData } from '@/data/auth/auth-config-query'
+import { authKeys } from '@/data/auth/keys'
 import { type DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
 import { type Schema } from '@/data/database/schemas-query'
 import { type FDW } from '@/data/fdw/fdws-query'
 import { AuthorizedApp, getAuthorizedApps } from '@/data/oauth/authorized-apps-query'
+import { oauthAppKeys } from '@/data/oauth/keys'
 import { getIntegrations, IntegrationStatus } from '@/data/partners/integration-status-query'
+import { partnersKeys } from '@/data/partners/keys'
+import { secretsKeys } from '@/data/secrets/keys'
 import { getSecrets, type ProjectSecret } from '@/data/secrets/secrets-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { ResponseError } from '@/types'
@@ -46,13 +51,15 @@ function usePermissionSafeQuery<T>({
   defaultVal,
   enabled = true,
 }: {
-  queryKey: (string | undefined)[]
+  queryKey: readonly (string | boolean | undefined)[]
   queryFn: (opts: { signal?: AbortSignal }) => Promise<T>
   defaultVal: T
   enabled: boolean
 }) {
   return useQuery({
-    queryKey,
+    // Callers should pass in the queryKey used by the standard data hook, as the shared prefix
+    // will let this new query also be invalidated in response to user actions.
+    queryKey: [...queryKey, 'permission-safe'],
     queryFn: async (opts) => {
       try {
         return await queryFn(opts)
@@ -85,31 +92,31 @@ export const useProjectOAuthIntegrationData = (
   const { data: org } = useSelectedOrganizationQuery({ enabled })
   const queries = {
     apiKeys: usePermissionSafeQuery({
-      queryKey: ['project-data', projectRef, 'api-keys'],
+      queryKey: apiKeysKeys.list(projectRef, false),
       queryFn: ({ signal }) => getAPIKeys({ projectRef, reveal: false }, signal),
       defaultVal: [],
       enabled: enabled && !!projectRef,
     }),
     edgeFunctionSecrets: usePermissionSafeQuery({
-      queryKey: ['project-data', projectRef, 'secrets'],
+      queryKey: secretsKeys.list(projectRef),
       queryFn: ({ signal }) => getSecrets({ projectRef }, signal),
       defaultVal: [],
       enabled: enabled && !!projectRef,
     }),
     authConfig: usePermissionSafeQuery({
-      queryKey: ['project-data', projectRef, 'auth-config'],
+      queryKey: authKeys.authConfig(projectRef),
       queryFn: ({ signal }) => getProjectAuthConfig({ projectRef }, signal),
       defaultVal: null,
       enabled: enabled && !!projectRef,
     }),
     partnerIntegrations: usePermissionSafeQuery({
-      queryKey: ['project-data', projectRef, 'partner-integrations'],
+      queryKey: partnersKeys.getIntegrations(projectRef),
       queryFn: ({ signal }) => getIntegrations({ projectRef }, signal),
       defaultVal: [],
       enabled: enabled && !!projectRef,
     }),
     oauthApps: usePermissionSafeQuery({
-      queryKey: ['project-data', org?.slug, 'oauth-apps'],
+      queryKey: oauthAppKeys.authorizedApps(org?.slug),
       queryFn: ({ signal }) => getAuthorizedApps({ slug: org?.slug }, signal),
       defaultVal: [],
       enabled: enabled && !!org,
