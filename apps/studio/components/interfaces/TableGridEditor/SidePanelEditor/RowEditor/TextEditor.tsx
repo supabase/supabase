@@ -1,7 +1,5 @@
-import { Editor } from '@monaco-editor/react'
 import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import { useParams } from 'common'
-import { Loader } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import remarkGfm from 'remark-gfm'
 import { toast } from 'sonner'
@@ -10,6 +8,7 @@ import { Button, cn, SidePanel } from 'ui'
 import { ActionBar } from '../ActionBar'
 import { isValueTruncated } from './RowEditor.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
@@ -129,35 +128,11 @@ export const TextEditor = ({
       <div className="relative flex flex-auto h-full flex-col gap-y-4">
         {view === 'edit' ? (
           <div className="w-full h-full grow">
-            <Editor
+            <CodeEditor
               key={value}
-              theme="supabase"
-              className="monaco-editor"
-              defaultLanguage="markdown"
+              language="markdown"
               value={strValue}
-              loading={<Loader className="animate-spin" strokeWidth={2} size={20} />}
-              options={{
-                readOnly,
-                tabSize: 2,
-                fontSize: 13,
-                minimap: {
-                  enabled: false,
-                },
-                wordWrap: 'on',
-                fixedOverflowWidgets: true,
-                lineNumbersMinChars: 4,
-              }}
-              onMount={(editor) => {
-                editor.changeViewZones((accessor) => {
-                  accessor.addZone({
-                    afterLineNumber: 0,
-                    heightInPx: 4,
-                    domNode: document.createElement('div'),
-                  })
-                })
-                editor.focus()
-              }}
-              onChange={(val) => setStrValue(val ?? '')}
+              onInputChange={(val) => setStrValue(val ?? '')}
             />
           </div>
         ) : (
