@@ -13,22 +13,6 @@ export const AUTH_EMAIL_TEMPLATES_DOCS_PATH = '/guides/auth/auth-email-templates
 
 export const AUTH_EMAIL_TEMPLATES_TERMINOLOGY_ANCHOR = 'terminology'
 
-/** Local development / self-hosted email templates guide. */
-export const LOCAL_EMAIL_TEMPLATES_DOCS_PATH =
-  '/guides/local-development/customizing-email-templates'
-
-export const LOCAL_EMAIL_TEMPLATES_VARIABLES_ANCHOR = 'template-variables'
-
-export function getEmailTemplatesDocsPath(isPlatform: boolean) {
-  return isPlatform ? AUTH_EMAIL_TEMPLATES_DOCS_PATH : LOCAL_EMAIL_TEMPLATES_DOCS_PATH
-}
-
-export function getEmailTemplateVariablesDocsPath(isPlatform: boolean) {
-  return isPlatform
-    ? `${AUTH_EMAIL_TEMPLATES_DOCS_PATH}#${AUTH_EMAIL_TEMPLATES_TERMINOLOGY_ANCHOR}`
-    : `${LOCAL_EMAIL_TEMPLATES_DOCS_PATH}#${LOCAL_EMAIL_TEMPLATES_VARIABLES_ANCHOR}`
-}
-
 /** Docs heading anchors for customizing-email-templates.mdx (ui Heading slugify output). */
 export const EMAIL_TEMPLATE_DOCS_ANCHORS = {
   CONFIRMATION: 'authemailtemplateconfirmation',

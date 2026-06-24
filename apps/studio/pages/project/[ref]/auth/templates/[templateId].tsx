@@ -44,7 +44,7 @@ import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/EmailTemplates/AuthTemplatesValidation'
 import { CustomEmailTemplateRestrictionAdmonition } from '@/components/interfaces/Auth/EmailTemplates/CustomEmailTemplateRestrictionAdmonition'
-import { getEmailTemplatesDocsPath } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.constants'
+import { AUTH_EMAIL_TEMPLATES_DOCS_PATH } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.constants'
 import {
   isCustomEmailTemplateEditingRestricted,
   isCustomEmailTemplateRestrictionStatusKnown,
@@ -60,7 +60,7 @@ import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-muta
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const TemplatePage: NextPageWithLayout = () => {
@@ -208,7 +208,7 @@ const RedirectToTemplates = () => {
             </PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
-            <DocsButton href={`${DOCS_URL}${getEmailTemplatesDocsPath(IS_PLATFORM)}`} />
+            <DocsButton href={`${DOCS_URL}${AUTH_EMAIL_TEMPLATES_DOCS_PATH}`} />
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
