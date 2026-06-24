@@ -35,9 +35,11 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       )
     })
 
-    it('routes the `storage` log type to edge_logs filtered by /storage/', () => {
+    it('routes the `storage` log type to storage_logs or edge_logs /storage/', () => {
       const sql = getUnifiedLogsQuery(withFilters('log_type:eq:storage'))
-      expect(sql).toContain(
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`source = 'storage_logs'`)
+      expect(where).toContain(
         `source = 'edge_logs' AND log_attributes['request.path'] LIKE '%/storage/%'`
       )
     })
@@ -169,6 +171,15 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       const sql = getLogsCountQuery(withFilters('log_type:eq:postgrest'))
       const logTypeWhere = whereOfBranchContaining(sql, `'log_type'`)
       expect(logTypeWhere).not.toContain(`LIKE '%/rest/%'`)
+    })
+
+    it('applies the connection-logs filter to every count scan so badges match the list', () => {
+      const sql = getLogsCountQuery({ ...baseSearch, hide_connection_logs: true } as any)
+      const scans = sql.split(/\bUNION ALL\b/)
+      expect(scans.length).toBeGreaterThan(1)
+      for (const scan of scans) {
+        expect(scan).toContain("event_message NOT LIKE 'connection received%'")
+      }
     })
   })
 
