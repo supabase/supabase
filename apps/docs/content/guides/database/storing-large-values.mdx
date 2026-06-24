@@ -44,7 +44,7 @@ Use this as a decision framework, not a rule:
 | You need transactional consistency with the row           | The payload is an artifact (a generated file, a raw response log) |
 | Row count is moderate                                     | The table grows without limit (e.g. one row per request)          |
 
-For AI apps, a common split: keep small, frequently queried fields (status, token counts, a short summary, embeddings) in Postgres; offload the raw prompt/response/log to [Storage](/docs/guides/storage) and keep a path pointer.
+For AI apps, a common split is to keep small, frequently queried fields (status, token counts, a short summary, embeddings) in Postgres and offload the raw prompt/response/log to [Storage](/docs/guides/storage) and keep a path pointer.
 
 ## Keeping large values in Postgres
 
