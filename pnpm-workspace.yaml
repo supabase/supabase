@@ -13,6 +13,9 @@ catalog:
   '@supabase/realtime-js': 2.108.2
   '@supabase/ssr': 0.10.2
   '@supabase/supabase-js': 2.108.2
+  '@tanstack/react-router': ^1.169.2
+  '@tanstack/react-start': ^1.167.65
+  '@tanstack/react-table': ^8.21.3
   '@types/node': ^22.0.0
   '@types/react': ^19.2.14
   '@types/react-dom': ^19.2.3
@@ -73,6 +76,10 @@ overrides:
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
   express-rate-limit>ip-address: ^10.1.1
+  # Pin h3 v1 to a single version so the Nuxt registry example (vue-blocks)
+  # doesn't end up with two copies (1.15.10 + 1.15.11) and hit nominal
+  # H3Event type mismatches. v2 (h3@2) is intentionally left untouched.
+  'h3@1': 1.15.11
   lodash: 'catalog:'
   lodash-es: 'catalog:'
   node-gyp>tar: ^7.5.11
