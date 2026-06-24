@@ -197,7 +197,7 @@ export const pricing: Pricing = {
       },
       {
         key: 'database.replication',
-        title: 'Supabase Pipelines',
+        title: 'Pipelines',
         plans: {
           free: false,
           pro: [
