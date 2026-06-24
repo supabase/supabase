@@ -25,6 +25,7 @@ import {
   buildLogQueryParams,
   resolveLogDateRange,
 } from '@/components/interfaces/Settings/Logs/logsDateRange'
+import { LogsExplorerOtelBanner } from '@/components/interfaces/Settings/Logs/LogsExplorerOtelBanner'
 import LogsQueryPanel from '@/components/interfaces/Settings/Logs/LogsQueryPanel'
 import { LogTable } from '@/components/interfaces/Settings/Logs/LogTable'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
@@ -200,6 +201,22 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     }
 
     addRecentLogSqlSnippet({ sql: template.searchString })
+  }
+
+  const applyRewrite = (newSql: string) => {
+    setEditorValue(newSql)
+    if (editorRef.current && monaco) {
+      const editorModel = editorRef.current.getModel()
+      editorRef.current.pushUndoStop()
+      editorRef.current.executeEdits('rewrite-clickhouse', [
+        {
+          text: newSql,
+          range: editorModel?.getFullModelRange() ?? new monaco.Range(1, 1, 1, 1),
+        },
+      ])
+      editorRef.current.pushUndoStop()
+      editorRef.current.focus()
+    }
   }
 
   const handleRun = (value?: string | React.MouseEvent) => {
@@ -401,6 +418,13 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             onSelectTemplate={onSelectTemplate}
             warnings={warnings}
           />
+          {useOtelEndpoint && (
+            <LogsExplorerOtelBanner
+              projectRef={projectRef}
+              sql={editorValue}
+              onApplyRewrite={applyRewrite}
+            />
+          )}
           <ShimmerLine active={isLoading} />
           <CodeEditor
             // Ensure we reset the editor to the query content whenever the selected query changes
