@@ -11,11 +11,11 @@ import { ObservabilitySection } from './ObservabilitySection'
 export function EdgeFunctionsContent() {
   return (
     <div className="overflow-x-clip">
-      <section className="border-t border-border">
+      <section className="border-t border-border" aria-label="Hero">
         <Hero />
         <Highlights />
       </section>
-      <section className="border-t border-border">
+      <section id="quote" className="border-t border-border" aria-label="Customer quote">
         <QuoteSection
           quote="Supabase gave us the flexibility and scalability needed at every growth stage."
           highlight="It's rare to find a tool that works just as well for startups as it does for large-scale operations."
@@ -27,22 +27,30 @@ export function EdgeFunctionsContent() {
           }}
         />
       </section>
-      <section className="border-t border-border">
+      <section id="examples" className="border-t border-border" aria-label="Example projects">
         <ExamplesSection />
       </section>
-      <section className="border-t border-border">
+      <section
+        id="local-dx"
+        className="border-t border-border"
+        aria-label="Local developer experience"
+      >
         <LocalDXSection />
       </section>
-      <section className="border-t border-border">
+      <section id="global-presence" className="border-t border-border" aria-label="Global presence">
         <GlobalPresenceSection />
       </section>
-      <section className="border-t border-border">
+      <section id="observability" className="border-t border-border" aria-label="Observability">
         <ObservabilitySection />
       </section>
-      <section className="border-y border-border">
+      <section
+        id="integrations"
+        className="border-y border-border"
+        aria-label="Supabase integrations"
+      >
         <IntegratesSection />
       </section>
-      <section className="">
+      <section id="get-started" aria-label="Get started">
         <CTASection />
       </section>
     </div>

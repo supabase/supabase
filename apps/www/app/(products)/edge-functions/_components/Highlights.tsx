@@ -93,7 +93,9 @@ export function Highlights() {
               key={highlight.title}
               className="bg-surface-75 border border-border rounded-lg p-6 flex flex-col gap-3"
             >
-              <div className="text-foreground-lighter">{highlight.icon}</div>
+              <div className="text-foreground-lighter" aria-hidden>
+                {highlight.icon}
+              </div>
               <h3 className="text-foreground text-base font-medium">{highlight.title}</h3>
               <p className="text-foreground-lighter text-sm">{highlight.paragraph}</p>
             </div>

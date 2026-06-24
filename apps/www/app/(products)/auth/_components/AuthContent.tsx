@@ -14,24 +14,40 @@ export function AuthContent({
 }) {
   return (
     <div className="overflow-x-clip">
-      <section>
+      <section aria-label="Hero">
         <Hero />
       </section>
-      <section className="border-t border-border">
+      <section
+        id="features"
+        className="border-t border-border"
+        aria-label="Authentication features"
+      >
         <FeaturesSection />
       </section>
-      <section className="border-t border-border">
+      <section id="quote" className="border-t border-border" aria-label="Customer quote">
         <QuoteSection />
       </section>
-      <section className="border-t border-border">
+      <section
+        id="highlights"
+        className="border-t border-border"
+        aria-label="Enterprise security highlights"
+      >
         <HighlightsSection />
       </section>
-      <section className="border-t border-border">{apiSlot}</section>
-      <section className="border-t border-border">{rlsSlot}</section>
-      <section className="border-t border-border">
+      <section id="api" className="border-t border-border" aria-label="API examples">
+        {apiSlot}
+      </section>
+      <section id="rls" className="border-t border-border" aria-label="Row Level Security">
+        {rlsSlot}
+      </section>
+      <section
+        id="built-with-supabase"
+        className="border-t border-border"
+        aria-label="Built with Supabase"
+      >
         <BuiltWithSupabaseSection />
       </section>
-      <section className="border-t border-border">
+      <section id="get-started" className="border-t border-border" aria-label="Get started">
         <CTASection />
       </section>
     </div>

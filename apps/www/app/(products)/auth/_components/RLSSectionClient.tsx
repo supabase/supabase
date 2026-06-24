@@ -102,12 +102,20 @@ export function RLSSectionClient({ examples }: { examples: RLSExample[] }) {
       {/* Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Left: tabs */}
-        <div className="flex flex-col gap-3 items-start justify-end">
+        <div
+          role="tablist"
+          aria-label="RLS policy examples"
+          className="flex flex-col gap-3 items-start justify-end"
+        >
           {examples.map((example, index) => {
             const isActive = index === activeIdx
             return (
               <button
                 key={example.title}
+                role="tab"
+                aria-selected={isActive}
+                aria-controls={`rls-panel-${index}`}
+                id={`rls-tab-${index}`}
                 onClick={() => handleTabClick(index)}
                 className={cn(
                   'text-left flex flex-col gap-0.5 py-2 transition-colors',
@@ -130,6 +138,9 @@ export function RLSSectionClient({ examples }: { examples: RLSExample[] }) {
 
         {/* Right: code block */}
         <motion.div
+          role="tabpanel"
+          id={`rls-panel-${activeIdx}`}
+          aria-labelledby={`rls-tab-${activeIdx}`}
           initial={false}
           animate={height != null ? { height } : undefined}
           transition={
@@ -178,6 +189,7 @@ export function RLSSectionClient({ examples }: { examples: RLSExample[] }) {
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className="shrink-0"
+              aria-hidden
             >
               <path
                 d="M3.5 2.5H9.5V8.5M9.5 2.5L2.5 9.5"

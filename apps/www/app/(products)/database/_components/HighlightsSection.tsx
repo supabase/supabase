@@ -80,17 +80,20 @@ export function HighlightsSection() {
               </div>
             </div>
             {/* Decorative image */}
-            <div className="hidden sm:flex lg:hidden xl:flex absolute top-0 right-0 bottom-0 items-end h-full opacity-50 dark:opacity-20 select-none">
+            <div
+              className="hidden sm:flex lg:hidden xl:flex absolute top-0 right-0 bottom-0 items-end h-full opacity-50 dark:opacity-20 select-none"
+              aria-hidden
+            >
               <Image
                 src={highlight.image.dark}
-                alt={highlight.title}
+                alt=""
                 width={296}
                 height={275}
                 className="hidden dark:block"
               />
               <Image
                 src={highlight.image.light}
-                alt={highlight.title}
+                alt=""
                 width={296}
                 height={275}
                 className="dark:hidden"

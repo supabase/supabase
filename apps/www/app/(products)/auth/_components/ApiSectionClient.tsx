@@ -110,20 +110,28 @@ export function ApiSectionClient({ examples }: { examples: ApiExample[] }) {
       {/* Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Left: tab cards */}
-        <div className="flex flex-col gap-1 items-start justify-end">
+        <div
+          role="tablist"
+          aria-label="Authentication API examples"
+          className="flex flex-col gap-1 items-start justify-end"
+        >
           {examples.map((example, index) => {
             const isActive = index === activeIdx
             const Icon = ICONS[example.icon]
             return (
               <button
                 key={example.title}
+                role="tab"
+                aria-selected={isActive}
+                aria-controls={`auth-api-panel-${index}`}
+                id={`auth-api-tab-${index}`}
                 onClick={() => handleTabClick(index)}
                 className={cn(
                   'text-left flex items-center gap-3 py-2 text-2xl font-medium transition-colors',
                   isActive ? 'text-foreground' : 'text-foreground-muted hover:text-foreground-light'
                 )}
               >
-                <Icon size={22} strokeWidth={1.5} />
+                <Icon size={22} strokeWidth={1.5} aria-hidden />
                 {example.title}
               </button>
             )
@@ -132,6 +140,9 @@ export function ApiSectionClient({ examples }: { examples: ApiExample[] }) {
 
         {/* Right: code block */}
         <motion.div
+          role="tabpanel"
+          id={`auth-api-panel-${activeIdx}`}
+          aria-labelledby={`auth-api-tab-${activeIdx}`}
           initial={false}
           animate={height != null ? { height } : undefined}
           transition={
@@ -200,6 +211,7 @@ export function ApiSectionClient({ examples }: { examples: ApiExample[] }) {
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className="shrink-0"
+              aria-hidden
             >
               <path
                 d="M3.5 2.5H9.5V8.5M9.5 2.5L2.5 9.5"

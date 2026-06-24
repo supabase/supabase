@@ -14,24 +14,32 @@ export function StorageContent({
 }) {
   return (
     <div className="overflow-x-clip">
-      <section>
+      <section aria-label="Hero">
         <Hero />
       </section>
-      <section className="border-t border-border">
+      <section id="features" className="border-t border-border" aria-label="Storage features">
         <FeaturesSection />
       </section>
-      <section className="border-t border-border">
+      <section id="quote" className="border-t border-border" aria-label="Customer quote">
         <QuoteSection />
       </section>
-      <section className="border-t border-border">
+      <section id="bucket-types" className="border-t border-border" aria-label="Bucket types">
         <BucketTypesSection />
       </section>
-      <section className="border-t border-border">{apiSlot}</section>
-      <section className="border-t border-border">{permissionsSlot}</section>
-      <section className="border-t border-border">
+      <section id="api" className="border-t border-border" aria-label="API examples">
+        {apiSlot}
+      </section>
+      <section id="permissions" className="border-t border-border" aria-label="Permissions">
+        {permissionsSlot}
+      </section>
+      <section
+        id="built-with-supabase"
+        className="border-t border-border"
+        aria-label="Built with Supabase"
+      >
         <BuiltWithSupabaseSection />
       </section>
-      <section className="border-t border-border">
+      <section id="get-started" className="border-t border-border" aria-label="Get started">
         <CTASection />
       </section>
     </div>

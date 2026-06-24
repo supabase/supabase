@@ -38,6 +38,8 @@ function PostgresSkeleton() {
 
   return (
     <div
+      role="img"
+      aria-label="Postgres elephant logo illustration"
       className="flex items-center justify-center w-full h-full relative"
       style={{
         maskImage: 'radial-gradient(ellipse 85% 85% at 50% 50%, black 30%, transparent 75%)',
@@ -48,6 +50,7 @@ function PostgresSkeleton() {
     >
       {/* Abstract construction lines behind the elephant */}
       <svg
+        aria-hidden
         className="absolute -inset-16 w-[calc(100%+128px)] h-[calc(100%+128px)] text-foreground-muted/20"
         viewBox="0 0 480 480"
         fill="none"
@@ -107,6 +110,7 @@ function PostgresSkeleton() {
 
       {/* Highlighted lines on hover */}
       <svg
+        aria-hidden
         className="absolute -inset-16 w-[calc(100%+128px)] h-[calc(100%+128px)] transition-opacity duration-500"
         style={{ opacity: hovered ? 0.35 : 0 }}
         viewBox="0 0 480 480"

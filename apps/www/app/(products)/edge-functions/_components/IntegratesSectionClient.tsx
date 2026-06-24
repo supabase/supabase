@@ -108,20 +108,28 @@ export function IntegratesSectionClient({ useCases }: { useCases: UseCase[] }) {
       {/* Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Left: tab cards */}
-        <div className="flex flex-col gap-1 items-start justify-end">
+        <div
+          role="tablist"
+          aria-label="Edge Functions integrations"
+          className="flex flex-col gap-1 items-start justify-end"
+        >
           {useCases.map((useCase, index) => {
             const isActive = index === activeIdx
             const Icon = ICONS[useCase.icon]
             return (
               <button
                 key={useCase.label}
+                role="tab"
+                aria-selected={isActive}
+                aria-controls={`ef-integrates-panel-${index}`}
+                id={`ef-integrates-tab-${index}`}
                 onClick={() => handleTabClick(index)}
                 className={cn(
                   'text-left flex items-center gap-3 py-2 text-2xl transition-colors',
                   isActive ? 'text-foreground' : 'text-foreground-muted hover:text-foreground-light'
                 )}
               >
-                <Icon size={22} strokeWidth={1.5} />
+                <Icon size={22} strokeWidth={1.5} aria-hidden />
                 {useCase.label}
               </button>
             )
@@ -129,7 +137,12 @@ export function IntegratesSectionClient({ useCases }: { useCases: UseCase[] }) {
         </div>
 
         {/* Right: code area */}
-        <div className="flex flex-col self-end border border-border rounded-md overflow-clip">
+        <div
+          role="tabpanel"
+          id={`ef-integrates-panel-${activeIdx}`}
+          aria-labelledby={`ef-integrates-tab-${activeIdx}`}
+          className="flex flex-col self-end border border-border rounded-md overflow-clip"
+        >
           <motion.div
             initial={false}
             animate={height != null ? { height } : undefined}
@@ -195,6 +208,7 @@ export function IntegratesSectionClient({ useCases }: { useCases: UseCase[] }) {
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
                 className="shrink-0"
+                aria-hidden
               >
                 <path
                   d="M3.5 2.5H9.5V8.5M9.5 2.5L2.5 9.5"
