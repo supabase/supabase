@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, Checkbox, DialogFooter, DialogSection, Label } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -51,6 +51,13 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
   })
 
   const paymentRef = useRef<PaymentMethodElementRef | null>(null)
+  const isMounted = useRef(true)
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false
+    }
+  }, [])
 
   const handleSubmit = async (event: any) => {
     event.preventDefault()
@@ -106,6 +113,8 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
 
     // Dry run passed — proceed with Stripe payment method creation / 3DS
     const result = await paymentRef.current?.confirmSetup()
+
+    if (!isMounted.current) return
 
     if (!result) {
       setIsSaving(false)
@@ -165,6 +174,8 @@ const AddPaymentMethodForm = ({ onCancel, onConfirm }: AddPaymentMethodFormProps
           })
         }
       }
+
+      if (!isMounted.current) return
 
       setIsSaving(false)
       onConfirm()
