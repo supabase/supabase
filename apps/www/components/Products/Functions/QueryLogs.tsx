@@ -55,6 +55,7 @@ const QueryLogs = ({ isActive, isInView }: { isActive?: boolean; isInView?: bool
 
   const isPlaying = isActive && isInView
   const INTERVAL = 550 // in milliseconds
+  const MAX_LOGS = 120
 
   const logs = [
     createLog(),
@@ -90,7 +91,7 @@ const QueryLogs = ({ isActive, isInView }: { isActive?: boolean; isInView?: bool
   useEffect(() => {
     if (isPlaying) {
       const newLog = createLog()
-      setActiveLogs((prev) => [newLog, ...prev])
+      setActiveLogs((prev) => [newLog, ...prev].slice(0, MAX_LOGS))
     }
   }, [isPlaying])
 
@@ -100,7 +101,7 @@ const QueryLogs = ({ isActive, isInView }: { isActive?: boolean; isInView?: bool
       if (skip) return
 
       const newLog = createLog()
-      setActiveLogs((prev) => [newLog, ...prev])
+      setActiveLogs((prev) => [newLog, ...prev].slice(0, MAX_LOGS))
     },
     isPlaying ? INTERVAL : null
   )
