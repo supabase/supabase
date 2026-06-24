@@ -5,7 +5,9 @@ description: 'How Postgres stores large text and JSON, and how to model large pa
 subtitle: 'Model large text/JSON payloads without bloating your tables.'
 ---
 
-Applications that store large values in a single column — LLM prompts and responses, chat memory, big JSON documents, base64 blobs — can grow a table to tens or hundreds of GB even with relatively few rows. This guide explains how Postgres stores large values, how to decide between keeping them in Postgres and offloading them to [Storage](/docs/guides/storage), and how to keep tables lean.
+This guide explains how Postgres stores large values and helps you decide between keeping large values in Postgres or offloading them to Storage.
+
+Applications that store large values in a single column can grow a table to tens or hundreds of GB even with relatively few rows. Large values can include LLM prompts and responses, chat memory, big JSON documents, and base64 blob. Because of this challenge, you may need strategies to keep tables lean.
 
 ## How Postgres stores large values (TOAST)
 
