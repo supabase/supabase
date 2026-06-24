@@ -13,7 +13,7 @@ If a table has grown unexpectedly large, working through it usually takes three 
 
 1. [Confirm it's a TOAST problem](#diagnosing-a-toast-problem).
 2. [Decide whether to keep the data in Postgres or offload it to Storage](#deciding-where-to-store-large-values).
-3. Resolve it by [modeling the data in Postgres](#keeping-large-values-in-postgres) or [offloading it to Storage](#offloading-large-values-to-storage), then [reclaiming any space](#reclaiming-space) that's already been lost.
+3. Resolve it by [keeping it in Postgres](#keeping-large-values-in-postgres) or [offloading it to Storage](#offloading-large-values-to-storage), then [reclaiming any space](#reclaiming-space) that's already been lost.
 
 First, it helps to understand how Postgres stores large values in the first place.
 
@@ -40,7 +40,6 @@ LLM payloads are usually high-entropy and unique, so Postgres's default compress
 
 ## Diagnosing a TOAST problem
 
-
 Symptoms you have a TOAST problem:
 
 - A table is far larger than its row count suggests, and `pg_total_relation_size` is dominated by TOAST.
@@ -50,12 +49,12 @@ Symptoms you have a TOAST problem:
 
 Use this as a decision framework, not a rule:
 
-| Keep in Postgres when…                                    | Offload to Storage when…                                          |
-| --------------------------------------------------------- | ----------------------------------------------------------------- |
+| Keep in Postgres when…                                     | Offload to Storage when…                                          |
+| ---------------------------------------------------------- | ----------------------------------------------------------------- |
 | You query into the value (filter or index on its contents) | You only ever read the whole value back by key                    |
-| Values are modest (low KB) and bounded                    | Values are large (100s of KB–MB) or unbounded                     |
-| You need transactional consistency with the row           | The payload is an artifact (a generated file, a raw response log) |
-| Row count is moderate                                     | The table grows without limit (e.g. one row per request)          |
+| Values are modest (low KB) and bounded                     | Values are large (100s of KB–MB) or unbounded                     |
+| You need transactional consistency with the row            | The payload is an artifact (a generated file, a raw response log) |
+| Row count is moderate                                      | The table grows without limit (e.g. one row per request)          |
 
 For AI apps, this is a common split:
 
@@ -133,6 +132,6 @@ A high `approx_free_percent` means reclaimable bloat. A high `approx_tuple_perce
 
 ## Reclaiming space
 
-Plain `VACUUM` reclaims dead tuples into reusable free space. It only returns space to the operating system when entirely-empty pages sit at the end of the table, so it can't shrink a file that's bloated in the middle. For details, see the [Postgres docs](https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-SPACE-RECOVERY). To actually shrink the files, rewrite the table with [`pg_repack`](/docs/guides/database/extensions/pg_repack) or `VACUUM FULL`. `pg_repack` runs online and is the recommended option. `VACUUM FULL` takes an exclusive lock, so run it only during a maintenance window. Both need roughly 2× the table's size in free disk while they run.
+Plain `VACUUM` reclaims dead tuples into reusable free space. It only returns space to the operating system when entirely-empty pages sit at the end of the table, so it can't shrink a file that's bloated in the middle. For details, see the [Postgres docs](https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-SPACE-RECOVERY). To shrink the files, rewrite the table with [`pg_repack`](/docs/guides/database/extensions/pg_repack) or `VACUUM FULL`. `pg_repack` runs online and is the recommended option. `VACUUM FULL` takes an exclusive lock, so run it only during a maintenance window. Both need roughly 2× the table's size in free disk while they run.
 
 Reclaiming space lowers your **used** space immediately, but the **provisioned** disk doesn't shrink on its own. It's right-sized to 1.2× your database size during the next [Postgres version upgrade](/docs/guides/platform/upgrading#disk-sizing).
