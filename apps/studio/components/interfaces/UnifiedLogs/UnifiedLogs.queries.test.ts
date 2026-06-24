@@ -19,19 +19,20 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
   describe('getUnifiedLogsQuery', () => {
     it('defaults to postgres + postgrest log types when none specified', () => {
       const sql = getUnifiedLogsQuery(baseSearch)
-      expect(sql).toContain(`source = 'postgres_logs'`)
-      // postgrest = edge_logs filtered by /rest/ path
-      expect(sql).toContain(
-        `source = 'edge_logs' AND log_attributes['request.path'] LIKE '%/rest/%'`
-      )
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`source = 'postgres_logs'`)
+      // postgrest = postgrest_logs OR edge_logs with /rest/ path
+      expect(where).toContain(`source = 'postgrest_logs'`)
+      expect(where).toContain(`log_attributes['request.path'] LIKE '%/rest/%'`)
     })
 
-    it('routes the `edge` log type to edge_logs without /rest/ or /storage/ paths', () => {
-      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:edge'))
-      expect(sql).toContain(`NOT LIKE '%/rest/%'`)
-      expect(sql).toContain(`NOT LIKE '%/storage/%'`)
+    it('routes the `postgrest` log type to postgrest_logs or edge_logs /rest/', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:postgrest'))
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
-      expect(where).not.toContain(`source = 'postgres_logs'`)
+      expect(where).toContain(`source = 'postgrest_logs'`)
+      expect(where).toContain(
+        `source = 'edge_logs' AND log_attributes['request.path'] LIKE '%/rest/%'`
+      )
     })
 
     it('routes the `storage` log type to edge_logs filtered by /storage/', () => {
@@ -144,7 +145,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toContain('arrayJoin([')
       expect(sql).toContain('multiIf(')
       expect(sql).toContain(`facet = 'total', 'all'`)
-      for (const lt of ['edge', 'postgrest', 'storage', 'postgres', 'edge function', 'auth']) {
+      for (const lt of ['postgrest', 'storage', 'postgres', 'edge function', 'auth']) {
         expect(sql).toContain(`'${lt}'`)
       }
       for (const lvl of ['success', 'warning', 'error']) {
@@ -157,7 +158,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
     })
 
     it('honours an active log_type filter in the total count scan', () => {
-      const sql = getLogsCountQuery(withFilters('log_type:eq:edge'))
+      const sql = getLogsCountQuery(withFilters('log_type:eq:storage'))
       // Assert on the WHERE only: value expressions mention other sources inline.
       const totalWhere = whereOfBranchContaining(sql, `'all'`)
       expect(totalWhere).toContain(`source = 'edge_logs'`)
@@ -165,9 +166,9 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
     })
 
     it('gives the log_type facet its own scan that excludes the log_type filter', () => {
-      const sql = getLogsCountQuery(withFilters('log_type:eq:edge'))
+      const sql = getLogsCountQuery(withFilters('log_type:eq:postgrest'))
       const logTypeWhere = whereOfBranchContaining(sql, `'log_type'`)
-      expect(logTypeWhere).not.toContain(`NOT LIKE '%/rest/%'`)
+      expect(logTypeWhere).not.toContain(`LIKE '%/rest/%'`)
     })
   })
 

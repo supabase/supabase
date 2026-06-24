@@ -55,8 +55,7 @@ const HTTP_STATUS_EXPR: SafeLogSqlFragment = safeSql`if(source = 'auth_logs', lo
  * logs; the UI surfaces gateway HTTP traffic for those buckets.
  */
 const LOG_TYPE_CONDITION: Record<string, SafeLogSqlFragment> = {
-  edge: safeSql`source = 'edge_logs' AND ${ATTR.path} NOT LIKE '%/rest/%' AND ${ATTR.path} NOT LIKE '%/storage/%'`,
-  postgrest: safeSql`source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%'`,
+  postgrest: safeSql`source = 'postgrest_logs' OR (source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%')`,
   storage: safeSql`source = 'edge_logs' AND ${ATTR.path} LIKE '%/storage/%'`,
   postgres: safeSql`source = 'postgres_logs'`,
   'edge function': safeSql`source = 'function_edge_logs'`,
@@ -67,7 +66,9 @@ const LOG_TYPE_CONDITION: Record<string, SafeLogSqlFragment> = {
 }
 
 // Derived `log_type` column for SELECT / GROUP BY / countIf use.
+// WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%' THEN 'postgrest'
 const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
+      WHEN source = 'postgrest_logs' THEN 'postgrest'
       WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%' THEN 'postgrest'
       WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/storage/%' THEN 'storage'
       WHEN source = 'edge_logs' THEN 'edge'
