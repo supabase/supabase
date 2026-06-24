@@ -15,7 +15,6 @@ import {
 } from '@/components/interfaces/Settings/Logs/Logs.utils.otel'
 import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
 import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
-import type { OtelLogRow } from '@/data/logs/otel-inspection.utils'
 import { safeSql } from '@/data/logs/safe-analytics-sql'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
@@ -101,10 +100,7 @@ function useSingleLog({
 
   let error: null | string | object = rcError ? (rcError as any).message : null
   const rawResult = data?.result ? data.result[0] : undefined
-  const result =
-    rawResult && useOtel
-      ? mapOtelSingleLogToLegacy(rawResult as unknown as OtelLogRow, queryType)
-      : rawResult
+  const result = rawResult && useOtel ? mapOtelSingleLogToLegacy(rawResult, queryType) : rawResult
 
   return {
     data: !!result

@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { LogsTableName, type SqlFilterEntry } from './Logs.constants'
 import type { Filters, LogData, LogsEndpointParams, QueryType } from './Logs.types'
 import { buildWhereClauses } from './Logs.utils'
-import { parseOtelTimestamp, type OtelLogRow } from '@/data/logs/otel-inspection.utils'
+import { parseOtelTimestamp } from '@/data/logs/otel-inspection.utils'
 import {
   joinSqlFragments,
   analyticsLiteral as lit,
@@ -366,12 +366,13 @@ const SINGLE_LOG_METADATA: Partial<Record<QueryType, (attrs: Record<string, any>
   }),
 }
 
-export const mapOtelSingleLogToLegacy = (row: OtelLogRow, queryType?: QueryType): LogData => {
-  const attrs: Record<string, any> = row.log_attributes ?? {}
+export const mapOtelSingleLogToLegacy = (row: unknown, queryType?: QueryType): LogData => {
+  const r = (row ?? {}) as Record<string, any>
+  const attrs: Record<string, any> = r.log_attributes ?? {}
   const base = {
-    id: row.id,
-    timestamp: otelTimestampToMicros(row.timestamp),
-    event_message: row.event_message,
+    id: r.id,
+    timestamp: otelTimestampToMicros(r.timestamp),
+    event_message: r.event_message,
   }
 
   const buildMetadata = queryType ? SINGLE_LOG_METADATA[queryType] : undefined
