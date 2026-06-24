@@ -17,9 +17,9 @@ If a table has grown unexpectedly large, working through it usually takes three 
 
 First, it helps to understand how Postgres stores large values in the first place.
 
-## How Postgres stores large values (The Oversized-Attribute Storage Techinque)
+## How Postgres stores large values (TOAST)
 
-When a row is wider than ~2 KB, Postgres automatically compresses large column values and moves them out of the main table into a companion table called TOAST, the Oversized-Attribute Storage Technique. Your queries don't change, but a table's size is often dominated by its hidden TOAST relation rather than by the columns you see.
+When a row is wider than ~2 KB, Postgres automatically compresses large column values and moves them out of the main table into a companion table using the Oversized-Attribute Storage Technique (TOAST). Your queries don't change, but a table's size is often dominated by its hidden TOAST relation rather than by the columns you see.
 
 Postgres splits each stored value into ~2 KB chunks, saved as rows in the TOAST table. See the Postgres docs on [TOAST](https://www.postgresql.org/docs/current/storage-toast.html) for details.
 
