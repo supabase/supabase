@@ -12,6 +12,7 @@ import {
   CardContent,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   Tooltip,
@@ -243,6 +244,9 @@ export const AccountIdentities = () => {
                   ? `Updating email address for ${getProviderName(selectedProviderUpdateEmail)} identity`
                   : 'Update email address'}
               </DialogTitle>
+              <DialogDescription>
+                Review how this identity handles email updates before continuing.
+              </DialogDescription>
             </DialogHeader>
             {selectedProviderUpdateEmail === 'github' ? (
               <GitHubChangeEmailAddress />

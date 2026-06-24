@@ -3,6 +3,7 @@ import {
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -19,6 +20,9 @@ export const ProtectedSchemaDialog = ({ onClose }: { onClose: () => void }) => {
     <>
       <DialogHeader>
         <DialogTitle>Schemas managed by Supabase</DialogTitle>
+        <DialogDescription>
+          Review which schemas are managed by Supabase and why dashboard edits are restricted.
+        </DialogDescription>
       </DialogHeader>
       <DialogSectionSeparator />
       <DialogSection className="space-y-2 prose">
