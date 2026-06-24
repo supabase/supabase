@@ -200,6 +200,22 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     addRecentLogSqlSnippet({ sql: template.searchString })
   }
 
+  const applyRewrite = (newSql: string) => {
+    setEditorValue(newSql)
+    if (editorRef.current && monaco) {
+      const editorModel = editorRef.current.getModel()
+      editorRef.current.pushUndoStop()
+      editorRef.current.executeEdits('rewrite-clickhouse', [
+        {
+          text: newSql,
+          range: editorModel?.getFullModelRange() ?? new monaco.Range(1, 1, 1, 1),
+        },
+      ])
+      editorRef.current.pushUndoStop()
+      editorRef.current.focus()
+    }
+  }
+
   const handleRun = (value?: string | React.MouseEvent) => {
     track('log_explorer_query_run_button_clicked', { is_saved_query: !!queryId })
 
@@ -387,7 +403,13 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             onSelectTemplate={onSelectTemplate}
             warnings={warnings}
           />
-          {useOtelEndpoint && <LogsExplorerOtelBanner projectRef={projectRef} sql={editorValue} />}
+          {useOtelEndpoint && (
+            <LogsExplorerOtelBanner
+              projectRef={projectRef}
+              sql={editorValue}
+              onApplyRewrite={applyRewrite}
+            />
+          )}
           <ShimmerLine active={isLoading} />
           <CodeEditor
             // Ensure we reset the editor to the query content whenever the selected query changes

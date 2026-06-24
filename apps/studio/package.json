@@ -54,6 +54,7 @@
     "@monaco-editor/react": "^4.6.0",
     "@next/bundle-analyzer": "16.2.3",
     "@number-flow/react": "^0.3.2",
+    "@polyglot-sql/sdk": "^0.5.7",
     "@sentry/nextjs": "catalog:",
     "@std/path": "npm:@jsr/std__path@^1.0.8",
     "@stripe/react-stripe-js": "6.1.0",
