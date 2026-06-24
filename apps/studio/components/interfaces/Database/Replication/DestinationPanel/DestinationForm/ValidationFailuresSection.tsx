@@ -36,7 +36,7 @@ export const ValidationFailuresSection = ({
       <p className="text-sm text-foreground-light mb-2!">
         {hasCriticalFailures
           ? `Please fix all required issues below${hasWarnings ? ' and review the others' : ''} before continuing.`
-          : 'The following issues were identified, although you may still proceed to create the destination.'}
+          : 'The following issues were identified, although you may still create the pipeline and start replication to the destination.'}
       </p>
       <Card>
         <Accordion type="multiple">
