@@ -238,19 +238,19 @@ export const EnumeratedTypes = () => {
                         {!isSchemaLocked && (
                           <div className="flex justify-end items-center space-x-2">
                             <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Tooltip>
-                                  <TooltipTrigger asChild>
-                                    <Button
-                                      variant="default"
-                                      className="px-1"
-                                      icon={<MoreVertical />}
-                                      aria-label="More options"
-                                    />
-                                  </TooltipTrigger>
-                                  <TooltipContent side="bottom">More options</TooltipContent>
-                                </Tooltip>
-                              </DropdownMenuTrigger>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <DropdownMenuTrigger asChild>
+                                      <Button
+                                        variant="default"
+                                        className="px-1"
+                                        icon={<MoreVertical />}
+                                        aria-label="More options"
+                                      />
+                                  </DropdownMenuTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">More options</TooltipContent>
+                              </Tooltip>
                               <DropdownMenuContent side="bottom" align="end" className="w-32">
                                 <DropdownMenuItem
                                   className="space-x-2"
