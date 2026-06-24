@@ -149,7 +149,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
               </div>
             )} */}
             {label ? (
-              <Tooltip>
+              <Tooltip delayDuration={500}>
                 <TooltipTrigger asChild>
                   <span>
                     <DataTableColumnStatusCode
