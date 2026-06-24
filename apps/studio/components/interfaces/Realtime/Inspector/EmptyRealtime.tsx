@@ -4,9 +4,32 @@ import { AiIconAnimation, Button, Card, cn } from 'ui'
 import { AnimatedCursors } from './AnimatedCursors'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { QuickStartSnippet } from '@/components/ui/QuickStartSnippet'
 import { DOCS_URL } from '@/lib/constants'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+
+// Drop-in client snippet that the 3-step explainer above resolves into.
+// A first-time visitor can copy this, paste it into their app, and see
+// realtime messages stream in — which is the moment the feature actually
+// "clicks" rather than just being described.
+const SUBSCRIBE_SNIPPET = `import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+const channel = supabase
+  .channel('room:lobby')
+  .on('broadcast', { event: 'message' }, ({ payload }) => {
+    console.log('Received:', payload)
+  })
+  .subscribe()
+
+// Broadcast a message from anywhere in your app
+await channel.send({
+  type: 'broadcast',
+  event: 'message',
+  payload: { text: 'Hello from realtime!' },
+})`
 
 /**
  * Acts as a container component for the entire log display
@@ -100,6 +123,15 @@ export const EmptyRealtime = ({ projectRef }: { projectRef: string }) => {
             />
           </div>
         </Card>
+
+        <div className="w-full">
+          <QuickStartSnippet
+            caption="Or paste this into your app to subscribe + broadcast on a channel:"
+            snippet={SUBSCRIBE_SNIPPET}
+            language="js"
+            className="max-w-full"
+          />
+        </div>
       </div>
     </div>
   )
