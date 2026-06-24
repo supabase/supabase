@@ -2,7 +2,7 @@ import { THRESHOLD_COUNT } from '@supabase/pg-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { AlertCircle, ArrowLeft, ArrowRight, HelpCircle, Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -195,6 +195,16 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
       snap.setPage(totalPages)
     }
   }, [isSuccess, hasCountData, page, totalPages])
+
+  // Reset back to the first page whenever the filters change
+  const hasMountedRef = useRef(false)
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true
+      return
+    }
+    snap.setPage(1)
+  }, [filters])
 
   // [Joshen] One to revisit if we can consolidate this and the main return statement
   if (isForeignTableSelected) {
