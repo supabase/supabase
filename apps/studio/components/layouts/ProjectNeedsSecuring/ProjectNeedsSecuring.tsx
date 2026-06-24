@@ -37,7 +37,7 @@ const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
 
   const isProjectHomeRoute = router.pathname === PROJECT_HOME_PATHNAME
 
-  const { data: lints = [], isPending: isLoadingLints } = useProjectLintsQuery(
+  const { data: lints = [] } = useProjectLintsQuery(
     { projectRef },
     { enabled: isProjectHomeRoute && !!projectRef }
   )
@@ -146,44 +146,38 @@ const ProjectNeedsSecuringGate = ({ children }: PropsWithChildren) => {
     )
   }, [rlsIssueKeys, tablePrivileges, tables])
 
-  if (!isProjectHomeRoute || !projectRef || isLoadingLints || !hasRlsIssues) {
+  // Keep children in one stable position when not gating. Changing their wrapper
+  // once lints load used to remount the homepage and reload the charts.
+  if (!isProjectHomeRoute || !projectRef) {
     return <>{children}</>
   }
 
   return (
-    <AnimatePresence mode="wait">
-      {shouldRenderGate ? (
-        <motion.div
-          key="project-needs-securing"
-          className="flex flex-1 min-h-0 w-full"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
-        >
-          <ProjectNeedsSecuringView
-            projectRef={projectRef}
-            issueCount={rlsIssueKeys.size}
-            tables={tableRows}
-            isLoading={isLoadingTables || isLoadingPostgrestConfig || isLoadingTablePrivileges}
-            error={tablesError ?? postgrestConfigError ?? tablePrivilegesError}
-            onDismiss={() => setSecurityDismissedAt(new Date().toISOString())}
-            onTrackAction={handleTrackAction}
-          />
-        </motion.div>
-      ) : (
-        <motion.div
-          key="project-needs-securing-children"
-          className="flex flex-1 min-h-0 w-full"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2, ease: 'easeOut' }}
-        >
-          {children}
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <>
+      <AnimatePresence>
+        {shouldRenderGate && (
+          <motion.div
+            key="project-needs-securing"
+            className="flex flex-1 min-h-0 w-full"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+          >
+            <ProjectNeedsSecuringView
+              projectRef={projectRef}
+              issueCount={rlsIssueKeys.size}
+              tables={tableRows}
+              isLoading={isLoadingTables || isLoadingPostgrestConfig || isLoadingTablePrivileges}
+              error={tablesError ?? postgrestConfigError ?? tablePrivilegesError}
+              onDismiss={() => setSecurityDismissedAt(new Date().toISOString())}
+              onTrackAction={handleTrackAction}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+      {!shouldRenderGate && children}
+    </>
   )
 }
 

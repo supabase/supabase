@@ -11,7 +11,7 @@ import { cn } from '../../lib/utils/cn'
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
   `relative
-  flex items-center justify-center
+  inline-flex items-center justify-center
   cursor-pointer
   space-x-2
   text-center
@@ -46,7 +46,7 @@ const buttonVariants = cva(
           border-strong hover:border-stronger
           focus-visible:outline-border-strong
           data-[state=open]:bg-selection
-          data-[state=open]:outline-brand-600
+          data-[state=open]:outline-border-strong
           data-[state=open]:border-button-hover
           `,
         secondary: `
@@ -165,7 +165,7 @@ const IconContainerVariants = cva('inline-flex items-center justify-center shrin
       xxlarge: '[&_svg]:h-[30px] [&_svg]:w-[30px]',
       xxxlarge: '[&_svg]:h-[42px] [&_svg]:w-[42px]',
     },
-    type: {
+    variant: {
       primary: 'text-brand-600',
       default: 'text-foreground-lighter',
       secondary: 'text-border-muted',
@@ -183,7 +183,7 @@ const IconContainerVariants = cva('inline-flex items-center justify-center shrin
 export type LoadingVariantProps = VariantProps<typeof loadingVariants>
 const loadingVariants = cva('', {
   variants: {
-    type: {
+    variant: {
       primary: 'text-brand-600',
       default: 'text-foreground-lighter',
       secondary: 'text-border-muted',
@@ -209,7 +209,7 @@ export interface ButtonProps
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     // omit 'disabled' as it is included in HTMLButtonElement
     Omit<ButtonVariantProps, 'disabled'>,
-    Omit<LoadingVariantProps, 'type'> {
+    LoadingVariantProps {
   asChild?: boolean
   variant?: ButtonVariantProps['variant']
   icon?: React.ReactNode
@@ -258,10 +258,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
         disabled={disabled}
         tabIndex={computedTabIndex}
-        className={cn(
-          buttonVariants({ variant: variant, size, disabled, block, rounded }),
-          className
-        )}
+        className={cn(buttonVariants({ variant, size, disabled, block, rounded }), className)}
         onClick={(e) => {
           // [Joshen] Prevents redirecting if Button is used with a link-based child element
           if (disabled) return e.preventDefault()
@@ -275,21 +272,17 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               undefined,
               showIcon &&
                 (loading ? (
-                  <div className={cn(IconContainerVariants({ size, type: variant }))}>
-                    <Loader2 className={cn(loadingVariants({ loading, type: variant }))} />
+                  <div className={cn(IconContainerVariants({ size, variant }))}>
+                    <Loader2 className={cn(loadingVariants({ loading, variant }))} />
                   </div>
                 ) : _iconLeft ? (
-                  <div className={cn(IconContainerVariants({ size, type: variant }))}>
-                    {_iconLeft}
-                  </div>
+                  <div className={cn(IconContainerVariants({ size, variant }))}>{_iconLeft}</div>
                 ) : null),
               children.props.children && (
                 <span className={'truncate'}>{children.props.children}</span>
               ),
               iconRight && !loading && (
-                <div className={cn(IconContainerVariants({ size, type: variant }))}>
-                  {iconRight}
-                </div>
+                <div className={cn(IconContainerVariants({ size, variant }))}>{iconRight}</div>
               )
             )
           ) : null
@@ -297,17 +290,15 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           <>
             {showIcon &&
               (loading ? (
-                <div className={cn(IconContainerVariants({ size, type: variant }))}>
-                  <Loader2 className={cn(loadingVariants({ loading, type: variant }))} />
+                <div className={cn(IconContainerVariants({ size, variant }))}>
+                  <Loader2 className={cn(loadingVariants({ loading, variant }))} />
                 </div>
               ) : _iconLeft ? (
-                <div className={cn(IconContainerVariants({ size, type: variant }))}>
-                  {_iconLeft}
-                </div>
+                <div className={cn(IconContainerVariants({ size, variant }))}>{_iconLeft}</div>
               ) : null)}{' '}
             {children && <span className={'truncate'}>{children}</span>}{' '}
             {iconRight && !loading && (
-              <div className={cn(IconContainerVariants({ size, type: variant }))}>{iconRight}</div>
+              <div className={cn(IconContainerVariants({ size, variant }))}>{iconRight}</div>
             )}
           </>
         )}

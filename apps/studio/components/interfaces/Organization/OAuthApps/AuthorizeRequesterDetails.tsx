@@ -15,7 +15,7 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { PERMISSIONS_DESCRIPTIONS } from './OAuthApps.constants'
 import { LogoBox } from '@/components/layouts/InterstitialLayout'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { DOCS_URL } from '@/lib/constants'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 
 const OAUTH_SCOPES_DOCS_URL = `${DOCS_URL}/guides/platform/oauth-apps/oauth-scopes`
 const PERMISSION_DETAILS_TRIGGER_CLASSNAME =
@@ -165,15 +165,49 @@ const PERMISSION_GROUPS: PermissionGroup[] = [
   },
 ]
 
-export const RequesterLogo = ({ icon, name }: { icon: string | null; name: string }) => (
-  <LogoBox>
-    {icon ? (
-      <img alt={name} src={icon} className="size-full object-cover" />
-    ) : (
-      <span className="text-lg font-medium text-foreground-light">{name.slice(0, 1)}</span>
-    )}
-  </LogoBox>
-)
+// Hardcode custom logs for known apps that have broken icons (e.g. due to CORS issues), to ensure they display properly
+//  in the UI. This should be deleted once we support CIMD MCP
+const CUSTOM_LOGO_URLS = {
+  perplexity: `${BASE_PATH}/img/icons/perplexity-icon.svg`,
+  cursor: `${BASE_PATH}/img/icons/cursor-icon.svg`,
+  claude: `${BASE_PATH}/img/icons/claude-icon.svg`,
+  chatgpt: `${BASE_PATH}/img/icons/openai-icon.svg`,
+  openai: `${BASE_PATH}/img/icons/openai-icon.svg`,
+}
+
+export const RequesterLogo = ({ icon, name }: { icon: string | null; name: string }) => {
+  const [failedIcon, setFailedIcon] = useState<string | null>(null)
+
+  const customLogoUrl = useMemo(() => {
+    for (const key of Object.keys(CUSTOM_LOGO_URLS)) {
+      if (icon?.toLocaleLowerCase().includes(key)) {
+        return CUSTOM_LOGO_URLS[key as keyof typeof CUSTOM_LOGO_URLS]
+      }
+
+      if (name.toLocaleLowerCase().includes(key)) {
+        return CUSTOM_LOGO_URLS[key as keyof typeof CUSTOM_LOGO_URLS]
+      }
+    }
+    return icon || ''
+  }, [icon, name])
+
+  const showLetter = !customLogoUrl || failedIcon === customLogoUrl
+
+  return (
+    <LogoBox>
+      {showLetter ? (
+        <span className="text-lg font-medium text-foreground-light">{name.slice(0, 1)}</span>
+      ) : (
+        <img
+          alt={name}
+          src={customLogoUrl}
+          className="size-full object-cover"
+          onError={() => setFailedIcon(customLogoUrl)}
+        />
+      )}
+    </LogoBox>
+  )
+}
 
 export const AuthorizeRequesterDetails = ({
   name,

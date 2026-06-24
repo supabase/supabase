@@ -21,32 +21,33 @@ Our [HIPAA documentation](/docs/guides/security/hipaa-compliance) provides more 
 
 </Admonition>
 
-# Meeting compliance requirements
+## Meeting compliance requirements
 
 SOC 2 compliance is a critical aspect of data security for Supabase and our customers. Being fully SOC 2 compliant is a shared responsibility and here’s a breakdown of the responsibilities for both parties:
 
-### Supabase responsibilities
+#### Supabase responsibilities
 
 1. **Security Measures**: Supabase implements robust security controls to protect customer data. These includes measures to prevent data breaches and ensure the confidentiality and integrity of the information managed and stored by the platform. Supabase is obliged to be vigilant about security risks and must demonstrate that our security measures meet industry standards through regular audits.
 2. **Compliance Audits**: Supabase undergoes SOC 2 audits yearly to verify that our data management practices comply with the Trust Services Criteria (TSC), which include security, availability, processing integrity, confidentiality, and privacy. These audits are conducted by an independent third party.
 3. **Incident Response**: Supabase has an incident response plan in place to handle data breaches efficiently. This plan outlines how the organization detects issues, responds to incidents, and manages system vulnerabilities.
 4. **Reporting**: Upon a successful audit, Supabase receive a SOC 2 report that details our compliance status. This report is available to customers as a SOC 2 Type 2 report, and allows customers and stakeholders to assure that Supabase has implemented adequate and the requisite safeguards to protect sensitive information.
 
-### Customer responsibilities
+#### Customer responsibilities
 
 1. **Compliance Requirements**: Understand your own compliance requirements. While SOC 2 compliance is not a legal requirement, many enterprise customers require their providers to have a SOC 2 report. This is because it provides assurance that the provider has implemented robust controls to protect customer data.
 2. **Due Diligence**: Customers must perform due diligence when selecting Supabase as a provider. This includes reviewing the SOC 2 Type 2 report to ensure that Supabase meets the expected security standards. Customers should also understand the division of responsibilities between themselves and Supabase to avoid duplication of effort.
 3. **Monitoring and Review**: Customers should regularly monitor and review Supabase’s compliance status.
 4. **Control Compliance**: If a customer needs to be SOC 2 compliant, they should themselves implement the requisite controls and undergo a SOC 2 audit.
+5. **Audit logging**: Supabase sets [Postgres connection logging](/docs/guides/platform/postgres-connection-logging) to off by default for new projects. If your SOC 2 program requires connection audit evidence, enable connection logging and define how you retain and review those logs.
 
-### Shared responsibilities
+#### Shared responsibilities
 
 1. **Data Security**: Both customers and Supabase share the responsibility of ensuring data security. While the Supabase, as the provider, implements the security controls, the customer must ensure that their use of the Supabase platform does not compromise these controls.
 2. **Control Compliance**: Supabase asserts through our SOC 2 that all requisite security controls are met. Customers wishing to also be SOC 2 compliant need to go through their own SOC 2 audit, verifying that security controls are met on the customer's side.
 
 In summary, SOC 2 compliance involves a shared responsibility between Supabase and our customers to ensure the security and integrity of data. Supabase, as a provider, must implement and maintain robust security measures, customers must perform due diligence and monitor Supabase's compliance status, while also implement their own compliance controls to protect their sensitive information.
 
-## Frequently asked questions
+### Frequently asked questions
 
 **How often is Supabase SOC 2 audited?**
 
@@ -78,7 +79,8 @@ While SOC 2 itself does not mandate specific data residency requirements, organi
 SOC 2 is non-industry specific and provides a framework for the security and privacy of data. This is however not sufficient in most cases when dealing with Protected Healthcare Information (PHI), which requires additional privacy and legal controls.
 When dealing with PHI in the United States or for United States customers, HIPAA is mandatory.
 
-## Resources
+### Resources
 
 1. [System and Organization Controls: SOC Suite of Services](https://www.aicpa-cima.com/resources/landing/system-and-organization-controls-soc-suite-of-services)
 2. [Shared Responsibility Model](/docs/guides/deployment/shared-responsibility-model)
+3. [Postgres connection logging](/docs/guides/platform/postgres-connection-logging)

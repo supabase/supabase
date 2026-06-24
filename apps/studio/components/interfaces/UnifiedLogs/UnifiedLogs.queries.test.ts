@@ -134,29 +134,40 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
   })
 
   describe('getLogsCountQuery', () => {
-    it('emits one UNION ALL branch per log_type bucket and per level', () => {
+    const whereOfBranchContaining = (sql: string, needle: string) => {
+      const branch = sql.split(/\bUNION ALL\b/).find((b) => b.includes(needle)) ?? ''
+      return branch.split(/\bWHERE\b/)[1]?.split(/\bGROUP BY\b/)[0] ?? ''
+    }
+
+    it('folds facets into single-pass arrayJoin scans with a total row', () => {
       const sql = getLogsCountQuery(baseSearch)
-      // Per-log-type counts
+      expect(sql).toContain('arrayJoin([')
+      expect(sql).toContain('multiIf(')
+      expect(sql).toContain(`facet = 'total', 'all'`)
       for (const lt of ['edge', 'postgrest', 'storage', 'postgres', 'edge function', 'auth']) {
         expect(sql).toContain(`'${lt}'`)
       }
-      // Per-level counts
       for (const lvl of ['success', 'warning', 'error']) {
         expect(sql).toContain(`'${lvl}'`)
       }
-      // Bundled via UNION ALL — multiple occurrences expected
-      expect(sql.match(/UNION ALL/g)?.length ?? 0).toBeGreaterThan(5)
+      expect(sql).toContain(`'pathname'`)
+      expect(sql).toContain('LIMIT 20')
+      // log_type + base + pathname = 3 scans
+      expect(sql.match(/FROM logs/g)?.length ?? 0).toBeLessThanOrEqual(4)
     })
 
-    it('honours an active log_type filter in the total count branch', () => {
+    it('honours an active log_type filter in the total count scan', () => {
       const sql = getLogsCountQuery(withFilters('log_type:eq:edge'))
-      // The first branch is the total — its WHERE must include the edge
-      // log_type predicate, otherwise the total badge would over-count
-      // when a log_type filter is active.
-      const totalBranch = sql.split(/\bUNION ALL\b/)[0]
-      expect(totalBranch).toContain(`'total'`)
-      expect(totalBranch).toContain(`source = 'edge_logs'`)
-      expect(totalBranch).not.toContain(`source = 'postgres_logs'`)
+      // Assert on the WHERE only: value expressions mention other sources inline.
+      const totalWhere = whereOfBranchContaining(sql, `'all'`)
+      expect(totalWhere).toContain(`source = 'edge_logs'`)
+      expect(totalWhere).not.toContain(`source = 'postgres_logs'`)
+    })
+
+    it('gives the log_type facet its own scan that excludes the log_type filter', () => {
+      const sql = getLogsCountQuery(withFilters('log_type:eq:edge'))
+      const logTypeWhere = whereOfBranchContaining(sql, `'log_type'`)
+      expect(logTypeWhere).not.toContain(`NOT LIKE '%/rest/%'`)
     })
   })
 

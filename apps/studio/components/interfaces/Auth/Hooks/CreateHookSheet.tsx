@@ -35,10 +35,10 @@ import { Hook, HOOK_DEFINITION_TITLE, HOOKS_DEFINITIONS } from './hooks.constant
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
 import { convertArgumentTypes } from '@/components/interfaces/Database/Functions/Functions.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { DocsButton } from '@/components/ui/DocsButton'
 import FunctionSelector from '@/components/ui/FunctionSelector'
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from '@/data/auth/auth-hooks-update-mutation'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
@@ -412,7 +412,10 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                               disabled={field.disabled}
                               filterFunction={(func) => {
                                 if (supportedReturnTypes.includes(func.return_type)) {
-                                  const { value } = convertArgumentTypes(func.argument_types)
+                                  const { value } = convertArgumentTypes({
+                                    type: func.type,
+                                    value: func.argument_types,
+                                  })
                                   if (value.length !== 1) return false
                                   return value[0].type === 'json' || value[0].type === 'jsonb'
                                 }
