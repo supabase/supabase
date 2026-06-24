@@ -18,7 +18,7 @@
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
     "@react-oauth/google": "^0.13.4",
-    "@supabase/supabase-js": "^2.94.0",
+    "@supabase/supabase-js": "^2",
     "expo": "~54.0.33",
     "expo-constants": "~18.0.13",
     "expo-font": "~14.0.11",

@@ -1,11 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { components } from 'api-types'
-import { handleError, post } from 'data/fetchers'
 import { toast } from 'sonner'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 
-import { BatchConfig, DestinationConfig } from './create-destination-pipeline-mutation'
+import {
+  BatchConfig,
+  buildDucklakeApiConfig,
+  DestinationConfig,
+} from './create-destination-pipeline-mutation'
 import { replicationKeys } from './keys'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type UpdateDestinationPipelineParams = {
   destinationId: number
@@ -81,8 +85,28 @@ async function updateDestinationPipeline(
         },
       },
     }
+  } else if ('ducklake' in destinationConfig) {
+    destination_config = buildDucklakeApiConfig(
+      destinationConfig.ducklake
+    ) as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
+  } else if ('snowflake' in destinationConfig) {
+    const { accountId, user, privateKey, privateKeyPassphrase, database, schema, role } =
+      destinationConfig.snowflake
+    destination_config = {
+      snowflake: {
+        account_id: accountId,
+        user,
+        private_key: privateKey,
+        private_key_passphrase: privateKeyPassphrase,
+        database,
+        schema,
+        role,
+      },
+    } as unknown as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
   } else {
-    throw new Error('Invalid destination config: must specify either bigQuery or iceberg')
+    throw new Error(
+      'Invalid destination config: must specify bigQuery, iceberg, ducklake, or snowflake'
+    )
   }
 
   const pipeline_config = {

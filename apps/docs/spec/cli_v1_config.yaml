@@ -116,7 +116,7 @@ parameters:
     required: false
     default: '1000'
     description: |
-      The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests.
+      The maximum number of rows returned from a view, table, or function. Limits payload size for accidental or malicious requests.
     links:
       - name: 'PostgREST configuration'
         link: 'https://postgrest.org/en/stable/configuration.html'
@@ -1331,7 +1331,7 @@ parameters:
     title: 'auth.mfa.totp.enroll_enabled'
     tags: ['auth']
     required: false
-    default: 'true'
+    default: 'false'
     description: |
       Enable TOTP enrollment for multi-factor authentication.
     links:
@@ -1342,7 +1342,7 @@ parameters:
     title: 'auth.mfa.totp.verify_enabled'
     tags: ['auth']
     required: false
-    default: 'true'
+    default: 'false'
     description: |
       Enable TOTP verification for multi-factor authentication.
     links:
@@ -1438,6 +1438,50 @@ parameters:
     links:
       - name: 'Auth Multi-Factor Authentication'
         link: 'https://supabase.com/docs/guides/auth/auth-mfa'
+
+  - id: 'auth.passkey.enabled'
+    title: 'auth.passkey.enabled'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Enable passkey sign-in and registration. Requires `auth.webauthn` to be configured.
+    links:
+      - name: 'Sign in with Passkey'
+        link: 'https://supabase.com/docs/guides/auth/passkeys'
+
+  - id: 'auth.webauthn.rp_display_name'
+    title: 'auth.webauthn.rp_display_name'
+    tags: ['auth']
+    required: false
+    default: ''
+    description: |
+      Human-readable name for the WebAuthn relying party shown to users during the passkey ceremony. Required when `auth.passkey.enabled` is `true`.
+    links:
+      - name: 'Sign in with Passkey'
+        link: 'https://supabase.com/docs/guides/auth/passkeys'
+
+  - id: 'auth.webauthn.rp_id'
+    title: 'auth.webauthn.rp_id'
+    tags: ['auth']
+    required: false
+    default: ''
+    description: |
+      WebAuthn relying party identifier. Must be a registrable suffix of every origin in `auth.webauthn.rp_origins` (for example `example.com` for `https://app.example.com`). Required when `auth.passkey.enabled` is `true`.
+    links:
+      - name: 'Sign in with Passkey'
+        link: 'https://supabase.com/docs/guides/auth/passkeys'
+
+  - id: 'auth.webauthn.rp_origins'
+    title: 'auth.webauthn.rp_origins'
+    tags: ['auth']
+    required: false
+    default: '[]'
+    description: |
+      List of origins your app is served from. The browser refuses the WebAuthn ceremony if the page origin is not in this list. Required when `auth.passkey.enabled` is `true`.
+    links:
+      - name: 'Sign in with Passkey'
+        link: 'https://supabase.com/docs/guides/auth/passkeys'
 
   - id: 'auth.sessions.timebox'
     title: 'auth.sessions.timebox'

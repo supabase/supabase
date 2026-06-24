@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { type SafeSqlFragment } from './pg-format'
 import { VERSION_SQL } from './sql/version'
 
 export const pgVersionZod = z.object({
@@ -9,7 +10,7 @@ export const pgVersionZod = z.object({
   max_connections: z.number(),
 })
 
-function retrieve() {
+function retrieve(): { sql: SafeSqlFragment; zod: typeof pgVersionZod } {
   return {
     sql: VERSION_SQL,
     zod: pgVersionZod,

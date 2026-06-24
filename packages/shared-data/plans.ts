@@ -1,7 +1,7 @@
 export type PlanId = 'free' | 'pro' | 'team' | 'enterprise'
 
 export interface PricingInformation {
-  id: string
+  id: 'tier_free' | 'tier_pro' | 'tier_team' | 'tier_enterprise'
   planId: PlanId
   name: string
   nameBadge?: string
@@ -50,7 +50,7 @@ export const plans: PricingInformation[] = [
     costUnit: '/ month',
     href: 'https://supabase.com/dashboard/new?plan=pro',
     priceLabel: 'From',
-    warning: '$10 in compute credits included',
+    warning: 'Includes one project running on Micro compute.',
     priceMonthly: 25,
     description: 'For production applications with the power to scale.',
     features: [
@@ -58,7 +58,7 @@ export const plans: PricingInformation[] = [
       ['8 GB disk size per project', 'then $0.125 per GB'],
       ['250 GB egress', 'then $0.09 per GB'],
       ['250 GB cached egress', 'then $0.03 per GB'],
-      ['100 GB file storage', 'then $0.021 per GB'],
+      ['100 GB file storage', 'then $0.0213 per GB'],
       'Email support',
       'Daily backups stored for 7 days',
       '7-day log retention',
@@ -75,11 +75,11 @@ export const plans: PricingInformation[] = [
     costUnit: '/ month',
     href: 'https://supabase.com/dashboard/new?plan=team',
     priceLabel: 'From',
-    warning: '$10 in compute credits included',
+    warning: 'Includes one project running on Micro compute.',
     priceMonthly: 599,
     description: 'Add features such as SSO, control over backups, and industry certifications.',
     features: [
-      'SOC2',
+      'SOC2 & ISO 27001',
       'Project-scoped and read-only access',
       'HIPAA available as paid add-on',
       'SSO for Supabase Dashboard',

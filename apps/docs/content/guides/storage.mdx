@@ -71,15 +71,20 @@ Specialized storage for vector embeddings and similarity search operations. Desi
 Check out all of the Storage [templates and examples](https://github.com/supabase/supabase/tree/master/examples/storage) in our GitHub repository.
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
-  {storageExamples.map((x) => (
-    <div className="col-span-12" key={x.href}>
-      <Link href={x.href} passHref>
-        <GlassPanel icon={'/docs/img/icons/github-icon'} hasLightIcon={true} title={x.name}>
-          {x.description}
-        </GlassPanel>
-      </Link>
-    </div>
-  ))}
+  <div className="col-span-12">
+    <Link
+      href="https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-uppy"
+      passHref
+    >
+      <GlassPanel
+        icon={'/docs/img/icons/github-icon'}
+        hasLightIcon={true}
+        title="Resumable Uploads with Uppy"
+      >
+        Use Uppy to upload files to Supabase Storage using the TUS protocol (resumable uploads).
+      </GlassPanel>
+    </Link>
+  </div>
 </div>
 
 ## Resources
@@ -87,22 +92,16 @@ Check out all of the Storage [templates and examples](https://github.com/supabas
 Find the source code and documentation in the Supabase GitHub repository.
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
-  {[
-    {
-      name: 'Supabase Storage API',
-      description: 'View the source code.',
-      href: 'https://github.com/supabase/storage-api',
-    },
-    {
-      name: 'OpenAPI Spec',
-      description: 'See the Swagger Documentation for Supabase Storage.',
-      href: 'https://supabase.github.io/storage/',
-    },
-  ].map((x) => (
-    <div className="col-span-6" key={x.href}>
-      <Link href={x.href} passHref>
-        <GlassPanel title={x.name}>{x.description}</GlassPanel>
-      </Link>
-    </div>
-  ))}
+  <div className="col-span-6">
+    <Link href="https://github.com/supabase/storage-api" passHref>
+      <GlassPanel title="Supabase Storage API">View the source code.</GlassPanel>
+    </Link>
+  </div>
+  <div className="col-span-6">
+    <Link href="https://supabase.github.io/storage/" passHref>
+      <GlassPanel title="OpenAPI Spec">
+        See the Swagger Documentation for Supabase Storage.
+      </GlassPanel>
+    </Link>
+  </div>
 </div>

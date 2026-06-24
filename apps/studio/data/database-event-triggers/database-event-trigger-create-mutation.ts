@@ -1,13 +1,15 @@
+import type { SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { executeSql } from 'data/sql/execute-sql-query'
 import { toast } from 'sonner'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+
 import { databaseEventTriggerKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseEventTriggerCreateVariables = {
   projectRef: string
   connectionString?: string | null
-  sql: string
+  sql: SafeSqlFragment
 }
 
 export async function createDatabaseEventTrigger({

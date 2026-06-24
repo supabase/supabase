@@ -1,45 +1,40 @@
-import { Card, CardContent, CardHeader } from 'ui'
-import { DOCS_URL } from 'lib/constants'
-import { DocsButton } from 'components/ui/DocsButton'
+import { Card, CardContent, CardHeader, CardTitle } from 'ui'
+
+import { DocsButton } from '@/components/ui/DocsButton'
+import { DOCS_URL } from '@/lib/constants'
 
 export function SettingsDatabaseEmptyStateLocal() {
   return (
     <>
       <Card>
-        <CardHeader className="flex-row items-center justify-between">
-          Local development & CLI
-          <div className="flex items-center gap-x-2">
-            <DocsButton href={`${DOCS_URL}/guides/local-development/cli/config#database-config`} />
-          </div>
+        <CardHeader>
+          <CardTitle>Local development & CLI</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="prose [&>code]:text-xs text-sm max-w-full">
-            Change settings in <code>supabase/config.toml</code> file, which is automatically loaded
-            on <code>supabase start</code>
+          <p className="text-sm text-foreground-light mb-4">
+            Configure database settings in{' '}
+            <code className="text-code-inline">supabase/config.toml</code> — applied automatically
+            on <code className="text-code-inline">supabase start</code>.
           </p>
+          <DocsButton href={`${DOCS_URL}/guides/local-development/cli/config#database-config`} />
         </CardContent>
       </Card>
 
       <Card>
-        <CardHeader className="flex-row items-center justify-between">
-          Self-Hosted Supabase
-          <div className="flex items-center gap-x-2">
-            <DocsButton
-              href={`${DOCS_URL}/guides/self-hosting/docker#configuring-and-securing-supabase`}
-            />
-          </div>
+        <CardHeader>
+          <CardTitle>Self-Hosted Supabase</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="prose [&>code]:text-xs space-x-1 text-sm max-w-full">
-            <span>Change settings in</span>
+          <p className="text-sm text-foreground-light mb-4">
+            Change settings in{' '}
             <a
               target="_blank"
               rel="noopener noreferrer"
               href="https://github.com/supabase/supabase/blob/master/docker/.env.example"
             >
               .env file
-            </a>
-            <span>and</span>
+            </a>{' '}
+            and{' '}
             <a
               target="_blank"
               rel="noopener noreferrer"
@@ -47,7 +42,11 @@ export function SettingsDatabaseEmptyStateLocal() {
             >
               docker-compose.yml
             </a>
+            .
           </p>
+          <DocsButton
+            href={`${DOCS_URL}/guides/self-hosting/docker#configuring-and-securing-supabase`}
+          />
         </CardContent>
       </Card>
     </>

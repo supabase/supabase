@@ -15,10 +15,8 @@ tags:
   - infrastructure
 toc_depth: 3
 imgSocial: 'https://zhfonblqamxferhoguzj.supabase.co/functions/v1/generate-og?template=announcement&layout=text-only&copy=When+to+use%0A%5BRead+Replicas%5D%0Avs.+bigger+compute'
-imgThumb: 'https://zhfonblqamxferhoguzj.supabase.co/functions/v1/generate-og?template=announcement&layout=text-only&copy=When+to+use%0A%5BRead+Replicas%5D%0Avs.+bigger+compute'
+imgThumb: 'https://zhfonblqamxferhoguzj.supabase.co/functions/v1/generate-og?template=ruler&layout=icon-only&icon=icon-database.svg'
 ---
-
-# When to use Read Replicas vs. bigger compute
 
 When your database starts slowing down, you face a choice: make your existing database bigger, or spread the load across multiple databases. Both approaches work. Neither is universally correct. The right answer depends on your workload, your budget, and where the bottleneck actually is.
 
@@ -132,7 +130,7 @@ Sometimes a $0 index beats a $200/month compute upgrade.
 
 **Analyze your queries with Claude Code:**
 
-If you use [Claude Code](https://claude.ai/claude-code) with the [Supabase MCP Server](https://github.com/supabase-community/supabase-mcp), you can ask Claude to analyze your database and suggest indexes:
+If you use [Claude Code](https://claude.ai/claude-code) with the [Supabase MCP Server](https://github.com/supabase/mcp), you can ask Claude to analyze your database and suggest indexes:
 
 ```
 Analyze my Supabase database for missing indexes:

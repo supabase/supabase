@@ -1,23 +1,12 @@
 import { Check, ChevronDown } from 'lucide-react'
 import { toast } from 'sonner'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import InformationBox from 'components/ui/InformationBox'
-import { useCreateAndExposeAPISchemaMutation } from 'data/api-settings/create-and-expose-api-schema-mutation'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  CodeBlock,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -27,6 +16,17 @@ import {
   DialogTitle,
   WarningIcon,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import InformationBox from '@/components/ui/InformationBox'
+import { useCreateAndExposeAPISchemaMutation } from '@/data/api-settings/create-and-expose-api-schema-mutation'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 interface HardenAPIModalProps {
   visible: boolean
@@ -123,14 +123,14 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
           <DocsButton
             abbrev={false}
             className="w-min mt-4"
-            href={`${DOCS_URL}/guides/database/hardening-data-api`}
+            href={`${DOCS_URL}/guides/api/using-custom-schemas`}
           />
         </DialogSection>
 
         <DialogSectionSeparator />
 
-        <Collapsible_Shadcn_>
-          <CollapsibleTrigger_Shadcn_ className="py-4 px-5 w-full flex items-center justify-between text-sm">
+        <Collapsible>
+          <CollapsibleTrigger className="py-4 px-5 w-full flex items-center justify-between text-sm">
             <p>
               1. Create a custom <code className="text-code-inline">api</code> schema and expose it
             </p>
@@ -142,8 +142,8 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
                 className="transition data-open-parent:rotate-180 data-closed-parent:rotate-0"
               />
             )}
-          </CollapsibleTrigger_Shadcn_>
-          <CollapsibleContent_Shadcn_ className="text-sm text-foreground-light flex flex-col gap-y-4">
+          </CollapsibleTrigger>
+          <CollapsibleContent className="text-sm text-foreground-light flex flex-col gap-y-4">
             <p className="mx-5">
               Click the button below to create a new schema named{' '}
               <code className="text-code-inline">api</code> and grant the{' '}
@@ -174,7 +174,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
             </div>
 
             <ButtonTooltip
-              type="primary"
+              variant="primary"
               className="w-min mx-5"
               onClick={onSelectCreateAndExposeAPISchema}
               disabled={hasAPISchema && isAPISchemaExposed}
@@ -207,13 +207,13 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
                 {`grant select on table api.<your_table> to anon;\ngrant select, insert, update, delete on table api.<your_table> to authenticated;`}
               </CodeBlock>
             </div>
-          </CollapsibleContent_Shadcn_>
-        </Collapsible_Shadcn_>
+          </CollapsibleContent>
+        </Collapsible>
 
         <DialogSectionSeparator />
 
-        <Collapsible_Shadcn_>
-          <CollapsibleTrigger_Shadcn_ className="py-4 px-5 w-full flex items-center justify-between text-sm">
+        <Collapsible>
+          <CollapsibleTrigger className="py-4 px-5 w-full flex items-center justify-between text-sm">
             <p>
               2. Remove the <code className="text-code-inline">public</code> schema from the exposed
               schemas
@@ -226,28 +226,28 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
                 className="transition data-open-parent:rotate-180 data-closed-parent:rotate-0"
               />
             )}
-          </CollapsibleTrigger_Shadcn_>
-          <CollapsibleContent_Shadcn_ className="text-sm text-foreground-light">
+          </CollapsibleTrigger>
+          <CollapsibleContent className="text-sm text-foreground-light">
             <div className="px-5 pb-4 flex flex-col gap-y-4">
-              <Alert_Shadcn_ variant="warning">
+              <Alert variant="warning">
                 <WarningIcon />
-                <AlertTitle_Shadcn_ className="text-foreground">
+                <AlertTitle className="text-foreground">
                   Ensure that your app is no longer using the{' '}
                   <code className="text-code-inline">public</code> schema
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
+                </AlertTitle>
+                <AlertDescription>
                   The <code className="text-code-inline">public</code> schema will not be accessible
                   via the API once its not exposed. You should be using the{' '}
                   <code className="text-code-inline">api</code> schema instead.
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
               <p>
                 Click the button below to remove the{' '}
                 <code className="text-code-inline">public</code> schema from both Exposed schemas
                 and Extra search path in your API configuration.
               </p>
               <ButtonTooltip
-                type="primary"
+                variant="primary"
                 className="w-min"
                 disabled={!isPublicSchemaExposed}
                 loading={isUpdatingConfig}
@@ -262,8 +262,8 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
                 Remove public schema from exposed schemas
               </ButtonTooltip>
             </div>
-          </CollapsibleContent_Shadcn_>
-        </Collapsible_Shadcn_>
+          </CollapsibleContent>
+        </Collapsible>
       </DialogContent>
     </Dialog>
   )

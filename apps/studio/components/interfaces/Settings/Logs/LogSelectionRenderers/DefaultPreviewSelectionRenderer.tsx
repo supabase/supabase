@@ -1,5 +1,4 @@
-import { Service } from 'data/graphql/graphql'
-import { useLogsUrlState } from 'hooks/analytics/useLogsUrlState'
+import { safeLocalStorage } from 'common'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -17,6 +16,9 @@ import { TimestampInfo } from 'ui-patterns'
 import { ErrorCodeDialog } from '../ErrorCodeDialog'
 import type { LogSearchCallback, PreviewLogData } from '../Logs.types'
 import { ResponseCodeFormatter } from '../LogsFormatters'
+import { ErrorCodeTooltip } from '@/components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
+import { Service } from '@/data/graphql/graphql'
+import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
 
 const LogRowCodeBlock = ({ value, className }: { value: string; className?: string }) => (
   <pre
@@ -25,7 +27,7 @@ const LogRowCodeBlock = ({ value, className }: { value: string; className?: stri
       className
     )}
   >
-    {JSON.stringify(value, null, 2)}
+    {typeof value === 'string' ? value : JSON.stringify(value, null, 2)}
   </pre>
 )
 
@@ -47,7 +49,7 @@ const PropertyRow = ({
 
   const service = path?.startsWith('/auth/') ? Service.Auth : undefined
 
-  const handleSearch: LogSearchCallback = async (event: string, { query }: { query?: string }) => {
+  const handleSearch: LogSearchCallback = async (_event: string, { query }: { query?: string }) => {
     setSearch(query || '')
   }
 
@@ -60,6 +62,7 @@ const PropertyRow = ({
   const isUserAgent = keyName === 'user_agent'
   const isEventMessage = keyName === 'event_message'
   const isPath = keyName === 'path'
+  const isErrorCode = keyName === 'error_code'
 
   function getSearchPairs() {
     if (isSearch && typeof value === 'string') {
@@ -73,7 +76,7 @@ const PropertyRow = ({
   const [isExpanded, setIsExpanded] = useState(() => {
     try {
       // Storing in local storage so users dont have to click expand every time they change selected log
-      return JSON.parse(localStorage.getItem(storageKey) ?? 'false')
+      return JSON.parse(safeLocalStorage.getItem(storageKey) ?? 'false')
     } catch (_) {
       return false
     }
@@ -81,7 +84,7 @@ const PropertyRow = ({
   const [isCopied, setIsCopied] = useState(false)
 
   useEffect(() => {
-    localStorage.setItem(storageKey, JSON.stringify(isExpanded))
+    safeLocalStorage.setItem(storageKey, JSON.stringify(isExpanded))
   }, [isExpanded, storageKey])
 
   const handleCopy = () => {
@@ -113,7 +116,7 @@ const PropertyRow = ({
               <Button
                 className="mt-1 w-full"
                 size="tiny"
-                type="outline"
+                variant="outline"
                 onClick={() => setIsExpanded(!isExpanded)}
               >
                 {isExpanded ? 'Collapse' : 'Expand'}
@@ -132,14 +135,14 @@ const PropertyRow = ({
         <DropdownMenuTrigger className="group w-full" data-testid={dataTestId}>
           <div className="rounded-md w-full overflow-hidden">
             <div
-              className={cn('flex h-[var(--header-height)] w-full', {
+              className={cn('flex h-(--header-height) w-full', {
                 'flex-col gap-1.5 h-auto': isExpanded,
                 'items-center group-hover:bg-surface-300 gap-4': !isExpanded,
               })}
             >
               <h3
                 className={cn('pl-3 text-foreground-lighter text-sm text-left', {
-                  'h-[var(--header-height)] flex items-center': isExpanded,
+                  'h-(--header-height) flex items-center': isExpanded,
                 })}
               >
                 {keyName}
@@ -163,6 +166,10 @@ const PropertyRow = ({
                   <div className="flex items-center gap-1 justify-end">
                     <ResponseCodeFormatter value={value} />
                   </div>
+                ) : isErrorCode ? (
+                  <ErrorCodeTooltip errorCode={String(value)} service={service}>
+                    <div className="truncate">{value}</div>
+                  </ErrorCodeTooltip>
                 ) : (
                   <div className="truncate">{value}</div>
                 )}

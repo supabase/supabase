@@ -1,9 +1,9 @@
+import { getIndexesSQL } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
-import { UseCustomQueryOptions } from 'types'
 
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
-import { getIndexesSQL } from './database-indexes.sql'
 import { databaseIndexesKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type GetIndexesArgs = {
   schema?: string
@@ -41,7 +41,7 @@ export async function getIndexes(
 }
 
 export type IndexesData = Awaited<ReturnType<typeof getIndexes>>
-export type IndexesError = ExecuteSqlError
+export type IndexesError = ResponseError
 
 export const useIndexesQuery = <TData = IndexesData>(
   { projectRef, connectionString, schema }: IndexesVariables,

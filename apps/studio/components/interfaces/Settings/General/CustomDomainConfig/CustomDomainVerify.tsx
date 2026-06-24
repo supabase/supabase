@@ -1,26 +1,20 @@
 import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import { InlineLink } from 'components/ui/InlineLink'
-import Panel from 'components/ui/Panel'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useCustomDomainReverifyQuery } from 'data/custom-domains/custom-domains-reverify-query'
-import { DOCS_URL } from 'lib/constants'
 import { AlertCircle, RefreshCw } from 'lucide-react'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  WarningIcon,
-} from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, WarningIcon } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
-import DNSRecord from './DNSRecord'
+import { DNSRecord } from './DNSRecord'
 import { DNSTableHeaders } from './DNSTableHeaders'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
+import Panel from '@/components/ui/Panel'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useCustomDomainDeleteMutation } from '@/data/custom-domains/custom-domains-delete-mutation'
+import { useCustomDomainsQuery } from '@/data/custom-domains/custom-domains-query'
+import { useCustomDomainReverifyQuery } from '@/data/custom-domains/custom-domains-reverify-query'
+import { DOCS_URL } from '@/lib/constants'
 
 export const CustomDomainVerify = () => {
   const { ref: projectRef } = useParams()
@@ -88,10 +82,8 @@ export const CustomDomainVerify = () => {
           </h4>
           <p className="text-sm text-foreground-light">
             Set the following TXT record(s) in your DNS provider, then click verify to confirm your
-            control over the domain.
-          </p>
-          <p className="text-sm text-foreground-light">
-            Records which have been successfully verified will be removed from this list below.
+            control over the domain. Records which have been successfully verified will be removed
+            from this list below.
           </p>
           {!isValidating && (
             <div className="mt-4 mb-2">
@@ -124,27 +116,25 @@ export const CustomDomainVerify = () => {
         </div>
 
         {hasCAAErrors && (
-          <Alert_Shadcn_>
+          <Alert>
             <WarningIcon />
-            <AlertTitle_Shadcn_>
-              Certificate Authority Authentication (CAA) error
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
+            <AlertTitle>Certificate Authority Authentication (CAA) error</AlertTitle>
+            <AlertDescription>
               Please add a CAA record allowing "digicert.com" to issue certificates for{' '}
               <code className="text-code-inline">{customDomain?.hostname}</code>. For example:{' '}
               <code className="text-code-inline">0 issue "digicert.com"</code>
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         )}
 
         {customDomain?.ssl.status === 'validation_timed_out' ? (
-          <Alert_Shadcn_>
+          <Alert>
             <WarningIcon />
-            <AlertTitle_Shadcn_>Validation timed out</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
+            <AlertTitle>Validation timed out</AlertTitle>
+            <AlertDescription>
               Please click "Verify" again to retry the validation of the records
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+            </AlertDescription>
+          </Alert>
         ) : (
           <div className="space-y-2">
             <DNSTableHeaders display={customDomain?.ssl.txt_name ?? ''} />
@@ -186,7 +176,7 @@ export const CustomDomainVerify = () => {
           <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
           <div className="flex items-center space-x-2">
             <Button
-              type="default"
+              variant="default"
               onClick={onCancelCustomDomain}
               loading={isDeleting}
               className="self-end"

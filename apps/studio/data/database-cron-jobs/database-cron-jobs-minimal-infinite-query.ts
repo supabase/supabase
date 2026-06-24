@@ -1,14 +1,14 @@
+import { getCronJobsMinimalSql } from '@supabase/pg-meta'
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
 
 import {
   CRON_JOBS_PAGE_LIMIT,
   CronJob,
   DatabaseCronJobRunsVariables,
 } from './database-cron-jobs-infinite-query'
-import { getCronJobsMinimalSql } from './database-cron-jobs.sql'
 import { databaseCronJobsKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 export async function getDatabaseCronJobsMinimal({
   projectRef,

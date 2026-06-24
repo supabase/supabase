@@ -1,27 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useDebounce } from '@uidotdev/usehooks'
+import { useParams } from 'common'
 import { Check, Github, Loader2 } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { InlineLink } from '@/components/ui/InlineLink'
-import { useParams } from 'common'
-import { useIsBranching2Enabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { AlertError } from 'components/ui/AlertError'
-import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
-import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
 import {
-  Badge,
   Button,
+  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -29,15 +17,25 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
-  Label_Shadcn_ as Label,
-  cn,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Label,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import * as z from 'zod'
+
+import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
+import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
+import { useCheckGithubBranchValidity } from '@/data/integrations/github-branch-check-query'
+import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { BASE_PATH } from '@/lib/constants'
 
 interface EditBranchModalProps {
   branch?: Branch
@@ -50,9 +48,8 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   const router = useRouter()
   const { data: projectDetails } = useSelectedProjectQuery()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
-  const gitlessBranching = useIsBranching2Enabled()
 
-  const [isGitBranchValid, setIsGitBranchValid] = useState(false)
+  const [isGitBranchValid, setIsGitBranchValid] = useState(true)
 
   const isBranch = projectDetails?.parent_project_ref !== undefined
   const projectRef =
@@ -101,12 +98,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
           val === branch?.name || (branches ?? []).every((b) => b.name !== val),
         'A branch with this name already exists'
       ),
-    gitBranchName: z
-      .string()
-      .refine(
-        (val) => gitlessBranching || !githubConnection || (val && val.length > 0),
-        'Git branch name is required when GitHub is connected'
-      ),
+    gitBranchName: z.string().optional(),
   })
 
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -200,24 +192,21 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   // Pre-fill form when the modal becomes visible and branch data is available
   useEffect(() => {
     if (visible && branch) {
-      setIsGitBranchValid(!!branch.git_branch || gitlessBranching) // Initial validity based on existing link or gitless branching
       form.reset({
         branchName: branch.name ?? '',
         gitBranchName: branch.git_branch ?? '',
       })
     }
-  }, [branch, visible, form, gitlessBranching])
+  }, [branch, visible, form])
 
   useEffect(() => {
     if (!githubConnection || !debouncedGitBranchName) {
-      setIsGitBranchValid(gitlessBranching)
-      form.clearErrors('gitBranchName')
-      return
+      return form.clearErrors('gitBranchName')
     }
 
     form.clearErrors('gitBranchName')
     validateGitBranchName(debouncedGitBranchName)
-  }, [debouncedGitBranchName, validateGitBranchName, form, githubConnection, gitlessBranching])
+  }, [debouncedGitBranchName, validateGitBranchName, form, githubConnection])
 
   return (
     <Dialog open={visible} onOpenChange={(open) => !open && onClose()}>
@@ -226,131 +215,130 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
           <DialogTitle>Edit branch "{branch?.name}"</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             <DialogSection padding="medium" className="space-y-4">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="branchName"
                 render={({ field }) => (
                   <FormItemLayout label="Preview branch name">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    <FormControl>
+                      <Input
                         {...field}
                         placeholder="e.g. staging, dev-feature-x"
                         autoComplete="off"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
 
-              {githubConnection && (
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="gitBranchName"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label={
-                        <div className="flex items-center justify-between w-full gap-4">
-                          <span className="flex-1">
-                            Sync with Git branch {gitlessBranching ? '(optional)' : ''}
-                          </span>
-                          <div className="flex items-center gap-2 text-sm">
-                            <Image
-                              className={cn('dark:invert')}
-                              src={`${BASE_PATH}/img/icons/github-icon.svg`}
-                              width={16}
-                              height={16}
-                              alt={`GitHub icon`}
-                            />
-                            <InlineLink href={`https://github.com/${repoOwner}/${repoName}`}>
-                              {repoOwner}/{repoName}
-                            </InlineLink>
-                          </div>
-                        </div>
-                      }
-                      description={
-                        gitlessBranching
-                          ? 'Automatically deploy changes on every commit'
-                          : 'If linked, migrations from this Git branch will be automatically deployed.'
-                      }
-                    >
-                      <div className="relative">
-                        <FormControl_Shadcn_>
-                          <Input_Shadcn_
-                            {...field}
-                            placeholder="e.g. main, feat/some-feature"
-                            autoComplete="off"
-                            onChange={(e) => {
-                              field.onChange(e)
-                              setIsGitBranchValid(false)
-                            }}
-                          />
-                        </FormControl_Shadcn_>
-                        <div className="absolute top-2.5 right-3 flex items-center gap-2">
-                          {field.value ? (
-                            isChecking ? (
-                              <Loader2 size={14} className="animate-spin" />
-                            ) : isGitBranchValid ? (
-                              <Check size={14} className="text-brand" strokeWidth={2} />
-                            ) : null
-                          ) : null}
-                        </div>
-                      </div>
-                    </FormItemLayout>
-                  )}
-                />
+              {isLoadingConnections && (
+                <div className="flex flex-col gap-y-2">
+                  <ShimmeringLoader />
+                  <ShimmeringLoader className="w-1/2" />
+                </div>
               )}
-              {isLoadingConnections && <GenericSkeletonLoader />}
+
               {isErrorConnections && (
                 <AlertError
                   error={connectionsError}
                   subject="Failed to retrieve GitHub connection information"
                 />
               )}
-              {isSuccessConnections && !githubConnection && (
-                <div className="flex items-center gap-2 justify-between">
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                      <Label>Sync with a GitHub branch</Label>
-                      {!gitlessBranching && <Badge variant="warning">Required</Badge>}
+
+              {isSuccessConnections &&
+                (githubConnection ? (
+                  <FormField
+                    control={form.control}
+                    name="gitBranchName"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        label={
+                          <div className="flex items-center justify-between w-full gap-4">
+                            <span className="flex-1">Sync with Git branch</span>
+                            <div className="flex items-center gap-2 text-sm">
+                              <Image
+                                className={cn('dark:invert')}
+                                src={`${BASE_PATH}/img/icons/github-icon.svg`}
+                                width={16}
+                                height={16}
+                                alt={`GitHub icon`}
+                              />
+                              <InlineLink href={`https://github.com/${repoOwner}/${repoName}`}>
+                                {repoOwner}/{repoName}
+                              </InlineLink>
+                            </div>
+                          </div>
+                        }
+                        labelOptional="Optional"
+                        description="Automatically deploy changes on every commit"
+                      >
+                        <div className="relative">
+                          <FormControl>
+                            <Input
+                              {...field}
+                              placeholder="e.g. main, feat/some-feature"
+                              autoComplete="off"
+                              onChange={(e) => {
+                                field.onChange(e)
+                                setIsGitBranchValid(false)
+                              }}
+                            />
+                          </FormControl>
+                          <div className="absolute top-2.5 right-3 flex items-center gap-2">
+                            {field.value ? (
+                              isChecking ? (
+                                <Loader2 size={14} className="animate-spin" />
+                              ) : isGitBranchValid ? (
+                                <Check size={14} className="text-brand" strokeWidth={2} />
+                              ) : null
+                            ) : null}
+                          </div>
+                        </div>
+                      </FormItemLayout>
+                    )}
+                  />
+                ) : (
+                  <div className="flex items-center gap-2 justify-between">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center gap-2">
+                        <Label>Sync with a GitHub branch</Label>
+                      </div>
+                      <p className="text-sm text-foreground-light">
+                        Optionally connect to a GitHub repository to manage migrations automatically
+                        for this branch.
+                      </p>
                     </div>
-                    <p className="text-sm text-foreground-light">
-                      {gitlessBranching
-                        ? 'Optionally connect to a GitHub repository to manage migrations automatically for this branch.'
-                        : 'Keep this preview branch in sync with a chosen GitHub branch'}
-                    </p>
+                    <Button variant="default" icon={<Github />} onClick={openLinkerPanel}>
+                      Connect to GitHub
+                    </Button>
                   </div>
-                  <Button type="default" icon={<Github />} onClick={openLinkerPanel}>
-                    {gitlessBranching ? 'Connect to GitHub' : 'Configure'}
-                  </Button>
-                </div>
-              )}
+                ))}
             </DialogSection>
 
             <DialogFooter padding="medium">
-              <Button disabled={isUpdating} type="default" onClick={onClose}>
+              <Button disabled={isUpdating} variant="default" onClick={onClose}>
                 Cancel
               </Button>
               <Button
                 form={formId}
                 disabled={
-                  !isSuccessConnections ||
+                  (!!gitBranchName && !isSuccessConnections) ||
                   isUpdating ||
                   !canSubmit ||
-                  isChecking ||
-                  (!gitlessBranching && !githubConnection)
+                  isChecking
                 }
                 loading={isUpdating}
-                type="primary"
-                htmlType="submit"
+                variant="primary"
+                type="submit"
               >
                 Update branch
               </Button>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

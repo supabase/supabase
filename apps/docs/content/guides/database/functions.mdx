@@ -30,9 +30,9 @@ and run the SQL queries yourself.
 3. Enter the SQL to create or replace your Database function.
 4. Click "Run" or cmd+enter (ctrl+enter).
 
-## Simple functions
+## Basic functions [#simple-functions]
 
-Let's create a basic Database Function which returns a string "hello world".
+Create a basic database function that returns the string "hello world".
 
 ```sql
 create or replace function hello_world() -- 1
@@ -53,7 +53,7 @@ At it's most basic a function has the following parts:
 2. `returns text`: The type of data that the function returns. If it returns nothing, you can `returns void`.
 3. `language sql`: The language used inside the function body. This can also be a procedural language: `plpgsql`, `plpython`, etc.
 4. `as $$`: The function wrapper. Anything enclosed inside the `$$` symbols will be part of the function body.
-5. `select 'hello world';`: A simple function body. The final `select` statement inside a function body will be returned if there are no statements following it.
+5. `select 'hello world';`: A basic function body. The final `select` statement inside a function body will be returned if there are no statements following it.
 6. `$$;`: The closing symbols of the function wrapper.
 
 </details>
@@ -290,7 +290,7 @@ data = supabase.rpc('get_planets').eq('id', 1).execute()
 
 ## Passing parameters
 
-Let's create a Function to insert a new planet into the `planets` table and return the new ID. Note that this time we're using the `plpgsql` language.
+Create a function to insert a new planet into the `planets` table and return the new ID. Note that this time we're using the `plpgsql` language.
 
 ```sql
 create or replace function add_planet(name text)
@@ -416,7 +416,7 @@ language plpgsql
 security definer set search_path = ''
 as $$
 begin
-  select 'hello world';
+  return 'hello world';
 end;
 $$;
 ```

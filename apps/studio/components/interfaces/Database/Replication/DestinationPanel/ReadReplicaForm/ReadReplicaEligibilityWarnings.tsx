@@ -1,21 +1,21 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { DocsButton } from 'components/ui/DocsButton'
-import { UpgradePlanButton } from 'components/ui/UpgradePlanButton'
-import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { MAX_REPLICAS_ABOVE_XL, MAX_REPLICAS_BELOW_XL } from 'data/read-replicas/replicas-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns'
+
 import { useCheckEligibilityDeployReplica } from './useCheckEligibilityDeployReplica'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
+import { useEnablePhysicalBackupsMutation } from '@/data/database/enable-physical-backups-mutation'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { READ_REPLICAS_MAX_COUNT } from '@/data/read-replicas/replicas-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 export const ReadReplicaEligibilityWarnings = () => {
   const { ref: projectRef } = useParams()
@@ -65,8 +65,8 @@ export const ReadReplicaEligibilityWarnings = () => {
   if (hasOverdueInvoices) {
     return (
       <Admonition type="warning" title="Your organization has overdue invoices">
-        <p>Please resolve all outstanding invoices first before deploying a new read replica</p>
-        <Button asChild type="default" className="mt-2">
+        <p>Please resolve all outstanding invoices first before deploying a new read replica.</p>
+        <Button asChild variant="default" className="mt-2">
           <Link href={`/org/${org?.slug}/billing#invoices`}>View invoices</Link>
         </Button>
       </Admonition>
@@ -81,7 +81,7 @@ export const ReadReplicaEligibilityWarnings = () => {
       >
         <p>
           Projects provisioned by other cloud providers currently will not be able to use read
-          replicas
+          replicas.
         </p>
         <DocsButton
           abbrev={false}
@@ -97,7 +97,7 @@ export const ReadReplicaEligibilityWarnings = () => {
       <Admonition
         type="warning"
         title="Read replicas are not supported for AWS (Revamped) projects"
-        description="Projects provisioned by other cloud providers currently will not be able to use read replicas"
+        description="Projects provisioned by other cloud providers currently will not be able to use read replicas."
       />
     )
   }
@@ -108,8 +108,8 @@ export const ReadReplicaEligibilityWarnings = () => {
         type="warning"
         title="Read replicas can only be deployed with projects on Postgres version 15 and above"
       >
-        <p>If you'd like to use read replicas, please contact us via support</p>
-        <Button asChild type="default" className="mt-2">
+        <p>If you'd like to use read replicas, please contact us via support.</p>
+        <Button asChild variant="default" className="mt-2">
           <SupportLink
             queryParams={{
               projectRef,
@@ -138,9 +138,7 @@ export const ReadReplicaEligibilityWarnings = () => {
             addon="computeSize"
             source="read-replicas"
             featureProposition="deploy Read Replicas"
-          >
-            Change compute size
-          </UpgradePlanButton>
+          />
           <DocsButton href={`${DOCS_URL}/guides/platform/read-replicas#prerequisites`} />
         </div>
       </Admonition>
@@ -179,7 +177,7 @@ export const ReadReplicaEligibilityWarnings = () => {
         {refetchInterval === false && (
           <div className="flex items-center gap-x-2 mt-2">
             <Button
-              type="default"
+              variant="default"
               loading={isEnabling}
               disabled={isEnabling}
               onClick={() => {
@@ -210,7 +208,9 @@ export const ReadReplicaEligibilityWarnings = () => {
           source="read-replicas"
           addon="spendCap"
           className="mt-2"
-        />
+        >
+          Disable spend cap
+        </UpgradePlanButton>
       </Admonition>
     )
   }
@@ -222,11 +222,11 @@ export const ReadReplicaEligibilityWarnings = () => {
         title={`You can only deploy up to ${maxNumberOfReplicas} read replicas at once`}
       >
         <p>If you'd like to spin up another read replica, please drop an existing replica first.</p>
-        {maxNumberOfReplicas === MAX_REPLICAS_BELOW_XL && (
+        {maxNumberOfReplicas < READ_REPLICAS_MAX_COUNT && (
           <>
             <p>
               Alternatively, you may deploy up to{' '}
-              <span className="text-foreground">{MAX_REPLICAS_ABOVE_XL}</span> replicas if your
+              <span className="text-foreground">{READ_REPLICAS_MAX_COUNT}</span> replicas if your
               project is on an XL compute or higher.
             </p>
             <UpgradePlanButton

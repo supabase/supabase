@@ -2,18 +2,23 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { MessageSquare } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
-
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
 import { AiIconAnimation, Button } from 'ui'
+
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface AIAssistantOptionProps {
   projectRef?: string | null
   organizationSlug?: string | null
+  onClick?: () => void
 }
 
-export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantOptionProps) => {
-  const { mutate: sendEvent } = useSendEventMutation()
+export const AIAssistantOption = ({
+  projectRef,
+  organizationSlug,
+  onClick,
+}: AIAssistantOptionProps) => {
+  const track = useTrack()
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -22,17 +27,16 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
   }, [])
 
   const onAiAssistantClicked = useCallback(() => {
-    sendEvent({
-      action: 'ai_assistant_in_support_form_clicked',
-      groups: {
-        project: projectRef === null || projectRef === NO_PROJECT_MARKER ? undefined : projectRef,
-        organization:
-          organizationSlug === null || organizationSlug === NO_ORG_MARKER
-            ? undefined
-            : organizationSlug,
-      },
+    track('ai_assistant_in_support_form_clicked', undefined, {
+      project: projectRef === null || projectRef === NO_PROJECT_MARKER ? undefined : projectRef,
+      organization:
+        organizationSlug === null || organizationSlug === NO_ORG_MARKER
+          ? undefined
+          : organizationSlug,
     })
-  }, [projectRef, organizationSlug, sendEvent])
+
+    onClick?.()
+  }, [onClick, projectRef, organizationSlug, track])
 
   // If no specific project selected, use the wildcard route
   const aiLink = `/project/${projectRef !== NO_PROJECT_MARKER ? projectRef : '_'}?sidebar=ai-assistant&slug=${organizationSlug}`
@@ -49,7 +53,7 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
           className="w-full overflow-hidden border rounded-md relative bg-200"
         >
           <div className="flex items-center p-6">
-            <div className="flex flex-col gap-3 z-[2] flex-shrink-0 w-full">
+            <div className="flex flex-col gap-3 z-2 shrink-0 w-full">
               <div>
                 <h5 className="text-sm font-medium text-foreground">Try Supabase Assistant</h5>
                 <p className="text-sm text-foreground-lighter">
@@ -57,15 +61,26 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
                 </p>
               </div>
               <div>
-                <Link href={aiLink} onClick={onAiAssistantClicked}>
-                  <Button size="tiny" type="default" icon={<AiIconAnimation size={14} />}>
+                {onClick ? (
+                  <Button
+                    size="tiny"
+                    variant="default"
+                    icon={<AiIconAnimation size={14} />}
+                    onClick={onAiAssistantClicked}
+                  >
                     Ask the Assistant
                   </Button>
-                </Link>
+                ) : (
+                  <Link href={aiLink} onClick={onAiAssistantClicked}>
+                    <Button size="tiny" variant="default" icon={<AiIconAnimation size={14} />}>
+                      Ask the Assistant
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
             {/* Decorative background */}
-            <div className="absolute z-[1] scale-75 -right-40 md:-right-24 -top-6 md:top-0">
+            <div className="absolute z-1 scale-75 -right-40 md:-right-24 -top-6 md:top-0">
               <div className="relative grow flex flex-col gap-3 w-[400px]">
                 <div className="flex items-start gap-3 pl-12">
                   <div className="w-8 h-8 rounded-full bg-background-surface-300 flex items-center justify-center">
@@ -86,7 +101,7 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
                   </div>
                 </div>
               </div>
-              <div className="absolute -inset-2 bg-gradient-to-l from-transparent via-background-200 via-[90%] to-background-200 to-[100%] z-[1]" />
+              <div className="absolute -inset-2 bg-linear-to-l from-transparent via-background-200 via-90% to-background-200 to-100% z-1" />
             </div>
           </div>
         </motion.aside>

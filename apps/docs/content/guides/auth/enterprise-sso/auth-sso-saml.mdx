@@ -78,10 +78,10 @@ Alternatively, you can use the `supabase sso info --project-ref <your-project>` 
 
 User accounts and identities created via SSO differ from regular (email, phone, password, social login...) accounts in these ways:
 
-- **No automatic linking.**
-  Each user account verified using a SSO identity provider will not be automatically linked to existing user accounts in the system. That is, if a user `valid.email@supabase.io` had signed up with a password, and then uses their company SSO login with your project, there will be two `valid.email@supabase.io` user accounts in the system.
+- **No identity linking.**
+  Each user account verified using an SSO identity provider are not legible for [identity linking](/docs/guides/auth/auth-identity-linking) to existing user accounts for security reasons. That is, if a user `valid.email@supabase.io` had signed up with a password, and then uses their company SSO login with your project, there will be two `valid.email@supabase.io` user accounts in the system.
 - **Emails are not necessarily unique.**
-  Given the behavior with no automatic linking, email addresses are no longer a unique identifier for a user account. Always use the user's UUID to correctly reference user accounts.
+  Given the behavior with no identity linking, email addresses are no longer a unique identifier for a user account. Always use the user's UUID to correctly reference user accounts.
 - **Sessions may have a maximum duration.**
   Depending on the configuration of the identity provider, a login session established with SSO may forcibly log out a user after a certain period of time.
 
@@ -106,7 +106,7 @@ If you use [Multi-Factor Authentication](/docs/guides/auth/auth-mfa) with SSO, t
 
 A common use case with SSO is to use the UUID of the identity provider as the identifier for the organization the user belongs to -- frequently known as a tenant. By associating the identity provider's UUID with your tenants, you can use restrictive RLS policies to scope down actions and data that a user is able to access.
 
-For example, let's say you have a table like:
+For example, say you have a table like:
 
 ```sql
 create table organization_settings (
@@ -195,7 +195,8 @@ To initiate a sign-in request from your application's user interface (i.e. the S
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 supabase.auth.signInWithSSO({
@@ -487,7 +488,8 @@ Yes, also referred to as [cross-origin authentication within the same site](http
 
 ```ts
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('https://your-project.supabase.co', 'sb_publishable_... or anon key')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 const { data, error } = await supabase.auth.signInWithSSO({
@@ -506,6 +508,7 @@ When redirecting to a URL other than the Site URL, a `/callback` endpoint is nec
 
 ```ts
 import { error, redirect } from '@sveltejs/kit'
+
 import type { RequestHandler } from './$types'
 
 export const GET: RequestHandler = async ({ url, locals }) => {

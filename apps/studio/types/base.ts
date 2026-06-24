@@ -1,8 +1,9 @@
 import type { PermissionAction } from '@supabase/shared-types/out/constants'
-import type { OrganizationBase } from 'data/organizations/organizations-query'
-import type { PlanId } from 'data/subscriptions/types'
 import type jsonLogic from 'json-logic-js'
-import type { ManagedBy } from 'lib/constants/infrastructure'
+
+import type { OrganizationBase } from '@/data/organizations/organizations-query'
+import type { PlanId } from '@/data/subscriptions/types'
+import type { ManagedBy } from '@/lib/constants/infrastructure'
 
 export interface Organization extends OrganizationBase {
   managed_by: ManagedBy
@@ -100,6 +101,8 @@ export class ResponseError extends Error {
   retryAfter?: number
   requestPathname?: string
   metadata?: CostMetadata
+  errorType?: string
+  formattedError?: string
 
   constructor(
     message: string | undefined,
@@ -107,7 +110,8 @@ export class ResponseError extends Error {
     requestId?: string,
     retryAfter?: number,
     requestPathname?: string,
-    metadata?: CostMetadata
+    metadata?: CostMetadata,
+    formattedError?: string
   ) {
     super(message || 'API error happened while trying to communicate with the server.')
     this.code = code
@@ -115,6 +119,7 @@ export class ResponseError extends Error {
     this.retryAfter = retryAfter
     this.requestPathname = requestPathname
     this.metadata = metadata
+    this.formattedError = formattedError
   }
 }
 

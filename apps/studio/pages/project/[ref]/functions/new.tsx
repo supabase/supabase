@@ -1,52 +1,53 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { EDGE_FUNCTION_TEMPLATES } from 'components/interfaces/Functions/Functions.templates'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import EdgeFunctionsLayout from 'components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
-import { PageLayout } from 'components/layouts/PageLayout/PageLayout'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { FileExplorerAndEditor } from 'components/ui/FileExplorerAndEditor'
-import { useEdgeFunctionDeployMutation } from 'data/edge-functions/edge-functions-deploy-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { BASE_PATH } from 'lib/constants'
 import { isEqual } from 'lodash'
 import { AlertCircle, Book, Check } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useId, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
 import {
   AiIconAnimation,
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  Input_Shadcn_,
-  Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  Input,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 import * as z from 'zod'
 
+import { EDGE_FUNCTION_TEMPLATES } from '@/components/interfaces/Functions/Functions.templates'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import EdgeFunctionsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { FileExplorerAndEditor } from '@/components/ui/FileExplorerAndEditor'
 import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
-import { useLatest } from '@/hooks/misc/useLatest'
+import { useEdgeFunctionDeployMutation } from '@/data/edge-functions/edge-functions-deploy-mutation'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
+import { BASE_PATH } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 // Array of adjectives and nouns for random function name generation
 const ADJECTIVES = [
@@ -77,7 +78,7 @@ const NOUNS = [
 // Function name validation regex - only allows alphanumeric characters, hyphens, and underscores
 const FUNCTION_NAME_REGEX = /^[A-Za-z0-9_-]+$/
 
-// Define form schema with yup
+// Define form schema with zod
 const FormSchema = z.object({
   functionName: z
     .string()
@@ -116,7 +117,7 @@ const NewFunctionPage = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const snap = useAiAssistantStateSnapshot()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const showStripeExample = useIsFeatureEnabled('edge_functions:show_stripe_example')
   const { openSidebar } = useSidebarManagerSnapshot()
 
@@ -142,14 +143,22 @@ const NewFunctionPage = () => {
     },
   })
 
-  const { mutate: deployFunction, isPending: isDeploying } = useEdgeFunctionDeployMutation({
+  const {
+    mutate: deployFunction,
+    isPending: isDeploying,
+    isSuccess: hasDeployed,
+  } = useEdgeFunctionDeployMutation({
     // [Joshen] To investigate: For some reason, the invalidation for list of edge functions isn't triggering
     onSuccess: () => {
       toast.success('Successfully deployed edge function')
       const functionName = form.getValues('functionName')
-      if (ref && functionName) {
-        router.push(`/project/${ref}/functions/${functionName}/details`)
-      }
+      // Allow the mutation state (isSuccess) to propagate before navigating
+      // to prevent unnecessary dialog about unsaved changes
+      setTimeout(() => {
+        if (ref && functionName) {
+          router.push(`/project/${ref}/functions/${functionName}/details`)
+        }
+      }, 150)
     },
   })
 
@@ -163,11 +172,7 @@ const NewFunctionPage = () => {
       files: files.map(({ name, content }) => ({ name, content })),
     })
 
-    sendEvent({
-      action: 'edge_function_deploy_button_clicked',
-      properties: { origin: 'functions_editor' },
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
+    track('edge_function_deploy_button_clicked', { origin: 'functions_editor' })
   }
 
   const handleChat = () => {
@@ -201,11 +206,7 @@ const NewFunctionPage = () => {
         ],
       },
     })
-    sendEvent({
-      action: 'edge_function_ai_assistant_button_clicked',
-      properties: { origin: 'functions_editor_chat' },
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
+    track('edge_function_ai_assistant_button_clicked', { origin: 'functions_editor_chat' })
   }
 
   const onSelectTemplate = (templateValue: string) => {
@@ -217,10 +218,9 @@ const NewFunctionPage = () => {
         )
       )
       setOpen(false)
-      sendEvent({
-        action: 'edge_function_template_clicked',
-        properties: { templateName: template.name, origin: 'editor_page' },
-        groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
+      track('edge_function_template_clicked', {
+        templateName: template.name,
+        origin: 'editor_page',
       })
     }
     setIsPreviewingTemplate(false)
@@ -276,21 +276,11 @@ const NewFunctionPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [template])
 
-  // [Joshen] Probably a candidate for useStaticEffectEvent
-  const filesRef = useLatest(files)
-  useEffect(() => {
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      const hasUnsavedChanges = !isEqual(INITIAL_FILES, filesRef.current)
-
-      if (hasUnsavedChanges) {
-        e.preventDefault()
-        e.returnValue = '' // deprecated, but older browsers still require this
-      }
-    }
-    window.addEventListener('beforeunload', handleBeforeUnload)
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const hasUnsavedChanges = useMemo(() => !isEqual(INITIAL_FILES, files), [files])
+  const { handleCancelNavigation, handleConfirmNavigation, shouldConfirmNavigation } =
+    usePreventNavigationOnUnsavedChanges({
+      hasChanges: hasUnsavedChanges && !hasDeployed,
+    })
 
   return (
     <PageLayout
@@ -305,11 +295,11 @@ const NewFunctionPage = () => {
       ]}
       primaryActions={
         <>
-          <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-            <PopoverTrigger_Shadcn_ asChild>
+          <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
               <Button
                 size="tiny"
-                type="default"
+                variant="default"
                 role="combobox"
                 aria-expanded={open}
                 aria-controls={templatesListboxId}
@@ -317,15 +307,15 @@ const NewFunctionPage = () => {
               >
                 Templates
               </Button>
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ id={templatesListboxId} className="w-[300px] p-0" align="end">
-              <Command_Shadcn_>
-                <CommandInput_Shadcn_ placeholder="Search templates..." />
-                <CommandList_Shadcn_>
-                  <CommandEmpty_Shadcn_>No templates found.</CommandEmpty_Shadcn_>
-                  <CommandGroup_Shadcn_>
+            </PopoverTrigger>
+            <PopoverContent id={templatesListboxId} className="w-[300px] p-0" align="end">
+              <Command>
+                <CommandInput placeholder="Search templates..." />
+                <CommandList>
+                  <CommandEmpty>No templates found.</CommandEmpty>
+                  <CommandGroup>
                     {templates.map((template) => (
-                      <CommandItem_Shadcn_
+                      <CommandItem
                         key={template.value}
                         value={template.value}
                         onSelect={onSelectTemplate}
@@ -349,16 +339,16 @@ const NewFunctionPage = () => {
                             {template.description}
                           </span>
                         </div>
-                      </CommandItem_Shadcn_>
+                      </CommandItem>
                     ))}
-                  </CommandGroup_Shadcn_>
-                </CommandList_Shadcn_>
-              </Command_Shadcn_>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
           <Button
             size="tiny"
-            type="default"
+            variant="default"
             onClick={handleChat}
             icon={<AiIconAnimation size={16} />}
           >
@@ -380,21 +370,21 @@ const NewFunctionPage = () => {
         setSelectedFileId={setSelectedFileId}
       />
 
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex items-center bg-background-muted justify-end p-4 border-t bg-surface-100 gap-3"
         >
           <div className="flex items-center gap-3">
-            <Label_Shadcn_ htmlFor="functionName">Function name</Label_Shadcn_>
-            <FormField_Shadcn_
+            <Label htmlFor="functionName">Function name</Label>
+            <FormField
               control={form.control}
               name="functionName"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex flex-col gap-0 m-0">
+                <FormItem className="flex flex-col gap-0 m-0">
                   <div className="flex items-center">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    <FormControl>
+                      <Input
                         id="functionName"
                         type="text"
                         size={'large'}
@@ -402,7 +392,7 @@ const NewFunctionPage = () => {
                         className="w-[250px]"
                         {...field}
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                     {form.formState.errors.functionName && (
                       <Tooltip>
                         <TooltipTrigger>
@@ -414,7 +404,7 @@ const NewFunctionPage = () => {
                       </Tooltip>
                     )}
                   </div>
-                </FormItem_Shadcn_>
+                </FormItem>
               )}
             />
           </div>
@@ -427,7 +417,12 @@ const NewFunctionPage = () => {
             Deploy function
           </Button>
         </form>
-      </Form_Shadcn_>
+      </Form>
+      <DiscardChangesConfirmationDialog
+        visible={shouldConfirmNavigation}
+        onCancel={handleCancelNavigation}
+        onClose={handleConfirmNavigation}
+      />
     </PageLayout>
   )
 }
@@ -435,7 +430,7 @@ const NewFunctionPage = () => {
 NewFunctionPage.getLayout = (page: React.ReactNode) => {
   return (
     <DefaultLayout>
-      <EdgeFunctionsLayout>{page}</EdgeFunctionsLayout>
+      <EdgeFunctionsLayout title="New">{page}</EdgeFunctionsLayout>
     </DefaultLayout>
   )
 }

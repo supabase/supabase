@@ -1,46 +1,44 @@
-import { useFlag } from 'common'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { IS_PLATFORM } from 'lib/constants'
-import { EMPTY_ARR } from 'lib/void'
 import { useMemo } from 'react'
 
-import { wrapperMetaComparator } from '../Wrappers/Wrappers.utils'
-import { INTEGRATIONS } from './Integrations.constants'
 import {
-  isInstalled as checkIsInstalled,
-  findStripeSchema,
-  parseStripeSchema,
-} from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
+  hasMatchingWrapper,
+  hasRequiredExtensions,
+  isOAuthInstalled,
+  isStripeSyncEngineInstalled,
+  useProjectOAuthIntegrationData,
+} from './Landing.utils'
+import { useAvailableIntegrations } from './useAvailableIntegrations'
+import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useFDWsQuery } from '@/data/fdw/fdws-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { EMPTY_ARR } from '@/lib/void'
 
 export const useInstalledIntegrations = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-  const stripeSyncEnabled = useFlag('enableStripeSyncEngineIntegration')
-
-  const allIntegrations = useMemo(() => {
-    return INTEGRATIONS.filter((integration) => {
-      if (
-        !integrationsWrappers &&
-        (integration.type === 'wrapper' || integration.id.endsWith('_wrapper'))
-      ) {
-        return false
-      }
-      if (!stripeSyncEnabled && integration.id === 'stripe_sync_engine') {
-        return false
-      }
-      if (!IS_PLATFORM && integration.id === 'data_api') {
-        return false
-      }
-      return true
-    })
-  }, [integrationsWrappers, stripeSyncEnabled])
 
   const {
-    data,
+    data: allIntegrations = EMPTY_ARR,
+    error: availableIntegrationsError,
+    isPending: isAvailableIntegrationsLoading,
+    isSuccess: isSuccessAvailableIntegrations,
+    isError: isErrorAvailableIntegrations,
+  } = useAvailableIntegrations()
+
+  const hasOAuthIntegration = useMemo(() => {
+    return allIntegrations.some((integration) => integration.type === 'oauth')
+  }, [allIntegrations])
+
+  const {
+    data: oauthData,
+    error: oauthDataError,
+    isError: isErrorOAuthData,
+    isLoading: isOAuthDataLoading,
+    isSuccess: isSuccessOAuthData,
+  } = useProjectOAuthIntegrationData(project?.ref, { enabled: hasOAuthIntegration })
+
+  const {
+    data: wrappers = EMPTY_ARR,
     error: fdwError,
     isError: isErrorFDWs,
     isPending: isFDWLoading,
@@ -50,7 +48,7 @@ export const useInstalledIntegrations = () => {
     connectionString: project?.connectionString,
   })
   const {
-    data: extensions,
+    data: extensions = EMPTY_ARR,
     error: extensionsError,
     isError: isErrorExtensions,
     isPending: isExtensionsLoading,
@@ -61,7 +59,7 @@ export const useInstalledIntegrations = () => {
   })
 
   const {
-    data: schemas,
+    data: schemas = EMPTY_ARR,
     error: schemasError,
     isError: isErrorSchemas,
     isPending: isSchemasLoading,
@@ -72,53 +70,60 @@ export const useInstalledIntegrations = () => {
   })
 
   const isHooksEnabled = schemas?.some((schema) => schema.name === 'supabase_functions')
-  const wrappers = useMemo(() => data ?? EMPTY_ARR, [data])
 
   const installedIntegrations = useMemo(() => {
     return allIntegrations
       .filter((integration) => {
-        // special handling for supabase webhooks
-        if (integration.id === 'webhooks') {
-          return isHooksEnabled
-        }
-        if (integration.id === 'data_api') {
-          return true
-        }
+        if (integration.id === 'webhooks') return isHooksEnabled
+        if (integration.id === 'data_api') return true
         if (integration.id === 'stripe_sync_engine') {
-          const stripeSchema = findStripeSchema(schemas)
-          const parsedSchema = parseStripeSchema(stripeSchema)
-          return checkIsInstalled(parsedSchema.status)
+          return isStripeSyncEngineInstalled(schemas)
         }
         if (integration.type === 'wrapper') {
-          return wrappers.find((w) => wrapperMetaComparator(integration.meta, w))
+          return hasMatchingWrapper({ meta: integration.meta, wrappers })
         }
         if (integration.type === 'postgres_extension') {
-          return integration.requiredExtensions.every((extName) => {
-            const foundExtension = (extensions ?? []).find((ext) => ext.name === extName)
-            return !!foundExtension?.installed_version
+          return hasRequiredExtensions({ integration, extensions })
+        }
+        if (integration.type === 'oauth') {
+          return isOAuthInstalled({
+            integration,
+            projectData: oauthData,
           })
         }
         return false
       })
       .sort((a, b) => a.name.localeCompare(b.name))
-  }, [allIntegrations, wrappers, extensions, schemas, isHooksEnabled])
+  }, [allIntegrations, wrappers, extensions, schemas, isHooksEnabled, oauthData])
 
-  // available integrations are all integrations that can be installed. If an integration can't be installed (needed
-  // extensions are not available on this DB image), the UI will provide a tooltip explaining why.
-  const availableIntegrations = useMemo(
-    () => allIntegrations.sort((a, b) => a.name.localeCompare(b.name)),
-    [allIntegrations]
-  )
-
-  const error = fdwError || extensionsError || schemasError
-  const isLoading = isSchemasLoading || isFDWLoading || isExtensionsLoading
-  const isError = isErrorFDWs || isErrorExtensions || isErrorSchemas
-  const isSuccess = isSuccessFDWs && isSuccessExtensions && isSuccessSchemas
+  const error =
+    fdwError ||
+    extensionsError ||
+    schemasError ||
+    availableIntegrationsError ||
+    (hasOAuthIntegration ? oauthDataError : null)
+  const isLoading =
+    isSchemasLoading ||
+    isFDWLoading ||
+    isExtensionsLoading ||
+    isAvailableIntegrationsLoading ||
+    (hasOAuthIntegration && isOAuthDataLoading)
+  const isError =
+    isErrorFDWs ||
+    isErrorExtensions ||
+    isErrorSchemas ||
+    isErrorAvailableIntegrations ||
+    (hasOAuthIntegration && isErrorOAuthData)
+  const isSuccess =
+    isSuccessFDWs &&
+    isSuccessExtensions &&
+    isSuccessSchemas &&
+    isSuccessAvailableIntegrations &&
+    (!hasOAuthIntegration || isSuccessOAuthData)
 
   return {
     // show all integrations at once instead of showing partial results
     installedIntegrations: isLoading ? EMPTY_ARR : installedIntegrations,
-    availableIntegrations: isLoading ? EMPTY_ARR : availableIntegrations,
     error,
     isError,
     isLoading,

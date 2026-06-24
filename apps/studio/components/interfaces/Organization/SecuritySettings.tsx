@@ -1,31 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { z } from 'zod'
-
-import { useParams } from 'common'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import NoPermission from 'components/ui/NoPermission'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useOrganizationMfaToggleMutation } from 'data/organizations/organization-mfa-mutation'
-import { useOrganizationMfaQuery } from 'data/organizations/organization-mfa-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useProfile } from 'lib/profile'
 import {
   Button,
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Switch,
   Tooltip,
   TooltipContent,
@@ -33,6 +19,20 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { z } from 'zod'
+
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import { useOrganizationMfaToggleMutation } from '@/data/organizations/organization-mfa-mutation'
+import { useOrganizationMfaQuery } from '@/data/organizations/organization-mfa-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 
 const schema = z.object({
   enforceMfa: z.boolean(),
@@ -41,7 +41,6 @@ const schema = z.object({
 export const SecuritySettings = () => {
   const { slug } = useParams()
   const { profile } = useProfile()
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: members } = useOrganizationMembersQuery({ slug })
 
   const { can: canReadMfaConfig, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -52,9 +51,10 @@ export const SecuritySettings = () => {
     PermissionAction.UPDATE,
     'organizations'
   )
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
-  const isPaidPlan = selectedOrganization?.plan.id !== 'free'
+  const { hasAccess: hasAccessToEnforceMfa, isLoading: isLoadingEntitlement } =
+    useCheckEntitlements('security.enforce_mfa')
 
   const {
     data: mfaConfig,
@@ -62,7 +62,7 @@ export const SecuritySettings = () => {
     isPending: isLoadingMfa,
     isError: isErrorMfa,
     isSuccess: isSuccessMfa,
-  } = useOrganizationMfaQuery({ slug }, { enabled: isPaidPlan && canReadMfaConfig })
+  } = useOrganizationMfaQuery({ slug }, { enabled: hasAccessToEnforceMfa && canReadMfaConfig })
 
   const { mutate: toggleMfa, isPending: isUpdatingMfa } = useOrganizationMfaToggleMutation({
     onError: (error) => {
@@ -71,15 +71,7 @@ export const SecuritySettings = () => {
     },
     onSuccess: (data) => {
       toast.success('Successfully updated organization MFA settings')
-      sendEvent({
-        action: 'organization_mfa_enforcement_updated',
-        properties: {
-          mfaEnforced: data.enforced,
-        },
-        groups: {
-          organization: slug ?? 'Unknown',
-        },
-      })
+      track('organization_mfa_enforcement_updated', { mfaEnforced: data.enforced })
     },
   })
 
@@ -100,14 +92,14 @@ export const SecuritySettings = () => {
     members?.find((member) => member.primary_email == profile?.primary_email)?.mfa_enabled || false
 
   const onSubmit = (values: { enforceMfa: boolean }) => {
-    if (!slug || !isPaidPlan) return
+    if (!slug || !hasAccessToEnforceMfa) return
     toggleMfa({ slug, setEnforced: values.enforceMfa })
   }
 
   return (
     <ScaffoldContainer size="small" className="px-6 xl:px-10">
       <ScaffoldSection isFullWidth>
-        {!isPaidPlan ? (
+        {!hasAccessToEnforceMfa && !isLoadingEntitlement ? (
           <UpgradeToPro
             source="organizationMfa"
             primaryText="Organization MFA enforcement is not available on Free Plan"
@@ -116,7 +108,7 @@ export const SecuritySettings = () => {
           />
         ) : (
           <>
-            {isLoadingMfa || isLoadingPermissions ? (
+            {isLoadingMfa || isLoadingPermissions || isLoadingEntitlement ? (
               <Card>
                 <CardContent>
                   <GenericSkeletonLoader />
@@ -126,16 +118,16 @@ export const SecuritySettings = () => {
               <NoPermission resourceText="view organization security settings" />
             ) : null}
 
-            {(isErrorMfa || mfaError) && isPaidPlan && (
+            {(isErrorMfa || mfaError) && hasAccessToEnforceMfa && (
               <AlertError error={mfaError} subject="Failed to retrieve MFA enforcement status" />
             )}
 
-            {isSuccessMfa && isPaidPlan && (
-              <Form_Shadcn_ {...form}>
+            {isSuccessMfa && hasAccessToEnforceMfa && (
+              <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                   <Card>
                     <CardContent>
-                      <FormField_Shadcn_
+                      <FormField
                         control={form.control}
                         name="enforceMfa"
                         render={({ field }) => (
@@ -144,14 +136,14 @@ export const SecuritySettings = () => {
                             label="Require MFA to access organization"
                             description="Team members must have MFA enabled and a valid MFA session to access the organization and any projects."
                           >
-                            <FormControl_Shadcn_>
+                            <FormControl>
                               <Tooltip>
                                 <TooltipTrigger asChild>
                                   <Switch
                                     checked={field.value}
                                     onCheckedChange={field.onChange}
                                     disabled={
-                                      !isPaidPlan ||
+                                      !hasAccessToEnforceMfa ||
                                       !canUpdateMfaConfig ||
                                       !hasMFAEnabled ||
                                       isUpdatingMfa
@@ -171,7 +163,7 @@ export const SecuritySettings = () => {
                                   </TooltipContent>
                                 )}
                               </Tooltip>
-                            </FormControl_Shadcn_>
+                            </FormControl>
                           </FormItemLayout>
                         )}
                       />
@@ -179,18 +171,20 @@ export const SecuritySettings = () => {
                     <CardFooter className="justify-end space-x-2">
                       {form.formState.isDirty && (
                         <Button
-                          type="default"
+                          variant="default"
                           disabled={isLoadingMfa || isUpdatingMfa}
-                          onClick={() => form.reset({ enforceMfa: isPaidPlan ? mfaConfig : false })}
+                          onClick={() =>
+                            form.reset({ enforceMfa: hasAccessToEnforceMfa ? mfaConfig : false })
+                          }
                         >
                           Cancel
                         </Button>
                       )}
                       <Button
-                        type="primary"
-                        htmlType="submit"
+                        variant="primary"
+                        type="submit"
                         disabled={
-                          !isPaidPlan ||
+                          !hasAccessToEnforceMfa ||
                           !canUpdateMfaConfig ||
                           isUpdatingMfa ||
                           isLoadingMfa ||
@@ -203,7 +197,7 @@ export const SecuritySettings = () => {
                     </CardFooter>
                   </Card>
                 </form>
-              </Form_Shadcn_>
+              </Form>
             )}
           </>
         )}

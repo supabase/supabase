@@ -1,11 +1,12 @@
 import { usePrevious } from '@uidotdev/usehooks'
 import { AlertCircle, Check, Loader2, RefreshCcw } from 'lucide-react'
 import { useEffect, useState } from 'react'
-
-import { useProfile } from 'lib/profile'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import ReadOnlyBadge from './ReadOnlyBadge'
+import { useProfile } from '@/lib/profile'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { isSnippetOwner } from '@/state/sql-editor/sql-editor-rules'
 
 export type SavingIndicatorProps = { id: string }
 
@@ -18,7 +19,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
   const [showSavedText, setShowSavedText] = useState(false)
 
   const snippet = snapV2.snippets[id]
-  const isSnippetOwner = profile?.id === snippet?.snippet.owner_id
+  const snippetIsOwned = !!snippet && isSnippetOwner(snippet.snippet, profile?.id)
 
   useEffect(() => {
     let cancel = false
@@ -40,9 +41,9 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
   return (
     <>
       <div className="mx-2 flex items-center gap-2">
-        {isSnippetOwner && savingState === 'UPDATING_FAILED' && (
+        {snippetIsOwned && savingState === 'UPDATING_FAILED' && (
           <Button
-            type="text"
+            variant="text"
             size="tiny"
             icon={<RefreshCcw className="text-gray-1100" strokeWidth={2} />}
             onClick={retry}
@@ -65,7 +66,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
             <TooltipContent>Saving changes...</TooltipContent>
           </Tooltip>
         ) : savingState === 'UPDATING_FAILED' ? (
-          isSnippetOwner ? (
+          snippetIsOwned ? (
             <Tooltip>
               <TooltipTrigger>
                 <AlertCircle className="text-red-900" size={14} strokeWidth={2} />

@@ -1,4 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
+
 import { passwordStrength } from './password-strength'
 
 describe('passwordStrength', () => {

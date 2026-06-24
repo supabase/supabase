@@ -5,9 +5,7 @@ import {
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,
 } from 'common'
-import { getProjectDetail } from 'data/projects/project-detail-query'
 import dayjs from 'dayjs'
-import { DOCS_URL } from 'lib/constants'
 import { partition } from 'lodash'
 import { Book, Github, Hash, MessageSquare } from 'lucide-react'
 import {
@@ -18,9 +16,11 @@ import {
   type inferParserType,
   type UseQueryStatesKeysMap,
 } from 'nuqs'
-import type { Organization } from 'types'
 
 import { CATEGORY_OPTIONS } from './Support.constants'
+import { getProjectDetail } from '@/data/projects/project-detail-query'
+import { DOCS_URL } from '@/lib/constants'
+import type { Organization } from '@/types'
 
 export const NO_PROJECT_MARKER = 'no-project'
 export const NO_ORG_MARKER = 'no-org'
@@ -56,9 +56,9 @@ export function getPageIcon(page: Page) {
     case PageType.Markdown:
     case PageType.Reference:
     case PageType.Integration:
-      return <Book strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Book strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <Github strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Github strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
@@ -69,9 +69,9 @@ export function getPageSectionIcon(page: Page) {
     case PageType.Markdown:
     case PageType.Reference:
     case PageType.Integration:
-      return <Hash strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <Hash strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     case PageType.GithubDiscussion:
-      return <MessageSquare strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+      return <MessageSquare strokeWidth={1.5} className="mr-0! w-4! h-4!" />
     default:
       throw new Error(`Unknown page type '${page.type}'`)
   }
@@ -139,11 +139,24 @@ export type SupportFormUrlKeys = inferParserType<typeof supportFormUrlState>
 
 export const loadSupportFormInitialParams = createLoader(supportFormUrlState)
 
+export function loadSupportFormInitialParamsFromObject(
+  initialParams: Partial<SupportFormUrlKeys>
+): SupportFormUrlKeys {
+  const normalizedParams = Object.fromEntries(
+    Object.entries(initialParams).flatMap(([key, value]) =>
+      value == null ? [] : [[key, String(value)]]
+    )
+  )
+
+  return loadSupportFormInitialParams(normalizedParams)
+}
+
 const serializeSupportFormInitialParams = createSerializer(supportFormUrlState)
 
 export function createSupportFormUrl(initialParams: Partial<SupportFormUrlKeys>) {
   const serializedParams = serializeSupportFormInitialParams(initialParams)
-  return `/support/new${serializedParams ?? ''}`
+  const query = serializedParams && serializedParams !== '?' ? serializedParams : ''
+  return `/support/new${query}`
 }
 
 /**

@@ -16,15 +16,12 @@ Projects must meet these requirements to use Read Replicas:
 
 1. Running on AWS.
 2. Running on at least a [Small compute add-on](/docs/guides/platform/compute-add-ons).
-
    - Read Replicas are started on the same compute instance as the Primary to keep up with changes.
 
 3. Running on Postgres 15+.
-
    - For projects running on older versions of Postgres, you need to [upgrade to the latest platform version](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade).
 
 4. Not using [legacy logical backups](/docs/guides/platform/backups#point-in-time-recovery)
-
    - Physical backups are automatically enabled if using [Point in time recovery (PITR)](/docs/guides/platform/backups#point-in-time-recovery)
 
 ## Creating a Read Replica
@@ -43,7 +40,7 @@ curl -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/read-replicas/se
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "region": "us-east-1"
+    "read_replica_region": "us-east-1"
   }'
 
 # Delete a Read Replica
@@ -103,7 +100,7 @@ We combine it with streaming replication to reduce replication lag. Once WAL-G f
 
 ### Restart or compute add-on change behaviour
 
-When you restart a project that utilizes Read Replicas, or change the compute add-on size, the Primary database gets restarted first. During this period, the Read Replicas remain available.
+When you restart a project that uses Read Replicas, or change the compute add-on size, the Primary database gets restarted first. During this period, the Read Replicas remain available.
 
 Once the Primary database has completed restarting (or resizing, in case of a compute add-on change) and become available for usage, all the Read Replicas are restarted (and resized, if needed) concurrently.
 
@@ -132,7 +129,7 @@ There is no single threshold to indicate when you should address replication lag
 
 <Admonition type="tip">
 
-If you are already ingesting your [project's metrics](/docs/guides/platform/metrics#accessing-the-metrics-endpoint) into your own environment, you can also keep track of replication lag and set alarms with the `physical_replication_lag_physical_replica_lag_seconds` metric.
+If you are already ingesting your [project's metrics](/docs/guides/telemetry/metrics) into your own environment, you can also keep track of replication lag and set alarms with the `physical_replication_lag_physical_replica_lag_seconds` metric.
 
 </Admonition>
 
@@ -141,7 +138,7 @@ If you are already ingesting your [project's metrics](/docs/guides/platform/metr
 Some common sources of high replication lag include:
 
 1. **Exclusive locks on tables on the Primary**: Operations such as `drop table` and `reindex` take an access-exclusive lock on the table. This can result in increasing replication lag for the duration of the lock.
-2. **Resource Constraints on the database**: Heavy utilization on the primary or the replica, if run on an under-resourced project, can result in high replication lag. This includes the characteristics of the disk being utilized (IOPS, Throughput).
+2. **Resource Constraints on the database**: Heavy utilization on the primary or the replica, if run on an under-resourced project, can result in high replication lag. This includes the characteristics of the disk being used (IOPS, Throughput).
 3. **Long-running transactions on the Primary**: Transactions that run for a long-time on the primary can also result in high replication lag. You can use the `pg_stat_activity` view to identify and terminate such transactions if needed. `pg_stat_activity` is a live view, and does not offer historical data on transactions that might have been active for a long time in the past.
    High replication lag can result in stale data returned for queries executed against the affected read replicas.
 

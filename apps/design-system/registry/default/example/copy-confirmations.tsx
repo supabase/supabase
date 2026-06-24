@@ -18,10 +18,10 @@ export default function CopyConfirmations() {
             </div>
           </div>
           <div className="flex gap-2 justify-end">
-            <Button type="default" size="tiny">
+            <Button variant="default" size="tiny">
               Cancel
             </Button>
-            <Button type="danger" size="tiny">
+            <Button variant="danger" size="tiny">
               Delete
             </Button>
           </div>
@@ -40,10 +40,10 @@ export default function CopyConfirmations() {
             </div>
           </div>
           <div className="flex gap-2 justify-end">
-            <Button type="default" size="tiny">
+            <Button variant="default" size="tiny">
               Cancel
             </Button>
-            <Button type="danger" size="tiny">
+            <Button variant="danger" size="tiny">
               Delete project
             </Button>
           </div>

@@ -5,7 +5,7 @@ import CodeSnippet from './CodeSnippet'
 import { DocSection } from './DocSection'
 import Snippets from './Snippets'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
@@ -17,10 +17,11 @@ interface AuthenticationProps {
 const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
   const { ref: projectRef } = useParams()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
+  const { data: apiKeyData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const { anonKey, serviceKey } = apiKeyData ?? {}
+
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
 
-  const { anonKey, serviceKey } = getKeys(apiKeys)
   const protocol = settings?.app_config?.protocol ?? 'https'
   const hostEndpoint = settings?.app_config?.endpoint
   const endpoint = `${protocol}://${hostEndpoint ?? ''}`
@@ -28,11 +29,11 @@ const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
   // [Joshen] ShowApiKey should really be a boolean, its confusing
   const defaultApiKey =
     showApiKey !== 'SUPABASE_KEY'
-      ? anonKey?.api_key ?? 'SUPABASE_CLIENT_API_KEY'
+      ? (anonKey?.api_key ?? 'SUPABASE_CLIENT_API_KEY')
       : 'SUPABASE_CLIENT_API_KEY'
   const serviceApiKey =
     showApiKey !== 'SUPABASE_KEY'
-      ? serviceKey?.api_key ?? 'SUPABASE_SERVICE_KEY'
+      ? (serviceKey?.api_key ?? 'SUPABASE_SERVICE_KEY')
       : 'SUPABASE_SERVICE_KEY'
 
   return (

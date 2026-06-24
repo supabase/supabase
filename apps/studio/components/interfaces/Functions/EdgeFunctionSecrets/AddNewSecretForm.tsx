@@ -1,8 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { useSecretsCreateMutation } from 'data/secrets/secrets-create-mutation'
-import { useSecretsQuery } from 'data/secrets/secrets-query'
-import { Eye, EyeOff, MinusCircle } from 'lucide-react'
+import { Eye, EyeOff, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -13,17 +11,22 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
-  Form_Shadcn_,
+  cn,
+  ExpandingTextArea,
+  Form,
+  FormControl,
+  FormField,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
 import { DuplicateSecretWarningModal } from './DuplicateSecretWarningModal'
+import { useSecretsCreateMutation } from '@/data/secrets/secrets-create-mutation'
+import { useSecretsQuery } from '@/data/secrets/secrets-query'
 
 type SecretPair = {
   name: string
@@ -55,7 +58,7 @@ const removeWrappingQuotes = (str: string): string => {
   return str
 }
 
-const AddNewSecretForm = () => {
+export const AddNewSecretForm = () => {
   const { ref: projectRef } = useParams()
   const [visibleSecrets, setVisibleSecrets] = useState<Set<string>>(new Set())
   const [duplicateSecretName, setDuplicateSecretName] = useState<string>('')
@@ -198,7 +201,7 @@ const AddNewSecretForm = () => {
 
   return (
     <>
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form className="w-full" onSubmit={form.handleSubmit(onSubmit)}>
           <Card>
             <CardHeader>
@@ -206,85 +209,118 @@ const AddNewSecretForm = () => {
             </CardHeader>
             <CardContent>
               {fields.map((fieldItem, index) => (
-                <div key={fieldItem.id} className="grid grid-cols-[1fr_1fr_auto] gap-4 mb-4">
-                  <FormField_Shadcn_
+                <div
+                  key={fieldItem.id}
+                  className={cn(
+                    'flex flex-col gap-4 last:mb-0 mb-4',
+                    index > 0 &&
+                      'border-t border-default pt-4 -mx-(--card-padding-x) px-(--card-padding-x)'
+                  )}
+                >
+                  <FormField
                     control={form.control}
                     name={`secrets.${index}.name`}
                     render={({ field }) => (
-                      <FormItem_Shadcn_ className="w-full">
-                        <FormLabel_Shadcn_>Name</FormLabel_Shadcn_>
-                        <FormControl_Shadcn_>
-                          <Input
-                            {...field}
-                            placeholder="e.g. CLIENT_KEY"
-                            data-1p-ignore
-                            data-lpignore="true"
-                            data-form-type="other"
-                            data-bwignore
-                            onPaste={(e) => handlePaste(e.nativeEvent)}
+                      <FormItemLayout
+                        label="Name"
+                        layout="flex-row-reverse"
+                        description="A unique name for your secret."
+                      >
+                        <div className="flex w-full items-center gap-2">
+                          <FormControl className="flex-1">
+                            <Input
+                              {...field}
+                              className="w-full font-mono"
+                              containerClassName="w-full"
+                              placeholder="e.g. CLIENT_KEY"
+                              data-1p-ignore
+                              data-lpignore="true"
+                              data-form-type="other"
+                              data-bwignore
+                              onPaste={(e) => handlePaste(e.nativeEvent)}
+                            />
+                          </FormControl>
+                          <Button
+                            variant="default"
+                            className="w-[34px] h-[34px] shrink-0 p-0"
+                            aria-label="Remove secret"
+                            icon={<Trash size={12} />}
+                            disabled={fields.length <= 1}
+                            onClick={() => handleRemoveSecret(fieldItem.id, index)}
                           />
-                        </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
+                        </div>
+                      </FormItemLayout>
                     )}
                   />
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name={`secrets.${index}.value`}
                     render={({ field }) => (
-                      <FormItem_Shadcn_ className="w-full relative">
-                        <FormLabel_Shadcn_>Value</FormLabel_Shadcn_>
-                        <FormControl_Shadcn_>
-                          <Input
-                            {...field}
-                            type={isSecretVisible(fieldItem.id) ? 'text' : 'password'}
-                            data-1p-ignore
-                            data-lpignore="true"
-                            data-form-type="other"
-                            data-bwignore
-                            actions={
-                              <div className="mr-1">
+                      <FormItemLayout
+                        label="Value"
+                        layout="flex-row-reverse"
+                        description="Supports multi-line values such as PEM keys, JSON, or functions."
+                      >
+                        <FormControl>
+                          <div className="relative w-full">
+                            <ExpandingTextArea
+                              {...field}
+                              data-1p-ignore
+                              data-lpignore="true"
+                              data-form-type="other"
+                              data-bwignore
+                              className="font-mono max-h-[320px] pr-10"
+                              style={
+                                {
+                                  WebkitTextSecurity: isSecretVisible(fieldItem.id)
+                                    ? undefined
+                                    : 'disc',
+                                } as React.CSSProperties
+                              }
+                            />
+                            <Tooltip>
+                              <TooltipTrigger asChild>
                                 <Button
-                                  type="text"
-                                  className="px-1"
+                                  variant="text"
+                                  className="absolute right-3 top-2 px-1"
+                                  aria-label={
+                                    isSecretVisible(fieldItem.id)
+                                      ? 'Hide secret value'
+                                      : 'Show secret value'
+                                  }
                                   icon={isSecretVisible(fieldItem.id) ? <EyeOff /> : <Eye />}
                                   onClick={() => handleToggleSecretVisibility(fieldItem.id)}
                                 />
-                              </div>
-                            }
-                          />
-                        </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
-                      </FormItem_Shadcn_>
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom">
+                                {isSecretVisible(fieldItem.id) ? 'Hide value' : 'Show value'}
+                              </TooltipContent>
+                            </Tooltip>
+                          </div>
+                        </FormControl>
+                      </FormItemLayout>
                     )}
-                  />
-
-                  <Button
-                    type="default"
-                    className="h-[34px] mt-6"
-                    icon={<MinusCircle />}
-                    disabled={fields.length <= 1}
-                    onClick={() => handleRemoveSecret(fieldItem.id, index)}
                   />
                 </div>
               ))}
-
-              <Button type="default" onClick={handleAddAnotherSecret}>
-                Add another
-              </Button>
             </CardContent>
             <CardFooter className="justify-between space-x-2">
               <p className="text-sm text-foreground-muted">
                 Insert or update multiple secrets at once by pasting key-value pairs
               </p>
 
-              <Button type="primary" htmlType="submit" disabled={isCreating} loading={isCreating}>
-                {isCreating ? 'Saving...' : fields.length > 1 ? 'Bulk save' : 'Save'}
-              </Button>
+              <div className="flex items-center space-x-2">
+                <Button variant="default" onClick={handleAddAnotherSecret}>
+                  Add another
+                </Button>
+                <Button variant="primary" type="submit" disabled={isCreating} loading={isCreating}>
+                  {isCreating ? 'Saving...' : fields.length > 1 ? 'Bulk save' : 'Save'}
+                </Button>
+              </div>
             </CardFooter>
           </Card>
         </form>
-      </Form_Shadcn_>
+      </Form>
       <DuplicateSecretWarningModal
         visible={!!duplicateSecretName}
         onCancel={handleCancelDuplicate}
@@ -295,5 +331,3 @@ const AddNewSecretForm = () => {
     </>
   )
 }
-
-export default AddNewSecretForm

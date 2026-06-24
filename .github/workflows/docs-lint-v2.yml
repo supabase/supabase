@@ -31,6 +31,7 @@ jobs:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           fetch-depth: 0
+          persist-credentials: false
           sparse-checkout: |
             supa-mdx-lint.config.toml
             supa-mdx-lint
@@ -46,7 +47,7 @@ jobs:
       - name: cache cargo
         id: cache-cargo
         if: steps.filter.outputs.docs == 'true'
-        uses: actions/cache@v4
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5
         with:
           path: |
             ~/.cargo/bin/

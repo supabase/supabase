@@ -10,25 +10,23 @@ import {
   Users,
   UserX,
 } from 'lucide-react'
+import { Image } from 'ui-patterns/Image'
 
-import { TwoColumnsSectionProps } from '~/components/Solutions/TwoColumnsSection'
-import { frameworks } from 'components/Hero/HeroFrameworks'
-
-import type { FeatureGridProps } from 'components/Solutions/FeatureGrid'
-import type { PlatformSectionProps } from 'components/Solutions/PlatformSection'
-import type { ResultsSectionProps } from 'components/Solutions/ResultsSection'
-import type { SecuritySectionProps } from 'components/Enterprise/Security'
-import type { WhatItTakesSectionProps } from 'components/Solutions/WhatItTakesSection'
+import { getSharedSections } from './shared-sections'
 import {
   FrameworkLink,
   type FeaturesSection,
   type HeroSection,
   type Metadata,
 } from './solutions.utils'
-import { getSharedSections } from './shared-sections'
-import { Image } from 'ui'
-
-import { useSendTelemetryEvent } from 'lib/telemetry'
+import type { SecuritySectionProps } from '@/components/Enterprise/Security'
+import { frameworks } from '@/components/Hero/HeroFrameworks'
+import type { FeatureGridProps } from '@/components/Solutions/FeatureGrid'
+import type { PlatformSectionProps } from '@/components/Solutions/PlatformSection'
+import type { ResultsSectionProps } from '@/components/Solutions/ResultsSection'
+import { TwoColumnsSectionProps } from '@/components/Solutions/TwoColumnsSection'
+import type { WhatItTakesSectionProps } from '@/components/Solutions/WhatItTakesSection'
+import { useSendTelemetryEvent } from '@/lib/telemetry'
 
 const data: () => {
   metadata: Metadata
@@ -114,7 +112,7 @@ const data: () => {
     singleQuote: {
       id: 'social-proof',
       quote: {
-        text: '"For me, the biggest benefit of Supabase is developer experience. My expertise doesn\'t lie in databases and infrastructure."',
+        text: 'You have to expect, plan, and build for scale. We can scale exponentially with Supabase.',
         author: 'Nick Farrant',
         role: 'Founding Engineer, Juniver',
         link: '/customers/juniver',

@@ -15,15 +15,18 @@ Edge Functions work seamlessly with [Supabase Storage](/docs/guides/storage). Th
 
 ## Basic file operations
 
-Use the Supabase client to upload files directly from your Edge Functions. You'll need the service role key for server-side storage operations:
+Use the Supabase client to upload files directly from your Edge Functions. You'll need the secret key for server-side storage operations:
 
 ```typescript
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
+const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
+
 Deno.serve(async (req) => {
   const supabaseAdmin = createClient(
-    Deno.env.get('SUPABASE_URL') ?? '',
-    Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    Deno.env.get('SUPABASE_URL')!,
+    // If you want to use a different api key, change 'default' to your preferred key name
+    SUPABASE_SECRET_KEYS['default']
   )
 
   // Generate your content
@@ -48,7 +51,7 @@ Deno.serve(async (req) => {
 
 <Admonition type="caution">
 
-Always use the `SUPABASE_SERVICE_ROLE_KEY` for server-side operations. Never expose this key in client-side code!
+Always use one of the `SUPABASE_SECRET_KEYS` for server-side operations. Never expose this key in client-side code!
 
 </Admonition>
 

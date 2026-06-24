@@ -1,5 +1,15 @@
 #!/bin/sh
 #
+# Generate secrets and legacy symmetric JWT API keys for self-hosted Supabase.
+#
+# Generates: JWT_SECRET, ANON_KEY, SERVICE_ROLE_KEY, and other secrets
+# needed for a fresh installation.
+#
+# Usage:
+#   sh generate-keys.sh              # Interactive: prints keys, prompts to update .env
+#   sh generate-keys.sh --update-env # Prints keys and writes them to .env
+#   sh generate-keys.sh | tee keys   # Non-interactive: prints keys only
+#
 # Portions of this code are derived from Inder Singh's setup.sh shell script.
 # Copyright 2025 Inder Singh. Licensed under Apache License 2.0.
 # Original source: https://github.com/singh-inder/supabase-automated-self-host/blob/main/setup.sh
@@ -35,7 +45,7 @@ fi
 
 jwt_secret="$(gen_base64 30)"
 
-# Used in get_token()
+# Used in gen_token()
 header='{"alg":"HS256","typ":"JWT"}'
 iat=$(date +%s)
 exp=$((iat + 5 * 3600 * 24 * 365)) # 5 years
@@ -87,21 +97,23 @@ echo "POSTGRES_PASSWORD=${postgres_password}"
 echo "DASHBOARD_PASSWORD=${dashboard_password}"
 echo ""
 
-if ! test -t 0; then
-    echo "Running non-interactively. Skipping .env update."
-    exit 0
+if [ "$1" = "--update-env" ]; then
+    update_env=true
+elif test -t 0; then
+    printf "Update .env file? (y/N) "
+    read -r REPLY
+    case "$REPLY" in
+        [Yy]) update_env=true ;;
+        *) update_env=false ;;
+    esac
+else
+    echo "Running non-interactively. Pass --update-env to write to .env."
+    update_env=false
 fi
 
-printf "Update .env file? (y/N) "
-read -r REPLY
-case "$REPLY" in
-    [Yy])
-        ;;
-    *)
-        echo "Not updating .env"
-        exit 0
-        ;;
-esac
+if [ "$update_env" != "true" ]; then
+    exit 0
+fi
 
 echo "Updating .env..."
 

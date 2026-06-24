@@ -1,9 +1,10 @@
+import { describe, expect, it } from 'vitest'
+
 import {
   checkHasNonPositiveValues,
   formatLogTick,
   getCumulativeResults,
-} from 'components/ui/QueryBlock/QueryBlock.utils'
-import { describe, expect, it } from 'vitest'
+} from '@/components/ui/QueryBlock/QueryBlock.utils'
 
 describe('checkHasNonPositiveValues', () => {
   it('returns false for an empty array', () => {
