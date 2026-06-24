@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import type PostTypes from 'types/post'
 
 import BlogClient from './BlogClient'
+import SectionContainer from '@/components/Layouts/SectionContainer'
 import { breadcrumbs } from '@/lib/breadcrumbs'
 import { breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 import { getSortedPosts } from '@/lib/posts'
@@ -50,16 +51,16 @@ export default async function BlogPage() {
       />
       <DefaultLayout>
         <h1 className="sr-only">Supabase blog</h1>
-        <div className="container relative mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16 xl:px-20">
+        <SectionContainer className="py-4 md:py-8 xl:py-10!">
           {featuredPost && (
             <FeaturedThumb key={featuredPost.slug} {...(featuredPost as PostTypes)} />
           )}
-        </div>
+        </SectionContainer>
 
         <div className="border-default border-t">
-          <div className="container mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16 xl:px-20">
+          <SectionContainer className="py-4 md:py-8 xl:py-10">
             <BlogClient initialBlogs={listPosts} totalPosts={totalListPosts} />
-          </div>
+          </SectionContainer>
         </div>
       </DefaultLayout>
     </>
