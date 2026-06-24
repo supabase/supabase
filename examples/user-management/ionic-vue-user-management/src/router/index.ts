@@ -23,16 +23,15 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, _from, next) => {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data } = await supabase.auth.getClaims()
+  const claims = data?.claims
 
-  if (to.path === '/account' && !user) {
+  if (to.path === '/account' && !claims) {
     next('/')
     return
   }
 
-  if (to.path === '/' && user) {
+  if (to.path === '/' && claims) {
     next('/account')
     return
   }
