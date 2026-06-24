@@ -1,24 +1,22 @@
 import { untrustedSql } from '@supabase/pg-meta'
-import { debounce, memoize } from 'lodash'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
 
-import { statusOnSaveError, statusOnSaveStart, statusOnSaveSuccess } from './sql-editor-lifecycle'
-import { buildUpsertPayload, isLoadedSnippet, validateMoveToFolder } from './sql-editor-rules'
+import { folderStatusOnSaveStart, isNewFolder } from './sql-editor-lifecycle'
+import { validateMoveToFolder } from './sql-editor-rules'
+import { createSaveMechanism } from './sql-editor-save'
 import type { StateSnippet, StateSnippetFolder } from './types'
 import type { QueryPlanRow } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
 import { DiffType } from '@/components/interfaces/SQLEditor/SQLEditor.types'
-import { upsertContent, UpsertContentPayload } from '@/data/content/content-upsert-mutation'
+import { upsertContent } from '@/data/content/content-upsert-mutation'
 import { contentKeys } from '@/data/content/keys'
 import { createSQLSnippetFolder } from '@/data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from '@/data/content/sql-folder-update-mutation'
 import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 import { Snippet, SnippetFolder } from '@/data/content/sql-folders-query'
 import { getQueryClient } from '@/data/query-client'
-
-const NEW_FOLDER_ID = 'new-folder'
 
 export const sqlEditorState = proxy({
   // ========================================================================
@@ -72,11 +70,6 @@ export const sqlEditorState = proxy({
    * Related to `autoLimit` in `results`. Refer to `checkIfAppendLimitRequired` and `suffixWithLimit` for usage.
    */
   limit: 100,
-
-  /**
-   * Used for error handling after optimistical rendering from renaming a folder
-   */
-  lastUpdatedFolderName: '',
 
   /**
    * For Assistant to render diffing into the editor
@@ -204,18 +197,19 @@ export const sqlEditorState = proxy({
    */
   addFolder: ({ projectRef, folder }: { projectRef: string; folder: SnippetFolder }) => {
     if (sqlEditorState.folders[folder.id]) return
-    sqlEditorState.folders[folder.id] = { projectRef, folder }
+    sqlEditorState.folders[folder.id] = { projectRef, status: 'idle', folder }
   },
 
   /**
-   * Adds a new folder placeholder for the UI to render
+   * Adds a new folder placeholder for the UI to render. The placeholder gets a
+   * unique local id and `status: 'new_editing'` to mark it as not-yet-persisted
+   * (the status, not the id, is what tags it as new).
    */
   addNewFolder: ({ projectRef }: { projectRef: string }) => {
-    // [Joshen] Use this to identify new folders that have yet to be saved
-    const id = NEW_FOLDER_ID
+    const id = crypto.randomUUID()
     sqlEditorState.folders[id] = {
       projectRef,
-      status: 'editing',
+      status: 'new_editing',
       folder: {
         id,
         name: '',
@@ -227,7 +221,10 @@ export const sqlEditorState = proxy({
   },
 
   editFolder: (id: string) => {
-    sqlEditorState.folders[id].status = 'editing'
+    const storeFolder = sqlEditorState.folders[id]
+    if (storeFolder) {
+      storeFolder.status = isNewFolder(storeFolder.status) ? 'new_editing' : 'editing'
+    }
   },
 
   /**
@@ -235,11 +232,11 @@ export const sqlEditorState = proxy({
    */
   saveFolder: ({ id, name }: { id: string; name: string }) => {
     let storeFolder = sqlEditorState.folders[id]
-    const isNewFolder = id === 'new-folder'
+    const isNew = isNewFolder(storeFolder.status)
     const hasChanges = storeFolder.folder.name !== name
     const folderNameTaken = sqlEditorState.allFolderNames.includes(name)
 
-    if (isNewFolder && folderNameTaken) {
+    if (isNew && folderNameTaken) {
       sqlEditorState.removeFolder(id)
       return toast.error('Unable to create new folder: This folder name already exists')
     } else if (hasChanges && folderNameTaken) {
@@ -249,12 +246,13 @@ export const sqlEditorState = proxy({
 
     const originalFolderName = storeFolder.folder.name.slice()
 
-    storeFolder.status = hasChanges ? 'saving' : 'idle'
+    storeFolder.status = hasChanges ? folderStatusOnSaveStart(storeFolder.status) : 'idle'
     storeFolder.folder.id = id
     storeFolder.folder.name = name
 
     if (hasChanges) {
-      sqlEditorState.lastUpdatedFolderName = originalFolderName
+      // Remember this folder's own pre-rename name so a failed save can roll back.
+      storeFolder.previousName = originalFolderName
       sqlEditorState.needsSaving.set(id, true)
     }
   },
@@ -376,70 +374,24 @@ export const useSnippets = (projectRef: string) => {
 // ## Below are all the asynchronous saving logic for the SQL Editor
 // ========================================================================
 
-async function upsertSnippet(
-  id: string,
-  projectRef: string,
-  payload: UpsertContentPayload,
-  shouldInvalidate = false
-) {
-  const snippet = sqlEditorState.snippets[id]?.snippet
-  try {
-    if (snippet) snippet.status = statusOnSaveStart(snippet.status)
-    await upsertContent({ projectRef, payload })
-
-    if (shouldInvalidate) {
-      const queryClient = getQueryClient()
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: contentKeys.count(projectRef, 'sql') }),
-        queryClient.invalidateQueries({ queryKey: contentKeys.sqlSnippets(projectRef) }),
-        queryClient.invalidateQueries({ queryKey: contentKeys.folders(projectRef) }),
-      ])
-    }
-
-    if (snippet) snippet.status = statusOnSaveSuccess()
-  } catch (error) {
-    if (snippet) snippet.status = statusOnSaveError(snippet.status)
-  }
-}
-
-const memoizedUpsertSnippet = memoize((_id: string) => debounce(upsertSnippet, 1000))
-
-const debouncedUpdateSnippet = (
-  id: string,
-  projectRef: string,
-  payload: UpsertContentPayload,
-  shouldInvalidate = false
-) => memoizedUpsertSnippet(id)(id, projectRef, payload, shouldInvalidate)
-
-async function upsertFolder(id: string, projectRef: string, name: string) {
-  try {
-    if (id === NEW_FOLDER_ID) {
-      const res = await createSQLSnippetFolder({ projectRef, name })
-      toast.success('Successfully created folder')
-      sqlEditorState.removeFolder(NEW_FOLDER_ID)
-      sqlEditorState.folders[res.id] = { projectRef, status: 'idle', folder: res }
-    } else {
-      await updateSQLSnippetFolder({ projectRef, id, name })
-      toast.success('Successfully updated folder')
-      sqlEditorState.folders[id].status = 'idle'
-    }
-  } catch (error: any) {
-    toast.error(`Failed to save folder: ${error.message}`)
-    if (error.message.includes('create')) {
-      sqlEditorState.removeFolder(id)
-    } else if (
-      error.message.includes('update') &&
-      sqlEditorState.lastUpdatedFolderName.length > 0
-    ) {
-      let storeFolder = sqlEditorState.folders[id]
-
-      storeFolder.status = 'idle'
-      storeFolder.folder.name = sqlEditorState.lastUpdatedFolderName
-    }
-  } finally {
-    sqlEditorState.lastUpdatedFolderName = ''
-  }
-}
+// The save mechanism owns how snippets/folders are persisted. Its data-layer
+// collaborators and query invalidation are injected here; the subscribe below
+// decides what to enqueue. (The enqueue policy moves to a scheduler in a later PR.)
+const saveMechanism = createSaveMechanism({
+  state: sqlEditorState,
+  upsertContent,
+  createSQLSnippetFolder,
+  updateSQLSnippetFolder,
+  notify: toast,
+  invalidate: async (projectRef: string) => {
+    const queryClient = getQueryClient()
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: contentKeys.count(projectRef, 'sql') }),
+      queryClient.invalidateQueries({ queryKey: contentKeys.sqlSnippets(projectRef) }),
+      queryClient.invalidateQueries({ queryKey: contentKeys.folders(projectRef) }),
+    ])
+  },
+})
 
 if (typeof window !== 'undefined') {
   devtools(sqlEditorState, {
@@ -461,17 +413,17 @@ if (typeof window !== 'undefined') {
 
         if (!result.ok) {
           toast.error(result.error)
-        } else if (isLoadedSnippet(snippet.snippet)) {
-          debouncedUpdateSnippet(
-            id,
-            snippet.projectRef,
-            buildUpsertPayload(snippet.snippet, id),
-            shouldInvalidate
-          )
+        } else {
+          saveMechanism.saveSnippet({ id, projectRef: snippet.projectRef, shouldInvalidate })
           sqlEditorState.needsSaving.delete(id)
         }
       } else if (folder) {
-        upsertFolder(id, folder.projectRef, folder.folder.name)
+        const { projectRef, folder: folderData, status } = folder
+        if (isNewFolder(status)) {
+          saveMechanism.createFolder({ projectRef, name: folderData.name, placeholderId: id })
+        } else {
+          saveMechanism.updateFolder({ id, projectRef, name: folderData.name })
+        }
         sqlEditorState.needsSaving.delete(id)
       }
     })
