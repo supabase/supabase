@@ -94,7 +94,7 @@ function Partner({ partner, overview }: PartnerData) {
       ) : null}
       <DefaultLayout>
         <SectionContainer>
-          <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-10 lg:col-span-2">
+          <div className="col-span-12 mx-auto mb-2 space-y-10 lg:col-span-2">
             {/* Back button */}
             <Link
               href="/partners/integrations"

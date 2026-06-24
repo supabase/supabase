@@ -14,6 +14,7 @@ import { Button, cn } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 
 import CustomersFilters from '../components/CustomerStories/CustomersFilters'
+import SectionContainer from '../components/Layouts/SectionContainer'
 import { breadcrumbs } from '@/lib/breadcrumbs'
 import { breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 
@@ -122,7 +123,7 @@ function CustomerStoriesPage(props: any) {
       />
       <DefaultLayout>
         <div className="relative z-0 bg-background overflow-hidden">
-          <div className="container mx-auto mt-28 sm:mt-44 px-4 xl:px-20">
+          <SectionContainer className="pt-0! pb-0! mt-28 sm:mt-44">
             <div className="mx-auto relative z-10">
               <motion.div
                 className="mx-auto sm:max-w-2xl text-center flex flex-col items-center mb-12"
@@ -177,13 +178,13 @@ function CustomerStoriesPage(props: any) {
                 )}
               </div>
             </div>
-            <div
-              className={cn(
-                'absolute inset-0 h-[150px] sm:h-[300px] bg-background z-0 after:bg-background!',
-                styles['bg-visual']
-              )}
-            />
-          </div>
+          </SectionContainer>
+          <div
+            className={cn(
+              'absolute inset-0 h-[150px] sm:h-[300px] bg-background z-0 after:bg-background!',
+              styles['bg-visual']
+            )}
+          />
         </div>
       </DefaultLayout>
     </>
