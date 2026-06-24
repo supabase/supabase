@@ -139,9 +139,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
                         Request alpha access
                       </Link>
                     </Button>
-                    <DocsButton
-                      href={`${DOCS_URL}/guides/database/replication#pipelines`}
-                    />
+                    <DocsButton href={`${DOCS_URL}/guides/database/replication#pipelines`} />
                   </div>
                 </div>
               </SheetSection>
