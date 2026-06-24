@@ -75,7 +75,7 @@ If the data belongs in Postgres, model it to limit bloat:
   );
   ```
 
-- **Set a retention policy.** If old rows aren't needed, delete them on a schedule with [pg_cron](/docs/guides/database/extensions/pg_cron). (Deleting alone won't shrink the file — see [Reclaiming space](#reclaiming-space).)
+- **Set a retention policy.** If old rows aren't needed, delete them on a schedule with [pg_cron](/docs/guides/database/extensions/pg_cron). Deleting alone won't shrink the file. See [Reclaiming space](#reclaiming-space).
 - **Consider `lz4` column compression.** Supabase's Postgres supports `lz4` (faster, often better ratio than the default `pglz`); set it per column with `ALTER TABLE … ALTER COLUMN … SET COMPRESSION lz4` (see [`default_toast_compression`](https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-DEFAULT-TOAST-COMPRESSION)). It applies only to values written after the change, and helps structured/repetitive JSON more than unique text.
 
 ## Offloading large values to Storage
