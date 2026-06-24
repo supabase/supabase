@@ -1,11 +1,11 @@
-import { Ref, forwardRef } from 'react'
-import { cn } from 'ui'
 import { cva, type VariantProps } from 'class-variance-authority'
+import { forwardRef, Ref } from 'react'
+import { cn } from 'ui'
 
-const sectionContainerVariants = cva('max-w-7xl relative mx-auto px-6', {
+const sectionContainerVariants = cva('relative mx-auto w-full px-6', {
   variants: {
     width: {
-      normal: 'lg:px-16 xl:px-20',
+      normal: 'max-w-(--container-max-w,75rem)',
       smallScreenFull: 'max-w-full lg:container px-0',
     },
     height: {

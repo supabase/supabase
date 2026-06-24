@@ -2,7 +2,7 @@ import 'swiper/css'
 
 import content from '~/data/home/content'
 import type { Example } from 'data/Examples'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import React, { FC } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
@@ -14,7 +14,8 @@ interface Props {
 }
 
 const ExamplesMobile: FC<Props> = ({ examples, className }: any) => {
-  const { basePath } = useRouter()
+  const router = useRouter()
+  const basePath = router?.basePath ?? ''
 
   return (
     <div className={className}>

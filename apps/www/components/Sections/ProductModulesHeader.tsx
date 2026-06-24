@@ -1,9 +1,10 @@
+import styles from '~/styles/animations.module.css'
+import { PlayCircle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Button, cn } from 'ui'
-import styles from '~/styles/animations.module.css'
+
 import AnnouncementBadge from '../Announcement/Badge'
-import { PlayCircle } from 'lucide-react'
 
 interface Types {
   h1: string | React.ReactNode
@@ -33,7 +34,7 @@ interface Types {
 const ProductModulesHeader = (props: Types) => (
   <div
     className={cn(
-      'container relative w-full mx-auto px-6 pt-2 pb-0 sm:px-16 xl:px-20',
+      'relative w-full mx-auto max-w-(--container-max-w,75rem) px-6 pt-2 pb-0',
       props.className
     )}
   >

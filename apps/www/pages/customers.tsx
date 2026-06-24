@@ -122,7 +122,7 @@ function CustomerStoriesPage(props: any) {
       />
       <DefaultLayout>
         <div className="relative z-0 bg-background overflow-hidden">
-          <div className="container mx-auto mt-28 sm:mt-44 px-4 xl:px-20">
+          <div className="mx-auto w-full max-w-(--container-max-w,75rem) mt-28 sm:mt-44 px-6">
             <div className="mx-auto relative z-10">
               <motion.div
                 className="mx-auto sm:max-w-2xl text-center flex flex-col items-center mb-12"

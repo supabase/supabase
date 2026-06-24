@@ -1,17 +1,15 @@
 'use client'
 
-import { isBrowser, LOCAL_STORAGE_KEYS } from 'common'
+import { type BlogView } from 'app/blog/blog-view'
 import BlogGridItem from 'components/Blog/BlogGridItem'
 import BlogListItem from 'components/Blog/BlogListItem'
-import DefaultLayout from 'components/Layouts/Default'
-import { AlignJustify, Grid, Search } from 'lucide-react'
+import BlogViewToggle from 'components/Blog/BlogViewToggle'
+import { Search } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import type PostTypes from 'types/post'
-import { Button, cn, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
-
-export type BlogView = 'list' | 'grid'
+import { InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 
 interface Author {
   author_id: string
@@ -25,12 +23,11 @@ interface AuthorClientProps {
   author: Author | null
   authorId: string
   blogs: PostTypes[]
+  initialView: BlogView
 }
 
-export default function AuthorClient({ author, authorId, blogs }: AuthorClientProps) {
-  const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
-  const localView = isBrowser ? (localStorage?.getItem(BLOG_VIEW) as BlogView) : undefined
-  const [view, setView] = useState<BlogView>(localView ?? 'list')
+export default function AuthorClient({ author, authorId, blogs, initialView }: AuthorClientProps) {
+  const [view, setView] = useState<BlogView>(initialView)
   const [searchTerm, setSearchTerm] = useState('')
   const isList = view === 'list'
 
@@ -44,17 +41,10 @@ export default function AuthorClient({ author, authorId, blogs }: AuthorClientPr
     )
   }, [blogs, searchTerm])
 
-  const handleViewSelection = () => {
-    setView((prevView) => {
-      const newValue = prevView === 'list' ? 'grid' : 'list'
-      localStorage.setItem(BLOG_VIEW, newValue)
-      return newValue
-    })
-  }
-
   return (
-    <DefaultLayout>
-      <div className="container mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16 xl:px-20">
+    <div>
+      {/* Header */}
+      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 pt-8 md:pt-12 pb-8">
         <div className="text-foreground-lighter flex space-x-1 mb-8">
           <h1 className="cursor-pointer">
             <Link href="/blog">Blog</Link>
@@ -64,7 +54,7 @@ export default function AuthorClient({ author, authorId, blogs }: AuthorClientPr
         </div>
 
         {author && (
-          <div className="flex items-center gap-6 pb-8">
+          <div className="flex items-center gap-6">
             {author.author_image_url && (
               <Image
                 src={author.author_image_url}
@@ -98,9 +88,10 @@ export default function AuthorClient({ author, authorId, blogs }: AuthorClientPr
         )}
       </div>
 
-      <div className="border-default border-t">
-        <div className="container mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16 xl:px-20">
-          <div className="flex flex-row items-center justify-between gap-2 mb-6">
+      {/* Filters row — divider above the header, search aligned with the view toggle */}
+      <div className="sticky top-[65px] z-10 bg-background/80 backdrop-blur-sm border-b border-border">
+        <div className="mx-auto max-w-(--container-max-w,75rem) px-6">
+          <div className="py-3 flex flex-row items-center justify-between gap-2">
             <div className="flex-1 max-w-[280px]">
               <InputGroup className="w-full">
                 <InputGroupInput
@@ -116,54 +107,37 @@ export default function AuthorClient({ author, authorId, blogs }: AuthorClientPr
                 </InputGroupAddon>
               </InputGroup>
             </div>
-            <Button
-              variant="default"
-              title={isList ? 'Grid View' : 'List View'}
-              onClick={handleViewSelection}
-              className="h-full p-2 text-foreground-light"
-            >
-              {isList ? (
-                <Grid className="w-4 h-4 stroke-1.5" />
-              ) : (
-                <AlignJustify className="w-4 h-4 stroke-1.5" />
-              )}
-            </Button>
+            <BlogViewToggle view={view} setView={setView} />
           </div>
+        </div>
+      </div>
 
-          {filteredBlogs.length > 0 ? (
-            <ol
-              className={cn(
-                'grid -mx-2 sm:-mx-4 py-6 lg:py-6 lg:pb-20',
-                isList ? 'grid-cols-1' : 'grid-cols-12 lg:gap-4'
-              )}
-            >
-              {filteredBlogs.map((blog: PostTypes, idx: number) =>
-                isList ? (
-                  <div
-                    className="col-span-12 px-2 sm:px-4 [&_a]:last:border-none"
-                    key={`list-${idx}-${blog.slug}`}
-                  >
-                    <BlogListItem post={blog} />
-                  </div>
-                ) : (
-                  <div
-                    className="col-span-12 mb-4 md:col-span-12 lg:col-span-6 xl:col-span-4 h-full"
-                    key={`grid-${idx}-${blog.slug}`}
-                  >
-                    <BlogGridItem post={blog} />
-                  </div>
-                )
-              )}
-            </ol>
+      {/* Posts */}
+      <div className="mx-auto max-w-(--container-max-w,75rem)">
+        {filteredBlogs.length > 0 ? (
+          isList ? (
+            <div>
+              {filteredBlogs.map((blog, idx) => (
+                <BlogListItem post={blog} key={`list-${idx}-${blog.slug}`} />
+              ))}
+            </div>
           ) : (
-            <p className="text-foreground-lighter py-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {filteredBlogs.map((blog, idx) => (
+                <BlogGridItem post={blog} key={`grid-${idx}-${blog.slug}`} />
+              ))}
+            </div>
+          )
+        ) : (
+          <div className="px-6 py-12">
+            <p className="text-sm text-light">
               {searchTerm
                 ? 'No posts found matching your search.'
                 : 'No posts found by this author.'}
             </p>
-          )}
-        </div>
+          </div>
+        )}
       </div>
-    </DefaultLayout>
+    </div>
   )
 }
