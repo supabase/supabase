@@ -141,7 +141,7 @@ module.exports = {
             },
             figcaption: {
               color: 'hsl(var(--foreground-muted))',
-              fontFamily: 'Office Code Pro, monospace',
+              fontFamily: 'var(--font-mono)',
             },
             'figure.quote-figure p:first-child': {
               marginTop: '0 !important',

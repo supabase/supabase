@@ -1,5 +1,5 @@
-import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
-import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.svg'
+import supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.svg'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'

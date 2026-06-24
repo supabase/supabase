@@ -161,7 +161,7 @@ const HomePageCover = (props) => {
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 items-start sm:items-center w-full max-w-xl xl:max-w-132">
           <DocsCoverLogo aria-hidden="true" />
           <div className="flex flex-col">
-            <h1 className="m-0 mb-3 text-2xl sm:text-3xl text-foreground">
+            <h1 className="font-heading m-0 mb-3 text-2xl sm:text-3xl text-foreground">
               {homepageHeading || props.title}
             </h1>
             <p className="m-0 text-foreground-light">

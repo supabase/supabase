@@ -1,6 +1,7 @@
 'use client'
 
 import ReactMarkdown from 'react-markdown'
+
 import { useGuide } from './Guide'
 
 interface GuideHeaderProps {
@@ -12,7 +13,7 @@ export function GuideHeader({ className }: GuideHeaderProps) {
 
   return (
     <div className={className}>
-      <h1 className="mb-0 [&>p]:m-0">
+      <h1 className="font-heading mb-0 [&>p]:m-0">
         <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
       </h1>
       {meta?.subtitle && (
