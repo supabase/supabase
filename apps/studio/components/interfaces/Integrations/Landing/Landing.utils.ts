@@ -83,37 +83,36 @@ export const useProjectOAuthIntegrationData = (
   isSuccess: boolean
 } => {
   const { data: org } = useSelectedOrganizationQuery({ enabled })
-  //const queries1 = useQueries({queries})
   const queries = {
     apiKeys: usePermissionSafeQuery({
       queryKey: ['project-data', projectRef, 'api-keys'],
       queryFn: () => getAPIKeys({ projectRef, reveal: false }),
       defaultVal: [],
-      enabled,
+      enabled: enabled && !!projectRef,
     }),
     edgeFunctionSecrets: usePermissionSafeQuery({
       queryKey: ['project-data', projectRef, 'secrets'],
       queryFn: () => getSecrets({ projectRef }),
       defaultVal: [],
-      enabled,
+      enabled: enabled && !!projectRef,
     }),
     authConfig: usePermissionSafeQuery({
       queryKey: ['project-data', projectRef, 'auth-config'],
       queryFn: () => getProjectAuthConfig({ projectRef }),
       defaultVal: null,
-      enabled,
+      enabled: enabled && !!projectRef,
     }),
     partnerIntegrations: usePermissionSafeQuery({
       queryKey: ['project-data', projectRef, 'partner-integrations'],
       queryFn: () => getIntegrations({ projectRef }),
       defaultVal: [],
-      enabled,
+      enabled: enabled && !!projectRef,
     }),
     oauthApps: usePermissionSafeQuery({
       queryKey: ['project-data', org?.slug, 'oauth-apps'],
       queryFn: () => getAuthorizedApps({ slug: org?.slug }),
       defaultVal: [],
-      enabled: !!org,
+      enabled: enabled && !!org,
     }),
   }
 
