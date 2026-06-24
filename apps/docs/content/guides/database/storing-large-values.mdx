@@ -113,6 +113,8 @@ select 'toast' as scope, s.* from t, lateral pgstattuple_approx(
 
 A high `approx_free_percent` means reclaimable bloat; a high `approx_tuple_percent` means the data is genuinely large and you should reduce what you store. See [`pgstattuple`](https://www.postgresql.org/docs/current/pgstattuple.html).
 
+`pgstattuple_approx` samples the table, so it stays cheap on large relations. The exact `pgstattuple()` function does a full-table scan — avoid running it on a large or busy database under heavy load.
+
 ## Reclaiming space
 
 Plain `VACUUM` reclaims dead tuples into reusable free space; it only returns space to the OS when entirely-empty pages sit at the end of the table, so it can't shrink a file that's bloated in the middle ([PG docs](https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-SPACE-RECOVERY)). To shrink the files, rewrite the table with [`pg_repack`](/docs/guides/database/extensions/pg_repack) (online, recommended) or `VACUUM FULL` (takes an exclusive lock — maintenance window only). Both need roughly 2× the table's size in free disk during the operation.
