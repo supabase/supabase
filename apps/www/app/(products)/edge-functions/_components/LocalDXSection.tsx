@@ -123,39 +123,35 @@ function LocalDXCard() {
 
 export function LocalDXSection() {
   return (
-    <div className="py-24 flex flex-col gap-16">
+    <SectionContainerWithCn spacing="sections">
       {/* Header */}
-      <SectionContainerWithCn height="none">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
-          <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
-            Delightful DX from <br />
-            <span className="text-foreground">local to production</span>
-          </h3>
-          <p className="text-foreground-lighter text-sm lg:text-base">
-            Edge Functions are developed using{' '}
-            <Link
-              href="https://deno.com/"
-              className="underline hover:text-foreground-light transition-colors"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Deno
-            </Link>
-            , an open source JavaScript runtime that ensures maximum power and flexibility. Migrate
-            in and out at any time with no vendor lock-in.
-          </p>
-        </div>
-      </SectionContainerWithCn>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
+        <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
+          Delightful DX from <br />
+          <span className="text-foreground">local to production</span>
+        </h3>
+        <p className="text-foreground-lighter text-sm lg:text-base">
+          Edge Functions are developed using{' '}
+          <Link
+            href="https://deno.com/"
+            className="underline hover:text-foreground-light transition-colors"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Deno
+          </Link>
+          , an open source JavaScript runtime that ensures maximum power and flexibility. Migrate in
+          and out at any time with no vendor lock-in.
+        </p>
+      </div>
 
       {/* Bento grid */}
-      <SectionContainerWithCn height="none">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-flow-dense gap-3">
-          <LocalDXCard />
-          <ParityCard />
-          <CICard />
-          <EcosystemCard />
-        </div>
-      </SectionContainerWithCn>
-    </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-flow-dense gap-3">
+        <LocalDXCard />
+        <ParityCard />
+        <CICard />
+        <EcosystemCard />
+      </div>
+    </SectionContainerWithCn>
   )
 }

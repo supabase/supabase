@@ -93,127 +93,121 @@ export function IntegratesSectionClient({ useCases }: { useCases: UseCase[] }) {
   }
 
   return (
-    <div ref={inViewRef} className="py-24 flex flex-col gap-16">
+    <SectionContainerWithCn ref={inViewRef} spacing="sections">
       {/* Header */}
-      <SectionContainerWithCn height="none">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
-          <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
-            Integrates with the <span className="text-foreground">Supabase ecosystem</span>
-          </h3>
-          <p className="text-foreground-lighter text-sm lg:text-base">
-            Access your database, auth, storage, and webhooks directly from Edge Functions with zero
-            configuration.
-          </p>
-        </div>
-      </SectionContainerWithCn>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
+        <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
+          Integrates with the <span className="text-foreground">Supabase ecosystem</span>
+        </h3>
+        <p className="text-foreground-lighter text-sm lg:text-base">
+          Access your database, auth, storage, and webhooks directly from Edge Functions with zero
+          configuration.
+        </p>
+      </div>
 
       {/* Content */}
-      <SectionContainerWithCn height="none">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Left: tab cards */}
-          <div className="flex flex-col gap-1 items-start justify-end">
-            {useCases.map((useCase, index) => {
-              const isActive = index === activeIdx
-              const Icon = ICONS[useCase.icon]
-              return (
-                <button
-                  key={useCase.label}
-                  onClick={() => handleTabClick(index)}
-                  className={cn(
-                    'text-left flex items-center gap-3 py-2 text-2xl transition-colors',
-                    isActive
-                      ? 'text-foreground'
-                      : 'text-foreground-muted hover:text-foreground-light'
-                  )}
-                >
-                  <Icon size={22} strokeWidth={1.5} />
-                  {useCase.label}
-                </button>
-              )
-            })}
-          </div>
-
-          {/* Right: code area */}
-          <div className="flex flex-col self-end border border-border rounded-md overflow-clip">
-            <motion.div
-              initial={false}
-              animate={height != null ? { height } : undefined}
-              transition={
-                hasMeasured.current ? { duration: 0.35, ease: [0.22, 1, 0.36, 1] } : { duration: 0 }
-              }
-              className="relative shrink-0 overflow-hidden"
-            >
-              {/* Invisible measuring copy: drives the animated code-area height */}
-              <div
-                ref={measureRef}
-                aria-hidden
-                className="pointer-events-none invisible absolute inset-x-0 top-0 overflow-x-auto [&_pre]:!bg-transparent [&_pre]:m-0 [&_pre]:p-6"
-                style={{ fontSize: '0.8125rem', fontWeight: 500, lineHeight: 1.7 }}
-                dangerouslySetInnerHTML={{ __html: active.darkHtml }}
-              />
-
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={active.label}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1, transition: { duration: 0.15, delay: 0.05 } }}
-                  exit={{ opacity: 0, transition: { duration: 0.05 } }}
-                  className="overflow-x-auto"
-                >
-                  <div
-                    dangerouslySetInnerHTML={{ __html: active.darkHtml }}
-                    className="hidden dark:block [&_pre]:!bg-transparent [&_pre]:m-0 [&_pre]:p-6"
-                    style={{ fontSize: '0.8125rem', fontWeight: 500, lineHeight: 1.7 }}
-                  />
-                  <div
-                    dangerouslySetInnerHTML={{ __html: active.lightHtml }}
-                    className="block dark:hidden [&_pre]:!bg-transparent [&_pre]:m-0 [&_pre]:p-6"
-                    style={{ fontSize: '0.8125rem', fontWeight: 500, lineHeight: 1.7 }}
-                  />
-                </motion.div>
-              </AnimatePresence>
-            </motion.div>
-
-            {/* Footer: active tab info */}
-            <div className="border-t border-border px-6 py-4 flex items-center gap-8 justify-between bg-surface-75">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={active.label}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1, transition: { duration: 0.15, delay: 0.05 } }}
-                  exit={{ opacity: 0, transition: { duration: 0.05 } }}
-                  className="flex flex-col gap-1"
-                >
-                  <h4 className="text-sm font-medium text-foreground">{active.label}</h4>
-                  <p className="text-sm text-foreground-lighter">{active.paragraph}</p>
-                </motion.div>
-              </AnimatePresence>
-              <Link
-                href="/docs/guides/functions"
-                className="flex items-center gap-1.5 rounded-full bg-surface-100 border border-border px-3 py-1.5 text-xs text-foreground-light hover:text-foreground hover:bg-surface-200 transition-colors whitespace-nowrap shrink-0"
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Left: tab cards */}
+        <div className="flex flex-col gap-1 items-start justify-end">
+          {useCases.map((useCase, index) => {
+            const isActive = index === activeIdx
+            const Icon = ICONS[useCase.icon]
+            return (
+              <button
+                key={useCase.label}
+                onClick={() => handleTabClick(index)}
+                className={cn(
+                  'text-left flex items-center gap-3 py-2 text-2xl transition-colors',
+                  isActive ? 'text-foreground' : 'text-foreground-muted hover:text-foreground-light'
+                )}
               >
-                Documentation
-                <svg
-                  width={12}
-                  height={12}
-                  viewBox="0 0 12 12"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="shrink-0"
-                >
-                  <path
-                    d="M3.5 2.5H9.5V8.5M9.5 2.5L2.5 9.5"
-                    stroke="currentColor"
-                    strokeWidth={1.5}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </Link>
-            </div>
+                <Icon size={22} strokeWidth={1.5} />
+                {useCase.label}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Right: code area */}
+        <div className="flex flex-col self-end border border-border rounded-md overflow-clip">
+          <motion.div
+            initial={false}
+            animate={height != null ? { height } : undefined}
+            transition={
+              hasMeasured.current ? { duration: 0.35, ease: [0.22, 1, 0.36, 1] } : { duration: 0 }
+            }
+            className="relative shrink-0 overflow-hidden"
+          >
+            {/* Invisible measuring copy: drives the animated code-area height */}
+            <div
+              ref={measureRef}
+              aria-hidden
+              className="pointer-events-none invisible absolute inset-x-0 top-0 overflow-x-auto [&_pre]:!bg-transparent [&_pre]:m-0 [&_pre]:p-6"
+              style={{ fontSize: '0.8125rem', fontWeight: 500, lineHeight: 1.7 }}
+              dangerouslySetInnerHTML={{ __html: active.darkHtml }}
+            />
+
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={active.label}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transition: { duration: 0.15, delay: 0.05 } }}
+                exit={{ opacity: 0, transition: { duration: 0.05 } }}
+                className="overflow-x-auto"
+              >
+                <div
+                  dangerouslySetInnerHTML={{ __html: active.darkHtml }}
+                  className="hidden dark:block [&_pre]:!bg-transparent [&_pre]:m-0 [&_pre]:p-6"
+                  style={{ fontSize: '0.8125rem', fontWeight: 500, lineHeight: 1.7 }}
+                />
+                <div
+                  dangerouslySetInnerHTML={{ __html: active.lightHtml }}
+                  className="block dark:hidden [&_pre]:!bg-transparent [&_pre]:m-0 [&_pre]:p-6"
+                  style={{ fontSize: '0.8125rem', fontWeight: 500, lineHeight: 1.7 }}
+                />
+              </motion.div>
+            </AnimatePresence>
+          </motion.div>
+
+          {/* Footer: active tab info */}
+          <div className="border-t border-border px-6 py-4 flex items-center gap-8 justify-between bg-surface-75">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={active.label}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transition: { duration: 0.15, delay: 0.05 } }}
+                exit={{ opacity: 0, transition: { duration: 0.05 } }}
+                className="flex flex-col gap-1"
+              >
+                <h4 className="text-sm font-medium text-foreground">{active.label}</h4>
+                <p className="text-sm text-foreground-lighter">{active.paragraph}</p>
+              </motion.div>
+            </AnimatePresence>
+            <Link
+              href="/docs/guides/functions"
+              className="flex items-center gap-1.5 rounded-full bg-surface-100 border border-border px-3 py-1.5 text-xs text-foreground-light hover:text-foreground hover:bg-surface-200 transition-colors whitespace-nowrap shrink-0"
+            >
+              Documentation
+              <svg
+                width={12}
+                height={12}
+                viewBox="0 0 12 12"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="shrink-0"
+              >
+                <path
+                  d="M3.5 2.5H9.5V8.5M9.5 2.5L2.5 9.5"
+                  stroke="currentColor"
+                  strokeWidth={1.5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </Link>
           </div>
         </div>
-      </SectionContainerWithCn>
-    </div>
+      </div>
+    </SectionContainerWithCn>
   )
 }

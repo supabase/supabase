@@ -59,29 +59,25 @@ function ObservabilityCard({
 
 export function ObservabilitySection() {
   return (
-    <div className="py-24 flex flex-col gap-16">
+    <SectionContainerWithCn spacing="sections">
       {/* Header */}
-      <SectionContainerWithCn height="none">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
-          <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
-            Debug and monitor with <br />
-            <span className="text-foreground">built-in observability</span>
-          </h3>
-          <p className="text-foreground-lighter text-sm lg:text-base">
-            Monitor, debug, and optimize your Edge Functions with realtime logs, queryable log
-            explorer, and health dashboards — all built into the Supabase Dashboard.
-          </p>
-        </div>
-      </SectionContainerWithCn>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
+        <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
+          Debug and monitor with <br />
+          <span className="text-foreground">built-in observability</span>
+        </h3>
+        <p className="text-foreground-lighter text-sm lg:text-base">
+          Monitor, debug, and optimize your Edge Functions with realtime logs, queryable log
+          explorer, and health dashboards — all built into the Supabase Dashboard.
+        </p>
+      </div>
 
       {/* 3-column grid */}
-      <SectionContainerWithCn height="none">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {cards.map((card) => (
-            <ObservabilityCard key={card.id} card={card} />
-          ))}
-        </div>
-      </SectionContainerWithCn>
-    </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {cards.map((card) => (
+          <ObservabilityCard key={card.id} card={card} />
+        ))}
+      </div>
+    </SectionContainerWithCn>
   )
 }

@@ -289,44 +289,40 @@ function BucketsSkeleton() {
 
 export function FeaturesSection() {
   return (
-    <div className="py-24 flex flex-col gap-16">
+    <SectionContainerWithCn spacing="sections">
       {/* Header */}
-      <SectionContainerWithCn height="none">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
-          <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
-            Everything you need
-            <br />
-            <span className="text-foreground">for storage</span>
-          </h3>
-          <p className="text-foreground-lighter text-sm lg:text-base">
-            S3 compatible storage with global CDN, image transformations, and fine-grained access
-            controls powered by Postgres RLS.
-          </p>
-        </div>
-      </SectionContainerWithCn>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
+        <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
+          Everything you need
+          <br />
+          <span className="text-foreground">for storage</span>
+        </h3>
+        <p className="text-foreground-lighter text-sm lg:text-base">
+          S3 compatible storage with global CDN, image transformations, and fine-grained access
+          controls powered by Postgres RLS.
+        </p>
+      </div>
 
       {/* 3-col grid */}
-      <SectionContainerWithCn height="none">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {FEATURES.map((feature) => {
-            const Visual = feature.visual
-            return (
-              <div
-                key={feature.title}
-                className="flex flex-col bg-surface-75 border border-border rounded-lg overflow-hidden"
-              >
-                <div className="relative flex items-center justify-center h-[320px]">
-                  <Visual />
-                </div>
-                <div className="px-6 py-5 flex flex-col gap-1">
-                  <h4 className="text-foreground text-sm font-medium">{feature.title}</h4>
-                  <p className="text-foreground-lighter text-sm">{feature.description}</p>
-                </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {FEATURES.map((feature) => {
+          const Visual = feature.visual
+          return (
+            <div
+              key={feature.title}
+              className="flex flex-col bg-surface-75 border border-border rounded-lg overflow-hidden"
+            >
+              <div className="relative flex items-center justify-center h-[320px]">
+                <Visual />
               </div>
-            )
-          })}
-        </div>
-      </SectionContainerWithCn>
-    </div>
+              <div className="px-6 py-5 flex flex-col gap-1">
+                <h4 className="text-foreground text-sm font-medium">{feature.title}</h4>
+                <p className="text-foreground-lighter text-sm">{feature.description}</p>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </SectionContainerWithCn>
   )
 }

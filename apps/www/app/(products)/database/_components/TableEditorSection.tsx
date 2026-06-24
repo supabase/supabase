@@ -108,91 +108,85 @@ export function TableEditorSection() {
   }
 
   return (
-    <div ref={inViewRef} className="py-24 flex flex-col gap-24">
+    <SectionContainerWithCn ref={inViewRef} className="space-y-8 md:space-y-24">
       {/* Header */}
-      <SectionContainerWithCn height="none">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
-          <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
-            Manage your data with a
-            <br />
-            <span className="text-foreground">built-in Table Editor</span>
-          </h3>
-          <p className="text-foreground-lighter text-sm lg:text-base">
-            Manage your data with a spreadsheet-like interface. Create tables, set up relationships,
-            and export — no SQL required.
-          </p>
-        </div>
-      </SectionContainerWithCn>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
+        <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
+          Manage your data with a
+          <br />
+          <span className="text-foreground">built-in Table Editor</span>
+        </h3>
+        <p className="text-foreground-lighter text-sm lg:text-base">
+          Manage your data with a spreadsheet-like interface. Create tables, set up relationships,
+          and export — no SQL required.
+        </p>
+      </div>
 
       {/* Content */}
-      <SectionContainerWithCn height="none">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Left: tabs */}
-          <div className="flex flex-col gap-1 items-start justify-end">
-            {TABS.map((tab, index) => {
-              const isActive = index === activeIdx
-              const Icon = ICONS[tab.icon]
-              return (
-                <button
-                  key={tab.label}
-                  onClick={() => handleTabClick(index)}
-                  className={cn(
-                    'text-left flex items-center gap-3 py-2 text-2xl font-medium transition-colors',
-                    isActive
-                      ? 'text-foreground'
-                      : 'text-foreground-muted hover:text-foreground-light'
-                  )}
-                >
-                  <Icon size={22} strokeWidth={1.5} />
-                  {tab.label}
-                </button>
-              )
-            })}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Left: tabs */}
+        <div className="flex flex-col gap-1 items-start justify-end">
+          {TABS.map((tab, index) => {
+            const isActive = index === activeIdx
+            const Icon = ICONS[tab.icon]
+            return (
+              <button
+                key={tab.label}
+                onClick={() => handleTabClick(index)}
+                className={cn(
+                  'text-left flex items-center gap-3 py-2 text-2xl font-medium transition-colors',
+                  isActive ? 'text-foreground' : 'text-foreground-muted hover:text-foreground-light'
+                )}
+              >
+                <Icon size={22} strokeWidth={1.5} />
+                {tab.label}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Right: image + footer */}
+        <div className="flex flex-col border border-border rounded-md overflow-clip bg-surface-75">
+          <div className="relative aspect-[16/7.5] shrink-0 overflow-hidden rounded-t-md flex items-end justify-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={active.label}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transition: { duration: 0.2, delay: 0.05 } }}
+                exit={{ opacity: 0, transition: { duration: 0.1 } }}
+                className="absolute inset-0 flex items-end justify-center px-6"
+              >
+                <img
+                  src={active.image.dark}
+                  alt={active.label}
+                  className="absolute inset-0 object-cover pointer-events-none hidden dark:block"
+                />
+                <img
+                  src={active.image.light}
+                  alt={active.label}
+                  className="absolute inset-0 object-cover pointer-events-none dark:hidden"
+                />
+              </motion.div>
+            </AnimatePresence>
           </div>
 
-          {/* Right: image + footer */}
-          <div className="flex flex-col border border-border rounded-md overflow-clip bg-surface-75">
-            <div className="relative aspect-[16/7.5] shrink-0 overflow-hidden rounded-t-md flex items-end justify-center">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={active.label}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1, transition: { duration: 0.2, delay: 0.05 } }}
-                  exit={{ opacity: 0, transition: { duration: 0.1 } }}
-                  className="absolute inset-0 flex items-end justify-center px-6"
-                >
-                  <img
-                    src={active.image.dark}
-                    alt={active.label}
-                    className="absolute inset-0 object-cover pointer-events-none hidden dark:block"
-                  />
-                  <img
-                    src={active.image.light}
-                    alt={active.label}
-                    className="absolute inset-0 object-cover pointer-events-none dark:hidden"
-                  />
-                </motion.div>
-              </AnimatePresence>
-            </div>
-
-            {/* Footer: active tab info */}
-            <div className="border-t border-border px-6 py-4 flex items-center gap-8 justify-between bg-surface-100">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={active.label}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1, transition: { duration: 0.15, delay: 0.05 } }}
-                  exit={{ opacity: 0, transition: { duration: 0.05 } }}
-                  className="flex flex-col gap-1"
-                >
-                  <h4 className="text-sm font-medium text-foreground">{active.label}</h4>
-                  <p className="text-sm text-foreground-lighter">{active.description}</p>
-                </motion.div>
-              </AnimatePresence>
-            </div>
+          {/* Footer: active tab info */}
+          <div className="border-t border-border px-6 py-4 flex items-center gap-8 justify-between bg-surface-100">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={active.label}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, transition: { duration: 0.15, delay: 0.05 } }}
+                exit={{ opacity: 0, transition: { duration: 0.05 } }}
+                className="flex flex-col gap-1"
+              >
+                <h4 className="text-sm font-medium text-foreground">{active.label}</h4>
+                <p className="text-sm text-foreground-lighter">{active.description}</p>
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
-      </SectionContainerWithCn>
-    </div>
+      </div>
+    </SectionContainerWithCn>
   )
 }

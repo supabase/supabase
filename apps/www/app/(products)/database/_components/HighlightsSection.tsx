@@ -45,65 +45,60 @@ const HIGHLIGHTS: Highlight[] = [
 
 export function HighlightsSection() {
   return (
-    <div className="py-24 flex flex-col gap-24">
+    <SectionContainerWithCn className="space-y-8 md:space-y-24">
       {/* Header */}
-      <SectionContainerWithCn height="none">
-        <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
-          Built for scale
-          <br />
-          <span className="text-foreground">with powerful new features</span>
-        </h3>
-      </SectionContainerWithCn>
-
-      <SectionContainerWithCn height="none">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          {HIGHLIGHTS.map((highlight) => (
-            <div
-              key={highlight.title}
-              className="relative flex flex-col overflow-hidden min-h-[400px] bg-surface-75 border border-border rounded-lg"
-            >
-              <div className="relative z-10 flex flex-col justify-between h-full p-6 md:p-8 pr-0 md:pr-0">
-                <div className="flex flex-col gap-4">
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-foreground text-lg font-medium">{highlight.title}</h4>
-                    {highlight.badge && <Badge variant="success">{highlight.badge}</Badge>}
-                  </div>
-                  <ul className="flex flex-col text-foreground-lighter text-sm gap-1.5">
-                    {highlight.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2">
-                        <Check className="w-3.5 h-3.5 mt-0.5 shrink-0 stroke-2 text-brand" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+      <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
+        Built for scale
+        <br />
+        <span className="text-foreground">with powerful new features</span>
+      </h3>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        {HIGHLIGHTS.map((highlight) => (
+          <div
+            key={highlight.title}
+            className="relative flex flex-col overflow-hidden min-h-[400px] bg-surface-75 border border-border rounded-lg"
+          >
+            <div className="relative z-10 flex flex-col justify-between h-full p-6 md:p-8 pr-0 md:pr-0">
+              <div className="flex flex-col gap-4">
+                <div className="flex items-center gap-2">
+                  <h4 className="text-foreground text-lg font-medium">{highlight.title}</h4>
+                  {highlight.badge && <Badge variant="success">{highlight.badge}</Badge>}
                 </div>
-                <div className="mt-6">
-                  <Button variant="default" size="small" asChild>
-                    <Link href={highlight.cta.href}>{highlight.cta.label}</Link>
-                  </Button>
-                </div>
+                <ul className="flex flex-col text-foreground-lighter text-sm gap-1.5">
+                  {highlight.features.map((feature) => (
+                    <li key={feature} className="flex items-start gap-2">
+                      <Check className="w-3.5 h-3.5 mt-0.5 shrink-0 stroke-2 text-brand" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-              {/* Decorative image */}
-              <div className="hidden sm:flex lg:hidden xl:flex absolute top-0 right-0 bottom-0 items-end h-full opacity-50 dark:opacity-20 select-none">
-                <Image
-                  src={highlight.image.dark}
-                  alt={highlight.title}
-                  width={296}
-                  height={275}
-                  className="hidden dark:block"
-                />
-                <Image
-                  src={highlight.image.light}
-                  alt={highlight.title}
-                  width={296}
-                  height={275}
-                  className="dark:hidden"
-                />
+              <div className="mt-6">
+                <Button variant="default" size="small" asChild>
+                  <Link href={highlight.cta.href}>{highlight.cta.label}</Link>
+                </Button>
               </div>
             </div>
-          ))}
-        </div>
-      </SectionContainerWithCn>
-    </div>
+            {/* Decorative image */}
+            <div className="hidden sm:flex lg:hidden xl:flex absolute top-0 right-0 bottom-0 items-end h-full opacity-50 dark:opacity-20 select-none">
+              <Image
+                src={highlight.image.dark}
+                alt={highlight.title}
+                width={296}
+                height={275}
+                className="hidden dark:block"
+              />
+              <Image
+                src={highlight.image.light}
+                alt={highlight.title}
+                width={296}
+                height={275}
+                className="dark:hidden"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </SectionContainerWithCn>
   )
 }

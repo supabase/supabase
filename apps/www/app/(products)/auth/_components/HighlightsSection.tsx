@@ -38,45 +38,40 @@ const HIGHLIGHTS = [
 
 export function HighlightsSection() {
   return (
-    <div className="py-24 flex flex-col gap-16">
+    <SectionContainerWithCn spacing="sections">
       {/* Header */}
-      <SectionContainerWithCn height="none">
-        <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
-          Enterprise ready
-          <br />
-          <span className="text-foreground">security at every level</span>
-        </h3>
-      </SectionContainerWithCn>
-
-      <SectionContainerWithCn height="none">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {HIGHLIGHTS.map((highlight) => (
-            <div
-              key={highlight.title}
-              className="relative flex flex-col overflow-hidden min-h-[400px] bg-surface-75 border border-border rounded-lg"
-            >
-              <div className="relative z-10 flex flex-col justify-between h-full p-6 md:p-8">
-                <div className="flex flex-col gap-4">
-                  <h4 className="text-foreground text-lg font-medium">{highlight.title}</h4>
-                  <ul className="flex flex-col text-foreground-lighter text-sm gap-1.5">
-                    {highlight.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2">
-                        <Check className="w-3.5 h-3.5 mt-0.5 shrink-0 stroke-2 text-brand" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="mt-6">
-                  <Button variant="default" size="small" asChild>
-                    <Link href={highlight.cta.href}>{highlight.cta.label}</Link>
-                  </Button>
-                </div>
+      <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
+        Enterprise ready
+        <br />
+        <span className="text-foreground">security at every level</span>
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {HIGHLIGHTS.map((highlight) => (
+          <div
+            key={highlight.title}
+            className="relative flex flex-col overflow-hidden min-h-[400px] bg-surface-75 border border-border rounded-lg"
+          >
+            <div className="relative z-10 flex flex-col justify-between h-full p-6 md:p-8">
+              <div className="flex flex-col gap-4">
+                <h4 className="text-foreground text-lg font-medium">{highlight.title}</h4>
+                <ul className="flex flex-col text-foreground-lighter text-sm gap-1.5">
+                  {highlight.features.map((feature) => (
+                    <li key={feature} className="flex items-start gap-2">
+                      <Check className="w-3.5 h-3.5 mt-0.5 shrink-0 stroke-2 text-brand" />
+                      <span>{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="mt-6">
+                <Button variant="default" size="small" asChild>
+                  <Link href={highlight.cta.href}>{highlight.cta.label}</Link>
+                </Button>
               </div>
             </div>
-          ))}
-        </div>
-      </SectionContainerWithCn>
-    </div>
+          </div>
+        ))}
+      </div>
+    </SectionContainerWithCn>
   )
 }

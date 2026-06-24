@@ -561,46 +561,42 @@ function RealtimeSkeleton() {
 
 export function FeaturesSection() {
   return (
-    <div className="py-24 flex flex-col gap-24">
+    <SectionContainerWithCn className="space-y-8 md:space-y-24">
       {/* Header */}
-      <SectionContainerWithCn height="none">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
-          <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
-            Everything you need
-            <br />
-            <span className="text-foreground">from your database</span>
-          </h3>
-          <p className="text-foreground-lighter text-sm lg:text-base">
-            Every Supabase project is a full Postgres database with realtime functionality,
-            fine-grained access controls, and instant APIs — no extra configuration required.
-          </p>
-        </div>
-      </SectionContainerWithCn>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
+        <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
+          Everything you need
+          <br />
+          <span className="text-foreground">from your database</span>
+        </h3>
+        <p className="text-foreground-lighter text-sm lg:text-base">
+          Every Supabase project is a full Postgres database with realtime functionality,
+          fine-grained access controls, and instant APIs — no extra configuration required.
+        </p>
+      </div>
 
       {/* 3-col grid */}
-      <SectionContainerWithCn height="none">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {FEATURES.map((feature) => {
-            const Visual = feature.visual
-            return (
-              <div
-                key={feature.title}
-                className="flex flex-col bg-surface-75 border border-border rounded-lg overflow-hidden"
-              >
-                {/* Visual with overlaid title */}
-                <div className="relative flex items-center justify-center h-[320px]">
-                  <Visual />
-                </div>
-                {/* Content */}
-                <div className="px-6 py-5 flex flex-col gap-1">
-                  <h4 className="text-foreground text-sm font-medium">{feature.description}</h4>
-                  <p className="text-foreground-lighter text-sm">{feature.detail}</p>
-                </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {FEATURES.map((feature) => {
+          const Visual = feature.visual
+          return (
+            <div
+              key={feature.title}
+              className="flex flex-col bg-surface-75 border border-border rounded-lg overflow-hidden"
+            >
+              {/* Visual with overlaid title */}
+              <div className="relative flex items-center justify-center h-[320px]">
+                <Visual />
               </div>
-            )
-          })}
-        </div>
-      </SectionContainerWithCn>
-    </div>
+              {/* Content */}
+              <div className="px-6 py-5 flex flex-col gap-1">
+                <h4 className="text-foreground text-sm font-medium">{feature.description}</h4>
+                <p className="text-foreground-lighter text-sm">{feature.detail}</p>
+              </div>
+            </div>
+          )
+        })}
+      </div>
+    </SectionContainerWithCn>
   )
 }
