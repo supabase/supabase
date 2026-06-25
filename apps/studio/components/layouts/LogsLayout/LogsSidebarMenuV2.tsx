@@ -13,10 +13,6 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
-import {
-  useFeaturePreviewModal,
-  useUnifiedLogsPreview,
-} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
 import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import SavedQueriesItem from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
@@ -55,9 +51,6 @@ export function SidebarCollapsible({
 export function LogsSidebarMenuV2() {
   const router = useRouter()
   const { ref } = useParams() as { ref: string }
-
-  const { selectFeaturePreview } = useFeaturePreviewModal()
-  const { enable: enableUnifiedLogs } = useUnifiedLogsPreview()
 
   const [searchText, setSearchText] = useState('')
 
