@@ -32,7 +32,7 @@ export function validateMoveToFolder({
 }: {
   visibility?: SnippetWithContent['visibility']
   folderId?: string | null
-}): { ok: boolean; error?: string } {
+}): { ok: true } | { ok: false; error: string } {
   if (visibility === 'project' && !!folderId) {
     return { ok: false, error: 'Shared snippet cannot be within a folder' }
   }

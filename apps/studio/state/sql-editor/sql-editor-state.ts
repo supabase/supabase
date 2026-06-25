@@ -1,22 +1,15 @@
 import { untrustedSql } from '@supabase/pg-meta'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
+import { proxy, ref, snapshot, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
 
 import { folderStatusOnSaveStart, isNewFolder } from './sql-editor-lifecycle'
-import { validateMoveToFolder } from './sql-editor-rules'
-import { createSaveMechanism } from './sql-editor-save'
 import type { StateSnippet, StateSnippetFolder } from './types'
 import type { QueryPlanRow } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
 import { DiffType } from '@/components/interfaces/SQLEditor/SQLEditor.types'
-import { upsertContent } from '@/data/content/content-upsert-mutation'
-import { contentKeys } from '@/data/content/keys'
-import { createSQLSnippetFolder } from '@/data/content/sql-folder-create-mutation'
-import { updateSQLSnippetFolder } from '@/data/content/sql-folder-update-mutation'
 import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 import { Snippet, SnippetFolder } from '@/data/content/sql-folders-query'
-import { getQueryClient } from '@/data/query-client'
 
 export const sqlEditorState = proxy({
   // ========================================================================
@@ -61,9 +54,15 @@ export const sqlEditorState = proxy({
     }
   },
   /**
-   * Synchronous saving of folders and snippets (debounce behavior). Key is the snippet id, value is shouldInvalidate
+   * Snippets queued for saving. Key is the snippet id, value is whether saving
+   * it should also invalidate the snippet/folder lists.
    */
   needsSaving: proxyMap<string, boolean>([]),
+  /**
+   * Folders queued for saving (create or rename). Kept separate from
+   * `needsSaving` so snippet and folder saves are scheduled independently.
+   */
+  pendingFolderSaves: proxyMap<string, boolean>([]),
   /**
    * UI-imposed limit for the number of results a query can return (applied to the SQL query being run if applicable).
    * Acts as a safeguard to prevent accidentally taking down the database from a really large SELECT query.
@@ -253,7 +252,7 @@ export const sqlEditorState = proxy({
     if (hasChanges) {
       // Remember this folder's own pre-rename name so a failed save can roll back.
       storeFolder.previousName = originalFolderName
-      sqlEditorState.needsSaving.set(id, true)
+      sqlEditorState.pendingFolderSaves.set(id, true)
     }
   },
 
@@ -370,62 +369,10 @@ export const useSnippets = (projectRef: string) => {
   )
 }
 
-// ========================================================================
-// ## Below are all the asynchronous saving logic for the SQL Editor
-// ========================================================================
-
-// The save mechanism owns how snippets/folders are persisted. Its data-layer
-// collaborators and query invalidation are injected here; the subscribe below
-// decides what to enqueue. (The enqueue policy moves to a scheduler in a later PR.)
-const saveMechanism = createSaveMechanism({
-  state: sqlEditorState,
-  upsertContent,
-  createSQLSnippetFolder,
-  updateSQLSnippetFolder,
-  notify: toast,
-  invalidate: async (projectRef: string) => {
-    const queryClient = getQueryClient()
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: contentKeys.count(projectRef, 'sql') }),
-      queryClient.invalidateQueries({ queryKey: contentKeys.sqlSnippets(projectRef) }),
-      queryClient.invalidateQueries({ queryKey: contentKeys.folders(projectRef) }),
-    ])
-  },
-})
-
 if (typeof window !== 'undefined') {
   devtools(sqlEditorState, {
     name: 'sqlEditorStateV2',
     // [Joshen] So that jest unit tests can ignore this
     enabled: process.env.NEXT_PUBLIC_ENVIRONMENT !== undefined,
-  })
-
-  subscribe(sqlEditorState.needsSaving, () => {
-    const state = getSqlEditorV2StateSnapshot()
-
-    state.needsSaving.forEach((shouldInvalidate, id) => {
-      const snippet = state.snippets[id]
-      const folder = state.folders[id]
-
-      if (snippet) {
-        const { visibility, folder_id } = snippet.snippet
-        const result = validateMoveToFolder({ visibility, folderId: folder_id })
-
-        if (!result.ok) {
-          toast.error(result.error)
-        } else {
-          saveMechanism.saveSnippet({ id, projectRef: snippet.projectRef, shouldInvalidate })
-          sqlEditorState.needsSaving.delete(id)
-        }
-      } else if (folder) {
-        const { projectRef, folder: folderData, status } = folder
-        if (isNewFolder(status)) {
-          saveMechanism.createFolder({ projectRef, name: folderData.name, placeholderId: id })
-        } else {
-          saveMechanism.updateFolder({ id, projectRef, name: folderData.name })
-        }
-        sqlEditorState.needsSaving.delete(id)
-      }
-    })
   })
 }
