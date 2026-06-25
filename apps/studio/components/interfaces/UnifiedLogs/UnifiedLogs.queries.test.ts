@@ -114,16 +114,16 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).not.toContain(`'%error%%'`)
     })
 
-    it('excludes connection log messages by default (hide_connection_logs=true)', () => {
-      const sql = getUnifiedLogsQuery({ ...baseSearch, hide_connection_logs: true } as any)
+    it('excludes connection log messages when show_connection_logs=false', () => {
+      const sql = getUnifiedLogsQuery({ ...baseSearch, show_connection_logs: false } as any)
       expect(sql).toContain("source != 'postgres_logs'")
       expect(sql).toContain("event_message NOT LIKE 'connection received%'")
       expect(sql).toContain("event_message NOT LIKE 'connection authenticated%'")
       expect(sql).toContain("event_message NOT LIKE 'connection authorized%'")
     })
 
-    it('includes connection log messages when hide_connection_logs=false', () => {
-      const sql = getUnifiedLogsQuery({ ...baseSearch, hide_connection_logs: false } as any)
+    it('includes connection log messages by default (show_connection_logs=true)', () => {
+      const sql = getUnifiedLogsQuery({ ...baseSearch, show_connection_logs: true } as any)
       expect(sql).not.toContain("event_message NOT LIKE 'connection received%'")
     })
 
@@ -174,7 +174,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
     })
 
     it('applies the connection-logs filter to every count scan so badges match the list', () => {
-      const sql = getLogsCountQuery({ ...baseSearch, hide_connection_logs: true } as any)
+      const sql = getLogsCountQuery({ ...baseSearch, show_connection_logs: false } as any)
       const scans = sql.split(/\bUNION ALL\b/)
       expect(scans.length).toBeGreaterThan(1)
       for (const scan of scans) {

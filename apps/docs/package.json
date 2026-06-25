@@ -151,7 +151,7 @@
     "@types/react-copy-to-clipboard": "^5.0.4",
     "@types/react-dom": "catalog:",
     "@types/unist": "^2.0.6",
-    "@redocly/cli": "^2.25.3",
+    "@redocly/cli": "^2.26.0",
     "amaro": "^1.1.5",
     "api-types": "workspace:*",
     "cheerio": "^1.0.0-rc.12",

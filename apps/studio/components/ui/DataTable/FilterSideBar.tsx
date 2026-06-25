@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { useEffect, type ReactNode } from 'react'
+import { cloneElement, Dispatch, SetStateAction, useEffect } from 'react'
 import { Badge, Button, cn, ResizablePanel, usePanelRef } from 'ui'
 
 import { FeaturePreviewSidebarPanel } from '../FeaturePreviewSidebarPanel'
@@ -15,16 +15,14 @@ import { UnifiedLogsBanner } from '@/components/interfaces/UnifiedLogs/UnifiedLo
 
 interface FilterSideBarProps {
   isFilterBarOpen: boolean
-  setIsFilterBarOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setIsFilterBarOpen: Dispatch<SetStateAction<boolean>>
   dateRangeDisabled?: DateRangeDisabled
-  afterFilters?: ReactNode
 }
 
 export function FilterSideBar({
   isFilterBarOpen,
   setIsFilterBarOpen,
   dateRangeDisabled,
-  afterFilters,
 }: FilterSideBarProps) {
   const router = useRouter()
   const { ref } = useParams()
@@ -84,7 +82,6 @@ export function FilterSideBar({
 
       <div className="flex-1 p-2 sm:overflow-y-scroll">
         <DataTableFilterControls dateRangeDisabled={dateRangeDisabled} />
-        {afterFilters}
         <FeaturePreviewSidebarPanel
           className="mx-2 my-4"
           title="Capture your logs"
@@ -93,9 +90,7 @@ export function FilterSideBar({
             <div className="flex items-center gap-4">
               {LOG_DRAIN_TYPES.filter((t) =>
                 ['datadog', 'sentry', 'webhook', 'loki'].includes(t.value)
-              ).map((type) =>
-                React.cloneElement(type.icon, { height: 20, width: 20, key: type.value })
-              )}
+              ).map((type) => cloneElement(type.icon, { height: 20, width: 20, key: type.value }))}
             </div>
           }
           actions={
