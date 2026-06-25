@@ -54,7 +54,7 @@ async function rollbackTables(
   )
   if (error) handleError(error)
 
-  // Logic for starting the pipeline back up after a successful rollback
+  // Logic for starting the pipeline back up after a successfull rollback
   if (pipelineStatusName) {
     const shouldStartPipelineAfterRollback = [
       PipelineStatusName.STOPPED,
