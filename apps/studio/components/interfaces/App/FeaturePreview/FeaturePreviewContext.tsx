@@ -75,17 +75,20 @@ export const useIsColumnLevelPrivilegesEnabled = () => {
 }
 
 export const useUnifiedLogsPreview = () => {
+  const unifiedLogsDefaultOptIn = useFlag('unifiedLogsDefaultOptIn')
   const { flags, onUpdateFlag } = useFeaturePreviewContext()
   const { hasLoaded: flagsHaveLoaded } = useContext(FeatureFlagContext)
-  const unifiedLogsEnabled = useFlag('unifiedLogs')
 
   const isLoading = !flagsHaveLoaded
-  const isEnabled = unifiedLogsEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+  const isEnabled = flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]
+
+  const hasToggledPreview = !!safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
+  const isDefaultOptIn = flagsHaveLoaded && unifiedLogsDefaultOptIn && !hasToggledPreview
 
   const enable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, true)
   const disable = () => onUpdateFlag(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, false)
 
-  return { isEnabled, isEligible: unifiedLogsEnabled, isLoading, enable, disable }
+  return { isEnabled, isLoading, isDefaultOptIn, enable, disable }
 }
 
 export const useIsPgDeltaDiffEnabled = () => {
