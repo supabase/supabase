@@ -76,6 +76,39 @@ function memberHasProjectScopedReadOnlyRole(
   })
 }
 
+function memberHasOrgScopedRoleName(
+  member: OrganizationMember,
+  roles: OrganizationRolesData,
+  roleName: string
+) {
+  const orgScopedRoles = roles.org_scoped_roles ?? []
+
+  return (member.role_ids ?? []).some((roleId) => {
+    const orgRole = orgScopedRoles.find((role) => role.id === roleId)
+    return orgRole?.name === roleName
+  })
+}
+
+function getPendingInviteProjectScopeCount(
+  member: OrganizationMember,
+  roles: OrganizationRolesData
+) {
+  const projectRefs = new Set<string>()
+
+  if (member.invited_role_scoped_projects?.length) {
+    member.invited_role_scoped_projects.forEach((projectRef) => projectRefs.add(projectRef))
+    return projectRefs.size
+  }
+
+  const projectScopedRoles = roles.project_scoped_roles ?? []
+  for (const roleId of member.role_ids ?? []) {
+    const projectRole = projectScopedRoles.find((role) => role.id === roleId)
+    projectRole?.projects.forEach((project) => projectRefs.add(project.ref))
+  }
+
+  return projectRefs.size
+}
+
 /** External collaborator in Team: pending invite or accepted guest with read-only platform access. */
 export function isExternalCollaboratorMember(
   member: OrganizationMember,
@@ -85,31 +118,42 @@ export function isExternalCollaboratorMember(
   if (!roles) return false
 
   const orgScopedRoles = roles.org_scoped_roles ?? []
-  const isReadOnlyGuest = isTemporaryAccessGuestMember(member, roles)
   const hasProjectScopedReadOnly = memberHasProjectScopedReadOnlyRole(member, roles)
 
   if (member.invited_id) {
-    if (hasProjectScopedReadOnly) return true
+    if (member.invited_is_external_collaborator) return true
+
+    // Standard Read-only / Developer / Admin invites use org-scoped role ids.
+    if (memberHasOrgScopedRoleName(member, roles, 'Read-only')) return false
+    if (memberHasOrgScopedRoleName(member, roles, 'Owner')) return false
+    if (memberHasOrgScopedRoleName(member, roles, 'Administrator')) return false
 
     const scopedProjects = member.invited_role_scoped_projects ?? []
-    if (isReadOnlyGuest && scopedProjects.length === 1) return true
-
     const orgHasReadOnly = orgScopedRoles.some((role) => role.name === 'Read-only')
-    const hasOrgDeveloperRole = (member.role_ids ?? []).some((roleId) => {
-      const orgRole = orgScopedRoles.find((role) => role.id === roleId)
-      return orgRole?.name === 'Developer'
-    })
-    if (!orgHasReadOnly && hasOrgDeveloperRole && scopedProjects.length === 1) return true
+    if (memberHasOrgScopedRoleName(member, roles, 'Developer')) {
+      // Free/Pro fallback when org Read-only is absent from /roles.
+      return !orgHasReadOnly && scopedProjects.length === 1
+    }
 
-    return false
+    // External collaborators are always single-project; multi-project pending invites are team members.
+    if (!hasProjectScopedReadOnly) return false
+
+    return getPendingInviteProjectScopeCount(member, roles) === 1
   }
 
-  if (hasProjectScopedReadOnly) return true
-
-  if (!isReadOnlyGuest) return false
-
   const jitSummary = options?.jitSummary
-  return Boolean(jitSummary && (jitSummary.status.active > 0 || jitSummary.status.expired > 0))
+  const hasJitGrants = Boolean(
+    jitSummary && (jitSummary.status.active > 0 || jitSummary.status.expired > 0)
+  )
+  if (!hasJitGrants || !hasProjectScopedReadOnly) return false
+
+  // Internal Read-only members keep org-scoped role ids even when scoped to projects.
+  const hasOrgScopedReadOnlyRole = (member.role_ids ?? []).some((roleId) => {
+    const orgRole = orgScopedRoles.find((role) => role.id === roleId)
+    return orgRole?.name === 'Read-only'
+  })
+
+  return !hasOrgScopedReadOnlyRole
 }
 
 export function getMemberJitGrantSummary(

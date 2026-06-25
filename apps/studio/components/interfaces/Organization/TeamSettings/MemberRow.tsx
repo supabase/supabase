@@ -110,7 +110,7 @@ export const MemberRow = ({ member, grantsByUserId }: MemberRowProps) => {
                   </Badge>
                 )}
                 {member.is_sso_user && <Badge variant="default">SSO</Badge>}
-                {isExternalCollaborator && <Badge variant="warning">Guest</Badge>}
+                {isExternalCollaborator && <Badge>Guest</Badge>}
                 {(member.metadata as any)?.origin && (
                   <PartnerIcon
                     organization={{

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { organizationKeys } from './keys'
+import { getTrackedGuestInviteEmails } from '@/components/interfaces/TemporaryAccess/guest-invite-tracking'
 import type { components } from '@/data/api'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -15,6 +16,8 @@ export interface OrganizationMember extends Member {
   invited_id?: number
   /** Present on pending invites when the platform API returns scoped projects. */
   invited_role_scoped_projects?: string[]
+  /** Set when this pending invite was sent as External collaborator from this browser session. */
+  invited_is_external_collaborator?: boolean
 }
 
 export async function getOrganizationMembers(
@@ -38,8 +41,10 @@ export async function getOrganizationMembers(
   if (orgInvitesError) handleError(orgInvitesError)
 
   // Remap invite data to look like existing members data
+  const guestInviteEmails = getTrackedGuestInviteEmails(slug)
   const invitedMembers = orgInvites.invitations.map((invite) => {
     const inviteWithScope = invite as typeof invite & { role_scoped_projects?: string[] }
+    const normalizedEmail = invite.invited_email.trim().toLowerCase()
     const member = {
       invited_at: invite.invited_at,
       invited_id: invite.id,
@@ -49,6 +54,7 @@ export async function getOrganizationMembers(
       ...(inviteWithScope.role_scoped_projects?.length
         ? { invited_role_scoped_projects: inviteWithScope.role_scoped_projects }
         : {}),
+      ...(guestInviteEmails.has(normalizedEmail) ? { invited_is_external_collaborator: true } : {}),
     }
     return { ...member, role_ids: [invite.role_id] }
   })

@@ -63,6 +63,7 @@ describe('TemporaryAccessMember.utils', () => {
     const pendingMember = {
       invited_id: 1,
       role_ids: [301],
+      invited_is_external_collaborator: true,
     } as OrganizationMember
     const teamRoles = {
       org_scoped_roles: [
@@ -85,17 +86,43 @@ describe('TemporaryAccessMember.utils', () => {
     ])
   })
 
-  it('detects pending external collaborator invites with scoped projects metadata', () => {
+  it('does not treat multi-project read-only pending invites as external collaborators', () => {
     const pendingMember = {
-      invited_id: 2,
-      role_ids: [4],
-      invited_role_scoped_projects: ['proj-a'],
+      invited_id: 3,
+      role_ids: [301],
     } as OrganizationMember
+    const teamRoles = {
+      org_scoped_roles: [
+        { id: 4, name: 'Read-only', base_role_id: 4, description: null, projects: [] },
+      ],
+      project_scoped_roles: [
+        {
+          id: 301,
+          name: 'Read-only_proj-a',
+          base_role_id: 4,
+          description: null,
+          projects: [
+            { ref: 'proj-a', name: 'Alpha' },
+            { ref: 'proj-b', name: 'Beta' },
+          ],
+        },
+      ],
+    } as never
 
-    expect(isExternalCollaboratorMember(pendingMember, roles)).toBe(true)
+    expect(isExternalCollaboratorMember(pendingMember, teamRoles)).toBe(false)
   })
 
-  it('detects accepted external collaborators with project-scoped read-only without jit grants', () => {
+  it('does not treat org-scoped read-only pending invites as external collaborators', () => {
+    const pendingMember = {
+      invited_id: 4,
+      role_ids: [4],
+      invited_role_scoped_projects: ['proj-a', 'proj-b'],
+    } as OrganizationMember
+
+    expect(isExternalCollaboratorMember(pendingMember, roles)).toBe(false)
+  })
+
+  it('detects accepted external collaborators with project-scoped read-only and jit grants', () => {
     const acceptedMember = {
       gotrue_id: 'user-2',
       role_ids: [301],
@@ -114,16 +141,51 @@ describe('TemporaryAccessMember.utils', () => {
         },
       ],
     } as never
+    const jitSummary = {
+      grants: [],
+      status: { active: 1, expired: 0, activeIp: 0, expiredIp: 0 },
+    }
 
-    expect(isExternalCollaboratorMember(acceptedMember, teamRoles, { jitSummary: null })).toBe(true)
+    expect(isExternalCollaboratorMember(acceptedMember, teamRoles, { jitSummary })).toBe(true)
   })
 
-  it('does not treat org-wide read-only members as external collaborators', () => {
+  it('does not treat project-scoped read-only members without jit grants as external collaborators', () => {
+    const readOnlyMember = {
+      gotrue_id: 'user-4',
+      role_ids: [301],
+    } as OrganizationMember
+    const teamRoles = {
+      org_scoped_roles: [
+        { id: 4, name: 'Read-only', base_role_id: 4, description: null, projects: [] },
+      ],
+      project_scoped_roles: [
+        {
+          id: 301,
+          name: 'Read-only_proj-a',
+          base_role_id: 4,
+          description: null,
+          projects: [{ ref: 'proj-a', name: 'Alpha' }],
+        },
+      ],
+    } as never
+
+    expect(isExternalCollaboratorMember(readOnlyMember, teamRoles, { jitSummary: null })).toBe(
+      false
+    )
+    expect(getMemberRoleNames(readOnlyMember, teamRoles)).toEqual(['Read-only'])
+  })
+
+  it('does not treat org-wide read-only members with jit grants as external collaborators', () => {
+    const jitSummary = {
+      grants: [],
+      status: { active: 1, expired: 0, activeIp: 0, expiredIp: 0 },
+    }
+
     expect(
       isExternalCollaboratorMember(
         { gotrue_id: 'user-3', role_ids: [4] } as OrganizationMember,
         roles,
-        { jitSummary: null }
+        { jitSummary }
       )
     ).toBe(false)
   })

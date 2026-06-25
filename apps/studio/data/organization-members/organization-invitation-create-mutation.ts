@@ -3,6 +3,7 @@ import { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { organizationKeys } from './keys'
+import { trackGuestInviteEmails } from '@/components/interfaces/TemporaryAccess/guest-invite-tracking'
 import type { PendingInvitationAccessGrant } from '@/components/interfaces/TemporaryAccess/TemporaryAccess.types'
 import { handleError, post } from '@/data/fetchers'
 import { organizationKeys as organizationKeysV1 } from '@/data/organizations/keys'
@@ -66,7 +67,11 @@ export const useOrganizationCreateInvitationMutation = ({
   >({
     mutationFn: (vars) => createOrganizationInvitation(vars),
     async onSuccess(data, variables, context) {
-      const { slug } = variables
+      const { slug, emails, pendingAccessGrant } = variables
+
+      if (pendingAccessGrant && emails.length > 0) {
+        trackGuestInviteEmails(slug, emails)
+      }
 
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: organizationKeys.rolesV2(slug) }),
