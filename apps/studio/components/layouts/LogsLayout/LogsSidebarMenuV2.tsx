@@ -1,17 +1,9 @@
-import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { ChevronRight, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
-import {
-  Badge,
-  Button,
-  cn,
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-  Separator,
-} from 'ui'
+import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, Separator } from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideBarFilters,
@@ -61,7 +53,6 @@ export function LogsSidebarMenuV2() {
   const router = useRouter()
   const { ref } = useParams() as { ref: string }
 
-  const unifiedLogsFlagEnabled = useFlag('unifiedLogs')
   const { isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
 
   const [searchText, setSearchText] = useState('')
@@ -219,21 +210,6 @@ export function LogsSidebarMenuV2() {
 
   return (
     <div className="pb-4 relative">
-      {IS_PLATFORM && !unifiedLogsFlagEnabled && (
-        <FeaturePreviewSidebarPanel
-          className="mx-4 mt-4"
-          illustration={<Badge variant="default">Coming soon</Badge>}
-          title="New logs"
-          description="Get early access"
-          actions={
-            <Link href="https://forms.supabase.com/unified-logs-signup" target="_blank">
-              <Button variant="default" size="tiny">
-                Early access
-              </Button>
-            </Link>
-          }
-        />
-      )}
       {isUnifiedLogsEligible && <UnifiedLogsBanner />}
 
       <div
