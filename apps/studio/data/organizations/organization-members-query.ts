@@ -13,6 +13,8 @@ export type Member = components['schemas']['Member']
 export interface OrganizationMember extends Member {
   invited_at?: string
   invited_id?: number
+  /** Present on pending invites when the platform API returns scoped projects. */
+  invited_role_scoped_projects?: string[]
 }
 
 export async function getOrganizationMembers(
@@ -37,12 +39,16 @@ export async function getOrganizationMembers(
 
   // Remap invite data to look like existing members data
   const invitedMembers = orgInvites.invitations.map((invite) => {
+    const inviteWithScope = invite as typeof invite & { role_scoped_projects?: string[] }
     const member = {
       invited_at: invite.invited_at,
       invited_id: invite.id,
       mfa_enabled: false,
       username: invite.invited_email.slice(0, 1),
       primary_email: invite.invited_email,
+      ...(inviteWithScope.role_scoped_projects?.length
+        ? { invited_role_scoped_projects: inviteWithScope.role_scoped_projects }
+        : {}),
     }
     return { ...member, role_ids: [invite.role_id] }
   })

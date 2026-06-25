@@ -279,6 +279,18 @@ describe('InviteMemberButton (network)', () => {
     })
   })
 
+  test('shows Team upgrade badge for project scope when entitlement is missing', async () => {
+    setupMocks()
+    customRender(<InviteMemberButton />, { profileContext: PROFILE_CONTEXT })
+    await openDialog()
+    await screen.findByText('Developer')
+
+    expect(screen.getByText('Access scope')).toBeInTheDocument()
+    expect(screen.getByText('Specific projects')).toBeInTheDocument()
+    expect(screen.getByText('Team')).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Specific projects/i })).toBeDisabled()
+  })
+
   test('shows access scope options when project-level permissions are enabled', async () => {
     setupMocks()
 

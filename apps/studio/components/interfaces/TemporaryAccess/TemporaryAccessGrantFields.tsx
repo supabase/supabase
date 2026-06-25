@@ -1,6 +1,8 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import type { Control } from 'react-hook-form'
 import {
+  Badge,
   Checkbox,
   Select,
   SelectContent,
@@ -23,6 +25,7 @@ import type {
 import { createEmptyIpRange, getRelativeDatetimeByMode } from './TemporaryAccess.utils'
 import { DatePicker } from '@/components/ui/DatePicker'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { useHasAccessToProjectLevelPermissions } from '@/data/subscriptions/org-subscription-query'
 import { DOCS_URL } from '@/lib/constants'
 
 const EXPIRY_MODE_OPTIONS: Array<{
@@ -66,6 +69,9 @@ export function TemporaryAccessGrantFields({
   allowNeverExpiry = true,
   grantsFieldName = 'grants',
 }: TemporaryAccessGrantFieldsProps) {
+  const { slug } = useParams()
+  const hasIpRestrictionsEntitlement = useHasAccessToProjectLevelPermissions(slug as string)
+
   const isSuperuserRole = role.id === 'postgres'
   const isReadOnlyRole = role.id === 'supabase_read_only_user'
   const checkboxId = `temporary-access-role-${role.id}`
@@ -317,25 +323,39 @@ export function TemporaryAccessGrantFields({
             <FormItemLayout
               isReactForm={false}
               label={
-                <p className="text-sm text-foreground">
-                  Restricted IP addresses{' '}
-                  <span className="font-normal text-foreground-lighter">(optional)</span>
-                </p>
+                <span className="flex w-full items-center justify-between gap-3">
+                  <p className="text-sm text-foreground">
+                    Restricted IP addresses{' '}
+                    <span className="font-normal text-foreground-lighter">(optional)</span>
+                  </p>
+                  {!hasIpRestrictionsEntitlement ? <Badge>Team</Badge> : null}
+                </span>
+              }
+              description={
+                !hasIpRestrictionsEntitlement
+                  ? 'Restrict database access by IP on Team plan and above'
+                  : undefined
               }
             >
-              <SingleValueFieldArray
-                control={control}
-                name={`${grantsFieldName}.${grantIndex}.ipRanges` as 'grants.0.ipRanges'}
-                valueFieldName="value"
-                createEmptyRow={createEmptyIpRange}
-                placeholder="192.168.0.0/24"
-                addLabel="Add IP restriction"
-                removeLabel="Remove IP restriction"
-                minimumRows={1}
-                inputAutoComplete="off"
-                rowsClassName="space-y-2"
-                addButtonClassName="w-min"
-              />
+              {hasIpRestrictionsEntitlement ? (
+                <SingleValueFieldArray
+                  control={control}
+                  name={`${grantsFieldName}.${grantIndex}.ipRanges` as 'grants.0.ipRanges'}
+                  valueFieldName="value"
+                  createEmptyRow={createEmptyIpRange}
+                  placeholder="192.168.0.0/24"
+                  addLabel="Add IP restriction"
+                  removeLabel="Remove IP restriction"
+                  minimumRows={1}
+                  inputAutoComplete="off"
+                  rowsClassName="space-y-2"
+                  addButtonClassName="w-min"
+                />
+              ) : (
+                <p className="text-sm text-foreground-lighter py-2">
+                  IP restrictions are unavailable on your current plan.
+                </p>
+              )}
             </FormItemLayout>
           </div>
         </div>

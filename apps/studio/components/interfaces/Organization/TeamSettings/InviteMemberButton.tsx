@@ -48,6 +48,7 @@ import {
   type TeamAccessScopeSelection,
 } from './TeamAccessScope.utils'
 import { TeamAccessScopeSelector } from './TeamAccessScopeSelector'
+import { TeamProjectScopeRadioGroup } from './TeamProjectScopeRadioGroup'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { useIsJitDbAccessEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import type { TemporaryAccessGrantDraft } from '@/components/interfaces/TemporaryAccess/TemporaryAccess.types'
@@ -58,6 +59,8 @@ import {
   EXTERNAL_COLLABORATOR_ROLE_ID,
   EXTERNAL_COLLABORATOR_ROLE_NAME,
   isExternalCollaboratorRole,
+  resolveExternalCollaboratorInviteRole,
+  resolveExternalCollaboratorInviteRoleForProject,
   validateGuestAccessGrants,
 } from '@/components/interfaces/TemporaryAccess/TemporaryAccessInvite.utils'
 import { TemporaryAccessInviteGrantSection } from '@/components/interfaces/TemporaryAccess/TemporaryAccessInviteGrantSection'
@@ -111,9 +114,13 @@ export const InviteMemberButton = () => {
   const [guestParentProjectRef, setGuestParentProjectRef] = useState<string | null>(null)
 
   const { data: members } = useOrganizationMembersQuery({ slug })
-  const { data: allRoles, isSuccess } = useOrganizationRolesV2Query({ slug })
+  const { data: allRoles, isSuccess: isRolesSuccess } = useOrganizationRolesV2Query({ slug })
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
-  const readOnlyOrgRole = orgScopedRoles.find((role) => role.name === 'Read-only')
+
+  const externalCollaboratorInviteRole = useMemo(
+    () => resolveExternalCollaboratorInviteRole(allRoles),
+    [allRoles]
+  )
 
   const { data: ssoConfig } = useOrgSSOConfigQuery({ orgSlug: slug })
   const hasSsoProvider = !!ssoConfig && ssoConfig !== null
@@ -142,10 +149,6 @@ export const InviteMemberButton = () => {
     permissions ?? []
   )
 
-  const canAssignExternalCollaborator = readOnlyOrgRole
-    ? rolesAddable.includes(readOnlyOrgRole.id)
-    : false
-
   const canInviteMembers =
     hasOrgRole &&
     rolesAddable.length > 0 &&
@@ -158,6 +161,19 @@ export const InviteMemberButton = () => {
         organization?.slug
       )
     )
+
+  const externalCollaboratorDisabledReason = useMemo(() => {
+    if (!canInviteMembers) {
+      return 'You need additional permissions to invite members'
+    }
+    if (isRolesSuccess && !externalCollaboratorInviteRole) {
+      return 'External collaborator invites are not available for this organization'
+    }
+    return undefined
+  }, [canInviteMembers, externalCollaboratorInviteRole, isRolesSuccess])
+
+  const isExternalCollaboratorDisabled =
+    !!externalCollaboratorDisabledReason || (!isRolesSuccess && isJitDbAccessEnabled)
 
   const { mutateAsync: inviteMemberAsync, isPending: isInviting } =
     useOrganizationCreateInvitationMutation()
@@ -238,8 +254,6 @@ export const InviteMemberButton = () => {
     [orgScopedRoles, selectedRoleId]
   )
   const requiresOrgWideAccess = selectedRole ? roleRequiresOrgWideAccess(selectedRole.name) : false
-  const showAccessScopeField =
-    hasAccessToProjectLevelPermissions && !isGuestInvite && !requiresOrgWideAccess
 
   const emailCount = parseEmails(email ?? '').length
 
@@ -284,10 +298,12 @@ export const InviteMemberButton = () => {
       : buildProjectPayloadFromAccessScope(values.accessScope)
     const ssoPayload = buildSsoPayload(values.requireSso)
 
-    const inviteRoleId = isGuest ? readOnlyOrgRole?.id : Number(values.role)
+    const inviteRoleId = isGuest
+      ? resolveExternalCollaboratorInviteRoleForProject(values.projectRef, allRoles)?.roleId
+      : Number(values.role)
 
     if (isGuest && !inviteRoleId) {
-      toast.error('Read-only role is required for external collaborator invites')
+      toast.error('External collaborator invites are not available for this organization')
       return
     }
 
@@ -347,7 +363,7 @@ export const InviteMemberButton = () => {
   }
 
   useEffect(() => {
-    if (isSuccess && isOpen) {
+    if (isRolesSuccess && isOpen) {
       const developerRoleId = orgScopedRoles
         .find((role) => role.name === 'Developer')
         ?.id.toString()
@@ -357,7 +373,7 @@ export const InviteMemberButton = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, isOpen])
+  }, [isRolesSuccess, isOpen])
 
   const hasUnsavedChanges = form.formState.isDirty
 
@@ -500,16 +516,23 @@ export const InviteMemberButton = () => {
                               <FormControl>
                                 <RadioGroupStackedItem
                                   value={EXTERNAL_COLLABORATOR_ROLE_ID}
-                                  disabled={!canAssignExternalCollaborator}
+                                  disabled={isExternalCollaboratorDisabled}
                                   label={EXTERNAL_COLLABORATOR_ROLE_NAME}
-                                  description={[
-                                    EXTERNAL_COLLABORATOR_ROLE_DESCRIPTION,
-                                    !canAssignExternalCollaborator
-                                      ? 'Additional permissions required to assign role'
-                                      : undefined,
-                                  ]
-                                    .filter(Boolean)
-                                    .join(' ')}
+                                  description={
+                                    isExternalCollaboratorDisabled &&
+                                    externalCollaboratorDisabledReason ? (
+                                      <>
+                                        <span className="block text-foreground-light">
+                                          {externalCollaboratorDisabledReason}
+                                        </span>
+                                        <span className="block mt-1">
+                                          {EXTERNAL_COLLABORATOR_ROLE_DESCRIPTION}
+                                        </span>
+                                      </>
+                                    ) : (
+                                      EXTERNAL_COLLABORATOR_ROLE_DESCRIPTION
+                                    )
+                                  }
                                 />
                               </FormControl>
                             </FormItem>
@@ -521,7 +544,7 @@ export const InviteMemberButton = () => {
                 />
               </SheetSection>
 
-              {hasAccessToProjectLevelPermissions && !isGuestInvite && (
+              {!isGuestInvite && (
                 <SheetSection className="flex flex-col gap-y-4 border-t">
                   <FormField
                     name="accessScope"
@@ -533,11 +556,17 @@ export const InviteMemberButton = () => {
                         description={
                           requiresOrgWideAccess
                             ? `${selectedRole?.name} always has access to all projects in the organization.`
-                            : 'Choose all projects or select one or more specific projects'
+                            : hasAccessToProjectLevelPermissions
+                              ? 'Choose all projects or select one or more specific projects'
+                              : 'Invite members to specific projects on Team plan and above'
                         }
                       >
                         <FormControl className="col-span-6">
-                          {showAccessScopeField ? (
+                          {requiresOrgWideAccess ? (
+                            <p className="text-sm text-foreground-light py-2">
+                              {ALL_PROJECTS_ACCESS_SCOPE_LABEL}
+                            </p>
+                          ) : hasAccessToProjectLevelPermissions ? (
                             <TeamAccessScopeSelector
                               value={field.value}
                               onChange={field.onChange}
@@ -549,9 +578,11 @@ export const InviteMemberButton = () => {
                               allowMultipleProjects
                             />
                           ) : (
-                            <p className="text-sm text-foreground-light py-2">
-                              {ALL_PROJECTS_ACCESS_SCOPE_LABEL}
-                            </p>
+                            <TeamProjectScopeRadioGroup
+                              value="all-projects"
+                              onValueChange={() => undefined}
+                              hasProjectScopeEntitlement={false}
+                            />
                           )}
                         </FormControl>
                       </FormItemLayout>

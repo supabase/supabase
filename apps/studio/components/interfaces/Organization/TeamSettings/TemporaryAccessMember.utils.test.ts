@@ -5,6 +5,8 @@ import {
   getMemberAccessScopeDisplay,
   getMemberJitGrantSummary,
   getMemberRoleNames,
+  isExternalCollaboratorMember,
+  resolveOrganizationRoleDisplayName,
 } from './TemporaryAccessMember.utils'
 import type { OrganizationMember } from '@/data/organizations/organization-members-query'
 
@@ -24,6 +26,121 @@ const roles = {
 describe('TemporaryAccessMember.utils', () => {
   it('returns role names for member role ids', () => {
     expect(getMemberRoleNames(member, roles)).toEqual(['Developer'])
+  })
+
+  it('resolves project-scoped internal role names to base roles', () => {
+    expect(
+      getMemberRoleNames(
+        { ...member, role_ids: [301] } as OrganizationMember,
+        {
+          org_scoped_roles: [
+            { id: 3, name: 'Developer', base_role_id: 3, description: null, projects: [] },
+            { id: 4, name: 'Read-only', base_role_id: 4, description: null, projects: [] },
+          ],
+          project_scoped_roles: [
+            {
+              id: 301,
+              name: 'Read-only_djszgdismohreupbpgob',
+              base_role_id: 4,
+              description: null,
+              projects: [{ ref: 'djszgdismohreupbpgob', name: 'My project' }],
+            },
+          ],
+        } as never
+      )
+    ).toEqual(['Read-only'])
+  })
+
+  it('shows External collaborator for JIT guest members', () => {
+    expect(
+      getMemberRoleNames({ ...member, role_ids: [301] } as OrganizationMember, roles, {
+        isJitGuest: true,
+      })
+    ).toEqual(['External collaborator'])
+  })
+
+  it('detects pending external collaborator invites with project-scoped read-only role', () => {
+    const pendingMember = {
+      invited_id: 1,
+      role_ids: [301],
+    } as OrganizationMember
+    const teamRoles = {
+      org_scoped_roles: [
+        { id: 4, name: 'Read-only', base_role_id: 4, description: null, projects: [] },
+      ],
+      project_scoped_roles: [
+        {
+          id: 301,
+          name: 'Read-only_djszgdismohreupbpgob',
+          base_role_id: 4,
+          description: null,
+          projects: [{ ref: 'djszgdismohreupbpgob', name: 'My project' }],
+        },
+      ],
+    } as never
+
+    expect(isExternalCollaboratorMember(pendingMember, teamRoles)).toBe(true)
+    expect(getMemberRoleNames(pendingMember, teamRoles, { isJitGuest: true })).toEqual([
+      'External collaborator',
+    ])
+  })
+
+  it('detects pending external collaborator invites with scoped projects metadata', () => {
+    const pendingMember = {
+      invited_id: 2,
+      role_ids: [4],
+      invited_role_scoped_projects: ['proj-a'],
+    } as OrganizationMember
+
+    expect(isExternalCollaboratorMember(pendingMember, roles)).toBe(true)
+  })
+
+  it('detects accepted external collaborators with project-scoped read-only without jit grants', () => {
+    const acceptedMember = {
+      gotrue_id: 'user-2',
+      role_ids: [301],
+    } as OrganizationMember
+    const teamRoles = {
+      org_scoped_roles: [
+        { id: 4, name: 'Read-only', base_role_id: 4, description: null, projects: [] },
+      ],
+      project_scoped_roles: [
+        {
+          id: 301,
+          name: 'Read-only_proj-a',
+          base_role_id: 4,
+          description: null,
+          projects: [{ ref: 'proj-a', name: 'Alpha' }],
+        },
+      ],
+    } as never
+
+    expect(isExternalCollaboratorMember(acceptedMember, teamRoles, { jitSummary: null })).toBe(true)
+  })
+
+  it('does not treat org-wide read-only members as external collaborators', () => {
+    expect(
+      isExternalCollaboratorMember(
+        { gotrue_id: 'user-3', role_ids: [4] } as OrganizationMember,
+        roles,
+        { jitSummary: null }
+      )
+    ).toBe(false)
+  })
+
+  it('resolveOrganizationRoleDisplayName strips known role suffixes', () => {
+    expect(
+      resolveOrganizationRoleDisplayName(
+        {
+          id: 99,
+          name: 'Developer_muvcxxloudcjgsjddnyl',
+          base_role_id: 3,
+          description: null,
+          projects: [],
+        },
+        [{ id: 3, name: 'Developer', base_role_id: 3, description: null, projects: [] }]
+      )
+    ).toBe('Developer')
   })
 
   it('describes multi-project access scope', () => {

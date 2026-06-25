@@ -1,32 +1,15 @@
-# Temporary access — design prototype
+# Temporary access — product documentation
 
-Interactive Studio prototype for the unified temporary access vision.
+**Status:** Production Studio (behind `jitDbAccess` feature preview)  
+**Branch:** `dnywh/feat/holistic-access`
 
-## Run locally
+This folder holds **living product docs only** — there is no interactive sandbox or `/design-prototypes` route. The feature ships in real Studio surfaces under Organization → Team, Account → My access, and the Connect sheet.
 
-```bash
-pnpm dev:studio
-```
+| Document                                         | Purpose                                                      |
+| ------------------------------------------------ | ------------------------------------------------------------ |
+| [PRODUCT-DECISIONS.md](./PRODUCT-DECISIONS.md)   | Decision log, invite model, implementation map, backend gaps |
+| [PR-FAQ.md](./PR-FAQ.md)                         | Customer-facing vision and FAQ                               |
+| [TIER-MATRIX.md](./TIER-MATRIX.md)               | Plan gating matrix and upgrade UX                            |
+| [STAKEHOLDER-REVIEW.md](./STAKEHOLDER-REVIEW.md) | Review agenda, API gaps, Linear links                        |
 
-Open [http://localhost:8082/design-prototypes/temporary-access](http://localhost:8082/design-prototypes/temporary-access)
-
-## Contents
-
-| File                                             | Purpose                         |
-| ------------------------------------------------ | ------------------------------- |
-| [PRODUCT-DECISIONS.md](./PRODUCT-DECISIONS.md)   | Living product + UX + API log   |
-| [PR-FAQ.md](./PR-FAQ.md)                         | External-facing product vision  |
-| [TIER-MATRIX.md](./TIER-MATRIX.md)               | Plan gating matrix              |
-| [STAKEHOLDER-REVIEW.md](./STAKEHOLDER-REVIEW.md) | Review agenda + API gaps        |
-| [VIDEO-WALKTHROUGH.md](./VIDEO-WALKTHROUGH.md)   | Recording script for demo video |
-
-## Prototype screens
-
-1. Vision — IA before/after
-2. Invite sheet — unified admin flow
-3. Team list — External collaborator badges + expiry
-4. Join & onboarding — auto-PAT + connection strings
-5. My access — active + expired states
-6. Connect sheet — Direct tab with role picker
-
-**Not included:** Database Settings (removed from vision)
+**Try it:** enable **Temporary access** in Account → Feature previews, then open **Organization → Team**.

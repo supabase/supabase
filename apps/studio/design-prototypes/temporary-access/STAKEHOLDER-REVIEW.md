@@ -1,8 +1,11 @@
-# Temporary access vision — stakeholder review
+# Temporary access — stakeholder review
 
-**Purpose:** Alignment session for unified temporary access UX  
-**Prototype:** `/design-prototypes/temporary-access` in Studio (local dev)  
-**Docs:** [PR-FAQ](./PR-FAQ.md) · [Tier matrix](./TIER-MATRIX.md) · [Product decisions](./PRODUCT-DECISIONS.md) · [Video guide](./VIDEO-WALKTHROUGH.md)
+**Purpose:** Alignment session for unified temporary access in production Studio  
+**Docs:** [README](./README.md) · [PR-FAQ](./PR-FAQ.md) · [Tier matrix](./TIER-MATRIX.md) · [Product decisions](./PRODUCT-DECISIONS.md)
+
+**Demo path (feature preview on):** Organization → Team → Invite members (External collaborator) → accept join flow → Account → My access → project Connect sheet (Direct tab).
+
+There is **no sandbox route**. All UI lives in production Studio behind the `jitDbAccess` feature preview.
 
 ---
 
@@ -13,63 +16,63 @@
 | Etienne Stalmans | Security / JIT backend | PAM auto-enable, grant model, API shape |
 | Kamal            | Scoped access tokens   | Auto-mint PAT, permission intersection  |
 | Johnny           | Scoped access          | Alignment with broader access work      |
-| Danny White      | Product Design         | Prototype, video, PR/FAQ                |
+| Danny White      | Product Design         | Studio integration, docs                |
 
 ---
 
-## Decisions to confirm
+## Decisions (Studio status)
 
-- [ ] Temporary access admin UX lives in **Org → Team** (not Database Settings)
-- [ ] **Auto-enable PAM on first grant** — no project toggle in admin flow
-- [ ] **External collaborator** = org guest, visible in Team
-- [ ] **Default expiry 1 hour** for temp access types (visible, not in Advanced)
-- [ ] **Scoped PAT auto-mint** at invite onboarding
-- [ ] **My access** hub for persistent connection info
-- [ ] Pause fragmented SEC-888 fixes pending this direction
+| Decision                                               | Studio                                                  |
+| ------------------------------------------------------ | ------------------------------------------------------- |
+| Admin UX in **Org → Team** (not Database Settings)     | Shipped                                                 |
+| **Auto-enable PAM on first grant** — no admin toggle   | Shipped (client-side hook)                              |
+| **External collaborator** = org guest, visible in Team | Shipped                                                 |
+| **Expiry** configurable at invite / manage time        | Shipped (UI)                                            |
+| **My access** hub                                      | Shipped (`/account/access`)                             |
+| **Scoped PAT auto-mint** at onboarding                 | Not shipped — links to token creation                   |
+| **pending_access_grant** on invitation API             | Not shipped — UI builds payload, mutation does not send |
+| Database Settings JIT rules UI                         | Removed                                                 |
 
 ---
 
-## API gaps to capture
+## API gaps
 
-### Required for prototype → production
+### P0 — unblock full guest invite + member experience
 
-| Endpoint / change                                                | Purpose                                                                                          | Owner               | Priority              |
-| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ------------------- | --------------------- |
-| `GET /platform/profile/access-grants`                            | List user's grants across all projects without `project_ref`                                     | Platform API        | P0 — powers My access |
-| Extend `POST /platform/organizations/{slug}/members/invitations` | Payload: `access_type`, `expires_at`, `postgres_roles`, `allowed_networks`, `branches_only`      | Platform API        | P0                    |
-| Extend member role update mutations                              | Same grant fields for edit/extend/revoke                                                         | Platform API        | P0                    |
-| Auto-enable on grant creation                                    | Server-side call to `PUT /v1/projects/{ref}/jit-access` when first DB grant on project           | Security / Mgmt API | P0                    |
-| Auto-mint scoped PAT on invite accept                            | Scoped token with grant-bounded permissions                                                      | Auth / Kamal        | P0                    |
-| Cascade revoke UI refresh                                        | [SEC-463](https://linear.app/supabase/issue/SEC-463) done; ensure Team list reflects immediately | Studio              | P1                    |
+| Change                                                            | Purpose                              | Owner               | Studio                  |
+| ----------------------------------------------------------------- | ------------------------------------ | ------------------- | ----------------------- |
+| Extend `POST .../members/invitations` with `pending_access_grant` | Apply JIT grant on accept            | Platform API        | Payload ready; not sent |
+| Apply grant + auto-enable PAM on accept                           | Server-side first-grant enable       | Security / Mgmt API | Client hook only today  |
+| Auto-mint scoped PAT on accept                                    | Onboarding without manual token step | Auth / Kamal        | Interstitial only       |
+| `GET /platform/profile/access-grants`                             | Cross-project list for My access     | Platform API        | N+1 workaround          |
 
-### Existing APIs to reuse (no change)
+### P1 — lifecycle
 
-| Endpoint                                     | Use                                                      |
-| -------------------------------------------- | -------------------------------------------------------- |
-| `GET/PUT /v1/projects/{ref}/jit-access`      | Enable/disable PAM (auto-called on first grant)          |
-| `PUT/DELETE /v1/projects/{ref}/database/jit` | Store postgres role grants per user                      |
-| `GET /v1/projects/{ref}/database/jit`        | Member self-query (Connect sheet, My access per-project) |
-| `GET /v1/projects/{ref}/database/jit/list`   | Admin list (replaced by Team member grant view)          |
+| Change                         | Purpose                                                   |
+| ------------------------------ | --------------------------------------------------------- |
+| Extend member update mutations | Extend / revoke / edit grants from Team                   |
+| Team list refresh on revoke    | SEC-463 cascade visibility                                |
+| Audit log events               | `access_grant.created`, `.expired`, `.revoked`            |
+| Server-side tier enforcement   | Match UI gates for IP, project scope, multi-project guest |
 
-### Future (not blocking Phase 1–2)
+### Reuse (no change)
 
-| Endpoint / change                     | Purpose                                                     |
-| ------------------------------------- | ----------------------------------------------------------- |
-| Expiry notification webhooks / emails | T-15min warning, on-expiry                                  |
-| `POST .../access-grants/{id}/extend`  | Guest request extension → admin approve                     |
-| Audit log events                      | `access_grant.created`, `.expired`, `.revoked`, `.extended` |
-| Org-level PAM kill switch             | If Security requires independent of grants                  |
+| Endpoint                                     | Use                                         |
+| -------------------------------------------- | ------------------------------------------- |
+| `GET/PUT /v1/projects/{ref}/jit-access`      | Enable/disable PAM                          |
+| `PUT/DELETE /v1/projects/{ref}/database/jit` | Postgres role grants per user               |
+| `GET /v1/projects/{ref}/database/jit`        | Self-query (Connect, My access per project) |
 
 ---
 
 ## Review agenda (45 min)
 
-1. **Problem + vision** (5 min) — watch or skim [video walkthrough](./VIDEO-WALKTHROUGH.md)
-2. **Walk prototype screens** (15 min) — invite → team list → onboarding → My access → Connect
+1. **Problem + vision** (5 min) — [PR-FAQ](./PR-FAQ.md) press release
+2. **Live Studio walkthrough** (15 min) — Team invite → Manage database access → My access → Connect
 3. **API gaps** (10 min) — table above; assign owners
 4. **Tier matrix** (5 min) — [TIER-MATRIX.md](./TIER-MATRIX.md)
-5. **Custom Permissions coupling** (5 min) — Enterprise templates later; don't block
-6. **Next steps** (5 min) — Phase 1 discovery vs admin unification sequencing
+5. **Custom Permissions coupling** (5 min) — Enterprise later; don't block P0
+6. **Next steps** (5 min) — invitation API + profile access-grants endpoint
 
 ---
 

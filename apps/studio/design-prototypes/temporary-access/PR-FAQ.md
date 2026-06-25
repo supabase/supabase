@@ -1,6 +1,6 @@
 # Temporary access via Team invites — PR/FAQ
 
-**Status:** Vision / design prototype (June 2026)  
+**Status:** Shipped in Studio (JIT feature preview, June 2026)  
 **Authors:** Product Design + Security  
 **Reviewers:** Etienne Stalmans, Kamal (scoped PATs), Johnny (scoped access)
 
@@ -12,9 +12,9 @@
 
 Today, Supabase organizations can invite developers with coarse roles—Owner, Administrator, Developer, Read-only—and scope them to specific projects on Team plans. But many teams need something finer: give a contractor direct Postgres access for an hour without handing them the full dashboard, or elevate an internal developer to a specific database role temporarily without changing their org role.
 
-Starting with this release, Supabase unifies temporary database access into the same flow you already use to invite team members. From **Organization → Team → Invite members**, admins choose an access type, set an expiry, pick Postgres roles, and send the invite. The platform automatically enables authenticated Postgres connections on the project—no separate configuration in Database Settings. Invitees receive a scoped access token and copy-paste connection strings at onboarding, with a persistent **My access** page to return to later.
+With this release, Supabase unifies temporary database access into the same flow you already use to invite team members. From **Organization → Team → Invite members**, admins pick a **Role** (including **External collaborator** for guests), set project scope, Postgres roles, and expiry, then send the invite. The platform automatically enables authenticated Postgres connections on the project when an admin first grants access—no separate configuration in Database Settings. Invitees are guided to create a scoped access token and can return to **Account → My access** for grant status.
 
-External collaborators join as org guests with a dedicated **External collaborator** role: visible in Team, connection-first in experience, and automatically revoked when access expires.
+External collaborators join as org guests: visible in Team with a **Guest** badge, connection-first in experience, and automatically revoked when database access expires.
 
 ---
 
@@ -24,7 +24,7 @@ External collaborators join as org guests with a dedicated **External collaborat
 
 **What is temporary access?**
 
-Temporary access lets Supabase organization members (and invited external collaborators) connect directly to Postgres using a Supabase access token as the password. Access is tied to a specific user, can expire automatically, and can be restricted by Postgres role and optionally by IP address.
+Temporary access lets Supabase organization members (and invited external collaborators) connect directly to Postgres using a Supabase access token as the password. Access is tied to a specific user, can expire automatically, and can be restricted by Postgres role and optionally by IP address (Team+).
 
 **How is this different from sharing the database password?**
 
@@ -32,7 +32,7 @@ The shared `postgres` role password is a long-lived credential. Temporary access
 
 **Where do I manage temporary access?**
 
-In **Organization → Team**. Invite a new member or edit an existing member's access. You choose the access type, duration, project scope, and database connection settings in one place. Database Settings is not used to manage people.
+In **Organization → Team**. Invite a new member or use **Manage database access** on an existing member. Database Settings is not used to manage people or JIT rules.
 
 **Do I need to enable anything in Database Settings first?**
 
@@ -40,25 +40,26 @@ No. The first time you grant someone database access through Team, Supabase enab
 
 **Who can I invite?**
 
-Anyone with a Supabase account whose email matches the invitation. They sign in or create an account at the join link. External collaborators appear in your Team list with an **External collaborator** badge.
+Anyone with a Supabase account whose email matches the invitation. They sign in or create an account at the join link. External collaborators appear in your Team list with a **Guest** badge.
 
-**What access types are available?**
+**How do roles work on the invite sheet?**
 
-- **Full team member** — standard org roles (Owner, Admin, Developer, Read-only)
-- **External collaborator** — org guest with minimal Studio access and bundled database connection
-- **Database access only** — predefined templates on Free/Pro; custom templates on Enterprise (future)
+There is no separate “access type” field. **Role** drives everything:
 
-**What is the default expiry?**
+- **Owner, Administrator, Developer, Read-only** — standard org members with org/project scope as today
+- **External collaborator** — org guest with project-scoped temporary Postgres access configured at invite time
 
-One hour for External collaborator and database-only access types. Full team members can have no expiry. Expiry is always shown explicitly when configuring access.
+**What is the default expiry for external collaborators?**
+
+Presets start at 1 hour; custom dates are supported. Guest invites cannot use “Never” expiry. Expiry for invite presets runs from **when the invitee accepts**, not when the invite was sent.
 
 **How does the invitee connect?**
 
-After accepting the invite, they land on an onboarding screen with connection strings (direct Postgres and pooler) and an auto-generated scoped access token. They copy the strings into psql, their IDE, or a CI job. The same information remains available on **Account → My access**.
+After accepting, guest invitees can land on a join interstitial with grant summary and a link to create a scoped access token. **Account → My access** lists active and expired grants per project. The **Connect** sheet Direct connection tab shows a notice and Postgres role picker when the member has active grants on that project.
 
 **What happens when access expires?**
 
-Postgres rejects new connections for that user. The admin sees **Expired** on the member row in Team. The member sees an expired state in My access with guidance to contact their admin.
+Postgres rejects new connections for that user. Admins see expiry metadata under the member's **Access** column in Team. Members see expired state in My access.
 
 **Can internal project members use temporary elevated database access?**
 
@@ -66,11 +67,15 @@ Yes. Members with grants see them in the **Connect** sheet under Direct connecti
 
 **Which plans support this?**
 
-Core temporary access—including expiry, External collaborator, and auto-minted scoped tokens—is available on all plans. Project-scoped invites and IP restrictions require Team or above. Custom permission templates require Enterprise.
+Core temporary access—including expiry, External collaborator, and the My access hub—is available on all plans. **Project-scoped invites for full members** (Developer/Read-only) and **IP restrictions** require Team or above. Custom permission templates require Enterprise (future).
 
 **Is this the same as Just-in-Time (JIT) access?**
 
 Yes, internally. Customer-facing copy uses **temporary access**. The underlying PAM authentication and grant APIs remain; only the admin and member experience is unified.
+
+**How do I try it?**
+
+Enable **Temporary access** under Account → Feature previews (`jitDbAccess`).
 
 ---
 
@@ -78,29 +83,31 @@ Yes, internally. Customer-facing copy uses **temporary access**. The underlying 
 
 **What backend work already exists?**
 
-PAM-based JIT authentication, project enable/disable API, per-user grant CRUD, Supavisor pooler support, branching, and non-project-member grants (SEC-811). See the [PAM for Just-In-Time Database Access](https://linear.app/supabase/project/pam-for-just-in-time-database-access/overview) project.
+PAM-based JIT authentication, project enable/disable API, per-user grant CRUD, Supavisor pooler support, branching, and non-project-member grants (SEC-811).
 
-**What changes in the API model?**
+**What is shipped in Studio UI?**
 
-Grants are created and updated through invite/member mutations rather than a separate Database Settings UI. First grant with database connection triggers `PUT /v1/projects/{ref}/jit-access` (enable) automatically.
+- Team invite sheet with External collaborator role + grant fields
+- **Manage database access** grant sheet for existing members
+- Team table: Member (with MFA subtext), Role, Access, Actions
+- Tier upgrade nudges: Team `Badge` on project scope; `(requires Team)` on External collaborator when multi-project without entitlement; Team `Badge` on IP restrictions
+- **Account → My access** (`/account/access`)
+- Connect sheet notice + role picker
+- Post-accept onboarding interstitial (`/join/temporary-access`) — guidance only, no auto-mint yet
+- Database Settings JIT admin UI removed
 
-**How do scoped PATs fit in?**
+**What is still blocked on backend?**
 
-On invite acceptance, the platform auto-mints a scoped PAT with permissions bounded by the grant. Same permission vocabulary as Kamal's scoped access token work. Legacy PATs continue to work but are not the primary UX.
+| Gap                                      | Impact                                                     |
+| ---------------------------------------- | ---------------------------------------------------------- |
+| `pending_access_grant` on invitation API | Guest invite-time DB config not applied on accept          |
+| `GET /platform/profile/access-grants`    | My access uses N+1 org projects + per-project self queries |
+| Auto-mint scoped PAT on accept           | Onboarding links to manual token creation                  |
+| Server-side tier enforcement             | UI gates only today                                        |
 
 **What's the relationship to Custom Permissions?**
 
-Custom Permissions (target Aug 2026) provides Enterprise invite-time templates ("SQL Editor only", etc.). Temporary access expiry is on the grant lifecycle, not JSONLogic conditions—orthogonal concerns.
-
-**What new APIs are needed?**
-
-- `GET /platform/profile/access-grants` — list grants across projects without knowing `project_ref` (powers My access)
-- Invite/member mutations extended with access grant payload (access type, expiry, postgres roles, IP, branch scope)
-- Auto-enable hook on first database grant
-
-**What are we removing from the UI?**
-
-Database Settings JIT rules table and admin toggle. Database Settings may retain a read-only status indicator or link to Team—TBD—not a configuration surface for people.
+Custom Permissions (Enterprise) provides invite-time templates. Temporary access expiry is on the grant lifecycle—orthogonal concerns.
 
 **Migration impact?**
 
@@ -110,16 +117,16 @@ Existing JIT grant data maps 1:1 to access grants. No customer data migration ex
 
 ## Problem
 
-Enterprise and security-conscious teams need to grant **time-limited, attributable, revocable** direct database access without full project permissions. Today's experience splits configuration across Database Settings, Team, and Account Access Tokens—fragmented, undiscoverable, and easy to misconfigure.
+Enterprise and security-conscious teams need **time-limited, attributable, revocable** direct database access without full project permissions. The old experience split configuration across Database Settings, Team, and Account Access Tokens—fragmented and undiscoverable.
 
 ## Solution
 
-One admin flow (Team invite/edit), one member home (My access), auto-enable on first grant, scoped PAT at onboarding.
+One admin flow (Team invite / Manage database access), one member home (My access), auto-enable PAM on first grant, scoped PAT at onboarding (backend pending).
 
 ## Tenets
 
 1. **Granting access is the opt-in** — no separate PAM toggle step for admins
-2. **Team is the source of truth** — no parallel rules table
+2. **Team is the source of truth** — no parallel rules table in Database Settings
 3. **Connection-first for guests** — External collaborators live in My access, not full Studio
 4. **Security on all tiers** — customization on Enterprise
 5. **Backend reuse** — unify UX, not rewrite PAM

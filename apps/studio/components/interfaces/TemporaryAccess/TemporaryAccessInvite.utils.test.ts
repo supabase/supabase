@@ -8,6 +8,7 @@ import {
   createInviteGuestGrantDraft,
   EXTERNAL_COLLABORATOR_ROLE_ID,
   isExternalCollaboratorRole,
+  resolveExternalCollaboratorInviteRole,
   serializeInviteGrantsForPendingPayload,
   validateGuestAccessGrants,
 } from './TemporaryAccessInvite.utils'
@@ -16,6 +17,42 @@ describe('TemporaryAccessInvite.utils', () => {
   test('isExternalCollaboratorRole identifies sentinel role id', () => {
     expect(isExternalCollaboratorRole(EXTERNAL_COLLABORATOR_ROLE_ID)).toBe(true)
     expect(isExternalCollaboratorRole('3')).toBe(false)
+  })
+
+  test('resolveExternalCollaboratorInviteRole prefers org Read-only', () => {
+    expect(
+      resolveExternalCollaboratorInviteRole({
+        org_scoped_roles: [
+          { id: 3, name: 'Developer', base_role_id: 3, description: null, projects: [] },
+          { id: 4, name: 'Read-only', base_role_id: 4, description: null, projects: [] },
+        ],
+        project_scoped_roles: [],
+      })
+    ).toEqual({ roleId: 4, usesDeveloperFallback: false })
+  })
+
+  test('resolveExternalCollaboratorInviteRole falls back to Developer on Free-style orgs', () => {
+    expect(
+      resolveExternalCollaboratorInviteRole({
+        org_scoped_roles: [
+          { id: 3, name: 'Developer', base_role_id: 3, description: null, projects: [] },
+        ],
+        project_scoped_roles: [],
+      })
+    ).toEqual({ roleId: 3, usesDeveloperFallback: true })
+  })
+
+  test('resolveExternalCollaboratorInviteRole uses project-scoped Read-only when present', () => {
+    expect(
+      resolveExternalCollaboratorInviteRole({
+        org_scoped_roles: [
+          { id: 3, name: 'Developer', base_role_id: 3, description: null, projects: [] },
+        ],
+        project_scoped_roles: [
+          { id: 104, name: 'Read-only', base_role_id: 4, description: null, projects: [] },
+        ],
+      })
+    ).toEqual({ roleId: 104, usesDeveloperFallback: false })
   })
 
   test('createInviteGuestGrantDraft pre-enables read-only with 1h expiry', () => {

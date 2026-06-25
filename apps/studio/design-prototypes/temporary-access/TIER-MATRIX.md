@@ -1,85 +1,105 @@
 # Temporary access — tier gating matrix
 
-**Status:** Finalized for design prototype (June 2026)  
+**Status:** Reflects shipped Studio UI (JIT feature preview, June 2026)  
 **Principle:** Security features on lower tiers; customization on higher tiers (Etienne Stalmans, JIT catchup Jun 2026)
+
+Entitlement hook: `useHasAccessToProjectLevelPermissions` → `project_scoped_roles` ([org-subscription-query.ts](../../data/subscriptions/org-subscription-query.ts)).
 
 ---
 
 ## Summary matrix
 
-| Capability                             | Free | Pro  | Team     | Enterprise |
-| -------------------------------------- | ---- | ---- | -------- | ---------- |
-| Temporary access with expiry           | Yes  | Yes  | Yes      | Yes        |
-| External collaborator role             | Yes¹ | Yes¹ | Yes      | Yes        |
-| Predefined access templates            | Yes  | Yes  | Yes      | Yes        |
-| Auto-mint scoped PAT at onboarding     | Yes  | Yes  | Yes      | Yes        |
-| My access hub                          | Yes  | Yes  | Yes      | Yes        |
-| Connect sheet JIT awareness            | Yes  | Yes  | Yes      | Yes        |
-| Auto-enable PAM on first grant         | Yes  | Yes  | Yes      | Yes        |
-| Project-scoped invites                 | —    | —    | Yes²     | Yes        |
-| Full Postgres role picker              | —    | —    | Yes      | Yes        |
-| IP / CIDR restrictions (Advanced)      | —    | —    | Yes      | Yes        |
-| Custom permission templates at invite  | —    | —    | —        | Yes        |
-| Management API for programmatic grants | —    | —    | Partial³ | Full       |
-| Audit log entries for grant lifecycle  | —    | —    | Yes      | Yes        |
-| Extension request flow (guest → admin) | —    | —    | Roadmap  | Roadmap    |
-| Expiry notifications (email)           | —    | —    | Roadmap  | Roadmap    |
+| Capability                                | Free | Pro  | Team     | Enterprise   |
+| ----------------------------------------- | ---- | ---- | -------- | ------------ |
+| Temporary access with expiry              | Yes  | Yes  | Yes      | Yes          |
+| External collaborator role                | Yes¹ | Yes¹ | Yes      | Yes          |
+| Manage database access (existing members) | Yes  | Yes  | Yes      | Yes          |
+| My access hub                             | Yes  | Yes  | Yes      | Yes          |
+| Connect sheet JIT awareness               | Yes  | Yes  | Yes      | Yes          |
+| Auto-enable PAM on first grant (Studio)   | Yes  | Yes  | Yes      | Yes          |
+| Project-scoped member invites             | —    | —    | Yes²     | Yes          |
+| IP / CIDR restrictions                    | —    | —    | Yes²     | Yes          |
+| Custom permission templates at invite     | —    | —    | —        | Yes (future) |
+| Auto-mint scoped PAT at onboarding        | —³   | —³   | —³       | —³           |
+| Management API for programmatic grants    | —    | —    | Partial⁴ | Full         |
+| Audit log entries for grant lifecycle     | —    | —    | Roadmap  | Roadmap      |
+| Extension request flow (guest → admin)    | —    | —    | Roadmap  | Roadmap      |
+| Expiry notifications (email)              | —    | —    | Roadmap  | Roadmap      |
 
-¹ Single project only on Free/Pro (no `project_scoped_roles` entitlement; org default project or sole project implied).  
-² Requires `project_scoped_roles` entitlement ([org-subscription-query.ts](../../data/subscriptions/org-subscription-query.ts)).  
-³ Read/write grants via existing JIT API today; unified invite API TBD.
+¹ External collaborator is always project-scoped (one project per invite); available on all plans. Team gates **full member** invites to specific projects only.  
+² Gated in UI via `project_scoped_roles` entitlement.  
+³ Onboarding interstitial links to manual scoped token creation; backend auto-mint pending.  
+⁴ Read/write grants via existing JIT API today; unified invite payload pending.
 
 ---
 
-## Predefined templates (Free / Pro / all tiers)
+## Studio UI enforcement (shipped)
 
-Supabase-defined templates—not customer-created. Enterprise adds custom templates on top.
+| Surface                                     | Without Team entitlement                                              | With Team entitlement                                 |
+| ------------------------------------------- | --------------------------------------------------------------------- | ----------------------------------------------------- |
+| Invite → Access scope (Developer/Read-only) | Radio locked to all projects; **Team** `Badge` on “Specific projects” | Full `TeamAccessScopeSelector` (all or multi-project) |
+| Update roles panel → project scope          | Same radio + **Team** `Badge`                                         | Project picker + per-project roles                    |
+| Grant form → IP restrictions                | **Team** `Badge`; fields replaced with unavailable copy               | Full IP/CIDR inputs                                   |
+| Invite → External collaborator              | Enabled when user can invite members; pick one project                | Same                                                  |
 
-| Template ID                    | Label                          | Platform role          | Postgres role(s)          | Default expiry | Max expiry |
-| ------------------------------ | ------------------------------ | ---------------------- | ------------------------- | -------------- | ---------- |
-| `external-collaborator`        | External collaborator          | Guest (minimal Studio) | Configurable preset       | 1 hour         | 7 days     |
-| `database-developer-temporary` | Database developer (temporary) | None / guest           | `postgres`                | 1 hour         | 7 days     |
-| `database-readonly-temporary`  | Database read-only (temporary) | None / guest           | `supabase_read_only_user` | 24 hours       | 30 days    |
+Upgrade components: standard `Badge` from `ui` for full-member project scope and IP fields.
 
-On Free/Pro, Postgres role selection is limited to presets within each template (no arbitrary role picker).
+---
+
+## Free vs Team: two paths to project-scoped access
+
+| Path                                          | Free / Pro                                             | Team+                       |
+| --------------------------------------------- | ------------------------------------------------------ | --------------------------- |
+| **External collaborator** (JIT guest invite)  | Yes — pick one project; Postgres access from JIT grant | Same                        |
+| **Developer / Read-only** → specific projects | No — locked to all projects (`project_scoped_roles`)   | Yes — Access scope combobox |
+
+On Free/Pro, `/roles` may omit **Read-only** until project-level permissions are enabled. External collaborator invites still work: Studio sends **Developer** + `role_scoped_projects` as a platform API stand-in when Read-only is absent; the **JIT grant** defines database access. A dedicated guest platform role is backend follow-up.
+
+Full members cannot get project-scoped **org** access without Team — only the JIT guest path above.
+
+## Postgres roles on guest invite (Studio today)
+
+External collaborator invites use the **same role list as Manage database access** — built-ins plus assignable custom roles from project SQL. This is **not** limited to predefined templates in the current Studio build (preview). Server-side tier caps on role choice are future work.
+
+Built-ins always shown: `postgres`, `supabase_read_only_user`. Custom roles must pass the assignability filter (`canLogin`, not system/reserved roles). Hidden roles notice appears below the role list when filtered custom roles exist.
 
 ---
 
 ## Entitlement mapping
 
-| Feature flag / entitlement   | Gates                                                |
-| ---------------------------- | ---------------------------------------------------- |
-| `project_scoped_roles`       | Project picker on invite; scope to one/many projects |
-| Custom Permissions platform  | Enterprise custom templates at invite time           |
-| `jitDbAccess` (feature flag) | Backend PAM availability on instance                 |
-| SSO (`auth.platform.sso`)    | SSO invitation type on invite sheet                  |
+| Feature flag / entitlement   | Gates                                                                        |
+| ---------------------------- | ---------------------------------------------------------------------------- |
+| `project_scoped_roles`       | Project-scoped member invites; multi-project External collaborator           |
+| Custom Permissions platform  | Enterprise custom templates at invite (future)                               |
+| `jitDbAccess` (feature flag) | All temporary access UI in Studio                                            |
+| SSO (`auth.platform.sso`)    | SSO upsell above Team table; invitation type in invite sheet when configured |
 
 ---
 
 ## Upgrade prompts (UX copy)
 
-| Scenario                        | Plan shown | Copy direction                                               |
-| ------------------------------- | ---------- | ------------------------------------------------------------ |
-| Free user tries project scope   | Team       | "Invite members to specific projects on Team plan and above" |
-| Pro user tries IP restrictions  | Team       | "Restrict database access by IP on Team plan and above"      |
-| Team user tries custom template | Enterprise | "Create custom permission templates on Enterprise"           |
-
-Reuse existing [UpgradePlanButton](apps/studio/components/ui/UpgradePlanButton.tsx) patterns from [InviteMemberButton.tsx](../../components/interfaces/Organization/TeamSettings/InviteMemberButton.tsx).
+| Scenario                                      | Plan shown | Copy / pattern                                                                                       |
+| --------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------- |
+| Developer/Read-only tries specific projects   | Team       | Description: “Invite members to specific projects on Team plan and above”; **Team** `Badge` on radio |
+| IP restrictions on grant form                 | Team       | Description: “Restrict database access by IP on Team plan and above”; **Team** `Badge` on label      |
+| External collaborator, multi-project Free/Pro | —          | Pick one project in invite sheet (no Team required)                                                  |
+| Custom templates (future)                     | Enterprise | TBD                                                                                                  |
 
 ---
 
-## Open questions for Product / Security sign-off
+## Open questions
 
-1. **Free tier single-project assumption** — auto-select sole project vs require upgrade when org has multiple projects?
-2. **Max expiry caps** — enforce server-side per tier or trust UI validation?
-3. **External collaborator on org-wide scope** — allow on Team+ or always project-scoped?
+1. **Server-side tier enforcement** — UI gates today; should API reject IP / multi-project guest invites on Free/Pro?
+2. **Max expiry caps per tier** — enforce server-side or trust UI validation?
+3. **Postgres role picker on Free/Pro** — Studio shows full list in preview; align with Enterprise-only custom templates later?
 
 ---
 
 ## Decision log
 
-| Date       | Decision                              | Rationale                                                                       |
-| ---------- | ------------------------------------- | ------------------------------------------------------------------------------- |
-| 2026-06-23 | Core temp access not paywalled        | Etienne: "I hate making security a paid feature"                                |
-| 2026-06-24 | Auto-enable on first grant (Option B) | Granting DB access IS the opt-in; remove Database Settings toggle from admin UX |
-| 2026-06-24 | External contractor = org guest       | Visible in Team as External collaborator                                        |
+| Date       | Decision                                                    | Rationale                                                                             |
+| ---------- | ----------------------------------------------------------- | ------------------------------------------------------------------------------------- | ---------------- |
+| 2026-06-23 | Core temp access not paywalled                              | Etienne: security should not be a paid feature                                        |
+| 2026-06-24 | Auto-enable on first grant (Option B)                       | Granting DB access IS the opt-in; remove Database Settings toggle from admin UX       |
+| 2026-06-24 | External contractor = org guest                             | Visible in Team as External collaborator / Guest badge                                |
+| 2026-06-25 | External collaborator on Free without Read-only in `/roles` | Developer + project scope as API stand-in; JIT grant is source of truth for DB access | Shipped (Studio) |

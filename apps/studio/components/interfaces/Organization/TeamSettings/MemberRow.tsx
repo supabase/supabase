@@ -1,4 +1,4 @@
-import { ArrowRight, Check, User, X } from 'lucide-react'
+import { ArrowRight, User } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import {
@@ -19,7 +19,7 @@ import {
   getMemberAccessScopeDisplay,
   getMemberJitGrantSummary,
   getMemberRoleNames,
-  isTemporaryAccessGuestMember,
+  isExternalCollaboratorMember,
 } from './TemporaryAccessMember.utils'
 import { useIsJitDbAccessEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import PartnerIcon from '@/components/ui/PartnerIcon'
@@ -59,10 +59,13 @@ export const MemberRow = ({ member, grantsByUserId }: MemberRowProps) => {
   const isInvitedUser = Boolean(member.invited_id)
   const jitSummary =
     isJitDbAccessEnabled && grantsByUserId ? getMemberJitGrantSummary(member, grantsByUserId) : null
-  const showGuestBadge =
-    isJitDbAccessEnabled && !!jitSummary && isTemporaryAccessGuestMember(member, roles)
+  const isExternalCollaborator =
+    isJitDbAccessEnabled && isExternalCollaboratorMember(member, roles, { jitSummary })
 
-  const roleNames = useMemo(() => getMemberRoleNames(member, roles), [member, roles])
+  const roleNames = useMemo(
+    () => getMemberRoleNames(member, roles, { isJitGuest: isExternalCollaborator }),
+    [member, roles, isExternalCollaborator]
+  )
   const accessScope = useMemo(
     () =>
       getMemberAccessScopeDisplay({
@@ -96,45 +99,38 @@ export const MemberRow = ({ member, grantsByUserId }: MemberRowProps) => {
               </div>
             }
           />
-          <div className="flex item-center gap-x-3">
-            <p className="text-foreground-light truncate">{member.primary_email}</p>
-            <div className="flex items-center gap-x-2">
-              {member.gotrue_id === profile?.gotrue_id && <Badge>You</Badge>}
-              {isInvitedUser && member.invited_at && (
-                <Badge variant={isInviteExpired(member.invited_at) ? 'destructive' : 'warning'}>
-                  {isInviteExpired(member.invited_at) ? 'Expired' : 'Invited'}
-                </Badge>
-              )}
-              {member.is_sso_user && <Badge variant="default">SSO</Badge>}
-              {showGuestBadge && <Badge variant="secondary">Guest</Badge>}
-              {(member.metadata as any)?.origin && (
-                <PartnerIcon
-                  organization={{
-                    managed_by:
-                      MEMBER_ORIGIN_TO_MANAGED_BY[
-                        (member.metadata as any).origin as keyof typeof MEMBER_ORIGIN_TO_MANAGED_BY
-                      ] ?? 'supabase',
-                  }}
-                  tooltipText="Managed by Vercel Marketplace."
-                />
-              )}
+          <div className="min-w-0">
+            <div className="flex items-center gap-x-3">
+              <p className="text-foreground truncate">{member.primary_email}</p>
+              <div className="flex items-center gap-x-2">
+                {member.gotrue_id === profile?.gotrue_id && <Badge>You</Badge>}
+                {isInvitedUser && member.invited_at && (
+                  <Badge variant={isInviteExpired(member.invited_at) ? 'destructive' : 'warning'}>
+                    {isInviteExpired(member.invited_at) ? 'Expired' : 'Invited'}
+                  </Badge>
+                )}
+                {member.is_sso_user && <Badge variant="default">SSO</Badge>}
+                {isExternalCollaborator && <Badge variant="secondary">Guest</Badge>}
+                {(member.metadata as any)?.origin && (
+                  <PartnerIcon
+                    organization={{
+                      managed_by:
+                        MEMBER_ORIGIN_TO_MANAGED_BY[
+                          (member.metadata as any)
+                            .origin as keyof typeof MEMBER_ORIGIN_TO_MANAGED_BY
+                        ] ?? 'supabase',
+                    }}
+                    tooltipText="Managed by Vercel Marketplace."
+                  />
+                )}
+              </div>
             </div>
+            {!isInvitedUser && (
+              <p className="text-sm text-foreground-lighter mt-0.5 truncate">
+                MFA {member.mfa_enabled ? 'enabled' : 'disabled'}
+              </p>
+            )}
           </div>
-        </div>
-      </TableCell>
-      <TableCell>
-        <div className="flex items-center gap-x-1.5">
-          {member.mfa_enabled ? (
-            <>
-              <span className="text-foreground-lighter">Enabled</span>
-              <Check className="text-brand" strokeWidth={2} size={16} />
-            </>
-          ) : (
-            <>
-              <span className="text-foreground-lighter">Disabled</span>
-              <X className="text-foreground-muted" strokeWidth={1.5} size={16} />
-            </>
-          )}
         </div>
       </TableCell>
       <TableCell className="max-w-48">
@@ -197,7 +193,7 @@ export const MemberRow = ({ member, grantsByUserId }: MemberRowProps) => {
             )}
             {accessScope.expiryMeta && (
               <p
-                className="text-xs text-foreground-lighter mt-0.5 truncate"
+                className="text-sm text-foreground-lighter mt-0.5 truncate"
                 title={accessScope.expiryMeta}
               >
                 {accessScope.expiryMeta}

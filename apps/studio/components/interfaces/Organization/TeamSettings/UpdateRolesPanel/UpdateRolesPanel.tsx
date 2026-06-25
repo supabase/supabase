@@ -11,8 +11,6 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-  RadioGroupStacked,
-  RadioGroupStackedItem,
   Select,
   SelectContent,
   SelectGroup,
@@ -30,6 +28,7 @@ import {
 } from 'ui'
 
 import { ROLE_DESCRIPTIONS } from '../Roles.constants'
+import { TeamProjectScopeRadioGroup } from '../TeamProjectScopeRadioGroup'
 import { useGetRolesManagementPermissions } from '../TeamSettings.utils'
 import { UpdateRolesConfirmationModal } from './UpdateRolesConfirmationModal'
 import {
@@ -98,6 +97,14 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
   const isApplyingRoleToAllProjects =
     projectsRoleConfiguration.length === 1 && projectsRoleConfiguration[0]?.ref === undefined
+  const projectScopeRadioValue =
+    projectsRoleConfiguration.length === 0
+      ? originalConfigurationType === 'org-scope'
+        ? 'all-projects'
+        : 'specific-projects'
+      : isApplyingRoleToAllProjects
+        ? 'all-projects'
+        : 'specific-projects'
   const canSaveRoles = projectsRoleConfiguration.length > 0
 
   const lowerPermissionsRole = orgScopedRoles.find((r) => r.name === 'Developer')?.id
@@ -188,26 +195,14 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
             </SheetHeader>
 
             <SheetSection className="h-full overflow-auto flex flex-col">
-              {isOptedIntoProjectLevelPermissions && (
-                <div className="border-b border-border pb-4">
-                  <RadioGroupStacked
-                    disabled={cannotAddAnyRoles}
-                    value={isApplyingRoleToAllProjects ? 'all-projects' : 'specific-projects'}
-                    onValueChange={(value) => onToggleApplyToAllProjects(value === 'all-projects')}
-                  >
-                    <RadioGroupStackedItem
-                      value="all-projects"
-                      label="All projects (current and future)"
-                      description="Apply this role across the entire organization, including future projects"
-                    />
-                    <RadioGroupStackedItem
-                      value="specific-projects"
-                      label="Specific projects"
-                      description="Choose which projects this member can access"
-                    />
-                  </RadioGroupStacked>
-                </div>
-              )}
+              <div className="border-b border-border pb-4">
+                <TeamProjectScopeRadioGroup
+                  disabled={cannotAddAnyRoles}
+                  value={projectScopeRadioValue}
+                  onValueChange={(value) => onToggleApplyToAllProjects(value === 'all-projects')}
+                  hasProjectScopeEntitlement={isOptedIntoProjectLevelPermissions}
+                />
+              </div>
 
               {projectsRoleConfiguration.length === 0 && (
                 <Alert>
@@ -220,6 +215,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
               )}
 
               {!isApplyingRoleToAllProjects &&
+                isOptedIntoProjectLevelPermissions &&
                 projectsRoleConfiguration.length > 0 &&
                 projectsRoleConfiguration.length < totalNumOrgProjects && (
                   <Collapsible className="bg-alternative border rounded-lg py-4 group">
@@ -327,7 +323,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                           </Select>
                         )}
 
-                        {!isApplyingRoleToAllProjects && (
+                        {!isApplyingRoleToAllProjects && isOptedIntoProjectLevelPermissions && (
                           <ButtonTooltip
                             variant="text"
                             disabled={!canRemoveRole}
@@ -350,7 +346,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                 })}
               </div>
 
-              {!isApplyingRoleToAllProjects && (
+              {!isApplyingRoleToAllProjects && isOptedIntoProjectLevelPermissions && (
                 <OrganizationProjectSelector
                   open={showProjectDropdown}
                   setOpen={setShowProjectDropdown}

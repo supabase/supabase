@@ -11,6 +11,7 @@ import {
   getInvalidIpRangeRows,
   getRelativeDatetimeByMode,
 } from './TemporaryAccess.utils'
+import type { OrganizationRolesResponse } from '@/data/organization-members/organization-roles-query'
 
 /** Form-only role id — maps to Read-only org role + pending JIT grant on invite. */
 export const EXTERNAL_COLLABORATOR_ROLE_ID = '__external_collaborator__' as const
@@ -19,6 +20,83 @@ export const EXTERNAL_COLLABORATOR_ROLE_NAME = 'External collaborator'
 
 export const EXTERNAL_COLLABORATOR_ROLE_DESCRIPTION =
   'Project-scoped guest with minimal Studio access and temporary database connections.'
+
+export type ExternalCollaboratorInviteRole = {
+  roleId: number
+  /** True when Free/Pro orgs omit Read-only from /roles and Developer is used as API stand-in. */
+  usesDeveloperFallback: boolean
+}
+
+/**
+ * Platform role sent on external collaborator invites.
+ * Prefers Read-only (org or project-scoped). Free/Pro orgs may omit Read-only from /roles;
+ * falls back to Developer + project scope while JIT grant carries database access.
+ */
+function isReadOnlyProjectScopedRole(
+  projectRole: OrganizationRolesResponse['project_scoped_roles'][number],
+  orgScopedRoles: OrganizationRolesResponse['org_scoped_roles']
+) {
+  if (projectRole.name === 'Read-only' || projectRole.name.startsWith('Read-only_')) {
+    return true
+  }
+
+  const baseRole = orgScopedRoles.find((role) => role.id === projectRole.base_role_id)
+  return baseRole?.name === 'Read-only'
+}
+
+export function resolveExternalCollaboratorInviteRole(
+  allRoles: OrganizationRolesResponse | undefined
+): ExternalCollaboratorInviteRole | undefined {
+  if (!allRoles) return undefined
+
+  const orgScopedRoles = allRoles.org_scoped_roles ?? []
+  const projectScopedRoles = allRoles.project_scoped_roles ?? []
+
+  const orgReadOnly = orgScopedRoles.find((role) => role.name === 'Read-only')
+  if (orgReadOnly) {
+    return { roleId: orgReadOnly.id, usesDeveloperFallback: false }
+  }
+
+  const projectReadOnly = projectScopedRoles.find((role) => role.name === 'Read-only')
+  if (projectReadOnly) {
+    return { roleId: projectReadOnly.id, usesDeveloperFallback: false }
+  }
+
+  for (const projectRole of projectScopedRoles) {
+    if (isReadOnlyProjectScopedRole(projectRole, orgScopedRoles)) {
+      return { roleId: projectRole.id, usesDeveloperFallback: false }
+    }
+  }
+
+  const orgDeveloper = orgScopedRoles.find((role) => role.name === 'Developer')
+  if (orgDeveloper) {
+    return { roleId: orgDeveloper.id, usesDeveloperFallback: true }
+  }
+
+  return undefined
+}
+
+/** Prefer the project-scoped Read-only role for a guest invite so pending rows are identifiable in Team. */
+export function resolveExternalCollaboratorInviteRoleForProject(
+  projectRef: string,
+  allRoles: OrganizationRolesResponse | undefined
+): ExternalCollaboratorInviteRole | undefined {
+  if (!allRoles || !projectRef) {
+    return resolveExternalCollaboratorInviteRole(allRoles)
+  }
+
+  const orgScopedRoles = allRoles.org_scoped_roles ?? []
+  const projectScopedRoles = allRoles.project_scoped_roles ?? []
+
+  for (const projectRole of projectScopedRoles) {
+    if (!projectRole.projects.some((project) => project.ref === projectRef)) continue
+    if (!isReadOnlyProjectScopedRole(projectRole, orgScopedRoles)) continue
+
+    return { roleId: projectRole.id, usesDeveloperFallback: false }
+  }
+
+  return resolveExternalCollaboratorInviteRole(allRoles)
+}
 
 const EXPIRY_MODE_TO_SECONDS: Record<'1h' | '1d' | '7d' | '30d', number> = {
   '1h': 60 * 60,

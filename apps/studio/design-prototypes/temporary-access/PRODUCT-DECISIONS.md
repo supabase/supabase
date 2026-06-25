@@ -1,8 +1,8 @@
 # Temporary access — product decisions log
 
 **Branch:** `dnywh/feat/holistic-access`  
-**Status:** Living document — append decisions as the feature evolves  
-**Related:** [PR-FAQ](./PR-FAQ.md) · [Tier matrix](./TIER-MATRIX.md) · [Stakeholder review](./STAKEHOLDER-REVIEW.md)
+**Status:** Living document — production Studio (`jitDbAccess` feature preview); no interactive sandbox  
+**Related:** [README](./README.md) · [PR-FAQ](./PR-FAQ.md) · [Tier matrix](./TIER-MATRIX.md) · [Stakeholder review](./STAKEHOLDER-REVIEW.md)
 
 ---
 
@@ -48,6 +48,10 @@ Customer-facing term: **temporary access**. Internal/backend term: **JIT** (Just
 | 2026-06-24 | **Do not** change Database → Roles create defaults for JIT | Custom roles serve many purposes (including NOLOGIN group roles); invite flow explains gaps instead | Agreed |
 | 2026-06-24 | **Delete Postgres role** warns if JIT grants reference it | JIT grants stored separately by role name; delete does not auto-revoke Team grants | Shipped (Studio) |
 | 2026-06-24 | **SSO upsell** above Team table, not in invite sheet | Org capability; invite keeps **Invitation type** only when SSO provider exists | Shipped (Studio) |
+| 2026-06-25 | **MFA under Member email**, not a table column | Four-column table: Member, Role, Access, Actions | Shipped (Studio) |
+| 2026-06-25 | **Team tier nudges** on project scope, Update roles, IP restrictions | Disabled control + **Team** `Badge` on full-member project scope and IP fields | Shipped (Studio) |
+| 2026-06-25 | **External collaborator permission** uses `canInviteMembers` | If you can invite members, you can invite external collaborators; maps to Read-only + JIT grant server-side | Shipped (Studio) |
+| 2026-06-25 | **No Team gate on External collaborator** | Guest is always single-project scoped; Team gates full-member project scope only | Shipped (Studio) |
 
 ---
 
@@ -136,22 +140,23 @@ The invite sheet uses `SheetSection` dividers. When walking the UI or writing te
 
 ### Full team members (Owner, Administrator, Developer, Read-only)
 
-| Role                 | Access scope                                                          |
-| -------------------- | --------------------------------------------------------------------- |
-| Owner, Administrator | Locked: all projects (current and future)                             |
-| Developer, Read-only | **Access scope** combobox: all projects or one/more specific projects |
+| Role                 | Access scope                                                                 |
+| -------------------- | ---------------------------------------------------------------------------- |
+| Owner, Administrator | Locked: all projects (current and future)                                    |
+| Developer, Read-only | **Access scope**: all projects, or specific projects (Team entitlement only) |
 
-### External collaborator (JIT preview / feature flag)
+Without `project_scoped_roles`, Developer/Read-only see access scope radios locked to all projects with a **Team** `Badge` on “Specific projects”.
 
-Shown as an extra **Role** option when `jitDbAccess` preview is enabled.
+### External collaborator (`jitDbAccess` feature preview)
 
-| Field                           | Notes                                                                                             |
-| ------------------------------- | ------------------------------------------------------------------------------------------------- |
-| **Project scope**               | Single project (required)                                                                         |
-| **Postgres roles and settings** | Same as Manage database access: role checkboxes, branch scope, expires after accept, optional IPs |
+Shown as an extra **Role** option when the Temporary access feature preview is enabled.
 
-**Platform mapping today:** Read-only org role + `role_scoped_projects: [ref]`.  
-**Platform mapping target:** `pending_access_grant` on invitation → applied on accept.
+| Field                           | Notes                                                                                                                |
+| ------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| **Project scope**               | Single project (required). Available on all plans via project picker                                                 |
+| **Postgres roles and settings** | Same as Manage database access: role checkboxes, branch scope, expires after accept, optional IPs (Team entitlement) |
+
+**Platform mapping today:** Read-only org role when present, else Developer + `role_scoped_projects` on Free/Pro; `pending_access_grant` on accept (API pending).
 
 **Removed copy:** “Configure database access after they accept” — replaced with invite-time fields and toast: _“Temporary database access will be ready when they accept the invitation.”_
 
@@ -161,15 +166,15 @@ Shown as an extra **Role** option when `jitDbAccess` preview is enabled.
 
 ## Team member list (DEPR-585)
 
-| Column                    | Content                                                             |
-| ------------------------- | ------------------------------------------------------------------- |
-| **Member**                | Email, You / Invited / SSO / **Guest** badges                       |
-| **MFA**                   | Enabled / Disabled                                                  |
-| **Role**                  | Org role name(s) only                                               |
-| **Access scope**          | All projects, single project name, or `N projects` (hover for list) |
-| **Access scope metadata** | JIT expiry when applicable, e.g. `Database access expires in 2h`    |
+| Column              | Content                                                              |
+| ------------------- | -------------------------------------------------------------------- |
+| **Member**          | Email; You / Invited / Expired / SSO / **Guest** badges; MFA subtext |
+| **Role**            | Org role name(s) only                                                |
+| **Access**          | All projects, single project name, or `N projects` (hover for list)  |
+| **Access metadata** | JIT expiry when applicable, e.g. `Database access expires in 2h`     |
+| **Actions**         | Manage access / update roles / remove (via `MemberActions`)          |
 
-Guest badge stays on the member cell. Active/expired JIT timing moved from member badges to access scope subtext.
+Guest badge on the member cell. Active/expired JIT timing on access subtext, not member badges.
 
 ---
 
@@ -220,6 +225,11 @@ Deleting a Postgres role does **not** automatically remove JIT grant rows today.
 | Change                                | Description                                                          |
 | ------------------------------------- | -------------------------------------------------------------------- |
 | `GET /platform/profile/access-grants` | Cross-project grant list for **My access** without per-project `ref` |
+| Auto-mint scoped PAT on accept        | Replace manual “create scoped token” onboarding step                 |
+
+**My access today:** aggregates grants via org projects + per-project `GET .../database/jit` self queries until profile endpoint exists.
+
+**Onboarding today:** `/join/temporary-access` interstitial lists grants and links to scoped token docs — no auto-mint.
 
 ### P1 — edit / lifecycle
 
@@ -274,23 +284,27 @@ Deleting a Postgres role does **not** automatically remove JIT grant rows today.
 
 ## Studio implementation map
 
-| Surface                          | Path                                                    | Notes                                                |
-| -------------------------------- | ------------------------------------------------------- | ---------------------------------------------------- |
-| Invite sheet                     | `TeamSettings/InviteMemberButton.tsx`                   | Role-first; guest fields when External collaborator  |
-| SSO upsell / setup               | `TeamSettings/TeamSsoAvailableAdmonition.tsx`           | Above members table; hidden when SSO configured      |
-| Access scope                     | `TeamSettings/TeamAccessScopeSelector.tsx`              | Shared combobox                                      |
-| Manage access (existing members) | `TemporaryAccess/TemporaryAccessGrantSheet.tsx`         | Full grant editor                                    |
-| Team table                       | `TeamSettings/MemberRow.tsx`, `MembersView.tsx`         | Role / Access scope / expiry (DEPR-585)              |
-| Team member utils                | `TeamSettings/TemporaryAccessMember.utils.ts`           | Scope display, JIT summary, guest detection          |
-| Project unavailable notices      | `TemporaryAccess/TemporaryAccessProjectNotice.tsx`      | Migration, PG17 upgrade, preview branch              |
-| Hidden roles (invite only)       | `TemporaryAccess/TemporaryAccessInviteGrantSection.tsx` | Dynamic copy below role list after roles query loads |
-| My access                        | `account/access`                                        | Member grant hub                                     |
-| Connect sheet                    | `TemporaryAccessConnectNotice`                          | JIT role picker                                      |
-| Join onboarding                  | `TemporaryAccessOnboarding`                             | Post-accept interstitial                             |
-| Invite grant builder             | `TemporaryAccess/TemporaryAccessInvite.utils.ts`        | Pending grant payload + validation                   |
-| Invite grant UI                  | `TemporaryAccess/TemporaryAccessInviteGrantSection.tsx` | Reuses `TemporaryAccessGrantFields`                  |
-| Role delete warning              | `Database/Roles/RolesList.tsx`                          | JIT grant holders when deleting a Postgres role      |
-| Auto-enable PAM                  | `TemporaryAccess/useAutoEnableJitAccess.ts`             | On first grant save                                  |
+| Surface                           | Path                                                    | Notes                                                |
+| --------------------------------- | ------------------------------------------------------- | ---------------------------------------------------- |
+| Invite sheet                      | `TeamSettings/InviteMemberButton.tsx`                   | Role-first; guest fields when External collaborator  |
+| Project scope radios + Team badge | `TeamSettings/TeamProjectScopeRadioGroup.tsx`           | Shared by invite + Update roles                      |
+| SSO upsell / setup                | `TeamSettings/TeamSsoAvailableAdmonition.tsx`           | Above members table; hidden when SSO configured      |
+| Access scope combobox             | `TeamSettings/TeamAccessScopeSelector.tsx`              | Team entitlement only                                |
+| Update roles panel                | `TeamSettings/UpdateRolesPanel/UpdateRolesPanel.tsx`    | Project scope radios + Team badge                    |
+| Manage access (existing members)  | `TemporaryAccess/TemporaryAccessGrantSheet.tsx`         | Full grant editor                                    |
+| Grant fields (IP, expiry)         | `TemporaryAccess/TemporaryAccessGrantFields.tsx`        | IP gated with Team `Badge`                           |
+| Team table                        | `TeamSettings/MemberRow.tsx`, `MembersView.tsx`         | Member / Role / Access / Actions                     |
+| Team member utils                 | `TeamSettings/TemporaryAccessMember.utils.ts`           | Scope display, JIT summary, guest detection          |
+| Project unavailable notices       | `TemporaryAccess/TemporaryAccessProjectNotice.tsx`      | Migration, PG17 upgrade, preview branch              |
+| Hidden roles (invite only)        | `TemporaryAccess/TemporaryAccessInviteGrantSection.tsx` | Dynamic copy below role list after roles query loads |
+| My access                         | `pages/account/access.tsx`                              | Member grant hub                                     |
+| Connect sheet                     | `TemporaryAccessConnectNotice.tsx`                      | JIT role picker + My access link                     |
+| Join onboarding                   | `pages/join/temporary-access.tsx`                       | Post-accept interstitial (no auto-PAT yet)           |
+| Invite grant builder              | `TemporaryAccess/TemporaryAccessInvite.utils.ts`        | Pending grant payload + validation                   |
+| Invite mutation                   | `organization-invitation-create-mutation.ts`            | `pendingAccessGrant` not sent (TODO)                 |
+| Role delete warning               | `Database/Roles/RolesList.tsx`                          | JIT grant holders when deleting a Postgres role      |
+| Auto-enable PAM                   | `TemporaryAccess/useAutoEnableJitAccess.ts`             | On first grant save (client)                         |
+| Feature preview gate              | `FeaturePreviewContext` (`jitDbAccess`)                 | All temporary access UI                              |
 
 **Removed:** `Settings/Database/JitDatabaseAccess/*` (configuration, rules table, rule sheet).
 
@@ -298,11 +312,12 @@ Deleting a Postgres role does **not** automatically remove JIT grant rows today.
 
 ## Open questions
 
-1. **Free tier multi-project orgs** — auto-select sole project vs upgrade prompt when inviting guest?
-2. **Read-only template max expiry** — tier matrix allows 30 days for read-only template; invite UI currently caps at 7 days for simplicity.
+1. ~~**Free tier multi-project orgs**~~ — **Decided:** External collaborator works on all plans; admin picks one project. Team required only for Developer/Read-only **Access scope** to specific projects.
+2. **Read-only template max expiry** — tier matrix allows 30 days for read-only template; invite UI currently allows 30d preset for all guest roles.
 3. **External collaborator platform role** — when does backend expose a distinct guest role vs Read-only stand-in?
 4. **Invitation edit** — can admins change pending grant before accept?
 5. **JIT grant cascade on Postgres role delete** — should backend auto-revoke grants when role is dropped?
+6. **Server-side tier enforcement** — UI gates IP and project scope today; API validation TBD.
 
 ---
 
@@ -324,4 +339,4 @@ When making a product or UX decision:
 4. **What’s shipped in Studio** — table from Decision log (`Shipped` rows).
 5. **What’s blocked** — Backend table (P0).
 6. **Tier matrix** — point to [TIER-MATRIX.md](./TIER-MATRIX.md).
-7. **Demo path** — invite → accept → onboarding → My access → Connect.
+7. **Demo path** — enable feature preview → Team invite (External collaborator) → accept → `/join/temporary-access` → Account → My access → Connect sheet.

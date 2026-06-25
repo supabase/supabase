@@ -91,7 +91,7 @@ const MEMBER: OrganizationMember = {
   username: 'member',
 }
 
-function setupMocks() {
+function setupMocks(options?: { withProjectScopedRolesEntitlement?: boolean }) {
   addAPIMock({
     method: 'get',
     path: '/platform/organizations',
@@ -138,7 +138,19 @@ function setupMocks() {
   addAPIMock({
     method: 'get',
     path: '/platform/organizations/:slug/entitlements',
-    response: () => HttpResponse.json<ListEntitlementsResponse>({ entitlements: [] }),
+    response: () =>
+      HttpResponse.json<ListEntitlementsResponse>({
+        entitlements: options?.withProjectScopedRolesEntitlement
+          ? [
+              {
+                hasAccess: true,
+                type: 'boolean',
+                config: { enabled: true },
+                feature: { key: 'project_scoped_roles', type: 'boolean' },
+              },
+            ]
+          : [],
+      }),
   })
 }
 
@@ -194,24 +206,21 @@ describe('UpdateRolesPanel (network)', () => {
     expect(screen.getByText(/limited to SELECT queries/i)).toBeInTheDocument()
   })
 
-  test('shows access scope mode options when project-level permissions are enabled', async () => {
+  test('shows Team upgrade badge for project scope when entitlement is missing', async () => {
     setupMocks()
 
-    addAPIMock({
-      method: 'get',
-      path: '/platform/organizations/:slug/entitlements',
-      response: () =>
-        HttpResponse.json<ListEntitlementsResponse>({
-          entitlements: [
-            {
-              hasAccess: true,
-              type: 'boolean',
-              config: { enabled: true },
-              feature: { key: 'project_scoped_roles', type: 'boolean' },
-            },
-          ],
-        }),
+    customRender(<UpdateRolesPanel visible member={MEMBER} onClose={vi.fn()} />, {
+      profileContext: PROFILE_CONTEXT,
     })
+
+    expect(await screen.findByText('All projects (current and future)')).toBeInTheDocument()
+    expect(screen.getByText('Specific projects')).toBeInTheDocument()
+    expect(screen.getByText('Team')).toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Specific projects/i })).toBeDisabled()
+  })
+
+  test('shows access scope mode options when project-level permissions are enabled', async () => {
+    setupMocks({ withProjectScopedRolesEntitlement: true })
 
     customRender(<UpdateRolesPanel visible member={MEMBER} onClose={vi.fn()} />, {
       profileContext: PROFILE_CONTEXT,
@@ -222,5 +231,9 @@ describe('UpdateRolesPanel (network)', () => {
     expect(
       screen.queryByText('Apply roles to all projects in the organization')
     ).not.toBeInTheDocument()
+
+    await waitFor(() => {
+      expect(screen.getByRole('radio', { name: /Specific projects/i })).toBeEnabled()
+    })
   })
 })

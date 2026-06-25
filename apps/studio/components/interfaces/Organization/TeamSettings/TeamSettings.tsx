@@ -54,8 +54,6 @@ export const TeamSettings = () => {
             </ScaffoldActionsGroup>
           </ScaffoldActionsContainer>
 
-          <TeamSsoAvailableAdmonition />
-
           {hasProjectScopedRoles && totalCount > threshold && (
             <Admonition
               type="warning"
@@ -67,6 +65,8 @@ export const TeamSettings = () => {
           <ScaffoldSectionContent className="w-full">
             <MembersView searchString={searchString} />
           </ScaffoldSectionContent>
+
+          <TeamSsoAvailableAdmonition />
         </ScaffoldFilterAndContent>
       </ScaffoldSection>
     </ScaffoldContainer>

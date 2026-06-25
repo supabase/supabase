@@ -107,9 +107,8 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                 <TableHeader>
                   <TableRow>
                     <TableHead key="header-user">Member</TableHead>
-                    <TableHead key="header-mfa">MFA</TableHead>
                     <TableHead key="header-role">Role</TableHead>
-                    <TableHead key="header-access-scope">Access scope</TableHead>
+                    <TableHead key="header-access-scope">Projects</TableHead>
                     <TableHead key="header-action" />
                   </TableRow>
                 </TableHeader>
@@ -119,7 +118,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                     ...(isSuccessRoles && isSuccessMembers && !isOrgScopedRole
                       ? [
                           <TableRow key="project-scope-notice">
-                            <TableCell colSpan={5} className="p-0!">
+                            <TableCell colSpan={4} className="p-0!">
                               <Admonition
                                 type="note"
                                 title="You have limited visibility in this organization"
@@ -141,7 +140,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                       : []),
                     ...sortedMembers.map((member) => (
                       <MemberRow
-                        key={member.gotrue_id}
+                        key={member.gotrue_id ?? `invite-${member.invited_id}`}
                         member={member}
                         grantsByUserId={grantsByUserId}
                       />
@@ -149,7 +148,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                     ...(searchString.length > 0 && filteredMembers.length === 0
                       ? [
                           <TableRow key="no-results" className="bg-panel-secondary-light">
-                            <TableCell colSpan={5}>
+                            <TableCell colSpan={4}>
                               <div className="flex items-center space-x-3 opacity-75">
                                 <AlertCircle size={16} strokeWidth={2} />
                                 <p className="text-foreground-light">
@@ -164,7 +163,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                 </TableBody>
                 <TableFooter className="font-normal">
                   <TableRow className="border-b-0 [&>td]:hover:bg-inherit">
-                    <TableCell colSpan={5} className="text-foreground-muted">
+                    <TableCell colSpan={4} className="text-foreground-muted">
                       {searchString
                         ? `${filteredMembers.length} of ${members.length} ${members.length === 1 ? 'member' : 'members'}`
                         : `${members.length || 0} ${members.length === 1 ? 'member' : 'members'}`}

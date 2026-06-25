@@ -1,9 +1,35 @@
 import dayjs from 'dayjs'
 
 import { ALL_PROJECTS_ACCESS_SCOPE_LABEL } from './TeamAccessScope.utils'
+import { EXTERNAL_COLLABORATOR_ROLE_NAME } from '@/components/interfaces/TemporaryAccess/TemporaryAccessInvite.utils'
 import type { OrgMemberJitGrantSummary } from '@/data/jit-db-access/use-org-jit-grants-query'
-import type { OrganizationRolesData } from '@/data/organization-members/organization-roles-query'
+import type {
+  OrganizationRole,
+  OrganizationRolesData,
+} from '@/data/organization-members/organization-roles-query'
 import type { OrganizationMember } from '@/data/organizations/organization-members-query'
+
+const KNOWN_ORG_ROLE_NAMES = ['Owner', 'Administrator', 'Developer', 'Read-only'] as const
+
+/** Internal project-scoped roles are named e.g. Read-only_<projectRef> — show the base role. */
+export function resolveOrganizationRoleDisplayName(
+  role: OrganizationRole,
+  orgScopedRoles: OrganizationRole[]
+): string {
+  const orgRole = orgScopedRoles.find((candidate) => candidate.id === role.id)
+  if (orgRole) return orgRole.name
+
+  const baseRole = orgScopedRoles.find((candidate) => candidate.id === role.base_role_id)
+  if (baseRole) return baseRole.name
+
+  for (const knownRoleName of KNOWN_ORG_ROLE_NAMES) {
+    if (role.name === knownRoleName || role.name.startsWith(`${knownRoleName}_`)) {
+      return knownRoleName
+    }
+  }
+
+  return role.name
+}
 
 export type MemberAccessScopeDisplay = {
   label: string
@@ -21,9 +47,11 @@ export function isTemporaryAccessGuestMember(
 
   for (const roleId of member.role_ids ?? []) {
     const projectRole = projectScopedRoles.find((role) => role.id === roleId)
-    if (projectRole) {
-      const baseRole = orgScopedRoles.find((role) => role.id === projectRole.base_role_id)
-      if (baseRole?.name === 'Read-only') return true
+    if (
+      projectRole &&
+      resolveOrganizationRoleDisplayName(projectRole, orgScopedRoles) === 'Read-only'
+    ) {
+      return true
     }
 
     const orgRole = orgScopedRoles.find((role) => role.id === roleId)
@@ -31,6 +59,57 @@ export function isTemporaryAccessGuestMember(
   }
 
   return false
+}
+
+function memberHasProjectScopedReadOnlyRole(
+  member: OrganizationMember,
+  roles: OrganizationRolesData
+) {
+  const orgScopedRoles = roles.org_scoped_roles ?? []
+  const projectScopedRoles = roles.project_scoped_roles ?? []
+
+  return (member.role_ids ?? []).some((roleId) => {
+    const projectRole = projectScopedRoles.find((role) => role.id === roleId)
+    return (
+      projectRole && resolveOrganizationRoleDisplayName(projectRole, orgScopedRoles) === 'Read-only'
+    )
+  })
+}
+
+/** External collaborator in Team: pending invite or accepted guest with read-only platform access. */
+export function isExternalCollaboratorMember(
+  member: OrganizationMember,
+  roles: OrganizationRolesData | undefined,
+  options?: { jitSummary?: ReturnType<typeof getMemberJitGrantSummary> | null }
+): boolean {
+  if (!roles) return false
+
+  const orgScopedRoles = roles.org_scoped_roles ?? []
+  const isReadOnlyGuest = isTemporaryAccessGuestMember(member, roles)
+  const hasProjectScopedReadOnly = memberHasProjectScopedReadOnlyRole(member, roles)
+
+  if (member.invited_id) {
+    if (hasProjectScopedReadOnly) return true
+
+    const scopedProjects = member.invited_role_scoped_projects ?? []
+    if (isReadOnlyGuest && scopedProjects.length === 1) return true
+
+    const orgHasReadOnly = orgScopedRoles.some((role) => role.name === 'Read-only')
+    const hasOrgDeveloperRole = (member.role_ids ?? []).some((roleId) => {
+      const orgRole = orgScopedRoles.find((role) => role.id === roleId)
+      return orgRole?.name === 'Developer'
+    })
+    if (!orgHasReadOnly && hasOrgDeveloperRole && scopedProjects.length === 1) return true
+
+    return false
+  }
+
+  if (hasProjectScopedReadOnly) return true
+
+  if (!isReadOnlyGuest) return false
+
+  const jitSummary = options?.jitSummary
+  return Boolean(jitSummary && (jitSummary.status.active > 0 || jitSummary.status.expired > 0))
 }
 
 export function getMemberJitGrantSummary(
@@ -49,18 +128,29 @@ export function getMemberJitGrantSummary(
 
 export function getMemberRoleNames(
   member: OrganizationMember,
-  roles: OrganizationRolesData | undefined
+  roles: OrganizationRolesData | undefined,
+  options?: { isJitGuest?: boolean }
 ): string[] {
+  if (options?.isJitGuest) {
+    return [EXTERNAL_COLLABORATOR_ROLE_NAME]
+  }
+
   const orgScopedRoles = roles?.org_scoped_roles ?? []
   const projectScopedRoles = roles?.project_scoped_roles ?? []
 
-  return (member.role_ids ?? [])
+  const displayNames = (member.role_ids ?? [])
     .map((roleId) => {
-      const orgScopedRole = orgScopedRoles.find((role) => role.id === roleId)
-      const projectScopedRole = projectScopedRoles.find((role) => role.id === roleId)
-      return orgScopedRole?.name ?? projectScopedRole?.name
+      const role =
+        orgScopedRoles.find((candidate) => candidate.id === roleId) ??
+        projectScopedRoles.find((candidate) => candidate.id === roleId)
+
+      if (!role) return undefined
+
+      return resolveOrganizationRoleDisplayName(role, orgScopedRoles)
     })
     .filter((name): name is string => Boolean(name))
+
+  return [...new Set(displayNames)]
 }
 
 export function formatMemberDatabaseExpiryMeta(
@@ -122,22 +212,29 @@ export function getMemberAccessScopeDisplay({
   const projectNames = new Set<string>()
   let isOrgWide = false
 
-  for (const roleId of member.role_ids ?? []) {
-    const orgScopedRole = orgScopedRoles.find((role) => role.id === roleId)
-    const projectScopedRole = projectScopedRoles.find((role) => role.id === roleId)
-    const role = orgScopedRole ?? projectScopedRole
-
-    if (!role) continue
-
-    if (!hasProjectScopedRoles || role.projects.length === 0) {
-      isOrgWide = true
-      break
-    }
-
-    role.projects.forEach((project) => {
-      const name = orgProjects.find((item) => item.ref === project.ref)?.name ?? project.ref
+  if (member.invited_id && member.invited_role_scoped_projects?.length) {
+    member.invited_role_scoped_projects.forEach((projectRef) => {
+      const name = orgProjects.find((item) => item.ref === projectRef)?.name ?? projectRef
       projectNames.add(name)
     })
+  } else {
+    for (const roleId of member.role_ids ?? []) {
+      const orgScopedRole = orgScopedRoles.find((role) => role.id === roleId)
+      const projectScopedRole = projectScopedRoles.find((role) => role.id === roleId)
+      const role = orgScopedRole ?? projectScopedRole
+
+      if (!role) continue
+
+      if (!hasProjectScopedRoles || role.projects.length === 0) {
+        isOrgWide = true
+        break
+      }
+
+      role.projects.forEach((project) => {
+        const name = orgProjects.find((item) => item.ref === project.ref)?.name ?? project.ref
+        projectNames.add(name)
+      })
+    }
   }
 
   let label: string
