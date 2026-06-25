@@ -431,7 +431,7 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
 
 /**
  * Project creation form was rendered and shown to the user. Passive impression that
- * anchors the project-creation funnel (exposed -> succeeded). Fires once per form view,
+ * anchors the project-creation funnel (exposed -> completed). Fires once per form view,
  * after the org and create-project permission have resolved, so it tracks the form
  * actually being visible rather than the route loading. Disambiguate by `surface`.
  * Completion is measured by `project_creation_simple_version_submitted` (which fires
@@ -454,7 +454,7 @@ export interface ProjectCreationFormExposedEvent {
 
 /**
  * New-organization form was rendered and shown to the user. Passive impression that
- * anchors the organization-creation funnel (exposed -> succeeded). Fires once per form
+ * anchors the organization-creation funnel (exposed -> completed). Fires once per form
  * view, after the user's profile has resolved (i.e. an authenticated session), so it
  * does not count pre-auth redirects. No organization group: the org does not exist yet
  * at this point in the flow.
@@ -472,14 +472,14 @@ export interface OrganizationCreationFormExposedEvent {
  * create success callback (both the free path and the paid path that confirms a pending
  * payment intent), so org-creation completion is measurable from frontend events without
  * relying on the backend `organization_created` event (which fires across all surfaces).
- * Closes the organization-creation funnel (exposed -> succeeded).
+ * Closes the organization-creation funnel (exposed -> completed).
  *
  * @group Events
  * @source studio
  * @page new
  */
-export interface OrganizationCreationSucceededEvent {
-  action: 'organization_creation_succeeded'
+export interface OrganizationCreationCompletedEvent {
+  action: 'organization_creation_completed'
   groups: Omit<TelemetryGroups, 'project'>
 }
 
@@ -3511,7 +3511,7 @@ export type TelemetryEvent =
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
   | ProjectCreationFormExposedEvent
   | OrganizationCreationFormExposedEvent
-  | OrganizationCreationSucceededEvent
+  | OrganizationCreationCompletedEvent
   | TableApiAccessToggleClickedEvent
   | RealtimeInspectorListenChannelClickedEvent
   | RealtimeInspectorBroadcastSentEvent
