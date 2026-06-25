@@ -161,7 +161,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       LOCAL_STORAGE_KEYS.UNIFIED_LOGS_BANNER_DISMISSED,
       false
     )
-    const { isEligible: showUnifiedLogsBanner } = useUnifiedLogsPreview()
+
     const [isProjectIntegrationBannerDismissed, setIsProjectIntegrationBannerDismissed] =
       useLocalStorageQuery(
         getProjectIntegrationBannerDismissKey({
@@ -241,7 +241,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
 
     useEffect(() => {
       if (!selectedProject?.ref) return
-      if (showUnifiedLogsBanner && !isUnifiedLogsBannerDismissed) {
+      if (!isUnifiedLogsBannerDismissed) {
         addBanner({
           id: BANNER_ID.UNIFIED_LOGS,
           isDismissed: false,
@@ -251,13 +251,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       } else {
         dismissBanner(BANNER_ID.UNIFIED_LOGS)
       }
-    }, [
-      selectedProject?.ref,
-      showUnifiedLogsBanner,
-      isUnifiedLogsBannerDismissed,
-      addBanner,
-      dismissBanner,
-    ])
+    }, [selectedProject?.ref, isUnifiedLogsBannerDismissed, addBanner, dismissBanner])
 
     useLayoutEffect(() => {
       const unregister = registerOpenMenu(() => {
