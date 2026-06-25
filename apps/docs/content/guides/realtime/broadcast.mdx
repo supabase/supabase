@@ -1042,6 +1042,12 @@ You can configure replay with the following options:
 - **`since`** (Required): The epoch timestamp in milliseconds (for example, `1697472000000`), specifying the earliest point from which messages should be retrieved.
 - **`limit`** (Optional): The number of messages to return. This must be a positive integer, with a maximum value of 25.
 
+<Admonition type="note">
+
+Messages are stored in daily partitions, and partitions older than 72 hours are dropped. Because whole days are removed at once, a message stays available for at least 72 hours and at most 4 days, depending on the time of day it was sent. Setting `since` further back than the retained window does not recover deleted messages. See [Realtime Limits](/docs/guides/realtime/limits) for details.
+
+</Admonition>
+
 <Tabs
   scrollable
   size="small"

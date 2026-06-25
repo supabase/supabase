@@ -20,6 +20,10 @@
     var(--font-geist-mono), 'Geist Mono', 'Source Code Pro', ui-monospace, Menlo, monospace;
 }
 
+@utility section-container {
+  @apply mx-auto max-w-7xl px-6 lg:px-12 xl:px-24;
+}
+
 @theme {
   --color-purple-sos-100: hsl(293 80% 97%);
   --color-purple-sos-200: hsl(293 85% 91%);
@@ -294,10 +298,6 @@ h6:not(.overwrite) {
   left: 0;
   transform-origin: 100% 0;
   overflow: hidden;
-}
-
-.section-container {
-  position: relative;
 }
 
 .stroke-text {

@@ -192,34 +192,58 @@ Existing projects on pg_graphql 1.5.x are not impacted unless they choose to upg
 
 ### Ltree indexes require reindexing after upgrade
 
-After upgrading, indexes on `ltree` columns that were built under the previous version can return incomplete results — for example, label searches silently miss rows that are present — until the index is rebuilt. This affects databases using a multibyte encoding (such as UTF-8) or a non-`libc` collation provider (ICU or builtin).
+_Applies when upgrading to Postgres 15.18 or 17.10._
 
-This is silent: no error is raised. Affected queries return fewer rows than expected until the indexes are reindexed.
+<Admonition type="caution">
 
-To find affected indexes, run the following in the SQL editor:
+You are affected only if you have indexes on `ltree` columns and your database uses a multibyte encoding or a non-`libc` collation provider.
 
-```sql
-select schemaname, tablename, indexname
-from pg_indexes
-where
-  indexname in (
-    select c.relname
-    from
-      pg_index as i
-      join pg_class as c on i.indexrelid = c.oid
-      join pg_attribute as a on a.attrelid = i.indrelid and a.attnum = ANY(i.indkey)
-      join pg_type as t on a.atttypid = t.oid
-    where t.typname in ('ltree', '_ltree')
-  );
-```
+</Admonition>
 
-To remediate, reindex each affected index. `REINDEX INDEX CONCURRENTLY` runs online with no downtime:
+After upgrading, indexes on `ltree` columns that were built under the previous version can return incomplete results until the index is rebuilt. For example, label searches silently miss rows that are present. This affects databases using a multibyte encoding, such as UTF-8, or a non-`libc` collation provider such as ICU or builtin.
 
-```sql
-REINDEX INDEX CONCURRENTLY <index_name>;
-```
+To mitigate this issue:
+
+1. Check whether your database needs reindexing:
+
+   ```sql
+   select
+     pg_encoding_to_char(encoding) as encoding,
+     pg_encoding_max_length(encoding) as max_bytes_per_char, -- 1 = single-byte, >1 = multibyte
+     datlocprovider as collation_provider, -- 'c' libc, 'i' icu, 'b' builtin
+     (pg_encoding_max_length(encoding) > 1 or datlocprovider != 'c') as reindex_required
+   from pg_database
+   where datname = current_database();
+   ```
+
+   If `reindex_required` is `false`, such as a single-byte encoding like LATIN1 with `libc` collation, no action is needed.
+
+2. If `reindex_required` is `true`, find the affected indexes:
+
+   ```sql
+   select schemaname, tablename, indexname
+   from pg_indexes
+   where
+     indexname in (
+       select c.relname
+       from
+         pg_index as i
+         join pg_class as c on i.indexrelid = c.oid
+         join pg_attribute as a on a.attrelid = i.indrelid and a.attnum = ANY(i.indkey)
+         join pg_type as t on a.atttypid = t.oid
+       where t.typname in ('ltree', '_ltree')
+     );
+   ```
+
+3. Reindex each affected index. `REINDEX INDEX CONCURRENTLY` runs online with no downtime:
+
+   ```sql
+   REINDEX INDEX CONCURRENTLY <index_name>;
+   ```
 
 ### Custom operator selectivity estimators
+
+_Applies when upgrading to Postgres 15.18 or 17.10._
 
 Attaching a non-built-in (extension- or user-provided) selectivity estimator function to an operator now requires superuser. Existing operators continue to work — the check only fires when an operator is (re)created, most commonly during `pg_dump` / `pg_restore`, a logical restore, or a branch.
 
