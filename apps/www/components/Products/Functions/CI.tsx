@@ -104,7 +104,7 @@ export const CI = ({ isHovered = false }: { isHovered?: boolean }) => {
         </div>
 
         {/* Code area */}
-        <div className="flex-1 rounded-lg rounded-r-none rounded-b-none overflow-hidden p-4 text-[13px] xl:text-sm font-mono leading-6 bg-surface-75">
+        <div className="flex-1 rounded-lg rounded-r-none rounded-b-none overflow-hidden p-4 text-[13px] xl:text-sm font-mono leading-6 bg-surface-75 whitespace-pre">
           <motion.div
             key={hoverCount}
             initial="hidden"
