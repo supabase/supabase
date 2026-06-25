@@ -5,7 +5,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useFormState } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
 import { Button, Form, useWatch } from 'ui'
@@ -167,7 +167,8 @@ const Wizard: NextPageWithLayout = () => {
     projectName: watchedProjectName,
     highAvailability,
   } = useWatch({ control: form.control })
-  const isDbRegionDirty = getFieldState('dbRegion', form.formState).isDirty
+  const { dirtyFields } = useFormState(form)
+  const isDbRegionDirty = dirtyFields.dbRegion
 
   // Read dirty state during render rather than depending on form.formState in the
   // effect — form.formState is a Proxy that gets a new reference every render, which
