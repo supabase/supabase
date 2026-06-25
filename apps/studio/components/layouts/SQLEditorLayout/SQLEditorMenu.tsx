@@ -22,6 +22,7 @@ import {
   InnerSideBarFilterSortDropdownItem,
 } from 'ui-patterns/InnerSideMenu'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { SearchList } from './SQLEditorNavV2/SearchList'
 import { SQLEditorNav } from './SQLEditorNavV2/SQLEditorNav'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -136,11 +137,12 @@ export const SQLEditorMenu = () => {
           </InnerSideBarFilters>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
+              <ButtonTooltip
                 data-testid="sql-editor-new-query-button"
                 variant="default"
                 icon={<Plus className="text-foreground" />}
                 className="w-[26px]"
+                tooltip={{ content: { text: 'New query' } }}
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" side="bottom" className="w-48">
