@@ -21,10 +21,7 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
-import {
-  useFeaturePreviewModal,
-  useUnifiedLogsPreview,
-} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
 import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import SavedQueriesItem from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
@@ -65,8 +62,7 @@ export function LogsSidebarMenuV2() {
   const { ref } = useParams() as { ref: string }
 
   const unifiedLogsFlagEnabled = useFlag('unifiedLogs')
-  const { selectFeaturePreview } = useFeaturePreviewModal()
-  const { enable: enableUnifiedLogs, isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
+  const { isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
 
   const [searchText, setSearchText] = useState('')
 
@@ -86,9 +82,7 @@ export function LogsSidebarMenuV2() {
 
   const enablePgReplicate = useIsETLPrivateAlpha()
   const { data: etlData, isPending: isETLLoading } = useReplicationSourcesQuery(
-    {
-      projectRef: ref,
-    },
+    { projectRef: ref },
     {
       enabled: enablePgReplicate,
       retry: false,
@@ -240,17 +234,7 @@ export function LogsSidebarMenuV2() {
           }
         />
       )}
-      {isUnifiedLogsEligible && (
-        <UnifiedLogsBanner
-          variant="promo"
-          className="mx-4 mt-4"
-          onEnable={() => {
-            enableUnifiedLogs()
-            router.push(`/project/${ref}/logs`)
-          }}
-          onMoreInfo={() => selectFeaturePreview('supabase-ui-preview-unified-logs')}
-        />
-      )}
+      {isUnifiedLogsEligible && <UnifiedLogsBanner />}
 
       <div
         className={cn(

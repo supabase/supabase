@@ -1,6 +1,5 @@
 import { useParams } from 'common'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { cloneElement, Dispatch, SetStateAction, useEffect } from 'react'
 import { Badge, Button, cn, ResizablePanel, usePanelRef } from 'ui'
 
@@ -24,16 +23,10 @@ export function FilterSideBar({
   setIsFilterBarOpen,
   dateRangeDisabled,
 }: FilterSideBarProps) {
-  const router = useRouter()
   const { ref } = useParams()
   const { table } = useDataTable()
 
-  const { disable: disableUnifiedLogs, isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
-
-  const handleGoBackToOldLogs = () => {
-    disableUnifiedLogs()
-    router.push(`/project/${ref}/logs/explorer`)
-  }
+  const { isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
 
   const panelRef = usePanelRef()
 
@@ -72,13 +65,7 @@ export function FilterSideBar({
         </div>
       </div>
 
-      {isUnifiedLogsEligible && (
-        <UnifiedLogsBanner
-          variant="utility"
-          className="mx-4 mt-4"
-          onSwitchBack={handleGoBackToOldLogs}
-        />
-      )}
+      {isUnifiedLogsEligible && <UnifiedLogsBanner />}
 
       <div className="flex-1 p-2 sm:overflow-y-scroll">
         <DataTableFilterControls dateRangeDisabled={dateRangeDisabled} />
