@@ -5,14 +5,16 @@ import { toast } from 'sonner'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
 
+import { statusOnSaveError, statusOnSaveStart, statusOnSaveSuccess } from './sql-editor-lifecycle'
 import { buildUpsertPayload, isLoadedSnippet, validateMoveToFolder } from './sql-editor-rules'
-import type { SnippetWithContent, StateSnippet, StateSnippetFolder } from './types'
+import type { StateSnippet, StateSnippetFolder } from './types'
 import type { QueryPlanRow } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
 import { DiffType } from '@/components/interfaces/SQLEditor/SQLEditor.types'
 import { upsertContent, UpsertContentPayload } from '@/data/content/content-upsert-mutation'
 import { contentKeys } from '@/data/content/keys'
 import { createSQLSnippetFolder } from '@/data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from '@/data/content/sql-folder-update-mutation'
+import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 import { Snippet, SnippetFolder } from '@/data/content/sql-folders-query'
 import { getQueryClient } from '@/data/query-client'
 
@@ -65,12 +67,6 @@ export const sqlEditorState = proxy({
    */
   needsSaving: proxyMap<string, boolean>([]),
   /**
-   * Stores the state of each snippet
-   */
-  savingStates: {} as {
-    [snippetId: string]: 'IDLE' | 'UPDATING' | 'UPDATING_FAILED'
-  },
-  /**
    * UI-imposed limit for the number of results a query can return (applied to the SQL query being run if applicable).
    * Acts as a safeguard to prevent accidentally taking down the database from a really large SELECT query.
    * Related to `autoLimit` in `results`. Refer to `checkIfAppendLimitRequired` and `suffixWithLimit` for usage.
@@ -107,7 +103,6 @@ export const sqlEditorState = proxy({
     sqlEditorState.snippets[snippet.id] = { projectRef, splitSizes: [50, 50], snippet }
     sqlEditorState.results[snippet.id] = []
     sqlEditorState.explainResults[snippet.id] = { rows: [] }
-    sqlEditorState.savingStates[snippet.id] = 'IDLE'
   },
 
   /**
@@ -387,8 +382,9 @@ async function upsertSnippet(
   payload: UpsertContentPayload,
   shouldInvalidate = false
 ) {
+  const snippet = sqlEditorState.snippets[id]?.snippet
   try {
-    sqlEditorState.savingStates[id] = 'UPDATING'
+    if (snippet) snippet.status = statusOnSaveStart(snippet.status)
     await upsertContent({ projectRef, payload })
 
     if (shouldInvalidate) {
@@ -400,13 +396,9 @@ async function upsertSnippet(
       ])
     }
 
-    let snippet = sqlEditorState.snippets[id]?.snippet
-    if (snippet?.content && 'isNotSavedInDatabaseYet' in snippet) {
-      snippet.isNotSavedInDatabaseYet = false
-    }
-    sqlEditorState.savingStates[id] = 'IDLE'
+    if (snippet) snippet.status = statusOnSaveSuccess()
   } catch (error) {
-    sqlEditorState.savingStates[id] = 'UPDATING_FAILED'
+    if (snippet) snippet.status = statusOnSaveError(snippet.status)
   }
 }
 

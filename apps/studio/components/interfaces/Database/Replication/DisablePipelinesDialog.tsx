@@ -16,22 +16,19 @@ import { Admonition } from 'ui-patterns/admonition'
 
 import { useDeleteReplicationTenantMutation } from '@/data/replication/delete-tenant-mutation'
 
-interface DisableExternalReplicationDialogProps {
+interface DisablePipelinesDialogProps {
   open: boolean
   setOpen: (value: boolean) => void
 }
 
-export const DisableExternalReplicationDialog = ({
-  open,
-  setOpen,
-}: DisableExternalReplicationDialogProps) => {
+export const DisablePipelinesDialog = ({ open, setOpen }: DisablePipelinesDialogProps) => {
   const { ref: projectRef } = useParams()
   const [error, setError] = useState<string | null>(null)
 
   const { mutateAsync: deleteReplicationTenant, isPending: isSubmitting } =
     useDeleteReplicationTenantMutation({
       onSuccess: () => {
-        toast.success('External replication has been disabled')
+        toast.success('Pipelines has been disabled')
         setOpen(false)
       },
       onError: () => {},
@@ -53,12 +50,12 @@ export const DisableExternalReplicationDialog = ({
     <AlertDialog open={open} onOpenChange={(open) => !isSubmitting && setOpen(open)}>
       <AlertDialogContent size="small">
         <AlertDialogHeader>
-          <AlertDialogTitle>Disable external replication</AlertDialogTitle>
+          <AlertDialogTitle>Disable Pipelines</AlertDialogTitle>
           <AlertDialogDescription className="space-y-2 text-sm">
             <p>
               This will remove the <code className="text-code-inline">etl</code> schema and all
-              connected resources from your database. Any active pipelines sending changes to
-              external destinations will stop.
+              connected resources from your database. Any active replication pipelines sending
+              changes to external destinations will stop.
             </p>
             <p>Read replicas are not affected.</p>
           </AlertDialogDescription>
@@ -67,7 +64,7 @@ export const DisableExternalReplicationDialog = ({
           <AlertDialogBody>
             <Admonition
               type="destructive"
-              title="Unable to disable external replication"
+              title="Unable to disable Pipelines"
               description={error}
             />
           </AlertDialogBody>

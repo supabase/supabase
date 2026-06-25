@@ -91,7 +91,7 @@ export const SlotStatusLegend = () => {
         </ul>
         <div className="border-t border-overlay px-4 py-2.5">
           <InlineLink
-            href={`${DOCS_URL}/guides/database/replication/external-replication-monitoring`}
+            href={`${DOCS_URL}/guides/database/replication/pipelines-monitoring`}
             className="text-xs text-foreground-light"
           >
             Learn more about monitoring replication

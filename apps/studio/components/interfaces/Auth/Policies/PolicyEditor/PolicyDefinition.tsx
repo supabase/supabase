@@ -4,7 +4,7 @@ import { HelpCircle } from 'lucide-react'
 import { useEffect } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import SqlEditor from '@/components/ui/SqlEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 
 interface PolicyDefinitionProps {
   operation: string
@@ -68,7 +68,11 @@ const PolicyDefinition = ({
             </p>
           </div>
           <div className={`w-2/3 ${showCheck(operation) ? 'h-32' : 'h-56'}`}>
-            <SqlEditor defaultValue={definition} onInputChange={onUpdatePolicyUsing} />
+            <CodeEditor
+              language="pgsql"
+              defaultValue={definition}
+              onInputChange={onUpdatePolicyUsing}
+            />
           </div>
         </div>
       )}
@@ -108,7 +112,7 @@ const PolicyDefinition = ({
             </p>
           </div>
           <div className={`w-2/3 ${showUsing(operation) ? 'h-32' : 'h-56'}`}>
-            <SqlEditor defaultValue={check} onInputChange={onUpdatePolicyCheck} />
+            <CodeEditor language="pgsql" defaultValue={check} onInputChange={onUpdatePolicyCheck} />
           </div>
         </div>
       )}
