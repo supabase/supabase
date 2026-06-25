@@ -23,7 +23,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DatePickerValue, LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
-import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
+import { PRODUCT_FILTER_PATHS, REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
 import type { ReportFilterItem } from './Reports.types'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
@@ -53,35 +53,35 @@ const PRODUCT_FILTERS = [
   {
     key: 'rest',
     filterKey: 'request.path',
-    filterValue: '/rest',
+    filterValue: PRODUCT_FILTER_PATHS.rest,
     label: 'Data API (PostgREST)',
     icon: Database,
   },
   {
     key: 'auth',
     filterKey: 'request.path',
-    filterValue: '/auth',
+    filterValue: PRODUCT_FILTER_PATHS.auth,
     label: 'Auth',
     icon: Auth,
   },
   {
     key: 'storage',
     filterKey: 'request.path',
-    filterValue: '/storage',
+    filterValue: PRODUCT_FILTER_PATHS.storage,
     label: 'Storage',
     icon: Storage,
   },
   {
     key: 'realtime',
     filterKey: 'request.path',
-    filterValue: '/realtime',
+    filterValue: PRODUCT_FILTER_PATHS.realtime,
     label: 'Realtime',
     icon: Realtime,
   },
   {
     key: 'graphql',
     filterKey: 'request.path',
-    filterValue: '/graphql',
+    filterValue: PRODUCT_FILTER_PATHS.graphql,
     label: 'GraphQL (pg_graphql)',
     icon: null,
   },

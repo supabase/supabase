@@ -14,6 +14,15 @@ import { PlanId } from '@/data/subscriptions/types'
 
 export const LAYOUT_COLUMN_COUNT = 2
 
+export const PRODUCT_FILTER_PATHS = {
+  rest: '/rest/',
+  auth: '/auth/',
+  storage: '/storage/',
+  realtime: '/realtime/',
+  graphql: '/graphql/',
+  functions: '/functions/',
+} as const
+
 export interface ReportsDatetimeHelper extends DatetimeHelper {
   availableIn: PlanId[]
 }

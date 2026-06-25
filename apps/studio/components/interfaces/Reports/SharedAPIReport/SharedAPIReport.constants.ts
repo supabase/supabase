@@ -1,10 +1,10 @@
 import * as Sentry from '@sentry/nextjs'
 import { useQueries, useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { useParams } from 'common/hooks'
 import { isEqual } from 'lodash'
 import { useState } from 'react'
 
-import { generateRegexpWhereSafe } from '../Reports.constants'
+import { generateRegexpWhereSafe, PRODUCT_FILTER_PATHS } from '../Reports.constants'
 import { ReportFilterItem } from '../Reports.types'
 import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
 import { safeSql, type SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
@@ -235,12 +235,12 @@ export const useSharedAPIReport = ({
   }
 
   const filterByMapValue = {
-    functions: '/functions',
-    realtime: '/realtime',
-    storage: '/storage',
-    graphql: '/graphql',
-    postgrest: '/rest',
-    auth: '/auth',
+    functions: PRODUCT_FILTER_PATHS.functions,
+    realtime: PRODUCT_FILTER_PATHS.realtime,
+    storage: PRODUCT_FILTER_PATHS.storage,
+    graphql: PRODUCT_FILTER_PATHS.graphql,
+    postgrest: PRODUCT_FILTER_PATHS.rest,
+    auth: PRODUCT_FILTER_PATHS.auth,
   }
 
   const baseFilter = {
