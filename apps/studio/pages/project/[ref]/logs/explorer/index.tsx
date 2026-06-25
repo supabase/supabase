@@ -55,6 +55,11 @@ const LOCAL_PLACEHOLDER_QUERY =
 const PLATFORM_PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
 
+// OTEL queries the single `logs` table filtered by `source`, with fields in
+// `log_attributes` rather than per-service tables and a `metadata` column.
+const OTEL_PLACEHOLDER_QUERY =
+  "select\n  timestamp,\n  event_message,\n  log_attributes\nfrom logs\nwhere source = 'edge_logs'\norder by timestamp desc\nlimit 5"
+
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
   const monaco = useMonaco()
@@ -90,10 +95,18 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }, [timestampStart, timestampEnd, defaultHelper])
   const [datePickerValue, setDatePickerValue] = useState<DatePickerValue>(initialDatePickerValue)
 
+  // When the otelLegacyLogs flag is on, the explorer queries the ClickHouse-backed
+  // logs.all.otel endpoint; otherwise it stays on the BigQuery logs.all endpoint.
+  const useOtelEndpoint = useFlag('otelLegacyLogs')
+
   const { logsDefaultQuery } = useCustomContent(['logs:default_query'])
-  const PLACEHOLDER_QUERY = IS_PLATFORM
-    ? (logsDefaultQuery ?? PLATFORM_PLACEHOLDER_QUERY)
-    : LOCAL_PLACEHOLDER_QUERY
+  // The custom and BigQuery defaults target per-service tables, which don't exist
+  // on OTEL, so the OTEL default takes precedence when the flag is on.
+  const PLACEHOLDER_QUERY = useOtelEndpoint
+    ? OTEL_PLACEHOLDER_QUERY
+    : IS_PLATFORM
+      ? (logsDefaultQuery ?? PLATFORM_PLACEHOLDER_QUERY)
+      : LOCAL_PLACEHOLDER_QUERY
 
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
@@ -104,10 +117,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     `project-content-${projectRef}-recent-log-sql`,
     []
   )
-
-  // When the otelLegacyLogs flag is on, the explorer queries the ClickHouse-backed
-  // logs.all.otel endpoint; otherwise it stays on the BigQuery logs.all endpoint.
-  const useOtelEndpoint = useFlag('otelLegacyLogs')
 
   const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToAuditLogDays = getEntitlementNumericValue()
@@ -330,6 +339,21 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       setSearch(q)
     }
   }, [q, search, setSearch])
+
+  // otelLegacyLogs resolves after the first render, so the editor can mount with the
+  // BigQuery default. Once OTEL is known, replace an untouched default with the OTEL
+  // one so the starter query runs against ClickHouse. Never touches user-typed SQL.
+  useEffect(() => {
+    if (!useOtelEndpoint || q || search || queryId) return
+    if (editorValue === OTEL_PLACEHOLDER_QUERY) return
+    const isUntouchedDefault =
+      editorValue === LOCAL_PLACEHOLDER_QUERY ||
+      editorValue === PLATFORM_PLACEHOLDER_QUERY ||
+      editorValue === logsDefaultQuery
+    if (!isUntouchedDefault) return
+    setEditorValue(OTEL_PLACEHOLDER_QUERY)
+    editorRef.current?.setValue(OTEL_PLACEHOLDER_QUERY)
+  }, [useOtelEndpoint, q, search, queryId, editorValue, logsDefaultQuery])
 
   useEffect(() => {
     // prevents overwriting when the user selects a helper.
