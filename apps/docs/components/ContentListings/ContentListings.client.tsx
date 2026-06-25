@@ -3,7 +3,6 @@
 import {
   getContentListingGridItemClassName,
   getContentListingGroupLabel,
-  getContentListingHeadingTag,
   isExternalContentListingHref,
   normalizeContentListingHref,
   type ContentListingGroup,
@@ -67,13 +66,7 @@ function ContentListingLink({
 function ContentListingGroupHeading({ group }: { group: ContentListingGroup }) {
   if (!group.heading) return null
 
-  const tag = getContentListingHeadingTag(group.headingLevel ?? '##')
-
-  return (
-    <Heading tag={tag} className="text-xl font-medium scroll-mt-24">
-      {group.heading}
-    </Heading>
-  )
+  return <Heading tag={group.headingLevel ?? 'h2'}>{group.heading}</Heading>
 }
 
 function ContentListingsListGroup({ group }: { group: ContentListingGroup }) {

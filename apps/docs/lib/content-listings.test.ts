@@ -6,206 +6,9 @@ import {
 } from '~/lib/content-listings.markdown'
 import {
   getContentListingGridItemClassName,
-  getContentListingHeadingTag,
   normalizeContentListingHref,
-  parseContentListings,
 } from '~/lib/content-listings.schema'
 import { describe, expect, it } from 'vitest'
-
-describe('parseContentListings', () => {
-  it('accepts valid grouped items', () => {
-    const result = parseContentListings([
-      {
-        id: 'get-started',
-        heading: 'Get started',
-        items: [
-          {
-            title: 'Connect',
-            href: '/guides/database/connecting-to-postgres',
-            description: 'Connection strings and pooler modes.',
-          },
-        ],
-      },
-    ])
-
-    expect(result).toHaveLength(1)
-    expect(result?.[0].id).toBe('get-started')
-  })
-
-  it('accepts groups with id only and no heading', () => {
-    const result = parseContentListings([
-      {
-        id: 'get-started',
-        items: [
-          {
-            title: 'Connect',
-            href: '/guides/database/connecting-to-postgres',
-            description: 'Connection strings and pooler modes.',
-          },
-        ],
-      },
-    ])
-
-    expect(result?.[0].heading).toBeUndefined()
-  })
-
-  it('accepts groups without id when heading is set', () => {
-    const result = parseContentListings([
-      {
-        heading: 'Get started',
-        items: [
-          {
-            title: 'Connect',
-            href: '/guides/database/connecting-to-postgres',
-            description: 'Connection strings and pooler modes.',
-          },
-        ],
-      },
-    ])
-
-    expect(result?.[0].id).toBeUndefined()
-    expect(result?.[0].heading).toBe('Get started')
-  })
-
-  it('normalizes heading-level from kebab-case YAML', () => {
-    const result = parseContentListings([
-      {
-        id: 'get-started',
-        heading: 'Get started',
-        'heading-level': '###',
-        items: [
-          {
-            title: 'Connect',
-            href: '/guides/database/connecting-to-postgres',
-            description: 'Connection strings and pooler modes.',
-          },
-        ],
-      },
-    ])
-
-    expect(result?.[0].headingLevel).toBe('###')
-  })
-
-  it('accepts optional icon on items', () => {
-    const result = parseContentListings([
-      {
-        id: 'examples',
-        type: 'grid',
-        items: [
-          {
-            title: 'Resumable Uploads with Uppy',
-            href: 'https://github.com/supabase/supabase/tree/master/examples/storage/resumable-upload-uppy',
-            description: 'Use Uppy to upload files with the TUS protocol.',
-            icon: '/docs/img/icons/github-icon',
-          },
-        ],
-      },
-    ])
-
-    expect(result?.[0].items[0].icon).toBe('/docs/img/icons/github-icon')
-  })
-
-  it('accepts external hrefs', () => {
-    const result = parseContentListings([
-      {
-        id: 'examples',
-        items: [
-          {
-            title: 'GitHub',
-            href: 'https://github.com/supabase/supabase',
-            description: 'External link.',
-          },
-        ],
-      },
-    ])
-
-    expect(result?.[0].items[0].href).toBe('https://github.com/supabase/supabase')
-  })
-
-  it('rejects invalid hrefs', () => {
-    expect(() =>
-      parseContentListings([
-        {
-          id: 'get-started',
-          items: [
-            {
-              title: 'Bad link',
-              href: 'ftp://example.com',
-              description: 'Invalid protocol.',
-            },
-          ],
-        },
-      ])
-    ).toThrow(/Invalid contentListings href/)
-  })
-
-  it('accepts grid columns when type is grid', () => {
-    const result = parseContentListings([
-      {
-        id: 'get-started',
-        type: 'grid',
-        columns: 3,
-        items: [
-          {
-            title: 'Quickstart',
-            href: '/guides/storage/quickstart',
-            description: 'Store and serve files.',
-          },
-        ],
-      },
-    ])
-
-    expect(result?.[0].columns).toBe(3)
-  })
-
-  it('leaves columns undefined when type is grid and columns is omitted', () => {
-    const result = parseContentListings([
-      {
-        id: 'get-started',
-        type: 'grid',
-        items: [
-          {
-            title: 'Quickstart',
-            href: '/guides/storage/quickstart',
-            description: 'Store and serve files.',
-          },
-        ],
-      },
-    ])
-
-    expect(result?.[0].columns).toBeUndefined()
-  })
-
-  it('rejects columns when type is not grid', () => {
-    expect(() =>
-      parseContentListings([
-        {
-          id: 'get-started',
-          type: 'list',
-          columns: 3,
-          items: [
-            {
-              title: 'Quickstart',
-              href: '/guides/storage/quickstart',
-              description: 'Store and serve files.',
-            },
-          ],
-        },
-      ])
-    ).toThrow(/columns is only valid when type is grid/)
-  })
-
-  it('requires item descriptions', () => {
-    expect(() =>
-      parseContentListings([
-        {
-          id: 'get-started',
-          items: [{ title: 'Connect', href: '/guides/database/connecting-to-postgres' }],
-        },
-      ])
-    ).toThrow(/Invalid content listing/)
-  })
-})
 
 describe('getContentListingGridItemClassName', () => {
   it('defaults to 3 columns when no argument is provided', () => {
@@ -216,14 +19,6 @@ describe('getContentListingGridItemClassName', () => {
     expect(getContentListingGridItemClassName(2)).toBe('col-span-12 md:col-span-6')
     expect(getContentListingGridItemClassName(3)).toBe('col-span-12 md:col-span-4')
     expect(getContentListingGridItemClassName(4)).toBe('col-span-12 md:col-span-3')
-  })
-})
-
-describe('getContentListingHeadingTag', () => {
-  it('maps markdown heading levels to html tags', () => {
-    expect(getContentListingHeadingTag('##')).toBe('h2')
-    expect(getContentListingHeadingTag('###')).toBe('h3')
-    expect(getContentListingHeadingTag('####')).toBe('h4')
   })
 })
 
@@ -277,7 +72,7 @@ describe('serializeContentListingGroupToMarkdown', () => {
       {
         id: 'get-started',
         heading: 'Get started',
-        headingLevel: '###',
+        headingLevel: 'h3',
         items: [
           {
             title: 'Connect',

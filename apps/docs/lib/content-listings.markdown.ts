@@ -12,7 +12,8 @@ export function serializeContentListingGroupToMarkdown(
   const lines: string[] = []
 
   if (group.heading) {
-    lines.push(`${group.headingLevel ?? '##'} ${group.heading}`)
+    const level = Number((group.headingLevel ?? 'h2').slice(1))
+    lines.push(`${'#'.repeat(level)} ${group.heading}`)
   }
 
   if (group.description) {

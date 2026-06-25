@@ -17,7 +17,7 @@ export const functionsGetStarted: ContentListingGroup = {
 export const functionsExamplesSupabase: ContentListingGroup = {
   id: 'examples-supabase',
   heading: 'Supabase integration',
-  headingLevel: '###',
+  headingLevel: 'h3',
   type: 'grid',
   items: [
     {
@@ -84,7 +84,7 @@ export const functionsExamplesSupabase: ContentListingGroup = {
 export const functionsExamplesWebhooksPayments: ContentListingGroup = {
   id: 'examples-webhooks-payments',
   heading: 'Webhooks & payments',
-  headingLevel: '###',
+  headingLevel: 'h3',
   type: 'grid',
   items: [
     {
@@ -110,7 +110,7 @@ export const functionsExamplesWebhooksPayments: ContentListingGroup = {
 export const functionsExamplesAiMedia: ContentListingGroup = {
   id: 'examples-ai-media',
   heading: 'AI & media',
-  headingLevel: '###',
+  headingLevel: 'h3',
   type: 'grid',
   items: [
     {
@@ -150,7 +150,7 @@ export const functionsExamplesAiMedia: ContentListingGroup = {
 export const functionsExamplesMessaging: ContentListingGroup = {
   id: 'examples-messaging',
   heading: 'Bots & email',
-  headingLevel: '###',
+  headingLevel: 'h3',
   type: 'grid',
   items: [
     {
@@ -179,7 +179,7 @@ export const functionsExamplesMessaging: ContentListingGroup = {
 export const functionsExamplesOperations: ContentListingGroup = {
   id: 'examples-operations',
   heading: 'Operations & security',
-  headingLevel: '###',
+  headingLevel: 'h3',
   type: 'grid',
   items: [
     {
