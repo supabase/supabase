@@ -8,6 +8,7 @@ import {
   SelectGroup,
   SelectItem,
   SelectLabel,
+  SelectSeparator,
   SelectTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -77,7 +78,7 @@ export const DestinationTypeSelection = () => {
 
   const groups: DestinationTypeGroup[] = [
     {
-      label: 'Within Supabase',
+      label: 'Other',
       options: [
         {
           value: 'Read Replica',
@@ -88,6 +89,11 @@ export const DestinationTypeSelection = () => {
           isAlpha: false,
           enabled: isOptionVisible('Read Replica', infrastructureReadReplicas),
         },
+      ],
+    },
+    {
+      label: 'Pipelines',
+      options: [
         {
           value: 'Analytics Bucket',
           label: 'Analytics Bucket',
@@ -96,11 +102,6 @@ export const DestinationTypeSelection = () => {
           isAlpha: true,
           enabled: isOptionVisible('Analytics Bucket', etlEnableIceberg),
         },
-      ],
-    },
-    {
-      label: 'Outside Supabase',
-      options: [
         {
           value: 'BigQuery',
           label: 'BigQuery',
@@ -156,7 +157,8 @@ export const DestinationTypeSelection = () => {
       description={
         selectedOption?.isAlpha && (
           <span className="block text-sm text-foreground-light mb-1">
-            This destination type is in alpha and may change while we iterate.{' '}
+            This destination type is in alpha and may be unstable or introduce breaking changes
+            while we iterate based on customer feedback.{' '}
             <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
               Leave feedback
             </InlineLink>
@@ -183,8 +185,9 @@ export const DestinationTypeSelection = () => {
           )}
         </SelectTrigger>
         <SelectContent align="end">
-          {visibleGroups.map((group) => (
+          {visibleGroups.map((group, index) => (
             <SelectGroup key={group.label}>
+              {index > 0 && <SelectSeparator />}
               <SelectLabel>{group.label}</SelectLabel>
               {group.options.map((option) => (
                 <SelectItem key={option.value} value={option.value} className="py-2">
