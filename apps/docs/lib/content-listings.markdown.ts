@@ -38,15 +38,3 @@ export function serializeContentListingGroupToMarkdown(
 
   return lines.join('\n')
 }
-
-/**
- * @deprecated Use serializeContentListingGroupToMarkdown for single groups via markdown-schema handlers.
- */
-export function serializeContentListingsToMarkdown(
-  contentListings: ContentListingGroup[],
-  linkBaseUrl: string
-): string {
-  return contentListings
-    .map((group) => serializeContentListingGroupToMarkdown(group, linkBaseUrl))
-    .join('\n\n')
-}

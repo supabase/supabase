@@ -1,9 +1,6 @@
 import { storageGetStarted } from '~/data/content-listings/storage.data'
 import { ContentListings as ContentListingsMarkdownHandler } from '~/internals/markdown-schema/Listings'
-import {
-  serializeContentListingGroupToMarkdown,
-  serializeContentListingsToMarkdown,
-} from '~/lib/content-listings.markdown'
+import { serializeContentListingGroupToMarkdown } from '~/lib/content-listings.markdown'
 import {
   getContentListingGridItemClassName,
   normalizeContentListingHref,
@@ -104,41 +101,6 @@ describe('serializeContentListingGroupToMarkdown', () => {
 
     expect(markdown).not.toMatch(/^#+\s/m)
     expect(markdown).toContain('**[Connect]')
-  })
-})
-
-describe('serializeContentListingsToMarkdown', () => {
-  it('joins multiple groups with blank lines', () => {
-    const markdown = serializeContentListingsToMarkdown(
-      [
-        {
-          id: 'get-started',
-          heading: 'Get started',
-          items: [
-            {
-              title: 'Connect',
-              href: '/guides/database/connecting-to-postgres',
-              description: 'Connection strings.',
-            },
-          ],
-        },
-        {
-          id: 'next-steps',
-          heading: 'Next steps',
-          items: [
-            {
-              title: 'Functions',
-              href: '/guides/database/functions',
-              description: 'Database functions.',
-            },
-          ],
-        },
-      ],
-      ''
-    )
-
-    expect(markdown).toContain('## Get started')
-    expect(markdown).toContain('## Next steps')
   })
 })
 
