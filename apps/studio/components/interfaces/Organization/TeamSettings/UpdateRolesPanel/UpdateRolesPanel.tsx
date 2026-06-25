@@ -11,6 +11,8 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
+  RadioGroupStacked,
+  RadioGroupStackedItem,
   Select,
   SelectContent,
   SelectGroup,
@@ -21,7 +23,6 @@ import {
   SheetFooter,
   SheetHeader,
   SheetSection,
-  Switch,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -188,13 +189,23 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
             <SheetSection className="h-full overflow-auto flex flex-col">
               {isOptedIntoProjectLevelPermissions && (
-                <div className="flex items-center gap-x-4 border-b border-border pb-4">
-                  <Switch
+                <div className="border-b border-border pb-4">
+                  <RadioGroupStacked
                     disabled={cannotAddAnyRoles}
-                    checked={isApplyingRoleToAllProjects}
-                    onCheckedChange={onToggleApplyToAllProjects}
-                  />
-                  <p className="text-sm">Apply roles to all projects in the organization</p>
+                    value={isApplyingRoleToAllProjects ? 'all-projects' : 'specific-projects'}
+                    onValueChange={(value) => onToggleApplyToAllProjects(value === 'all-projects')}
+                  >
+                    <RadioGroupStackedItem
+                      value="all-projects"
+                      label="All projects (current and future)"
+                      description="Apply this role across the entire organization, including future projects"
+                    />
+                    <RadioGroupStackedItem
+                      value="specific-projects"
+                      label="Specific projects"
+                      description="Choose which projects this member can access"
+                    />
+                  </RadioGroupStacked>
                 </div>
               )}
 

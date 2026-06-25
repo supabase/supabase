@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { UserPlus } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -28,7 +28,6 @@ import {
   SheetSection,
   SheetTitle,
   SheetTrigger,
-  Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -36,16 +35,35 @@ import * as z from 'zod'
 
 import {
   BatchInvitationResult,
-  buildProjectPayload,
+  buildProjectPayloadFromAccessScope,
   buildSsoPayload,
   categorizeInviteEmails,
   emailSchema,
   parseEmails,
 } from './InviteMemberButton.utils'
 import { ROLE_DESCRIPTIONS } from './Roles.constants'
+import {
+  ALL_PROJECTS_ACCESS_SCOPE,
+  ALL_PROJECTS_ACCESS_SCOPE_LABEL,
+  roleRequiresOrgWideAccess,
+  type TeamAccessScopeSelection,
+} from './TeamAccessScope.utils'
+import { TeamAccessScopeSelector } from './TeamAccessScopeSelector'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { useIsJitDbAccessEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import type { TemporaryAccessInviteType } from '@/components/interfaces/TemporaryAccess/TemporaryAccess.types'
+import type {
+  TemporaryAccessInviteExpiry,
+  TemporaryAccessPostgresTemplate,
+} from '@/components/interfaces/TemporaryAccess/TemporaryAccess.types'
+import {
+  buildPendingInvitationAccessGrant,
+  EXTERNAL_COLLABORATOR_ROLE_DESCRIPTION,
+  EXTERNAL_COLLABORATOR_ROLE_ID,
+  EXTERNAL_COLLABORATOR_ROLE_NAME,
+  INVITE_EXPIRY_OPTIONS,
+  isExternalCollaboratorRole,
+  POSTGRES_ACCESS_TEMPLATES,
+} from '@/components/interfaces/TemporaryAccess/TemporaryAccessInvite.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -68,6 +86,21 @@ import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useProfile } from '@/lib/profile'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
+const accessScopeSchema = z.union([
+  z.literal(ALL_PROJECTS_ACCESS_SCOPE),
+  z.array(z.string()).min(1, 'Select at least one project'),
+])
+
+type InviteMemberFormValues = {
+  email: string
+  role: string
+  accessScope: TeamAccessScopeSelection
+  projectRef: string
+  postgresTemplate: TemporaryAccessPostgresTemplate
+  expiry: TemporaryAccessInviteExpiry
+  requireSso: 'auto' | 'sso' | 'non-sso'
+}
+
 export const InviteMemberButton = () => {
   const { slug } = useParams()
   const { profile } = useProfile()
@@ -80,6 +113,7 @@ export const InviteMemberButton = () => {
   const isJitDbAccessEnabled = useIsJitDbAccessEnabled()
 
   const [isOpen, setIsOpen] = useState(false)
+  const [accessScopeDropdownOpen, setAccessScopeDropdownOpen] = useState(false)
   const [projectDropdownOpen, setProjectDropdownOpen] = useState(false)
 
   const { data: members } = useOrganizationMembersQuery({ slug })
@@ -90,13 +124,14 @@ export const InviteMemberButton = () => {
   const { data: ssoConfig } = useOrgSSOConfigQuery({ orgSlug: slug })
   const hasSsoProvider = !!ssoConfig && ssoConfig !== null
 
-  const defaultValues = {
+  const defaultValues: InviteMemberFormValues = {
     email: '',
     role: orgScopedRoles.find((role) => role.name === 'Developer')?.id.toString() ?? '',
-    accessType: 'full-member' as TemporaryAccessInviteType,
-    applyToOrg: true,
+    accessScope: ALL_PROJECTS_ACCESS_SCOPE,
     projectRef: '',
-    requireSso: 'auto' as const,
+    postgresTemplate: 'read-only',
+    expiry: '1h',
+    requireSso: 'auto',
   }
 
   const { hasAccess: hasAccessToSso } = useCheckEntitlements('auth.platform.sso')
@@ -114,6 +149,10 @@ export const InviteMemberButton = () => {
     orgScopedRoles,
     permissions ?? []
   )
+
+  const canAssignExternalCollaborator = readOnlyOrgRole
+    ? rolesAddable.includes(readOnlyOrgRole.id)
+    : false
 
   const canInviteMembers =
     hasOrgRole &&
@@ -134,53 +173,71 @@ export const InviteMemberButton = () => {
   const FormSchema = z
     .object({
       email: emailSchema,
-      role: z.string(),
-      accessType: z.enum(['full-member', 'external-collaborator', 'database-only']),
-      applyToOrg: z.boolean(),
+      role: z.string().min(1, 'Role is required'),
+      accessScope: accessScopeSchema,
       projectRef: z.string(),
+      postgresTemplate: z.enum(['read-only', 'developer']),
+      expiry: z.enum(['1h', '1d', '7d']),
       requireSso: z.enum(['auto', 'sso', 'non-sso']),
     })
     .superRefine((data, ctx) => {
-      const isTemporaryAccessInvite = data.accessType !== 'full-member'
+      const isGuestInvite = isJitDbAccessEnabled && isExternalCollaboratorRole(data.role)
 
-      if (isTemporaryAccessInvite && !data.projectRef) {
+      if (isGuestInvite && !data.projectRef) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'A project must be selected for temporary access',
+          message: 'A project must be selected for external collaborators',
           path: ['projectRef'],
         })
+        return
       }
 
-      if (!isTemporaryAccessInvite && !data.role) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'Role is required',
-          path: ['role'],
-        })
-      }
+      if (!isGuestInvite) {
+        const selectedRole = orgScopedRoles.find((role) => role.id.toString() === data.role)
+        if (!selectedRole) return
 
-      if (!isTemporaryAccessInvite && !data.applyToOrg && !data.projectRef) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'A project must be selected',
-          path: ['projectRef'],
-        })
+        if (
+          roleRequiresOrgWideAccess(selectedRole.name) &&
+          data.accessScope !== ALL_PROJECTS_ACCESS_SCOPE
+        ) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `${selectedRole.name} must have access to all projects`,
+            path: ['accessScope'],
+          })
+        }
       }
     })
 
-  const form = useForm<z.infer<typeof FormSchema>>({
+  const form = useForm<InviteMemberFormValues>({
     mode: 'onSubmit',
     reValidateMode: 'onChange',
     resolver: zodResolver(FormSchema),
     defaultValues,
   })
 
-  const { applyToOrg, projectRef, email, accessType } = form.watch()
-  const isTemporaryAccessInvite = isJitDbAccessEnabled && accessType !== 'full-member'
+  const { projectRef, email } = form.watch()
+  const selectedRoleId = form.watch('role')
+  const isGuestInvite = isJitDbAccessEnabled && isExternalCollaboratorRole(selectedRoleId)
+
+  const selectedRole = useMemo(
+    () => orgScopedRoles.find((role) => role.id.toString() === selectedRoleId),
+    [orgScopedRoles, selectedRoleId]
+  )
+  const requiresOrgWideAccess = selectedRole ? roleRequiresOrgWideAccess(selectedRole.name) : false
+  const showAccessScopeField =
+    hasAccessToProjectLevelPermissions && !isGuestInvite && !requiresOrgWideAccess
 
   const emailCount = parseEmails(email ?? '').length
 
-  const onInviteMember = async (values: z.infer<typeof FormSchema>) => {
+  useEffect(() => {
+    if (isGuestInvite || !requiresOrgWideAccess) return
+    if (form.getValues('accessScope') !== ALL_PROJECTS_ACCESS_SCOPE) {
+      form.setValue('accessScope', ALL_PROJECTS_ACCESS_SCOPE, { shouldDirty: true })
+    }
+  }, [form, isGuestInvite, requiresOrgWideAccess])
+
+  const onInviteMember = async (values: InviteMemberFormValues) => {
     if (!slug) return console.error('Slug is required')
     if (profile?.id === undefined) return console.error('Profile ID required')
     const emails = parseEmails(values.email).map((e) => e.toLowerCase())
@@ -208,16 +265,31 @@ export const InviteMemberButton = () => {
       if (toInvite.length === 0) return
     }
 
-    const projectPayload = isTemporaryAccessInvite
-      ? buildProjectPayload(false, values.projectRef)
-      : buildProjectPayload(values.applyToOrg, values.projectRef)
+    const isGuest = isJitDbAccessEnabled && isExternalCollaboratorRole(values.role)
+    const projectPayload = isGuest
+      ? buildProjectPayloadFromAccessScope([values.projectRef])
+      : buildProjectPayloadFromAccessScope(values.accessScope)
     const ssoPayload = buildSsoPayload(values.requireSso)
 
-    const inviteRoleId = isTemporaryAccessInvite ? readOnlyOrgRole?.id : Number(values.role)
+    const inviteRoleId = isGuest ? readOnlyOrgRole?.id : Number(values.role)
 
-    if (isTemporaryAccessInvite && !inviteRoleId) {
-      toast.error('Read-only role is required for temporary access invites')
+    if (isGuest && !inviteRoleId) {
+      toast.error('Read-only role is required for external collaborator invites')
       return
+    }
+
+    let pendingAccessGrant
+    if (isGuest) {
+      try {
+        pendingAccessGrant = buildPendingInvitationAccessGrant({
+          projectRef: values.projectRef,
+          postgresTemplate: values.postgresTemplate,
+          expiry: values.expiry,
+        })
+      } catch {
+        toast.error('Failed to prepare database access for this invitation')
+        return
+      }
     }
 
     let result: BatchInvitationResult
@@ -228,6 +300,7 @@ export const InviteMemberButton = () => {
         roleId: inviteRoleId!,
         ...projectPayload,
         ...ssoPayload,
+        pendingAccessGrant,
       })) as BatchInvitationResult
     } catch {
       return // onError callback already showed the toast
@@ -248,10 +321,9 @@ export const InviteMemberButton = () => {
     }
 
     if (succeeded.length > 0) {
-      if (isTemporaryAccessInvite) {
+      if (isGuest) {
         toast.message('Invitation sent', {
-          description:
-            'After they accept, configure database access from Team using Manage database access.',
+          description: 'Temporary database access will be ready when they accept the invitation.',
         })
       }
       closeInviteSheet()
@@ -274,6 +346,7 @@ export const InviteMemberButton = () => {
   const hasUnsavedChanges = form.formState.isDirty
 
   const closeInviteSheet = () => {
+    setAccessScopeDropdownOpen(false)
     setProjectDropdownOpen(false)
     setIsOpen(false)
     form.reset(defaultValues)
@@ -354,102 +427,221 @@ export const InviteMemberButton = () => {
               className="flex flex-col gap-y-4"
               onSubmit={form.handleSubmit(onInviteMember)}
             >
-              {isJitDbAccessEnabled && (
-                <FormField
-                  name="accessType"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="horizontal"
-                      label="Access type"
-                      description="Choose how this person will access your organization"
-                    >
-                      <FormControl className="col-span-6">
-                        <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
-                          <RadioGroupStackedItem
-                            value="full-member"
-                            label="Full team member"
-                            description="Standard organization role with Studio access."
-                          />
-                          <RadioGroupStackedItem
-                            value="external-collaborator"
-                            label="External collaborator"
-                            description="Project-scoped guest with temporary database access (Read-only org role)."
-                          />
-                          <RadioGroupStackedItem
-                            value="database-only"
-                            label="Database access only"
-                            description="Minimal org access focused on temporary Postgres connections."
-                          />
-                        </RadioGroupStacked>
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-              )}
+              <FormField
+                name="email"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout layout="horizontal" label="Email addresses">
+                    <FormControl className="col-span-6">
+                      <ExpandingTextArea
+                        autoFocus
+                        {...field}
+                        autoComplete="off"
+                        disabled={isInviting}
+                        placeholder="name@example.com, name2@example.com, ..."
+                        className="max-h-48"
+                        data-1p-ignore
+                        data-lpignore="true"
+                        data-form-type="other"
+                        data-bwignore
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
 
-              {!isTemporaryAccessInvite && (
+              <FormField
+                name="role"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout
+                    layout="horizontal"
+                    label="Role"
+                    description={
+                      <>
+                        Learn more about{' '}
+                        <InlineLink href={`${DOCS_URL}/guides/platform/access-control`}>
+                          roles and permissions
+                        </InlineLink>
+                      </>
+                    }
+                  >
+                    <FormControl className="col-span-6">
+                      <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
+                        {orgScopedRoles.map((role) => {
+                          const canAssignRole = rolesAddable.includes(role.id)
+                          const isOwnerRole = role.name === 'Owner'
+                          const disabledForStripe = isStripeProjectsOrg && isOwnerRole
+                          const disabled = !canAssignRole || disabledForStripe
+                          const disabledReason = disabledForStripe
+                            ? 'Cannot be assigned in Stripe Projects organizations'
+                            : !canAssignRole
+                              ? 'Additional permissions required to assign role'
+                              : undefined
+
+                          return (
+                            <FormItem asChild key={role.id}>
+                              <FormControl>
+                                <RadioGroupStackedItem
+                                  value={role.id.toString()}
+                                  disabled={disabled}
+                                  label={role.name}
+                                  description={[
+                                    ROLE_DESCRIPTIONS[role.name] ??
+                                      'Permissions are based on the configured organization role.',
+                                    disabledReason,
+                                  ]
+                                    .filter(Boolean)
+                                    .join(' ')}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )
+                        })}
+                        {isJitDbAccessEnabled && (
+                          <FormItem asChild>
+                            <FormControl>
+                              <RadioGroupStackedItem
+                                value={EXTERNAL_COLLABORATOR_ROLE_ID}
+                                disabled={!canAssignExternalCollaborator}
+                                label={EXTERNAL_COLLABORATOR_ROLE_NAME}
+                                description={[
+                                  EXTERNAL_COLLABORATOR_ROLE_DESCRIPTION,
+                                  !canAssignExternalCollaborator
+                                    ? 'Additional permissions required to assign role'
+                                    : undefined,
+                                ]
+                                  .filter(Boolean)
+                                  .join(' ')}
+                              />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      </RadioGroupStacked>
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+
+              {hasAccessToProjectLevelPermissions && !isGuestInvite && (
                 <FormField
-                  name="role"
+                  name="accessScope"
                   control={form.control}
                   render={({ field }) => (
                     <FormItemLayout
                       layout="horizontal"
-                      label="Role"
+                      label="Access scope"
                       description={
-                        <>
-                          Learn more about{' '}
-                          <InlineLink href={`${DOCS_URL}/guides/platform/access-control`}>
-                            roles and permissions
-                          </InlineLink>
-                        </>
+                        requiresOrgWideAccess
+                          ? `${selectedRole?.name} always has access to all projects in the organization.`
+                          : 'Choose all projects or select one or more specific projects'
                       }
                     >
                       <FormControl className="col-span-6">
-                        <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
-                          {orgScopedRoles.map((role) => {
-                            const canAssignRole = rolesAddable.includes(role.id)
-                            const isOwnerRole = role.name === 'Owner'
-                            const disabledForStripe = isStripeProjectsOrg && isOwnerRole
-                            const disabled = !canAssignRole || disabledForStripe
-                            const disabledReason = disabledForStripe
-                              ? 'Cannot be assigned in Stripe Projects organizations'
-                              : !canAssignRole
-                                ? 'Additional permissions required to assign role'
-                                : undefined
-
-                            return (
-                              <FormItem asChild key={role.id}>
-                                <FormControl>
-                                  <RadioGroupStackedItem
-                                    value={role.id.toString()}
-                                    disabled={disabled}
-                                    label={role.name}
-                                    description={[
-                                      ROLE_DESCRIPTIONS[role.name] ??
-                                        'Permissions are based on the configured organization role.',
-                                      disabledReason,
-                                    ]
-                                      .filter(Boolean)
-                                      .join(' ')}
-                                  />
-                                </FormControl>
-                              </FormItem>
-                            )
-                          })}
-                        </RadioGroupStacked>
+                        {showAccessScopeField ? (
+                          <TeamAccessScopeSelector
+                            value={field.value}
+                            onChange={field.onChange}
+                            open={accessScopeDropdownOpen}
+                            setOpen={setAccessScopeDropdownOpen}
+                            fetchOnMount
+                            sameWidthAsTrigger
+                            checkPosition="left"
+                            allowMultipleProjects
+                          />
+                        ) : (
+                          <p className="text-sm text-foreground-light py-2">
+                            {ALL_PROJECTS_ACCESS_SCOPE_LABEL}
+                          </p>
+                        )}
                       </FormControl>
                     </FormItemLayout>
                   )}
                 />
               )}
 
-              {isTemporaryAccessInvite && (
-                <Admonition
-                  type="note"
-                  title="Configure database access after they accept"
-                  description="Grant Postgres roles and expiry from Team → Manage database access once the invitee joins. Default duration is 1 hour."
-                />
+              {isGuestInvite && (
+                <>
+                  <FormField
+                    name="projectRef"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="horizontal"
+                        label="Project scope"
+                        description="Database access applies to this project"
+                      >
+                        <FormControl className="col-span-6">
+                          <OrganizationProjectSelector
+                            fetchOnMount
+                            sameWidthAsTrigger
+                            checkPosition="left"
+                            selectedRef={projectRef}
+                            open={projectDropdownOpen}
+                            setOpen={setProjectDropdownOpen}
+                            searchPlaceholder="Search project..."
+                            onSelect={(project) => field.onChange(project.ref)}
+                            onInitialLoad={(projects) => field.onChange(projects[0]?.ref ?? '')}
+                          />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+
+                  <FormField
+                    name="postgresTemplate"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="horizontal"
+                        label="Database access"
+                        description="Postgres role granted when they accept"
+                      >
+                        <FormControl className="col-span-6">
+                          <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
+                            {POSTGRES_ACCESS_TEMPLATES.map((template) => (
+                              <RadioGroupStackedItem
+                                key={template.id}
+                                value={template.id}
+                                label={template.label}
+                                description={template.description}
+                              />
+                            ))}
+                          </RadioGroupStacked>
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+
+                  <FormField
+                    name="expiry"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="horizontal"
+                        label="Access duration"
+                        description="Access expires automatically after this period"
+                      >
+                        <FormControl className="col-span-6">
+                          <Select value={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                {INVITE_EXPIRY_OPTIONS.map((option) => (
+                                  <SelectItem key={option.value} value={option.value}>
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </>
               )}
 
               {hasSsoProvider && (
@@ -482,76 +674,6 @@ export const InviteMemberButton = () => {
                   )}
                 />
               )}
-              {hasAccessToProjectLevelPermissions && !isTemporaryAccessInvite && (
-                <FormField
-                  name="applyToOrg"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="horizontal"
-                      label="Grant this role on all projects"
-                      description="Apply this role to all current and future projects in the organization"
-                    >
-                      <FormControl className="col-span-6">
-                        <Switch checked={field.value} onCheckedChange={field.onChange} />
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-              )}
-              {(!applyToOrg || isTemporaryAccessInvite) && (
-                <FormField
-                  name="projectRef"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="horizontal"
-                      label={isTemporaryAccessInvite ? 'Project scope' : 'Select a project'}
-                      description={
-                        isTemporaryAccessInvite
-                          ? 'Temporary database access will apply to this project'
-                          : 'Project access can be adjusted after the user joins'
-                      }
-                    >
-                      <FormControl className="col-span-6">
-                        <OrganizationProjectSelector
-                          fetchOnMount
-                          sameWidthAsTrigger
-                          checkPosition="left"
-                          selectedRef={projectRef}
-                          open={projectDropdownOpen}
-                          setOpen={setProjectDropdownOpen}
-                          searchPlaceholder="Search project..."
-                          onSelect={(project) => field.onChange(project.ref)}
-                          onInitialLoad={(projects) => field.onChange(projects[0]?.ref ?? '')}
-                        />
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-              )}
-              <FormField
-                name="email"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItemLayout layout="horizontal" label="Email addresses">
-                    <FormControl className="col-span-6">
-                      <ExpandingTextArea
-                        autoFocus
-                        {...field}
-                        autoComplete="off"
-                        disabled={isInviting}
-                        placeholder="name@example.com, name2@example.com, ..."
-                        className="max-h-48"
-                        data-1p-ignore
-                        data-lpignore="true"
-                        data-form-type="other"
-                        data-bwignore
-                      />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
             </form>
           </Form>
         </SheetSection>

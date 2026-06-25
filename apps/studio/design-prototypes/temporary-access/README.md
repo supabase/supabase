@@ -14,6 +14,7 @@ Open [http://localhost:8082/design-prototypes/temporary-access](http://localhost
 
 | File                                             | Purpose                         |
 | ------------------------------------------------ | ------------------------------- |
+| [PRODUCT-DECISIONS.md](./PRODUCT-DECISIONS.md)   | Living product + UX + API log   |
 | [PR-FAQ.md](./PR-FAQ.md)                         | External-facing product vision  |
 | [TIER-MATRIX.md](./TIER-MATRIX.md)               | Plan gating matrix              |
 | [STAKEHOLDER-REVIEW.md](./STAKEHOLDER-REVIEW.md) | Review agenda + API gaps        |

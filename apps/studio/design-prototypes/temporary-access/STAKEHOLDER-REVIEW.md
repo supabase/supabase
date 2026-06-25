@@ -2,7 +2,7 @@
 
 **Purpose:** Alignment session for unified temporary access UX  
 **Prototype:** `/design-prototypes/temporary-access` in Studio (local dev)  
-**Docs:** [PR-FAQ](./PR-FAQ.md) · [Tier matrix](./TIER-MATRIX.md) · [Video guide](./VIDEO-WALKTHROUGH.md)
+**Docs:** [PR-FAQ](./PR-FAQ.md) · [Tier matrix](./TIER-MATRIX.md) · [Product decisions](./PRODUCT-DECISIONS.md) · [Video guide](./VIDEO-WALKTHROUGH.md)
 
 ---
 

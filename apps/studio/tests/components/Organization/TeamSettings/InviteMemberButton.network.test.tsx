@@ -1,10 +1,11 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { InviteMemberButton } from '@/components/interfaces/Organization/TeamSettings/InviteMemberButton'
+import { EXTERNAL_COLLABORATOR_ROLE_NAME } from '@/components/interfaces/TemporaryAccess/TemporaryAccessInvite.utils'
 import type { ProfileContextType } from '@/lib/profile'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
@@ -14,6 +15,7 @@ type OrganizationResponse = components['schemas']['OrganizationResponse']
 type Member = components['schemas']['Member']
 type InvitationResponse = components['schemas']['InvitationResponse']
 type OrganizationRoleResponse = components['schemas']['OrganizationRoleResponse']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
 type ListEntitlementsResponse = components['schemas']['ListEntitlementsResponse']
 type CreateInvitationResponse = components['schemas']['CreateInvitationResponse']
 type AccessControlPermission = components['schemas']['AccessControlPermission']
@@ -35,6 +37,10 @@ vi.mock('@/lib/constants', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()
   return { ...actual, IS_PLATFORM: true }
 })
+
+vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
+  useIsJitDbAccessEnabled: () => true,
+}))
 
 const PROFILE_CONTEXT: ProfileContextType = {
   profile: {
@@ -257,5 +263,99 @@ describe('InviteMemberButton (network)', () => {
       emails: ['new@example.com', 'second@example.com'],
       role_id: ROLE_IDS.developer,
     })
+  })
+
+  test('shows access scope options when project-level permissions are enabled', async () => {
+    setupMocks()
+
+    addAPIMock({
+      method: 'get',
+      path: '/platform/organizations/:slug/entitlements',
+      response: () =>
+        HttpResponse.json<ListEntitlementsResponse>({
+          entitlements: [
+            {
+              hasAccess: true,
+              type: 'boolean',
+              config: { enabled: true },
+              feature: { key: 'project_scoped_roles', type: 'boolean' },
+            },
+          ],
+        }),
+    })
+
+    addAPIMock({
+      method: 'get',
+      path: '/platform/organizations/:slug/projects',
+      response: () =>
+        HttpResponse.json<OrganizationProjectsResponse>({
+          pagination: { count: 0, limit: 96, offset: 0 },
+          projects: [],
+        }),
+    })
+
+    customRender(<InviteMemberButton />, { profileContext: PROFILE_CONTEXT })
+    const dialog = await openDialog()
+
+    expect(screen.getByText('Access scope')).toBeInTheDocument()
+    expect(screen.queryByText('Grant this role on all projects')).not.toBeInTheDocument()
+    expect(within(dialog).getByRole('combobox')).toHaveTextContent(
+      'All projects (current and future)'
+    )
+  })
+
+  test('locks access scope to all projects for Owner role', async () => {
+    setupMocks()
+
+    addAPIMock({
+      method: 'get',
+      path: '/platform/organizations/:slug/entitlements',
+      response: () =>
+        HttpResponse.json<ListEntitlementsResponse>({
+          entitlements: [
+            {
+              hasAccess: true,
+              type: 'boolean',
+              config: { enabled: true },
+              feature: { key: 'project_scoped_roles', type: 'boolean' },
+            },
+          ],
+        }),
+    })
+
+    customRender(<InviteMemberButton />, { profileContext: PROFILE_CONTEXT })
+    await openDialog()
+
+    await userEvent.click(await screen.findByText('Owner'))
+
+    expect(screen.getByText(/Owner always has access to all projects/i)).toBeInTheDocument()
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+  })
+
+  test('shows guest database access fields when External collaborator role is selected', async () => {
+    setupMocks()
+
+    addAPIMock({
+      method: 'get',
+      path: '/platform/organizations/:slug/projects',
+      response: () =>
+        HttpResponse.json<OrganizationProjectsResponse>({
+          pagination: { count: 1, limit: 96, offset: 0 },
+          projects: [{ ref: 'test-project', name: 'Test Project' }],
+        }),
+    })
+
+    customRender(<InviteMemberButton />, { profileContext: PROFILE_CONTEXT })
+    await openDialog()
+
+    await userEvent.click(await screen.findByText(EXTERNAL_COLLABORATOR_ROLE_NAME))
+
+    expect(screen.getByText('Project scope')).toBeInTheDocument()
+    expect(screen.getByText('Database access')).toBeInTheDocument()
+    expect(screen.getByText('Access duration')).toBeInTheDocument()
+    expect(screen.queryByText('Access scope')).not.toBeInTheDocument()
+    expect(
+      screen.queryByText(/configure database access after they accept/i)
+    ).not.toBeInTheDocument()
   })
 })

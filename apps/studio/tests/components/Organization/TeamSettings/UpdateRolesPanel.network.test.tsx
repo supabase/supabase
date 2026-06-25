@@ -193,4 +193,34 @@ describe('UpdateRolesPanel (network)', () => {
     expect(screen.getByText(/Manage project content/i)).toBeInTheDocument()
     expect(screen.getByText(/limited to SELECT queries/i)).toBeInTheDocument()
   })
+
+  test('shows access scope mode options when project-level permissions are enabled', async () => {
+    setupMocks()
+
+    addAPIMock({
+      method: 'get',
+      path: '/platform/organizations/:slug/entitlements',
+      response: () =>
+        HttpResponse.json<ListEntitlementsResponse>({
+          entitlements: [
+            {
+              hasAccess: true,
+              type: 'boolean',
+              config: { enabled: true },
+              feature: { key: 'project_scoped_roles', type: 'boolean' },
+            },
+          ],
+        }),
+    })
+
+    customRender(<UpdateRolesPanel visible member={MEMBER} onClose={vi.fn()} />, {
+      profileContext: PROFILE_CONTEXT,
+    })
+
+    expect(await screen.findByText('All projects (current and future)')).toBeInTheDocument()
+    expect(screen.getByText('Specific projects')).toBeInTheDocument()
+    expect(
+      screen.queryByText('Apply roles to all projects in the organization')
+    ).not.toBeInTheDocument()
+  })
 })

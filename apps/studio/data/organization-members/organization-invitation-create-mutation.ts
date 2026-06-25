@@ -3,6 +3,7 @@ import { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { organizationKeys } from './keys'
+import type { PendingInvitationAccessGrant } from '@/components/interfaces/TemporaryAccess/TemporaryAccess.types'
 import { handleError, post } from '@/data/fetchers'
 import { organizationKeys as organizationKeysV1 } from '@/data/organizations/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -13,6 +14,11 @@ export type OrganizationCreateInvitationVariables = {
   roleId: number
   projects?: string[]
   requireSso?: boolean
+  /**
+   * Pending JIT grant for External collaborator invites.
+   * Not sent until CreateInvitationBody supports `pending_access_grant` (see PRODUCT-DECISIONS.md).
+   */
+  pendingAccessGrant?: PendingInvitationAccessGrant
 }
 
 export async function createOrganizationInvitation({
@@ -21,10 +27,12 @@ export async function createOrganizationInvitation({
   roleId,
   projects,
   requireSso,
+  pendingAccessGrant: _pendingAccessGrant,
 }: OrganizationCreateInvitationVariables) {
   const payload: components['schemas']['CreateInvitationBody'] = { emails, role_id: roleId }
   if (projects !== undefined) payload.role_scoped_projects = projects
   if (requireSso !== undefined) payload.require_sso = requireSso
+  // TODO(platform-api): attach pendingAccessGrant when CreateInvitationBody gains pending_access_grant
 
   const { data, error } = await post('/platform/organizations/{slug}/members/invitations', {
     params: { path: { slug } },

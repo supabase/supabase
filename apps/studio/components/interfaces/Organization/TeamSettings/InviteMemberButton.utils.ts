@@ -89,16 +89,14 @@ export function categorizeInviteEmails(
   return { alreadyInvited, alreadyMembers, toInvite }
 }
 
-export function buildProjectPayload(
-  applyToOrg: boolean,
-  projectRef: string
-): { projects: string[] } | Record<string, never> {
-  if (applyToOrg) return {}
-  if (!projectRef) {
-    throw new Error('projectRef is required when applyToOrg is false')
-  }
-  return { projects: [projectRef] }
-}
+export {
+  ALL_PROJECTS_ACCESS_SCOPE,
+  ALL_PROJECTS_ACCESS_SCOPE_LABEL,
+  buildProjectPayload,
+  buildProjectPayloadFromAccessScope,
+  getAccessScopeLabel,
+  isAllProjectsAccessScope,
+} from './TeamAccessScope.utils'
 
 export function buildSsoPayload(
   requireSso: 'auto' | 'sso' | 'non-sso'

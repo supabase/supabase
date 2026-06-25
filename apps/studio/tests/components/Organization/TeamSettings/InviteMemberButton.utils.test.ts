@@ -1,7 +1,9 @@
 import { describe, expect, test } from 'vitest'
 
 import {
+  ALL_PROJECTS_ACCESS_SCOPE,
   buildProjectPayload,
+  buildProjectPayloadFromAccessScope,
   buildSsoPayload,
   categorizeInviteEmails,
   emailSchema,
@@ -149,6 +151,28 @@ describe('categorizeInviteEmails', () => {
     const result = categorizeInviteEmails(['member@example.com'], members)
     expect(result.toInvite).toStrictEqual(['member@example.com'])
     expect(result.alreadyMembers).toStrictEqual([])
+  })
+})
+
+describe('buildProjectPayloadFromAccessScope', () => {
+  test('returns empty object for all projects scope', () => {
+    expect(buildProjectPayloadFromAccessScope(ALL_PROJECTS_ACCESS_SCOPE)).toStrictEqual({})
+  })
+
+  test('throws when no projects are selected', () => {
+    expect(() => buildProjectPayloadFromAccessScope([])).toThrowError('Select at least one project')
+  })
+
+  test('returns projects array for a single project scope', () => {
+    expect(buildProjectPayloadFromAccessScope(['ref_abc'])).toStrictEqual({
+      projects: ['ref_abc'],
+    })
+  })
+
+  test('returns projects array for multiple project scopes', () => {
+    expect(buildProjectPayloadFromAccessScope(['ref_a', 'ref_b'])).toStrictEqual({
+      projects: ['ref_a', 'ref_b'],
+    })
   })
 })
 
