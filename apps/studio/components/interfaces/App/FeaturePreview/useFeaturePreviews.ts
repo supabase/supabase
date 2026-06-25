@@ -25,6 +25,8 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const jitDbAccessEnabled = useFlag('jitDbAccess')
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
 
+  const unifiedLogsDefaultOptIn = useFlag('unifiedLogsDefaultOptIn')
+
   return useMemo(
     () =>
       [
@@ -45,7 +47,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           enabled: true,
           isNew: true,
           isPlatformOnly: true,
-          isDefaultOptIn: false,
+          isDefaultOptIn: unifiedLogsDefaultOptIn,
           getRoute: (ref?: string) => `/project/${ref}/logs`,
         },
         {
