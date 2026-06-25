@@ -49,7 +49,7 @@
   --animate-marketplace-featured-progress: marketplace-featured-progress linear forwards;
 
   --text-sm: 13px;
-  --font-normale: 500;
+  --font-normal: 500;
 }
 
 @keyframes shimmer {
