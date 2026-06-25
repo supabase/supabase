@@ -181,7 +181,7 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
                       <TooltipTrigger asChild>
                         <DropdownMenuTrigger asChild>
                           <Button
-                            aria-label="More options"
+                            aria-label={`${x.function_name} actions`}
                             variant="default"
                             className="px-1"
                             icon={<MoreVertical />}
