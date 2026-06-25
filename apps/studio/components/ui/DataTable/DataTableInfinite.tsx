@@ -51,7 +51,6 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   const headerGroups = table.getHeaderGroups()
   const headers = headerGroups[0].headers
   const rows = table.getRowModel().rows ?? []
-  console.log({ test: table.getRowCount() })
 
   const onScroll = useCallback(
     (e: UIEvent<HTMLElement>) => {

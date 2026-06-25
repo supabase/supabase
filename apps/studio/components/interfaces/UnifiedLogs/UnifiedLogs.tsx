@@ -258,8 +258,6 @@ export const UnifiedLogs = () => {
     getFacetedMinMaxValues: getTTableFacetedMinMaxValues(),
   })
 
-  console.log({ flatData })
-
   const selectedRow = useMemo(() => {
     if ((isLoading || isFetching) && !flatData.length) return
     return table.getCoreRowModel().flatRows.find((row) => row.id === openRowId)
