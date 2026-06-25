@@ -63,6 +63,7 @@ import {
   classifyStripeError,
   classifyValidationError,
 } from '@/lib/telemetry/funnel-errors'
+import { useTrack } from '@/lib/telemetry/track'
 import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
 interface NewOrgFormProps {
@@ -98,6 +99,7 @@ export const NewOrgForm = ({
 }: NewOrgFormProps) => {
   const router = useRouter()
   const user = useProfile()
+  const track = useTrack()
   const { resolvedTheme } = useTheme()
   const { lastVisitedOrganization } = useLastVisitedOrganization()
 
@@ -169,6 +171,14 @@ export const NewOrgForm = ({
       form.setValue('name', prefilledOrgName)
     }
   }, [isSuccess, form, organizations?.length, user.profile?.username, user.isSuccess])
+
+  const hasTrackedFormExposed = useRef(false)
+  useEffect(() => {
+    if (hasTrackedFormExposed.current) return
+    if (!user.isSuccess) return
+    hasTrackedFormExposed.current = true
+    track('organization_creation_form_exposed')
+  }, [user.isSuccess, track])
 
   const [latestAddress, setLatestAddress] = useState<CustomerAddress>()
   const [latestTaxId, setLatestTaxId] = useState<CustomerTaxId | null>()
@@ -288,6 +298,8 @@ export const NewOrgForm = ({
   }
 
   const onOrganizationCreated = (org: { slug: string }) => {
+    track('organization_creation_completed', undefined, { organization: org.slug })
+
     const prefilledProjectName = user.profile?.username
       ? user.profile.username + `'s Project`
       : 'My Project'
