@@ -1,29 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  Form,
-  FormControl,
-  FormField,
-  Switch,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import AlertError from '@/components/ui/AlertError'
-import { InlineLink } from '@/components/ui/InlineLink'
 import NoPermission from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
@@ -41,7 +30,7 @@ const schema = z.object({
 export const SecuritySettings = () => {
   const { slug } = useParams()
   const { profile } = useProfile()
-  const { data: members } = useOrganizationMembersQuery({ slug })
+  const { data: members, isPending: isLoadingMembers } = useOrganizationMembersQuery({ slug })
 
   const { can: canReadMfaConfig, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.READ,
@@ -89,7 +78,10 @@ export const SecuritySettings = () => {
   }, [mfaConfig, form])
 
   const hasMFAEnabled =
-    members?.find((member) => member.primary_email == profile?.primary_email)?.mfa_enabled || false
+    members?.find((member) => member.primary_email == profile?.primary_email)?.mfa_enabled ?? false
+
+  const requiresPersonalMfa =
+    canUpdateMfaConfig && !hasMFAEnabled && !isLoadingMembers && members !== undefined
 
   const onSubmit = (values: { enforceMfa: boolean }) => {
     if (!slug || !hasAccessToEnforceMfa) return
@@ -108,7 +100,7 @@ export const SecuritySettings = () => {
           />
         ) : (
           <>
-            {isLoadingMfa || isLoadingPermissions || isLoadingEntitlement ? (
+            {isLoadingMfa || isLoadingPermissions || isLoadingEntitlement || isLoadingMembers ? (
               <Card>
                 <CardContent>
                   <GenericSkeletonLoader />
@@ -122,7 +114,21 @@ export const SecuritySettings = () => {
               <AlertError error={mfaError} subject="Failed to retrieve MFA enforcement status" />
             )}
 
-            {isSuccessMfa && hasAccessToEnforceMfa && (
+            {requiresPersonalMfa && (
+              <Admonition
+                type="note"
+                layout="horizontal"
+                title="Enable MFA on your account first"
+                description="You need to set up multi-factor authentication (MFA) on your own account before you can enforce it on your organization."
+                actions={
+                  <Button asChild variant="default">
+                    <Link href="/account/security">Set up MFA</Link>
+                  </Button>
+                }
+              />
+            )}
+
+            {isSuccessMfa && hasAccessToEnforceMfa && !requiresPersonalMfa && (
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                   <Card>
@@ -133,36 +139,18 @@ export const SecuritySettings = () => {
                         render={({ field }) => (
                           <FormItemLayout
                             layout="flex-row-reverse"
+                            className="justify-between"
                             label="Require MFA to access organization"
                             description="Team members must have MFA enabled and a valid MFA session to access the organization and any projects."
                           >
                             <FormControl>
-                              <Tooltip>
-                                <TooltipTrigger asChild>
-                                  <Switch
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                    disabled={
-                                      !hasAccessToEnforceMfa ||
-                                      !canUpdateMfaConfig ||
-                                      !hasMFAEnabled ||
-                                      isUpdatingMfa
-                                    }
-                                  />
-                                </TooltipTrigger>
-                                {(!canUpdateMfaConfig || !hasMFAEnabled) && (
-                                  <TooltipContent side="bottom">
-                                    {!canUpdateMfaConfig ? (
-                                      "You don't have permission to update MFA settings"
-                                    ) : (
-                                      <>
-                                        <InlineLink href="/account/security">Enable MFA</InlineLink>{' '}
-                                        on your own account first
-                                      </>
-                                    )}
-                                  </TooltipContent>
-                                )}
-                              </Tooltip>
+                              <Switch
+                                checked={field.value}
+                                onCheckedChange={field.onChange}
+                                disabled={
+                                  !hasAccessToEnforceMfa || !canUpdateMfaConfig || isUpdatingMfa
+                                }
+                              />
                             </FormControl>
                           </FormItemLayout>
                         )}
@@ -192,7 +180,7 @@ export const SecuritySettings = () => {
                         }
                         loading={isUpdatingMfa}
                       >
-                        Save changes
+                        Save
                       </Button>
                     </CardFooter>
                   </Card>
