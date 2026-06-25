@@ -512,7 +512,7 @@ export const LogTable = ({
         )}
         <Button
           title="run-logs-query"
-          variant={hasEditorValue ? 'primary' : 'alternative'}
+          variant="primary"
           disabled={!hasEditorValue}
           onClick={onRun}
           iconRight={<Play size={12} />}
