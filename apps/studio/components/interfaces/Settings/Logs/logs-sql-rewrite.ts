@@ -83,6 +83,8 @@ const otelKey = (node: any): string =>
 const isSourceColumn = (node: any, source: string): boolean =>
   !!node?.column?.table && (node.column.table.name === source || node.column.table.name === 'logs')
 
+const isUnnestJoin = (join: any): boolean => !!join?.this?.alias?.this?.unnest
+
 export async function rewriteBqLogsSqlToClickhouse(input: string): Promise<RewriteResult> {
   const sdk = await loadSdk()
   const BQ = sdk.Dialect.BigQuery
@@ -131,9 +133,12 @@ export async function rewriteBqLogsSqlToClickhouse(input: string): Promise<Rewri
     const source = fromTable?.name?.name
     if (!source || !LOG_TABLES.has(source)) return false
 
+    // Only `unnest` joins are foldable into `log_attributes`. A real join means
+    // we can't safely rewrite, so bail and let the AI Assistant fallback handle it.
+    const joins = select.joins ?? []
+    if (joins.some((join: any) => !isUnnestJoin(join))) return false
+
     fromTable.name.name = 'logs'
-    // Legacy log queries only join via `unnest`; those joins are folded into the
-    // `log_attributes` map access, so drop them.
     select.joins = []
 
     // SELECT list: keep the original leaf name as the alias so result columns

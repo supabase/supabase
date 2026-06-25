@@ -46,6 +46,13 @@ cross join unnest(m.parsed) as parsed`)
     expect(changed).toBe(false)
     expect(sql).toBe('select 1')
   })
+
+  it('bails on a non-unnest join so the AI fallback handles it', async () => {
+    const input = 'select a.event_message from edge_logs a join postgres_logs b on a.id = b.id'
+    const { sql, changed } = await rewriteBqLogsSqlToClickhouse(input)
+    expect(changed).toBe(false)
+    expect(sql).toBe(input)
+  })
 })
 
 describe('buildClickhouseRewritePrompt', () => {
