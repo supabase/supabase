@@ -1,12 +1,13 @@
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
 
 import { withSupabase } from 'npm:@supabase/server@^1'
+import { Database } from '../_shared/database.types.ts'
 
 const model = new Supabase.ai.Session('gte-small')
 
 // Called with a secret key on the `apikey` header. Deploy with verify_jwt = false.
 export default {
-  fetch: withSupabase({ auth: 'secret' }, async (req, ctx) => {
+  fetch: withSupabase<Database>({ auth: 'secret' }, async (req, ctx) => {
     const { search } = await req.json()
     if (!search) {
       return Response.json({ error: 'Please provide a search param!' }, { status: 400 })
