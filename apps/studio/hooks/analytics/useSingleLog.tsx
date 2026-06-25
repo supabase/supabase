@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useFlag } from 'common'
+import { useMemo } from 'react'
 
 import { LOGS_TABLES } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type {
@@ -43,7 +44,7 @@ function useSingleLog({
   const useOtel = useFlag('otelLegacyLogs')
   const endpoint = logsAllEndpointUrl(useOtel)
 
-  const sql = (() => {
+  const sql = useMemo(() => {
     if (!id || !table) return safeSql``
     if (useOtel) {
       try {
@@ -54,7 +55,7 @@ function useSingleLog({
       }
     }
     return genSingleLogQuery(table, id)
-  })()
+  }, [id, table, useOtel])
 
   const enabled = Boolean(id && table)
 

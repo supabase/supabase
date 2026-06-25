@@ -11,88 +11,258 @@ import {
   otelTimestampToMicros,
 } from './Logs.utils.otel'
 import type { OtelLogRow } from '@/data/logs/otel-inspection.utils'
+import { formatSql } from '@/lib/formatSql'
 
-// Collapse whitespace so assertions are resilient to formatting/newlines.
-const sql = (fragment: string) => fragment.replace(/\s+/g, ' ').trim()
+// Format generated SQL so snapshots are deterministic and full strings can be compared.
+const fmt = (fragment: string) => formatSql(fragment)
 
 describe('genDefaultQueryOtel', () => {
   it('targets the OTEL logs table by source and aliases postgres columns', () => {
-    const q = sql(genDefaultQueryOtel(LogsTableName.POSTGRES, {}, 100))
-    expect(q).toContain('-- Logs Preview Query (otel)')
-    expect(q).toContain('FROM logs')
-    expect(q).toContain("source = 'postgres_logs'")
-    expect(q).toContain("log_attributes['parsed.error_severity'] AS error_severity")
-    expect(q).toContain("log_attributes['parsed.detail'] AS detail")
-    expect(q).toContain("log_attributes['parsed.hint'] AS hint")
-    expect(q).toContain('ORDER BY timestamp DESC')
-    expect(q).toContain('LIMIT 100')
+    expect(fmt(genDefaultQueryOtel(LogsTableName.POSTGRES, {}, 100))).toMatchInlineSnapshot(`
+      "-- Logs Preview Query (otel) ['postgres_logs']
+      select
+        id,
+        timestamp,
+        event_message,
+        log_attributes['identifier'] as identifier,
+        log_attributes['parsed.error_severity'] as error_severity,
+        log_attributes['parsed.detail'] as detail,
+        log_attributes['parsed.hint'] as hint
+      from
+        logs
+      where
+        source = 'postgres_logs'
+      order by
+        timestamp desc
+      limit
+        100"
+    `)
   })
 
   it('aliases edge columns to the leaf names the api renderer reads', () => {
-    const q = sql(genDefaultQueryOtel(LogsTableName.EDGE, {}, 50))
-    expect(q).toContain("source = 'edge_logs'")
-    expect(q).toContain("log_attributes['request.method'] AS method")
-    expect(q).toContain("log_attributes['request.path'] AS path")
-    expect(q).toContain("log_attributes['response.status_code'] AS status_code")
-    expect(q).toContain('LIMIT 50')
+    expect(fmt(genDefaultQueryOtel(LogsTableName.EDGE, {}, 50))).toMatchInlineSnapshot(`
+      "-- Logs Preview Query (otel) ['edge_logs']
+      select
+        id,
+        timestamp,
+        event_message,
+        log_attributes['identifier'] as identifier,
+        log_attributes['request.method'] as method,
+        log_attributes['request.path'] as path,
+        log_attributes['request.search'] as search,
+        log_attributes['response.status_code'] as status_code
+      from
+        logs
+      where
+        source = 'edge_logs'
+      order by
+        timestamp desc
+      limit
+        50"
+    `)
   })
 
   it('maps pg_cron onto postgres_logs with the cron predicate', () => {
-    const q = sql(genDefaultQueryOtel(LogsTableName.PG_CRON, {}))
-    expect(q).toContain("source = 'postgres_logs'")
-    expect(q).toContain("log_attributes['parsed.application_name'] = 'pg_cron'")
-    expect(q).toContain("event_message ILIKE '%cron job%'")
+    expect(fmt(genDefaultQueryOtel(LogsTableName.PG_CRON, {}))).toMatchInlineSnapshot(`
+      "-- Logs Preview Query (otel) ['pg_cron_logs']
+      select
+        id,
+        timestamp,
+        event_message,
+        log_attributes['parsed.error_severity'] as error_severity,
+        log_attributes['parsed.query'] as query
+      from
+        logs
+      where
+        source = 'postgres_logs'
+        and (
+          log_attributes['parsed.application_name'] = 'pg_cron'
+          or event_message ilike '%cron job%'
+        )
+      order by
+        timestamp desc
+      limit
+        100"
+    `)
   })
 
   it('selects only id/timestamp/event_message for tables without a column map', () => {
-    const q = sql(genDefaultQueryOtel(LogsTableName.MULTIGRES, {}))
-    expect(q).toContain("source = 'multigres_logs'")
-    expect(q).toContain('SELECT id, timestamp, event_message FROM logs')
+    expect(fmt(genDefaultQueryOtel(LogsTableName.MULTIGRES, {}))).toMatchInlineSnapshot(`
+      "-- Logs Preview Query (otel) ['multigres_logs']
+      select
+        id,
+        timestamp,
+        event_message
+      from
+        logs
+      where
+        source = 'multigres_logs'
+      order by
+        timestamp desc
+      limit
+        100"
+    `)
   })
 
   it('translates an edge status_code filter to a ClickHouse predicate', () => {
-    const q = sql(genDefaultQueryOtel(LogsTableName.EDGE, { status_code: { error: true } }))
-    expect(q).toContain("toInt32OrZero(log_attributes['response.status_code']) BETWEEN 500 AND 599")
+    expect(
+      fmt(genDefaultQueryOtel(LogsTableName.EDGE, { status_code: { error: true } }))
+    ).toMatchInlineSnapshot(`
+      "-- Logs Preview Query (otel) ['edge_logs']
+      select
+        id,
+        timestamp,
+        event_message,
+        log_attributes['identifier'] as identifier,
+        log_attributes['request.method'] as method,
+        log_attributes['request.path'] as path,
+        log_attributes['request.search'] as search,
+        log_attributes['response.status_code'] as status_code
+      from
+        logs
+      where
+        source = 'edge_logs'
+        and (
+          toInt32OrZero (log_attributes['response.status_code']) between 500 and 599
+        )
+      order by
+        timestamp desc
+      limit
+        100"
+    `)
   })
 
   it('translates a search_query filter to a case-insensitive event_message match', () => {
-    const q = sql(genDefaultQueryOtel(LogsTableName.POSTGRES, { search_query: 'deadlock' }))
-    expect(q).toContain("event_message ILIKE '%deadlock%'")
+    expect(
+      fmt(genDefaultQueryOtel(LogsTableName.POSTGRES, { search_query: 'deadlock' }))
+    ).toMatchInlineSnapshot(`
+      "-- Logs Preview Query (otel) ['postgres_logs']
+      select
+        id,
+        timestamp,
+        event_message,
+        log_attributes['identifier'] as identifier,
+        log_attributes['parsed.error_severity'] as error_severity,
+        log_attributes['parsed.detail'] as detail,
+        log_attributes['parsed.hint'] as hint
+      from
+        logs
+      where
+        source = 'postgres_logs'
+        and (event_message ilike '%deadlock%')
+      order by
+        timestamp desc
+      limit
+        100"
+    `)
   })
 
   it('uses the shared auth severity condition for the severity.error filter', () => {
-    const q = sql(genDefaultQueryOtel(LogsTableName.AUTH, { severity: { error: true } }))
-    expect(q).toContain(
-      "log_attributes['level'] IN ('error', 'fatal') OR toInt32OrZero(log_attributes['status']) >= 500"
-    )
+    expect(
+      fmt(genDefaultQueryOtel(LogsTableName.AUTH, { severity: { error: true } }))
+    ).toMatchInlineSnapshot(`
+      "-- Logs Preview Query (otel) ['auth_logs']
+      select
+        id,
+        timestamp,
+        event_message,
+        log_attributes['level'] as level,
+        log_attributes['status'] as status,
+        log_attributes['path'] as path,
+        log_attributes['msg'] as msg,
+        log_attributes['error'] as error
+      from
+        logs
+      where
+        source = 'auth_logs'
+        and (
+          log_attributes['level'] in ('error', 'fatal')
+          or toInt32OrZero (log_attributes['status']) >= 500
+        )
+      order by
+        timestamp desc
+      limit
+        100"
+    `)
   })
 
   it('falls back to a log_attributes equality for unknown filter keys', () => {
-    const q = sql(genDefaultQueryOtel(LogsTableName.AUTH, { trace_id: 'abc-123' }))
-    expect(q).toContain("log_attributes['trace_id'] = 'abc-123'")
+    expect(
+      fmt(genDefaultQueryOtel(LogsTableName.AUTH, { trace_id: 'abc-123' }))
+    ).toMatchInlineSnapshot(`
+      "-- Logs Preview Query (otel) ['auth_logs']
+      select
+        id,
+        timestamp,
+        event_message,
+        log_attributes['level'] as level,
+        log_attributes['status'] as status,
+        log_attributes['path'] as path,
+        log_attributes['msg'] as msg,
+        log_attributes['error'] as error
+      from
+        logs
+      where
+        source = 'auth_logs'
+        and (log_attributes['trace_id'] = 'abc-123')
+      order by
+        timestamp desc
+      limit
+        100"
+    `)
   })
 
   it('combines multiple filters with AND alongside the source predicate', () => {
-    const q = sql(
-      genDefaultQueryOtel(LogsTableName.EDGE, {
-        status_code: { error: true },
-        method: { get: true },
-      })
-    )
-    expect(q).toContain("source = 'edge_logs'")
-    expect(q).toContain("toInt32OrZero(log_attributes['response.status_code']) BETWEEN 500 AND 599")
-    expect(q).toContain("log_attributes['request.method'] = 'GET'")
-    expect(q.match(/ AND /g)?.length).toBeGreaterThanOrEqual(2)
+    expect(
+      fmt(
+        genDefaultQueryOtel(LogsTableName.EDGE, {
+          status_code: { error: true },
+          method: { get: true },
+        })
+      )
+    ).toMatchInlineSnapshot(`
+      "-- Logs Preview Query (otel) ['edge_logs']
+      select
+        id,
+        timestamp,
+        event_message,
+        log_attributes['identifier'] as identifier,
+        log_attributes['request.method'] as method,
+        log_attributes['request.path'] as path,
+        log_attributes['request.search'] as search,
+        log_attributes['response.status_code'] as status_code
+      from
+        logs
+      where
+        source = 'edge_logs'
+        and (
+          toInt32OrZero (log_attributes['response.status_code']) between 500 and 599
+        )
+        and (log_attributes['request.method'] = 'GET')
+      order by
+        timestamp desc
+      limit
+        100"
+    `)
   })
 })
 
 describe('genCountQueryOtel', () => {
   it('counts rows for the source with translated auth filters', () => {
-    const q = sql(genCountQueryOtel(LogsTableName.AUTH, { status_code: { server_error: true } }))
-    expect(q).toContain('-- Logs Count Query (otel)')
-    expect(q).toContain('SELECT count() AS count FROM logs')
-    expect(q).toContain("source = 'auth_logs'")
-    expect(q).toContain("toInt32OrZero(log_attributes['status']) BETWEEN 500 AND 599")
+    expect(
+      fmt(genCountQueryOtel(LogsTableName.AUTH, { status_code: { server_error: true } }))
+    ).toMatchInlineSnapshot(`
+      "-- Logs Count Query (otel) ['auth_logs']
+      select
+        count() as count
+      from
+        logs
+      where
+        source = 'auth_logs'
+        and (
+          toInt32OrZero (log_attributes['status']) between 500 and 599
+        )"
+    `)
   })
 })
 
@@ -103,76 +273,330 @@ describe('genChartQueryOtel', () => {
   }
 
   it('buckets by minute for short ranges and emits ok/error/warning counts', () => {
-    const q = sql(genChartQueryOtel(LogsTableName.EDGE, params, {}))
-    expect(q).toContain('-- Logs Chart Query (otel)')
-    expect(q).toContain('toStartOfMinute(timestamp) AS timestamp')
-    expect(q).toContain('AS ok_count')
-    expect(q).toContain('AS error_count')
-    expect(q).toContain('AS warning_count')
-    expect(q).toContain('countIf(')
-    expect(q).toContain('GROUP BY timestamp')
+    expect(fmt(genChartQueryOtel(LogsTableName.EDGE, params, {}))).toMatchInlineSnapshot(`
+      "-- Logs Chart Query (otel) ['edge_logs']
+      select
+        toStartOfMinute (timestamp) as timestamp,
+        countIf (
+          not (
+            (
+              toInt32OrZero (log_attributes['response.status_code']) >= 500
+            )
+            or (
+              toInt32OrZero (log_attributes['response.status_code']) between 400 and 499
+            )
+          )
+        ) as ok_count,
+        countIf (
+          toInt32OrZero (log_attributes['response.status_code']) >= 500
+        ) as error_count,
+        countIf (
+          toInt32OrZero (log_attributes['response.status_code']) between 400 and 499
+        ) as warning_count
+      from
+        logs
+      where
+        source = 'edge_logs'
+      group by
+        timestamp
+      order by
+        timestamp asc"
+    `)
   })
 
   it('buckets by hour for ranges longer than 12 hours', () => {
-    const q = sql(
-      genChartQueryOtel(
-        LogsTableName.POSTGRES,
-        {
-          iso_timestamp_start: '2024-01-01T00:00:00.000Z',
-          iso_timestamp_end: '2024-01-02T00:00:00.000Z',
-        },
-        {}
+    expect(
+      fmt(
+        genChartQueryOtel(
+          LogsTableName.POSTGRES,
+          {
+            iso_timestamp_start: '2024-01-01T00:00:00.000Z',
+            iso_timestamp_end: '2024-01-02T00:00:00.000Z',
+          },
+          {}
+        )
       )
-    )
-    expect(q).toContain('toStartOfHour(timestamp) AS timestamp')
+    ).toMatchInlineSnapshot(`
+      "-- Logs Chart Query (otel) ['postgres_logs']
+      select
+        toStartOfHour (timestamp) as timestamp,
+        countIf (
+          not (
+            (
+              log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC')
+            )
+            or (
+              log_attributes['parsed.error_severity'] = 'WARNING'
+            )
+          )
+        ) as ok_count,
+        countIf (
+          log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC')
+        ) as error_count,
+        countIf (
+          log_attributes['parsed.error_severity'] = 'WARNING'
+        ) as warning_count
+      from
+        logs
+      where
+        source = 'postgres_logs'
+      group by
+        timestamp
+      order by
+        timestamp asc"
+    `)
   })
 
   it('classifies auth severity by level and status, matching the BigQuery conditions', () => {
-    const q = sql(genChartQueryOtel(LogsTableName.AUTH, params, {}))
-    expect(q).toContain(
-      "log_attributes['level'] IN ('error', 'fatal') OR toInt32OrZero(log_attributes['status']) >= 500"
-    )
-    expect(q).toContain(
-      "log_attributes['level'] = 'warning' OR toInt32OrZero(log_attributes['status']) BETWEEN 400 AND 499"
-    )
+    expect(fmt(genChartQueryOtel(LogsTableName.AUTH, params, {}))).toMatchInlineSnapshot(`
+      "-- Logs Chart Query (otel) ['auth_logs']
+      select
+        toStartOfMinute (timestamp) as timestamp,
+        countIf (
+          not (
+            (
+              log_attributes['level'] in ('error', 'fatal')
+              or toInt32OrZero (log_attributes['status']) >= 500
+            )
+            or (
+              log_attributes['level'] = 'warning'
+              or toInt32OrZero (log_attributes['status']) between 400 and 499
+            )
+          )
+        ) as ok_count,
+        countIf (
+          log_attributes['level'] in ('error', 'fatal')
+          or toInt32OrZero (log_attributes['status']) >= 500
+        ) as error_count,
+        countIf (
+          log_attributes['level'] = 'warning'
+          or toInt32OrZero (log_attributes['status']) between 400 and 499
+        ) as warning_count
+      from
+        logs
+      where
+        source = 'auth_logs'
+      group by
+        timestamp
+      order by
+        timestamp asc"
+    `)
   })
 
   it('uses JSONExtractString for multigres severity (event_message is a JSON string)', () => {
-    const q = sql(genChartQueryOtel(LogsTableName.MULTIGRES, params, {}))
-    expect(q).toContain("JSONExtractString(event_message, 'level') IN ('ERROR', 'FATAL', 'PANIC')")
+    expect(fmt(genChartQueryOtel(LogsTableName.MULTIGRES, params, {}))).toMatchInlineSnapshot(`
+      "-- Logs Chart Query (otel) ['multigres_logs']
+      select
+        toStartOfMinute (timestamp) as timestamp,
+        countIf (
+          not (
+            (
+              JSONExtractString (event_message, 'level') in ('ERROR', 'FATAL', 'PANIC')
+            )
+            or (
+              JSONExtractString (event_message, 'level') in ('WARN', 'WARNING')
+            )
+          )
+        ) as ok_count,
+        countIf (
+          JSONExtractString (event_message, 'level') in ('ERROR', 'FATAL', 'PANIC')
+        ) as error_count,
+        countIf (
+          JSONExtractString (event_message, 'level') in ('WARN', 'WARNING')
+        ) as warning_count
+      from
+        logs
+      where
+        source = 'multigres_logs'
+      group by
+        timestamp
+      order by
+        timestamp asc"
+    `)
   })
 
   it('counts pg_cron errors but never warnings, matching BigQuery (no pg_cron warning case)', () => {
-    const q = sql(genChartQueryOtel(LogsTableName.PG_CRON, params, {}))
-    // Errors use the postgres severity predicate...
-    expect(q).toContain(
-      "countIf(log_attributes['parsed.error_severity'] IN ('ERROR', 'FATAL', 'PANIC')) AS error_count"
-    )
-    // ...but warnings are constant-false, so a WARNING cron row counts as ok (BQ parity).
-    expect(q).toContain('countIf(0) AS warning_count')
+    expect(fmt(genChartQueryOtel(LogsTableName.PG_CRON, params, {}))).toMatchInlineSnapshot(`
+      "-- Logs Chart Query (otel) ['pg_cron_logs']
+      select
+        toStartOfMinute (timestamp) as timestamp,
+        countIf (
+          not (
+            (
+              log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC')
+            )
+            or (0)
+          )
+        ) as ok_count,
+        countIf (
+          log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC')
+        ) as error_count,
+        countIf (0) as warning_count
+      from
+        logs
+      where
+        source = 'postgres_logs'
+        and (
+          log_attributes['parsed.application_name'] = 'pg_cron'
+          or event_message ilike '%cron job%'
+        )
+      group by
+        timestamp
+      order by
+        timestamp asc"
+    `)
   })
 
   it('emits constant-false severity for tables without a severity concept', () => {
-    const q = sql(genChartQueryOtel(LogsTableName.STORAGE, params, {}))
-    expect(q).toContain("source = 'storage_logs'")
-    // No error/warning predicate, so every row counts as ok.
-    expect(q).toContain('countIf(NOT ((0) OR (0))) AS ok_count')
-    expect(q).toContain('countIf(0) AS error_count')
+    expect(fmt(genChartQueryOtel(LogsTableName.STORAGE, params, {}))).toMatchInlineSnapshot(`
+      "-- Logs Chart Query (otel) ['storage_logs']
+      select
+        toStartOfMinute (timestamp) as timestamp,
+        countIf (
+          not (
+            (0)
+            or (0)
+          )
+        ) as ok_count,
+        countIf (0) as error_count,
+        countIf (0) as warning_count
+      from
+        logs
+      where
+        source = 'storage_logs'
+      group by
+        timestamp
+      order by
+        timestamp asc"
+    `)
+  })
+
+  it('defaults the chart bucket to minute when no time range is given', () => {
+    expect(fmt(genChartQueryOtel(LogsTableName.EDGE, {}, {}))).toMatchInlineSnapshot(`
+      "-- Logs Chart Query (otel) ['edge_logs']
+      select
+        toStartOfMinute (timestamp) as timestamp,
+        countIf (
+          not (
+            (
+              toInt32OrZero (log_attributes['response.status_code']) >= 500
+            )
+            or (
+              toInt32OrZero (log_attributes['response.status_code']) between 400 and 499
+            )
+          )
+        ) as ok_count,
+        countIf (
+          toInt32OrZero (log_attributes['response.status_code']) >= 500
+        ) as error_count,
+        countIf (
+          toInt32OrZero (log_attributes['response.status_code']) between 400 and 499
+        ) as warning_count
+      from
+        logs
+      where
+        source = 'edge_logs'
+      group by
+        timestamp
+      order by
+        timestamp asc"
+    `)
   })
 })
 
 describe('genSingleLogQueryOtel', () => {
   it('fetches a single row by id with raw attributes', () => {
-    const q = sql(genSingleLogQueryOtel('123e4567-e89b-12d3-a456-426614174000'))
-    expect(q).toContain('-- Single Log Query (otel)')
-    expect(q).toContain('FROM logs')
-    expect(q).toContain("WHERE id = '123e4567-e89b-12d3-a456-426614174000'")
-    expect(q).toContain('log_attributes')
-    expect(q).toContain('LIMIT 1')
+    expect(
+      fmt(genSingleLogQueryOtel('123e4567-e89b-12d3-a456-426614174000'))
+    ).toMatchInlineSnapshot(`
+      "-- Single Log Query (otel)
+      select
+        id,
+        timestamp,
+        event_message,
+        source,
+        severity_text,
+        log_attributes
+      from
+        logs
+      where
+        id = '123e4567-e89b-12d3-a456-426614174000'
+      limit
+        1"
+    `)
   })
 
   it('rejects a non-uuid id', () => {
     expect(() => genSingleLogQueryOtel("1' OR '1'='1")).toThrow('Invalid logId')
+  })
+})
+
+describe('OTEL filter translation', () => {
+  it('translates the database filter for postgres', () => {
+    expect(
+      fmt(genDefaultQueryOtel(LogsTableName.POSTGRES, { database: 'replica-1' }))
+    ).toMatchInlineSnapshot(`
+      "-- Logs Preview Query (otel) ['postgres_logs']
+      select
+        id,
+        timestamp,
+        event_message,
+        log_attributes['identifier'] as identifier,
+        log_attributes['parsed.error_severity'] as error_severity,
+        log_attributes['parsed.detail'] as detail,
+        log_attributes['parsed.hint'] as hint
+      from
+        logs
+      where
+        source = 'postgres_logs'
+        and (log_attributes['identifier'] = 'replica-1')
+      order by
+        timestamp desc
+      limit
+        100"
+    `)
+  })
+
+  it('translates the database filter for supavisor', () => {
+    expect(
+      fmt(genDefaultQueryOtel(LogsTableName.SUPAVISOR, { database: 'proj' }))
+    ).toMatchInlineSnapshot(`
+      "-- Logs Preview Query (otel) ['supavisor_logs']
+      select
+        id,
+        timestamp,
+        event_message
+      from
+        logs
+      where
+        source = 'supavisor_logs'
+        and (log_attributes['project'] like 'proj%')
+      order by
+        timestamp desc
+      limit
+        100"
+    `)
+  })
+
+  it('translates the etl pipeline_id filter', () => {
+    expect(
+      fmt(genDefaultQueryOtel(LogsTableName.ETL, { pipeline_id: '42' }))
+    ).toMatchInlineSnapshot(`
+      "-- Logs Preview Query (otel) ['etl_replication_logs']
+      select
+        id,
+        timestamp,
+        event_message
+      from
+        logs
+      where
+        source = 'etl_replication_logs'
+        and (log_attributes['pipeline_id'] = '42')
+      order by
+        timestamp desc
+      limit
+        100"
+    `)
   })
 })
 
@@ -312,28 +736,5 @@ describe('mapOtelSingleLogToLegacy', () => {
     expect(log.metadata[0].parsed[0].hint).toBeNull()
     expect(log.metadata[0].parsed[0].detail).toBeNull()
     expect(log.metadata[0].parsed[0].query).toBeNull()
-  })
-})
-
-describe('OTEL filter translation and chart defaults', () => {
-  it('translates the database filter for postgres and supavisor', () => {
-    expect(sql(genDefaultQueryOtel(LogsTableName.POSTGRES, { database: 'replica-1' }))).toContain(
-      "log_attributes['identifier'] = 'replica-1'"
-    )
-    expect(sql(genDefaultQueryOtel(LogsTableName.SUPAVISOR, { database: 'proj' }))).toContain(
-      "log_attributes['project'] LIKE 'proj%'"
-    )
-  })
-
-  it('translates the etl pipeline_id filter', () => {
-    expect(sql(genDefaultQueryOtel(LogsTableName.ETL, { pipeline_id: '42' }))).toContain(
-      "log_attributes['pipeline_id'] = '42'"
-    )
-  })
-
-  it('defaults the chart bucket to minute when no time range is given', () => {
-    expect(sql(genChartQueryOtel(LogsTableName.EDGE, {}, {}))).toContain(
-      'toStartOfMinute(timestamp)'
-    )
   })
 })
