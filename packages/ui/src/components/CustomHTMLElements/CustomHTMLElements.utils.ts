@@ -63,7 +63,7 @@ export const removeAnchor = (text: any) => {
   if (typeof text === 'object' && Array.isArray(text)) {
     return text.filter((x) => !(typeof x === 'string' && hasCustomAnchor(x)))
   } else if (typeof text === 'string') {
-    if (text.indexOf('[#') > 0) return text.slice(0, text.indexOf('[#'))
+    if (text.indexOf('[#') >= 0) return text.slice(0, text.indexOf('[#'))
     else return text
   }
   return text
