@@ -1,7 +1,7 @@
 [data-theme='light'],
 .light {
   --helpers-os-appearance: Light;
-  --hue: 160;
+  --hue: 159;
   --chroma: 0.005;
   /*
    * Soft-gray canvas (not pure white) so elevated surfaces have headroom to
@@ -17,10 +17,11 @@
   /*
    * Expressive fills run darker than the dark-theme anchors so they hold contrast
    * against the near-white surface (a light amber on white disappears). Lightness
-   * is mode-aware; chroma still derives from --chroma in semantic.css.
+   * is mode-aware; chroma is the shared --expressive-chroma from semantic.css.
    */
   --warning-lightness: 0.68;
   --destructive-lightness: 0.52;
+  --info-lightness: 0.54;
 
   --code-block-5: 14deg 80.4% 58%;
   --code-block-4: 276.3deg 60% 52.9%;

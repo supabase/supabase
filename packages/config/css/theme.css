@@ -27,6 +27,8 @@
   --color-warning-foreground: var(--warning-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -68,7 +70,7 @@
   --color-brand-400: hsl(var(--brand-400));
   --color-brand-500: hsl(var(--brand-500));
   --color-brand-600: hsl(var(--brand-600));
-  --color-brand: hsl(var(--brand-default));
+  --color-brand: var(--primary);
   --color-brand-link: hsl(var(--brand-link));
   --color-_secondary-200: hsl(var(--secondary-200));
   --color-_secondary-400: hsl(var(--secondary-400));
@@ -322,6 +324,7 @@
   --color-border-stronger: var(--border-stronger);
   --color-border-destructive: var(--border-destructive);
   --color-border-warning: var(--border-warning);
+  --color-border-info: var(--border-info);
   --color-border-brand: var(--border-brand);
   /*
    * This will generate colors only for border utilities

@@ -8,7 +8,9 @@
  */
 
 :root {
-  --hue: 160;
+  /* --hue is the brand hue: Supabase green measures ~159° in OKLCH, and the
+     brand (--primary) is derived from it, so the two can't drift apart. */
+  --hue: 159;
   --chroma: 0.01;
   --surface: 0.985;
 
@@ -79,11 +81,15 @@
    * toward the brand --hue for harmony, then clamp to their perceptual category
    * so "warning" always reads amber and "destructive" always reads red no matter
    * what --hue is. --status-hue-pull: 0 = fixed amber/red, 1 = fully brand-relative.
-   * At --hue: 160 the pull term is 0, so these resolve to the base 75 / 25.
+   * At the default --hue the pull term is 0, so these resolve to their bases
+   * (warning 75 / destructive 25 / info 288). --brand-hue-reference is the
+   * --hue at which pull is zero; keep it equal to the default brand hue.
    * Warning sits at 75 (amber), not higher toward yellow — yellow can't darken
-   * without going olive, so it loses contrast on light surfaces.
+   * without going olive, so it loses contrast on light surfaces. Info is a violet
+   * (matching the "no additional charge" badge); like the others it pulls a touch
+   * with the brand --hue but clamps so it always reads violet.
    */
-  --brand-hue-reference: 160;
+  --brand-hue-reference: 159;
   --status-hue-pull: 0.15;
   --warning-hue: clamp(
     65,
@@ -95,6 +101,11 @@
     calc(25 + (var(--hue) - var(--brand-hue-reference)) * var(--status-hue-pull)),
     42
   );
+  --info-hue: clamp(
+    272,
+    calc(288 + (var(--hue) - var(--brand-hue-reference)) * var(--status-hue-pull)),
+    302
+  );
   /*
    * Expressive (status) colors are deliberately NOT derived from the neutral
    * surface→foreground span the way text and surfaces are. An expressive color
@@ -102,17 +113,18 @@
    * left warning under-saturated in light mode and too dark in dark mode.
    *
    * Instead each is anchored to a fixed target lightness near its hue's chroma
-   * peak. Chroma scales off the theme's --chroma knob at a much higher level
-   * than neutrals (which use ~0.5–0.9×), so expressive fills track the theme's
-   * overall saturation but stay vibrant, then clamp into a calm-but-present band
-   * that sits inside sRGB at these lightnesses — no gamut mapping required. The
-   * lightness anchors are mode-invariant on purpose — a warning should read as
-   * the same amber everywhere — but themes may override --warning-lightness /
-   * --destructive-lightness to nudge a single mode.
+   * peak and a single shared --expressive-chroma. That chroma is a flat constant,
+   * deliberately NOT derived from the neutral --chroma knob: status colors must
+   * stay legible even when the brand is dialed toward grayscale. It sits inside
+   * sRGB at these lightnesses, so no gamut mapping is required.
+   *
+   * The dark-mode lightness anchors live here; light mode runs darker (set in
+   * light.css) so the fills hold contrast against the near-white surface.
    */
-  --expressive-chroma: clamp(0.13, calc(var(--chroma) * 13), 0.16);
+  --expressive-chroma: 0.14;
   --warning-lightness: 0.8;
-  --destructive-lightness: 0.585;
+  --destructive-lightness: 0.75;
+  --info-lightness: 0.7;
 
   /* shadcn semantic pairs */
   --background: oklch(var(--surface) calc(var(--chroma) * 0.5) var(--hue));
@@ -126,7 +138,10 @@
   --popover: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-2)) c h);
   --popover-foreground: var(--foreground);
 
-  --primary: oklch(0.72 calc(var(--chroma) * 9) var(--hue));
+  /* Primary IS the brand: a fixed, vivid Supabase green on --hue, mode-invariant
+     and decoupled from the --chroma knob so the brand holds its identity even as
+     neutrals desaturate. --color-brand aliases this in theme.css. */
+  --primary: oklch(0.76 0.15 var(--hue));
   --primary-foreground: oklch(
     min(var(--surface), var(--foreground-lightness)) calc(var(--chroma) * 0.45) var(--hue)
   );
@@ -173,10 +188,15 @@
   --destructive-foreground: oklch(
     from var(--destructive) clamp(0.12, calc((0.62 - l) * 100), 0.99) calc(c * 0.08) h
   );
+  --info: oklch(var(--info-lightness) var(--expressive-chroma) var(--info-hue));
+  --info-foreground: oklch(
+    from var(--info) clamp(0.12, calc((0.62 - l) * 100), 0.99) calc(c * 0.08) h
+  );
 
   /* Status border tokens for subtle / tinted surfaces */
   --border-destructive: oklch(from var(--destructive) l c h / 30%);
   --border-warning: oklch(from var(--warning) l c h / 30%);
+  --border-info: oklch(from var(--info) l c h / 30%);
   --border-brand: oklch(from var(--primary) l c h / 30%);
 
   --border: oklch(
@@ -186,47 +206,4 @@
     from var(--foreground) l calc(c * 0.5) h / calc(3% + 38% * var(--contrast-border))
   );
   --ring: oklch(from var(--primary) l c h / 55%);
-
-  /* Legacy foreground aliases */
-  --foreground-default: var(--foreground);
-  --foreground-light: var(--muted-foreground);
-  --foreground-lighter: var(--tertiary-foreground);
-  --foreground-muted: var(--tertiary-foreground);
-  --foreground-contrast: var(--primary-foreground);
-
-  /* Legacy background aliases */
-  --background-default: var(--background);
-  --background-200: var(--card);
-  --background-alternative-default: var(--background);
-  --background-alternative-200: var(--card);
-  --background-selection: var(--accent);
-  --background-control: var(--accent);
-  --background-surface-75: var(--background);
-  --background-surface-100: var(--card);
-  --background-surface-200: var(--muted);
-  --background-surface-300: var(--secondary);
-  --background-surface-400: var(--tertiary);
-  --background-overlay-default: var(--secondary);
-  --background-overlay-hover: var(--accent);
-  --background-muted: var(--muted);
-  --background-button-default: var(--secondary);
-  --background-dialog-default: var(--popover);
-  --background-dash-sidebar: var(--background);
-  --background-dash-canvas: var(--background);
-
-  /* Legacy border aliases */
-  --border-default: var(--border);
-  --border-muted: var(--border);
-  --border-secondary: var(--border-muted);
-  --border-overlay: oklch(
-    from var(--foreground) l calc(c * 0.5) h / calc(4% + 34% * var(--contrast-border))
-  );
-  --border-control: var(--input);
-  --border-alternative: var(--border);
-  --border-strong: var(--input);
-  --border-stronger: oklch(
-    from var(--foreground) l calc(c * 0.5) h / calc(5% + 45% * var(--contrast-border))
-  );
-  --border-button-default: var(--border);
-  --border-button-hover: var(--border-stronger);
 }
