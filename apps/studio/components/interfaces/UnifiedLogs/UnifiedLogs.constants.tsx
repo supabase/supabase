@@ -71,7 +71,7 @@ export const SEARCH_PARAMS_PARSER = {
   id: parseAsString,
 
   // View options
-  hide_connection_logs: parseAsBoolean.withDefault(true),
+  show_connection_logs: parseAsBoolean.withDefault(true),
 }
 
 const POSTGRES_STATUS_CODE_LABELS = {

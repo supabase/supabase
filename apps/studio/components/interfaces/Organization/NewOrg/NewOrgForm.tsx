@@ -58,7 +58,13 @@ import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganizat
 import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from '@/lib/constants'
 import { validateReturnTo } from '@/lib/gotrue'
 import { useProfile } from '@/lib/profile'
+import {
+  classifyApiError,
+  classifyStripeError,
+  classifyValidationError,
+} from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
 interface NewOrgFormProps {
   onPaymentMethodReset: () => void
@@ -236,6 +242,8 @@ export const NewOrgForm = ({
     [freeOrgs, projectsByOrg]
   )
 
+  const trackFunnelError = useTrackFunnelError()
+
   const { mutate: createOrganization } = useOrganizationCreateMutation({
     onSuccess: async (org) => {
       if ('pending_payment_intent_secret' in org && org.pending_payment_intent_secret) {
@@ -246,6 +254,7 @@ export const NewOrgForm = ({
     },
     onError: (data) => {
       toast.error(data.message, { duration: 10_000 })
+      trackFunnelError('org_creation', classifyApiError('org_creation', data), 'toast')
       setNewOrgLoading(false)
     },
   })
@@ -255,6 +264,10 @@ export const NewOrgForm = ({
       if (data && 'slug' in data) {
         onOrganizationCreated({ slug: data.slug })
       }
+    },
+    onError: (error) => {
+      toast.error(error.message, { dismissible: true, duration: 10_000 })
+      trackFunnelError('org_creation', classifyApiError('org_creation', error), 'toast')
     },
   })
 
@@ -270,6 +283,11 @@ export const NewOrgForm = ({
         size: form.getValues('size'),
       })
     } else {
+      trackFunnelError(
+        'org_creation',
+        classifyStripeError(paymentIntentConfirmation.error),
+        'toast'
+      )
       // If the payment intent is not successful, we reset the payment method and show an error
       toast.error(`Could not confirm payment. Please try again or use a different card.`, {
         duration: 10_000,
@@ -366,7 +384,12 @@ export const NewOrgForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} id={FORM_ID}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit, (errors) =>
+          trackFunnelError('org_creation', classifyValidationError('org_creation', errors), 'form')
+        )}
+        id={FORM_ID}
+      >
         <Panel
           title={
             <div key="panel-title">
@@ -559,6 +582,11 @@ export const NewOrgForm = ({
               onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
               onError={(err) => {
                 toast.error(err.message, { duration: 10_000 })
+                trackFunnelError(
+                  'org_creation',
+                  { errorCategory: 'payment', errorReason: 'payment_error' },
+                  'toast'
+                )
                 setNewOrgLoading(false)
                 resetPaymentMethod()
               }}
