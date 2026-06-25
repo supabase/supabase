@@ -56,7 +56,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       enableHiding: false,
       enableResizing: false,
       enableSorting: false,
-      filterFn: (_row, _columnId, _filterValue) => true,
+      filterFn: () => true,
       size: 48,
       minSize: 48,
       maxSize: 48,
@@ -76,7 +76,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       enableHiding: false,
       enableResizing: false,
       enableSorting: false,
-      filterFn: (_row, _columnId, _filterValue) => true,
+      filterFn: () => true,
       size: 48,
       minSize: 48,
       maxSize: 48,
@@ -93,7 +93,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
         const date = new Date(row.getValue<ColumnSchema['date']>('date'))
         return <HoverCardTimestamp date={date} />
       },
-      filterFn: (_row, _columnId, _filterValue) => true,
+      filterFn: () => true,
       enableResizing: false,
       enableSorting: false,
       size: 140,
@@ -118,7 +118,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
         )
       },
       enableHiding: false,
-      filterFn: (_row, _columnId, _filterValue) => true,
+      filterFn: () => true,
       enableResizing: false,
       enableSorting: false,
       size: 40,
@@ -169,7 +169,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
           </div>
         )
       },
-      filterFn: (_row, _columnId, _filterValue) => true,
+      filterFn: () => true,
       enableResizing: false,
       enableSorting: false,
       size: 70,
@@ -206,6 +206,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
     {
       accessorKey: 'pathname',
       header: 'Pathname',
+      filterFn: () => true,
       enableSorting: false,
       enableResizing: false,
       size: 250,
