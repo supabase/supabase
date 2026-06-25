@@ -33,6 +33,7 @@ const Index = () => {
   return (
     <>
       <NextSeo
+        canonical="https://supabase.com/support"
         title={data.meta_title}
         description={data.meta_description}
         openGraph={{

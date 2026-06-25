@@ -36,6 +36,7 @@ function EdgeFunctions() {
   return (
     <>
       <NextSeo
+        canonical="https://supabase.com/edge-functions"
         title={pageData.metaTitle}
         description={pageData.metaDescription}
         openGraph={{
