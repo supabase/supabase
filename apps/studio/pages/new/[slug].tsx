@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag, useParams } from 'common'
+import { useFeatureFlags, useFlag, useParams } from 'common'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -103,6 +103,7 @@ const Wizard: NextPageWithLayout = () => {
     'integrations.github_connections'
   )
 
+  const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = useFlag('enableSmartRegion')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showInternalOnlyConfiguration = useFlag('newProjectInternalOnlyConfiguration')
@@ -166,6 +167,7 @@ const Wizard: NextPageWithLayout = () => {
     projectName: watchedProjectName,
     highAvailability,
   } = useWatch({ control: form.control })
+  const isDbRegionDirty = getFieldState('dbRegion', form.formState).isDirty
 
   // Read dirty state during render rather than depending on form.formState in the
   // effect — form.formState is a Proxy that gets a new reference every render, which
@@ -174,18 +176,6 @@ const Wizard: NextPageWithLayout = () => {
     'dataApiDefaultPrivileges',
     form.formState
   ).isDirty
-
-  useEffect(() => {
-    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
-    if (isDataApiDefaultPrivilegesDirty) return
-    setValue(
-      'dataApiDefaultPrivileges',
-      !isInDataApiRevokeTreatment(dataApiRevokeOnCreateDefaultFlag),
-      {
-        shouldDirty: false,
-      }
-    )
-  }, [dataApiRevokeOnCreateDefaultFlag, isDataApiDefaultPrivilegesDirty, setValue])
 
   // [Charis] Since the form is updated in a useEffect, there is an edge case
   // when switching from free to paid, where canChooseInstanceSize is true for
@@ -232,7 +222,7 @@ const Wizard: NextPageWithLayout = () => {
       cloudProvider: PROVIDERS[defaultProvider].id,
     },
     {
-      enabled: !smartRegionEnabled,
+      enabled: flagsLoaded && !smartRegionEnabled,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       refetchInterval: false,
@@ -249,13 +239,14 @@ const Wizard: NextPageWithLayout = () => {
         desiredInstanceSize: instanceSize as DesiredInstanceSize,
       },
       {
-        enabled: smartRegionEnabled,
+        enabled: flagsLoaded && smartRegionEnabled,
         refetchOnMount: false,
         refetchOnWindowFocus: false,
         refetchInterval: false,
         refetchOnReconnect: false,
       }
     )
+
   const recommendedSmartRegion = smartRegionEnabled
     ? availableRegionsData?.recommendations.smartGroup.name
     : ''
@@ -447,7 +438,6 @@ const Wizard: NextPageWithLayout = () => {
     if (projectName) setValue('projectName', projectName || '')
   }, [slug, setValue, projectName])
 
-  const isDbRegionDirty = getFieldState('dbRegion', form.formState).isDirty
   useEffect(() => {
     if (!isDbRegionDirty && defaultRegion) {
       setValue('dbRegion', defaultRegion)
@@ -455,18 +445,17 @@ const Wizard: NextPageWithLayout = () => {
   }, [defaultRegion, isDbRegionDirty, setValue])
 
   useEffect(() => {
-    if (regionError) {
-      resetField('dbRegion', {
-        defaultValue: PROVIDERS[defaultProvider].default_region.displayName,
-      })
-    }
-  }, [regionError, resetField, defaultProvider])
-
-  useEffect(() => {
     if (!isDbRegionDirty && recommendedSmartRegion) {
       setValue('dbRegion', recommendedSmartRegion)
     }
   }, [recommendedSmartRegion, isDbRegionDirty, setValue])
+
+  useEffect(() => {
+    const defaultRegion = PROVIDERS[defaultProvider].default_region.displayName
+    if (regionError && defaultRegion) {
+      resetField('dbRegion', { defaultValue: defaultRegion })
+    }
+  }, [regionError, resetField, defaultProvider])
 
   useEffect(() => {
     if (highAvailability && cloudProvider !== 'AWS_K8S') {
@@ -493,6 +482,18 @@ const Wizard: NextPageWithLayout = () => {
       shouldValidate: true,
     })
   }, [githubRepositoryName, watchedProjectName, setValue])
+
+  useEffect(() => {
+    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
+    if (isDataApiDefaultPrivilegesDirty) return
+    setValue(
+      'dataApiDefaultPrivileges',
+      !isInDataApiRevokeTreatment(dataApiRevokeOnCreateDefaultFlag),
+      {
+        shouldDirty: false,
+      }
+    )
+  }, [dataApiRevokeOnCreateDefaultFlag, isDataApiDefaultPrivilegesDirty, setValue])
 
   return (
     <>
