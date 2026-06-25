@@ -61,4 +61,19 @@ describe('buildClickhouseRewritePrompt', () => {
     expect(prompt).not.toContain('```sql')
     expect(prompt.toLowerCase()).toContain('how do i write queries')
   })
+
+  it('includes the logs schema: table shape, sources, keys, and timestamp format', () => {
+    for (const prompt of [
+      buildClickhouseRewritePrompt(),
+      buildClickhouseRewritePrompt('select 1'),
+    ]) {
+      expect(prompt).toContain('log_attributes')
+      expect(prompt).toContain("source = 'edge_logs'")
+      expect(prompt).toContain('auth_logs')
+      expect(prompt).toContain('response.status_code')
+      expect(prompt).toContain('toInt32OrZero')
+      // Timestamp format the user flagged.
+      expect(prompt).toContain('2026-06-22T09:34:06.215000')
+    }
+  })
 })

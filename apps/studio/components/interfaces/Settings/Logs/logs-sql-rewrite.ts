@@ -175,6 +175,39 @@ export async function rewriteBqLogsSqlToClickhouse(input: string): Promise<Rewri
   return { sql: generated.sql[0], changed: true }
 }
 
+// Schema reference handed to the AI Assistant so it knows the table shape, the
+// available sources, their log_attributes keys, and the timestamp format. Mirrors
+// OTEL_SOURCES in Logs.utils.otel.ts.
+const LOGS_SCHEMA_REFERENCE = `The logs table (ClickHouse) has these columns:
+- id (String)
+- timestamp (DateTime64, UTC) formatted like 2026-06-22T09:34:06.215000 (ISO 8601, microsecond precision, no trailing Z). Use it directly, e.g. order by timestamp desc. The Logs Explorer already applies the selected time range, so an explicit timestamp filter is usually unnecessary.
+- event_message (String): the raw log line
+- severity_text (String): log level when present
+- source (String): the service the log belongs to. Always filter by it, e.g. where source = 'edge_logs'.
+- log_attributes (Map(String, String)): structured per-source fields, read as log_attributes['key']. Values are strings, so wrap numeric ones in toInt32OrZero(...) for comparisons.
+
+Sources and their common log_attributes keys:
+- edge_logs: request.method, request.path, request.search, response.status_code, identifier
+- postgres_logs: parsed.error_severity, parsed.detail, parsed.hint, parsed.query, identifier
+- pg_cron logs live under source = 'postgres_logs' (parsed.error_severity, parsed.query)
+- auth_logs: level, status, path, msg, error
+- function_edge_logs: response.status_code, request.method, request.pathname, function_id, execution_id, execution_time_ms, deployment_id, version
+- function_logs: event_type, function_id, execution_id, level
+- storage_logs, realtime_logs, postgrest_logs, supavisor_logs, pgbouncer_logs, pg_upgrade_logs, auth_audit_logs, multigres_logs, etl_replication_logs: mostly id, timestamp, event_message, with any extra fields in log_attributes
+
+Tips:
+- List the keys present on a row with: select mapKeys(log_attributes) from logs where source = '...' limit 1
+- Numeric filter: toInt32OrZero(log_attributes['response.status_code']) between 500 and 599
+- Text search: event_message ILIKE '%timeout%'
+
+Example:
+select timestamp, event_message, log_attributes['request.path'] as path
+from logs
+where source = 'edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) >= 500
+order by timestamp desc
+limit 100`
+
 /**
  * Prompt for the AI Assistant to rewrite a Logs Explorer query from the old
  * BigQuery dialect to the ClickHouse-backed OTEL logs schema. Used as the
@@ -186,7 +219,7 @@ export function buildClickhouseRewritePrompt(sql?: string): string {
     'The Logs Explorer now runs on a ClickHouse-backed engine instead of BigQuery, which uses a different SQL dialect and schema (a single `logs` table with fields in the `log_attributes` map, keyed by `source`).'
   const trimmed = sql?.trim()
   if (!trimmed) {
-    return `${intro}\n\nHow do I write queries against the new ClickHouse logs schema? Give a short overview of the key differences from the old BigQuery syntax.`
+    return `${intro}\n\n${LOGS_SCHEMA_REFERENCE}\n\nHow do I write queries against the new ClickHouse logs schema? Give a short overview of the key differences from the old BigQuery syntax.`
   }
-  return `${intro}\n\nRewrite this query to valid ClickHouse SQL against the new logs schema, preserving its original intent:\n\n\`\`\`sql\n${trimmed}\n\`\`\``
+  return `${intro}\n\n${LOGS_SCHEMA_REFERENCE}\n\nRewrite this query to valid ClickHouse SQL against the schema above, preserving its original intent:\n\n\`\`\`sql\n${trimmed}\n\`\`\``
 }
