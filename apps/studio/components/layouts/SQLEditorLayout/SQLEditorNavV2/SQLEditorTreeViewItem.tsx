@@ -37,6 +37,11 @@ import useLatest from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import {
+  isFolderEditing,
+  isFolderSaving,
+  type FolderStatus,
+} from '@/state/sql-editor/sql-editor-lifecycle'
 
 interface SQLEditorTreeViewItemProps extends Omit<
   ComponentProps<typeof TreeViewItem>,
@@ -44,7 +49,7 @@ interface SQLEditorTreeViewItemProps extends Omit<
 > {
   element: any
   isMultiSelected?: boolean
-  status?: 'editing' | 'saving' | 'idle'
+  status?: FolderStatus
   getNodeProps: () => any
   onSelectCreate?: () => void
   onSelectDelete?: () => void
@@ -105,8 +110,8 @@ export const SQLEditorTreeViewItem = ({
   const isSharedSnippet = element.metadata.visibility === 'project'
   const isFavorite = element.metadata.favorite
 
-  const isEditing = status === 'editing'
-  const isSaving = status === 'saving'
+  const isEditing = isFolderEditing(status)
+  const isSaving = isFolderSaving(status)
 
   const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
     PermissionAction.CREATE,

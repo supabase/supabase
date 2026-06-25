@@ -307,7 +307,8 @@ const buildBaseWhere = (
  * by the connection rows the list hides).
  */
 const connectionLogsFilter = (search: QuerySearchParamsType): SafeLogSqlFragment | null => {
-  if (!search.hide_connection_logs) return null
+  // Visible by default — only an explicit `false` hides connection logs.
+  if (search.show_connection_logs !== false) return null
   return safeSql`(source != 'postgres_logs' OR (
     event_message NOT LIKE 'connection received%' AND
     event_message NOT LIKE 'connection authenticated%' AND
