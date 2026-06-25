@@ -11,57 +11,24 @@ import {
 } from '~/lib/content-listings.schema'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import Link from 'next/link'
-import { type ReactNode } from 'react'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
-function ContentListingLink({
-  item,
-  groupLabel,
-  listingId,
-  children,
-  className,
-}: {
-  item: ContentListingItem
-  groupLabel: string
-  listingId: string
-  children: ReactNode
-  className?: string
-}) {
+function useContentListingClickHandler(group: ContentListingGroup) {
   const sendTelemetryEvent = useSendTelemetryEvent()
-  const href = normalizeContentListingHref(item.href)
+  const groupLabel = getContentListingGroupLabel(group)
 
-  const onClick = () => {
+  return (item: ContentListingItem) => () => {
     sendTelemetryEvent({
       action: 'docs_content_listing_clicked',
       properties: {
         targetPath: item.href,
         linkTitle: item.title,
         ...(groupLabel ? { groupTitle: groupLabel } : {}),
-        listingId,
+        listingId: group.id,
       },
     })
   }
-
-  if (isExternalContentListingHref(href)) {
-    return (
-      <a
-        href={href}
-        target="_blank"
-        rel="noopener noreferrer"
-        className={className}
-        onClick={onClick}
-      >
-        {children}
-      </a>
-    )
-  }
-
-  return (
-    <Link href={href} className={className} onClick={onClick}>
-      {children}
-    </Link>
-  )
 }
 
 function ContentListingGroupHeading({ group }: { group: ContentListingGroup }) {
@@ -71,22 +38,24 @@ function ContentListingGroupHeading({ group }: { group: ContentListingGroup }) {
 }
 
 function ContentListingsListGroup({ group }: { group: ContentListingGroup }) {
-  const groupLabel = getContentListingGroupLabel(group)
+  const trackClick = useContentListingClickHandler(group)
 
   return (
     <section className="not-prose space-y-4">
       <ContentListingGroupHeading group={group} />
       {group.description && <p className="text-foreground-light">{group.description}</p>}
       <ul className="list-disc pl-6 space-y-2">
-        {group.items.map((item) => (
-          <li key={`${group.id}-${item.href}`}>
-            <ContentListingLink item={item} groupLabel={groupLabel} listingId={group.id}>
-              <span>
+        {group.items.map((item) => {
+          const href = normalizeContentListingHref(item.href)
+          const external = isExternalContentListingHref(href)
+          return (
+            <li key={`${group.id}-${item.href}`}>
+              <Link href={href} onClick={trackClick(item)} target={external ? '_blank' : undefined}>
                 <strong>{item.title}</strong>: {item.description}
-              </span>
-            </ContentListingLink>
-          </li>
-        ))}
+              </Link>
+            </li>
+          )
+        })}
       </ul>
     </section>
   )
@@ -94,27 +63,31 @@ function ContentListingsListGroup({ group }: { group: ContentListingGroup }) {
 
 function ContentListingsGridGroup({ group }: { group: ContentListingGroup }) {
   const itemClassName = getContentListingGridItemClassName(group.columns ?? 3)
-  const groupLabel = getContentListingGroupLabel(group)
+  const trackClick = useContentListingClickHandler(group)
 
   return (
     <section className="not-prose space-y-4">
       <ContentListingGroupHeading group={group} />
       {group.description && <p className="text-foreground-light">{group.description}</p>}
       <div className="grid md:grid-cols-12 gap-4">
-        {group.items.map((item) => (
-          <div key={`${group.id}-${item.href}`} className={itemClassName}>
-            <ContentListingLink
-              item={item}
-              groupLabel={groupLabel}
-              listingId={group.id}
-              className="block h-full"
+        {group.items.map((item) => {
+          const href = normalizeContentListingHref(item.href)
+          const external = isExternalContentListingHref(href)
+          return (
+            <Link
+              key={`${group.id}-${item.href}`}
+              href={href}
+              passHref
+              className={`${itemClassName} block h-full`}
+              onClick={trackClick(item)}
+              target={external ? '_blank' : undefined}
             >
               <GlassPanel title={item.title} icon={item.icon} hasLightIcon={Boolean(item.icon)}>
                 {item.description}
               </GlassPanel>
-            </ContentListingLink>
-          </div>
-        ))}
+            </Link>
+          )
+        })}
       </div>
     </section>
   )
