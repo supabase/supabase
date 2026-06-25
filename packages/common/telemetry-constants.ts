@@ -2844,9 +2844,17 @@ export interface DashboardErrorCreatedEvent {
      */
     source?: 'admonition' | 'toast' | 'error_display' | 'form'
     /**
-     * Type of error matched (for error_display source)
+     * Normalized, PII-free error category derived from the error
+     * (e.g. 'connection-timeout', 'unauthorized', 'forbidden', 'not-found',
+     * 'server-error', 'network-error', 'timeout', 'canceled', 'unknown').
+     * Never contains the raw error message.
      */
     errorType?: string
+    /**
+     * HTTP status code (e.g. 403, 500) when available, or a transport category
+     * ('network', 'timeout') when there is no status. PII-free.
+     */
+    errorCode?: number | string
     /**
      * Whether troubleshooting steps are available (for error_display source)
      */

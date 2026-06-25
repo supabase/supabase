@@ -3,6 +3,7 @@
 import { ErrorDisplay, SupportFormParams } from 'ui-patterns/ErrorDisplay/ErrorDisplay'
 
 import { getMappingForError } from './ErrorMatcher.utils'
+import { categorizeError } from '@/lib/telemetry/categorizeError'
 import { useTrack } from '@/lib/telemetry/track'
 
 interface ErrorMatcherProps {
@@ -29,7 +30,7 @@ export function ErrorMatcher({ title, error, supportFormParams, className }: Err
         if (Math.random() < 0.1) {
           track('dashboard_error_created', {
             source: 'error_display',
-            errorType: mapping?.id,
+            ...categorizeError(error),
             hasTroubleshooting: !!mapping,
           })
         }

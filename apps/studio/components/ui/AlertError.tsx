@@ -4,6 +4,7 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { categorizeError } from '@/lib/telemetry/categorizeError'
 import { useTrack } from '@/lib/telemetry/track'
 
 export interface AlertErrorProps {
@@ -73,6 +74,7 @@ export const AlertError = ({
       if (Math.random() < 0.1) {
         track('dashboard_error_created', {
           source: 'admonition',
+          ...categorizeError(error),
         })
       }
     }
