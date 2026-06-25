@@ -1,12 +1,14 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import type { SupaRow } from '../types'
 import {
   formatGridDataWithOperationValues,
   generateTableChangeKey,
   getStableRowIdentifiers,
+  queueRowDeletesWithOptimisticUpdate,
   rowMatchesIdentifiers,
 } from './queueOperationUtils'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import {
   QueuedOperationType,
   type NewAddRowOperation,
@@ -535,5 +537,34 @@ describe('formatGridDataWithOperationValues', () => {
     expect(getStableRowIdentifiers(result[0], { id: result[0].id })).toEqual({ id: 1 })
     expect(result[1]).toMatchObject({ idx: 1, id: 1, name: 'Updated Bob' })
     expect(getStableRowIdentifiers(result[1], { id: result[1].id })).toEqual({ id: 2 })
+  })
+})
+
+describe('queueRowDeletesWithOptimisticUpdate', () => {
+  test('should queue pending add row deletes with the temp row as original row', () => {
+    const queueOperation = vi.fn()
+    const row = { idx: -100, __tempId: '-100', name: 'New Row' } as SupaRow
+
+    queueRowDeletesWithOptimisticUpdate({
+      rows: [row],
+      table: {
+        id: 1,
+        schema: 'public',
+        name: 'users',
+        entity_type: ENTITY_TYPE.TABLE,
+        primary_keys: [{ name: 'id' }],
+      } as Parameters<typeof queueRowDeletesWithOptimisticUpdate>[0]['table'],
+      queueOperation,
+      projectRef: 'project-ref',
+    })
+
+    expect(queueOperation).toHaveBeenCalledWith({
+      type: QueuedOperationType.DELETE_ROW,
+      tableId: 1,
+      payload: expect.objectContaining({
+        rowIdentifiers: { id: undefined },
+        originalRow: row,
+      }),
+    })
   })
 })
