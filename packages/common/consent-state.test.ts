@@ -318,13 +318,14 @@ describe('applyPriorDecisionToSDK', () => {
       services?: MockService[]
       areAllAccepted?: boolean
       onAcceptAll?: () => Promise<void>
+      onDenyAll?: () => Promise<void>
       onUpdateServices?: (decisions: UserDecision[]) => Promise<void>
     } = {}
   ) => {
     const services = opts.services ?? []
     return {
       acceptAllServices: vi.fn(opts.onAcceptAll ?? (() => Promise.resolve())),
-      denyAllServices: vi.fn(() => Promise.resolve()),
+      denyAllServices: vi.fn(opts.onDenyAll ?? (() => Promise.resolve())),
       updateServices: vi.fn(opts.onUpdateServices ?? (() => Promise.resolve())),
       getCategoriesBaseInfo: vi.fn(() => []),
       getServicesBaseInfo: vi.fn(() => services),
@@ -446,5 +447,61 @@ describe('applyPriorDecisionToSDK', () => {
 
     expect(UC.updateServices).not.toHaveBeenCalled()
     expect(consentState.hasConsented).toBe(true)
+  })
+})
+
+describe('consentState.denyAll', () => {
+  const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0))
+
+  beforeEach(() => {
+    consentState.UC = null
+    consentState.categories = null
+    consentState.showConsentToast = false
+    consentState.hasConsented = false
+  })
+
+  it('sets hasConsented false and hides the banner on success', async () => {
+    const UC = makeMockUC()
+    consentState.UC = UC as never
+    consentState.hasConsented = true
+    consentState.showConsentToast = true
+
+    consentState.denyAll()
+    await flushPromises()
+
+    expect(UC.denyAllServices).toHaveBeenCalledOnce()
+    expect(consentState.hasConsented).toBe(false)
+    expect(consentState.showConsentToast).toBe(false)
+  })
+
+  // On failure the optimistic deny must be rolled back, otherwise the app
+  // believes the user denied consent even though the SDK call failed.
+  it('restores hasConsented and re-shows the banner when denyAllServices rejects', async () => {
+    const UC = makeMockUC({ onDenyAll: () => Promise.reject(new Error('network')) })
+    consentState.UC = UC as never
+    consentState.hasConsented = true
+    consentState.showConsentToast = false
+
+    consentState.denyAll()
+    expect(consentState.hasConsented).toBe(false) // optimistic update
+
+    await flushPromises()
+
+    expect(consentState.hasConsented).toBe(true)
+    expect(consentState.showConsentToast).toBe(true)
+  })
+
+  // The banner must be re-shown on failure regardless of the prior consent
+  // value (showConsentToast is a toast-visibility flag, not a consent boolean).
+  it('re-shows the banner on rejection even if the user had not previously consented', async () => {
+    const UC = makeMockUC({ onDenyAll: () => Promise.reject(new Error('network')) })
+    consentState.UC = UC as never
+    consentState.hasConsented = false
+    consentState.showConsentToast = false
+
+    consentState.denyAll()
+    await flushPromises()
+
+    expect(consentState.showConsentToast).toBe(true)
   })
 })
