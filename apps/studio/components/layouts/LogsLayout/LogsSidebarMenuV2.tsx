@@ -13,7 +13,6 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
-import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
 import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import SavedQueriesItem from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
@@ -52,8 +51,6 @@ export function SidebarCollapsible({
 export function LogsSidebarMenuV2() {
   const router = useRouter()
   const { ref } = useParams() as { ref: string }
-
-  const { isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
 
   const [searchText, setSearchText] = useState('')
 
@@ -210,7 +207,7 @@ export function LogsSidebarMenuV2() {
 
   return (
     <div className="pb-4 relative">
-      {isUnifiedLogsEligible && <UnifiedLogsBanner />}
+      <UnifiedLogsBanner />
 
       <div
         className={cn(
