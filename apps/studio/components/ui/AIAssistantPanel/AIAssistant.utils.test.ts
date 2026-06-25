@@ -86,6 +86,21 @@ describe('AIAssistant.utils.ts:isReadOnlySelect', () => {
     const result2 = isReadOnlySelect(sql2)
     expect(result2).toBe(false)
   })
+  test('Should return false for an UPDATE hidden behind an allowed column name', () => {
+    const sql = `select updated_at from countries; update countries set name = 'hello' where id = 2;`
+    const result = isReadOnlySelect(sql)
+    expect(result).toBe(false)
+  })
+  test('Should return false for a DELETE hidden behind an allowed column name', () => {
+    const sql = `select deleted_at from countries; delete from countries where id = 2;`
+    const result = isReadOnlySelect(sql)
+    expect(result).toBe(false)
+  })
+  test('Should return true for a SELECT that only references timestamp-like columns', () => {
+    const sql = `select created_at, updated_at from countries where id > 100;`
+    const result = isReadOnlySelect(sql)
+    expect(result).toBe(true)
+  })
 })
 
 describe('AIAssistant.utils.ts:hasPendingToolApproval', () => {

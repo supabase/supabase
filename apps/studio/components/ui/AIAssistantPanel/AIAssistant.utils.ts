@@ -57,17 +57,14 @@ export const isReadOnlySelect = (query: string): boolean => {
   // List of keywords that indicate write operations
   const writeOperations = ['insert', 'update', 'delete', 'alter', 'drop', 'create', 'replace']
 
-  // Words that may appear in column names etc
-  const allowedPatterns = ['created', 'inserted', 'updated', 'deleted', 'truncate']
-
-  // Check for any write operations
-  const hasWriteOperation = writeOperations.some((op) => {
-    // Ignore if part of allowed pattern
-    const isAllowed = allowedPatterns.some(
-      (allowed) => normalizedQuery.includes(allowed) && allowed.includes(op)
-    )
-    return !isAllowed && normalizedQuery.includes(op)
-  })
+  // Match write keywords only as whole words so that identifiers such as
+  // `created_at` or `updated_at` aren't mistaken for `create`/`update`
+  // operations. A previous substring-based allow-list incorrectly masked real
+  // write statements whenever such an identifier appeared anywhere in the query
+  // (e.g. `select updated_at from t; update t set ...` was treated as read-only).
+  const hasWriteOperation = writeOperations.some((op) =>
+    new RegExp(`\\b${op}\\b`).test(normalizedQuery)
+  )
   if (hasWriteOperation) return false
 
   const hasUnknownFunction = containsUnknownFunction(normalizedQuery)
