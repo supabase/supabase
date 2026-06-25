@@ -37,7 +37,6 @@ export const HTTPHeaders = ({ form }: HTTPHeadersProps) => {
     functionType === 'supabase_function'
       ? buildEdgeFunctionHeaderAddActions({
           apiKey,
-          includeApiKeyHeader: serviceKey?.type === 'secret',
           createRow,
         }).map((action) =>
           action.key === 'add-auth-header'
