@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest'
 
 import {
   formatMemberDatabaseExpiryMeta,
+  formatPendingGuestAccessExpiryMeta,
   getMemberAccessScopeDisplay,
   getMemberJitGrantSummary,
   getMemberRoleNames,
+  getPendingGuestAccessTooltip,
   isExternalCollaboratorMember,
   resolveOrganizationRoleDisplayName,
 } from './TemporaryAccessMember.utils'
@@ -51,12 +53,12 @@ describe('TemporaryAccessMember.utils', () => {
     ).toEqual(['Read-only'])
   })
 
-  it('shows External collaborator for JIT guest members', () => {
+  it('shows Temporary guest for JIT guest members', () => {
     expect(
       getMemberRoleNames({ ...member, role_ids: [301] } as OrganizationMember, roles, {
         isJitGuest: true,
       })
-    ).toEqual(['External collaborator'])
+    ).toEqual(['Temporary guest'])
   })
 
   it('detects pending external collaborator invites with project-scoped read-only role', () => {
@@ -82,7 +84,7 @@ describe('TemporaryAccessMember.utils', () => {
 
     expect(isExternalCollaboratorMember(pendingMember, teamRoles)).toBe(true)
     expect(getMemberRoleNames(pendingMember, teamRoles, { isJitGuest: true })).toEqual([
-      'External collaborator',
+      'Temporary guest',
     ])
   })
 
@@ -235,6 +237,57 @@ describe('TemporaryAccessMember.utils', () => {
     expect(display.isOrgWide).toBe(true)
   })
 
+  it('formats pending guest expiry metadata', () => {
+    expect(
+      formatPendingGuestAccessExpiryMeta({
+        project_ref: 'proj-a',
+        roles: [{ role: 'supabase_read_only_user', expires_after_seconds: 3600 }],
+      })
+    ).toBe('1 hour expiry')
+  })
+
+  it('builds pending guest avatar tooltip copy', () => {
+    expect(
+      getPendingGuestAccessTooltip({
+        project_ref: 'proj-a',
+        roles: [{ role: 'supabase_read_only_user', expires_after_seconds: 3600 }],
+      })
+    ).toBe('This guest has not joined yet. 1 hour access starts when they accept the invitation.')
+  })
+
+  it('shows pending guest expiry in access column subtext', () => {
+    const display = getMemberAccessScopeDisplay({
+      member: {
+        invited_id: 1,
+        role_ids: [301],
+        invited_pending_access_grant: {
+          project_ref: 'proj-a',
+          roles: [{ role: 'supabase_read_only_user', expires_after_seconds: 3600 }],
+        },
+      } as OrganizationMember,
+      roles: {
+        org_scoped_roles: [
+          { id: 4, name: 'Read-only', base_role_id: 4, description: null, projects: [] },
+        ],
+        project_scoped_roles: [
+          {
+            id: 301,
+            name: 'Read-only_proj-a',
+            base_role_id: 4,
+            description: null,
+            projects: [{ ref: 'proj-a', name: 'Alpha' }],
+          },
+        ],
+      } as never,
+      orgProjects: [{ ref: 'proj-a', name: 'Alpha' }],
+      hasProjectScopedRoles: true,
+      jitSummary: null,
+      isPendingExternalCollaborator: true,
+    })
+
+    expect(display.expiryMeta).toBe('1 hour expiry')
+  })
+
   it('formats database expiry metadata from jit grants', () => {
     const jitSummary = getMemberJitGrantSummary(
       { gotrue_id: 'user-1', role_ids: [4] } as OrganizationMember,
@@ -255,5 +308,69 @@ describe('TemporaryAccessMember.utils', () => {
 
     expect(jitSummary).not.toBeNull()
     expect(formatMemberDatabaseExpiryMeta(jitSummary!)).toMatch(/Database access expires in \d+h/)
+  })
+
+  it('does not show jit expiry subtext for org members with stale grants', () => {
+    const display = getMemberAccessScopeDisplay({
+      member: { gotrue_id: 'owner-1', role_ids: [1] } as OrganizationMember,
+      roles: {
+        org_scoped_roles: [
+          { id: 1, name: 'Owner', base_role_id: 1, description: null, projects: [] },
+        ],
+        project_scoped_roles: [],
+      } as never,
+      orgProjects: [],
+      hasProjectScopedRoles: true,
+      jitSummary: {
+        grants: [
+          {
+            projectRef: 'proj-a',
+            projectName: 'Alpha',
+            userRoles: [{ role: 'postgres', expires_at: Math.floor(Date.now() / 1000) - 3600 }],
+            status: { active: 0, expired: 1, activeIp: 0, expiredIp: 0 },
+          },
+        ],
+        status: { active: 0, expired: 1, activeIp: 0, expiredIp: 0 },
+      },
+      isExternalCollaborator: false,
+    })
+
+    expect(display.expiryMeta).toBeNull()
+  })
+
+  it('shows jit expiry subtext for accepted temporary guests', () => {
+    const display = getMemberAccessScopeDisplay({
+      member: { gotrue_id: 'guest-1', role_ids: [301] } as OrganizationMember,
+      roles: {
+        org_scoped_roles: [
+          { id: 4, name: 'Read-only', base_role_id: 4, description: null, projects: [] },
+        ],
+        project_scoped_roles: [
+          {
+            id: 301,
+            name: 'Read-only_proj-a',
+            base_role_id: 4,
+            description: null,
+            projects: [{ ref: 'proj-a', name: 'Alpha' }],
+          },
+        ],
+      } as never,
+      orgProjects: [{ ref: 'proj-a', name: 'Alpha' }],
+      hasProjectScopedRoles: true,
+      jitSummary: {
+        grants: [
+          {
+            projectRef: 'proj-a',
+            projectName: 'Alpha',
+            userRoles: [{ role: 'postgres', expires_at: Math.floor(Date.now() / 1000) - 3600 }],
+            status: { active: 0, expired: 1, activeIp: 0, expiredIp: 0 },
+          },
+        ],
+        status: { active: 0, expired: 1, activeIp: 0, expiredIp: 0 },
+      },
+      isExternalCollaborator: true,
+    })
+
+    expect(display.expiryMeta).toBe('Database access expired')
   })
 })

@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { UserPlus } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, type FieldErrors } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -38,6 +38,7 @@ import {
   buildSsoPayload,
   categorizeInviteEmails,
   emailSchema,
+  getInviteFormErrorMessage,
   parseEmails,
 } from './InviteMemberButton.utils'
 import { ROLE_DESCRIPTIONS } from './Roles.constants'
@@ -60,7 +61,6 @@ import {
   EXTERNAL_COLLABORATOR_ROLE_NAME,
   isExternalCollaboratorRole,
   resolveExternalCollaboratorInviteRole,
-  resolveExternalCollaboratorInviteRoleForProject,
   validateGuestAccessGrants,
 } from '@/components/interfaces/TemporaryAccess/TemporaryAccessInvite.utils'
 import { TemporaryAccessInviteGrantSection } from '@/components/interfaces/TemporaryAccess/TemporaryAccessInviteGrantSection'
@@ -167,7 +167,7 @@ export const InviteMemberButton = () => {
       return 'You need additional permissions to invite members'
     }
     if (isRolesSuccess && !externalCollaboratorInviteRole) {
-      return 'External collaborator invites are not available for this organization'
+      return 'Temporary guest invites are not available for this organization'
     }
     return undefined
   }, [canInviteMembers, externalCollaboratorInviteRole, isRolesSuccess])
@@ -207,7 +207,7 @@ export const InviteMemberButton = () => {
         if (!data.projectRef) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
-            message: 'A project must be selected for external collaborators',
+            message: 'A project must be selected for temporary guests',
             path: ['projectRef'],
           })
         }
@@ -299,11 +299,11 @@ export const InviteMemberButton = () => {
     const ssoPayload = buildSsoPayload(values.requireSso)
 
     const inviteRoleId = isGuest
-      ? resolveExternalCollaboratorInviteRoleForProject(values.projectRef, allRoles)?.roleId
+      ? resolveExternalCollaboratorInviteRole(allRoles)?.roleId
       : Number(values.role)
 
     if (isGuest && !inviteRoleId) {
-      toast.error('External collaborator invites are not available for this organization')
+      toast.error('Temporary guest invites are not available for this organization')
       return
     }
 
@@ -361,6 +361,13 @@ export const InviteMemberButton = () => {
       closeInviteSheet()
     }
   }
+
+  const onInvalidInvite = (errors: FieldErrors<InviteMemberFormValues>) => {
+    const message = getInviteFormErrorMessage(errors)
+    if (message) toast.error(message)
+  }
+
+  const submitInvite = form.handleSubmit(onInviteMember, onInvalidInvite)
 
   useEffect(() => {
     if (isRolesSuccess && isOpen) {
@@ -434,11 +441,7 @@ export const InviteMemberButton = () => {
         </SheetHeader>
         <SheetSection className="grow overflow-auto p-0">
           <Form {...form}>
-            <form
-              id="organization-invitation"
-              className="flex flex-col"
-              onSubmit={form.handleSubmit(onInviteMember)}
-            >
+            <form id="organization-invitation" className="flex flex-col" onSubmit={submitInvite}>
               <SheetSection className="flex flex-col gap-y-4">
                 <FormField
                   name="email"
@@ -681,7 +684,7 @@ export const InviteMemberButton = () => {
           </Button>
           <Shortcut
             id={SHORTCUT_IDS.ORG_TEAM_INVITE_SUBMIT}
-            onTrigger={() => form.handleSubmit(onInviteMember)()}
+            onTrigger={() => submitInvite()}
             options={{ enabled: isOpen && !isInviting }}
             side="top"
           >

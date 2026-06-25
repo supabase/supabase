@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 
 import { ALL_PROJECTS_ACCESS_SCOPE_LABEL } from './TeamAccessScope.utils'
+import type { PendingInvitationAccessGrant } from '@/components/interfaces/TemporaryAccess/TemporaryAccess.types'
 import { EXTERNAL_COLLABORATOR_ROLE_NAME } from '@/components/interfaces/TemporaryAccess/TemporaryAccessInvite.utils'
 import type { OrgMemberJitGrantSummary } from '@/data/jit-db-access/use-org-jit-grants-query'
 import type {
@@ -238,18 +239,89 @@ export function formatMemberDatabaseExpiryMeta(
   return `Database access expires ${soonestExpiry.format('D MMM YYYY, h:mma')}`
 }
 
+function formatRelativeExpirySubtext(seconds: number): string {
+  const presetLabels: Record<number, string> = {
+    [60 * 60]: '1 hour expiry',
+    [60 * 60 * 24]: '1 day expiry',
+    [60 * 60 * 24 * 7]: '7 day expiry',
+    [60 * 60 * 24 * 30]: '30 day expiry',
+  }
+
+  if (presetLabels[seconds]) return presetLabels[seconds]
+
+  if (seconds < 60 * 60) {
+    const minutes = Math.max(1, Math.round(seconds / 60))
+    return `${minutes} minute${minutes === 1 ? '' : 's'} expiry`
+  }
+
+  if (seconds < 60 * 60 * 24) {
+    const hours = Math.max(1, Math.round(seconds / 3600))
+    return `${hours} hour${hours === 1 ? '' : 's'} expiry`
+  }
+
+  const days = Math.max(1, Math.round(seconds / (60 * 60 * 24)))
+  return `${days} day${days === 1 ? '' : 's'} expiry`
+}
+
+export function formatPendingGuestAccessExpiryMeta(
+  pendingAccessGrant: PendingInvitationAccessGrant | undefined
+): string | null {
+  const roles = pendingAccessGrant?.roles ?? []
+  const relativeDurations = roles
+    .map((role) => role.expires_after_seconds)
+    .filter((seconds): seconds is number => typeof seconds === 'number')
+  const absoluteExpiries = roles
+    .map((role) => role.expires_at)
+    .filter((expiresAt): expiresAt is number => typeof expiresAt === 'number')
+
+  if (relativeDurations.length > 0) {
+    return formatRelativeExpirySubtext(Math.min(...relativeDurations))
+  }
+
+  if (absoluteExpiries.length > 0) {
+    const soonestExpiry = dayjs.unix(Math.min(...absoluteExpiries))
+    if (soonestExpiry.isValid()) {
+      return `Expires ${soonestExpiry.format('D MMM YYYY')}`
+    }
+  }
+
+  return null
+}
+
+export function getPendingGuestAccessTooltip(
+  pendingAccessGrant: PendingInvitationAccessGrant | undefined
+): string {
+  const expirySubtext = formatPendingGuestAccessExpiryMeta(pendingAccessGrant)
+
+  if (expirySubtext?.endsWith(' expiry')) {
+    const duration = expirySubtext.replace(/ expiry$/, '')
+    return `This guest has not joined yet. ${duration} access starts when they accept the invitation.`
+  }
+
+  if (expirySubtext?.startsWith('Expires ')) {
+    return `This guest has not joined yet. Access is set to ${expirySubtext.toLowerCase()} once they accept.`
+  }
+
+  return 'This guest has not joined yet. Database access starts when they accept the invitation.'
+}
+
 export function getMemberAccessScopeDisplay({
   member,
   roles,
   orgProjects,
   hasProjectScopedRoles,
   jitSummary,
+  isPendingExternalCollaborator = false,
+  isExternalCollaborator = false,
 }: {
   member: OrganizationMember
   roles: OrganizationRolesData | undefined
   orgProjects: Array<{ ref: string; name: string }>
   hasProjectScopedRoles: boolean
   jitSummary: ReturnType<typeof getMemberJitGrantSummary>
+  isPendingExternalCollaborator?: boolean
+  /** Accepted temporary guests only — org members may have stale JIT rows from testing. */
+  isExternalCollaborator?: boolean
 }): MemberAccessScopeDisplay {
   const orgScopedRoles = roles?.org_scoped_roles ?? []
   const projectScopedRoles = roles?.project_scoped_roles ?? []
@@ -296,6 +368,10 @@ export function getMemberAccessScopeDisplay({
     label,
     projectNames: [...projectNames],
     isOrgWide,
-    expiryMeta: jitSummary ? formatMemberDatabaseExpiryMeta(jitSummary) : null,
+    expiryMeta: isPendingExternalCollaborator
+      ? formatPendingGuestAccessExpiryMeta(member.invited_pending_access_grant)
+      : isExternalCollaborator && jitSummary
+        ? formatMemberDatabaseExpiryMeta(jitSummary)
+        : null,
   }
 }

@@ -42,7 +42,7 @@ describe('TemporaryAccessInvite.utils', () => {
     ).toEqual({ roleId: 3, usesDeveloperFallback: true })
   })
 
-  test('resolveExternalCollaboratorInviteRole uses project-scoped Read-only when present', () => {
+  test('resolveExternalCollaboratorInviteRole falls back to org Developer when org Read-only is absent', () => {
     expect(
       resolveExternalCollaboratorInviteRole({
         org_scoped_roles: [
@@ -52,7 +52,7 @@ describe('TemporaryAccessInvite.utils', () => {
           { id: 104, name: 'Read-only', base_role_id: 4, description: null, projects: [] },
         ],
       })
-    ).toEqual({ roleId: 104, usesDeveloperFallback: false })
+    ).toEqual({ roleId: 3, usesDeveloperFallback: true })
   })
 
   test('createInviteGuestGrantDraft pre-enables read-only with 1h expiry', () => {

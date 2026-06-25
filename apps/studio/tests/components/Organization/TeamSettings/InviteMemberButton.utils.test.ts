@@ -7,6 +7,7 @@ import {
   buildSsoPayload,
   categorizeInviteEmails,
   emailSchema,
+  getInviteFormErrorMessage,
   MAX_BATCH_INVITE_SIZE,
   parseEmails,
 } from '@/components/interfaces/Organization/TeamSettings/InviteMemberButton.utils'
@@ -209,6 +210,27 @@ describe('buildSsoPayload', () => {
 
   test('returns { requireSso: false } for "non-sso"', () => {
     expect(buildSsoPayload('non-sso')).toStrictEqual({ requireSso: false })
+  })
+})
+
+describe('getInviteFormErrorMessage', () => {
+  test('prioritizes guestAccess errors', () => {
+    expect(
+      getInviteFormErrorMessage({
+        email: { message: 'Email required' },
+        guestAccess: { message: 'Select at least one Postgres role.' },
+      })
+    ).toBe('Select at least one Postgres role.')
+  })
+
+  test('falls back through project, access scope, role, and email', () => {
+    expect(getInviteFormErrorMessage({ projectRef: { message: 'Pick a project' } })).toBe(
+      'Pick a project'
+    )
+    expect(getInviteFormErrorMessage({ role: { message: 'Role is required' } })).toBe(
+      'Role is required'
+    )
+    expect(getInviteFormErrorMessage({})).toBeUndefined()
   })
 })
 

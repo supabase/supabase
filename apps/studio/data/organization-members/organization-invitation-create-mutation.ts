@@ -70,7 +70,7 @@ export const useOrganizationCreateInvitationMutation = ({
       const { slug, emails, pendingAccessGrant } = variables
 
       if (pendingAccessGrant && emails.length > 0) {
-        trackGuestInviteEmails(slug, emails)
+        trackGuestInviteEmails(slug, emails, pendingAccessGrant)
       }
 
       await Promise.all([

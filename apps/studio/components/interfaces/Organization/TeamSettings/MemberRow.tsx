@@ -10,6 +10,9 @@ import {
   ScrollArea,
   TableCell,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -19,9 +22,11 @@ import {
   getMemberAccessScopeDisplay,
   getMemberJitGrantSummary,
   getMemberRoleNames,
+  getPendingGuestAccessTooltip,
   isExternalCollaboratorMember,
 } from './TemporaryAccessMember.utils'
 import { useIsJitDbAccessEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { ClockFading } from '@/components/ui/icons/ClockFading'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { ProfileImage } from '@/components/ui/ProfileImage'
 import type { OrgMemberJitGrantSummary } from '@/data/jit-db-access/use-org-jit-grants-query'
@@ -66,6 +71,7 @@ export const MemberRow = ({ member, grantsByUserId }: MemberRowProps) => {
     () => getMemberRoleNames(member, roles, { isJitGuest: isExternalCollaborator }),
     [member, roles, isExternalCollaborator]
   )
+  const isPendingGuest = isInvitedUser && isExternalCollaborator
   const accessScope = useMemo(
     () =>
       getMemberAccessScopeDisplay({
@@ -74,11 +80,43 @@ export const MemberRow = ({ member, grantsByUserId }: MemberRowProps) => {
         orgProjects,
         hasProjectScopedRoles,
         jitSummary,
+        isPendingExternalCollaborator: isPendingGuest,
+        isExternalCollaborator,
       }),
-    [member, roles, orgProjects, hasProjectScopedRoles, jitSummary]
+    [
+      member,
+      roles,
+      orgProjects,
+      hasProjectScopedRoles,
+      jitSummary,
+      isPendingGuest,
+      isExternalCollaborator,
+    ]
   )
 
   const profileImageUrl = undefined
+  const pendingGuestAccessTooltip = useMemo(
+    () =>
+      isPendingGuest
+        ? getPendingGuestAccessTooltip(member.invited_pending_access_grant)
+        : undefined,
+    [isPendingGuest, member.invited_pending_access_grant]
+  )
+
+  const avatarPlaceholder = (
+    <div
+      className={cn(
+        'w-[32px] h-[32px] md:w-[40px] md:h-[40px]',
+        'bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center'
+      )}
+    >
+      {isPendingGuest ? (
+        <ClockFading size={20} strokeWidth={1.5} />
+      ) : (
+        <User size={20} strokeWidth={1.5} />
+      )}
+    </div>
+  )
 
   return (
     <TableRow>
@@ -89,14 +127,18 @@ export const MemberRow = ({ member, grantsByUserId }: MemberRowProps) => {
             src={profileImageUrl}
             className="border rounded-full w-[32px] h-[32px] md:w-[40px] md:h-[40px]"
             placeholder={
-              <div
-                className={cn(
-                  'w-[32px] h-[32px] md:w-[40px] md:h-[40px]',
-                  'bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center'
-                )}
-              >
-                <User size={20} strokeWidth={1.5} />
-              </div>
+              isPendingGuest ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span className="inline-flex">{avatarPlaceholder}</span>
+                  </TooltipTrigger>
+                  <TooltipContent side="right" className="max-w-xs">
+                    {pendingGuestAccessTooltip}
+                  </TooltipContent>
+                </Tooltip>
+              ) : (
+                avatarPlaceholder
+              )
             }
           />
           <div className="min-w-0">
@@ -110,7 +152,6 @@ export const MemberRow = ({ member, grantsByUserId }: MemberRowProps) => {
                   </Badge>
                 )}
                 {member.is_sso_user && <Badge variant="default">SSO</Badge>}
-                {isExternalCollaborator && <Badge>Guest</Badge>}
                 {(member.metadata as any)?.origin && (
                   <PartnerIcon
                     organization={{

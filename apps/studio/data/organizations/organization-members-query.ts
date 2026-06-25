@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { organizationKeys } from './keys'
-import { getTrackedGuestInviteEmails } from '@/components/interfaces/TemporaryAccess/guest-invite-tracking'
+import { getTrackedGuestInvite } from '@/components/interfaces/TemporaryAccess/guest-invite-tracking'
+import type { PendingInvitationAccessGrant } from '@/components/interfaces/TemporaryAccess/TemporaryAccess.types'
 import type { components } from '@/data/api'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -18,6 +19,8 @@ export interface OrganizationMember extends Member {
   invited_role_scoped_projects?: string[]
   /** Set when this pending invite was sent as External collaborator from this browser session. */
   invited_is_external_collaborator?: boolean
+  /** Guest database access configured at invite time (session storage until platform API supports it). */
+  invited_pending_access_grant?: PendingInvitationAccessGrant
 }
 
 export async function getOrganizationMembers(
@@ -41,10 +44,10 @@ export async function getOrganizationMembers(
   if (orgInvitesError) handleError(orgInvitesError)
 
   // Remap invite data to look like existing members data
-  const guestInviteEmails = getTrackedGuestInviteEmails(slug)
   const invitedMembers = orgInvites.invitations.map((invite) => {
     const inviteWithScope = invite as typeof invite & { role_scoped_projects?: string[] }
     const normalizedEmail = invite.invited_email.trim().toLowerCase()
+    const trackedGuestInvite = getTrackedGuestInvite(slug, normalizedEmail)
     const member = {
       invited_at: invite.invited_at,
       invited_id: invite.id,
@@ -54,7 +57,14 @@ export async function getOrganizationMembers(
       ...(inviteWithScope.role_scoped_projects?.length
         ? { invited_role_scoped_projects: inviteWithScope.role_scoped_projects }
         : {}),
-      ...(guestInviteEmails.has(normalizedEmail) ? { invited_is_external_collaborator: true } : {}),
+      ...(trackedGuestInvite
+        ? {
+            invited_is_external_collaborator: true,
+            ...(trackedGuestInvite.pendingAccessGrant
+              ? { invited_pending_access_grant: trackedGuestInvite.pendingAccessGrant }
+              : {}),
+          }
+        : {}),
     }
     return { ...member, role_ids: [invite.role_id] }
   })

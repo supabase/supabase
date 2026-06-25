@@ -65,6 +65,22 @@ export type BatchInvitationResult = {
   failed: BatchInvitationFailure[]
 }
 
+export function getInviteFormErrorMessage(errors: {
+  email?: { message?: string }
+  role?: { message?: string }
+  projectRef?: { message?: string }
+  guestAccess?: { message?: string }
+  accessScope?: { message?: string }
+}): string | undefined {
+  return (
+    errors.guestAccess?.message ??
+    errors.projectRef?.message ??
+    errors.accessScope?.message ??
+    errors.role?.message ??
+    errors.email?.message
+  )
+}
+
 export function categorizeInviteEmails(
   emails: string[],
   members: OrganizationMember[]

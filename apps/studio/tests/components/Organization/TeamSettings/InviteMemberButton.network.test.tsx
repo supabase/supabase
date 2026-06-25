@@ -356,7 +356,7 @@ describe('InviteMemberButton (network)', () => {
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
   })
 
-  test('shows guest database access fields when External collaborator role is selected', async () => {
+  test('shows guest database access fields when Temporary guest role is selected', async () => {
     setupMocks()
 
     addAPIMock({

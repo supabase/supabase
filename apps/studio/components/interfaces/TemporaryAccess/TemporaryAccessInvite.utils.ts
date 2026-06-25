@@ -16,10 +16,10 @@ import type { OrganizationRolesResponse } from '@/data/organization-members/orga
 /** Form-only role id — maps to Read-only org role + pending JIT grant on invite. */
 export const EXTERNAL_COLLABORATOR_ROLE_ID = '__external_collaborator__' as const
 
-export const EXTERNAL_COLLABORATOR_ROLE_NAME = 'External collaborator'
+export const EXTERNAL_COLLABORATOR_ROLE_NAME = 'Temporary guest'
 
 export const EXTERNAL_COLLABORATOR_ROLE_DESCRIPTION =
-  'Project-scoped guest with minimal Studio access and temporary database connections.'
+  'Project-scoped temporary guest with limited Studio access and time-bound database connections.'
 
 export type ExternalCollaboratorInviteRole = {
   roleId: number
@@ -28,44 +28,20 @@ export type ExternalCollaboratorInviteRole = {
 }
 
 /**
- * Platform role sent on external collaborator invites.
- * Prefers Read-only (org or project-scoped). Free/Pro orgs may omit Read-only from /roles;
- * falls back to Developer + project scope while JIT grant carries database access.
+ * Platform role sent on temporary guest invites.
+ * Invitations accept org-scoped role ids plus role_scoped_projects — not project-scoped role ids.
+ * Free/Pro orgs may omit Read-only from /roles; falls back to Developer + project scope.
  */
-function isReadOnlyProjectScopedRole(
-  projectRole: OrganizationRolesResponse['project_scoped_roles'][number],
-  orgScopedRoles: OrganizationRolesResponse['org_scoped_roles']
-) {
-  if (projectRole.name === 'Read-only' || projectRole.name.startsWith('Read-only_')) {
-    return true
-  }
-
-  const baseRole = orgScopedRoles.find((role) => role.id === projectRole.base_role_id)
-  return baseRole?.name === 'Read-only'
-}
-
 export function resolveExternalCollaboratorInviteRole(
   allRoles: OrganizationRolesResponse | undefined
 ): ExternalCollaboratorInviteRole | undefined {
   if (!allRoles) return undefined
 
   const orgScopedRoles = allRoles.org_scoped_roles ?? []
-  const projectScopedRoles = allRoles.project_scoped_roles ?? []
 
   const orgReadOnly = orgScopedRoles.find((role) => role.name === 'Read-only')
   if (orgReadOnly) {
     return { roleId: orgReadOnly.id, usesDeveloperFallback: false }
-  }
-
-  const projectReadOnly = projectScopedRoles.find((role) => role.name === 'Read-only')
-  if (projectReadOnly) {
-    return { roleId: projectReadOnly.id, usesDeveloperFallback: false }
-  }
-
-  for (const projectRole of projectScopedRoles) {
-    if (isReadOnlyProjectScopedRole(projectRole, orgScopedRoles)) {
-      return { roleId: projectRole.id, usesDeveloperFallback: false }
-    }
   }
 
   const orgDeveloper = orgScopedRoles.find((role) => role.name === 'Developer')
@@ -74,28 +50,6 @@ export function resolveExternalCollaboratorInviteRole(
   }
 
   return undefined
-}
-
-/** Prefer the project-scoped Read-only role for a guest invite so pending rows are identifiable in Team. */
-export function resolveExternalCollaboratorInviteRoleForProject(
-  projectRef: string,
-  allRoles: OrganizationRolesResponse | undefined
-): ExternalCollaboratorInviteRole | undefined {
-  if (!allRoles || !projectRef) {
-    return resolveExternalCollaboratorInviteRole(allRoles)
-  }
-
-  const orgScopedRoles = allRoles.org_scoped_roles ?? []
-  const projectScopedRoles = allRoles.project_scoped_roles ?? []
-
-  for (const projectRole of projectScopedRoles) {
-    if (!projectRole.projects.some((project) => project.ref === projectRef)) continue
-    if (!isReadOnlyProjectScopedRole(projectRole, orgScopedRoles)) continue
-
-    return { roleId: projectRole.id, usesDeveloperFallback: false }
-  }
-
-  return resolveExternalCollaboratorInviteRole(allRoles)
 }
 
 const EXPIRY_MODE_TO_SECONDS: Record<'1h' | '1d' | '7d' | '30d', number> = {
@@ -193,7 +147,7 @@ export function validateGuestAccessGrants(grants: TemporaryAccessRoleGrantDraft[
 
   for (const grant of enabledGrants) {
     if (grant.expiryMode === 'never') {
-      return 'External collaborators must have an expiry.'
+      return 'Temporary guests must have an expiry.'
     }
 
     if (grant.hasExpiry && grant.expiryMode === 'custom' && !grant.expiry) {
