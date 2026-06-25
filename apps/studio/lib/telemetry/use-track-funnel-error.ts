@@ -3,6 +3,7 @@ import { useCallback } from 'react'
 import type { FunnelErrorClassification, FunnelOrigin } from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
 
+// Matches the existing dashboard_error_created capture rate; keeps PostHog volume bounded.
 const SAMPLE_RATE = 0.1
 
 export function useTrackFunnelError() {

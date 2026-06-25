@@ -102,11 +102,7 @@ export function classifyValidationError(
       return { errorCategory: 'validation', errorReason: reasons[field] }
     }
   }
-  const firstErroredField = Object.keys(fieldErrors)[0]
-  return {
-    errorCategory: 'validation',
-    errorReason: (firstErroredField && reasons[firstErroredField]) || 'other',
-  }
+  return { errorCategory: 'validation', errorReason: 'other' }
 }
 
 export function classifyStripeError(error: unknown): FunnelErrorClassification {
