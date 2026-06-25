@@ -6,8 +6,8 @@ import { useRouter } from 'next/router'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button, SidePanel } from 'ui'
 
 import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import InformationBox from '@/components/ui/InformationBox'
-import SqlEditor from '@/components/ui/SqlEditor'
 import {
   useDatabaseFunctionsQuery,
   type DatabaseFunction,
@@ -163,7 +163,12 @@ const Function = ({ id, completeStatement, name, onClick }: FunctionProps) => {
           </div>
           <AccordionContent className="[&>div]:pb-0" onClick={(e) => e.stopPropagation()}>
             <div className="mt-4 h-64 border border-default">
-              <SqlEditor defaultValue={completeStatement} readOnly={true} contextmenu={false} />
+              <CodeEditor
+                isReadOnly
+                language="pgsql"
+                defaultValue={completeStatement}
+                options={{ contextmenu: false }}
+              />
             </div>
           </AccordionContent>
         </AccordionItem>
