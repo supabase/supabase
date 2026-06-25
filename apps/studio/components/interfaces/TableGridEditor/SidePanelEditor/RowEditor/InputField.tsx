@@ -1,5 +1,5 @@
 import { includes, noop } from 'lodash'
-import { Edit, Eye } from 'lucide-react'
+import { Edit, Expand, Eye } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -278,11 +278,10 @@ export const InputField = ({
             <InputGroupButton
               variant="default"
               type="button"
+              icon={isEditable ? <Edit /> : <Expand />}
+              className="px-1.5"
               onClick={() => onEditJson({ column: field.name, value: field.value })}
-              icon={isEditable ? <Edit /> : <Eye />}
-            >
-              {isEditable ? 'Edit' : 'View JSON'}
-            </InputGroupButton>
+            />
           </InputGroupAddon>
         </InputGroup>
       </FormItemLayout>
