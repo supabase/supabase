@@ -2,90 +2,27 @@ import Image from 'next/image'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import antigravityAuthenticateScreenshot from './assets/antigravity-authenticate-screenshot.png'
-import type {
-  AntigravityMcpConfig,
-  ClaudeCodeMcpConfig,
-  CodexMcpConfig,
-  CopilotMcpConfig,
-  FactoryMcpConfig,
-  GeminiMcpConfig,
-  GooseMcpConfig,
-  McpClient,
-  McpFeatureGroup,
-  OpenCodeMcpConfig,
-  VSCodeMcpConfig,
-  WindsurfMcpConfig,
-} from './types'
+import { MCP_CLI_COMMANDS, MCP_CLIENT_DATA } from './clients.data'
+import type { ClaudeCodeMcpConfig, CopilotMcpConfig, McpClient } from './types'
 import { getMcpUrl } from './types'
 
-export const FEATURE_GROUPS_PLATFORM: McpFeatureGroup[] = [
-  {
-    id: 'docs',
-    name: 'Documentation',
-    description: 'Access Supabase documentation and guides',
-  },
-  {
-    id: 'account',
-    name: 'Account',
-    description: 'Manage account settings and preferences',
-  },
-  {
-    id: 'database',
-    name: 'Database',
-    description: 'Query and manage database schema and data',
-  },
-  {
-    id: 'debugging',
-    name: 'Debugging',
-    description: 'Debug and troubleshoot issues',
-  },
-  {
-    id: 'development',
-    name: 'Development',
-    description: 'Development tools and utilities',
-  },
-  {
-    id: 'functions',
-    name: 'Functions',
-    description: 'Manage and deploy Edge Functions',
-  },
-  {
-    id: 'branching',
-    name: 'Branching',
-    description: 'Manage database branches',
-  },
-  {
-    id: 'storage',
-    name: 'Storage',
-    description: 'Manage files and storage buckets',
-  },
-]
+export {
+  DEFAULT_MCP_URL_NON_PLATFORM,
+  DEFAULT_MCP_URL_PLATFORM,
+  FEATURE_GROUPS_NON_PLATFORM,
+  FEATURE_GROUPS_PLATFORM,
+  MCP_CLIENT_GROUPS,
+} from './clients.data'
 
-export const FEATURE_GROUPS_NON_PLATFORM = FEATURE_GROUPS_PLATFORM.filter((group) =>
-  ['docs', 'database', 'development', 'debugging'].includes(group.id)
-)
-
-/** Only set hasDistinctDarkIcon: true when the client has a separate -icon-dark.svg that looks different. Otherwise the same -icon.svg is used for both themes. */
-export const MCP_CLIENTS: McpClient[] = [
-  {
-    key: 'claude-code',
-    label: 'Claude Code',
-    icon: 'claude',
-    configFile: '.mcp.json',
-    externalDocsUrl: 'https://code.claude.com/docs/en/mcp',
-    transformConfig: (config): ClaudeCodeMcpConfig => {
-      return {
-        mcpServers: {
-          supabase: {
-            type: 'http',
-            url: config.mcpServers.supabase.url,
-          },
-        },
-      }
-    },
+/** JSX-only fields keyed by client key. Only clients that HAD these fields. */
+const CLIENT_UI: Record<
+  string,
+  Pick<McpClient, 'primaryInstructions' | 'alternateInstructions' | 'deepLinkDescription'>
+> = {
+  'claude-code': {
     primaryInstructions: (_config, onCopy) => {
       const config = _config as ClaudeCodeMcpConfig
-      const command = `claude mcp add --scope project --transport http supabase "${config.mcpServers.supabase.url}"`
+      const command = MCP_CLI_COMMANDS['claude-code'].install!(config.mcpServers.supabase.url)
       return (
         <div className="space-y-2">
           <p className="text-xs text-foreground-light">
@@ -110,7 +47,7 @@ export const MCP_CLIENTS: McpClient[] = [
           IDE extension) run:
         </p>
         <CodeBlock
-          value="claude /mcp"
+          value={MCP_CLI_COMMANDS['claude-code'].authenticate}
           language="bash"
           focusable={false}
           className="block"
@@ -122,64 +59,10 @@ export const MCP_CLIENTS: McpClient[] = [
       </div>
     ),
   },
-  {
-    key: 'cursor',
-    label: 'Cursor',
-    icon: 'cursor',
-    configFile: '.cursor/mcp.json',
-    externalDocsUrl: 'https://docs.cursor.com/context/mcp',
-    generateDeepLink: (config) => {
-      const name = 'supabase'
-      const mcpUrl = getMcpUrl(config)
-      const serverConfig = {
-        url: mcpUrl,
-      }
-      const base64Config = Buffer.from(JSON.stringify(serverConfig)).toString('base64')
-      return `cursor://anysphere.cursor-deeplink/mcp/install?name=${name}&config=${encodeURIComponent(base64Config)}`
-    },
-  },
-  {
-    key: 'vscode',
-    label: 'VS Code',
-    icon: 'vscode',
-    configFile: '.vscode/mcp.json',
-    externalDocsUrl: 'https://code.visualstudio.com/docs/copilot/chat/mcp-servers',
-    transformConfig: (config): VSCodeMcpConfig => {
-      return {
-        servers: {
-          supabase: {
-            type: 'http',
-            url: config.mcpServers.supabase.url,
-          },
-        },
-      }
-    },
-    generateDeepLink: (_config) => {
-      const config = _config as VSCodeMcpConfig
-      const mcpConfig = { name: 'supabase', ...config.servers.supabase }
-
-      return `vscode:mcp/install?${encodeURIComponent(JSON.stringify(mcpConfig))}`
-    },
-  },
-  {
-    key: 'codex',
-    label: 'Codex',
-    icon: 'openai',
-    hasDistinctDarkIcon: true,
-    configFile: '~/.codex/config.toml',
-    externalDocsUrl: 'https://developers.openai.com/codex/mcp/',
-    transformConfig: (config): CodexMcpConfig => {
-      return {
-        mcp_servers: {
-          supabase: {
-            url: config.mcpServers.supabase.url,
-          },
-        },
-      }
-    },
+  codex: {
     primaryInstructions: (config, onCopy) => {
       const mcpUrl = getMcpUrl(config)
-      const command = `codex mcp add supabase --url "${mcpUrl}"`
+      const command = MCP_CLI_COMMANDS['codex'].install!(mcpUrl)
       return (
         <div className="space-y-2">
           <p className="text-xs text-foreground-light">Add the Supabase MCP server to Codex:</p>
@@ -197,7 +80,7 @@ export const MCP_CLIENTS: McpClient[] = [
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">Authenticate with the MCP server:</p>
         <CodeBlock
-          value="codex mcp login supabase"
+          value={MCP_CLI_COMMANDS['codex'].authenticate}
           language="bash"
           focusable={false}
           className="block"
@@ -209,24 +92,10 @@ export const MCP_CLIENTS: McpClient[] = [
       </div>
     ),
   },
-  {
-    key: 'gemini-cli',
-    label: 'Gemini CLI',
-    icon: 'gemini-cli',
-    configFile: '.gemini/settings.json',
-    externalDocsUrl: 'https://geminicli.com/docs/tools/mcp-server/',
-    transformConfig: (config): GeminiMcpConfig => {
-      return {
-        mcpServers: {
-          supabase: {
-            httpUrl: config.mcpServers.supabase.url,
-          },
-        },
-      }
-    },
+  'gemini-cli': {
     primaryInstructions: (config, onCopy, options) => {
       const mcpUrl = getMcpUrl(config)
-      const mcpCommand = `gemini mcp add -t http supabase ${mcpUrl}`
+      const mcpCommand = MCP_CLI_COMMANDS['gemini-cli'].install!(mcpUrl)
       return (
         <div className="space-y-2">
           <p className="text-xs text-warning">
@@ -290,7 +159,7 @@ export const MCP_CLIENTS: McpClient[] = [
             the server:
           </p>
           <CodeBlock
-            value="/mcp auth supabase"
+            value={MCP_CLI_COMMANDS['gemini-cli'].authenticate}
             language="bash"
             focusable={false}
             className="block"
@@ -300,27 +169,10 @@ export const MCP_CLIENTS: McpClient[] = [
       )
     },
   },
-  {
-    key: 'copilot-cli',
-    label: 'GitHub Copilot',
-    icon: 'copilot',
-    hasDistinctDarkIcon: true,
-    configFile: '~/.copilot/mcp-config.json',
-    externalDocsUrl:
-      'https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-mcp-servers',
-    transformConfig: (config): CopilotMcpConfig => {
-      return {
-        mcpServers: {
-          supabase: {
-            type: 'http',
-            url: config.mcpServers.supabase.url,
-          },
-        },
-      }
-    },
+  'copilot-cli': {
     primaryInstructions: (_config, onCopy) => {
       const config = _config as CopilotMcpConfig
-      const command = `copilot mcp add --transport http supabase "${config.mcpServers.supabase.url}"`
+      const command = MCP_CLI_COMMANDS['copilot-cli'].install!(config.mcpServers.supabase.url)
       return (
         <div className="space-y-2">
           <p className="text-xs text-foreground-light">
@@ -342,7 +194,7 @@ export const MCP_CLIENTS: McpClient[] = [
           After configuring the MCP server, authenticate by running:
         </p>
         <CodeBlock
-          value="copilot -i /mcp"
+          value={MCP_CLI_COMMANDS['copilot-cli'].authenticate}
           language="bash"
           focusable={false}
           className="block"
@@ -354,21 +206,7 @@ export const MCP_CLIENTS: McpClient[] = [
       </div>
     ),
   },
-  {
-    key: 'antigravity',
-    label: 'Antigravity',
-    icon: 'antigravity',
-    configFile: '~/.gemini/antigravity/mcp_config.json',
-    externalDocsUrl: 'https://antigravity.google/docs/mcp',
-    transformConfig: (config): AntigravityMcpConfig => {
-      return {
-        mcpServers: {
-          supabase: {
-            serverUrl: config.mcpServers.supabase.url,
-          },
-        },
-      }
-    },
+  antigravity: {
     alternateInstructions: (_config, _onCopy) => (
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">
@@ -398,23 +236,7 @@ export const MCP_CLIENTS: McpClient[] = [
       </div>
     ),
   },
-  {
-    key: 'windsurf',
-    label: 'Windsurf',
-    icon: 'windsurf',
-    hasDistinctDarkIcon: true,
-    configFile: '~/.codeium/windsurf/mcp_config.json',
-    externalDocsUrl: '',
-    transformConfig: (config): WindsurfMcpConfig => {
-      return {
-        mcpServers: {
-          supabase: {
-            command: 'npx',
-            args: ['-y', 'mcp-remote', config.mcpServers.supabase.url],
-          },
-        },
-      }
-    },
+  windsurf: {
     primaryInstructions: (_config, _onCopy) => (
       <p className="text-xs text-warning">
         Ensure you are running Windsurf version <code>0.1.37</code> or higher.
@@ -427,41 +249,10 @@ export const MCP_CLIENTS: McpClient[] = [
       </p>
     ),
   },
-  {
-    key: 'goose',
-    label: 'Goose',
-    icon: 'goose',
-    hasDistinctDarkIcon: true,
-    configFile: '~/.config/goose/config.yaml',
-    externalDocsUrl: 'https://block.github.io/goose/docs/category/getting-started',
-    transformConfig: (config): GooseMcpConfig => {
-      return {
-        extensions: {
-          supabase: {
-            available_tools: [],
-            bundled: null,
-            description:
-              'Connect your Supabase projects to AI assistants. Manage tables, query data, deploy Edge Functions, and interact with your Supabase backend directly from your MCP client.',
-            enabled: true,
-            env_keys: [],
-            envs: {},
-            headers: {},
-            name: 'Supabase',
-            timeout: 300,
-            type: 'streamable_http',
-            uri: config.mcpServers.supabase.url,
-          },
-        },
-      }
-    },
-    generateDeepLink: (config) => {
-      const name = 'supabase'
-      const mcpUrl = getMcpUrl(config)
-      return `goose://extension?type=streamable_http&url=${encodeURIComponent(mcpUrl)}&id=supabase&name=${name}&description=${encodeURIComponent('Connect your Supabase projects to AI assistants. Manage tables, query data, deploy Edge Functions, and interact with your Supabase backend directly from your MCP client.')}`
-    },
+  goose: {
     primaryInstructions: (config, onCopy) => {
       const mcpUrl = getMcpUrl(config)
-      const command = `goose session --with-streamable-http-extension "${mcpUrl}"`
+      const command = MCP_CLI_COMMANDS['goose'].install!(mcpUrl)
       return (
         <div className="space-y-2">
           <p className="text-xs text-foreground-light">
@@ -494,26 +285,10 @@ export const MCP_CLIENTS: McpClient[] = [
       </div>
     ),
   },
-  {
-    key: 'factory',
-    label: 'Factory',
-    icon: 'factory',
-    hasDistinctDarkIcon: true,
-    configFile: '~/.factory/mcp.json',
-    externalDocsUrl: 'https://docs.factory.ai/cli/configuration/mcp.md',
-    transformConfig: (config): FactoryMcpConfig => {
-      return {
-        mcpServers: {
-          supabase: {
-            type: 'http',
-            url: config.mcpServers.supabase.url,
-          },
-        },
-      }
-    },
+  factory: {
     primaryInstructions: (config, onCopy) => {
       const mcpUrl = getMcpUrl(config)
-      const command = `droid mcp add supabase ${mcpUrl} --type http`
+      const command = MCP_CLI_COMMANDS['factory'].install!(mcpUrl)
       return (
         <div className="space-y-2">
           <p className="text-xs text-foreground-light">Add Supabase MCP server to Factory:</p>
@@ -536,33 +311,14 @@ export const MCP_CLIENTS: McpClient[] = [
       </div>
     ),
   },
-  {
-    key: 'opencode',
-    label: 'OpenCode',
-    icon: 'opencode',
-    hasDistinctDarkIcon: true,
-    configFile: '~/.config/opencode/opencode.json',
-    externalDocsUrl: 'https://opencode.ai/docs/mcp-servers/',
-    transformConfig: (config): OpenCodeMcpConfig => {
-      const mcpUrl = getMcpUrl(config)
-      return {
-        $schema: 'https://opencode.ai/config.json',
-        mcp: {
-          supabase: {
-            type: 'remote',
-            url: mcpUrl,
-            enabled: true,
-          },
-        },
-      }
-    },
+  opencode: {
     alternateInstructions: (_config, onCopy) => (
       <div className="space-y-2">
         <p className="text-xs text-foreground-light">
           After adding the configuration, run the following command to authenticate:
         </p>
         <CodeBlock
-          value="opencode mcp auth supabase"
+          value={MCP_CLI_COMMANDS['opencode'].authenticate}
           language="bash"
           focusable={false}
           className="block"
@@ -574,16 +330,7 @@ export const MCP_CLIENTS: McpClient[] = [
       </div>
     ),
   },
-  {
-    key: 'kiro',
-    label: 'Kiro',
-    icon: 'kiro',
-    configFile: '~/.kiro/settings/mcp.json',
-    externalDocsUrl: 'https://kiro.dev/docs/mcp/',
-    generateDeepLink: (_config, options) => {
-      const power = options?.isPlatform ? 'supabase-hosted' : 'supabase-local'
-      return `https://kiro.dev/launch/powers/${power}`
-    },
+  kiro: {
     deepLinkDescription: (
       <>
         Install the Supabase{' '}
@@ -599,39 +346,10 @@ export const MCP_CLIENTS: McpClient[] = [
       </>
     ),
   },
-  {
-    key: 'claude-ai',
-    label: 'Claude.ai',
-    icon: 'claude',
-    externalDocsUrl: 'https://claude.com/docs/connectors/overview',
-    generateDeepLink: () =>
-      'https://claude.ai/directory/connectors/11ca66fc-1e98-49d5-ab9b-7cb4672a8f10',
-  },
-  {
-    key: 'chatgpt',
-    label: 'ChatGPT',
-    icon: 'openai',
-    hasDistinctDarkIcon: true,
-    externalDocsUrl: 'https://chatgpt.com/features/apps/',
-    generateDeepLink: () =>
-      'https://chatgpt.com/apps/supabase/asdk_app_69d3e5ee6a708191baa733f7b8931995',
-  },
-]
+}
 
-export const MCP_CLIENT_GROUPS = [
-  {
-    heading: 'AI Agent CLI',
-    keys: ['claude-code', 'codex', 'gemini-cli', 'copilot-cli', 'opencode', 'factory'],
-  },
-  {
-    heading: 'Web Clients',
-    keys: ['claude-ai', 'chatgpt', 'goose'],
-  },
-  {
-    heading: 'IDE',
-    keys: ['cursor', 'vscode', 'antigravity', 'kiro', 'windsurf'],
-  },
-] as const
-
-export const DEFAULT_MCP_URL_PLATFORM = 'http://localhost:8080/mcp'
-export const DEFAULT_MCP_URL_NON_PLATFORM = 'http://localhost:54321/mcp'
+/** Only set hasDistinctDarkIcon: true when the client has a separate -icon-dark.svg that looks different. Otherwise the same -icon.svg is used for both themes. */
+export const MCP_CLIENTS: McpClient[] = MCP_CLIENT_DATA.map((data) => ({
+  ...data,
+  ...CLIENT_UI[data.key],
+}))

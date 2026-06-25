@@ -10,6 +10,8 @@ export {
   MCP_CLIENTS,
   MCP_CLIENT_GROUPS,
 } from './constants'
+export { MCP_CLIENT_DATA } from './clients.data'
+export type { McpClientData } from './clients.data'
 export { getMcpUrl } from './utils/getMcpUrl'
 export { createMcpCopyHandler, type McpCopyType } from './utils/createMcpCopyHandler'
 export { McpConfigPanel, type McpConfigPanelProps } from './McpConfigPanel'

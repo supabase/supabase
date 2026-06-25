@@ -10,10 +10,12 @@ import type { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
+import { McpConfigPanel } from 'ui-patterns/McpUrlBuilder/McpConfigPanel.md'
+
+import { addBaseUrlPrefix } from './internal-links'
 import { Admonition } from './markdown-schema/Admonition'
 import { AuthProviders } from './markdown-schema/AuthProviders'
 import { ComputeDiskLimitsTable } from './markdown-schema/ComputeDiskLimitsTable'
-import { addBaseUrlPrefix } from './internal-links'
 import { Link } from './markdown-schema/Link'
 import { MetricsStackCards } from './markdown-schema/MetricsStackCards'
 import { NavData } from './markdown-schema/NavData'
@@ -31,14 +33,20 @@ type JsxNode = MdxJsxFlowElement | MdxJsxTextElement
 type Props = Record<string, unknown>
 
 /**
- * A handler converts a single MDX component into a markdown string. It receives
- * the component's props, the already-serialized markdown of its children, and
- * the raw AST node (escape hatch for handlers that need to inspect structure).
+ * A handler converts a single MDX component into output. It receives the
+ * component's props, the already-serialized markdown of its children, and the
+ * raw AST node (escape hatch for handlers that need to inspect structure).
+ *
+ * It may return either a markdown string (passed through verbatim via an `html`
+ * node) or mdast node(s) - a `root` is unwrapped into its children, an array is
+ * spliced in, a single node is inserted as-is. Returning nodes lets handlers be
+ * authored with the mdast-jsx runtime.
  *
  * Any component not in the schema is treated as `({ children }) => children`,
  * i.e. the wrapper is dropped and its children are kept as-is.
  */
-type ComponentHandler = (ctx: { props: Props; children: string; node: JsxNode }) => string
+type HandlerResult = string | Root | Content | Content[]
+type ComponentHandler = (ctx: { props: Props; children: string; node: JsxNode }) => HandlerResult
 type ComponentSchema = Record<string, ComponentHandler>
 
 const PARSE_OPTIONS = {
@@ -97,9 +105,9 @@ async function inlinePartials(parent: Parent): Promise<void> {
 
 /**
  * Walks the tree bottom-up. For each JSX element, runs its schema handler (or
- * the default) and replaces the node with an `html` node holding the result.
- * The `html` type passes through `mdast-util-to-markdown` verbatim, so whatever
- * markdown the handler returns lands in the final output unchanged.
+ * the default) and replaces the node with the handler's result: a string is
+ * wrapped in an `html` node (passed through `mdast-util-to-markdown` verbatim),
+ * while returned mdast node(s) are spliced into the tree directly.
  */
 function applySchema(parent: Parent, schema: ComponentSchema): void {
   for (const child of parent.children as Content[]) {
@@ -120,8 +128,16 @@ function applySchema(parent: Parent, schema: ComponentSchema): void {
         type: 'root',
         children: child.children as Root['children'],
       }).trim()
-      const value = handler({ props: propsFrom(child), children, node: child })
-      next.push({ type: 'html', value } as Content)
+      const result = handler({ props: propsFrom(child), children, node: child })
+      if (typeof result === 'string') {
+        next.push({ type: 'html', value: result } as Content)
+      } else if (Array.isArray(result)) {
+        next.push(...result)
+      } else if (result.type === 'root') {
+        next.push(...(result.children as Content[]))
+      } else {
+        next.push(result)
+      }
       continue
     }
     next.push(child)
@@ -139,6 +155,7 @@ const SCHEMA: ComponentSchema = {
   AuthProviders,
   ComputeDiskLimitsTable,
   Link,
+  McpConfigPanel,
   Price,
   GlassPanel: Panel,
   IconPanel: Panel,
