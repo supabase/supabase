@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { XIcon } from 'lucide-react'
 import Head from 'next/head'
@@ -239,7 +239,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
 
     useEffect(() => {
       if (!selectedProject?.ref) return
-      if (!isUnifiedLogsBannerDismissed) {
+      if (IS_PLATFORM && !isUnifiedLogsBannerDismissed) {
         addBanner({
           id: BANNER_ID.UNIFIED_LOGS,
           isDismissed: false,
