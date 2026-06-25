@@ -73,8 +73,7 @@ const QueryLogs = ({ isActive, isInView }: { isActive?: boolean; isInView?: bool
   const [activeLogs, setActiveLogs] = useState(logs)
 
   function createLog(offset?: number) {
-    const t = new Date()
-    t.setSeconds(t.getSeconds() - (offset ?? 0))
+    const t = new Date(Date.now() - (offset ?? 0))
     const randomStatus = Math.random()
     const s = randomStatus > 0.92 ? STATUS.ERROR : randomStatus > 0.5 ? STATUS.INFO : STATUS.LOG
 
