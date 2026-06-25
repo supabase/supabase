@@ -30,7 +30,13 @@ const schema = z.object({
 export const SecuritySettings = () => {
   const { slug } = useParams()
   const { profile } = useProfile()
-  const { data: members, isPending: isLoadingMembers } = useOrganizationMembersQuery({ slug })
+  const {
+    data: members,
+    error: membersError,
+    isPending: isLoadingMembers,
+    isError: isMembersError,
+    isSuccess: isSuccessMembers,
+  } = useOrganizationMembersQuery({ slug })
 
   const { can: canReadMfaConfig, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.READ,
@@ -80,8 +86,7 @@ export const SecuritySettings = () => {
   const hasMFAEnabled =
     members?.find((member) => member.primary_email == profile?.primary_email)?.mfa_enabled ?? false
 
-  const requiresPersonalMfa =
-    canUpdateMfaConfig && !hasMFAEnabled && !isLoadingMembers && members !== undefined
+  const requiresPersonalMfa = isSuccessMembers && canUpdateMfaConfig && !hasMFAEnabled
 
   const onSubmit = (values: { enforceMfa: boolean }) => {
     if (!slug || !hasAccessToEnforceMfa) return
@@ -110,6 +115,10 @@ export const SecuritySettings = () => {
               <NoPermission resourceText="view organization security settings" />
             ) : null}
 
+            {isMembersError && (
+              <AlertError error={membersError} subject="Failed to retrieve organization members" />
+            )}
+
             {(isErrorMfa || mfaError) && hasAccessToEnforceMfa && (
               <AlertError error={mfaError} subject="Failed to retrieve MFA enforcement status" />
             )}
@@ -128,7 +137,7 @@ export const SecuritySettings = () => {
               />
             )}
 
-            {isSuccessMfa && hasAccessToEnforceMfa && !requiresPersonalMfa && (
+            {isSuccessMfa && hasAccessToEnforceMfa && isSuccessMembers && !requiresPersonalMfa && (
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                   <Card>
