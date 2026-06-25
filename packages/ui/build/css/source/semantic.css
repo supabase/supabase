@@ -15,8 +15,8 @@
   --foreground-lightness: 0.16;
   /* How far muted/tertiary text sits from --surface toward --foreground-lightness
      (0 = surface, 1 = full foreground) at --contrast 0.5; themes override. */
-  --muted-foreground-level: 0.68;
-  --tertiary-foreground-level: 0.48;
+  --muted-foreground-level: 0.8;
+  --tertiary-foreground-level: 0.6;
 
   /*
    * Global contrast knob, 0 to 1. Default 0.5 is the comfortable baseline; 0 keeps

@@ -32,7 +32,8 @@ import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
+import { ColorSystemTinker, ColorTinkerProvider } from 'color-tinker'
+import { DevToolbar, DevToolsDock, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
@@ -211,26 +212,31 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       <TooltipProvider>
                         <RouteValidationWrapper>
                           <ThemeProvider>
-                            <DevToolbarProvider apiUrl={API_URL}>
-                              <AiAssistantStateContextProvider>
-                                <CommandProvider>
-                                  <BannerStackProvider>
-                                    <FeaturePreviewContextProvider>
-                                      <MainScrollContainerProvider>
-                                        {getLayout(<Component {...pageProps} />)}
-                                      </MainScrollContainerProvider>
-                                      <GlobalShortcuts />
-                                      <StudioCommandMenu />
-                                      <FeaturePreviewModal />
-                                    </FeaturePreviewContextProvider>
-                                  </BannerStackProvider>
-                                  <Toaster />
-                                  <MonacoThemeProvider />
-                                </CommandProvider>
-                              </AiAssistantStateContextProvider>
-                              <DevToolbar extraTabs={devToolbarExtraTabs} />
-                              <DevToolbarTrigger />
-                            </DevToolbarProvider>
+                            <ColorTinkerProvider>
+                              <DevToolbarProvider apiUrl={API_URL}>
+                                <AiAssistantStateContextProvider>
+                                  <CommandProvider>
+                                    <BannerStackProvider>
+                                      <FeaturePreviewContextProvider>
+                                        <MainScrollContainerProvider>
+                                          {getLayout(<Component {...pageProps} />)}
+                                        </MainScrollContainerProvider>
+                                        <GlobalShortcuts />
+                                        <StudioCommandMenu />
+                                        <FeaturePreviewModal />
+                                      </FeaturePreviewContextProvider>
+                                    </BannerStackProvider>
+                                    <Toaster />
+                                    <MonacoThemeProvider />
+                                  </CommandProvider>
+                                </AiAssistantStateContextProvider>
+                                <DevToolbar extraTabs={devToolbarExtraTabs} />
+                                <DevToolsDock>
+                                  <ColorSystemTinker />
+                                  <DevToolbarTrigger />
+                                </DevToolsDock>
+                              </DevToolbarProvider>
+                            </ColorTinkerProvider>
                           </ThemeProvider>
                         </RouteValidationWrapper>
                       </TooltipProvider>

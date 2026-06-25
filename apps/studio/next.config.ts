@@ -599,7 +599,16 @@ const nextConfig = {
         : []),
     ],
   },
-  transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'api-types', 'icons'],
+  transpilePackages: [
+    'ui',
+    'ui-patterns',
+    'common',
+    'shared-data',
+    'api-types',
+    'icons',
+    'dev-tools',
+    'color-tinker',
+  ],
   serverExternalPackages: ['libpg-query'],
   turbopack: {
     rules: {
