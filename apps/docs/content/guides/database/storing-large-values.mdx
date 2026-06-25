@@ -72,21 +72,21 @@ If the data belongs in Postgres, model it to limit bloat:
 - **Don't store the same payload twice.** Keeping both a truncated preview and the full response in separate columns doubles the TOAST footprint with no benefit.
 - **Split cold, large columns into a side table** keyed by the primary key. Keep the hot, frequently-updated row narrow. This reduces churn and keeps the main table fast:
 
-   ```sql
-   create table requests (
-     id bigint primary key generated always as identity,
-     created_at timestamptz default now(),
-     status text,
-     input_tokens int,
-     output_tokens int
-   );
+  ```sql
+  create table requests (
+    id bigint primary key generated always as identity,
+    created_at timestamptz default now(),
+    status text,
+    input_tokens int,
+    output_tokens int
+  );
 
-   create table request_payloads (
-     request_id bigint primary key references requests (id) on delete cascade,
-     prompt text,
-     response jsonb
-   );
-   ```
+  create table request_payloads (
+    request_id bigint primary key references requests (id) on delete cascade,
+    prompt text,
+    response jsonb
+  );
+  ```
 
 - **Set a retention policy.** If old rows aren't needed, delete them on a schedule with [pg_cron](/docs/guides/database/extensions/pg_cron). Deleting alone won't shrink the file. See [Reclaiming space](#reclaiming-space).
 - **Consider `lz4` column compression.** Supabase's Postgres supports `lz4`, which is faster than the default `pglz` and often compresses better. Set it per column with `ALTER TABLE … ALTER COLUMN … SET COMPRESSION lz4`. For the underlying setting, see [`default_toast_compression`](https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-DEFAULT-TOAST-COMPRESSION). Compression applies only to values written after you make the change. It helps structured or repetitive JSON more than unique text.
