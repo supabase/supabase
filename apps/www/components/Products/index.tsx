@@ -1,11 +1,6 @@
-'use client'
+import { Check } from 'lucide-react'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import type { ProductType } from '~/data/MainProducts'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { Check } from 'lucide-react'
-import { PRODUCT_MODULES_SHORTNAMES, PRODUCT_SHORTNAMES } from 'shared-data/products'
-
 import AuthVisual from './AuthVisual'
 import DataAPIsVisual from './DataAPIsVisual'
 import DatabaseVisual from './DatabaseVisual'
@@ -14,6 +9,11 @@ import ProductCard from './ProductCard'
 import RealtimeVisual from './RealtimeVisual'
 import StorageVisual from './StorageVisual'
 import VectorVisual from './VectorVisual'
+
+import { PRODUCT_MODULES_SHORTNAMES, PRODUCT_SHORTNAMES } from 'shared-data/products'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+
+import type { ProductType } from '~/data/MainProducts'
 
 interface Props {
   products: ProductType
@@ -32,7 +32,7 @@ const Products: React.FC<Props> = (props) => {
   }
 
   return (
-    <SectionContainer className="!pt-0 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 xl:gap-3 2xl:gap-2 md:grid-cols-12">
+    <SectionContainer className="pt-0! grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 xl:gap-3 2xl:gap-6 md:grid-cols-12">
       <ProductCard
         isDatabase
         className="col-span-6 md:col-span-12 xl:col-span-6"
@@ -80,7 +80,7 @@ const Products: React.FC<Props> = (props) => {
         title={props.products['functions'].name}
         subtitle={
           <>
-            Write custom code
+            Easily write custom code
             <br className="hidden sm:inline-block" />{' '}
             <strong>without deploying or scaling servers.</strong>
           </>
@@ -211,8 +211,7 @@ const Products: React.FC<Props> = (props) => {
         onClick={() => sendTelemetryEvent('data-api')}
         image={<DataAPIsVisual className="hidden sm:block" />}
       />
-
-      <p className="text-xl sm:text-2xl text-foreground-lighter col-span-full tracking-[-.01rem] max-w-(--container-max-w,75rem) mx-auto mt-8">
+      <p className="text-xl sm:text-2xl text-foreground-lighter col-span-full tracking-[-.01rem]">
         <span className="text-foreground">Use one or all.</span> Best of breed products. Integrated
         as a platform.
       </p>

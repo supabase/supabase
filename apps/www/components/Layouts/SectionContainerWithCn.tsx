@@ -2,15 +2,15 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { forwardRef, Ref } from 'react'
 import { cn } from 'ui'
 
-const sectionContainerVariants = cva('relative mx-auto w-full px-6', {
+const sectionContainerVariants = cva('section-container relative', {
   variants: {
     width: {
-      normal: 'max-w-(--container-max-w,75rem)',
+      normal: '',
       smallScreenFull: 'max-w-full lg:container px-0',
     },
     height: {
-      normal: 'py-16 md:py-24 lg:py-24',
-      narrow: 'py-6 md:py-8',
+      normal: 'py-16 md:py-18 lg:py-24',
+      narrow: 'py-6 md:py-8 lg:py-8 xl:py-10',
       none: '',
     },
   },

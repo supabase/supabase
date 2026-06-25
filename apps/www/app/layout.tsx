@@ -3,13 +3,11 @@ import 'config/code-hike.css'
 import '../styles/globals.css'
 import '../pages/launch-week/launchWeek.css'
 
-import { APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
-import { geistMono, inter, manrope } from '~/lib/fonts'
-import { Agentation } from 'agentation'
 import { Metadata } from 'next'
 import type { Viewport } from 'next'
 
 import Providers from './providers'
+import { APP_NAME, DEFAULT_META_DESCRIPTION } from '@/lib/constants'
 
 const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
 
@@ -48,14 +46,9 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      suppressHydrationWarning
-      className={`${manrope.variable} ${inter.variable} ${geistMono.variable}`}
-    >
+    <html lang="en" suppressHydrationWarning>
       <body>
         <Providers>{children}</Providers>
-        {process.env.NODE_ENV === 'development' && <Agentation endpoint="http://localhost:4747" />}
       </body>
     </html>
   )

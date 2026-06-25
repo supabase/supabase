@@ -1,11 +1,15 @@
+import FeaturedThumb from 'components/Blog/FeaturedThumb'
+import DefaultLayout from 'components/Layouts/Default'
 import type { Metadata } from 'next'
-import { cookies } from 'next/headers'
+import type PostTypes from 'types/post'
 
-import { BLOG_VIEW_COOKIE, isBlogView, type BlogView } from './blog-view'
 import BlogClient from './BlogClient'
+import SectionContainer from '@/components/Layouts/SectionContainer'
 import { breadcrumbs } from '@/lib/breadcrumbs'
 import { breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 import { getSortedPosts } from '@/lib/posts'
+
+export const revalidate = 30
 
 export const metadata: Metadata = {
   title: 'Supabase Blog: the Postgres development platform',
@@ -29,16 +33,13 @@ export default async function BlogPage() {
     return dateB - dateA
   })
 
-  // The featured post + secondary spotlights are derived from the head of this
-  // list inside BlogClient; chrome (nav, footer, container) comes from the blog
-  // route's layout.tsx.
   const initialPosts = allPosts.slice(0, INITIAL_POSTS_LIMIT)
-
-  // Render the list/grid view from a cookie so it matches the user's choice on
-  // first paint (avoids the localStorage hydration flicker).
-  const cookieStore = await cookies()
-  const cookieView = cookieStore.get(BLOG_VIEW_COOKIE)?.value
-  const initialView: BlogView = isBlogView(cookieView) ? cookieView : 'list'
+  const featuredPost = initialPosts[0]
+  // Featured post is rendered as the hero above the list, so exclude it from
+  // the list to avoid showing it twice. BlogClient compensates the API offset
+  // when scrolling for more posts.
+  const listPosts = initialPosts.slice(1)
+  const totalListPosts = Math.max(0, allPosts.length - 1)
 
   return (
     <>
@@ -48,11 +49,20 @@ export default async function BlogPage() {
           __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.blogIndex)),
         }}
       />
-      <BlogClient
-        initialBlogs={initialPosts}
-        totalPosts={allPosts.length}
-        initialView={initialView}
-      />
+      <DefaultLayout>
+        <h1 className="sr-only">Supabase blog</h1>
+        <SectionContainer className="py-4 md:py-8 xl:py-10!">
+          {featuredPost && (
+            <FeaturedThumb key={featuredPost.slug} {...(featuredPost as PostTypes)} />
+          )}
+        </SectionContainer>
+
+        <div className="border-default border-t">
+          <SectionContainer className="py-4 md:py-8 xl:py-10">
+            <BlogClient initialBlogs={listPosts} totalPosts={totalListPosts} />
+          </SectionContainer>
+        </div>
+      </DefaultLayout>
     </>
   )
 }

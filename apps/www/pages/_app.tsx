@@ -3,7 +3,6 @@ import 'config/code-hike.css'
 import '../styles/globals.css'
 import './launch-week/launchWeek.css'
 
-import { geistMono, inter, manrope } from '~/lib/fonts'
 import {
   AuthProvider,
   FeatureFlagProvider,
@@ -66,7 +65,7 @@ export default function App({ Component, pageProps }: AppProps) {
     : null
 
   return (
-    <main className={`${manrope.variable} ${inter.variable} ${geistMono.variable}`}>
+    <>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         {mdAlternateHref && <link rel="alternate" type="text/markdown" href={mdAlternateHref} />}
@@ -125,6 +124,6 @@ export default function App({ Component, pageProps }: AppProps) {
         </FeatureFlagProvider>
       </AuthProvider>
       <TelemetryTagManager />
-    </main>
+    </>
   )
 }

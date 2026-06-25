@@ -1,4 +1,3 @@
-import staticContent from '.generated/staticContent/_index.json'
 import { GlobeAltIcon } from '@heroicons/react/outline'
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -97,8 +96,6 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
   const meta_title = 'Careers | Supabase'
   const meta_description = 'Help build software developers love'
 
-  const { jobsCount } = staticContent
-
   return (
     <>
       <NextSeo
@@ -124,19 +121,21 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
         />
       </Head>
       <DefaultLayout>
-        <header className="container relative mx-auto px-6 pt-12 pb-8 lg:pt-24 lg:px-16 xl:px-20 text-center space-y-4">
-          <h1 className="text-sm text-brand md:text-base">
-            <span className="sr-only">Supabase </span>Careers
-          </h1>
-          <h2 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1px]">
-            We're on a mission to build the best developer platform
-          </h2>
-          <p className="text-sm md:text-base text-foreground-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
-            Explore remote opportunities and join our team to help us achieve it.
-          </p>
-          <Button asChild variant="primary" size="medium" className="mt-4">
-            <Link href="#positions">Open positions {jobsCount > 0 && `(${jobsCount})`}</Link>
-          </Button>
+        <header>
+          <SectionContainer className="pt-12 pb-8! lg:pt-24 py-0 text-center space-y-4">
+            <h1 className="text-sm text-brand md:text-base">
+              <span className="sr-only">Supabase </span>Careers
+            </h1>
+            <h2 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1px]">
+              We're on a mission to build the best developer platform
+            </h2>
+            <p className="text-sm md:text-base text-foreground-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
+              Explore remote opportunities and join our team to help us achieve it.
+            </p>
+            <Button asChild variant="primary" className="mt-4">
+              <Link href="#positions">Open positions</Link>
+            </Button>
+          </SectionContainer>
         </header>
 
         <SectionContainer className="pt-8!">

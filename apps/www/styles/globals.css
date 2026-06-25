@@ -12,6 +12,10 @@
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
 @source './../../../packages/marketing/src/**/*.{tsx,ts,js}';
 
+@utility section-container {
+  @apply mx-auto max-w-7xl px-6 lg:px-12 xl:px-24;
+}
+
 @theme {
   --color-purple-sos-100: hsl(293 80% 97%);
   --color-purple-sos-200: hsl(293 85% 91%);
@@ -128,19 +132,24 @@
   }
 }
 
-:root {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-heading: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, Menlo, monospace;
-  /* Tailwind v4 inlines .font-sans / .font-mono utilities through these knobs
-   * (see packages/config/css/theme.css). Set them so utility classes pick up
-   * the same fonts as the raw --font-sans / --font-mono vars above. */
-  --font-custom: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-source-code-pro: var(--font-geist-mono), ui-monospace, Menlo, monospace;
-  --heading-tracking: 0;
-  --body-tracking: 0;
-  --heading-leading: 1.1;
-  --body-leading: 1.6;
+@font-face {
+  font-family: 'custom-font';
+  src:
+    url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
+    url(../../../packages/common/assets/fonts/CustomFont-Book.woff) format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'custom-font';
+  src:
+    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff2) format('woff2'),
+    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff) format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
 }
 
 html {
@@ -149,41 +158,8 @@ html {
 
 body {
   @apply bg-default text-foreground;
-  letter-spacing: var(--body-tracking);
-  line-height: var(--body-leading);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-heading);
-  letter-spacing: var(--heading-tracking);
-  line-height: var(--heading-leading);
-}
-
-.h1:not(.prose *):not(.overwrite),
-.h2:not(.prose *):not(.overwrite),
-.h3:not(.prose *):not(.overwrite),
-.h4:not(.prose *):not(.overwrite),
-.h5:not(.prose *):not(.overwrite),
-.h6:not(.prose *):not(.overwrite) {
-  font-family: var(--font-heading);
-}
-
-pre,
-code,
-kbd,
-samp,
-pre *,
-code *,
-kbd *,
-samp * {
-  font-family: var(--font-mono) !important;
 }
 
 /*
@@ -246,22 +222,11 @@ h6:not(.overwrite) {
 }
 
 .toc-animate {
-  @apply !text-foreground;
-}
-
-.toc-passed {
-  @apply !text-foreground;
+  @apply translate-x-1! text-brand!;
 }
 
 .prose-toc a {
   transition: all 0.07s ease-in-out;
-  color: hsl(var(--foreground-light)) !important;
-  font-weight: 400 !important;
-}
-
-.prose-toc a.toc-passed,
-.prose-toc a.toc-animate {
-  color: hsl(var(--foreground-default)) !important;
 }
 
 @media only screen and (max-width: 960px) {
@@ -330,10 +295,6 @@ h6:not(.overwrite) {
   left: 0;
   transform-origin: 100% 0;
   overflow: hidden;
-}
-
-.section-container {
-  position: relative;
 }
 
 .stroke-text {
