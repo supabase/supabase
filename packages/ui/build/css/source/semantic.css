@@ -9,7 +9,7 @@
 
 :root {
   --hue: 160;
-  --chroma: 0.010;
+  --chroma: 0.01;
   --surface: 0.985;
 
   --foreground-lightness: 0.16;
@@ -79,14 +79,16 @@
    * toward the brand --hue for harmony, then clamp to their perceptual category
    * so "warning" always reads amber and "destructive" always reads red no matter
    * what --hue is. --status-hue-pull: 0 = fixed amber/red, 1 = fully brand-relative.
-   * At --hue: 160 the pull term is 0, so these resolve to the original 85 / 25.
+   * At --hue: 160 the pull term is 0, so these resolve to the base 75 / 25.
+   * Warning sits at 75 (amber), not higher toward yellow — yellow can't darken
+   * without going olive, so it loses contrast on light surfaces.
    */
   --brand-hue-reference: 160;
   --status-hue-pull: 0.15;
   --warning-hue: clamp(
-    75,
-    calc(85 + (var(--hue) - var(--brand-hue-reference)) * var(--status-hue-pull)),
-    110
+    65,
+    calc(75 + (var(--hue) - var(--brand-hue-reference)) * var(--status-hue-pull)),
+    95
   );
   --destructive-hue: clamp(
     12,
@@ -94,14 +96,23 @@
     42
   );
   /*
-   * Status chroma is bounded the same way. It scales with the brand --chroma so
-   * status colors share the theme's saturation level, but clamps to a floor — so
-   * warning/destructive never wash out to gray when --chroma is near 0 — and a
-   * ceiling that keeps them inside the displayable amber/red gamut. The band is set
-   * so the currently tuned themes are unchanged; it only rescues very low --chroma.
+   * Expressive (status) colors are deliberately NOT derived from the neutral
+   * surface→foreground span the way text and surfaces are. An expressive color
+   * has its own identity; tying its lightness to the theme's text ramp is what
+   * left warning under-saturated in light mode and too dark in dark mode.
+   *
+   * Instead each is anchored to a fixed target lightness near its hue's chroma
+   * peak. Chroma scales off the theme's --chroma knob at a much higher level
+   * than neutrals (which use ~0.5–0.9×), so expressive fills track the theme's
+   * overall saturation but stay vibrant, then clamp into a calm-but-present band
+   * that sits inside sRGB at these lightnesses — no gamut mapping required. The
+   * lightness anchors are mode-invariant on purpose — a warning should read as
+   * the same amber everywhere — but themes may override --warning-lightness /
+   * --destructive-lightness to nudge a single mode.
    */
-  --warning-chroma: clamp(0.15, calc(var(--chroma) * 8), 0.2);
-  --destructive-chroma: clamp(0.19, calc(var(--chroma) * 10), 0.25);
+  --expressive-chroma: clamp(0.13, calc(var(--chroma) * 13), 0.16);
+  --warning-lightness: 0.8;
+  --destructive-lightness: 0.585;
 
   /* shadcn semantic pairs */
   --background: oklch(var(--surface) calc(var(--chroma) * 0.5) var(--hue));
@@ -144,15 +155,23 @@
   --accent: oklch(from var(--foreground) l c h / var(--accent-alpha));
   --accent-foreground: var(--foreground);
 
-  --warning: oklch(0.78 var(--warning-chroma) var(--warning-hue));
-  --warning-foreground: oklch(
-    calc(min(var(--surface), var(--foreground-lightness)) + 0.06) calc(var(--chroma) * 2)
-      var(--warning-hue)
+  --warning: oklch(var(--warning-lightness) var(--expressive-chroma) var(--warning-hue));
+  --destructive: oklch(
+    var(--destructive-lightness) var(--expressive-chroma) var(--destructive-hue)
   );
-  --destructive: oklch(0.62 var(--destructive-chroma) var(--destructive-hue));
+  /*
+   * Text that sits on the solid fill: dark ink on light fills (amber), white on
+   * dark fills (red). The clamp turns the fill's own lightness into a hard flip
+   * around L≈0.62 — (0.62 − l) is negative for light fills (→ floor 0.12) and
+   * positive for dark fills (→ ceil 0.99) — so on-colors stay legible and keep
+   * flipping correctly if the anchors are retuned. A trace of hue chroma keeps
+   * the ink from reading as flat gray.
+   */
+  --warning-foreground: oklch(
+    from var(--warning) clamp(0.12, calc((0.62 - l) * 100), 0.99) calc(c * 0.08) h
+  );
   --destructive-foreground: oklch(
-    max(var(--surface), var(--foreground-lightness)) calc(var(--chroma) * 0.5)
-      var(--destructive-hue)
+    from var(--destructive) clamp(0.12, calc((0.62 - l) * 100), 0.99) calc(c * 0.08) h
   );
 
   /* Status border tokens for subtle / tinted surfaces */

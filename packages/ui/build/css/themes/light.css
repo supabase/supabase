@@ -2,7 +2,7 @@
 .light {
   --helpers-os-appearance: Light;
   --hue: 160;
-  --chroma: 0.010;
+  --chroma: 0.005;
   /*
    * Soft-gray canvas (not pure white) so elevated surfaces have headroom to
    * brighten toward white. --elevation-step is positive here: higher surfaces
@@ -14,6 +14,13 @@
   --foreground-lightness: 0.16;
   --muted-foreground-level: 0.68;
   --tertiary-foreground-level: 0.48;
+  /*
+   * Expressive fills run darker than the dark-theme anchors so they hold contrast
+   * against the near-white surface (a light amber on white disappears). Lightness
+   * is mode-aware; chroma still derives from --chroma in semantic.css.
+   */
+  --warning-lightness: 0.68;
+  --destructive-lightness: 0.52;
 
   --code-block-5: 14deg 80.4% 58%;
   --code-block-4: 276.3deg 60% 52.9%;
@@ -32,7 +39,7 @@
   --brand-400: 151.3deg 66.9% 66.9%;
   --brand-300: 147.5deg 72% 80.4%;
   --brand-200: 147.6deg 72.5% 90%;
-  --warning-default: 30.3deg 80.3% 47.8%;
+  /* --warning-default: 30.3deg 80.3% 47.8%; */
   --warning-600: 30.3deg 80.3% 47.8%;
   --warning-500: 36.3deg 85.7% 67.1%;
   --warning-400: 41.9deg 100% 81.8%;
