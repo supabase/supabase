@@ -1,9 +1,14 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
+import { isFeatureEnabled, type Feature } from 'common/enabled-features'
 import matter from 'gray-matter'
 import yaml from 'js-yaml'
+import { fromMarkdown } from 'mdast-util-from-markdown'
+import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
+import { toMarkdown } from 'mdast-util-to-markdown'
+import { gfm } from 'micromark-extension-gfm'
 
-import { getInternalLinkBaseUrl, prefixInternalLinks } from './internal-links'
+import { addBaseUrlPrefix } from './internal-links'
 
 const GENERATED = path.join(process.cwd(), 'features/docs/generated')
 const OUT_DIR = path.join(process.cwd(), 'public/markdown/reference')
@@ -37,6 +42,11 @@ type RefBase = {
   outFile: string
   /** Folder under docs/ref/ that holds .mdx sections for `type: "markdown"` entries. */
   mdxDir: string
+  /**
+   * Enabled-features flag gating this reference. When set and the feature is
+   * disabled in enabled-features.json, the file is not generated.
+   */
+  feature?: Feature
 }
 
 type SdkLegacyRef = RefBase & {
@@ -95,6 +105,7 @@ const REFERENCES: Ref[] = [
     mdxDir: path.join(MDX_ROOT, 'dart'),
     sectionsPath: path.join(GENERATED, 'dart.v2.sections.json'),
     functionsPath: path.join(GENERATED, 'dart.v2.functions.json'),
+    feature: 'sdk:dart',
   },
   {
     kind: 'sdk-legacy',
@@ -103,6 +114,7 @@ const REFERENCES: Ref[] = [
     mdxDir: path.join(MDX_ROOT, 'kotlin'),
     sectionsPath: path.join(GENERATED, 'kotlin.v1.sections.json'),
     functionsPath: path.join(GENERATED, 'kotlin.v1.functions.json'),
+    feature: 'sdk:kotlin',
   },
   {
     kind: 'sdk-legacy',
@@ -111,6 +123,7 @@ const REFERENCES: Ref[] = [
     mdxDir: path.join(MDX_ROOT, 'python'),
     sectionsPath: path.join(GENERATED, 'python.v2.sections.json'),
     functionsPath: path.join(GENERATED, 'python.v2.functions.json'),
+    feature: 'sdk:python',
   },
   {
     kind: 'sdk-legacy',
@@ -119,6 +132,7 @@ const REFERENCES: Ref[] = [
     mdxDir: path.join(MDX_ROOT, 'swift'),
     sectionsPath: path.join(GENERATED, 'swift.v2.sections.json'),
     functionsPath: path.join(GENERATED, 'swift.v2.functions.json'),
+    feature: 'sdk:swift',
   },
   {
     kind: 'sdk-legacy',
@@ -127,6 +141,7 @@ const REFERENCES: Ref[] = [
     mdxDir: path.join(MDX_ROOT, 'csharp'),
     sectionsPath: path.join(GENERATED, 'csharp.v0.sections.json'),
     functionsPath: path.join(GENERATED, 'csharp.v0.functions.json'),
+    feature: 'sdk:csharp',
   },
 ]
 
@@ -388,10 +403,11 @@ async function generate() {
   const sharedTypeSpec = await readJson<TypeSpec>(
     path.join(process.cwd(), 'content/reference/javascript/v2/typeSpec.json')
   )
-  const linkBaseUrl = getInternalLinkBaseUrl()
+
+  const references = REFERENCES.filter((ref) => !ref.feature || isFeatureEnabled(ref.feature))
 
   await Promise.all(
-    REFERENCES.map(async (ref) => {
+    references.map(async (ref) => {
       let output: string
       switch (ref.kind) {
         case 'sdk-legacy':
@@ -407,11 +423,21 @@ async function generate() {
           output = await renderCli(ref)
           break
       }
-      await fs.writeFile(path.join(OUT_DIR, ref.outFile), prefixInternalLinks(output, linkBaseUrl))
+      const tree = fromMarkdown(output, {
+        extensions: [gfm()],
+        mdastExtensions: [gfmFromMarkdown()],
+      })
+      addBaseUrlPrefix(tree)
+      const prefixed = toMarkdown(tree, {
+        extensions: [gfmToMarkdown()],
+        bullet: '-',
+        listItemIndent: 'one',
+      })
+      await fs.writeFile(path.join(OUT_DIR, ref.outFile), prefixed)
     })
   )
 
-  console.log(`Generated ${REFERENCES.length} markdown files under public/markdown/reference/`)
+  console.log(`Generated ${references.length} markdown files under public/markdown/reference/`)
 }
 
 generate()
