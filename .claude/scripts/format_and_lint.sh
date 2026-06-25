@@ -29,9 +29,7 @@ cd "$CLAUDE_PROJECT_DIR"
 # Prettier and ESLint for supported file types
 case "$file_path" in
   *.ts|*.tsx|*.js|*.jsx|*.json|*.css|*.scss|*.md|*.mdx|*.html|*.yaml|*.yml|*.sql)
-    # SORT_IMPORTS=false matches CI's `test:prettier`, so local formatting
-    # never drifts from what CI checks.
-    SORT_IMPORTS=false pnpm exec prettier --config prettier.config.mjs --write "$file_path"
+    pnpm exec prettier --config prettier.config.mjs --write "$file_path"
     ;;
 esac
 
@@ -42,9 +40,7 @@ case "$file_path" in
       dir="${entry%%:*}"
       filter="${entry##*:}"
       if [[ "$file_path" == *"$dir/"* ]]; then
-        # Best-effort: a worktree with an incomplete install can fail to load
-        # eslint plugins. Never let that abort the (already-done) prettier step.
-        pnpm --filter="$filter" exec eslint --fix "$file_path" || true
+        pnpm --filter="$filter" exec eslint --fix "$file_path"
         break
       fi
     done
