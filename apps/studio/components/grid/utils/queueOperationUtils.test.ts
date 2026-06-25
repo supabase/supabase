@@ -4,6 +4,7 @@ import type { SupaRow } from '../types'
 import {
   formatGridDataWithOperationValues,
   generateTableChangeKey,
+  getStableRowIdentifiers,
   rowMatchesIdentifiers,
 } from './queueOperationUtils'
 import {
@@ -152,6 +153,20 @@ describe('rowMatchesIdentifiers', () => {
   })
 })
 
+describe('stable queued row identifiers', () => {
+  test('should use original row identifiers when present', () => {
+    const row = { idx: 0, id: 3, __originalRowIdentifiers: { id: 1 } }
+
+    expect(getStableRowIdentifiers(row, { id: 3 })).toEqual({ id: 1 })
+  })
+
+  test('should fall back to current identifiers when original row identifiers are not present', () => {
+    const row = { idx: 0, id: 3 }
+
+    expect(getStableRowIdentifiers(row, { id: 3 })).toEqual({ id: 3 })
+  })
+})
+
 describe('formatGridDataWithOperationValues', () => {
   const makeRow = (idx: number, data: Record<string, unknown> = {}): SupaRow => ({
     idx,
@@ -217,7 +232,7 @@ describe('formatGridDataWithOperationValues', () => {
     })
 
     const result = formatGridDataWithOperationValues({ operations: [op], rows })
-    expect(result[0]).toEqual({ idx: 0, id: 1, name: 'Updated' })
+    expect(result[0]).toMatchObject({ idx: 0, id: 1, name: 'Updated' })
     expect(result[1]).toEqual(rows[1])
   })
 
@@ -447,5 +462,78 @@ describe('formatGridDataWithOperationValues', () => {
 
     const result = formatGridDataWithOperationValues({ operations: [op], rows })
     expect(result[0].name).toBe('Updated')
+  })
+
+  test('should preserve row identity after a primary key edit', () => {
+    const rows = [makeRow(0, { id: 1, name: 'Alice' })]
+    const idEdit = makeEditOp({
+      id: 'edit_cell_content:1:id:id:1',
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'id',
+        oldValue: 1,
+        newValue: 3,
+        table: {} as any,
+      },
+    })
+    const nameEdit = makeEditOp({
+      id: 'edit_cell_content:1:name:id:1',
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'name',
+        oldValue: 'Alice',
+        newValue: 'Updated Alice',
+        table: {} as any,
+      },
+    })
+
+    const result = formatGridDataWithOperationValues({ operations: [idEdit, nameEdit], rows })
+
+    expect(result[0]).toMatchObject({ idx: 0, id: 3, name: 'Updated Alice' })
+    expect(getStableRowIdentifiers(result[0], { id: result[0].id })).toEqual({ id: 1 })
+  })
+
+  test('should keep two rows distinct when one row takes another row primary key value', () => {
+    const rows = [makeRow(0, { id: 1, name: 'Alice' }), makeRow(1, { id: 2, name: 'Bob' })]
+    const aliceIdEdit = makeEditOp({
+      id: 'edit_cell_content:1:id:id:1',
+      payload: {
+        rowIdentifiers: { id: 1 },
+        columnName: 'id',
+        oldValue: 1,
+        newValue: 3,
+        table: {} as any,
+      },
+    })
+    const bobIdEdit = makeEditOp({
+      id: 'edit_cell_content:1:id:id:2',
+      payload: {
+        rowIdentifiers: { id: 2 },
+        columnName: 'id',
+        oldValue: 2,
+        newValue: 1,
+        table: {} as any,
+      },
+    })
+    const bobNameEdit = makeEditOp({
+      id: 'edit_cell_content:1:name:id:2',
+      payload: {
+        rowIdentifiers: { id: 2 },
+        columnName: 'name',
+        oldValue: 'Bob',
+        newValue: 'Updated Bob',
+        table: {} as any,
+      },
+    })
+
+    const result = formatGridDataWithOperationValues({
+      operations: [aliceIdEdit, bobIdEdit, bobNameEdit],
+      rows,
+    })
+
+    expect(result[0]).toMatchObject({ idx: 0, id: 3, name: 'Alice' })
+    expect(getStableRowIdentifiers(result[0], { id: result[0].id })).toEqual({ id: 1 })
+    expect(result[1]).toMatchObject({ idx: 1, id: 1, name: 'Updated Bob' })
+    expect(getStableRowIdentifiers(result[1], { id: result[1].id })).toEqual({ id: 2 })
   })
 })
