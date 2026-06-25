@@ -212,7 +212,7 @@ const Products: React.FC<Props> = (props) => {
         image={<DataAPIsVisual className="hidden sm:block" />}
       />
 
-      <p className="text-xl sm:text-2xl text-foreground-lighter col-span-full tracking-[-.01rem] max-w-[var(--container-max-w,75rem)] mx-auto mt-8">
+      <p className="text-xl sm:text-2xl text-foreground-lighter col-span-full tracking-[-.01rem] max-w-(--container-max-w,75rem) mx-auto mt-8">
         <span className="text-foreground">Use one or all.</span> Best of breed products. Integrated
         as a platform.
       </p>

@@ -24,7 +24,7 @@ export function FrameworksSectionClient({ frameworks }: { frameworks: Framework[
 
   return (
     <div className="border-b border-border py-24">
-      <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6">
+      <div className="mx-auto max-w-(--container-max-w,75rem) px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-0">
           {/* Left: title */}
           <div className="flex flex-col justify-between py-4 gap-6 md:gap-10">
@@ -101,7 +101,7 @@ export function FrameworksSectionClient({ frameworks }: { frameworks: Framework[
                 href={active.docsUrl}
                 className="absolute bottom-4 right-4 flex items-center gap-1.5 rounded-full bg-surface-100 border border-border px-3 py-1.5 text-xs text-foreground-light hover:text-foreground hover:bg-surface-200 transition-colors whitespace-nowrap"
               >
-                Read docs for <span>{active.name}</span>
+                {`Read docs for ${active.name}`}
                 <svg
                   width={12}
                   height={12}

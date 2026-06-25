@@ -137,8 +137,8 @@
    * the same fonts as the raw --font-sans / --font-mono vars above. */
   --font-custom: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-source-code-pro: var(--font-geist-mono), ui-monospace, Menlo, monospace;
-  --heading-tracking: -0.02em;
-  --body-tracking: -0.01em;
+  --heading-tracking: 0;
+  --body-tracking: 0;
   --heading-leading: 1.1;
   --body-leading: 1.6;
 }

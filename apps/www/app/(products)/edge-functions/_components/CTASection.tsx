@@ -64,7 +64,7 @@ function TerminalAnimation() {
 
 export function CTASection() {
   return (
-    <div className="mx-auto max-w-[var(--container-max-w,75rem)]">
+    <div className="mx-auto max-w-(--container-max-w,75rem)">
       <div className="flex flex-col items-center text-center gap-10 py-24 md:py-32 px-6">
         <div className="flex flex-col items-center gap-4">
           <h2 className="text-2xl md:text-4xl text-foreground">

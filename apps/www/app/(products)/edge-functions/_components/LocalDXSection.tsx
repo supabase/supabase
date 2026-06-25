@@ -49,6 +49,7 @@ function ParityCard() {
             href="https://github.com/supabase/edge-runtime/"
             className="underline hover:text-foreground-light transition-colors"
             target="_blank"
+            rel="noopener noreferrer"
           >
             Edge runtime
           </Link>{' '}
@@ -85,6 +86,7 @@ function CICard() {
             href="https://supabase.com/docs/guides/functions/cicd-workflow"
             className="underline hover:text-foreground-light transition-colors"
             target="_blank"
+            rel="noopener noreferrer"
           >
             Supabase CLI with GitHub actions
           </Link>{' '}
@@ -122,7 +124,7 @@ export function LocalDXSection() {
   return (
     <div className="py-24 flex flex-col gap-16">
       {/* Header */}
-      <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6 w-full">
+      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16 items-end">
           <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
             Delightful DX from <br />
@@ -134,6 +136,7 @@ export function LocalDXSection() {
               href="https://deno.com/"
               className="underline hover:text-foreground-light transition-colors"
               target="_blank"
+              rel="noopener noreferrer"
             >
               Deno
             </Link>
@@ -144,7 +147,7 @@ export function LocalDXSection() {
       </div>
 
       {/* Bento grid */}
-      <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6 w-full">
+      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 grid-flow-dense gap-3">
           <LocalDXCard />
           <ParityCard />

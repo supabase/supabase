@@ -112,7 +112,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
             isTransparent && 'border-transparent backdrop-blur-none'
           )}
         >
-          <div className="relative flex justify-between h-16 mx-auto max-w-[var(--container-max-w,75rem)] px-6 w-full">
+          <div className="relative flex justify-between h-16 mx-auto max-w-(--container-max-w,75rem) px-6 w-full">
             <div className="flex items-center flex-1 sm:items-stretch justify-between">
               <div className="flex items-center">
                 <div className="flex items-center shrink-0">
@@ -153,7 +153,7 @@ const Nav = ({ hideNavbar, stickyNavbar = true }: Props) => {
                   </NavigationMenuList>
                 </NavigationMenu>
               </div>
-              <div className="flex items-center gap-2 opacity-0 animate-fade-in scale-100! delay-300">
+              <div className="flex items-center gap-2 animate-fade-in delay-300">
                 <div
                   className={cn(
                     'flex items-center gap-2 transition-opacity',

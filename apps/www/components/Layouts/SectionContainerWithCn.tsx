@@ -5,7 +5,7 @@ import { cn } from 'ui'
 const sectionContainerVariants = cva('relative mx-auto w-full px-6', {
   variants: {
     width: {
-      normal: 'max-w-[var(--container-max-w,75rem)]',
+      normal: 'max-w-(--container-max-w,75rem)',
       smallScreenFull: 'max-w-full lg:container px-0',
     },
     height: {

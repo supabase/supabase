@@ -19,7 +19,7 @@ const SectionContainer = forwardRef(
       ref={ref}
       id={id}
       className={classNames(
-        `sm:py-18 relative mx-auto w-full max-w-[var(--container-max-w,75rem)] px-6 py-16 md:py-24 lg:py-24`,
+        `sm:py-18 relative mx-auto w-full max-w-(--container-max-w,75rem) px-6 py-16 md:py-24 lg:py-24`,
         className
       )}
     >

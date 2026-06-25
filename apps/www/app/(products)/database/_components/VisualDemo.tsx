@@ -429,7 +429,7 @@ export function VisualDemo() {
 
   return (
     <div ref={containerRef} className="border-t border-border relative">
-      <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6 pb-16 md:pb-24">
+      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 pb-16 md:pb-24">
         <div className="pt-8 md:pt-0 md:-translate-y-16 relative w-full h-[620px]">
           {/* Gradient blob behind card */}
           <div

@@ -106,7 +106,7 @@ function ContribGraph() {
     <svg
       ref={ref}
       viewBox={`0 0 ${SVG_W} ${SVG_H}`}
-      preserveAspectRatio="xMaxYMid slice"
+      preserveAspectRatio="xMidYMid slice"
       className="absolute inset-0 h-full w-full"
       aria-hidden
     >
@@ -139,22 +139,22 @@ export function OpenSourceSection() {
   const starsNum = 98400
 
   return (
-    <div className="border-b border-border overflow-hidden">
-      <div className="relative py-24 flex flex-col justify-center">
-        {/* Contrib graph background — right-aligned, radial fade */}
-        <div
-          className="hidden md:block absolute inset-y-0 left-1/4 right-[calc((100%-var(--container-max-w,75rem))/2*-1)]"
-          style={{
-            maskImage: 'radial-gradient(ellipse 55% 90% at 58% 50%, black 15%, transparent 60%)',
-            WebkitMaskImage:
-              'radial-gradient(ellipse 55% 90% at 58% 50%, black 15%, transparent 60%)',
-          }}
-        >
-          <ContribGraph />
-        </div>
+    <div className="relative border-b border-border overflow-hidden">
+      {/* Contrib graph — right half, full-height bleed (desktop) */}
+      <div
+        className="hidden md:block absolute inset-y-0 right-0 w-1/2"
+        style={{
+          maskImage: 'radial-gradient(ellipse 70% 80% at 50% 50%, black 25%, transparent 75%)',
+          WebkitMaskImage:
+            'radial-gradient(ellipse 70% 80% at 50% 50%, black 25%, transparent 75%)',
+        }}
+      >
+        <ContribGraph />
+      </div>
 
-        <div className="relative z-10 w-full max-w-[var(--container-max-w,75rem)] mx-auto px-6">
-          <div className="flex flex-col items-center text-center md:items-start md:text-left justify-between gap-6 py-10 max-w-lg md:max-w-lg mx-auto md:mx-0">
+      <div className="relative z-10 w-full max-w-(--container-max-w,75rem) mx-auto px-6 py-24">
+        <div className="flex flex-col mx-auto md:mx-0 items-center md:items-start gap-6 w-full max-w-lg">
+          <div className="flex flex-col items-center text-center md:items-start md:text-left gap-6 w-full">
             <div>
               <h2 className="text-4xl text-foreground text-balance">Open source from day one</h2>
               <p className="mt-4 text-sm leading-relaxed text-foreground-lighter">
@@ -189,6 +189,18 @@ export function OpenSourceSection() {
                 </Link>
               </Button>
             </div>
+          </div>
+
+          {/* Contrib graph — stacked below the text on mobile */}
+          <div
+            className="md:hidden relative w-full aspect-2/1 mt-2"
+            style={{
+              maskImage: 'radial-gradient(ellipse 70% 80% at 50% 50%, black 25%, transparent 75%)',
+              WebkitMaskImage:
+                'radial-gradient(ellipse 70% 80% at 50% 50%, black 25%, transparent 75%)',
+            }}
+          >
+            <ContribGraph />
           </div>
         </div>
       </div>

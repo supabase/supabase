@@ -101,7 +101,7 @@ export function BuiltWithSupabaseSection() {
   return (
     <div className="py-24 flex flex-col gap-16">
       {/* Header row */}
-      <div className="mx-auto max-w-[var(--container-max-w,75rem)] w-full px-6">
+      <div className="mx-auto max-w-(--container-max-w,75rem) w-full px-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
           <h3 className="text-2xl md:text-4xl text-foreground-lighter max-w-xl">
             Kickstart your next project <br />
@@ -116,7 +116,7 @@ export function BuiltWithSupabaseSection() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-[var(--container-max-w,75rem)] px-6 w-full">
+      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 w-full">
         {/* Featured row - 2 large cells */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {featuredExamples.map((example) => {
