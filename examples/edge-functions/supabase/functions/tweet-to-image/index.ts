@@ -36,20 +36,22 @@ async function handler(req: Request, ctx) {
     const tweet = tweets[0]
     console.log('formattedTweets', JSON.stringify(tweets, null, 2))
     const generatedImage = new ImageResponse(
-      <div
-        style={{
-          height: '100%',
-          width: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: '#1c1c1c',
-          color: '#EDEDED',
-        }}
-      >
-        <Tweet {...tweet} />
-      </div>,
+      React.createElement(
+        'div',
+        {
+          style: {
+            height: '100%',
+            width: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: '#1c1c1c',
+            color: '#EDEDED',
+          },
+        },
+        React.createElement(Tweet, { ...tweet })
+      ),
       {
         width: 1200,
         height: 630,
