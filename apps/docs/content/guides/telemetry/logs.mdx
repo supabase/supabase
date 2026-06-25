@@ -261,13 +261,27 @@ You can access the following logs from the **Sources** drop-down:
 
 ## Querying with the Logs Explorer
 
-The Logs Explorer uses BigQuery and supports all [available SQL functions and operators](https://cloud.google.com/bigquery/docs/reference/standard-sql/functions-and-operators).
+<Admonition type="caution">
+
+The Logs Explorer is migrating from BigQuery to ClickHouse. During this transition, the examples below show both dialects.
+
+Select the **BigQuery** or **ClickHouse** tab to see the equivalent query for each backend. BigQuery supports all [available SQL functions and operators](https://cloud.google.com/bigquery/docs/reference/standard-sql/functions-and-operators), while ClickHouse supports its own [SQL functions and operators](https://clickhouse.com/docs/sql-reference/functions).
+
+The two backends store logs differently:
+
+- **BigQuery** stores each log's nested metadata as an array of objects, which you query by joining with `unnest()` (see [Unnesting arrays](#unnesting-arrays)).
+- **ClickHouse** stores all sources in a single `logs` table keyed by a `source` column (for example, `source = 'edge_logs'`), with the nested metadata fields flattened into a `log_attributes` map. You access a field with `log_attributes['<dot.path>']` — for example, `log_attributes['request.method']` — instead of unnesting.
+
+</Admonition>
 
 ### Timestamp display and behavior
 
-Each log entry is stored with a `timestamp` as a `TIMESTAMP` data type. Use the appropriate [timestamp function](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp) to use the `timestamp` field in a query.
+Each log entry is stored with a `timestamp`.
 
-Raw top-level timestamp values are rendered as unix microsecond. To render the timestamps in a human-readable format, use the `DATETIME()` function to convert the unix timestamp display into an ISO-8601 timestamp.
+<Tabs scrollable size="small" type="underlined" defaultActiveId="bigquery" queryGroup="logsEngine">
+<TabPanel id="bigquery" label="BigQuery">
+
+In **BigQuery**, the `timestamp` is a `TIMESTAMP` data type whose raw top-level values are rendered as unix microseconds. Use the appropriate [timestamp function](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp) to use the `timestamp` field in a query, and use the `DATETIME()` function to convert the unix timestamp display into a human-readable ISO-8601 timestamp.
 
 ```sql
 -- timestamp column without datetime()
@@ -279,25 +293,67 @@ select datetime(timestamp) from ....
 -- 2022-09-27T09:17:10.439Z
 ```
 
+</TabPanel>
+<TabPanel id="clickhouse" label="ClickHouse">
+
+In **ClickHouse**, the `timestamp` is stored as a native datetime column and is already rendered in a human-readable format, so no conversion is needed. Use [date and time functions](https://clickhouse.com/docs/sql-reference/functions/date-time-functions) such as `formatDateTime()` if you need a specific format.
+
+```sql
+-- timestamp is already a native datetime column, rendered in a human-readable format
+select timestamp from logs;
+-- 2022-09-27 09:17:10.439
+```
+
+</TabPanel>
+</Tabs>
+
 ### Unnesting arrays
 
 Each log event stores metadata an array of objects with multiple levels, and can be seen by selecting single log events in the Logs Explorer. To query arrays, use `unnest()` on each array field and add it to the query as a join. This allows you to reference the nested objects with an alias and select their individual fields.
 
+<Admonition type="note">
+
+Unnesting applies to **BigQuery** only. In **ClickHouse**, the same nested fields are flattened into the `log_attributes` map, so you access them directly with `log_attributes['<dot.path>']` instead of joining with `unnest()`. The ClickHouse tabs below show the equivalent flat queries.
+
+</Admonition>
+
 For example, to query the edge logs without any joins:
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="bigquery" queryGroup="logsEngine">
+<TabPanel id="bigquery" label="BigQuery">
 
 ```sql
 select timestamp, metadata from edge_logs as t;
 ```
 
-The resulting `metadata` key is rendered as an array of objects in the Logs Explorer. In the following diagram, each box represents a nested array of objects:
+</TabPanel>
+<TabPanel id="clickhouse" label="ClickHouse">
 
-{/* <!-- Scene is here https://app.excalidraw.com/s/8gj16loJfGZ/3HzccK9MyLx --> */}
+```sql
+select timestamp, log_attributes from logs where source = 'edge_logs';
+```
 
-![Without Unnesting](/docs/img/unnesting-none.png)
+</TabPanel>
+</Tabs>
+
+The resulting `metadata` key is rendered as an array of objects in the Logs Explorer. In the following diagram, each box represents a nested array of objects.
+
+<Image
+  alt="A diagram showing the nested structure of the metadata key in the edge logs. The metadata key contains an array of objects, each of which contains a request object, which in turn contains an array of headers objects."
+  src={{
+    dark: '/docs/img/unnesting-none-dark.png',
+    light: '/docs/img/unnesting-none.png',
+  }}
+  width={1600}
+  height={767}
+/>
 
 Perform a `cross join unnest()` to work with the keys nested in the `metadata` key.
 
 To query for a nested value, add a join for each array level:
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="bigquery" queryGroup="logsEngine">
+<TabPanel id="bigquery" label="BigQuery">
 
 ```sql
 select timestamp, request.method, header.cf_ipcountry
@@ -308,8 +364,32 @@ from
   cross join unnest(request.headers) as header;
 ```
 
+</TabPanel>
+<TabPanel id="clickhouse" label="ClickHouse">
+
+```sql
+select
+  timestamp,
+  log_attributes['request.method'] as method,
+  log_attributes['request.headers.cf_ipcountry'] as cf_ipcountry
+from logs
+where source = 'edge_logs';
+```
+
+</TabPanel>
+</Tabs>
+
 This surfaces the following columns available for selection:
-![With Two Level Unnesting](/docs/img/unnesting-2.png)
+
+<Image
+  alt="A diagram showing the nested structure of the metadata key in the edge logs, with two levels of unnesting. The metadata key contains an array of objects, each of which contains a request object, which in turn contains an array of headers objects. The method and cf_ipcountry keys are highlighted to show that they can be selected."
+  src={{
+    dark: '/docs/img/unnesting-2-dark.png',
+    light: '/docs/img/unnesting-2.png',
+  }}
+  width={1600}
+  height={767}
+/>
 
 This allows you to select the `method` and `cf_ipcountry` columns. In JS dot notation, the full paths for each selected column are:
 
@@ -332,6 +412,9 @@ When querying large objects, the columnar storage engine selects each column ass
 
 Instead, select only the values required.
 
+<Tabs scrollable size="small" type="underlined" defaultActiveId="bigquery" queryGroup="logsEngine">
+<TabPanel id="bigquery" label="BigQuery">
+
 ```sql
 -- ❌ Avoid doing this
 select
@@ -351,11 +434,36 @@ from
   cross join unnest(m.request) as r;
 ```
 
+</TabPanel>
+<TabPanel id="clickhouse" label="ClickHouse">
+
+```sql
+-- ❌ Avoid doing this
+select
+  timestamp,
+  log_attributes -- <- the whole attributes map
+from logs
+where source = 'edge_logs';
+
+-- ✅ Do this
+select
+  timestamp,
+  log_attributes['request.method'] as method -- <- select only the required value
+from logs
+where source = 'edge_logs';
+```
+
+</TabPanel>
+</Tabs>
+
 ### Examples and templates
 
 The Logs Explorer includes **Templates** (available in the Templates tab or the dropdown in the Query tab) to help you get started.
 
 For example, you can enter the following query in the SQL Editor to retrieve each user's IP address:
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="bigquery" queryGroup="logsEngine">
+<TabPanel id="bigquery" label="BigQuery">
 
 ```sql
 select datetime(timestamp), h.x_real_ip
@@ -367,9 +475,33 @@ from
 where h.x_real_ip is not null and r.method = "GET";
 ```
 
+</TabPanel>
+<TabPanel id="clickhouse" label="ClickHouse">
+
+```sql
+select
+  timestamp,
+  log_attributes['request.headers.x_real_ip'] as x_real_ip
+from logs
+where source = 'edge_logs'
+  and log_attributes['request.headers.x_real_ip'] != ''
+  and log_attributes['request.method'] = 'GET';
+```
+
+</TabPanel>
+</Tabs>
+
 ### Logs field reference
 
-Refer to the full field reference for each available source below. Do note that in order to access each nested key, you would need to perform the [necessary unnesting joins](#unnesting-arrays)
+Refer to the full field reference for each available source below.
+
+<Admonition type="tip">
+
+In **BigQuery**, to access each nested key you would need to perform the [necessary unnesting joins](#unnesting-arrays).
+
+In **ClickHouse**, the same keys are available directly in the `log_attributes` map (for example, `log_attributes['request.method']`).
+
+</Admonition>
 
 <SharedData data="logConstants">
   {(logConstants) => (
