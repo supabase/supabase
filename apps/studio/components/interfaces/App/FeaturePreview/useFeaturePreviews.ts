@@ -20,7 +20,7 @@ export type FeaturePreview = {
 }
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
-  const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
+  const unifiedLogsDefaultOptIn = useFlag('unifiedLogsDefaultOptIn')
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
   const platformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
@@ -43,10 +43,10 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
           name: 'Updated Logs interface',
           discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
-          enabled: isUnifiedLogsPreviewAvailable,
+          enabled: false,
           isNew: true,
           isPlatformOnly: true,
-          isDefaultOptIn: false,
+          isDefaultOptIn: unifiedLogsDefaultOptIn,
           getRoute: (ref?: string) => `/project/${ref}/logs`,
         },
         {
