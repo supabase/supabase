@@ -1,14 +1,14 @@
 ---
 id: 'bigquery-destination'
 title: 'BigQuery destination'
-description: 'Configure BigQuery as an external replication destination.'
+description: 'Configure BigQuery as a Supabase Pipelines destination.'
 subtitle: 'Replicate Supabase Postgres tables to BigQuery.'
 sidebar_label: 'BigQuery'
 ---
 
 <Admonition type="caution" title="Private Alpha">
 
-External replication is currently in private alpha. Access is limited and features may change.
+Supabase Pipelines is currently in private alpha. Private alpha features can be unstable and may introduce breaking changes while we evaluate the product direction, refine the feature set, and incorporate customer feedback.
 
 </Admonition>
 
@@ -75,7 +75,7 @@ Required permissions:
    | **Connection pool size** | `4` connections    | Size of the BigQuery Storage Write API connection pool. More connections allow more parallel writes, but consume more resources.                                           |
    | **Maximum staleness**    | No staleness limit | Maximum allowed age, in minutes, for BigQuery cached metadata before reading base tables. Lower values improve freshness. Higher values can reduce query cost and latency. |
 
-6. Click **Create and start** to begin replication
+6. Click **Create and start pipeline** to begin replication
 
 Your replication pipeline now starts copying data from your database to BigQuery.
 
@@ -90,9 +90,9 @@ Once configured, replication to BigQuery:
 
 ## Source table requirements
 
-BigQuery replication requires each source table to have a primary key, and the publication must include the primary-key columns. External replication declares those columns as the BigQuery destination primary key so BigQuery CDC can apply `UPSERT` and `DELETE` rows.
+BigQuery replication requires each source table to have a primary key, and the publication must include the primary-key columns. Pipelines declares those columns as the BigQuery destination primary key so BigQuery change data capture (CDC) can apply `UPSERT` and `DELETE` rows.
 
-BigQuery primary keys are `NOT ENFORCED`, and BigQuery CDC supports composite primary keys with up to 16 columns. Your source primary key must stay unique and non-null because BigQuery uses it to match CDC rows.
+BigQuery primary keys are `NOT ENFORCED`, and BigQuery change data capture (CDC) supports composite primary keys with up to 16 columns. Your source primary key must stay unique and non-null because BigQuery uses it to match CDC rows.
 
 Source tables must also use a BigQuery-compatible Postgres `REPLICA IDENTITY` setting. Most tables can keep the Postgres default, as long as they have a primary key and all primary-key columns are included in the publication.
 
@@ -100,13 +100,13 @@ Source tables must also use a BigQuery-compatible Postgres `REPLICA IDENTITY` se
 | ------------------------------------------------ | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `REPLICA IDENTITY DEFAULT` with a primary key    | Supported        | Recommended for most tables. BigQuery uses the replicated source primary key to apply upserts and deletes.                                                      |
 | `REPLICA IDENTITY FULL`                          | Supported        | Recommended for tables with large `text`, `jsonb`, `bytea`, or other values that Postgres may store out-of-line using TOAST, especially when those rows update. |
-| `REPLICA IDENTITY USING INDEX`                   | Not supported    | BigQuery CDC rows are keyed by the source primary key, not by an alternative unique index.                                                                      |
+| `REPLICA IDENTITY USING INDEX`                   | Not supported    | BigQuery change data capture (CDC) rows are keyed by the source primary key, not by an alternative unique index.                                                |
 | `REPLICA IDENTITY NOTHING`                       | Not supported    | Updates and deletes do not include enough row identity for BigQuery to apply them safely.                                                                       |
 | `REPLICA IDENTITY DEFAULT` without a primary key | Not supported    | BigQuery requires a source primary key.                                                                                                                         |
 
-For a general explanation of how replica identity affects update and delete events, see [How does replica identity affect updates and deletes?](/docs/guides/database/replication/external-replication-faq#how-does-replica-identity-affect-updates-and-deletes).
+For a general explanation of how replica identity affects update and delete events, see [How does replica identity affect updates and deletes?](/docs/guides/database/replication/pipelines-faq#how-does-replica-identity-affect-updates-and-deletes).
 
-For updates, Postgres does not always send a complete old row through logical replication. It can also mark unchanged toasted values as `unchanged toast` instead of resending the value. BigQuery CDC upserts require a complete new row because omitted columns are not preserved in the destination. The replication pipeline can reconstruct a complete update when the old row image contains the missing value, which is reliable with `REPLICA IDENTITY FULL`.
+For updates, Postgres does not always send a complete old row through logical replication. It can also mark unchanged toasted values as `unchanged toast` instead of resending the value. BigQuery change data capture (CDC) upserts require a complete new row because omitted columns are not preserved in the destination. The replication pipeline can reconstruct a complete update when the old row image contains the missing value, which is reliable with `REPLICA IDENTITY FULL`.
 
 If a BigQuery pipeline fails with an error about a partial update row, set `REPLICA IDENTITY FULL` on the affected source table and restart the pipeline. Changing replica identity only affects new WAL records, so a retained update that was written before the change may still need to be skipped by recreating the pipeline or re-copying the affected table.
 
@@ -145,7 +145,7 @@ This structure handles table truncations while maintaining query compatibility.
 
 ## Schema change support
 
-Schema change support for BigQuery is currently in beta. External replication supports a limited set of schema changes while the feature is developed further.
+Schema change support for BigQuery is currently in beta. Pipelines supports a limited set of schema changes for BigQuery while the feature is developed further.
 
 Supported schema changes:
 
@@ -162,7 +162,7 @@ Unsupported or limited schema changes:
 - Filling existing rows for `ADD COLUMN ... DEFAULT`
 - Unsupported default expressions
 
-BigQuery requires added columns to be nullable. When a replicated `ADD COLUMN` includes a default, external replication can apply supported default metadata for future rows, but BigQuery does not backfill existing rows through that DDL. Existing destination rows remain `NULL` unless you run a separate backfill.
+BigQuery requires added columns to be nullable. When a replicated `ADD COLUMN` includes a default, Pipelines can apply supported default metadata for future rows, but BigQuery does not backfill existing rows through that DDL. Existing destination rows remain `NULL` unless you run a separate backfill.
 
 Supported defaults are best-effort translations to BigQuery SQL. Unsupported defaults are skipped with a warning instead of failing replication.
 
@@ -177,4 +177,4 @@ Supported defaults are best-effort translations to BigQuery SQL. Unsupported def
 ## Additional resources
 
 - [BigQuery documentation](https://cloud.google.com/bigquery/docs) - Official Google BigQuery documentation
-- [BigQuery change data capture](https://cloud.google.com/bigquery/docs/change-data-capture) - BigQuery CDC requirements and limitations
+- [BigQuery change data capture](https://cloud.google.com/bigquery/docs/change-data-capture) - BigQuery change data capture (CDC) requirements and limitations

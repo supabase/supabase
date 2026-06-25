@@ -428,7 +428,7 @@ export const CreateWrapperSheet = ({
                             </div>
                             <div className="flex items-center space-x-2">
                               <Button
-                                type="default"
+                                variant="default"
                                 className="px-1"
                                 icon={<Edit />}
                                 onClick={() => {
@@ -436,7 +436,7 @@ export const CreateWrapperSheet = ({
                                 }}
                               />
                               <Button
-                                type="default"
+                                variant="default"
                                 className="px-1"
                                 icon={<Trash />}
                                 onClick={() => {
@@ -449,7 +449,7 @@ export const CreateWrapperSheet = ({
                       })}
 
                       <div className="flex justify-end">
-                        <Button type="default" onClick={() => setSelectedTableToEdit(NewTable)}>
+                        <Button variant="default" onClick={() => setSelectedTableToEdit(NewTable)}>
                           Add foreign table
                         </Button>
                       </div>
@@ -507,8 +507,8 @@ export const CreateWrapperSheet = ({
             <SheetFooter>
               <Button
                 size="tiny"
-                type="default"
-                htmlType="button"
+                variant="default"
+                type="button"
                 onClick={onCloseWithConfirmation}
                 disabled={isSubmitting}
               >
@@ -516,9 +516,9 @@ export const CreateWrapperSheet = ({
               </Button>
               <Button
                 size="tiny"
-                type="primary"
+                variant="primary"
                 form={FORM_ID}
-                htmlType="submit"
+                type="submit"
                 disabled={isSubmitting || isExtensionDataLoading}
                 loading={isSubmitting}
               >

@@ -19,9 +19,9 @@ import ProductsNav from '@/components/Products/ProductsNav'
 import ProductHeader from '@/components/Sections/ProductHeader'
 import MainProducts from '@/data/MainProducts'
 import ApiExamplesData from '@/data/products/database/api-examples'
-import { ETLVisual } from '@/data/products/database/etl-visual'
 import ExtensionsExamplesData from '@/data/products/database/extensions-examples'
 import HighlightsCards from '@/data/products/database/highlight-cards'
+import { PipelinesVisual } from '@/data/products/database/pipelines-visual'
 import SqlViewCarouselData from '@/data/products/database/sql-view-carousel.json'
 import TableViewCarouselData from '@/data/products/database/table-view-carousel.json'
 import { breadcrumbs } from '@/lib/breadcrumbs'
@@ -284,11 +284,11 @@ function Database() {
         <SectionContainer>
           <div className="grid grid-cols-12 lg:gap-16">
             <div className="col-span-12 mb-8 lg:col-span-6 xl:col-span-5">
-              <h2 className="h2">Supabase ETL</h2>
+              <h2 className="h2">Supabase Pipelines</h2>
               <p className="p text-lg">Stream your Postgres data to external systems.</p>
               <p className="p">
                 Automatically replicate your database changes to external data warehouses and
-                analytics platforms in real-time, without pipelines.
+                analytics platforms in near real time with managed replication pipelines.
               </p>
 
               <div className="my-8">
@@ -304,17 +304,17 @@ function Database() {
               </div>
 
               <div className="mt-4 flex gap-2">
-                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
                   <Link href="/docs/guides/database/replication">Read the docs</Link>
                 </Button>
-                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
-                  <Link href="/blog/supabase-etl">Read the blog post</Link>
+                <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
+                  <Link href="/blog/introducing-supabase-pipelines">Read the blog post</Link>
                 </Button>
               </div>
             </div>
             <div className="col-span-12 lg:col-span-6 lg:col-start-7">
-              {/* TODO: Add ETL illustration */}
-              <ETLVisual className="w-full" />
+              {/* TODO: Add Pipelines illustration */}
+              <PipelinesVisual className="w-full" />
             </div>
           </div>
         </SectionContainer>
@@ -366,7 +366,7 @@ function Database() {
             <div className="section--bg-masked">
               <div className="section--bg border-t border-b border-control"></div>
             </div>
-            <div className="section-container pt-12 pb-0">
+            <div className="relative pt-12 pb-0">
               <div className="overflow-x-hidden">
                 <SectionContainer className="mb-0 pb-8 lg:pt-32">
                   <GithubExamples />
@@ -390,7 +390,7 @@ function Database() {
                 title="40+ preinstalled extensions"
                 text="We only show a few of the extensions supported by Supabase here, but we preinstall many more that you can use right away."
               />
-              <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+              <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
                 <Link href="/docs/guides/database">Explore documentation</Link>
               </Button>
             </div>

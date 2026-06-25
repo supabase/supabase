@@ -29,7 +29,7 @@ import {
 } from 'ui'
 
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
-import { getContentById } from '@/data/content/content-id-query'
+import { getContentById, getSqlSnippetById } from '@/data/content/content-id-query'
 import { useSQLSnippetFolderContentsQuery } from '@/data/content/sql-folder-contents-query'
 import { Snippet } from '@/data/content/sql-folders-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -177,12 +177,23 @@ export const SQLEditorTreeViewItem = ({
     }
   }
 
-  const onToggleFavorite = () => {
+  const onToggleFavorite = async () => {
     const snippetId = element.metadata.id
-    if (snippetId) {
-      if (isFavorite) snapV2.removeFavorite(snippetId)
-      else snapV2.addFavorite(snippetId)
+    if (!snippetId) return
+    if (!projectRef) return console.error('Project ref is required')
+
+    // Persisting a favorite goes through the full content upsert, so the
+    // snippet's content must be loaded first — otherwise the PUT endpoint
+    // rejects the update. Snippets listed in the nav that have never been
+    // opened have no content loaded yet, so fetch it before toggling.
+    const storeSnippet = snapV2.snippets[snippetId]
+    if (!storeSnippet?.snippet.content) {
+      const snippet = await getSqlSnippetById({ projectRef, id: snippetId })
+      snapV2.setSnippet(projectRef, snippet)
     }
+
+    if (isFavorite) snapV2.removeFavorite(snippetId)
+    else snapV2.addFavorite(snippetId)
   }
 
   const onSelectDuplicate = async () => {
@@ -437,7 +448,7 @@ export const SQLEditorTreeViewItem = ({
           }}
         >
           <Button
-            type="outline"
+            variant="outline"
             size="tiny"
             block
             loading={isInFolder ? isFetchingNextPageInFolder : _isFetchingNextPage}

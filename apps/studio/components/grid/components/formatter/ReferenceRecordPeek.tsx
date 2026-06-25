@@ -162,7 +162,7 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
           id={String(table.id)}
           filters={[{ column, operator: '=', value: String(value) }]}
         >
-          <Button type="default">Open table</Button>
+          <Button variant="default">Open table</Button>
         </EditorTablePageLink>
       </div>
     </>

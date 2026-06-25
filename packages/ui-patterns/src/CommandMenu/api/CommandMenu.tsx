@@ -85,7 +85,7 @@ function CommandError({ resetErrorBoundary }: { resetErrorBoundary: () => void }
           Sorry, looks like we&apos;re having some issues with the command menu!
         </p>
         <p className="text-sm text-center">Please try again in a bit.</p>
-        <Button size="tiny" type="secondary" onClick={resetErrorBoundary}>
+        <Button size="tiny" variant="secondary" onClick={resetErrorBoundary}>
           Try again?
         </Button>
       </div>

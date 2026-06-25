@@ -437,7 +437,7 @@ export const SidePanelEditor = ({
         }),
         queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
         queryClient.invalidateQueries({
-          queryKey: tableKeys.list(project?.ref, selectedTable?.schema, includeColumns),
+          queryKey: tableKeys.list(project?.ref, selectedTable?.schema, { includeColumns }),
         }),
         queryClient.invalidateQueries({
           queryKey: tableKeys.infiniteListPrefix(project?.ref, selectedTable?.schema),
@@ -508,7 +508,7 @@ export const SidePanelEditor = ({
         // Switch it to individual tables via an array of strings
         // Refer to PublicationStore for more information about this
         const publicTables = await queryClient.fetchQuery({
-          queryKey: tableKeys.list(project.ref, 'public', includeColumns),
+          queryKey: tableKeys.list(project.ref, 'public', { includeColumns }),
           queryFn: ({ signal }) =>
             getTables(
               {
@@ -646,10 +646,10 @@ export const SidePanelEditor = ({
                 .map(([, data]) => data?.pages?.[0]?.data?.count)
                 .find((count) => typeof count === 'number') ??
               queryClient.getQueryData<unknown[]>(
-                tableKeys.list(project?.ref, payload.schema, true)
+                tableKeys.list(project?.ref, payload.schema, { includeColumns: true })
               )?.length ??
               queryClient.getQueryData<unknown[]>(
-                tableKeys.list(project?.ref, payload.schema, false)
+                tableKeys.list(project?.ref, payload.schema, { includeColumns: false })
               )?.length
 
             createTableSpan.setAttributes({
@@ -713,7 +713,7 @@ export const SidePanelEditor = ({
                 async () => {
                   await Promise.all([
                     queryClient.invalidateQueries({
-                      queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
+                      queryKey: tableKeys.list(project?.ref, table.schema, { includeColumns }),
                     }),
                     queryClient.invalidateQueries({
                       queryKey: tableKeys.infiniteListPrefix(project?.ref, table.schema),
@@ -783,7 +783,7 @@ export const SidePanelEditor = ({
 
         await Promise.all([
           queryClient.invalidateQueries({
-            queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
+            queryKey: tableKeys.list(project?.ref, table.schema, { includeColumns }),
           }),
           queryClient.invalidateQueries({
             queryKey: tableKeys.infiniteListPrefix(project?.ref, table.schema),

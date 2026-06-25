@@ -153,14 +153,14 @@ export const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps
         <DialogSection>
           <div className="flex items-center justify-start gap-x-2">
             {selectedSnippet.docLink && (
-              <Button asChild type="default" icon={<ExternalLink />}>
+              <Button asChild variant="default" icon={<ExternalLink />}>
                 <Link href={selectedSnippet.docLink.href} target="_blank" rel="noreferrer">
                   {selectedSnippet.docLink.label}
                 </Link>
               </Button>
             )}
 
-            <Button asChild type="default" icon={<ExternalLink />}>
+            <Button asChild variant="default" icon={<ExternalLink />}>
               <Link href={CLI_DOCS_URL} target="_blank" rel="noreferrer">
                 About CLI
               </Link>

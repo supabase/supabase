@@ -2,20 +2,17 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import PageBreadcrumb from '~/components/Sections/PageBreadcrumb'
 import PageHeader from '~/components/Sections/PageHeader'
+import { getAddendaList, type AddendumSummary } from '~/lib/addenda'
 import { FileText } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { Badge } from 'ui'
 
-const addenda = [
-  {
-    label: 'Integration Partner Addendum',
-    href: '/legal/partner-resources/program-addenda/integration-partner-addendum',
-    effectiveDate: 'May 27, 2026',
-  },
-]
+export async function getStaticProps() {
+  return { props: { addenda: getAddendaList() } }
+}
 
-export default function ProgramAddendaPage() {
+export default function ProgramAddendaPage({ addenda }: { addenda: AddendumSummary[] }) {
   return (
     <DefaultLayout>
       <NextSeo
@@ -48,15 +45,15 @@ export default function ProgramAddendaPage() {
         <p>Additional partner-type addenda will be added as the program expands.</p>
         <div className="divide-y divide-border">
           {addenda.map((item) => (
-            <div key={item.href} className="flex items-center gap-3 py-4">
+            <div key={item.slug} className="flex items-center gap-3 py-4">
               <FileText size={15} className="shrink-0 text-foreground-muted" />
               <Link
                 href={item.href}
                 className="text-foreground-light transition-colors hover:text-foreground hover:underline"
               >
-                {item.label}
+                {item.title}
               </Link>
-              <Badge>Effective {item.effectiveDate}</Badge>
+              <Badge>Effective {item.versions[0].effectiveDate}</Badge>
             </div>
           ))}
         </div>

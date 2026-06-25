@@ -22,7 +22,7 @@ import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringL
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { CreateIndexSidePanel } from './CreateIndexSidePanel'
 import AlertError from '@/components/ui/AlertError'
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import SchemaSelector from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useDatabaseIndexDeleteMutation } from '@/data/database-indexes/index-delete-mutation'
@@ -195,7 +195,7 @@ export const Indexes = () => {
               >
                 <Button
                   className="ml-auto grow lg:grow-0"
-                  type="primary"
+                  variant="primary"
                   onClick={() => setShowCreateIndex(true)}
                   disabled={!isSuccessSchemas}
                 >
@@ -260,13 +260,13 @@ export const Indexes = () => {
                           </TableCell>
                           <TableCell>
                             <div className="flex justify-end items-center space-x-2">
-                              <Button type="default" onClick={() => setEditIndexId(index.name)}>
+                              <Button variant="default" onClick={() => setEditIndexId(index.name)}>
                                 View definition
                               </Button>
                               {!isSchemaLocked && (
                                 <Button
                                   aria-label="Delete index"
-                                  type="text"
+                                  variant="text"
                                   className="px-1"
                                   icon={<Trash />}
                                   onClick={() => setDeleteIndexId(index.name)}

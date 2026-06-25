@@ -237,7 +237,7 @@ function AuthPage() {
             <div className="section--bg-masked">
               <div className="section--bg border-t border-b border-control"></div>
             </div>
-            <div className="section-container pt-12 pb-0">
+            <div className="relative pt-12 pb-0">
               <div className="overflow-x-hidden">
                 <SectionContainer className="mb-0 pb-8">
                   <GithubExamples />
@@ -259,7 +259,13 @@ function AuthPage() {
               </p>
               <p className="p">Policies can be written in SQL or using the dashboard online.</p>
 
-              <Button asChild size="small" type="default" className="mt-4" icon={<ArrowUpRight />}>
+              <Button
+                asChild
+                size="small"
+                variant="default"
+                className="mt-4"
+                icon={<ArrowUpRight />}
+              >
                 <Link href="/docs/guides/database/postgres/row-level-security">
                   Explore documentation
                 </Link>

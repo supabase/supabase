@@ -144,7 +144,7 @@ export const PolicyTemplates = ({
                 </SimpleCodeBlock>
                 <CopyButton
                   iconOnly
-                  type="default"
+                  variant="default"
                   className="px-1 absolute top-1.5 right-1.5"
                   text={template.statement}
                 />

@@ -1,16 +1,15 @@
 import 'swiper/css'
 
-import { useRef } from 'react'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { Button, cn } from 'ui'
-import Link from 'next/link'
-import { CTA } from '~/types/common'
-
 import ExampleCard from '~/components/ExampleCard'
-import { Swiper, SwiperSlide } from 'swiper/react'
+import { CTA } from '~/types/common'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
+import Link from 'next/link'
+import { useRef } from 'react'
 // import Swiper core and required modules
 import SwiperCore from 'swiper'
 import { Navigation, Pagination } from 'swiper/modules'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import { Button, cn } from 'ui'
 
 // install Swiper modules
 SwiperCore.use([Navigation, Pagination])
@@ -32,7 +31,7 @@ const ExamplesCarousel = ({
       <div className="w-full flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4">
         <h3 className="h2 mb-0!">{title}</h3>
         {cta && (
-          <Button asChild type="default" size="tiny">
+          <Button asChild variant="default" size="tiny">
             <Link href={cta.href}>{cta.label}</Link>
           </Button>
         )}

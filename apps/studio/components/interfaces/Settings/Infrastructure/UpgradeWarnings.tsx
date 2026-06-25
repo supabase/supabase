@@ -20,7 +20,7 @@ export const ReadReplicasWarning = ({ latestPgVersion }: { latestPgVersion: stri
       title="A newer version of Postgres is available"
       description={`You will need to remove all read replicas prior to upgrading your Postgres version to the latest available (${latestPgVersion}).`}
       actions={
-        <Button asChild type="default">
+        <Button asChild variant="default">
           <Link href={`/project/${ref}/database/replication`}>Manage read replicas</Link>
         </Button>
       }
@@ -124,7 +124,7 @@ const ValidationErrorItem = ({ error }: { error: ProjectUpgradeEligibilityValida
         <p className="text-foreground-lighter text-xs">{description}</p>
       </div>
       {manageLink && (
-        <Button size="tiny" type="default" asChild>
+        <Button size="tiny" variant="default" asChild>
           <Link href={manageLink}>Manage</Link>
         </Button>
       )}
@@ -160,6 +160,10 @@ const getWarningTitle = (warning: ProjectUpgradeEligibilityWarning): string => {
   switch (warning.type) {
     case 'pg_graphql_introspection_change':
       return 'GraphQL introspection will be disabled by default after upgrade'
+    case 'ltree_reindex_required':
+      return 'ltree indexes must be reindexed after this upgrade'
+    case 'operator_estimator_gate':
+      return 'Custom operators may need attention after this upgrade'
   }
 }
 
@@ -167,6 +171,10 @@ const getWarningDescription = (warning: ProjectUpgradeEligibilityWarning): strin
   switch (warning.type) {
     case 'pg_graphql_introspection_change':
       return 'After upgrading, queries to `__schema` and `__type` will return an error unless introspection is explicitly re-enabled on the schema. Regular data queries are not affected.'
+    case 'ltree_reindex_required':
+      return 'After upgrading, ltree indexes on this database can return incomplete results until they are rebuilt. Run `REINDEX INDEX CONCURRENTLY` on the affected indexes — this runs online with no downtime.'
+    case 'operator_estimator_gate':
+      return 'After upgrading, recreating an operator that references a non-built-in selectivity estimator (for example during a restore or branch) requires superuser and may fail. Most projects are not affected.'
   }
 }
 
@@ -174,6 +182,10 @@ const getWarningLink = (warning: ProjectUpgradeEligibilityWarning): string => {
   switch (warning.type) {
     case 'pg_graphql_introspection_change':
       return `${DOCS_URL}/guides/platform/upgrading#upgrading-to-pg_graphql-160`
+    case 'ltree_reindex_required':
+      return `${DOCS_URL}/guides/platform/upgrading#ltree-indexes-require-reindexing-after-upgrade`
+    case 'operator_estimator_gate':
+      return `${DOCS_URL}/guides/platform/upgrading#custom-operator-selectivity-estimators`
   }
 }
 
@@ -191,7 +203,7 @@ export const ValidationWarningsAdmonition = ({
       title={getWarningTitle(warning)}
       description={getWarningDescription(warning)}
     >
-      <Button asChild type="default" className="mt-2">
+      <Button asChild variant="default" className="mt-2">
         <Link href={getWarningLink(warning)} target="_blank" rel="noreferrer">
           Read upgrade notes
         </Link>

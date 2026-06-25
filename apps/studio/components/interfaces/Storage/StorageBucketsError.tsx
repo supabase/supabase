@@ -29,7 +29,7 @@ const StorageBucketsError = ({ error }: StorageBucketsErrorProps) => {
             </>
           }
           actions={
-            <Button key="contact-support" asChild type="default" className="ml-4">
+            <Button key="contact-support" asChild variant="default" className="ml-4">
               <SupportLink
                 queryParams={{
                   projectRef: ref,

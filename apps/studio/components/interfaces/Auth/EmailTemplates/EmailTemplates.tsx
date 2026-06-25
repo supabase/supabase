@@ -155,7 +155,7 @@ export const EmailTemplates = () => {
                 }
                 layout="horizontal"
                 actions={
-                  <Button asChild type="default">
+                  <Button asChild variant="default">
                     <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
                   </Button>
                 }
@@ -258,13 +258,13 @@ export const EmailTemplates = () => {
                     )}
                     <CardFooter className="justify-end space-x-2">
                       {notificationsForm.formState.isDirty && (
-                        <Button type="default" onClick={() => notificationsForm.reset()}>
+                        <Button variant="default" onClick={() => notificationsForm.reset()}>
                           Cancel
                         </Button>
                       )}
                       <Button
-                        type="primary"
-                        htmlType="submit"
+                        variant="primary"
+                        type="submit"
                         disabled={
                           !canUpdateConfig ||
                           isUpdatingConfig ||

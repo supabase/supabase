@@ -56,7 +56,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
             <div className="flex flex-row justify-between items-center">
               <h3>Field Reference</h3>
               <Button
-                type="text"
+                variant="text"
                 className="px-1"
                 onClick={() => setShowReference(false)}
                 icon={<X size={18} strokeWidth={1.5} />}
@@ -69,7 +69,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
           hideFooter
           triggerElement={
             <Button
-              type="default"
+              variant="default"
               onClick={() => setShowReference(true)}
               icon={<BookOpen strokeWidth={1.5} />}
             >
@@ -104,7 +104,7 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
             <Popover open={open} onOpenChange={setOpen}>
               <PopoverTrigger asChild>
                 <Button
-                  type="default"
+                  variant="default"
                   role="combobox"
                   size={'small'}
                   aria-expanded={open}

@@ -17,6 +17,7 @@ export function useAvailableConnectModes(): ConnectMode[] {
   return useMemo(() => {
     const allModes: { id: ConnectMode; enabled: boolean }[] = [
       { id: 'framework', enabled: showAppFrameworks || showMobileFrameworks },
+      { id: 'server', enabled: true },
       { id: 'direct', enabled: true },
       { id: 'orm', enabled: showOrms },
       { id: 'mcp', enabled: true },
