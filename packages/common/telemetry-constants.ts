@@ -2842,7 +2842,7 @@ export interface DashboardErrorCreatedEvent {
     /**
      * Source of the error
      */
-    source?: 'admonition' | 'toast' | 'error_display'
+    source?: 'admonition' | 'toast' | 'error_display' | 'form'
     /**
      * Type of error matched (for error_display source)
      */
@@ -2851,6 +2851,22 @@ export interface DashboardErrorCreatedEvent {
      * Whether troubleshooting steps are available (for error_display source)
      */
     hasTroubleshooting?: boolean
+    /**
+     * Funnel the error occurred in (set only for instrumented funnel errors)
+     */
+    origin?: 'signup' | 'project_creation' | 'org_creation'
+    /**
+     * Coarse classification of the funnel error
+     */
+    errorCategory?: 'validation' | 'api' | 'network' | 'payment' | 'unknown'
+    /**
+     * Controlled-vocabulary slug describing the reason (no free text, no PII)
+     */
+    errorReason?: string
+    /**
+     * HTTP status code for api/network errors (absent for validation/payment)
+     */
+    errorCode?: number
   }
   groups: TelemetryGroups
 }

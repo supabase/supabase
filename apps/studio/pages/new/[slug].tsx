@@ -71,13 +71,16 @@ import { usePHFlag } from '@/hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from '@/lib/constants'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { useProfile } from '@/lib/profile'
+import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 import type { NextPageWithLayout } from '@/types'
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
 const Wizard: NextPageWithLayout = () => {
   const track = useTrack()
+  const trackFunnelError = useTrackFunnelError()
   const router = useRouter()
   const { slug, projectName } = useParams()
   const { appTitle } = useCustomContent(['app:title'])
@@ -317,6 +320,10 @@ const Wizard: NextPageWithLayout = () => {
       )
       router.push(`/project/${res.ref}`)
     },
+    onError: (error) => {
+      toast.error(`Failed to create new project: ${error.message}`)
+      trackFunnelError('project_creation', classifyApiError('project_creation', error), 'toast')
+    },
   })
 
   const onSubmitWithComputeCostsConfirmation = async (values: z.infer<typeof FormSchema>) => {
@@ -356,6 +363,11 @@ const Wizard: NextPageWithLayout = () => {
     } = values
 
     if (useOrioleDb && !availableOrioleVersion) {
+      trackFunnelError(
+        'project_creation',
+        { errorCategory: 'validation', errorReason: 'oriole_unavailable' },
+        'toast'
+      )
       return toast.error('No available OrioleDB image found, only Postgres is available')
     }
 
@@ -501,7 +513,15 @@ const Wizard: NextPageWithLayout = () => {
         <meta name="description" content="Supabase Studio" />
       </Head>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation)}>
+        <form
+          onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation, (errors) =>
+            trackFunnelError(
+              'project_creation',
+              classifyValidationError('project_creation', errors),
+              'form'
+            )
+          )}
+        >
           <Panel
             loading={!isOrganizationsSuccess}
             title={
