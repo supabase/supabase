@@ -66,7 +66,7 @@ export function LogsSidebarMenuV2() {
 
   const unifiedLogsFlagEnabled = useFlag('unifiedLogs')
   const { selectFeaturePreview } = useFeaturePreviewModal()
-  const { enable: enableUnifiedLogs, isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
+  const { enable: enableUnifiedLogs } = useUnifiedLogsPreview()
 
   const [searchText, setSearchText] = useState('')
 
@@ -240,17 +240,15 @@ export function LogsSidebarMenuV2() {
           }
         />
       )}
-      {isUnifiedLogsEligible && (
-        <UnifiedLogsBanner
-          variant="promo"
-          className="mx-4 mt-4"
-          onEnable={() => {
-            enableUnifiedLogs()
-            router.push(`/project/${ref}/logs`)
-          }}
-          onMoreInfo={() => selectFeaturePreview('supabase-ui-preview-unified-logs')}
-        />
-      )}
+      <UnifiedLogsBanner
+        variant="promo"
+        className="mx-4 mt-4"
+        onEnable={() => {
+          enableUnifiedLogs()
+          router.push(`/project/${ref}/logs`)
+        }}
+        onMoreInfo={() => selectFeaturePreview('supabase-ui-preview-unified-logs')}
+      />
 
       <div
         className={cn(

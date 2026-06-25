@@ -28,7 +28,7 @@ export function FilterSideBar({
   const { ref } = useParams()
   const { table } = useDataTable()
 
-  const { disable: disableUnifiedLogs, isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
+  const { disable: disableUnifiedLogs } = useUnifiedLogsPreview()
 
   const handleGoBackToOldLogs = () => {
     disableUnifiedLogs()
@@ -66,19 +66,17 @@ export function FilterSideBar({
         <div className="flex h-[48px] items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <p className="text-foreground text-lg">Logs</p>
-            {isUnifiedLogsEligible && <Badge variant="default">Beta</Badge>}
+            <Badge variant="default">Beta</Badge>
           </div>
           {table.getState().columnFilters.length ? <DataTableResetButton /> : null}
         </div>
       </div>
 
-      {isUnifiedLogsEligible && (
-        <UnifiedLogsBanner
-          variant="utility"
-          className="mx-4 mt-4"
-          onSwitchBack={handleGoBackToOldLogs}
-        />
-      )}
+      <UnifiedLogsBanner
+        variant="utility"
+        className="mx-4 mt-4"
+        onSwitchBack={handleGoBackToOldLogs}
+      />
 
       <div className="flex-1 p-2 sm:overflow-y-scroll">
         <DataTableFilterControls dateRangeDisabled={dateRangeDisabled} />
