@@ -38,6 +38,7 @@ import {
   isUninstalling,
 } from './stripe-sync-status'
 import { StripeSyncChangesCard } from './StripeSyncChangesCard'
+import { StatusDisplay } from './StatusDisplay'
 import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 import { useStripeSyncInstallMutation } from '@/data/database-integrations/stripe/stripe-sync-install-mutation'
@@ -230,6 +231,21 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
       ) : (
         (installed || uninstalling || uninstallError) && (
           <>
+            <div className="space-y-4">
+              <StatusDisplay
+                status={installationStatus}
+                isInstallRequested={isInstallRequested}
+                isInstallInitiated={isInstallInitiated}
+                isUninstallRequested={isUninstallRequested}
+                isUninstallInitiated={isUninstallInitiated}
+                isUpgrade={upgradeAvailable}
+                timedOut={timedOut}
+                version={schemaComment?.newVersion || schemaComment?.version}
+              />
+              <Admonition type="info" title="Local Development">
+                For local development, ensure you are running the matching version of the Stripe Sync Engine docker image (<code>stripe/sync-engine:v{schemaComment?.newVersion || schemaComment?.version}</code>) to prevent schema mismatches.
+              </Admonition>
+            </div>
             <StripeSyncChangesCard
               installationStatus={installationStatus}
               isUpgrade={upgradeAvailable}
