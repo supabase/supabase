@@ -1,11 +1,13 @@
 'use client'
 
+import staticContent from '.generated/staticContent/_index.json'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { useInView } from 'framer-motion'
 import Link from 'next/link'
 import { useRef } from 'react'
 import { Button } from 'ui'
 
+import { kFormatter } from '../../../lib/helpers'
 import SectionContainer from '@/components/Layouts/SectionContainer'
 
 // ── Pixel font (5×7 per glyph) ─────────────────────────────────────────────
@@ -52,12 +54,12 @@ const GAP = 0.5
 const COLS = 72
 const ROWS = 40
 
-const TEXT = '98.4K'
+const githubStars = staticContent.githubStars
+const TEXT = kFormatter(githubStars)
 const TEXT_MASK = textToPixelMask(TEXT)
 const TEXT_W = TEXT.length * 6 - 1
 const TEXT_H = 7
-// Position text toward the right
-const TEXT_OFFSET_X = Math.floor(COLS * 0.56 - TEXT_W / 2)
+const TEXT_OFFSET_X = Math.floor((COLS - TEXT_W) / 2)
 const TEXT_OFFSET_Y = Math.floor((ROWS - TEXT_H) / 2)
 
 const LEVELS_BG = [
@@ -137,8 +139,6 @@ function ContribGraph() {
 
 export function OpenSourceSection() {
   const sendTelemetryEvent = useSendTelemetryEvent()
-
-  const starsNum = 98400
 
   return (
     <div className="relative">
