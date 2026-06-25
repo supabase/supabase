@@ -1,5 +1,6 @@
 import Document, { DocumentContext, Head, Html, Main, NextScript } from 'next/document'
 
+import { inter, sourceCodePro } from '@/fonts'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 
 class MyDocument extends Document {
@@ -25,7 +26,7 @@ class MyDocument extends Document {
             }
           />
         </Head>
-        <body>
+        <body className={`${inter.variable} ${sourceCodePro.variable}`}>
           <Main />
           <NextScript />
         </body>
