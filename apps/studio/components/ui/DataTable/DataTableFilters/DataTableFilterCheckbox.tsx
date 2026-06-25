@@ -1,4 +1,5 @@
-import { Search } from 'lucide-react'
+import { Minus, Plus, Search } from 'lucide-react'
+import { useQueryStates } from 'nuqs'
 import { useState } from 'react'
 import { Checkbox, cn, Label, Skeleton } from 'ui'
 
@@ -7,6 +8,7 @@ import { formatCompactNumber } from '../DataTable.utils'
 import { InputWithAddons } from '../primitives/InputWithAddons'
 import { useDataTable } from '../providers/DataTableProvider'
 import { DataTableFilterCheckboxLoader } from './DataTableFilterCheckboxLoader'
+import { SEARCH_PARAMS_PARSER } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
 
 export function DataTableFilterCheckbox<TData>({
   value: _value,
@@ -15,6 +17,22 @@ export function DataTableFilterCheckbox<TData>({
 }: DataTableCheckboxFilterField<TData>) {
   const value = _value as string
   const [inputValue, setInputValue] = useState('')
+  const [expandedOptions, setExpandedOptions] = useState<Set<string>>(new Set())
+  const [searchParams, setSearchParams] = useQueryStates(SEARCH_PARAMS_PARSER)
+
+  // Nested options map 1:1 to a boolean search param via their `value`
+  // (e.g. `show_connection_logs`), so they can be read/written generically.
+  const getBooleanParam = (key: string) => Boolean(searchParams[key as keyof typeof searchParams])
+  const setBooleanParam = (key: string, val: boolean) =>
+    setSearchParams({ [key]: val } as Partial<typeof searchParams>)
+
+  const toggleExpanded = (key: string) =>
+    setExpandedOptions((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
   const { table, columnFilters, isLoading, isLoadingCounts, getFacetedUniqueValues } =
     useDataTable()
 
@@ -65,18 +83,20 @@ export function DataTableFilterCheckbox<TData>({
             </div>
           </div>
         ) : (
-          filterOptions
-            // TODO: we shoudn't sort the options here, instead filterOptions should be sorted by default
-            // .sort((a, b) => a.label.localeCompare(b.label))
-            .map((option, index) => {
-              const checked = filters.includes(option.value)
+          filterOptions.map((option, index) => {
+            const checked = filters.includes(option.value)
+            const optionKey = String(option.value)
+            const hasNested = (option.options ?? []).length > 0
+            const isExpanded = expandedOptions.has(optionKey)
 
-              return (
+            return (
+              <div
+                key={String(option.value)}
+                className={cn('py-2', index !== filterOptions.length - 1 ? 'border-b' : undefined)}
+              >
                 <div
-                  key={String(option.value)}
                   className={cn(
-                    'group relative flex items-center space-x-2 px-2 py-2 hover:bg-accent/50',
-                    index !== filterOptions.length - 1 ? 'border-b' : undefined
+                    'group relative flex items-center space-x-2 px-2 hover:bg-accent/50'
                   )}
                 >
                   <Checkbox
@@ -100,6 +120,17 @@ export function DataTableFilterCheckbox<TData>({
                         <span className="truncate font-normal block">{option.label}</span>
                       )}
                     </div>
+                    {hasNested && (
+                      <button
+                        type="button"
+                        aria-label={isExpanded ? 'Collapse' : 'Expand'}
+                        aria-expanded={isExpanded}
+                        onClick={() => toggleExpanded(optionKey)}
+                        className="flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-foreground-lighter hover:bg-selection hover:text-foreground mr-2.5"
+                      >
+                        {isExpanded ? <Minus size={12} /> : <Plus size={12} />}
+                      </button>
+                    )}
                     <span className="shrink-0 flex items-center justify-center font-mono text-xs">
                       {isLoadingCounts ? (
                         <Skeleton className="h-4 w-4" />
@@ -113,7 +144,7 @@ export function DataTableFilterCheckbox<TData>({
                       type="button"
                       onClick={() => column?.setFilterValue([option.value])}
                       className={cn(
-                        'absolute inset-y-0 right-0 hidden font-normal text-muted-foreground backdrop-blur-xs hover:text-foreground group-hover:block',
+                        'absolute inset-y-0 right-0 -top-0.5 hidden font-normal text-muted-foreground backdrop-blur-xs hover:text-foreground group-hover:block',
                         'rounded-md ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
                       )}
                     >
@@ -121,8 +152,55 @@ export function DataTableFilterCheckbox<TData>({
                     </button>
                   </Label>
                 </div>
-              )
-            })
+                {hasNested &&
+                  isExpanded &&
+                  option.options?.map((optionNested, nestedIndex) => {
+                    const nestedChecked = getBooleanParam(optionNested.value)
+                    const isLastNested = nestedIndex === (option.options?.length ?? 0) - 1
+                    return (
+                      <div
+                        key={optionNested.value}
+                        className={cn(
+                          'group/nested relative flex items-stretch',
+                          nestedIndex === 0 && '[&>div:last-child]:pt-2'
+                        )}
+                      >
+                        <div aria-hidden className="relative w-7 shrink-0">
+                          {isLastNested ? (
+                            <span
+                              className={cn(
+                                'absolute left-4 top-0 w-3 rounded-bl-sm border-b border-l border-border',
+                                option.options?.length === 1 ? 'h-[60%]' : 'h-1/2'
+                              )}
+                            />
+                          ) : (
+                            <>
+                              <span className="absolute left-4 top-0 h-full w-px bg-border" />
+                              <span className="absolute left-4 top-[55%] h-px w-3 bg-border" />
+                            </>
+                          )}
+                        </div>
+                        <div className="flex flex-1 items-center gap-x-2 rounded-sm py-1 pr-2 hover:bg-accent/50 min-w-0">
+                          <Checkbox
+                            id={`${value}-${optionNested.value}`}
+                            checked={nestedChecked}
+                            onCheckedChange={(isChecked) =>
+                              setBooleanParam(optionNested.value, Boolean(isChecked))
+                            }
+                          />
+                          <Label
+                            htmlFor={`${value}-${optionNested.value}`}
+                            className="flex w-full cursor-pointer items-center text-[0.8rem] font-normal text-foreground/70 group-hover/nested:text-accent-foreground min-w-0"
+                          >
+                            <span className="truncate text-xs">{optionNested.label}</span>
+                          </Label>
+                        </div>
+                      </div>
+                    )
+                  })}
+              </div>
+            )
+          })
         )}
       </div>
     </div>

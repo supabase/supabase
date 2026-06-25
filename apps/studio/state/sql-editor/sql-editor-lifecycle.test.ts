@@ -1,12 +1,17 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  folderStatusOnSaveStart,
+  isFolderEditing,
+  isFolderSaving,
+  isNewFolder,
   isSaveFailed,
   isSaving,
   statusOnSaveError,
   statusOnSaveStart,
   statusOnSaveSuccess,
   wasNeverPersisted,
+  type FolderStatus,
 } from './sql-editor-lifecycle'
 import type { SnippetStatus } from '@/data/content/snippet-status'
 
@@ -114,5 +119,55 @@ describe('lifecycle round trips', () => {
     status = statusOnSaveSuccess()
     expect(status).toBe('saved')
     expect(wasNeverPersisted(status)).toBe(false)
+  })
+})
+
+const NEW_FOLDER: Array<FolderStatus> = ['new_editing', 'new_saving']
+const PERSISTED_FOLDER: Array<FolderStatus> = ['editing', 'saving', 'idle']
+
+describe('isNewFolder', () => {
+  it.each(NEW_FOLDER)('is true for not-yet-persisted folder status %s', (status) => {
+    expect(isNewFolder(status)).toBe(true)
+  })
+
+  it.each(PERSISTED_FOLDER)('is false for persisted folder status %s', (status) => {
+    expect(isNewFolder(status)).toBe(false)
+  })
+
+  it('treats an absent status as not-new', () => {
+    expect(isNewFolder(undefined)).toBe(false)
+  })
+})
+
+describe('isFolderEditing', () => {
+  it('is true only while the name is being edited inline (new or persisted)', () => {
+    expect(isFolderEditing('new_editing')).toBe(true)
+    expect(isFolderEditing('editing')).toBe(true)
+  })
+
+  it.each(['new_saving', 'saving', 'idle', undefined] as const)('is false for %s', (status) => {
+    expect(isFolderEditing(status)).toBe(false)
+  })
+})
+
+describe('isFolderSaving', () => {
+  it('is true only while a create/rename is in flight (new or persisted)', () => {
+    expect(isFolderSaving('new_saving')).toBe(true)
+    expect(isFolderSaving('saving')).toBe(true)
+  })
+
+  it.each(['new_editing', 'editing', 'idle', undefined] as const)('is false for %s', (status) => {
+    expect(isFolderSaving(status)).toBe(false)
+  })
+})
+
+describe('folderStatusOnSaveStart', () => {
+  it('keeps a new folder in the new family', () => {
+    expect(folderStatusOnSaveStart('new_editing')).toBe('new_saving')
+  })
+
+  it('moves a persisted folder to saving', () => {
+    expect(folderStatusOnSaveStart('editing')).toBe('saving')
+    expect(folderStatusOnSaveStart('idle')).toBe('saving')
   })
 })

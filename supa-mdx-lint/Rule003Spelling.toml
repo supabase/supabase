@@ -52,6 +52,7 @@ allow_list = [
     "[Cc]ryptosystem",
     "[Cc]utover",
     "[Dd]ata[Ff]rames?",
+    "dbpedia",
     "[Dd]atasets?",
     "[Dd]atasources?",
     "[Dd]atetime",
