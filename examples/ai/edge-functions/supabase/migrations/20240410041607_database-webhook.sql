@@ -1,6 +1,6 @@
 -- Insert your <PROJECT-REF> and <SUPABASE_SECRET_KEY> below, then uncomment the trigger creation and run `supabase db push`
 -- Alternatively, head to the Database Webhook settings https://supabase.com/dashboard/project/_/database/hooks
--- Select "Create a new Hook" > Table "public.embeddings" > check "INSERT" & "Update" > Supabase Edge Functions > Add auth header with service key
+-- Select "Create a new Hook" > Table "public.embeddings" > check "INSERT" & "Update" > Supabase Edge Functions > Add apiKey header with secret key
 
 -- CREATE TRIGGER "on_inserted_or_updated_embedding"
 -- AFTER INSERT
