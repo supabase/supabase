@@ -41,6 +41,10 @@ GRANT ALL ON ALL TABLES IN SCHEMA myschema TO service_role;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA myschema TO authenticated;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA myschema TO service_role;
 
+-- PostgreSQL grants EXECUTE on new functions to PUBLIC by default.
+-- Revoke that default first if you want function access to stay opt-in.
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
+
 -- Grant EXECUTE only on routines that should be callable through the Data API.
 -- For example:
 -- GRANT EXECUTE ON FUNCTION myschema.your_function() TO authenticated;
@@ -52,7 +56,7 @@ ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA myschema GRANT USAGE, SELEC
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA myschema GRANT ALL ON SEQUENCES TO service_role;
 ```
 
-If you already applied broader grants from an older setup, revoke them before switching to narrower access. Also note that `ALTER DEFAULT PRIVILEGES FOR ROLE postgres` applies only to objects created by `postgres`; repeat it for any other roles that create tables, views, functions, or sequences in this schema.
+If you already applied broader grants from an older setup, revoke them before switching to narrower access. If you already created functions that should not be callable by client-facing roles, revoke `EXECUTE` on those functions and then grant it back explicitly where needed. Also note that `ALTER DEFAULT PRIVILEGES FOR ROLE postgres` applies only to objects created by `postgres`; repeat it for any other roles that create tables, views, functions, or sequences in this schema.
 
 For more guidance on grants, RLS, and exposed views or functions, see [Securing your API](/docs/guides/api/securing-your-api) and [Row Level Security](/docs/guides/database/postgres/row-level-security).
 
