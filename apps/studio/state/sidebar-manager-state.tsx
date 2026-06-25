@@ -55,7 +55,9 @@ const createSidebarManagerState = () => {
         ...handlers,
       }
 
-      // If this sidebar was pending to be opened, open it now
+      // If this sidebar was pending to be opened, open it now.
+      // This covers both the initial "openSidebar before register" case and
+      // the restore-after-transient-unregister case set in unregisterSidebar.
       if (state.pendingSidebarOpen === id) {
         state.pendingSidebarOpen = undefined
         state.openSidebar(id)
@@ -76,6 +78,13 @@ const createSidebarManagerState = () => {
       if (state.activeSidebar?.id === id) {
         state.activeSidebar = undefined
         panel.onClose?.()
+
+        // Queue a restore for when this sidebar re-registers. This handles transient
+        // enabled=false cycles (e.g. project briefly undefined during navigation) so
+        // the panel snaps back open without the user losing their place.
+        // The pending intent is cleared by any explicit user close action
+        // (closeSidebar, closeActive, toggleSidebar) so intentional dismissals are respected.
+        state.pendingSidebarOpen = id
       }
     },
 
@@ -87,7 +96,9 @@ const createSidebarManagerState = () => {
         return
       }
 
-      // Clear any pending request since we're opening a sidebar now
+      // Clear any pending restore/open request. Opening a registered sidebar
+      // is an explicit action that supersedes any queued intent, including
+      // the restore-after-transient-unregister set in unregisterSidebar.
       state.pendingSidebarOpen = undefined
 
       if (state.activeSidebar?.id === id) {
@@ -113,6 +124,10 @@ const createSidebarManagerState = () => {
       if (state.activeSidebar?.id === id) {
         panel.onClose?.()
         state.activeSidebar = undefined
+        // User explicitly toggled closed — cancel any pending restore for this sidebar
+        if (state.pendingSidebarOpen === id) {
+          state.pendingSidebarOpen = undefined
+        }
         return
       }
 
@@ -133,6 +148,10 @@ const createSidebarManagerState = () => {
 
       panel.onClose?.()
       state.activeSidebar = undefined
+      // User explicitly closed — cancel any pending restore for this sidebar
+      if (state.pendingSidebarOpen === id) {
+        state.pendingSidebarOpen = undefined
+      }
       return
     },
 
@@ -142,11 +161,20 @@ const createSidebarManagerState = () => {
 
     closeActive() {
       if (!state.activeSidebar) return
-      state.activeSidebar?.onClose?.()
+      const id = state.activeSidebar.id
+      state.activeSidebar.onClose?.()
       state.activeSidebar = undefined
+      // User explicitly closed — cancel any pending restore for this sidebar
+      if (state.pendingSidebarOpen === id) {
+        state.pendingSidebarOpen = undefined
+      }
     },
 
     clearActiveSidebar() {
+      // Intentionally does not cancel pendingSidebarOpen or call onClose.
+      // Used by the mobile UI to displace an open sidebar without treating it
+      // as a deliberate user dismissal — the sidebar will still restore if
+      // it re-registers while pendingSidebarOpen was already set.
       state.activeSidebar = undefined
     },
   })
