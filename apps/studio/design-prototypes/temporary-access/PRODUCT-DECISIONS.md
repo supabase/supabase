@@ -37,6 +37,30 @@ Customer-facing term: **temporary access**. Internal/backend term: **JIT** (Just
 | 2026-06-25 | Guest invites: **Postgres template** (Read-only / Developer) + **expiry** at invite time | Configure access when sending invite, not as a follow-up admin task                                                | UI shipped; API pending |
 | 2026-06-25 | Pending grant stored on invitation, applied on **accept**                                | JIT API requires `user_id`; invitee does not exist until accept                                                    | Agreed; API pending     |
 
+| 2026-06-25 | Guest invites: **Postgres roles and settings** matches Manage access sheet | Full role list, IP restrictions, branch scope, expiry — not simplified templates | Shipped (Studio) |
+| 2026-06-25 | **Expiry semantics split by context** | Manage access: relative presets → absolute timestamp at save. Invite presets: `expires_after_seconds` from **accept**. Invite custom: absolute `expires_at`. | Shipped (Studio) / API pending |
+
+---
+
+## Expiry semantics (important)
+
+### Manage database access (existing members)
+
+The JIT grant sheet labels the field **“Expires in”** with presets (1 hour, 1 day, …). Choosing a preset computes an **absolute** `expires_at` timestamp **at the moment the admin saves** and shows it as “Expires at DD MMM, HH:mm”.
+
+### External collaborator invite (pending grant)
+
+| UI choice                   | Stored on invitation    | When access ends                                 |
+| --------------------------- | ----------------------- | ------------------------------------------------ |
+| Preset (1h / 1d / 7d / 30d) | `expires_after_seconds` | Duration starts **when they accept**             |
+| Custom date picker          | `expires_at` (unix)     | Fixed wall-clock time, regardless of accept time |
+
+**Why not “1 hour from invite sent”?** The invitee may accept hours later; duration should start when access is actually granted (accept), not when the email was sent.
+
+**Why custom absolute on invite?** For scheduled access windows (“until Friday 5pm”) where the end time is wall-clock, not relative to accept.
+
+Guest invites **cannot** use “Never” expiry.
+
 ---
 
 ## Invite form model (current)
@@ -59,11 +83,10 @@ Customer-facing term: **temporary access**. Internal/backend term: **JIT** (Just
 
 Shown as an extra **Role** option when `jitDbAccess` preview is enabled.
 
-| Field               | Notes                                                                     |
-| ------------------- | ------------------------------------------------------------------------- |
-| **Project scope**   | Single project (required)                                                 |
-| **Database access** | Template: Read-only (`supabase_read_only_user`) or Developer (`postgres`) |
-| **Access duration** | 1 hour (default), 1 day, or 7 days                                        |
+| Field                           | Notes                                                                                             |
+| ------------------------------- | ------------------------------------------------------------------------------------------------- |
+| **Project scope**               | Single project (required)                                                                         |
+| **Postgres roles and settings** | Same as Manage database access: role checkboxes, branch scope, expires after accept, optional IPs |
 
 **Platform mapping today:** Read-only org role + `role_scoped_projects: [ref]`.  
 **Platform mapping target:** `pending_access_grant` on invitation → applied on accept.
@@ -74,13 +97,13 @@ Shown as an extra **Role** option when `jitDbAccess` preview is enabled.
 
 ## What we removed / deprecated
 
-| Removed                                                            | Replaced by                                   |
-| ------------------------------------------------------------------ | --------------------------------------------- |
-| Top-level **Access type** (full member / external / database-only) | **Role** includes External collaborator       |
-| **Database access only** as separate type                          | Postgres template under External collaborator |
-| **Grant this role on all projects** toggle                         | **Access scope** combobox                     |
-| **Select a project** (single) for full members                     | Multi-select in **Access scope**              |
-| Database Settings JIT rules UI                                     | Team invite + **Manage database access**      |
+| Removed                                                            | Replaced by                                      |
+| ------------------------------------------------------------------ | ------------------------------------------------ |
+| Top-level **Access type** (full member / external / database-only) | **Role** includes External collaborator          |
+| **Database access only** as separate type                          | Postgres role picker under External collaborator |
+| **Grant this role on all projects** toggle                         | **Access scope** combobox                        |
+| **Select a project** (single) for full members                     | Multi-select in **Access scope**                 |
+| Database Settings JIT rules UI                                     | Team invite + **Manage database access**         |
 
 ---
 
@@ -88,12 +111,12 @@ Shown as an extra **Role** option when `jitDbAccess` preview is enabled.
 
 ### P0 — unblock invite-time guest configuration
 
-| Change                        | Description                                                                                                                           |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| Extend `CreateInvitationBody` | Add `pending_access_grant` (or equivalent): `project_ref`, `roles[]` with `expires_at`, optional `branches_only`, `allowed_networks`  |
-| Apply grant on accept         | When invitation is accepted, create JIT grant via existing `PUT /v1/projects/{ref}/database/jit` using stored payload + new `user_id` |
-| Auto-enable PAM               | Server-side `PUT /v1/projects/{ref}/jit-access` on first grant (if not already enabled)                                               |
-| Auto-mint scoped PAT          | On accept, mint PAT bounded by grant (Kamal / scoped access)                                                                          |
+| Change                        | Description                                                                                                                                         |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Extend `CreateInvitationBody` | Add `pending_access_grant`: `project_ref`, `roles[]` with `expires_at` **or** `expires_after_seconds`, optional `branches_only`, `allowed_networks` |
+| Apply grant on accept         | When invitation is accepted, create JIT grant via existing `PUT /v1/projects/{ref}/database/jit` using stored payload + new `user_id`               |
+| Auto-enable PAM               | Server-side `PUT /v1/projects/{ref}/jit-access` on first grant (if not already enabled)                                                             |
+| Auto-mint scoped PAT          | On accept, mint PAT bounded by grant (Kamal / scoped access)                                                                                        |
 
 **Studio readiness:** `buildPendingInvitationAccessGrant()` + `OrganizationCreateInvitationVariables.pendingAccessGrant` — wired in UI, **not yet sent** in HTTP body until API types land.
 
@@ -114,7 +137,7 @@ Shown as an extra **Role** option when `jitDbAccess` preview is enabled.
 ### Future
 
 - Dedicated **External collaborator** platform role (today: Read-only + guest UX + JIT grant)
-- IP/CIDR at invite (Team+ entitlement)
+- IP/CIDR at invite (Team+ entitlement) — UI present; enforce server-side per tier
 - Custom permission templates at invite (Enterprise)
 - Expiry notification emails
 - Guest extension request flow
@@ -135,7 +158,11 @@ Shown as an extra **Role** option when `jitDbAccess` preview is enabled.
     "roles": [
       {
         "role": "supabase_read_only_user",
-        "expires_at": 1719234000
+        "expires_after_seconds": 3600,
+        "branches_only": false,
+        "allowed_networks": {
+          "allowed_cidrs": [{ "cidr": "203.0.113.0/24" }]
+        }
       }
     ]
   }
@@ -152,16 +179,17 @@ Shown as an extra **Role** option when `jitDbAccess` preview is enabled.
 
 ## Studio implementation map
 
-| Surface                          | Path                                             | Notes                                               |
-| -------------------------------- | ------------------------------------------------ | --------------------------------------------------- |
-| Invite sheet                     | `TeamSettings/InviteMemberButton.tsx`            | Role-first; guest fields when External collaborator |
-| Access scope                     | `TeamSettings/TeamAccessScopeSelector.tsx`       | Shared combobox                                     |
-| Manage access (existing members) | `TemporaryAccess/TemporaryAccessGrantSheet.tsx`  | Full grant editor                                   |
-| Team badges                      | `TeamSettings/MemberRow`                         | Expiry / guest badges                               |
-| My access                        | `account/access`                                 | Member grant hub                                    |
-| Connect sheet                    | `TemporaryAccessConnectNotice`                   | JIT role picker                                     |
-| Join onboarding                  | `TemporaryAccessOnboarding`                      | Post-accept interstitial                            |
-| Invite grant builder             | `TemporaryAccess/TemporaryAccessInvite.utils.ts` | Pending grant payload                               |
+| Surface                          | Path                                                    | Notes                                               |
+| -------------------------------- | ------------------------------------------------------- | --------------------------------------------------- |
+| Invite sheet                     | `TeamSettings/InviteMemberButton.tsx`                   | Role-first; guest fields when External collaborator |
+| Access scope                     | `TeamSettings/TeamAccessScopeSelector.tsx`              | Shared combobox                                     |
+| Manage access (existing members) | `TemporaryAccess/TemporaryAccessGrantSheet.tsx`         | Full grant editor                                   |
+| Team badges                      | `TeamSettings/MemberRow`                                | Expiry / guest badges                               |
+| My access                        | `account/access`                                        | Member grant hub                                    |
+| Connect sheet                    | `TemporaryAccessConnectNotice`                          | JIT role picker                                     |
+| Join onboarding                  | `TemporaryAccessOnboarding`                             | Post-accept interstitial                            |
+| Invite grant builder             | `TemporaryAccess/TemporaryAccessInvite.utils.ts`        | Pending grant payload + validation                  |
+| Invite grant UI                  | `TemporaryAccess/TemporaryAccessInviteGrantSection.tsx` | Reuses `TemporaryAccessGrantFields`                 |
 
 ---
 

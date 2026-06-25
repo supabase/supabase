@@ -53,27 +53,28 @@ export type TemporaryAccessUserRule = {
 
 export type TemporaryAccessGrantSheetMode = 'add' | 'edit'
 
-/** Postgres access preset for External collaborator invites. */
-export type TemporaryAccessPostgresTemplate = 'read-only' | 'developer'
-
-/** Expiry presets available at invite time for guest database access. */
-export type TemporaryAccessInviteExpiry = '1h' | '1d' | '7d'
+/** How expiry is interpreted in the Manage database access sheet vs invite flow. */
+export type TemporaryAccessExpiryContext = 'on_grant' | 'on_accept'
 
 /**
  * Grant payload stored on invitation and applied when the invitee accepts.
- * Shape aligns with PUT /v1/projects/{ref}/database/jit role entries.
+ * Preset durations use expires_after_seconds (relative to accept).
+ * Custom picker uses expires_at (absolute wall-clock time).
  */
+export type PendingInvitationRoleGrant = {
+  role: string
+  expires_at?: number
+  expires_after_seconds?: number
+  branches_only?: boolean
+  allowed_networks?: {
+    allowed_cidrs?: Array<{ cidr: string }>
+    allowed_cidrs_v6?: Array<{ cidr: string }>
+  }
+}
+
 export type PendingInvitationAccessGrant = {
   project_ref: string
-  roles: Array<{
-    role: string
-    expires_at: number
-    branches_only?: boolean
-    allowed_networks?: {
-      allowed_cidrs?: Array<{ cidr: string }>
-      allowed_cidrs_v6?: Array<{ cidr: string }>
-    }
-  }>
+  roles: PendingInvitationRoleGrant[]
 }
 
 export type TemporaryAccessProjectGrant = {

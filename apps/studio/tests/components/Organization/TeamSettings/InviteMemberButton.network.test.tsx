@@ -42,6 +42,19 @@ vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () =
   useIsJitDbAccessEnabled: () => true,
 }))
 
+vi.mock('@/data/database-roles/database-roles-query', () => ({
+  useDatabaseRolesQuery: ({ projectRef }: { projectRef?: string }) => ({
+    data: projectRef
+      ? [
+          { name: 'postgres', canLogin: true, isSuperuser: false },
+          { name: 'supabase_read_only_user', canLogin: true, isSuperuser: false },
+        ]
+      : undefined,
+    isLoading: false,
+    isSuccess: !!projectRef,
+  }),
+}))
+
 const PROFILE_CONTEXT: ProfileContextType = {
   profile: {
     id: 1,
@@ -341,18 +354,33 @@ describe('InviteMemberButton (network)', () => {
       response: () =>
         HttpResponse.json<OrganizationProjectsResponse>({
           pagination: { count: 1, limit: 96, offset: 0 },
-          projects: [{ ref: 'test-project', name: 'Test Project' }],
+          projects: [
+            {
+              ref: 'test-project',
+              name: 'Test Project',
+            } as OrganizationProjectsResponse['projects'][number],
+          ],
         }),
     })
 
     customRender(<InviteMemberButton />, { profileContext: PROFILE_CONTEXT })
     await openDialog()
 
-    await userEvent.click(await screen.findByText(EXTERNAL_COLLABORATOR_ROLE_NAME))
+    const guestRole = await screen.findByRole('radio', {
+      name: new RegExp(EXTERNAL_COLLABORATOR_ROLE_NAME, 'i'),
+    })
+    expect(guestRole).not.toBeDisabled()
+    await userEvent.click(guestRole)
 
-    expect(screen.getByText('Project scope')).toBeInTheDocument()
-    expect(screen.getByText('Database access')).toBeInTheDocument()
-    expect(screen.getByText('Access duration')).toBeInTheDocument()
+    await waitFor(
+      () => {
+        expect(screen.getByText('Project scope')).toBeInTheDocument()
+        expect(screen.getByText('Postgres roles and settings')).toBeInTheDocument()
+        expect(screen.getAllByText(/Restricted IP addresses/i).length).toBeGreaterThan(0)
+        expect(screen.getAllByText('Expires after accept').length).toBeGreaterThan(0)
+      },
+      { timeout: 5000 }
+    )
     expect(screen.queryByText('Access scope')).not.toBeInTheDocument()
     expect(
       screen.queryByText(/configure database access after they accept/i)

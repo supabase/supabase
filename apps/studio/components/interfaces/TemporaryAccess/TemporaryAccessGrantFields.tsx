@@ -15,6 +15,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 
 import type {
+  TemporaryAccessExpiryContext,
   TemporaryAccessGrantDraft,
   TemporaryAccessRoleGrantDraft,
   TemporaryAccessRoleOption,
@@ -48,6 +49,11 @@ interface TemporaryAccessGrantFieldsProps {
   role: TemporaryAccessRoleOption
   grant: TemporaryAccessRoleGrantDraft
   onChange: (next: TemporaryAccessRoleGrantDraft) => void
+  /** on_grant: expiry relative to when admin saves (Manage access). on_accept: invite presets run from accept. */
+  expiryContext?: TemporaryAccessExpiryContext
+  allowNeverExpiry?: boolean
+  /** React Hook Form path prefix for grant rows. Defaults to `grants`. */
+  grantsFieldName?: string
 }
 
 export function TemporaryAccessGrantFields({
@@ -56,10 +62,23 @@ export function TemporaryAccessGrantFields({
   role,
   grant,
   onChange,
+  expiryContext = 'on_grant',
+  allowNeverExpiry = true,
+  grantsFieldName = 'grants',
 }: TemporaryAccessGrantFieldsProps) {
   const isSuperuserRole = role.id === 'postgres'
   const isReadOnlyRole = role.id === 'supabase_read_only_user'
   const checkboxId = `temporary-access-role-${role.id}`
+  const expiryOptions = allowNeverExpiry
+    ? EXPIRY_MODE_OPTIONS
+    : EXPIRY_MODE_OPTIONS.filter((option) => option.value !== 'never')
+
+  const expiryPresetDescription: Record<string, string> = {
+    '1h': '1 hour',
+    '1d': '1 day',
+    '7d': '7 days',
+    '30d': '30 days',
+  }
 
   return (
     <div className={grant.enabled ? 'bg-surface-100' : 'bg-background'}>
@@ -173,9 +192,9 @@ export function TemporaryAccessGrantFields({
 
             <FormItemLayout
               isReactForm={false}
-              label="Expires in"
+              label={expiryContext === 'on_accept' ? 'Expires after accept' : 'Expires in'}
               description={
-                grant.hasExpiry && grant.expiry ? (
+                grant.hasExpiry && grant.expiry && expiryContext === 'on_grant' ? (
                   <p className="text-xs text-foreground-lighter">
                     Expires at{' '}
                     <TimestampInfo
@@ -183,6 +202,37 @@ export function TemporaryAccessGrantFields({
                       className="text-foreground-lighter"
                       labelFormat="DD MMM, HH:mm"
                     />
+                  </p>
+                ) : grant.hasExpiry &&
+                  grant.expiryMode !== 'custom' &&
+                  grant.expiryMode !== 'never' &&
+                  expiryContext === 'on_accept' ? (
+                  <p className="text-xs text-foreground-lighter">
+                    Access lasts {expiryPresetDescription[grant.expiryMode]} once they accept the
+                    invitation.
+                  </p>
+                ) : grant.hasExpiry && grant.expiryMode === 'custom' ? (
+                  <p className="text-xs text-foreground-lighter">
+                    {expiryContext === 'on_accept' ? (
+                      <>
+                        Access expires at{' '}
+                        <TimestampInfo
+                          utcTimestamp={grant.expiry}
+                          className="text-foreground-lighter"
+                          labelFormat="DD MMM, HH:mm"
+                        />{' '}
+                        (fixed date, regardless of when they accept).
+                      </>
+                    ) : (
+                      <>
+                        Expires at{' '}
+                        <TimestampInfo
+                          utcTimestamp={grant.expiry}
+                          className="text-foreground-lighter"
+                          labelFormat="DD MMM, HH:mm"
+                        />
+                      </>
+                    )}
                   </p>
                 ) : grant.expiryMode === 'never' ? (
                   <div className="mt-3 mx-0.5 flex w-full items-center gap-x-2">
@@ -231,7 +281,7 @@ export function TemporaryAccessGrantFields({
                       <SelectValue placeholder="Expires in" />
                     </SelectTrigger>
                     <SelectContent>
-                      {EXPIRY_MODE_OPTIONS.map((option) => (
+                      {expiryOptions.map((option) => (
                         <SelectItem key={option.value} value={option.value}>
                           {option.label}
                         </SelectItem>
@@ -275,7 +325,7 @@ export function TemporaryAccessGrantFields({
             >
               <SingleValueFieldArray
                 control={control}
-                name={`grants.${grantIndex}.ipRanges` as const}
+                name={`${grantsFieldName}.${grantIndex}.ipRanges` as 'grants.0.ipRanges'}
                 valueFieldName="value"
                 createEmptyRow={createEmptyIpRange}
                 placeholder="192.168.0.0/24"

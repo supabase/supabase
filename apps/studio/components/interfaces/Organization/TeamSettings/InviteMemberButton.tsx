@@ -51,19 +51,17 @@ import {
 import { TeamAccessScopeSelector } from './TeamAccessScopeSelector'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { useIsJitDbAccessEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import type {
-  TemporaryAccessInviteExpiry,
-  TemporaryAccessPostgresTemplate,
-} from '@/components/interfaces/TemporaryAccess/TemporaryAccess.types'
+import type { TemporaryAccessGrantDraft } from '@/components/interfaces/TemporaryAccess/TemporaryAccess.types'
 import {
   buildPendingInvitationAccessGrant,
+  createInviteGuestGrantDraft,
   EXTERNAL_COLLABORATOR_ROLE_DESCRIPTION,
   EXTERNAL_COLLABORATOR_ROLE_ID,
   EXTERNAL_COLLABORATOR_ROLE_NAME,
-  INVITE_EXPIRY_OPTIONS,
   isExternalCollaboratorRole,
-  POSTGRES_ACCESS_TEMPLATES,
+  validateGuestAccessGrants,
 } from '@/components/interfaces/TemporaryAccess/TemporaryAccessInvite.utils'
+import { TemporaryAccessInviteGrantSection } from '@/components/interfaces/TemporaryAccess/TemporaryAccessInviteGrantSection'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -96,8 +94,7 @@ type InviteMemberFormValues = {
   role: string
   accessScope: TeamAccessScopeSelection
   projectRef: string
-  postgresTemplate: TemporaryAccessPostgresTemplate
-  expiry: TemporaryAccessInviteExpiry
+  guestAccess: TemporaryAccessGrantDraft
   requireSso: 'auto' | 'sso' | 'non-sso'
 }
 
@@ -129,8 +126,7 @@ export const InviteMemberButton = () => {
     role: orgScopedRoles.find((role) => role.name === 'Developer')?.id.toString() ?? '',
     accessScope: ALL_PROJECTS_ACCESS_SCOPE,
     projectRef: '',
-    postgresTemplate: 'read-only',
-    expiry: '1h',
+    guestAccess: createInviteGuestGrantDraft([]),
     requireSso: 'auto',
   }
 
@@ -176,36 +172,57 @@ export const InviteMemberButton = () => {
       role: z.string().min(1, 'Role is required'),
       accessScope: accessScopeSchema,
       projectRef: z.string(),
-      postgresTemplate: z.enum(['read-only', 'developer']),
-      expiry: z.enum(['1h', '1d', '7d']),
+      guestAccess: z.object({
+        memberId: z.string(),
+        grants: z.array(
+          z.object({
+            roleId: z.string(),
+            enabled: z.boolean(),
+            branchesOnly: z.boolean(),
+            expiryMode: z.enum(['1h', '1d', '7d', '30d', 'custom', 'never']),
+            hasExpiry: z.boolean(),
+            expiry: z.string(),
+            ipRanges: z.array(z.object({ value: z.string() })),
+          })
+        ),
+      }),
       requireSso: z.enum(['auto', 'sso', 'non-sso']),
     })
     .superRefine((data, ctx) => {
       const isGuestInvite = isJitDbAccessEnabled && isExternalCollaboratorRole(data.role)
 
-      if (isGuestInvite && !data.projectRef) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: 'A project must be selected for external collaborators',
-          path: ['projectRef'],
-        })
+      if (isGuestInvite) {
+        if (!data.projectRef) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: 'A project must be selected for external collaborators',
+            path: ['projectRef'],
+          })
+        }
+
+        const guestError = validateGuestAccessGrants(data.guestAccess.grants)
+        if (guestError) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: guestError,
+            path: ['guestAccess'],
+          })
+        }
         return
       }
 
-      if (!isGuestInvite) {
-        const selectedRole = orgScopedRoles.find((role) => role.id.toString() === data.role)
-        if (!selectedRole) return
+      const selectedRole = orgScopedRoles.find((role) => role.id.toString() === data.role)
+      if (!selectedRole) return
 
-        if (
-          roleRequiresOrgWideAccess(selectedRole.name) &&
-          data.accessScope !== ALL_PROJECTS_ACCESS_SCOPE
-        ) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `${selectedRole.name} must have access to all projects`,
-            path: ['accessScope'],
-          })
-        }
+      if (
+        roleRequiresOrgWideAccess(selectedRole.name) &&
+        data.accessScope !== ALL_PROJECTS_ACCESS_SCOPE
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `${selectedRole.name} must have access to all projects`,
+          path: ['accessScope'],
+        })
       }
     })
 
@@ -281,13 +298,16 @@ export const InviteMemberButton = () => {
     let pendingAccessGrant
     if (isGuest) {
       try {
-        pendingAccessGrant = buildPendingInvitationAccessGrant({
-          projectRef: values.projectRef,
-          postgresTemplate: values.postgresTemplate,
-          expiry: values.expiry,
-        })
-      } catch {
-        toast.error('Failed to prepare database access for this invitation')
+        pendingAccessGrant = buildPendingInvitationAccessGrant(
+          values.projectRef,
+          values.guestAccess
+        )
+      } catch (error) {
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : 'Failed to prepare database access for this invitation'
+        )
         return
       }
     }
@@ -588,58 +608,13 @@ export const InviteMemberButton = () => {
                     )}
                   />
 
-                  <FormField
-                    name="postgresTemplate"
+                  <TemporaryAccessInviteGrantSection
+                    projectRef={projectRef}
+                    guestAccess={form.watch('guestAccess')}
                     control={form.control}
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="horizontal"
-                        label="Database access"
-                        description="Postgres role granted when they accept"
-                      >
-                        <FormControl className="col-span-6">
-                          <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
-                            {POSTGRES_ACCESS_TEMPLATES.map((template) => (
-                              <RadioGroupStackedItem
-                                key={template.id}
-                                value={template.id}
-                                label={template.label}
-                                description={template.description}
-                              />
-                            ))}
-                          </RadioGroupStacked>
-                        </FormControl>
-                      </FormItemLayout>
-                    )}
-                  />
-
-                  <FormField
-                    name="expiry"
-                    control={form.control}
-                    render={({ field }) => (
-                      <FormItemLayout
-                        layout="horizontal"
-                        label="Access duration"
-                        description="Access expires automatically after this period"
-                      >
-                        <FormControl className="col-span-6">
-                          <Select value={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectGroup>
-                                {INVITE_EXPIRY_OPTIONS.map((option) => (
-                                  <SelectItem key={option.value} value={option.value}>
-                                    {option.label}
-                                  </SelectItem>
-                                ))}
-                              </SelectGroup>
-                            </SelectContent>
-                          </Select>
-                        </FormControl>
-                      </FormItemLayout>
-                    )}
+                    onGuestAccessChange={(next) =>
+                      form.setValue('guestAccess', next, { shouldDirty: true })
+                    }
                   />
                 </>
               )}
