@@ -70,7 +70,7 @@ export const PROVIDERS = {
   AWS_NIMBUS: {
     id: 'AWS_NIMBUS',
     name: 'AWS (Nimbus)',
-    default_region: AWS_REGIONS_DEFAULT,
+    default_region: AWS_REGIONS.EAST_US,
     regions: { ...AWS_REGIONS },
   },
 } as const

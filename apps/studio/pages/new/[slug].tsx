@@ -217,7 +217,7 @@ const Wizard: NextPageWithLayout = () => {
     ? 0
     : monthlyInstancePrice(instanceSize) - availableComputeCredits
 
-  const { data: _defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
+  const { data: autoDefaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {
       cloudProvider: PROVIDERS[defaultProvider].id,
     },
@@ -251,16 +251,14 @@ const Wizard: NextPageWithLayout = () => {
     ? availableRegionsData?.recommendations.smartGroup.name
     : ''
 
+  const fixedDefaultRegion = PROVIDERS[defaultProvider].default_region.displayName
   const regionError =
     smartRegionEnabled && defaultProvider !== 'AWS_NIMBUS'
       ? availableRegionsError
       : defaultRegionError
-  const defaultRegion =
-    defaultProvider === 'AWS_NIMBUS'
-      ? AWS_REGIONS.EAST_US.displayName
-      : smartRegionEnabled
-        ? availableRegionsData?.recommendations.smartGroup.name
-        : _defaultRegion
+  const defaultRegion = smartRegionEnabled
+    ? availableRegionsData?.recommendations.smartGroup.name
+    : (autoDefaultRegion ?? fixedDefaultRegion)
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
   const canConfigureGitHubOnCreate =
@@ -451,11 +449,10 @@ const Wizard: NextPageWithLayout = () => {
   }, [recommendedSmartRegion, isDbRegionDirty, setValue])
 
   useEffect(() => {
-    const defaultRegion = PROVIDERS[defaultProvider].default_region.displayName
-    if (regionError && defaultRegion) {
-      resetField('dbRegion', { defaultValue: defaultRegion })
+    if (regionError && fixedDefaultRegion) {
+      resetField('dbRegion', { defaultValue: fixedDefaultRegion })
     }
-  }, [regionError, resetField, defaultProvider])
+  }, [regionError, resetField, fixedDefaultRegion])
 
   useEffect(() => {
     if (highAvailability && cloudProvider !== 'AWS_K8S') {
