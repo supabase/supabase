@@ -61,7 +61,7 @@ Use this decision framework. It is not a strict rule:
 
 For AI apps, use this split:
 
-- Keep small, frequently queried fields in Postgres: status, token counts, a short summary, and embeddings.
+- Keep small, frequently queried fields in Postgres: status, token counts, and a short summary.
 - Offload the raw prompt, response, or log to Storage. Keep a path pointer in Postgres. For more information, see [Storage](/docs/guides/storage).
 
 ## Keeping large values in Postgres
@@ -90,6 +90,7 @@ If the data belongs in Postgres, model it to limit bloat:
 
 - **Set a retention policy.** If old rows aren't needed, delete them on a schedule with [pg_cron](/docs/guides/database/extensions/pg_cron). Deleting alone won't shrink the file. See [Reclaiming space](#reclaiming-space).
 - **Consider `lz4` column compression.** Supabase's Postgres supports `lz4`, which is faster than the default `pglz` and often compresses better. Set it per column with `ALTER TABLE … ALTER COLUMN … SET COMPRESSION lz4`. For the underlying setting, see [`default_toast_compression`](https://www.postgresql.org/docs/current/runtime-config-client.html#GUC-DEFAULT-TOAST-COMPRESSION). Compression applies only to values written after you make the change. It helps structured or repetitive JSON more than unique text.
+- **Shrink embeddings instead of offloading them.** Embeddings are large values too. A 1536-dimension vector is about 6 KB, so it gets TOASTed. You can't offload a vector to Storage and keep a pointer. Postgres needs the vector in the table to run similarity search. Instead, reduce its size. Use an embedding model with fewer dimensions, or store the vector as `halfvec`, which uses 2 bytes per dimension instead of 4. For large-scale workloads, Supabase Vector Buckets store embeddings in object storage. This feature is in early development, so review its current status first. See [Vector Buckets](/docs/guides/storage/vector/introduction) and the [pgvector guide](/docs/guides/database/extensions/pgvector).
 
 ## Offloading large values to Storage
 
