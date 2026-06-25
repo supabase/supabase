@@ -4,7 +4,7 @@ import { useFlag, useParams } from 'common'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
+import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { AWS_REGIONS, type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
@@ -425,6 +425,14 @@ const Wizard: NextPageWithLayout = () => {
 
     createProject(data)
   }
+
+  const hasTrackedFormExposed = useRef(false)
+  useEffect(() => {
+    if (hasTrackedFormExposed.current) return
+    if (!isOrganizationsSuccess || !canCreateProject || !currentOrg) return
+    hasTrackedFormExposed.current = true
+    track('project_creation_form_exposed', { surface: 'main' })
+  }, [isOrganizationsSuccess, canCreateProject, currentOrg, track])
 
   useEffect(() => {
     // Only set once to ensure compute credits dont change while project is being created
