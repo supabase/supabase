@@ -99,10 +99,10 @@ const buttonVariants = cva(
         `,
         text: `
           text-foreground
-          hover:bg-surface-300
+          hover:bg-accent
           shadow-none
           focus-visible:outline-border-strong
-          data-[state=open]:bg-surface-300
+          data-[state=open]:bg-accent
           data-[state=open]:outline-border-strong
           border-transparent
         `,

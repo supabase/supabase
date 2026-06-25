@@ -59,9 +59,20 @@
   --elevation-2: 1.5;
   --elevation-3: 2;
   --elevation-4: 3;
-  /* Signed span surface→foreground (+ in dark, − in light); also used by accent. */
+  /* Signed span surface→foreground (+ in dark, − in light). */
   --tone-span: calc(var(--foreground-lightness) - var(--surface));
   --elevation-step: calc(var(--tone-span) * 0.04);
+  /*
+   * Foreground overlays for muted / accent / tertiary. Alpha is tuned so each level
+   * matches the lightness delta of the same elevation ratio on --background; a
+   * translucent --foreground layer then composites with whatever surface sits
+   * beneath (lightens in dark, darkens in light). Steps: muted (e1) → accent
+   * (e2) → tertiary (e3).
+   */
+  --surface-overlay-unit: calc(var(--elevation-step) / abs(var(--tone-span)));
+  --muted-alpha: calc(var(--surface-overlay-unit) * var(--elevation-1));
+  --accent-alpha: calc(var(--surface-overlay-unit) * var(--elevation-2));
+  --tertiary-alpha: calc(var(--surface-overlay-unit) * var(--elevation-3));
 
   /*
    * Status hues stay anchored to amber / red but pull a fraction of the way
@@ -113,9 +124,7 @@
     from var(--background) calc(l + var(--elevation-step) * var(--elevation-3)) c h
   );
   --secondary-foreground: var(--foreground);
-  --tertiary: oklch(
-    from var(--background) calc(l + var(--elevation-step) * var(--elevation-4)) c h
-  );
+  --tertiary: oklch(from var(--foreground) l c h / var(--tertiary-alpha));
   --tertiary-foreground-mix: calc(
     var(--tertiary-foreground-level) + (1 - var(--tertiary-foreground-level)) * var(--contrast-up) -
       var(--tertiary-foreground-level) * 0.5 * var(--contrast-down)
@@ -124,7 +133,7 @@
     from var(--foreground) calc(var(--surface) + var(--tone-span) * var(--tertiary-foreground-mix))
       c h
   );
-  --muted: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-2)) c h);
+  --muted: oklch(from var(--foreground) l c h / var(--muted-alpha));
   --muted-foreground-mix: calc(
     var(--muted-foreground-level) + (1 - var(--muted-foreground-level)) * var(--contrast-up) -
       var(--muted-foreground-level) * 0.5 * var(--contrast-down)
@@ -132,14 +141,7 @@
   --muted-foreground: oklch(
     from var(--foreground) calc(var(--surface) + var(--tone-span) * var(--muted-foreground-mix)) c h
   );
-  /*
-   * Accent is a contrast / hover-selection fill, not an elevation surface, so it
-   * always steps toward the foreground: slightly darker than --background in
-   * light, slightly lighter in dark — regardless of the elevation direction.
-   * The --tone-span term carries the sign per theme.
-   */
-  --accent-step: calc(0.012 + 0.17 * var(--contrast-border));
-  --accent: oklch(from var(--background) calc(l + var(--tone-span) * var(--accent-step)) c h);
+  --accent: oklch(from var(--foreground) l c h / var(--accent-alpha));
   --accent-foreground: var(--foreground);
 
   --warning: oklch(0.78 var(--warning-chroma) var(--warning-hue));
@@ -179,7 +181,7 @@
   --background-alternative-default: var(--background);
   --background-alternative-200: var(--card);
   --background-selection: var(--accent);
-  --background-control: var(--muted);
+  --background-control: var(--accent);
   --background-surface-75: var(--background);
   --background-surface-100: var(--card);
   --background-surface-200: var(--muted);
