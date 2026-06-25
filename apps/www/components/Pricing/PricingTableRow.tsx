@@ -1,9 +1,10 @@
 import ProductIcon from 'components/ProductIcon'
-import { Fragment, ReactNode } from 'react'
-import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { FeatureKey } from 'shared-data/pricing'
 import Link from 'next/link'
+import { Fragment, ReactNode } from 'react'
+import { FeatureKey } from 'shared-data/pricing'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
+import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
 
 type PricingTooltips = {
   [key in FeatureKey]?: {
@@ -38,8 +39,11 @@ export const pricingTooltips: PricingTooltips = {
   'database.egress': {
     main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor, Log Drains) in GB throughout your billing period. Excludes cache hits.',
   },
-  'database.cachedEgress': {
-    main: 'Billing is based on the total sum of any outgoing traffic (includes Database, Storage, API, Edge Functions) in GB throughout your billing period that is served from our CDN cache.',
+  'database.replication': {
+    main: 'Supabase Pipelines is available as an add-on for paid plans. It provides change-data-capture pipelines that replicate your Postgres tables to analytical destinations in near real time.\nYou are billed for each active pipeline, the replicated bytes, and initial copies/backfills. Initial copies/backfills are billed at a lower rate.',
+  },
+  'storage.cachedEgress': {
+    main: 'Billing is based on the total sum of outgoing Storage traffic in GB throughout your billing period that is served from our CDN cache.',
   },
   'auth.totalUsers': {
     main: 'The maximum number of users your project can have',
@@ -91,6 +95,18 @@ export const pricingTooltips: PricingTooltips = {
   },
   'security.hipaa': {
     main: 'Available as a paid add-on on Team Plan and above.',
+  },
+  'security.privateLink': {
+    main: (
+      <span className="prose text-xs">
+        AWS PrivateLink enables private connectivity between your AWS VPC and Supabase, keeping
+        traffic within the AWS network. Read more in our{' '}
+        <Link href="/docs/guides/platform/privatelink" target="_blank">
+          docs
+        </Link>
+        .
+      </span>
+    ),
   },
 
   'security.accessRoles': {

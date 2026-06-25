@@ -1,18 +1,28 @@
-import { useBucketPolicyCount } from 'components/interfaces/Storage/useBucketPolicyCount'
+import { FilesBucket as FilesBucketIcon } from 'icons'
+import { ChevronRight } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import {
+  Badge,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+
+import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
+import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
 import {
   VirtualizedTableCell,
   VirtualizedTableHead,
   VirtualizedTableHeader,
   VirtualizedTableRow,
-} from 'components/ui/VirtualizedTable'
-import { Bucket } from 'data/storage/buckets-query'
-import { FilesBucket as FilesBucketIcon } from 'icons'
-import { BASE_PATH } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
-import { ChevronRight } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import type React from 'react'
-import { Badge, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+} from '@/components/ui/VirtualizedTable'
+import { Bucket } from '@/data/storage/buckets-query'
+import { formatBytes } from '@/lib/helpers'
+import { createNavigationHandler } from '@/lib/navigation'
 
 type BucketTableMode = 'standard' | 'virtualized'
 
@@ -88,30 +98,19 @@ export const BucketTableRow = ({
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
 
-  const handleBucketNavigation = (
-    bucketId: string,
-    event: React.MouseEvent | React.KeyboardEvent
-  ) => {
-    const url = `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucketId)}`
-    if (event.metaKey || event.ctrlKey) {
-      window.open(`${BASE_PATH}${url}`, '_blank')
-    } else {
-      router.push(url)
-    }
-  }
+  const handleBucketNavigation = createNavigationHandler(
+    `/project/${projectRef}/storage/files/buckets/${encodeURIComponent(bucket.id)}`,
+    router
+  )
 
   return (
     <BucketTableRow
       key={bucket.id}
       data-bucket-id={bucket.id}
       className="relative cursor-pointer h-16 group inset-focus"
-      onClick={(event) => handleBucketNavigation(bucket.id, event)}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter' || event.key === ' ') {
-          event.preventDefault()
-          handleBucketNavigation(bucket.id, event)
-        }
-      }}
+      onClick={handleBucketNavigation}
+      onAuxClick={handleBucketNavigation}
+      onKeyDown={handleBucketNavigation}
       tabIndex={0}
     >
       <BucketTableCell className="w-2 pr-1">
@@ -120,7 +119,16 @@ export const BucketTableRow = ({
       <BucketTableCell className="flex-1">
         <div className="flex items-center gap-2.5">
           <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
-          {bucket.public && <Badge variant="warning">Public</Badge>}
+          {bucket.public && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge variant="warning" className="flex">
+                  Public
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent side="top">{PUBLIC_BUCKET_TOOLTIP}</TooltipContent>
+            </Tooltip>
+          )}
         </div>
       </BucketTableCell>
 

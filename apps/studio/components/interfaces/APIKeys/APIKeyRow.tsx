@@ -1,5 +1,4 @@
-import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
-import type { APIKeysData } from 'data/api-keys/api-keys-query'
+import { IS_PLATFORM, useFlag } from 'common'
 import { motion } from 'framer-motion'
 import { MoreVertical } from 'lucide-react'
 import {
@@ -10,25 +9,34 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
+import { ShimmeringLoader, TimestampInfo } from 'ui-patterns'
+
 import { APIKeyDeleteDialog } from './APIKeyDeleteDialog'
 import { ApiKeyPill } from './ApiKeyPill'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import type { APIKeysData } from '@/data/api-keys/api-keys-query'
 
 export const APIKeyRow = ({
   apiKey,
   lastSeen,
   isDeleting,
+  isDeleteModalOpen,
+  isLoadingLastSeen = false,
+  showLastSeen = true,
   onDelete,
   setKeyToDelete,
-  isDeleteModalOpen,
 }: {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
-  lastSeen?: { timestamp: string }
+  lastSeen?: { timestamp: number; relative: string }
+  showLastSeen?: boolean
   isDeleting: boolean
+  isDeleteModalOpen: boolean
+  isLoadingLastSeen?: boolean
   onDelete: () => void
   setKeyToDelete: (id: string | null) => void
-  isDeleteModalOpen: boolean
 }) => {
   const MotionTableRow = motion.create(TableRow)
+  const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
 
   return (
     <>
@@ -44,7 +52,7 @@ export const APIKeyRow = ({
           mass: 1,
         }}
       >
-        <TableCell className="py-2">
+        <TableCell className="py-2 w-56">
           <div className="flex flex-col">
             <span className="font-medium">{apiKey.name}</span>
             <div className="text-sm text-foreground-lighter">
@@ -52,40 +60,56 @@ export const APIKeyRow = ({
             </div>
           </div>
         </TableCell>
+
         <TableCell className="py-2">
           <div className="flex flex-row gap-2">
             <ApiKeyPill apiKey={apiKey} />
           </div>
         </TableCell>
 
-        <TableCell className="py-2 min-w-0 whitespace-nowrap hidden lg:table-cell">
-          <div className="truncate" title={lastSeen?.timestamp || 'Never used'}>
-            {lastSeen?.timestamp ?? <span className="text-foreground-lighter">Never used</span>}
-          </div>
-        </TableCell>
-
-        <TableCell className="py-2">
-          <div className="flex justify-end">
-            <DropdownMenu>
-              <DropdownMenuTrigger className="px-1 focus-visible:outline-none" asChild>
-                <Button
-                  type="text"
-                  size="tiny"
-                  icon={
-                    <MoreVertical
-                      size="14"
-                      className="text-foreground-light hover:text-foreground"
-                    />
-                  }
+        {showLastSeen && showApiKeysLastUsed && (
+          <TableCell className="py-2 min-w-0 whitespace-nowrap hidden lg:table-cell">
+            <div className="truncate" title={lastSeen?.timestamp.toString() || 'Never used'}>
+              {isLoadingLastSeen ? (
+                <ShimmeringLoader />
+              ) : lastSeen?.timestamp ? (
+                <TimestampInfo
+                  className="text-sm"
+                  utcTimestamp={lastSeen?.timestamp}
+                  label={lastSeen.relative}
                 />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="max-w-40" align="end">
-                <APIKeyDeleteDialog apiKey={apiKey} setKeyToDelete={setKeyToDelete} />
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </TableCell>
+              ) : (
+                <span className="text-foreground-lighter">Never used</span>
+              )}
+            </div>
+          </TableCell>
+        )}
+
+        {IS_PLATFORM && (
+          <TableCell className="py-2">
+            <div className="flex justify-end">
+              <DropdownMenu>
+                <DropdownMenuTrigger className="px-1 focus-visible:outline-hidden" asChild>
+                  <Button
+                    variant="text"
+                    size="tiny"
+                    icon={
+                      <MoreVertical
+                        size="14"
+                        className="text-foreground-light hover:text-foreground"
+                      />
+                    }
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="max-w-40" align="end">
+                  <APIKeyDeleteDialog apiKey={apiKey} setKeyToDelete={setKeyToDelete} />
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </TableCell>
+        )}
       </MotionTableRow>
+
       <TextConfirmModal
         visible={isDeleteModalOpen}
         onCancel={() => setKeyToDelete(null)}

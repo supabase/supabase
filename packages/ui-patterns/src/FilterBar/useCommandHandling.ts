@@ -1,88 +1,48 @@
 import { useCallback } from 'react'
-import { ActiveInput } from './hooks'
-import { FilterProperty, FilterGroup } from './types'
+
+import { ActiveInputState, FilterGroup, FilterProperty, MenuItem } from './types'
 import {
-  findGroupByPath,
   addFilterToGroup,
   addGroupToGroup,
-  isCustomOptionObject,
+  findGroupByPath,
+  isFilterOperatorObject,
+  updateNestedOperator,
   updateNestedValue,
-  removeFromGroup,
 } from './utils'
-
-import { MenuItem } from './menuItems'
 
 export function useCommandHandling({
   activeInput,
   setActiveInput,
   activeFilters,
   onFilterChange,
+  commitFilters,
   filterProperties,
   freeformText,
   onFreeformTextChange,
-  handleInputChange,
   handleOperatorChange,
   newPathRef,
-  handleAIFilter,
+  setIsCommandMenuVisible,
 }: {
-  activeInput: ActiveInput
-  setActiveInput: (input: ActiveInput) => void
+  activeInput: ActiveInputState
+  setActiveInput: (input: ActiveInputState) => void
   activeFilters: FilterGroup
   onFilterChange: (filters: FilterGroup) => void
+  commitFilters: (filters: FilterGroup) => void
   filterProperties: FilterProperty[]
   freeformText: string
   onFreeformTextChange: (text: string) => void
-  handleInputChange: (path: number[], value: string) => void
   handleOperatorChange: (path: number[], value: string) => void
   newPathRef: React.MutableRefObject<number[]>
-  handleAIFilter: () => void
+  setIsCommandMenuVisible: (visible: boolean) => void
 }) {
-  const removeFilterByPath = useCallback(
-    (path: number[]) => {
-      const updatedFilters = removeFromGroup(activeFilters, path)
-      onFilterChange(updatedFilters)
-    },
-    [activeFilters, onFilterChange]
-  )
-
-  const handleItemSelect = useCallback(
-    (item: MenuItem) => {
-      const selectedValue = item.value
-      if (item.value === 'ai-filter') {
-        handleAIFilter()
-        return
-      }
-
-      if (item.value === 'group') {
-        handleGroupCommand()
-        return
-      }
-
-      if (activeInput?.type === 'value') {
-        handleValueCommand(item)
-      } else if (activeInput?.type === 'operator') {
-        handleOperatorCommand(selectedValue)
-      } else if (activeInput?.type === 'group') {
-        handleGroupPropertyCommand(selectedValue)
-      }
-    },
-    [
-      activeInput,
-      activeFilters,
-      filterProperties,
-      freeformText,
-      handleAIFilter,
-      handleInputChange,
-      handleOperatorChange,
-    ]
-  )
-
   const handleGroupCommand = useCallback(() => {
     if (activeInput && activeInput.type === 'group') {
       const currentPath = activeInput.path
       const group = findGroupByPath(activeFilters, currentPath)
       if (!group) return
 
+      // Group-add is structural (no value typed yet), so update draft state only — onApply will
+      // fire once a value gets committed inside the new group.
       const updatedFilters = addGroupToGroup(activeFilters, currentPath)
       onFilterChange(updatedFilters)
       newPathRef.current = [...currentPath, group.conditions.length]
@@ -91,23 +51,20 @@ export function useCommandHandling({
       }, 0)
       onFreeformTextChange('')
     }
-  }, [activeInput, activeFilters, onFilterChange, setActiveInput, onFreeformTextChange])
+  }, [activeInput, activeFilters, onFilterChange, newPathRef, setActiveInput, onFreeformTextChange])
 
   const handleValueCommand = useCallback(
     (item: MenuItem) => {
       if (!activeInput || activeInput.type !== 'value') return
 
       const path = activeInput.path
-
-      // Custom value handled inline in popover; do nothing here
-
-      // Handle regular options
-      handleInputChange(path, item.value)
+      const updated = updateNestedValue(activeFilters, path, item.value)
+      commitFilters(updated)
       setTimeout(() => {
         setActiveInput({ type: 'group', path: path.slice(0, -1) })
       }, 0)
     },
-    [activeInput, handleInputChange, setActiveInput, removeFilterByPath]
+    [activeInput, activeFilters, commitFilters, setActiveInput]
   )
 
   const handleOperatorCommand = useCallback(
@@ -116,9 +73,38 @@ export function useCommandHandling({
 
       const path = activeInput.path
       handleOperatorChange(path, selectedValue)
-      setActiveInput(null)
+      setActiveInput({ type: 'value', path })
     },
     [activeInput, handleOperatorChange, setActiveInput]
+  )
+
+  const handlePropertySelection = useCallback(
+    (selectedProperty: FilterProperty, currentPath: number[], group: FilterGroup) => {
+      // Adding a new condition stub (property only, no operator/value yet) is structural —
+      // draft-only. onApply fires once the user picks an operator or value.
+      let updatedFilters = addFilterToGroup(activeFilters, currentPath, selectedProperty)
+      const newPath = [...currentPath, group.conditions.length]
+
+      // If the property only allows a single operator, pre-fill it and skip the operator step —
+      // the user otherwise has to hit Enter on a one-item dropdown before they can type a value.
+      const operators = selectedProperty.operators ?? []
+      const onlyOperator =
+        operators.length === 1
+          ? isFilterOperatorObject(operators[0])
+            ? operators[0].value
+            : operators[0]
+          : null
+
+      if (onlyOperator) {
+        updatedFilters = updateNestedOperator(updatedFilters, newPath, onlyOperator)
+      }
+      onFilterChange(updatedFilters)
+
+      setTimeout(() => {
+        setActiveInput({ type: onlyOperator ? 'value' : 'operator', path: newPath })
+      }, 0)
+    },
+    [activeFilters, onFilterChange, setActiveInput]
   )
 
   const handleGroupPropertyCommand = useCallback(
@@ -135,46 +121,98 @@ export function useCommandHandling({
       const group = findGroupByPath(activeFilters, currentPath)
       if (!group) return
 
-      // Check if the property itself is a custom option object
-      if (
-        selectedProperty.options &&
-        !Array.isArray(selectedProperty.options) &&
-        isCustomOptionObject(selectedProperty.options)
-      ) {
-        handleCustomPropertySelection(selectedProperty, currentPath, group)
-      } else {
-        handleNormalPropertySelection(selectedProperty, currentPath, group)
-      }
+      handlePropertySelection(selectedProperty, currentPath, group)
       onFreeformTextChange('')
     },
-    [activeInput, filterProperties, activeFilters, onFilterChange, onFreeformTextChange]
+    [activeInput, filterProperties, activeFilters, onFreeformTextChange, handlePropertySelection]
   )
 
-  const handleCustomPropertySelection = useCallback(
-    (selectedProperty: FilterProperty, currentPath: number[], group: FilterGroup) => {
-      const updatedFilters = addFilterToGroup(activeFilters, currentPath, selectedProperty)
-      onFilterChange(updatedFilters)
-      const newPath = [...currentPath, group.conditions.length]
+  const handleItemSelect = useCallback(
+    (item: MenuItem) => {
+      const selectedValue = item.value
+      if (item.isAction && item.action) {
+        const path = activeInput?.type === 'group' ? activeInput.path : []
+        Promise.resolve(
+          item.action.onSelect(item.actionInputValue ?? freeformText ?? '', {
+            path,
+            activeFilters,
+          })
+        )
+          .catch((error) => console.error('FilterBar action failed', error))
+          .finally(() => {
+            setIsCommandMenuVisible(false)
+            setActiveInput(null)
+          })
+        return
+      }
 
-      // Focus the newly added condition's value input so its popover opens immediately
-      setTimeout(() => {
-        setActiveInput({ type: 'value', path: newPath })
-      }, 0)
+      if (item.isFreeformSearch && item.freeformPropertyName) {
+        if (!activeInput || activeInput.type !== 'group') return
+        const property = filterProperties.find((p) => p.name === item.freeformPropertyName)
+        if (!property) return
+
+        const currentPath = activeInput.path
+        const group = findGroupByPath(activeFilters, currentPath)
+        if (!group) return
+
+        const operators = property.operators ?? ['=']
+        const defaultOperator =
+          operators.find((op) => (isFilterOperatorObject(op) ? op.value : op) === '=') ??
+          operators[0]
+        const operatorValue = isFilterOperatorObject(defaultOperator)
+          ? defaultOperator.value
+          : defaultOperator
+
+        let updatedFilters = addFilterToGroup(activeFilters, currentPath, property)
+        const newPath = [...currentPath, group.conditions.length]
+        updatedFilters = updateNestedOperator(updatedFilters, newPath, operatorValue)
+        updatedFilters = updateNestedValue(updatedFilters, newPath, item.freeformValue ?? '')
+        commitFilters(updatedFilters)
+        onFreeformTextChange('')
+        setTimeout(() => {
+          setActiveInput({ type: 'group', path: currentPath })
+        }, 0)
+        return
+      }
+
+      if (item.value === '__new_group__') {
+        handleGroupCommand()
+        return
+      }
+
+      if (activeInput?.type === 'value') {
+        handleValueCommand(item)
+      } else if (activeInput?.type === 'operator') {
+        if (item.isDefaultOperator) {
+          const path = activeInput.path
+          const filtersWithOperator = updateNestedOperator(activeFilters, path, item.value)
+          commitFilters(updateNestedValue(filtersWithOperator, path, item.defaultValue ?? ''))
+
+          // Added minor delay to ensure the filter is updated before navigating to the group
+          setTimeout(() => {
+            setActiveInput({ type: 'group', path: path.slice(0, -1) })
+          }, 0)
+        } else {
+          handleOperatorCommand(selectedValue)
+        }
+      } else if (activeInput?.type === 'group') {
+        handleGroupPropertyCommand(selectedValue)
+      }
     },
-    [activeFilters, onFilterChange, setActiveInput, removeFilterByPath]
-  )
-
-  const handleNormalPropertySelection = useCallback(
-    (selectedProperty: FilterProperty, currentPath: number[], group: FilterGroup) => {
-      const updatedFilters = addFilterToGroup(activeFilters, currentPath, selectedProperty)
-      onFilterChange(updatedFilters)
-      const newPath = [...currentPath, group.conditions.length]
-
-      setTimeout(() => {
-        setActiveInput({ type: 'value', path: newPath })
-      }, 0)
-    },
-    [activeFilters, onFilterChange, setActiveInput]
+    [
+      activeInput,
+      activeFilters,
+      freeformText,
+      filterProperties,
+      onFreeformTextChange,
+      setActiveInput,
+      handleGroupCommand,
+      handleValueCommand,
+      handleOperatorCommand,
+      handleGroupPropertyCommand,
+      commitFilters,
+      setIsCommandMenuVisible,
+    ]
   )
 
   return {

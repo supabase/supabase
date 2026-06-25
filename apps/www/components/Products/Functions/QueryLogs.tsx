@@ -139,7 +139,7 @@ const QueryLogs = ({ isActive, isInView }: { isActive?: boolean; isInView?: bool
               <span
                 className={cn(
                   'w-[50px] flex items-center gap-1',
-                  log.status === 'ERROR' ? '!text-red-900' : '!text-blue-900'
+                  log.status === 'ERROR' ? 'text-red-900!' : 'text-blue-900!'
                 )}
               >
                 <span>

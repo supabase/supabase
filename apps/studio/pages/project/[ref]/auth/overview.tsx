@@ -1,15 +1,6 @@
+import { FeatureFlagContext, useFlag, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useContext, useEffect } from 'react'
-
-import { FeatureFlagContext, useFlag, useParams } from 'common'
-import { OverviewLearnMore } from 'components/interfaces/Auth/Overview/OverviewLearnMore'
-import { OverviewMetrics } from 'components/interfaces/Auth/Overview/OverviewMetrics'
-import AuthLayout from 'components/layouts/AuthLayout/AuthLayout'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useAuthOverviewQuery } from 'data/auth/auth-overview-query'
-import { DOCS_URL } from 'lib/constants'
-import { NextPageWithLayout } from 'types'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -19,6 +10,15 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 
+import { OverviewLearnMore } from '@/components/interfaces/Auth/Overview/OverviewLearnMore'
+import { OverviewMetrics } from '@/components/interfaces/Auth/Overview/OverviewMetrics'
+import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
+import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useAuthOverviewQuery } from '@/data/auth/auth-overview-query'
+import { DOCS_URL } from '@/lib/constants'
+import { NextPageWithLayout } from '@/types'
+
 const AuthOverview: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref } = useParams()
@@ -27,7 +27,7 @@ const AuthOverview: NextPageWithLayout = () => {
 
   const {
     data: metrics,
-    isLoading,
+    isPending: isLoading,
     error,
   } = useAuthOverviewQuery({ projectRef: ref }, { enabled: !!ref })
 
@@ -69,7 +69,7 @@ const AuthOverview: NextPageWithLayout = () => {
 
 AuthOverview.getLayout = (page) => (
   <DefaultLayout>
-    <AuthLayout>{page}</AuthLayout>
+    <AuthLayout title="Overview">{page}</AuthLayout>
   </DefaultLayout>
 )
 

@@ -1,10 +1,12 @@
 import { useParams } from 'common'
-import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
-import Description from 'components/interfaces/Docs/Description'
-import Param from 'components/interfaces/Docs/Param'
-import Snippets from 'components/interfaces/Docs/Snippets'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { ProjectJsonSchemaPaths } from 'data/docs/project-json-schema-query'
+
+import { DocSection } from './DocSection'
+import CodeSnippet from '@/components/interfaces/Docs/CodeSnippet'
+import Description from '@/components/interfaces/Docs/Description'
+import Param from '@/components/interfaces/Docs/Param'
+import Snippets from '@/components/interfaces/Docs/Snippets'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { ProjectJsonSchemaPaths } from '@/data/docs/project-json-schema-query'
 
 /**
  * TODO: need to support rpc with the same name and different params type
@@ -50,17 +52,18 @@ export const RpcContent = ({
   if (!path) return null
 
   return (
-    <>
-      <h2 className="text-foreground mt-0">
-        <span className="px-6 text-2xl">{meta.id}</span>
-      </h2>
-
-      <div className="doc-section">
-        <article className="code-column text-foreground">
-          <label className="font-mono text-xs uppercase text-foreground-lighter">Description</label>
-          <Description content={summary ?? ''} metadata={{ rpc: rpcId }} onChange={refreshDocs} />
-        </article>
-        <article className="code">
+    <div className="flex flex-col flex-1">
+      <DocSection
+        title={meta.id}
+        content={
+          <>
+            <label className="font-mono text-xs uppercase text-foreground-lighter inline-block mb-2">
+              Description
+            </label>
+            <Description content={summary ?? ''} metadata={{ rpc: rpcId }} onChange={refreshDocs} />
+          </>
+        }
+        snippets={
           <CodeSnippet
             selectedLang={selectedLang}
             snippet={Snippets.rpcSingle({
@@ -72,15 +75,18 @@ export const RpcContent = ({
               endpoint: endpoint,
             })}
           />
-        </article>
-      </div>
+        }
+      />
+
       {rpcParams.length > 0 && (
-        <div>
-          <h3 className="text-foreground mt-0 px-6 capitalize">Function Arguments</h3>
+        <div className="flex flex-col flex-1">
+          <DocSection title="Function Arguments" content={null} />
           {rpcParams.map((x, i) => {
             return (
-              <div key={i} className="doc-section">
-                <article className="code-column text-foreground">
+              <DocSection
+                key={i}
+                title={null}
+                content={
                   <Param
                     key={x.name}
                     name={x.name}
@@ -89,13 +95,12 @@ export const RpcContent = ({
                     required={true}
                     description={false}
                   />
-                </article>
-                <article className="code"></article>
-              </div>
+                }
+              />
             )
           })}
         </div>
       )}
-    </>
+    </div>
   )
 }

@@ -1,19 +1,11 @@
-import { ChevronDown } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
 import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
+import { CommandGroup } from '@ui/components/shadcn/ui/command'
 import { Label } from '@ui/components/shadcn/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
-import {
-  Button,
-  cn,
-  Command_Shadcn_ as Command,
-  CommandInput_Shadcn_ as CommandInput,
-  CommandItem_Shadcn_,
-} from 'ui'
-import { CommandList_Shadcn_ as CommandList, CommandEmpty_Shadcn_ as CommandEmpty } from 'ui'
+import { ChevronDown } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Button, cn, Command, CommandEmpty, CommandInput, CommandItem, CommandList } from 'ui'
 import { z } from 'zod'
-import { CommandGroup } from '@ui/components/shadcn/ui/command'
 
 export interface ReportSelectOption {
   label: React.ReactNode
@@ -74,7 +66,7 @@ export const ReportsSelectFilter = ({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          type={isActive ? 'default' : 'outline'}
+          variant={isActive ? 'default' : 'outline'}
           className={cn(
             'min-w-20 border-dashed relative group justify-between',
             { 'border-solid': isActive },
@@ -88,18 +80,18 @@ export const ReportsSelectFilter = ({
           </span>
         </Button>
       </PopoverTrigger>
-      <PopoverContent align="start" className="p-0 w-72" portal={true}>
+      <PopoverContent align="start" className="p-0 w-72">
         <Command>
           {showSearch && <CommandInput placeholder="Search..." />}
           <CommandList>
             <CommandEmpty>No options found.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => (
-                <CommandItem_Shadcn_ key={option.value}>
+                <CommandItem key={option.value}>
                   <Label
                     key={option.value}
                     className={
-                      'flex items-center overflow-hidden p-1 rounded-sm gap-x-3 w-full h-full'
+                      'flex items-center overflow-hidden p-1 rounded-xs gap-x-3 w-full h-full'
                     }
                   >
                     <Checkbox
@@ -121,22 +113,22 @@ export const ReportsSelectFilter = ({
                       )}
                     </div>
                   </Label>
-                </CommandItem_Shadcn_>
+                </CommandItem>
               ))}
             </CommandGroup>
           </CommandList>
         </Command>
 
         <div className="flex items-center justify-end gap-2 border-t border-default p-2">
-          <Button size="tiny" type="outline" onClick={handleClearAll} disabled={isLoading}>
+          <Button size="tiny" variant="outline" onClick={handleClearAll} disabled={isLoading}>
             Clear
           </Button>
           <Button
             loading={isLoading}
             size="tiny"
-            type="primary"
+            variant="primary"
             onClick={handleApply}
-            htmlType="button"
+            type="button"
           >
             Apply
           </Button>

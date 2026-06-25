@@ -1,29 +1,30 @@
-import { cn, Image } from 'ui'
-import dynamic from 'next/dynamic'
 import { CubeIcon } from '@heroicons/react/outline'
 import {
   ArrowRight,
   ArrowUpRight,
-  Timer,
-  Lock,
-  ShieldCheck,
-  Users,
-  UserX,
+  Check,
+  ClipboardCheck,
   FolderLock,
+  HeartPulse,
+  InfoIcon,
   Lightbulb,
   List,
-  ClipboardCheck,
+  Lock,
   ShieldAlert,
-  HeartPulse,
-  Check,
-  InfoIcon,
+  ShieldCheck,
+  Timer,
+  Users,
+  UserX,
 } from 'lucide-react'
-import RealtimeLogs from 'components/Products/Functions/RealtimeLogs'
-
-import MainProducts from 'data/MainProducts'
+import dynamic from 'next/dynamic'
 import { PRODUCT_SHORTNAMES } from 'shared-data/products'
-import { companyStats } from 'data/company-stats'
-import { DerivLogo } from '~/components/BrandLogo'
+import { cn } from 'ui'
+import { Image } from 'ui-patterns/Image'
+
+import { DerivLogo } from '@/components/BrandLogo'
+import RealtimeLogs from '@/components/Products/Functions/RealtimeLogs'
+import { companyStats } from '@/data/company-stats'
+import MainProducts from '@/data/MainProducts'
 
 const AuthVisual = dynamic(() => import('components/Products/AuthVisual'))
 const FunctionsVisual = dynamic(() => import('components/Products/FunctionsVisual'))
@@ -39,7 +40,7 @@ const data = {
     id: 'hero',
     title: 'Moving from Neon to Supabase',
     sectionContainerClassName: cn(
-      '[&_h1]:text-xl [&_h1]:md:!text-2xl [&_h1]:lg:!text-4xl [&_h1]:2xl:!text-5xl',
+      '[&_h1]:text-xl [&_h1]:md:text-2xl! [&_h1]:lg:text-4xl! [&_h1]:2xl:text-5xl!',
       '[&_.image-container]:flex [&_.image-container]:items-center'
     ),
     h1: 'Neon users switch to Supabase for a complete Postgres experience',
@@ -224,15 +225,15 @@ const data = {
             etc.), SAML, SSO, and phone/SMS OTP.
           </>
         ),
-        className: '!border-l-0 sm:!border-l sm:!border-t-0',
-        image: <AuthVisual className="2xl:!-bottom-20" />,
+        className: 'border-l-0! sm:border-l! sm:border-t-0!',
+        image: <AuthVisual className="2xl:-bottom-20!" />,
       },
       {
         id: 'rbac',
         title: 'Role-Based Access Control',
         icon: 'M17.6874 22.888V20.3886C17.6874 17.5888 15.4178 15.3192 12.618 15.3192C9.8182 15.3192 7.54852 17.5888 7.54852 20.3886V22.888M21.5531 11.5235C21.8189 14.1669 20.9393 16.9038 18.9141 18.9289C18.5359 19.3072 18.1328 19.6455 17.7101 19.9438M20.8038 8.70448C20.3598 7.71036 19.7299 6.77911 18.9141 5.96334C15.3338 2.38299 9.52889 2.38299 5.94855 5.96334C4.17501 7.73687 3.28 10.0562 3.26352 12.3807M24.0875 13.1161L23.2046 12.2332C22.3264 11.355 20.9026 11.355 20.0244 12.2332L19.1415 13.1161M0.875198 10.9503L1.75809 11.8331C2.63629 12.7113 4.06012 12.7113 4.93832 11.8331L5.82121 10.9503M7.49904 20.4919C5.77226 19.4557 4.37848 17.8555 3.62143 15.8584M15.6799 12.1942C15.6799 13.9201 14.2808 15.3192 12.5549 15.3192C10.829 15.3192 9.42993 13.9201 9.42993 12.1942C9.42993 10.4683 10.829 9.06917 12.5549 9.06917C14.2808 9.06917 15.6799 10.4683 15.6799 12.1942Z',
         subheading: <>Secure your data properly.</>,
-        className: '!border-l-0',
+        className: 'border-l-0!',
         image: (
           <Image
             draggable={false}
@@ -259,7 +260,7 @@ const data = {
             applications.
           </>
         ),
-        className: '!border-l-0 sm:!border-l',
+        className: 'border-l-0! sm:border-l!',
         image: (
           <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]" />
         ),
@@ -274,7 +275,7 @@ const data = {
             managing files, images, and videos.
           </>
         ),
-        className: '!border-l-0 lg:!border-l',
+        className: 'border-l-0! lg:border-l!',
         image: (
           <Image
             draggable={false}
@@ -301,7 +302,7 @@ const data = {
         subheading: (
           <>Serverless functions powered by Deno, deployed globally for low-latency execution.</>
         ),
-        className: '!border-l-0 sm:!border-l lg:!border-l-0',
+        className: 'border-l-0! sm:border-l! lg:border-l-0!',
         image: <FunctionsVisual className="" />,
       },
       {
@@ -314,7 +315,7 @@ const data = {
             storage.
           </>
         ),
-        className: '!border-l-0 lg:!border-l',
+        className: 'border-l-0! lg:border-l!',
         image: (
           <Image
             draggable={false}
@@ -353,7 +354,7 @@ const data = {
   },
   developerExperience: {
     id: 'developer-experience',
-    className: '[&_h2]:!max-w-sm',
+    className: '[&_h2]:max-w-sm!',
     title: (
       <>
         Developers can build <span className="text-foreground">faster</span> with Supabase
@@ -448,7 +449,7 @@ const data = {
         title: 'Foreign Data Wrappers',
         icon: 'M10.2805 18.2121C11.2419 18.6711 12.3325 18.8932 13.4711 18.8084C15.2257 18.6776 16.7596 17.843 17.8169 16.6015M8.21496 8.36469C9.27117 7.14237 10.7928 6.322 12.5311 6.19248C13.7196 6.10392 14.8558 6.34979 15.8474 6.85054M17.8169 16.6015L20.5242 19.3223C22.1857 17.5141 23.1562 15.1497 23.1562 12.5005C23.1562 6.89135 18.6091 2.34424 13 2.34424C10.9595 2.34424 9.16199 2.87659 7.57035 3.91232C8.35717 3.56865 9.22613 3.37801 10.1396 3.37801C12.6236 3.37801 14.7783 4.78762 15.8474 6.85054M17.8169 16.6015V16.6015C16.277 15.059 16.3448 12.5527 16.5387 10.3817C16.5557 10.191 16.5644 9.99794 16.5644 9.80282C16.5644 8.73844 16.3056 7.73451 15.8474 6.85054M13 22.6567C7.39086 22.6567 2.84375 18.1096 2.84375 12.5005C2.84375 9.84123 3.8026 7.48969 5.4753 5.67921L8.21496 8.42354V8.42354C9.76942 9.98064 9.69844 12.5133 9.51947 14.7062C9.50526 14.8803 9.49802 15.0564 9.49802 15.2341C9.49802 18.7705 12.3648 21.6373 15.9012 21.6373C16.8116 21.6373 17.6776 21.4473 18.4618 21.1048C16.8609 22.1588 15.06 22.6567 13 22.6567Z',
         subheading:
-          'Connect Supabase to Redshift, BigQuery, MySQL, and external APIs for seamless integrations.',
+          'Connect Supabase to BigQuery, Snowflake, ClickHouse, S3, Stripe, Firebase, and external APIs for seamless integrations.',
         image: (
           <Image
             draggable={false}
@@ -521,7 +522,7 @@ const data = {
           <RealtimeLogs
             isActive={false}
             isInView={true}
-            className="h-3/5 bottom-0 top-auto [&_.visual-overlay]:!bg-[linear-gradient(to_top,hsl(var(--background-default))_0%,transparent_100%)]"
+            className="h-3/5 bottom-0 top-auto [&_.visual-overlay]:bg-[linear-gradient(to_top,hsl(var(--background-default))_0%,transparent_100%)]!"
           />
         ),
       },
@@ -577,10 +578,10 @@ const data = {
       },
       {
         id: 'multi-region',
-        title: 'Multi-region Deployments',
+        title: 'Multi-region Options',
         description: (
           <>
-            Deploy databases across multiple regions for{' '}
+            Deploy in your chosen region with optional read replicas in other regions for{' '}
             <span className="text-foreground">global availability</span>.
           </>
         ),
@@ -592,9 +593,8 @@ const data = {
         title: 'High Availability Architecture',
         description: (
           <>
-            Enterprise plans offer{' '}
-            <span className="text-foreground">automatic failover and redundancy</span> for
-            mission-critical applications.
+            Enterprise plans offer <span className="text-foreground">failover and redundancy</span>{' '}
+            for mission-critical applications.
           </>
         ),
         icon: 'M16.3046 3.24514C15.3004 2.91279 14.2268 2.73291 13.1111 2.73291C7.50197 2.73291 2.95486 7.28002 2.95486 12.8892C2.95486 18.4983 7.50197 23.0454 13.1111 23.0454C18.7203 23.0454 23.2674 18.4983 23.2674 12.8892C23.2674 10.5703 22.4902 8.4329 21.1822 6.72328L12.2253 15.5572L10.2303 13.5622M13.2175 6.31682C9.54013 6.31682 6.55899 9.29795 6.55899 12.4809C6.55899 16.1583 9.54013 19.1395 13.2175 19.1395C16.895 19.1395 19.8761 16.1583 19.8761 12.4809C19.8761 11.1095 19.4615 9.83483 18.7507 8.77557',

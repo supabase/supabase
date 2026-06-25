@@ -9,7 +9,7 @@ database_id = "9a55c946-877f-46ae-8b57-51934e02a36c"
 
 This is a general guide for debugging pg_cron. Below lists issues and how to debug them
 
-# Cannot create/edit/delete cron jobs
+## Cannot create/edit/delete cron jobs
 
 Cron jobs can only be modified with the respective SQL functions:
 
@@ -23,13 +23,13 @@ If you are trying to make changes, use the cron functions. If the cron functions
 
 ---
 
-# Cron Jobs are not running
+## Cron Jobs are not running
 
 > You should consider initiating a software upgrade in the [Infrastructure Settings](/dashboard/project/_/settings/infrastructure) if your Postgres version is below v15.6.1.122. Upgrading will give you access to pg_cron v1.6.4+, which has many bug fixes and auto-revive capabilities.
 
-## Debugging steps:
+### Debugging steps:
 
-### Check to see if "pg_cron scheduler" is active
+#### Check to see if `pg_cron scheduler` is active
 
 pg_cron operates as the `pg_cron scheduler` process within Postgres. Use the below query to check if the worker is active
 
@@ -56,9 +56,9 @@ If the query does not return a row, the worker has died. To revive it, you must 
 
 <br />
 
-### Check the `cron.job_run_details` table for more information
+#### Check the `cron.job_run_details` table for more information
 
-pg_cron creates logs in its own table `cron.job_run_details"`. The below query checks for issues from the past 5 days :
+pg_cron creates logs in its own table `cron.job_run_details`. The below query checks for issues from the past 5 days :
 
 ```sql
 SELECT *
@@ -77,7 +77,7 @@ Respond to the errors exposed appropriately.
 
 <br />
 
-### Check if there are too many cron jobs running concurrently
+#### Check if there are too many cron jobs running concurrently
 
 pg_cron supports up to 32 concurrent jobs, each using a database connection. If too many jobs are running simultaneously, space them out to prevent connection overload and job failure.
 
@@ -110,7 +110,7 @@ You can view your concurrent peak connection usage throughout the day at the bot
 
 <br />
 
-### Check for database strain
+#### Check for database strain
 
 Unfortunately, excessive resource strain can slow down or disrupt jobs.
 
@@ -125,7 +125,7 @@ It is important to make sure you are running the latest release of pg_cron (1.6.
 
 <br />
 
-### Check the log explorer for more information
+#### Check the log explorer for more information
 
 Although pg*cron records errors in the `cron.job_run_details` table, in rare cases, more information can be found in the general Postgres logs. You can check the [Log Explorer](/dashboard/project/*/logs/explorer) for failure events with the following query
 
@@ -156,7 +156,7 @@ If you're interested in modifying the query, there is an advanced [guide](https:
 
 <br />
 
-### Create custom logs within cron jobs
+#### Create custom logs within cron jobs
 
 If it's still not clear what is occurring you may be able to capture more logs by running the pg_cron query inside a database function:
 
@@ -188,12 +188,12 @@ You can then search for your custom messages in the [Logs Interface](/dashboard/
 
 <br />
 
-### Upgrading pg_cron version
+#### Upgrading pg_cron version
 
 The current version of pg*cron on Supabase is 1.6.4. It comes with a [few bug fixes](https://github.com/citusdata/pg_cron/releases/tag/v1.6.4). You should consider upgrading to Postgres v15.6.1.122+ in the[ Infrastructure Settings](/dashboard/project/*/settings/infrastructure) to get the latest extension.
 
 <br />
 
-### Contacting support and the maintainers
+#### Contacting support and the maintainers
 
 Although Supabase includes the extension, it is maintained by Citus (a Microsoft subsidiary). You can contact Support for more help, but you should also consider creating an issue in the [pg_cron repo](https://github.com/citusdata/pg_cron).

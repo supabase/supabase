@@ -1,11 +1,11 @@
+import { useParams } from 'common'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import SVG from 'react-inlinesvg'
-
-import { useParams } from 'common'
-import { BASE_PATH } from 'lib/constants'
 import { Badge, Button, cn } from 'ui'
+
 import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
+import { BASE_PATH } from '@/lib/constants'
 
 interface ForeignKeyProps {
   foreignKey: ForeignKey
@@ -23,7 +23,7 @@ export const ForeignKeyRow = ({
   disabled = false,
   status,
   layout = 'horizontal',
-  closePanel,
+  closePanel: _closePanel,
   onSelectEdit,
   onSelectRemove,
   onSelectUndoRemove,
@@ -60,7 +60,7 @@ export const ForeignKeyRow = ({
             </p>
             <Button
               asChild
-              type="default"
+              variant="default"
               title={`${foreignKey.schema}.${foreignKey.table}`}
               className="py-0.5 px-1.5 font-mono"
               icon={
@@ -71,7 +71,7 @@ export const ForeignKeyRow = ({
                   preProcessor={(code: any) =>
                     code.replace(/svg/, 'svg class="m-auto text-color-inherit"')
                   }
-                  loader={<span className="block w-4 h-4 bg-[#133929] rounded-sm" />}
+                  loader={<span className="block w-4 h-4 bg-[#133929] rounded-xs" />}
                   cacheRequests={true}
                 />
               }
@@ -105,15 +105,15 @@ export const ForeignKeyRow = ({
       </div>
       {!disabled && (
         <div className="flex items-center gap-x-2">
-          <Button type="default" onClick={onSelectEdit}>
+          <Button variant="default" onClick={onSelectEdit}>
             Edit
           </Button>
           {foreignKey.toRemove ? (
-            <Button type="default" onClick={onSelectUndoRemove}>
+            <Button variant="default" onClick={onSelectUndoRemove}>
               Cancel remove
             </Button>
           ) : (
-            <Button type="default" onClick={onSelectRemove}>
+            <Button variant="default" onClick={onSelectRemove}>
               Remove
             </Button>
           )}

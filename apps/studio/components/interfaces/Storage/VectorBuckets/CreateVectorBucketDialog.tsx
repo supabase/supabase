@@ -1,20 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-
-import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
-import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
-import { useS3VectorsWrapperCreateMutation } from 'data/storage/s3-vectors-wrapper-create-mutation'
-import { useVectorBucketCreateMutation } from 'data/storage/vector-bucket-create-mutation'
-import { useVectorBucketsQuery } from 'data/storage/vector-buckets-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Dialog,
@@ -24,16 +12,25 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import { validVectorBucketName } from './CreateVectorBucketDialog.utils'
 import { useS3VectorsWrapperExtension } from './useS3VectorsWrapper'
-import { getVectorBucketFDWSchemaName } from './VectorBuckets.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
+import { useS3VectorsWrapperCreateMutation } from '@/data/storage/s3-vectors-wrapper-create-mutation'
+import { useVectorBucketCreateMutation } from '@/data/storage/vector-bucket-create-mutation'
+import { useVectorBucketsQuery } from '@/data/storage/vector-buckets-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 const FormSchema = z.object({
   name: z
@@ -91,7 +88,6 @@ export const CreateVectorBucketDialog = ({
   setVisible: (visible: boolean) => void
 }) => {
   const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
   const { data: project } = useSelectedProjectQuery()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -102,7 +98,7 @@ export const CreateVectorBucketDialog = ({
     defaultValues: { name: '' },
   })
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { mutateAsync: createVectorBucket } = useVectorBucketCreateMutation({
     onError: () => {},
   })
@@ -111,10 +107,6 @@ export const CreateVectorBucketDialog = ({
     useS3VectorsWrapperExtension()
 
   const { mutateAsync: createS3VectorsWrapper } = useS3VectorsWrapperCreateMutation()
-
-  const { mutateAsync: createSchema } = useSchemaCreateMutation({
-    onError: () => {},
-  })
 
   const { mutateAsync: enableExtension } = useDatabaseExtensionEnableMutation()
 
@@ -146,36 +138,25 @@ export const CreateVectorBucketDialog = ({
           schema: wrappersExtension.schema ?? 'extensions',
           version: wrappersExtension.default_version,
         })
-
-        await createS3VectorsWrapper({ bucketName: values.name })
-
-        await createSchema({
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          name: getVectorBucketFDWSchemaName(values.name),
-        })
-      } else if (wrappersExtensionState === 'installed') {
-        await createS3VectorsWrapper({ bucketName: values.name })
-
-        await createSchema({
-          projectRef: project?.ref,
-          connectionString: project?.connectionString,
-          name: getVectorBucketFDWSchemaName(values.name),
-        })
       }
+
+      await createS3VectorsWrapper({ bucketName: values.name })
+      toast.success(`Successfully created vector bucket ${values.name}`)
     } catch (error: any) {
-      toast.warning(
-        `Failed to create vector bucket integration: ${error.message}. The bucket will be created but you will need to manually install the integration.`
+      toast.success(
+        <div>
+          <p>Successfully created vector bucket {values.name}</p>
+          <p className="text-foreground-light text-xs">
+            However, bucket integration will need to be manually installed as we ran into an error:
+          </p>
+          <p className="text-foreground-light text-xs">{error.message}</p>
+        </div>,
+        { duration: 8000 }
       )
     }
-    setIsLoading(false)
 
-    sendEvent({
-      action: 'storage_bucket_created',
-      properties: { bucketType: 'vector' },
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
-    toast.success(`Successfully created vector bucket ${values.name}`)
+    setIsLoading(false)
+    track('storage_bucket_created', { bucketType: 'vector' })
     form.reset()
     setVisible(false)
   }
@@ -193,10 +174,10 @@ export const CreateVectorBucketDialog = ({
 
         <DialogSectionSeparator />
 
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogSection className="flex flex-col gap-y-4">
-              <FormField_Shadcn_
+            <DialogSection className="flex flex-col p-0!">
+              <FormField
                 key="name"
                 name="name"
                 control={form.control}
@@ -204,11 +185,12 @@ export const CreateVectorBucketDialog = ({
                   <FormItemLayout
                     name="name"
                     label="Bucket name"
+                    className="px-5 py-5"
                     labelOptional="Cannot be changed after creation"
-                    description="A target schema will be created that matches this name."
+                    description="Must be between 3–63 characters. Only lowercase letters, numbers, and hyphens are allowed"
                   >
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    <FormControl>
+                      <Input
                         id="name"
                         data-1p-ignore
                         data-lpignore="true"
@@ -217,16 +199,17 @@ export const CreateVectorBucketDialog = ({
                         {...field}
                         placeholder="Enter bucket name"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
-              <Admonition type="default">
+
+              <Admonition type="default" className="border-x-0 border-b-0 rounded-none">
                 <p>
                   Supabase will install the{' '}
                   {wrappersExtensionState !== 'installed' ? 'Wrappers extension and ' : ''}
                   S3 Vectors Wrapper integration on your behalf.{' '}
-                  <InlineLink href={`${DOCS_URL}/guides/database/extensions/wrappers/s3-vectors`}>
+                  <InlineLink href={`${DOCS_URL}/guides/database/extensions/wrappers/s3_vectors`}>
                     Learn more
                   </InlineLink>
                   .
@@ -234,13 +217,13 @@ export const CreateVectorBucketDialog = ({
               </Admonition>
             </DialogSection>
           </form>
-        </Form_Shadcn_>
+        </Form>
 
         <DialogFooter>
-          <Button type="default" disabled={isLoading} onClick={() => setVisible(false)}>
+          <Button variant="default" disabled={isLoading} onClick={() => setVisible(false)}>
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" loading={isLoading}>
+          <Button form={formId} type="submit" loading={isLoading}>
             Create
           </Button>
         </DialogFooter>

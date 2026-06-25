@@ -2,7 +2,7 @@ import { proxy, snapshot, useSnapshot } from 'valtio'
 
 export type AdvisorTab = 'all' | 'security' | 'performance' | 'messages'
 export type AdvisorSeverity = 'critical' | 'warning' | 'info'
-export type AdvisorItemSource = 'lint' | 'notification'
+export type AdvisorItemSource = 'lint' | 'notification' | 'signal'
 
 const initialState = {
   activeTab: 'all' as AdvisorTab,

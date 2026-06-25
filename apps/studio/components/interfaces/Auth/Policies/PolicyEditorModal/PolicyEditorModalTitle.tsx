@@ -1,10 +1,10 @@
 import { noop } from 'lodash'
 import { ChevronLeft, FlaskConical } from 'lucide-react'
-
-import { DocsButton } from 'components/ui/DocsButton'
-import { DOCS_URL } from 'lib/constants'
 import { Button } from 'ui'
+
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { DOCS_URL } from '@/lib/constants'
 
 interface PolicyEditorModalTitleProps {
   view: string
@@ -56,7 +56,7 @@ const PolicyEditorModalTitle = ({
       </h4>
       <div className="flex items-center gap-x-2 pr-6">
         {showAssistantPreview && view === POLICY_MODAL_VIEWS.EDITOR && (
-          <Button type="default" icon={<FlaskConical />} onClick={onToggleFeaturePreviewModal}>
+          <Button variant="default" icon={<FlaskConical />} onClick={onToggleFeaturePreviewModal}>
             Try Supabase Assistant
           </Button>
         )}

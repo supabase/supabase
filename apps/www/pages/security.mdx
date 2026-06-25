@@ -1,12 +1,14 @@
 import {
-  KeyIcon,
-  UserGroupIcon,
-  ShieldCheckIcon,
-  RewindIcon,
-  CreditCardIcon,
   ClipboardCheckIcon,
+  CreditCardIcon,
+  KeyIcon,
+  RewindIcon,
+  ShieldCheckIcon,
+  UserGroupIcon,
 } from '@heroicons/react/outline'
+import SecurityNewsletterForm from '~/components/SecurityNewsletterForm'
 import { Activity, Lock } from 'lucide-react'
+
 import Layout from '../layouts/Layout'
 
 export const meta = {
@@ -28,7 +30,7 @@ export const Section = ({ children, icon, img }) => (
   </div>
 )
 
-<div className="container mx-auto px-8 sm:px-16 xl:px-20 grid grid-cols-12 items-center my-8">
+<div className="section-container grid grid-cols-12 items-center my-8">
   <div className="col-span-12 lg:col-span-6">
     <h1 className="xl:text-5xl mb-4 [&_p]:m-0">Security at Supabase</h1>
     <h2 className="text-xl text-foreground-light max-w-xl m-0 [&_p]:m-0">
@@ -42,7 +44,7 @@ export const Section = ({ children, icon, img }) => (
   </div>
 </div>
 
-<div className="container mx-auto px-8 sm:px-16 xl:px-20 mb-16">
+<div className="section-container mb-16">
 
 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-16">
 
@@ -80,6 +82,15 @@ Enterprise and Team customers can request to sign our BAA [on the dashboard](/da
 <div className="w-32">
   <img src="/images/security/HIPAA.svg" />
 </div>
+
+</Section>
+<Section icon={<ShieldCheckIcon strokeWidth={1}/>}>
+
+### ISO 27001
+
+Supabase is ISO 27001 certified. ISO 27001 is an internationally recognized standard for information security management systems (ISMS), confirming that we maintain rigorous controls to protect customer data.
+
+Enterprise and Team customers can access our ISO 27001 certificate [on the dashboard](/dashboard/org/_/documents).
 
 </Section>
 <Section icon={<KeyIcon strokeWidth={1}/>}>
@@ -144,6 +155,10 @@ In addition to protection at the CDN level via Cloudflare, we employ [fail2ban](
 
 </div>
 
+</div>
+
+<div className="section-container mb-16">
+  <SecurityNewsletterForm />
 </div>
 
 export default (context) => <Layout meta={meta} children={context.children} context={context} />

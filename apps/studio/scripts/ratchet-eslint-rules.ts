@@ -128,7 +128,7 @@ function dangerouslyRunEsLint(eslintCmd: string, eslintArgs: string): ESLintExec
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
     env: process.env,
-    maxBuffer: 32 * 1024 * 1024, // allow large ESLint JSON payloads
+    maxBuffer: 128 * 1024 * 1024, // allow large ESLint JSON payloads (the studio repo regularly emits ~35MB+)
   })
 
   const stdout = typeof proc.stdout === 'string' ? proc.stdout : ''
@@ -240,7 +240,11 @@ export function runRatchet(argv: string[], runEslint = dangerouslyRunEsLint): nu
   // Offloaded to user. Must document that they should not pass untrusted input
   // via --eslint or --eslint-args.
   const { results, stderr } = runEslint(args.eslint, args.eslintArgs)
-  const currentSnapshots = collectRuleSnapshots(results, args.rules)
+
+  // Filter out test files.
+  const filteredResults = results.filter((result) => !result.filePath?.includes('.test.'))
+
+  const currentSnapshots = collectRuleSnapshots(filteredResults, args.rules)
   const currentCounts: Record<string, number> = {}
   for (const rule of args.rules) {
     currentCounts[rule] = currentSnapshots[rule]?.total ?? 0

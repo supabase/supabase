@@ -29,11 +29,13 @@ When creating a table, it's best practice to add columns at the same time.
 
 <Image
   alt="Tables and columns"
-  zoomable
-  src={{
+
+src={{
     dark: '/docs/img/database/managing-tables/creating-tables.png',
     light: '/docs/img/database/managing-tables/creating-tables--light.png',
   }}
+width={1600}
+height={1145}
 />
 
 You must define the "data type" of each column when it is created. You can add and remove columns at any time after creating a table.
@@ -90,7 +92,7 @@ You must define the "data type" when you create a column.
 
 ### Data types
 
-Every column is a predefined type. Postgres provides many [default types](https://www.postgresql.org/docs/current/datatype.html), and you can even design your own (or use extensions) if the default types don't fit your needs. You can use any data type that Postgres supports via the SQL editor. We only support a subset of these in the Table Editor in an effort to keep the experience simple for people with less experience with databases.
+Every column is a predefined type. Postgres provides many [default types](https://www.postgresql.org/docs/current/datatype.html), and you can even design your own (or use extensions) if the default types don't fit your needs. You can use any data type that Postgres supports via the SQL editor. We only support a subset of these in the Table Editor in an effort to keep the experience focused for people with less experience with databases.
 
 <details>
 <summary>Show/Hide default data types</summary>
@@ -311,7 +313,7 @@ supabase
 
 ### Bulk data loading
 
-When inserting large data sets it's best to use PostgreSQL's [COPY](https://www.postgresql.org/docs/current/sql-copy.html) command.
+When inserting large data sets it's best to use Postgres's [COPY](https://www.postgresql.org/docs/current/sql-copy.html) command.
 This loads data directly from a file into a table. There are several file formats available for copying data: text, CSV, binary, JSON, etc.
 
 For example, if you wanted to load a CSV file into your movies table:
@@ -343,17 +345,19 @@ Tables can be "joined" together using Foreign Keys.
 
 <Image
   alt="Foreign Keys"
-  zoomable
-  src={{
+
+src={{
     dark: '/docs/img/database/managing-tables/joining-tables.png',
     light: '/docs/img/database/managing-tables/joining-tables--light.png',
   }}
+width={1600}
+height={1145}
 />
 
 This is where the "Relational" naming comes from, as data typically forms some sort of relationship.
 
 In our "movies" example above, we might want to add a "category" for each movie (for example, "Action", or "Documentary").
-Let's create a new table called `categories` and "link" our `movies` table.
+Create a new table called `categories` and link it to the `movies` table.
 
 ```sql
 create table categories (
@@ -421,11 +425,13 @@ Tables belong to `schemas`. Schemas are a way of organizing your tables, often f
 
 <Image
   alt="Schemas and tables"
-  zoomable
-  src={{
+
+src={{
     dark: '/docs/img/database/managing-tables/schemas.png',
     light: '/docs/img/database/managing-tables/schemas--light.png',
   }}
+width={1600}
+height={1145}
 />
 
 If you don't explicitly pass a schema when creating a table, Postgres will assume that you want to create the table in the `public` schema.

@@ -1,10 +1,14 @@
 ---
 id: 'pgjwt'
 title: 'pgjwt: JSON Web Tokens'
-description: 'Encode and decode JWTs in PostgreSQL'
+description: 'Encode and decode JWTs in Postgres'
 ---
 
-{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
+<Admonition type="note">
+
+Supabase creates and handles JWT for you. It is built into the platform. **If you use Postgres version 15 or earlier**, you don't need the pgjwt extension, and it is safe to disable. For more information on how Supabase handles JWTs, read the [Supabase and JWTs documentation](/docs/guides/auth/jwts#supabase-and-jwts)
+
+</Admonition>
 
 <Admonition type="deprecation">
 
@@ -51,8 +55,8 @@ It's good practice to create the extension within a separate schema (like `exten
 
 ## API
 
-- [`sign(payload json, secret text, algorithm text default 'HSA256')`](https://github.com/michelp/pgjwt#usage): Signs a JWT containing _payload_ with _secret_ using _algorithm_.
-- [`verify(token text, secret text, algorithm text default 'HSA256')`](https://github.com/michelp/pgjwt#usage): Decodes a JWT _token_ that was signed with _secret_ using _algorithm_.
+- [`sign(payload json, secret text, algorithm text default 'HS256')`](https://github.com/michelp/pgjwt#usage): Signs a JWT containing _payload_ with _secret_ using _algorithm_.
+- [`verify(token text, secret text, algorithm text default 'HS256')`](https://github.com/michelp/pgjwt#usage): Decodes a JWT _token_ that was signed with _secret_ using _algorithm_.
 
 Where:
 

@@ -1,10 +1,12 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
+
 // End of third-party imports
 
-import type { ExtendedSupportCategories } from 'components/interfaces/Support/Support.constants'
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import type { ExtendedSupportCategories } from '@/components/interfaces/Support/Support.constants'
+import { handleError, post } from '@/data/fetchers'
+import { ResponseError } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type sendSupportTicketVariables = {
   subject: string
@@ -20,7 +22,11 @@ export type sendSupportTicketVariables = {
   siteUrl?: string
   additionalRedirectUrls?: string
   dashboardSentryIssueId?: string
+  dashboardLogs?: string
+  dashboardStudioVersion?: string
 }
+
+const RATE_LIMIT_FALLBACK_SECONDS = 60
 
 export async function sendSupportTicket({
   subject,
@@ -36,8 +42,10 @@ export async function sendSupportTicket({
   siteUrl,
   additionalRedirectUrls,
   dashboardSentryIssueId,
+  dashboardLogs,
+  dashboardStudioVersion,
 }: sendSupportTicketVariables) {
-  const { data, error } = await post('/platform/feedback/send', {
+  const { data, error, response } = await post('/platform/feedback/send', {
     body: {
       subject,
       message,
@@ -54,10 +62,26 @@ export async function sendSupportTicket({
       browserInformation,
       allowSupportAccess,
       dashboardSentryIssueId,
+      dashboardLogs,
+      dashboardStudioVersion,
     },
   })
 
   if (error) {
+    const httpResponse: unknown = response
+    if (httpResponse instanceof Response && httpResponse.status === 429) {
+      const resetHeader =
+        httpResponse.headers.get('Retry-After') ?? httpResponse.headers.get('X-RateLimit-Reset')
+      const parsedReset = resetHeader ? parseInt(resetHeader, 10) : NaN
+      const waitSeconds = Number.isFinite(parsedReset) ? parsedReset : RATE_LIMIT_FALLBACK_SECONDS
+      throw new ResponseError(
+        `You have submitted too many support requests. Please try again in ${waitSeconds} second${waitSeconds === 1 ? '' : 's'}.`,
+        429,
+        undefined,
+        waitSeconds
+      )
+    }
+
     handleError(error, {
       alwaysCapture: true,
       sentryContext: {

@@ -1,30 +1,22 @@
+import { useParams } from 'common'
 import { toString as CronToString } from 'cronstrue'
 import { Edit3, List } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import { useCronJobQuery } from 'data/database-cron-jobs/database-cron-job-query'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
 import {
-  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
-  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
-  BreadcrumbList_Shadcn_ as BreadcrumbList,
-  BreadcrumbPage_Shadcn_ as BreadcrumbPage,
-  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
   Button,
   cn,
-  CodeBlock,
-  Sheet,
-  SheetContent,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 import {
   PageHeader,
   PageHeaderAside,
@@ -34,10 +26,14 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { CreateCronJobSheet } from './CreateCronJobSheet/CreateCronJobSheet'
 import { isSecondsFormat, parseCronJobCommand } from './CronJobs.utils'
 import { PreviousRunsTab } from './PreviousRunsTab'
+import { useCronJobQuery } from '@/data/database-cron-jobs/database-cron-job-query'
+import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const CronJobPage = () => {
   const router = useRouter()
@@ -49,7 +45,7 @@ export const CronJobPage = () => {
 
   const jobId = Number(childId)
 
-  const { data: job, isLoading } = useCronJobQuery({
+  const { data: job, isPending: isLoading } = useCronJobQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id: jobId,
@@ -64,15 +60,6 @@ export const CronJobPage = () => {
   const edgeFunctionSlug = edgeFunction?.split('/functions/v1/').pop()
   const isValidEdgeFunction = edgeFunctions.some((x) => x.slug === edgeFunctionSlug)
 
-  const [isDirty, setIsDirty] = useState(false)
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
-    checkIsDirty: () => isDirty,
-    onClose: () => {
-      setIsDirty(false)
-      setIsEditSheetOpen(false)
-    },
-  })
-
   const pageTitle = childLabel || childId || 'Cron Job'
 
   const pageSubtitle = job ? (
@@ -83,7 +70,7 @@ export const CronJobPage = () => {
           <span className="cursor-pointer underline decoration-dotted lowercase">
             {isSecondsFormat(job.schedule)
               ? job.schedule.toLowerCase()
-              : CronToString(job.schedule.toLowerCase())}
+              : CronToString(job.schedule.toLowerCase().replace(/\$/g, 'L'))}
           </span>
         </TooltipTrigger>
         <TooltipContent side="bottom" align="center">
@@ -127,13 +114,13 @@ export const CronJobPage = () => {
   const secondaryActions = [
     <Button
       key="edit"
-      type="outline"
+      variant="outline"
       icon={<Edit3 strokeWidth={1.5} size="14" />}
       onClick={() => setIsEditSheetOpen(true)}
     >
       Edit
     </Button>,
-    <Button key="view-logs" asChild type="outline" icon={<List strokeWidth={1.5} size="14" />}>
+    <Button key="view-logs" asChild variant="outline" icon={<List strokeWidth={1.5} size="14" />}>
       <Link
         target="_blank"
         rel="noopener noreferrer"
@@ -144,7 +131,7 @@ export const CronJobPage = () => {
     </Button>,
     ...(isValidEdgeFunction
       ? [
-          <Button key="view-edge-logs" asChild type="outline">
+          <Button key="view-edge-logs" asChild variant="outline">
             <Link
               target="_blank"
               rel="noopener noreferrer"
@@ -189,42 +176,16 @@ export const CronJobPage = () => {
           {secondaryActions.length > 0 && <PageHeaderAside>{secondaryActions}</PageHeaderAside>}
         </PageHeaderMeta>
       </PageHeader>
+
       <PreviousRunsTab />
 
-      <Sheet open={isEditSheetOpen} onOpenChange={setIsEditSheetOpen}>
-        <SheetContent size="lg">
-          {job && (
-            <CreateCronJobSheet
-              selectedCronJob={{
-                jobname: job.jobname,
-                schedule: job.schedule,
-                active: job.active,
-                command: job.command,
-              }}
-              supportsSeconds={true}
-              onDirty={setIsDirty}
-              onClose={() => setIsEditSheetOpen(false)}
-              onCloseWithConfirmation={confirmOnClose}
-            />
-          )}
-        </SheetContent>
-      </Sheet>
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
+      {job && (
+        <CreateCronJobSheet
+          open={isEditSheetOpen}
+          selectedCronJob={job}
+          onClose={() => setIsEditSheetOpen(false)}
+        />
+      )}
     </>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)

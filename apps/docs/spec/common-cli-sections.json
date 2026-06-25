@@ -208,6 +208,12 @@
         "title": "Apply pending migration files",
         "slug": "supabase-migration-up",
         "type": "cli-command"
+      },
+      {
+        "id": "supabase-migration-down",
+        "title": "Reset migrations to a prior version",
+        "slug": "supabase-migration-down",
+        "type": "cli-command"
       }
     ]
   },
@@ -875,6 +881,18 @@
         "id": "supabase-completion-bash",
         "title": "Generate bash script",
         "slug": "supabase-completion-bash",
+        "type": "cli-command"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Telemetry",
+    "items": [
+      {
+        "id": "supabase-telemetry",
+        "title": "Manage CLI telemetry settings",
+        "slug": "supabase-telemetry",
         "type": "cli-command"
       }
     ]

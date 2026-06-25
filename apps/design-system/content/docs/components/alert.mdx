@@ -1,57 +1,24 @@
 ---
 title: Alert
-description: Displays a callout for user attention.
+description: Displays a low-level callout primitive for user attention.
 component: true
 source:
   radix: true
   shadcn: true
 ---
 
-The primitive component that forms [Admonition](../fragments/admonition). Do not use this component unless you are intentionally deviating from our consistent callout pattern.
+Alert is the low-level shadcn primitive that forms the foundation for [Admonition](../fragments/admonition). Use Admonition for product callouts unless you need custom composition that the Admonition API does not support.
 
-<ComponentPreview
-  name="alert-demo"
-  description="An alert with an icon, title and description. The title says 'Heads up!' and the description is 'You can add components to your app using the cli.'."
-  peekCode
-  wide
-/>
+Examples where Alert may be appropriate include bespoke icons, custom internal layouts, or wrapper components that need direct access to `alertVariants`.
 
-## Installation
+Use [Collapsible Alert](../fragments/collapsible-alert) when a callout also needs expandable detail. Use [Collapsible](./collapsible) only for generic disclosure behaviour that is not itself an alert.
 
-<Tabs defaultValue="cli">
-
-<TabsList>
-  <TabsTrigger value="cli">CLI</TabsTrigger>
-  <TabsTrigger value="manual">Manual</TabsTrigger>
-</TabsList>
-<TabsContent value="cli">
-
-```bash
-npx shadcn-ui@latest add alert
-```
-
-</TabsContent>
-
-<TabsContent value="manual">
-
-<Steps>
-
-<Step>Copy and paste the following code into your project.</Step>
-
-<ComponentSource name="alert" />
-
-<Step>Update the import paths to match your project setup.</Step>
-
-</Steps>
-
-</TabsContent>
-
-</Tabs>
+<ComponentPreview name="alert-demo" peekCode wide />
 
 ## Usage
 
 ```tsx
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Alert, AlertDescription, AlertTitle } from 'ui/src/components/shadcn/ui/alert'
 ```
 
 ```tsx
@@ -64,18 +31,10 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 </Alert>
 ```
 
-## Examples
+### Variants
 
-### Default
+Use `alertVariants` when building shared wrappers around the primitive.
 
-<ComponentPreview
-  name="alert-demo"
-  description="An alert with an icon, title and description. The title says 'Heads up!' and the description is 'You can add components to your app using the cli.'."
-/>
-
-### Destructive
-
-<ComponentPreview
-  name="alert-destructive"
-  description="An alert with a destructive variant. The title says 'Delete this item?' and the description is 'This action cannot be undone.'."
-/>
+```tsx
+import { alertVariants } from 'ui/src/components/shadcn/ui/alert'
+```

@@ -1,15 +1,15 @@
+import { useIsLoggedIn, useIsMFAEnabled, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import { toast } from 'sonner'
 
-import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsMFAEnabled, useParams } from 'common'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { useDashboardHistory } from 'hooks/misc/useDashboardHistory'
-import useLatest from 'hooks/misc/useLatest'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { IS_PLATFORM } from 'lib/constants'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
+import useLatest from '@/hooks/misc/useLatest'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
 
 // Ideally these could all be within a _middleware when we use Next 12
 export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
@@ -21,10 +21,7 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   const isUserMFAEnabled = useIsMFAEnabled()
 
   const { setLastVisitedSnippet, setLastVisitedTable } = useDashboardHistory()
-  const [lastVisitedOrganization, setLastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization, setLastVisitedOrganization } = useLastVisitedOrganization()
 
   const DEFAULT_HOME = IS_PLATFORM
     ? !!lastVisitedOrganization
@@ -53,7 +50,7 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
     return excemptUrls.includes(router?.pathname)
   }
 
-  const { isError: isErrorProject } = useProjectDetailQuery({ ref })
+  const { isError: isErrorProject, error: projectError } = useProjectDetailQuery({ ref })
 
   const { data: organizations, isSuccess: orgsInitialized } = useOrganizationsQuery({
     enabled: isLoggedIn,
@@ -70,8 +67,8 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       const isValidOrg = organizations.some((org) => org.slug === slug)
 
       if (!isValidOrg) {
-        toast.error("We couldn't find that organization")
-        router.push(`${DEFAULT_HOME}?error=org_not_found&org=${slug}`)
+        toast.error('You do not have access to this organization')
+        router.push(DEFAULT_HOME)
         return
       }
     }
@@ -83,7 +80,10 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
     // A successful request to project details will validate access to both project and branches
     if (!!ref && isErrorProject) {
-      toast.error('This project does not exist')
+      // 404 means the project no longer exists (e.g. was deleted), not an access error
+      if (projectError?.code !== 404) {
+        toast.error('You do not have access to this project')
+      }
       router.push(DEFAULT_HOME)
       return
     }

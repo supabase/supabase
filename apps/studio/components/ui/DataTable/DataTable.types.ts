@@ -1,7 +1,10 @@
+import type { ReactNode } from 'react'
+
 // TODO: we could type the value(!) especially when using enums
 export type Option = {
   label: string
-  value: string | boolean | number | undefined
+  value: string
+  options?: Option[]
 }
 
 export type DatePreset = {
@@ -18,7 +21,7 @@ export type Input = {
 
 export type Checkbox = {
   type: 'checkbox'
-  component?: (props: Option) => JSX.Element | null
+  component?: (props: Option) => ReactNode
   options?: Option[]
 }
 
@@ -52,6 +55,8 @@ export type Base<TData> = {
   commandDisabled?: boolean
   hasDynamicOptions?: boolean
   hasAsyncSearch?: boolean
+  /** Defines if the filter should be present in the filter nav */
+  hidden?: boolean
 }
 
 export type DataTableCheckboxFilterField<TData> = Base<TData> & Checkbox

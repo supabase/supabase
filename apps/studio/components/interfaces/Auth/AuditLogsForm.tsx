@@ -1,28 +1,10 @@
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { boolean, object } from 'yup'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Form_Shadcn_,
-  Switch,
-} from 'ui'
+import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -32,9 +14,18 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import * as z from 'zod'
 
-const schema = object({
-  AUDIT_LOG_DISABLE_POSTGRES: boolean().required(),
+import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+const schema = z.object({
+  AUDIT_LOG_DISABLE_POSTGRES: z.boolean(),
 })
 
 const AUDIT_LOG_ENTRIES_TABLE = 'audit_log_entries'
@@ -60,7 +51,7 @@ export const AuditLogsForm = () => {
     data: authConfig,
     error: authConfigError,
     isError,
-    isLoading,
+    isPending: isLoading,
   } = useAuthConfigQuery({ projectRef })
 
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
@@ -73,9 +64,10 @@ export const AuditLogsForm = () => {
   })
 
   const form = useForm({
-    resolver: yupResolver(schema),
+    resolver: zodResolver(schema),
     defaultValues: { AUDIT_LOG_DISABLE_POSTGRES: false },
   })
+  const { isDirty } = form.formState
   const { AUDIT_LOG_DISABLE_POSTGRES: formValueDisablePostgres } = form.watch()
   const currentlyDisabled = authConfig?.AUDIT_LOG_DISABLE_POSTGRES ?? false
   const isDisabling = !currentlyDisabled && formValueDisablePostgres
@@ -122,11 +114,11 @@ export const AuditLogsForm = () => {
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmitAuditLogs)} className="space-y-4">
             <Card>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="AUDIT_LOG_DISABLE_POSTGRES"
                   render={({ field }) => (
@@ -156,13 +148,13 @@ export const AuditLogsForm = () => {
                         </p>
                       }
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Switch
                           checked={!field.value}
                           onCheckedChange={(value) => field.onChange(!value)}
                           disabled={!canUpdateConfig}
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -171,33 +163,36 @@ export const AuditLogsForm = () => {
                     type="warning"
                     className="mt-4"
                     title="Disabling PostgreSQL storage will not automatically migrate or transfer existing audit log data"
-                  >
-                    <p className="!mb-0 !leading-normal prose text-foreground-light text-sm max-w-full">
-                      Future audit logs will only appear in the project's{' '}
-                      <InlineLink
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        href={`/project/${projectRef}/logs/explorer?q=select%0A++cast(timestamp+as+datetime)+as+timestamp%2C%0A++event_message%2C+metadata+%0Afrom+auth_audit_logs+%0Alimit+10%0A`}
-                      >
-                        auth logs
-                      </InlineLink>
-                      . You are responsible for backing up, copying, or migrating existing data from
-                      the <code>{AUDIT_LOG_ENTRIES_TABLE}</code> table if needed.
-                    </p>
-                  </Admonition>
+                    description={
+                      <p>
+                        Future audit logs will only appear in the project’s{' '}
+                        <InlineLink
+                          href={`/project/${projectRef}/logs/explorer?q=select%0A++cast(timestamp+as+datetime)+as+timestamp%2C%0A++event_message%2C+metadata+%0Afrom+auth_audit_logs+%0Alimit+10%0A`}
+                        >
+                          auth logs
+                        </InlineLink>
+                        . You are responsible for backing up, copying, or migrating existing data
+                        from the{' '}
+                        <code className="text-code-inline break-keep!">
+                          {AUDIT_LOG_ENTRIES_TABLE}
+                        </code>{' '}
+                        table if needed.
+                      </p>
+                    }
+                  />
                 )}
               </CardContent>
 
               <CardFooter className="justify-end space-x-2">
-                {form.formState.isDirty && (
-                  <Button type="default" onClick={() => form.reset()}>
+                {isDirty && (
+                  <Button variant="default" onClick={() => form.reset()}>
                     Cancel
                   </Button>
                 )}
                 <Button
-                  type="primary"
-                  htmlType="submit"
-                  disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
+                  variant="primary"
+                  type="submit"
+                  disabled={!canUpdateConfig || isUpdatingConfig || !isDirty}
                   loading={isUpdatingConfig}
                 >
                   Save changes
@@ -205,7 +200,7 @@ export const AuditLogsForm = () => {
               </CardFooter>
             </Card>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </PageSectionContent>
     </PageSection>
   )

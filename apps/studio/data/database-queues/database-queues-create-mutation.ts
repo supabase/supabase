@@ -1,10 +1,15 @@
+import { ident, literal, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import { tableKeys } from 'data/tables/keys'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { databaseQueuesKeys } from './keys'
+import {
+  isQueueNameValid,
+  pgmqQueueTable,
+} from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { tableKeys } from '@/data/tables/keys'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueueCreateVariables = {
   projectRef: string
@@ -26,19 +31,29 @@ export async function createDatabaseQueue({
   enableRls,
   configuration,
 }: DatabaseQueueCreateVariables) {
+  if (!isQueueNameValid(name)) {
+    throw new Error(
+      'Invalid queue name: must contain only alphanumeric characters, underscores, and hyphens'
+    )
+  }
+
   const { partitionInterval, retentionInterval } = configuration ?? {}
 
-  const query =
+  const createFragment =
     type === 'partitioned'
-      ? `select from pgmq.create_partitioned('${name}', '${partitionInterval}', '${retentionInterval}');`
+      ? safeSql`select from pgmq.create_partitioned(${literal(name)}, ${literal(partitionInterval)}, ${literal(retentionInterval)});`
       : type === 'unlogged'
-        ? `SELECT pgmq.create_unlogged('${name}');`
-        : `SELECT pgmq.create('${name}');`
+        ? safeSql`SELECT pgmq.create_unlogged(${literal(name)});`
+        : safeSql`SELECT pgmq.create(${literal(name)});`
+
+  const rlsFragment = enableRls
+    ? safeSql` alter table ${ident('pgmq')}.${ident(pgmqQueueTable(name))} enable row level security;`
+    : safeSql``
 
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `${query} ${enableRls ? `alter table pgmq."q_${name}" enable row level security;` : ''}`.trim(),
+    sql: safeSql`${createFragment}${rlsFragment}`,
     queryKey: databaseQueuesKeys.create(),
   })
 

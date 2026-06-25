@@ -1,21 +1,22 @@
 import fs from 'fs'
-
-import { useRouter } from 'next/router'
-import Head from 'next/head'
-
-import { NextSeo } from 'next-seo'
-import { generateRss } from '~/lib/rss'
-import { getSortedPosts } from '~/lib/posts'
-
 import DefaultLayout from '~/components/Layouts/Default'
+import { getSortedPosts } from '~/lib/posts'
+import { generateRss } from '~/lib/rss'
+import styles from '~/styles/customers.module.css'
 import type PostTypes from '~/types/post'
 import { motion } from 'framer-motion'
-import styles from '~/styles/customers.module.css'
+import { NextSeo } from 'next-seo'
+import Head from 'next/head'
 import Link from 'next/link'
-import { GlassPanel } from 'ui-patterns/GlassPanel'
-import CustomersFilters from '../components/CustomerStories/CustomersFilters'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, cn } from 'ui'
+import { GlassPanel } from 'ui-patterns/GlassPanel'
+
+import CustomersFilters from '../components/CustomerStories/CustomersFilters'
+import SectionContainer from '../components/Layouts/SectionContainer'
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 
 export async function getStaticProps() {
   const allPostsData: any[] = getSortedPosts({ directory: '_customers' })
@@ -99,6 +100,12 @@ function CustomerStoriesPage(props: any) {
           title="RSS feed for customer stories"
           href={`${basePath}/customers-rss.xml`}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.customersIndex)),
+          }}
+        />
       </Head>
       <NextSeo
         title={meta.title}
@@ -116,7 +123,7 @@ function CustomerStoriesPage(props: any) {
       />
       <DefaultLayout>
         <div className="relative z-0 bg-background overflow-hidden">
-          <div className="container mx-auto mt-28 sm:mt-44 px-4 xl:px-20">
+          <SectionContainer className="pt-0! pb-0! mt-28 sm:mt-44">
             <div className="mx-auto relative z-10">
               <motion.div
                 className="mx-auto sm:max-w-2xl text-center flex flex-col items-center mb-12"
@@ -171,13 +178,13 @@ function CustomerStoriesPage(props: any) {
                 )}
               </div>
             </div>
-            <div
-              className={cn(
-                'absolute inset-0 h-[150px] sm:h-[300px] bg-background z-0 after:!bg-background',
-                styles['bg-visual']
-              )}
-            />
-          </div>
+          </SectionContainer>
+          <div
+            className={cn(
+              'absolute inset-0 h-[150px] sm:h-[300px] bg-background z-0 after:bg-background!',
+              styles['bg-visual']
+            )}
+          />
         </div>
       </DefaultLayout>
     </>

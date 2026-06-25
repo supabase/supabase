@@ -1,14 +1,13 @@
+import { Query } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { Query } from '@supabase/pg-meta/src/query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { RoleImpersonationState, wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { tableRowKeys } from './keys'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
+import { useTrack } from '@/lib/telemetry/track'
+import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type TableRowCreateVariables = {
   projectRef: string
@@ -67,31 +66,22 @@ export const useTableRowCreateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  const { mutate: sendEvent } = useSendEventMutation()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   return useMutation<TableRowCreateData, ResponseError, TableRowCreateVariables>({
     mutationFn: (vars) => createTableRow(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, table } = variables
 
-      // Track data insertion event
-      try {
-        sendEvent({
-          action: 'table_data_added',
-          properties: {
-            method: 'table_editor',
-            schema_name: table.schema,
-            table_name: table.name,
-          },
-          groups: {
-            project: projectRef,
-            ...(org?.slug && { organization: org.slug }),
-          },
-        })
-      } catch (error) {
-        console.error('Failed to track table data insertion event:', error)
-      }
+      track(
+        'table_data_added',
+        {
+          method: 'table_editor',
+          schema_name: table.schema,
+          table_name: table.name,
+        },
+        { project: projectRef }
+      )
 
       await queryClient.invalidateQueries({
         queryKey: tableRowKeys.tableRowsAndCount(projectRef, table.id),

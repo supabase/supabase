@@ -1,6 +1,6 @@
+import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react'
 import type { ComponentProps } from 'react'
 import * as React from 'react'
-import { ArrowDown, ArrowUp, ChevronsUpDown } from 'lucide-react'
 
 import { cn } from '../../../lib/utils/cn'
 import { ShadowScrollArea } from '../../ShadowScrollArea'
@@ -44,11 +44,7 @@ const TableFooter = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <tfoot
-    ref={ref}
-    className={cn('bg-primary font-medium text-primary-foreground', className)}
-    {...props}
-  />
+  <tfoot ref={ref} className={cn('border-t font-medium', className)} {...props} />
 ))
 TableFooter.displayName = 'TableFooter'
 
@@ -57,7 +53,7 @@ const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTML
     <tr
       ref={ref}
       className={cn(
-        'border-b [&>td]:hover:bg-surface-200 data-[state=selected]:bg-muted',
+        'border-b group data-[state=selected]:bg-muted hover:bg-surface-200',
         className
       )}
       {...props}
@@ -74,6 +70,8 @@ const TableHead = React.forwardRef<
     ref={ref}
     className={cn(
       'h-10 px-4 text-left align-middle heading-meta whitespace-nowrap text-foreground-lighter [&:has([role=checkbox])]:pr-0',
+      // Transition text color when NoSearchResults or NoFilterResults empty state is shown
+      'transition-colors',
       className
     )}
     {...props}
@@ -124,7 +122,7 @@ function TableHeadSort<TColumn extends string = string>({
           className={cn(
             baseIconClass,
             'transition-opacity opacity-80 md:opacity-40',
-            !isActive ? 'group-hover/table-head-sort:opacity-80' : '!opacity-0'
+            !isActive ? 'group-hover/table-head-sort:opacity-80' : 'opacity-0!'
           )}
         />
       </>
@@ -135,7 +133,7 @@ function TableHeadSort<TColumn extends string = string>({
     <button
       type="button"
       className={cn(
-        'group/table-head-sort heading-meta whitespace-nowrap flex items-center gap-1 cursor-pointer select-none !bg-transparent border-none p-0 w-full text-left',
+        'group/table-head-sort heading-meta whitespace-nowrap flex items-center gap-1 cursor-pointer select-none bg-transparent! border-none p-0 w-full text-left',
         className
       )}
       onClick={() => onSortChange(column)}
@@ -163,7 +161,16 @@ const TableCaption = React.forwardRef<
   HTMLTableCaptionElement,
   React.HTMLAttributes<HTMLTableCaptionElement>
 >(({ className, ...props }, ref) => (
-  <caption ref={ref} className={cn('mt-4 text-sm text-foreground-muted', className)} {...props} />
+  <caption
+    ref={ref}
+    className={cn(
+      'border-t', // TableCaption is aligned by parent Table at caption-bottom
+      'p-4 text-sm text-foreground-muted', // Match styling of TableCell
+      className
+    )}
+    // Should only contain inline elements
+    {...props}
+  />
 ))
 TableCaption.displayName = 'TableCaption'
 

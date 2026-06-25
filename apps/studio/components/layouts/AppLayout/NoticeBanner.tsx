@@ -1,71 +1,87 @@
-import Link from 'next/link'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
+import { TimestampInfo } from 'ui-patterns'
 
-import { useAppBannerContext } from 'components/interfaces/App/AppBannerWrapperContext'
-import { Button, WarningIcon, cn } from 'ui'
+import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-// This file, like AppBannerWrapperContext.tsx, is meant to be dynamic - update this as and when we need to use the NoticeBanner
-// We can disable this banner after 23rd November 2025 as the maintenance window is complete
+// Update this whenever the banner content below changes so old client bundles
+// stop displaying outdated notices after the relevant date passes.
+const BANNER_EXPIRES_AT = new Date('2026-06-09T15:00:00Z')
 
+const SUPAVISOR_UPDATE_REGIONS = {
+  'eu-central-1': {
+    start: Date.UTC(2026, 4, 26, 13, 0, 0),
+    end: Date.UTC(2026, 4, 26, 15, 0, 0),
+    url: 'https://status.supabase.com/incidents/jy1tm4wfs68t',
+  },
+  'eu-west-2': {
+    start: Date.UTC(2026, 5, 9, 13, 0, 0),
+    end: Date.UTC(2026, 5, 9, 15, 0, 0),
+    url: 'https://status.supabase.com/incidents/3t293hpd545z',
+  },
+  'us-west-1': {
+    start: Date.UTC(2026, 5, 2, 16, 0, 0),
+    end: Date.UTC(2026, 5, 2, 18, 0, 0),
+    url: 'https://status.supabase.com/incidents/8f72bnv3xs8r',
+  },
+  'us-east-1': {
+    start: Date.UTC(2026, 5, 3, 13, 0, 0),
+    end: Date.UTC(2026, 5, 3, 15, 0, 0),
+    url: 'https://status.supabase.com/incidents/y8rp6dwjyplw',
+  },
+}
+
+/**
+ * Used to display urgent notices that apply for all users, such as maintenance windows.
+ */
 export const NoticeBanner = () => {
   const router = useRouter()
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
 
-  const appBannerContext = useAppBannerContext()
-  const { maintenanceWindowBannerAcknowledged, onUpdateAcknowledged } = appBannerContext
+  const [bannerAcknowledged, setBannerAcknowledged, { isSuccess }] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SUPAVISOR_MAINTENANCE(ref ?? ''),
+    false
+  )
 
-  const acknowledged = maintenanceWindowBannerAcknowledged
+  const region = project?.region ?? ''
+  const maintenanceWindow =
+    SUPAVISOR_UPDATE_REGIONS[region as keyof typeof SUPAVISOR_UPDATE_REGIONS]
 
-  if (router.pathname.includes('sign-in') || acknowledged) {
+  if (
+    Date.now() >= BANNER_EXPIRES_AT.getTime() ||
+    router.pathname.includes('sign-in') ||
+    !isSuccess ||
+    !project ||
+    !maintenanceWindow ||
+    bannerAcknowledged
+  ) {
     return null
   }
 
   return (
-    <div
-      className={cn(
-        'relative bg-warning-300 dark:bg-warning-200 border-b border-muted py-1 flex items-center justify-center flex-shrink-0 px-0'
-      )}
-    >
-      <div className="absolute inset-y-0 left-0 right-0 overflow-hidden z-0">
-        <div
-          className="absolute inset-0 opacity-[0.8%]"
-          style={{
-            background: `repeating-linear-gradient(
-                  45deg,
-                  currentColor,
-                  currentColor 10px,
-                  transparent 10px,
-                  transparent 20px
-                )`,
-            maskImage: 'linear-gradient(to top, black, transparent)',
-            WebkitMaskImage: 'linear-gradient(to top, black, transparent)',
-          }}
-        />
-      </div>
-      <div className="items-center flex flex-row gap-3 z-[1]">
-        <WarningIcon className="z-[1] flex-shrink-0" />
-        <div className="flex-1 text-xs sm:text-sm z-[1] text-warning">
-          Urgent Dashboard and Management API maintenance between 23:00 UTC on Nov 21, 2025 and
-          23:00 UTC on Nov 23, 2025. For full details,{' '}
-          <Link
-            href="https://status.supabase.com/incidents/z0l2157y33xk"
-            target="_blank"
-            rel="noreferrer"
-            className="opacity-75 hover:opacity-100 underline"
-          >
-            check here
-          </Link>
+    <HeaderBanner
+      variant="note"
+      title="Upcoming maintenance"
+      description={
+        <>
+          Shared pooler maintenance in{' '}
+          <a target="_blank" rel="noopener referrer" href={maintenanceWindow.url}>
+            {project.region}
+          </a>{' '}
+          on{' '}
+          <TimestampInfo
+            className="text-sm"
+            utcTimestamp={maintenanceWindow.start}
+            label={dayjs(maintenanceWindow.start).format('DD MMM, HH:mm')}
+          />
           .
-        </div>
-        <Button
-          type="text"
-          className="opacity-75 z-[1] flex-shrink-0"
-          onClick={() => {
-            onUpdateAcknowledged('maintenance-window-banner-2025-11-21')
-          }}
-        >
-          Dismiss
-        </Button>
-      </div>
-    </div>
+        </>
+      }
+      onDismiss={() => setBannerAcknowledged(true)}
+    />
   )
 }

@@ -1,4 +1,5 @@
 import { z } from 'zod'
+
 import { NEW_NAMESPACE_MARKER } from './CreateTableSheet.constants'
 
 const getValidRegex = (type: 'namespace' | 'table') =>
@@ -68,6 +69,35 @@ export const createFormSchema = () =>
           })
         }
       }
+
+      data.columns.forEach((column, index) => {
+        if (column.type === 'decimal') {
+          if (column.precision == null) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'Required',
+              path: [`columns.${index}.precision`],
+            })
+          }
+          if (column.scale == null) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'Required',
+              path: [`columns.${index}.scale`],
+            })
+          }
+        }
+
+        if (column.type === 'fixed') {
+          if (column.length == null) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: 'Required',
+              path: [`columns.${index}.length`],
+            })
+          }
+        }
+      })
 
       if (data.name) {
         const newTableError = validateName({ name: data.name, type: 'table' })

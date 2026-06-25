@@ -1,15 +1,14 @@
-import { useParams } from 'common/hooks'
-import { BannerCard } from '../BannerCard'
-import { useTrack } from 'lib/telemetry/track'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { Badge } from 'ui'
-import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
-import React from 'react'
-import { Button } from 'ui'
+import { useParams } from 'common/hooks'
 import Link from 'next/link'
-import { DOCS_URL } from 'lib/constants'
+import { Badge, Button } from 'ui'
+
+import { BannerCard } from '../BannerCard'
 import { useBannerStack } from '../BannerStackProvider'
+import { AnimatedLogos } from '@/components/interfaces/LogDrains/AnimatedLogos'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const BannerMetricsAPI = () => {
   const { ref } = useParams()
@@ -24,7 +23,7 @@ export const BannerMetricsAPI = () => {
       onDismiss={() => {
         setIsDismissed(true)
         dismissBanner('metrics-api-banner')
-        track('observability_banner_dismiss_button_clicked')
+        track('metrics_api_banner_dismiss_button_clicked')
       }}
     >
       <div className="flex flex-col gap-y-4">
@@ -32,13 +31,7 @@ export const BannerMetricsAPI = () => {
           <Badge variant="success" className="-ml-0.5 uppercase inline-flex items-center mb-2">
             Beta
           </Badge>
-          <div className="flex items-center gap-4">
-            {LOG_DRAIN_TYPES.filter((type) => type.value !== 'sentry').map((type) => (
-              <React.Fragment key={type.value}>
-                {React.cloneElement(type.icon, { height: 20, width: 20 })}
-              </React.Fragment>
-            ))}
-          </div>
+          <AnimatedLogos iconSize={20} className="h-[22px]!" />
         </div>
         <div className="flex flex-col gap-y-1 mb-2">
           <p className="text-sm font-medium">Export Metrics to your dashboards</p>
@@ -47,11 +40,11 @@ export const BannerMetricsAPI = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button type="default" size="tiny" asChild>
+          <Button variant="default" size="tiny" asChild>
             <Link
               href={`${DOCS_URL}/guides/telemetry/metrics`}
               target="_blank"
-              onClick={() => track('observability_banner_cta_button_clicked')}
+              onClick={() => track('metrics_api_banner_cta_button_clicked')}
             >
               Get started for free
             </Link>

@@ -1,11 +1,10 @@
 'use client'
 
-import * as React from 'react'
 import { Minus, Plus } from 'lucide-react'
+import * as React from 'react'
 import { Bar, BarChart, ResponsiveContainer } from 'recharts'
-
-import { Button } from 'ui'
 import {
+  Button,
   Drawer,
   DrawerClose,
   DrawerContent,
@@ -68,7 +67,7 @@ export default function DrawerDemo() {
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <Button type="default" size="small">
+        <Button variant="default" size="small">
           Open Drawer
         </Button>
       </DrawerTrigger>
@@ -81,7 +80,7 @@ export default function DrawerDemo() {
           <div className="p-4 pb-0">
             <div className="flex items-center justify-center space-x-2">
               <Button
-                type="outline"
+                variant="outline"
                 size="small"
                 className="h-8 w-8 shrink-0 rounded-full"
                 onClick={() => onClick(-10)}
@@ -95,7 +94,7 @@ export default function DrawerDemo() {
                 <div className="text-[0.70rem] uppercase text-muted-foreground">Calories/day</div>
               </div>
               <Button
-                type="outline"
+                variant="outline"
                 size="small"
                 className="h-8 w-8 shrink-0 rounded-full"
                 onClick={() => onClick(10)}
@@ -124,7 +123,7 @@ export default function DrawerDemo() {
           <DrawerFooter>
             <Button>Submit</Button>
             <DrawerClose asChild>
-              <Button type="outline">Cancel</Button>
+              <Button variant="outline">Cancel</Button>
             </DrawerClose>
           </DrawerFooter>
         </div>

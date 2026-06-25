@@ -1,8 +1,9 @@
-import SqlEditor from 'components/ui/SqlEditor'
 import { isEmpty, noop } from 'lodash'
 import { useState } from 'react'
-import { Button, Modal } from 'ui'
+import { Button, DialogFooter, DialogSection } from 'ui'
+
 import type { PolicyForReview } from './Policies.types'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 
 interface PolicyReviewProps {
   policy: PolicyForReview
@@ -10,7 +11,9 @@ interface PolicyReviewProps {
   onSelectSave: () => void
 }
 
-const PolicyReview = ({
+// [Joshen] This seems like dead code atm, clean up separately
+
+export const PolicyReview = ({
   policy = {},
   onSelectBack = noop,
   onSelectSave = noop,
@@ -25,7 +28,7 @@ const PolicyReview = ({
 
   return (
     <>
-      <Modal.Content>
+      <DialogSection>
         <div className="space-y-6">
           <div className="flex items-center justify-between space-y-8">
             <div className="flex flex-col">
@@ -43,25 +46,33 @@ const PolicyReview = ({
               </div>
             ) : (
               <div className="space-y-2">
-                <span>{policy.description}</span>
+                <p>{policy.description}</p>
                 <div className="h-40">
-                  <SqlEditor readOnly defaultValue={formattedSQLStatement} />
+                  <CodeEditor
+                    hideLineNumbers
+                    isReadOnly
+                    language="pgsql"
+                    defaultValue={formattedSQLStatement}
+                  />
                 </div>
               </div>
             )}
           </div>
         </div>
-      </Modal.Content>
-      <div className="flex w-full items-center justify-end gap-2 border-t px-6 py-4 border-default">
-        <Button type="default" onClick={onSelectBack}>
+      </DialogSection>
+      <DialogFooter>
+        <Button variant="default" onClick={onSelectBack}>
           Back to edit
         </Button>
-        <Button type="primary" disabled={isEmpty(policy)} onClick={onSavePolicy} loading={isSaving}>
+        <Button
+          variant="primary"
+          disabled={isEmpty(policy)}
+          onClick={onSavePolicy}
+          loading={isSaving}
+        >
           Save policy
         </Button>
-      </div>
+      </DialogFooter>
     </>
   )
 }
-
-export default PolicyReview

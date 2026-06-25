@@ -187,7 +187,7 @@ The table below shows the actions each role can take on the resources belonging 
 | Auth Settings                                                                                          | View                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
 |                                                                                                        | Update                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |           <IconX size={14} />           |                       <IconX size={14} />                       |
 | SMTP Settings                                                                                          | View                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
-|                                                                                                        | Update                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |
+|                                                                                                        | Update                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |           <IconX size={14} />           |                       <IconX size={14} />                       |
 | Advanced Settings                                                                                      | View                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
 |                                                                                                        | Update                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |           <IconX size={14} />           |                       <IconX size={14} />                       |
 | <a href="#storage-config-permissions" id="storage-config-permissions">**Storage Configuration**</a>    |                        |                                         |                                         |                                         |                                                                 |
@@ -264,14 +264,22 @@ The table below shows the actions each role can take on the resources belonging 
 | Production Branch                                                                                      | Read                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
 |                                                                                                        | Write                  | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |
 | Development Branches                                                                                   | List                   | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |             <IconCheck size={14} color="#3FCF8E" />             |
-|                                                                                                        | Create                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |
+|                                                                                                        | Create[^8]             | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |
 |                                                                                                        | Update                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |
 |                                                                                                        | Delete                 | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> | <IconCheck size={14} color="#3FCF8E" /> |                       <IconX size={14} />                       |
 
 [^1]: Available on the Team and Enterprise Plans.
+
 [^2]: Sending anonymous data to OpenAI is opt in and can improve Studio AI Assistant's responses.
+
 [^3]: Invites sent from a SSO account can only be accepted by another SSO account coming from the same identity provider. This is a security measure that prevents accidental invites to accounts not managed by your company's enterprise systems.
+
 [^4]: Available on the Team and Enterprise Plans.
+
 [^5]: Read-Only role is able to access secrets.
+
 [^6]: Listed permissions are for the API and Dashboard.
+
 [^7]: Limited to executing SELECT queries. SQL Query Snippets run by the Read-Only role are run against the database using the **supabase_read_only_user**. This role has the [predefined Postgres role pg_read_all_data](https://www.postgresql.org/docs/current/predefined-roles.html).
+
+[^8]: When using dashboard branching without a GitHub integration, the first branch creation also registers the project's production branch — a one-time step that requires Owner or Administrator. See [Branching via the dashboard](/docs/guides/deployment/branching/dashboard) for details. Developers can create, update, and delete branches normally after that.

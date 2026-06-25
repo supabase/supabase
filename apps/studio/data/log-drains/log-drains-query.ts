@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from 'types'
+
 import { logDrainsKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { MAX_RETRY_FAILURE_COUNT } from '@/data/query-client'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type LogDrainsVariables = {
   ref?: string
@@ -37,5 +39,12 @@ export const useLogDrainsQuery = <TData = LogDrainsData>(
     queryFn: ({ signal }) => getLogDrains({ ref }, signal),
     enabled: enabled && !!ref,
     refetchOnMount: false,
+    retry: (failureCount, error) => {
+      if (error.code === 500 || error.message.includes('API error happened')) return false
+      if (failureCount < MAX_RETRY_FAILURE_COUNT) {
+        return true
+      }
+      return false
+    },
     ...options,
   })

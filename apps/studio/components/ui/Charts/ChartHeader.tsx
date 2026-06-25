@@ -1,4 +1,4 @@
-import dayjs from 'dayjs'
+import { useParams } from 'common'
 import {
   Activity,
   BarChartIcon,
@@ -7,17 +7,14 @@ import {
   SquareTerminal,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { cn } from 'ui'
+import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { formatBytes } from 'lib/helpers'
-import { numberFormatter } from './Charts.utils'
+import { formatPercentage, numberFormatter } from './Charts.utils'
 import { useChartHoverState } from './useChartHoverState'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { Badge } from 'ui'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
+import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
 export interface ChartHeaderProps {
   title?: string
@@ -44,6 +41,7 @@ export interface ChartHeaderProps {
   valuePrecision?: number
   shouldFormatBytes?: boolean
   isNetworkChart?: boolean
+  isMemoryChart?: boolean
   attributes?: any[]
   sql?: string
   titleTooltip?: string
@@ -79,14 +77,16 @@ export const ChartHeader = ({
   sql,
   titleTooltip,
   showNewBadge,
+  isMemoryChart,
 }: ChartHeaderProps) => {
-  const { hoveredIndex, isHovered, isCurrentChart, setHover, clearHover } = useChartHoverState(
-    syncId || 'default'
-  )
+  const { ref } = useParams()
+  const { hoveredIndex, isHovered } = useChartHoverState(syncId || 'default')
   const [localHighlightedValue, setLocalHighlightedValue] = useState(highlightedValue)
   const [localHighlightedLabel, setLocalHighlightedLabel] = useState(highlightedLabel)
-  const { ref } = useParams()
-  const router = useRouter()
+
+  // When `displayDateInUtc` is set the chart explicitly wants UTC labels.
+  // Otherwise honour the user's selected timezone via the picker.
+  const formatPickerDate = useFormatDateTime()
 
   const formatHighlightedValue = (value: any) => {
     if (typeof value !== 'number') {
@@ -99,10 +99,22 @@ export const ChartHeader = ({
 
     if (shouldFormatBytes) {
       const bytesValue = isNetworkChart ? Math.abs(value) : value
-      return formatBytes(bytesValue, valuePrecision)
+      return isMemoryChart
+        ? formatBytesMinMB(bytesValue, valuePrecision)
+        : formatBytes(bytesValue, valuePrecision)
     }
 
-    return numberFormatter(value, valuePrecision)
+    if (format === '%') {
+      return formatPercentage(value, valuePrecision)
+    }
+
+    const formattedValue = numberFormatter(value, valuePrecision)
+
+    if (typeof format === 'string' && format) {
+      return `${formattedValue} ${format}`
+    }
+
+    return formattedValue
   }
 
   useEffect(() => {
@@ -141,11 +153,11 @@ export const ChartHeader = ({
         // Update highlighted label based on sync state
         let newLabel = highlightedLabel
         if (xAxisIsDate && activeDataPoint[xAxisKey]) {
-          const day = (value: number | string) =>
-            displayDateInUtc ? dayjs(value).utc() : dayjs(value)
-          newLabel = day(activeDataPoint[xAxisKey]).format(
-            customDateFormat || 'YYYY-MM-DD HH:mm:ss'
-          )
+          const value = activeDataPoint[xAxisKey] as number | string
+          const fmt = customDateFormat || 'YYYY-MM-DD HH:mm:ss'
+          newLabel = displayDateInUtc
+            ? formatDateTime(value, { tz: 'UTC', format: fmt })
+            : formatPickerDate(value, fmt)
         } else if (activeDataPoint[xAxisKey]) {
           newLabel = activeDataPoint[xAxisKey]
         }
@@ -169,6 +181,7 @@ export const ChartHeader = ({
     highlightedValue,
     highlightedLabel,
     attributes,
+    formatPickerDate,
   ])
 
   const chartTitle = (
@@ -177,11 +190,32 @@ export const ChartHeader = ({
         <h3 className={'text-foreground-lighter ' + (minimalHeader ? 'text-xs' : 'text-sm')}>
           {title}
         </h3>
-        {titleTooltip && <InfoTooltip>{titleTooltip}</InfoTooltip>}
+        {titleTooltip && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <InfoIcon className="w-4 h-4 text-foreground-lighter" />
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-xs">
+              {titleTooltip}
+              {docsUrl && (
+                <>
+                  {' '}
+                  <Link
+                    href={docsUrl}
+                    target="_blank"
+                    className="underline text-foreground hover:text-foreground-light"
+                  >
+                    Read docs
+                  </Link>
+                </>
+              )}
+            </TooltipContent>
+          </Tooltip>
+        )}
       </div>
-      {docsUrl && (
+      {!titleTooltip && docsUrl && (
         <ButtonTooltip
-          type="text"
+          variant="text"
           className="px-1"
           asChild
           tooltip={{
@@ -228,7 +262,7 @@ export const ChartHeader = ({
   return (
     <div
       className={cn(
-        'flex-grow flex justify-between items-start min-h-16',
+        'grow flex justify-between items-start min-h-16',
         hideHighlightArea && 'hidden'
       )}
     >
@@ -245,7 +279,7 @@ export const ChartHeader = ({
       <div className="flex items-center gap-2">
         {sql ? (
           <ButtonTooltip
-            type="default"
+            variant="default"
             className="px-1.5"
             asChild
             tooltip={{
@@ -263,7 +297,7 @@ export const ChartHeader = ({
 
         {!hideChartType && onChartStyleChange && (
           <ButtonTooltip
-            type="default"
+            variant="default"
             className="px-1.5"
             icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
             onClick={() => onChartStyleChange(chartStyle === 'bar' ? 'line' : 'bar')}
@@ -277,7 +311,7 @@ export const ChartHeader = ({
         )}
         {setShowMaxValue && (
           <ButtonTooltip
-            type={showMaxValue ? 'default' : 'dashed'}
+            variant={showMaxValue ? 'default' : 'dashed'}
             className="px-1.5"
             icon={
               <GitCommitHorizontalIcon

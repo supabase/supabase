@@ -1,8 +1,18 @@
-import { Button } from 'ui'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from 'ui'
-import { Input_Shadcn_ } from 'ui'
-import { Label_Shadcn_ } from 'ui'
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import {
+  Button,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Input,
+  Label,
+  Tabs_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+} from 'ui'
 
 export default function TabsDemo() {
   return (
@@ -21,12 +31,12 @@ export default function TabsDemo() {
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="space-y-1">
-              <Label_Shadcn_ htmlFor="name">Name</Label_Shadcn_>
-              <Input_Shadcn_ id="name" defaultValue="Pedro Duarte" />
+              <Label htmlFor="name">Name</Label>
+              <Input id="name" defaultValue="Pedro Duarte" />
             </div>
             <div className="space-y-1">
-              <Label_Shadcn_ htmlFor="username">Username</Label_Shadcn_>
-              <Input_Shadcn_ id="username" defaultValue="@peduarte" />
+              <Label htmlFor="username">Username</Label>
+              <Input id="username" defaultValue="@peduarte" />
             </div>
           </CardContent>
           <CardFooter>
@@ -44,12 +54,12 @@ export default function TabsDemo() {
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="space-y-1">
-              <Label_Shadcn_ htmlFor="current">Current password</Label_Shadcn_>
-              <Input_Shadcn_ id="current" type="password" />
+              <Label htmlFor="current">Current password</Label>
+              <Input id="current" type="password" />
             </div>
             <div className="space-y-1">
-              <Label_Shadcn_ htmlFor="new">New password</Label_Shadcn_>
-              <Input_Shadcn_ id="new" type="password" />
+              <Label htmlFor="new">New password</Label>
+              <Input id="new" type="password" />
             </div>
           </CardContent>
           <CardFooter>

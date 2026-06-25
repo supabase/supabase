@@ -1,12 +1,8 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useState } from 'react'
 import { Button, SidePanel } from 'ui'
 
-import { useParams } from 'common'
-import { getKeys, useAPIKeysQuery } from 'data/api-keys/api-keys-query'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useAppStateSnapshot } from 'state/app-state'
-import { useApiKeysVisibility } from '../APIKeys/hooks/useApiKeysVisibility'
 import { Bucket } from './Content/Bucket'
 import { EdgeFunction } from './Content/EdgeFunction'
 import { EdgeFunctions } from './Content/EdgeFunctions'
@@ -18,9 +14,13 @@ import { RPC } from './Content/RPC'
 import { Storage } from './Content/Storage'
 import { StoredProcedures } from './Content/StoredProcedures'
 import { UserManagement } from './Content/UserManagement'
-import FirstLevelNav from './FirstLevelNav'
+import { FirstLevelNav } from './FirstLevelNav'
 import LanguageSelector from './LanguageSelector'
-import SecondLevelNav from './SecondLevelNav'
+import { SecondLevelNav } from './SecondLevelNav'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 /**
  * [Joshen] Reminder: when we choose to release this as a main feature
@@ -44,30 +44,21 @@ export const ProjectAPIDocs = () => {
   const [showKeys, setShowKeys] = useState(false)
   const language = snap.docsLanguage
 
-  const { canReadAPIKeys } = useApiKeysVisibility()
-  const { data: apiKeys } = useAPIKeysQuery(
+  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { data: apiKeysData } = useAPIKeys(
     { projectRef: ref },
     { enabled: snap.showProjectApiDocs && canReadAPIKeys }
   )
-  const { data: settings } = useProjectSettingsV2Query(
-    { projectRef: ref },
-    { enabled: snap.showProjectApiDocs }
-  )
-  const { data: customDomainData } = useCustomDomainsQuery(
+  const { anonKey } = apiKeysData ?? {}
+
+  const { data: endpoint } = useProjectApiUrl(
     { projectRef: ref },
     { enabled: snap.showProjectApiDocs }
   )
 
-  const { anonKey } = getKeys(apiKeys)
   const apikey = showKeys
-    ? anonKey?.api_key ?? 'SUPABASE_CLIENT_ANON_KEY'
+    ? (anonKey?.api_key ?? 'SUPABASE_CLIENT_ANON_KEY')
     : 'SUPABASE_CLIENT_ANON_KEY'
-  const protocol = settings?.app_config?.protocol ?? 'https'
-  const hostEndpoint = settings?.app_config?.endpoint
-  const endpoint =
-    customDomainData?.customDomain?.status === 'active'
-      ? `https://${customDomainData.customDomain?.hostname}`
-      : `${protocol}://${hostEndpoint ?? ''}`
 
   return (
     <SidePanel
@@ -84,7 +75,7 @@ export const ProjectAPIDocs = () => {
             <div className="flex items-center space-x-1">
               {!isEntityDocs && <LanguageSelector simplifiedVersion />}
               {isIntroduction && (
-                <Button type="default" onClick={() => setShowKeys(!showKeys)}>
+                <Button variant="default" onClick={() => setShowKeys(!showKeys)}>
                   {showKeys ? 'Hide keys' : 'Show keys'}
                 </Button>
               )}

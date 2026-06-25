@@ -1,22 +1,21 @@
+import { useParams } from 'common'
 import { ArrowRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
-
-import { useParams } from 'common'
-import { ClientLibrary } from 'components/interfaces/Home/ClientLibrary'
-import { ExampleProject } from 'components/interfaces/Home/ExampleProject'
-import { EXAMPLE_PROJECTS } from 'components/interfaces/Home/Home.constants'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { DisplayApiSettings } from 'components/ui/ProjectSettings/DisplayApiSettings'
-import { DisplayConfigSettings } from 'components/ui/ProjectSettings/DisplayConfigSettings'
-import { useInvalidateProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { useInvalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
-import { useProjectStatusQuery } from 'data/projects/project-status-query'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL, PROJECT_STATUS } from 'lib/constants'
 import { Badge, Button } from 'ui'
+
+import { ClientLibrary } from '@/components/interfaces/Home/ClientLibrary'
+import { ExampleProject } from '@/components/interfaces/Home/ExampleProject'
+import { EXAMPLE_PROJECTS } from '@/components/interfaces/Home/Home.constants'
+import { APIKeys } from '@/components/interfaces/Project/APIKeys'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { useInvalidateProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useInvalidateProjectDetailsQuery } from '@/data/projects/project-detail-query'
+import { useProjectStatusQuery } from '@/data/projects/project-status-query'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL, PROJECT_STATUS } from '@/lib/constants'
 
 const BuildingState = () => {
   const { ref } = useParams()
@@ -35,7 +34,8 @@ const BuildingState = () => {
     { projectRef: ref },
     {
       enabled: project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY,
-      refetchInterval: (data) => {
+      refetchInterval: (query) => {
+        const data = query.state.data
         return data?.status === PROJECT_STATUS.ACTIVE_HEALTHY ? false : 4000
       },
     }
@@ -124,7 +124,7 @@ const BuildingState = () => {
                           If your dashboard hasn't connected within 2 minutes, you can open a
                           support ticket.
                         </p>
-                        <Button asChild type="default">
+                        <Button asChild variant="default">
                           <SupportLink>Contact support team</SupportLink>
                         </Button>
                       </>
@@ -134,8 +134,7 @@ const BuildingState = () => {
               </div>
             </div>
             <div className="col-span-12  lg:col-span-8 flex flex-col gap-8">
-              <DisplayApiSettings showLegacyText={false} />
-              <DisplayConfigSettings />
+              <APIKeys />
             </div>
           </div>
         </div>

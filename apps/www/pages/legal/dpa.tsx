@@ -1,7 +1,7 @@
-import CTABanner from 'components/CTABanner/index'
 import Layout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import CTABanner from 'components/CTABanner/index'
 
 const DPA = () => {
   const sendTelemetryEvent = useSendTelemetryEvent()
@@ -19,7 +19,7 @@ const DPA = () => {
                   part of this commitment, we have prepared a Data Processing Addendum ("DPA"). You
                   can review a static PDF version of our latest DPA document{' '}
                   <a
-                    href="https://supabase.com/downloads/docs/Supabase+DPA+250805.pdf"
+                    href="https://supabase.com/downloads/docs/Supabase+DPA+260601.pdf"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-brand-link hover:underline"

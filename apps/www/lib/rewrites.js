@@ -29,6 +29,14 @@ const rewrites = [
     source: '/ui/:path*',
     destination: `${process.env.NEXT_PUBLIC_UI_LIBRARY_URL}/:path*`,
   },
+  {
+    source: '/design-system',
+    destination: `${process.env.NEXT_PUBLIC_DESIGN_SYSTEM_URL}`,
+  },
+  {
+    source: '/design-system/:path*',
+    destination: `${process.env.NEXT_PUBLIC_DESIGN_SYSTEM_URL}/:path*`,
+  },
 
   {
     source: '/new-docs',
@@ -56,14 +64,6 @@ const rewrites = [
   {
     source: '/.well-known/security.txt',
     destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/.well-known/security.txt`,
-  },
-  {
-    source: '/llms.txt',
-    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/llms.txt`,
-  },
-  {
-    source: '/llms/:path(.*\\.txt$)',
-    destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/llms/:path`,
   },
   { source: '/feed.xml', destination: `/rss.xml` },
 ]
