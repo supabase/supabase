@@ -157,7 +157,8 @@ export const ObservabilityOverview = () => {
       const end = dayjs.utc(datum.timestamp).add(1, unit).toISOString()
 
       const queryParams = new URLSearchParams({ its: start, ite: end })
-      router.push(`${logsUrl}?${queryParams.toString()}`)
+      const separator = logsUrl.includes('?') ? '&' : '?'
+      router.push(`${logsUrl}${separator}${queryParams.toString()}`)
     },
     [router, interval]
   )
