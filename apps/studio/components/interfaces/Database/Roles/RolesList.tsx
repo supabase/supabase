@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -12,6 +12,8 @@ import { CreateRolePanel } from './CreateRolePanel'
 import { RoleRow } from './RoleRow'
 import { RoleRowSkeleton } from './RoleRowSkeleton'
 import { SUPABASE_ROLES } from './Roles.constants'
+import { useIsJitDbAccessEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { getJitGrantHoldersForPostgresRole } from '@/components/interfaces/TemporaryAccess/TemporaryAccess.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { Shortcut } from '@/components/ui/Shortcut'
@@ -19,6 +21,8 @@ import { SparkBar } from '@/components/ui/SparkBar'
 import { useDatabaseRoleDeleteMutation } from '@/data/database-roles/database-role-delete-mutation'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
+import { useJitDbAccessMembersQuery } from '@/data/jit-db-access/jit-db-access-members-query'
+import { useProjectMembersQuery } from '@/data/projects/project-members-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { onSearchInputEscape } from '@/lib/keyboard'
@@ -29,6 +33,7 @@ type SUPABASE_ROLE = (typeof SUPABASE_ROLES)[number]
 
 export const RolesList = () => {
   const { data: project } = useSelectedProjectQuery()
+  const isJitDbAccessEnabled = useIsJitDbAccessEnabled()
 
   const [filterString, setFilterString] = useState('')
   const [filterType, setFilterType] = useState<'all' | 'active'>('all')
@@ -87,6 +92,29 @@ export const RolesList = () => {
   const [selectedRoleIdToDelete, setSelectedRoleIdToDelete] = useQueryState('delete', parseAsString)
   const roles = sortBy(data ?? [], (r) => r.name.toLocaleLowerCase())
   const roleToDelete = roles?.find((role) => role.id.toString() === selectedRoleIdToDelete)
+
+  const { data: jitMembers } = useJitDbAccessMembersQuery(
+    { projectRef: project?.ref },
+    { enabled: isJitDbAccessEnabled && !!roleToDelete && !!project?.ref }
+  )
+  const { data: projectMembers } = useProjectMembersQuery(
+    { projectRef: project?.ref },
+    { enabled: isJitDbAccessEnabled && !!roleToDelete && !!project?.ref }
+  )
+
+  const jitGrantHolders = useMemo(() => {
+    if (!roleToDelete) return []
+
+    const memberEmailByUserId = new Map(
+      (projectMembers ?? []).map((member) => [member.user_id, member.primary_email])
+    )
+
+    return getJitGrantHoldersForPostgresRole({
+      jitMembers,
+      roleName: roleToDelete.name,
+      memberEmailByUserId,
+    })
+  }, [jitMembers, projectMembers, roleToDelete])
 
   const filteredRoles = (
     filterType === 'active' ? roles.filter((role) => role.activeConnections > 0) : roles
@@ -299,6 +327,27 @@ export const RolesList = () => {
           This will automatically revoke any membership of this role in other roles, and this action
           cannot be undone.
         </p>
+        {jitGrantHolders.length > 0 && (
+          <div className="mt-4 space-y-2 text-sm">
+            <p className="text-foreground-light">
+              This role is used for temporary database access on this project for{' '}
+              {jitGrantHolders.length}{' '}
+              {jitGrantHolders.length === 1 ? 'team member' : 'team members'}:
+            </p>
+            <ul className="list-disc pl-5 text-foreground-light">
+              {jitGrantHolders.map((holder) => (
+                <li key={holder.userId}>
+                  {holder.email}
+                  {holder.hasActiveGrant ? '' : ' (expired grant)'}
+                </li>
+              ))}
+            </ul>
+            <p className="text-foreground-light">
+              Deleting the Postgres role prevents new connections with it. Revoke access from Team
+              settings first if you want to clean up grants before deleting the role.
+            </p>
+          </div>
+        )}
       </ConfirmationModal>
     </>
   )

@@ -6,10 +6,14 @@ import {
   computeStatusFromApiRoles,
   computeStatusFromGrants,
   createEmptyGrant,
+  formatHiddenTemporaryAccessRolesMessage,
   getAssignableTemporaryAccessRoleOptions,
+  getHiddenCustomTemporaryAccessRoles,
   getInvalidIpRangeRows,
+  getJitGrantHoldersForPostgresRole,
   getMinutesUntilExpiry,
   getRelativeDatetimeByMode,
+  getTemporaryAccessHiddenRolesDescription,
   getTemporaryAccessMemberOptions,
   serializeDraftRolesForGrantMutation,
 } from './TemporaryAccess.utils'
@@ -77,6 +81,80 @@ describe('TemporaryAccess.utils', () => {
     ] as never)
 
     expect(roles.map((role) => role.id)).toEqual(['postgres', 'supabase_read_only_user'])
+  })
+
+  it('includes custom login roles from the project', () => {
+    const roles = getAssignableTemporaryAccessRoleOptions([
+      { name: 'my_app_reader', canLogin: true, isSuperuser: false },
+      { name: 'my_app_no_login', canLogin: false, isSuperuser: false },
+    ] as never)
+
+    expect(roles.map((role) => role.id)).toEqual([
+      'my_app_reader',
+      'postgres',
+      'supabase_read_only_user',
+    ])
+  })
+
+  it('describes hidden custom roles that cannot be granted', () => {
+    const databaseRoles = [
+      { name: 'my_app_reader', canLogin: false, isSuperuser: false },
+      { name: 'my_app_writer', canLogin: true, isSuperuser: false },
+    ] as never
+
+    expect(getTemporaryAccessHiddenRolesDescription(databaseRoles)).toBe(
+      '1 custom role is not shown for temporary access: my_app_reader (login disabled).'
+    )
+  })
+
+  it('describes every hidden custom role from the project roles query', () => {
+    const databaseRoles = [
+      { name: 'my_app_reader', canLogin: false, isSuperuser: false },
+      { name: 'my_app_writer', canLogin: false, isSuperuser: false },
+      { name: 'my_app_login', canLogin: true, isSuperuser: false },
+    ] as never
+
+    expect(getTemporaryAccessHiddenRolesDescription(databaseRoles)).toBe(
+      '2 custom roles are not shown for temporary access: my_app_reader (login disabled), my_app_writer (login disabled).'
+    )
+  })
+
+  it('omits Supabase-managed roles from the hidden custom roles notice', () => {
+    const databaseRoles = [
+      { name: 'my_app_reader', canLogin: false, isSuperuser: false },
+      { name: 'authenticator', canLogin: false, isSuperuser: false },
+      { name: 'supabase_admin', canLogin: false, isSuperuser: true },
+      { name: 'anon', canLogin: false, isSuperuser: false },
+    ] as never
+
+    expect(getTemporaryAccessHiddenRolesDescription(databaseRoles)).toBe(
+      '1 custom role is not shown for temporary access: my_app_reader (login disabled).'
+    )
+    expect(getHiddenCustomTemporaryAccessRoles(databaseRoles)).toEqual([
+      { name: 'my_app_reader', reason: 'login disabled' },
+    ])
+  })
+
+  it('finds jit grant holders for a postgres role', () => {
+    const holders = getJitGrantHoldersForPostgresRole({
+      jitMembers: [
+        {
+          user_id: 'user-1',
+          user_roles: [{ role: 'my_app_reader', expires_at: Math.floor(Date.now() / 1000) + 3600 }],
+        },
+      ],
+      roleName: 'my_app_reader',
+      memberEmailByUserId: new Map([['user-1', 'reader@example.com']]),
+    })
+
+    expect(holders).toEqual([
+      {
+        userId: 'user-1',
+        email: 'reader@example.com',
+        grantCount: 1,
+        hasActiveGrant: true,
+      },
+    ])
   })
 
   it('includes builtin roles when database roles are unavailable', () => {

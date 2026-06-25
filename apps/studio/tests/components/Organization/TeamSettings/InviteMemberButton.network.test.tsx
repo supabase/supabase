@@ -48,6 +48,7 @@ vi.mock('@/data/database-roles/database-roles-query', () => ({
       ? [
           { name: 'postgres', canLogin: true, isSuperuser: false },
           { name: 'supabase_read_only_user', canLogin: true, isSuperuser: false },
+          { name: 'my_app_no_login', canLogin: false, isSuperuser: false },
         ]
       : undefined,
     isLoading: false,
@@ -376,6 +377,9 @@ describe('InviteMemberButton (network)', () => {
       () => {
         expect(screen.getByText('Project scope')).toBeInTheDocument()
         expect(screen.getByText('Postgres roles and settings')).toBeInTheDocument()
+        expect(screen.getByTestId('temporary-access-hidden-roles-helper')).toHaveTextContent(
+          '1 custom role is not shown for temporary access: my_app_no_login (login disabled).'
+        )
         expect(screen.getAllByText(/Restricted IP addresses/i).length).toBeGreaterThan(0)
         expect(screen.getAllByText('Expires after accept').length).toBeGreaterThan(0)
       },

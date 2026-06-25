@@ -9,7 +9,6 @@ import {
 } from 'ui-patterns/PageHeader'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
-import { useIsJitDbAccessEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DiskManagementPanelForm } from '@/components/interfaces/DiskManagement/DiskManagementPanelForm'
 import { BannedIPs } from '@/components/interfaces/Settings/Database/BannedIPs'
 import { ConnectionLogging } from '@/components/interfaces/Settings/Database/ConnectionLogging'
@@ -17,7 +16,6 @@ import { ConnectionPooling } from '@/components/interfaces/Settings/Database/Con
 import { DatabaseReadOnlyAlert } from '@/components/interfaces/Settings/Database/DatabaseReadOnlyAlert'
 import { ResetDbPassword } from '@/components/interfaces/Settings/Database/DatabaseSettings/ResetDbPassword'
 import { DiskSizeConfiguration } from '@/components/interfaces/Settings/Database/DiskSizeConfiguration'
-import { JitDbAccessConfiguration } from '@/components/interfaces/Settings/Database/JitDatabaseAccess/JitDbAccessConfiguration'
 import { NetworkRestrictions } from '@/components/interfaces/Settings/Database/NetworkRestrictions/NetworkRestrictions'
 import { PoolingModesModal } from '@/components/interfaces/Settings/Database/PoolingModesModal'
 import { SettingsDatabaseEmptyStateLocal } from '@/components/interfaces/Settings/Database/SettingsDatabaseEmptyStateLocal'
@@ -32,7 +30,6 @@ import type { NextPageWithLayout } from '@/types'
 const DatabaseSettings: NextPageWithLayout = () => {
   const isAws = useIsAwsCloudProvider()
   const isAwsK8s = useIsAwsK8sCloudProvider()
-  const jitDbAccessEnabled = useIsJitDbAccessEnabled()
   const showNewDiskManagementUI = isAws || isAwsK8s
   const { databaseNetworkRestrictions } = useIsFeatureEnabled(['database:network_restrictions'])
   const databaseLogsConfigurationEnabled = useFlag('databaseLogsConfiguration')
@@ -54,7 +51,6 @@ const DatabaseSettings: NextPageWithLayout = () => {
           <PageContainer size="small" className="flex flex-col gap-8 pb-12">
             <DatabaseReadOnlyAlert />
             <ResetDbPassword />
-            {jitDbAccessEnabled && <JitDbAccessConfiguration />}
             <ConnectionPooling />
             <SSLConfiguration />
             {showNewDiskManagementUI ? (

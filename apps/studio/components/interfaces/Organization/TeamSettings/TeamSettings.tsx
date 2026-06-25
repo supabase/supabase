@@ -6,6 +6,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { InviteMemberButton } from './InviteMemberButton'
 import MembersView from './MembersView'
+import { TeamSsoAvailableAdmonition } from './TeamSsoAvailableAdmonition'
 import {
   ScaffoldActionsContainer,
   ScaffoldActionsGroup,
@@ -52,6 +53,8 @@ export const TeamSettings = () => {
               <InviteMemberButton />
             </ScaffoldActionsGroup>
           </ScaffoldActionsContainer>
+
+          <TeamSsoAvailableAdmonition />
 
           {hasProjectScopedRoles && totalCount > threshold && (
             <Admonition

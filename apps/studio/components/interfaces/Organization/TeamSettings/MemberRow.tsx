@@ -1,5 +1,4 @@
-import { useParams } from 'common'
-import { ArrowRight, Check, ChevronRight, User, X } from 'lucide-react'
+import { ArrowRight, Check, User, X } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import {
@@ -17,11 +16,12 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
 import {
+  getMemberAccessScopeDisplay,
   getMemberJitGrantSummary,
+  getMemberRoleNames,
   isTemporaryAccessGuestMember,
 } from './TemporaryAccessMember.utils'
 import { useIsJitDbAccessEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { TemporaryAccessStatusBadge } from '@/components/interfaces/TemporaryAccess/TemporaryAccessStatusBadge'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { ProfileImage } from '@/components/ui/ProfileImage'
 import type { OrgMemberJitGrantSummary } from '@/data/jit-db-access/use-org-jit-grants-query'
@@ -41,7 +41,6 @@ const MEMBER_ORIGIN_TO_MANAGED_BY = {
 } as const
 
 export const MemberRow = ({ member, grantsByUserId }: MemberRowProps) => {
-  const { slug } = useParams()
   const { profile } = useProfile()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const isJitDbAccessEnabled = useIsJitDbAccessEnabled()
@@ -51,7 +50,9 @@ export const MemberRow = ({ member, grantsByUserId }: MemberRowProps) => {
   })
   const hasProjectScopedRoles = (roles?.project_scoped_roles ?? []).length > 0
 
-  const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
+  const { data: projectsData } = useOrgProjectsInfiniteQuery({
+    slug: selectedOrganization?.slug,
+  })
   const orgProjects =
     useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
@@ -61,7 +62,19 @@ export const MemberRow = ({ member, grantsByUserId }: MemberRowProps) => {
   const showGuestBadge =
     isJitDbAccessEnabled && !!jitSummary && isTemporaryAccessGuestMember(member, roles)
 
-  // Use generic avatar for all team members instead of attempting to fetch from GitHub
+  const roleNames = useMemo(() => getMemberRoleNames(member, roles), [member, roles])
+  const accessScope = useMemo(
+    () =>
+      getMemberAccessScopeDisplay({
+        member,
+        roles,
+        orgProjects,
+        hasProjectScopedRoles,
+        jitSummary,
+      }),
+    [member, roles, orgProjects, hasProjectScopedRoles, jitSummary]
+  )
+
   const profileImageUrl = undefined
 
   return (
@@ -93,12 +106,7 @@ export const MemberRow = ({ member, grantsByUserId }: MemberRowProps) => {
                 </Badge>
               )}
               {member.is_sso_user && <Badge variant="default">SSO</Badge>}
-              {jitSummary && (
-                <TemporaryAccessStatusBadge
-                  status={jitSummary.status}
-                  showGuestBadge={showGuestBadge}
-                />
-              )}
+              {showGuestBadge && <Badge variant="secondary">Guest</Badge>}
               {(member.metadata as any)?.origin && (
                 <PartnerIcon
                   organization={{
@@ -129,83 +137,78 @@ export const MemberRow = ({ member, grantsByUserId }: MemberRowProps) => {
           )}
         </div>
       </TableCell>
-      <TableCell className="max-w-64">
+      <TableCell className="max-w-48">
         {isLoadingRoles ? (
           <ShimmeringLoader className="w-32" />
         ) : (
-          member.role_ids.map((id) => {
-            const orgScopedRole = (roles?.org_scoped_roles ?? []).find((role) => role.id === id)
-            const projectScopedRole = (roles?.project_scoped_roles ?? []).find(
-              (role) => role.id === id
-            )
-            const role = orgScopedRole || projectScopedRole
-            const roleName = (role?.name ?? '').split('_')[0]
-            const projectsApplied =
-              role?.projects.length === 0
-                ? (orgProjects?.map((p) => p.name) ?? [])
-                : (role?.projects ?? [])
-                    .map(({ ref }) => orgProjects?.find((p) => p.ref === ref)?.name ?? '')
-                    .filter((x) => x.length > 0)
-
-            return (
-              <div key={`role-${id}`} className="flex items-center gap-x-2">
-                <p className="text-foreground-light">{roleName}</p>
-                {hasProjectScopedRoles && (
-                  <>
-                    <ChevronRight className="text-foreground-muted/50" size={14} />
-                    {projectsApplied.length === 1 ? (
-                      <span className="text-foreground-light truncate" title={projectsApplied[0]}>
-                        {projectsApplied[0]}
-                      </span>
-                    ) : (
-                      <HoverCard openDelay={200}>
-                        <HoverCardTrigger asChild>
-                          <span className="text-foreground-light">
-                            {role?.projects.length === 0
-                              ? 'Organization'
-                              : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}
-                          </span>
-                        </HoverCardTrigger>
-                        <HoverCardContent className="p-0">
-                          <p className="p-2 text-xs">
-                            {roleName} role applies to {projectsApplied.length} project
-                            {projectsApplied.length > 1 ? 's' : ''}
-                          </p>
-                          <div className="border-t flex flex-col py-1">
-                            <ScrollArea
-                              className={cn(projectsApplied.length > 5 ? 'h-[130px]' : '')}
-                            >
-                              {projectsApplied.map((name) => {
-                                const ref = orgProjects?.find((p) => p.name === name)?.ref
-                                return (
-                                  <Link
-                                    key={name}
-                                    href={`/project/${ref}`}
-                                    className="px-2 py-1 group hover:bg-surface-300 hover:text-foreground transition flex items-center justify-between"
-                                  >
-                                    <span className="text-xs truncate max-w-[60%]">{name}</span>
-                                    <span className="text-xs text-foreground flex items-center gap-x-1 opacity-0 group-hover:opacity-100 transition">
-                                      Go to project
-                                      <ArrowRight size={14} />
-                                    </span>
-                                  </Link>
-                                )
-                              })}
-                            </ScrollArea>
-                          </div>
-                        </HoverCardContent>
-                      </HoverCard>
-                    )}
-                  </>
-                )}
-              </div>
-            )
-          })
+          <p className="text-foreground-light truncate" title={roleNames.join(', ')}>
+            {roleNames.join(', ') || '—'}
+          </p>
+        )}
+      </TableCell>
+      <TableCell className="max-w-64">
+        {isLoadingRoles ? (
+          <ShimmeringLoader className="w-40" />
+        ) : (
+          <div className="min-w-0">
+            {accessScope.projectNames.length === 1 && !accessScope.isOrgWide ? (
+              <span className="text-foreground-light truncate block" title={accessScope.label}>
+                {accessScope.label}
+              </span>
+            ) : accessScope.projectNames.length > 1 && !accessScope.isOrgWide ? (
+              <HoverCard openDelay={200}>
+                <HoverCardTrigger asChild>
+                  <button type="button" className="text-left text-foreground-light hover:underline">
+                    {accessScope.label}
+                  </button>
+                </HoverCardTrigger>
+                <HoverCardContent className="p-0">
+                  <p className="p-2 text-xs text-foreground-light">
+                    Access applies to {accessScope.projectNames.length} projects
+                  </p>
+                  <div className="border-t flex flex-col py-1">
+                    <ScrollArea
+                      className={cn(accessScope.projectNames.length > 5 ? 'h-[130px]' : '')}
+                    >
+                      {accessScope.projectNames.map((name) => {
+                        const ref = orgProjects?.find((project) => project.name === name)?.ref
+                        return (
+                          <Link
+                            key={name}
+                            href={`/project/${ref}`}
+                            className="px-2 py-1 group hover:bg-surface-300 hover:text-foreground transition flex items-center justify-between"
+                          >
+                            <span className="text-xs truncate max-w-[60%]">{name}</span>
+                            <span className="text-xs text-foreground flex items-center gap-x-1 opacity-0 group-hover:opacity-100 transition">
+                              Go to project
+                              <ArrowRight size={14} />
+                            </span>
+                          </Link>
+                        )
+                      })}
+                    </ScrollArea>
+                  </div>
+                </HoverCardContent>
+              </HoverCard>
+            ) : (
+              <span className="text-foreground-light truncate block" title={accessScope.label}>
+                {accessScope.label}
+              </span>
+            )}
+            {accessScope.expiryMeta && (
+              <p
+                className="text-xs text-foreground-lighter mt-0.5 truncate"
+                title={accessScope.expiryMeta}
+              >
+                {accessScope.expiryMeta}
+              </p>
+            )}
+          </div>
         )}
       </TableCell>
       <TableCell>
         <MemberActions member={member} />
-      </TableCell>{' '}
+      </TableCell>
     </TableRow>
   )
 }

@@ -29,7 +29,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -64,17 +63,14 @@ import {
 import { TemporaryAccessInviteGrantSection } from '@/components/interfaces/TemporaryAccess/TemporaryAccessInviteGrantSection'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
-import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useOrganizationCreateInvitationMutation } from '@/data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useOrgSSOConfigQuery } from '@/data/sso/sso-config-query'
 import { useHasAccessToProjectLevelPermissions } from '@/data/subscriptions/org-subscription-query'
-import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { doPermissionsCheck, useGetPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -112,6 +108,7 @@ export const InviteMemberButton = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [accessScopeDropdownOpen, setAccessScopeDropdownOpen] = useState(false)
   const [projectDropdownOpen, setProjectDropdownOpen] = useState(false)
+  const [guestParentProjectRef, setGuestParentProjectRef] = useState<string | null>(null)
 
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles, isSuccess } = useOrganizationRolesV2Query({ slug })
@@ -130,7 +127,6 @@ export const InviteMemberButton = () => {
     requireSso: 'auto',
   }
 
-  const { hasAccess: hasAccessToSso } = useCheckEntitlements('auth.platform.sso')
   const hasAccessToProjectLevelPermissions = useHasAccessToProjectLevelPermissions(slug as string)
 
   const userMemberData = members?.find((m) => m.gotrue_id === profile?.gotrue_id)
@@ -413,175 +409,159 @@ export const InviteMemberButton = () => {
           </ButtonTooltip>
         </Shortcut>
       </SheetTrigger>
-      <SheetContent className="flex flex-col gap-0">
+      <SheetContent size="lg" className="flex flex-col gap-0">
         <SheetHeader>
           <SheetTitle>Invite team members</SheetTitle>
           <SheetDescription>
             Send invitations and choose the access each new team member receives.
           </SheetDescription>
         </SheetHeader>
-        <Admonition
-          type="note"
-          showIcon={false}
-          title="Single Sign-On (SSO) available"
-          layout={!hasAccessToSso ? 'vertical' : 'horizontal'}
-          className="rounded-none border-t-0 border-x-0 px-5"
-          description="Enforce login via your company identity provider for added security and access control. Available on Team plan and above."
-          actions={
-            <>
-              <DocsButton href={`${DOCS_URL}/guides/platform/sso`} />
-              {!hasAccessToSso && (
-                <UpgradePlanButton
-                  plan="Team"
-                  source="inviteMemberSSO"
-                  featureProposition="enable Single Sign-on (SSO)"
-                />
-              )}
-            </>
-          }
-        />
-        <SheetSection className="grow overflow-auto">
+        <SheetSection className="grow overflow-auto p-0">
           <Form {...form}>
             <form
               id="organization-invitation"
-              className="flex flex-col gap-y-4"
+              className="flex flex-col"
               onSubmit={form.handleSubmit(onInviteMember)}
             >
-              <FormField
-                name="email"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItemLayout layout="horizontal" label="Email addresses">
-                    <FormControl className="col-span-6">
-                      <ExpandingTextArea
-                        autoFocus
-                        {...field}
-                        autoComplete="off"
-                        disabled={isInviting}
-                        placeholder="name@example.com, name2@example.com, ..."
-                        className="max-h-48"
-                        data-1p-ignore
-                        data-lpignore="true"
-                        data-form-type="other"
-                        data-bwignore
-                      />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
+              <SheetSection className="flex flex-col gap-y-4">
+                <FormField
+                  name="email"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItemLayout layout="horizontal" label="Email addresses">
+                      <FormControl className="col-span-6">
+                        <ExpandingTextArea
+                          autoFocus
+                          {...field}
+                          autoComplete="off"
+                          disabled={isInviting}
+                          placeholder="name@example.com, name2@example.com, ..."
+                          className="max-h-48"
+                          data-1p-ignore
+                          data-lpignore="true"
+                          data-form-type="other"
+                          data-bwignore
+                        />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
 
-              <FormField
-                name="role"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="horizontal"
-                    label="Role"
-                    description={
-                      <>
-                        Learn more about{' '}
-                        <InlineLink href={`${DOCS_URL}/guides/platform/access-control`}>
-                          roles and permissions
-                        </InlineLink>
-                      </>
-                    }
-                  >
-                    <FormControl className="col-span-6">
-                      <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
-                        {orgScopedRoles.map((role) => {
-                          const canAssignRole = rolesAddable.includes(role.id)
-                          const isOwnerRole = role.name === 'Owner'
-                          const disabledForStripe = isStripeProjectsOrg && isOwnerRole
-                          const disabled = !canAssignRole || disabledForStripe
-                          const disabledReason = disabledForStripe
-                            ? 'Cannot be assigned in Stripe Projects organizations'
-                            : !canAssignRole
-                              ? 'Additional permissions required to assign role'
-                              : undefined
+                <FormField
+                  name="role"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItemLayout
+                      layout="horizontal"
+                      label="Role"
+                      description={
+                        <>
+                          Learn more about{' '}
+                          <InlineLink href={`${DOCS_URL}/guides/platform/access-control`}>
+                            roles and permissions
+                          </InlineLink>
+                        </>
+                      }
+                    >
+                      <FormControl className="col-span-6">
+                        <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
+                          {orgScopedRoles.map((role) => {
+                            const canAssignRole = rolesAddable.includes(role.id)
+                            const isOwnerRole = role.name === 'Owner'
+                            const disabledForStripe = isStripeProjectsOrg && isOwnerRole
+                            const disabled = !canAssignRole || disabledForStripe
+                            const disabledReason = disabledForStripe
+                              ? 'Cannot be assigned in Stripe Projects organizations'
+                              : !canAssignRole
+                                ? 'Additional permissions required to assign role'
+                                : undefined
 
-                          return (
-                            <FormItem asChild key={role.id}>
+                            return (
+                              <FormItem asChild key={role.id}>
+                                <FormControl>
+                                  <RadioGroupStackedItem
+                                    value={role.id.toString()}
+                                    disabled={disabled}
+                                    label={role.name}
+                                    description={[
+                                      ROLE_DESCRIPTIONS[role.name] ??
+                                        'Permissions are based on the configured organization role.',
+                                      disabledReason,
+                                    ]
+                                      .filter(Boolean)
+                                      .join(' ')}
+                                  />
+                                </FormControl>
+                              </FormItem>
+                            )
+                          })}
+                          {isJitDbAccessEnabled && (
+                            <FormItem asChild>
                               <FormControl>
                                 <RadioGroupStackedItem
-                                  value={role.id.toString()}
-                                  disabled={disabled}
-                                  label={role.name}
+                                  value={EXTERNAL_COLLABORATOR_ROLE_ID}
+                                  disabled={!canAssignExternalCollaborator}
+                                  label={EXTERNAL_COLLABORATOR_ROLE_NAME}
                                   description={[
-                                    ROLE_DESCRIPTIONS[role.name] ??
-                                      'Permissions are based on the configured organization role.',
-                                    disabledReason,
+                                    EXTERNAL_COLLABORATOR_ROLE_DESCRIPTION,
+                                    !canAssignExternalCollaborator
+                                      ? 'Additional permissions required to assign role'
+                                      : undefined,
                                   ]
                                     .filter(Boolean)
                                     .join(' ')}
                                 />
                               </FormControl>
                             </FormItem>
-                          )
-                        })}
-                        {isJitDbAccessEnabled && (
-                          <FormItem asChild>
-                            <FormControl>
-                              <RadioGroupStackedItem
-                                value={EXTERNAL_COLLABORATOR_ROLE_ID}
-                                disabled={!canAssignExternalCollaborator}
-                                label={EXTERNAL_COLLABORATOR_ROLE_NAME}
-                                description={[
-                                  EXTERNAL_COLLABORATOR_ROLE_DESCRIPTION,
-                                  !canAssignExternalCollaborator
-                                    ? 'Additional permissions required to assign role'
-                                    : undefined,
-                                ]
-                                  .filter(Boolean)
-                                  .join(' ')}
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      </RadioGroupStacked>
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-
-              {hasAccessToProjectLevelPermissions && !isGuestInvite && (
-                <FormField
-                  name="accessScope"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="horizontal"
-                      label="Access scope"
-                      description={
-                        requiresOrgWideAccess
-                          ? `${selectedRole?.name} always has access to all projects in the organization.`
-                          : 'Choose all projects or select one or more specific projects'
-                      }
-                    >
-                      <FormControl className="col-span-6">
-                        {showAccessScopeField ? (
-                          <TeamAccessScopeSelector
-                            value={field.value}
-                            onChange={field.onChange}
-                            open={accessScopeDropdownOpen}
-                            setOpen={setAccessScopeDropdownOpen}
-                            fetchOnMount
-                            sameWidthAsTrigger
-                            checkPosition="left"
-                            allowMultipleProjects
-                          />
-                        ) : (
-                          <p className="text-sm text-foreground-light py-2">
-                            {ALL_PROJECTS_ACCESS_SCOPE_LABEL}
-                          </p>
-                        )}
+                          )}
+                        </RadioGroupStacked>
                       </FormControl>
                     </FormItemLayout>
                   )}
                 />
+              </SheetSection>
+
+              {hasAccessToProjectLevelPermissions && !isGuestInvite && (
+                <SheetSection className="flex flex-col gap-y-4 border-t">
+                  <FormField
+                    name="accessScope"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="horizontal"
+                        label="Access scope"
+                        description={
+                          requiresOrgWideAccess
+                            ? `${selectedRole?.name} always has access to all projects in the organization.`
+                            : 'Choose all projects or select one or more specific projects'
+                        }
+                      >
+                        <FormControl className="col-span-6">
+                          {showAccessScopeField ? (
+                            <TeamAccessScopeSelector
+                              value={field.value}
+                              onChange={field.onChange}
+                              open={accessScopeDropdownOpen}
+                              setOpen={setAccessScopeDropdownOpen}
+                              fetchOnMount
+                              sameWidthAsTrigger
+                              checkPosition="left"
+                              allowMultipleProjects
+                            />
+                          ) : (
+                            <p className="text-sm text-foreground-light py-2">
+                              {ALL_PROJECTS_ACCESS_SCOPE_LABEL}
+                            </p>
+                          )}
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </SheetSection>
               )}
 
               {isGuestInvite && (
-                <>
+                <SheetSection className="flex flex-col gap-y-4 border-t">
                   <FormField
                     name="projectRef"
                     control={form.control}
@@ -600,8 +580,15 @@ export const InviteMemberButton = () => {
                             open={projectDropdownOpen}
                             setOpen={setProjectDropdownOpen}
                             searchPlaceholder="Search project..."
-                            onSelect={(project) => field.onChange(project.ref)}
-                            onInitialLoad={(projects) => field.onChange(projects[0]?.ref ?? '')}
+                            onSelect={(project) => {
+                              field.onChange(project.ref)
+                              setGuestParentProjectRef(project.parent_project_ref ?? null)
+                            }}
+                            onInitialLoad={(projects) => {
+                              const project = projects[0]
+                              field.onChange(project?.ref ?? '')
+                              setGuestParentProjectRef(project?.parent_project_ref ?? null)
+                            }}
                           />
                         </FormControl>
                       </FormItemLayout>
@@ -610,44 +597,49 @@ export const InviteMemberButton = () => {
 
                   <TemporaryAccessInviteGrantSection
                     projectRef={projectRef}
+                    parentProjectRef={guestParentProjectRef}
                     guestAccess={form.watch('guestAccess')}
                     control={form.control}
                     onGuestAccessChange={(next) =>
                       form.setValue('guestAccess', next, { shouldDirty: true })
                     }
                   />
-                </>
+                </SheetSection>
               )}
 
               {hasSsoProvider && (
-                <FormField
-                  name="requireSso"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItemLayout
-                      layout="horizontal"
-                      label="Invitation type"
-                      description="Choose how the invitee should authenticate"
-                    >
-                      <FormControl className="col-span-6">
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Automatic (based on your account)" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectGroup>
-                              <SelectItem value="auto">
-                                Automatic (based on your account)
-                              </SelectItem>
-                              <SelectItem value="sso">Require SSO authentication</SelectItem>
-                              <SelectItem value="non-sso">Email/password authentication</SelectItem>
-                            </SelectGroup>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
+                <SheetSection className="flex flex-col gap-y-4 border-t">
+                  <FormField
+                    name="requireSso"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="horizontal"
+                        label="Invitation type"
+                        description="Choose how the invitee should authenticate"
+                      >
+                        <FormControl className="col-span-6">
+                          <Select value={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Automatic (based on your account)" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectGroup>
+                                <SelectItem value="auto">
+                                  Automatic (based on your account)
+                                </SelectItem>
+                                <SelectItem value="sso">Require SSO authentication</SelectItem>
+                                <SelectItem value="non-sso">
+                                  Email/password authentication
+                                </SelectItem>
+                              </SelectGroup>
+                            </SelectContent>
+                          </Select>
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </SheetSection>
               )}
             </form>
           </Form>

@@ -32,6 +32,7 @@ import {
   serializeDraftRolesForGrantMutation,
 } from './TemporaryAccess.utils'
 import { TemporaryAccessGrantFields } from './TemporaryAccessGrantFields'
+import { TemporaryAccessProjectNotice } from './TemporaryAccessProjectNotice'
 import { useAutoEnableJitAccess } from './useAutoEnableJitAccess'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -108,13 +109,15 @@ export function TemporaryAccessGrantSheet({
   mode = 'edit',
 }: TemporaryAccessGrantSheetProps) {
   const [projectRef, setProjectRef] = useState(initialProjectRef ?? '')
+  const [parentProjectRef, setParentProjectRef] = useState<string | null>(null)
   const [projectDropdownOpen, setProjectDropdownOpen] = useState(false)
 
   const resolvedProjectRef = projectRef || initialProjectRef
 
-  const { data: databaseRoles, isSuccess: isSuccessDatabaseRoles } = useDatabaseRolesQuery({
-    projectRef: resolvedProjectRef,
-  })
+  const { data: databaseRoles, isSuccess: isSuccessDatabaseRoles } = useDatabaseRolesQuery(
+    { projectRef: resolvedProjectRef },
+    { refetchOnMount: 'always' }
+  )
   const roleOptions = useMemo(
     () => getAssignableTemporaryAccessRoleOptions(databaseRoles),
     [databaseRoles]
@@ -238,8 +241,7 @@ export function TemporaryAccessGrantSheet({
           <SheetHeader>
             <SheetTitle>Manage database access</SheetTitle>
             <SheetDescription>
-              Configure temporary Postgres access for {memberLabel}. Access is managed from Team,
-              not Database Settings.
+              Configure temporary Postgres access for {memberLabel}.
             </SheetDescription>
           </SheetHeader>
 
@@ -255,9 +257,15 @@ export function TemporaryAccessGrantSheet({
                     open={projectDropdownOpen}
                     setOpen={setProjectDropdownOpen}
                     searchPlaceholder="Search project..."
-                    onSelect={(project) => setProjectRef(project.ref)}
+                    onSelect={(project) => {
+                      setProjectRef(project.ref)
+                      setParentProjectRef(project.parent_project_ref ?? null)
+                    }}
                     onInitialLoad={(projects) => {
-                      if (!projectRef && projects[0]) setProjectRef(projects[0].ref)
+                      if (!projectRef && projects[0]) {
+                        setProjectRef(projects[0].ref)
+                        setParentProjectRef(projects[0].parent_project_ref ?? null)
+                      }
                     }}
                   />
                 </FormItemLayout>
@@ -272,37 +280,45 @@ export function TemporaryAccessGrantSheet({
                     description="Select a project to configure database access."
                   />
                 ) : (
-                  <FormItemLayout
-                    layout="vertical"
-                    label="Postgres roles and settings"
-                    description={
-                      <>
-                        Use{' '}
-                        <InlineLink href={`${DOCS_URL}/guides/database/postgres/roles`}>
-                          custom Postgres roles
-                        </InlineLink>{' '}
-                        with narrow permissions to reduce the impact of direct database access.
-                      </>
-                    }
-                  >
-                    {grants.length === 0 ? (
-                      <Admonition type="note" description="No assignable roles found." />
-                    ) : (
-                      <div className="overflow-hidden rounded-md border">
-                        {grants.map((grant, index) => (
-                          <div key={grant.roleId} className={index > 0 ? 'border-t' : ''}>
-                            <TemporaryAccessGrantFields
-                              control={form.control}
-                              grantIndex={index}
-                              role={{ id: grant.roleId, label: grant.roleId }}
-                              grant={grant}
-                              onChange={(next) => updateGrant(grant.roleId, () => next)}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </FormItemLayout>
+                  <>
+                    <TemporaryAccessProjectNotice
+                      projectRef={resolvedProjectRef}
+                      parentProjectRef={parentProjectRef}
+                    />
+                    <FormItemLayout
+                      layout="vertical"
+                      label="Postgres roles and settings"
+                      description={
+                        <>
+                          Use{' '}
+                          <InlineLink href={`${DOCS_URL}/guides/database/postgres/roles`}>
+                            custom Postgres roles
+                          </InlineLink>{' '}
+                          with narrow permissions to reduce the impact of direct database access.
+                          Custom roles need User can login enabled (Database → Roles) to appear
+                          here.
+                        </>
+                      }
+                    >
+                      {grants.length === 0 ? (
+                        <Admonition type="note" description="No assignable roles found." />
+                      ) : (
+                        <div className="overflow-hidden rounded-md border">
+                          {grants.map((grant, index) => (
+                            <div key={grant.roleId} className={index > 0 ? 'border-t' : ''}>
+                              <TemporaryAccessGrantFields
+                                control={form.control}
+                                grantIndex={index}
+                                role={{ id: grant.roleId, label: grant.roleId }}
+                                grant={grant}
+                                onChange={(next) => updateGrant(grant.roleId, () => next)}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </FormItemLayout>
+                  </>
                 )}
               </SheetSection>
             </ScrollArea>

@@ -24,7 +24,7 @@ export async function getDatabaseRoles(
     signal
   )
 
-  return result as PgRole[]
+  return pgMetaRolesList.zod.parse(result)
 }
 
 export type DatabaseRolesData = z.infer<typeof pgMetaRolesList.zod>

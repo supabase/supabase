@@ -12,6 +12,7 @@ import type {
   TemporaryAccessStatusBadge,
   TemporaryAccessUserRule,
 } from './TemporaryAccess.types'
+import { SUPABASE_ROLES } from '@/components/interfaces/Database/Roles/Roles.constants'
 import { type DatabaseRolesData, type PgRole } from '@/data/database-roles/database-roles-query'
 import type { JitDbAccessMembersData } from '@/data/jit-db-access/jit-db-access-members-query'
 import type { OrganizationMembersData } from '@/data/organizations/organization-members-query'
@@ -214,6 +215,15 @@ function isBuiltinTemporaryAccessRole(roleName: string) {
   return (BUILTIN_TEMPORARY_ACCESS_ROLE_NAMES as readonly string[]).includes(roleName)
 }
 
+/** User-created roles shown under "Other database roles" on Database → Roles. */
+function isUserManagedCustomRole(roleName: string) {
+  return (
+    !isBuiltinTemporaryAccessRole(roleName) &&
+    !(SUPABASE_ROLES as readonly string[]).includes(roleName) &&
+    !roleName.startsWith('pg_')
+  )
+}
+
 function isAssignableTemporaryAccessRole(role: PgRole) {
   // postgres is a superuser in Postgres but is a first-class JIT grant target in Studio
   if (isBuiltinTemporaryAccessRole(role.name)) {
@@ -227,6 +237,50 @@ function isAssignableTemporaryAccessRole(role: PgRole) {
     (!role.name.startsWith('supabase_') || role.name === 'supabase_read_only_user') &&
     !['pgbouncer', 'authenticator'].includes(role.name)
   )
+}
+
+export function getUnassignableTemporaryAccessRoleReason(role: PgRole): string | null {
+  if (isAssignableTemporaryAccessRole(role)) return null
+
+  if (!role.canLogin) return 'login disabled'
+  if (role.isSuperuser && !isBuiltinTemporaryAccessRole(role.name)) return 'superuser'
+  if (role.name.startsWith('pg_')) return 'system role'
+  if (role.name.startsWith('supabase_')) return 'reserved Supabase role'
+  if (['pgbouncer', 'authenticator'].includes(role.name)) return 'not grantable'
+
+  return 'not grantable'
+}
+
+export function getHiddenCustomTemporaryAccessRoles(
+  databaseRoles?: DatabaseRolesData | null
+): Array<{ name: string; reason: string }> {
+  return (databaseRoles ?? [])
+    .filter((role) => isUserManagedCustomRole(role.name))
+    .filter((role) => !isAssignableTemporaryAccessRole(role))
+    .map((role) => ({
+      name: role.name,
+      reason: getUnassignableTemporaryAccessRoleReason(role) ?? 'not grantable',
+    }))
+}
+
+export function getTemporaryAccessHiddenRolesDescription(
+  databaseRoles?: DatabaseRolesData | null
+): string | null {
+  return formatHiddenTemporaryAccessRolesMessage(getHiddenCustomTemporaryAccessRoles(databaseRoles))
+}
+
+export function formatHiddenTemporaryAccessRolesMessage(
+  hiddenRoles: Array<{ name: string; reason: string }>
+): string | null {
+  if (hiddenRoles.length === 0) return null
+
+  const roleList = hiddenRoles.map((role) => `${role.name} (${role.reason})`).join(', ')
+
+  if (hiddenRoles.length === 1) {
+    return `1 custom role is not shown for temporary access: ${roleList}.`
+  }
+
+  return `${hiddenRoles.length} custom roles are not shown for temporary access: ${roleList}.`
 }
 
 function serializeAllowedNetworks(roleObj: {
@@ -365,6 +419,35 @@ export function computeStatusFromApiRoles(
   })
 
   return computeStatusFromGrants(grants)
+}
+
+export function getJitGrantHoldersForPostgresRole({
+  jitMembers,
+  roleName,
+  memberEmailByUserId,
+}: {
+  jitMembers: JitDbAccessMembersData | undefined
+  roleName: string
+  memberEmailByUserId?: Map<string, string>
+}) {
+  return (jitMembers ?? [])
+    .map((item) => {
+      const matchingGrants = (item.user_roles ?? []).filter((grant) => grant.role === roleName)
+      if (matchingGrants.length === 0) return null
+
+      const nowUnix = dayjs().unix()
+      const hasActiveGrant = matchingGrants.some(
+        (grant) => typeof grant.expires_at !== 'number' || grant.expires_at > nowUnix
+      )
+
+      return {
+        userId: item.user_id,
+        email: memberEmailByUserId?.get(item.user_id) ?? item.user_id,
+        grantCount: matchingGrants.length,
+        hasActiveGrant,
+      }
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null)
 }
 
 export function serializeDraftRolesForGrantMutation(draft: TemporaryAccessGrantDraft) {
