@@ -1,3 +1,4 @@
+import type { FieldErrors } from 'react-hook-form'
 import { describe, expect, it } from 'vitest'
 
 import { classifyApiError, classifyStripeError, classifyValidationError } from './funnel-errors'
@@ -61,7 +62,9 @@ describe('classifyApiError', () => {
 
 describe('classifyValidationError', () => {
   it('maps a signup password error to password_invalid', () => {
-    expect(classifyValidationError('signup', { password: { type: 'too_small' } } as any)).toEqual({
+    expect(
+      classifyValidationError('signup', { password: { type: 'too_small' } } as FieldErrors)
+    ).toEqual({
       errorCategory: 'validation',
       errorReason: 'password_invalid',
     })
@@ -72,22 +75,22 @@ describe('classifyValidationError', () => {
       classifyValidationError('signup', {
         email: { type: 'invalid' },
         password: { type: 'too_small' },
-      } as any)
+      } as FieldErrors)
     ).toEqual({ errorCategory: 'validation', errorReason: 'email_invalid' })
   })
 
   it('maps an org name error to org_name_missing', () => {
-    expect(classifyValidationError('org_creation', { name: { type: 'too_small' } } as any)).toEqual(
-      {
-        errorCategory: 'validation',
-        errorReason: 'org_name_missing',
-      }
-    )
+    expect(
+      classifyValidationError('org_creation', { name: { type: 'too_small' } } as FieldErrors)
+    ).toEqual({
+      errorCategory: 'validation',
+      errorReason: 'org_name_missing',
+    })
   })
 
   it('falls back to other for an unmapped field', () => {
     expect(
-      classifyValidationError('project_creation', { somethingNew: { type: 'x' } } as any)
+      classifyValidationError('project_creation', { somethingNew: { type: 'x' } } as FieldErrors)
     ).toEqual({ errorCategory: 'validation', errorReason: 'other' })
   })
 })
