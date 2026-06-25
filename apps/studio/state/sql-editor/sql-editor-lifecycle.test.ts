@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   folderStatusOnSaveStart,
+  hasUnsavedChanges,
   isFolderEditing,
   isFolderSaving,
   isNewFolder,
@@ -56,6 +57,20 @@ describe('isSaveFailed', () => {
     'is false for %s',
     (status) => {
       expect(isSaveFailed(status)).toBe(false)
+    }
+  )
+})
+
+describe('hasUnsavedChanges', () => {
+  it('is false only for a clean, saved snippet', () => {
+    expect(hasUnsavedChanges('saved')).toBe(false)
+    expect(hasUnsavedChanges(undefined)).toBe(false)
+  })
+
+  it.each(['new', 'new_saving', 'new_save_failed', 'unsaved', 'saving', 'save_failed'] as const)(
+    'is true for unsaved/in-flight/failed status %s',
+    (status) => {
+      expect(hasUnsavedChanges(status)).toBe(true)
     }
   )
 })
