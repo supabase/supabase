@@ -88,6 +88,16 @@ export const SecuritySettings = () => {
 
   const requiresPersonalMfa = isSuccessMembers && canUpdateMfaConfig && !hasMFAEnabled
 
+  const isLoadingMfaEnforcementSettings =
+    isLoadingMfa || isLoadingPermissions || isLoadingEntitlement || isLoadingMembers
+  const hasMfaConfigError = (isErrorMfa || Boolean(mfaError)) && hasAccessToEnforceMfa
+  const canShowMfaEnforcementForm =
+    isSuccessMfa && hasAccessToEnforceMfa && isSuccessMembers && !requiresPersonalMfa
+  const isMfaEnforcementSwitchDisabled =
+    !hasAccessToEnforceMfa || !canUpdateMfaConfig || isUpdatingMfa
+  const isSaveMfaEnforcementDisabled =
+    isMfaEnforcementSwitchDisabled || isLoadingMfa || !form.formState.isDirty
+
   const onSubmit = (values: { enforceMfa: boolean }) => {
     if (!slug || !hasAccessToEnforceMfa) return
     toggleMfa({ slug, setEnforced: values.enforceMfa })
@@ -105,7 +115,7 @@ export const SecuritySettings = () => {
           />
         ) : (
           <>
-            {isLoadingMfa || isLoadingPermissions || isLoadingEntitlement || isLoadingMembers ? (
+            {isLoadingMfaEnforcementSettings ? (
               <Card>
                 <CardContent>
                   <GenericSkeletonLoader />
@@ -119,7 +129,7 @@ export const SecuritySettings = () => {
               <AlertError error={membersError} subject="Failed to retrieve organization members" />
             )}
 
-            {(isErrorMfa || mfaError) && hasAccessToEnforceMfa && (
+            {hasMfaConfigError && (
               <AlertError error={mfaError} subject="Failed to retrieve MFA enforcement status" />
             )}
 
@@ -137,7 +147,7 @@ export const SecuritySettings = () => {
               />
             )}
 
-            {isSuccessMfa && hasAccessToEnforceMfa && isSuccessMembers && !requiresPersonalMfa && (
+            {canShowMfaEnforcementForm && (
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)}>
                   <Card>
@@ -156,9 +166,7 @@ export const SecuritySettings = () => {
                               <Switch
                                 checked={field.value}
                                 onCheckedChange={field.onChange}
-                                disabled={
-                                  !hasAccessToEnforceMfa || !canUpdateMfaConfig || isUpdatingMfa
-                                }
+                                disabled={isMfaEnforcementSwitchDisabled}
                               />
                             </FormControl>
                           </FormItemLayout>
@@ -180,13 +188,7 @@ export const SecuritySettings = () => {
                       <Button
                         variant="primary"
                         type="submit"
-                        disabled={
-                          !hasAccessToEnforceMfa ||
-                          !canUpdateMfaConfig ||
-                          isUpdatingMfa ||
-                          isLoadingMfa ||
-                          !form.formState.isDirty
-                        }
+                        disabled={isSaveMfaEnforcementDisabled}
                         loading={isUpdatingMfa}
                       >
                         Save
