@@ -41,6 +41,8 @@ const LegacyIntegrationPage = () => {
     integration,
     isAvailableLoading,
     isInstalledLoading,
+    isIntegrationStatusLoading,
+    oauthIntegrationData,
     tabs,
     Component,
   } = useIntegrationDetail()
@@ -117,7 +119,11 @@ const LegacyIntegrationPage = () => {
             </PageHeaderSummary>
 
             {integration?.type === 'oauth' && (
-              <InstallOAuthIntegrationButton integration={integration} />
+              <InstallOAuthIntegrationButton
+                integration={integration}
+                data={oauthIntegrationData}
+                isLoading={isIntegrationStatusLoading}
+              />
             )}
           </PageHeaderMeta>
         )}
