@@ -29,7 +29,7 @@ import {
 } from 'ui'
 
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
-import { getContentById } from '@/data/content/content-id-query'
+import { getContentById, getSqlSnippetById } from '@/data/content/content-id-query'
 import { useSQLSnippetFolderContentsQuery } from '@/data/content/sql-folder-contents-query'
 import { Snippet } from '@/data/content/sql-folders-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -188,12 +188,8 @@ export const SQLEditorTreeViewItem = ({
     // opened have no content loaded yet, so fetch it before toggling.
     const storeSnippet = snapV2.snippets[snippetId]
     if (!storeSnippet?.snippet.content) {
-      const data = await getContentById({ projectRef, id: snippetId })
-      // getContentById returns a union content; narrow to the SQL variant (the
-      // only kind the SQL editor loads) via its discriminating field.
-      if ('unchecked_sql' in data.content) {
-        snapV2.setSnippet(projectRef, { ...data, content: data.content })
-      }
+      const snippet = await getSqlSnippetById({ projectRef, id: snippetId })
+      snapV2.setSnippet(projectRef, snippet)
     }
 
     if (isFavorite) snapV2.removeFavorite(snippetId)

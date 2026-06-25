@@ -30,8 +30,8 @@ const DatabaseReplicationPage: NextPageWithLayout = () => {
               <h3 className="text-foreground text-xl prose">Replication</h3>
             </div>
             <p className="prose text-sm max-w-full">
-              Deploy read replicas across multiple regions, or replicate database changes to
-              external data warehouses and analytics platforms
+              Deploy Read Replicas across multiple regions, or use Pipelines to replicate database
+              changes to analytics destinations.
             </p>
           </div>
         </ScaffoldSection>
