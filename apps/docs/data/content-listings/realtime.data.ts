@@ -1,7 +1,7 @@
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
 export const realtimeGetStarted: ContentListingGroup = {
-  id: 'get-started',
+  id: 'realtime-get-started',
   heading: 'Get started',
   type: 'grid',
   columns: 2,
@@ -15,7 +15,7 @@ export const realtimeGetStarted: ContentListingGroup = {
 }
 
 export const realtimeExamples: ContentListingGroup = {
-  id: 'examples',
+  id: 'realtime-examples',
   heading: 'Examples',
   type: 'grid',
   columns: 2,
@@ -46,7 +46,7 @@ export const realtimeExamples: ContentListingGroup = {
 }
 
 export const realtimeResources: ContentListingGroup = {
-  id: 'resources',
+  id: 'realtime-resources',
   heading: 'Resources',
   description: 'Find the source code and documentation in the Supabase GitHub repository:',
   type: 'grid',

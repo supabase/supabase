@@ -1,7 +1,7 @@
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
 export const functionsGetStarted: ContentListingGroup = {
-  id: 'get-started',
+  id: 'functions-get-started',
   heading: 'Get started',
   type: 'grid',
   columns: 2,
@@ -15,7 +15,7 @@ export const functionsGetStarted: ContentListingGroup = {
 }
 
 export const functionsExamplesSupabase: ContentListingGroup = {
-  id: 'examples-supabase',
+  id: 'functions-examples-supabase',
   heading: 'Supabase integration',
   headingLevel: 'h3',
   type: 'grid',
@@ -82,7 +82,7 @@ export const functionsExamplesSupabase: ContentListingGroup = {
 }
 
 export const functionsExamplesWebhooksPayments: ContentListingGroup = {
-  id: 'examples-webhooks-payments',
+  id: 'functions-examples-webhooks-payments',
   heading: 'Webhooks & payments',
   headingLevel: 'h3',
   type: 'grid',
@@ -108,7 +108,7 @@ export const functionsExamplesWebhooksPayments: ContentListingGroup = {
 }
 
 export const functionsExamplesAiMedia: ContentListingGroup = {
-  id: 'examples-ai-media',
+  id: 'functions-examples-ai-media',
   heading: 'AI & media',
   headingLevel: 'h3',
   type: 'grid',
@@ -148,7 +148,7 @@ export const functionsExamplesAiMedia: ContentListingGroup = {
 }
 
 export const functionsExamplesMessaging: ContentListingGroup = {
-  id: 'examples-messaging',
+  id: 'functions-examples-messaging',
   heading: 'Bots & email',
   headingLevel: 'h3',
   type: 'grid',
@@ -177,7 +177,7 @@ export const functionsExamplesMessaging: ContentListingGroup = {
 }
 
 export const functionsExamplesOperations: ContentListingGroup = {
-  id: 'examples-operations',
+  id: 'functions-examples-operations',
   heading: 'Operations & security',
   headingLevel: 'h3',
   type: 'grid',

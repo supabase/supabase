@@ -1,7 +1,7 @@
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
 export const authGetStarted: ContentListingGroup = {
-  id: 'get-started',
+  id: 'auth-get-started',
   heading: 'Get started',
   description: "Start here if you're new to Supabase Auth:",
   type: 'grid',
@@ -25,7 +25,7 @@ export const authGetStarted: ContentListingGroup = {
 }
 
 export const authPricing: ContentListingGroup = {
-  id: 'pricing',
+  id: 'auth-pricing',
   heading: 'Pricing',
   description:
     'Charges apply to Monthly Active Users (MAU), Monthly Active Third-Party Users (Third-Party MAU), and Monthly Active SSO Users (SSO MAU) and Advanced MFA Add-ons. For a detailed breakdown of how these charges are calculated, refer to the following pages.',
@@ -55,7 +55,7 @@ export const authPricing: ContentListingGroup = {
 }
 
 export const authNextSteps: ContentListingGroup = {
-  id: 'next-steps',
+  id: 'auth-next-steps',
   heading: 'Next steps',
   description:
     "Once you've covered the basics, these guides help with other use cases and features:",

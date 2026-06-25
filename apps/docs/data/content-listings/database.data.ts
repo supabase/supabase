@@ -1,7 +1,7 @@
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
 export const databaseGetStarted: ContentListingGroup = {
-  id: 'get-started',
+  id: 'database-get-started',
   heading: 'Get started',
   description: "If you're new to the database section, these are the pages to read first:",
   type: 'grid',
@@ -44,7 +44,7 @@ export const databaseGetStarted: ContentListingGroup = {
 }
 
 export const databaseNextSteps: ContentListingGroup = {
-  id: 'next-steps',
+  id: 'database-next-steps',
   heading: 'Next steps',
   description:
     "Once you've covered the basics, these guides help with other use cases and features:",

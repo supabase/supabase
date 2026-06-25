@@ -1,5 +1,5 @@
-import { storageGetStarted } from '~/components/listings/storage.data'
-import { ListingsMarkdownHandlers } from '~/internals/markdown-schema/Listings'
+import { storageGetStarted } from '~/data/content-listings/storage.data'
+import { ContentListings as ContentListingsMarkdownHandler } from '~/internals/markdown-schema/Listings'
 import {
   serializeContentListingGroupToMarkdown,
   serializeContentListingsToMarkdown,
@@ -142,19 +142,24 @@ describe('serializeContentListingsToMarkdown', () => {
   })
 })
 
-describe('ListingsMarkdownHandlers', () => {
-  it('exports markdown for named listing components from shared data', () => {
-    const markdown = ListingsMarkdownHandlers.StorageGetStartedListings()
+describe('ContentListings markdown handler', () => {
+  it('serializes the group looked up by id', () => {
+    const markdown = ContentListingsMarkdownHandler({ props: { id: 'storage-get-started' } })
 
     expect(markdown).toContain('## Get started')
     expect(markdown).toContain('Files buckets')
     expect(markdown).toContain('/guides/storage/quickstart')
   })
 
-  it('matches serializeContentListingGroupToMarkdown for the same data', () => {
-    expect(ListingsMarkdownHandlers.StorageGetStartedListings()).toBe(
-      serializeContentListingGroupToMarkdown(storageGetStarted, '')
-    )
+  it('returns empty string when id is missing or unknown', () => {
+    expect(ContentListingsMarkdownHandler({ props: {} })).toBe('')
+    expect(ContentListingsMarkdownHandler({ props: { id: 'nonexistent-id' } })).toBe('')
+  })
+
+  it('matches direct serializeContentListingGroupToMarkdown for the same data', () => {
+    const handler = ContentListingsMarkdownHandler({ props: { id: 'storage-get-started' } })
+    const direct = serializeContentListingGroupToMarkdown(storageGetStarted, '')
+    expect(handler).toBe(direct)
   })
 })
 

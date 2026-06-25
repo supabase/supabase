@@ -1,5 +1,6 @@
 'use client'
 
+import { getContentListingById } from '~/data/content-listings'
 import {
   getContentListingGridItemClassName,
   getContentListingGroupLabel,
@@ -23,7 +24,7 @@ function ContentListingLink({
 }: {
   item: ContentListingItem
   groupLabel: string
-  listingId?: string
+  listingId: string
   children: ReactNode
   className?: string
 }) {
@@ -37,7 +38,7 @@ function ContentListingLink({
         targetPath: item.href,
         linkTitle: item.title,
         ...(groupLabel ? { groupTitle: groupLabel } : {}),
-        ...(listingId ? { listingId } : {}),
+        listingId,
       },
     })
   }
@@ -78,7 +79,7 @@ function ContentListingsListGroup({ group }: { group: ContentListingGroup }) {
       {group.description && <p className="text-foreground-light">{group.description}</p>}
       <ul className="list-disc pl-6 space-y-2">
         {group.items.map((item) => (
-          <li key={`${group.id ?? group.heading}-${item.href}`}>
+          <li key={`${group.id}-${item.href}`}>
             <ContentListingLink item={item} groupLabel={groupLabel} listingId={group.id}>
               <span>
                 <strong>{item.title}</strong>: {item.description}
@@ -101,7 +102,7 @@ function ContentListingsGridGroup({ group }: { group: ContentListingGroup }) {
       {group.description && <p className="text-foreground-light">{group.description}</p>}
       <div className="grid md:grid-cols-12 gap-4">
         {group.items.map((item) => (
-          <div key={`${group.id ?? group.heading}-${item.href}`} className={itemClassName}>
+          <div key={`${group.id}-${item.href}`} className={itemClassName}>
             <ContentListingLink
               item={item}
               groupLabel={groupLabel}
@@ -121,9 +122,11 @@ function ContentListingsGridGroup({ group }: { group: ContentListingGroup }) {
 
 /**
  * Renders a standardized orientation link section (grid or list layout).
+ * The `id` selects which content listing group to render from the data registry.
  */
-export function ContentListings(group: ContentListingGroup) {
-  if (!group.items.length) return null
+export function ContentListings({ id }: { id: string }) {
+  const group = getContentListingById(id)
+  if (!group || !group.items.length) return null
 
   const content =
     group.type === 'grid' ? (

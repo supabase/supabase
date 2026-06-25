@@ -1,7 +1,7 @@
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
 export const storageGetStarted: ContentListingGroup = {
-  id: 'get-started',
+  id: 'storage-get-started',
   heading: 'Get started',
   description: 'Choose the bucket type that fits your use case:',
   type: 'grid',
@@ -28,7 +28,7 @@ export const storageGetStarted: ContentListingGroup = {
 }
 
 export const storageExamples: ContentListingGroup = {
-  id: 'examples',
+  id: 'storage-examples',
   heading: 'Examples',
   description: 'Working sample projects for common Storage integration patterns:',
   type: 'grid',
@@ -51,7 +51,7 @@ export const storageExamples: ContentListingGroup = {
 }
 
 export const storageResources: ContentListingGroup = {
-  id: 'resources',
+  id: 'storage-resources',
   heading: 'Resources',
   description: 'Source code and REST API reference for the Storage service:',
   type: 'grid',

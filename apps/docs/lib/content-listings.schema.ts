@@ -34,9 +34,9 @@ export function getContentListingGridItemClassName(columns: ContentListingGridCo
   return CONTENT_LISTING_GRID_ITEM_CLASS[columns]
 }
 
-/** Label for telemetry and keys — prefers heading, falls back to id. */
+/** Label for telemetry — prefers heading, falls back to id. */
 export function getContentListingGroupLabel(group: ContentListingGroup): string {
-  return group.heading ?? group.id ?? 'content-listing'
+  return group.heading ?? group.id
 }
 
 /**
