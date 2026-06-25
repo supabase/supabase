@@ -37,6 +37,7 @@ import { AuthorizeRequesterDetails } from '../AuthorizeRequesterDetails'
 import { OAuthSecrets } from '../OAuthSecrets/OAuthSecrets'
 import { ScopesPanel } from './Scopes'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { Shortcut } from '@/components/ui/Shortcut'
 import {
   OAuthAppCreateResponse,
   useOAuthAppCreateMutation,
@@ -46,6 +47,7 @@ import type { OAuthApp } from '@/data/oauth/oauth-apps-query'
 import { DOCS_URL } from '@/lib/constants'
 import { isValidHttpUrl, uuidv4 } from '@/lib/helpers'
 import { uploadAttachment } from '@/lib/upload'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export interface PublishAppSidePanelProps {
   visible: boolean
@@ -272,7 +274,7 @@ export const PublishAppSidePanel = ({
                         <div className="absolute bottom-1 right-1">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button type="default" className="px-1">
+                              <Button variant="default" className="px-1">
                                 <Edit />
                               </Button>
                             </DropdownMenuTrigger>
@@ -336,7 +338,7 @@ export const PublishAppSidePanel = ({
                     </p>
                   </div>
                   <Button
-                    type="default"
+                    variant="default"
                     onClick={() => appendCallbackUrl({ id: uuidv4(), value: '' })}
                   >
                     Add URL
@@ -362,7 +364,7 @@ export const PublishAppSidePanel = ({
                               {callbackUrlsFields.length > 1 ? (
                                 <InputGroupAddon align="inline-end">
                                   <InputGroupButton
-                                    type="default"
+                                    variant="default"
                                     onClick={() => removeCallbackUrl(index)}
                                   >
                                     Remove
@@ -412,19 +414,26 @@ export const PublishAppSidePanel = ({
             <SidePanel.Content>
               <div className="pt-2 pb-3 flex items-center justify-between">
                 <Button
-                  type="default"
+                  variant="default"
                   onClick={() => setShowPreview(true)}
                   disabled={name.length === 0 || website.length === 0}
                 >
                   Preview consent for users
                 </Button>
                 <div className="flex items-center space-x-2">
-                  <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
+                  <Button variant="default" disabled={isSubmitting} onClick={() => onClose()}>
                     Cancel
                   </Button>
-                  <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
-                    Confirm
-                  </Button>
+                  <Shortcut
+                    id={SHORTCUT_IDS.ORG_OAUTH_APPS_SUBMIT}
+                    onTrigger={() => form.handleSubmit(onSubmit)()}
+                    options={{ enabled: visible && !isSubmitting }}
+                    side="top"
+                  >
+                    <Button type="submit" loading={isSubmitting} disabled={isSubmitting}>
+                      Confirm
+                    </Button>
+                  </Shortcut>
                 </div>
               </div>
             </SidePanel.Content>

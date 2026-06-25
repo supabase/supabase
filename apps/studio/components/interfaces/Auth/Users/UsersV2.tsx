@@ -69,13 +69,12 @@ import { useUserDeleteMutation } from '@/data/auth/user-delete-mutation'
 import { useUserIndexStatusesQuery } from '@/data/auth/user-search-indexes-query'
 import { useUsersCountQuery } from '@/data/auth/users-count-query'
 import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
 import { cleanPointerEventsNoneOnBody, isAtBottom } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 const SORT_BY_VALUE_COUNT_THRESHOLD = 10_000
@@ -98,13 +97,12 @@ export const UsersV2 = () => {
     isPending: isPendingProject,
     isError: isProjectError,
   } = useSelectedProjectQuery()
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   const gridRef = useRef<DataGridHandle>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const xScroll = useRef<number>(0)
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const {
     authenticationShowProviderFilter: showProviderFilter,
@@ -345,10 +343,6 @@ export const UsersV2 = () => {
     keywords: filterKeywords,
     filter_column: specificFilterColumn === 'freeform' ? undefined : specificFilterColumn,
   }
-  const telemetryGroups = {
-    project: projectRef ?? 'Unknown',
-    organization: selectedOrg?.slug ?? 'Unknown',
-  }
 
   const updateStorageFilter = (value: SpecificFilterColumn) => {
     setLocalStorageFilter(value)
@@ -457,13 +451,9 @@ export const UsersV2 = () => {
 
   const handleRefresh = () => {
     refetch()
-    sendEvent({
-      action: 'auth_users_search_submitted',
-      properties: {
-        trigger: 'refresh_button',
-        ...telemetryProps,
-      },
-      groups: telemetryGroups,
+    track('auth_users_search_submitted', {
+      trigger: 'refresh_button',
+      ...telemetryProps,
     })
   }
 
@@ -554,7 +544,7 @@ export const UsersV2 = () => {
                 icon={<WandSparklesIcon />}
                 onClick={() => setShowCreateIndexesModal(true)}
                 loading={isUpdatingAuthConfig}
-                type="default"
+                variant="default"
               >
                 Upgrade search
               </Button>
@@ -572,7 +562,7 @@ export const UsersV2 = () => {
                 on the number of users in your project.
               </div>
 
-              <Button type="link" iconRight={<ExternalLinkIcon />} asChild>
+              <Button variant="link" iconRight={<ExternalLinkIcon />} asChild>
                 <Link
                   href={`/project/${projectRef}/logs/explorer?q=${encodeURI(INDEX_WORKER_LOGS_SEARCH_STRING)}`}
                   target="_blank"
@@ -587,11 +577,11 @@ export const UsersV2 = () => {
         <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-start justify-between gap-2">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
-              <Button type="default" icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
+              <Button variant="default" icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
                 Delete {selectedUsers.size} users
               </Button>
               <ButtonTooltip
-                type="default"
+                variant="default"
                 icon={<X />}
                 className="px-1.5"
                 onClick={() => setSelectedUsers(new Set([]))}
@@ -607,7 +597,6 @@ export const UsersV2 = () => {
                   setSearch={setSearch}
                   improvedSearchEnabled={improvedSearchEnabled}
                   telemetryProps={telemetryProps}
-                  telemetryGroups={telemetryGroups}
                   onSelectFilterColumn={(value) => {
                     if (value === 'freeform') {
                       if (isCountWithinThresholdForSortBy) {
@@ -627,14 +616,10 @@ export const UsersV2 = () => {
                       value={filterUserType}
                       onValueChange={(val) => {
                         setFilterUserType(val as Filter)
-                        sendEvent({
-                          action: 'auth_users_search_submitted',
-                          properties: {
-                            trigger: 'user_type_filter',
-                            ...telemetryProps,
-                            user_type: val,
-                          },
-                          groups: telemetryGroups,
+                        track('auth_users_search_submitted', {
+                          trigger: 'user_type_filter',
+                          ...telemetryProps,
+                          user_type: val,
                         })
                       }}
                     >
@@ -680,14 +665,10 @@ export const UsersV2 = () => {
                       className="w-52"
                       onSaveFilters={(providers) => {
                         setSelectedProviders(providers)
-                        sendEvent({
-                          action: 'auth_users_search_submitted',
-                          properties: {
-                            trigger: 'provider_filter',
-                            ...telemetryProps,
-                            providers,
-                          },
-                          groups: telemetryGroups,
+                        track('auth_users_search_submitted', {
+                          trigger: 'provider_filter',
+                          ...telemetryProps,
+                          providers,
                         })
                       }}
                     />
@@ -751,15 +732,11 @@ export const UsersV2 = () => {
                   setSortByValue={(value) => {
                     const [sortColumn, sortOrder] = value.split(':')
                     updateSortByValue(value)
-                    sendEvent({
-                      action: 'auth_users_search_submitted',
-                      properties: {
-                        trigger: 'sort_change',
-                        ...telemetryProps,
-                        sort_column: sortColumn,
-                        sort_order: sortOrder,
-                      },
-                      groups: telemetryGroups,
+                    track('auth_users_search_submitted', {
+                      trigger: 'sort_change',
+                      ...telemetryProps,
+                      sort_column: sortColumn,
+                      sort_order: sortOrder,
                     })
                   }}
                   showSortByEmail={showSortByEmail}
@@ -772,7 +749,7 @@ export const UsersV2 = () => {
                 <ButtonTooltip
                   size="tiny"
                   icon={<RefreshCw />}
-                  type="default"
+                  variant="default"
                   className="w-7"
                   loading={isRefetching && !isFetchingNextPage}
                   onClick={handleRefresh}
@@ -794,7 +771,7 @@ export const UsersV2 = () => {
             <div className="flex flex-col w-full h-full">
               <DataGrid
                 ref={gridRef}
-                className="grow border-t-0"
+                className="grow border-t-0! border-b-0!"
                 rowHeight={44}
                 headerRowHeight={36}
                 columns={columns}

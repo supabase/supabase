@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM, useParams } from 'common'
+import { IS_PLATFORM } from 'common'
 import { PlayCircle, StopCircle } from 'lucide-react'
 import { Dispatch, SetStateAction, useCallback } from 'react'
 import { Button } from 'ui'
@@ -11,9 +11,8 @@ import { RealtimeConfig } from './useRealtimeMessages'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { getTemporaryAPIKey } from '@/data/api-keys/temp-api-keys-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -34,9 +33,7 @@ export const Header = ({
   filterPopoverOpen,
   onFilterPopoverChange,
 }: HeaderProps) => {
-  const { mutate: sendEvent } = useSendEventMutation()
-  const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(
     PermissionAction.READ,
@@ -57,15 +54,9 @@ export const Header = ({
     }
 
     if (willStartListening) {
-      sendEvent({
-        action: 'realtime_inspector_listen_channel_clicked',
-        groups: {
-          project: ref ?? 'Unknown',
-          organization: org?.slug ?? 'Unknown',
-        },
-      })
+      track('realtime_inspector_listen_channel_clicked')
     }
-  }, [config, onChangeConfig, sendEvent, ref, org])
+  }, [config, onChangeConfig, track])
 
   useShortcut(SHORTCUT_IDS.INSPECTOR_TOGGLE_LISTENING, handleToggleListening, {
     enabled: canToggleListening,
@@ -74,7 +65,7 @@ export const Header = ({
   const listeningButton = (
     <Button
       size="tiny"
-      type={config.enabled ? 'warning' : 'primary'}
+      variant={config.enabled ? 'warning' : 'primary'}
       className="rounded-l-none border-l-0"
       disabled={!canToggleListening}
       icon={config.enabled ? <StopCircle size="16" /> : <PlayCircle size="16" />}
@@ -101,7 +92,7 @@ export const Header = ({
         ) : (
           <ButtonTooltip
             size="tiny"
-            type={config.enabled ? 'warning' : 'primary'}
+            variant={config.enabled ? 'warning' : 'primary'}
             className="rounded-l-none border-l-0"
             disabled
             icon={config.enabled ? <StopCircle size="16" /> : <PlayCircle size="16" />}

@@ -40,7 +40,7 @@ export const BannerMetricsAPI = () => {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button type="default" size="tiny" asChild>
+          <Button variant="default" size="tiny" asChild>
             <Link
               href={`${DOCS_URL}/guides/telemetry/metrics`}
               target="_blank"

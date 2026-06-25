@@ -30,7 +30,7 @@ import { LogTable } from '@/components/interfaces/Settings/Logs/LogTable'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import LoadingOpacity from '@/components/ui/LoadingOpacity'
 import ShimmerLine from '@/components/ui/ShimmerLine'
 import { useContentQuery } from '@/data/content/content-query'
@@ -203,9 +203,14 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const handleRun = (value?: string | React.MouseEvent) => {
     track('log_explorer_query_run_button_clicked', { is_saved_query: !!queryId })
 
-    const query = typeof value === 'string' ? value || editorValue : editorValue
+    // Read the latest value straight from the editor instance rather than from
+    // `editorValue` state, which can lag behind the most recent keystroke. This
+    // keeps the Run button consistent with the Cmd+Enter keybinding.
+    const liveValue = editorRef.current?.getValue()
+    const query = typeof value === 'string' ? value || editorValue : (liveValue ?? editorValue)
     const resolvedParams = buildLogQueryParams(datePickerValue, query)
 
+    setSelectedLog(null)
     setParams((prev) => ({
       ...prev,
       sql: resolvedParams.sql,
@@ -310,6 +315,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     } else {
       setTimeRange(resolvedRange.from || '', resolvedRange.to || '')
     }
+    setSelectedLog(null)
     setParams((prev) => ({
       ...prev,
       iso_timestamp_start: resolvedRange.from,

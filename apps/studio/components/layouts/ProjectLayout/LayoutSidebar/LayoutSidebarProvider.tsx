@@ -2,14 +2,14 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, type PropsWithChildren } from 'react'
+import { useEffect, useEffectEvent, type PropsWithChildren } from 'react'
 
 import { getSupportLinkQueryParams } from '@/components/ui/HelpPanel/HelpPanel.utils'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import useLatest from '@/hooks/misc/useLatest'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import {
@@ -44,7 +44,7 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
   const router = useRouter()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { openSidebar, closeSidebar, activeSidebar } = useSidebarManagerSnapshot()
 
   const [sidebarURLParam, setSidebarUrlParam] = useQueryState('sidebar', parseAsString)
@@ -83,20 +83,16 @@ export const LayoutSidebarProvider = ({ children }: PropsWithChildren) => {
     sidebarManagerState.toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
   )
 
+  const onSidebarChanged = useEffectEvent(
+    (sidebarId: (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS]) => {
+      track('sidebar_opened', { sidebar: sidebarId })
+    }
+  )
+
   useEffect(() => {
     if (!!project) {
       if (activeSidebar) {
-        // add event tracking
-        sendEvent({
-          action: 'sidebar_opened',
-          properties: {
-            sidebar: activeSidebar.id as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS],
-          },
-          groups: {
-            project: project?.ref ?? 'Unknown',
-            organization: org?.slug ?? 'Unknown',
-          },
-        })
+        onSidebarChanged(activeSidebar.id as (typeof SIDEBAR_KEYS)[keyof typeof SIDEBAR_KEYS])
         setSidebarLocalStorage(activeSidebar.id)
       } else {
         setSidebarLocalStorage('')

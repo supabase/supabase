@@ -217,9 +217,11 @@ export const GitHubIntegrationConnectionForm = ({
         project_ref: selectedProject.ref,
         repository_id: Number(selectedRepo.id),
         workdir: data.supabaseDirectory,
-        supabase_changes_only: data.supabaseChangesOnly,
-        branch_limit: Number(data.branchLimit),
-        new_branch_per_pr: data.new_branch_per_pr ?? false,
+        ...(hasAccessToBranching && {
+          supabase_changes_only: data.supabaseChangesOnly,
+          branch_limit: Number(data.branchLimit),
+          new_branch_per_pr: data.new_branch_per_pr ?? false,
+        }),
       },
     })
 
@@ -266,9 +268,11 @@ export const GitHubIntegrationConnectionForm = ({
       organizationId: selectedOrganization.id,
       connection: {
         workdir: data.supabaseDirectory,
-        supabase_changes_only: data.supabaseChangesOnly,
-        branch_limit: Number(data.branchLimit),
-        new_branch_per_pr: data.new_branch_per_pr ?? false,
+        ...(hasAccessToBranching && {
+          supabase_changes_only: data.supabaseChangesOnly,
+          branch_limit: Number(data.branchLimit),
+          new_branch_per_pr: data.new_branch_per_pr ?? false,
+        }),
       },
     })
 
@@ -618,7 +622,7 @@ export const GitHubIntegrationConnectionForm = ({
                     <div>
                       {connection && (
                         <Button
-                          type="outline"
+                          variant="outline"
                           onClick={handleRemoveIntegration}
                           disabled={isDeletingConnection || isCheckingBranch}
                           loading={isDeletingConnection}
@@ -630,7 +634,7 @@ export const GitHubIntegrationConnectionForm = ({
                     <div className="flex space-x-2">
                       {githubSettingsForm.formState.isDirty && (
                         <Button
-                          type="default"
+                          variant="default"
                           onClick={() => githubSettingsForm.reset()}
                           disabled={!canUpdateGitHubConnection || isCheckingBranch}
                         >
@@ -638,8 +642,8 @@ export const GitHubIntegrationConnectionForm = ({
                         </Button>
                       )}
                       <Button
-                        type="primary"
-                        htmlType="submit"
+                        variant="primary"
+                        type="submit"
                         disabled={
                           !hasAccessToGitHubIntegration ||
                           (!connection && !canCreateGitHubConnection) ||

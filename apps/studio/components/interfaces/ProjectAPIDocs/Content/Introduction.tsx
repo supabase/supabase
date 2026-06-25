@@ -9,19 +9,19 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) => {
   const { ref } = useParams()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef: ref }, { enabled: canReadAPIKeys })
+  const { data: apiKeysData } = useAPIKeys({ projectRef: ref }, { enabled: canReadAPIKeys })
   useProjectSettingsV2Query({ projectRef: ref })
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const { anonKey, serviceKey } = apiKeysData ?? {}
+
+  const track = useTrack()
 
   const [copied, setCopied] = useState<'anon' | 'service'>()
 
@@ -29,7 +29,6 @@ export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentPr
     if (copied !== undefined) setTimeout(() => setCopied(undefined), 2000)
   }, [copied])
 
-  const { anonKey, serviceKey } = getKeys(apiKeys)
   const anonApiKey = anonKey?.api_key
   const serviceApiKey = serviceKey?.api_key ?? 'SUPABASE_CLIENT_SERVICE_KEY'
 
@@ -62,21 +61,14 @@ export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentPr
                 actions={[
                   <Button
                     key="copy"
-                    type="default"
+                    variant="default"
                     icon={<Copy />}
                     onClick={() => {
                       setCopied('anon')
                       copyToClipboard(anonApiKey ?? 'SUPABASE_CLIENT_ANON_KEY')
-                      sendEvent({
-                        action: 'api_docs_code_copy_button_clicked',
-                        properties: {
-                          title: 'Client API key',
-                          selectedLanguage: language,
-                        },
-                        groups: {
-                          project: ref ?? 'Unknown',
-                          organization: org?.slug ?? 'Unknown',
-                        },
+                      track('api_docs_code_copy_button_clicked', {
+                        title: 'Client API key',
+                        selectedLanguage: language,
                       })
                     }}
                   >
@@ -110,21 +102,14 @@ export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentPr
                 actions={[
                   <Button
                     key="copy"
-                    type="default"
+                    variant="default"
                     icon={<Copy />}
                     onClick={() => {
                       setCopied('service')
                       copyToClipboard(serviceApiKey)
-                      sendEvent({
-                        action: 'api_docs_code_copy_button_clicked',
-                        properties: {
-                          title: 'Service key',
-                          selectedLanguage: language,
-                        },
-                        groups: {
-                          project: ref ?? 'Unknown',
-                          organization: org?.slug ?? 'Unknown',
-                        },
+                      track('api_docs_code_copy_button_clicked', {
+                        title: 'Service key',
+                        selectedLanguage: language,
                       })
                     }}
                   >

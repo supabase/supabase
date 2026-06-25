@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM, useFeatureFlags } from 'common'
 import { Database } from 'common/marketplace.types'
 import { Search } from 'lucide-react'
@@ -33,7 +32,7 @@ import { ProjectIntegrationsLayoutDispatch } from '@/components/layouts/ProjectI
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
-import { marketplaceCategoriesQueryOptions } from '@/data/marketplace/integration-categories-query'
+import { useMarketplaceCategoriesQuery } from '@/data/marketplace/integration-categories-query'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
@@ -55,7 +54,7 @@ function getIntegrationImage(integration: IntegrationDefinition) {
 
   if (integration.files?.length) {
     const heroImage = integration?.files?.[0]
-    return heroImage
+    return heroImage?.src ?? undefined
   }
 }
 
@@ -183,9 +182,9 @@ const LegacyIntegrationsPage = () => {
 
   const selectedCategory = useFilterCategory()
 
-  const { data: categories = [], isPending: isPendingCategories } = useQuery(
-    marketplaceCategoriesQueryOptions({ enabled: isMarketplaceEnabled })
-  )
+  const { data: categories = [], isPending: isPendingCategories } = useMarketplaceCategoriesQuery({
+    enabled: isMarketplaceEnabled,
+  })
 
   const isLoadingSelectedCategory =
     selectedCategory !== 'all' &&

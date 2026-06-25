@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { Button } from 'ui'
+import { Button, DialogFooter } from 'ui'
 
 interface PolicyEditorFooterProps {
   showTemplates: boolean
@@ -12,18 +12,16 @@ const PolicyEditorFooter = ({
   onViewTemplates = noop,
   onReviewPolicy = noop,
 }: PolicyEditorFooterProps) => (
-  <div className="flex justify-between items-center border-t px-6 py-4 border-default">
-    <div className="flex w-full items-center justify-end gap-2">
-      {showTemplates && (
-        <Button type="default" onClick={onViewTemplates}>
-          View templates
-        </Button>
-      )}
-      <Button type="primary" onClick={onReviewPolicy}>
-        Review
+  <DialogFooter>
+    {showTemplates && (
+      <Button variant="default" onClick={onViewTemplates}>
+        View templates
       </Button>
-    </div>
-  </div>
+    )}
+    <Button variant="primary" onClick={onReviewPolicy}>
+      Review
+    </Button>
+  </DialogFooter>
 )
 
 export default PolicyEditorFooter

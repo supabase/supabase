@@ -7,12 +7,15 @@ packages:
 blockExoticSubdeps: true
 
 catalog:
-  '@sentry/nextjs': ^10.26.0
-  '@supabase/auth-js': 2.106.2
-  '@supabase/postgrest-js': 2.106.2
-  '@supabase/realtime-js': 2.106.2
+  '@sentry/nextjs': ^10.59.0
+  '@supabase/auth-js': 2.108.2
+  '@supabase/postgrest-js': 2.108.2
+  '@supabase/realtime-js': 2.108.2
   '@supabase/ssr': 0.10.2
-  '@supabase/supabase-js': 2.106.2
+  '@supabase/supabase-js': 2.108.2
+  '@tanstack/react-router': ^1.169.2
+  '@tanstack/react-start': ^1.167.65
+  '@tanstack/react-table': ^8.21.3
   '@types/node': ^22.0.0
   '@types/react': ^19.2.14
   '@types/react-dom': ^19.2.3
@@ -29,10 +32,10 @@ catalog:
   react-dom: ^19.2.6
   recharts: ^2.15.4
   tailwindcss: ^4.2.4
-  tsx: 4.20.3
+  tsx: ^4.22.0
   typescript: ~6.0.0
   valtio: ^1.12.0
-  vite: ^8.0.8
+  vite: ^8.0.16
   vite-tsconfig-paths: ^6.1.1
   vitest: ^4.1.4
   zod: 3.25.76
@@ -56,8 +59,7 @@ minimumReleaseAgeExclude:
   - '@supabase/*'
   - '@supabase-labs/*'
   # The following are excluded to fix vulnerablities.
-  - mermaid
-  - '@mermaid-js/parser'
+  - react-use
 
 onlyBuiltDependencies:
   - node-pty
@@ -66,25 +68,28 @@ onlyBuiltDependencies:
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
   '@mapbox/node-pre-gyp>tar': ^7.5.11
-  '@redocly/respect-core>form-data': ^4.0.4
-  '@redocly/respect-core>js-yaml': ^4.1.1
-  '@rollup/plugin-terser>serialize-javascript': ^7.0.5
+  '@sentry/webpack-plugin>uuid': ^11.1.1
+  '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
+  'braintrust>uuid': ^11.1.1
+  'mdx-bundler>uuid': ^11.1.1
+  braintrust>esbuild: ^0.28.1
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
-  esbuild: ^0.25.2
   express-rate-limit>ip-address: ^10.1.1
+  # Pin h3 v1 to a single version so the Nuxt registry example (vue-blocks)
+  # doesn't end up with two copies (1.15.10 + 1.15.11) and hit nominal
+  # H3Event type mismatches. v2 (h3@2) is intentionally left untouched.
+  'h3@1': 1.15.11
   lodash: 'catalog:'
   lodash-es: 'catalog:'
   node-gyp>tar: ^7.5.11
   nodemailer: ^7.0.11
-  payload>undici: ^7.18.2
-  pgsql-parser>libpg-query: ^15.2.0
   postcss: 'catalog:'
+  qs: ^6.15.2
   refractor>prismjs: ^1.30.0
   supabase>tar: ^7.5.11
-  terser-webpack-plugin>serialize-javascript: ^7.0.5
-  tmp: ^0.2.4
-  unhead: ^2.1.13
+  tmp: ^0.2.7
+  vite>esbuild: ^0.28.1
   webpack: ^5.104.1
 
 patchedDependencies:

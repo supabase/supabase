@@ -259,7 +259,7 @@ const InnovationTeams: NextPage = () => {
                       <p className="text-foreground-lighter text-sm mb-6 grow">
                         {option.description}
                       </p>
-                      <Button type={index === 0 ? 'primary' : 'default'} asChild>
+                      <Button variant={index === 0 ? 'primary' : 'default'} asChild>
                         <Link href={option.cta.href}>{option.cta.label}</Link>
                       </Button>
                     </div>

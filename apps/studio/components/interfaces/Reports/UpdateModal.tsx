@@ -131,10 +131,10 @@ export const UpdateCustomReportModal = ({
               />
             </DialogSection>
             <DialogFooter>
-              <Button htmlType="reset" type="default" onClick={handleCancel} disabled={isUpdating}>
+              <Button type="reset" variant="default" onClick={handleCancel} disabled={isUpdating}>
                 Cancel
               </Button>
-              <Button htmlType="submit" loading={isUpdating} disabled={isUpdating || !isDirty}>
+              <Button type="submit" loading={isUpdating} disabled={isUpdating || !isDirty}>
                 Save custom report
               </Button>
             </DialogFooter>

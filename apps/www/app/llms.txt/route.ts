@@ -1,4 +1,7 @@
+import { promises as fs } from 'node:fs'
+import path from 'node:path'
 import { isFeatureEnabled } from 'common/enabled-features'
+import matter from 'gray-matter'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,7 +11,44 @@ interface Source {
   enabled: boolean
 }
 
-function getSources(): Source[] {
+/**
+ * Resolved relative to apps/www (process.cwd() at runtime). The directory is
+ * included in the serverless bundle via outputFileTracingIncludes in
+ * next.config.mjs so this readdir works on Vercel.
+ */
+const GUIDES_CONTENT_DIR = path.join(process.cwd(), '..', 'docs', 'content', 'guides')
+
+async function readFrontmatterTitle(dirName: string): Promise<string | null> {
+  try {
+    const mdxPath = path.join(GUIDES_CONTENT_DIR, `${dirName}.mdx`)
+    const raw = await fs.readFile(mdxPath, 'utf-8')
+    const { data } = matter(raw)
+    return typeof data.title === 'string' && data.title.length > 0 ? data.title : null
+  } catch {
+    return null
+  }
+}
+
+async function getGuideSources(): Promise<Source[]> {
+  const entries = await fs.readdir(GUIDES_CONTENT_DIR, { withFileTypes: true })
+  const dirNames = entries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort()
+
+  return Promise.all(
+    dirNames.map(async (dirName) => {
+      const frontmatterTitle = await readFrontmatterTitle(dirName)
+      return {
+        title: `Supabase - ${frontmatterTitle ?? dirName}`,
+        relPath: `docs/guides/${dirName}.md`,
+        enabled: true,
+      }
+    })
+  )
+}
+
+async function getSources(): Promise<Source[]> {
   const { sdkCsharp, sdkDart, sdkKotlin, sdkPython, sdkSwift } = isFeatureEnabled([
     'sdk:csharp',
     'sdk:dart',
@@ -17,8 +57,10 @@ function getSources(): Source[] {
     'sdk:swift',
   ])
 
+  const guideSources = await getGuideSources()
+
   return [
-    { title: 'Supabase Guides', relPath: 'llms/guides.txt', enabled: true },
+    ...guideSources,
     { title: 'Supabase Reference (JavaScript)', relPath: 'llms/js.txt', enabled: true },
     { title: 'Supabase Reference (Dart)', relPath: 'llms/dart.txt', enabled: sdkDart },
     { title: 'Supabase Reference (Swift)', relPath: 'llms/swift.txt', enabled: sdkSwift },
@@ -26,6 +68,7 @@ function getSources(): Source[] {
     { title: 'Supabase Reference (Python)', relPath: 'llms/python.txt', enabled: sdkPython },
     { title: 'Supabase Reference (C#)', relPath: 'llms/csharp.txt', enabled: sdkCsharp },
     { title: 'Supabase CLI Reference', relPath: 'llms/cli.txt', enabled: true },
+    { title: 'Supabase Management API Reference', relPath: 'llms/api.txt', enabled: true },
   ]
 }
 
@@ -47,7 +90,7 @@ const PRODUCT_OVERVIEW_LINKS = [
 ].join('\n')
 
 export async function GET() {
-  const sources = getSources()
+  const sources = await getSources()
 
   const sourceLinks = sources
     .filter((source) => source.enabled)

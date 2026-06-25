@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IS_PLATFORM, useParams } from 'common'
+import { IS_PLATFORM } from 'common'
 import { ChevronDown } from 'lucide-react'
 import { Dispatch, SetStateAction, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -26,9 +26,8 @@ import { RealtimeConfig } from './useRealtimeMessages'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { getTemporaryAPIKey } from '@/data/api-keys/temp-api-keys-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 type ControlledOpenProps =
@@ -59,9 +58,7 @@ export const ChooseChannelPopover = ({
       setInternalOpen(v)
     }
   }
-  const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
@@ -80,13 +77,7 @@ export const ChooseChannelPopover = ({
 
   const onSubmit = async () => {
     setOpen(false)
-    sendEvent({
-      action: 'realtime_inspector_listen_channel_clicked',
-      groups: {
-        project: ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+    track('realtime_inspector_listen_channel_clicked')
 
     let token = config.token
 
@@ -106,7 +97,7 @@ export const ChooseChannelPopover = ({
 
   const channelPopoverTrigger = (
     <PopoverTrigger asChild>
-      <Button className="rounded-r-none" type="default" size="tiny" iconRight={<ChevronDown />}>
+      <Button className="rounded-r-none" variant="default" size="tiny" iconRight={<ChevronDown />}>
         <p
           className="max-w-[120px] truncate"
           title={config.channelName.length > 0 ? config.channelName : ''}
@@ -154,7 +145,7 @@ export const ChooseChannelPopover = ({
                             </FormControl>
                             <InputGroupAddon align="inline-end">
                               <InputGroupButton
-                                type="primary"
+                                variant="primary"
                                 disabled={form.getValues().channel.length === 0}
                                 onClick={() => onSubmit()}
                               >
@@ -229,7 +220,7 @@ export const ChooseChannelPopover = ({
                 If you leave this channel, all of the messages populated on this page will disappear
               </p>
               <Button
-                type="default"
+                variant="default"
                 onClick={() => onChangeConfig({ ...config, channelName: '', enabled: false })}
               >
                 Leave channel

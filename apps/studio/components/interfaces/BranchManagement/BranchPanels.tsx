@@ -96,7 +96,7 @@ export const BranchRow = ({
         {branch.git_branch && isGithubConnected && (
           <ButtonTooltip
             asChild
-            type="default"
+            variant="default"
             className="px-1.5"
             tooltip={{ content: { side: 'bottom', text: 'View branch on GitHub' } }}
           >

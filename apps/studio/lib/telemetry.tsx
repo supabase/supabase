@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
-import { LOCAL_STORAGE_KEYS, PageTelemetry, posthogClient, useUser } from 'common'
+import { LOCAL_STORAGE_KEYS, PageTelemetry, posthogClient, safeLocalStorage, useUser } from 'common'
 import { useEffect, useRef } from 'react'
 import { useConsentToast } from 'ui-patterns/consent'
 
@@ -10,7 +10,7 @@ import { API_URL, IS_PLATFORM } from '@/lib/constants'
 const getAnonId = async (id: string) => {
   const encoder = new TextEncoder()
   const data = encoder.encode(id)
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data as BufferSource)
   const hashArray = Array.from(new Uint8Array(hashBuffer))
   const base64String = btoa(hashArray.map((byte) => String.fromCharCode(byte)).join(''))
 
@@ -65,10 +65,10 @@ export function Telemetry() {
     }
 
     const setSentryId = async () => {
-      let sentryUserId = localStorage.getItem(LOCAL_STORAGE_KEYS.SENTRY_USER_ID)
+      let sentryUserId = safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.SENTRY_USER_ID)
       if (!sentryUserId) {
         sentryUserId = await getAnonId(user?.id)
-        localStorage.setItem(LOCAL_STORAGE_KEYS.SENTRY_USER_ID, sentryUserId)
+        safeLocalStorage.setItem(LOCAL_STORAGE_KEYS.SENTRY_USER_ID, sentryUserId)
       }
       Sentry.setUser({ id: sentryUserId })
     }
