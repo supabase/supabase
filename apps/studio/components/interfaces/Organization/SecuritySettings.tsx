@@ -123,7 +123,21 @@ export const SecuritySettings = () => {
               </Card>
             ) : !canReadMfaConfig ? (
               <NoPermission resourceText="view organization security settings" />
-            ) : null}
+            ) : (
+              requiresPersonalMfa && (
+                <Admonition
+                  type="note"
+                  layout="horizontal"
+                  title="Enable MFA on your account first"
+                  description="You need to set up multi-factor authentication (MFA) on your own account before you can enforce it on your organization."
+                  actions={
+                    <Button asChild variant="default">
+                      <Link href="/account/security">Set up MFA</Link>
+                    </Button>
+                  }
+                />
+              )
+            )}
 
             {isMembersError && (
               <AlertError error={membersError} subject="Failed to retrieve organization members" />
@@ -131,20 +145,6 @@ export const SecuritySettings = () => {
 
             {hasMfaConfigError && (
               <AlertError error={mfaError} subject="Failed to retrieve MFA enforcement status" />
-            )}
-
-            {requiresPersonalMfa && (
-              <Admonition
-                type="note"
-                layout="horizontal"
-                title="Enable MFA on your account first"
-                description="You need to set up multi-factor authentication (MFA) on your own account before you can enforce it on your organization."
-                actions={
-                  <Button asChild variant="default">
-                    <Link href="/account/security">Set up MFA</Link>
-                  </Button>
-                }
-              />
             )}
 
             {canShowMfaEnforcementForm && (
