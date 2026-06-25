@@ -389,6 +389,7 @@ export const AIEditor = ({
         <div className="w-full h-full relative">
           <CodeEditor
             language={language}
+            autofocus={autoFocus}
             className={className}
             isReadOnly={readOnly}
             options={options}
