@@ -38,3 +38,40 @@ export function statusOnSaveSuccess(): SnippetStatus {
 export function statusOnSaveError(status: SnippetStatus | undefined): SnippetStatus {
   return wasNeverPersisted(status) ? 'new_save_failed' : 'save_failed'
 }
+
+/**
+ * The lifecycle of a folder in the SQL editor nav, as a single set of
+ * mutually-exclusive states. Like SnippetStatus, this collapses two orthogonal
+ * axes — persistence (a locally-created placeholder vs a persisted folder) and
+ * progress (inline-name editing / save in flight / settled) — into one enum, so
+ * a folder can never be in a nonsensical combination (e.g. "new" yet "idle").
+ * The predicates below recover each axis.
+ */
+export type FolderStatus =
+  // Never persisted to the database (a locally-created placeholder):
+  | 'new_editing' // its name is being entered inline
+  | 'new_saving' // its create is in flight
+  // Persisted to the database:
+  | 'idle' // settled
+  | 'editing' // its name is being edited inline (rename)
+  | 'saving' // its rename is in flight
+
+/** True for a locally-created placeholder folder that has not been persisted. */
+export function isNewFolder(status: FolderStatus | undefined): boolean {
+  return status === 'new_editing' || status === 'new_saving'
+}
+
+/** True while the folder's name is being edited inline. */
+export function isFolderEditing(status: FolderStatus | undefined): boolean {
+  return status === 'new_editing' || status === 'editing'
+}
+
+/** True while a folder create/rename is in flight. */
+export function isFolderSaving(status: FolderStatus | undefined): boolean {
+  return status === 'new_saving' || status === 'saving'
+}
+
+/** Transition when a folder save begins, preserving the never-persisted axis. */
+export function folderStatusOnSaveStart(status: FolderStatus): FolderStatus {
+  return isNewFolder(status) ? 'new_saving' : 'saving'
+}
