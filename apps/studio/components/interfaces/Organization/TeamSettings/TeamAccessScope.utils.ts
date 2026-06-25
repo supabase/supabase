@@ -1,7 +1,7 @@
 /** Sentinel value for org-wide project access (current and future projects). */
 export const ALL_PROJECTS_ACCESS_SCOPE = '__all_projects__' as const
 
-export const ALL_PROJECTS_ACCESS_SCOPE_LABEL = 'All projects (current and future)'
+export const ALL_PROJECTS_ACCESS_SCOPE_LABEL = 'All projects'
 
 /** Roles that must always apply organization-wide (not project-scoped). */
 export const ORG_WIDE_ONLY_ROLE_NAMES = ['Owner', 'Administrator'] as const

@@ -24,7 +24,7 @@ export function TeamProjectScopeRadioGroup({
     >
       <RadioGroupStackedItem
         value="all-projects"
-        label="All projects (current and future)"
+        label="All projects"
         description="Apply this role across the entire organization, including future projects"
       />
       <RadioGroupStackedItem

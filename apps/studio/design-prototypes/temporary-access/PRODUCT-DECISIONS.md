@@ -142,7 +142,7 @@ The invite sheet uses `SheetSection` dividers. When walking the UI or writing te
 
 | Role                 | Access scope                                                                 |
 | -------------------- | ---------------------------------------------------------------------------- |
-| Owner, Administrator | Locked: all projects (current and future)                                    |
+| Owner, Administrator | Locked: all projects                                                         |
 | Developer, Read-only | **Access scope**: all projects, or specific projects (Team entitlement only) |
 
 Without `project_scoped_roles`, Developer/Read-only see access scope radios locked to all projects with a **Team** `Badge` on “Specific projects”.

@@ -169,7 +169,7 @@ describe('TemporaryAccessMember.utils', () => {
       jitSummary: null,
     })
 
-    expect(display.label).toBe('All projects (current and future)')
+    expect(display.label).toBe('All projects')
     expect(display.isOrgWide).toBe(true)
   })
 

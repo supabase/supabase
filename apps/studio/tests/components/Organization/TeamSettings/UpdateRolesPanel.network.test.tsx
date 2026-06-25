@@ -213,7 +213,7 @@ describe('UpdateRolesPanel (network)', () => {
       profileContext: PROFILE_CONTEXT,
     })
 
-    expect(await screen.findByText('All projects (current and future)')).toBeInTheDocument()
+    expect(await screen.findByText('All projects')).toBeInTheDocument()
     expect(screen.getByText('Specific projects')).toBeInTheDocument()
     expect(screen.getByText('Team')).toBeInTheDocument()
     expect(screen.getByRole('radio', { name: /Specific projects/i })).toBeDisabled()
@@ -226,7 +226,7 @@ describe('UpdateRolesPanel (network)', () => {
       profileContext: PROFILE_CONTEXT,
     })
 
-    expect(await screen.findByText('All projects (current and future)')).toBeInTheDocument()
+    expect(await screen.findByText('All projects')).toBeInTheDocument()
     expect(screen.getByText('Specific projects')).toBeInTheDocument()
     expect(
       screen.queryByText('Apply roles to all projects in the organization')

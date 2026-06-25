@@ -325,9 +325,7 @@ describe('InviteMemberButton (network)', () => {
 
     expect(screen.getByText('Access scope')).toBeInTheDocument()
     expect(screen.queryByText('Grant this role on all projects')).not.toBeInTheDocument()
-    expect(within(dialog).getByRole('combobox')).toHaveTextContent(
-      'All projects (current and future)'
-    )
+    expect(within(dialog).getByRole('combobox')).toHaveTextContent('All projects')
   })
 
   test('locks access scope to all projects for Owner role', async () => {
