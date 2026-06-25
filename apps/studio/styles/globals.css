@@ -47,6 +47,9 @@
   --animate-chevron-up: chevron-up 2s ease-in-out infinite;
   --animate-sway: sway 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-marketplace-featured-progress: marketplace-featured-progress linear forwards;
+
+  --text-sm: 13px;
+  --font-normale: 500;
 }
 
 @keyframes shimmer {
@@ -165,14 +168,6 @@
   ::backdrop,
   ::file-selector-button {
     border-color: hsl(var(--border-default, currentColor));
-  }
-
-  h1,
-  h2 {
-    font-weight: 500;
-  }
-  body {
-    letter-spacing: -0.01em;
   }
 }
 
