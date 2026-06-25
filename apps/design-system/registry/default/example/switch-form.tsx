@@ -83,7 +83,7 @@ export default function SwitchForm() {
             />
           </div>
         </div>
-        <Button type="submit" variant="alternative">
+        <Button type="submit" variant="primary">
           Submit
         </Button>
       </form>

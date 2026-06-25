@@ -22,39 +22,20 @@ export const filterFields = [
     value: 'log_type',
     type: 'checkbox',
     defaultOpen: true,
-    options: Object.entries(LOG_TYPES_LABELS).map(([value, label]) => ({ label, value })),
+    options: Object.entries(LOG_TYPES_LABELS).map(([value, label]) => ({
+      label,
+      value,
+      options:
+        // [Joshen] Nested options are treated as just boolean toggles atm for simplicity
+        // Refer to DataTableFilterCheckbox for their logic
+        value === 'postgres' ? [{ label: 'Connection logs', value: 'show_connection_logs' }] : [],
+    })),
     component: (props: Option) => {
       return (
-        <div className="flex w-full items-center justify-between gap-2">
+        <div className="flex items-center w-full justify-between gap-2">
           <span className="text-foreground/70 group-hover:text-accent-foreground text-xs">
             {props.label}
           </span>
-        </div>
-      )
-    },
-  },
-  {
-    label: 'Status',
-    value: 'status',
-    type: 'checkbox',
-    defaultOpen: true,
-    options: [],
-    hasDynamicOptions: true,
-    component: (props: Option) => {
-      if (typeof props.value === 'boolean') return null
-      if (typeof props.value === 'undefined') return null
-
-      const statusValue = String(props.value)
-      const statusLabel = STATUS_CODE_LABELS[statusValue as keyof typeof STATUS_CODE_LABELS]
-
-      return (
-        <div className="flex items-center gap-2 w-full min-w-0">
-          <span className="shrink-0 text-foreground">{statusValue}</span>
-          {statusLabel && (
-            <span className="text-[0.7rem] text-foreground-lighter truncate" title={statusLabel}>
-              {statusLabel}
-            </span>
-          )}
         </div>
       )
     },
@@ -82,10 +63,36 @@ export const filterFields = [
     },
   },
   {
+    label: 'Status',
+    value: 'status',
+    type: 'checkbox',
+    defaultOpen: false,
+    options: [],
+    hasDynamicOptions: true,
+    component: (props: Option) => {
+      if (typeof props.value === 'boolean') return null
+      if (typeof props.value === 'undefined') return null
+
+      const statusValue = String(props.value)
+      const statusLabel = STATUS_CODE_LABELS[statusValue as keyof typeof STATUS_CODE_LABELS]
+
+      return (
+        <div className="flex items-center gap-2 w-full min-w-0">
+          <span className="shrink-0 text-foreground">{statusValue}</span>
+          {statusLabel && (
+            <span className="text-[0.7rem] text-foreground-lighter truncate" title={statusLabel}>
+              {statusLabel}
+            </span>
+          )}
+        </div>
+      )
+    },
+  },
+  {
     label: 'Method',
     value: 'method',
     type: 'checkbox',
-    defaultOpen: true,
+    defaultOpen: false,
     options: METHODS.map((method) => ({ label: method, value: method })),
     component: (props: Option) => {
       return (

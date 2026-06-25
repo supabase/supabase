@@ -1,26 +1,26 @@
 ---
-id: 'external-replication-setup'
-title: 'Set up external replication (ETL)'
-description: 'Set up external replication (ETL) using Postgres logical replication.'
-subtitle: 'Configure publications and destinations for external replication (ETL).'
+id: 'pipelines'
+title: 'Set up Pipelines'
+description: 'Create a managed replication pipeline using Postgres logical replication.'
+subtitle: 'Configure publications, destinations, and managed replication pipelines.'
 sidebar_label: 'Setting up'
 ---
 
 <Admonition type="caution" title="Private Alpha">
 
-External replication (ETL) is currently in private alpha. Managed pipelines run through Supabase ETL. Access is limited and features may change.
+Supabase Pipelines is currently in private alpha. Private alpha features can be unstable and may introduce breaking changes while we evaluate the product direction, refine the feature set, and incorporate customer feedback.
 
 </Admonition>
 
-External replication (ETL) is powered by [Supabase ETL](https://github.com/supabase/etl) and uses **Postgres logical replication** to stream changes from your database to destination systems. It provides a managed interface through the Dashboard to configure and monitor replication pipelines. In this context, "external" means outside the source database; destinations can be Supabase-managed or third-party systems as support expands.
+Pipelines is a managed CDC feature for creating replication pipelines from Supabase Postgres to destination systems. It uses **Postgres logical replication** with the open-source [Supabase ETL engine](https://github.com/supabase/etl). You choose a destination in the Dashboard, and Supabase runs the pipeline that streams database changes to that destination.
 
 ## Setup overview
 
-External replication (ETL) requires two main components: a **Postgres publication** (defines what to replicate) and a **destination** (where data is sent). Supabase ETL runs the managed pipeline that reads from the publication and writes to the destination. Follow these steps to set up your replication pipeline.
+Pipelines requires two main components: a **Postgres publication** (defines what to replicate) and a **destination** (where data is sent). Supabase runs the managed pipeline that reads from the publication and writes to the destination. Follow these steps to set up your replication pipeline.
 
 <Admonition type="tip">
 
-If you already have a Postgres publication set up, you can skip to [Step 2: Enable external replication (ETL)](#step-2-enable-external-replication).
+If you already have a Postgres publication set up, you can skip to [Step 2: Enable Pipelines](#step-2-enable-pipelines).
 
 </Admonition>
 
@@ -90,7 +90,7 @@ for table orders where (created_at > '2024-01-01');
 
 ##### Partitioned tables
 
-External replication (ETL) follows Postgres publication semantics for partitioned tables. The `publish_via_partition_root` publication setting controls whether changes from partitions are emitted as the partition root or as the leaf partitions.
+Pipelines follows Postgres publication semantics for partitioned tables. The `publish_via_partition_root` publication setting controls whether changes from partitions are emitted as the partition root or as the leaf partitions.
 
 | Publication setting                        | What gets replicated                                                                                       | Destination shape                                                       |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
@@ -118,7 +118,7 @@ Use `publish_via_partition_root = true` when you want analytics queries to read 
 
 Publications created from the Dashboard replication flow use `publish_via_partition_root = true`. If you create or alter a publication manually with SQL, set this option explicitly so the destination shape matches what you expect.
 
-On Postgres 15 and newer, row filters on partition publications apply during both the initial copy and streaming phases. External replication (ETL) uses the row filter attached to the effective publication table entry: the published partition root when `publish_via_partition_root = true`, and the published leaf relation when `publish_via_partition_root = false`.
+On Postgres 15 and newer, row filters on partition publications apply during both the initial copy and streaming phases. Pipelines uses the row filter attached to the effective publication table entry: the published partition root when `publish_via_partition_root = true`, and the published leaf relation when `publish_via_partition_root = false`.
 
 <Admonition type="note">
 
@@ -133,17 +133,19 @@ After creating a publication via SQL, you can view it in the Dashboard:
 1. Navigate to the [**Database > Publications**](/dashboard/project/_/database/publications) section of the Dashboard
 2. You'll see all your publications listed with their tables
 
-### Step 2: Enable external replication (ETL) [#step-2-enable-external-replication]
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
-Before creating an external replication (ETL) pipeline, enable it for your project:
+### Step 2: Enable Pipelines
+
+Before creating a managed replication pipeline, enable Pipelines for your project:
 
 1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
 2. Click **Add destination** to show the replication side panel
-3. Select an external replication (ETL) destination, such as **BigQuery**
-4. Click **Enable external replication (ETL)**
+3. Select a Pipelines destination, such as **BigQuery**
+4. Click **Enable Pipelines**
 
 <Image
-  alt="Enable external replication (ETL)"
+  alt="Enable Pipelines"
   src="/docs/img/database/replication/replication-enable-replication.png"
   width={3560}
   height={2156}
@@ -151,7 +153,7 @@ Before creating an external replication (ETL) pipeline, enable it for your proje
 
 ### Step 3: Configure a destination
 
-Once external replication (ETL) is enabled and you have a Postgres publication, configure a destination. The destination is where your replicated data will be stored, while the pipeline is the active Postgres replication process that continuously streams changes from your database to that destination.
+Once Pipelines is enabled and you have a Postgres publication, configure a destination. The destination is where your replicated data will be stored, while the pipeline is the active Postgres replication process that continuously streams changes from your database to that destination.
 
 #### Choose and configure your destination
 
@@ -181,23 +183,23 @@ Follow these steps to configure your destination. Each destination has its own s
 
    Use **Invalidated slot behavior** carefully. If **Recreate** is selected and the pipeline restarts after Postgres has invalidated the main replication slot, the pipeline creates a new slot and copies all replicated tables again. This full restart is required for consistency because the old slot can no longer provide every change the pipeline missed.
 
-6. Click **Create and start** to begin replication
+6. Click **Create and start pipeline** to begin replication
 
 Your replication pipeline now starts copying data from your database to your destination.
 
 ### Step 4: Monitor your pipeline
 
-After creating a destination, the replication pipeline starts and appears in the destinations list. You can monitor the pipeline's status and performance from the Dashboard.
+After you create and start the pipeline, its destination appears in the destinations list. You can monitor the pipeline's status and performance from the Dashboard.
 
 <Image
-  alt="External replication (ETL) destinations list"
+  alt="Replication pipelines destinations list"
   src="/docs/img/database/replication/replication-destinations-list.png"
   width={3560}
   height={2146}
 
 />
 
-For comprehensive monitoring instructions including pipeline states, metrics, and logs, see the [external replication (ETL) monitoring guide](/docs/guides/database/replication/external-replication-monitoring).
+For comprehensive monitoring instructions including pipeline states, metrics, and logs, see [Monitor pipeline status](/docs/guides/database/replication/pipelines-monitoring).
 
 ### Managing your pipeline
 
@@ -213,24 +215,26 @@ You can manage your pipeline from the destinations list using the actions menu.
 
 Available actions:
 
-- **Start**: Begin replication for a stopped pipeline
+- **Start pipeline**: Begin replication for a stopped pipeline
 - **Stop**: Pause replication (changes will queue up in the WAL)
-- **Restart**: Stop and start the pipeline (required after publication changes)
+- **Restart pipeline**: Stop and start the pipeline (required after publication changes)
 - **Edit destination**: Modify destination settings like credentials or advanced options
 - **Delete**: Remove the destination and permanently stop replication
 
-### Disabling external replication (ETL) [#disabling-external-replication]
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
-To turn off external replication (ETL) for a project, delete all replication pipelines first. After all pipelines are removed, open the three-dot actions menu on the Replication page and click **Disable external replication (ETL)**.
+### Disabling Pipelines
+
+To turn off Pipelines for a project, delete all replication pipelines first. After all pipelines are removed, open the three-dot actions menu on the Replication page and click **Disable Pipelines**.
 
 <Image
-  alt="Disable external replication (ETL) from the Replication page actions menu"
+  alt="Disable Pipelines from the Replication page actions menu"
   src="/docs/img/database/replication/replication-disable-external-replication.png"
   width={3560}
   height={2156}
 />
 
-For cleanup details, see [What happens when you disable external replication (ETL)?](/docs/guides/database/replication/external-replication-faq#what-happens-when-you-disable-external-replication).
+For cleanup details, see [What happens when you disable Pipelines?](/docs/guides/database/replication/pipelines-faq#what-happens-when-you-disable-pipelines).
 
 ### Adding or removing tables
 
@@ -272,7 +276,7 @@ If your Postgres publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, ne
 
 <Admonition type="note">
 
-When a table is deleted at the destination, the behavior depends on the destination. In general, the pipeline tries to recreate the table so replication can continue. To permanently delete a table, pause the pipeline first or remove it from the publication before deleting. See the [external replication (ETL) FAQ](/docs/guides/database/replication/external-replication-faq#what-happens-if-a-table-is-deleted-at-the-destination) for details.
+When a table is deleted at the destination, the behavior depends on the destination. In general, the pipeline tries to recreate the table so replication can continue. To permanently delete a table, pause the pipeline first or remove it from the publication before deleting. See the [Pipelines FAQ](/docs/guides/database/replication/pipelines-faq#what-happens-if-a-table-is-deleted-at-the-destination) for details.
 
 </Admonition>
 
@@ -282,13 +286,13 @@ Schema change support depends on the destination. BigQuery is currently the only
 
 ### How it works
 
-Once configured, external replication (ETL):
+Once configured, a replication pipeline:
 
 1. **Captures** changes from your Postgres database using Postgres publications and logical replication
-2. **Streams** the changes through Supabase ETL
+2. **Streams** the changes through the managed pipeline
 3. **Loads** the data to your destination
 
-External replication (ETL) automatically optimizes how changes are delivered to the destination. Supabase ETL currently performs data extraction and loading only, without transformation - your data is replicated as-is to the destination.
+Pipelines automatically optimizes how changes are delivered to the destination. It currently performs data extraction and loading only, without transformation - your data is replicated as-is to the destination.
 
 ### Troubleshooting
 
@@ -299,11 +303,11 @@ If you encounter issues during setup:
 - **Pipeline failed to start**: Check the error message in the status view for specific details
 - **No data being replicated**: Verify your Postgres publication includes the correct tables and event types
 
-For more troubleshooting help, see the [external replication (ETL) FAQ](/docs/guides/database/replication/external-replication-faq).
+For more troubleshooting help, see the [Pipelines FAQ](/docs/guides/database/replication/pipelines-faq).
 
 ### Limitations
 
-External replication (ETL) has the following limitations:
+Pipelines has the following limitations:
 
 - **Primary keys required**: Tables must have primary keys (Postgres logical replication requirement)
 - **Custom data types**: Custom values replicate as strings. Check that your destination can interpret those string values correctly.
@@ -311,12 +315,12 @@ External replication (ETL) has the following limitations:
 - **Replica identity**: `REPLICA IDENTITY FULL` is strongly recommended. Updates and deletes need enough row data to apply changes correctly at the destination.
 - **Schema changes**: Currently in beta and limited to BigQuery
 - **No data transformation**: Data is replicated as-is without transformation
-- **Data duplicates**: Duplicates can occur when stopping a pipeline if your database has transactions that take longer than a few minutes to complete. See [Can data duplicates occur during pipeline operations?](/docs/guides/database/replication/external-replication-faq#can-data-duplicates-occur-during-pipeline-operations) for details
+- **Data duplicates**: Duplicates can occur when stopping a pipeline if your database has transactions that take longer than a few minutes to complete. See [Can data duplicates occur during pipeline operations?](/docs/guides/database/replication/pipelines-faq#can-data-duplicates-occur-during-pipeline-operations) for details
 
 Destination-specific limitations, such as BigQuery's row size limits, are documented in each destination guide.
 
 ### Next steps
 
 - [Set up BigQuery](/docs/guides/database/replication/bigquery)
-- [Monitor external replication (ETL)](/docs/guides/database/replication/external-replication-monitoring)
-- [View external replication (ETL) FAQ](/docs/guides/database/replication/external-replication-faq)
+- [Monitor pipeline status](/docs/guides/database/replication/pipelines-monitoring)
+- [View the Pipelines FAQ](/docs/guides/database/replication/pipelines-faq)

@@ -26,7 +26,7 @@ import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConf
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
-import { DisableExternalReplicationDialog } from './DisableExternalReplicationDialog'
+import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
 import {
   useIsETLBigQueryPrivateAlpha,
@@ -75,8 +75,7 @@ export const Destinations = () => {
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState<string>('')
   const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
-  const [showDisableExternalReplicationDialog, setShowDisableExternalReplicationDialog] =
-    useState(false)
+  const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
 
   const [_, setDestinationType] = useQueryState(
     'destinationType',
@@ -146,7 +145,7 @@ export const Destinations = () => {
     () => sourcesData?.sources.find((source) => source.name === projectRef),
     [projectRef, sourcesData?.sources]
   )
-  const canDisableExternalReplication =
+  const canDisablePipelines =
     isSourcesSuccess &&
     isDestinationsSuccess &&
     isPipelinesSuccess &&
@@ -259,14 +258,14 @@ export const Destinations = () => {
               </Button>
             </Shortcut>
             <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
-            {canDisableExternalReplication && (
+            {canDisablePipelines && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="default" icon={<MoreVertical />} className="w-7" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-52">
-                  <DropdownMenuItem onClick={() => setShowDisableExternalReplicationDialog(true)}>
-                    Disable external replication
+                  <DropdownMenuItem onClick={() => setShowDisablePipelinesDialog(true)}>
+                    Disable Pipelines
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -356,8 +355,8 @@ export const Destinations = () => {
             >
               <h4>Replication keeps your data in sync across systems</h4>
               <p className="text-foreground-light text-sm text-balance text-center mt-1">
-                Deploy read replicas for lower latency and better resource management, or capture
-                database changes to external destinations for real-time data pipelines.
+                Deploy Read Replicas for lower latency and workload isolation, or add a Pipelines
+                destination for analytics workloads.
               </p>
               <Button
                 icon={<Plus />}
@@ -374,9 +373,9 @@ export const Destinations = () => {
 
       <DestinationPanel onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)} />
 
-      <DisableExternalReplicationDialog
-        open={showDisableExternalReplicationDialog}
-        setOpen={setShowDisableExternalReplicationDialog}
+      <DisablePipelinesDialog
+        open={showDisablePipelinesDialog}
+        setOpen={setShowDisablePipelinesDialog}
       />
     </>
   )
