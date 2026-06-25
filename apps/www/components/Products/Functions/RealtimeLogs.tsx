@@ -33,8 +33,7 @@ const RealtimeLogs: FC<Props> = ({ isActive, isInView, className }) => {
   const [activeLogs, setActiveLogs] = useState(logs)
 
   function createLog(offset?: number) {
-    const t = new Date()
-    t.setSeconds(t.getSeconds() - (offset ?? 0))
+    const t = new Date(Date.now() - (offset ?? 0))
 
     const rand = Math.random()
     const status =
