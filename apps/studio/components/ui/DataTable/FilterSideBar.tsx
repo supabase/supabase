@@ -1,6 +1,5 @@
 import { useParams } from 'common'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { cloneElement, Dispatch, SetStateAction, useEffect } from 'react'
 import { Badge, Button, cn, ResizablePanel, usePanelRef } from 'ui'
 
@@ -9,7 +8,6 @@ import { DateRangeDisabled } from './DataTable.types'
 import { DataTableFilterControls } from './DataTableFilters/DataTableFilterControls'
 import { DataTableResetButton } from './DataTableResetButton'
 import { useDataTable } from './providers/DataTableProvider'
-import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import { UnifiedLogsBanner } from '@/components/interfaces/UnifiedLogs/UnifiedLogsBanner'
 
@@ -24,16 +22,8 @@ export function FilterSideBar({
   setIsFilterBarOpen,
   dateRangeDisabled,
 }: FilterSideBarProps) {
-  const router = useRouter()
   const { ref } = useParams()
   const { table } = useDataTable()
-
-  const { disable: disableUnifiedLogs } = useUnifiedLogsPreview()
-
-  const handleGoBackToOldLogs = () => {
-    disableUnifiedLogs()
-    router.push(`/project/${ref}/logs/explorer`)
-  }
 
   const panelRef = usePanelRef()
 
