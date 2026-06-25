@@ -73,7 +73,7 @@ const StatusMessage = ({
 /*
  * Extract the db_schema from the response.info object
  */
-export const extractDbSchema = (response: ServiceHealthResponse | undefined) => {
+const extractDbSchema = (response: ServiceHealthResponse | undefined) => {
   if (response?.info && 'db_schema' in response.info) {
     return response.info.db_schema
   }
