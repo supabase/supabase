@@ -57,6 +57,7 @@ export type Database = MergeDeep<
 >
 
 export type Listing = Database['public']['Views']['listings']['Row']
+export type MarketplaceListing = Database['public']['Views']['marketplace_listings']['Row']
 export type Partner = Database['public']['Views']['partners']['Row']
 
 export const createMarketplaceClient = () => {
