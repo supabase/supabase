@@ -40,9 +40,22 @@ Customer-facing term: **temporary access**. Internal/backend term: **JIT** (Just
 | 2026-06-25 | Guest invites: **Postgres roles and settings** matches Manage access sheet | Full role list, IP restrictions, branch scope, expiry — not simplified templates | Shipped (Studio) |
 | 2026-06-25 | **Expiry semantics split by context** | Manage access: relative presets → absolute timestamp at save. Invite presets: `expires_after_seconds` from **accept**. Invite custom: absolute `expires_at`. | Shipped (Studio) / API pending |
 
+| 2026-06-25 | **Builtin JIT roles** always listed: `postgres`, `supabase_read_only_user` | postgres is a superuser in PG but excluded by old filter; custom roles merged from project SQL when available | Shipped (Studio) |
+
 ---
 
-## Expiry semantics (important)
+## Postgres roles on guest invite
+
+**Not custom-only.** External collaborator invites use the same role list as **Manage database access**:
+
+| Source               | Roles                                                            |
+| -------------------- | ---------------------------------------------------------------- |
+| **Always shown**     | `postgres`, `supabase_read_only_user` (built-in JIT targets)     |
+| **From project SQL** | Additional custom login roles that pass the assignability filter |
+
+`postgres` is a superuser in Postgres but is intentionally grantable (with a warning in the UI). The previous `!isSuperuser` filter incorrectly hid it. Built-ins are merged into the list even when the roles query fails or has not returned yet.
+
+---
 
 ### Manage database access (existing members)
 

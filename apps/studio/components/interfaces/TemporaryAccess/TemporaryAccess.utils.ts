@@ -207,7 +207,19 @@ export function getInvalidIpRangeRows(value: TemporaryAccessIpRangeDraft[]) {
   return parseIpRangeRows(value).filter((cidr) => !isValidCidr(cidr))
 }
 
+/** Built-in Postgres roles always offered for temporary database access. */
+export const BUILTIN_TEMPORARY_ACCESS_ROLE_NAMES = ['postgres', 'supabase_read_only_user'] as const
+
+function isBuiltinTemporaryAccessRole(roleName: string) {
+  return (BUILTIN_TEMPORARY_ACCESS_ROLE_NAMES as readonly string[]).includes(roleName)
+}
+
 function isAssignableTemporaryAccessRole(role: PgRole) {
+  // postgres is a superuser in Postgres but is a first-class JIT grant target in Studio
+  if (isBuiltinTemporaryAccessRole(role.name)) {
+    return role.canLogin
+  }
+
   return (
     role.canLogin &&
     !role.isSuperuser &&
@@ -231,12 +243,17 @@ function serializeAllowedNetworks(roleObj: {
 export function getAssignableTemporaryAccessRoleOptions(
   databaseRoles?: DatabaseRolesData | null
 ): TemporaryAccessRoleOption[] {
-  return (
+  const fromApi =
     databaseRoles
       ?.filter(isAssignableTemporaryAccessRole)
-      .map((role) => ({ id: role.name, label: role.name }))
-      .sort((a, b) => a.label.localeCompare(b.label)) ?? []
+      .map((role) => ({ id: role.name, label: role.name })) ?? []
+
+  const seen = new Set(fromApi.map((role) => role.id))
+  const builtins = BUILTIN_TEMPORARY_ACCESS_ROLE_NAMES.filter((name) => !seen.has(name)).map(
+    (name) => ({ id: name, label: name })
   )
+
+  return [...fromApi, ...builtins].sort((a, b) => a.label.localeCompare(b.label))
 }
 
 export function getTemporaryAccessMemberOptions(

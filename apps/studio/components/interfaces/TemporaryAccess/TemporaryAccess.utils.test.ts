@@ -6,6 +6,7 @@ import {
   computeStatusFromApiRoles,
   computeStatusFromGrants,
   createEmptyGrant,
+  getAssignableTemporaryAccessRoleOptions,
   getInvalidIpRangeRows,
   getMinutesUntilExpiry,
   getRelativeDatetimeByMode,
@@ -67,6 +68,22 @@ describe('TemporaryAccess.utils', () => {
 
     expect(status.active).toBe(1)
     expect(status.expired).toBe(1)
+  })
+
+  it('includes builtin postgres even when marked superuser', () => {
+    const roles = getAssignableTemporaryAccessRoleOptions([
+      { name: 'postgres', canLogin: true, isSuperuser: true },
+      { name: 'supabase_read_only_user', canLogin: true, isSuperuser: false },
+    ] as never)
+
+    expect(roles.map((role) => role.id)).toEqual(['postgres', 'supabase_read_only_user'])
+  })
+
+  it('includes builtin roles when database roles are unavailable', () => {
+    expect(getAssignableTemporaryAccessRoleOptions(null).map((role) => role.id)).toEqual([
+      'postgres',
+      'supabase_read_only_user',
+    ])
   })
 
   it('returns minutes until the nearest active grant expiry', () => {

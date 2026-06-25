@@ -31,7 +31,7 @@ export function TemporaryAccessInviteGrantSection<TFieldValues extends FieldValu
   const {
     data: databaseRoles,
     isLoading,
-    isSuccess,
+    isError,
   } = useDatabaseRolesQuery({
     projectRef,
   })
@@ -43,7 +43,7 @@ export function TemporaryAccessInviteGrantSection<TFieldValues extends FieldValu
   const roleIds = useMemo(() => roleOptions.map((role) => role.id), [roleOptions])
 
   useEffect(() => {
-    if (!isSuccess) return
+    if (!projectRef || roleIds.length === 0) return
 
     const hasExistingGrants = guestAccess.grants.length > 0
     if (!hasExistingGrants) {
@@ -53,7 +53,7 @@ export function TemporaryAccessInviteGrantSection<TFieldValues extends FieldValu
 
     onGuestAccessChange(mergeGuestGrantsWithRoleIds(guestAccess, roleIds))
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, roleIds.join('|')])
+  }, [projectRef, roleIds.join('|')])
 
   const updateGrant = (
     roleId: string,
@@ -71,12 +71,21 @@ export function TemporaryAccessInviteGrantSection<TFieldValues extends FieldValu
     return <Admonition type="note" description="Select a project to configure database access." />
   }
 
-  if (isLoading) {
+  if (isLoading && guestAccess.grants.length === 0) {
     return <ShimmeringLoader className="py-4" />
   }
 
   if (guestAccess.grants.length === 0) {
-    return <Admonition type="note" description="No assignable Postgres roles found." />
+    return (
+      <Admonition
+        type="note"
+        description={
+          isError
+            ? 'Could not load Postgres roles from the project. Built-in roles should still appear once the project is reachable.'
+            : 'No assignable Postgres roles found.'
+        }
+      />
+    )
   }
 
   return (
@@ -90,6 +99,7 @@ export function TemporaryAccessInviteGrantSection<TFieldValues extends FieldValu
             Manage database access
           </InlineLink>
           . Preset durations start when they accept; custom sets a fixed expiry date.
+          {isError ? ' Custom roles could not be loaded from the project.' : null}
         </>
       }
     >
