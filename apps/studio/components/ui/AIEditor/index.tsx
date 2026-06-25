@@ -267,11 +267,6 @@ export const AIEditor = ({
         setCommandMenuOpenRef.current(true)
       }
     })
-
-    if (autoFocus) {
-      if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
-      editor.focus()
-    }
   }
 
   const handlePrompt = async (
