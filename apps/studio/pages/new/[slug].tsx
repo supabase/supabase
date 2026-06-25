@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag, useParams } from 'common'
+import { useFeatureFlags, useFlag, useParams } from 'common'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { AWS_REGIONS, type CloudProvider } from 'shared-data'
+import { useForm, useFormState } from 'react-hook-form'
+import { type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
 import { Button, Form, useWatch } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -103,6 +103,7 @@ const Wizard: NextPageWithLayout = () => {
     'integrations.github_connections'
   )
 
+  const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = useFlag('enableSmartRegion')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showInternalOnlyConfiguration = useFlag('newProjectInternalOnlyConfiguration')
@@ -166,6 +167,8 @@ const Wizard: NextPageWithLayout = () => {
     projectName: watchedProjectName,
     highAvailability,
   } = useWatch({ control: form.control })
+  const { dirtyFields } = useFormState(form)
+  const isDbRegionDirty = dirtyFields.dbRegion
 
   // Read dirty state during render rather than depending on form.formState in the
   // effect — form.formState is a Proxy that gets a new reference every render, which
@@ -174,18 +177,6 @@ const Wizard: NextPageWithLayout = () => {
     'dataApiDefaultPrivileges',
     form.formState
   ).isDirty
-
-  useEffect(() => {
-    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
-    if (isDataApiDefaultPrivilegesDirty) return
-    setValue(
-      'dataApiDefaultPrivileges',
-      !isInDataApiRevokeTreatment(dataApiRevokeOnCreateDefaultFlag),
-      {
-        shouldDirty: false,
-      }
-    )
-  }, [dataApiRevokeOnCreateDefaultFlag, isDataApiDefaultPrivilegesDirty, setValue])
 
   // [Charis] Since the form is updated in a useEffect, there is an edge case
   // when switching from free to paid, where canChooseInstanceSize is true for
@@ -227,12 +218,12 @@ const Wizard: NextPageWithLayout = () => {
     ? 0
     : monthlyInstancePrice(instanceSize) - availableComputeCredits
 
-  const { data: _defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
+  const { data: autoDefaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {
       cloudProvider: PROVIDERS[defaultProvider].id,
     },
     {
-      enabled: !smartRegionEnabled,
+      enabled: flagsLoaded && !smartRegionEnabled,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       refetchInterval: false,
@@ -249,27 +240,26 @@ const Wizard: NextPageWithLayout = () => {
         desiredInstanceSize: instanceSize as DesiredInstanceSize,
       },
       {
-        enabled: smartRegionEnabled,
+        enabled: flagsLoaded && smartRegionEnabled,
         refetchOnMount: false,
         refetchOnWindowFocus: false,
         refetchInterval: false,
         refetchOnReconnect: false,
       }
     )
+
   const recommendedSmartRegion = smartRegionEnabled
     ? availableRegionsData?.recommendations.smartGroup.name
     : ''
 
+  const fixedDefaultRegion = PROVIDERS[defaultProvider].default_region.displayName
   const regionError =
     smartRegionEnabled && defaultProvider !== 'AWS_NIMBUS'
       ? availableRegionsError
       : defaultRegionError
-  const defaultRegion =
-    defaultProvider === 'AWS_NIMBUS'
-      ? AWS_REGIONS.EAST_US.displayName
-      : smartRegionEnabled
-        ? availableRegionsData?.recommendations.smartGroup.name
-        : _defaultRegion
+  const defaultRegion = smartRegionEnabled
+    ? availableRegionsData?.recommendations.smartGroup.name
+    : (autoDefaultRegion ?? fixedDefaultRegion)
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
   const canConfigureGitHubOnCreate =
@@ -447,7 +437,6 @@ const Wizard: NextPageWithLayout = () => {
     if (projectName) setValue('projectName', projectName || '')
   }, [slug, setValue, projectName])
 
-  const isDbRegionDirty = getFieldState('dbRegion', form.formState).isDirty
   useEffect(() => {
     if (!isDbRegionDirty && defaultRegion) {
       setValue('dbRegion', defaultRegion)
@@ -455,18 +444,16 @@ const Wizard: NextPageWithLayout = () => {
   }, [defaultRegion, isDbRegionDirty, setValue])
 
   useEffect(() => {
-    if (regionError) {
-      resetField('dbRegion', {
-        defaultValue: PROVIDERS[defaultProvider].default_region.displayName,
-      })
-    }
-  }, [regionError, resetField, defaultProvider])
-
-  useEffect(() => {
     if (!isDbRegionDirty && recommendedSmartRegion) {
       setValue('dbRegion', recommendedSmartRegion)
     }
   }, [recommendedSmartRegion, isDbRegionDirty, setValue])
+
+  useEffect(() => {
+    if (regionError && fixedDefaultRegion) {
+      resetField('dbRegion', { defaultValue: fixedDefaultRegion })
+    }
+  }, [regionError, resetField, fixedDefaultRegion])
 
   useEffect(() => {
     if (highAvailability && cloudProvider !== 'AWS_K8S') {
@@ -493,6 +480,18 @@ const Wizard: NextPageWithLayout = () => {
       shouldValidate: true,
     })
   }, [githubRepositoryName, watchedProjectName, setValue])
+
+  useEffect(() => {
+    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
+    if (isDataApiDefaultPrivilegesDirty) return
+    setValue(
+      'dataApiDefaultPrivileges',
+      !isInDataApiRevokeTreatment(dataApiRevokeOnCreateDefaultFlag),
+      {
+        shouldDirty: false,
+      }
+    )
+  }, [dataApiRevokeOnCreateDefaultFlag, isDataApiDefaultPrivilegesDirty, setValue])
 
   return (
     <>
