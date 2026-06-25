@@ -278,7 +278,7 @@ services:
             - anon
 
   ## Storage API endpoint (with Authorization header transformation).
-  ## No key-auth — S3 protocol requests don't carry an apikey header.
+  ## No key-auth - S3 protocol requests don't carry an apikey header.
   ##
   ## The request-transformer translates opaque API keys to asymmetric JWTs
   ## and passes through existing Authorization headers (user JWTs, AWS SigV4).
@@ -314,6 +314,21 @@ services:
               end
 
   ## Edge Functions routes
+  ##
+  ## Functions header handling: opaque sb_ keys are translated to the pre-signed
+  ## internal asymmetric JWT and injected as a raw `sb-api-key` header (no
+  ## `Bearer` prefix), while `Authorization` is left untouched so user-session
+  ## JWTs and legacy bearers flow through to the runtime.
+  ##
+  ## No `key-auth`: Functions is a passthrough that does NOT validate keys. Kong
+  ## cannot reject an invalid key while still letting unauthenticated requests
+  ## through (key-auth's `anonymous` fallback accepts missing AND invalid keys
+  ## alike), so unknown/invalid keys simply pass to the runtime, which handles
+  ## verify_jwt itself.
+  ##
+  ## The request-transformer strips any client-supplied `sb-api-key` (anti-spoof)
+  ## and re-adds the translated value; on no match the Lua expression yields nil
+  ## (an empty header) which the post-function then removes.
   - name: functions-v1
     _comment: 'Edge Functions: /functions/v1/* -> http://functions:9000/*'
     url: http://functions:9000/
@@ -325,6 +340,22 @@ services:
           - /functions/v1/
     plugins:
       - name: cors
+      - name: request-transformer
+        config:
+          remove:
+            headers:
+              - "sb-api-key"
+          add:
+            headers:
+              - "sb-api-key:$LUA_FUNCTIONS_EXPR"
+      - name: post-function
+        config:
+          access:
+            - |
+              local v = kong.request.get_header("sb-api-key")
+              if v == nil or v == "" or v:find("^%s*$") then
+                kong.service.request.clear_header("sb-api-key")
+              end
 
   ## OAuth 2.0 Authorization Server Metadata (RFC 8414)
   - name: well-known-oauth

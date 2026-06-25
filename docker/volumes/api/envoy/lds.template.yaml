@@ -991,6 +991,107 @@ resources:
                         end
                       end
 
+                # Functions: mirror the platform behavior. Translate opaque sb_
+                # keys to the pre-signed internal asymmetric JWT and inject it as a
+                # raw `sb-api-key` header (no Bearer prefix), leaving Authorization
+                # untouched. The apikey is read from the header only (+ an
+                # Authorization `Bearer sb_` fallback) - no query-string source.
+                # Strips any client-supplied sb-api-key (anti-spoof). Returns 401 only
+                # for an sb_-prefixed key that is invalid/unregistered, or an
+                # apikey-vs-bearer sb_ conflict; any non-sb_ value (legacy/user/
+                # third-party JWT, or anything else) passes through to the runtime.
+                - name: envoy.filters.http.lua
+                  typed_config:
+                    '@type': >-
+                      type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
+                    inline_code: |
+                      local FUNCTIONS_ROUTE = "functions-v1-all"
+                      local FUNCTIONS_PREFIX = "/functions/v1/"
+                      local PUBLISHABLE_KEY = "${SUPABASE_PUBLISHABLE_KEY}"
+                      local SECRET_KEY = "${SUPABASE_SECRET_KEY}"
+                      local ANON_JWT = "${ANON_KEY_ASYMMETRIC}"
+                      local SERVICE_ROLE_JWT = "${SERVICE_ROLE_KEY_ASYMMETRIC}"
+                      local TRANSLATION_ENABLED = SECRET_KEY ~= "" and PUBLISHABLE_KEY ~= "" and SERVICE_ROLE_JWT ~= "" and ANON_JWT ~= ""
+
+                      local function is_functions_request(request_handle, headers)
+                        if request_handle:streamInfo():routeName() == FUNCTIONS_ROUTE then
+                          return true
+                        end
+
+                        local path = headers:get(":path")
+                        if path == nil then
+                          return false
+                        end
+
+                        return string.sub(path, 1, string.len(FUNCTIONS_PREFIX)) == FUNCTIONS_PREFIX
+                      end
+
+                      local function bearer_token(auth)
+                        if auth == nil then
+                          return nil
+                        end
+
+                        return string.match(auth, "^[Bb]earer%s+(.+)$")
+                      end
+
+                      local function unauthorized(request_handle, message)
+                        request_handle:respond(
+                          { [":status"] = "401", ["content-type"] = "text/plain" },
+                          message
+                        )
+                      end
+
+                      function envoy_on_request(request_handle)
+                        local headers = request_handle:headers()
+                        if not is_functions_request(request_handle, headers) then
+                          return
+                        end
+
+                        -- Strip any client-supplied sb-api-key (anti-spoof).
+                        headers:remove("sb-api-key")
+
+                        -- No opaque keys configured: nothing to translate, pass through.
+                        if not TRANSLATION_ENABLED then
+                          return
+                        end
+
+                        local apikey = headers:get("apikey")
+                        local bearer = bearer_token(headers:get("authorization"))
+
+                        -- No key at all: pass through (verify_jwt:false / unauthenticated).
+                        if (apikey == nil or apikey == "") and (bearer == nil or bearer == "") then
+                          return
+                        end
+
+                        -- Conflict: bearer carries an sb_ key that disagrees with apikey.
+                        if bearer ~= nil and string.sub(bearer, 1, 3) == "sb_"
+                           and apikey ~= nil and apikey ~= "" and apikey ~= bearer then
+                          unauthorized(request_handle, "Conflicting API keys")
+                          return
+                        end
+
+                        -- Resolve the key from apikey, else an Authorization `Bearer sb_` fallback.
+                        local key = apikey
+                        if (key == nil or key == "") and bearer ~= nil and string.sub(bearer, 1, 3) == "sb_" then
+                          key = bearer
+                        end
+
+                        -- Non-sb_ value (legacy/user/third-party JWT, or anything else):
+                        -- pass through; the runtime verifies it.
+                        if key == nil or key == "" or string.sub(key, 1, 3) ~= "sb_" then
+                          return
+                        end
+
+                        -- sb_ key: translate publishable/secret, otherwise reject.
+                        if key == SECRET_KEY then
+                          headers:replace("sb-api-key", SERVICE_ROLE_JWT)
+                        elseif key == PUBLISHABLE_KEY then
+                          headers:replace("sb-api-key", ANON_JWT)
+                        else
+                          unauthorized(request_handle, "Invalid API key")
+                        end
+                      end
+
                 - name: envoy.filters.http.rbac
                   typed_config:
                     '@type': >-

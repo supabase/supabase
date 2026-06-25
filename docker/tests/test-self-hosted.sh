@@ -167,7 +167,7 @@ else
     check "Create user (admin)" "true" "false"
 fi
 
-# Public signup (optional — depends on email autoconfirm setting)
+# Public signup (optional - depends on email autoconfirm setting)
 signup_email="smoke-signup-$$@example.com"
 signup_resp=$(http_body "$BASE_URL/auth/v1/signup" \
     -H "apikey: $ANON_KEY" \
@@ -438,6 +438,24 @@ fn_resp=$(http_body "$BASE_URL/functions/v1/hello" \
     -H "Content-Type: application/json" \
     -d '{}')
 check "Call hello function" '"Hello from Edge Functions!"' "$fn_resp"
+
+# Unauthenticated invocation must still reach the function (verify_jwt:false) -
+# Functions has no key-auth gate, so a request with no apikey passes through.
+fn_noauth_resp=$(http_body "$BASE_URL/functions/v1/hello" \
+    -X POST \
+    -H "Content-Type: application/json" \
+    -d '{}')
+check "Call hello function (no auth)" '"Hello from Edge Functions!"' "$fn_noauth_resp"
+
+# A non-sb_ value (typo / legacy / third-party JWT) is not rejected at the
+# gateway - it passes to the runtime.
+# (Detailed sb_-key translation/rejection is covered in test-auth-keys.sh.)
+check "Functions pass non-sb_ apikey" "200" \
+    "$(http_status "$BASE_URL/functions/v1/hello" \
+        -X POST \
+        -H "apikey: invalid-key" \
+        -H "Content-Type: application/json" \
+        -d '{}')"
 
 # ---------------------------------------------
 # 8. pg-meta (Studio backend)
