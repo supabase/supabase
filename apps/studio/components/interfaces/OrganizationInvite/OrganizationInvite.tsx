@@ -11,11 +11,13 @@ import {
   getOrganizationInviteStatus,
 } from './OrganizationInvite.utils'
 import { OrganizationInviteError } from './OrganizationInviteError'
+import { useIsJitDbAccessEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   InterstitialAccountRow,
   InterstitialLayout,
   SupabaseLogo,
 } from '@/components/layouts/InterstitialLayout'
+import { get } from '@/data/fetchers'
 import { useOrganizationAcceptInvitationMutation } from '@/data/organization-members/organization-invitation-accept-mutation'
 import { useOrganizationInvitationTokenQuery } from '@/data/organization-members/organization-invitation-token-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -29,6 +31,7 @@ export const OrganizationInvite = () => {
   const { slug, token } = useParams()
 
   const isSignUpEnabled = useIsFeatureEnabled('dashboard_auth:sign_up')
+  const isJitDbAccessEnabled = useIsJitDbAccessEnabled()
 
   const {
     data,
@@ -71,8 +74,35 @@ export const OrganizationInvite = () => {
 
   const { mutate: joinOrganization, isPending: isJoining } =
     useOrganizationAcceptInvitationMutation({
-      onSuccess: () => {
-        router.push('/organizations')
+      onSuccess: async () => {
+        if (!isJitDbAccessEnabled || !slug) {
+          router.push('/organizations')
+          return
+        }
+
+        try {
+          const { data: projectsData } = await get('/platform/organizations/{slug}/projects', {
+            params: { path: { slug }, query: { limit: 100, offset: 0 } },
+          })
+
+          const projects = projectsData?.projects ?? []
+          const grantResults = await Promise.all(
+            projects.map(async (project) => {
+              const { data } = await get(`/v1/projects/{ref}/database/jit`, {
+                params: { path: { ref: project.ref } },
+              })
+              return data?.user_roles?.length ? project.ref : null
+            })
+          )
+
+          if (grantResults.some(Boolean)) {
+            router.push(`/join/temporary-access?slug=${slug}`)
+          } else {
+            router.push('/organizations')
+          }
+        } catch {
+          router.push('/organizations')
+        }
       },
       onError: (error) => {
         toast.error(`Failed to join organization: ${error.message}`)

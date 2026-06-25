@@ -1,18 +1,20 @@
 import dayjs from 'dayjs'
 import { describe, expect, it } from 'vitest'
 
-import type { JitUserRuleDraft } from './JitDbAccess.types'
+import type { TemporaryAccessGrantDraft } from './TemporaryAccess.types'
 import {
+  computeStatusFromApiRoles,
   computeStatusFromGrants,
   createEmptyGrant,
   getInvalidIpRangeRows,
-  getJitMemberOptions,
+  getMinutesUntilExpiry,
   getRelativeDatetimeByMode,
+  getTemporaryAccessMemberOptions,
   serializeDraftRolesForGrantMutation,
-} from './JitDbAccess.utils'
+} from './TemporaryAccess.utils'
 import type { OrganizationMembersData } from '@/data/organizations/organization-members-query'
 
-describe('jitDbAccess.utils', () => {
+describe('TemporaryAccess.utils', () => {
   it('returns empty expiry string for never/custom-only fallback modes', () => {
     expect(getRelativeDatetimeByMode('never')).toBe('')
     expect(getRelativeDatetimeByMode('custom')).toBe('')
@@ -57,6 +59,31 @@ describe('jitDbAccess.utils', () => {
     })
   })
 
+  it('computes status from API role payloads', () => {
+    const status = computeStatusFromApiRoles([
+      { role: 'postgres', expires_at: dayjs().add(1, 'hour').unix() },
+      { role: 'supabase_read_only_user', expires_at: dayjs().subtract(1, 'hour').unix() },
+    ])
+
+    expect(status.active).toBe(1)
+    expect(status.expired).toBe(1)
+  })
+
+  it('returns minutes until the nearest active grant expiry', () => {
+    const grants = [
+      {
+        ...createEmptyGrant('postgres'),
+        enabled: true,
+        hasExpiry: true,
+        expiry: dayjs().add(45, 'minute').toISOString(),
+      },
+    ]
+
+    const minutes = getMinutesUntilExpiry(grants)
+    expect(minutes).toBeGreaterThanOrEqual(44)
+    expect(minutes).toBeLessThanOrEqual(45)
+  })
+
   it('returns invalid CIDRs from repeated input rows', () => {
     expect(
       getInvalidIpRangeRows([
@@ -73,7 +100,7 @@ describe('jitDbAccess.utils', () => {
 describe('serializeDraftRolesForGrantMutation', () => {
   it('serializes role expiry and IP restrictions for grant mutation payload', () => {
     const expiry = '2026-06-01T12:00:00.000Z'
-    const draft: JitUserRuleDraft = {
+    const draft: TemporaryAccessGrantDraft = {
       memberId: 'user-1',
       grants: [
         {
@@ -116,7 +143,7 @@ describe('serializeDraftRolesForGrantMutation', () => {
   })
 })
 
-describe('getJitMemberOptions', () => {
+describe('getTemporaryAccessMemberOptions', () => {
   it('excludes invited org members without gotrue IDs from selectable options', () => {
     const organizationMembers: OrganizationMembersData = [
       {
@@ -141,7 +168,7 @@ describe('getJitMemberOptions', () => {
       },
     ]
 
-    expect(getJitMemberOptions(organizationMembers, [])).toEqual([
+    expect(getTemporaryAccessMemberOptions(organizationMembers, [])).toEqual([
       {
         id: 'de305d54-75b4-431b-adb2-eb6b9e546014',
         email: 'active@example.com',

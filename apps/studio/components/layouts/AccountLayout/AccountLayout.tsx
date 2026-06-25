@@ -7,6 +7,7 @@ import { cn } from 'ui'
 import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
 import { AccountMenuContent } from './AccountMenuContent'
 import { WithSidebar } from './WithSidebar'
+import { useIsJitDbAccessEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
@@ -27,6 +28,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
   const currentPath = router.pathname
 
   const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
+  const isJitDbAccessEnabled = useIsJitDbAccessEnabled()
 
   const { appTitle } = useCustomContent(['app:title'])
   const brandTitle = appTitle || 'Supabase'
@@ -81,6 +83,16 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
                   isActive:
                     currentPath === '/account/tokens' || currentPath === '/account/tokens/scoped',
                 },
+                ...(isJitDbAccessEnabled
+                  ? [
+                      {
+                        key: 'my-access',
+                        label: 'My access',
+                        href: '/account/access',
+                        isActive: currentPath === '/account/access',
+                      },
+                    ]
+                  : []),
                 ...(showSecuritySettings
                   ? [
                       {
@@ -106,7 +118,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
               ],
             },
           ],
-    [currentPath, showSecuritySettings]
+    [currentPath, showSecuritySettings, isJitDbAccessEnabled]
   )
 
   useLayoutEffect(() => {

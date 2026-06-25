@@ -27,6 +27,7 @@ import {
   resolveConnectionString,
 } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { ResetDbPasswordDialog } from '@/components/interfaces/Settings/Database/DatabaseSettings/ResetDbPasswordDialog'
+import { TemporaryAccessConnectNotice } from '@/components/interfaces/TemporaryAccess/TemporaryAccessConnectNotice'
 import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
@@ -232,6 +233,7 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
 
   return (
     <div className="flex flex-col gap-2">
+      <TemporaryAccessConnectNotice />
       {deploymentMode.isPlatform && poolerBadge && !isHighAvailability && (
         <div className="flex items-center gap-x-2">
           <Badge>{poolerBadge}</Badge>

@@ -16,7 +16,7 @@ export type FeaturePreview = {
    * Where to send the user after enabling, to try the feature out. Omit if the
    * feature has no single destination (e.g. a global layout change).
    */
-  getRoute?: (ref?: string) => string
+  getRoute?: (ctx?: { ref?: string; slug?: string }) => string | undefined
 }
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
@@ -37,7 +37,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           isNew: true,
           isPlatformOnly: false,
           isDefaultOptIn: false,
-          getRoute: (ref?: string) => `/project/${ref}/auth/policies`,
+          getRoute: ({ ref } = {}) => (ref ? `/project/${ref}/auth/policies` : undefined),
         },
         {
           key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
@@ -47,7 +47,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           isNew: true,
           isPlatformOnly: true,
           isDefaultOptIn: false,
-          getRoute: (ref?: string) => `/project/${ref}/logs`,
+          getRoute: ({ ref } = {}) => (ref ? `/project/${ref}/logs` : undefined),
         },
         {
           key: LOCAL_STORAGE_KEYS.UI_PREVIEW_ADVISOR_RULES,
@@ -57,7 +57,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           isNew: false,
           isPlatformOnly: true,
           isDefaultOptIn: false,
-          getRoute: (ref?: string) => `/project/${ref}/advisors/rules/security`,
+          getRoute: ({ ref } = {}) => (ref ? `/project/${ref}/advisors/rules/security` : undefined),
         },
 
         {
@@ -77,7 +77,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           isPlatformOnly: true,
           isDefaultOptIn: false,
           enabled: platformWebhooksEnabled,
-          getRoute: (ref?: string) => `/project/${ref}/settings/webhooks`,
+          getRoute: ({ ref } = {}) => (ref ? `/project/${ref}/settings/webhooks` : undefined),
         },
         {
           key: LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
@@ -87,7 +87,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           isPlatformOnly: true,
           isDefaultOptIn: false,
           enabled: jitDbAccessEnabled,
-          getRoute: (ref?: string) => `/project/${ref}/database/settings`,
+          getRoute: ({ slug } = {}) => (slug ? `/org/${slug}/team` : undefined),
         },
         {
           key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
@@ -97,7 +97,8 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           isNew: false,
           isPlatformOnly: false,
           isDefaultOptIn: false,
-          getRoute: (ref?: string) => `/project/${ref}/database/column-privileges`,
+          getRoute: ({ ref } = {}) =>
+            ref ? `/project/${ref}/database/column-privileges` : undefined,
         },
         {
           key: LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
@@ -107,7 +108,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           isNew: true,
           isPlatformOnly: true,
           isDefaultOptIn: false,
-          getRoute: (ref?: string) => `/project/${ref}/integrations`,
+          getRoute: ({ ref } = {}) => (ref ? `/project/${ref}/integrations` : undefined),
         },
       ].sort((a, b) => Number(b.isNew) - Number(a.isNew)),
     [

@@ -17,7 +17,9 @@ import { Admonition } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { MemberRow } from './MemberRow'
+import { useIsJitDbAccessEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import AlertError from '@/components/ui/AlertError'
+import { useOrgJitGrantsIndexQuery } from '@/data/jit-db-access/use-org-jit-grants-query'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useProfile } from '@/lib/profile'
@@ -29,6 +31,11 @@ export interface MembersViewProps {
 const MembersView = ({ searchString }: MembersViewProps) => {
   const { slug } = useParams()
   const { profile } = useProfile()
+  const isJitDbAccessEnabled = useIsJitDbAccessEnabled()
+  const { grantsByUserId } = useOrgJitGrantsIndexQuery({
+    slug,
+    enabled: isJitDbAccessEnabled,
+  })
 
   const {
     data: members = [],
@@ -122,9 +129,21 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                           </TableRow>,
                         ]
                       : []),
-                    ...(!!user ? [<MemberRow key={user.gotrue_id} member={user} />] : []),
+                    ...(!!user
+                      ? [
+                          <MemberRow
+                            key={user.gotrue_id}
+                            member={user}
+                            grantsByUserId={grantsByUserId}
+                          />,
+                        ]
+                      : []),
                     ...sortedMembers.map((member) => (
-                      <MemberRow key={member.gotrue_id} member={member} />
+                      <MemberRow
+                        key={member.gotrue_id}
+                        member={member}
+                        grantsByUserId={grantsByUserId}
+                      />
                     )),
                     ...(searchString.length > 0 && filteredMembers.length === 0
                       ? [

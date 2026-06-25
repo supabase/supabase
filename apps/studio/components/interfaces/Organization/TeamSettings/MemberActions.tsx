@@ -1,12 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { MoreVertical, Redo2, Trash } from 'lucide-react'
+import { Database, MoreVertical, Redo2, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
@@ -15,6 +16,8 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { LeaveTeamButton } from './LeaveTeamButton'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
+import { useIsJitDbAccessEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { TemporaryAccessGrantSheet } from '@/components/interfaces/TemporaryAccess/TemporaryAccessGrantSheet'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { useOrganizationCreateInvitationMutation } from '@/data/organization-members/organization-invitation-create-mutation'
@@ -39,8 +42,10 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
   const { slug } = useParams()
   const { profile } = useProfile()
   const [showAccessModal, setShowAccessModal] = useState(false)
+  const [showDatabaseAccessSheet, setShowDatabaseAccessSheet] = useState(false)
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const organizationMembersDeletionEnabled = useIsFeatureEnabled('organization_members:delete')
+  const isJitDbAccessEnabled = useIsJitDbAccessEnabled()
 
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: permissions } = usePermissionsQuery()
@@ -102,6 +107,10 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
     useOrganizationDeleteInvitationMutation()
 
   const isLoading = isDeletingMember || isDeletingInvite || isCreatingInvite
+
+  const memberLabel = member.primary_email ?? member.username ?? 'Member'
+  const canManageDatabaseAccess =
+    isJitDbAccessEnabled && !!member.gotrue_id && !isPendingInviteAcceptance && canRemoveMember
 
   const handleMemberDelete = () => {
     if (!slug) return console.error('slug is required')
@@ -190,8 +199,20 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
               icon={<MoreVertical />}
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end" className="w-40">
+          <DropdownMenuContent side="bottom" align="end" className="w-52">
             <>
+              {canManageDatabaseAccess && (
+                <>
+                  <DropdownMenuItem
+                    className="gap-x-2"
+                    onClick={() => setShowDatabaseAccessSheet(true)}
+                  >
+                    <Database size={14} />
+                    <p>Manage database access</p>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               {isPendingInviteAcceptance ? (
                 <>
                   <DropdownMenuItemTooltip
@@ -297,6 +318,15 @@ export const MemberActions = ({ member }: MemberActionsProps) => {
         member={member}
         onClose={() => setShowAccessModal(false)}
       />
+
+      {canManageDatabaseAccess && member.gotrue_id && (
+        <TemporaryAccessGrantSheet
+          open={showDatabaseAccessSheet}
+          onOpenChange={setShowDatabaseAccessSheet}
+          memberId={member.gotrue_id}
+          memberLabel={memberLabel}
+        />
+      )}
     </>
   )
 }

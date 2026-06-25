@@ -39,6 +39,7 @@ import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -57,7 +58,8 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
 
 export const FeaturePreviewModal = () => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref, slug } = useParams()
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const featurePreviews = useFeaturePreviews()
   const {
     showFeaturePreviewModal,
@@ -84,8 +86,11 @@ export const FeaturePreviewModal = () => {
     allFeaturePreviews[0]
   const isSelectedFeatureEnabled = flags[selectedFeature?.key]
 
-  const selectedFeatureRoute = selectedFeature?.getRoute?.(ref)
-  const hasRoute = selectedFeatureRoute !== undefined && ref !== undefined
+  const selectedFeatureRoute = selectedFeature?.getRoute?.({
+    ref,
+    slug: slug ?? selectedOrganization?.slug,
+  })
+  const hasRoute = selectedFeatureRoute !== undefined
 
   const toggleFeature = () => {
     if (!selectedFeature) return

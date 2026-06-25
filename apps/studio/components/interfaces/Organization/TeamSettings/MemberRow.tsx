@@ -16,8 +16,15 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { isInviteExpired } from '../Organization.utils'
 import { MemberActions } from './MemberActions'
+import {
+  getMemberJitGrantSummary,
+  isTemporaryAccessGuestMember,
+} from './TemporaryAccessMember.utils'
+import { useIsJitDbAccessEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { TemporaryAccessStatusBadge } from '@/components/interfaces/TemporaryAccess/TemporaryAccessStatusBadge'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { ProfileImage } from '@/components/ui/ProfileImage'
+import type { OrgMemberJitGrantSummary } from '@/data/jit-db-access/use-org-jit-grants-query'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import { OrganizationMember } from '@/data/organizations/organization-members-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
@@ -26,16 +33,18 @@ import { useProfile } from '@/lib/profile'
 
 interface MemberRowProps {
   member: OrganizationMember
+  grantsByUserId?: Map<string, OrgMemberJitGrantSummary[]>
 }
 
 const MEMBER_ORIGIN_TO_MANAGED_BY = {
   vercel: 'vercel-marketplace',
 } as const
 
-export const MemberRow = ({ member }: MemberRowProps) => {
+export const MemberRow = ({ member, grantsByUserId }: MemberRowProps) => {
   const { slug } = useParams()
   const { profile } = useProfile()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const isJitDbAccessEnabled = useIsJitDbAccessEnabled()
 
   const { data: roles, isPending: isLoadingRoles } = useOrganizationRolesV2Query({
     slug: selectedOrganization?.slug,
@@ -47,6 +56,10 @@ export const MemberRow = ({ member }: MemberRowProps) => {
     useMemo(() => projectsData?.pages.flatMap((page) => page.projects), [projectsData?.pages]) || []
 
   const isInvitedUser = Boolean(member.invited_id)
+  const jitSummary =
+    isJitDbAccessEnabled && grantsByUserId ? getMemberJitGrantSummary(member, grantsByUserId) : null
+  const showGuestBadge =
+    isJitDbAccessEnabled && !!jitSummary && isTemporaryAccessGuestMember(member, roles)
 
   // Use generic avatar for all team members instead of attempting to fetch from GitHub
   const profileImageUrl = undefined
@@ -80,6 +93,12 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                 </Badge>
               )}
               {member.is_sso_user && <Badge variant="default">SSO</Badge>}
+              {jitSummary && (
+                <TemporaryAccessStatusBadge
+                  status={jitSummary.status}
+                  showGuestBadge={showGuestBadge}
+                />
+              )}
               {(member.metadata as any)?.origin && (
                 <PartnerIcon
                   organization={{
@@ -95,7 +114,6 @@ export const MemberRow = ({ member }: MemberRowProps) => {
           </div>
         </div>
       </TableCell>
-
       <TableCell>
         <div className="flex items-center gap-x-1.5">
           {member.mfa_enabled ? (
@@ -111,7 +129,6 @@ export const MemberRow = ({ member }: MemberRowProps) => {
           )}
         </div>
       </TableCell>
-
       <TableCell className="max-w-64">
         {isLoadingRoles ? (
           <ShimmeringLoader className="w-32" />
@@ -186,10 +203,9 @@ export const MemberRow = ({ member }: MemberRowProps) => {
           })
         )}
       </TableCell>
-
       <TableCell>
         <MemberActions member={member} />
-      </TableCell>
+      </TableCell>{' '}
     </TableRow>
   )
 }
