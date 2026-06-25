@@ -18,8 +18,8 @@ export default function HeroSection({
     <header
       className={cn(
         'flex flex-col border-b border-muted',
-        'bg-[radial-gradient(circle_at_50%_240%,var(--brand-300),transparent_70%)]',
-        'md:bg-[radial-gradient(circle_at_50%_280%,var(--brand-300),transparent_70%)]',
+        'bg-[radial-gradient(circle_at_50%_240%,hsl(var(--brand-300)),transparent_70%)]',
+        'md:bg-[radial-gradient(circle_at_50%_280%,hsl(var(--brand-300)),transparent_70%)]',
         compact && 'items-center justify-center min-h-[35vh] lg:min-h-[50vh]'
       )}
     >

@@ -6,8 +6,8 @@ import { cn } from 'ui'
 const CHART_COLORS = {
   TICK: 'var(--background-overlay-hover)',
   AXIS: 'var(--background-overlay-hover)',
-  GREEN_1: 'var(--brand-default)', // #3ECF8E
-  GREEN_2: 'var(--brand-500)',
+  GREEN_1: 'hsl(var(--brand-default))', // #3ECF8E
+  GREEN_2: 'hsl(var(--brand-500))',
 }
 
 const Metrics = ({ isActive }: { isActive?: boolean }) => {
@@ -101,8 +101,8 @@ const Metrics = ({ isActive }: { isActive?: boolean }) => {
           >
             <defs>
               <linearGradient id="colorPv" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--brand-default)" stopOpacity={0.7} />
-                <stop offset="95%" stopColor="var(--brand-default)" stopOpacity={0} />
+                <stop offset="5%" stopColor="hsl(var(--brand-default))" stopOpacity={0.7} />
+                <stop offset="95%" stopColor="hsl(var(--brand-default))" stopOpacity={0} />
               </linearGradient>
             </defs>
             <XAxis
@@ -119,7 +119,7 @@ const Metrics = ({ isActive }: { isActive?: boolean }) => {
             <Area
               type="monotone"
               dataKey="pv"
-              stroke="var(--brand-default)"
+              stroke="hsl(var(--brand-default))"
               fillOpacity={1}
               fill="url(#colorPv)"
             />

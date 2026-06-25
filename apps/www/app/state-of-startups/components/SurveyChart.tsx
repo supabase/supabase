@@ -120,7 +120,7 @@ export function SurveyChart({
   const resolvedFunctionName = rpcNameForYear(functionName, year)
   const { get, fetchAndCache } = useSurveyDataCache()
   const accent = useAccent()
-  const accentBg = 'var(--brand-300)'
+  const accentBg = 'hsl(var(--brand-300))'
   const accentBarFg = 'bg-brand'
   const accentBarText = 'text-brand-link dark:text-brand'
 

@@ -89,7 +89,7 @@ const CustomersVisual = () => {
         <g filter="url(#filter2_f_4353_100693)">
           <path
             d="M930.203 82.036C914.556 60.4668 890.905 48.1616 865.905 48.1616H865.057C840.76 48.1616 817.7 60.0178 802.035 80.564C818.898 64.5075 841.409 55.49 864.944 55.49H865.882C890.122 55.49 913.214 65.1309 930.203 82.036Z"
-            fill="var(--brand-default)"
+            fill="hsl(var(--brand-default))"
           />
         </g>
         <g filter="url(#filter3_f_4353_100693)">
@@ -523,7 +523,7 @@ const CustomersVisual = () => {
             gradientUnits="userSpaceOnUse"
           >
             <stop stopColor="transparent" stopOpacity="0" />
-            <stop offset="0.5" stopColor="var(--brand-default)" stopOpacity="0.6" />
+            <stop offset="0.5" stopColor="hsl(var(--brand-default))" stopOpacity="0.6" />
             <stop offset="1" stopColor="transparent" stopOpacity="0" />
           </m.linearGradient>
           <linearGradient
@@ -534,7 +534,7 @@ const CustomersVisual = () => {
             y2="193.79"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor="var(--brand-default)" />
+            <stop stopColor="hsl(var(--brand-default))" />
             <stop offset="1" stopColor="var(--background-alternative-default)" />
           </linearGradient>
           <linearGradient
@@ -562,7 +562,7 @@ const CustomersVisual = () => {
             gradientUnits="userSpaceOnUse"
           >
             <stop offset="0.0114691" stopColor="var(--background-alternative-default)" />
-            <stop offset="0.540433" stopColor="var(--brand-default)" />
+            <stop offset="0.540433" stopColor="hsl(var(--brand-default))" />
             <stop offset="1" stopColor="var(--background-alternative-default)" />
           </linearGradient>
           <linearGradient
@@ -573,7 +573,7 @@ const CustomersVisual = () => {
             y2="105.386"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor="var(--brand-default)" />
+            <stop stopColor="hsl(var(--brand-default))" />
             <stop offset="1" stopColor="white" stopOpacity="0" />
           </linearGradient>
           <radialGradient
@@ -706,7 +706,7 @@ const CustomersVisual = () => {
             y2="105.061"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor="var(--brand-default)" />
+            <stop stopColor="hsl(var(--brand-default))" />
             <stop offset="0.15625" stopColor="var(--foreground-lighter)" stopOpacity="0" />
           </linearGradient>
           <linearGradient
@@ -750,8 +750,8 @@ const CustomersVisual = () => {
             y2="94.3999"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor="var(--brand-default)" />
-            <stop offset="1" stopColor="var(--brand-default)" stopOpacity="1" />
+            <stop stopColor="hsl(var(--brand-default))" />
+            <stop offset="1" stopColor="hsl(var(--brand-default))" stopOpacity="1" />
           </linearGradient>
           <linearGradient
             id="paint26_linear_4353_100693"
@@ -761,8 +761,8 @@ const CustomersVisual = () => {
             y2="203.949"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor="var(--brand-500)" />
-            <stop offset="1" stopColor="var(--brand-default)" stopOpacity="1" />
+            <stop stopColor="hsl(var(--brand-500))" />
+            <stop offset="1" stopColor="hsl(var(--brand-default))" stopOpacity="1" />
           </linearGradient>
           <linearGradient
             id="paint27_linear_4353_100693"
@@ -772,8 +772,8 @@ const CustomersVisual = () => {
             y2="185.046"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor="var(--brand-500)" />
-            <stop offset="1" stopColor="var(--brand-default)" stopOpacity="1" />
+            <stop stopColor="hsl(var(--brand-500))" />
+            <stop offset="1" stopColor="hsl(var(--brand-default))" stopOpacity="1" />
           </linearGradient>
           <linearGradient
             id="paint28_linear_4353_100693"
@@ -783,8 +783,8 @@ const CustomersVisual = () => {
             y2="237.781"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor="var(--brand-500)" />
-            <stop offset="1" stopColor="var(--brand-default)" stopOpacity="1" />
+            <stop stopColor="hsl(var(--brand-500))" />
+            <stop offset="1" stopColor="hsl(var(--brand-default))" stopOpacity="1" />
           </linearGradient>
           <linearGradient
             id="paint29_linear_4353_100693"
@@ -794,8 +794,8 @@ const CustomersVisual = () => {
             y2="74.8884"
             gradientUnits="userSpaceOnUse"
           >
-            <stop stopColor="var(--brand-500)" />
-            <stop offset="1" stopColor="var(--brand-default)" stopOpacity="1" />
+            <stop stopColor="hsl(var(--brand-500))" />
+            <stop offset="1" stopColor="hsl(var(--brand-default))" stopOpacity="1" />
           </linearGradient>
         </defs>
       </m.svg>

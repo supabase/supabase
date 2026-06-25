@@ -107,8 +107,8 @@ const VectorVisual: React.FC<Props> = ({ className }) => {
               gradientUnits="userSpaceOnUse"
               gradientTransform={gradientTransform}
             >
-              <stop stopColor="var(--brand-default)" />
-              <stop offset="1" stopColor="var(--brand-default)" stopOpacity="0" />
+              <stop stopColor="hsl(var(--brand-default))" />
+              <stop offset="1" stopColor="hsl(var(--brand-default))" stopOpacity="0" />
             </radialGradient>
           </defs>
         </svg>

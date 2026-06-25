@@ -18,8 +18,8 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } fr
 const CHART_COLORS = {
   TICK: 'var(--background-overlay-hover)',
   AXIS: 'var(--background-overlay-hover)',
-  BRAND: 'var(--brand-default)',
-  BRAND_HOVER: 'var(--brand-500)',
+  BRAND: 'hsl(var(--brand-default))',
+  BRAND_HOVER: 'hsl(var(--brand-500))',
 }
 
 export type ChartLineTick = {

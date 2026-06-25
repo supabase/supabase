@@ -154,21 +154,21 @@ const EXECUTION_TIME_CHART_CONFIG = {
   },
   max_execution_time: {
     label: 'Max Execution Time',
-    color: 'var(--brand-default)',
+    color: 'hsl(var(--brand-default))',
   },
 } satisfies ChartConfig
 
 const CPU_TIME_CHART_CONFIG = {
   max_cpu_time_used: {
     label: 'Max CPU Time',
-    color: 'var(--brand-default)',
+    color: 'hsl(var(--brand-default))',
   },
 } satisfies ChartConfig
 
 const MEMORY_CHART_CONFIG = {
   avg_memory_used: {
     label: 'Memory Usage',
-    color: 'var(--brand-default)',
+    color: 'hsl(var(--brand-default))',
   },
 } satisfies ChartConfig
 

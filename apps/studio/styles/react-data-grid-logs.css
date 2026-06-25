@@ -105,8 +105,8 @@
   background: linear-gradient(
     to right,
     var(--background-default) 0%,
-    var(--brand-default) 25%,
-    var(--brand-300) 35%,
+    hsl(var(--brand-default)) 25%,
+    hsl(var(--brand-300)) 35%,
     var(--background-default) 45%,
     var(--background-surface-100) 75%
   );

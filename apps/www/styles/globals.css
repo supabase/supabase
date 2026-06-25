@@ -458,7 +458,7 @@ launch week
 */
 
 .launch-week-timeline-border--approaching {
-  border-image: linear-gradient(to bottom, var(--brand-default), var(--color-purple-700)) 1 100%;
+  border-image: linear-gradient(to bottom, hsl(var(--brand-default)), var(--color-purple-700)) 1 100%;
 }
 
 .video-container {
@@ -562,9 +562,9 @@ launch week
   filter: blur(calc(var(--auth-ui-card-height) / 6));
   background-image: linear-gradient(
     var(--rotate),
-    var(--brand-default),
+    hsl(var(--brand-default)),
     #3c67e3 43%,
-    var(--brand-default)
+    hsl(var(--brand-default))
   );
   opacity: 1;
   transition: opacity 0.5s;
@@ -738,17 +738,17 @@ launch week
 }
 
 [class*='gradient-text-']::selection {
-  background-color: var(--brand-default);
+  background-color: hsl(var(--brand-default));
   background-clip: unset;
   -webkit-text-fill-color: white;
 }
 
 @layer utilities {
   .gradient-text-brand-100 {
-    background-image: linear-gradient(45deg, var(--brand-500) 0%, var(--brand-default) 100%);
+    background-image: linear-gradient(45deg, hsl(var(--brand-500)) 0%, hsl(var(--brand-default)) 100%);
   }
   .gradient-text-brand-300 {
-    background-image: linear-gradient(45deg, var(--brand-500) 0%, var(--brand-default) 100%);
+    background-image: linear-gradient(45deg, hsl(var(--brand-500)) 0%, hsl(var(--brand-default)) 100%);
   }
   .gradient-text-100 {
     background-image: -webkit-linear-gradient(45deg, #fff 0%, var(--color-green-1200) 100%);

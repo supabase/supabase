@@ -250,8 +250,8 @@ const MetricCardSparkline = React.forwardRef<HTMLDivElement, MetricCardSparkline
           <AreaChart data={data} margin={{ top: 5, left: 0, right: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="sparklineGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="var(--brand-default)" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="var(--brand-default)" stopOpacity={0} />
+                <stop offset="5%" stopColor="hsl(var(--brand-default))" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="hsl(var(--brand-default))" stopOpacity={0} />
               </linearGradient>
             </defs>
             <RechartsTooltip content={<SparklineTooltip />} />
@@ -260,7 +260,7 @@ const MetricCardSparkline = React.forwardRef<HTMLDivElement, MetricCardSparkline
               dataKey={dataKey || 'value'}
               fill="url(#sparklineGradient)"
               fillOpacity={0.1}
-              stroke="var(--brand-default)"
+              stroke="hsl(var(--brand-default))"
               strokeWidth={1.5}
             />
           </AreaChart>

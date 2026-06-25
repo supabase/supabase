@@ -5,10 +5,10 @@
 export const CHART_COLORS = {
   TICK: 'var(--background-overlay-hover)',
   AXIS: 'var(--background-overlay-hover)',
-  GREEN_1: 'var(--brand-default)',
-  GREEN_2: 'var(--brand-500)',
-  RED_1: 'var(--destructive-default)',
-  RED_2: 'var(--destructive-500)',
+  GREEN_1: 'hsl(var(--brand-default))',
+  GREEN_2: 'hsl(var(--brand-500))',
+  RED_1: 'hsl(var(--destructive-default))',
+  RED_2: 'hsl(var(--destructive-500))',
   REFERENCE_LINE: 'var(--foreground-muted)',
   REFERENCE_LINE_TEXT: 'var(--foreground-muted)',
 }

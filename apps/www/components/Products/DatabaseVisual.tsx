@@ -113,7 +113,7 @@ const DatabaseVisual: React.FC<Props> = ({ className, hasGlow = true }) => {
               gradientUnits="userSpaceOnUse"
               gradientTransform={gradientTransform}
             >
-              <stop stopColor="var(--brand-default)" />
+              <stop stopColor="hsl(var(--brand-default))" />
               <stop offset="1" stopColor="var(--foreground-lighter)" />
             </radialGradient>
             <radialGradient
@@ -124,7 +124,7 @@ const DatabaseVisual: React.FC<Props> = ({ className, hasGlow = true }) => {
               gradientUnits="userSpaceOnUse"
               gradientTransform={gradientTransform}
             >
-              <stop stopColor="var(--brand-default)" />
+              <stop stopColor="hsl(var(--brand-default))" />
               <stop offset="1" stopColor="var(--foreground-lighter)" />
             </radialGradient>
             <radialGradient
@@ -135,7 +135,7 @@ const DatabaseVisual: React.FC<Props> = ({ className, hasGlow = true }) => {
               gradientUnits="userSpaceOnUse"
               gradientTransform={gradientTransform}
             >
-              <stop stopColor="var(--brand-default)" />
+              <stop stopColor="hsl(var(--brand-default))" />
               <stop offset="1" stopColor="var(--foreground-lighter)" />
             </radialGradient>
           </defs>

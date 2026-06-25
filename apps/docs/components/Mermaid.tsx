@@ -8,7 +8,7 @@ export function Mermaid({ chart }: MermaidProps) {
   const svg = renderMermaidSVG(chart, {
     bg: 'var(--background-default)',
     fg: 'var(--foreground-default)',
-    accent: 'var(--brand-default)',
+    accent: 'hsl(var(--brand-default))',
     muted: 'var(--foreground-light)',
     line: 'var(--border-strong)',
     border: 'var(--border-strong)',

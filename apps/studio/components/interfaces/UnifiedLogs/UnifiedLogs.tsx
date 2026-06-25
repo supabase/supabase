@@ -74,11 +74,11 @@ export const CHART_CONFIG = {
   },
   warning: {
     label: <TooltipLabel level="warning" />,
-    color: 'var(--warning-default)',
+    color: 'hsl(var(--warning-default))',
   },
   error: {
     label: <TooltipLabel level="error" />,
-    color: 'var(--destructive-default)',
+    color: 'hsl(var(--destructive-default))',
   },
 } satisfies ChartConfig
 

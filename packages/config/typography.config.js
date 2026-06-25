@@ -199,7 +199,7 @@ module.exports = {
             '--tw-prose-body': 'var(--foreground-light)',
             '--tw-prose-headings': 'var(--foreground-default)',
             '--tw-prose-lead': 'var(--foreground-light)',
-            '--tw-prose-links': 'var(--brand-500)',
+            '--tw-prose-links': 'hsl(var(--brand-500))',
             '--tw-prose-bold': 'var(--foreground-light)',
             '--tw-prose-counters': 'var(--foreground-light)',
             '--tw-prose-bullets': 'var(--foreground-muted)',

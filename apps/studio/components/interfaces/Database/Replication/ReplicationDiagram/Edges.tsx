@@ -46,7 +46,7 @@ const getEdgeVisual = ({ isComingUp, isReplicating, isFailed }: ReplicationState
   if (isFailed) {
     return {
       Icon: X,
-      color: 'var(--destructive-default)',
+      color: 'hsl(var(--destructive-default))',
       opacity: 1,
       dashArray: '5 5',
       shouldAnimate: false,
@@ -66,7 +66,7 @@ const getEdgeVisual = ({ isComingUp, isReplicating, isFailed }: ReplicationState
   if (isReplicating) {
     return {
       Icon: ArrowRight,
-      color: 'var(--brand-default)',
+      color: 'hsl(var(--brand-default))',
       opacity: 1,
       dashArray: '5',
       shouldAnimate: true,

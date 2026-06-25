@@ -208,8 +208,8 @@ Line chart component for displaying time-series data.
 | `DateTimeFormat`    | `string`                                                              | `'MMM D, YYYY, hh:mma'`  | Date format for tooltips and labels                               |
 | `isFullHeight`      | `boolean`                                                             | `false`                  | Whether chart should take full height                             |
 | `className`         | `string`                                                              | -                        | Additional CSS classes                                            |
-| `color`             | `string`                                                              | `'var(--brand-default)'` | Line color                                                        |
-| `hoverColor`        | `string`                                                              | `'var(--brand-500)'`     | Line color on hover                                               |
+| `color`             | `string`                                                              | `'hsl(var(--brand-default))'` | Line color                                                        |
+| `hoverColor`        | `string`                                                              | `'hsl(var(--brand-500))'`     | Line color on hover                                               |
 | `chartHighlight`    | `ChartHighlight`                                                      | -                        | Highlight selection configuration                                 |
 | `updateDateRange`   | `(from: string, to: string) => void`                                  | -                        | Callback when date range is updated via highlight                 |
 | `highlightActions`  | `ChartHighlightAction[]`                                              | -                        | Actions to show when area is highlighted                          |
@@ -261,8 +261,8 @@ Bar chart component for displaying time-series data.
 | `DateTimeFormat`    | `string`                                                             | `'MMM D, YYYY, hh:mma'`  | Date format for tooltips and labels                               |
 | `isFullHeight`      | `boolean`                                                            | `false`                  | Whether chart should take full height                             |
 | `className`         | `string`                                                             | -                        | Additional CSS classes                                            |
-| `color`             | `string`                                                             | `'var(--brand-default)'` | Bar color                                                         |
-| `hoverColor`        | `string`                                                             | `'var(--brand-500)'`     | Bar color on hover                                                |
+| `color`             | `string`                                                             | `'hsl(var(--brand-default))'` | Bar color                                                         |
+| `hoverColor`        | `string`                                                             | `'hsl(var(--brand-500))'`     | Bar color on hover                                                |
 | `chartHighlight`    | `ChartHighlight`                                                     | -                        | Highlight selection configuration                                 |
 | `updateDateRange`   | `(from: string, to: string) => void`                                 | -                        | Callback when date range is updated via highlight                 |
 | `highlightActions`  | `ChartHighlightAction[]`                                             | -                        | Actions to show when area is highlighted                          |

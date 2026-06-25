@@ -63,9 +63,9 @@ const Partners = () => {
                       y2="21.5"
                       gradientUnits="userSpaceOnUse"
                     >
-                      <stop stopColor="var(--brand-600)" stopOpacity="0" />
-                      <stop offset="0.510417" stopColor="var(--brand-600)" />
-                      <stop offset="1" stopColor="var(--brand-600)" stopOpacity="0" />
+                      <stop stopColor="hsl(var(--brand-600))" stopOpacity="0" />
+                      <stop offset="0.510417" stopColor="hsl(var(--brand-600))" />
+                      <stop offset="1" stopColor="hsl(var(--brand-600))" stopOpacity="0" />
                     </linearGradient>
                   </defs>
                 </svg>

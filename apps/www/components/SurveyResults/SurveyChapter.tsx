@@ -33,7 +33,7 @@ export function SurveyChapter({
         <header
           className={`flex flex-col gap-24 border-b border-muted`}
           style={{
-            background: `radial-gradient(circle at ${number % 2 === 0 ? '65%' : '35%'} 280%, var(--brand-300), transparent 70%)`,
+            background: `radial-gradient(circle at ${number % 2 === 0 ? '65%' : '35%'} 280%, hsl(var(--brand-300)), transparent 70%)`,
           }}
         >
           {/* Decorative progress bar */}

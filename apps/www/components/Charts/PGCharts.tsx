@@ -9,7 +9,7 @@ import { Tabs } from 'ui'
 import * as data from '@/data/blog/PostgresFTSComparison'
 
 const barColors = {
-  pg: 'var(--brand-600)',
+  pg: 'hsl(var(--brand-600))',
   meilisearch: 'var(--color-blue-1100)',
   typesense: 'var(--color-violet-1100)',
   'sqlite-disk': 'var(--color-orange-1100)',

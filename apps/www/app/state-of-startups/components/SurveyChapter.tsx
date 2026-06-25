@@ -44,8 +44,8 @@ export function SurveyChapter({
             style={{
               background:
                 number % 2 !== 0
-                  ? `radial-gradient(circle at 35% 280%, var(--brand-300), transparent 70%)`
-                  : `radial-gradient(circle at 65% 280%, var(--brand-300), transparent 70%)`,
+                  ? `radial-gradient(circle at 35% 280%, hsl(var(--brand-300)), transparent 70%)`
+                  : `radial-gradient(circle at 65% 280%, hsl(var(--brand-300)), transparent 70%)`,
             }}
           >
             {/* Decorative progress bar */}

@@ -297,7 +297,7 @@ const CTABanner = forwardRef<HTMLElement>((props, ref) => {
     <section
       className="flex flex-col items-center gap-4 px-4 py-32 text-center border-b border-muted"
       style={{
-        background: 'radial-gradient(circle at center 220%, var(--brand-400), transparent 70%)',
+        background: 'radial-gradient(circle at center 220%, hsl(var(--brand-400)), transparent 70%)',
       }}
       ref={ref}
     >

@@ -6,9 +6,9 @@
   --ch-3: #ffcda1;
   --ch-4: #f8f8f2;
   --ch-5: #bda4ff;
-  --ch-6: var(--brand-600);
+  --ch-6: hsl(var(--brand-600));
   --ch-7: #569cd6;
-  --ch-8: var(--brand-default);
+  --ch-8: hsl(var(--brand-default));
   --ch-9: #ffa198;
   --ch-10: #f0f6fc;
   --ch-11: #490202;
@@ -37,9 +37,9 @@
   --ch-3: #953800;
   --ch-4: #24292f;
   --ch-5: #8250df;
-  --ch-6: var(--brand-600);
+  --ch-6: hsl(var(--brand-600));
   --ch-7: #cf222e;
-  --ch-8: var(--brand-default);
+  --ch-8: hsl(var(--brand-default));
   --ch-9: #82071e;
   --ch-10: #f6f8fa;
   --ch-11: #ffebe9;
