@@ -105,9 +105,8 @@ describe('genDefaultQueryOtel', () => {
   })
 
   it('translates an edge status_code filter to a ClickHouse predicate', () => {
-    expect(
-      fmt(genDefaultQueryOtel(LogsTableName.EDGE, { status_code: { error: true } }))
-    ).toMatchInlineSnapshot(`
+    expect(fmt(genDefaultQueryOtel(LogsTableName.EDGE, { status_code: { error: true } })))
+      .toMatchInlineSnapshot(`
       "-- Logs Preview Query (otel) ['edge_logs']
       select
         id,
@@ -133,9 +132,8 @@ describe('genDefaultQueryOtel', () => {
   })
 
   it('translates a search_query filter to a case-insensitive event_message match', () => {
-    expect(
-      fmt(genDefaultQueryOtel(LogsTableName.POSTGRES, { search_query: 'deadlock' }))
-    ).toMatchInlineSnapshot(`
+    expect(fmt(genDefaultQueryOtel(LogsTableName.POSTGRES, { search_query: 'deadlock' })))
+      .toMatchInlineSnapshot(`
       "-- Logs Preview Query (otel) ['postgres_logs']
       select
         id,
@@ -158,9 +156,8 @@ describe('genDefaultQueryOtel', () => {
   })
 
   it('uses the shared auth severity condition for the severity.error filter', () => {
-    expect(
-      fmt(genDefaultQueryOtel(LogsTableName.AUTH, { severity: { error: true } }))
-    ).toMatchInlineSnapshot(`
+    expect(fmt(genDefaultQueryOtel(LogsTableName.AUTH, { severity: { error: true } })))
+      .toMatchInlineSnapshot(`
       "-- Logs Preview Query (otel) ['auth_logs']
       select
         id,
@@ -187,9 +184,8 @@ describe('genDefaultQueryOtel', () => {
   })
 
   it('falls back to a log_attributes equality for unknown filter keys', () => {
-    expect(
-      fmt(genDefaultQueryOtel(LogsTableName.AUTH, { trace_id: 'abc-123' }))
-    ).toMatchInlineSnapshot(`
+    expect(fmt(genDefaultQueryOtel(LogsTableName.AUTH, { trace_id: 'abc-123' })))
+      .toMatchInlineSnapshot(`
       "-- Logs Preview Query (otel) ['auth_logs']
       select
         id,
@@ -249,9 +245,8 @@ describe('genDefaultQueryOtel', () => {
 
 describe('genCountQueryOtel', () => {
   it('counts rows for the source with translated auth filters', () => {
-    expect(
-      fmt(genCountQueryOtel(LogsTableName.AUTH, { status_code: { server_error: true } }))
-    ).toMatchInlineSnapshot(`
+    expect(fmt(genCountQueryOtel(LogsTableName.AUTH, { status_code: { server_error: true } })))
+      .toMatchInlineSnapshot(`
       "-- Logs Count Query (otel) ['auth_logs']
       select
         count() as count
@@ -506,9 +501,8 @@ describe('genChartQueryOtel', () => {
 
 describe('genSingleLogQueryOtel', () => {
   it('fetches a single row by id with raw attributes', () => {
-    expect(
-      fmt(genSingleLogQueryOtel('123e4567-e89b-12d3-a456-426614174000'))
-    ).toMatchInlineSnapshot(`
+    expect(fmt(genSingleLogQueryOtel('123e4567-e89b-12d3-a456-426614174000')))
+      .toMatchInlineSnapshot(`
       "-- Single Log Query (otel)
       select
         id,
@@ -533,9 +527,8 @@ describe('genSingleLogQueryOtel', () => {
 
 describe('OTEL filter translation', () => {
   it('translates the database filter for postgres', () => {
-    expect(
-      fmt(genDefaultQueryOtel(LogsTableName.POSTGRES, { database: 'replica-1' }))
-    ).toMatchInlineSnapshot(`
+    expect(fmt(genDefaultQueryOtel(LogsTableName.POSTGRES, { database: 'replica-1' })))
+      .toMatchInlineSnapshot(`
       "-- Logs Preview Query (otel) ['postgres_logs']
       select
         id,
@@ -558,9 +551,8 @@ describe('OTEL filter translation', () => {
   })
 
   it('translates the database filter for supavisor', () => {
-    expect(
-      fmt(genDefaultQueryOtel(LogsTableName.SUPAVISOR, { database: 'proj' }))
-    ).toMatchInlineSnapshot(`
+    expect(fmt(genDefaultQueryOtel(LogsTableName.SUPAVISOR, { database: 'proj' })))
+      .toMatchInlineSnapshot(`
       "-- Logs Preview Query (otel) ['supavisor_logs']
       select
         id,
@@ -579,9 +571,8 @@ describe('OTEL filter translation', () => {
   })
 
   it('translates the etl pipeline_id filter', () => {
-    expect(
-      fmt(genDefaultQueryOtel(LogsTableName.ETL, { pipeline_id: '42' }))
-    ).toMatchInlineSnapshot(`
+    expect(fmt(genDefaultQueryOtel(LogsTableName.ETL, { pipeline_id: '42' })))
+      .toMatchInlineSnapshot(`
       "-- Logs Preview Query (otel) ['etl_replication_logs']
       select
         id,
