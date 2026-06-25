@@ -193,7 +193,6 @@ vi.mock('@/components/ui/BannerStack/Banners/BannerUnifiedLogs', () => ({
 vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
   useUnifiedLogsPreview: () => ({
     isEnabled: false,
-    isEligible: false,
     isLoading: false,
     enable: () => {},
     disable: () => {},

@@ -64,9 +64,8 @@ export function LogsSidebarMenuV2() {
   const router = useRouter()
   const { ref } = useParams() as { ref: string }
 
-  const unifiedLogsFlagEnabled = useFlag('unifiedLogs')
   const { selectFeaturePreview } = useFeaturePreviewModal()
-  const { enable: enableUnifiedLogs, isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
+  const { enable: enableUnifiedLogs } = useUnifiedLogsPreview()
 
   const [searchText, setSearchText] = useState('')
 
@@ -225,32 +224,15 @@ export function LogsSidebarMenuV2() {
 
   return (
     <div className="pb-4 relative">
-      {IS_PLATFORM && !unifiedLogsFlagEnabled && (
-        <FeaturePreviewSidebarPanel
-          className="mx-4 mt-4"
-          illustration={<Badge variant="default">Coming soon</Badge>}
-          title="New logs"
-          description="Get early access"
-          actions={
-            <Link href="https://forms.supabase.com/unified-logs-signup" target="_blank">
-              <Button variant="default" size="tiny">
-                Early access
-              </Button>
-            </Link>
-          }
-        />
-      )}
-      {isUnifiedLogsEligible && (
-        <UnifiedLogsBanner
-          variant="promo"
-          className="mx-4 mt-4"
-          onEnable={() => {
-            enableUnifiedLogs()
-            router.push(`/project/${ref}/logs`)
-          }}
-          onMoreInfo={() => selectFeaturePreview('supabase-ui-preview-unified-logs')}
-        />
-      )}
+      <UnifiedLogsBanner
+        variant="promo"
+        className="mx-4 mt-4"
+        onEnable={() => {
+          enableUnifiedLogs()
+          router.push(`/project/${ref}/logs`)
+        }}
+        onMoreInfo={() => selectFeaturePreview('supabase-ui-preview-unified-logs')}
+      />
 
       <div
         className={cn(
