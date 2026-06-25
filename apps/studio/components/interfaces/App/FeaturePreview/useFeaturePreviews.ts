@@ -111,6 +111,12 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           getRoute: (ref?: string) => `/project/${ref}/integrations`,
         },
       ].sort((a, b) => Number(b.isNew) - Number(a.isNew)),
-    [pgDeltaDiffEnabled, platformWebhooksEnabled, jitDbAccessEnabled, isMarketplaceEnabled]
+    [
+      unifiedLogsDefaultOptIn,
+      pgDeltaDiffEnabled,
+      platformWebhooksEnabled,
+      jitDbAccessEnabled,
+      isMarketplaceEnabled,
+    ]
   )
 }

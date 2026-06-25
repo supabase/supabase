@@ -72,11 +72,7 @@ export function FilterSideBar({
         </div>
       </div>
 
-      <UnifiedLogsBanner
-        variant="utility"
-        className="mx-4 mt-4"
-        onSwitchBack={handleGoBackToOldLogs}
-      />
+      <UnifiedLogsBanner />
 
       <div className="flex-1 p-2 sm:overflow-y-scroll">
         <DataTableFilterControls dateRangeDisabled={dateRangeDisabled} />

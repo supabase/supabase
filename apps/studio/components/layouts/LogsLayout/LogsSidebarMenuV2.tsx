@@ -224,15 +224,7 @@ export function LogsSidebarMenuV2() {
 
   return (
     <div className="pb-4 relative">
-      <UnifiedLogsBanner
-        variant="promo"
-        className="mx-4 mt-4"
-        onEnable={() => {
-          enableUnifiedLogs()
-          router.push(`/project/${ref}/logs`)
-        }}
-        onMoreInfo={() => selectFeaturePreview('supabase-ui-preview-unified-logs')}
-      />
+      <UnifiedLogsBanner />
 
       <div
         className={cn(
@@ -247,7 +239,7 @@ export function LogsSidebarMenuV2() {
             aria-labelledby="Search collections"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-          ></InnerSideBarFilterSearchInput>
+          />
         </InnerSideBarFilters>
 
         <Button
