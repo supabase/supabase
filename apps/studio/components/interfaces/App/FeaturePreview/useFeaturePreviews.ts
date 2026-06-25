@@ -111,7 +111,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         },
       ].sort((a, b) => Number(b.isNew) - Number(a.isNew)),
     [
-      isUnifiedLogsPreviewAvailable,
+      unifiedLogsDefaultOptIn,
       pgDeltaDiffEnabled,
       platformWebhooksEnabled,
       jitDbAccessEnabled,
