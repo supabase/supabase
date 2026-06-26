@@ -1,7 +1,7 @@
 import { Maximize2, Minimize2 } from 'lucide-react'
 import { Button, cn, FormControl, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 
 export const FunctionEditor = ({
   field,
@@ -36,7 +36,7 @@ export const FunctionEditor = ({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              type="text"
+              variant="text"
               size="tiny"
               className={cn(
                 'px-1.5 text-foreground-lighter hover:text-foreground',

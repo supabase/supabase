@@ -16,7 +16,7 @@ export function Hero() {
         question answered helps someone build something amazing.
       </p>
 
-      <Button size="medium" asChild type="outline">
+      <Button size="medium" asChild variant="outline">
         <Link href="/contribute/about">Get involved</Link>
       </Button>
     </header>

@@ -105,7 +105,9 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
   const pendingDeltaRef = useRef(0)
 
   const handleWheel: React.WheelEventHandler<HTMLDivElement> = (e) => {
-    if (e.deltaX === 0) return
+    // Only scroll sideways when horizontal intent wins. Trackpads report a small
+    // deltaX on vertical scrolls, so a deltaX === 0 check would hijack them.
+    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return
 
     const delta = Math.abs(e.deltaX) * 2 * (e.deltaX > 0 ? 1 : -1)
     pendingDeltaRef.current += delta
@@ -145,7 +147,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
     <div ref={ref} className={cn('relative w-full', className)} {...rest}>
       {showArrows && canScrollLeft && (
         <Button
-          type="default"
+          variant="default"
           onClick={scrollLeft}
           className="absolute w-8 h-8 left-0 top-1/2 -translate-y-1/2 z-10 rounded-full p-2"
           aria-label="Scroll left"
@@ -156,7 +158,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
 
       {showArrows && canScrollRight && hasContentToScroll && (
         <Button
-          type="default"
+          variant="default"
           onClick={scrollRight}
           className="absolute w-8 h-8 right-0 top-1/2 -translate-y-1/2 z-10 rounded-full p-2"
           aria-label="Scroll right"

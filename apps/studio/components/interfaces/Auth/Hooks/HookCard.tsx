@@ -105,7 +105,7 @@ export const HookCard = ({ hook, onSelect }: HookCardProps) => {
         </div>
         <div className="flex flex-row gap-2">
           <ButtonTooltip
-            type="default"
+            variant="default"
             disabled={!canUpdateAuthHook}
             onClick={() => onSelect()}
             tooltip={{

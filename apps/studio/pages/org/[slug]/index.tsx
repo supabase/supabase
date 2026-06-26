@@ -37,7 +37,7 @@ const ProjectsPage: NextPageWithLayout = () => {
               </>
             }
             actions={
-              <Button asChild type="default">
+              <Button asChild variant="default">
                 <Link href="/account/security">Set up MFA</Link>
               </Button>
             }

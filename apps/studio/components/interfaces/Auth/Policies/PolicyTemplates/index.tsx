@@ -35,7 +35,7 @@ const PolicyTemplates = ({
           This will override any existing code you've written
         </span>
         <Button
-          type="primary"
+          variant="primary"
           disabled={isEmpty(selectedTemplate)}
           onClick={() => onUseTemplate(selectedTemplate)}
         >

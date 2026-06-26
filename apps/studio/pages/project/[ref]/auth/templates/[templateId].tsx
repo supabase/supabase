@@ -6,7 +6,21 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
+import {
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  Form,
+  FormControl,
+  FormField,
+  Switch,
+} from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -26,17 +40,11 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import {
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from 'ui/src/components/shadcn/ui/breadcrumb'
 import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/EmailTemplates/AuthTemplatesValidation'
 import { CustomEmailTemplateRestrictionAdmonition } from '@/components/interfaces/Auth/EmailTemplates/CustomEmailTemplateRestrictionAdmonition'
+import { AUTH_EMAIL_TEMPLATES_DOCS_PATH } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.constants'
 import {
   isCustomEmailTemplateEditingRestricted,
   isCustomEmailTemplateRestrictionStatusKnown,
@@ -106,10 +114,6 @@ const RedirectToTemplates = () => {
       ? TEMPLATES_SCHEMAS.find((template) => slugifyTitle(template.title) === templateId)
       : null
 
-  // Convert templateId slug to one lowercase word to match docs anchor tag
-  const templateIdForDocs =
-    typeof templateId === 'string' ? templateId.replace(/-/g, '').toLowerCase() : ''
-
   // Determine if this is a security notification template
   const isSecurityTemplate = template?.misc?.emailTemplateType === 'security'
 
@@ -172,7 +176,7 @@ const RedirectToTemplates = () => {
           title="Unable to find template"
           description={`${templateId ? `The template "${templateId}"` : 'This template'} doesn’t seem to exist.`}
         >
-          <Button asChild type="default" className="mt-2">
+          <Button asChild variant="default" className="mt-2">
             <Link href={`/project/${ref}/auth/templates`}>Head back</Link>
           </Button>
         </Admonition>
@@ -204,9 +208,7 @@ const RedirectToTemplates = () => {
             </PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
-            <DocsButton
-              href={`${DOCS_URL}/guides/local-development/customizing-email-templates#${isSecurityTemplate ? 'security' : 'auth'}emailtemplate${templateIdForDocs}`}
-            />
+            <DocsButton href={`${DOCS_URL}${AUTH_EMAIL_TEMPLATES_DOCS_PATH}`} />
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
@@ -253,13 +255,13 @@ const RedirectToTemplates = () => {
                         </CardContent>
                         <CardFooter className="justify-end space-x-2">
                           {templateForm.formState.isDirty && (
-                            <Button type="default" onClick={() => templateForm.reset()}>
+                            <Button variant="default" onClick={() => templateForm.reset()}>
                               Cancel
                             </Button>
                           )}
                           <Button
-                            type="primary"
-                            htmlType="submit"
+                            variant="primary"
+                            type="submit"
                             disabled={
                               !canUpdateConfig ||
                               isUpdatingConfig ||

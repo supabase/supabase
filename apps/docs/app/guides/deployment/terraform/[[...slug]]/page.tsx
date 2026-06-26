@@ -1,6 +1,5 @@
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { genGuideMeta, removeRedundantH1 } from '~/features/docs/GuidesMdx.utils'
-import { notFoundWithPathname } from '~/features/docs/notFound.utils'
 import { getEmptyArray } from '~/features/helpers.fn'
 import { IS_DEV } from '~/lib/constants'
 import { isValidGuideFrontmatter } from '~/lib/docs'
@@ -11,6 +10,7 @@ import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
 import { getGitHubFileContents } from '~/lib/octokit'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 import matter from 'gray-matter'
+import { notFound } from 'next/navigation'
 import rehypeSlug from 'rehype-slug'
 
 import {
@@ -106,7 +106,7 @@ const getContent = async ({ slug }: Params) => {
   const page = pageMap.find((page) => page.slug === requestedSlug)
 
   if (!page) {
-    notFoundWithPathname(`/guides/deployment/terraform${slug?.length ? `/${slug.join('/')}` : ''}`)
+    notFound()
   }
 
   const { meta, remoteFile, useRoot } = page

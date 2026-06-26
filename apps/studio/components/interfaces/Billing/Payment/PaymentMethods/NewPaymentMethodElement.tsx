@@ -395,7 +395,7 @@ export const NewPaymentMethodElement = forwardRef(
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
-                            type="default"
+                            variant="default"
                             role="combobox"
                             size="medium"
                             aria-expanded={showTaxIDsPopover}

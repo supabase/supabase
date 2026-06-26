@@ -34,7 +34,7 @@ export const AccessTokenNewBanner = <T,>({
       className="mb-6 relative"
       actions={
         <Button
-          type="text"
+          variant="text"
           icon={<X />}
           className="w-7 h-7 absolute top-2.5 right-2.5"
           onClick={onClose}

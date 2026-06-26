@@ -116,7 +116,7 @@ const PropertyRow = ({
               <Button
                 className="mt-1 w-full"
                 size="tiny"
-                type="outline"
+                variant="outline"
                 onClick={() => setIsExpanded(!isExpanded)}
               >
                 {isExpanded ? 'Collapse' : 'Expand'}

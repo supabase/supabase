@@ -97,7 +97,7 @@ export const GraphqlExposureLintCTA = ({
 
   return (
     <>
-      <Button type="primary" disabled={!canAct} onClick={() => setShowConfirmRevoke(true)}>
+      <Button variant="primary" disabled={!canAct} onClick={() => setShowConfirmRevoke(true)}>
         {TRIGGER_LABEL[lintName]}
       </Button>
       <ConfirmationModal

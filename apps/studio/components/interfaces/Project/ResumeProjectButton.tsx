@@ -41,7 +41,7 @@ const FormSchema = z.object({
 
 type ResumeProjectButtonProps = Pick<
   ComponentPropsWithoutRef<typeof ButtonTooltip>,
-  'className' | 'size' | 'type'
+  'className' | 'size' | 'variant'
 > & {
   label?: string
 }
@@ -50,7 +50,7 @@ export const ResumeProjectButton = ({
   className,
   label = 'Resume project',
   size,
-  type = 'default',
+  variant = 'default',
 }: ResumeProjectButtonProps) => {
   const router = useRouter()
   const { ref } = useParams()
@@ -161,7 +161,7 @@ export const ResumeProjectButton = ({
       <ButtonTooltip
         className={className}
         size={size}
-        type={type}
+        variant={variant}
         disabled={buttonDisabled}
         loading={isRestoring}
         onClick={onSelectRestore}
@@ -249,8 +249,8 @@ export const ResumeProjectButton = ({
           </DialogSection>
           <DialogFooter>
             <Button
-              htmlType="button"
-              type="default"
+              type="button"
+              variant="default"
               onClick={() => setShowFreeProjectLimitWarning(false)}
             >
               Understood

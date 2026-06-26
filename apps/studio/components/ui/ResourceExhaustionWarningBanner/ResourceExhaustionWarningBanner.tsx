@@ -241,7 +241,7 @@ export const ResourceExhaustionWarningBanner = () => {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="default"
+                variant="default"
                 icon={<Wrench size={14} />}
                 iconRight={<ChevronDown size={14} />}
               >
@@ -278,20 +278,20 @@ export const ResourceExhaustionWarningBanner = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : learnMoreUrl !== undefined ? (
-          <Button asChild type="default" icon={<BookOpen size={14} />}>
+          <Button asChild variant="default" icon={<BookOpen size={14} />}>
             <a href={learnMoreUrl} target="_blank" rel="noreferrer">
               Learn more
             </a>
           </Button>
         ) : aiPrompt !== undefined ? (
-          <Button type="default" onClick={handleAskAI}>
+          <Button variant="default" onClick={handleAskAI}>
             Ask AI Assistant
           </Button>
         ) : null}
         {correctionUrl !== undefined && (
           <Button
             asChild
-            type="primary"
+            variant="primary"
             disabled={isComputeUpgradeMetric && isOrgLoading}
             onClick={() =>
               track('resource_exhaustion_banner_upgrade_clicked', {

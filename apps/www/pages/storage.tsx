@@ -238,7 +238,13 @@ function StoragePage() {
                 archives, and more, then serve them fast from a global CDN with fine-grained access
                 controls.
               </p>
-              <Button asChild size="small" type="default" className="mt-4" icon={<ArrowUpRight />}>
+              <Button
+                asChild
+                size="small"
+                variant="default"
+                className="mt-4"
+                icon={<ArrowUpRight />}
+              >
                 <Link href="/docs/guides/storage">Read the docs</Link>
               </Button>
             </div>
@@ -250,11 +256,11 @@ function StoragePage() {
                 is efficient to query, partition, and transform, and optionally expose via Postgres.
               </p>
               <div className="mt-4 flex gap-2">
-                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
                   <Link href="/docs/guides/storage/analytics/introduction">Read the docs</Link>
                 </Button>
-                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
-                  <Link href="/blog/analytics-buckets">Read the blog post</Link>
+                <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
+                  <Link href="/blog/introducing-analytics-buckets">Read the blog post</Link>
                 </Button>
               </div>
             </div>
@@ -267,10 +273,10 @@ function StoragePage() {
                 search, and more.
               </p>
               <div className="mt-4 flex gap-2">
-                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
                   <Link href="/docs/guides/storage/vector/introduction">Read the docs</Link>
                 </Button>
-                <Button asChild size="small" type="default" icon={<ArrowUpRight />}>
+                <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
                   <Link href="/blog/vector-buckets">Read the blog post</Link>
                 </Button>
               </div>
@@ -298,7 +304,7 @@ function StoragePage() {
                   <Button
                     asChild
                     size="small"
-                    type="default"
+                    variant="default"
                     className="mt-4"
                     icon={<ArrowUpRight />}
                   >
@@ -314,7 +320,7 @@ function StoragePage() {
                   <Button
                     asChild
                     size="small"
-                    type="default"
+                    variant="default"
                     className="mt-4"
                     icon={<ArrowUpRight />}
                   >
@@ -333,7 +339,7 @@ function StoragePage() {
             <div className="section--bg-masked">
               <div className="section--bg border-t border-control"></div>
             </div>
-            <div className="section-container pt-12 pb-0">
+            <div className="relative pt-12 pb-0">
               <div className="overflow-x-hidden">
                 <SectionContainer>
                   <div className="grid grid-cols-12 lg:gap-16">
@@ -355,7 +361,7 @@ function StoragePage() {
                       <Button
                         asChild
                         size="small"
-                        type="default"
+                        variant="default"
                         className="mt-4"
                         icon={<ArrowUpRight />}
                       >

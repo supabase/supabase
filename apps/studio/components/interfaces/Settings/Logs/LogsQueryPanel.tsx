@@ -1,4 +1,3 @@
-import { useFlag } from 'common'
 import { BookOpen, Check, ChevronDown, ChevronsUpDown, Copy, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
@@ -18,12 +17,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Label,
   Popover,
   PopoverContent,
   PopoverTrigger,
   SidePanel,
-  Switch,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -48,8 +45,6 @@ export interface LogsQueryPanelProps {
   onSelectTemplate: (template: LogTemplate) => void
   onSelectSource: (source: string) => void
   onDateChange: (value: DatePickerValue) => void
-  useOtel?: boolean
-  onUseOtelChange?: (value: boolean) => void
 }
 
 function DropdownMenuItemContent({ name, desc }: { name: ReactNode; desc?: string }) {
@@ -68,13 +63,9 @@ const LogsQueryPanel = ({
   onSelectTemplate,
   onSelectSource,
   onDateChange,
-  useOtel = false,
-  onUseOtelChange,
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
   const { logsTemplates } = useIsFeatureEnabled(['logs:templates'])
-  const showChToggleInLogExplorer = useFlag('showChToggleInLogExplorer')
-  const otelToggleEnabled = !!showChToggleInLogExplorer && !!onUseOtelChange
 
   const {
     projectAuthAll: authEnabled,
@@ -114,7 +105,7 @@ const LogsQueryPanel = ({
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<ChevronDown />}>
+                <Button variant="default" iconRight={<ChevronDown />}>
                   Insert source
                 </Button>
               </DropdownMenuTrigger>
@@ -139,7 +130,7 @@ const LogsQueryPanel = ({
             {logsTemplates && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="default" iconRight={<ChevronDown />}>
+                  <Button variant="default" iconRight={<ChevronDown />}>
                     Templates
                   </Button>
                 </DropdownMenuTrigger>
@@ -166,30 +157,6 @@ const LogsQueryPanel = ({
               }}
               helpers={EXPLORER_DATEPICKER_HELPERS}
             />
-
-            {otelToggleEnabled && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      id="logs-explorer-otel-toggle"
-                      checked={useOtel}
-                      onCheckedChange={(checked) => onUseOtelChange?.(checked)}
-                    />
-                    <Label
-                      htmlFor="logs-explorer-otel-toggle"
-                      className="text-xs text-foreground-light cursor-pointer"
-                    >
-                      OTEL endpoint
-                    </Label>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-xs">
-                  Run this query against the new ClickHouse-backed OTEL endpoint instead of
-                  BigQuery. Use to validate ClickHouse SQL before relying on it.
-                </TooltipContent>
-              </Tooltip>
-            )}
 
             <div
               data-testid="log-explorer-warnings"
@@ -226,7 +193,7 @@ const LogsQueryPanel = ({
               <div className="flex flex-row justify-between items-center">
                 <h3>Field Reference</h3>
                 <Button
-                  type="text"
+                  variant="text"
                   className="px-1"
                   onClick={() => setShowReference(false)}
                   icon={<X />}
@@ -239,7 +206,7 @@ const LogsQueryPanel = ({
             hideFooter
             triggerElement={
               <Button
-                type="text"
+                variant="text"
                 onClick={() => setShowReference(true)}
                 icon={<BookOpen />}
                 className="px-2"
@@ -276,7 +243,7 @@ const LogsQueryPanel = ({
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                   <Button
-                    type="default"
+                    variant="default"
                     role="combobox"
                     size={'small'}
                     aria-expanded={open}

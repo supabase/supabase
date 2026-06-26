@@ -210,7 +210,7 @@ export const WithStatements = ({
               side="top"
             >
               <Button
-                type="default"
+                variant="default"
                 size="tiny"
                 icon={<RefreshCw />}
                 onClick={handleRefresh}
@@ -223,7 +223,7 @@ export const WithStatements = ({
               side="top"
             >
               <Button
-                type="default"
+                variant="default"
                 size="tiny"
                 icon={<RotateCcw />}
                 onClick={() => setShowResetgPgStatStatements(true)}
@@ -258,7 +258,7 @@ export const WithStatements = ({
       >
         <Button
           className="absolute top-1.5 right-3 px-1.5"
-          type="text"
+          variant="text"
           size="tiny"
           onClick={() => setShowBottomSection(false)}
         >
@@ -270,7 +270,7 @@ export const WithStatements = ({
             Consider resetting the analysis after optimizing any queries
           </p>
           <Button
-            type="default"
+            variant="default"
             className="mt-3! w-min"
             onClick={() => setShowResetgPgStatStatements(true)}
           >

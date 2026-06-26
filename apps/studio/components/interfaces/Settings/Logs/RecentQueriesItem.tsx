@@ -23,7 +23,7 @@ const RecentQueriesItem: React.FC<Props> = ({ item }) => {
       </Table.td>
       <Table.td className="text-right">
         <Button
-          type="alternative"
+          variant="primary"
           iconRight={<Play size={10} />}
           onClick={() =>
             router.push(`/project/${ref}/logs/explorer?q=${encodeURIComponent(item.sql)}`)

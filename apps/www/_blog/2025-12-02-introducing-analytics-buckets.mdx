@@ -115,22 +115,6 @@ Analytics Buckets require authentication with two services:
 
 You authenticate using your Supabase service key for the catalog and S3 credentials for storage.
 
-## Streaming data with Supabase ETL
-
-Analytics Buckets work hand in hand with [Supabase ETL](/blog/introducing-supabase-etl). ETL captures changes from your Postgres database and streams them to Analytics Buckets in near real time.
-
-This gives you:
-
-- Automatic replication of your Postgres tables
-
-- Near real-time data in your analytics bucket
-
-- Complete changelog with every insert, update, and delete
-
-- No manual data movement or scheduled jobs
-
-To set up replication, create a Postgres publication for the tables you want to replicate, then add an Analytics Buckets destination in the Replication section of the Dashboard.
-
 ## Querying from Postgres
 
 You can query Analytics Buckets directly from Postgres using Foreign Data Wrappers. This lets you join hot data in Postgres with historical data in Analytics Buckets.
@@ -161,7 +145,7 @@ A common architecture is data tiering: keeping recent data in Postgres and archi
 
 1. Partition tables by time in Postgres, keeping a rolling window like the last 90 days
 
-2. Stream all data to Analytics Buckets using Supabase ETL
+2. Populate Analytics Buckets with your ingestion pipeline
 
 3. Drop old partitions from Postgres
 
@@ -203,7 +187,7 @@ To request access, fill out the form at [forms.supabase.com/analytics-buckets](h
 
 3. Connect using PyIceberg, Spark, or your tool of choice
 
-4. Set up ETL to stream data from Postgres automatically
+4. Populate the bucket with your ingestion pipeline
 
 Separate your transactional and analytical workloads. Keep Postgres fast. Store history at S3 prices. Query from any tool.
 

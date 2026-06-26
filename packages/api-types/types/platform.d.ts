@@ -5914,61 +5914,180 @@ export interface components {
             }
           }
         | {
-            ducklake: {
-              /**
-               * @description DuckLake catalog URL
-               * @example postgres://user:pass@localhost:5432/ducklake_catalog
-               */
-              catalog_url: string
-              /**
-               * @description DuckLake data path
-               * @example s3://<bucket-name>/
-               */
-              data_path: string
-              /**
-               * @description Schema used for DuckLake metadata tables stored in PostgreSQL
-               * @default ducklake
-               * @example ducklake
-               */
-              metadata_schema?: string
-              /**
-               * @description Number of concurrent DuckDB connections.
-               * @example 4
-               */
-              pool_size?: number
-              /**
-               * @description S3-compatible storage access key ID
-               * @example my-access-key
-               */
-              s3_access_key_id: string
-              /**
-               * @description S3-compatible storage endpoint
-               * @example 127.0.0.1:5000/s3
-               */
-              s3_endpoint: string
-              /**
-               * @description S3-compatible storage region
-               * @example us-east-1
-               */
-              s3_region: string
-              /**
-               * @description S3-compatible storage secret access key
-               * @example my-secret-key
-               */
-              s3_secret_access_key: string
-              /**
-               * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
-               * @example path
-               * @enum {string}
-               */
-              s3_url_style?: 'path' | 'vhost'
-              /**
-               * @description Whether to use SSL for S3-compatible storage
-               * @default true
-               * @example false
-               */
-              s3_use_ssl?: boolean
-            }
+            ducklake:
+              | {
+                  /**
+                   * @description DuckLake catalog URL
+                   * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                   */
+                  catalog_url: string
+                  /**
+                   * @description DuckLake data path
+                   * @example s3://<bucket-name>/
+                   */
+                  data_path: string
+                  /**
+                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                   * @default ducklake
+                   * @example ducklake
+                   */
+                  metadata_schema?: string
+                  /**
+                   * @description Number of concurrent DuckDB connections.
+                   * @example 4
+                   */
+                  pool_size?: number
+                  /**
+                   * @description S3-compatible storage access key ID
+                   * @example my-access-key
+                   */
+                  s3_access_key_id: string
+                  /**
+                   * @description S3-compatible storage endpoint
+                   * @example 127.0.0.1:5000/s3
+                   */
+                  s3_endpoint: string
+                  /**
+                   * @description S3-compatible storage region
+                   * @example us-east-1
+                   */
+                  s3_region: string
+                  /**
+                   * @description S3-compatible storage secret access key
+                   * @example my-secret-key
+                   */
+                  s3_secret_access_key: string
+                  /**
+                   * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                   * @example path
+                   * @enum {string}
+                   */
+                  s3_url_style?: 'path' | 'vhost'
+                  /**
+                   * @description Whether to use SSL for S3-compatible storage
+                   * @default true
+                   * @example false
+                   */
+                  s3_use_ssl?: boolean
+                }
+              | {
+                  catalog:
+                    | {
+                        /**
+                         * @description DuckLake catalog URL
+                         * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                         */
+                        catalog_url: string
+                        /**
+                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
+                         * @example ducklake
+                         */
+                        metadata_schema?: string
+                        /**
+                         * @description Number of concurrent DuckDB connections.
+                         * @example 4
+                         */
+                        pool_size?: number
+                        /** @enum {string} */
+                        type: 'postgres_url'
+                      }
+                    | {
+                        /**
+                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
+                         * @example ducklake
+                         */
+                        metadata_schema?: string
+                        /**
+                         * @description Number of concurrent DuckDB connections.
+                         * @example 4
+                         */
+                        pool_size?: number
+                        /**
+                         * @description Supabase project ref used as the DuckLake PostgreSQL catalog
+                         * @example abcjuqabhgwjjutfvtpa
+                         */
+                        project_ref: string
+                        /** @enum {string} */
+                        type: 'supabase_project'
+                      }
+                  /**
+                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                   * @default ducklake
+                   * @example ducklake
+                   */
+                  metadata_schema?: string
+                  /**
+                   * @description Number of concurrent DuckDB connections.
+                   * @example 4
+                   */
+                  pool_size?: number
+                  storage:
+                    | {
+                        /**
+                         * @description DuckLake data path
+                         * @example s3://<bucket-name>/
+                         */
+                        data_path: string
+                        /**
+                         * @description S3-compatible storage access key ID
+                         * @example my-access-key
+                         */
+                        s3_access_key_id: string
+                        /**
+                         * @description S3-compatible storage endpoint
+                         * @example 127.0.0.1:5000/s3
+                         */
+                        s3_endpoint: string
+                        /**
+                         * @description S3-compatible storage region
+                         * @example us-east-1
+                         */
+                        s3_region: string
+                        /**
+                         * @description S3-compatible storage secret access key
+                         * @example my-secret-key
+                         */
+                        s3_secret_access_key: string
+                        /**
+                         * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                         * @example path
+                         * @enum {string}
+                         */
+                        s3_url_style?: 'path' | 'vhost'
+                        /**
+                         * @description Whether to use SSL for S3-compatible storage
+                         * @default true
+                         * @example false
+                         */
+                        s3_use_ssl?: boolean
+                        /** @enum {string} */
+                        type: 's3'
+                      }
+                    | {
+                        /**
+                         * @description Storage bucket id used for DuckLake data files
+                         * @example ducklake
+                         */
+                        bucket: string
+                        /**
+                         * @description Optional description for the generated Supabase Storage S3 credential
+                         * @example DuckLake replication destination
+                         */
+                        credential_description?: string
+                        /**
+                         * @description Optional path prefix inside the bucket for DuckLake data files
+                         * @example replication
+                         */
+                        path?: string
+                        /**
+                         * @description Supabase project ref whose Object Storage S3 API stores DuckLake data files
+                         * @example abcjuqabhgwjjutfvtpa
+                         */
+                        project_ref: string
+                        /** @enum {string} */
+                        type: 'supabase_storage'
+                      }
+                }
           }
         | {
             snowflake: {
@@ -6107,61 +6226,180 @@ export interface components {
             }
           }
         | {
-            ducklake: {
-              /**
-               * @description DuckLake catalog URL
-               * @example postgres://user:pass@localhost:5432/ducklake_catalog
-               */
-              catalog_url: string
-              /**
-               * @description DuckLake data path
-               * @example s3://<bucket-name>/
-               */
-              data_path: string
-              /**
-               * @description Schema used for DuckLake metadata tables stored in PostgreSQL
-               * @default ducklake
-               * @example ducklake
-               */
-              metadata_schema?: string
-              /**
-               * @description Number of concurrent DuckDB connections.
-               * @example 4
-               */
-              pool_size?: number
-              /**
-               * @description S3-compatible storage access key ID
-               * @example my-access-key
-               */
-              s3_access_key_id: string
-              /**
-               * @description S3-compatible storage endpoint
-               * @example 127.0.0.1:5000/s3
-               */
-              s3_endpoint: string
-              /**
-               * @description S3-compatible storage region
-               * @example us-east-1
-               */
-              s3_region: string
-              /**
-               * @description S3-compatible storage secret access key
-               * @example my-secret-key
-               */
-              s3_secret_access_key: string
-              /**
-               * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
-               * @example path
-               * @enum {string}
-               */
-              s3_url_style?: 'path' | 'vhost'
-              /**
-               * @description Whether to use SSL for S3-compatible storage
-               * @default true
-               * @example false
-               */
-              s3_use_ssl?: boolean
-            }
+            ducklake:
+              | {
+                  /**
+                   * @description DuckLake catalog URL
+                   * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                   */
+                  catalog_url: string
+                  /**
+                   * @description DuckLake data path
+                   * @example s3://<bucket-name>/
+                   */
+                  data_path: string
+                  /**
+                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                   * @default ducklake
+                   * @example ducklake
+                   */
+                  metadata_schema?: string
+                  /**
+                   * @description Number of concurrent DuckDB connections.
+                   * @example 4
+                   */
+                  pool_size?: number
+                  /**
+                   * @description S3-compatible storage access key ID
+                   * @example my-access-key
+                   */
+                  s3_access_key_id: string
+                  /**
+                   * @description S3-compatible storage endpoint
+                   * @example 127.0.0.1:5000/s3
+                   */
+                  s3_endpoint: string
+                  /**
+                   * @description S3-compatible storage region
+                   * @example us-east-1
+                   */
+                  s3_region: string
+                  /**
+                   * @description S3-compatible storage secret access key
+                   * @example my-secret-key
+                   */
+                  s3_secret_access_key: string
+                  /**
+                   * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                   * @example path
+                   * @enum {string}
+                   */
+                  s3_url_style?: 'path' | 'vhost'
+                  /**
+                   * @description Whether to use SSL for S3-compatible storage
+                   * @default true
+                   * @example false
+                   */
+                  s3_use_ssl?: boolean
+                }
+              | {
+                  catalog:
+                    | {
+                        /**
+                         * @description DuckLake catalog URL
+                         * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                         */
+                        catalog_url: string
+                        /**
+                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
+                         * @example ducklake
+                         */
+                        metadata_schema?: string
+                        /**
+                         * @description Number of concurrent DuckDB connections.
+                         * @example 4
+                         */
+                        pool_size?: number
+                        /** @enum {string} */
+                        type: 'postgres_url'
+                      }
+                    | {
+                        /**
+                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
+                         * @example ducklake
+                         */
+                        metadata_schema?: string
+                        /**
+                         * @description Number of concurrent DuckDB connections.
+                         * @example 4
+                         */
+                        pool_size?: number
+                        /**
+                         * @description Supabase project ref used as the DuckLake PostgreSQL catalog
+                         * @example abcjuqabhgwjjutfvtpa
+                         */
+                        project_ref: string
+                        /** @enum {string} */
+                        type: 'supabase_project'
+                      }
+                  /**
+                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                   * @default ducklake
+                   * @example ducklake
+                   */
+                  metadata_schema?: string
+                  /**
+                   * @description Number of concurrent DuckDB connections.
+                   * @example 4
+                   */
+                  pool_size?: number
+                  storage:
+                    | {
+                        /**
+                         * @description DuckLake data path
+                         * @example s3://<bucket-name>/
+                         */
+                        data_path: string
+                        /**
+                         * @description S3-compatible storage access key ID
+                         * @example my-access-key
+                         */
+                        s3_access_key_id: string
+                        /**
+                         * @description S3-compatible storage endpoint
+                         * @example 127.0.0.1:5000/s3
+                         */
+                        s3_endpoint: string
+                        /**
+                         * @description S3-compatible storage region
+                         * @example us-east-1
+                         */
+                        s3_region: string
+                        /**
+                         * @description S3-compatible storage secret access key
+                         * @example my-secret-key
+                         */
+                        s3_secret_access_key: string
+                        /**
+                         * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                         * @example path
+                         * @enum {string}
+                         */
+                        s3_url_style?: 'path' | 'vhost'
+                        /**
+                         * @description Whether to use SSL for S3-compatible storage
+                         * @default true
+                         * @example false
+                         */
+                        s3_use_ssl?: boolean
+                        /** @enum {string} */
+                        type: 's3'
+                      }
+                    | {
+                        /**
+                         * @description Storage bucket id used for DuckLake data files
+                         * @example ducklake
+                         */
+                        bucket: string
+                        /**
+                         * @description Optional description for the generated Supabase Storage S3 credential
+                         * @example DuckLake replication destination
+                         */
+                        credential_description?: string
+                        /**
+                         * @description Optional path prefix inside the bucket for DuckLake data files
+                         * @example replication
+                         */
+                        path?: string
+                        /**
+                         * @description Supabase project ref whose Object Storage S3 API stores DuckLake data files
+                         * @example abcjuqabhgwjjutfvtpa
+                         */
+                        project_ref: string
+                        /** @enum {string} */
+                        type: 'supabase_storage'
+                      }
+                }
           }
         | {
             snowflake: {
@@ -9747,61 +9985,180 @@ export interface components {
             }
           }
         | {
-            ducklake: {
-              /**
-               * @description DuckLake catalog URL
-               * @example postgres://user:pass@localhost:5432/ducklake_catalog
-               */
-              catalog_url: string
-              /**
-               * @description DuckLake data path
-               * @example s3://<bucket-name>/
-               */
-              data_path: string
-              /**
-               * @description Schema used for DuckLake metadata tables stored in PostgreSQL
-               * @default ducklake
-               * @example ducklake
-               */
-              metadata_schema?: string
-              /**
-               * @description Number of concurrent DuckDB connections.
-               * @example 4
-               */
-              pool_size?: number
-              /**
-               * @description S3-compatible storage access key ID
-               * @example my-access-key
-               */
-              s3_access_key_id: string
-              /**
-               * @description S3-compatible storage endpoint
-               * @example 127.0.0.1:5000/s3
-               */
-              s3_endpoint: string
-              /**
-               * @description S3-compatible storage region
-               * @example us-east-1
-               */
-              s3_region: string
-              /**
-               * @description S3-compatible storage secret access key
-               * @example my-secret-key
-               */
-              s3_secret_access_key: string
-              /**
-               * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
-               * @example path
-               * @enum {string}
-               */
-              s3_url_style?: 'path' | 'vhost'
-              /**
-               * @description Whether to use SSL for S3-compatible storage
-               * @default true
-               * @example false
-               */
-              s3_use_ssl?: boolean
-            }
+            ducklake:
+              | {
+                  /**
+                   * @description DuckLake catalog URL
+                   * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                   */
+                  catalog_url: string
+                  /**
+                   * @description DuckLake data path
+                   * @example s3://<bucket-name>/
+                   */
+                  data_path: string
+                  /**
+                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                   * @default ducklake
+                   * @example ducklake
+                   */
+                  metadata_schema?: string
+                  /**
+                   * @description Number of concurrent DuckDB connections.
+                   * @example 4
+                   */
+                  pool_size?: number
+                  /**
+                   * @description S3-compatible storage access key ID
+                   * @example my-access-key
+                   */
+                  s3_access_key_id: string
+                  /**
+                   * @description S3-compatible storage endpoint
+                   * @example 127.0.0.1:5000/s3
+                   */
+                  s3_endpoint: string
+                  /**
+                   * @description S3-compatible storage region
+                   * @example us-east-1
+                   */
+                  s3_region: string
+                  /**
+                   * @description S3-compatible storage secret access key
+                   * @example my-secret-key
+                   */
+                  s3_secret_access_key: string
+                  /**
+                   * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                   * @example path
+                   * @enum {string}
+                   */
+                  s3_url_style?: 'path' | 'vhost'
+                  /**
+                   * @description Whether to use SSL for S3-compatible storage
+                   * @default true
+                   * @example false
+                   */
+                  s3_use_ssl?: boolean
+                }
+              | {
+                  catalog:
+                    | {
+                        /**
+                         * @description DuckLake catalog URL
+                         * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                         */
+                        catalog_url: string
+                        /**
+                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
+                         * @example ducklake
+                         */
+                        metadata_schema?: string
+                        /**
+                         * @description Number of concurrent DuckDB connections.
+                         * @example 4
+                         */
+                        pool_size?: number
+                        /** @enum {string} */
+                        type: 'postgres_url'
+                      }
+                    | {
+                        /**
+                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
+                         * @example ducklake
+                         */
+                        metadata_schema?: string
+                        /**
+                         * @description Number of concurrent DuckDB connections.
+                         * @example 4
+                         */
+                        pool_size?: number
+                        /**
+                         * @description Supabase project ref used as the DuckLake PostgreSQL catalog
+                         * @example abcjuqabhgwjjutfvtpa
+                         */
+                        project_ref: string
+                        /** @enum {string} */
+                        type: 'supabase_project'
+                      }
+                  /**
+                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                   * @default ducklake
+                   * @example ducklake
+                   */
+                  metadata_schema?: string
+                  /**
+                   * @description Number of concurrent DuckDB connections.
+                   * @example 4
+                   */
+                  pool_size?: number
+                  storage:
+                    | {
+                        /**
+                         * @description DuckLake data path
+                         * @example s3://<bucket-name>/
+                         */
+                        data_path: string
+                        /**
+                         * @description S3-compatible storage access key ID
+                         * @example my-access-key
+                         */
+                        s3_access_key_id: string
+                        /**
+                         * @description S3-compatible storage endpoint
+                         * @example 127.0.0.1:5000/s3
+                         */
+                        s3_endpoint: string
+                        /**
+                         * @description S3-compatible storage region
+                         * @example us-east-1
+                         */
+                        s3_region: string
+                        /**
+                         * @description S3-compatible storage secret access key
+                         * @example my-secret-key
+                         */
+                        s3_secret_access_key: string
+                        /**
+                         * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                         * @example path
+                         * @enum {string}
+                         */
+                        s3_url_style?: 'path' | 'vhost'
+                        /**
+                         * @description Whether to use SSL for S3-compatible storage
+                         * @default true
+                         * @example false
+                         */
+                        s3_use_ssl?: boolean
+                        /** @enum {string} */
+                        type: 's3'
+                      }
+                    | {
+                        /**
+                         * @description Storage bucket id used for DuckLake data files
+                         * @example ducklake
+                         */
+                        bucket: string
+                        /**
+                         * @description Optional description for the generated Supabase Storage S3 credential
+                         * @example DuckLake replication destination
+                         */
+                        credential_description?: string
+                        /**
+                         * @description Optional path prefix inside the bucket for DuckLake data files
+                         * @example replication
+                         */
+                        path?: string
+                        /**
+                         * @description Supabase project ref whose Object Storage S3 API stores DuckLake data files
+                         * @example abcjuqabhgwjjutfvtpa
+                         */
+                        project_ref: string
+                        /** @enum {string} */
+                        type: 'supabase_storage'
+                      }
+                }
           }
         | {
             snowflake: {
@@ -9952,61 +10309,180 @@ export interface components {
               }
             }
           | {
-              ducklake: {
-                /**
-                 * @description DuckLake catalog URL
-                 * @example postgres://user:pass@localhost:5432/ducklake_catalog
-                 */
-                catalog_url: string
-                /**
-                 * @description DuckLake data path
-                 * @example s3://<bucket-name>/
-                 */
-                data_path: string
-                /**
-                 * @description Schema used for DuckLake metadata tables stored in PostgreSQL
-                 * @default ducklake
-                 * @example ducklake
-                 */
-                metadata_schema?: string
-                /**
-                 * @description Number of concurrent DuckDB connections.
-                 * @example 4
-                 */
-                pool_size?: number
-                /**
-                 * @description S3-compatible storage access key ID
-                 * @example my-access-key
-                 */
-                s3_access_key_id: string
-                /**
-                 * @description S3-compatible storage endpoint
-                 * @example 127.0.0.1:5000/s3
-                 */
-                s3_endpoint: string
-                /**
-                 * @description S3-compatible storage region
-                 * @example us-east-1
-                 */
-                s3_region: string
-                /**
-                 * @description S3-compatible storage secret access key
-                 * @example my-secret-key
-                 */
-                s3_secret_access_key: string
-                /**
-                 * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
-                 * @example path
-                 * @enum {string}
-                 */
-                s3_url_style?: 'path' | 'vhost'
-                /**
-                 * @description Whether to use SSL for S3-compatible storage
-                 * @default true
-                 * @example false
-                 */
-                s3_use_ssl?: boolean
-              }
+              ducklake:
+                | {
+                    /**
+                     * @description DuckLake catalog URL
+                     * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                     */
+                    catalog_url: string
+                    /**
+                     * @description DuckLake data path
+                     * @example s3://<bucket-name>/
+                     */
+                    data_path: string
+                    /**
+                     * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                     * @default ducklake
+                     * @example ducklake
+                     */
+                    metadata_schema?: string
+                    /**
+                     * @description Number of concurrent DuckDB connections.
+                     * @example 4
+                     */
+                    pool_size?: number
+                    /**
+                     * @description S3-compatible storage access key ID
+                     * @example my-access-key
+                     */
+                    s3_access_key_id: string
+                    /**
+                     * @description S3-compatible storage endpoint
+                     * @example 127.0.0.1:5000/s3
+                     */
+                    s3_endpoint: string
+                    /**
+                     * @description S3-compatible storage region
+                     * @example us-east-1
+                     */
+                    s3_region: string
+                    /**
+                     * @description S3-compatible storage secret access key
+                     * @example my-secret-key
+                     */
+                    s3_secret_access_key: string
+                    /**
+                     * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                     * @example path
+                     * @enum {string}
+                     */
+                    s3_url_style?: 'path' | 'vhost'
+                    /**
+                     * @description Whether to use SSL for S3-compatible storage
+                     * @default true
+                     * @example false
+                     */
+                    s3_use_ssl?: boolean
+                  }
+                | {
+                    catalog:
+                      | {
+                          /**
+                           * @description DuckLake catalog URL
+                           * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                           */
+                          catalog_url: string
+                          /**
+                           * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
+                           * @example ducklake
+                           */
+                          metadata_schema?: string
+                          /**
+                           * @description Number of concurrent DuckDB connections.
+                           * @example 4
+                           */
+                          pool_size?: number
+                          /** @enum {string} */
+                          type: 'postgres_url'
+                        }
+                      | {
+                          /**
+                           * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
+                           * @example ducklake
+                           */
+                          metadata_schema?: string
+                          /**
+                           * @description Number of concurrent DuckDB connections.
+                           * @example 4
+                           */
+                          pool_size?: number
+                          /**
+                           * @description Supabase project ref used as the DuckLake PostgreSQL catalog
+                           * @example abcjuqabhgwjjutfvtpa
+                           */
+                          project_ref: string
+                          /** @enum {string} */
+                          type: 'supabase_project'
+                        }
+                    /**
+                     * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                     * @default ducklake
+                     * @example ducklake
+                     */
+                    metadata_schema?: string
+                    /**
+                     * @description Number of concurrent DuckDB connections.
+                     * @example 4
+                     */
+                    pool_size?: number
+                    storage:
+                      | {
+                          /**
+                           * @description DuckLake data path
+                           * @example s3://<bucket-name>/
+                           */
+                          data_path: string
+                          /**
+                           * @description S3-compatible storage access key ID
+                           * @example my-access-key
+                           */
+                          s3_access_key_id: string
+                          /**
+                           * @description S3-compatible storage endpoint
+                           * @example 127.0.0.1:5000/s3
+                           */
+                          s3_endpoint: string
+                          /**
+                           * @description S3-compatible storage region
+                           * @example us-east-1
+                           */
+                          s3_region: string
+                          /**
+                           * @description S3-compatible storage secret access key
+                           * @example my-secret-key
+                           */
+                          s3_secret_access_key: string
+                          /**
+                           * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                           * @example path
+                           * @enum {string}
+                           */
+                          s3_url_style?: 'path' | 'vhost'
+                          /**
+                           * @description Whether to use SSL for S3-compatible storage
+                           * @default true
+                           * @example false
+                           */
+                          s3_use_ssl?: boolean
+                          /** @enum {string} */
+                          type: 's3'
+                        }
+                      | {
+                          /**
+                           * @description Storage bucket id used for DuckLake data files
+                           * @example ducklake
+                           */
+                          bucket: string
+                          /**
+                           * @description Optional description for the generated Supabase Storage S3 credential
+                           * @example DuckLake replication destination
+                           */
+                          credential_description?: string
+                          /**
+                           * @description Optional path prefix inside the bucket for DuckLake data files
+                           * @example replication
+                           */
+                          path?: string
+                          /**
+                           * @description Supabase project ref whose Object Storage S3 API stores DuckLake data files
+                           * @example abcjuqabhgwjjutfvtpa
+                           */
+                          project_ref: string
+                          /** @enum {string} */
+                          type: 'supabase_storage'
+                        }
+                  }
             }
           | {
               snowflake: {
@@ -11924,61 +12400,180 @@ export interface components {
             }
           }
         | {
-            ducklake: {
-              /**
-               * @description DuckLake catalog URL
-               * @example postgres://user:pass@localhost:5432/ducklake_catalog
-               */
-              catalog_url: string
-              /**
-               * @description DuckLake data path
-               * @example s3://<bucket-name>/
-               */
-              data_path: string
-              /**
-               * @description Schema used for DuckLake metadata tables stored in PostgreSQL
-               * @default ducklake
-               * @example ducklake
-               */
-              metadata_schema?: string
-              /**
-               * @description Number of concurrent DuckDB connections.
-               * @example 4
-               */
-              pool_size?: number
-              /**
-               * @description S3-compatible storage access key ID
-               * @example my-access-key
-               */
-              s3_access_key_id: string
-              /**
-               * @description S3-compatible storage endpoint
-               * @example 127.0.0.1:5000/s3
-               */
-              s3_endpoint: string
-              /**
-               * @description S3-compatible storage region
-               * @example us-east-1
-               */
-              s3_region: string
-              /**
-               * @description S3-compatible storage secret access key
-               * @example my-secret-key
-               */
-              s3_secret_access_key: string
-              /**
-               * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
-               * @example path
-               * @enum {string}
-               */
-              s3_url_style?: 'path' | 'vhost'
-              /**
-               * @description Whether to use SSL for S3-compatible storage
-               * @default true
-               * @example false
-               */
-              s3_use_ssl?: boolean
-            }
+            ducklake:
+              | {
+                  /**
+                   * @description DuckLake catalog URL
+                   * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                   */
+                  catalog_url: string
+                  /**
+                   * @description DuckLake data path
+                   * @example s3://<bucket-name>/
+                   */
+                  data_path: string
+                  /**
+                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                   * @default ducklake
+                   * @example ducklake
+                   */
+                  metadata_schema?: string
+                  /**
+                   * @description Number of concurrent DuckDB connections.
+                   * @example 4
+                   */
+                  pool_size?: number
+                  /**
+                   * @description S3-compatible storage access key ID
+                   * @example my-access-key
+                   */
+                  s3_access_key_id: string
+                  /**
+                   * @description S3-compatible storage endpoint
+                   * @example 127.0.0.1:5000/s3
+                   */
+                  s3_endpoint: string
+                  /**
+                   * @description S3-compatible storage region
+                   * @example us-east-1
+                   */
+                  s3_region: string
+                  /**
+                   * @description S3-compatible storage secret access key
+                   * @example my-secret-key
+                   */
+                  s3_secret_access_key: string
+                  /**
+                   * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                   * @example path
+                   * @enum {string}
+                   */
+                  s3_url_style?: 'path' | 'vhost'
+                  /**
+                   * @description Whether to use SSL for S3-compatible storage
+                   * @default true
+                   * @example false
+                   */
+                  s3_use_ssl?: boolean
+                }
+              | {
+                  catalog:
+                    | {
+                        /**
+                         * @description DuckLake catalog URL
+                         * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                         */
+                        catalog_url: string
+                        /**
+                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
+                         * @example ducklake
+                         */
+                        metadata_schema?: string
+                        /**
+                         * @description Number of concurrent DuckDB connections.
+                         * @example 4
+                         */
+                        pool_size?: number
+                        /** @enum {string} */
+                        type: 'postgres_url'
+                      }
+                    | {
+                        /**
+                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
+                         * @example ducklake
+                         */
+                        metadata_schema?: string
+                        /**
+                         * @description Number of concurrent DuckDB connections.
+                         * @example 4
+                         */
+                        pool_size?: number
+                        /**
+                         * @description Supabase project ref used as the DuckLake PostgreSQL catalog
+                         * @example abcjuqabhgwjjutfvtpa
+                         */
+                        project_ref: string
+                        /** @enum {string} */
+                        type: 'supabase_project'
+                      }
+                  /**
+                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                   * @default ducklake
+                   * @example ducklake
+                   */
+                  metadata_schema?: string
+                  /**
+                   * @description Number of concurrent DuckDB connections.
+                   * @example 4
+                   */
+                  pool_size?: number
+                  storage:
+                    | {
+                        /**
+                         * @description DuckLake data path
+                         * @example s3://<bucket-name>/
+                         */
+                        data_path: string
+                        /**
+                         * @description S3-compatible storage access key ID
+                         * @example my-access-key
+                         */
+                        s3_access_key_id: string
+                        /**
+                         * @description S3-compatible storage endpoint
+                         * @example 127.0.0.1:5000/s3
+                         */
+                        s3_endpoint: string
+                        /**
+                         * @description S3-compatible storage region
+                         * @example us-east-1
+                         */
+                        s3_region: string
+                        /**
+                         * @description S3-compatible storage secret access key
+                         * @example my-secret-key
+                         */
+                        s3_secret_access_key: string
+                        /**
+                         * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                         * @example path
+                         * @enum {string}
+                         */
+                        s3_url_style?: 'path' | 'vhost'
+                        /**
+                         * @description Whether to use SSL for S3-compatible storage
+                         * @default true
+                         * @example false
+                         */
+                        s3_use_ssl?: boolean
+                        /** @enum {string} */
+                        type: 's3'
+                      }
+                    | {
+                        /**
+                         * @description Storage bucket id used for DuckLake data files
+                         * @example ducklake
+                         */
+                        bucket: string
+                        /**
+                         * @description Optional description for the generated Supabase Storage S3 credential
+                         * @example DuckLake replication destination
+                         */
+                        credential_description?: string
+                        /**
+                         * @description Optional path prefix inside the bucket for DuckLake data files
+                         * @example replication
+                         */
+                        path?: string
+                        /**
+                         * @description Supabase project ref whose Object Storage S3 API stores DuckLake data files
+                         * @example abcjuqabhgwjjutfvtpa
+                         */
+                        project_ref: string
+                        /** @enum {string} */
+                        type: 'supabase_storage'
+                      }
+                }
           }
         | {
             snowflake: {
@@ -12117,61 +12712,180 @@ export interface components {
             }
           }
         | {
-            ducklake: {
-              /**
-               * @description DuckLake catalog URL
-               * @example postgres://user:pass@localhost:5432/ducklake_catalog
-               */
-              catalog_url: string
-              /**
-               * @description DuckLake data path
-               * @example s3://<bucket-name>/
-               */
-              data_path: string
-              /**
-               * @description Schema used for DuckLake metadata tables stored in PostgreSQL
-               * @default ducklake
-               * @example ducklake
-               */
-              metadata_schema?: string
-              /**
-               * @description Number of concurrent DuckDB connections.
-               * @example 4
-               */
-              pool_size?: number
-              /**
-               * @description S3-compatible storage access key ID
-               * @example my-access-key
-               */
-              s3_access_key_id: string
-              /**
-               * @description S3-compatible storage endpoint
-               * @example 127.0.0.1:5000/s3
-               */
-              s3_endpoint: string
-              /**
-               * @description S3-compatible storage region
-               * @example us-east-1
-               */
-              s3_region: string
-              /**
-               * @description S3-compatible storage secret access key
-               * @example my-secret-key
-               */
-              s3_secret_access_key: string
-              /**
-               * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
-               * @example path
-               * @enum {string}
-               */
-              s3_url_style?: 'path' | 'vhost'
-              /**
-               * @description Whether to use SSL for S3-compatible storage
-               * @default true
-               * @example false
-               */
-              s3_use_ssl?: boolean
-            }
+            ducklake:
+              | {
+                  /**
+                   * @description DuckLake catalog URL
+                   * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                   */
+                  catalog_url: string
+                  /**
+                   * @description DuckLake data path
+                   * @example s3://<bucket-name>/
+                   */
+                  data_path: string
+                  /**
+                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                   * @default ducklake
+                   * @example ducklake
+                   */
+                  metadata_schema?: string
+                  /**
+                   * @description Number of concurrent DuckDB connections.
+                   * @example 4
+                   */
+                  pool_size?: number
+                  /**
+                   * @description S3-compatible storage access key ID
+                   * @example my-access-key
+                   */
+                  s3_access_key_id: string
+                  /**
+                   * @description S3-compatible storage endpoint
+                   * @example 127.0.0.1:5000/s3
+                   */
+                  s3_endpoint: string
+                  /**
+                   * @description S3-compatible storage region
+                   * @example us-east-1
+                   */
+                  s3_region: string
+                  /**
+                   * @description S3-compatible storage secret access key
+                   * @example my-secret-key
+                   */
+                  s3_secret_access_key: string
+                  /**
+                   * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                   * @example path
+                   * @enum {string}
+                   */
+                  s3_url_style?: 'path' | 'vhost'
+                  /**
+                   * @description Whether to use SSL for S3-compatible storage
+                   * @default true
+                   * @example false
+                   */
+                  s3_use_ssl?: boolean
+                }
+              | {
+                  catalog:
+                    | {
+                        /**
+                         * @description DuckLake catalog URL
+                         * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                         */
+                        catalog_url: string
+                        /**
+                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
+                         * @example ducklake
+                         */
+                        metadata_schema?: string
+                        /**
+                         * @description Number of concurrent DuckDB connections.
+                         * @example 4
+                         */
+                        pool_size?: number
+                        /** @enum {string} */
+                        type: 'postgres_url'
+                      }
+                    | {
+                        /**
+                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
+                         * @example ducklake
+                         */
+                        metadata_schema?: string
+                        /**
+                         * @description Number of concurrent DuckDB connections.
+                         * @example 4
+                         */
+                        pool_size?: number
+                        /**
+                         * @description Supabase project ref used as the DuckLake PostgreSQL catalog
+                         * @example abcjuqabhgwjjutfvtpa
+                         */
+                        project_ref: string
+                        /** @enum {string} */
+                        type: 'supabase_project'
+                      }
+                  /**
+                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                   * @default ducklake
+                   * @example ducklake
+                   */
+                  metadata_schema?: string
+                  /**
+                   * @description Number of concurrent DuckDB connections.
+                   * @example 4
+                   */
+                  pool_size?: number
+                  storage:
+                    | {
+                        /**
+                         * @description DuckLake data path
+                         * @example s3://<bucket-name>/
+                         */
+                        data_path: string
+                        /**
+                         * @description S3-compatible storage access key ID
+                         * @example my-access-key
+                         */
+                        s3_access_key_id: string
+                        /**
+                         * @description S3-compatible storage endpoint
+                         * @example 127.0.0.1:5000/s3
+                         */
+                        s3_endpoint: string
+                        /**
+                         * @description S3-compatible storage region
+                         * @example us-east-1
+                         */
+                        s3_region: string
+                        /**
+                         * @description S3-compatible storage secret access key
+                         * @example my-secret-key
+                         */
+                        s3_secret_access_key: string
+                        /**
+                         * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                         * @example path
+                         * @enum {string}
+                         */
+                        s3_url_style?: 'path' | 'vhost'
+                        /**
+                         * @description Whether to use SSL for S3-compatible storage
+                         * @default true
+                         * @example false
+                         */
+                        s3_use_ssl?: boolean
+                        /** @enum {string} */
+                        type: 's3'
+                      }
+                    | {
+                        /**
+                         * @description Storage bucket id used for DuckLake data files
+                         * @example ducklake
+                         */
+                        bucket: string
+                        /**
+                         * @description Optional description for the generated Supabase Storage S3 credential
+                         * @example DuckLake replication destination
+                         */
+                        credential_description?: string
+                        /**
+                         * @description Optional path prefix inside the bucket for DuckLake data files
+                         * @example replication
+                         */
+                        path?: string
+                        /**
+                         * @description Supabase project ref whose Object Storage S3 API stores DuckLake data files
+                         * @example abcjuqabhgwjjutfvtpa
+                         */
+                        project_ref: string
+                        /** @enum {string} */
+                        type: 'supabase_storage'
+                      }
+                }
           }
         | {
             snowflake: {
@@ -12729,61 +13443,180 @@ export interface components {
             }
           }
         | {
-            ducklake: {
-              /**
-               * @description DuckLake catalog URL
-               * @example postgres://user:pass@localhost:5432/ducklake_catalog
-               */
-              catalog_url: string
-              /**
-               * @description DuckLake data path
-               * @example s3://<bucket-name>/
-               */
-              data_path: string
-              /**
-               * @description Schema used for DuckLake metadata tables stored in PostgreSQL
-               * @default ducklake
-               * @example ducklake
-               */
-              metadata_schema?: string
-              /**
-               * @description Number of concurrent DuckDB connections.
-               * @example 4
-               */
-              pool_size?: number
-              /**
-               * @description S3-compatible storage access key ID
-               * @example my-access-key
-               */
-              s3_access_key_id: string
-              /**
-               * @description S3-compatible storage endpoint
-               * @example 127.0.0.1:5000/s3
-               */
-              s3_endpoint: string
-              /**
-               * @description S3-compatible storage region
-               * @example us-east-1
-               */
-              s3_region: string
-              /**
-               * @description S3-compatible storage secret access key
-               * @example my-secret-key
-               */
-              s3_secret_access_key: string
-              /**
-               * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
-               * @example path
-               * @enum {string}
-               */
-              s3_url_style?: 'path' | 'vhost'
-              /**
-               * @description Whether to use SSL for S3-compatible storage
-               * @default true
-               * @example false
-               */
-              s3_use_ssl?: boolean
-            }
+            ducklake:
+              | {
+                  /**
+                   * @description DuckLake catalog URL
+                   * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                   */
+                  catalog_url: string
+                  /**
+                   * @description DuckLake data path
+                   * @example s3://<bucket-name>/
+                   */
+                  data_path: string
+                  /**
+                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                   * @default ducklake
+                   * @example ducklake
+                   */
+                  metadata_schema?: string
+                  /**
+                   * @description Number of concurrent DuckDB connections.
+                   * @example 4
+                   */
+                  pool_size?: number
+                  /**
+                   * @description S3-compatible storage access key ID
+                   * @example my-access-key
+                   */
+                  s3_access_key_id: string
+                  /**
+                   * @description S3-compatible storage endpoint
+                   * @example 127.0.0.1:5000/s3
+                   */
+                  s3_endpoint: string
+                  /**
+                   * @description S3-compatible storage region
+                   * @example us-east-1
+                   */
+                  s3_region: string
+                  /**
+                   * @description S3-compatible storage secret access key
+                   * @example my-secret-key
+                   */
+                  s3_secret_access_key: string
+                  /**
+                   * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                   * @example path
+                   * @enum {string}
+                   */
+                  s3_url_style?: 'path' | 'vhost'
+                  /**
+                   * @description Whether to use SSL for S3-compatible storage
+                   * @default true
+                   * @example false
+                   */
+                  s3_use_ssl?: boolean
+                }
+              | {
+                  catalog:
+                    | {
+                        /**
+                         * @description DuckLake catalog URL
+                         * @example postgres://user:pass@localhost:5432/ducklake_catalog
+                         */
+                        catalog_url: string
+                        /**
+                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
+                         * @example ducklake
+                         */
+                        metadata_schema?: string
+                        /**
+                         * @description Number of concurrent DuckDB connections.
+                         * @example 4
+                         */
+                        pool_size?: number
+                        /** @enum {string} */
+                        type: 'postgres_url'
+                      }
+                    | {
+                        /**
+                         * @description Schema used for DuckLake metadata tables stored in this PostgreSQL catalog. Overrides `metadata_schema` when provided.
+                         * @example ducklake
+                         */
+                        metadata_schema?: string
+                        /**
+                         * @description Number of concurrent DuckDB connections.
+                         * @example 4
+                         */
+                        pool_size?: number
+                        /**
+                         * @description Supabase project ref used as the DuckLake PostgreSQL catalog
+                         * @example abcjuqabhgwjjutfvtpa
+                         */
+                        project_ref: string
+                        /** @enum {string} */
+                        type: 'supabase_project'
+                      }
+                  /**
+                   * @description Schema used for DuckLake metadata tables stored in PostgreSQL
+                   * @default ducklake
+                   * @example ducklake
+                   */
+                  metadata_schema?: string
+                  /**
+                   * @description Number of concurrent DuckDB connections.
+                   * @example 4
+                   */
+                  pool_size?: number
+                  storage:
+                    | {
+                        /**
+                         * @description DuckLake data path
+                         * @example s3://<bucket-name>/
+                         */
+                        data_path: string
+                        /**
+                         * @description S3-compatible storage access key ID
+                         * @example my-access-key
+                         */
+                        s3_access_key_id: string
+                        /**
+                         * @description S3-compatible storage endpoint
+                         * @example 127.0.0.1:5000/s3
+                         */
+                        s3_endpoint: string
+                        /**
+                         * @description S3-compatible storage region
+                         * @example us-east-1
+                         */
+                        s3_region: string
+                        /**
+                         * @description S3-compatible storage secret access key
+                         * @example my-secret-key
+                         */
+                        s3_secret_access_key: string
+                        /**
+                         * @description S3 URL style: `path` (MinIO/Supabase) or `vhost` (AWS)
+                         * @example path
+                         * @enum {string}
+                         */
+                        s3_url_style?: 'path' | 'vhost'
+                        /**
+                         * @description Whether to use SSL for S3-compatible storage
+                         * @default true
+                         * @example false
+                         */
+                        s3_use_ssl?: boolean
+                        /** @enum {string} */
+                        type: 's3'
+                      }
+                    | {
+                        /**
+                         * @description Storage bucket id used for DuckLake data files
+                         * @example ducklake
+                         */
+                        bucket: string
+                        /**
+                         * @description Optional description for the generated Supabase Storage S3 credential
+                         * @example DuckLake replication destination
+                         */
+                        credential_description?: string
+                        /**
+                         * @description Optional path prefix inside the bucket for DuckLake data files
+                         * @example replication
+                         */
+                        path?: string
+                        /**
+                         * @description Supabase project ref whose Object Storage S3 API stores DuckLake data files
+                         * @example abcjuqabhgwjjutfvtpa
+                         */
+                        project_ref: string
+                        /** @enum {string} */
+                        type: 'supabase_storage'
+                      }
+                }
           }
         | {
             snowflake: {
@@ -12818,6 +13651,37 @@ export interface components {
               user: string
             }
           }
+      /** @description Pipeline configuration */
+      pipeline_config?: {
+        /** @description Batch configuration */
+        batch?: {
+          /**
+           * @description Maximum fill time in milliseconds
+           * @example 200
+           */
+          max_fill_ms?: number
+        }
+        /**
+         * @description Behavior when the replication slot is invalidated
+         * @example error
+         * @enum {string}
+         */
+        invalidated_slot_behavior?: 'error' | 'recreate'
+        /** @description Maximum number of copy connections per table */
+        max_copy_connections_per_table?: number
+        /** @description Maximum number of table sync workers */
+        max_table_sync_workers?: number
+        /**
+         * @description Publication name
+         * @example pub_orders
+         */
+        publication_name: string
+      }
+      /**
+       * @description Source id
+       * @example 1
+       */
+      source_id?: number
     }
     ValidateReplicationPipelineBody: {
       /** @description Pipeline configuration */

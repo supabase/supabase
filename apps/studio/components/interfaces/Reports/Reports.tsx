@@ -377,14 +377,14 @@ const Reports = () => {
           {hasEdits && (
             <div className="flex items-center gap-x-2">
               <Button
-                type="default"
+                variant="default"
                 disabled={isSaving}
                 onClick={() => setConfig(currentReportContent)}
               >
                 Cancel
               </Button>
               <Button
-                type="primary"
+                variant="primary"
                 icon={<Save />}
                 loading={isSaving}
                 onClick={() => onSaveReport()}
@@ -397,7 +397,7 @@ const Reports = () => {
         <div className={cn('mb-4 flex items-center gap-x-3 justify-between')}>
           <div className="flex items-center gap-x-2">
             <ButtonTooltip
-              type="default"
+              variant="default"
               icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
               className="w-7"
               disabled={isRefreshing}
@@ -426,7 +426,7 @@ const Reports = () => {
             {canUpdateReport ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="default" icon={<Plus />}>
+                  <Button variant="default" icon={<Plus />}>
                     <span>Add block</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -437,7 +437,7 @@ const Reports = () => {
             ) : (
               <ButtonTooltip
                 disabled
-                type="default"
+                variant="default"
                 icon={<Plus />}
                 tooltip={{
                   content: {
@@ -467,7 +467,7 @@ const Reports = () => {
             {canUpdateReport ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="default" iconRight={<Plus size={14} />}>
+                  <Button variant="default" iconRight={<Plus size={14} />}>
                     Add your first chart
                   </Button>
                 </DropdownMenuTrigger>
