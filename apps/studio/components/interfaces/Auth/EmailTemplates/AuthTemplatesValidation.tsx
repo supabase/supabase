@@ -256,7 +256,7 @@ const PASSWORD_CHANGED_NOTIFICATION: AuthTemplate = {
     MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION: { title: 'Subject', type: 'string' },
     MAILER_TEMPLATES_PASSWORD_CHANGED_NOTIFICATION_CONTENT: { title: 'Body', type: 'code' },
   },
-  variables: [TemplateVariables.Email, TemplateVariables.Data],
+  variables: [TemplateVariables.Email, TemplateVariables.Data, TemplateVariables.SiteURL],
   validationSchema: z.object({
     MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
   }),
@@ -274,7 +274,12 @@ const EMAIL_CHANGED_NOTIFICATION: AuthTemplate = {
     MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION: { title: 'Subject', type: 'string' },
     MAILER_TEMPLATES_EMAIL_CHANGED_NOTIFICATION_CONTENT: { title: 'Body', type: 'code' },
   },
-  variables: [TemplateVariables.Email, TemplateVariables.OldEmail, TemplateVariables.Data],
+  variables: [
+    TemplateVariables.Email,
+    TemplateVariables.OldEmail,
+    TemplateVariables.Data,
+    TemplateVariables.SiteURL,
+  ],
   validationSchema: z.object({
     MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
   }),
@@ -297,6 +302,7 @@ const PHONE_CHANGED_NOTIFICATION: AuthTemplate = {
     TemplateVariables.Phone,
     TemplateVariables.OldPhone,
     TemplateVariables.Data,
+    TemplateVariables.SiteURL,
   ],
   validationSchema: z.object({
     MAILER_SUBJECTS_PHONE_CHANGED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
@@ -315,7 +321,12 @@ const IDENTITY_LINKED_NOTIFICATION: AuthTemplate = {
     MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION: { title: 'Subject', type: 'string' },
     MAILER_TEMPLATES_IDENTITY_LINKED_NOTIFICATION_CONTENT: { title: 'Body', type: 'code' },
   },
-  variables: [TemplateVariables.Email, TemplateVariables.Provider, TemplateVariables.Data],
+  variables: [
+    TemplateVariables.Email,
+    TemplateVariables.Provider,
+    TemplateVariables.Data,
+    TemplateVariables.SiteURL,
+  ],
   validationSchema: z.object({
     MAILER_SUBJECTS_IDENTITY_LINKED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
   }),
@@ -333,7 +344,12 @@ const IDENTITY_UNLINKED_NOTIFICATION: AuthTemplate = {
     MAILER_SUBJECTS_IDENTITY_UNLINKED_NOTIFICATION: { title: 'Subject', type: 'string' },
     MAILER_TEMPLATES_IDENTITY_UNLINKED_NOTIFICATION_CONTENT: { title: 'Body', type: 'code' },
   },
-  variables: [TemplateVariables.Email, TemplateVariables.Provider, TemplateVariables.Data],
+  variables: [
+    TemplateVariables.Email,
+    TemplateVariables.Provider,
+    TemplateVariables.Data,
+    TemplateVariables.SiteURL,
+  ],
   validationSchema: z.object({
     MAILER_SUBJECTS_IDENTITY_UNLINKED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
   }),
@@ -351,7 +367,12 @@ const MFA_FACTOR_ENROLLED_NOTIFICATION: AuthTemplate = {
     MAILER_SUBJECTS_MFA_FACTOR_ENROLLED_NOTIFICATION: { title: 'Subject', type: 'string' },
     MAILER_TEMPLATES_MFA_FACTOR_ENROLLED_NOTIFICATION_CONTENT: { title: 'Body', type: 'code' },
   },
-  variables: [TemplateVariables.Email, TemplateVariables.FactorType, TemplateVariables.Data],
+  variables: [
+    TemplateVariables.Email,
+    TemplateVariables.FactorType,
+    TemplateVariables.Data,
+    TemplateVariables.SiteURL,
+  ],
   validationSchema: z.object({
     MAILER_SUBJECTS_MFA_FACTOR_ENROLLED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
   }),
@@ -369,7 +390,12 @@ const MFA_FACTOR_UNENROLLED_NOTIFICATION: AuthTemplate = {
     MAILER_SUBJECTS_MFA_FACTOR_UNENROLLED_NOTIFICATION: { title: 'Subject', type: 'string' },
     MAILER_TEMPLATES_MFA_FACTOR_UNENROLLED_NOTIFICATION_CONTENT: { title: 'Body', type: 'code' },
   },
-  variables: [TemplateVariables.Email, TemplateVariables.FactorType, TemplateVariables.Data],
+  variables: [
+    TemplateVariables.Email,
+    TemplateVariables.FactorType,
+    TemplateVariables.Data,
+    TemplateVariables.SiteURL,
+  ],
   validationSchema: z.object({
     MAILER_SUBJECTS_MFA_FACTOR_UNENROLLED_NOTIFICATION: z.string().min(1, 'Subject is required.'),
   }),

@@ -41,6 +41,7 @@ Brent Newson
 Brian Cullen
 Brent Schroeter
 Bruno Kilian
+Burhan A
 Carel de Waal
 Cameron Blackwood
 Cameron Michie
@@ -190,6 +191,7 @@ Manan Gupta
 Marcus Weiner
 Marija Milicevic
 Mark Burggraf
+Márton Boros
 Matthew Hambright
 Matt Hudson
 Matt Johnston
