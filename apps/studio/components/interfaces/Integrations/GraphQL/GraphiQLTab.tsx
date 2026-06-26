@@ -33,27 +33,21 @@ const ROLE_IMPERSONATION_PLUGIN: GraphiQLPlugin = {
   content: () => <RoleImpersonationSelector orientation="vertical" />,
 }
 
-const MONACO_THEME = { dark: 'supabase-graphql-dark', light: 'supabase-graphql-light' }
+// Use Studio's primary `supabase` theme for GraphiQL too (not a separate `supabase-graphql-*`
+// theme). Monaco's token-color classes (.mtk*) are global, so a second theme with extra rules
+// (e.g. GraphiQL's gql-argument color) reorders the palette and bleeds wrong syntax colors into
+// every other editor on the page. Sharing one theme keeps the palette identical.
+const SUPABASE_THEME = { dark: 'supabase', light: 'supabase' }
 
 const GraphiQLMonacoTheme = ({ resolvedTheme }: { resolvedTheme: 'dark' | 'light' }) => {
   const { monaco } = useMonaco()
 
   useEffect(() => {
     if (!monaco) return
-    const dark = getTheme('dark')
-    const light = getTheme('light')
-    monaco.editor.defineTheme(MONACO_THEME.dark, {
-      ...dark,
-      rules: [...dark.rules, { token: 'argument.identifier.gql', foreground: '908aff' }],
-    })
-    monaco.editor.defineTheme(MONACO_THEME.light, {
-      ...light,
-      rules: [...light.rules, { token: 'argument.identifier.gql', foreground: '6c69ce' }],
-      // Match the dashboard's bg-default in light mode so the editor doesn't read
-      // as a darker square against the surrounding UI.
-      colors: { ...light.colors, 'editor.background': '#fcfcfc' },
-    })
-    monaco.editor.setTheme(MONACO_THEME[resolvedTheme])
+    // GraphiQL runs on its own Monaco instance, so define the `supabase` theme on it (the same
+    // definition MonacoThemeProvider applies to the rest of Studio) before using it.
+    monaco.editor.defineTheme('supabase', getTheme(resolvedTheme))
+    monaco.editor.setTheme('supabase')
   }, [monaco, resolvedTheme])
 
   return null
@@ -209,7 +203,7 @@ export const GraphiQLTab = () => {
           key={graphiqlKey}
           fetcher={fetcher}
           forcedTheme={currentTheme}
-          editorTheme={MONACO_THEME}
+          editorTheme={SUPABASE_THEME}
           className={styles.root}
           plugins={plugins}
         />
