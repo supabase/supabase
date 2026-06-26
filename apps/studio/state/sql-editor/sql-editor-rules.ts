@@ -1,5 +1,5 @@
-import type { SnippetWithContent } from './types'
 import type { UpsertContentPayload } from '@/data/content/content-upsert-mutation'
+import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 
 /**
  *
@@ -32,7 +32,7 @@ export function validateMoveToFolder({
 }: {
   visibility?: SnippetWithContent['visibility']
   folderId?: string | null
-}): { ok: boolean; error?: string } {
+}): { ok: true } | { ok: false; error: string } {
   if (visibility === 'project' && !!folderId) {
     return { ok: false, error: 'Shared snippet cannot be within a folder' }
   }

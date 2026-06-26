@@ -29,7 +29,6 @@ import {
 
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
-import { ConnectionLogsToggle } from './components/ConnectionLogsToggle'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
@@ -377,7 +376,6 @@ export const UnifiedLogs = () => {
             isFilterBarOpen={isFilterBarOpen}
             setIsFilterBarOpen={setIsFilterBarOpen}
             dateRangeDisabled={{ after: new Date() }}
-            afterFilters={<ConnectionLogsToggle />}
           />
           <ResizableHandle withHandle />
           <ResizablePanel

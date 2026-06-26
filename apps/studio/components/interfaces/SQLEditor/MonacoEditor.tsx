@@ -19,7 +19,9 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { wasNeverPersisted } from '@/state/sql-editor/sql-editor-lifecycle'
 import { canEditSnippet } from '@/state/sql-editor/sql-editor-rules'
+import { useSqlEditorSaveCoordinator } from '@/state/sql-editor/sql-editor-save-coordinator'
 import { useTabsStateSnapshot } from '@/state/tabs'
 
 export type MonacoEditorProps = {
@@ -92,6 +94,10 @@ export const MonacoEditor = ({
   const aiHotkeyEnabledRef = useRef(isAIAssistantHotkeyEnabled)
   aiHotkeyEnabledRef.current = isAIAssistantHotkeyEnabled
 
+  const { requestSave } = useSqlEditorSaveCoordinator()
+  const requestSaveRef = useRef(requestSave)
+  requestSaveRef.current = requestSave
+
   const handleEditorOnMount: OnMount = (editor, monaco) => {
     const model = editor.getModel()
     if (model !== null) {
@@ -141,7 +147,7 @@ export const MonacoEditor = ({
       contextMenuGroupId: 'operation',
       contextMenuOrder: 0,
       run: () => {
-        if (snippet) snapV2.addNeedsSaving(snippet.snippet.id)
+        if (snippet) requestSaveRef.current(snippet.snippet.id)
       },
     })
 
@@ -237,7 +243,7 @@ export const MonacoEditor = ({
 
   useEffect(() => {
     if (debouncedValue.length > 0 && snippet) {
-      const shouldInvalidate = snippet.snippet.isNotSavedInDatabaseYet
+      const shouldInvalidate = wasNeverPersisted(snippet.snippet.status)
       snapV2.setSql({ id, sql: value, shouldInvalidate })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

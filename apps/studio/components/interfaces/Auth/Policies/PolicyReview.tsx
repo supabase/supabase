@@ -3,13 +3,15 @@ import { useState } from 'react'
 import { Button, DialogFooter, DialogSection } from 'ui'
 
 import type { PolicyForReview } from './Policies.types'
-import SqlEditor from '@/components/ui/SqlEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 
 interface PolicyReviewProps {
   policy: PolicyForReview
   onSelectBack: () => void
   onSelectSave: () => void
 }
+
+// [Joshen] This seems like dead code atm, clean up separately
 
 export const PolicyReview = ({
   policy = {},
@@ -44,9 +46,14 @@ export const PolicyReview = ({
               </div>
             ) : (
               <div className="space-y-2">
-                <span>{policy.description}</span>
+                <p>{policy.description}</p>
                 <div className="h-40">
-                  <SqlEditor readOnly defaultValue={formattedSQLStatement} />
+                  <CodeEditor
+                    hideLineNumbers
+                    isReadOnly
+                    language="pgsql"
+                    defaultValue={formattedSQLStatement}
+                  />
                 </div>
               </div>
             )}
