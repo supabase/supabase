@@ -159,6 +159,9 @@ export const SQLEditor = () => {
   const [potentialIssues, setPotentialIssues] = useState<PotentialIssues>()
 
   const [showWidget, setShowWidget] = useState(false)
+  // Bumped on every editor mount (including the keyed remount on snippet switch)
+  // so a diff request that arrived before the editor was ready gets re-processed.
+  const [editorMountCount, setEditorMountCount] = useState(0)
   const [activeUtilityTab, setActiveUtilityTab] = useState<string>('results')
 
   const refocusEditor = useCallback(() => {
@@ -577,6 +580,8 @@ export const SQLEditor = () => {
   )
 
   const onMount = (editor: IStandaloneCodeEditor) => {
+    setEditorMountCount((count) => count + 1)
+
     const tabId = createTabId('sql', { id })
     const tabData = tabs.tabsMap[tabId]
 
@@ -837,7 +842,8 @@ export const SQLEditor = () => {
     if (request === undefined) return
 
     const editorModel = editorRef.current?.getModel()
-    // Editor isn't ready yet; leave the request pending so it applies once mounted.
+    // Editor isn't ready yet; leave the request pending. editorMountCount bumps
+    // on mount and re-runs this effect, so the request applies once mounted.
     if (!editorModel) return
 
     const { diffType, sql } = request
@@ -860,7 +866,7 @@ export const SQLEditor = () => {
     // One-shot: drain the request so it can't re-apply to a later editor or session.
     sqlEditorDiffRequestState.consumeDiffRequest()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [diffRequest.pending])
+  }, [diffRequest.pending, editorMountCount])
 
   // We want to check if the diff editor is mounted and if it is, we want to show the widget
   // We also want to cleanup the widget when the diff editor is closed
