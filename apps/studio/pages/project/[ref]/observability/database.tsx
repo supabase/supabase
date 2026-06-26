@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, Button } from 'ui'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
@@ -227,7 +228,11 @@ const DatabaseUsage = () => {
 
   return (
     <>
-      <ReportHeader showDatabaseSelector title="Database" />
+      <ReportHeader
+        showDatabaseSelector
+        title="Database"
+        docsHref={OBSERVABILITY_DOCS_HREFS.database}
+      />
       <ReportStickyNav
         content={
           <>

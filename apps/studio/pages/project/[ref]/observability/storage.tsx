@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Button } from 'ui'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import {
   NetworkTrafficRenderer,
   ResponseSpeedChartRenderer,
@@ -88,7 +89,11 @@ export const StorageReport: NextPageWithLayout = () => {
 
   return (
     <ReportPadding>
-      <ReportHeader title="Storage" showDatabaseSelector={false} />
+      <ReportHeader
+        title="Storage"
+        showDatabaseSelector={false}
+        docsHref={OBSERVABILITY_DOCS_HREFS.storage}
+      />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2">

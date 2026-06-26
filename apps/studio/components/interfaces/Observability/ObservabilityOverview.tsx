@@ -8,6 +8,7 @@ import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { useUnifiedLogsPreview } from '../App/FeaturePreview/FeaturePreviewContext'
 import { DatabaseInfrastructureSection } from './DatabaseInfrastructureSection'
+import { OBSERVABILITY_DOCS_HREFS } from './Observability.constants'
 import { useObservabilityOverviewData } from './ObservabilityOverview.utils'
 import { ObservabilityOverviewFooter } from './ObservabilityOverviewFooter'
 import { ServiceHealthTable } from './ServiceHealthTable'
@@ -167,7 +168,7 @@ export const ObservabilityOverview = () => {
     <ReportPadding>
       <div className="flex flex-row justify-between items-center">
         <div className="flex items-center gap-3">
-          <ReportHeader title="Overview" />
+          <ReportHeader title="Overview" docsHref={OBSERVABILITY_DOCS_HREFS.overview} />
           <Tooltip>
             <TooltipTrigger asChild>
               <Badge variant="warning">Beta</Badge>

@@ -5,6 +5,7 @@ import { ArrowRight, RefreshCw } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from 'ui'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
@@ -140,7 +141,11 @@ const RealtimeUsage = () => {
 
   return (
     <>
-      <ReportHeader showDatabaseSelector={false} title="Realtime" />
+      <ReportHeader
+        showDatabaseSelector={false}
+        title="Realtime"
+        docsHref={OBSERVABILITY_DOCS_HREFS.realtime}
+      />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-3">

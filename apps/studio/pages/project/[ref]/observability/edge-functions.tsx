@@ -6,6 +6,7 @@ import { parseAsJson, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { Button } from 'ui'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
 import {
@@ -143,7 +144,11 @@ const EdgeFunctionsUsage = () => {
 
   return (
     <>
-      <ReportHeader title="Edge Functions" showDatabaseSelector={false} />
+      <ReportHeader
+        title="Edge Functions"
+        showDatabaseSelector={false}
+        docsHref={OBSERVABILITY_DOCS_HREFS.edgeFunctions}
+      />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2">

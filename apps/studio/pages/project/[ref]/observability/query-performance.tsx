@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import { parseAsArrayOf, parseAsInteger, parseAsJson, parseAsString, useQueryStates } from 'nuqs'
 import { Admonition } from 'ui-patterns'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import { useIndexAdvisorStatus } from '@/components/interfaces/QueryPerformance/hooks/useIsIndexAdvisorStatus'
 import { useQueryPerformanceSort } from '@/components/interfaces/QueryPerformance/hooks/useQueryPerformanceSort'
 import { QueryPerformance } from '@/components/interfaces/QueryPerformance/QueryPerformance'
@@ -16,7 +17,6 @@ import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/Observ
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
@@ -90,9 +90,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
       <div className="w-full mb-0 flex lg:items-center justify-between gap-4 py-4 px-6 lg:flex-row flex-col">
         <h3 className="text-foreground text-xl prose">Query Performance</h3>
         <div className="flex items-center gap-2 flex-wrap">
-          <DocsButton
-            href={`${DOCS_URL}/guides/platform/performance#examining-query-performance`}
-          />
+          <DocsButton href={OBSERVABILITY_DOCS_HREFS.queryPerformance} />
           <DatabaseSelector />
         </div>
       </div>

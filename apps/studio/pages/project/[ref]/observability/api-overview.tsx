@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import {
   ErrorCountsChartRenderer,
   NetworkTrafficRenderer,
@@ -94,7 +95,11 @@ export const ApiReport: NextPageWithLayout = () => {
 
   return (
     <ReportPadding>
-      <ReportHeader title="API Gateway" showDatabaseSelector={false} />
+      <ReportHeader
+        title="API Gateway"
+        showDatabaseSelector={false}
+        docsHref={OBSERVABILITY_DOCS_HREFS.apiGateway}
+      />
       <ReportStickyNav
         content={
           <div className="flex items-center gap-3">

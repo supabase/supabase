@@ -6,6 +6,7 @@ import { parseAsJson, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { Button } from 'ui'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
@@ -209,7 +210,11 @@ const AuthUsage = () => {
 
   return (
     <>
-      <ReportHeader title="Auth" showDatabaseSelector={false} />
+      <ReportHeader
+        title="Auth"
+        showDatabaseSelector={false}
+        docsHref={OBSERVABILITY_DOCS_HREFS.auth}
+      />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2">

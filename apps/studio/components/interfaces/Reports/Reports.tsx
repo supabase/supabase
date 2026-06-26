@@ -12,10 +12,12 @@ import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { GridResize } from './GridResize'
 import { MetricOptions } from './MetricOptions'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { DateRangePicker } from '@/components/ui/DateRangePicker'
+import { DocsButton } from '@/components/ui/DocsButton'
 import NoPermission from '@/components/ui/NoPermission'
 import { DEFAULT_CHART_CONFIG } from '@/components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from '@/data/analytics/constants'
@@ -450,6 +452,7 @@ const Reports = () => {
                 Add block
               </ButtonTooltip>
             )}
+            <DocsButton href={OBSERVABILITY_DOCS_HREFS.customReport} />
             <DatabaseSelector />
           </div>
         </div>
