@@ -68,7 +68,7 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
 
       if (!isValidOrg) {
         toast.error('You do not have access to this organization')
-        router.push(`${DEFAULT_HOME}?error=org_not_found&org=${slug}`)
+        router.push(DEFAULT_HOME)
         return
       }
     }

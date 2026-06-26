@@ -507,7 +507,7 @@ export const EditorPanel = () => {
               wordWrap: 'on',
               lineNumbers: 'on',
               folding: false,
-              padding: { top: 16 },
+              padding: { top: 12 },
               lineNumbersMinChars: 3,
             }}
             executeQuery={onExecuteSql}
@@ -516,7 +516,6 @@ export const EditorPanel = () => {
             openAIAssistantShortcutEnabled={isAIAssistantHotkeyEnabled}
           />
         </div>
-
         {error !== undefined && (
           <div className="shrink-0">
             <Admonition
@@ -539,7 +538,6 @@ export const EditorPanel = () => {
             />
           </div>
         )}
-
         {showWarning && (
           <SqlWarningAdmonition
             className="border-t"
@@ -557,7 +555,6 @@ export const EditorPanel = () => {
             }}
           />
         )}
-
         {results !== undefined && results.length > 0 && (
           <div
             className={cn(
@@ -593,7 +590,6 @@ export const EditorPanel = () => {
             </p>
           </div>
         )}
-
         <div className="relative shrink-0 flex items-center gap-2 justify-end px-5 py-4 w-full border-t">
           {(isUpserting || saveStatus !== 'idle') && (
             <div

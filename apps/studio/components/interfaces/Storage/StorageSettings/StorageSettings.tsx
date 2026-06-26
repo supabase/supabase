@@ -335,7 +335,6 @@ export const StorageSettings = () => {
                                 hideMessage
                                 layout="flex-row-reverse"
                                 label="Global file size limit"
-                                className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full [&>div]:min-w-100"
                                 description={
                                   <>
                                     Restrict the size of files uploaded across all buckets.{' '}
