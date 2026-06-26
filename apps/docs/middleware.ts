@@ -1,3 +1,4 @@
+import { MARKDOWN_SLUGS } from '~/__generated__/markdown-manifest'
 import { clientSdkIds } from '~/content/navigation.references'
 import { BASE_PATH } from '~/lib/constants'
 import { negotiateMarkdown } from 'common/markdown-negotiation'
@@ -6,6 +7,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 const REFERENCE_PATH = `${BASE_PATH ?? ''}/reference`
 const GUIDES_PATH = `${BASE_PATH ?? ''}/guides`
+const GUIDES_MARKDOWN_SLUGS = new Set(MARKDOWN_SLUGS)
 
 export function middleware(request: NextRequest) {
   const url = new URL(request.url)
@@ -19,7 +21,7 @@ export function middleware(request: NextRequest) {
         acceptHeader: request.headers.get('accept') ?? '',
         userAgent: request.headers.get('user-agent') ?? '',
       },
-      { hasMarkdownVariant: true, isMarkdownSuffix: isMdSuffix }
+      { hasMarkdownVariant: GUIDES_MARKDOWN_SLUGS.has(slug), isMarkdownSuffix: isMdSuffix }
     )
 
     if (decision === 'not-acceptable') {
