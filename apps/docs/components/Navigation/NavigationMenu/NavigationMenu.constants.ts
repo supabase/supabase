@@ -2977,8 +2977,8 @@ export const telemetry: NavMenuConstant = {
           url: '/guides/telemetry/advanced-log-filtering' as `/${string}`,
         },
         {
-          name: 'Querying ClickHouse logs',
-          url: '/guides/telemetry/querying-clickhouse-logs' as `/${string}`,
+          name: 'Querying Supabase logs',
+          url: '/guides/telemetry/querying-supabase-logs' as `/${string}`,
         },
         {
           name: 'Logs field reference',
