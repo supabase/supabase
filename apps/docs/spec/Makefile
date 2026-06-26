@@ -47,13 +47,6 @@ download.tsdoc.v2:
 download.analytics.v0:
 	curl -sS https://logflare.app/api/openapi > $(REPO_DIR)/analytics_v0_openapi.json
 
-# Dart/Flutter has no upstream TypeDoc dump. Instead the committed legacy spec
-# (`supabase_dart_v2.yml`) is converted into a TypeDoc-shaped dump under
-# `reference/dart/v2/` by a pre-step script. `codegen:references:new` runs this
-# automatically before the content build; this target is the manual equivalent.
-generate.dart.v2:
-	cd $(REPO_DIR)/.. && pnpm run codegen:references:dart
-
 ###############################################################################
 # Transform docs into working files
 ###############################################################################
