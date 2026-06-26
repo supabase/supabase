@@ -68,7 +68,8 @@ describe('ColorTinker', () => {
     delete window.devColors
     document.documentElement.style.cssText = ''
     mockComputedStyle({
-      '--hue': '155',
+      '--surface-hue': '155',
+      '--primary-hue': '155',
       '--surface': '0.2',
       '--elevation-step': '0.01',
       '--chroma': '0.03',
@@ -153,7 +154,8 @@ describe('ColorTinker', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Theme')).toBeInTheDocument()
-        expect(screen.getByText('Hue')).toBeInTheDocument()
+        expect(screen.getByText('Surface hue')).toBeInTheDocument()
+        expect(screen.getByText('Brand hue')).toBeInTheDocument()
       })
     })
   })
@@ -215,7 +217,8 @@ describe('ColorTinker', () => {
         VALUES_STORAGE_KEY,
         JSON.stringify({
           dark: {
-            '--hue': 200,
+            '--surface-hue': 200,
+            '--primary-hue': 200,
             '--surface': 0.3,
             '--elevation-step': 0.01,
             '--chroma': 0.03,
@@ -229,7 +232,7 @@ describe('ColorTinker', () => {
       await flushAnimationFrames()
 
       await waitFor(() => {
-        expect(document.documentElement.style.getPropertyValue('--hue')).toBe('200')
+        expect(document.documentElement.style.getPropertyValue('--surface-hue')).toBe('200')
       })
 
       await user.click(screen.getByRole('button', { name: 'Color system tinker' }))
@@ -238,7 +241,7 @@ describe('ColorTinker', () => {
       await waitFor(() => {
         expect(screen.queryByRole('button', { name: 'Color system tinker' })).toBeNull()
       })
-      expect(document.documentElement.style.getPropertyValue('--hue')).toBe('')
+      expect(document.documentElement.style.getPropertyValue('--surface-hue')).toBe('')
       expect(localStorage.getItem(ENABLED_STORAGE_KEY)).toBeNull()
     })
   })

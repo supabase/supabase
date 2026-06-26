@@ -8,9 +8,18 @@
  */
 
 :root {
-  /* --hue is the brand hue: Supabase green measures ~159° in OKLCH, and the
-     brand (--primary) is derived from it, so the two can't drift apart. */
+  /*
+   * Hue inputs. A single --hue used to drive both the neutral surface/text ramp
+   * and the brand, so the two could never drift apart. They are now split so a
+   * theme can run, say, a cool-gray surface against the green brand:
+   *   --surface-hue  tints backgrounds, text and borders (the neutral ramp)
+   *   --primary-hue  is the brand hue that --primary is built from
+   * Both default to --hue (Supabase green ≈159° in OKLCH), so a theme that only
+   * sets --hue keeps surfaces and brand locked together as before; override
+   * either one to let them diverge. */
   --hue: 159;
+  --surface-hue: var(--hue);
+  --primary-hue: var(--hue);
   --chroma: 0.01;
   --surface: 0.985;
 
@@ -78,32 +87,33 @@
 
   /*
    * Status hues stay anchored to amber / red but pull a fraction of the way
-   * toward the brand --hue for harmony, then clamp to their perceptual category
-   * so "warning" always reads amber and "destructive" always reads red no matter
-   * what --hue is. --status-hue-pull: 0 = fixed amber/red, 1 = fully brand-relative.
-   * At the default --hue the pull term is 0, so these resolve to their bases
-   * (warning 75 / destructive 25 / info 288). --brand-hue-reference is the
-   * --hue at which pull is zero; keep it equal to the default brand hue.
+   * toward the brand --primary-hue for harmony, then clamp to their perceptual
+   * category so "warning" always reads amber and "destructive" always reads red
+   * no matter what --primary-hue is. --status-hue-pull: 0 = fixed amber/red,
+   * 1 = fully brand-relative. At the default --primary-hue the pull term is 0, so
+   * these resolve to their bases (warning 75 / destructive 25 / info 288).
+   * --brand-hue-reference is the --primary-hue at which pull is zero; keep it
+   * equal to the default brand hue.
    * Warning sits at 75 (amber), not higher toward yellow — yellow can't darken
    * without going olive, so it loses contrast on light surfaces. Info is a violet
    * (matching the "no additional charge" badge); like the others it pulls a touch
-   * with the brand --hue but clamps so it always reads violet.
+   * with the brand --primary-hue but clamps so it always reads violet.
    */
   --brand-hue-reference: 159;
   --status-hue-pull: 0.15;
   --warning-hue: clamp(
     65,
-    calc(75 + (var(--hue) - var(--brand-hue-reference)) * var(--status-hue-pull)),
+    calc(75 + (var(--primary-hue) - var(--brand-hue-reference)) * var(--status-hue-pull)),
     95
   );
   --destructive-hue: clamp(
     12,
-    calc(25 + (var(--hue) - var(--brand-hue-reference)) * var(--status-hue-pull)),
+    calc(25 + (var(--primary-hue) - var(--brand-hue-reference)) * var(--status-hue-pull)),
     42
   );
   --info-hue: clamp(
     272,
-    calc(288 + (var(--hue) - var(--brand-hue-reference)) * var(--status-hue-pull)),
+    calc(288 + (var(--primary-hue) - var(--brand-hue-reference)) * var(--status-hue-pull)),
     302
   );
   /*
@@ -127,10 +137,10 @@
   --info-lightness: 0.7;
 
   /* shadcn semantic pairs */
-  --background: oklch(var(--surface) calc(var(--chroma) * 0.5) var(--hue));
+  --background: oklch(var(--surface) calc(var(--chroma) * 0.5) var(--surface-hue));
   --foreground: oklch(
     calc(var(--surface) + var(--tone-span) * var(--contrast-text)) calc(var(--chroma) * 0.55)
-      var(--hue)
+      var(--surface-hue)
   );
 
   --card: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-1)) c h);
@@ -138,12 +148,15 @@
   --popover: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-2)) c h);
   --popover-foreground: var(--foreground);
 
-  /* Primary IS the brand: a fixed, vivid Supabase green on --hue, mode-invariant
-     and decoupled from the --chroma knob so the brand holds its identity even as
-     neutrals desaturate. --color-brand aliases this in theme.css. */
-  --primary: oklch(0.76 0.15 var(--hue));
+  /* Primary is the brand-derived accent: a fixed, vivid Supabase green on
+     --primary-hue, mode-invariant and decoupled from the --chroma knob so it
+     holds its identity even as neutrals desaturate. NOTE: the `brand` utility
+     (--color-brand in theme.css) is deliberately NOT this — it maps to the
+     per-theme --brand-default scale (master behavior) while we resolve how
+     `brand` is used across the interface. */
+  --primary: oklch(0.76 0.15 var(--primary-hue));
   --primary-foreground: oklch(
-    min(var(--surface), var(--foreground-lightness)) calc(var(--chroma) * 0.45) var(--hue)
+    min(var(--surface), var(--foreground-lightness)) calc(var(--chroma) * 0.45) var(--primary-hue)
   );
 
   --secondary: oklch(

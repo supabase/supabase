@@ -70,7 +70,7 @@
   --color-brand-400: hsl(var(--brand-400));
   --color-brand-500: hsl(var(--brand-500));
   --color-brand-600: hsl(var(--brand-600));
-  --color-brand: var(--primary);
+  --color-brand: hsl(var(--brand-default));
   --color-brand-link: hsl(var(--brand-link));
   --color-_secondary-200: hsl(var(--secondary-200));
   --color-_secondary-400: hsl(var(--secondary-400));

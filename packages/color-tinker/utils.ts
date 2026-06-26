@@ -30,7 +30,7 @@ export function isColorValues(value: unknown): value is ColorValues {
   return (
     typeof value === 'object' &&
     value !== null &&
-    typeof (value as ColorValues)['--hue'] === 'number'
+    typeof (value as ColorValues)['--surface-hue'] === 'number'
   )
 }
 

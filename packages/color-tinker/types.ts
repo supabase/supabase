@@ -6,7 +6,8 @@ export interface ColorTinkerContextType {
 export type ThemeKey = 'dark' | 'light'
 
 export type ColorVarName =
-  | '--hue'
+  | '--surface-hue'
+  | '--primary-hue'
   | '--surface'
   | '--elevation-step'
   | '--chroma'
