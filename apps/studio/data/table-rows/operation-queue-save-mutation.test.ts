@@ -53,4 +53,13 @@ describe('getOperationSqlStatements', () => {
     expect(String(statements[0])).toContain('where id = 1')
     expect(String(statements[1])).toContain('where id = 2')
   })
+
+  it('does not merge rows whose identifier values would collide with delimiter keys', () => {
+    const statements = getOperationSqlStatements([
+      createEditOperation('name', 'Row 1', { a: 'x', b: 'y|b:z' }),
+      createEditOperation('name', 'Row 2', { a: 'x|b:y', b: 'z' }),
+    ])
+
+    expect(statements).toHaveLength(2)
+  })
 })

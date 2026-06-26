@@ -562,7 +562,7 @@ describe('queueRowDeletesWithOptimisticUpdate', () => {
       type: QueuedOperationType.DELETE_ROW,
       tableId: 1,
       payload: expect.objectContaining({
-        rowIdentifiers: { id: undefined },
+        rowIdentifiers: { id: undefined, __tempId: '-100' },
         originalRow: row,
       }),
     })

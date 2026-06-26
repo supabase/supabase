@@ -263,6 +263,9 @@ export function queueRowDeletesWithOptimisticUpdate({
       rowIdentifiers[pk.name] = row[pk.name]
     })
     const stableRowIdentifiers = getStableRowIdentifiers(row, rowIdentifiers)
+    if (isPendingAddRow(row)) {
+      stableRowIdentifiers.__tempId = row.__tempId
+    }
 
     queueOperation({
       type: QueuedOperationType.DELETE_ROW,

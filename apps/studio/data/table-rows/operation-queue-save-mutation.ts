@@ -20,10 +20,9 @@ import {
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 function getEditCellOperationRowKey(operation: EditCellContentOperation): string {
-  const rowIdentifiersKey = Object.entries(operation.payload.rowIdentifiers)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([key, value]) => `${key}:${value}`)
-    .join('|')
+  const rowIdentifiersKey = JSON.stringify(
+    Object.entries(operation.payload.rowIdentifiers).sort(([a], [b]) => a.localeCompare(b))
+  )
 
   return `${operation.tableId}:${rowIdentifiersKey}`
 }
