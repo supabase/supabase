@@ -419,10 +419,7 @@ const Reports = () => {
           </div>
 
           <div className="flex items-center gap-x-2">
-            <DocsButton
-              href={OBSERVABILITY_DOCS_HREFS.customReport}
-              topic={reportTitle}
-            />
+            <DocsButton href={OBSERVABILITY_DOCS_HREFS.customReport} topic={reportTitle} />
             <ButtonTooltip
               variant="default"
               icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
