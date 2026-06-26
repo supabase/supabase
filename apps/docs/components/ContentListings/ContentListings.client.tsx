@@ -40,23 +40,31 @@ function ContentListingGroupHeading({ group }: { group: ContentListingGroup }) {
 function ContentListingsListGroup({ group }: { group: ContentListingGroup }) {
   const trackClick = useContentListingClickHandler(group)
 
+  // Heading stays outside `not-prose` so it inherits the surrounding MDX prose
+  // typography. The list itself opts out so its explicit Tailwind layout wins.
   return (
-    <section className="not-prose space-y-4">
+    <section className="space-y-4">
       <ContentListingGroupHeading group={group} />
-      {group.description && <p className="text-foreground-light">{group.description}</p>}
-      <ul className="list-disc pl-6 space-y-2">
-        {group.items.map((item) => {
-          const href = normalizeContentListingHref(item.href)
-          const external = isExternalContentListingHref(href)
-          return (
-            <li key={`${group.id}-${item.href}`}>
-              <Link href={href} onClick={trackClick(item)} target={external ? '_blank' : undefined}>
-                <strong>{item.title}</strong>: {item.description}
-              </Link>
-            </li>
-          )
-        })}
-      </ul>
+      <div className="not-prose space-y-4">
+        {group.description && <p className="text-foreground-light">{group.description}</p>}
+        <ul className="list-disc pl-6 space-y-2">
+          {group.items.map((item) => {
+            const href = normalizeContentListingHref(item.href)
+            const external = isExternalContentListingHref(href)
+            return (
+              <li key={`${group.id}-${item.href}`}>
+                <Link
+                  href={href}
+                  onClick={trackClick(item)}
+                  target={external ? '_blank' : undefined}
+                >
+                  <strong>{item.title}</strong>: {item.description}
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+      </div>
     </section>
   )
 }
@@ -66,28 +74,30 @@ function ContentListingsGridGroup({ group }: { group: ContentListingGroup }) {
   const trackClick = useContentListingClickHandler(group)
 
   return (
-    <section className="not-prose space-y-4">
+    <section className="space-y-4">
       <ContentListingGroupHeading group={group} />
-      {group.description && <p className="text-foreground-light">{group.description}</p>}
-      <div className="grid md:grid-cols-12 gap-4">
-        {group.items.map((item) => {
-          const href = normalizeContentListingHref(item.href)
-          const external = isExternalContentListingHref(href)
-          return (
-            <Link
-              key={`${group.id}-${item.href}`}
-              href={href}
-              passHref
-              className={`${itemClassName} block h-full`}
-              onClick={trackClick(item)}
-              target={external ? '_blank' : undefined}
-            >
-              <GlassPanel title={item.title} icon={item.icon} hasLightIcon={Boolean(item.icon)}>
-                {item.description}
-              </GlassPanel>
-            </Link>
-          )
-        })}
+      <div className="not-prose space-y-4">
+        {group.description && <p className="text-foreground-light">{group.description}</p>}
+        <div className="grid md:grid-cols-12 gap-4">
+          {group.items.map((item) => {
+            const href = normalizeContentListingHref(item.href)
+            const external = isExternalContentListingHref(href)
+            return (
+              <Link
+                key={`${group.id}-${item.href}`}
+                href={href}
+                passHref
+                className={`${itemClassName} block h-full`}
+                onClick={trackClick(item)}
+                target={external ? '_blank' : undefined}
+              >
+                <GlassPanel title={item.title} icon={item.icon} hasLightIcon={Boolean(item.icon)}>
+                  {item.description}
+                </GlassPanel>
+              </Link>
+            )
+          })}
+        </div>
       </div>
     </section>
   )
