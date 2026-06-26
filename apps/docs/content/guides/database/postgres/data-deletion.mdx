@@ -188,7 +188,7 @@ If autovacuum is not keeping up, you can trigger a manual vacuum:
 vacuum (verbose) logs;
 ```
 
-For reclaiming disk space (not only marking tuples as reusable), use `VACUUM FULL` — but be aware this rewrites the entire table and takes an `ACCESS EXCLUSIVE` lock:
+To reclaim disk space rather than only marking tuples as reusable, use `VACUUM FULL`. Note that this rewrites the entire table and takes an `ACCESS EXCLUSIVE` lock:
 
 ```sql
 -- This locks the table for the duration — use during maintenance windows only
