@@ -31,7 +31,11 @@ import surveyData from '../data/surveys/state-of-startups-2026'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT = join(__dirname, '..', 'data', 'surveys', 'state-of-startups-data.json')
 
+// This is a standalone, manually-run generator (not a turbo task), so these
+// env vars don't affect any build output and need not be declared in turbo.json.
+// eslint-disable-next-line turbo/no-undeclared-env-vars
 const URL = process.env.SURVEY_DB_URL ?? 'http://127.0.0.1:55321'
+// eslint-disable-next-line turbo/no-undeclared-env-vars
 const KEY = process.env.SURVEY_DB_KEY ?? 'sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH'
 const YEARS = [2025, 2026] as const
 
@@ -92,11 +96,17 @@ function collectTuples(): Tuple[] {
     qy: { column: string; aggregation: Aggregation; filters?: SurveyFilters },
     extra?: SurveyFilters
   ) => push(qy.column, qy.aggregation, mergeFilters(qy.filters, extra))
-  const addTopLine = (item: any) => {
-    if (item.kind === 'compare') {
+  type TLQuery = { column: string; aggregation: Aggregation; filters?: SurveyFilters }
+  const addTopLine = (item: {
+    kind?: string
+    query?: TLQuery
+    a?: { query: TLQuery }
+    b?: { query: TLQuery }
+  }) => {
+    if (item.kind === 'compare' && item.a && item.b) {
       addQuery(item.a.query)
       addQuery(item.b.query)
-    } else {
+    } else if (item.query) {
       addQuery(item.query)
     }
   }
@@ -157,7 +167,7 @@ async function fetchDistribution(year: number, t: Tuple) {
     }),
   ])
   if (statsRes.error || rcRes.error) return null // column absent for this year, etc.
-  const rows = (statsRes.data ?? []).map((r: any) => ({
+  const rows = ((statsRes.data ?? []) as { label: unknown; count: unknown }[]).map((r) => ({
     label: String(r.label),
     count: Number(r.count ?? 0),
   }))
