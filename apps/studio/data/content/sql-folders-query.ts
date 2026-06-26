@@ -1,6 +1,7 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
+import { remapSqlContentFields } from './content-remap'
 import { contentKeys } from './keys'
 import type { SnippetStatus } from './snippet-status'
 import { get, handleError } from '@/data/fetchers'
@@ -62,7 +63,7 @@ export async function getSQLSnippetFolders(
   if (error) handleError(error)
   return {
     ...data.data,
-    contents: (data.data.contents ?? []).map(withSavedStatus),
+    contents: remapSqlContentFields((data.data.contents ?? []).map(withSavedStatus) as any) as any,
     cursor: data.cursor,
   }
 }

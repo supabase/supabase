@@ -126,7 +126,9 @@ export const sqlEditorState = proxy({
   setSnippet: (projectRef: string, snippet: SnippetWithContent) => {
     let storedSnippet = sqlEditorState.snippets[snippet.id]
     if (storedSnippet) {
-      if (!storedSnippet.snippet.content) {
+      const hasUsableContent =
+        storedSnippet.snippet.content && storedSnippet.snippet.content.unchecked_sql !== undefined
+      if (!hasUsableContent) {
         storedSnippet.snippet.content = snippet.content
       }
     } else {
