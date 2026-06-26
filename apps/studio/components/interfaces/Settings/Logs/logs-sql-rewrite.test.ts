@@ -53,6 +53,52 @@ cross join unnest(m.parsed) as parsed`)
     expect(changed).toBe(false)
     expect(sql).toBe(input)
   })
+
+  it('rewrites a log table query that has no joins', async () => {
+    const { sql, changed } = await rewriteBqLogsSqlToClickhouse(
+      'select event_message from auth_logs limit 10'
+    )
+    expect(changed).toBe(true)
+    const out = collapse(sql)
+    expect(out).toContain('FROM logs')
+    expect(out).toContain("source = 'auth_logs'")
+  })
+
+  it('strips the table prefix from source-qualified columns in the SELECT list', async () => {
+    const { sql, changed } = await rewriteBqLogsSqlToClickhouse(
+      'select edge_logs.id, edge_logs.timestamp from edge_logs'
+    )
+    expect(changed).toBe(true)
+    const out = collapse(sql)
+    expect(out).toContain("source = 'edge_logs'")
+    expect(out).not.toContain('edge_logs.id')
+    expect(out).not.toContain('edge_logs.timestamp')
+  })
+
+  it('casts numeric metadata fields other than status_code (status) and folds the root alias', async () => {
+    const { sql } = await rewriteBqLogsSqlToClickhouse(
+      `select id from auth_logs cross join unnest(metadata) as m where m.status >= 400`
+    )
+    expect(collapse(sql)).toContain("toInt32OrZero(log_attributes['status']) >= 400")
+  })
+
+  it('rewrites columns in group by and aggregations', async () => {
+    const { sql, changed } = await rewriteBqLogsSqlToClickhouse(
+      `select request.method, count(*) as c
+from edge_logs
+cross join unnest(metadata) as m
+cross join unnest(m.request) as request
+group by request.method`
+    )
+    expect(changed).toBe(true)
+    const out = collapse(sql)
+    expect(out).toContain("log_attributes['request.method']")
+    expect(out.toLowerCase()).toContain('group by')
+  })
+
+  it('throws on a query it cannot parse', async () => {
+    await expect(rewriteBqLogsSqlToClickhouse('!! not valid sql @@')).rejects.toThrow()
+  })
 })
 
 describe('buildClickhouseRewritePrompt', () => {
