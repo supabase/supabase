@@ -28,8 +28,8 @@ import {
   otelFieldsFromKeys,
   toOtelFieldSchemas,
 } from '@/components/interfaces/Settings/Logs/Logs.fieldReference'
-import { useOtelLogKeysQuery } from '@/data/logs/otel-log-keys-query'
 import Table from '@/components/to-be-cleaned/Table'
+import { useOtelLogKeysQuery } from '@/data/logs/otel-log-keys-query'
 import { DOCS_URL } from '@/lib/constants'
 
 export interface LogsExplorerHeaderProps {
