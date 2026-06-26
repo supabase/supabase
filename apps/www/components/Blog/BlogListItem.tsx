@@ -3,9 +3,9 @@ import Link from 'next/link'
 import React from 'react'
 import { Badge } from 'ui'
 
+import AuthorAvatars from './AuthorAvatars'
 import blogAuthors from '@/lib/authors.json'
 import type PostTypes from '@/types/post'
-import AuthorAvatars from './AuthorAvatars'
 
 interface Props {
   post: PostTypes
@@ -35,7 +35,7 @@ const BlogListItem = ({ post }: Props) => {
     <Link
       href={post.path}
       prefetch={false}
-      className="group flex flex-col lg:grid lg:grid-cols-10 xl:grid-cols-12 w-full py-2 sm:py-4 h-full hover:bg-surface-75/50 transition-colors px-6"
+      className="group flex flex-col lg:grid lg:grid-cols-10 xl:grid-cols-12 w-full py-2 sm:py-4 lg:px-2 h-full hover:bg-surface-75/50 transition-colors"
     >
       <div className="flex w-full lg:col-span-8 xl:col-span-8">
         <h3 className="text-foreground text-sm group-hover:underline">{post.title}</h3>

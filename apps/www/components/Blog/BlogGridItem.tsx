@@ -29,7 +29,7 @@ const BlogGridItem = ({ post }: Props) => {
   const imageUrl = getBlogThumbnailImage(post) ?? BLOG_PLACEHOLDER_IMAGE
 
   return (
-    <Link href={post.path} prefetch={false} className="group flex flex-col h-full p-6">
+    <Link href={post.path} prefetch={false} className="group flex flex-col h-full">
       <div className="relative w-full aspect-[1.91/1] overflow-hidden rounded-md border border-foreground/10">
         <Image
           fill

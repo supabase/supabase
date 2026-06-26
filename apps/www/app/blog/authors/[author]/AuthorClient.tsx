@@ -2,14 +2,14 @@
 
 import BlogGridItem from 'components/Blog/BlogGridItem'
 import BlogListItem from 'components/Blog/BlogListItem'
+import { AlignJustify, Grid, Search } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Suspense, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import type PostTypes from 'types/post'
+import { Button, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 
-import BlogFilters from '@/components/Blog/BlogFilters'
 import DefaultLayout from '@/components/Layouts/Default'
-import SectionContainer from '@/components/Layouts/SectionContainer'
 import SectionContainerWithCn from '@/components/Layouts/SectionContainerWithCn'
 
 export type BlogView = 'list' | 'grid'
@@ -34,6 +34,8 @@ export default function AuthorClient({ author, authorId, blogs, initialView }: A
   const [searchTerm, setSearchTerm] = useState('')
   const isList = view === 'list'
 
+  const handleViewSelection = () => setView(isList ? 'grid' : 'list')
+
   const filteredBlogs = useMemo(() => {
     if (!searchTerm) return blogs
     const term = searchTerm.toLowerCase()
@@ -45,7 +47,7 @@ export default function AuthorClient({ author, authorId, blogs, initialView }: A
   }, [blogs, searchTerm])
 
   return (
-    <DefaultLayout>
+    <>
       <SectionContainerWithCn height="narrow" className="space-y-6">
         <div className="text-foreground-lighter flex space-x-1">
           <h1 className="cursor-pointer">
@@ -91,20 +93,42 @@ export default function AuthorClient({ author, authorId, blogs, initialView }: A
       </SectionContainerWithCn>
 
       {/* Filters row — divider above the header, search aligned with the view toggle */}
-      <div className="sticky top-[65px] z-10 bg-background/80 backdrop-blur-sm border-b border-border">
-        <SectionContainer className="py-3!">
-          <Suspense fallback={null}>
-            <BlogFilters
-              view={view}
-              setView={setView}
-              onSearch={(search) => setSearchTerm(search)}
-            />
-          </Suspense>
-        </SectionContainer>
+      <div className="border-default border-t">
+        <SectionContainerWithCn height="none" className="py-6">
+          <div className="flex flex-row items-center justify-between gap-2">
+            <div className="flex-1 max-w-[280px]">
+              <InputGroup className="w-full">
+                <InputGroupInput
+                  size="small"
+                  autoComplete="off"
+                  type="search"
+                  placeholder="Search posts"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <InputGroupAddon>
+                  <Search />
+                </InputGroupAddon>
+              </InputGroup>
+            </div>
+            <Button
+              variant="default"
+              title={isList ? 'Grid View' : 'List View'}
+              onClick={handleViewSelection}
+              className="h-full p-2 text-foreground-light"
+            >
+              {isList ? (
+                <Grid className="w-4 h-4 stroke-1.5" />
+              ) : (
+                <AlignJustify className="w-4 h-4 stroke-1.5" />
+              )}
+            </Button>
+          </div>
+        </SectionContainerWithCn>
       </div>
 
       {/* Posts */}
-      <SectionContainerWithCn height="none" className="py-3">
+      <SectionContainerWithCn height="none">
         {filteredBlogs.length > 0 ? (
           isList ? (
             <div>
@@ -113,7 +137,7 @@ export default function AuthorClient({ author, authorId, blogs, initialView }: A
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-12 py-4">
               {filteredBlogs.map((blog, idx) => (
                 <BlogGridItem post={blog} key={`grid-${idx}-${blog.slug}`} />
               ))}
@@ -129,6 +153,6 @@ export default function AuthorClient({ author, authorId, blogs, initialView }: A
           </div>
         )}
       </SectionContainerWithCn>
-    </DefaultLayout>
+    </>
   )
 }

@@ -8,6 +8,7 @@ import { useInfiniteScrollWithFetch } from 'hooks/useInfiniteScroll'
 import { Suspense, useCallback, useState } from 'react'
 import type PostTypes from 'types/post'
 
+import SectionContainerWithCn from '../../components/Layouts/SectionContainerWithCn'
 import SectionContainer from '@/components/Layouts/SectionContainer'
 
 const POSTS_PER_PAGE = 25
@@ -168,7 +169,7 @@ export default function BlogClient({ initialBlogs, totalPosts, initialView }: Bl
       </div>
 
       {/* Blog posts */}
-      <SectionContainer className="py-0!">
+      <SectionContainerWithCn height="none" className="py-6">
         {isFiltering ? (
           isList ? (
             <div>
@@ -193,7 +194,7 @@ export default function BlogClient({ initialBlogs, totalPosts, initialView }: Bl
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 py-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-12 py-4">
               {visibleBlogs.map((blog: PostTypes, idx: number) => (
                 <BlogGridItem post={blog} key={`grid-${idx}-${blog.slug}`} />
               ))}
@@ -210,7 +211,7 @@ export default function BlogClient({ initialBlogs, totalPosts, initialView }: Bl
             <div className="h-8 w-8 animate-spin rounded-full border-2 border-foreground-muted border-t-foreground" />
           </div>
         )}
-      </SectionContainer>
+      </SectionContainerWithCn>
     </div>
   )
 }

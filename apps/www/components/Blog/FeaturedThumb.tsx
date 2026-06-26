@@ -30,13 +30,13 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
   const imageUrl = getBlogThumbnailImage(blog) ?? BLOG_PLACEHOLDER_IMAGE
 
   return (
-    <div key={blog.slug} className="w-full grid lg:grid-cols-12 gap-8">
-      {/* Image */}
-      <Link
-        href={`${blog.path}`}
-        prefetch={false}
-        className="relative w-full aspect-[1.91/1] lg:col-span-6 overflow-hidden block group"
-      >
+    <Link
+      href={`${blog.path}`}
+      prefetch={false}
+      key={blog.slug}
+      className="group w-full grid lg:grid-cols-12 gap-8 md:gap-12 hover:bg-surface-200 dark:hover:bg-surface-75 p-2 sm:p-4 rounded-xl"
+    >
+      <div className="relative w-full aspect-[1.91/1] lg:col-span-6 overflow-hidden block group">
         <div className="relative w-full h-full shadow-lg border border-foreground/10 rounded-lg overflow-hidden">
           <Image
             src={imageUrl}
@@ -47,16 +47,12 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
             alt="blog thumbnail"
           />
         </div>
-      </Link>
+      </div>
 
       {/* Text */}
-      <div className="flex flex-col lg:col-span-6 px-6 py-4 xl:justify-center">
+      <div className="flex flex-col lg:col-span-6 md:justify-center">
         <div>
-          <Link href={`${blog.path}`} prefetch={false} className="group">
-            <h2 className="h2 lg:text-2xl! xl:text-3xl! mb-2! group-hover:underline">
-              {blog.title}
-            </h2>
-          </Link>
+          <h2 className="h2 lg:text-2xl! xl:text-3xl! mb-2! group-hover:underline">{blog.title}</h2>
           <p className="p">{blog.description}</p>
         </div>
 
@@ -69,7 +65,7 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
 
