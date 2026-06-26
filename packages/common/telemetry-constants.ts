@@ -484,6 +484,17 @@ export interface OrganizationCreationCompletedEvent {
 }
 
 /**
+ * Test event added to validate the telemetry pipeline / GitHub PR automation. Not fired
+ * anywhere; this only adds the definition to the telemetry event union. Safe to remove.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface TestTrackingEvent {
+  action: 'test_tracking_event'
+}
+
+/**
  * User toggled Data API access on a table via the switch in the table editor side panel.
  * Only fires for new tables — editing existing tables links out to the settings page instead.
  *
@@ -3528,6 +3539,7 @@ export type TelemetryEvent =
   | ProjectCreationFormExposedEvent
   | OrganizationCreationFormExposedEvent
   | OrganizationCreationCompletedEvent
+  | TestTrackingEvent
   | TableApiAccessToggleClickedEvent
   | RealtimeInspectorListenChannelClickedEvent
   | RealtimeInspectorBroadcastSentEvent
