@@ -14,7 +14,7 @@ export const DocsButton = ({ href, abbrev = true, className, topic }: DocsButton
       asChild
       variant="default"
       className={className}
-      icon={<BookOpen aria-hidden />}
+      icon={<BookOpen />}
       onClick={(e) => e.stopPropagation()}
     >
       <a

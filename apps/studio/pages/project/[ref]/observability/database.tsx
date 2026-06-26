@@ -245,7 +245,7 @@ const DatabaseUsage = () => {
                 <Button
                   variant="default"
                   disabled={isRefreshing}
-                  icon={<RefreshCw aria-hidden className={isRefreshing ? 'animate-spin' : ''} />}
+                  icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
                   className="w-7"
                   onClick={onRefreshReport}
                 />
