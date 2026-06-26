@@ -1,5 +1,29 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 
+reviews:
+  # Targeted, path-scoped review guidance. Kept in the repo (rather than the
+  # CodeRabbit dashboard) so it's version-controlled, visible, and reviewable.
+  path_instructions:
+    - path: 'packages/common/telemetry-constants.ts'
+      instructions: |
+        Strictly enforce event naming: [object]_[verb] in snake_case. Only approved
+        verbs: opened, clicked, submitted, created, removed, updated, retrieved,
+        intended, evaluated, added, enabled, disabled, copied, exposed, failed,
+        converted. Properties must be camelCase for new events (match existing
+        convention when adding to existing events). Flag any usage of
+        useSendEventMutation. Verify @group Events and @source JSDoc tags are
+        accurate. Check that new interfaces are added to the TelemetryEvent union type.
+    - path: 'apps/studio/components/**/*.tsx'
+      instructions: |
+        Only suggest adding PostHog event tracking (via useTrack from
+        lib/telemetry/track, [object]_[verb] snake_case) when a new user-facing
+        interaction is growth-relevant: e.g. first-use of a feature, onboarding steps,
+        project/org creation, upgrade/billing actions, enabling or disabling a product
+        feature, or any action that signals activation or retention. Do not suggest
+        tracking for: passive views, page loads, UI-only state changes (e.g. expanding
+        a panel, switching tabs in a settings page), developer/internal tooling
+        interactions, or interactions clearly unrelated to product adoption.
+
 # Applies our internal engineering skills (.claude/skills/) as CodeRabbit review
 # guidelines. The skills are the single source of truth — they are consumed
 # directly, with no copy of their content elsewhere.
