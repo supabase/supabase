@@ -122,6 +122,7 @@
     "memoize-one": "^5.0.1",
     "mime-db": "^1.53.0",
     "monaco-editor": "catalog:",
+    "monaco-graphql": "1.7.3",
     "next": "catalog:",
     "next-themes": "catalog:",
     "nuqs": "2.7.1",
