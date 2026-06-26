@@ -20,14 +20,15 @@
   --hue: 159;
   --surface-hue: var(--hue);
   --primary-hue: var(--hue);
-  --chroma: 0.01;
-  --surface: 0.985;
+  /* Root defaults mirror the dark theme (the app's default appearance). */
+  --chroma: 0.016;
+  --surface: 0.17;
 
-  --foreground-lightness: 0.16;
+  --foreground-lightness: 0.95;
   /* How far muted/tertiary text sits from --surface toward --foreground-lightness
      (0 = surface, 1 = full foreground) at --contrast 0.5; themes override. */
   --muted-foreground-level: 0.8;
-  --tertiary-foreground-level: 0.6;
+  --tertiary-foreground-level: 0.65;
 
   /*
    * Global contrast knob, 0 to 1. Default 0.5 is the comfortable baseline; 0 keeps
