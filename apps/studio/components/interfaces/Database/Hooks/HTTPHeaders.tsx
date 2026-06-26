@@ -32,22 +32,12 @@ export const HTTPHeaders = ({ form }: HTTPHeadersProps) => {
   const apiKey = secretKey?.api_key ?? serviceKey?.api_key ?? '[YOUR API KEY]'
 
   const functionType = useWatch({ control: form.control, name: 'function_type' })
-  const createRow = (name: string, value: string) => ({ id: uuidv4(), name, value })
   const addActions =
     functionType === 'supabase_function'
       ? buildEdgeFunctionHeaderAddActions({
           apiKey,
-          createRow,
-        }).map((action) =>
-          action.key === 'add-auth-header'
-            ? {
-                ...action,
-                label: 'Add apiKey header with secret key',
-                description: 'Required for edge functions invoked with a secret key',
-                createRows: () => [createRow('apikey', apiKey)],
-              }
-            : action
-        )
+          createRow: (name: string, value: string) => ({ id: uuidv4(), name, value }),
+        })
       : []
 
   return (

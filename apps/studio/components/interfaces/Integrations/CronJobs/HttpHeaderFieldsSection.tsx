@@ -29,7 +29,6 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
     variant === 'edge_function'
       ? buildEdgeFunctionHeaderAddActions({
           apiKey,
-          includeApiKeyHeader: serviceKey?.type === 'secret',
           createRow: (name: string, value: string) => ({ name, value }),
         })
       : []

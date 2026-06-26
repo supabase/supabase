@@ -2,23 +2,18 @@ import type { KeyValueFieldArrayAction } from 'ui-patterns/form/KeyValueFieldArr
 
 interface BuildEdgeFunctionHeaderAddActionsParams<TRow> {
   apiKey: string
-  includeApiKeyHeader?: boolean
   createRow: (name: string, value: string) => TRow
 }
 
 export const buildEdgeFunctionHeaderAddActions = <TRow>({
   apiKey,
-  includeApiKeyHeader = false,
   createRow,
 }: BuildEdgeFunctionHeaderAddActionsParams<TRow>): KeyValueFieldArrayAction<TRow>[] => [
   {
     key: 'add-auth-header',
-    label: 'Add auth header with secret key',
-    description: 'Required if your edge function enforces JWT verification',
-    createRows: () => [
-      createRow('Authorization', `Bearer ${apiKey}`),
-      ...(includeApiKeyHeader ? [createRow('apikey', apiKey)] : []),
-    ],
+    label: 'Add apiKey header with secret key',
+    description: 'Required for edge functions invoked with a secret key',
+    createRows: () => [createRow('apikey', apiKey)],
   },
   {
     key: 'add-source-header',
