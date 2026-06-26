@@ -27,7 +27,6 @@ import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import { ArrowDown, Check, X } from 'lucide-react'
 import Link from 'next/link'
-import { type HTMLAttributes } from 'react'
 import { Badge, Button } from 'ui'
 import { Admonition, type AdmonitionProps } from 'ui-patterns/admonition'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
@@ -103,17 +102,17 @@ const components = {
   TabPanel,
   InfoTooltip,
   a: MdxAnchor,
-  h2: (props: HTMLAttributes<HTMLHeadingElement>) => (
+  h2: (props: JSX.IntrinsicElements['h2']) => (
     <Heading tag="h2" {...props}>
       {props.children}
     </Heading>
   ),
-  h3: (props: HTMLAttributes<HTMLHeadingElement>) => (
+  h3: (props: JSX.IntrinsicElements['h3']) => (
     <Heading tag="h3" {...props}>
       {props.children}
     </Heading>
   ),
-  h4: (props: HTMLAttributes<HTMLHeadingElement>) => (
+  h4: (props: JSX.IntrinsicElements['h4']) => (
     <Heading tag="h4" {...props}>
       {props.children}
     </Heading>
