@@ -14,24 +14,29 @@ export interface StatQuery extends DistributionQuery {
 
 interface SurveyStatCardProps {
   label: string
-  query: StatQuery
+  /** Data-driven percent. Omit when `value` is provided. */
+  query?: StatQuery
+  /** Static percent to display as-is (for derived/combined figures that don't
+   *  map to a single column). Overrides `query`. */
+  value?: number
   /** Section-level cohort toggle filter, merged on top of the query filters. */
   cohortFilter?: SurveyFilters
 }
 
-export function SurveyStatCard({ label, query, cohortFilter }: SurveyStatCardProps) {
+export function SurveyStatCard({ label, query, value, cohortFilter }: SurveyStatCardProps) {
   const cardRef = useRef<HTMLDivElement>(null)
   const { year } = useYear()
 
   const accentBg = 'bg-brand'
   const accentText = 'text-brand'
 
-  // Resolve the percent from the embedded static dataset for the active year.
-  // Returns null when the option/column has no data that year (e.g. a
-  // new-in-2026 question viewed at 2025), which renders an em dash.
-  const resolvedPercent = useDistributionPercent(query, cohortFilter)
+  // A static `value` wins; otherwise resolve from the embedded dataset for the
+  // active year. Returns null when the option/column has no data that year
+  // (e.g. a new-in-2026 question viewed at 2025), which renders an em dash.
+  const queried = useDistributionPercent(query, cohortFilter)
+  const resolvedPercent = value ?? queried
 
-  const isNewThisYear = resolvedPercent === null && query.newIn2026 && year < 2026
+  const isNewThisYear = resolvedPercent === null && query?.newIn2026 && year < 2026
 
   const [displayValue, setDisplayValue] = useState(0)
   const [hasAnimated, setHasAnimated] = useState(false)

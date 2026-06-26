@@ -124,6 +124,7 @@ function collectTuples(): Tuple[] {
       }
 
       for (const stat of section.stats) {
+        if (!stat.query) continue // static stat card; no distribution to fetch
         for (const extra of cohortExtras) addQuery(stat.query, extra)
       }
 

@@ -21668,6 +21668,43 @@
         }
       ],
       "respondentCount": 585
+    },
+    "2026|databases|single|": {
+      "rows": [
+        {
+          "label": "Supabase",
+          "count": 1342
+        },
+        {
+          "label": "PostgreSQL",
+          "count": 603
+        },
+        {
+          "label": "Other",
+          "count": 164
+        },
+        {
+          "label": "Redis",
+          "count": 164
+        },
+        {
+          "label": "MySQL",
+          "count": 137
+        },
+        {
+          "label": "Firebase",
+          "count": 137
+        },
+        {
+          "label": "SQLite",
+          "count": 110
+        },
+        {
+          "label": "MongoDB",
+          "count": 110
+        }
+      ],
+      "respondentCount": 2739
     }
   }
 }

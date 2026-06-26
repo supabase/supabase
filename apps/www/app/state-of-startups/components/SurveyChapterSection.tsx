@@ -12,8 +12,11 @@ import { SurveyChart } from './SurveyChart'
 import { SurveyCrossTabChart } from './SurveyCrossTabChart'
 import { SurveyPullQuote } from './SurveyPullQuote'
 import { SurveyPullQuoteGrid } from './SurveyPullQuoteGrid'
+import { SurveyRankedAnswersPair } from './SurveyRankedAnswersPair'
 import { SurveySectionBreak } from './SurveySectionBreak'
 import { SurveyStatCard } from './SurveyStatCard'
+import { SurveySummarizedAnswer } from './SurveySummarizedAnswer'
+import { SurveyWordCloud } from './SurveyWordCloud'
 import { YearProvider } from './year-context'
 import { YearToggle } from './YearToggle'
 
@@ -29,6 +32,9 @@ export function SurveyChapterSection({ section }: { section: SurveySection }) {
     pullQuotes,
     cohortToggle,
     callout,
+    wordCloud,
+    summarizedAnswer,
+    rankedAnswersPair,
   } = section
 
   const [cohortLabel, setCohortLabel] = useState(cohortToggle?.defaultLabel ?? '')
@@ -50,7 +56,8 @@ export function SurveyChapterSection({ section }: { section: SurveySection }) {
   const hasComparison = useMemo(() => {
     const probe = (col: string, agg: Aggregation, f?: SurveyFilters) =>
       getDistribution(2025, col, agg, f) !== undefined
-    if (stats.some((s) => probe(s.query.column, s.query.aggregation, s.query.filters))) return true
+    if (stats.some((s) => s.query && probe(s.query.column, s.query.aggregation, s.query.filters)))
+      return true
     return charts.some((c) => {
       if (c.kind === 'cross-tab') {
         return c.cohorts.some((co) =>
@@ -111,6 +118,7 @@ export function SurveyChapterSection({ section }: { section: SurveySection }) {
                   key={index}
                   label={stat.label}
                   query={stat.query}
+                  value={stat.value}
                   cohortFilter={cohortFilter}
                 />
               ))}
@@ -157,6 +165,19 @@ export function SurveyChapterSection({ section }: { section: SurveySection }) {
               />
             )
           })}
+
+          {rankedAnswersPair && rankedAnswersPair.length > 0 && (
+            <SurveyRankedAnswersPair rankedAnswersPair={rankedAnswersPair} />
+          )}
+
+          {wordCloud && <SurveyWordCloud label={wordCloud.label} answers={wordCloud.words} />}
+
+          {summarizedAnswer && (
+            <SurveySummarizedAnswer
+              label={summarizedAnswer.label}
+              answers={summarizedAnswer.answers}
+            />
+          )}
 
           {callout && <SectionCallout {...callout} />}
         </div>

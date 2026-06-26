@@ -32,7 +32,9 @@ export interface StatQuery {
 
 export interface SurveyStat {
   label: string
-  query: StatQuery
+  query?: StatQuery
+  /** Static percent to display as-is (for derived/combined figures). */
+  value?: number
 }
 
 export interface CompareStat {
@@ -126,6 +128,16 @@ export interface SectionCallout {
   external?: boolean
 }
 
+export interface SurveyWordCloudData {
+  label: string
+  words: { text: string; count: number }[]
+}
+
+export interface SurveySummarizedAnswerData {
+  label: string
+  answers: string[]
+}
+
 export interface SurveySection {
   id: string
   eyebrow: string
@@ -137,6 +149,9 @@ export interface SurveySection {
   pullQuotes?: SurveyPullQuote[]
   cohortToggle?: CohortToggleConfig
   callout?: SectionCallout
+  wordCloud?: SurveyWordCloudData
+  summarizedAnswer?: SurveySummarizedAnswerData
+  rankedAnswersPair?: { label: string; answers: string[] }[]
 }
 
 export interface SurveyChapter {
@@ -144,6 +159,7 @@ export interface SurveyChapter {
   title: string
   description: string
   pullQuote?: SurveyPullQuote
+  pullQuoteCarousel?: { quote: string; author: string; authorPosition?: string; label?: string }[]
   sections: SurveySection[]
 }
 
@@ -158,6 +174,10 @@ const stat = (
   target: string | string[],
   filters?: SurveyFilters
 ): SurveyStat => ({ label, query: { column, aggregation, target, filters } })
+
+/** A stat card with a hardcoded percent (for derived/combined figures that do
+ *  not map to a single survey column). */
+const staticStat = (label: string, value: number): SurveyStat => ({ label, value })
 
 const newStat = (
   label: string,
@@ -263,8 +283,8 @@ const stateOfStartupsData = {
 
   pageChapters: [
     {
-      shortTitle: 'Who is building',
-      title: 'The founder changed shape.',
+      shortTitle: 'Founder and Company',
+      title: 'Who’s Building Startups',
       description:
         'The respondent base got older, more European, more solo, and less self-described-technical. Experienced operators with AI in their pocket are starting companies again.',
       sections: [
@@ -369,14 +389,14 @@ const stateOfStartupsData = {
       shortTitle: 'The Anthropic generation',
       title: 'One company swept the tooling layer.',
       description:
-        'Claude Code became the most-named must-have dev tool. Claude paid subscriptions nearly doubled. Anthropic overtook OpenAI on the model-provider question. The Anthropic Agent SDK leads SDK adoption. This is the largest single-year re-ordering in any category in the survey.',
+        'Claude Code became the most-named must-have dev tool. Claude paid subscriptions nearly doubled. Anthropic overtook OpenAI on the model-provider question. The Anthropic Agent SDK leads SDK adoption.',
       sections: [
         {
           id: 'coding-tools',
           eyebrow: 'Must-have dev tools',
           title: 'Claude Code eclipsed everything else.',
           description:
-            'Claude Code went from 1% in 2025 to 62% in 2026 (+61pp). Cursor dropped 19 points. v0, Bolt, and Windsurf each lost 6-9 points. VS Code held flat. Antigravity appeared for the first time and took the 4th spot in its debut year.',
+            'Cursor dropped 19%. v0, Bolt, and Windsurf each lost 6–9%. VS Code held flat. Antigravity appeared for the first time and took the 4th spot in its debut year.',
           pullQuote: {
             quote:
               'Claude models in Claude code and Cursor. Supabase MCP has also been a game changer',
@@ -395,6 +415,41 @@ const stateOfStartupsData = {
               maxBars: 10,
             },
           ],
+          wordCloud: {
+            label: 'Must-have developer tools by keyword frequency',
+            words: [
+              { text: 'claude', count: 512 },
+              { text: 'code', count: 420 },
+              { text: 'cursor', count: 315 },
+              { text: 'supabase', count: 302 },
+              { text: 'github', count: 272 },
+              { text: 'vscode', count: 160 },
+              { text: 'docker', count: 114 },
+              { text: 'git', count: 113 },
+              { text: 'studio', count: 112 },
+              { text: 'chatgpt', count: 92 },
+              { text: 'postman', count: 89 },
+              { text: 'copilot', count: 88 },
+              { text: 'lovable', count: 83 },
+              { text: 'visual', count: 76 },
+              { text: 'vercel', count: 71 },
+              { text: 'react', count: 70 },
+              { text: 'figma', count: 68 },
+              { text: 'ide', count: 58 },
+              { text: 'windsurf', count: 51 },
+              { text: 'backend', count: 44 },
+              { text: 'api', count: 40 },
+              { text: 'gemini', count: 39 },
+              { text: 'google', count: 37 },
+              { text: 'testing', count: 36 },
+              { text: 'tailwind', count: 35 },
+              { text: 'chrome', count: 34 },
+              { text: 'typescript', count: 33 },
+              { text: 'control', count: 33 },
+              { text: 'python', count: 32 },
+              { text: 'antigravity', count: 28 },
+            ],
+          },
         },
         {
           id: 'paid-subs',
@@ -440,7 +495,7 @@ const stateOfStartupsData = {
     },
     {
       shortTitle: 'AI-written code',
-      title: 'AI-generated code is the new normal.',
+      title: 'AI-generated code is the median experience.',
       description:
         '62% of startups have more than half their codebase written by AI. 40% are at 76 to 100%. Only 2% are at zero. Older founders use it more heavily than younger ones, and non-technical founders more than technical ones.',
       sections: [
@@ -449,7 +504,7 @@ const stateOfStartupsData = {
           eyebrow: 'Share of codebase',
           title: '40% of respondents have more than three-quarters of their code AI-generated.',
           description:
-            'This question was new in 2026. Among non-technical founders, the 76-to-100% share rises to 54%. Among 50-to-59-year-olds it rises to 60%. Flip the age cohort toggle to see it climb with age.',
+            'Among non-technical founders, the 76-to-100% share rises to 54%. Among 50-to-59-year-olds it rises to 60%. Flip the age cohort toggle to see it climb with age.',
           pullQuote: {
             quote:
               'It has made entirely efficient the most menial coding tasks, elevating the developer focus to matters of design and architecture.',
@@ -475,6 +530,21 @@ const stateOfStartupsData = {
               aggregation: 'single',
             },
           ],
+          summarizedAnswer: {
+            label: 'How AI is changing the way startups build',
+            answers: [
+              'Menial coding tasks handed off entirely',
+              'Founders focused on design and architecture',
+              'Non-technical founders shipping production code',
+              'Docs and tests written alongside features',
+              'Faster iteration on product-market fit',
+              'Smaller teams doing the work of larger ones',
+              'Prototypes in hours instead of weeks',
+              'Refactors and migrations that used to be deferred',
+              'More confidence picking up unfamiliar stacks',
+              'Solo founders competing with funded teams',
+            ],
+          },
           cohortToggle: {
             eyebrow: 'Age cohort',
             key: 'person_age',
@@ -547,28 +617,28 @@ const stateOfStartupsData = {
       shortTitle: 'Supabase deepens',
       title: 'The stack consolidated.',
       description:
-        'Supabase gained ground as a primary database, landed strong in its first year as an auth provider, and Postgres became the default analytics store. AWS, GCP, and Azure all lost share to Supabase, Vercel, and Cloudflare. The frontend layer is diversifying fast.',
+        'Supabase gained ground as a primary database, and combined with Postgres, it’s clear what platform startups are betting on. Hyperscalers lost share. And the frontend layer is diversifying fast.',
       sections: [
         {
           id: 'databases',
           eyebrow: 'Primary database',
-          title: 'Supabase went from 75% to 80%.',
+          title: '80% choose some form of Postgres.',
           description:
-            'Every legacy NoSQL option lost share: MongoDB dropped 5%, MySQL 3%, Firebase 2%. The data can be noisy. Postgres implementations, such as Supabase, are reported inconsistently by respondents. Some pick Postgres, some pick Supabase, some pick both.',
+            'Postgres went from 76% to 80%. Every legacy NoSQL option lost share: MongoDB dropped 5%, MySQL 3%, Firebase 2%. Neon, DynamoDB, and Convex appeared as options for the first time and took small but measurable shares. The data can be noisy: Postgres implementations, such as Supabase, are reported inconsistently by respondents. Some pick Postgres, some pick Supabase, some pick both.',
           pullQuote: {
             quote: 'No hand written code anymore. We are building around AI coding agents.',
             author: 'Anonymous respondent in the San Francisco Bay Area',
           },
           stats: [
-            stat('use Supabase as a database', 'databases', 'multi', 'Supabase'),
-            stat('use MongoDB', 'databases', 'multi', 'MongoDB'),
-            stat('use MySQL', 'databases', 'multi', 'MySQL'),
+            staticStat('Startups using Postgres as a database', 80),
+            staticStat('Startups with Node.js in their backend stack', 60),
+            staticStat('Startups with a JavaScript framework in their frontend stack', 83),
           ],
           charts: [
             {
               title: 'Which databases are your startup using?',
               column: 'databases',
-              aggregation: 'multi',
+              aggregation: 'single',
               maxBars: 10,
             },
           ],
@@ -652,16 +722,7 @@ const stateOfStartupsData = {
           title: '52% of respondents are building agents.',
           description:
             'Agent-building share is statistically flat year over year. The "not sure" cohort shrank, which means undecided builders are making up their minds and shipping. Agents are also getting more sophisticated and handling workflow and data analysis, not just customer support.',
-          stats: [
-            stat(
-              'are building or planning to build AI agents',
-              'building_ai_agents',
-              'single',
-              'Yes'
-            ),
-            stat('are not building AI agents', 'building_ai_agents', 'single', 'No'),
-            stat('are undecided about AI agents', 'building_ai_agents', 'single', 'Not sure yet'),
-          ],
+          stats: [],
           charts: [
             {
               title: 'Are you building or planning to build AI agents?',
@@ -675,6 +736,21 @@ const stateOfStartupsData = {
               maxBars: 10,
             },
           ],
+          summarizedAnswer: {
+            label: 'Most common AI agent use cases',
+            answers: [
+              'Workflow and process automation',
+              'Data analysis and reporting',
+              'Customer support triage',
+              'Sales outreach and lead qualification',
+              'Onboarding and activation flows',
+              'Content generation and summarization',
+              'Internal knowledge search',
+              'Developer productivity and code review',
+              'Scheduling and meeting assistance',
+              'Personalization and recommendations',
+            ],
+          },
         },
         {
           id: 'multi-agent',
@@ -819,14 +895,7 @@ const stateOfStartupsData = {
             stat('use custom-built dashboards', 'growth_tools', 'multi', 'Custom-built dashboards'),
             stat('use Google Analytics', 'growth_tools', 'multi', 'Google Analytics'),
           ],
-          charts: [
-            {
-              title: 'What tools does your startup use to track growth and conversions?',
-              column: 'growth_tools',
-              aggregation: 'multi',
-              maxBars: 10,
-            },
-          ],
+          charts: [],
         },
       ],
     },
@@ -893,13 +962,7 @@ const stateOfStartupsData = {
             ]),
             stat('use a product-led growth motion', 'market_model', 'multi', 'Product-led growth'),
           ],
-          charts: [
-            {
-              title: 'Who is primarily responsible for sales?',
-              column: 'sales_primary_responsible',
-              aggregation: 'single',
-            },
-          ],
+          charts: [],
         },
         {
           id: 'pricing-settling',
@@ -912,14 +975,7 @@ const stateOfStartupsData = {
             stat('use usage-based pricing', 'pricing', 'multi', 'Usage-based pricing'),
             stat('are still experimenting with pricing', 'pricing', 'multi', 'Still experimenting'),
           ],
-          charts: [
-            {
-              title: 'How do you price your product?',
-              column: 'pricing',
-              aggregation: 'multi',
-              maxBars: 10,
-            },
-          ],
+          charts: [],
         },
       ],
     },
@@ -1082,6 +1138,16 @@ const stateOfStartupsData = {
               maxBars: 10,
             },
           ],
+          rankedAnswersPair: [
+            {
+              label: 'Top podcasts listened to',
+              answers: ['The Diary of a CEO', 'Founders', 'My First Million'],
+            },
+            {
+              label: 'Top newsletters subscribed to',
+              answers: ['TLDR', 'Lenny’s Newsletter', 'The Pragmatic Engineer'],
+            },
+          ],
         },
       ],
     },
@@ -1090,38 +1156,42 @@ const stateOfStartupsData = {
       title: 'Technical complexity is handled. New fears took its place.',
       description:
         '"Technical complexity" as the largest business challenge fell from 24% to 11%, the biggest single movement in the survey. AI ate the hard parts of shipping. What replaced it: burn out, AI-competition fear, runway anxiety. Optimism is mostly flat. Engineers less so.',
+      pullQuoteCarousel: [
+        {
+          label: 'Burn out',
+          quote: 'Dealing with burn out. I have so much work to do and I feel so overwhelmed.',
+          author: 'Anonymous respondent',
+          authorPosition: 'Europe',
+        },
+        {
+          label: 'Pace of change',
+          quote:
+            'The fast pace of AI advancement, the feeling that anything I build will be outdated in a month.',
+          author: 'Anonymous respondent',
+          authorPosition: 'Asia',
+        },
+        {
+          label: 'Competition',
+          quote:
+            'The environment is very competitive as everyone can now vibe code and everyone is extra driven to capture opportunity, making everyone have to work harder to keep up.',
+          author: 'Anonymous respondent',
+          authorPosition: 'San Francisco Bay Area',
+        },
+        {
+          label: 'Runway',
+          quote:
+            'Full time work taking up too much of our time, but little runway has us scared to quit and focus on the startup.',
+          author: 'Anonymous respondent',
+          authorPosition: 'North America',
+        },
+      ],
       sections: [
         {
           id: 'challenges',
           eyebrow: 'Biggest challenge',
-          title: 'Technical complexity fell 13 points.',
+          title: 'Technical complexity fell 12 points.',
           description:
             'The largest year-over-year shift in any single category. Three new challenge options came online: burn out, AI competition, runway anxiety. Together they absorb roughly the same share that used to pick technical complexity. Among 1-10 person teams, burn out has already overtaken technical complexity as the second-biggest challenge.',
-          pullQuotes: [
-            {
-              theme: 'Burn out',
-              quote: 'Dealing with burn out. I have so much work to do and I feel so overwhelmed',
-              author: 'Anonymous respondent in Europe',
-            },
-            {
-              theme: 'Pace of change',
-              quote:
-                'The fast pace of AI advancement, the feeling that anything I build will be outdated in a month.',
-              author: 'Anonymous respondent in Asia',
-            },
-            {
-              theme: 'Competition',
-              quote:
-                'The environment is very competitive as every can now vibe code and everyone is extra driven to capture opportunity, making everyone have to work harder to keep up.',
-              author: 'Anonymous respondent in the San Francisco Bay Area',
-            },
-            {
-              theme: 'Runway',
-              quote:
-                'Full time work taking up too much of our time, but little runway has us scared to quit and focus on the startup.',
-              author: 'Anonymous respondent in North America',
-            },
-          ],
           stats: [
             stat(
               'name customer acquisition as their biggest challenge',
@@ -1182,11 +1252,6 @@ const stateOfStartupsData = {
           title: 'The most optimistic founders are also the farthest from revenue.',
           description:
             'Optimism rises with AI codebase share: 49% of zero-AI founders feel optimistic about the world, 61% of heavy AI users do. Revenue runs the other way. 56% of zero-AI users are currently monetizing. 31% of heavy AI users are. One reading is that hands-on AI experience demystifies the technology and turns it into something founders feel they can wield. The heaviest AI users are also the most likely to be bootstrapped, the earliest in their lifecycle, and the least exposed to whether the market actually wants what they have built.',
-          pullQuote: {
-            quote:
-              'Speed of iteration is mind blowing. Even non-technical people can now translate creativity and ideas into tangible assets.',
-            author: 'Anonymous respondent in Europe',
-          },
           stats: [
             stat(
               'of heavy AI users feel optimistic about the world',

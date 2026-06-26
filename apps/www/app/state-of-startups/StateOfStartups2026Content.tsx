@@ -2,7 +2,6 @@
 
 import DefaultLayout from '~/components/Layouts/Default'
 import pageData from '~/data/surveys/state-of-startups-2026'
-import type { TopLineItem } from '~/data/surveys/state-of-startups-2026'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
@@ -13,9 +12,7 @@ import { ParticipantsCarousel } from './components/ParticipantsCarousel'
 import { StateOfStartupsAuroraHeader } from './components/StateOfStartupsAuroraHeader'
 import { SurveyChapter } from './components/SurveyChapter'
 import { SurveyChapterSection } from './components/SurveyChapterSection'
-import { SurveyCompareStatCard } from './components/SurveyCompareStatCard'
 import { SurveySectionBreak } from './components/SurveySectionBreak'
-import { SurveyStatCard } from './components/SurveyStatCard'
 import { YearProvider } from './components/year-context'
 
 interface FloatingTocProps {
@@ -245,8 +242,6 @@ export default function StateOfStartups2026Content() {
           <SurveySectionBreak />
         </section>
 
-        <TopLineBand />
-
         {pageData.pageChapters.map((chapter, chapterIndex) => (
           <SurveyChapter
             key={chapterIndex + 1}
@@ -255,6 +250,7 @@ export default function StateOfStartups2026Content() {
             title={chapter.title}
             description={chapter.description}
             pullQuote={chapter.pullQuote}
+            pullQuoteCarousel={chapter.pullQuoteCarousel}
           >
             {chapter.sections.map((section, sectionIndex) => (
               <SurveyChapterSection key={sectionIndex + 1} section={section} />
@@ -265,43 +261,6 @@ export default function StateOfStartups2026Content() {
         <ParticipantsList />
       </DefaultLayout>
     </YearProvider>
-  )
-}
-
-// Top-line findings band: the headline stats and comparisons that frame the
-// report, rendered above the chapters.
-function TopLineBand() {
-  const renderItem = (item: TopLineItem, i: number) =>
-    item.kind === 'compare' ? (
-      <SurveyCompareStatCard key={i} label={item.label} a={item.a} b={item.b} />
-    ) : (
-      <SurveyStatCard key={i} label={item.label} query={item.query} />
-    )
-
-  return (
-    <section className="border-b border-muted bg-alternative">
-      <div className="max-w-240 mx-auto md:border-x border-muted">
-        <header className="px-8 pt-10 pb-4 flex flex-col gap-2">
-          <p className="text-brand-link dark:text-brand text-sm font-mono uppercase tracking-widest">
-            {pageData.heroSection.eyebrow}
-          </p>
-          <h2 className="text-foreground text-3xl md:text-4xl tracking-tight text-balance">
-            The ground moved.
-          </h2>
-        </header>
-        <div className="flex flex-col xs:flex-row flex-wrap divide-y xs:divide-x xs:divide-y-0 divide-muted border-t border-muted">
-          {(pageData.topLineHero as TopLineItem[]).map(renderItem)}
-        </div>
-        <div className="px-8 pt-8 pb-2 border-t border-muted">
-          <p className="text-foreground-lighter text-sm font-mono uppercase tracking-widest">
-            {pageData.topLineSecondary.eyebrow}
-          </p>
-        </div>
-        <div className="flex flex-col xs:flex-row flex-wrap divide-y xs:divide-x xs:divide-y-0 divide-muted">
-          {(pageData.topLineSecondary.items as TopLineItem[]).map(renderItem)}
-        </div>
-      </div>
-    </section>
   )
 }
 
