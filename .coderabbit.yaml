@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+
+# Applies our internal engineering skills (.claude/skills/) as CodeRabbit review
+# guidelines. The skills are the single source of truth — they are consumed
+# directly, with no copy of their content elsewhere.
+#
+# `applyTo` decouples where a guideline file lives from the code it governs.
+# Without it, CodeRabbit scopes a guideline file to its own directory and below;
+# our skills live in .claude/skills/, which contains no code, so they would never
+# reach apps/studio. `applyTo` points them at the right paths instead.
+knowledge_base:
+  code_guidelines:
+    filePatterns:
+      # Studio code conventions — React/TS, UI patterns, composition, data fetching, errors
+      - files: '.claude/skills/{studio-best-practices,studio-ui-patterns,vercel-composition-patterns,studio-queries,studio-error-handling}/SKILL.md'
+        applyTo: 'apps/studio/**/*.{ts,tsx}'
+      # Studio unit / component test conventions
+      - files: '.claude/skills/{studio-testing,studio-mock-api-tests}/SKILL.md'
+        applyTo: 'apps/studio/**/*.test.{ts,tsx}'
+      # Studio end-to-end (Playwright) test conventions
+      - files: '.claude/skills/studio-e2e-tests/SKILL.md'
+        applyTo: 'e2e/studio/**/*.spec.ts'
