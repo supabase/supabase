@@ -554,7 +554,7 @@ const stateOfStartupsData = {
           eyebrow: 'Primary database',
           title: 'Supabase went from 75% to 80%.',
           description:
-            'Every legacy NoSQL option lost share: MongoDB dropped 5%, MySQL 3%, Firebase 2%.',
+            'Every legacy NoSQL option lost share: MongoDB dropped 5%, MySQL 3%, Firebase 2%. The data can be noisy. Postgres implementations, such as Supabase, are reported inconsistently by respondents. Some pick Postgres, some pick Supabase, some pick both.',
           pullQuote: {
             quote: 'No hand written code anymore. We are building around AI coding agents.',
             author: 'Anonymous respondent in the San Francisco Bay Area',
