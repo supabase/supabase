@@ -265,12 +265,18 @@ export const TableList = ({
           </Shortcut>
           <Popover>
             <PopoverTrigger asChild>
-              <Button
-                size="tiny"
-                variant={visibleTypes.length !== 5 ? 'default' : 'dashed'}
-                className="px-1"
-                icon={<Filter />}
-              />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="tiny"
+                    variant={visibleTypes.length !== 5 ? 'default' : 'dashed'}
+                    className="px-1"
+                    icon={<Filter />}
+                    aria-label="Filter"
+                  />
+                </TooltipTrigger>
+                <TooltipContent>Filter</TooltipContent>
+              </Tooltip>
             </PopoverTrigger>
             <PopoverContent className="p-0 w-56" side="bottom" align="center">
               <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
