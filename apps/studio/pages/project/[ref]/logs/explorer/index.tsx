@@ -69,11 +69,6 @@ const OTEL_PLACEHOLDER_QUERY =
 const otelSourceQuery = (source: string) =>
   `select\n  timestamp,\n  event_message,\n  log_attributes\nfrom logs\nwhere source = '${source}'\norder by timestamp desc\nlimit 100`
 
-// A query still written in the legacy BigQuery dialect, which the rewrite banner
-// offers to convert.
-const looksLikeBigQueryLogsQuery = (sql: string) =>
-  /\bcross\s+join\s+unnest\b/i.test(sql) || /\bmetadata\./i.test(sql)
-
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
   const monaco = useMonaco()
@@ -480,16 +475,17 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             templates={allTemplates.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
             warnings={warnings}
+            showRewriteAction={useOtelEndpoint && rewriteBannerDismissed}
+            isRewriting={isRewriting}
+            onRewrite={handleRewrite}
           />
-          {useOtelEndpoint &&
-            !rewriteBannerDismissed &&
-            looksLikeBigQueryLogsQuery(editorValue) && (
-              <LogsExplorerOtelBanner
-                isRewriting={isRewriting}
-                onRewrite={handleRewrite}
-                onDismiss={() => setRewriteBannerDismissed(true)}
-              />
-            )}
+          {useOtelEndpoint && !rewriteBannerDismissed && (
+            <LogsExplorerOtelBanner
+              isRewriting={isRewriting}
+              onRewrite={handleRewrite}
+              onDismiss={() => setRewriteBannerDismissed(true)}
+            />
+          )}
           <ShimmerLine active={isLoading} />
           {rewriteProposal ? (
             <div className="flex h-full flex-col">
