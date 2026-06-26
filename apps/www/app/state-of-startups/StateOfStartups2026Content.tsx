@@ -2,6 +2,7 @@
 
 import DefaultLayout from '~/components/Layouts/Default'
 import pageData from '~/data/surveys/state-of-startups-2026'
+import type { TopLineItem } from '~/data/surveys/state-of-startups-2026'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
@@ -10,14 +11,11 @@ import { Button, cn } from 'ui'
 
 import { ParticipantsCarousel } from './components/ParticipantsCarousel'
 import { StateOfStartupsAuroraHeader } from './components/StateOfStartupsAuroraHeader'
-import {
-  SurveyDataProvider,
-  type SurveyDataCache,
-  type SurveyStatCache,
-} from './components/survey-data-context'
 import { SurveyChapter } from './components/SurveyChapter'
 import { SurveyChapterSection } from './components/SurveyChapterSection'
+import { SurveyCompareStatCard } from './components/SurveyCompareStatCard'
 import { SurveySectionBreak } from './components/SurveySectionBreak'
+import { SurveyStatCard } from './components/SurveyStatCard'
 import { YearProvider } from './components/year-context'
 import { YearToggle } from './components/YearToggle'
 
@@ -121,13 +119,7 @@ function FloatingTableOfContents({
   )
 }
 
-export default function StateOfStartups2026Content({
-  preloadedData,
-  preloadedStats,
-}: {
-  preloadedData: SurveyDataCache
-  preloadedStats: SurveyStatCache
-}) {
+export default function StateOfStartups2026Content() {
   const [showFloatingToc, setShowFloatingToc] = useState(false)
   const [isTocOpen, setIsTocOpen] = useState(false)
   const [activeChapter, setActiveChapter] = useState(1)
@@ -200,105 +192,118 @@ export default function StateOfStartups2026Content({
 
   return (
     <YearProvider>
-      <SurveyDataProvider preloadedData={preloadedData} preloadedStats={preloadedStats}>
-        <DefaultLayout className="bg-alternative overflow-hidden">
-          <AnimatePresence>
-            {showFloatingToc && (
-              <motion.div
-                key="floating-controls"
-                className="fixed top-20 inset-x-0 z-50 pointer-events-none flex justify-center"
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
-              >
-                <motion.div layout className="flex items-start gap-2 pointer-events-auto">
-                  <FloatingTableOfContents
-                    tocRef={tocRef}
-                    isTocOpen={isTocOpen}
-                    setIsTocOpen={setIsTocOpen}
-                    activeChapter={activeChapter}
-                  />
-                  <YearToggle />
-                </motion.div>
+      <DefaultLayout className="bg-alternative overflow-hidden">
+        <AnimatePresence>
+          {showFloatingToc && (
+            <motion.div
+              key="floating-controls"
+              className="fixed top-20 inset-x-0 z-50 pointer-events-none flex justify-center"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+            >
+              <motion.div layout className="flex items-start gap-2 pointer-events-auto">
+                <FloatingTableOfContents
+                  tocRef={tocRef}
+                  isTocOpen={isTocOpen}
+                  setIsTocOpen={setIsTocOpen}
+                  activeChapter={activeChapter}
+                />
+                <YearToggle />
               </motion.div>
-            )}
-          </AnimatePresence>
-          {/* Intro section */}
-          <section ref={heroRef} className="w-full">
-            <StateOfStartupsAuroraHeader />
-            <SurveySectionBreak className="hidden md:block" />
-            <div className="grid grid-cols-1 md:grid-cols-3 max-w-240 mx-auto md:border-x border-muted">
-              {/* Intro text */}
-              <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground text-xl md:text-2xl text-balance">
-                <p>{pageData.heroSection.subheader}</p>
-                <p>{pageData.heroSection.cta}</p>
-              </div>
-
-              {/* Table of contents */}
-              <ol className="flex flex-col py-5">
-                {pageData.pageChapters.map((chapter, chapterIndex) => (
-                  <li key={chapterIndex + 1}>
-                    <Link
-                      href={`#chapter-${chapterIndex + 1}`}
-                      className="group flex flex-row gap-5 py-3 pl-7 pr-8 font-mono uppercase tracking-wide text-sm transition-all text-foreground-light hover:text-brand-link hover:bg-brand-300/25"
-                    >
-                      <span className="text-xs rounded-full bg-surface-75 border border-surface-200 group-hover:border-brand-500/40 w-5 h-5 flex items-center justify-center group-hover:bg-brand-600/5">
-                        {chapterIndex + 1}
-                      </span>{' '}
-                      {chapter.shortTitle}
-                    </Link>
-                  </li>
-                ))}
-              </ol>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        {/* Intro section */}
+        <section ref={heroRef} className="w-full">
+          <StateOfStartupsAuroraHeader />
+          <SurveySectionBreak className="hidden md:block" />
+          <div className="grid grid-cols-1 md:grid-cols-3 max-w-240 mx-auto md:border-x border-muted">
+            {/* Intro text */}
+            <div className="md:col-span-2 flex flex-col gap-4 px-8 py-10 border-b md:border-b-0 md:border-r border-muted text-foreground text-xl md:text-2xl text-balance">
+              <p>{pageData.heroSection.subheader}</p>
+              <p>{pageData.heroSection.cta}</p>
             </div>
 
-            <SurveySectionBreak />
-          </section>
-
-          {pageData.pageChapters.map((chapter, chapterIndex) => (
-            <SurveyChapter
-              key={chapterIndex + 1}
-              number={chapterIndex + 1}
-              shortTitle={chapter.shortTitle}
-              title={chapter.title}
-              description={chapter.description}
-              pullQuote={chapter.pullQuote}
-              pullQuoteCarousel={
-                (
-                  chapter as {
-                    pullQuoteCarousel?: Parameters<typeof SurveyChapter>[0]['pullQuoteCarousel']
-                  }
-                ).pullQuoteCarousel
-              }
-            >
-              {chapter.sections.map((section, sectionIndex) => (
-                <SurveyChapterSection
-                  key={sectionIndex + 1}
-                  title={section.title}
-                  description={section.description}
-                  stats={section.stats}
-                  charts={section.charts}
-                  wordCloud={section.wordCloud}
-                  summarizedAnswer={section.summarizedAnswer}
-                  rankedAnswersPair={section.rankedAnswersPair}
-                  pullQuote={
-                    (
-                      section as {
-                        pullQuote?: Parameters<typeof SurveyChapterSection>[0]['pullQuote']
-                      }
-                    ).pullQuote
-                  }
-                  newInYear={(section as { newInYear?: 2025 | 2026 }).newInYear}
-                />
+            {/* Table of contents */}
+            <ol className="flex flex-col py-5">
+              {pageData.pageChapters.map((chapter, chapterIndex) => (
+                <li key={chapterIndex + 1}>
+                  <Link
+                    href={`#chapter-${chapterIndex + 1}`}
+                    className="group flex flex-row gap-5 py-3 pl-7 pr-8 font-mono uppercase tracking-wide text-sm transition-all text-foreground-light hover:text-brand-link hover:bg-brand-300/25"
+                  >
+                    <span className="text-xs rounded-full bg-surface-75 border border-surface-200 group-hover:border-brand-500/40 w-5 h-5 flex items-center justify-center group-hover:bg-brand-600/5">
+                      {chapterIndex + 1}
+                    </span>{' '}
+                    {chapter.shortTitle}
+                  </Link>
+                </li>
               ))}
-            </SurveyChapter>
-          ))}
-          <CTABanner ref={ctaBannerRef} />
-          <ParticipantsList />
-        </DefaultLayout>
-      </SurveyDataProvider>
+            </ol>
+          </div>
+
+          <SurveySectionBreak />
+        </section>
+
+        <TopLineBand />
+
+        {pageData.pageChapters.map((chapter, chapterIndex) => (
+          <SurveyChapter
+            key={chapterIndex + 1}
+            number={chapterIndex + 1}
+            shortTitle={chapter.shortTitle}
+            title={chapter.title}
+            description={chapter.description}
+            pullQuote={chapter.pullQuote}
+          >
+            {chapter.sections.map((section, sectionIndex) => (
+              <SurveyChapterSection key={sectionIndex + 1} section={section} />
+            ))}
+          </SurveyChapter>
+        ))}
+        <CTABanner ref={ctaBannerRef} />
+        <ParticipantsList />
+      </DefaultLayout>
     </YearProvider>
+  )
+}
+
+// Top-line findings band: the headline stats and comparisons that frame the
+// report, rendered above the chapters.
+function TopLineBand() {
+  const renderItem = (item: TopLineItem, i: number) =>
+    item.kind === 'compare' ? (
+      <SurveyCompareStatCard key={i} label={item.label} a={item.a} b={item.b} />
+    ) : (
+      <SurveyStatCard key={i} label={item.label} query={item.query} />
+    )
+
+  return (
+    <section className="border-b border-muted bg-alternative">
+      <div className="max-w-240 mx-auto md:border-x border-muted">
+        <header className="px-8 pt-10 pb-4 flex flex-col gap-2">
+          <p className="text-brand-link dark:text-brand text-sm font-mono uppercase tracking-widest">
+            {pageData.heroSection.eyebrow}
+          </p>
+          <h2 className="text-foreground text-3xl md:text-4xl tracking-tight text-balance">
+            The ground moved.
+          </h2>
+        </header>
+        <div className="flex flex-col xs:flex-row flex-wrap divide-y xs:divide-x xs:divide-y-0 divide-muted border-t border-muted">
+          {(pageData.topLineHero as TopLineItem[]).map(renderItem)}
+        </div>
+        <div className="px-8 pt-8 pb-2 border-t border-muted">
+          <p className="text-foreground-lighter text-sm font-mono uppercase tracking-widest">
+            {pageData.topLineSecondary.eyebrow}
+          </p>
+        </div>
+        <div className="flex flex-col xs:flex-row flex-wrap divide-y xs:divide-x xs:divide-y-0 divide-muted">
+          {(pageData.topLineSecondary.items as TopLineItem[]).map(renderItem)}
+        </div>
+      </div>
+    </section>
   )
 }
 

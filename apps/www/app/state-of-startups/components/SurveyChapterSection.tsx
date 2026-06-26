@@ -1,170 +1,134 @@
 'use client'
 
-import { useAccent } from './accent-context'
-import { AcceleratorParticipationChart } from './charts/AcceleratorParticipationChart'
-import { AICodebasePercentChart } from './charts/AICodebasePercentChart'
-import { AICodingToolsChart } from './charts/AICodingToolsChart'
-import { AIModelsChart } from './charts/AIModelsChart'
-import { AuthProviderChart } from './charts/AuthProviderChart'
-import { BiggestChallengeChart } from './charts/BiggestChallengeChart'
-import { BuildingAgentsChart } from './charts/BuildingAgentsChart'
-import { DatabasesChart } from './charts/DatabasesChart'
-import { FundingStageChart } from './charts/FundingStageChart'
-import { IndustryChart } from './charts/IndustryChart'
-import { InitialPayingCustomersChart } from './charts/InitialPayingCustomersChart'
-import { LocationChart } from './charts/LocationChart'
-import { MCPAdoptionChart } from './charts/MCPAdoptionChart'
-import { NewIdeasChart } from './charts/NewIdeasChart'
-import { PaidSubscriptionsChart } from './charts/PaidSubscriptionsChart'
-import { RegularSocialMediaUseChart } from './charts/RegularSocialMediaUseChart'
-import { RoleChart } from './charts/RoleChart'
-import { SalesToolsChart } from './charts/SalesToolsChart'
-import { WorldOutlookChart } from './charts/WorldOutlookChart'
+import type { SurveySection } from '~/data/surveys/state-of-startups-2026'
+import { useMemo, useState } from 'react'
+
+import type { SurveyFilters } from '../lib/survey-keys'
+import { CohortToggle } from './CohortToggle'
+import { SectionCallout } from './SectionCallout'
+import { SurveyChannelMixChart } from './SurveyChannelMixChart'
+import { SurveyChart } from './SurveyChart'
+import { SurveyCrossTabChart } from './SurveyCrossTabChart'
 import { SurveyPullQuote } from './SurveyPullQuote'
-import { SurveyRankedAnswersPair } from './SurveyRankedAnswersPair'
+import { SurveyPullQuoteGrid } from './SurveyPullQuoteGrid'
 import { SurveySectionBreak } from './SurveySectionBreak'
-import { SurveyStatCard, type SurveyStatSource } from './SurveyStatCard'
-import { SurveySummarizedAnswer } from './SurveySummarizedAnswer'
-import { SurveyWordCloud } from './SurveyWordCloud'
-import { useYear, type SurveyYear } from './year-context'
+import { SurveyStatCard } from './SurveyStatCard'
 
-interface SurveyChapterSectionProps {
-  title: string
-  description: string
-  stats?: Array<{ percent: number; label: string; source?: SurveyStatSource }>
-  charts?: string[]
+export function SurveyChapterSection({ section }: { section: SurveySection }) {
+  const {
+    id,
+    eyebrow,
+    title,
+    description,
+    stats,
+    charts,
+    pullQuote,
+    pullQuotes,
+    cohortToggle,
+    callout,
+  } = section
 
-  wordCloud?: {
-    label: string
-    words: { text: string; count: number }[]
-  }
-  summarizedAnswer?: {
-    label: string
-    answers: string[]
-  }
-  rankedAnswersPair?: Array<{ label: string; answers: string[] }>
-  pullQuote?: {
-    quote: string
-    author: string
-    authorPosition?: string
-    authorAvatar?: string
-  }
-  /**
-   * Set when an entire section's data first appeared in a given survey year.
-   * If the user toggles the page to an earlier year, the section body is
-   * replaced with a "Not available in <prior year>" placeholder while the
-   * title and description still render.
-   */
-  newInYear?: SurveyYear
-  children?: React.ReactNode
-}
+  const [cohortLabel, setCohortLabel] = useState(cohortToggle?.defaultLabel ?? '')
 
-export function SurveyChapterSection({
-  title,
-  description,
-  stats,
-  charts,
-  wordCloud,
-  summarizedAnswer,
-  rankedAnswersPair,
-  pullQuote,
-  newInYear,
-  children,
-}: SurveyChapterSectionProps) {
-  const accent = useAccent()
-  const { year } = useYear()
-  const isAvailableForYear = !newInYear || year >= newInYear
+  // The active cohort toggle option merges its filter into every stat and bar
+  // chart in the section. Cross-tab and channel-mix carry their own cohorts.
+  const cohortFilter: SurveyFilters | undefined = useMemo(() => {
+    if (!cohortToggle) return undefined
+    const option = cohortToggle.options.find((o) => o.label === cohortLabel)
+    if (!option || option.filter === null) return undefined
+    return { [cohortToggle.key]: option.filter }
+  }, [cohortToggle, cohortLabel])
 
   const eyebrowColor = 'text-brand-link dark:text-brand'
 
-  const chartComponents = {
-    AcceleratorParticipationChart,
-    AICodebasePercentChart,
-    AICodingToolsChart,
-    AIModelsChart,
-    AuthProviderChart,
-    BiggestChallengeChart,
-    BuildingAgentsChart,
-    DatabasesChart,
-    FundingStageChart,
-    IndustryChart,
-    InitialPayingCustomersChart,
-    LocationChart,
-    MCPAdoptionChart,
-    NewIdeasChart,
-    PaidSubscriptionsChart,
-    RegularSocialMediaUseChart,
-    RoleChart,
-    SalesToolsChart,
-    WorldOutlookChart,
-  }
-
   return (
-    <div id={title.toLowerCase().replace(/\s+/g, '-')} className="">
+    <div id={id} className="">
       <div className="max-w-240 mx-auto flex flex-col md:border-x border-muted">
         <header className="grid grid-cols-1 md:grid-cols-3 text-balance">
-          <h3
-            className={`pt-8 pb-4 px-8 md:border-r border-muted font-mono uppercase tracking-wider text-sm ${eyebrowColor}`}
-          >
-            {title}
-          </h3>
+          <div className="pt-8 pb-4 px-8 md:border-r border-muted flex flex-col gap-2">
+            <h3 className={`font-mono uppercase tracking-wider text-sm ${eyebrowColor}`}>
+              {eyebrow}
+            </h3>
+            <p className="text-foreground text-lg tracking-tight">{title}</p>
+          </div>
           <p className="pb-8 md:pt-8 px-8 md:col-span-2 text-foreground-light text-lg md:text-xl leading-relaxed">
             {description}
           </p>
         </header>
 
-        {isAvailableForYear ? (
-          <>
-            {stats && (
-              <aside className="border-t border-muted flex flex-col xs:flex-row flex-wrap divide-y xs:divide-x xs:divide-y-0 divide-muted">
-                {stats.map((stat, index) => (
-                  <SurveyStatCard
-                    key={index}
-                    percent={stat.percent}
-                    label={stat.label}
-                    source={stat.source}
-                  />
-                ))}
-              </aside>
-            )}
-
-            {charts?.map((chartName, index) => {
-              const ChartComponent = chartComponents[chartName as keyof typeof chartComponents]
-              return ChartComponent ? <ChartComponent key={index} /> : null
-            })}
-
-            {rankedAnswersPair && <SurveyRankedAnswersPair rankedAnswersPair={rankedAnswersPair} />}
-
-            {wordCloud && <SurveyWordCloud label={wordCloud.label} answers={wordCloud.words} />}
-
-            {summarizedAnswer && (
-              <SurveySummarizedAnswer
-                label={summarizedAnswer.label}
-                answers={summarizedAnswer.answers}
-              />
-            )}
-
-            {children}
-          </>
-        ) : (
-          <div className="border-t border-muted px-8 py-16 flex flex-col items-center justify-center gap-2 text-center">
-            <p className="text-foreground-light text-balance">Not available in {year}.</p>
-            <p className="text-foreground-lighter text-sm text-balance">
-              This question was added to the {newInYear} survey. Switch the year toggle to{' '}
-              {newInYear} to view.
-            </p>
-          </div>
+        {cohortToggle && (
+          <CohortToggle
+            eyebrow={cohortToggle.eyebrow}
+            options={cohortToggle.options}
+            value={cohortLabel}
+            onValueChange={setCohortLabel}
+          />
         )}
+
+        {stats.length > 0 && (
+          <aside className="border-t border-muted flex flex-col xs:flex-row flex-wrap divide-y xs:divide-x xs:divide-y-0 divide-muted">
+            {stats.map((stat, index) => (
+              <SurveyStatCard
+                key={index}
+                label={stat.label}
+                query={stat.query}
+                cohortFilter={cohortFilter}
+              />
+            ))}
+          </aside>
+        )}
+
+        {charts.map((chart, index) => {
+          if (chart.kind === 'cross-tab') {
+            return (
+              <SurveyCrossTabChart
+                key={index}
+                title={chart.title}
+                eyebrow={chart.eyebrow}
+                axisColumn={chart.axisColumn}
+                cohorts={chart.cohorts}
+                series={chart.series}
+              />
+            )
+          }
+          if (chart.kind === 'channel-mix') {
+            return (
+              <SurveyChannelMixChart
+                key={index}
+                title={chart.title}
+                eyebrow={chart.eyebrow}
+                column={chart.column}
+                cohortColumn={chart.cohortColumn}
+                cohorts={chart.cohorts}
+                rows={chart.rows}
+              />
+            )
+          }
+          return (
+            <SurveyChart
+              key={index}
+              title={chart.title}
+              column={chart.column}
+              aggregation={chart.aggregation}
+              filters={chart.filters}
+              cohortFilter={cohortFilter}
+              maxBars={chart.maxBars}
+            />
+          )
+        })}
+
+        {callout && <SectionCallout {...callout} />}
       </div>
 
-      {pullQuote && isAvailableForYear && (
+      {pullQuote && (
         <SurveyPullQuote
           quote={pullQuote.quote}
           author={pullQuote.author}
           authorPosition={pullQuote.authorPosition}
-          authorAvatar={pullQuote.authorAvatar}
         />
       )}
+
+      {pullQuotes && pullQuotes.length > 0 && <SurveyPullQuoteGrid quotes={pullQuotes} />}
 
       <SurveySectionBreak />
     </div>
