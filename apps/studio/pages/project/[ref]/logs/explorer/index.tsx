@@ -88,9 +88,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const editorRef = useRef<editor.IStandaloneCodeEditor>(null)
   const [editorId] = useState<string>(uuidv4())
-  // Bumped to force a fresh Monaco model (it caches by path) when we replace the
-  // editor content outside of typing, e.g. accepting a rewrite.
-  const [editorResetKey, setEditorResetKey] = useState<number>(0)
   const { search, setSearch, timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
   const defaultHelper = useMemo(() => getDefaultHelper(EXPLORER_DATEPICKER_HELPERS), [])
   const initialDatePickerValue = useMemo<DatePickerValue>(() => {
@@ -250,10 +247,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const acceptRewrite = () => {
     if (!rewriteProposal) return
-    // The editor is unmounted while the diff is shown, and Monaco caches the model
-    // by path, so set the value via state and remount with a fresh model path.
+    // The editor is controlled by `editorValue`, so updating state applies the
+    // rewrite even though the editor is remounting from the diff view.
     setEditorValue(rewriteProposal.modified)
-    setEditorResetKey((key) => key + 1)
     setRewriteProposal(null)
     toast.success('Applied the ClickHouse rewrite')
   }
@@ -506,13 +502,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             </div>
           ) : (
             <CodeEditor
-              // Ensure we reset the editor to the query content whenever the selected
-              // query changes or a rewrite is applied (new model path).
-              key={`${queryId}-${editorResetKey}`}
-              id={`${editorId}-${editorResetKey}`}
+              // Ensure we reset the editor to the query content whenever the selected query changes
+              key={queryId}
+              id={editorId}
               editorRef={editorRef}
               language="pgsql"
-              defaultValue={editorValue}
+              value={editorValue}
               onInputChange={(v) => setEditorValue(v || '')}
               actions={{ runQuery: { enabled: true, callback: handleRun } }}
             />
