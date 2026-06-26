@@ -90,7 +90,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
       <div className="w-full mb-0 flex lg:items-center justify-between gap-4 py-4 px-6 lg:flex-row flex-col">
         <h3 className="text-foreground text-xl prose">Query Performance</h3>
         <div className="flex items-center gap-2 flex-wrap">
-          <DocsButton href={OBSERVABILITY_DOCS_HREFS.queryPerformance} />
+          <DocsButton href={OBSERVABILITY_DOCS_HREFS.queryPerformance} topic="Query Performance" />
           <DatabaseSelector />
         </div>
       </div>

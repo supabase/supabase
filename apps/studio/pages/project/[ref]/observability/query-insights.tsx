@@ -32,7 +32,7 @@ const QueryInsightsReport: NextPageWithLayout = () => {
       <div className="w-full mb-0 flex lg:items-center justify-between gap-4 py-2 px-6 lg:flex-row flex-col border-b lg:h-[48px]">
         <h3 className="text-foreground text-xl prose">Query Insights</h3>
         <div className="flex items-center gap-2 flex-wrap">
-          <DocsButton href={OBSERVABILITY_DOCS_HREFS.queryInsights} />
+          <DocsButton href={OBSERVABILITY_DOCS_HREFS.queryInsights} topic="Query Insights" />
           <DatabaseSelector />
           <Select
             value={datePickerValue.isHelper ? datePickerValue.text : undefined}

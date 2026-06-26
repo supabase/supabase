@@ -20,7 +20,7 @@ const ReportHeader = ({ title, showDatabaseSelector, docsHref }: ReportHeaderPro
       <h1>{title}</h1>
       {(docsHref || showDatabaseSelector) && (
         <div className="flex items-center gap-2 flex-wrap">
-          {docsHref && <DocsButton href={docsHref} />}
+          {docsHref && <DocsButton href={docsHref} topic={title} />}
           {showDatabaseSelector && (
             <DatabaseSelector
               onSelectId={(db) => {

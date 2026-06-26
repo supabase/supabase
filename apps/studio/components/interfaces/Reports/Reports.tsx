@@ -452,7 +452,10 @@ const Reports = () => {
                 Add block
               </ButtonTooltip>
             )}
-            <DocsButton href={OBSERVABILITY_DOCS_HREFS.customReport} />
+            <DocsButton
+              href={OBSERVABILITY_DOCS_HREFS.customReport}
+              topic={currentReport?.name ?? 'Custom report'}
+            />
             <DatabaseSelector />
           </div>
         </div>
