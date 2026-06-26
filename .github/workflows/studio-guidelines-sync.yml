@@ -1,0 +1,39 @@
+name: Studio Guidelines Sync
+
+on:
+  pull_request:
+    branches:
+      - 'master'
+    paths:
+      - '.claude/skills/**'
+      - 'apps/studio/AGENTS.md'
+      - 'scripts/sync-studio-guidelines.mjs'
+
+# Cancel old builds on new commit for same workflow + branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Check apps/studio/AGENTS.md is in sync
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            .claude/skills
+            apps/studio/AGENTS.md
+            scripts
+            .nvmrc
+      - name: Setup node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+      - name: Verify guidelines are up to date
+        run: node scripts/sync-studio-guidelines.mjs --check
