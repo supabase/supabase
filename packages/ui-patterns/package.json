@@ -78,6 +78,10 @@
       "import": "./src/CodeBlock/index.tsx",
       "types": "./src/CodeBlock/index.tsx"
     },
+    "./CollapsibleCardSection": {
+      "import": "./src/CollapsibleCardSection.tsx",
+      "types": "./src/CollapsibleCardSection.tsx"
+    },
     "./CommandMenu/api/Badges": {
       "import": "./src/CommandMenu/api/Badges.tsx",
       "types": "./src/CommandMenu/api/Badges.tsx"
@@ -309,6 +313,10 @@
     "./DataInputs/Input": {
       "import": "./src/DataInputs/Input.tsx",
       "types": "./src/DataInputs/Input.tsx"
+    },
+    "./DatePicker": {
+      "import": "./src/DatePicker/index.ts",
+      "types": "./src/DatePicker/index.ts"
     },
     "./Dialogs/ConfirmationModal": {
       "import": "./src/Dialogs/ConfirmationModal.tsx",
@@ -797,7 +805,7 @@
     "@std/toml": "jsr:^1.0.11",
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
-    "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-table": "catalog:",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

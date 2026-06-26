@@ -38,7 +38,7 @@ In practice, you can use either `NO ACTION` or `RESTRICT` depending on your need
 
 ## Example
 
-Let's further illustrate the difference with an example. We'll use the following data:
+To illustrate the difference, use the following example. We'll use the following data:
 
 `grandparent`
 
@@ -117,7 +117,7 @@ Even though the foreign key constraint between parent and grandparent is `CASCAD
 
 ### `NO ACTION`
 
-Let's change the child-father relationship to `NO ACTION`:
+Change the child-father relationship to `NO ACTION`:
 
 ```sql
 alter table child
@@ -157,7 +157,7 @@ ERROR: update or delete on table "parent" violates foreign key constraint "child
 DETAIL: Key (id)=(1) is still referenced from table "child".
 ```
 
-But, when we combine it with _other_ constraints, then any other constraints take precedence. For example, let's run the same but add a `mother` column that has a `CASCADE` delete:
+But, when we combine it with _other_ constraints, then any other constraints take precedence. For example, run the same scenario but add a `mother` column that has a `CASCADE` delete:
 
 ```sql
 alter table child
@@ -169,7 +169,7 @@ set mother = 2
 where id = 1;
 ```
 
-Then let's run a delete on the `grandparent` table:
+Then run a delete on the `grandparent` table:
 
 ```shell
 postgres=# delete from grandparent;

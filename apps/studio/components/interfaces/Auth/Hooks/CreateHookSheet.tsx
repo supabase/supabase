@@ -35,13 +35,13 @@ import { Hook, HOOK_DEFINITION_TITLE, HOOKS_DEFINITIONS } from './hooks.constant
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
 import { convertArgumentTypes } from '@/components/interfaces/Database/Functions/Functions.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { DocsButton } from '@/components/ui/DocsButton'
 import FunctionSelector from '@/components/ui/FunctionSelector'
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from '@/data/auth/auth-hooks-update-mutation'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from '@/lib/constants'
@@ -412,7 +412,10 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                               disabled={field.disabled}
                               filterFunction={(func) => {
                                 if (supportedReturnTypes.includes(func.return_type)) {
-                                  const { value } = convertArgumentTypes(func.argument_types)
+                                  const { value } = convertArgumentTypes({
+                                    type: func.type,
+                                    value: func.argument_types,
+                                  })
                                   if (value.length !== 1) return false
                                   return value[0].type === 'json' || value[0].type === 'jsonb'
                                 }
@@ -492,7 +495,7 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                           <div className="flex flex-row">
                             <Input {...field} className="rounded-r-none border-r-0" />
                             <Button
-                              type="default"
+                              variant="default"
                               size="small"
                               className="rounded-l-none text-xs"
                               onClick={() => {
@@ -517,18 +520,18 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
         <SheetFooter>
           {!isCreating && (
             <div className="flex-1">
-              <Button type="danger" onClick={() => onDelete()}>
+              <Button variant="danger" onClick={() => onDelete()}>
                 Delete hook
               </Button>
             </div>
           )}
 
-          <Button disabled={isUpdatingAuthHooks} type="default" onClick={confirmOnClose}>
+          <Button disabled={isUpdatingAuthHooks} variant="default" onClick={confirmOnClose}>
             Cancel
           </Button>
           <Button
             form={FORM_ID}
-            htmlType="submit"
+            type="submit"
             disabled={isUpdatingAuthHooks}
             loading={isUpdatingAuthHooks}
           >

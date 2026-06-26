@@ -1,6 +1,6 @@
 import { useMonaco } from '@monaco-editor/react'
 import { useLocalStorage } from '@uidotdev/usehooks'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import type { editor } from 'monaco-editor'
 import { useRouter } from 'next/router'
@@ -30,7 +30,7 @@ import { LogTable } from '@/components/interfaces/Settings/Logs/LogTable'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import LoadingOpacity from '@/components/ui/LoadingOpacity'
 import ShimmerLine from '@/components/ui/ShimmerLine'
 import { useContentQuery } from '@/data/content/content-query'
@@ -54,6 +54,9 @@ const LOCAL_PLACEHOLDER_QUERY =
 
 const PLATFORM_PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
+
+const OTEL_PLACEHOLDER_QUERY =
+  "select\n  timestamp,\n  event_message,\n  log_attributes\nfrom logs\nwhere source = 'edge_logs'\norder by timestamp desc\nlimit 5"
 
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
@@ -90,10 +93,14 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }, [timestampStart, timestampEnd, defaultHelper])
   const [datePickerValue, setDatePickerValue] = useState<DatePickerValue>(initialDatePickerValue)
 
+  const useOtelEndpoint = useFlag('otelLegacyLogs')
+
   const { logsDefaultQuery } = useCustomContent(['logs:default_query'])
-  const PLACEHOLDER_QUERY = IS_PLATFORM
-    ? (logsDefaultQuery ?? PLATFORM_PLACEHOLDER_QUERY)
-    : LOCAL_PLACEHOLDER_QUERY
+  const PLACEHOLDER_QUERY = useOtelEndpoint
+    ? OTEL_PLACEHOLDER_QUERY
+    : IS_PLATFORM
+      ? (logsDefaultQuery ?? PLATFORM_PLACEHOLDER_QUERY)
+      : LOCAL_PLACEHOLDER_QUERY
 
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
@@ -103,11 +110,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
     `project-content-${projectRef}-recent-log-sql`,
     []
-  )
-
-  const [useOtelEndpoint, setUseOtelEndpoint] = useLocalStorage<boolean>(
-    `logs-explorer-use-otel-endpoint-${projectRef}`,
-    false
   )
 
   const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
@@ -203,9 +205,14 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const handleRun = (value?: string | React.MouseEvent) => {
     track('log_explorer_query_run_button_clicked', { is_saved_query: !!queryId })
 
-    const query = typeof value === 'string' ? value || editorValue : editorValue
+    // Read the latest value straight from the editor instance rather than from
+    // `editorValue` state, which can lag behind the most recent keystroke. This
+    // keeps the Run button consistent with the Cmd+Enter keybinding.
+    const liveValue = editorRef.current?.getValue()
+    const query = typeof value === 'string' ? value || editorValue : (liveValue ?? editorValue)
     const resolvedParams = buildLogQueryParams(datePickerValue, query)
 
+    setSelectedLog(null)
     setParams((prev) => ({
       ...prev,
       sql: resolvedParams.sql,
@@ -310,6 +317,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     } else {
       setTimeRange(resolvedRange.from || '', resolvedRange.to || '')
     }
+    setSelectedLog(null)
     setParams((prev) => ({
       ...prev,
       iso_timestamp_start: resolvedRange.from,
@@ -325,6 +333,18 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       setSearch(q)
     }
   }, [q, search, setSearch])
+
+  useEffect(() => {
+    if (!useOtelEndpoint || q || search || queryId) return
+    if (editorValue === OTEL_PLACEHOLDER_QUERY) return
+    const isUntouchedDefault =
+      editorValue === LOCAL_PLACEHOLDER_QUERY ||
+      editorValue === PLATFORM_PLACEHOLDER_QUERY ||
+      editorValue === logsDefaultQuery
+    if (!isUntouchedDefault) return
+    setEditorValue(OTEL_PLACEHOLDER_QUERY)
+    editorRef.current?.setValue(OTEL_PLACEHOLDER_QUERY)
+  }, [useOtelEndpoint, q, search, queryId, editorValue, logsDefaultQuery])
 
   useEffect(() => {
     // prevents overwriting when the user selects a helper.
@@ -380,8 +400,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             templates={allTemplates.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
             warnings={warnings}
-            useOtel={useOtelEndpoint}
-            onUseOtelChange={setUseOtelEndpoint}
           />
           <ShimmerLine active={isLoading} />
           <CodeEditor

@@ -8,7 +8,7 @@ import { useParams } from 'common'
 import { GraphiQL, HISTORY_PLUGIN } from 'graphiql'
 import { User as IconUser } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
 import { toast } from 'sonner'
 import { LogoLoader } from 'ui'
 
@@ -59,7 +59,51 @@ const GraphiQLMonacoTheme = ({ resolvedTheme }: { resolvedTheme: 'dark' | 'light
   return null
 }
 
+/**
+ * Inset the editor content from the container edges without floating the scroll shadow.
+ *
+ * Monaco anchors its `.scroll-decoration` (the shadow shown when scrolled) to the editor's
+ * top edge and absolutely positions the line numbers at the gutter's left edge, so container
+ * padding can't move either — it would just push the whole editor (shadow included) inward.
+ * Instead use Monaco's own options:
+ * - `padding` insets the content top/bottom while leaving the shadow pinned to the top, so
+ *   `.graphiql-query-editor` can stay full-bleed (`p-0`) for a flush shadow.
+ * - `glyphMargin` reserves an empty column to the left of the line numbers (same gutter
+ *   background), giving them left breathing room.
+ *
+ * GraphiQL shares the global Monaco instance with the rest of Studio (the SQL editor etc.),
+ * so we must scope `updateOptions` to editors that live inside the GraphiQL container —
+ * `monaco.editor.getEditors()`/`onDidCreateEditor()` see every editor in the app, and
+ * applying these options globally would shift the SQL editor's layout too. Filtering by
+ * container also means there's nothing to revert on unmount: we never touch other editors.
+ */
+const GraphiQLEditorOptions = ({
+  containerRef,
+}: {
+  containerRef: RefObject<HTMLDivElement | null>
+}) => {
+  const { monaco } = useMonaco()
+
+  useEffect(() => {
+    if (!monaco) return
+    const options = { padding: { top: 16, bottom: 16 }, glyphMargin: true }
+    const applyToGraphiQLEditor = (editor: ReturnType<typeof monaco.editor.getEditors>[number]) => {
+      if (containerRef.current?.contains(editor.getContainerDomNode())) {
+        editor.updateOptions(options)
+      }
+    }
+
+    monaco.editor.getEditors().forEach(applyToGraphiQLEditor)
+    const disposable = monaco.editor.onDidCreateEditor(applyToGraphiQLEditor)
+
+    return () => disposable.dispose()
+  }, [monaco, containerRef])
+
+  return null
+}
+
 export const GraphiQLTab = () => {
+  const editorContainerRef = useRef<HTMLDivElement>(null)
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const currentTheme = resolvedTheme?.includes('dark') ? 'dark' : 'light'
@@ -145,6 +189,7 @@ export const GraphiQLTab = () => {
   return (
     <div className="flex flex-col h-full">
       <GraphiQLMonacoTheme resolvedTheme={currentTheme} />
+      <GraphiQLEditorOptions containerRef={editorContainerRef} />
       {notice === 'opt-in' && (
         <IntrospectionDisabledNotice
           schema={DEFAULT_INTROSPECTION_SCHEMA}
@@ -159,7 +204,7 @@ export const GraphiQLTab = () => {
           onDisabled={handleIntrospectionChanged}
         />
       )}
-      <div className="flex-1 min-h-0">
+      <div ref={editorContainerRef} className="flex-1 min-h-0">
         <GraphiQL
           key={graphiqlKey}
           fetcher={fetcher}

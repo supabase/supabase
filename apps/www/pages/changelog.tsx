@@ -200,7 +200,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
         }}
       />
       <DefaultLayout>
-        <div className="container mx-auto max-w-5xl flex flex-col gap-8 px-4 py-10 sm:px-16 xl:px-20">
+        <div className="container mx-auto max-w-6xl flex flex-col gap-8 px-4 py-10 sm:px-16 xl:px-24">
           <div className="pb-4">
             <h1 className="h1">Changelog</h1>
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -210,7 +210,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
               <div className="w-full lg:w-auto flex flex-wrap items-center gap-1">
                 <div className="flex-1">
                   <Button
-                    type="default"
+                    variant="default"
                     size="tiny"
                     className={cn('shrink-0', !filterPanelOpen && 'px-1.5')}
                     aria-expanded={filterPanelOpen}
@@ -233,7 +233,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                 </div>
                 <Button
                   asChild
-                  type="default"
+                  variant="default"
                   className="shrink-0"
                   icon={<Rss className="h-4 w-4" strokeWidth={2} aria-hidden />}
                 >
@@ -274,7 +274,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                   />
                   {(filterSearch.trim().length > 0 || selectedTags.size > 0) && (
                     <Button
-                      type="outline"
+                      variant="outline"
                       size="tiny"
                       className="absolute inset-1 my-auto left-auto shrink-0"
                       onClick={clearFilters}
@@ -313,7 +313,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                   <p className="text-foreground-lighter text-sm">No entries match your filters.</p>
                   {!filterPanelOpen && (
                     <Button
-                      type="text"
+                      variant="text"
                       size="tiny"
                       className="shrink-0"
                       icon={<X className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
@@ -331,7 +331,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                     </p>
                     {!filterPanelOpen && (
                       <Button
-                        type="text"
+                        variant="text"
                         size="tiny"
                         className="shrink-0"
                         icon={<X className="h-4 w-4" strokeWidth={1.5} aria-hidden />}

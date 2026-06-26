@@ -97,7 +97,7 @@ export const validateFields = (fields: RowField[]) => {
       }
     }
     if (field.format.includes('json') && (field.value?.length ?? 0) > 0) {
-      const isTruncated = isValueTruncated(field.value)
+      const isTruncated = isValueTruncated(field.value, field.format)
       // don't validate if the value is truncated
       if (isTruncated) return
 
@@ -191,16 +191,25 @@ const convertInputDatetimeToPostgresDatetime = (
 export const generateRowObjectFromFields = ({
   fields,
   includeUndefinedValues = false,
+  useDefaultForEmptyValues = false,
 }: {
   fields: RowField[]
   includeUndefinedValues?: boolean
+  useDefaultForEmptyValues?: boolean
 }): object => {
   const rowObject = {} as any
   fields.forEach((field) => {
     const isArray = field.format.startsWith('_')
     const value = field.value
+    const shouldUseDefaultValue =
+      useDefaultForEmptyValues &&
+      value === '' &&
+      (field.isIdentity || field.defaultValue !== null) &&
+      !TEXT_TYPES.includes(field.format)
 
-    if (isArray && value !== null) {
+    if (shouldUseDefaultValue) {
+      rowObject[field.name] = undefined
+    } else if (isArray && value !== null) {
       rowObject[field.name] = tryParseJson(value)
     } else if (field.format.includes('json')) {
       if (typeof field.value === 'object') {
@@ -244,7 +253,7 @@ export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) =
     } else if (type !== undefined && JSON_TYPES.includes(type)) {
       // don't update if the value is truncated. This is to enable the user to change cell values on rows which have
       // truncated JSON values. If the user
-      const isTruncated = isValueTruncated(field?.value)
+      const isTruncated = isValueTruncated(field?.value, field?.format)
       if (!isTruncated) {
         payload[property] = rowObject[property]
       }
@@ -263,7 +272,9 @@ export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) =
 /**
  * Checks if the value is truncated. The JSON types are usually truncated if they're too big to show in the editor.
  */
-export const isValueTruncated = (value: string | null | undefined) => {
+export const isValueTruncated = (value: string | null | undefined, format?: string | null) => {
+  const isArrayColumn = typeof format === 'string' && format.startsWith('_')
+
   return (
     (typeof value === 'string' && value.endsWith('...') && value.length > MAX_CHARACTERS) ||
     // if the value is an array which total representation is > MAX_CHARACTERS
@@ -275,9 +286,7 @@ export const isValueTruncated = (value: string | null | undefined) => {
       // If the array have MAX_ARRAY_SIZE elements in it
       // its a large truncated array
       (value.match(/","/g) || []).length === MAX_ARRAY_SIZE) ||
-    // if the string represent a multi-dimentional array we always consider it as possibly truncated
-    // so user load the whole value before edition
-    (typeof value === 'string' && value.startsWith('[["')) ||
+    (typeof value === 'string' && isArrayColumn && value.startsWith('[["')) ||
     // [Joshen] For json arrays, refer to getTableRowsSql from table-row-query
     // for array types, we're adding {"truncated": true} as the last item of the JSON to
     // maintain the JSON array structure

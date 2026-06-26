@@ -26,22 +26,35 @@ type LogsBarChartDatum = {
 
 export const LogsBarChart = ({
   data,
+  error,
   onBarClick,
   EmptyState,
+  ErrorState,
   DateTimeFormat = 'MMM D, YYYY, hh:mma',
   isFullHeight = false,
   chartConfig,
   hideZeroValues = false,
+  hideDateRange = false,
+  hideXAxis = false,
 }: {
   data: LogsBarChartDatum[]
+  error?: unknown | null
   onBarClick?: (datum: LogsBarChartDatum, tooltipData?: CategoricalChartState) => void
   EmptyState?: ReactNode
+  ErrorState?: ReactNode
   DateTimeFormat?: string
   isFullHeight?: boolean
   chartConfig?: ChartConfig
   hideZeroValues?: boolean
+  hideDateRange?: boolean
+  hideXAxis?: boolean
 }) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
+
+  if (error) {
+    if (ErrorState) return ErrorState
+    return null
+  }
 
   if (data.length === 0) {
     if (EmptyState) return EmptyState
@@ -94,6 +107,7 @@ export const LogsBarChart = ({
             tick={false}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
+            {...(hideXAxis ? { height: 1 } : {})}
           />
           <ChartTooltip
             animationDuration={0}
@@ -171,7 +185,7 @@ export const LogsBarChart = ({
           </Bar>
         </RechartBarChart>
       </ChartContainer>
-      {data && (
+      {data && !hideDateRange && (
         <div className="text-foreground-lighter -mt-10 flex items-center justify-between text-[10px] font-mono">
           <span>{startDate}</span>
           <span>{endDate}</span>

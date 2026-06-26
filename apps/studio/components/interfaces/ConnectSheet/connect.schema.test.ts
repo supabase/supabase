@@ -94,7 +94,9 @@ describe('connect.schema:fields', () => {
     const field = connectSchema.fields.connectionMethod
     expect(field.type).toBe('radio-list')
     expect(field.options).toEqual({ source: 'connectionMethods' })
-    expect(field.defaultValue).toBe('direct')
+    // defaultValue is intentionally unset — useConnectState.setMode picks the
+    // per-deployment-mode default (platform/CLI: 'direct'; self-hosted: 'session')
+    expect(field.defaultValue).toBeUndefined()
   })
 
   test('useSharedPooler field should depend on transaction connection method', () => {

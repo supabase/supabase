@@ -101,7 +101,7 @@ export const BannerRlsTester = () => {
           </p>
         </div>
         <Button
-          type="default"
+          variant="default"
           className="w-min"
           onClick={() => selectFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER)}
         >

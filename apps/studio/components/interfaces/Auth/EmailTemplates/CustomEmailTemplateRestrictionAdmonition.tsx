@@ -25,13 +25,17 @@ export const CustomEmailTemplateRestrictionAdmonition = () => {
       description="Emails will be sent using the default templates. Set up custom SMTP to edit their subject and body."
       actions={
         <div className="flex w-full @lg:w-auto">
-          <Button asChild type="default" className="flex-1 rounded-r-none px-3 @lg:flex-none">
+          <Button
+            asChild
+            variant="default"
+            className="flex-1 rounded-r-none px-3 @lg:flex-none hover:z-10"
+          >
             <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="default"
+                variant="default"
                 aria-label="More email template editing options"
                 className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px"
                 icon={<ChevronDown />}

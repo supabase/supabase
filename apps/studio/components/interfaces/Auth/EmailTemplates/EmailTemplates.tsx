@@ -79,9 +79,10 @@ export const EmailTemplates = () => {
     },
   })
 
-  const usingBuiltInEmailSender = isSuccess && authConfig && !hasCustomEmailSender(authConfig)
-  const hasSendEmailHook =
-    isSuccess && !!(authConfig?.HOOK_SEND_EMAIL_ENABLED && authConfig?.HOOK_SEND_EMAIL_URI)
+  const usingBuiltInEmailSender = !hasCustomEmailSender(authConfig)
+  const hasSendEmailHook = !!(
+    authConfig?.HOOK_SEND_EMAIL_ENABLED && authConfig?.HOOK_SEND_EMAIL_URI
+  )
   const isTemplateRestrictionStatusKnown = isCustomEmailTemplateRestrictionStatusKnown({
     authConfig,
     organization: selectedOrganization,
@@ -171,9 +172,8 @@ export const EmailTemplates = () => {
                   </p>
                 }
                 layout="horizontal"
-                className="mb-4"
                 actions={
-                  <Button asChild type="default">
+                  <Button asChild variant="default">
                     <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
                   </Button>
                 }
@@ -276,13 +276,13 @@ export const EmailTemplates = () => {
                     )}
                     <CardFooter className="justify-end space-x-2">
                       {notificationsForm.formState.isDirty && (
-                        <Button type="default" onClick={() => notificationsForm.reset()}>
+                        <Button variant="default" onClick={() => notificationsForm.reset()}>
                           Cancel
                         </Button>
                       )}
                       <Button
-                        type="primary"
-                        htmlType="submit"
+                        variant="primary"
+                        type="submit"
                         disabled={
                           !canUpdateConfig ||
                           isUpdatingConfig ||

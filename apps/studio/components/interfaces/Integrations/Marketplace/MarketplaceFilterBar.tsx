@@ -1,4 +1,5 @@
 import { ChevronDown, LayoutGrid, List, Search } from 'lucide-react'
+import type { Ref } from 'react'
 import {
   Button,
   cn,
@@ -19,12 +20,14 @@ import {
   type MarketplaceIntegrationType,
   type MarketplaceSource,
 } from './Marketplace.constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
 
 export type ViewMode = 'list' | 'grid'
 
 interface MarketplaceFilterBarProps {
   resultCount: number
   search: string
+  searchInputRef?: Ref<HTMLInputElement>
   onSearchChange: (value: string) => void
   category: string | null
   onCategoryChange: (value: string | null) => void
@@ -49,6 +52,7 @@ const triggerCls = 'inline-flex flex-row gap-2'
 export const MarketplaceFilterBar = ({
   resultCount,
   search,
+  searchInputRef,
   onSearchChange,
   category,
   onCategoryChange,
@@ -75,15 +79,17 @@ export const MarketplaceFilterBar = ({
   return (
     <div
       className={cn(
-        'sticky top-0 z-5 -mx-6 flex flex-wrap items-center gap-2 px-6 py-3 xl:-mx-10 xl:px-10',
+        'sticky top-0 z-20 -mx-6 flex flex-wrap items-center gap-2 px-6 py-3 xl:-mx-10 xl:px-10',
         'bg-dash-sidebar/95 backdrop-blur',
         showClear ? 'border-b border-muted' : 'border-b border-transparent'
       )}
     >
       <Input
+        ref={searchInputRef}
         value={search}
         size="tiny"
         onChange={(e) => onSearchChange(e.target.value)}
+        onKeyDown={onSearchInputEscape(search, onSearchChange)}
         placeholder={`Search integration${resultCount === 1 ? '' : 's'}…`}
         icon={<Search size={14} />}
         containerClassName="w-full min-w-40 max-w-60 grow flex-1"
@@ -91,7 +97,7 @@ export const MarketplaceFilterBar = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" iconRight={<ChevronDown />} className={triggerCls}>
+          <Button variant="default" iconRight={<ChevronDown />} className={triggerCls}>
             <span className="truncate">Category: {categoryLabel}</span>
           </Button>
         </DropdownMenuTrigger>
@@ -104,31 +110,33 @@ export const MarketplaceFilterBar = ({
               All categories
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            {categoryOptions.map((c) => {
-              const Icon = getCategoryIcon(c.slug)
-              return (
-                <DropdownMenuItem
-                  key={c.slug}
-                  onClick={() => onCategoryChange(c.slug)}
-                  className="flex items-center gap-2"
-                >
-                  <Icon size={13} className="text-foreground-lighter" />
-                  <span className="flex-1">{c.name}</span>
-                  {categoryCounts?.[c.slug] !== undefined && (
-                    <span className="font-mono text-xs text-foreground-lighter">
-                      {categoryCounts[c.slug]}
-                    </span>
-                  )}
-                </DropdownMenuItem>
-              )
-            })}
+            {categoryOptions
+              .filter((c) => !categoryCounts || categoryCounts[c.slug] > 0)
+              .map((c) => {
+                const Icon = getCategoryIcon(c.slug)
+                return (
+                  <DropdownMenuItem
+                    key={c.slug}
+                    onClick={() => onCategoryChange(c.slug)}
+                    className="flex items-center gap-2"
+                  >
+                    <Icon size={13} className="text-foreground-lighter" />
+                    <span className="flex-1">{c.name}</span>
+                    {categoryCounts?.[c.slug] !== undefined && (
+                      <span className="font-mono text-xs text-foreground-lighter">
+                        {categoryCounts[c.slug]}
+                      </span>
+                    )}
+                  </DropdownMenuItem>
+                )
+              })}
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" iconRight={<ChevronDown />} className={triggerCls}>
+          <Button variant="default" iconRight={<ChevronDown />} className={triggerCls}>
             <span className="truncate">Type: {typeLabel}</span>
           </Button>
         </DropdownMenuTrigger>
@@ -162,7 +170,7 @@ export const MarketplaceFilterBar = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" iconRight={<ChevronDown />} className={triggerCls}>
+          <Button variant="default" iconRight={<ChevronDown />} className={triggerCls}>
             <span className="truncate">Source: {sourceLabel}</span>
           </Button>
         </DropdownMenuTrigger>
@@ -208,7 +216,7 @@ export const MarketplaceFilterBar = ({
           aria-label="Grid view"
           onClick={() => onViewModeChange('grid')}
           className={cn(
-            'border-r px-2 py-1.5 rounded-l-md',
+            'border-r px-2 py-1.5 rounded-l-md cursor-pointer',
             'focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-muted focus-visible:ring-offset-1 focus-visible:ring-offset-background',
             viewMode === 'grid'
               ? 'bg-surface-200 text-foreground'
@@ -222,7 +230,7 @@ export const MarketplaceFilterBar = ({
           aria-label="List view"
           onClick={() => onViewModeChange('list')}
           className={cn(
-            'px-2 py-1.5 rounded-r-md',
+            'px-2 py-1.5 rounded-r-md cursor-pointer',
             'focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-muted focus-visible:ring-offset-1 focus-visible:ring-offset-background',
             viewMode === 'list'
               ? 'bg-surface-200 text-foreground'

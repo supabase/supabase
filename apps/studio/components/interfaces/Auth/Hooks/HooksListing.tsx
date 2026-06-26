@@ -21,13 +21,13 @@ import { DeleteSendEmailHookConfirmationDialog } from './DeleteSendEmailHookConf
 import { HookCard } from './HookCard'
 import { Hook, HOOKS_DEFINITIONS } from './hooks.constants'
 import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
-import { FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
+import { isBeforeFreeTierTemplateBlockCutoff } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
 import { isSmtpEnabled } from '@/components/interfaces/Auth/SmtpForm/SmtpForm.utils'
-import AlertError from '@/components/ui/AlertError'
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { AlertError } from '@/components/ui/AlertError'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from '@/data/auth/auth-hooks-update-mutation'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -96,7 +96,7 @@ export const HooksListing = () => {
     !!selectedOrganization &&
     selectedOrganization.plan?.id === 'free' &&
     !!project?.inserted_at &&
-    project.inserted_at >= FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE &&
+    !isBeforeFreeTierTemplateBlockCutoff(project.inserted_at) &&
     !isSmtpEnabled(authConfig)
 
   const handleDeleteSendEmailHook = (): Promise<void> => {
@@ -173,7 +173,7 @@ export const HooksListing = () => {
             description="Use Postgres functions or HTTP endpoints to customize your authentication flow."
           >
             <AddHookDropdown
-              type="default"
+              variant="default"
               align="center"
               buttonText="Add a new hook"
               open={addHookEmptyOpen}

@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { Plus, ShieldCheck } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
+import { useRef } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -17,7 +18,6 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  DialogTrigger,
   Form,
   FormControl,
   FormField,
@@ -26,7 +26,9 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import { Shortcut } from '@/components/ui/Shortcut'
 import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const NAME_SCHEMA = z
   .string()
@@ -48,11 +50,13 @@ const SCHEMA = z.object({
 export const CreateSecretAPIKeyDialog = () => {
   const { ref: projectRef } = useParams()
   const [visible, setVisible] = useQueryState('new', parseAsString)
+  const formRef = useRef<HTMLFormElement>(null)
 
   const onOpenChange = (value: boolean) => {
     if (value) setVisible('secret')
     else setVisible('')
   }
+  const openDialog = () => setVisible('secret')
 
   const defaultValues = { name: '', description: '' }
   const form = useForm<z.infer<typeof SCHEMA>>({
@@ -82,11 +86,16 @@ export const CreateSecretAPIKeyDialog = () => {
 
   return (
     <Dialog open={visible === 'secret'} onOpenChange={onOpenChange}>
-      <DialogTrigger asChild>
-        <Button type="default" className="mt-2" icon={<Plus />}>
+      <Shortcut
+        id={SHORTCUT_IDS.API_KEYS_NEW_SECRET}
+        onTrigger={openDialog}
+        side="bottom"
+        tooltipOpen={visible === 'secret' ? false : undefined}
+      >
+        <Button variant="default" className="mt-2" icon={<Plus />} onClick={openDialog}>
           New secret key
         </Button>
-      </DialogTrigger>
+      </Shortcut>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create new secret API key</DialogTitle>
@@ -101,6 +110,7 @@ export const CreateSecretAPIKeyDialog = () => {
         <DialogSection className="flex flex-col gap-4">
           <Form {...form}>
             <form
+              ref={formRef}
               className="flex flex-col gap-4"
               id={FORM_ID}
               onSubmit={form.handleSubmit(onSubmit)}
@@ -160,9 +170,16 @@ export const CreateSecretAPIKeyDialog = () => {
           </Alert>
         </DialogSection>
         <DialogFooter>
-          <Button form={FORM_ID} htmlType="submit" loading={isCreatingAPIKey}>
-            Create API key
-          </Button>
+          <Shortcut
+            id={SHORTCUT_IDS.API_KEYS_CREATE_SECRET}
+            onTrigger={() => formRef.current?.requestSubmit()}
+            options={{ enabled: visible === 'secret' && !isCreatingAPIKey }}
+            side="top"
+          >
+            <Button form={FORM_ID} type="submit" loading={isCreatingAPIKey}>
+              Create API key
+            </Button>
+          </Shortcut>
         </DialogFooter>
       </DialogContent>
     </Dialog>

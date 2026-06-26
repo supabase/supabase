@@ -3,6 +3,9 @@ import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
+import { InlineLink } from '@/components/ui/InlineLink'
+import { DOCS_URL } from '@/lib/constants'
+
 /**
  * Shown on template list and editor pages when a send-email hook is active.
  * The hook bypasses template rendering entirely — Auth sends event metadata to
@@ -16,9 +19,17 @@ export const SendEmailHookActiveAdmonition = () => {
       type="default"
       layout="responsive"
       title="Email templates are not used"
-      description="A Send Email hook is active. Event metadata is passed directly to your hook, meaning these templates are bypassed entirely."
+      description={
+        <>
+          A Send Email hook is active. Event metadata is passed directly to your hook, meaning these
+          templates are bypassed entirely.{' '}
+          <InlineLink href={`${DOCS_URL}/guides/auth/auth-hooks/send-email-hook`}>
+            Learn more
+          </InlineLink>
+        </>
+      }
       actions={
-        <Button asChild type="default">
+        <Button asChild variant="default">
           <Link href={`/project/${projectRef}/auth/hooks?hook=send-email`}>Manage hook</Link>
         </Button>
       }

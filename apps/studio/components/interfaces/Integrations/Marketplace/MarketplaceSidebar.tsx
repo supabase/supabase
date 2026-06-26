@@ -3,6 +3,7 @@ import { ArrowUpRight, BookOpen, LayoutGrid, PlusSquare } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { cn } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns'
 
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { DOCS_URL } from '@/lib/constants'
@@ -56,7 +57,7 @@ export const MarketplaceSidebar = () => {
   const router = useRouter()
   const { ref } = useParams()
 
-  const { installedIntegrations } = useInstalledIntegrations()
+  const { installedIntegrations, isLoading } = useInstalledIntegrations()
 
   const baseHref = `/project/${ref}/integrations`
   const isDiscoverActive =
@@ -69,10 +70,19 @@ export const MarketplaceSidebar = () => {
         href={baseHref}
         active={isDiscoverActive}
         icon={<LayoutGrid size={13} />}
-        label="Marketplace"
+        label="Explore all"
       />
 
-      {installedIntegrations.length > 0 && (
+      {isLoading ? (
+        <>
+          <div className={sectionLabelCls}>Installed</div>
+          <div className="space-y-1">
+            <ShimmeringLoader />
+            <ShimmeringLoader />
+            <ShimmeringLoader />
+          </div>
+        </>
+      ) : installedIntegrations.length > 0 ? (
         <>
           <div className={sectionLabelCls}>Installed · {installedIntegrations.length}</div>
           {installedIntegrations.map((integration) => {
@@ -96,7 +106,7 @@ export const MarketplaceSidebar = () => {
             )
           })}
         </>
-      )}
+      ) : null}
 
       <div className={sectionLabelCls}>Resources</div>
       {HELP_LINKS.map(({ icon, label, href }) => (

@@ -5,7 +5,7 @@ import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { getOrgAIDetails } from '@/lib/ai/ai-details'
 import { getModel } from '@/lib/ai/model'

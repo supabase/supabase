@@ -1,7 +1,12 @@
+import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc'
+
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
 import { type AuthTemplateType, type KebabCase } from './EmailTemplates.types'
 import type { components } from '@/data/api'
 import type { Organization } from '@/types'
+
+dayjs.extend(utc)
 
 type AuthConfig = components['schemas']['GoTrueConfigResponse']
 
@@ -10,7 +15,7 @@ type AuthConfig = components['schemas']['GoTrueConfigResponse']
  * restriction. Projects created before it are grandfathered and keep editing access.
  * Must stay in sync with FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE in the platform.
  */
-export const FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE = '2026-06-01T00:00:00Z'
+export const FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE = '2026-06-03T00:00:00Z'
 
 /**
  * Convert template title to URL-friendly slug
@@ -43,6 +48,10 @@ export const isCustomEmailTemplateRestrictionStatusKnown = ({
   return authConfig !== undefined && organization !== undefined && projectInsertedAt !== undefined
 }
 
+export const isBeforeFreeTierTemplateBlockCutoff = (projectInsertedAt?: string) => {
+  return dayjs.utc(projectInsertedAt).isBefore(FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE)
+}
+
 export const isCustomEmailTemplateEditingRestricted = ({
   authConfig,
   organization,
@@ -57,7 +66,9 @@ export const isCustomEmailTemplateEditingRestricted = ({
 
   // Grandfathering: projects created before the cutoff date keep editing access.
   // Mirrors FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE enforcement in the platform.
-  if (projectInsertedAt && projectInsertedAt < FREE_TIER_TEMPLATE_BLOCK_CUTOFF_DATE) return false
+  if (projectInsertedAt && isBeforeFreeTierTemplateBlockCutoff(projectInsertedAt)) {
+    return false
+  }
 
   // Temporary Studio-side paygate while Platform/Auth own the exact eligibility cohort.
   return !hasCustomEmailSender(authConfig)

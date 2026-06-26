@@ -205,6 +205,7 @@ export const LogsPreviewer = ({
         setTimeRange(newTimestampStart, timestampEnd)
       }
     }
+    setSelectedLogId(null)
     refresh()
   }
 
@@ -216,6 +217,7 @@ export const LogsPreviewer = ({
       setSearch(query || '')
       setSelectedLogId(null)
     } else if (event === 'event-chart-bar-click') {
+      setSelectedLogId(null)
       setTimeRange(from || '', to || '')
     } else if (event === 'datepicker-change') {
       const shouldShowUpgradePrompt = maybeShowUpgradePromptIfNotEntitled(
@@ -225,6 +227,7 @@ export const LogsPreviewer = ({
       if (shouldShowUpgradePrompt) {
         setShowUpgradePrompt(!showUpgradePrompt)
       } else {
+        setSelectedLogId(null)
         setTimeRange(from || '', to || '')
       }
     }
@@ -372,7 +375,7 @@ export const LogsPreviewer = ({
             <Button
               onClick={loadOlder}
               icon={<Rewind />}
-              type="default"
+              variant="default"
               loading={isLoadingOlder}
               disabled={isLoadingOlder}
             >

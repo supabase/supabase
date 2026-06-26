@@ -2,8 +2,8 @@ import { Check } from 'lucide-react'
 import { PricingInformation } from 'shared-data'
 import { Button, cn } from 'ui'
 
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 export interface EnterpriseCardProps {
   plan: PricingInformation
@@ -12,12 +12,11 @@ export interface EnterpriseCardProps {
 
 export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => {
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
-  const orgSlug = selectedOrganization?.slug
 
   const features = plan.features
   const currentPlan = selectedOrganization?.plan.name
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   return (
     <div
@@ -46,13 +45,12 @@ export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => 
         <Button
           block
           asChild
-          type="default"
+          variant="default"
           size="tiny"
           onClick={() =>
-            sendEvent({
-              action: 'studio_pricing_plan_cta_clicked',
-              properties: { selectedPlan: 'Enterprise', currentPlan },
-              groups: { organization: orgSlug ?? 'Unknown' },
+            track('studio_pricing_plan_cta_clicked', {
+              selectedPlan: 'Enterprise',
+              currentPlan,
             })
           }
         >
@@ -83,13 +81,12 @@ export const EnterpriseCard = ({ plan, isCurrentPlan }: EnterpriseCardProps) => 
         <Button
           block
           asChild
-          type="default"
+          variant="default"
           size="tiny"
           onClick={() =>
-            sendEvent({
-              action: 'studio_pricing_plan_cta_clicked',
-              properties: { selectedPlan: 'Enterprise', currentPlan },
-              groups: { organization: orgSlug ?? 'Unknown' },
+            track('studio_pricing_plan_cta_clicked', {
+              selectedPlan: 'Enterprise',
+              currentPlan,
             })
           }
         >

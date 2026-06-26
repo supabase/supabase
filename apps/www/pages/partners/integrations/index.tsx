@@ -7,7 +7,7 @@ import { type Category, type Partner } from '~/types/partners'
 import { Loader, Search } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 import { useDebounce } from 'use-debounce'
 
@@ -51,6 +51,7 @@ function IntegrationPartnersPage(props: Props) {
   const [search, setSearch] = useState('')
   const [debouncedSearchTerm] = useDebounce(search, 300)
   const [isSearching, setIsSearching] = useState(false)
+  const searchIdRef = useRef(0)
 
   useEffect(() => {
     if (debouncedSearchTerm.trim() === '') {
@@ -60,13 +61,24 @@ function IntegrationPartnersPage(props: Props) {
     }
 
     setIsSearching(true)
-    searchPartners(debouncedSearchTerm).then((partners) => {
-      if (partners) {
-        setPartners(partners)
-      }
+    const currentSearchId = ++searchIdRef.current
 
-      setIsSearching(false)
-    })
+    searchPartners(debouncedSearchTerm)
+      .then((results) => {
+        if (currentSearchId === searchIdRef.current) {
+          setPartners(results ?? [])
+        }
+      })
+      .catch(() => {
+        if (currentSearchId === searchIdRef.current) {
+          setPartners([])
+        }
+      })
+      .finally(() => {
+        if (currentSearchId === searchIdRef.current) {
+          setIsSearching(false)
+        }
+      })
   }, [debouncedSearchTerm, initialPartners])
 
   return (

@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
+import { useFeatureFlags, useFlag, useParams } from 'common'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { AWS_REGIONS, type CloudProvider } from 'shared-data'
+import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
+import { useForm, useFormState } from 'react-hook-form'
+import { type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
 import { Button, Form, useWatch } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -26,6 +26,7 @@ import { sizes } from '@/components/interfaces/ProjectCreation/ProjectCreation.c
 import { FormSchema } from '@/components/interfaces/ProjectCreation/ProjectCreation.schema'
 import {
   instanceLabel,
+  monthlyInstancePrice,
   smartRegionToExactRegion,
 } from '@/components/interfaces/ProjectCreation/ProjectCreation.utils'
 import { ProjectCreationFooter } from '@/components/interfaces/ProjectCreation/ProjectCreationFooter'
@@ -46,7 +47,7 @@ import { useAuthorizedAppsQuery } from '@/data/oauth/authorized-apps-query'
 import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
+import { DesiredInstanceSize } from '@/data/projects/new-project.constants'
 import {
   OrgProject,
   useOrgProjectsInfiniteQuery,
@@ -58,22 +59,28 @@ import {
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useDataApiRevokeOnCreateDefaultEnabled } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
+import {
+  isInDataApiRevokeTreatment,
+  useDataApiRevokeOnCreateDefaultEnabled,
+} from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { usePHFlag } from '@/hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from '@/lib/constants'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { useProfile } from '@/lib/profile'
+import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 import type { NextPageWithLayout } from '@/types'
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
 const Wizard: NextPageWithLayout = () => {
   const track = useTrack()
+  const trackFunnelError = useTrackFunnelError()
   const router = useRouter()
   const { slug, projectName } = useParams()
   const { appTitle } = useCustomContent(['app:title'])
@@ -88,10 +95,7 @@ const Wizard: NextPageWithLayout = () => {
   const isFreePlan = currentOrg?.plan?.id === 'free'
   const canChooseInstanceSize = !isFreePlan
 
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
   const { can: isAdmin } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
   const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
@@ -102,14 +106,18 @@ const Wizard: NextPageWithLayout = () => {
     'integrations.github_connections'
   )
 
+  const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = useFlag('enableSmartRegion')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showInternalOnlyConfiguration = useFlag('newProjectInternalOnlyConfiguration')
 
   // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
   // users whose flags haven't loaded yet. The raw value preserves undefined (omitted from
-  // PostHog) so we only record true/false when the flag is resolved.
-  const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
+  // PostHog) so we only record an actual value (boolean true/false, or a variant string
+  // like 'test'/'control' post-multivariate migration) once the flag has resolved.
+  const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean | string>(
+    'dataApiRevokeOnCreateDefault'
+  )
   const isDataApiRevokeOnCreateDefault = useDataApiRevokeOnCreateDefaultEnabled()
 
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
@@ -162,6 +170,8 @@ const Wizard: NextPageWithLayout = () => {
     projectName: watchedProjectName,
     highAvailability,
   } = useWatch({ control: form.control })
+  const { dirtyFields } = useFormState(form)
+  const isDbRegionDirty = dirtyFields.dbRegion
 
   // Read dirty state during render rather than depending on form.formState in the
   // effect — form.formState is a Proxy that gets a new reference every render, which
@@ -170,14 +180,6 @@ const Wizard: NextPageWithLayout = () => {
     'dataApiDefaultPrivileges',
     form.formState
   ).isDirty
-
-  useEffect(() => {
-    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
-    if (isDataApiDefaultPrivilegesDirty) return
-    setValue('dataApiDefaultPrivileges', !dataApiRevokeOnCreateDefaultFlag, {
-      shouldDirty: false,
-    })
-  }, [dataApiRevokeOnCreateDefaultFlag, isDataApiDefaultPrivilegesDirty, setValue])
 
   // [Charis] Since the form is updated in a useEffect, there is an edge case
   // when switching from free to paid, where canChooseInstanceSize is true for
@@ -217,14 +219,14 @@ const Wizard: NextPageWithLayout = () => {
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
   const additionalMonthlySpend = isFreePlan
     ? 0
-    : instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly - availableComputeCredits
+    : monthlyInstancePrice(instanceSize) - availableComputeCredits
 
-  const { data: _defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
+  const { data: autoDefaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {
       cloudProvider: PROVIDERS[defaultProvider].id,
     },
     {
-      enabled: !smartRegionEnabled,
+      enabled: flagsLoaded && !smartRegionEnabled,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       refetchInterval: false,
@@ -241,27 +243,26 @@ const Wizard: NextPageWithLayout = () => {
         desiredInstanceSize: instanceSize as DesiredInstanceSize,
       },
       {
-        enabled: smartRegionEnabled,
+        enabled: flagsLoaded && smartRegionEnabled,
         refetchOnMount: false,
         refetchOnWindowFocus: false,
         refetchInterval: false,
         refetchOnReconnect: false,
       }
     )
+
   const recommendedSmartRegion = smartRegionEnabled
     ? availableRegionsData?.recommendations.smartGroup.name
     : ''
 
+  const fixedDefaultRegion = PROVIDERS[defaultProvider].default_region.displayName
   const regionError =
     smartRegionEnabled && defaultProvider !== 'AWS_NIMBUS'
       ? availableRegionsError
       : defaultRegionError
-  const defaultRegion =
-    defaultProvider === 'AWS_NIMBUS'
-      ? AWS_REGIONS.EAST_US.displayName
-      : smartRegionEnabled
-        ? availableRegionsData?.recommendations.smartGroup.name
-        : _defaultRegion
+  const defaultRegion = smartRegionEnabled
+    ? availableRegionsData?.recommendations.smartGroup.name
+    : (autoDefaultRegion ?? fixedDefaultRegion)
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
   const canConfigureGitHubOnCreate =
@@ -319,6 +320,10 @@ const Wizard: NextPageWithLayout = () => {
       )
       router.push(`/project/${res.ref}`)
     },
+    onError: (error) => {
+      toast.error(`Failed to create new project: ${error.message}`)
+      trackFunnelError('project_creation', classifyApiError('project_creation', error), 'toast')
+    },
   })
 
   const onSubmitWithComputeCostsConfirmation = async (values: z.infer<typeof FormSchema>) => {
@@ -358,6 +363,11 @@ const Wizard: NextPageWithLayout = () => {
     } = values
 
     if (useOrioleDb && !availableOrioleVersion) {
+      trackFunnelError(
+        'project_creation',
+        { errorCategory: 'validation', errorReason: 'oriole_unavailable' },
+        'toast'
+      )
       return toast.error('No available OrioleDB image found, only Postgres is available')
     }
 
@@ -418,6 +428,14 @@ const Wizard: NextPageWithLayout = () => {
     createProject(data)
   }
 
+  const hasTrackedFormExposed = useRef(false)
+  useEffect(() => {
+    if (hasTrackedFormExposed.current) return
+    if (!isOrganizationsSuccess || !canCreateProject || !currentOrg) return
+    hasTrackedFormExposed.current = true
+    track('project_creation_form_exposed', { surface: 'main' })
+  }, [isOrganizationsSuccess, canCreateProject, currentOrg, track])
+
   useEffect(() => {
     // Only set once to ensure compute credits dont change while project is being created
     if (allOrgProjects && allOrgProjects.length > 0 && !allProjects) {
@@ -439,7 +457,6 @@ const Wizard: NextPageWithLayout = () => {
     if (projectName) setValue('projectName', projectName || '')
   }, [slug, setValue, projectName])
 
-  const isDbRegionDirty = getFieldState('dbRegion', form.formState).isDirty
   useEffect(() => {
     if (!isDbRegionDirty && defaultRegion) {
       setValue('dbRegion', defaultRegion)
@@ -447,18 +464,16 @@ const Wizard: NextPageWithLayout = () => {
   }, [defaultRegion, isDbRegionDirty, setValue])
 
   useEffect(() => {
-    if (regionError) {
-      resetField('dbRegion', {
-        defaultValue: PROVIDERS[defaultProvider].default_region.displayName,
-      })
-    }
-  }, [regionError, resetField, defaultProvider])
-
-  useEffect(() => {
     if (!isDbRegionDirty && recommendedSmartRegion) {
       setValue('dbRegion', recommendedSmartRegion)
     }
   }, [recommendedSmartRegion, isDbRegionDirty, setValue])
+
+  useEffect(() => {
+    if (regionError && fixedDefaultRegion) {
+      resetField('dbRegion', { defaultValue: fixedDefaultRegion })
+    }
+  }, [regionError, resetField, fixedDefaultRegion])
 
   useEffect(() => {
     if (highAvailability && cloudProvider !== 'AWS_K8S') {
@@ -486,6 +501,18 @@ const Wizard: NextPageWithLayout = () => {
     })
   }, [githubRepositoryName, watchedProjectName, setValue])
 
+  useEffect(() => {
+    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
+    if (isDataApiDefaultPrivilegesDirty) return
+    setValue(
+      'dataApiDefaultPrivileges',
+      !isInDataApiRevokeTreatment(dataApiRevokeOnCreateDefaultFlag),
+      {
+        shouldDirty: false,
+      }
+    )
+  }, [dataApiRevokeOnCreateDefaultFlag, isDataApiDefaultPrivilegesDirty, setValue])
+
   return (
     <>
       {/* Wizard layouts set the visual header but not the browser tab title. */}
@@ -494,7 +521,15 @@ const Wizard: NextPageWithLayout = () => {
         <meta name="description" content="Supabase Studio" />
       </Head>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation)}>
+        <form
+          onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation, (errors) =>
+            trackFunnelError(
+              'project_creation',
+              classifyValidationError('project_creation', errors),
+              'form'
+            )
+          )}
+        >
           <Panel
             loading={!isOrganizationsSuccess}
             title={
@@ -614,7 +649,7 @@ const Wizard: NextPageWithLayout = () => {
                             </p>
 
                             <div>
-                              <Button asChild type="default">
+                              <Button asChild variant="default">
                                 <Link href={`/org/${slug}/billing#invoices`}>View invoices</Link>
                               </Button>
                             </div>

@@ -111,7 +111,8 @@ export function ApiKeyPill({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              type="outline"
+              variant="outline"
+              aria-label={show ? 'Hide API key' : 'Reveal API key'}
               className="rounded-full px-2 pointer-events-auto"
               loading={show && isLoading}
               icon={show ? <EyeOff strokeWidth={2} /> : <Eye strokeWidth={2} />}
@@ -134,7 +135,8 @@ export function ApiKeyPill({
       <Tooltip>
         <TooltipTrigger asChild>
           <CopyButton
-            type="default"
+            variant="default"
+            aria-label="Copy API key"
             asyncText={onCopy}
             iconOnly
             className="rounded-full px-2 pointer-events-auto"

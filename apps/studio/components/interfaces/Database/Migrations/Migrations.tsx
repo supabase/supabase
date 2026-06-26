@@ -22,7 +22,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { MigrationsEmptyState } from './MigrationsEmptyState'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migrations-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -90,7 +90,7 @@ const Migrations = () => {
               </>
             }
           >
-            <Button key="contact-support" asChild type="default">
+            <Button key="contact-support" asChild variant="default">
               <SupportLink
                 queryParams={{
                   projectRef: project?.ref,
@@ -176,7 +176,7 @@ const Migrations = () => {
                               </TableCell>
                               <TableCell align="right">
                                 <Button
-                                  type="default"
+                                  variant="default"
                                   onClick={() => setSelectedMigration(migration)}
                                 >
                                   View migration SQL
@@ -211,7 +211,7 @@ const Migrations = () => {
         onCancel={() => setSelectedMigration(undefined)}
         customFooter={
           <div className="flex items-center justify-end p-4 border-t border-overlay-border">
-            <Button type="default" onClick={() => setSelectedMigration(undefined)}>
+            <Button variant="default" onClick={() => setSelectedMigration(undefined)}>
               Close
             </Button>
           </div>

@@ -35,7 +35,7 @@ import {
 } from 'ui-patterns/multi-select'
 import { z } from 'zod'
 
-import { ExposedSchemaSelector } from './ExposedSchemaSelector'
+import { ExposedSchemaSelector, internalSchemasCannotExpose } from './ExposedSchemaSelector'
 import { HardenAPIModal } from './HardenAPIModal'
 import { ExposedFunctionSelector } from '@/components/interfaces/Settings/API/ExposedFunctionSelector'
 import { ExposedTableSelector } from '@/components/interfaces/Settings/API/ExposedTableSelector'
@@ -58,8 +58,14 @@ const formSchema = z.object({
   // Fields for updatePostgrestConfig
   dbSchema: z.array(z.string()),
   dbExtraSearchPath: z.array(z.string()),
-  maxRows: z.number().max(1000000, "Can't be more than 1,000,000"),
-  dbPool: z
+  maxRows: z
+    .union([
+      z.literal(''),
+      z.coerce.number().int().min(1).max(1000000, "Can't be more than 1,000,000"),
+    ])
+    .refine((value) => value !== '', 'Max rows is required')
+    .transform((value) => Number(value)),
+  dbPool: z.coerce
     .number()
     .min(0, 'Must be more than 0')
     .max(1000, "Can't be more than 1000")
@@ -130,7 +136,12 @@ export const PostgrestConfig = () => {
 
   const { can: canUpdatePostgrestConfigPermission, isSuccess: isPermissionsLoaded } =
     useAsyncCheckPermissions(PermissionAction.UPDATE, 'custom_config_postgrest')
+  // PostgREST config (exposed schemas, extra search path, max rows, pool size) is persisted via
+  // the platform API, which isn't available self-hosted (the values come from env vars there).
   const canUpdatePostgrestConfig = IS_PLATFORM && canUpdatePostgrestConfigPermission
+  // Entity exposure (tables, functions, default privileges) is applied with SQL GRANT/REVOKE
+  // directly against the database, so it works both on the platform and self-hosted.
+  const canUpdateExposedEntities = canUpdatePostgrestConfigPermission
 
   const defaultValues = useMemo(() => {
     return {
@@ -185,16 +196,20 @@ export const PostgrestConfig = () => {
         })
       }
 
-      await updatePostgrestConfig(
-        {
-          projectRef,
-          dbSchema,
-          maxRows: values.maxRows,
-          dbExtraSearchPath: values.dbExtraSearchPath.join(','),
-          dbPool: values.dbPool ? values.dbPool : null,
-        },
-        { onError: noop }
-      )
+      // The PostgREST config endpoint isn't available self-hosted, so only persist these fields on
+      // the platform. Entity exposure above is applied via SQL and works in both environments.
+      if (canUpdatePostgrestConfig) {
+        await updatePostgrestConfig(
+          {
+            projectRef,
+            dbSchema,
+            maxRows: values.maxRows,
+            dbExtraSearchPath: values.dbExtraSearchPath.join(','),
+            dbPool: values.dbPool ? values.dbPool : null,
+          },
+          { onError: noop }
+        )
+      }
 
       await Promise.all([
         queryClient.invalidateQueries({
@@ -264,6 +279,10 @@ export const PostgrestConfig = () => {
     () => watchedDbSchema.filter((schema) => !allSchemas.some((s) => s.name === schema)),
     [allSchemas, watchedDbSchema]
   )
+  const protectedSchemasExposed = useMemo(
+    () => watchedDbSchema.filter((schema) => internalSchemasCannotExpose.has(schema)),
+    [watchedDbSchema]
+  )
 
   return (
     <PageSection id="postgrest-config" className="first:pt-0">
@@ -287,9 +306,6 @@ export const PostgrestConfig = () => {
                       layout="flex-row-reverse"
                       label="Exposed schemas"
                       description="Select schemas to include in the Data API. Schemas must be included before tables can be exposed."
-                      error={
-                        missingExposedSchema.length > 0 ? 'Some exposed schemas are missing' : null
-                      }
                     >
                       <ExposedSchemaSelector
                         selectedSchemas={watchedDbSchema}
@@ -309,6 +325,19 @@ export const PostgrestConfig = () => {
                           }
                         }}
                       />
+                      {protectedSchemasExposed.length > 0 ? (
+                        <p className="mt-1 text-sm text-warning">
+                          {protectedSchemasExposed.length} protected schema
+                          {protectedSchemasExposed.length > 1 ? 's' : ''} is currently exposed and
+                          should be removed
+                        </p>
+                      ) : missingExposedSchema.length > 0 ? (
+                        <p className="mt-1 text-sm text-foreground-lighter">
+                          {missingExposedSchema.length} exposed schema
+                          {missingExposedSchema.length > 1 ? 's' : ''} does not exist — safe to
+                          remove
+                        </p>
+                      ) : null}
                     </FormItemLayout>
 
                     <FormItemLayout
@@ -408,7 +437,7 @@ export const PostgrestConfig = () => {
                                 <div>
                                   <Switch
                                     size="large"
-                                    disabled={!canUpdatePostgrestConfig}
+                                    disabled={!canUpdateExposedEntities}
                                     checked={field.value}
                                     onCheckedChange={field.onChange}
                                   />
@@ -497,7 +526,6 @@ export const PostgrestConfig = () => {
                                   disabled={!canUpdatePostgrestConfig}
                                   {...field}
                                   type="number"
-                                  onChange={(e) => field.onChange(Number(e.target.value))}
                                 />
                                 <InputGroupAddon align="inline-end">
                                   <InputGroupText>rows</InputGroupText>
@@ -549,22 +577,20 @@ export const PostgrestConfig = () => {
               )}
             </form>
           </Form>
-          {IS_PLATFORM && (
-            <CardFooter className="border-t">
-              <FormActions
-                form={formId}
-                isSubmitting={isUpdating}
-                hasChanges={form.formState.isDirty}
-                handleReset={resetForm}
-                disabled={!canUpdatePostgrestConfig}
-                helper={
-                  isPermissionsLoaded && !canUpdatePostgrestConfigPermission
-                    ? "You need additional permissions to update your project's API settings"
-                    : undefined
-                }
-              />
-            </CardFooter>
-          )}
+          <CardFooter className="border-t">
+            <FormActions
+              form={formId}
+              isSubmitting={isUpdating}
+              hasChanges={form.formState.isDirty}
+              handleReset={resetForm}
+              disabled={!canUpdateExposedEntities}
+              helper={
+                isPermissionsLoaded && !canUpdateExposedEntities
+                  ? "You need additional permissions to update your project's API settings"
+                  : undefined
+              }
+            />
+          </CardFooter>
         </Card>
         {IS_PLATFORM && (
           <Card className="mb-4">
@@ -576,7 +602,7 @@ export const PostgrestConfig = () => {
                 description="Expose a custom schema instead of the public schema"
               >
                 <div className="flex gap-2 items-center justify-end">
-                  <Button type="default" icon={<Lock />} onClick={() => setShowModal(true)}>
+                  <Button variant="default" icon={<Lock />} onClick={() => setShowModal(true)}>
                     Harden Data API
                   </Button>
                 </div>

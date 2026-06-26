@@ -151,6 +151,39 @@ export type Database = {
         }
         Relationships: []
       }
+      feedback_comments: {
+        Row: {
+          comment: string
+          created_at: string
+          id: number
+          metadata: Json | null
+          page: string
+          title: string | null
+          user_id: string | null
+          vote: Database['public']['Enums']['feedback_vote'] | null
+        }
+        Insert: {
+          comment: string
+          created_at?: string
+          id?: never
+          metadata?: Json | null
+          page: string
+          title?: string | null
+          user_id?: string | null
+          vote?: Database['public']['Enums']['feedback_vote'] | null
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          id?: never
+          metadata?: Json | null
+          page?: string
+          title?: string | null
+          user_id?: string | null
+          vote?: Database['public']['Enums']['feedback_vote'] | null
+        }
+        Relationships: []
+      }
       last_changed: {
         Row: {
           checksum: string

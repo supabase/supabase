@@ -40,21 +40,27 @@ export const ResetTemplateDialog = ({
   const { id } = template
   const templateType = getAuthTemplateType(id)
 
-  const { mutateAsync: resetAuthTemplate } = useAuthTemplateResetMutation()
+  const { mutate: resetAuthTemplate, isPending: isResetting } = useAuthTemplateResetMutation()
 
   const resetTemplateToDefault = async () => {
     if (!projectRef) throw new Error('Project ref is required')
     if (!templateType) throw new Error('Template type is required')
 
-    const config = await resetAuthTemplate({ projectRef, template: templateType })
-    toast.success('Email template reset to default')
-    onResetSuccess(config)
+    resetAuthTemplate(
+      { projectRef, template: templateType },
+      {
+        onSuccess: (config) => {
+          toast.success('Email template reset to default')
+          onResetSuccess(config)
+        },
+      }
+    )
   }
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button type="default" htmlType="button" disabled={!canUpdateConfig}>
+        <Button variant="default" type="button" disabled={!canUpdateConfig}>
           Reset template
         </Button>
       </AlertDialogTrigger>
@@ -69,7 +75,14 @@ export const ResetTemplateDialog = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="warning" onClick={resetTemplateToDefault}>
+          <AlertDialogAction
+            variant="warning"
+            loading={isResetting}
+            onClick={(e) => {
+              e.preventDefault()
+              resetTemplateToDefault()
+            }}
+          >
             Reset
           </AlertDialogAction>
         </AlertDialogFooter>

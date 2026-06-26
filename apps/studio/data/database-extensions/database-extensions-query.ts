@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { databaseExtensionsKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
