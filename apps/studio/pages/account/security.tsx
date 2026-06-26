@@ -56,7 +56,7 @@ const Security: NextPageWithLayout = () => {
                     you will lose access to your account.
                   </strong>
                 </p>
-                <p>We strongly recommend adding authentication on a second device right now.</p>
+                <p>We strongly recommend adding another factor of authentication on another device right now.</p>
               </>
             }
           />
