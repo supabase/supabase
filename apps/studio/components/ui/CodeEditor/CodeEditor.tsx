@@ -1,8 +1,9 @@
 import Editor, { EditorProps, Monaco, OnChange, OnMount, useMonaco } from '@monaco-editor/react'
 import { merge, noop } from 'lodash'
+import { Loader2 } from 'lucide-react'
 import type { editor } from 'monaco-editor'
 import { RefObject, useEffect, useRef, useState } from 'react'
-import { cn, LogoLoader } from 'ui'
+import { cn } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 import { alignEditor } from './CodeEditor.utils'
@@ -21,14 +22,26 @@ const DEFAULT_ACTIONS = {
   placeholderFill: { enabled: true },
 }
 
+export type ValidLanguages =
+  | 'pgsql'
+  | 'json'
+  | 'html'
+  | 'typescript'
+  | 'javascript'
+  | 'css'
+  | 'csv'
+  | 'plaintext'
+  | 'markdown'
+
 interface CodeEditorProps {
   id?: string
-  language: 'pgsql' | 'json' | 'html' | 'typescript' | 'plaintext' | undefined
+  language: ValidLanguages
   autofocus?: boolean
   defaultValue?: string
   isReadOnly?: boolean
   hideLineNumbers?: boolean
   className?: string
+  wrapperClassName?: string
   loading?: boolean
   options?: EditorProps['options']
   value?: string
@@ -57,6 +70,7 @@ export const CodeEditor = ({
   isReadOnly = false,
   hideLineNumbers = false,
   className,
+  wrapperClassName,
   loading,
   options,
   value,
@@ -97,6 +111,7 @@ export const CodeEditor = ({
     {
       tabSize: 2,
       fontSize: 13,
+      domReadOnly: isReadOnly,
       readOnly: isReadOnly,
       minimap: { enabled: false },
       wordWrap: 'on',
@@ -246,10 +261,11 @@ export const CodeEditor = ({
         path={id}
         theme="supabase"
         className={cn(className, 'monaco-editor')}
+        wrapperProps={{ className: wrapperClassName }}
         value={value ?? undefined}
         language={language}
         defaultValue={defaultValue ?? undefined}
-        loading={loading || <LogoLoader />}
+        loading={loading || <Loader2 className="animate-spin" strokeWidth={2} size={20} />}
         options={optionsMerged}
         onMount={handleMount}
         onChange={onChangeContent}
