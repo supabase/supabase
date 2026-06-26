@@ -507,6 +507,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
                   language="pgsql"
                   original={rewriteProposal.original}
                   modified={rewriteProposal.modified}
+                  options={{ renderSideBySide: true }}
                 />
               </div>
             </div>
