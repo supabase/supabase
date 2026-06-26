@@ -87,7 +87,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }, [logsShowMetadataIpTemplate])
 
   const editorRef = useRef<editor.IStandaloneCodeEditor>(null)
-  const pendingRewriteSqlRef = useRef<string | null>(null)
   const [editorId] = useState<string>(uuidv4())
   const { search, setSearch, timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
   const defaultHelper = useMemo(() => getDefaultHelper(EXPLORER_DATEPICKER_HELPERS), [])
@@ -248,10 +247,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const acceptRewrite = () => {
     if (!rewriteProposal) return
-    // The editor is unmounted while the diff is shown, so stash the rewrite and let
-    // the editor's onMount apply it once it remounts (Monaco caches its model, so a
-    // remount alone keeps the old query).
-    pendingRewriteSqlRef.current = rewriteProposal.modified
+    // The CodeEditor stays mounted behind the diff overlay, so its live instance can
+    // be updated directly. Keep editorValue in sync so reads of state agree with it.
+    editorRef.current?.setValue(rewriteProposal.modified)
     setEditorValue(rewriteProposal.modified)
     setRewriteProposal(null)
     toast.success('Applied the ClickHouse rewrite')
@@ -479,31 +477,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             />
           )}
           <ShimmerLine active={isLoading} />
-          {rewriteProposal ? (
-            <div className="flex h-full flex-col">
-              <div className="flex items-center justify-between gap-2 border-b bg-surface-100 px-4 py-2">
-                <span className="text-xs text-foreground-light">
-                  Review the ClickHouse rewrite before applying it
-                </span>
-                <div className="flex items-center gap-2">
-                  <Button variant="default" size="tiny" onClick={discardRewrite}>
-                    Discard
-                  </Button>
-                  <Button variant="primary" size="tiny" onClick={acceptRewrite}>
-                    Accept
-                  </Button>
-                </div>
-              </div>
-              <div className="min-h-0 flex-1">
-                <DiffEditor
-                  language="pgsql"
-                  original={rewriteProposal.original}
-                  modified={rewriteProposal.modified}
-                  options={{ renderSideBySide: true }}
-                />
-              </div>
-            </div>
-          ) : (
+          {/* Keep CodeEditor mounted at all times; the diff renders as an opaque overlay
+              so accepting can update the live editor instance directly (Monaco's model
+              caching and remount lifecycle are then irrelevant). */}
+          <div className="relative h-full">
             <CodeEditor
               // Ensure we reset the editor to the query content whenever the selected query changes
               key={queryId}
@@ -512,15 +489,34 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               language="pgsql"
               defaultValue={editorValue}
               onInputChange={(v) => setEditorValue(v || '')}
-              onMount={(editor) => {
-                if (pendingRewriteSqlRef.current !== null) {
-                  editor.setValue(pendingRewriteSqlRef.current)
-                  pendingRewriteSqlRef.current = null
-                }
-              }}
               actions={{ runQuery: { enabled: true, callback: handleRun } }}
             />
-          )}
+            {rewriteProposal && (
+              <div className="absolute inset-0 z-10 flex flex-col bg-studio">
+                <div className="flex items-center justify-between gap-2 border-b bg-surface-100 px-4 py-2">
+                  <span className="text-xs text-foreground-light">
+                    Review the ClickHouse rewrite before applying it
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <Button variant="default" size="tiny" onClick={discardRewrite}>
+                      Discard
+                    </Button>
+                    <Button variant="primary" size="tiny" onClick={acceptRewrite}>
+                      Accept
+                    </Button>
+                  </div>
+                </div>
+                <div className="min-h-0 flex-1">
+                  <DiffEditor
+                    language="pgsql"
+                    original={rewriteProposal.original}
+                    modified={rewriteProposal.modified}
+                    options={{ renderSideBySide: true }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel collapsible minSize="5" className="overflow-auto">
