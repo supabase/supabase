@@ -1,13 +1,12 @@
 import { proxy, ref, snapshot, useSnapshot } from 'valtio'
 
 import type { QueryPlanRow } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
-import { DiffType } from '@/components/interfaces/SQLEditor/SQLEditor.types'
 
 /**
  * Ephemeral, per-session SQL editor state that is NOT persisted: query results,
- * EXPLAIN results, the Assistant diff, and the row limit. Kept separate from the
- * snippet/folder store (which deals with persistence) because none of this is
- * saved — it lives only for the current editing session.
+ * EXPLAIN results, and the row limit. Kept separate from the snippet/folder
+ * store (which deals with persistence) because none of this is saved — it lives
+ * only for the current editing session.
  */
 export const sqlEditorSessionState = proxy({
   /**
@@ -37,12 +36,6 @@ export const sqlEditorSessionState = proxy({
    * to `autoLimit` in `results`; see `checkIfAppendLimitRequired`/`suffixWithLimit`.
    */
   limit: 100,
-
-  /** SQL the Assistant wants rendered as a diff in the editor. */
-  diffContent: undefined as undefined | { sql: string; diffType: DiffType },
-
-  setDiffContent: (sql: string, diffType: DiffType) =>
-    (sqlEditorSessionState.diffContent = { sql, diffType }),
 
   setLimit: (value: number) => (sqlEditorSessionState.limit = value),
 

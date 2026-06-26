@@ -2,7 +2,6 @@ import { snapshot } from 'valtio'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { sqlEditorSessionState } from './sql-editor-session-state'
-import { DiffType } from '@/components/interfaces/SQLEditor/SQLEditor.types'
 
 // The session store is a module singleton, so reset its mutable fields before
 // each test to keep cases independent.
@@ -10,7 +9,6 @@ beforeEach(() => {
   sqlEditorSessionState.results = {}
   sqlEditorSessionState.explainResults = {}
   sqlEditorSessionState.limit = 100
-  sqlEditorSessionState.diffContent = undefined
 })
 
 describe('sqlEditorSessionState', () => {
@@ -91,19 +89,6 @@ describe('sqlEditorSessionState', () => {
       sqlEditorSessionState.setLimit(500)
 
       expect(snapshot(sqlEditorSessionState).limit).toBe(500)
-    })
-  })
-
-  describe('diffContent', () => {
-    it('is undefined by default and set by setDiffContent', () => {
-      expect(snapshot(sqlEditorSessionState).diffContent).toBeUndefined()
-
-      sqlEditorSessionState.setDiffContent('select 1', DiffType.Addition)
-
-      expect(snapshot(sqlEditorSessionState).diffContent).toEqual({
-        sql: 'select 1',
-        diffType: DiffType.Addition,
-      })
     })
   })
 })

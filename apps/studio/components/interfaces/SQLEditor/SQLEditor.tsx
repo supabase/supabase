@@ -93,6 +93,10 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import {
+  sqlEditorDiffRequestState,
+  useSqlEditorDiffRequestSnapshot,
+} from '@/state/sql-editor/sql-editor-diff-request'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
@@ -121,6 +125,7 @@ export const SQLEditor = () => {
   const { openSidebar } = useSidebarManagerSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const sessionSnap = useSqlEditorSessionSnapshot()
+  const diffRequest = useSqlEditorDiffRequestSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const { aiOptInLevel } = useOrgAiOptInLevel()
@@ -828,29 +833,34 @@ export const SQLEditor = () => {
   }, [isSuccessReadReplicas, databases, ref])
 
   useEffect(() => {
-    if (sessionSnap.diffContent !== undefined) {
-      const { diffType, sql }: { diffType: DiffType; sql: string } = sessionSnap.diffContent
-      const editorModel = editorRef.current?.getModel()
-      if (!editorModel) return
+    const request = diffRequest.pending
+    if (request === undefined) return
 
-      const existingValue = editorRef.current?.getValue() ?? ''
-      if (existingValue.length === 0) {
-        // if the editor is empty, just copy over the code
-        editorRef.current?.executeEdits('apply-ai-message', [
-          {
-            text: `${sql}`,
-            range: editorModel.getFullModelRange(),
-          },
-        ])
-      } else {
-        const currentSql = editorRef.current?.getValue()
-        const diff = { original: currentSql || '', modified: sql }
-        setSourceSqlDiff(diff)
-        setSelectedDiffType(diffType)
-      }
+    const editorModel = editorRef.current?.getModel()
+    // Editor isn't ready yet; leave the request pending so it applies once mounted.
+    if (!editorModel) return
+
+    const { diffType, sql } = request
+    const existingValue = editorRef.current?.getValue() ?? ''
+    if (existingValue.length === 0) {
+      // if the editor is empty, just copy over the code
+      editorRef.current?.executeEdits('apply-ai-message', [
+        {
+          text: `${sql}`,
+          range: editorModel.getFullModelRange(),
+        },
+      ])
+    } else {
+      const currentSql = editorRef.current?.getValue()
+      const diff = { original: currentSql || '', modified: sql }
+      setSourceSqlDiff(diff)
+      setSelectedDiffType(diffType)
     }
+
+    // One-shot: drain the request so it can't re-apply to a later editor or session.
+    sqlEditorDiffRequestState.consumeDiffRequest()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sessionSnap.diffContent])
+  }, [diffRequest.pending])
 
   // We want to check if the diff editor is mounted and if it is, we want to show the widget
   // We also want to cleanup the widget when the diff editor is closed
