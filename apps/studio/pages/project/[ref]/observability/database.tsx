@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, Button } from 'ui'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
@@ -25,6 +26,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { MultiAttribute } from '@/components/ui/Charts/ComposedChart.utils'
 import { LazyComposedChartHandler } from '@/components/ui/Charts/ComposedChartHandler'
 import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { analyticsKeys } from '@/data/analytics/keys'
@@ -64,6 +66,8 @@ DatabaseReport.getLayout = (page) => (
 
 export type UpdateDateRange = (from: string, to: string) => void
 export default DatabaseReport
+
+const REPORT_TITLE = 'Database'
 
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
@@ -227,10 +231,11 @@ const DatabaseUsage = () => {
 
   return (
     <>
-      <ReportHeader showDatabaseSelector title="Database" />
+      <ReportHeader showDatabaseSelector title={REPORT_TITLE} />
       <ReportStickyNav
         content={
-          <>
+          <div className="ml-auto flex items-center gap-2 flex-wrap">
+            <DocsButton href={OBSERVABILITY_DOCS_HREFS.database} topic={REPORT_TITLE} />
             <ShortcutTooltip
               shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
               label="Refresh report"
@@ -275,7 +280,7 @@ const DatabaseUsage = () => {
                 </div>
               )}
             </div>
-          </>
+          </div>
         }
       >
         {selectedDateRange &&
