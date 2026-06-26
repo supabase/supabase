@@ -1,7 +1,8 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 
-# Fall back to organization-level CodeRabbit settings for anything not set here.
-inheritance: true
+# Don't inherit organization-level settings (they're tuned for other repos);
+# this config is self-contained and unset values use CodeRabbit defaults.
+inheritance: false
 
 # Enrich linked issues with related code and potential solutions during review.
 issue_enrichment:
