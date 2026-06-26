@@ -72,6 +72,7 @@ export const AutoEnableRLSNotice = ({ iconOnly }: { iconOnly?: boolean }) => {
             variant="text"
             className="w-6"
             tooltip={{ content: { side: 'bottom', text: 'Dismiss' } }}
+            aria-label="Dismiss RLS notice"
             onClick={() => setIsMinimized(true)}
           />
         </>
