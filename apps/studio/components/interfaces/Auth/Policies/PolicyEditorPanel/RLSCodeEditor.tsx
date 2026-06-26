@@ -1,11 +1,9 @@
-import Editor, { Monaco, OnChange, OnMount, useMonaco } from '@monaco-editor/react'
+import { Monaco } from '@monaco-editor/react'
 import { noop } from 'lodash'
 import type { editor } from 'monaco-editor'
-import { MutableRefObject, useEffect, useRef } from 'react'
-import { cn } from 'ui'
+import { RefObject, useEffect } from 'react'
 
-import { Markdown } from '@/components/interfaces/Markdown'
-import { formatSql } from '@/lib/formatSql'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 
 // [Joshen] Is there a way we can just have one single MonacoEditor component that's shared across the dashboard?
 // Feels like we're creating multiple copies of Editor. I'm keen to make this one the defacto as well so lets make sure
@@ -21,13 +19,12 @@ interface RLSCodeEditorProps {
   placeholder?: string
   readOnly?: boolean
 
-  disableTabToUsePlaceholder?: boolean
   lineNumberStart?: number
   onChange?: () => void
   onMount?: () => void
 
-  editorRef: MutableRefObject<editor.IStandaloneCodeEditor | null>
-  monacoRef?: MutableRefObject<Monaco>
+  editorRef: RefObject<editor.IStandaloneCodeEditor | null>
+  monacoRef?: RefObject<Monaco>
 }
 
 export const RLSCodeEditor = ({
@@ -39,8 +36,6 @@ export const RLSCodeEditor = ({
   value,
   placeholder,
   readOnly = false,
-
-  disableTabToUsePlaceholder = false,
   lineNumberStart,
   onChange = noop,
   onMount: _onMount = noop,
@@ -48,140 +43,34 @@ export const RLSCodeEditor = ({
   editorRef,
   monacoRef,
 }: RLSCodeEditorProps) => {
-  const hasValue = useRef<editor.IContextKey<boolean>>(null)
-  const monaco = useMonaco()
-
-  const placeholderId = `monaco-placeholder-${id}`
-  const options: editor.IStandaloneEditorConstructionOptions = {
-    tabSize: 2,
-    fontSize: 13,
-    readOnly,
-    minimap: { enabled: false },
-    wordWrap: 'on' as const,
-    contextmenu: true,
-    lineNumbers:
-      lineNumberStart !== undefined ? (num) => (num + lineNumberStart).toString() : undefined,
-    glyphMargin: undefined,
-    lineNumbersMinChars: 4,
-    folding: undefined,
-    scrollBeyondLastLine: false,
-  }
-
-  const onMount: OnMount = async (editor, monaco) => {
-    editorRef.current = editor
-    if (monacoRef !== undefined) monacoRef.current = monaco
-
-    hasValue.current = editor.createContextKey('hasValue', false)
-    const placeholderEl = document.getElementById(placeholderId) as HTMLElement | null
-    if (placeholderEl && placeholder !== undefined && (value ?? '').trim().length === 0) {
-      placeholderEl.style.display = 'block'
-    }
-
-    if (!disableTabToUsePlaceholder) {
-      editor.addCommand(
-        monaco.KeyCode.Tab,
-        () => {
-          editor.executeEdits('source', [
-            {
-              // @ts-ignore
-              identifier: 'add-placeholder',
-              range: new monaco.Range(1, 1, 1, 1),
-              text: (placeholder ?? '')
-                .split('\n\n')
-                .join('\n')
-                .replaceAll('*', '')
-                .replaceAll('&nbsp;', ''),
-            },
-          ])
-        },
-        '!hasValue'
-      )
-    }
-
-    editor.focus()
-
-    _onMount()
-  }
-
-  const onChangeContent: OnChange = (value) => {
-    if (hasValue.current) {
-      hasValue.current.set((value ?? '').length > 0)
-    }
-
-    const placeholderEl = document.getElementById(placeholderId) as HTMLElement | null
-    if (placeholderEl) {
-      if (!value) {
-        placeholderEl.style.display = 'block'
-      } else {
-        placeholderEl.style.display = 'none'
-      }
-    }
-
+  const onChangeContent = (value?: string) => {
     onChange()
     onInputChange?.(value)
   }
 
   // when the value has changed, trigger the onChange callback so that the height of the container can be adjusted.
   // Happens when the value wordwraps and is updated via a template.
-  useEffect(() => {
-    onChange()
-  }, [value])
-
-  useEffect(() => {
-    if (monaco) {
-      // Enable pgsql format
-      const formatprovider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
-        async provideDocumentFormattingEdits(model: any) {
-          const value = model.getValue()
-          const formatted = formatSql(value)
-          return [
-            {
-              range: model.getFullModelRange(),
-              text: formatted.trim(),
-            },
-          ]
-        },
-      })
-
-      return () => {
-        formatprovider.dispose()
-      }
-    }
-  }, [monaco])
-
-  useEffect(() => {
-    if (value !== undefined && value.trim().length > 0) {
-      const placeholderEl = document.getElementById(placeholderId) as HTMLElement | null
-      if (placeholderEl) placeholderEl.style.display = 'none'
-    }
-  }, [value])
+  useEffect(() => onChange(), [value])
 
   return (
-    <>
-      <Editor
-        path={id}
-        theme="supabase"
-        wrapperProps={{ className: cn(wrapperClassName) }}
-        className={cn(className, 'monaco-editor')}
-        value={value ?? undefined}
-        defaultLanguage="pgsql"
-        defaultValue={defaultValue ?? undefined}
-        options={options}
-        onMount={onMount}
-        onChange={onChangeContent}
-      />
-      {placeholder !== undefined && (
-        <div
-          id={placeholderId}
-          className={cn(
-            'monaco-placeholder absolute top-0 left-[57px] text-sm pointer-events-none font-mono tracking-tighter',
-            '[&>div>p]:text-foreground-lighter [&>div>p]:m-0!'
-          )}
-          style={{ display: 'none' }}
-        >
-          <Markdown content={placeholder} />
-        </div>
-      )}
-    </>
+    <CodeEditor
+      id={id}
+      monacoRef={monacoRef}
+      editorRef={editorRef}
+      isReadOnly={readOnly}
+      language="pgsql"
+      className={className}
+      wrapperClassName={wrapperClassName}
+      placeholder={placeholder}
+      value={value ?? undefined}
+      defaultValue={defaultValue ?? undefined}
+      options={{
+        lineNumbers:
+          lineNumberStart !== undefined ? (num) => (num + lineNumberStart).toString() : undefined,
+      }}
+      actions={{ placeholderFill: { enabled: false } }}
+      onMount={_onMount}
+      onInputChange={onChangeContent}
+    />
   )
 }

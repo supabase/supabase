@@ -1,5 +1,6 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { Check, ChevronDown } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { useMemo, useState } from 'react'
 import {
   Badge,
@@ -11,11 +12,12 @@ import {
   CollapsibleTrigger,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { getMcpClientIconSrc } from 'ui-patterns/McpUrlBuilder'
 
 import { PERMISSIONS_DESCRIPTIONS } from './OAuthApps.constants'
 import { LogoBox } from '@/components/layouts/InterstitialLayout'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { DOCS_URL } from '@/lib/constants'
 
 const OAUTH_SCOPES_DOCS_URL = `${DOCS_URL}/guides/platform/oauth-apps/oauth-scopes`
 const PERMISSION_DETAILS_TRIGGER_CLASSNAME =
@@ -165,44 +167,61 @@ const PERMISSION_GROUPS: PermissionGroup[] = [
   },
 ]
 
-// Hardcode custom logs for known apps that have broken icons (e.g. due to CORS issues), to ensure they display properly
-//  in the UI. This should be deleted once we support CIMD MCP
-const CUSTOM_LOGO_URLS = {
-  perplexity: `${BASE_PATH}/img/icons/perplexity-icon.svg`,
-  cursor: `${BASE_PATH}/img/icons/cursor-icon.svg`,
-  claude: `${BASE_PATH}/img/icons/claude-icon.svg`,
-  chatgpt: `${BASE_PATH}/img/icons/openai-icon.svg`,
-  openai: `${BASE_PATH}/img/icons/openai-icon.svg`,
+const CUSTOM_LOGO_KEYS = {
+  perplexity: { icon: 'perplexity', hasDistinctDarkIcon: true },
+  cursor: { icon: 'cursor', hasDistinctDarkIcon: true },
+  claude: { icon: 'claude', hasDistinctDarkIcon: false },
+  chatgpt: { icon: 'openai', hasDistinctDarkIcon: true },
+  openai: { icon: 'openai', hasDistinctDarkIcon: true },
+} as const
+
+function getRequesterLogo({
+  icon,
+  name,
+  useDarkVariant,
+}: {
+  icon: string | null
+  name: string
+  useDarkVariant: boolean
+}) {
+  const searchableText = `${icon ?? ''} ${name}`.toLowerCase()
+
+  for (const [match, asset] of Object.entries(CUSTOM_LOGO_KEYS)) {
+    if (searchableText.includes(match)) {
+      const customLogoUrl = getMcpClientIconSrc({
+        icon: asset.icon,
+        useDarkVariant,
+        hasDistinctDarkIcon: asset.hasDistinctDarkIcon,
+      })
+
+      if (customLogoUrl) return { src: customLogoUrl, isKnownClient: true }
+    }
+  }
+
+  return { src: icon || '', isKnownClient: false }
 }
 
 export const RequesterLogo = ({ icon, name }: { icon: string | null; name: string }) => {
   const [failedIcon, setFailedIcon] = useState<string | null>(null)
+  const { resolvedTheme } = useTheme()
 
-  const customLogoUrl = useMemo(() => {
-    for (const key of Object.keys(CUSTOM_LOGO_URLS)) {
-      if (icon?.toLocaleLowerCase().includes(key)) {
-        return CUSTOM_LOGO_URLS[key as keyof typeof CUSTOM_LOGO_URLS]
-      }
+  const logo = useMemo(
+    () => getRequesterLogo({ icon, name, useDarkVariant: resolvedTheme === 'dark' }),
+    [icon, name, resolvedTheme]
+  )
 
-      if (name.toLocaleLowerCase().includes(key)) {
-        return CUSTOM_LOGO_URLS[key as keyof typeof CUSTOM_LOGO_URLS]
-      }
-    }
-    return icon || ''
-  }, [icon, name])
-
-  const showLetter = !customLogoUrl || failedIcon === customLogoUrl
+  const showLetter = !logo.src || failedIcon === logo.src
 
   return (
-    <LogoBox>
+    <LogoBox className="bg-surface-75">
       {showLetter ? (
         <span className="text-lg font-medium text-foreground-light">{name.slice(0, 1)}</span>
       ) : (
         <img
           alt={name}
-          src={customLogoUrl}
-          className="size-full object-cover"
-          onError={() => setFailedIcon(customLogoUrl)}
+          src={logo.src}
+          className={cn(logo.isKnownClient ? 'size-7 object-contain' : 'size-full object-cover')}
+          onError={() => setFailedIcon(logo.src)}
         />
       )}
     </LogoBox>
