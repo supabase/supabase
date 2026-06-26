@@ -21705,6 +21705,40 @@
         }
       ],
       "respondentCount": 2739
+    },
+    "2025|must_have_tools|multi|": {
+      "rows": [
+        {
+          "label": "Cursor",
+          "count": 504
+        },
+        {
+          "label": "Claude",
+          "count": 143
+        },
+        {
+          "label": "ChatGPT/Codex",
+          "count": 113
+        }
+      ],
+      "respondentCount": 2110
+    },
+    "2026|must_have_tools|multi|": {
+      "rows": [
+        {
+          "label": "Claude",
+          "count": 871
+        },
+        {
+          "label": "Cursor",
+          "count": 315
+        },
+        {
+          "label": "ChatGPT/Codex",
+          "count": 267
+        }
+      ],
+      "respondentCount": 2739
     }
   }
 }

@@ -14,6 +14,8 @@ import { useYear } from './year-context'
 
 interface SurveyChartProps {
   title: string
+  /** Smaller parenthetical under the title clarifying how the question was asked. */
+  note?: string
   column: string
   aggregation: Aggregation
   /** Static filters baked into the chart config (e.g. location = North America). */
@@ -28,6 +30,7 @@ const accentBarText = 'text-brand-link dark:text-brand'
 
 export function SurveyChart({
   title,
+  note,
   column,
   aggregation,
   filters,
@@ -66,7 +69,7 @@ export function SurveyChart({
   )
 
   return (
-    <SurveyChartShell eyebrow="Q&A" title={title} isEmpty={chartData.length === 0}>
+    <SurveyChartShell eyebrow="Q&A" title={title} note={note} isEmpty={chartData.length === 0}>
       <div className="flex flex-row flex-wrap gap-6 px-8 pb-4 justify-end">
         <div className="hidden xs:block">
           <TwoOptionToggle

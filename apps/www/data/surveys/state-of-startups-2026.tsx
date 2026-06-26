@@ -49,6 +49,8 @@ export type TopLineItem = ({ kind: 'stat' } & SurveyStat) | CompareStat
 export interface BarChartConfig {
   kind?: 'bar'
   title: string
+  /** Smaller parenthetical under the title clarifying how the question was asked. */
+  note?: string
   column: string
   aggregation: Aggregation
   filters?: SurveyFilters
@@ -143,6 +145,9 @@ export interface SurveySection {
   eyebrow: string
   title: string
   description: string
+  /** Question header rendered above the stat cards, with an optional smaller
+   *  parenthetical note clarifying how the question was asked. */
+  statsHeading?: { title: string; note?: string }
   stats: SurveyStat[]
   charts: ChartConfig[]
   pullQuote?: SurveyPullQuote
@@ -275,7 +280,7 @@ const stateOfStartupsData = {
       },
       {
         kind: 'stat',
-        label: 'of startups with a GTM motion have no formal CRM. The number grew 11pp.',
+        label: 'of startups with a GTM motion have no formal CRM. The number grew 11%.',
         query: q('sales_tools', 'multi', NO_CRM),
       },
     ] as TopLineItem[],
@@ -293,7 +298,7 @@ const stateOfStartupsData = {
           eyebrow: 'One person, one platform',
           title: 'Solo founders continue to thrive.',
           description:
-            'Solo founders were already the largest group in 2025 at 53%. In 2026 they are 61% of respondents, up 8 points. Cofounder pairs slipped.',
+            'Solo founders were already the largest group in 2025 at 53%. In 2026 they are 61% of respondents, up 8%. Cofounder pairs slipped.',
           pullQuote: {
             quote:
               'Before I had to recruit engineers, now I’ve become the engineer doing pair or mob programming with multiple LLMs',
@@ -340,7 +345,7 @@ const stateOfStartupsData = {
           eyebrow: 'Older is the new younger',
           title: 'Founders 40 and older grew from 18% to 25%.',
           description:
-            'Every age band above 40 grew by a statistically significant margin. The 22 to 29 cohort shrank by 5 points. Seasoned operators are filling the gap, often with AI doing the typing.',
+            'Every age band above 40 grew by a statistically significant margin. The 22 to 29 cohort shrank by 5%. Seasoned operators are filling the gap, often with AI doing the typing.',
           pullQuote: {
             quote: 'It has allowed me to build the vision that has been in my head for decades',
             author: 'Mazz Ink',
@@ -357,7 +362,7 @@ const stateOfStartupsData = {
           eyebrow: 'From anywhere',
           title: 'You can build a great company from anywhere now.',
           description:
-            'The top metros are still the top metros. But AI has flattened the development gap everywhere else. Europe grew 4pp; Africa grew 2pp. Startups are setting up across Toronto, Chicago, Denver, and Austin, and throughout Europe, Asia, and Africa.',
+            'The top metros are still the top metros. But AI has flattened the development gap everywhere else. Europe grew 4%; Africa grew 2%. Startups are setting up across Toronto, Chicago, Denver, and Austin, and throughout Europe, Asia, and Africa.',
           pullQuote: {
             quote:
               'Speed of iteration is mind blowing. Even non-technical people can now translate creativity and ideas into tangible assets.',
@@ -402,14 +407,19 @@ const stateOfStartupsData = {
               'Claude models in Claude code and Cursor. Supabase MCP has also been a game changer',
             author: 'Adrian, FindHomes',
           },
+          statsHeading: {
+            title: 'What are your must-have dev tools?',
+            note: 'Unaided, free-form text',
+          },
           stats: [
-            stat('list Claude Code as a must-have', 'ai_coding_tools', 'multi', 'Claude Code'),
-            stat('list Cursor as a must-have', 'ai_coding_tools', 'multi', 'Cursor'),
-            stat('list VS Code as a must-have', 'ai_coding_tools', 'multi', 'Visual Studio Code'),
+            stat('Claude', 'must_have_tools', 'multi', 'Claude'),
+            stat('Cursor', 'must_have_tools', 'multi', 'Cursor'),
+            stat('ChatGPT/Codex', 'must_have_tools', 'multi', 'ChatGPT/Codex'),
           ],
           charts: [
             {
               title: 'Which AI coding tools do you use?',
+              note: 'Aided, multiple options selectable',
               column: 'ai_coding_tools',
               aggregation: 'multi',
               maxBars: 10,
@@ -563,7 +573,7 @@ const stateOfStartupsData = {
           eyebrow: 'The cost of vibes',
           title: 'Building got easier. Selling did not.',
           description:
-            'The more AI-generated a startup’s codebase, the less likely it is monetizing yet. 31% of startups with 76 to 100% AI-generated code are currently monetizing, vs 56% of those at zero. That cohort is also the most likely to name customer acquisition as their biggest challenge: 37% at the heavy end, 21% at zero. Read it as a posture of stage, not proof of failure: heavy AI users skew earlier and more bootstrapped.',
+            'The more AI-generated a startup’s codebase, the less likely it is monetizing yet, and the more likely it names customer acquisition as its biggest challenge. One way to view this, early-stage startups are the ones more likely to be heavy users of AI, and they’re also the ones most likely to be early to monetization.',
           pullQuote: {
             quote:
               'The hardest is getting the first paying customer to care, because AI-native dev tooling is a crowded space where every founder ships fast but almost nobody converts.',
@@ -624,7 +634,7 @@ const stateOfStartupsData = {
           eyebrow: 'Primary database',
           title: '80% choose some form of Postgres.',
           description:
-            'Postgres went from 76% to 80%. Every legacy NoSQL option lost share: MongoDB dropped 5%, MySQL 3%, Firebase 2%. Neon, DynamoDB, and Convex appeared as options for the first time and took small but measurable shares. The data can be noisy: Postgres implementations, such as Supabase, are reported inconsistently by respondents. Some pick Postgres, some pick Supabase, some pick both.',
+            'Postgres went from 76% to 80%. Every legacy NoSQL option lost share: MongoDB dropped 5%, MySQL 3%, Firebase 2%. Neon, DynamoDB, and Convex appeared as options for the first time and took small but measurable shares.',
           pullQuote: {
             quote: 'No hand written code anymore. We are building around AI coding agents.',
             author: 'Anonymous respondent in the San Francisco Bay Area',
@@ -668,7 +678,7 @@ const stateOfStartupsData = {
           eyebrow: 'Hosting and cloud',
           title: 'Supabase and Vercel are running away with startup hosting.',
           description:
-            'Supabase held its lead. Vercel was already ahead of AWS in 2025, and in 2026 it extended that lead by 9 points. Cloudflare grew fastest of all, crossing 27% and passing AWS on the way up. Every hyperscaler lost share.',
+            'Supabase held its lead. Vercel was already ahead of AWS in 2025, and in 2026 it extended that lead by 9%. Cloudflare grew fastest of all, crossing 27% and passing AWS on the way up. Every hyperscaler lost share.',
           stats: [
             stat('build on Supabase', 'cloud_providers', 'multi', 'Supabase'),
             stat('host on Vercel', 'cloud_providers', 'multi', 'Vercel'),
@@ -688,7 +698,7 @@ const stateOfStartupsData = {
           eyebrow: 'Frontend diversifies',
           title: 'Expo, TanStack, HTMX, and Astro all arrived this year.',
           description:
-            'React and Next.js both grew. But four tools went from effectively zero to real share in 12 months: Expo 10%, TanStack 8%, HTMX 4%, Astro 3%. Native mobile also picked up 3 points. The React-Next monoculture cracked.',
+            'React and Next.js both grew. But four tools went from effectively zero to real share in 12 months: Expo 10%, TanStack 8%, HTMX 4%, Astro 3%. Native mobile also picked up 3%.',
           stats: [
             newStat('use Expo', 'frontend_stack', 'multi', 'Expo'),
             newStat('use TanStack', 'frontend_stack', 'multi', 'TanStack'),
@@ -847,7 +857,7 @@ const stateOfStartupsData = {
         {
           id: 'no-crm',
           eyebrow: 'Sales tools',
-          title: 'CRM absence jumped 11 points.',
+          title: 'CRM absence jumped 11%.',
           description:
             '53% of startups with a GTM motion have no formal CRM, up from 43%. Every named CRM lost share: HubSpot, Salesforce, Notion/Airtable, Google Sheets. Teams build their own or do without.',
           stats: [
@@ -869,7 +879,7 @@ const stateOfStartupsData = {
           eyebrow: 'Observability',
           title: '56% still don’t use observability tools. Those who do are building their own.',
           description:
-            '"Custom solution" is the fastest-growing answer, up 2.5pp. Datadog and Prometheus both lost share. Sentry kept its lead and grew slightly. The observability market is bifurcating between Sentry for errors and custom dashboards for everything else.',
+            '"Custom solution" is the fastest-growing answer, up 2.5%. Datadog and Prometheus both lost share. Sentry kept its lead and grew slightly. The observability market is bifurcating between Sentry for errors and custom dashboards for everything else.',
           stats: [
             stat('don’t use observability tools yet', 'observability', 'multi', NO_OBSERVABILITY),
             stat('use Sentry', 'observability', 'multi', 'Sentry'),
@@ -887,9 +897,9 @@ const stateOfStartupsData = {
         {
           id: 'analytics',
           eyebrow: 'Analytics and growth tools',
-          title: 'Custom-built dashboards grew 6 points.',
+          title: 'Custom-built dashboards grew 6%.',
           description:
-            '"I don’t track this yet" grew 5pp. HubSpot, Salesforce, Mixpanel, Segment all lost share. The pattern repeats: skip the vendor, ship something internal, or don’t track at all.',
+            '"I don’t track this yet" grew 5%. HubSpot, Salesforce, Mixpanel, Segment all lost share. The pattern repeats: skip the vendor, ship something internal, or don’t track at all.',
           stats: [
             stat('don’t track growth yet', 'growth_tools', 'multi', NO_ANALYTICS),
             stat('use custom-built dashboards', 'growth_tools', 'multi', 'Custom-built dashboards'),
@@ -950,7 +960,7 @@ const stateOfStartupsData = {
           eyebrow: 'Sales motion',
           title: 'Founder-led sales is still the norm.',
           description:
-            'Dedicated full-time sales hires usually do not arrive until after the tenth employee. Product-led growth as a motion climbed 4 points to half of respondents. "Not sure yet" is shrinking.',
+            'Dedicated full-time sales hires usually do not arrive until after the tenth employee. Product-led growth as a motion climbed 4% to half of respondents. "Not sure yet" is shrinking.',
           stats: [
             stat('have any dedicated sales function', 'dedicated_sales_function', 'single', [
               'Yes, full-time sales team',
@@ -967,7 +977,7 @@ const stateOfStartupsData = {
         {
           id: 'pricing-settling',
           eyebrow: 'Pricing is settling',
-          title: 'Tiered feature plans jumped 12 points.',
+          title: 'Tiered feature plans jumped 12%.',
           description:
             'For the first time in the survey, startups are picking a pricing shape earlier in their lifecycle, and they are picking the same one. Tiered feature plans went from 23% to 36% of respondents who picked any pricing model. The "still experimenting" cohort shrank.',
           stats: [
@@ -990,7 +1000,7 @@ const stateOfStartupsData = {
           eyebrow: 'Developer communities',
           title: 'Most startups skip community.',
           description:
-            'Most startups skip community entirely. 48% have not built one, up 4 points, and the "planning to" middle is shrinking. Only 11% have built one. That small group is the one to watch: the chart below shows they grow from a completely different mix of channels.',
+            'Most startups skip community entirely. 48% have not built one, up 4%, and the "planning to" middle is shrinking. Only 11% have built one. That small group is the one to watch: the chart below shows they grow from a completely different mix of channels.',
           stats: [
             stat('have built a developer community', 'dev_community_built', 'single', 'Yes'),
             stat(
@@ -1093,7 +1103,7 @@ const stateOfStartupsData = {
           eyebrow: 'The quiet exit',
           title: '10% of founders have given up on social media.',
           description:
-            'X lost 6 points. LinkedIn lost 3. Reddit and Discord lost 3-4. TikTok was the only platform that grew. The "I have no online persona" share grew 5 points to 33%. One in three respondents is fully offline.',
+            'X lost 6%. LinkedIn lost 3%. Reddit and Discord lost 3-4%. TikTok was the only platform that grew. The "I have no online persona" share grew 5% to 33%. One in three respondents is fully offline.',
           stats: [
             stat(
               'use LinkedIn at least 3x a week',
@@ -1128,7 +1138,7 @@ const stateOfStartupsData = {
           eyebrow: 'Conferences fell',
           title: '2 in 3 respondents are not attending any industry conference.',
           description:
-            'The "none of the above" cohort jumped 10 points. Google Cloud Next, AWS re:Invent, Microsoft Build, and Y Combinator Demo Day all lost share. Conference-led developer marketing is working for a smaller slice of the market every year.',
+            'The "none of the above" cohort jumped 10%. Google Cloud Next, AWS re:Invent, Microsoft Build, and Y Combinator Demo Day all lost share. Conference-led developer marketing is working for a smaller slice of the market every year.',
           stats: [],
           charts: [
             {
@@ -1189,7 +1199,7 @@ const stateOfStartupsData = {
         {
           id: 'challenges',
           eyebrow: 'Biggest challenge',
-          title: 'Technical complexity fell 12 points.',
+          title: 'Technical complexity fell 12%.',
           description:
             'The largest year-over-year shift in any single category. Three new challenge options came online: burn out, AI competition, runway anxiety. Together they absorb roughly the same share that used to pick technical complexity. Among 1-10 person teams, burn out has already overtaken technical complexity as the second-biggest challenge.',
           stats: [
@@ -1224,9 +1234,9 @@ const stateOfStartupsData = {
         {
           id: 'outlook',
           eyebrow: 'World outlook',
-          title: 'Founders remain upbeat, but not equally.',
+          title: 'People are mostly optimistic, but not equally.',
           description:
-            '57% say they are optimistic, down 1 point from last year, not statistically significant. Founders are 58% optimistic; non-founders are 49%. Flip the cohort toggle to see the gap for yourself.',
+            '57% say they are optimistic, down 1% from last year, not statistically significant. Founders are 58% optimistic; non-founders are 49%.',
           stats: [],
           charts: [
             {

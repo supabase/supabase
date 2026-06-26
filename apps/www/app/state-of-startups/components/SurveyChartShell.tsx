@@ -9,12 +9,15 @@ const CHART_GRADIENT =
 export function SurveyChartShell({
   eyebrow,
   title,
+  note,
   isEmpty = false,
   emptyNoun = 'question',
   children,
 }: {
   eyebrow?: string
   title: string
+  /** Smaller parenthetical under the title clarifying how the question was asked. */
+  note?: string
   isEmpty?: boolean
   emptyNoun?: string
   children: ReactNode
@@ -27,7 +30,10 @@ export function SurveyChartShell({
             {eyebrow}
           </p>
         )}
-        <h3 className="text-foreground text-xl tracking-tight text-balance">{title}</h3>
+        <h3 className="text-foreground text-xl tracking-tight text-balance">
+          {title}
+          {note && <span className="ml-2 text-sm font-normal text-foreground-light">({note})</span>}
+        </h3>
       </header>
       {isEmpty ? (
         <div className="flex flex-col items-center justify-center gap-2 py-16 px-8 text-center">

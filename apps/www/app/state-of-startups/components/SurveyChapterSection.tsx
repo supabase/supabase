@@ -26,6 +26,7 @@ export function SurveyChapterSection({ section }: { section: SurveySection }) {
     eyebrow,
     title,
     description,
+    statsHeading,
     stats,
     charts,
     pullQuote,
@@ -111,8 +112,28 @@ export function SurveyChapterSection({ section }: { section: SurveySection }) {
             />
           )}
 
+          {/* Optional question header describing the stat cards below as the
+              answer to a specific survey question. */}
+          {statsHeading && (
+            <header className="px-8 pt-8 pb-2 border-t border-muted flex flex-col gap-1">
+              <p className="text-foreground/30 text-sm font-mono uppercase tracking-widest">
+                {'Q&A'}
+              </p>
+              <h3 className="text-foreground text-xl tracking-tight text-balance">
+                {statsHeading.title}
+                {statsHeading.note && (
+                  <span className="ml-2 text-sm font-normal text-foreground-light">
+                    ({statsHeading.note})
+                  </span>
+                )}
+              </h3>
+            </header>
+          )}
+
           {stats.length > 0 && (
-            <aside className="border-t border-muted flex flex-col xs:flex-row flex-wrap divide-y xs:divide-x xs:divide-y-0 divide-muted">
+            <aside
+              className={`${statsHeading ? '' : 'border-t border-muted'} flex flex-col xs:flex-row flex-wrap divide-y xs:divide-x xs:divide-y-0 divide-muted`}
+            >
               {stats.map((stat, index) => (
                 <SurveyStatCard
                   key={index}
@@ -157,6 +178,7 @@ export function SurveyChapterSection({ section }: { section: SurveySection }) {
               <SurveyChart
                 key={index}
                 title={chart.title}
+                note={chart.note}
                 column={chart.column}
                 aggregation={chart.aggregation}
                 filters={chart.filters}
