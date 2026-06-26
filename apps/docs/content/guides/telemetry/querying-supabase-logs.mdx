@@ -81,6 +81,15 @@ where source = 'postgres_logs'
 limit 1;
 ```
 
+## Best practices
+
+- Always include a `LIMIT`. Log tables are large, and an unbounded query scans far more data than you need.
+- Always filter by `source`. It scopes the query to one service instead of every log in the project.
+- Keep the time range tight. A smaller window in the date picker returns results faster.
+- Filter on the real columns (`source`, `timestamp`) before reaching into `log_attributes`.
+- Order by `timestamp desc` to see the most recent logs first.
+- Select the columns you need and use `count()` instead of `count(*)` or `select *`, which aren't supported.
+
 ## Examples
 
 Count requests by status code:
