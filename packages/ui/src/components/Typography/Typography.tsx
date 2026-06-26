@@ -1,26 +1,10 @@
 import Link from './Link'
 import Text from './Text'
 import Title from './Title'
-// @ts-ignore
-import TypographyStyles from './Typography.module.css'
 
 function Typography({ children, tag = 'div', style }: any) {
-  // let classes = [
-  //   TypographyStyles['sbui-typography'],
-  //   TypographyStyles['sbui-typography-container'],
-  // ]
-  // if (className) {
-  //   classes.push(className)
-  // }
   let CustomTag: any = `${tag}`
-  return (
-    <CustomTag
-      style={style}
-      // className={classes.join(' ')}
-    >
-      {children}
-    </CustomTag>
-  )
+  return <CustomTag style={style}>{children}</CustomTag>
 }
 
 Typography.Title = Title
