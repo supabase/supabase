@@ -95,9 +95,7 @@ export const ConnectSection = () => {
                 </span>
                 <div className="flex min-w-0 flex-1 flex-col gap-1 xl:flex-initial">
                   <p className="text-sm">{action.heading}</p>
-                  <p className="text-xs text-foreground-lighter leading-none">
-                    {action.subheading}!
-                  </p>
+                  <p className="text-sm text-foreground-lighter">{action.subheading}</p>
                 </div>
                 <ChevronRight
                   size={16}

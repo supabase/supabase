@@ -57,14 +57,14 @@ async function verifyTablePrivileges(
 }
 
 /**
- * Locates the API access toggle switch for Data API access.
+ * Locates the API access toggle switch for Data API Access.
  * Only present when creating or duplicating a table (not when editing).
  */
 function getApiAccessSwitch(page: Page) {
   const sidePanel = page.getByTestId('table-editor-side-panel')
   const dataApiSection = sidePanel
     .locator('div')
-    .filter({ hasText: 'Data API access' })
+    .filter({ hasText: 'Data API Access' })
     .filter({ has: page.getByRole('switch') })
   return dataApiSection.getByRole('switch')
 }
@@ -239,10 +239,10 @@ test.describe('API Access Toggle', () => {
     await page.getByRole('menuitem', { name: 'Edit table' }).click()
     await expect(page.getByTestId('table-editor-side-panel')).toBeVisible()
 
-    // Data API access section is visible
+    // Data API Access section is visible
     await expect(
-      page.getByText('Data API access'),
-      'Data API access label should be visible in edit mode'
+      page.getByText('Data API Access'),
+      'Data API Access label should be visible in edit mode'
     ).toBeVisible()
 
     // In edit mode the panel shows a "Manage access" link instead of a toggle switch

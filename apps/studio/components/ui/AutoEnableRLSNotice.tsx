@@ -5,6 +5,8 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
+  Card,
+  CardContent,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -15,7 +17,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
@@ -59,13 +60,21 @@ export const AutoEnableRLSNotice = ({ iconOnly }: { iconOnly?: boolean }) => {
   }
 
   return (
-    <Admonition
-      type="note"
-      layout="horizontal"
-      title="Auto-enable RLS for new tables"
-      description="We recommend creating an event trigger that enables Row Level Security on all new tables."
-      actions={
-        <>
+    <Card>
+      <CardContent className="flex items-center justify-between">
+        <div className="flex items-center gap-x-4">
+          <div className="rounded-lg bg-surface-300 text-foreground-light w-10 h-10 flex items-center justify-center">
+            <ShieldCheck size={18} />
+          </div>
+          <div className="text-sm">
+            <p>Auto-enable RLS for new tables</p>
+            <p className="text-foreground-lighter">
+              Create an event trigger that enables Row Level Security on all new tables
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-x-2">
           <CreateEnsureRLSTriggerDialog />
           <ButtonTooltip
             icon={<X />}
@@ -74,9 +83,9 @@ export const AutoEnableRLSNotice = ({ iconOnly }: { iconOnly?: boolean }) => {
             tooltip={{ content: { side: 'bottom', text: 'Minimize' } }}
             onClick={() => setIsMinimized(true)}
           />
-        </>
-      }
-    />
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -122,7 +131,7 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
             tooltip={{ content: { side: 'bottom', text: 'Auto-enable RLS for new tables' } }}
           />
         ) : (
-          <Button variant="default">Learn more</Button>
+          <Button variant="primary">Learn more</Button>
         )}
       </DialogTrigger>
       <DialogContent size="large">
