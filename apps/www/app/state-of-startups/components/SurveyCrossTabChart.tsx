@@ -24,14 +24,20 @@ interface SurveyCrossTabChartProps {
   axisColumn: string
   cohorts: CrossTabCohort[]
   series: CrossTabSeries[]
+  xAxisLabel?: string
+  yAxisLabel?: string
 }
 
 // SVG geometry
 const W = 640
-const H = 280
-const PAD_X = 32
+const H = 300
+const PAD_LEFT = 52
+const PAD_RIGHT = 16
 const PAD_TOP = 24
-const PAD_BOTTOM = 48
+const PAD_BOTTOM = 72
+
+const ACCENT = 'hsl(var(--brand-default))'
+const MUTED = 'hsl(var(--foreground-light))'
 
 export function SurveyCrossTabChart({
   title,
@@ -39,6 +45,8 @@ export function SurveyCrossTabChart({
   axisColumn,
   cohorts,
   series,
+  xAxisLabel,
+  yAxisLabel = '% of respondents',
 }: SurveyCrossTabChartProps) {
   const { year } = useYear()
 
@@ -56,10 +64,10 @@ export function SurveyCrossTabChart({
 
   const hasData = lines.some((l) => l.points.some((p) => p !== null))
 
-  const innerW = W - PAD_X * 2
+  const innerW = W - PAD_LEFT - PAD_RIGHT
   const innerH = H - PAD_TOP - PAD_BOTTOM
   const x = (i: number) =>
-    cohorts.length <= 1 ? PAD_X + innerW / 2 : PAD_X + (i * innerW) / (cohorts.length - 1)
+    cohorts.length <= 1 ? PAD_LEFT + innerW / 2 : PAD_LEFT + (i * innerW) / (cohorts.length - 1)
   const y = (pct: number) => PAD_TOP + (1 - pct / 100) * innerH
 
   return (
@@ -74,18 +82,36 @@ export function SurveyCrossTabChart({
           {[0, 25, 50, 75, 100].map((g) => (
             <g key={g}>
               <line
-                x1={PAD_X}
-                x2={W - PAD_X}
+                x1={PAD_LEFT}
+                x2={W - PAD_RIGHT}
                 y1={y(g)}
                 y2={y(g)}
-                stroke="hsl(var(--border-muted))"
+                style={{ stroke: 'hsl(var(--border-muted))' }}
                 strokeWidth={1}
               />
-              <text x={4} y={y(g) + 3} className="fill-foreground-muted" fontSize={10}>
+              <text
+                x={PAD_LEFT - 8}
+                y={y(g) + 3}
+                textAnchor="end"
+                className="fill-foreground-muted"
+                fontSize={10}
+              >
                 {g}%
               </text>
             </g>
           ))}
+
+          {/* y-axis title */}
+          <text
+            transform={`rotate(-90 14 ${PAD_TOP + innerH / 2})`}
+            x={14}
+            y={PAD_TOP + innerH / 2}
+            textAnchor="middle"
+            className="fill-foreground-light"
+            fontSize={11}
+          >
+            {yAxisLabel}
+          </text>
 
           {/* series lines */}
           {lines.map((l) => {
@@ -93,18 +119,17 @@ export function SurveyCrossTabChart({
               .map((p, i) => (p === null ? null : `${x(i)},${y(p)}`))
               .filter(Boolean)
               .join(' ')
-            const stroke =
-              l.tone === 'accent' ? 'hsl(var(--brand))' : 'hsl(var(--foreground-muted))'
+            const stroke = l.tone === 'accent' ? ACCENT : MUTED
             return (
               <g key={l.caption}>
                 <polyline
                   points={pts}
                   fill="none"
-                  stroke={stroke}
-                  strokeWidth={l.tone === 'accent' ? 3 : 2}
+                  style={{ stroke }}
+                  strokeWidth={l.tone === 'accent' ? 3 : 2.5}
                   strokeLinejoin="round"
                   strokeLinecap="round"
-                  strokeDasharray={l.tone === 'muted' ? '6 4' : undefined}
+                  strokeDasharray={l.tone === 'muted' ? '7 4' : undefined}
                 />
                 {l.points.map((p, i) =>
                   p === null ? null : (
@@ -112,8 +137,8 @@ export function SurveyCrossTabChart({
                       key={i}
                       cx={x(i)}
                       cy={y(p)}
-                      r={l.tone === 'accent' ? 4 : 3}
-                      fill={stroke}
+                      r={l.tone === 'accent' ? 4 : 3.5}
+                      style={{ fill: stroke }}
                     />
                   )
                 )}
@@ -126,7 +151,7 @@ export function SurveyCrossTabChart({
             <text
               key={c.label}
               x={x(i)}
-              y={H - PAD_BOTTOM + 24}
+              y={H - PAD_BOTTOM + 22}
               textAnchor="middle"
               className="fill-foreground-light"
               fontSize={11}
@@ -134,6 +159,19 @@ export function SurveyCrossTabChart({
               {c.label}
             </text>
           ))}
+
+          {/* x-axis title */}
+          {xAxisLabel && (
+            <text
+              x={PAD_LEFT + innerW / 2}
+              y={H - 14}
+              textAnchor="middle"
+              className="fill-foreground-muted"
+              fontSize={11}
+            >
+              {xAxisLabel}
+            </text>
+          )}
         </svg>
       </div>
     </SurveyChartShell>

@@ -57,7 +57,7 @@ export function ChartLegend({
         <div key={item.label} className="flex items-center gap-2">
           <span
             className={`inline-block ${item.variant === 'line' ? 'w-4 h-[3px]' : 'w-3 h-3'} ${
-              item.tone === 'accent' ? 'bg-brand' : 'bg-foreground-muted'
+              item.tone === 'accent' ? 'bg-brand' : 'bg-foreground-light'
             }`}
           />
           <span className="text-foreground-light text-xs font-mono uppercase tracking-widest">

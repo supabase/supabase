@@ -7,6 +7,7 @@ import { Button } from 'ui'
 
 import type { Aggregation, SurveyFilters } from '../lib/survey-key'
 import { distributionToBars, getDistribution, mergeFilters } from '../lib/survey-keys'
+import { buildSurveySql } from '../lib/survey-sql'
 import { SurveyChartShell } from './SurveyChartShell'
 import TwoOptionToggle from './TwoOptionToggle'
 import { useYear } from './year-context'
@@ -59,16 +60,10 @@ export function SurveyChart({
   const BUTTON_AREA_HEIGHT = 40 // px
   const CHART_HEIGHT = FIXED_HEIGHT - BUTTON_AREA_HEIGHT // px
 
-  const sql = useMemo(() => {
-    const fn =
-      aggregation === 'multi'
-        ? 'get_multi_select_stats'
-        : aggregation === 'boolean'
-          ? 'get_boolean_stats'
-          : 'get_single_select_stats'
-    const filterArg = effectiveFilters ? `, '${JSON.stringify(effectiveFilters)}'::jsonb` : ''
-    return `-- Pre-aggregated and embedded at build time\nselect label, count\nfrom ${fn}(${year}, '${column}'${filterArg});`
-  }, [aggregation, effectiveFilters, year, column])
+  const sql = useMemo(
+    () => buildSurveySql(year, column, aggregation, effectiveFilters, maxBars),
+    [year, column, aggregation, effectiveFilters, maxBars]
+  )
 
   return (
     <SurveyChartShell eyebrow="Q&A" title={title} isEmpty={chartData.length === 0}>

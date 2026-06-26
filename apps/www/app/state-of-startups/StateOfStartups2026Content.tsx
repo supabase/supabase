@@ -17,7 +17,6 @@ import { SurveyCompareStatCard } from './components/SurveyCompareStatCard'
 import { SurveySectionBreak } from './components/SurveySectionBreak'
 import { SurveyStatCard } from './components/SurveyStatCard'
 import { YearProvider } from './components/year-context'
-import { YearToggle } from './components/YearToggle'
 
 interface FloatingTocProps {
   tocRef: RefObject<HTMLDivElement | null>
@@ -210,7 +209,6 @@ export default function StateOfStartups2026Content() {
                   setIsTocOpen={setIsTocOpen}
                   activeChapter={activeChapter}
                 />
-                <YearToggle />
               </motion.div>
             </motion.div>
           )}

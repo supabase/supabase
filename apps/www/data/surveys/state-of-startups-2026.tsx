@@ -69,6 +69,8 @@ export interface CrossTabChartConfig {
   title: string
   eyebrow?: string
   axisColumn: string
+  xAxisLabel?: string
+  yAxisLabel?: string
   cohorts: CrossTabCohort[]
   series: CrossTabSeries[]
 }
@@ -220,7 +222,7 @@ const stateOfStartupsData = {
     title: 'State of Startups 2026',
     subheader:
       'Two thousand startup builders told us what they picked up and what they put down between 2025 and 2026. Anthropic rewrote the tooling layer, AI-written code became the median experience, and great companies are now starting up from anywhere.',
-    cta: 'Startups are the leading indicator. The tools founders pick up, the habits they drop, and the channels they stop trusting disrupt the status quo. If startups succeed, the effects ripple through the ecosystem. We track them so we can see what is coming.',
+    cta: 'Startups are the leading indicator. The tools founders pick up, the habits they drop, and the channels they stop trusting shift the status quo. If startups succeed, the effects ripple outward. We track them so we can see what is coming.',
   },
 
   topLineHero: [
@@ -264,17 +266,17 @@ const stateOfStartupsData = {
       shortTitle: 'Who is building',
       title: 'The founder changed shape.',
       description:
-        'The respondent base got older, more European, more solo, and less self-described-technical. One pattern connects it: experienced operators with AI in their pocket are starting companies again.',
+        'The respondent base got older, more European, more solo, and less self-described-technical. Experienced operators with AI in their pocket are starting companies again.',
       sections: [
         {
           id: 'solo-founders',
-          eyebrow: '01 · One person, one platform',
+          eyebrow: 'One person, one platform',
           title: 'Solo founders continue to thrive.',
           description:
-            'Solo founders were already the largest group in 2025 at 52%. In 2026 they are 61% of respondents, up 9 points. Cofounder pairs slipped. The one-person startup is the dominant shape and it is still growing.',
+            'Solo founders were already the largest group in 2025 at 53%. In 2026 they are 61% of respondents, up 8 points. Cofounder pairs slipped.',
           pullQuote: {
             quote:
-              'Before I had to recruit engineers, now I’ve become the engineer doing pair or mob programming with multiple LlMs',
+              'Before I had to recruit engineers, now I’ve become the engineer doing pair or mob programming with multiple LLMs',
             author: 'Your Friend Fido',
           },
           stats: [
@@ -292,13 +294,13 @@ const stateOfStartupsData = {
         },
         {
           id: 'non-technical-founders',
-          eyebrow: '02 · Not what an engineer looks like',
+          eyebrow: 'Not what an engineer looks like',
           title: '22% of startups are founded by non-technical founders.',
           description:
             'Technical-founder share dropped from 82% to 78%. The same cohort leans harder on AI code generation than anyone else.',
           pullQuote: {
             quote:
-              'I am a brand developer unfamiliar with coding. This opens up an entire realm of possibilities in what I am able to build for clients.',
+              'I am a brand new developer unfamiliar with coding. This opens up an entire realm of possibilities in what I am able to build for clients.',
             author: 'Anonymous respondent in North America',
           },
           stats: [
@@ -315,7 +317,7 @@ const stateOfStartupsData = {
         },
         {
           id: 'older-founders',
-          eyebrow: '03 · Older is the new younger',
+          eyebrow: 'Older is the new younger',
           title: 'Founders 40 and older grew from 18% to 25%.',
           description:
             'Every age band above 40 grew by a statistically significant margin. The 22 to 29 cohort shrank by 5 points. Seasoned operators are filling the gap, often with AI doing the typing.',
@@ -332,10 +334,10 @@ const stateOfStartupsData = {
         },
         {
           id: 'geo-shift',
-          eyebrow: '04 · From anywhere',
+          eyebrow: 'From anywhere',
           title: 'You can build a great company from anywhere now.',
           description:
-            'The top metros are still the top metros. But AI has flattened the development gap everywhere else. Europe grew 4pp; Africa grew 2pp. Startups are setting up across Toronto, Chicago, Denver, Austin, across Europe, Asia, and Africa. The playbook no longer requires a specific zip code.',
+            'The top metros are still the top metros. But AI has flattened the development gap everywhere else. Europe grew 4pp; Africa grew 2pp. Startups are setting up across Toronto, Chicago, Denver, and Austin, and throughout Europe, Asia, and Africa.',
           pullQuote: {
             quote:
               'Speed of iteration is mind blowing. Even non-technical people can now translate creativity and ideas into tangible assets.',
@@ -371,7 +373,7 @@ const stateOfStartupsData = {
       sections: [
         {
           id: 'coding-tools',
-          eyebrow: '05 · Must-have dev tools',
+          eyebrow: 'Must-have dev tools',
           title: 'Claude Code eclipsed everything else.',
           description:
             'Claude Code went from 1% in 2025 to 62% in 2026 (+61pp). Cursor dropped 19 points. v0, Bolt, and Windsurf each lost 6-9 points. VS Code held flat. Antigravity appeared for the first time and took the 4th spot in its debut year.',
@@ -396,10 +398,10 @@ const stateOfStartupsData = {
         },
         {
           id: 'paid-subs',
-          eyebrow: '06 · Paid AI subscriptions',
+          eyebrow: 'Paid AI subscriptions',
           title: 'Claude overtook OpenAI in the wallet.',
           description:
-            'Paid Claude subscriptions jumped from 28% to 59% of respondents. Paid OpenAI dropped from 57% to 39%. Gemini entered the list at 27%. The money is moving faster than any lagging indicator could capture.',
+            'Paid Claude subscriptions jumped from 28% to 59% of respondents. Paid OpenAI dropped from 57% to 39%. Gemini entered the list at 27%.',
           stats: [
             stat('pay for Claude', 'subscriptions', 'multi', 'Claude'),
             stat('pay for OpenAI / ChatGPT', 'subscriptions', 'multi', 'OpenAI / ChatGPT'),
@@ -416,10 +418,10 @@ const stateOfStartupsData = {
         },
         {
           id: 'model-providers',
-          eyebrow: '07 · Model providers',
+          eyebrow: 'Model providers',
           title: 'Anthropic is the default model provider.',
           description:
-            'Anthropic/Claude climbed from 38% to 64%; OpenAI fell from 69% to 51%. Gemini entered at 44%. Hugging Face and custom models lost material share, suggesting fewer teams are running their own inference.',
+            'Anthropic/Claude climbed from 38% to 64%; OpenAI fell from 69% to 51%. Gemini entered at 44%. Hugging Face and custom models lost material share, a sign fewer teams run their own inference.',
           stats: [
             stat('use Anthropic models', 'ai_models_used', 'multi', 'Anthropic/Claude'),
             stat('use OpenAI models', 'ai_models_used', 'multi', 'OpenAI'),
@@ -438,16 +440,16 @@ const stateOfStartupsData = {
     },
     {
       shortTitle: 'AI-written code',
-      title: 'AI-generated code is the median experience.',
+      title: 'AI-generated code is the new normal.',
       description:
-        '62% of startups have more than half their codebase written by AI. 41% are at 76 to 100%. Only 2% are at zero. Older founders use it more heavily than younger ones, and non-technical founders more than technical ones.',
+        '62% of startups have more than half their codebase written by AI. 40% are at 76 to 100%. Only 2% are at zero. Older founders use it more heavily than younger ones, and non-technical founders more than technical ones.',
       sections: [
         {
           id: 'ai-codebase',
-          eyebrow: '08 · Share of codebase',
-          title: '41% of respondents have more than three-quarters of their code AI-generated.',
+          eyebrow: 'Share of codebase',
+          title: '40% of respondents have more than three-quarters of their code AI-generated.',
           description:
-            'This question was new in 2026. Among non-technical founders, the 76-to-100% share rises to 54%. Among 50-to-59-year-olds it rises to 80%. AI code generation is a median practice, not a fringe one. Flip the age cohort toggle to see it climb with age.',
+            'This question was new in 2026. Among non-technical founders, the 76-to-100% share rises to 54%. Among 50-to-59-year-olds it rises to 60%. Flip the age cohort toggle to see it climb with age.',
           pullQuote: {
             quote:
               'It has made entirely efficient the most menial coding tasks, elevating the developer focus to matters of design and architecture.',
@@ -488,10 +490,10 @@ const stateOfStartupsData = {
         },
         {
           id: 'cost-of-vibes',
-          eyebrow: '08b · The cost of vibes',
+          eyebrow: 'The cost of vibes',
           title: 'Building got easier. Selling did not.',
           description:
-            'Heavy AI users ship more code and have less revenue to show for it. 31% of startups with 76 to 100% AI-generated code are currently monetizing, vs 61% of those at zero. The same cohort is most likely to name customer acquisition as their biggest challenge: 38% at the heavy end, 22% at zero. AI ate the building. Distribution is the new bottleneck.',
+            'The more AI-generated a startup’s codebase, the less likely it is monetizing yet. 31% of startups with 76 to 100% AI-generated code are currently monetizing, vs 56% of those at zero. That cohort is also the most likely to name customer acquisition as their biggest challenge: 37% at the heavy end, 21% at zero. Read it as a posture of stage, not proof of failure: heavy AI users skew earlier and more bootstrapped.',
           pullQuote: {
             quote:
               'The hardest is getting the first paying customer to care, because AI-native dev tooling is a crowded space where every founder ships fast but almost nobody converts.',
@@ -523,24 +525,17 @@ const stateOfStartupsData = {
           charts: [
             {
               kind: 'cross-tab',
-              title: 'Two slopes that go in opposite directions',
+              title: 'More AI-generated code, less likely to be monetizing yet',
               eyebrow: 'Cost of vibes',
               axisColumn: 'ai_generated_codebase_percent',
+              xAxisLabel: 'Share of codebase that is AI-generated',
+              yAxisLabel: 'Share of respondents who are monetizing',
               cohorts: AI_CODEBASE_COHORTS,
               series: [
                 {
                   caption: 'Currently monetizing',
                   tone: 'accent',
                   query: { column: 'currently_monetizing', aggregation: 'single', target: 'Yes' },
-                },
-                {
-                  caption: 'Customer acquisition is the biggest challenge',
-                  tone: 'muted',
-                  query: {
-                    column: 'biggest_challenge',
-                    aggregation: 'single',
-                    target: 'Customer acquisition',
-                  },
                 },
               ],
             },
@@ -552,12 +547,12 @@ const stateOfStartupsData = {
       shortTitle: 'Supabase deepens',
       title: 'The stack consolidated.',
       description:
-        'Supabase gained ground as a primary database, landed strong in its first year as an auth provider, and Postgres became the default analytics store. AWS, GCP, and Azure all lost share to Supabase, Vercel, and Cloudflare. A quieter story: the frontend layer is diversifying fast.',
+        'Supabase gained ground as a primary database, landed strong in its first year as an auth provider, and Postgres became the default analytics store. AWS, GCP, and Azure all lost share to Supabase, Vercel, and Cloudflare. The frontend layer is diversifying fast.',
       sections: [
         {
           id: 'databases',
-          eyebrow: '09 · Primary database',
-          title: 'Supabase went from 76% to 80%.',
+          eyebrow: 'Primary database',
+          title: 'Supabase went from 75% to 80%.',
           description:
             'Every legacy NoSQL option lost share: MongoDB dropped 5%, MySQL 3%, Firebase 2%.',
           pullQuote: {
@@ -580,7 +575,7 @@ const stateOfStartupsData = {
         },
         {
           id: 'auth',
-          eyebrow: '10 · Auth (new this year)',
+          eyebrow: 'Auth (new this year)',
           title: 'Supabase Auth landed at 72%.',
           description:
             'This question was new in 2026, so there is no prior baseline. Three in four respondents who answered the auth question picked Supabase Auth. The firm migration floor is the ~25% who picked no Supabase option at all.',
@@ -600,7 +595,7 @@ const stateOfStartupsData = {
         },
         {
           id: 'hosting',
-          eyebrow: '11 · Hosting and cloud',
+          eyebrow: 'Hosting and cloud',
           title: 'Supabase and Vercel are running away with startup hosting.',
           description:
             'Supabase held its lead. Vercel was already ahead of AWS in 2025, and in 2026 it extended that lead by 9 points. Cloudflare grew fastest of all, crossing 27% and passing AWS on the way up. Every hyperscaler lost share.',
@@ -620,10 +615,10 @@ const stateOfStartupsData = {
         },
         {
           id: 'frontend',
-          eyebrow: '12 · Frontend diversifies',
+          eyebrow: 'Frontend diversifies',
           title: 'Expo, TanStack, HTMX, and Astro all arrived this year.',
           description:
-            'React and Next.js both grew. But the quieter story is that four tools went from effectively zero to real share in 12 months: Expo 10%, TanStack 8%, HTMX 4%, Astro 3%. Native mobile also picked up 3 points. The React-Next monoculture cracked.',
+            'React and Next.js both grew. But four tools went from effectively zero to real share in 12 months: Expo 10%, TanStack 8%, HTMX 4%, Astro 3%. Native mobile also picked up 3 points. The React-Next monoculture cracked.',
           stats: [
             newStat('use Expo', 'frontend_stack', 'multi', 'Expo'),
             newStat('use TanStack', 'frontend_stack', 'multi', 'TanStack'),
@@ -653,10 +648,10 @@ const stateOfStartupsData = {
       sections: [
         {
           id: 'agent-building',
-          eyebrow: '13 · Who is building agents',
+          eyebrow: 'Who is building agents',
           title: '52% of respondents are building agents.',
           description:
-            'Agent-building share is statistically flat year over year. The "not sure" cohort shrank, which means undecided builders are making up their minds and shipping. What-they-automate has shifted: workflow and data analysis climbed; customer support fell off the top spot.',
+            'Agent-building share is statistically flat year over year. The "not sure" cohort shrank, which means undecided builders are making up their minds and shipping. Agents are also getting more sophisticated and handling workflow and data analysis, not just customer support.',
           stats: [
             stat(
               'are building or planning to build AI agents',
@@ -683,10 +678,10 @@ const stateOfStartupsData = {
         },
         {
           id: 'multi-agent',
-          eyebrow: '14 · Multi-agent (new this year)',
+          eyebrow: 'Multi-agent (new this year)',
           title: 'Three in four agent-builders are doing multi-agent work.',
           description:
-            '25% say multi-agent is in production. 21% in development. 36% planning. Only 16% said no. This question was new this year; the on-ramp is already steeper than the "are you building agents at all" question was in 2025.',
+            '24% of people building agents are orchestrating multiple agents. The advanced builders are racing ahead of the pack.',
           stats: [
             stat(
               'have multi-agent systems in production',
@@ -717,10 +712,10 @@ const stateOfStartupsData = {
         },
         {
           id: 'agent-infra-gap',
-          eyebrow: '15 · The operational gap (new this year)',
+          eyebrow: 'The operational gap (new this year)',
           title: 'Agents ship without the operations stack.',
           description:
-            'These questions were new in 2026. Every number is a wedge for a product play: no monitoring, no prompt versioning, no evaluation. Whoever builds the operator tools for the next 500k AI startups has an open market.',
+            'Agent usage and construction is growing. But the operational layer (monitoring, versioning, evaluation, etc.) is still missing. If the agentic trend continues, this represents a real opportunity for the next wave of builders.',
           stats: [],
           charts: [
             {
@@ -745,10 +740,10 @@ const stateOfStartupsData = {
         },
         {
           id: 'mcp',
-          eyebrow: '16 · MCP (new this year)',
+          eyebrow: 'MCP (new this year)',
           title: 'MCP went mainstream fast.',
           description:
-            'A year after the protocol launched, 57% of respondents have hands on it. Only 14% say they are unfamiliar. This question is new in 2026 so there is no year-over-year comparison; the speed of the on-ramp is what stands out.',
+            'A year after the Model Context Protocol launched, more than half of respondents are already active users. Even as the debate over MCP and APIs continues, people still find MCP valuable in at least some contexts.',
           stats: [],
           charts: [
             {
@@ -771,14 +766,14 @@ const stateOfStartupsData = {
       shortTitle: 'What happens to SaaS?',
       title: 'What is going to happen to SaaS?',
       description:
-        'Five separate questions show the same pattern this year. CRMs, analytics, observability, dev communities, prompt management. In every one, named SaaS vendors lost share, and either "we don’t have one yet" or "custom-built" grew. Startups are not buying operator SaaS. They are building their own or doing without. What happens to SaaS tools is going to be the biggest question of the year.',
+        'The same pattern shows up across categories this year. In CRMs, analytics, and observability, named SaaS vendors lost share while "we don’t have one yet" or "custom-built" grew. Startups are not buying operator SaaS. They are building their own or doing without.',
       sections: [
         {
           id: 'no-crm',
-          eyebrow: '17 · Sales tools',
+          eyebrow: 'Sales tools',
           title: 'CRM absence jumped 11 points.',
           description:
-            '53% of startups with a GTM motion have no formal CRM, up from 43%. Every named CRM lost share: HubSpot, Salesforce, Notion/Airtable, Google Sheets. Build-your-own, or nothing at all.',
+            '53% of startups with a GTM motion have no formal CRM, up from 43%. Every named CRM lost share: HubSpot, Salesforce, Notion/Airtable, Google Sheets. Teams build their own or do without.',
           stats: [
             stat('have no formal CRM', 'sales_tools', 'multi', NO_CRM),
             stat('use Google Sheets as a CRM', 'sales_tools', 'multi', 'Google Sheets'),
@@ -795,7 +790,7 @@ const stateOfStartupsData = {
         },
         {
           id: 'observability',
-          eyebrow: '18 · Observability',
+          eyebrow: 'Observability',
           title: '56% still don’t use observability tools. Those who do are building their own.',
           description:
             '"Custom solution" is the fastest-growing answer, up 2.5pp. Datadog and Prometheus both lost share. Sentry kept its lead and grew slightly. The observability market is bifurcating between Sentry for errors and custom dashboards for everything else.',
@@ -815,7 +810,7 @@ const stateOfStartupsData = {
         },
         {
           id: 'analytics',
-          eyebrow: '19 · Analytics and growth tools',
+          eyebrow: 'Analytics and growth tools',
           title: 'Custom-built dashboards grew 6 points.',
           description:
             '"I don’t track this yet" grew 5pp. HubSpot, Salesforce, Mixpanel, Segment all lost share. The pattern repeats: skip the vendor, ship something internal, or don’t track at all.',
@@ -833,30 +828,6 @@ const stateOfStartupsData = {
             },
           ],
         },
-        {
-          id: 'dev-community',
-          eyebrow: '20 · Developer communities',
-          title: 'The 11% who built one have a different growth playbook.',
-          description:
-            'Most teams are not even trying. "No, we haven’t built a community" grew 4 points to 48%. "In progress / planning to" shrank. The "yes, we built one" share held flat at 11%. The smaller top-of-funnel hides the better signal: the small slice of startups that did build a community pulls customers from a completely different mix of channels. See section 21b for the divergence.',
-          stats: [
-            stat('have built a developer community', 'dev_community_built', 'single', 'Yes'),
-            stat(
-              'are planning a developer community',
-              'dev_community_built',
-              'single',
-              'In progress / planning to'
-            ),
-            stat('have not built one', 'dev_community_built', 'single', 'No'),
-          ],
-          charts: [
-            {
-              title: 'Have you built a developer community around your product?',
-              column: 'dev_community_built',
-              aggregation: 'single',
-            },
-          ],
-        },
       ],
     },
     {
@@ -867,7 +838,7 @@ const stateOfStartupsData = {
       sections: [
         {
           id: 'initial-customers',
-          eyebrow: '21 · Initial customers',
+          eyebrow: 'Initial customers',
           title: 'Personal networks still work best.',
           description:
             'Personal networks remain the top source of initial paying customers. 67% of respondents still haven’t tried paid acquisition at all, up from 62% last year.',
@@ -906,11 +877,88 @@ const stateOfStartupsData = {
           ],
         },
         {
-          id: 'community-moat',
-          eyebrow: '21b · Community is the moat',
-          title: 'The teams that built a community do not need to borrow yours.',
+          id: 'sales-motion',
+          eyebrow: 'Sales motion',
+          title: 'Founder-led sales is still the norm.',
           description:
-            'When anyone can ship anything, distribution is the bottleneck. Personal networks run dry. Cold outreach gets ignored. The startups that built a developer community ship into a different funnel: open-source users and developer communities convert into paying customers at multiples of the rate non-community teams see. The chart below splits the customer-source mix by community status. Same survey. A different growth playbook.',
+            'Dedicated full-time sales hires usually do not arrive until after the tenth employee. Product-led growth as a motion climbed 4 points to half of respondents. "Not sure yet" is shrinking.',
+          stats: [
+            stat('have any dedicated sales function', 'dedicated_sales_function', 'single', [
+              'Yes, full-time sales team',
+              'Yes, but it’s founder-led or part-time',
+            ]),
+            stat('have no dedicated sales function', 'dedicated_sales_function', 'single', [
+              'No, and no plans to add one yet',
+              'No, but planning to build one',
+            ]),
+            stat('use a product-led growth motion', 'market_model', 'multi', 'Product-led growth'),
+          ],
+          charts: [
+            {
+              title: 'Who is primarily responsible for sales?',
+              column: 'sales_primary_responsible',
+              aggregation: 'single',
+            },
+          ],
+        },
+        {
+          id: 'pricing-settling',
+          eyebrow: 'Pricing is settling',
+          title: 'Tiered feature plans jumped 12 points.',
+          description:
+            'For the first time in the survey, startups are picking a pricing shape earlier in their lifecycle, and they are picking the same one. Tiered feature plans went from 23% to 36% of respondents who picked any pricing model. The "still experimenting" cohort shrank.',
+          stats: [
+            stat('use tiered feature plans', 'pricing', 'multi', 'Tiered feature plans'),
+            stat('use usage-based pricing', 'pricing', 'multi', 'Usage-based pricing'),
+            stat('are still experimenting with pricing', 'pricing', 'multi', 'Still experimenting'),
+          ],
+          charts: [
+            {
+              title: 'How do you price your product?',
+              column: 'pricing',
+              aggregation: 'multi',
+              maxBars: 10,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      shortTitle: 'Community',
+      title: 'Community is the moat.',
+      description:
+        'Few startups build a developer community. The ones that do grow from a completely different mix of channels, and convert at higher rates.',
+      sections: [
+        {
+          id: 'dev-community',
+          eyebrow: 'Developer communities',
+          title: 'Most startups skip community.',
+          description:
+            'Most startups skip community entirely. 48% have not built one, up 4 points, and the "planning to" middle is shrinking. Only 11% have built one. That small group is the one to watch: the chart below shows they grow from a completely different mix of channels.',
+          stats: [
+            stat('have built a developer community', 'dev_community_built', 'single', 'Yes'),
+            stat(
+              'are planning a developer community',
+              'dev_community_built',
+              'single',
+              'In progress / planning to'
+            ),
+            stat('have not built one', 'dev_community_built', 'single', 'No'),
+          ],
+          charts: [
+            {
+              title: 'Have you built a developer community around your product?',
+              column: 'dev_community_built',
+              aggregation: 'single',
+            },
+          ],
+        },
+        {
+          id: 'community-moat',
+          eyebrow: 'The growth split',
+          title: 'Investing in community pays off.',
+          description:
+            'When anyone can ship anything, distribution is the bottleneck. Personal networks run dry. Cold outreach gets ignored. The startups that built a developer community ship into a different funnel: open-source users and developer communities convert into paying customers at multiples of the rate non-community teams see. The chart below splits the customer-source mix by community status.',
           pullQuote: {
             quote:
               'The hardest part has been gaining consistent user traction, cutting through noise, reaching the right audience, and turning early interest into active, retained users.',
@@ -976,51 +1024,6 @@ const stateOfStartupsData = {
             },
           ],
         },
-        {
-          id: 'sales-motion',
-          eyebrow: '22 · Sales motion',
-          title: 'Founder-led sales is still the norm.',
-          description:
-            'Dedicated full-time sales hires usually do not arrive until after the tenth employee. Product-led growth as a motion climbed 4 points to half of respondents. "Not sure yet" is shrinking.',
-          stats: [
-            stat('have any dedicated sales function', 'dedicated_sales_function', 'single', [
-              'Yes, full-time sales team',
-              'Yes, but it’s founder-led or part-time',
-            ]),
-            stat('have no dedicated sales function', 'dedicated_sales_function', 'single', [
-              'No, and no plans to add one yet',
-              'No, but planning to build one',
-            ]),
-            stat('use a product-led growth motion', 'market_model', 'multi', 'Product-led growth'),
-          ],
-          charts: [
-            {
-              title: 'Who is primarily responsible for sales?',
-              column: 'sales_primary_responsible',
-              aggregation: 'single',
-            },
-          ],
-        },
-        {
-          id: 'pricing-settling',
-          eyebrow: '23 · Pricing is settling',
-          title: 'Tiered feature plans jumped 12 points.',
-          description:
-            'For the first time in the survey, startups are picking a pricing shape earlier in their lifecycle, and they are picking the same one. Tiered feature plans went from 23% to 36% of respondents who picked any pricing model. The "still experimenting" cohort shrank.',
-          stats: [
-            stat('use tiered feature plans', 'pricing', 'multi', 'Tiered feature plans'),
-            stat('use usage-based pricing', 'pricing', 'multi', 'Usage-based pricing'),
-            stat('are still experimenting with pricing', 'pricing', 'multi', 'Still experimenting'),
-          ],
-          charts: [
-            {
-              title: 'How do you price your product?',
-              column: 'pricing',
-              aggregation: 'multi',
-              maxBars: 10,
-            },
-          ],
-        },
       ],
     },
     {
@@ -1031,7 +1034,7 @@ const stateOfStartupsData = {
       sections: [
         {
           id: 'social-exit',
-          eyebrow: '24 · The quiet exit',
+          eyebrow: 'The quiet exit',
           title: '10% of founders have given up on social media.',
           description:
             'X lost 6 points. LinkedIn lost 3. Reddit and Discord lost 3-4. TikTok was the only platform that grew. The "I have no online persona" share grew 5 points to 33%. One in three respondents is fully offline.',
@@ -1066,7 +1069,7 @@ const stateOfStartupsData = {
         },
         {
           id: 'conferences',
-          eyebrow: '25 · Conferences fell',
+          eyebrow: 'Conferences fell',
           title: '2 in 3 respondents are not attending any industry conference.',
           description:
             'The "none of the above" cohort jumped 10 points. Google Cloud Next, AWS re:Invent, Microsoft Build, and Y Combinator Demo Day all lost share. Conference-led developer marketing is working for a smaller slice of the market every year.',
@@ -1084,13 +1087,13 @@ const stateOfStartupsData = {
     },
     {
       shortTitle: 'Outlook',
-      title: 'Technical complexity collapsed. New fears took its place.',
+      title: 'Technical complexity is handled. New fears took its place.',
       description:
-        'The biggest single movement in the entire survey: "technical complexity" as the largest business challenge fell from 24% to 11%. AI ate the hard parts of shipping. What replaced it: burn out, AI-competition fear, runway anxiety. Optimism is mostly flat. Engineers less so.',
+        '"Technical complexity" as the largest business challenge fell from 24% to 11%, the biggest single movement in the survey. AI ate the hard parts of shipping. What replaced it: burn out, AI-competition fear, runway anxiety. Optimism is mostly flat. Engineers less so.',
       sections: [
         {
           id: 'challenges',
-          eyebrow: '26 · Biggest challenge',
+          eyebrow: 'Biggest challenge',
           title: 'Technical complexity fell 13 points.',
           description:
             'The largest year-over-year shift in any single category. Three new challenge options came online: burn out, AI competition, runway anxiety. Together they absorb roughly the same share that used to pick technical complexity. Among 1-10 person teams, burn out has already overtaken technical complexity as the second-biggest challenge.',
@@ -1150,7 +1153,7 @@ const stateOfStartupsData = {
         },
         {
           id: 'outlook',
-          eyebrow: '27 · World outlook',
+          eyebrow: 'World outlook',
           title: 'Founders remain upbeat, but not equally.',
           description:
             '57% say they are optimistic, down 1 point from last year, not statistically significant. Founders are 58% optimistic; non-founders are 49%. Flip the cohort toggle to see the gap for yourself.',
@@ -1175,10 +1178,10 @@ const stateOfStartupsData = {
         },
         {
           id: 'optimism-gap',
-          eyebrow: '27b · The optimism gap',
+          eyebrow: 'The optimism gap',
           title: 'The most optimistic founders are also the farthest from revenue.',
           description:
-            'Optimism rises with AI codebase share: 49% of zero-AI founders feel optimistic about the world, 60% of heavy AI users do. Revenue runs the other way. 61% of zero-AI users are currently monetizing. 31% of heavy AI users are. The easy reading is that hands-on AI experience demystifies the technology and turns it into something founders feel they can wield. The data is harder than that. The heaviest AI users are also the most likely to be bootstrapped, the earliest in their lifecycle, and the least exposed to whether the market actually wants what they have built. Read the chart as a posture, not a verdict. Shipping faster makes founders feel better. It does not, on its own, make customers pay.',
+            'Optimism rises with AI codebase share: 49% of zero-AI founders feel optimistic about the world, 61% of heavy AI users do. Revenue runs the other way. 56% of zero-AI users are currently monetizing. 31% of heavy AI users are. One reading is that hands-on AI experience demystifies the technology and turns it into something founders feel they can wield. The heaviest AI users are also the most likely to be bootstrapped, the earliest in their lifecycle, and the least exposed to whether the market actually wants what they have built.',
           pullQuote: {
             quote:
               'Speed of iteration is mind blowing. Even non-technical people can now translate creativity and ideas into tangible assets.',
@@ -1210,20 +1213,17 @@ const stateOfStartupsData = {
           charts: [
             {
               kind: 'cross-tab',
-              title: 'Optimism rises. Revenue falls. Same x-axis.',
+              title: 'Optimism climbs as AI writes more of the code',
               eyebrow: 'Optimism gap',
               axisColumn: 'ai_generated_codebase_percent',
+              xAxisLabel: 'Share of codebase that is AI-generated',
+              yAxisLabel: 'Share of respondents who are optimistic',
               cohorts: AI_CODEBASE_COHORTS,
               series: [
                 {
-                  caption: 'Feel optimistic about the world',
+                  caption: 'Feel optimistic',
                   tone: 'accent',
                   query: { column: 'world_outlook', aggregation: 'single', target: 'Optimistic' },
-                },
-                {
-                  caption: 'Currently monetizing',
-                  tone: 'muted',
-                  query: { column: 'currently_monetizing', aggregation: 'single', target: 'Yes' },
                 },
               ],
             },

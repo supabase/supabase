@@ -31,6 +31,10 @@
           "count": 266
         },
         {
+          "label": "ChatGPT / Codex",
+          "count": 232
+        },
+        {
           "label": "Windsurf",
           "count": 226
         },
@@ -41,10 +45,6 @@
         {
           "label": "Cline",
           "count": 71
-        },
-        {
-          "label": "ChatGPT",
-          "count": 30
         },
         {
           "label": "Claude Code",
@@ -107,19 +107,7 @@
           "count": 4
         },
         {
-          "label": "Chatgpt",
-          "count": 4
-        },
-        {
-          "label": "Codex",
-          "count": 4
-        },
-        {
           "label": "Augment",
-          "count": 3
-        },
-        {
-          "label": "chatgpt",
           "count": 3
         },
         {
@@ -168,10 +156,6 @@
         },
         {
           "label": "Coderabbit",
-          "count": 2
-        },
-        {
-          "label": "codex",
           "count": 2
         },
         {
@@ -311,14 +295,6 @@
           "count": 1
         },
         {
-          "label": "chatGPT",
-          "count": 1
-        },
-        {
-          "label": "ChatGpt",
-          "count": 1
-        },
-        {
           "label": "ChatGPT & Phind",
           "count": 1
         },
@@ -376,10 +352,6 @@
         },
         {
           "label": "Codebuff",
-          "count": 1
-        },
-        {
-          "label": "CODEX",
           "count": 1
         },
         {
@@ -660,14 +632,6 @@
         },
         {
           "label": "open ai",
-          "count": 1
-        },
-        {
-          "label": "Openai",
-          "count": 1
-        },
-        {
-          "label": "OpenAI",
           "count": 1
         },
         {
@@ -10333,12 +10297,12 @@
           "count": 409
         },
         {
-          "label": "v0",
-          "count": 191
+          "label": "ChatGPT / Codex",
+          "count": 356
         },
         {
-          "label": "Codex",
-          "count": 150
+          "label": "v0",
+          "count": 191
         },
         {
           "label": "Windsurf",
@@ -10365,10 +10329,6 @@
           "count": 54
         },
         {
-          "label": "codex",
-          "count": 22
-        },
-        {
           "label": "Devin",
           "count": 21
         },
@@ -10387,10 +10347,6 @@
         {
           "label": "Tempo",
           "count": 13
-        },
-        {
-          "label": "ChatGPT",
-          "count": 10
         },
         {
           "label": "Opencode",
@@ -10414,10 +10370,6 @@
         },
         {
           "label": "Base44",
-          "count": 4
-        },
-        {
-          "label": "chatgpt",
           "count": 4
         },
         {
@@ -10445,16 +10397,8 @@
           "count": 4
         },
         {
-          "label": "OpenAI",
-          "count": 4
-        },
-        {
           "label": "opencode",
           "count": 4
-        },
-        {
-          "label": "Chatgpt",
-          "count": 3
         },
         {
           "label": "Conductor",
@@ -10486,10 +10430,6 @@
         },
         {
           "label": "ChatGPT Codex",
-          "count": 2
-        },
-        {
-          "label": "CodeX",
           "count": 2
         },
         {
@@ -10530,10 +10470,6 @@
         },
         {
           "label": "Kilo Code",
-          "count": 2
-        },
-        {
-          "label": "Openai",
           "count": 2
         },
         {
@@ -10622,14 +10558,6 @@
         },
         {
           "label": "Chat GPT and Gemini",
-          "count": 1
-        },
-        {
-          "label": "ChatGpt",
-          "count": 1
-        },
-        {
-          "label": "CHatGPT",
           "count": 1
         },
         {

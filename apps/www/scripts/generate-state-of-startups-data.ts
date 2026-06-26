@@ -47,6 +47,37 @@ interface Tuple {
   filters?: SurveyFilters
 }
 
+// Manual consolidations: free-text survey options that should be counted as a
+// single entry. The merged percentage is authoritative (provided by the survey
+// owner) because a distinct-respondent union cannot be derived by summing the
+// individual option counts. Source labels are matched case-insensitively.
+const MULTI_MERGES: Record<
+  string,
+  { into: string; from: string[]; pct: Record<number, number> }[]
+> = {
+  ai_coding_tools: [
+    { into: 'ChatGPT / Codex', from: ['chatgpt', 'codex', 'openai'], pct: { 2025: 11, 2026: 13 } },
+  ],
+}
+
+function applyMerges(
+  year: number,
+  column: string,
+  dist: { rows: { label: string; count: number }[]; respondentCount: number }
+) {
+  const merges = MULTI_MERGES[column]
+  if (!merges) return dist
+  let rows = dist.rows
+  for (const m of merges) {
+    const fam = new Set(m.from.map((s) => s.toLowerCase()))
+    rows = rows.filter((r) => !fam.has(r.label.trim().toLowerCase()))
+    const count = Math.round(((m.pct[year] ?? 0) / 100) * dist.respondentCount)
+    if (count > 0) rows.push({ label: m.into, count })
+  }
+  rows.sort((a, b) => b.count - a.count)
+  return { ...dist, rows }
+}
+
 /** Walk the narrative and emit every (column, aggregation, filters) it renders:
  *  top-line items, section stats and bar charts (each also under every cohort
  *  toggle option), cross-tab series per axis cohort, and channel-mix per
@@ -130,7 +161,7 @@ async function fetchDistribution(year: number, t: Tuple) {
     label: String(r.label),
     count: Number(r.count ?? 0),
   }))
-  return { rows, respondentCount: Number(rcRes.data ?? 0) }
+  return applyMerges(year, t.column, { rows, respondentCount: Number(rcRes.data ?? 0) })
 }
 
 async function main() {
