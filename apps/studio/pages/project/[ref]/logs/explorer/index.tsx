@@ -87,6 +87,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }, [logsShowMetadataIpTemplate])
 
   const editorRef = useRef<editor.IStandaloneCodeEditor>(null)
+  const pendingRewriteSqlRef = useRef<string | null>(null)
   const [editorId] = useState<string>(uuidv4())
   const { search, setSearch, timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
   const defaultHelper = useMemo(() => getDefaultHelper(EXPLORER_DATEPICKER_HELPERS), [])
@@ -247,8 +248,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const acceptRewrite = () => {
     if (!rewriteProposal) return
-    // The editor is controlled by `editorValue`, so updating state applies the
-    // rewrite even though the editor is remounting from the diff view.
+    // The editor is unmounted while the diff is shown, so stash the rewrite and let
+    // the editor's onMount apply it once it remounts (Monaco caches its model, so a
+    // remount alone keeps the old query).
+    pendingRewriteSqlRef.current = rewriteProposal.modified
     setEditorValue(rewriteProposal.modified)
     setRewriteProposal(null)
     toast.success('Applied the ClickHouse rewrite')
@@ -507,8 +510,14 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               id={editorId}
               editorRef={editorRef}
               language="pgsql"
-              value={editorValue}
+              defaultValue={editorValue}
               onInputChange={(v) => setEditorValue(v || '')}
+              onMount={(editor) => {
+                if (pendingRewriteSqlRef.current !== null) {
+                  editor.setValue(pendingRewriteSqlRef.current)
+                  pendingRewriteSqlRef.current = null
+                }
+              }}
               actions={{ runQuery: { enabled: true, callback: handleRun } }}
             />
           )}
