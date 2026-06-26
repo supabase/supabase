@@ -22,6 +22,7 @@ export default function BlogViewToggle({
             setBlogViewCookie(v)
           }}
           aria-label={`${v} view`}
+          aria-pressed={view === v}
           className={cn(
             'relative flex items-center justify-center w-7 h-7 rounded-sm transition-colors',
             view === v ? 'text-foreground' : 'text-foreground-light hover:text-foreground'

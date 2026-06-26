@@ -50,17 +50,24 @@ export default function CategoryClient({
       <SectionContainer>
         {visiblePosts.length ? (
           isList ? (
-            <div>
+            <ul aria-label={`Blog posts, ${visiblePosts.length} total`}>
               {visiblePosts.map((post, idx) => (
-                <BlogListItem post={post} key={`list-${idx}-${post.slug}`} />
+                <li key={`list-${idx}-${post.slug}`}>
+                  <BlogListItem post={post} />
+                </li>
               ))}
-            </div>
+            </ul>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <ul
+              aria-label={`Blog posts, ${visiblePosts.length} total`}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+            >
               {visiblePosts.map((post, idx) => (
-                <BlogGridItem post={post} key={`grid-${idx}-${post.slug}`} />
+                <li key={`grid-${idx}-${post.slug}`}>
+                  <BlogGridItem post={post} />
+                </li>
               ))}
-            </div>
+            </ul>
           )
         ) : (
           <div className="px-6 py-12">

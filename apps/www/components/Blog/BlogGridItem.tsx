@@ -30,31 +30,31 @@ const BlogGridItem = ({ post }: Props) => {
 
   return (
     <Link href={post.path} prefetch={false} className="group flex flex-col h-full">
-      <div className="relative w-full aspect-[1.91/1] overflow-hidden rounded-md border border-foreground/10">
-        <Image
-          fill
-          sizes="100%"
-          quality={100}
-          src={imageUrl}
-          className="object-cover"
-          alt={`${post.title} thumbnail`}
-        />
+      <div
+        className="relative w-full aspect-[1.91/1] overflow-hidden rounded-md border border-foreground/10"
+        aria-hidden="true"
+      >
+        <Image fill sizes="100%" quality={100} src={imageUrl} className="object-cover" alt="" />
       </div>
       <div className="flex flex-col gap-1 pt-4">
         <h3 className="text-foreground text-lg group-hover:underline">{post.title}</h3>
         <p className="text-foreground-lighter text-sm mt-1 line-clamp-2">{post.description}</p>
         {post.date && (
           <div className="text-foreground-lighter flex items-center space-x-1.5 text-[11px] mt-3">
-            <p>{dayjs(post.date).format('D MMM YYYY')}</p>
+            <p>
+              <span className="sr-only">Published </span>
+              {dayjs(post.date).format('D MMM YYYY')}
+            </p>
             {post.readingTime && (
               <>
-                <p>•</p>
+                <p aria-hidden="true">•</p>
                 <p>{post.readingTime}</p>
               </>
             )}
           </div>
         )}
         <div className="mt-1.5">
+          <span className="sr-only">Author: </span>
           <AuthorAvatars authors={author} />
         </div>
       </div>

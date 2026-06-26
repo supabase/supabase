@@ -31,14 +31,17 @@ function SecondarySpotlight({ post }: { post: PostTypes }) {
       prefetch={false}
       className="group flex gap-4 items-start hover:bg-surface-200 dark:hover:bg-surface-75 p-2 sm:p-4 rounded-xl"
     >
-      <div className="relative shrink-0 w-36 aspect-[1.91/1] overflow-hidden rounded-md border border-foreground/10">
+      <div
+        className="relative shrink-0 w-36 aspect-[1.91/1] overflow-hidden rounded-md border border-foreground/10"
+        aria-hidden="true"
+      >
         <Image
           src={imageUrl}
           fill
           sizes="112px"
           quality={80}
           className="object-cover group-hover:scale-[1.03] transition-transform duration-300"
-          alt={post.title}
+          alt=""
         />
       </div>
       <div className="flex flex-col gap-1 min-w-0">
@@ -46,9 +49,17 @@ function SecondarySpotlight({ post }: { post: PostTypes }) {
           {post.title}
         </h3>
         {post.formattedDate && (
-          <p className="text-foreground-lighter text-xs">{post.formattedDate}</p>
+          <p className="text-foreground-lighter text-xs">
+            <span className="sr-only">Published </span>
+            {post.formattedDate}
+          </p>
         )}
-        {authorNames && <p className="text-foreground-light text-xs">{authorNames}</p>}
+        {authorNames && (
+          <p className="text-foreground-light text-xs">
+            <span className="sr-only">Author: </span>
+            {authorNames}
+          </p>
+        )}
       </div>
     </Link>
   )
@@ -92,11 +103,16 @@ export default function BlogHero({
       <SectionContainer className="py-6! md:py-8!">
         <FeaturedThumb key={featuredPost.slug} {...featuredPost} />
         {secondaryPosts.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-muted grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <ul
+            aria-label="More recent posts"
+            className="mt-4 pt-4 border-t border-muted grid grid-cols-1 sm:grid-cols-2 gap-4"
+          >
             {secondaryPosts.map((post) => (
-              <SecondarySpotlight key={post.slug} post={post} />
+              <li key={post.slug}>
+                <SecondarySpotlight post={post} />
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </SectionContainer>
     </motion.div>

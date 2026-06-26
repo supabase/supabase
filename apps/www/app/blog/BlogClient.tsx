@@ -155,8 +155,6 @@ export default function BlogClient({ initialBlogs, totalPosts, initialView }: Bl
 
   return (
     <div>
-      <h1 className="sr-only">Supabase blog</h1>
-
       {/* Filters row */}
       <div className="sticky top-[65px] z-10 bg-background/80 backdrop-blur-sm border-b border-border">
         <SectionContainer className="py-0!">
@@ -188,17 +186,24 @@ export default function BlogClient({ initialBlogs, totalPosts, initialView }: Bl
           )
         ) : visibleBlogs?.length ? (
           isList ? (
-            <div>
+            <ul aria-label={`Blog posts, ${currentTotal} total`}>
               {visibleBlogs.map((blog: PostTypes, idx: number) => (
-                <BlogListItem post={blog} key={`list-${idx}-${blog.slug}`} />
+                <li key={`list-${idx}-${blog.slug}`}>
+                  <BlogListItem post={blog} />
+                </li>
               ))}
-            </div>
+            </ul>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-12 py-4">
+            <ul
+              aria-label={`Blog posts, ${currentTotal} total`}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-12 py-4"
+            >
               {visibleBlogs.map((blog: PostTypes, idx: number) => (
-                <BlogGridItem post={blog} key={`grid-${idx}-${blog.slug}`} />
+                <li key={`grid-${idx}-${blog.slug}`}>
+                  <BlogGridItem post={blog} />
+                </li>
               ))}
-            </div>
+            </ul>
           )
         ) : (
           <div className="px-6 py-12">

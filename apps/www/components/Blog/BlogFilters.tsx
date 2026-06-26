@@ -164,6 +164,12 @@ function BlogFilters({ view, setView, onFilterChange, onSearch }: Props) {
               key={category}
               href={categoryHref(category)}
               scroll={false}
+              aria-label={
+                category === 'all'
+                  ? 'Show all blog posts'
+                  : `Filter blog posts by category: ${categoryLabel(category)}`
+              }
+              aria-current={isActive ? 'page' : undefined}
               className={cn(
                 'relative px-3 py-1.5 text-sm rounded-full transition-colors',
                 isActive ? 'text-foreground' : 'text-foreground-lighter hover:text-foreground-light'
@@ -189,9 +195,10 @@ function BlogFilters({ view, setView, onFilterChange, onSearch }: Props) {
             className="px-2 h-full"
             size="medium"
             variant="default"
+            aria-label="Search posts"
             onClick={() => setShowSearchInput(true)}
           >
-            <Search size="14" />
+            <Search size="14" aria-hidden="true" />
           </Button>
         </div>
       )}
@@ -208,7 +215,7 @@ function BlogFilters({ view, setView, onFilterChange, onSearch }: Props) {
               onChange={(event) => handleSearchByText(event.target.value)}
             />
             <InputGroupAddon>
-              <Search />
+              <Search aria-hidden="true" />
             </InputGroupAddon>
             {isMobile && (
               <InputGroupAddon align="inline-end">

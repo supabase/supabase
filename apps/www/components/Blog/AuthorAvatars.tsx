@@ -1,4 +1,5 @@
 import Image from 'next/image'
+
 import type Author from '@/types/author'
 
 interface Props {
@@ -30,7 +31,7 @@ export default function AuthorAvatars({ authors, showName = true, size = 'sm' }:
                 }
                 fill
                 className="object-cover"
-                alt={author.author}
+                alt={showName ? '' : author.author}
               />
             )}
           </div>

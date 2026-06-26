@@ -58,6 +58,7 @@ const BlogListItem = ({ post }: Props) => {
         )}
         {post.date && (
           <p className="text-foreground-lighter group-hover:text-foreground-light flex-1 lg:text-right w-full">
+            <span className="sr-only">Published </span>
             {dayjs(post.date).format('D MMM YYYY')}
           </p>
         )}
