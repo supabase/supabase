@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import { BookOpen, Check, ChevronDown, ChevronsUpDown, Copy, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
@@ -32,6 +33,7 @@ import {
   LogsTableName,
 } from './Logs.constants'
 import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
+import { toOtelFieldSchemas } from './Logs.fieldReference'
 import { LogsWarning, LogTemplate } from './Logs.types'
 import Table from '@/components/to-be-cleaned/Table'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -92,11 +94,14 @@ const LogsQueryPanel = ({
   const [open, setOpen] = useState(false)
 
   const showMultigresLogs = useShowMultigresLogs()
-  const schemas = logConstants.schemas.filter(
+  const useOtel = useFlag('otelLegacyLogs')
+  const baseSchemas = logConstants.schemas.filter(
     (schema) => schema.reference !== 'multigres_logs' || showMultigresLogs
   )
+  const schemas = useOtel ? toOtelFieldSchemas(baseSchemas) : baseSchemas
 
-  const [selectedSchema, setSelectedSchema] = useState(schemas[0])
+  const [selectedRef, setSelectedRef] = useState(schemas[0]?.reference)
+  const selectedSchema = schemas.find((s) => s.reference === selectedRef) ?? schemas[0]
 
   return (
     <div className="flex items-center border-b bg-surface-100 h-(--header-height)">
@@ -217,24 +222,33 @@ const LogsQueryPanel = ({
           >
             <SidePanel.Content>
               <div className="pt-4 pb-2 space-y-1">
-                <p className="text-sm">
-                  The following table shows all the available paths that can be queried from each
-                  respective source. Do note that to access nested keys, you would need to perform
-                  the necessary{' '}
-                  <Link
-                    href={`${DOCS_URL}/guides/platform/logs#unnesting-arrays`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-brand"
-                  >
-                    unnesting joins
-                    <ExternalLink
-                      size="14"
-                      className="ml-1 inline translate-y-[-2px]"
-                      strokeWidth={1.5}
-                    />
-                  </Link>
-                </p>
+                {useOtel ? (
+                  <p className="text-sm">
+                    The following table shows the fields available on each source. Nested fields
+                    live in the <code className="text-xs">log_attributes</code> map and are read
+                    with <code className="text-xs">log_attributes['key']</code> — no unnesting joins
+                    needed.
+                  </p>
+                ) : (
+                  <p className="text-sm">
+                    The following table shows all the available paths that can be queried from each
+                    respective source. Do note that to access nested keys, you would need to perform
+                    the necessary{' '}
+                    <Link
+                      href={`${DOCS_URL}/guides/platform/logs#unnesting-arrays`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-brand"
+                    >
+                      unnesting joins
+                      <ExternalLink
+                        size="14"
+                        className="ml-1 inline translate-y-[-2px]"
+                        strokeWidth={1.5}
+                      />
+                    </Link>
+                  </p>
+                )}
               </div>
             </SidePanel.Content>
             <SidePanel.Separator />
@@ -264,14 +278,16 @@ const LogsQueryPanel = ({
                             key={schema.reference}
                             value={schema.reference}
                             onSelect={() => {
-                              setSelectedSchema(schema)
+                              setSelectedRef(schema.reference)
                               setOpen(false)
                             }}
                           >
                             <Check
                               className={cn(
                                 'mr-2 h-4 w-4',
-                                selectedSchema === schema ? 'opacity-100' : 'opacity-0'
+                                selectedSchema?.reference === schema.reference
+                                  ? 'opacity-100'
+                                  : 'opacity-0'
                               )}
                             />
                             {schema.name}
