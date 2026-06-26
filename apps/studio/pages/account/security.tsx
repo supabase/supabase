@@ -46,22 +46,8 @@ const Security: NextPageWithLayout = () => {
             className="mt-8"
             type="danger"
             layout="horizontal"
-            title="Important: You can get permanently locked out"
-            description={
-              <>
-                <p>
-                  If you lose access to your authenticator app and don't have a second method set
-                  up,{' '}
-                  <strong className="text-destructive">
-                    you will lose access to your account.
-                  </strong>
-                </p>
-                <p>
-                  We strongly recommend adding another factor of authentication on another device
-                  right now.
-                </p>
-              </>
-            }
+            title="Avoid being locked out"
+            description="Add a backup sign-in method now. Otherwise, losing access to your authenticator app will permanently lock you out of your account."
           />
         )}
         <Card className="mt-8">
