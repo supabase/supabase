@@ -35,7 +35,36 @@ Rules: always filter by source; the editor applies the selected time range so a 
 export function buildClickhouseRewritePrompt(sql: string): string {
   return `${LOGS_SCHEMA_REFERENCE}
 
-Rewrite the following query to valid ClickHouse SQL against the logs schema above, preserving its original intent. Reply with ONLY the rewritten SQL query: no explanation, no comments, and no markdown code fences.
+Convert the BigQuery logs query below to ClickHouse SQL for the logs table. There are no per-service tables and no unnest joins in ClickHouse. Follow these rules exactly:
+
+1. Replace the FROM table with the single logs table and filter by source. The old table name is the source value: "from postgres_logs as t" becomes "from logs where source = 'postgres_logs'". This is required, never select from a table like postgres_logs or edge_logs.
+2. Remove every "cross join unnest(...)" clause.
+3. Replace any column that came from an unnest alias with a log_attributes lookup. A field off unnest(metadata) becomes log_attributes['field']; a field off a nested struct like unnest(m.parsed) becomes log_attributes['parsed.field'] (keep the struct name as a dotted prefix, drop the metadata root and every alias).
+4. Wrap numeric fields in toInt32OrZero(...) before comparing or aggregating them.
+5. Replace cast(timestamp as datetime) with timestamp, and use count() instead of count(*).
+6. Preserve the original select list, filters, group by, order by, and limit intent.
+
+Example.
+BigQuery:
+select count(t.timestamp) as count, p.error_severity
+from postgres_logs as t
+cross join unnest(metadata) as m
+cross join unnest(m.parsed) as p
+where p.error_severity in ('ERROR', 'FATAL', 'PANIC')
+group by p.error_severity
+order by count desc
+limit 100
+
+ClickHouse:
+select count() as count, log_attributes['parsed.error_severity'] as error_severity
+from logs
+where source = 'postgres_logs'
+  and log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC')
+group by log_attributes['parsed.error_severity']
+order by count desc
+limit 100
+
+Reply with ONLY the rewritten SQL query: no explanation, no comments, and no markdown code fences.
 
 ${sql}`
 }
