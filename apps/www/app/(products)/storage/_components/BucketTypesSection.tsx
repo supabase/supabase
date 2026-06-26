@@ -49,7 +49,7 @@ export function BucketTypesSection() {
         {BUCKET_TYPES.map((bucket) => (
           <div
             key={bucket.title}
-            className="relative flex flex-col overflow-hidden min-h-[320px] bg-surface-75 border border-border rounded-lg"
+            className="relative flex flex-col overflow-hidden lg:min-h-[320px] bg-surface-75 border border-border rounded-lg"
           >
             <div className="relative z-10 flex flex-col justify-between h-full p-6 md:p-8">
               <div className="flex flex-col gap-4">

@@ -49,7 +49,7 @@ export function HighlightsSection() {
         {HIGHLIGHTS.map((highlight) => (
           <div
             key={highlight.title}
-            className="relative flex flex-col overflow-hidden min-h-[400px] bg-surface-75 border border-border rounded-lg"
+            className="relative flex flex-col overflow-hidden md:min-h-[400px] bg-surface-75 border border-border rounded-lg"
           >
             <div className="relative z-10 flex flex-col justify-between h-full p-6 md:p-8">
               <div className="flex flex-col gap-4">
