@@ -175,7 +175,9 @@ export const MarketplaceDetail = () => {
             <CustomPageComponent />
           </div>
         ) : (
-          <CustomPageComponent />
+          <div className="flex-1 min-h-0">
+            <CustomPageComponent />
+          </div>
         )
       ) : null}
     </>
