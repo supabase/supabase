@@ -59,7 +59,7 @@ create table documents (
 );
 ```
 
-In the SQL snippet above, we create a documents table with an embedding column. This is a standard Postgres column, so you can name it anything you like. The embedding column uses the vector data type with 384 dimensions. Change this number to match the dimensions your embedding model produces. For example, if you're [generating embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings) using the open source [gte-small](https://huggingface.co/Supabase/gte-small) model, set this to 384.
+In the SQL snippet above, we create a `documents` table with an `embedding` column. This is a standard Postgres column, so you can name it anything you like. The `embedding` column uses the `vector` data type with 384 dimensions. Change this number to match the dimensions your embedding model produces. For example, if you're [generating embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings) using the open source [`gte-small`](https://huggingface.co/Supabase/gte-small) model, set this to 384.
 
 <Admonition type="tip">
 
