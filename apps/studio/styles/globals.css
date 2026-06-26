@@ -200,6 +200,15 @@ body,
   box-sizing: border-box;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading, var(--font-sans));
+}
+
 .form-group .form-text,
 .Form .form-text {
   @apply text-foreground-lighter;

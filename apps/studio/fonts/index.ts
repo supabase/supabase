@@ -1,4 +1,11 @@
+import { Manrope } from 'next/font/google'
 import localFont from 'next/font/local'
+
+export const manrope = Manrope({
+  variable: '--font-manrope',
+  display: 'swap',
+  subsets: ['latin'],
+})
 
 export const inter = localFont({
   variable: '--font-inter',
