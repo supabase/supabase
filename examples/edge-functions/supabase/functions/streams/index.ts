@@ -2,9 +2,9 @@ import { withSupabase } from 'npm:@supabase/server@^1'
 
 const msg = new TextEncoder().encode('data: hello\r\n\r\n')
 
-// Public endpoint, so deploy with verify_jwt = false.
+// Authenticated endpoint, so deploy with verify_jwt = true.
 export default {
-  fetch: withSupabase({ auth: 'none' }, (req, ctx) => {
+  fetch: withSupabase({ auth: 'user' }, (req, ctx) => {
     let timerId: number | undefined
 
     const body = new ReadableStream({

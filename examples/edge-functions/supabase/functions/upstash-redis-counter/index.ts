@@ -7,9 +7,9 @@ import { withSupabase } from 'npm:@supabase/server@^1'
 
 console.log(`Function "upstash-redis-counter" up and running!`)
 
-// Public endpoint, so deploy with verify_jwt = false.
+// Authenticated endpoint, so deploy with verify_jwt = true.
 export default {
-  fetch: withSupabase({ auth: 'none' }, async (_req) => {
+  fetch: withSupabase({ auth: 'user' }, async (_req) => {
     try {
       const redis = new Redis({
         url: Deno.env.get('UPSTASH_REDIS_REST_URL')!,
@@ -47,4 +47,6 @@ export default {
   }),
 }
 
-// To invoke, navigate to 'http://localhost:54321/functions/v1/upstash-redis-counter'.
+// To invoke:
+// curl -i --location --request GET 'http://localhost:54321/functions/v1/upstash-redis-counter' \
+//   --header 'Authorization: Bearer <USER_ACCESS_TOKEN>'

@@ -17,9 +17,9 @@ const transport = nodemailer.createTransport({
 
 console.log(`Function "send-email-smtp" up and running!`)
 
-// Public endpoint, so deploy with verify_jwt = false.
+// Authenticated endpoint, so deploy with verify_jwt = true.
 export default {
-  fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
+  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
     try {
       await new Promise<void>((resolve, reject) => {
         transport.sendMail(
@@ -50,5 +50,6 @@ export default {
 
 // To invoke:
 // curl -i --location --request POST 'http://localhost:54321/functions/v1/send-email-smtp' \
+//   --header 'Authorization: Bearer <USER_ACCESS_TOKEN>' \
 //   --header 'Content-Type: application/json' \
 //   --data '{"name":"Functions"}'

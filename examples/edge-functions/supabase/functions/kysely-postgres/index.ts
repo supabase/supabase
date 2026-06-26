@@ -60,9 +60,9 @@ const db = new Kysely<Database>({
   },
 })
 
-// Public endpoint, so deploy with verify_jwt = false.
+// Authenticated endpoint, so deploy with verify_jwt = true.
 export default {
-  fetch: withSupabase({ auth: 'none' }, async (_req, _ctx) => {
+  fetch: withSupabase({ auth: 'user' }, async (_req, _ctx) => {
     try {
       // Run a query
       const animals = await db
@@ -96,4 +96,6 @@ export default {
   }),
 }
 
-// To invoke: navigate to http://localhost:54321/functions/v1/kysely-postgres
+// To invoke:
+// curl -i --location --request GET 'http://localhost:54321/functions/v1/kysely-postgres' \
+//   --header 'Authorization: Bearer <USER_ACCESS_TOKEN>'

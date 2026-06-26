@@ -6,10 +6,10 @@ import { withSupabase } from 'npm:@supabase/server@^1'
 
 console.log(`Function "browser-with-cors" up and running!`)
 
-// Public endpoint, so deploy with verify_jwt = false.
+// Authenticated endpoint, so deploy with verify_jwt = true.
 // withSupabase handles CORS automatically.
 export default {
-  fetch: withSupabase({ auth: 'none' }, async (req, _ctx) => {
+  fetch: withSupabase({ auth: 'user' }, async (req, _ctx) => {
     try {
       const { name } = await req.json()
       const data = {
@@ -25,5 +25,6 @@ export default {
 
 // To invoke:
 // curl -i --location --request POST 'http://localhost:54321/functions/v1/browser-with-cors' \
+//   --header 'Authorization: Bearer <USER_ACCESS_TOKEN>' \
 //   --header 'Content-Type: application/json' \
 //   --data '{"name":"Functions"}'

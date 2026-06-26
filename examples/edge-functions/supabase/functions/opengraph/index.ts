@@ -8,7 +8,7 @@ import { handler } from './handler.tsx'
 
 console.log(`Function "opengraph" up and running!`)
 
-// Public endpoint, so deploy with verify_jwt = false.
+// Authenticated endpoint, so deploy with verify_jwt = true.
 export default {
-  fetch: withSupabase({ auth: 'none' }, handler),
+  fetch: withSupabase({ auth: 'user' }, handler),
 }

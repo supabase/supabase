@@ -8,9 +8,9 @@ const wasmBytes = await Deno.readFile(
 )
 await initializeImageMagick(wasmBytes)
 
-// Public endpoint, so deploy with verify_jwt = false.
+// Authenticated endpoint, so deploy with verify_jwt = true.
 export default {
-  fetch: withSupabase({ auth: 'none' }, async (req, _ctx) => {
+  fetch: withSupabase({ auth: 'user' }, async (req, _ctx) => {
     const formData = await req.formData()
     const file = formData.get('file')
     if (!(file instanceof Blob)) {

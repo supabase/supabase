@@ -29,11 +29,10 @@ async function uploadAudioToStorage(
   console.log('Storage upload result', { data, error })
 }
 
-// Open endpoint for testing. In production, implement an authorization layer in the handler or switch the auth mode. Deploy with verify_jwt = false.
+// Authenticated endpoint, so deploy with verify_jwt = true.
 export default {
-  fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
-    // To secure your function for production, you can for example validate the request origin,
-    // or append a user access token and validate it with Supabase Auth.
+  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
+    // You can add extra checks here, for example validating the request origin.
     console.log('Request origin', req.headers.get('host'))
     const url = new URL(req.url)
     const params = new URLSearchParams(url.search)

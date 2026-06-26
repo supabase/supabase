@@ -8,9 +8,9 @@ function ips(req: Request) {
   return req.headers.get('x-forwarded-for')?.split(/\s*,\s*/)
 }
 
-// Public endpoint, so deploy with verify_jwt = false.
+// Authenticated endpoint, so deploy with verify_jwt = true.
 export default {
-  fetch: withSupabase({ auth: 'none' }, async (req, _ctx) => {
+  fetch: withSupabase({ auth: 'user' }, async (req, _ctx) => {
     const clientIps = ips(req) || ['']
     const res = await fetch(
       `https://ipinfo.io/${clientIps[0]}?token=${Deno.env.get('IPINFO_TOKEN')}`,
