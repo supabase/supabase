@@ -1,7 +1,6 @@
 import dayjs from 'dayjs'
-import { AlertCircle } from 'lucide-react'
 import { useState } from 'react'
-import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
+import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
