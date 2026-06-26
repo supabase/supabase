@@ -69,7 +69,7 @@ export type IntegrationDefinition = {
   icon: (props?: { className?: string; style?: Record<string, string | number> }) => ReactNode
   description: string | null
   content?: string | null
-  files?: string[]
+  files?: { src: string; alt: string }[]
   docsUrl: string | null
   siteUrl?: string | null
   author: {
@@ -118,6 +118,7 @@ export type IntegrationDefinition = {
   secretKeyPrefix?: string
   edgeFunctionSecretName?: string
   listingId?: string
+  oauthAppId?: string
 } & (
   | { type: 'wrapper'; meta: WrapperMeta }
   | { type: 'postgres_extension' | 'custom' | 'oauth' | 'template' }
@@ -231,8 +232,8 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
-                (mod) => mod.IntegrationOverviewTabWrapper
+              import('@/components/interfaces/Integrations/CronJobs/OverviewTab').then(
+                (mod) => mod.CronOverviewTab
               ),
             {
               loading: Loading,
@@ -275,8 +276,8 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
-                (mod) => mod.IntegrationOverviewTabWrapper
+              import('@/components/interfaces/Integrations/Vault/OverviewTab').then(
+                (mod) => mod.VaultOverviewTab
               ),
             {
               loading: Loading,
@@ -445,8 +446,8 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         case 'overview':
           return dynamic(
             () =>
-              import('@/components/interfaces/Integrations/Integration/IntegrationOverviewTabWrapper').then(
-                (mod) => mod.IntegrationOverviewTabWrapper
+              import('@/components/interfaces/Integrations/GraphQL/OverviewTab').then(
+                (mod) => mod.GraphQLOverviewTab
               ),
             {
               loading: Loading,

@@ -2,10 +2,10 @@ import { safeSql } from '@supabase/pg-meta'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { getStudioTools } from './studio-tools'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { NO_DATA_PERMISSIONS } from '@/lib/ai/tools/tool-sanitizer'
 
-vi.mock('@/data/sql/execute-sql-query', () => ({
+vi.mock('@/data/sql/execute-sql-mutation', () => ({
   executeSql: vi.fn(),
 }))
 

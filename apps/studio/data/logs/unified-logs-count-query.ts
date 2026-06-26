@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useFlag } from 'common'
 
+import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
 import {
@@ -11,9 +12,11 @@ import {
 import { getLogsCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getLogsCountQuery as getLogsCountQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import { FacetMetadataSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
-import { handleError, post } from '@/data/fetchers'
-import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from '@/types'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
+
+// Trimmed client-side because the OTEL endpoint rejects LIMIT BY, so the count
+// query can't cap rows per facet in SQL.
+const MAX_FACET_ROWS = 20
 
 export async function getUnifiedLogsCount(
   { projectRef, search, useOtel = false }: UnifiedLogsVariables & { useOtel?: boolean },
@@ -27,51 +30,50 @@ export async function getUnifiedLogsCount(
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
 
   const endpoint = logsAllEndpointUrl(useOtel)
-  const { data, error } = await post(endpoint, {
-    params: { path: { ref: projectRef } },
-    body: { iso_timestamp_start: isoTimestampStart, iso_timestamp_end: isoTimestampEnd, sql },
+  const data = await executeAnalyticsSql({
+    projectRef,
+    endpoint,
+    sql,
+    iso_timestamp_start: isoTimestampStart,
+    iso_timestamp_end: isoTimestampEnd,
     signal,
   })
 
-  if (error) handleError(error)
-
-  // Process count results into facets structure
   const facets: Record<string, FacetMetadataSchema> = {}
-  const countsByDimension: Record<string, Map<string, number>> = {}
+  const countsByFacet: Record<string, Map<string, number>> = {}
   let totalRowCount = 0
 
-  // Group by dimension
   if (data?.result) {
     data.result.forEach((row: any) => {
-      const dimension = row.dimension
+      const facet = row.facet
       const value = row.value
       const count = Number(row.count || 0)
 
-      // Set total count if this is the total dimension
-      if (dimension === 'total' && value === 'all') {
+      if (facet === 'total' && value === 'all') {
         totalRowCount = count
       }
 
-      // Initialize dimension map if not exists
-      if (!countsByDimension[dimension]) {
-        countsByDimension[dimension] = new Map()
+      if (!countsByFacet[facet]) {
+        countsByFacet[facet] = new Map()
       }
 
-      // Add count to the dimension map
-      countsByDimension[dimension].set(value, count)
+      countsByFacet[facet].set(value, count)
     })
   }
 
-  // Convert dimension maps to facets structure
-  Object.entries(countsByDimension).forEach(([dimension, countsMap]) => {
-    // Skip the 'total' dimension as it's not a facet
-    if (dimension === 'total') return
+  Object.entries(countsByFacet).forEach(([facet, countsMap]) => {
+    if (facet === 'total') return
 
-    const dimensionTotal = Array.from(countsMap.values()).reduce((sum, count) => sum + count, 0)
+    const rows = Array.from(countsMap.entries())
+      .map(([value, count]) => ({ value, total: count }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, MAX_FACET_ROWS)
 
-    facets[dimension] = {
-      total: dimensionTotal,
-      rows: Array.from(countsMap.entries()).map(([value, count]) => ({ value, total: count })),
+    const facetTotal = rows.reduce((sum, row) => sum + row.total, 0)
+
+    facets[facet] = {
+      total: facetTotal,
+      rows,
     }
   })
 
@@ -79,7 +81,7 @@ export async function getUnifiedLogsCount(
 }
 
 export type UnifiedLogsCountData = Awaited<ReturnType<typeof getUnifiedLogsCount>>
-export type UnifiedLogsCountError = ExecuteSqlError
+export type UnifiedLogsCountError = ResponseError
 
 export const useUnifiedLogsCountQuery = <TData = UnifiedLogsCountData>(
   { projectRef, search }: UnifiedLogsVariables,

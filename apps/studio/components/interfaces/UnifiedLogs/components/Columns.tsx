@@ -1,5 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table'
-import { Checkbox, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Checkbox, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { STATUS_CODE_LABELS } from '../UnifiedLogs.constants'
 import { ColumnFilterSchema, ColumnSchema } from '../UnifiedLogs.schema'
@@ -56,7 +56,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       enableHiding: false,
       enableResizing: false,
       enableSorting: false,
-      filterFn: (_row, _columnId, _filterValue) => true,
+      filterFn: () => true,
       size: 48,
       minSize: 48,
       maxSize: 48,
@@ -76,7 +76,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       enableHiding: false,
       enableResizing: false,
       enableSorting: false,
-      filterFn: (_row, _columnId, _filterValue) => true,
+      filterFn: () => true,
       size: 48,
       minSize: 48,
       maxSize: 48,
@@ -93,7 +93,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
         const date = new Date(row.getValue<ColumnSchema['date']>('date'))
         return <HoverCardTimestamp date={date} />
       },
-      filterFn: (_row, _columnId, _filterValue) => true,
+      filterFn: () => true,
       enableResizing: false,
       enableSorting: false,
       size: 140,
@@ -118,7 +118,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
         )
       },
       enableHiding: false,
-      filterFn: (_row, _columnId, _filterValue) => true,
+      filterFn: () => true,
       enableResizing: false,
       enableSorting: false,
       size: 40,
@@ -169,7 +169,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
           </div>
         )
       },
-      filterFn: (_row, _columnId, _filterValue) => true,
+      filterFn: () => true,
       enableResizing: false,
       enableSorting: false,
       size: 70,
@@ -184,7 +184,10 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
     {
       accessorKey: 'method',
       header: 'Method',
-      filterFn: 'arrIncludesSome',
+      // Filtering is server-side via the `filter` URL param, like every other
+      // column in this table. The built-in `arrIncludesSome` would receive the
+      // wrapped { operator, values } shape and reject it.
+      filterFn: (_row, _columnId, _filterValue) => true,
       cell: ({ row }) => {
         const value = row.getValue<ColumnSchema['method']>('method')
         return <span className="text-foreground-lighter">{value}</span>
@@ -203,10 +206,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
     {
       accessorKey: 'pathname',
       header: 'Pathname',
-      cell: ({ row }) => {
-        const value = row.getValue<ColumnFilterSchema['pathname']>('pathname') ?? ''
-        return value
-      },
+      filterFn: () => true,
       enableSorting: false,
       enableResizing: false,
       size: 250,
@@ -216,11 +216,20 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
         cellClassName: 'font-mono tracking-tight w-[250px]',
         headerClassName: 'w-[250px]',
       },
+      cell: ({ row }) => {
+        const value = row.getValue<ColumnFilterSchema['pathname']>('pathname') ?? ''
+        return value
+      },
     },
     // Event message column - controlled by columnVisibility
     {
       accessorKey: 'event_message',
       header: 'Event message',
+      // No client-side filterFn — event_message uses server-side LIKE/ILIKE via
+      // the `filter` URL param (see translateFilter in UnifiedLogs.queries.ts).
+      // We still need a no-op so TanStack's default `includesString` doesn't run
+      // against the wrapped { operator, values } shape we write.
+      filterFn: () => true,
       cell: ({ row }) => {
         const value = row.getValue<ColumnSchema['event_message']>('event_message')
         const logType = row.original.log_type
@@ -241,7 +250,13 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
                 </TooltipContent>
               </Tooltip>
             )}
-            {displayMessage && <span className="text-muted-foreground">{displayMessage}</span>}
+            {displayMessage && (
+              <span
+                className={cn('text-muted-foreground', logType === 'auth' && 'capitalize-sentence')}
+              >
+                {displayMessage}
+              </span>
+            )}
           </div>
         )
       },

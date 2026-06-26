@@ -1,7 +1,28 @@
 import { describe, expect, it } from 'vitest'
 
 import { cronPattern, secondsPattern } from './CronJobs.constants'
-import { formatCronJobColumns, parseCronJobCommand } from './CronJobs.utils'
+import {
+  buildCronCreateQuery,
+  buildCronUpdateQuery,
+  formatCronJobColumns,
+  parseCronJobCommand,
+} from './CronJobs.utils'
+
+describe('buildCronQuery', () => {
+  it('uses cron.schedule to create a job by name', () => {
+    expect(buildCronCreateQuery('my-job', '*/5 * * * *', 'select 1')).toBe(
+      "select cron.schedule('my-job', '*/5 * * * *', 'select 1');"
+    )
+  })
+})
+
+describe('buildCronUpdateQuery', () => {
+  it('uses cron.alter_job to update a job by id', () => {
+    expect(buildCronUpdateQuery(42, '*/10 * * * *', 'select 2')).toBe(
+      "select cron.alter_job(job_id := 42, schedule := '*/10 * * * *', command := 'select 2');"
+    )
+  })
+})
 
 describe('parseCronJobCommand', () => {
   it('should return a default object when the command is null', () => {
@@ -185,6 +206,116 @@ describe('parseCronJobCommand', () => {
       ],
       httpBody: '',
       timeoutMs: 1000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should keep a jsonb_build_object header value that contains a comma intact', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('Accept', 'application/json, text/plain'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'Accept', value: 'application/json, text/plain' }],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should not shift later jsonb_build_object headers when an earlier value contains a comma', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('Accept', 'application/json, text/plain', 'Authorization', 'Bearer abc'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [
+        { name: 'Accept', value: 'application/json, text/plain' },
+        { name: 'Authorization', value: 'Bearer abc' },
+      ],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should keep a jsonb_build_object header value that contains parentheses intact', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('User-Agent', 'Mozilla/5.0 (compatible)'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'User-Agent', value: 'Mozilla/5.0 (compatible)' }],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should keep an escaped quote inside a comma-containing jsonb_build_object value', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('X-Company', 'O''Reilly, Inc'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'X-Company', value: "O'Reilly, Inc" }],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should unescape backslashes in an E-prefixed jsonb_build_object header value', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('X-Custom', E'value\\\\here'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'X-Custom', value: 'value\\here' }],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should keep later jsonb_build_object headers when an earlier value contains parentheses', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('User-Agent', 'Mozilla/5.0 (compatible)', 'Accept', 'application/json'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [
+        { name: 'User-Agent', value: 'Mozilla/5.0 (compatible)' },
+        { name: 'Accept', value: 'application/json' },
+      ],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should parse jsonb_build_object headers when there is whitespace before the opening parenthesis', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object ('Accept', 'application/json'), timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'Accept', value: 'application/json' }],
+      httpBody: '',
+      timeoutMs: 5000,
+      type: 'http_request',
+      snippet: command,
+    })
+  })
+
+  it('should not let a comma inside a jsonb_build_object value swallow the following body argument', () => {
+    const command = `select net.http_post( url:='https://example.com/api/endpoint', headers:=jsonb_build_object('Accept', 'application/json, text/plain'), body:='{"key": "value"}', timeout_milliseconds:=5000 );`
+    expect(parseCronJobCommand(command, 'random_project_ref')).toStrictEqual({
+      endpoint: 'https://example.com/api/endpoint',
+      method: 'POST',
+      httpHeaders: [{ name: 'Accept', value: 'application/json, text/plain' }],
+      httpBody: '{"key": "value"}',
+      timeoutMs: 5000,
       type: 'http_request',
       snippet: command,
     })

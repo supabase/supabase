@@ -126,6 +126,7 @@ export const MCP_CLIENTS: McpClient[] = [
     key: 'cursor',
     label: 'Cursor',
     icon: 'cursor',
+    hasDistinctDarkIcon: true,
     configFile: '.cursor/mcp.json',
     externalDocsUrl: 'https://docs.cursor.com/context/mcp',
     generateDeepLink: (config) => {

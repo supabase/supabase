@@ -39,6 +39,7 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getParallelApprovalIdsToReject } from '@/lib/ai/message-utils'
 import {
   DEFAULT_ASSISTANT_BASE_MODEL_ID,
   defaultAssistantModelId,
@@ -367,6 +368,18 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   }, [isResubmitting, chatStatus, error])
 
   useEffect(() => {
+    // Approval-required tools can't run in parallel. Auto-deny extras so the model reissues them sequentially.
+    for (const id of getParallelApprovalIdsToReject(chatMessages)) {
+      addToolApprovalResponse?.({
+        id,
+        approved: false,
+        reason:
+          'Only one approval-required tool call is allowed per turn. Please reissue this tool call after the current one completes.',
+      })
+    }
+  }, [chatMessages, addToolApprovalResponse])
+
+  useEffect(() => {
     setValue(snap.initialInput || '')
     if (inputRef.current && snap.initialInput) {
       inputRef.current.focus()
@@ -432,7 +445,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       <div className="flex items-center gap-x-2 mr-auto">
                         {isContextExceededError ? (
                           <Button
-                            type="default"
+                            variant="default"
                             size="tiny"
                             onClick={() => snap.newChat()}
                             className="text-xs"
@@ -442,7 +455,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                         ) : (
                           <>
                             <Button
-                              type="default"
+                              variant="default"
                               size="tiny"
                               onClick={() => regenerate()}
                               className="text-xs"
@@ -450,7 +463,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                               Retry
                             </Button>
                             <ButtonTooltip
-                              type="default"
+                              variant="default"
                               size="tiny"
                               onClick={handleClearMessages}
                               className="w-7 h-7"
@@ -516,7 +529,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                       <span>Editing message</span>
                     </div>
                     <ButtonTooltip
-                      type="outline"
+                      variant="outline"
                       size="tiny"
                       icon={<X size={14} />}
                       onClick={cancelEdit}
@@ -601,3 +614,5 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     </ErrorBoundary>
   )
 }
+
+export { SupportAssistantSuccessCardContent } from './SupportAssistantSuccessCardContent'

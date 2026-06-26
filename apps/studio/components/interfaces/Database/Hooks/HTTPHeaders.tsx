@@ -11,7 +11,7 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from '@/components/ui/Forms/FormSection'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { uuidv4 } from '@/lib/helpers'
 
@@ -23,12 +23,14 @@ export const HTTPHeaders = ({ form }: HTTPHeadersProps) => {
   const { ref } = useParams()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
-  const { data: apiKeys } = useAPIKeysQuery(
-    { projectRef: ref, reveal: true },
+  const { data: apiKeyData } = useAPIKeys(
+    {
+      projectRef: ref,
+      reveal: true,
+    },
     { enabled: canReadAPIKeys }
   )
-
-  const { serviceKey, secretKey } = getKeys(apiKeys)
+  const { serviceKey, secretKey } = apiKeyData ?? {}
   const apiKey = secretKey?.api_key ?? serviceKey?.api_key ?? '[YOUR API KEY]'
 
   const functionType = useWatch({ control: form.control, name: 'function_type' })

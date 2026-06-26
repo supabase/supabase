@@ -54,7 +54,7 @@ interface ProjectSelectorProps {
 }
 
 function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
-  const { projectRef: urlProjectRef } = useParams()
+  const { ref: routeProjectRef } = useParams()
 
   return (
     <FormField
@@ -71,15 +71,20 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
               slug={!orgSlug || orgSlug === NO_ORG_MARKER ? undefined : orgSlug}
               selectedRef={field.value}
               onInitialLoad={(projects) => {
-                if (!urlProjectRef && (!projectRef || projectRef === NO_PROJECT_MARKER))
+                const hasSelectedProject = !!projectRef && projectRef !== NO_PROJECT_MARKER
+                const hasRouteProjectInList =
+                  !!routeProjectRef && projects.some((project) => project.ref === routeProjectRef)
+
+                if (!hasRouteProjectInList && !hasSelectedProject) {
                   field.onChange(projects[0]?.ref ?? NO_PROJECT_MARKER)
+                }
               }}
               onSelect={(project) => field.onChange(project.ref)}
               renderTrigger={({ isLoading, project, listboxId, open }) => {
                 return (
                   <Button
                     block
-                    type="default"
+                    variant="default"
                     role="combobox"
                     aria-label="Select a project"
                     aria-expanded={open}
@@ -145,7 +150,7 @@ function ProjectRefHighlighted({ projectRef }: ProjectRefHighlightedProps) {
           </p>
           <CopyButton
             iconOnly
-            type="text"
+            variant="text"
             text={projectRef}
             onClick={() => toast.success('Copied project ID to clipboard')}
           />
@@ -202,7 +207,7 @@ export const PlanExpectationInfoContent = ({
               Upgrade plan
             </Link>
           </Button>
-          <Button asChild type="default" size="tiny" icon={<ExternalLink />}>
+          <Button asChild variant="default" size="tiny" icon={<ExternalLink />}>
             <Link href="https://supabase.com/contact/enterprise" target="_blank" rel="noreferrer">
               Enquire about Enterprise
             </Link>

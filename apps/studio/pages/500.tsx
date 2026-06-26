@@ -1,4 +1,3 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { NextPage } from 'next'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
@@ -7,7 +6,7 @@ import { useRouter } from 'next/router'
 import { Button } from 'ui'
 
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSignOut } from '@/lib/auth'
 
 const Error500: NextPage = () => {
@@ -15,10 +14,7 @@ const Error500: NextPage = () => {
   const signOut = useSignOut()
   const { resolvedTheme } = useTheme()
 
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const onClickLogout = async () => {
     await signOut()
@@ -69,7 +65,7 @@ const Error500: NextPage = () => {
         ) : (
           <Button onClick={onClickLogout}>Head back</Button>
         )}
-        <Button type="secondary" asChild>
+        <Button variant="secondary" asChild>
           <SupportLink>Submit a support request</SupportLink>
         </Button>
       </div>

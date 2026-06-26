@@ -1,6 +1,5 @@
-import { useQuery } from '@tanstack/react-query'
 import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import { Button, Card, ShadowScrollArea, Table, TableBody, TableHeader } from 'ui'
 import {
   EmptyStatePresentational,
@@ -24,7 +23,7 @@ import {
   type MarketplaceSource,
 } from './Marketplace.constants'
 import { MarketplaceCard } from './MarketplaceCard'
-import { MarketplaceFeaturedHero } from './MarketplaceFeaturedHero'
+import { MarketplaceFeaturedHeroGrid } from './MarketplaceFeaturedHeroGrid'
 import { MarketplaceFilterBar, type ViewMode } from './MarketplaceFilterBar'
 import { MarketplaceListHeader, MarketplaceListRow } from './MarketplaceListRow'
 import { IntegrationLoadingCard } from '@/components/interfaces/Integrations/Landing/IntegrationCard'
@@ -33,9 +32,11 @@ import { useInstalledIntegrations } from '@/components/interfaces/Integrations/L
 import { useIntegrationFilteringAndSort } from '@/components/interfaces/Integrations/Landing/useIntegrationFilteringAndSort'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { marketplaceCategoriesQueryOptions } from '@/data/marketplace/integration-categories-query'
+import { useMarketplaceCategoriesQuery } from '@/data/marketplace/integration-categories-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const MARKETPLACE_VIEW_MODE_STORAGE_KEY = 'supabase.marketplace.viewMode'
 
@@ -87,7 +88,7 @@ export const MarketplaceIndex = () => {
   const isLoading = isLoadingAvailable || isLoadingInstalled
   const isSuccess = isSuccessAvailable && isSuccessInstalled
 
-  const { data: marketplaceCategories = [] } = useQuery(marketplaceCategoriesQueryOptions())
+  const { data: marketplaceCategories = [] } = useMarketplaceCategoriesQuery()
 
   const categoryOptions = useMemo(() => {
     // Start with marketplace DB categories
@@ -193,16 +194,27 @@ export const MarketplaceIndex = () => {
     setSearch('')
   }
 
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search integrations' }
+  )
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, clearAll)
+
   const activeFilters = [category, type, source].filter(Boolean)
   const pageTitle = useMemo(() => {
-    if (activeFilters.length !== 1) return 'Integrations Marketplace'
-    if (category)
-      return `Integrations Marketplace: ${formatCategoryLabel(category, categoryOptions)}`
+    if (activeFilters.length !== 1) return 'Extend your database'
+    if (category) return `Integrations: ${formatCategoryLabel(category, categoryOptions)}`
     if (type)
-      return `Integrations Marketplace: ${INTEGRATION_TYPES.find((t) => t.key === type)?.label ?? type}s`
+      return `Integrations: ${INTEGRATION_TYPES.find((t) => t.key === type)?.label ?? type}s`
     if (source)
-      return `Integrations Marketplace: ${MARKETPLACE_SOURCES.find((s) => s.key === source)?.label ?? source}`
-    return 'Integrations Marketplace'
+      return `Integrations: ${MARKETPLACE_SOURCES.find((s) => s.key === source)?.label ?? source}`
+    return 'Integrations'
   }, [activeFilters.length, category, type, source, categoryOptions])
 
   return (
@@ -226,7 +238,7 @@ export const MarketplaceIndex = () => {
         {isLoading && (
           <div className="grid gap-4 xl:grid-cols-3 2xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, idx) => (
-              <IntegrationLoadingCard key={`marketplace-loading-${idx}`} />
+              <IntegrationLoadingCard key={`integrations-loading-${idx}`} />
             ))}
           </div>
         )}
@@ -238,16 +250,18 @@ export const MarketplaceIndex = () => {
         {isSuccess && (
           <>
             {featured.length > 0 && (
-              <MarketplaceFeaturedHero
+              <MarketplaceFeaturedHeroGrid
                 integrations={featured}
                 installedIds={installedIds}
-                categoryOptions={categoryOptions}
+                primaryIntegrationId={featured[0].id}
+                secondaryIntegrationIds={featured.slice(1, 3).map((i) => i.id)}
               />
             )}
 
             <MarketplaceFilterBar
               resultCount={filtered.length}
               search={search}
+              searchInputRef={searchInputRef}
               onSearchChange={(v) => setSearch(v)}
               category={category}
               onCategoryChange={(v) => setCategory(v)}
@@ -267,7 +281,7 @@ export const MarketplaceIndex = () => {
 
             {filtered.length === 0 && (
               <EmptyStatePresentational title="No results found">
-                <Button type="default" onClick={clearAll}>
+                <Button variant="default" onClick={clearAll}>
                   Clear filters
                 </Button>
               </EmptyStatePresentational>

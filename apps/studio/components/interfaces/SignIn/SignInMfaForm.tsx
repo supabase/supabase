@@ -103,10 +103,18 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
       <AlertError
         error={error}
         subject="Error while signing in"
+        hideContactSupport
         additionalActions={
-          <Button asChild type="default">
-            <Link href="/sign-in">Back to sign in</Link>
-          </Button>
+          <>
+            <Button asChild variant="default">
+              <Link href="/sign-in">Back to sign in</Link>
+            </Button>
+            <Button asChild variant="default">
+              <Link href="https://supabase.com/support" target="_blank" rel="noreferrer">
+                Contact support
+              </Link>
+            </Button>
+          </>
         }
       />
     )
@@ -160,7 +168,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
             <div className="flex items-center justify-between gap-x-2">
               <Button
                 block
-                type="outline"
+                variant="outline"
                 size="large"
                 disabled={isVerifying || isSuccess}
                 onClick={onClickLogout}
@@ -171,7 +179,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
               <Button
                 block
                 form={formId}
-                htmlType="submit"
+                type="submit"
                 size="large"
                 disabled={isVerifying || isSuccess}
                 loading={isVerifying || isSuccess}

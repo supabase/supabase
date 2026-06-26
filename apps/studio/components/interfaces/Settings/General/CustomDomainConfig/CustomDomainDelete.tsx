@@ -64,7 +64,7 @@ export const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDel
         <div className="flex items-center justify-between">
           <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
           <Button
-            type="danger"
+            variant="danger"
             icon={<Trash />}
             onClick={() => setIsDeleteConfirmModalVisible(true)}
           >

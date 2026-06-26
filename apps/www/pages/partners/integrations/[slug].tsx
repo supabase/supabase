@@ -94,7 +94,7 @@ function Partner({ partner, overview }: PartnerData) {
       ) : null}
       <DefaultLayout>
         <SectionContainer>
-          <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-10 lg:col-span-2">
+          <div className="col-span-12 mx-auto mb-2 space-y-10 lg:col-span-2">
             {/* Back button */}
             <Link
               href="/partners/integrations"
@@ -207,7 +207,7 @@ function Partner({ partner, overview }: PartnerData) {
                     Get started with {partner.title} and Supabase.
                   </h1>
                   <a href={partner.installUrl} target="_blank" rel="noreferrer">
-                    <Button size="medium" type="secondary">
+                    <Button size="medium" variant="secondary">
                       Add integration
                     </Button>
                   </a>
@@ -246,7 +246,7 @@ const PartnerDetails = ({ partner }: { partner: Partner }) => {
           {partner.type === 'technology' && (
             <div className="flex items-center justify-between py-2">
               <span className="text-foreground-lighter">Developer</span>
-              <span className="text-foreground">{partner.partnerName}</span>
+              <span className="text-foreground">{partner.builtBy}</span>
             </div>
           )}
 

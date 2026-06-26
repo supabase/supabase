@@ -10,14 +10,14 @@ export default function AdmonitionDemo() {
         title="Set up custom SMTP"
         description="You’re using the built-in email service. This service has rate limits and is not meant to be
         used for production apps."
-        actions={<Button type="default">Set up SMTP</Button>}
+        actions={<Button variant="default">Set up SMTP</Button>}
       />
       <Admonition
         type="destructive"
         layout="horizontal"
         title="Deleting this organization will also remove its projects"
         description="Make sure you have made a backup of your projects if you want to keep your data."
-        actions={<Button type="danger">Delete organization</Button>}
+        actions={<Button variant="danger">Delete organization</Button>}
       />
     </div>
   )

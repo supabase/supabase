@@ -6,6 +6,8 @@ subtitle: 'Customize local email templates via the config file.'
 
 You can customize the email templates for local development by [editing the `config.toml` file](/docs/guides/local-development/cli/config#auth-config).
 
+This guide covers local development and CLI workflows. For hosted projects, use the [Email Templates](/dashboard/project/_/auth/templates) page in the dashboard. See [Email templates](/docs/guides/auth/auth-email-templates) for terminology, limitations, and customization patterns that apply in every environment.
+
 <Admonition type="note">
 
 For configuring a self-hosted Supabase instance, see [Custom Email Templates](/docs/guides/self-hosting/custom-email-templates)
@@ -101,7 +103,7 @@ There are several authentication-related email templates which can be configured
 
 ### `auth.email.template.reauthentication`
 
-**Default subject**: "{{ .Token }} is your verification code"
+**Default subject**: "`{{ .Token }} is your verification code`"
 **When sent**: When a user needs to re-authenticate for sensitive operations
 **Purpose**: Ask users to verify their identity before a sensitive operation
 **Content**: Contains a 6-digit OTP code for verification

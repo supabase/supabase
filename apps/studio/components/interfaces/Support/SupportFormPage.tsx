@@ -25,14 +25,14 @@ import { SupportFormV2 } from './SupportFormV2'
 import { useSupportForm } from './useSupportForm'
 import CopyButton from '@/components/ui/CopyButton'
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useStateTransition } from '@/hooks/misc/useStateTransition'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 
 export { SupportForm, SupportFormStatusButton } from './SupportSidebarForm'
 
 function useSupportFormTelemetry() {
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   return useCallback(
     ({
@@ -44,17 +44,12 @@ function useSupportFormTelemetry() {
       orgSlug: string | undefined
       category: ExtendedSupportCategories
     }) =>
-      sendEvent({
-        action: 'support_ticket_submitted',
-        properties: {
-          ticketCategory: category,
-        },
-        groups: {
-          project: projectRef,
-          organization: orgSlug,
-        },
-      }),
-    [sendEvent]
+      track(
+        'support_ticket_submitted',
+        { ticketCategory: category },
+        { project: projectRef, organization: orgSlug }
+      ),
+    [track]
   )
 }
 
@@ -87,7 +82,9 @@ function SupportFormPageContent() {
 
   useStateTransition(state, 'submitting', 'error', (_, curr) => {
     toast.error(`Failed to submit support ticket: ${curr.message}`)
-    Sentry.captureMessage(`Failed to submit Support Form: ${curr.message}`)
+    if (curr.code !== 429) {
+      Sentry.captureMessage(`Failed to submit Support Form: ${curr.message}`)
+    }
     dispatch({ type: 'RETURN_TO_EDITING' })
   })
 
@@ -142,7 +139,7 @@ function SupportFormHeader() {
       </div>
 
       <div className="flex items-center gap-x-3">
-        <Button asChild type="default" icon={<Wrench />}>
+        <Button asChild variant="default" icon={<Wrench />}>
           <Link
             href={`${DOCS_URL}/guides/troubleshooting?products=platform`}
             target="_blank"
@@ -155,7 +152,7 @@ function SupportFormHeader() {
           <TooltipTrigger asChild>
             <Button
               asChild
-              type="default"
+              variant="default"
               icon={
                 isLoading ? (
                   <Loader2 className="animate-spin" />
@@ -216,7 +213,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
                 </code>
               </a>
               <CopyButton
-                type="text"
+                variant="text"
                 text="support@supabase.com"
                 iconOnly
                 onClick={() => toast.success('Copied email address to clipboard')}
@@ -230,7 +227,7 @@ function SupportFormDirectEmailInfo({ projectRef }: SupportFormDirectEmailInfoPr
                 <code className="text-code-inline text-foreground-light!">{projectRef}</code>
                 <CopyButton
                   iconOnly
-                  type="text"
+                  variant="text"
                   text={projectRef}
                   onClick={() => toast.success('Copied project ID to clipboard')}
                 />
@@ -263,8 +260,7 @@ function SupportFormBody({
   return (
     <div
       className={cn(
-        'min-w-full w-full space-y-12 rounded-sm border bg-panel-body-light shadow-md',
-        `${isSuccess ? 'pt-8' : 'py-8'}`,
+        'min-w-full w-full space-y-12 rounded-sm border bg-panel-body-light shadow-md py-8',
         'border-default'
       )}
     >

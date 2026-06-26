@@ -107,7 +107,7 @@ export const SignInSSOForm = () => {
           />
         </div>
 
-        <Button block form={formId} htmlType="submit" size="large" loading={isSubmitting}>
+        <Button block form={formId} type="submit" size="large" loading={isSubmitting}>
           Sign in
         </Button>
       </form>

@@ -26,6 +26,7 @@ import type { MultiAttribute } from '@/components/ui/Charts/ComposedChart.utils'
 import { LazyComposedChartHandler } from '@/components/ui/Charts/ComposedChartHandler'
 import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { analyticsKeys } from '@/data/analytics/keys'
 import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 import { useProjectDiskResizeMutation } from '@/data/config/project-disk-resize-mutation'
@@ -43,6 +44,8 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { NextPageWithLayout } from '@/types'
 
 const DatabaseReport: NextPageWithLayout = () => {
@@ -82,6 +85,7 @@ const DatabaseUsage = () => {
 
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [showIncreaseDiskSizeModal, setshowIncreaseDiskSizeModal] = useState(false)
+  const [showDatePicker, setShowDatePicker] = useState(false)
 
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
 
@@ -133,6 +137,7 @@ const DatabaseUsage = () => {
     project?.cloud_provider !== 'FLY'
 
   const showDiskIOBurstBalanceChart = useFlag('showDiskIOBurstBalanceChart')
+  const showMemoryCommitmentChart = useFlag('showMemoryCommitmentChart')
 
   const REPORT_ATTRIBUTES = getReportAttributesV2(
     entitledFeatures,
@@ -141,7 +146,8 @@ const DatabaseUsage = () => {
     maxConnections,
     defaultMaxClientConn,
     isSpendCapEnabled,
-    showDiskIOBurstBalanceChart
+    showDiskIOBurstBalanceChart,
+    showMemoryCommitmentChart
   )
 
   const { isPending: isUpdatingDiskSize } = useProjectDiskResizeMutation({
@@ -191,6 +197,13 @@ const DatabaseUsage = () => {
     }
   )
 
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, onRefreshReport, {
+    enabled: !isRefreshing,
+  })
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER, () => {
+    setShowDatePicker((open) => !open)
+  })
+
   const stateSyncedFromUrlRef = useRef(false)
   useEffect(() => {
     if (stateSyncedFromUrlRef.current) return
@@ -218,20 +231,28 @@ const DatabaseUsage = () => {
       <ReportStickyNav
         content={
           <>
-            <ButtonTooltip
-              type="default"
-              disabled={isRefreshing}
-              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-              className="w-7"
-              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-              onClick={onRefreshReport}
-            />
+            <ShortcutTooltip
+              shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
+              label="Refresh report"
+              side="bottom"
+            >
+              <Button
+                variant="default"
+                disabled={isRefreshing}
+                icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                className="w-7"
+                onClick={onRefreshReport}
+              />
+            </ShortcutTooltip>
             <ReportSettings chartId="database-charts" />
             <div className="flex items-center gap-3">
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
                 helpers={datePickerHelpers}
+                open={showDatePicker}
+                onOpenChange={setShowDatePicker}
+                shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
               />
               <UpgradePrompt
                 show={showUpgradePrompt}
@@ -330,26 +351,30 @@ const DatabaseUsage = () => {
           renderer={(props) => {
             return (
               <div>
-                <div className="col-span-4 inline-grid grid-cols-12 gap-12 w-full mt-5">
-                  <div className="grid gap-2 col-span-4 xl:col-span-2">
-                    <h5>Space used</h5>
-                    <span className="text-lg">{formatBytes(databaseSizeBytes, 2, 'GB')}</span>
+                <div className="flex flex-wrap items-center gap-8 mt-5">
+                  <div className="flex flex-col gap-1">
+                    <p className="text-sm text-foreground-light">Space used</p>
+                    <span className="text-lg font-semibold text-foreground">
+                      {formatBytes(databaseSizeBytes, 2, 'GB')}
+                    </span>
                   </div>
-                  <div className="grid gap-2 col-span-4 xl:col-span-3">
-                    <h5>Provisioned disk size</h5>
-                    <span className="text-lg">{currentDiskSize} GB</span>
+                  <div className="flex flex-col gap-1">
+                    <p className="text-sm text-foreground-light">Provisioned disk size</p>
+                    <span className="text-lg font-semibold text-foreground">
+                      {currentDiskSize} GB
+                    </span>
                   </div>
 
-                  <div className="col-span-full lg:col-span-4 xl:col-span-7 lg:text-right">
+                  <div className="ml-auto">
                     {project?.cloud_provider === 'AWS' ? (
-                      <Button asChild type="default">
+                      <Button asChild variant="default">
                         <Link href={`/project/${ref}/settings/compute-and-disk`}>
                           Increase disk size
                         </Link>
                       </Button>
                     ) : (
                       <ButtonTooltip
-                        type="default"
+                        variant="default"
                         disabled={!canUpdateDiskSizeConfig}
                         onClick={() => setshowIncreaseDiskSizeModal(true)}
                         tooltip={{
@@ -367,8 +392,12 @@ const DatabaseUsage = () => {
                   </div>
                 </div>
 
-                <h3 className="mt-8 text-sm">Large Objects</h3>
-                {!props.isLoading && props.data.length === 0 && <span>No large objects found</span>}
+                <p className="mt-8 text-sm font-medium text-foreground-light">Large Objects</p>
+                {!props.isLoading && props.data.length === 0 && (
+                  <span className="text-sm text-foreground-light mt-2 block">
+                    No large objects found
+                  </span>
+                )}
                 {!props.isLoading && props.data.length > 0 && (
                   <Table
                     className="space-y-3 mt-4"
@@ -414,7 +443,7 @@ const DatabaseUsage = () => {
                       inactive.
                     </p>
 
-                    <Button asChild type="default" icon={<ExternalLink />}>
+                    <Button asChild variant="default" icon={<ExternalLink />}>
                       <Link
                         href={`${DOCS_URL}/guides/platform/database-size#disk-space-usage`}
                         target="_blank"
