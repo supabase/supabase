@@ -95,8 +95,7 @@ export function TableDetailLayout({
   const showPoliciesTab = isTable
   const showSettingsTab = isTable
   const storageSyncError = warehouseState?.syncState === 'error'
-  const hasWarehouseStorage =
-    warehouseState?.mode === 'has_warehouse_copy' || warehouseState?.mode === 'warehouse_backed'
+  const hasWarehouseStorage = warehouseState?.mode === 'has_warehouse_copy'
   const tableSizeLabel =
     isTable && selectedTable.size !== undefined
       ? (getWarehouseStorageSummaryLabel(warehouseState, selectedTable.size) ?? selectedTable.size)

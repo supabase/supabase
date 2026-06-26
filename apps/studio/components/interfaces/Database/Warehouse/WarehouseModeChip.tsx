@@ -5,13 +5,11 @@ import type { WarehouseMode } from './warehouseDemoStore'
 const MODE_LABELS: Record<WarehouseMode, string> = {
   postgres: 'Postgres',
   has_warehouse_copy: 'Postgres + Warehouse',
-  warehouse_backed: 'Warehouse',
 }
 
-const MODE_VARIANTS: Record<WarehouseMode, 'default' | 'success' | 'warning'> = {
+const MODE_VARIANTS: Record<WarehouseMode, 'default' | 'warning'> = {
   postgres: 'default',
   has_warehouse_copy: 'warning',
-  warehouse_backed: 'success',
 }
 
 interface WarehouseModeChipProps {

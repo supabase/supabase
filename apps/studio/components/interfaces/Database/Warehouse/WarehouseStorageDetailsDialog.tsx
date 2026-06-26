@@ -27,7 +27,6 @@ interface WarehouseStorageDetailsDialogProps {
 const MODE_LABELS: Record<WarehouseMode, string> = {
   postgres: 'Postgres',
   has_warehouse_copy: 'Postgres + Warehouse',
-  warehouse_backed: 'Warehouse',
 }
 
 const MODE_TOOLTIPS: Partial<Record<WarehouseMode, ReactNode>> = {
@@ -36,9 +35,6 @@ const MODE_TOOLTIPS: Partial<Record<WarehouseMode, ReactNode>> = {
       Kept in the Postgres heap with a synced columnar copy in Warehouse. Changes in Postgres
       propagate to the copy; sync is one-way.
     </>
-  ),
-  warehouse_backed: (
-    <>This table&apos;s storage was moved to Warehouse. The Postgres heap no longer exists.</>
   ),
 }
 
@@ -119,24 +115,6 @@ export function WarehouseStorageDetailsDialog({
                   <span className="text-foreground-light">
                     Reads → Warehouse · Writes → Postgres
                   </span>
-                </MetaRow>
-              </>
-            )}
-
-            {mode === 'warehouse_backed' && (
-              <>
-                <MetaRow label="Size">{warehouseSize}</MetaRow>
-                {state.migrationCompletedAt !== undefined && (
-                  <MetaRow label="Moved">
-                    <TimestampInfo
-                      className="text-sm text-foreground-light"
-                      utcTimestamp={state.migrationCompletedAt}
-                      displayAs="local"
-                    />
-                  </MetaRow>
-                )}
-                <MetaRow label="Routing">
-                  <span className="text-foreground-light">Reads & writes → Warehouse</span>
                 </MetaRow>
               </>
             )}

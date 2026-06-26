@@ -79,11 +79,9 @@ export function TableDetailOverviewMetrics({ table }: TableDetailOverviewMetrics
   const warehouseSizeBytes = warehouseState?.warehouseSizeBytes ?? 0
   const warehouseMode = warehouseState?.mode ?? 'postgres'
   const sizeBytes =
-    warehouseMode === 'warehouse_backed'
-      ? warehouseSizeBytes
-      : warehouseMode === 'has_warehouse_copy'
-        ? postgresSizeBytes + warehouseSizeBytes
-        : postgresSizeBytes
+    warehouseMode === 'has_warehouse_copy'
+      ? postgresSizeBytes + warehouseSizeBytes
+      : postgresSizeBytes
   const sizeLabel =
     getWarehouseStorageSummaryLabel(warehouseState, table.size) ??
     table.size ??

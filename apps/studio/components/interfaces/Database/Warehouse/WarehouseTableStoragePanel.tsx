@@ -1,4 +1,4 @@
-import { ChevronDown, History } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useState, type ReactNode } from 'react'
 import {
@@ -8,7 +8,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import {
@@ -17,15 +16,13 @@ import {
   type WarehouseMode,
 } from './warehouseDemoStore'
 import { WarehouseDetachModal } from './WarehouseDetachModal'
-import { WarehouseEnablementModal, type EnablementVariant } from './WarehouseEnablementModal'
+import { WarehouseEnablementModal } from './WarehouseEnablementModal'
 import { WarehouseSyncChip } from './WarehouseSyncChip'
-import { WarehouseTimeTravelFlow } from './WarehouseTimeTravelFlow'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 
 const MODE_LABELS: Record<WarehouseMode, string> = {
   postgres: 'Postgres heap',
   has_warehouse_copy: 'Postgres heap + Warehouse copy',
-  warehouse_backed: 'Warehouse',
 }
 
 const MODE_TOOLTIPS: Partial<Record<WarehouseMode, ReactNode>> = {
@@ -34,9 +31,6 @@ const MODE_TOOLTIPS: Partial<Record<WarehouseMode, ReactNode>> = {
       Kept in the Postgres heap with a synced columnar copy in Warehouse. Changes in Postgres
       propagate to the copy; sync is one-way.
     </>
-  ),
-  warehouse_backed: (
-    <>This table&apos;s storage was moved to Warehouse. The Postgres heap no longer exists.</>
   ),
 }
 
@@ -76,10 +70,9 @@ export function WarehouseTableStoragePanel({
   const warehouseSize = formatWarehouseSize(state.warehouseSizeBytes)
   const copyName = state.copyName ?? `warehouse.${tableKey.split('.').pop() ?? tableKey}`
 
-  const [enablementModal, setEnablementModal] = useState<EnablementVariant | null>(null)
+  const [enablementModalOpen, setEnablementModalOpen] = useState(false)
   const [detachConfirm, setDetachConfirm] = useState(false)
   const [detachProgress, setDetachProgress] = useState(false)
-  const [timeTravelOpen, setTimeTravelOpen] = useState(false)
 
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
   const [, setConnectTab] = useQueryState('connectTab', parseAsString)
@@ -120,32 +113,23 @@ export function WarehouseTableStoragePanel({
               <MetaRow label="Warehouse size">{warehouseSize}</MetaRow>
             </>
           )}
-
-          {mode === 'warehouse_backed' && (
-            <>
-              <MetaRow label="Size">{warehouseSize}</MetaRow>
-              {state.migrationCompletedAt !== undefined && (
-                <MetaRow label="Moved">
-                  <TimestampInfo
-                    className="text-sm text-foreground-light"
-                    utcTimestamp={state.migrationCompletedAt}
-                    displayAs="local"
-                  />
-                </MetaRow>
-              )}
-            </>
-          )}
         </div>
 
         {mode === 'postgres' && (
-          <div className="flex">
-            <Button
-              type="button"
-              variant="default"
-              className="rounded-r-none"
-              onClick={() => setEnablementModal('attach')}
-            >
-              Copy to Warehouse
+          <Button
+            type="button"
+            variant="default"
+            className="w-fit"
+            onClick={() => setEnablementModalOpen(true)}
+          >
+            Copy to Warehouse
+          </Button>
+        )}
+
+        {mode === 'has_warehouse_copy' && (
+          <div className="flex flex-wrap gap-2">
+            <Button type="button" variant="default" onClick={openCatalogConnect}>
+              Connect externally
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -153,78 +137,26 @@ export function WarehouseTableStoragePanel({
                   type="button"
                   variant="default"
                   icon={<ChevronDown />}
-                  className="rounded-l-none border-l-0 px-1"
                   aria-label="More storage actions"
                 />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-48" align="end">
-                <DropdownMenuItem onClick={() => setEnablementModal('move')}>
-                  Move to Warehouse
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setDetachConfirm(true)}>
+                  Detach Warehouse copy
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
         )}
-
-        {mode === 'has_warehouse_copy' && (
-          <div className="flex flex-wrap gap-2">
-            <div className="flex">
-              <Button
-                type="button"
-                variant="default"
-                className="rounded-r-none"
-                onClick={() => setEnablementModal('move')}
-              >
-                Move fully to Warehouse
-              </Button>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    type="button"
-                    variant="default"
-                    icon={<ChevronDown />}
-                    className="rounded-l-none border-l-0 px-1"
-                    aria-label="More storage actions"
-                  />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => setDetachConfirm(true)}>
-                    Detach Warehouse copy
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-            <Button type="button" variant="default" onClick={openCatalogConnect}>
-              Connect externally
-            </Button>
-          </div>
-        )}
-
-        {mode === 'warehouse_backed' && (
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              variant="default"
-              icon={<History />}
-              onClick={() => setTimeTravelOpen(true)}
-            >
-              View snapshots
-            </Button>
-            <Button type="button" variant="default" onClick={openCatalogConnect}>
-              Connect externally
-            </Button>
-          </div>
-        )}
       </div>
 
-      {enablementModal && (
+      {enablementModalOpen && (
         <WarehouseEnablementModal
           open={true}
-          variant={enablementModal}
           tableKey={tableKey}
           tableName={tableName}
           onOpenChange={(open) => {
-            if (!open) setEnablementModal(null)
+            if (!open) setEnablementModalOpen(false)
           }}
         />
       )}
@@ -258,12 +190,6 @@ export function WarehouseTableStoragePanel({
           }}
         />
       )}
-
-      <WarehouseTimeTravelFlow
-        tableKey={tableKey}
-        sheetOpen={timeTravelOpen}
-        onSheetOpenChange={setTimeTravelOpen}
-      />
     </>
   )
 }
