@@ -54,7 +54,6 @@ export function Telemetry() {
       return
     }
 
-    console.log(user.id)
     Sentry.setUser({ id: user.id })
   }, [user?.id])
 
