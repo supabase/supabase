@@ -7,6 +7,7 @@ import { useMemo, useState } from 'react'
 import { Button } from 'ui'
 
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
+import { ObservabilityReportToolbarActions } from '@/components/interfaces/Observability/ObservabilityReportToolbarActions'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
 import {
@@ -144,15 +145,14 @@ const EdgeFunctionsUsage = () => {
 
   return (
     <>
-      <ReportHeader
-        title="Edge Functions"
-        showDatabaseSelector={false}
-        docsHref={OBSERVABILITY_DOCS_HREFS.edgeFunctions}
-      />
+      <ReportHeader title="Edge Functions" showDatabaseSelector={false} />
       <ReportStickyNav
         content={
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-2 w-full">
+            <ObservabilityReportToolbarActions
+              docsHref={OBSERVABILITY_DOCS_HREFS.edgeFunctions}
+              topic="Edge Functions"
+            >
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
                 label="Refresh report"
@@ -161,7 +161,7 @@ const EdgeFunctionsUsage = () => {
                 <Button
                   variant="default"
                   disabled={isRefreshing}
-                  icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                  icon={<RefreshCw aria-hidden className={isRefreshing ? 'animate-spin' : ''} />}
                   className="w-7"
                   onClick={onRefreshReport}
                 />
@@ -199,7 +199,7 @@ const EdgeFunctionsUsage = () => {
                   </p>
                 </div>
               )}
-            </div>
+            </ObservabilityReportToolbarActions>
             <div className="w-full flex items-center gap-2 flex-wrap">
               <ReportsSelectFilter
                 label="Function"

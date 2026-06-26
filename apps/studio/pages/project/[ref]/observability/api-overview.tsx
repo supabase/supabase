@@ -19,6 +19,7 @@ import { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.Date
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { useApiReport } from '@/data/reports/api-report-query'
 import { useReportDateRange } from '@/hooks/misc/useReportDateRange'
@@ -95,14 +96,10 @@ export const ApiReport: NextPageWithLayout = () => {
 
   return (
     <ReportPadding>
-      <ReportHeader
-        title="API Gateway"
-        showDatabaseSelector={false}
-        docsHref={OBSERVABILITY_DOCS_HREFS.apiGateway}
-      />
+      <ReportHeader title="API Gateway" showDatabaseSelector={false} />
       <ReportStickyNav
         content={
-          <div className="flex items-center gap-3">
+          <div className="flex w-full items-center gap-3">
             <ReportFilterBar
               onRemoveFilters={removeFilters}
               onDatepickerChange={handleDatepickerChange}
@@ -114,9 +111,10 @@ export const ApiReport: NextPageWithLayout = () => {
               filters={filters}
               datepickerHelpers={datePickerHelpers}
               initialDatePickerValue={datePickerValue}
-              className="w-full"
+              className="flex-1 min-w-0"
               showDatabaseSelector={false}
             />
+            <DocsButton href={OBSERVABILITY_DOCS_HREFS.apiGateway} topic="API Gateway" />
             <UpgradePrompt
               show={showUpgradePrompt}
               setShowUpgradePrompt={setShowUpgradePrompt}

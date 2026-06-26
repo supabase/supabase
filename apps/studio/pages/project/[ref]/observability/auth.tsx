@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { Button } from 'ui'
 
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
+import { ObservabilityReportToolbarActions } from '@/components/interfaces/Observability/ObservabilityReportToolbarActions'
 import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
@@ -210,15 +211,14 @@ const AuthUsage = () => {
 
   return (
     <>
-      <ReportHeader
-        title="Auth"
-        showDatabaseSelector={false}
-        docsHref={OBSERVABILITY_DOCS_HREFS.auth}
-      />
+      <ReportHeader title="Auth" showDatabaseSelector={false} />
       <ReportStickyNav
         content={
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-2 w-full">
+            <ObservabilityReportToolbarActions
+              docsHref={OBSERVABILITY_DOCS_HREFS.auth}
+              topic="Auth"
+            >
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
                 label="Refresh report"
@@ -261,7 +261,7 @@ const AuthUsage = () => {
                   </p>
                 </div>
               )}
-            </div>
+            </ObservabilityReportToolbarActions>
           </div>
         }
       >

@@ -398,14 +398,6 @@ const Reports = () => {
         </div>
         <div className={cn('mb-4 flex items-center gap-x-3 justify-between')}>
           <div className="flex items-center gap-x-2">
-            <ButtonTooltip
-              variant="default"
-              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-              className="w-7"
-              disabled={isRefreshing}
-              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-              onClick={onRefreshReport}
-            />
             <div className="flex items-center gap-x-3">
               <DateRangePicker
                 value="7d"
@@ -425,6 +417,18 @@ const Reports = () => {
           </div>
 
           <div className="flex items-center gap-x-2">
+            <DocsButton
+              href={OBSERVABILITY_DOCS_HREFS.customReport}
+              topic={currentReport?.name ?? 'Custom report'}
+            />
+            <ButtonTooltip
+              variant="default"
+              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+              className="w-7"
+              disabled={isRefreshing}
+              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+              onClick={onRefreshReport}
+            />
             {canUpdateReport ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -452,10 +456,6 @@ const Reports = () => {
                 Add block
               </ButtonTooltip>
             )}
-            <DocsButton
-              href={OBSERVABILITY_DOCS_HREFS.customReport}
-              topic={currentReport?.name ?? 'Custom report'}
-            />
             <DatabaseSelector />
           </div>
         </div>

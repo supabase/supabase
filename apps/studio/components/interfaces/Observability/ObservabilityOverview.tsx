@@ -13,8 +13,8 @@ import { useObservabilityOverviewData } from './ObservabilityOverview.utils'
 import { ObservabilityOverviewFooter } from './ObservabilityOverviewFooter'
 import { ServiceHealthTable } from './ServiceHealthTable'
 import { useSlowQueriesCount } from './useSlowQueriesCount'
-import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
 import { CHART_INTERVALS } from '@/components/ui/Logs/logs.utils'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
@@ -168,7 +168,7 @@ export const ObservabilityOverview = () => {
     <ReportPadding>
       <div className="flex flex-row justify-between items-center">
         <div className="flex items-center gap-3">
-          <ReportHeader title="Overview" docsHref={OBSERVABILITY_DOCS_HREFS.overview} />
+          <h1>Overview</h1>
           <Tooltip>
             <TooltipTrigger asChild>
               <Badge variant="warning">Beta</Badge>
@@ -179,6 +179,7 @@ export const ObservabilityOverview = () => {
           </Tooltip>
         </div>
         <div className="flex items-center gap-2">
+          <DocsButton href={OBSERVABILITY_DOCS_HREFS.overview} topic="Overview" />
           <ShortcutTooltip
             shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
             label="Refresh report"

@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from 'ui'
 
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
+import { ObservabilityReportToolbarActions } from '@/components/interfaces/Observability/ObservabilityReportToolbarActions'
 import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
@@ -141,15 +142,14 @@ const RealtimeUsage = () => {
 
   return (
     <>
-      <ReportHeader
-        showDatabaseSelector={false}
-        title="Realtime"
-        docsHref={OBSERVABILITY_DOCS_HREFS.realtime}
-      />
+      <ReportHeader showDatabaseSelector={false} title="Realtime" />
       <ReportStickyNav
         content={
-          <div className="flex flex-col gap-3">
-            <div className="flex gap-2">
+          <div className="flex flex-col gap-3 w-full">
+            <ObservabilityReportToolbarActions
+              docsHref={OBSERVABILITY_DOCS_HREFS.realtime}
+              topic="Realtime"
+            >
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
                 label="Refresh report"
@@ -191,7 +191,7 @@ const RealtimeUsage = () => {
                   </p>
                 </div>
               )}
-            </div>
+            </ObservabilityReportToolbarActions>
           </div>
         }
       >
