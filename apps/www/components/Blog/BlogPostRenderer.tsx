@@ -6,6 +6,7 @@ import type { PostReturnType, ProcessedBlogData, StaticAuthor, Tag } from 'types
 import { Badge } from 'ui'
 
 import { CTASection } from '../CTASection'
+import SectionContainerWithCn from '../Layouts/SectionContainerWithCn'
 import { BlogTableOfContents } from '@/components/Blog/BlogTableOfContents'
 import DraftModeBanner from '@/components/Blog/DraftModeBanner'
 import ShareArticleActions from '@/components/Blog/ShareArticleActions'
@@ -96,7 +97,7 @@ const BlogPostRenderer = async ({
     <>
       {isDraftMode && <DraftModeBanner />}
       <div className="overflow-x-clip">
-        <div className="mx-auto max-w-(--container-max-w,75rem) px-6">
+        <SectionContainerWithCn height="none">
           <div className="grid grid-cols-12 xl:gap-x-8 xl:gap-y-0">
             {/* Row 1, Col 1: Back button */}
             <div className="col-span-12 xl:row-start-1 xl:col-start-1 xl:col-span-1 pt-8 xl:pt-12 flex items-start justify-start">
