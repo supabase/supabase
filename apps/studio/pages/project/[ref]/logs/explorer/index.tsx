@@ -475,10 +475,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
                   Review the ClickHouse rewrite before applying it
                 </span>
                 <div className="flex items-center gap-2">
-                  <Button type="default" size="tiny" onClick={discardRewrite}>
+                  <Button variant="default" size="tiny" onClick={discardRewrite}>
                     Discard
                   </Button>
-                  <Button type="primary" size="tiny" onClick={acceptRewrite}>
+                  <Button variant="primary" size="tiny" onClick={acceptRewrite}>
                     Accept
                   </Button>
                 </div>
