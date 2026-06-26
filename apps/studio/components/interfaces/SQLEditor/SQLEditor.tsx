@@ -125,7 +125,8 @@ export const SQLEditor = () => {
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const logsTimeRange = useSqlEditorLogsStateSnapshot()
-  const queryingLogs = isLogsSource(databaseSelectorState.selectedDatabaseId)
+  const logsSourceEnabled = useFlag('otelLegacyLogs')
+  const queryingLogs = logsSourceEnabled && isLogsSource(databaseSelectorState.selectedDatabaseId)
   const { aiOptInLevel } = useOrgAiOptInLevel()
   const showPrettyExplain = useFlag('ShowPrettyExplain')
 

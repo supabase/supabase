@@ -1,5 +1,5 @@
 import { Hotkey } from '@tanstack/react-hotkeys'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { AlignLeft, Check, Heart, Keyboard, MoreVertical } from 'lucide-react'
 import { toast } from 'sonner'
 import {
@@ -56,7 +56,8 @@ export const UtilityActions = ({
   const snapV2 = useSqlEditorV2StateSnapshot()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const logsTimeRange = useSqlEditorLogsStateSnapshot()
-  const queryingLogs = isLogsSource(databaseSelectorState.selectedDatabaseId)
+  const logsSourceEnabled = useFlag('otelLegacyLogs')
+  const queryingLogs = logsSourceEnabled && isLogsSource(databaseSelectorState.selectedDatabaseId)
 
   const [isAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
@@ -220,7 +221,9 @@ export const UtilityActions = ({
             <DatabaseSelector
               selectedDatabaseId={lastSelectedDb.length === 0 ? undefined : lastSelectedDb}
               variant="connected-on-right"
-              additionalOptions={[{ id: SQL_EDITOR_LOGS_SOURCE_ID, name: 'Logs' }]}
+              additionalOptions={
+                logsSourceEnabled ? [{ id: SQL_EDITOR_LOGS_SOURCE_ID, name: 'Logs' }] : []
+              }
               onSelectId={onSelectDatabase}
             />
           )}
