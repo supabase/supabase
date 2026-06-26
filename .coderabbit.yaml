@@ -1,5 +1,16 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 
+# Inherit org-level settings for anything not specified here. Matches the
+# CodeRabbit dashboard (schema default is false), so the repo keeps falling back
+# to organization config for unset values.
+inheritance: true
+
+# Enrich linked issues with related code / potential solutions. Matches the
+# dashboard (schema default is false).
+issue_enrichment:
+  auto_enrich:
+    enabled: true
+
 reviews:
   # Skip machine-generated / vendored files (mirrors .prettierignore). Keeps
   # reviews focused on hand-written code and preserves rate-limit budget on
