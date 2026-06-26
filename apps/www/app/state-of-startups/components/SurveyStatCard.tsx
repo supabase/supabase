@@ -1,24 +1,14 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
-import {
-  distributionPercent,
-  getDistribution,
-  mergeFilters,
-  type Aggregation,
-  type SurveyFilters,
-} from '../lib/survey-keys'
-import { useAccent } from './accent-context'
+import type { DistributionQuery, SurveyFilters } from '../lib/survey-key'
+import { useDistributionPercent } from './use-distribution'
 import { useYear } from './year-context'
 
 const ANIMATION_DURATION = 600
 
-export interface StatQuery {
-  column: string
-  aggregation: Aggregation
-  target: string | string[]
-  filters?: SurveyFilters
+export interface StatQuery extends DistributionQuery {
   newIn2026?: boolean
 }
 
@@ -31,7 +21,6 @@ interface SurveyStatCardProps {
 
 export function SurveyStatCard({ label, query, cohortFilter }: SurveyStatCardProps) {
   const cardRef = useRef<HTMLDivElement>(null)
-  const accent = useAccent()
   const { year } = useYear()
 
   const accentBg = 'bg-brand'
@@ -40,11 +29,7 @@ export function SurveyStatCard({ label, query, cohortFilter }: SurveyStatCardPro
   // Resolve the percent from the embedded static dataset for the active year.
   // Returns null when the option/column has no data that year (e.g. a
   // new-in-2026 question viewed at 2025), which renders an em dash.
-  const resolvedPercent: number | null = useMemo(() => {
-    const filters = mergeFilters(query.filters, cohortFilter)
-    const dist = getDistribution(year, query.column, query.aggregation, filters)
-    return distributionPercent(dist, query.target)
-  }, [query.column, query.aggregation, query.target, query.filters, cohortFilter, year])
+  const resolvedPercent = useDistributionPercent(query, cohortFilter)
 
   const isNewThisYear = resolvedPercent === null && query.newIn2026 && year < 2026
 

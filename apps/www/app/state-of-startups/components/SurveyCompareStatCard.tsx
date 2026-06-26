@@ -1,29 +1,10 @@
 'use client'
 
-import { useMemo } from 'react'
+import type { DistributionQuery } from '../lib/survey-key'
+import { useDistributionPercent } from './use-distribution'
 
-import { distributionPercent, getDistribution } from '../lib/survey-keys'
-import type { Aggregation, SurveyFilters } from '../lib/survey-keys'
-import { useYear } from './year-context'
-
-// Local mirror of the narrative StatQuery shape (avoids a data-file import cycle).
-interface CompareQuery {
-  column: string
-  aggregation: Aggregation
-  target: string | string[]
-  filters?: SurveyFilters
-}
-
-function usePercent(query: CompareQuery): number | null {
-  const { year } = useYear()
-  return useMemo(() => {
-    const dist = getDistribution(year, query.column, query.aggregation, query.filters)
-    return distributionPercent(dist, query.target)
-  }, [year, query.column, query.aggregation, query.target, query.filters])
-}
-
-function CompareValue({ caption, query }: { caption: string; query: CompareQuery }) {
-  const percent = usePercent(query)
+function CompareValue({ caption, query }: { caption: string; query: DistributionQuery }) {
+  const percent = useDistributionPercent(query)
   return (
     <div className="flex flex-col gap-1">
       <span className="text-foreground-light text-xs font-mono uppercase tracking-widest">
@@ -42,8 +23,8 @@ export function SurveyCompareStatCard({
   b,
 }: {
   label: string
-  a: { caption: string; query: CompareQuery }
-  b: { caption: string; query: CompareQuery }
+  a: { caption: string; query: DistributionQuery }
+  b: { caption: string; query: DistributionQuery }
 }) {
   return (
     <div className="flex-1 px-8 py-8 flex flex-col gap-6">
