@@ -62,7 +62,6 @@
     "@monaco-editor/react": "^4.6.0",
     "@next/bundle-analyzer": "16.2.3",
     "@number-flow/react": "^0.3.2",
-    "@polyglot-sql/sdk": "^0.5.7",
     "@radix-ui/react-slider": "^1.1.2",
     "@radix-ui/react-slot": "^1.2.0",
     "@radix-ui/react-visually-hidden": "^1.2.3",

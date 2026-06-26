@@ -6,8 +6,9 @@ import type { editor } from 'monaco-editor'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
+import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 
+import { rewriteLogsSqlWithAI } from '@/components/interfaces/Settings/Logs/logs-sql-rewrite'
 import {
   EXPLORER_DATEPICKER_HELPERS,
   getDefaultHelper,
@@ -32,6 +33,7 @@ import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { DiffEditor } from '@/components/ui/DiffEditor'
 import LoadingOpacity from '@/components/ui/LoadingOpacity'
 import ShimmerLine from '@/components/ui/ShimmerLine'
 import { useContentQuery } from '@/data/content/content-query'
@@ -39,11 +41,14 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from '@/data/content/content-upsert-mutation'
+import { constructHeaders } from '@/data/fetchers'
 import useLogsQuery from '@/hooks/analytics/useLogsQuery'
 import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useUpgradePrompt } from '@/hooks/misc/useUpgradePrompt'
 import { uuidv4 } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
@@ -64,6 +69,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const monaco = useMonaco()
   const router = useRouter()
   const { profile } = useProfile()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: organization } = useSelectedOrganizationQuery()
   const { ref, q, queryId } = useParams()
   const track = useTrack()
   const projectRef = ref as string
@@ -107,6 +114,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
   const [selectedLog, setSelectedLog] = useState<LogData | null>(null)
+  const [rewriteProposal, setRewriteProposal] = useState<{
+    original: string
+    modified: string
+  } | null>(null)
+  const [isRewriting, setIsRewriting] = useState<boolean>(false)
 
   const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
     `project-content-${projectRef}-recent-log-sql`,
@@ -203,7 +215,33 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     addRecentLogSqlSnippet({ sql: template.searchString })
   }
 
-  const applyRewrite = (newSql: string) => {
+  const handleRewrite = async () => {
+    const currentSql = editorRef.current?.getValue() ?? editorValue
+    if (!currentSql.trim()) {
+      toast.info('Write a query to rewrite first')
+      return
+    }
+    setIsRewriting(true)
+    try {
+      const headerData = await constructHeaders()
+      const rewritten = await rewriteLogsSqlWithAI({
+        sql: currentSql,
+        projectRef,
+        connectionString: project?.connectionString,
+        orgSlug: organization?.slug,
+        authorizationHeader: headerData.get('Authorization'),
+      })
+      setRewriteProposal({ original: currentSql, modified: rewritten })
+    } catch (error) {
+      toast.error(`Couldn't rewrite the query: ${(error as Error).message}`)
+    } finally {
+      setIsRewriting(false)
+    }
+  }
+
+  const acceptRewrite = () => {
+    if (!rewriteProposal) return
+    const newSql = rewriteProposal.modified
     setEditorValue(newSql)
     if (editorRef.current && monaco) {
       const editorModel = editorRef.current.getModel()
@@ -217,7 +255,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       editorRef.current.pushUndoStop()
       editorRef.current.focus()
     }
+    setRewriteProposal(null)
+    toast.success('Applied the ClickHouse rewrite')
   }
+
+  const discardRewrite = () => setRewriteProposal(null)
 
   const handleRun = (value?: string | React.MouseEvent) => {
     track('log_explorer_query_run_button_clicked', { is_saved_query: !!queryId })
@@ -421,21 +463,46 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
           {useOtelEndpoint && (
             <LogsExplorerOtelBanner
               projectRef={projectRef}
-              sql={editorValue}
-              onApplyRewrite={applyRewrite}
+              isRewriting={isRewriting}
+              onRewrite={handleRewrite}
             />
           )}
           <ShimmerLine active={isLoading} />
-          <CodeEditor
-            // Ensure we reset the editor to the query content whenever the selected query changes
-            key={queryId}
-            id={editorId}
-            editorRef={editorRef}
-            language="pgsql"
-            defaultValue={editorValue}
-            onInputChange={(v) => setEditorValue(v || '')}
-            actions={{ runQuery: { enabled: true, callback: handleRun } }}
-          />
+          {rewriteProposal ? (
+            <div className="flex h-full flex-col">
+              <div className="flex items-center justify-between gap-2 border-b bg-surface-100 px-4 py-2">
+                <span className="text-xs text-foreground-light">
+                  Review the ClickHouse rewrite before applying it
+                </span>
+                <div className="flex items-center gap-2">
+                  <Button type="default" size="tiny" onClick={discardRewrite}>
+                    Discard
+                  </Button>
+                  <Button type="primary" size="tiny" onClick={acceptRewrite}>
+                    Accept
+                  </Button>
+                </div>
+              </div>
+              <div className="min-h-0 flex-1">
+                <DiffEditor
+                  language="pgsql"
+                  original={rewriteProposal.original}
+                  modified={rewriteProposal.modified}
+                />
+              </div>
+            </div>
+          ) : (
+            <CodeEditor
+              // Ensure we reset the editor to the query content whenever the selected query changes
+              key={queryId}
+              id={editorId}
+              editorRef={editorRef}
+              language="pgsql"
+              defaultValue={editorValue}
+              onInputChange={(v) => setEditorValue(v || '')}
+              actions={{ runQuery: { enabled: true, callback: handleRun } }}
+            />
+          )}
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel collapsible minSize="5" className="overflow-auto">

@@ -1,191 +1,16 @@
 /**
- * Deterministically rewrites a legacy BigQuery logs query into the ClickHouse
- * dialect + schema used by the OTEL `logs.all.otel` endpoint.
- *
- * The old logs live in per-service tables (`edge_logs`, `postgres_logs`, …) with
- * nested fields reached through `cross join unnest(metadata)`. The OTEL endpoint
- * stores everything in one `logs` table keyed by `source`, with those fields in a
- * `log_attributes` map. So the rewrite, done on the parsed query tree:
- *   - points the FROM at `logs` and adds `source = '<table>'`
- *   - drops the `unnest` joins
- *   - turns `request.method` style refs into `log_attributes['request.method']`
- *   - wraps numeric fields in `toInt32OrZero` so comparisons still work
- *
- * Parsing/generation runs through the WASM-backed polyglot SDK, loaded lazily so
- * it never enters the main bundle.
+ * Rewrites a legacy BigQuery logs query into ClickHouse SQL for the OTEL
+ * `logs.all.otel` endpoint by asking the AI completion endpoint, then returns
+ * only the rewritten query. The Logs Explorer shows it as a diff to accept; the
+ * AI Assistant panel is not opened.
  */
+import { BASE_PATH } from '@/lib/constants'
 
-// Legacy BigQuery logs tables. A FROM referencing one of these is remapped onto
-// the OTEL `logs` table with a matching `source` filter (the names are identical).
-const LOG_TABLES = new Set<string>([
-  'edge_logs',
-  'postgres_logs',
-  'function_logs',
-  'function_edge_logs',
-  'auth_logs',
-  'auth_audit_logs',
-  'realtime_logs',
-  'storage_logs',
-  'postgrest_logs',
-  'supavisor_logs',
-  'pgbouncer_logs',
-  'pg_upgrade_logs',
-  'pg_cron_logs',
-  'etl_replication_logs',
-  'multigres_logs',
-])
-
-// BigQuery unnest alias -> OTEL `log_attributes` key prefix. The legacy queries
-// unnest `metadata` (aliased `m`/`metadata`, the root, so no prefix) and its
-// `request` / `response` / `parsed` structs (which keep their name as the prefix).
-const ALIAS_PREFIX: Record<string, string> = {
-  request: 'request.',
-  response: 'response.',
-  parsed: 'parsed.',
-  m: '',
-  metadata: '',
-}
-
-// `log_attributes` values are strings; these keys are compared/aggregated as
-// numbers, so they need `toInt32OrZero(...)`.
-const NUMERIC_KEYS = new Set([
-  'response.status_code',
-  'request.status_code',
-  'status',
-  'execution_time_ms',
-])
-
-export interface RewriteResult {
-  sql: string
-  /** False when the query referenced no legacy log table, so nothing was rewritten. */
-  changed: boolean
-}
-
-type Sdk = typeof import('@polyglot-sql/sdk')
-
-let sdkPromise: Promise<Sdk> | null = null
-const loadSdk = (): Promise<Sdk> => {
-  if (sdkPromise === null) {
-    sdkPromise = import('@polyglot-sql/sdk').then(async (sdk) => {
-      await sdk.init?.()
-      return sdk
-    })
-  }
-  return sdkPromise
-}
-
-const isUnnestColumn = (node: any): boolean =>
-  !!node?.column?.table && ALIAS_PREFIX[node.column.table.name] !== undefined
-
-const otelKey = (node: any): string =>
-  `${ALIAS_PREFIX[node.column.table.name]}${node.column.name.name}`
-
-const isSourceColumn = (node: any, source: string): boolean =>
-  !!node?.column?.table && (node.column.table.name === source || node.column.table.name === 'logs')
-
-const isUnnestJoin = (join: any): boolean => !!join?.this?.alias?.this?.unnest
-
-export async function rewriteBqLogsSqlToClickhouse(input: string): Promise<RewriteResult> {
-  const sdk = await loadSdk()
-  const BQ = sdk.Dialect.BigQuery
-  const CH = sdk.Dialect.ClickHouse
-
-  const parsed = sdk.parse(input, BQ)
-  if (!parsed.success || !parsed.ast) {
-    throw new Error(parsed.error || 'Could not parse the query.')
-  }
-
-  // Build a `log_attributes['key']` expression node (numeric-cast when needed) by
-  // lifting it out of a tiny parsed query.
-  const attrExpr = (key: string): any => {
-    const expr = NUMERIC_KEYS.has(key)
-      ? `toInt32OrZero(log_attributes['${key}'])`
-      : `log_attributes['${key}']`
-    return sdk.parse(`select ${expr} as x from t`, CH).ast[0].select.expressions[0].alias.this
-  }
-
-  const rewriteColumns = (node: any, source: string): void => {
-    if (!node || typeof node !== 'object') return
-    for (const k of Object.keys(node)) {
-      const child = node[k]
-      if (isUnnestColumn(child)) node[k] = attrExpr(otelKey(child))
-      else if (isSourceColumn(child, source)) child.column.table = null
-      else rewriteColumns(child, source)
-    }
-  }
-
-  const injectSourceFilter = (select: any, source: string): void => {
-    const srcWhere = sdk.parse(`select 1 from t where source = '${source}'`, CH).ast[0].select
-      .where_clause
-    if (!select.where_clause) {
-      select.where_clause = srcWhere
-      return
-    }
-    const andWhere = sdk.parse(`select 1 from t where x and y`, CH).ast[0].select.where_clause
-    const conj = Object.keys(andWhere.this)[0]
-    andWhere.this[conj].left = srcWhere.this
-    andWhere.this[conj].right = select.where_clause.this
-    select.where_clause = andWhere
-  }
-
-  const remapSelect = (select: any): boolean => {
-    const fromTable = select?.from?.expressions?.[0]?.table
-    const source = fromTable?.name?.name
-    if (!source || !LOG_TABLES.has(source)) return false
-
-    // Only `unnest` joins are foldable into `log_attributes`. A real join means
-    // we can't safely rewrite, so bail and let the AI Assistant fallback handle it.
-    const joins = select.joins ?? []
-    if (joins.some((join: any) => !isUnnestJoin(join))) return false
-
-    fromTable.name.name = 'logs'
-    select.joins = []
-
-    // SELECT list: keep the original leaf name as the alias so result columns
-    // (and the renderers reading them) are unchanged.
-    select.expressions = select.expressions.map((expr: any) => {
-      if (isUnnestColumn(expr)) {
-        const leaf = expr.column.name.name
-        const aliased = sdk.parse(`select x as ${leaf} from t`, CH).ast[0].select.expressions[0]
-        aliased.alias.this = attrExpr(otelKey(expr))
-        return aliased
-      }
-      if (isSourceColumn(expr, source)) {
-        expr.column.table = null
-        return expr
-      }
-      rewriteColumns(expr, source)
-      return expr
-    })
-
-    rewriteColumns(select.where_clause, source)
-    rewriteColumns(select.group_by, source)
-    rewriteColumns(select.having, source)
-    rewriteColumns(select.order_by, source)
-
-    injectSourceFilter(select, source)
-    return true
-  }
-
-  let changed = false
-  for (const statement of parsed.ast) {
-    if (statement?.select) changed = remapSelect(statement.select) || changed
-  }
-  if (!changed) return { sql: input, changed: false }
-
-  const generated = sdk.generate(parsed.ast, CH)
-  if (!generated.success || !generated.sql?.[0]) {
-    throw new Error(generated.error || 'Could not generate ClickHouse SQL.')
-  }
-  return { sql: generated.sql[0], changed: true }
-}
-
-// Schema reference handed to the AI Assistant so it knows the table shape, the
-// available sources, their log_attributes keys, and the timestamp format. Mirrors
-// OTEL_SOURCES in Logs.utils.otel.ts.
-const LOGS_SCHEMA_REFERENCE = `The logs table (ClickHouse) has these columns:
+// Schema reference given to the model so it writes ClickHouse logs SQL. Kept
+// backtick-free so it composes into the prompt cleanly.
+export const LOGS_SCHEMA_REFERENCE = `The logs table (ClickHouse) has these columns:
 - id (String)
-- timestamp (DateTime64, UTC) formatted like 2026-06-22T09:34:06.215000 (ISO 8601, microsecond precision, no trailing Z). Use it directly, e.g. order by timestamp desc. The Logs Explorer already applies the selected time range, so an explicit timestamp filter is usually unnecessary.
+- timestamp (DateTime64, UTC) formatted like 2026-06-22T09:34:06.215000 (ISO 8601, microsecond precision, no trailing Z)
 - event_message (String): the raw log line
 - severity_text (String): log level when present
 - source (String): the service the log belongs to. Always filter by it, e.g. where source = 'edge_logs'.
@@ -196,35 +21,76 @@ Sources and their common log_attributes keys:
 - postgres_logs: parsed.error_severity, parsed.detail, parsed.hint, parsed.query, identifier
 - pg_cron logs live under source = 'postgres_logs' (parsed.error_severity, parsed.query)
 - auth_logs: level, status, path, msg, error
-- function_edge_logs: response.status_code, request.method, request.pathname, function_id, execution_id, execution_time_ms, deployment_id, version
+- function_edge_logs: response.status_code, request.method, request.pathname, function_id, execution_id, execution_time_ms
 - function_logs: event_type, function_id, execution_id, level
-- storage_logs, realtime_logs, postgrest_logs, supavisor_logs, pgbouncer_logs, pg_upgrade_logs, auth_audit_logs, multigres_logs, etl_replication_logs: mostly id, timestamp, event_message, with any extra fields in log_attributes
+- storage_logs, realtime_logs, postgrest_logs, supavisor_logs, pgbouncer_logs: mostly id, timestamp, event_message, with extra fields in log_attributes
 
-Tips:
-- List the keys present on a row with: select mapKeys(log_attributes) from logs where source = '...' limit 1
-- Numeric filter: toInt32OrZero(log_attributes['response.status_code']) between 500 and 599
-- Text search: event_message ILIKE '%timeout%'
-
-Example:
-select timestamp, event_message, log_attributes['request.path'] as path
-from logs
-where source = 'edge_logs'
-  and toInt32OrZero(log_attributes['response.status_code']) >= 500
-order by timestamp desc
-limit 100`
+Rules: always filter by source; the editor applies the selected time range so a timestamp filter is usually unnecessary; the old BigQuery unnest joins become log_attributes['key'] lookups (drop the metadata root).`
 
 /**
- * Prompt for the AI Assistant to rewrite a Logs Explorer query from the old
- * BigQuery dialect to the ClickHouse-backed OTEL logs schema. Used as the
- * fallback when the deterministic rewrite above can't handle a query. Includes
- * the current query when present; otherwise asks for general guidance.
+ * Prompt for the AI completion endpoint. Includes the schema and the query to
+ * rewrite, and instructs the model to return only the SQL so the result can go
+ * straight into the editor diff.
  */
-export function buildClickhouseRewritePrompt(sql?: string): string {
-  const intro =
-    'The Logs Explorer now runs on a ClickHouse-backed engine instead of BigQuery, which uses a different SQL dialect and schema (a single `logs` table with fields in the `log_attributes` map, keyed by `source`).'
-  const trimmed = sql?.trim()
-  if (!trimmed) {
-    return `${intro}\n\n${LOGS_SCHEMA_REFERENCE}\n\nHow do I write queries against the new ClickHouse logs schema? Give a short overview of the key differences from the old BigQuery syntax.`
+export function buildClickhouseRewritePrompt(sql: string): string {
+  return `${LOGS_SCHEMA_REFERENCE}
+
+Rewrite the following query to valid ClickHouse SQL against the logs schema above, preserving its original intent. Reply with ONLY the rewritten SQL query: no explanation, no comments, and no markdown code fences.
+
+${sql}`
+}
+
+// Models sometimes wrap SQL in a markdown code fence despite being asked not to.
+// Strip a single surrounding fence so the editor gets raw SQL.
+export function stripSqlCodeFences(text: string): string {
+  const trimmed = text.trim()
+  const fenced = trimmed.match(/^```(?:sql)?\s*\n?([\s\S]*?)\n?```$/i)
+  return (fenced ? fenced[1] : trimmed).trim()
+}
+
+export interface RewriteLogsSqlArgs {
+  sql: string
+  projectRef?: string
+  connectionString?: string | null
+  orgSlug?: string
+  authorizationHeader?: string | null
+}
+
+/**
+ * Calls the AI completion endpoint in the background and returns the rewritten
+ * ClickHouse query. Throws on a failed request or an empty result.
+ */
+export async function rewriteLogsSqlWithAI(args: RewriteLogsSqlArgs) {
+  const { sql, projectRef, connectionString, orgSlug, authorizationHeader } = args
+
+  const response = await fetch(`${BASE_PATH}/api/ai/code/complete`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(authorizationHeader ? { Authorization: authorizationHeader } : {}),
+    },
+    body: JSON.stringify({
+      projectRef,
+      connectionString,
+      language: 'sql',
+      orgSlug,
+      completionMetadata: {
+        textBeforeCursor: '',
+        textAfterCursor: '',
+        language: 'pgsql',
+        prompt: buildClickhouseRewritePrompt(sql),
+        selection: sql,
+      },
+    }),
+  })
+
+  if (!response.ok) {
+    const errorText = await response.text()
+    throw new Error(errorText || 'Failed to rewrite the query')
   }
-  return `${intro}\n\n${LOGS_SCHEMA_REFERENCE}\n\nRewrite this query to valid ClickHouse SQL against the schema above, preserving its original intent:\n\n\`\`\`sql\n${trimmed}\n\`\`\``
+
+  const raw = await response.json()
+  const rewritten = stripSqlCodeFences(typeof raw === 'string' ? raw : String(raw))
+  if (!rewritten) throw new Error('The assistant returned an empty query')
+  return rewritten
 }
