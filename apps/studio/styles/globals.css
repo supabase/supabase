@@ -7,6 +7,10 @@
 @source './../../../packages/ui/src/**/*.{tsx,ts,js}';
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
 
+@theme inline {
+  --font-heading: var(--font-heading, var(--font-sans));
+}
+
 @theme {
   --text-grid: 13px;
 
@@ -206,7 +210,7 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-heading, var(--font-sans));
+  @apply font-heading font-medium;
 }
 
 .form-group .form-text,
