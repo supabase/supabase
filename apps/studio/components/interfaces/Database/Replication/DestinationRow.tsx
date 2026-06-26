@@ -1,22 +1,9 @@
+import { useParams } from 'common'
+import { AnalyticsBucket, BigQuery, Database } from 'icons'
+import { Minus, Snowflake } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { AlertError } from 'components/ui/AlertError'
-import { useDeleteDestinationPipelineMutation } from 'data/replication/delete-destination-pipeline-mutation'
-import { useReplicationPipelineReplicationStatusQuery } from 'data/replication/pipeline-replication-status-query'
-import { useReplicationPipelineStatusQuery } from 'data/replication/pipeline-status-query'
-import { useReplicationPipelineVersionQuery } from 'data/replication/pipeline-version-query'
-import { Pipeline } from 'data/replication/pipelines-query'
-import { useStopPipelineMutation } from 'data/replication/stop-pipeline-mutation'
-import { AnalyticsBucket, BigQuery, Database } from 'icons'
-import { Minus } from 'lucide-react'
-import {
-  PipelineStatusRequestStatus,
-  usePipelineRequestStatus,
-} from 'state/replication-pipeline-request-status'
-import type { ResponseError } from 'types'
 import {
   Button,
   TableCell,
@@ -27,46 +14,49 @@ import {
   WarningIcon,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { DeleteDestination } from './DeleteDestination'
-import { DestinationPanel } from './DestinationPanel/DestinationPanel'
-import { DestinationType } from './DestinationPanel/DestinationPanel.types'
-import { getStatusName, PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
 import { PipelineStatus } from './PipelineStatus'
 import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.constants'
+import { getFormattedLagValue } from './ReplicationPipelineStatus/ReplicationPipelineStatus.utils'
 import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
+import { useDestinationInformation } from './useDestinationInformation'
+import { AlertError } from '@/components/ui/AlertError'
+import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
+import { useReplicationPipelineReplicationStatusQuery } from '@/data/replication/pipeline-replication-status-query'
+import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
+import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-version-query'
+import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
+import {
+  PipelineStatusRequestStatus,
+  usePipelineRequestStatus,
+} from '@/state/replication-pipeline-request-status'
+import { type ResponseError } from '@/types'
 
 interface DestinationRowProps {
-  sourceId?: number
   destinationId: number
-  destinationName: string
-  type?: DestinationType
-  pipeline?: Pipeline
-  error: ResponseError | null
-  isLoading: boolean
-  isError: boolean
-  isSuccess: boolean
 }
 
-export const DestinationRow = ({
-  sourceId,
-  destinationId,
-  destinationName,
-  type,
-  pipeline,
-  error: pipelineError,
-  isLoading: isPipelineLoading,
-  isError: isPipelineError,
-  isSuccess: isPipelineSuccess,
-}: DestinationRowProps) => {
+export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   const { ref: projectRef } = useParams()
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
-  const [showEditDestinationPanel, setShowEditDestinationPanel] = useState(false)
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
 
+  const { type, statusName, destination, pipeline, pipelineStatus, pipelineFetcher } =
+    useDestinationInformation({
+      id: destinationId,
+    })
   const {
-    data: pipelineStatusData,
+    error: pipelineError,
+    isPending: isPipelineLoading,
+    isError: isPipelineError,
+    isSuccess: isPipelineSuccess,
+  } = pipelineFetcher
+  const destinationName = destination?.name ?? ''
+
+  const {
     error: pipelineStatusError,
     isPending: isPipelineStatusLoading,
     isError: isPipelineStatusError,
@@ -78,7 +68,7 @@ export const DestinationRow = ({
     },
     { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
   )
-  const { getRequestStatus, updatePipelineStatus, setRequestStatus } = usePipelineRequestStatus()
+  const { getRequestStatus, updatePipelineStatus } = usePipelineRequestStatus()
   const requestStatus = pipeline?.id
     ? getRequestStatus(pipeline.id)
     : PipelineStatusRequestStatus.None
@@ -86,16 +76,24 @@ export const DestinationRow = ({
   const { mutateAsync: stopPipeline } = useStopPipelineMutation()
   const { mutateAsync: deleteDestinationPipeline } = useDeleteDestinationPipelineMutation({})
 
-  const pipelineStatus = pipelineStatusData?.status
-  const statusName = getStatusName(pipelineStatus)
-
   // Fetch table-level replication status to surface errors in list view
-  const { data: replicationStatusData } = useReplicationPipelineReplicationStatusQuery(
+  const {
+    data: replicationStatusData,
+    isPending: isReplicationStatusLoading,
+    isError: isReplicationStatusError,
+  } = useReplicationPipelineReplicationStatusQuery(
     { projectRef, pipelineId: pipeline?.id },
     { refetchInterval: STATUS_REFRESH_FREQUENCY_MS }
   )
   const tableStatuses = replicationStatusData?.table_statuses ?? []
   const errorCount = tableStatuses.filter((t) => t.state?.name === 'error').length
+  const applyLag = replicationStatusData?.apply_lag
+  // Show the byte-based slot lag (WAL the destination hasn't confirmed flushing yet). The
+  // time-based flush_lag from pg_stat_replication is routinely NULL for logical slots that are
+  // idle or don't report timed feedback, whereas confirmed_flush_lsn_bytes is always populated.
+  const lagBytes = applyLag?.confirmed_flush_lsn_bytes
+  const lag = getFormattedLagValue('bytes', lagBytes)
+  const isCaughtUp = lagBytes === 0
   // Only show errors when pipeline is running (not when stopped or restarting)
   const isPipelineStopped = statusName === PipelineStatusName.STOPPED
   const isRestarting = requestStatus === PipelineStatusRequestStatus.RestartRequested
@@ -113,7 +111,7 @@ export const DestinationRow = ({
       return console.error('Project ref is required')
     }
     if (!pipeline) {
-      return toast.error(PIPELINE_ERROR_MESSAGES.NO_PIPELINE_FOUND)
+      return toast.error('No pipeline found')
     }
 
     try {
@@ -128,7 +126,7 @@ export const DestinationRow = ({
       setShowDeleteDestinationForm(false)
       toast.success(`Deleted destination "${destinationName}"`)
     } catch (error) {
-      toast.error(PIPELINE_ERROR_MESSAGES.DELETE_DESTINATION)
+      toast.error(`Failed to delete destination: ${(error as ResponseError).message}`)
     } finally {
       setIsDeleting(false)
     }
@@ -143,7 +141,11 @@ export const DestinationRow = ({
   return (
     <>
       {isPipelineError && (
-        <AlertError error={pipelineError} subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_PIPELINE} />
+        <TableRow>
+          <TableCell colSpan={6}>
+            <AlertError error={pipelineError} subject="Failed to retrieve pipeline information" />
+          </TableCell>
+        </TableRow>
       )}
       {isPipelineSuccess && (
         <TableRow>
@@ -152,6 +154,10 @@ export const DestinationRow = ({
               <BigQuery size={18} className="text-foreground-light" />
             ) : type === 'Analytics Bucket' ? (
               <AnalyticsBucket size={18} className="text-foreground-light" />
+            ) : type === 'DuckLake' ? (
+              <Database size={18} className="text-foreground-light" />
+            ) : type === 'Snowflake' ? (
+              <Snowflake size={18} className="text-foreground-light" />
             ) : (
               <Database size={18} className="text-foreground-light" />
             )}
@@ -162,12 +168,10 @@ export const DestinationRow = ({
               <ShimmeringLoader />
             ) : (
               <div>
-                <p title={destinationName} className="truncate">
-                  {destinationName}
+                <p>
+                  {type} (Pipeline ID: {pipeline?.id})
                 </p>
-                <p className="text-foreground-lighter">
-                  {type} (ID: {pipeline?.id})
-                </p>
+                <p className="text-foreground-lighter">{destinationName}</p>
               </div>
             )}
           </TableCell>
@@ -177,7 +181,7 @@ export const DestinationRow = ({
               <ShimmeringLoader />
             ) : (
               <PipelineStatus
-                pipelineStatus={pipelineStatusData?.status}
+                pipelineStatus={pipelineStatus?.status}
                 error={pipelineStatusError}
                 isLoading={isPipelineStatusLoading}
                 isError={isPipelineStatusError}
@@ -189,7 +193,17 @@ export const DestinationRow = ({
           </TableCell>
 
           <TableCell>
-            <Minus size={18} className="text-foreground-lighter" />
+            {!pipeline ? (
+              <Minus size={18} className="text-foreground-lighter" />
+            ) : isReplicationStatusLoading ? (
+              <ShimmeringLoader />
+            ) : isReplicationStatusError || !applyLag ? (
+              <Minus size={18} className="text-foreground-lighter" />
+            ) : isCaughtUp ? (
+              <span className="text-foreground-light whitespace-nowrap">Caught up</span>
+            ) : (
+              <span className="text-foreground whitespace-nowrap">{lag.display}</span>
+            )}
           </TableCell>
 
           <TableCell>
@@ -208,23 +222,23 @@ export const DestinationRow = ({
                     <WarningIcon />
                   </TooltipTrigger>
                   <TooltipContent side="bottom">
-                    {errorCount} table{errorCount === 1 ? '' : 's'} encountered replication errors
+                    {errorCount} table{errorCount === 1 ? '' : 's'} encountered replication errors.
                   </TooltipContent>
                 </Tooltip>
               )}
-              <Button asChild type="default" className="relative">
+              <Button asChild variant="default" className="relative">
                 <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
-                  View replication
+                  View pipeline
                 </Link>
               </Button>
               <RowMenu
+                destinationId={destinationId}
                 pipeline={pipeline}
-                pipelineStatus={pipelineStatusData?.status}
+                pipelineStatus={pipelineStatus?.status}
                 error={pipelineStatusError}
                 isLoading={isPipelineStatusLoading}
                 isError={isPipelineStatusError}
                 onDeleteClick={() => setShowDeleteDestinationForm(true)}
-                onEditClick={() => setShowEditDestinationPanel(true)}
                 hasUpdate={hasUpdate}
                 onUpdateClick={() => setShowUpdateVersionModal(true)}
               />
@@ -239,20 +253,6 @@ export const DestinationRow = ({
         onDelete={onDeleteClick}
         isLoading={isDeleting}
         name={destinationName}
-      />
-
-      <DestinationPanel
-        visible={showEditDestinationPanel}
-        type={type}
-        onClose={() => setShowEditDestinationPanel(false)}
-        existingDestination={{
-          sourceId,
-          destinationId: destinationId,
-          pipelineId: pipeline?.id,
-          enabled:
-            statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED,
-          statusName,
-        }}
       />
 
       <UpdateVersionModal

@@ -1,17 +1,17 @@
 import { useQuery } from '@tanstack/react-query'
-import { LogsTableName } from 'components/interfaces/Settings/Logs/Logs.constants'
+import { useMemo } from 'react'
+
+import { useFillTimeseriesSorted } from './useFillTimeseriesSorted'
+import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
+import { LogsTableName } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type {
   EventChart,
   EventChartData,
   Filters,
   LogsEndpointParams,
-} from 'components/interfaces/Settings/Logs/Logs.types'
-import { genChartQuery } from 'components/interfaces/Settings/Logs/Logs.utils'
-import { get } from 'data/fetchers'
-import { useMemo } from 'react'
-
-import { useFillTimeseriesSorted } from './useFillTimeseriesSorted'
-import useTimeseriesUnixToIso from './useTimeseriesUnixToIso'
+} from '@/components/interfaces/Settings/Logs/Logs.types'
+import { genChartQuery } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
 
 interface ProjectUsageStatsHookResult {
   error: string | Object | null
@@ -71,20 +71,15 @@ function useProjectUsageStats({
   const { data: eventChartResponse, refetch: refreshEventChart } = useQuery({
     queryKey: chartQueryKey,
     queryFn: async ({ signal }) => {
-      const { data, error } = await get(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-        params: {
-          path: { ref: projectRef },
-          query: {
-            iso_timestamp_start: timestampStart,
-            iso_timestamp_end: timestampEnd,
-            sql: chartQuery,
-          },
-        },
+      const data = await executeAnalyticsSql({
+        projectRef,
+        endpoint: '/platform/projects/{ref}/analytics/endpoints/logs.all',
+        sql: chartQuery,
+        iso_timestamp_start: timestampStart,
+        iso_timestamp_end: timestampEnd,
+        method: 'get',
         signal,
       })
-      if (error) {
-        throw error
-      }
 
       return data as unknown as EventChart
     },

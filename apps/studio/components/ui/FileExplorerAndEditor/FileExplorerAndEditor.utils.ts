@@ -1,6 +1,7 @@
-import { formatBytes } from '@/lib/helpers'
 import { BlobReader, BlobWriter, TextWriter, ZipReader } from '@zip.js/zip.js'
+
 import { FileAction, type FileActionResult, type FileData } from './FileExplorerAndEditor.types'
+import { formatBytes } from '@/lib/helpers'
 
 // Configuration for zip file extraction
 export const ZIP_EXTRACTION_CONFIG = {
@@ -37,7 +38,17 @@ export const isBinaryFile = (fileName: string): boolean => {
   return binaryExtensions.includes(extension || '')
 }
 
-export const getLanguageFromFileName = (fileName: string): string => {
+type EditorLanguage =
+  | 'typescript'
+  | 'javascript'
+  | 'json'
+  | 'html'
+  | 'css'
+  | 'markdown'
+  | 'csv'
+  | 'plaintext'
+
+export const getLanguageFromFileName = (fileName: string): EditorLanguage => {
   const extension = fileName.split('.').pop()?.toLowerCase()
   switch (extension) {
     case 'ts':

@@ -1,75 +1,75 @@
-import { useFlag, useParams } from 'common'
-import { ReplicationComingSoon } from 'components/interfaces/Database/Replication/ComingSoon'
-import { Destinations } from 'components/interfaces/Database/Replication/Destinations'
-import { useIsETLPrivateAlpha } from 'components/interfaces/Database/Replication/useIsETLPrivateAlpha'
-import DatabaseLayout from 'components/layouts/DatabaseLayout/DatabaseLayout'
-import { DefaultLayout } from 'components/layouts/DefaultLayout'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { FormHeader } from 'components/ui/Forms/FormHeader'
-import { UnknownInterface } from 'components/ui/UnknownInterface'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { PipelineRequestStatusProvider } from 'state/replication-pipeline-request-status'
-import type { NextPageWithLayout } from 'types'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { Destinations } from '@/components/interfaces/Database/Replication/Destinations'
 import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
+import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
+import { UnknownInterface } from '@/components/ui/UnknownInterface'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
+import type { NextPageWithLayout } from '@/types'
 
 const DatabaseReplicationPage: NextPageWithLayout = () => {
-  const { ref } = useParams()
-  const enablePgReplicate = useIsETLPrivateAlpha()
+  const { data: selectedProject, isPending } = useSelectedProjectQuery()
+  const { isHighAvailability } = useHighAvailability()
   const showPgReplicate = useIsFeatureEnabled('database:replication')
-  const unifiedReplication = useFlag('unifiedReplication')
 
   if (!showPgReplicate) {
-    return <UnknownInterface urlBack={`/project/${ref}/database/schemas`} />
+    return <UnknownInterface urlBack={`/project/${selectedProject?.ref}/database/schemas`} />
+  }
+
+  if (isHighAvailability) {
+    return (
+      <div className="flex h-full w-full items-center justify-center p-6">
+        <HighAvailabilityDisabledEmptyState
+          title="Replication unavailable on High Availability projects"
+          description="We're working to bring replication to High Availability projects. Contact support if this is blocking your work."
+        />
+      </div>
+    )
   }
 
   return (
-    <>
-      {unifiedReplication || enablePgReplicate ? (
-        <PipelineRequestStatusProvider>
-          <ScaffoldContainer>
-            <ScaffoldSection isFullWidth>
-              <div className="w-full mb-6">
-                <div className="flex items-center gap-x-2 mb-1">
-                  <h3 className="text-foreground text-xl prose">Replication</h3>
-                </div>
-                <p className="prose text-sm max-w-full">
-                  Automatically replicate your database changes to external data warehouses and
-                  analytics platforms in real-time
-                </p>
-              </div>
-            </ScaffoldSection>
-          </ScaffoldContainer>
+    <PipelineRequestStatusProvider>
+      <ScaffoldContainer>
+        <ScaffoldSection isFullWidth>
+          <div className="w-full mb-6">
+            <div className="flex items-center gap-x-2 mb-1">
+              <h3 className="text-foreground text-xl prose">Replication</h3>
+            </div>
+            <p className="prose text-sm max-w-full">
+              Deploy Read Replicas across multiple regions, or use Pipelines to replicate database
+              changes to analytics destinations.
+            </p>
+          </div>
+        </ScaffoldSection>
+      </ScaffoldContainer>
 
+      {isPending ? (
+        <ScaffoldContainer>
+          <GenericSkeletonLoader />
+        </ScaffoldContainer>
+      ) : (
+        <>
           <ReplicationDiagram />
-
           <ScaffoldContainer>
-            <ScaffoldSection isFullWidth className="!pt-6">
+            <ScaffoldSection isFullWidth className="pt-6!">
               <Destinations />
             </ScaffoldSection>
           </ScaffoldContainer>
-        </PipelineRequestStatusProvider>
-      ) : (
-        <>
-          <ScaffoldContainer>
-            <ScaffoldSection isFullWidth>
-              <FormHeader
-                className="[&>div>p]:max-w-full"
-                title="Replication"
-                description=" Automatically replicate your database changes to external data warehouses and analytics platforms in real-time"
-              />
-            </ScaffoldSection>
-          </ScaffoldContainer>
-          <ReplicationComingSoon projectRef={ref || '_'} />
         </>
       )}
-    </>
+    </PipelineRequestStatusProvider>
   )
 }
 
 DatabaseReplicationPage.getLayout = (page) => (
   <DefaultLayout>
-    <DatabaseLayout title="Database Replication">{page}</DatabaseLayout>
+    <DatabaseLayout title="Replication">{page}</DatabaseLayout>
   </DefaultLayout>
 )
 

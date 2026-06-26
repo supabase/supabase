@@ -1,26 +1,31 @@
-import { BookOpen, Check, ChevronDown, Copy, ExternalLink, X } from 'lucide-react'
+import { BookOpen, Check, ChevronDown, ChevronsUpDown, Copy, ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
-
-import { IS_PLATFORM } from 'common'
-import Table from 'components/to-be-cleaned/Table'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL } from 'lib/constants'
 import { logConstants } from 'shared-data'
 import {
   Badge,
   Button,
+  cn,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   SidePanel,
-  Tabs,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+
 import {
   EXPLORER_DATEPICKER_HELPERS,
   LOGS_SOURCE_DESCRIPTION,
@@ -28,6 +33,10 @@ import {
 } from './Logs.constants'
 import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import { LogsWarning, LogTemplate } from './Logs.types'
+import Table from '@/components/to-be-cleaned/Table'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
+import { DOCS_URL } from '@/lib/constants'
 
 export interface LogsQueryPanelProps {
   templates?: LogTemplate[]
@@ -80,14 +89,23 @@ const LogsQueryPanel = ({
     setSelectedDatePickerValue(value)
   }, [value.from, value.to, value.text, value.isHelper])
 
+  const [open, setOpen] = useState(false)
+
+  const showMultigresLogs = useShowMultigresLogs()
+  const schemas = logConstants.schemas.filter(
+    (schema) => schema.reference !== 'multigres_logs' || showMultigresLogs
+  )
+
+  const [selectedSchema, setSelectedSchema] = useState(schemas[0])
+
   return (
-    <div className="border-b bg-surface-100">
+    <div className="flex items-center border-b bg-surface-100 h-(--header-height)">
       <div className="flex w-full items-center justify-between px-4 md:px-5 py-2 overflow-x-scroll no-scrollbar">
         <div className="flex w-full flex-row items-center justify-between gap-x-4">
           <div className="flex items-center gap-2">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<ChevronDown />}>
+                <Button variant="default" iconRight={<ChevronDown />}>
                   Insert source
                 </Button>
               </DropdownMenuTrigger>
@@ -109,10 +127,10 @@ const LogsQueryPanel = ({
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {IS_PLATFORM && logsTemplates && (
+            {logsTemplates && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="default" iconRight={<ChevronDown />}>
+                  <Button variant="default" iconRight={<ChevronDown />}>
                     Templates
                   </Button>
                 </DropdownMenuTrigger>
@@ -175,7 +193,7 @@ const LogsQueryPanel = ({
               <div className="flex flex-row justify-between items-center">
                 <h3>Field Reference</h3>
                 <Button
-                  type="text"
+                  variant="text"
                   className="px-1"
                   onClick={() => setShowReference(false)}
                   icon={<X />}
@@ -188,7 +206,7 @@ const LogsQueryPanel = ({
             hideFooter
             triggerElement={
               <Button
-                type="text"
+                variant="text"
                 onClick={() => setShowReference(true)}
                 icon={<BookOpen />}
                 className="px-2"
@@ -212,7 +230,7 @@ const LogsQueryPanel = ({
                     unnesting joins
                     <ExternalLink
                       size="14"
-                      className="ml-1 inline -translate-y-[2px]"
+                      className="ml-1 inline translate-y-[-2px]"
                       strokeWidth={1.5}
                     />
                   </Link>
@@ -220,38 +238,64 @@ const LogsQueryPanel = ({
               </div>
             </SidePanel.Content>
             <SidePanel.Separator />
-            <Tabs
-              scrollable
-              size="small"
-              type="underlined"
-              defaultActiveId="edge_logs"
-              listClassNames="px-2"
-            >
-              {logConstants.schemas.map((schema) => (
-                <Tabs.Panel
-                  key={schema.reference}
-                  id={schema.reference}
-                  label={schema.name}
-                  className="px-4 pb-4"
-                >
-                  <Table
-                    head={[
-                      <Table.th className="text-xs !p-2" key="path">
-                        Path
-                      </Table.th>,
-                      <Table.th key="type" className="text-xs !p-2">
-                        Type
-                      </Table.th>,
-                    ]}
-                    body={schema.fields
-                      .sort((a: any, b: any) => a.path - b.path)
-                      .map((field) => (
-                        <Field key={field.path} field={field} />
-                      ))}
-                  />
-                </Tabs.Panel>
-              ))}
-            </Tabs>
+
+            <div className="px-4 pb-4 flex flex-col gap-4">
+              <Popover open={open} onOpenChange={setOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="default"
+                    role="combobox"
+                    size={'small'}
+                    aria-expanded={open}
+                    className="w-full justify-between"
+                    iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                  >
+                    {value ? selectedSchema?.name : 'Select source...'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="p-0" sameWidthAsTrigger>
+                  <Command>
+                    <CommandInput placeholder="Search source..." />
+                    <CommandList>
+                      <CommandEmpty>No source found.</CommandEmpty>
+                      <CommandGroup>
+                        {schemas.map((schema) => (
+                          <CommandItem
+                            key={schema.reference}
+                            value={schema.reference}
+                            onSelect={() => {
+                              setSelectedSchema(schema)
+                              setOpen(false)
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                'mr-2 h-4 w-4',
+                                selectedSchema === schema ? 'opacity-100' : 'opacity-0'
+                              )}
+                            />
+                            {schema.name}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+              <Table
+                head={[
+                  <Table.th className="text-xs p-2!" key="path">
+                    Path
+                  </Table.th>,
+                  <Table.th key="type" className="text-xs p-2!">
+                    Type
+                  </Table.th>,
+                ]}
+                body={selectedSchema.fields.map((field) => (
+                  <Field key={field.path} field={field} />
+                ))}
+              />
+            </div>
           </SidePanel>
         </div>
       </div>
@@ -272,7 +316,7 @@ const Field = ({
   return (
     <Table.tr>
       <Table.td
-        className="font-mono text-xs !p-2 cursor-pointer hover:text-foreground transition flex items-center space-x-2"
+        className="font-mono text-xs p-2! cursor-pointer hover:text-foreground transition flex items-center space-x-2"
         onClick={() =>
           copyToClipboard(field.path, () => {
             setIsCopied(true)
@@ -297,7 +341,7 @@ const Field = ({
           </Tooltip>
         )}
       </Table.td>
-      <Table.td className="font-mono text-xs !p-2">{field.type}</Table.td>
+      <Table.td className="font-mono text-xs p-2!">{field.type}</Table.td>
     </Table.tr>
   )
 }

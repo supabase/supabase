@@ -1,14 +1,13 @@
-import Link from 'next/link'
-
-import { Button } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
+import Link from 'next/link'
+import { Button } from 'ui'
 
 const Hero = () => {
   const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
-    <div className="relative -mt-[65px]">
+    <div className="relative mt-[-65px]">
       <SectionContainer className="pt-8 pb-10 md:pt-16 overflow-hidden">
         <div className="relative">
           <div className="mx-auto">
@@ -41,7 +40,7 @@ const Hero = () => {
                       Start your project
                     </Link>
                   </Button>
-                  <Button asChild size="medium" type="default">
+                  <Button asChild size="medium" variant="default">
                     <Link
                       href="/contact/sales"
                       as="/contact/sales"

@@ -1,6 +1,7 @@
 'use client'
 
 import * as React from 'react'
+
 import { cn } from '../../../lib/utils/cn'
 import { Button, ButtonProps } from '../../Button/Button'
 
@@ -37,7 +38,7 @@ const ButtonGroupItem = React.forwardRef<HTMLButtonElement, ButtonGroupItemProps
     return (
       <Button
         ref={ref}
-        type="text"
+        variant="text"
         icon={icon}
         asChild={asChild}
         className={cn(

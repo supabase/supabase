@@ -29,6 +29,18 @@
     "title": "Analytics",
     "items": [
       {
+        "id": "v2-create-log-drain",
+        "title": "Create log drain",
+        "slug": "v2-create-log-drain",
+        "type": "operation"
+      },
+      {
+        "id": "v2-delete-log-drain",
+        "title": "Delete log drain",
+        "slug": "v2-delete-log-drain",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-project-function-combined-stats",
         "title": "Get project function combined stats",
         "slug": "v1-get-project-function-combined-stats",
@@ -50,6 +62,18 @@
         "id": "v1-get-project-usage-request-count",
         "title": "Get project usage request count",
         "slug": "v1-get-project-usage-request-count",
+        "type": "operation"
+      },
+      {
+        "id": "v2-list-log-drains",
+        "title": "List log drains",
+        "slug": "v2-list-log-drains",
+        "type": "operation"
+      },
+      {
+        "id": "v2-update-log-drain",
+        "title": "Update log drain",
+        "slug": "v2-update-log-drain",
         "type": "operation"
       }
     ]
@@ -257,15 +281,33 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-backup-schedule",
+        "title": "Get backup schedule",
+        "slug": "v1-get-backup-schedule",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-database-metadata",
         "title": "Get database metadata",
         "slug": "v1-get-database-metadata",
         "type": "operation"
       },
       {
+        "id": "v1-get-database-openapi",
+        "title": "Get database openapi",
+        "slug": "v1-get-database-openapi",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-jit-access",
         "title": "Get jit access",
         "slug": "v1-get-jit-access",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-jit-access-config",
+        "title": "Get jit access config",
+        "slug": "v1-get-jit-access-config",
         "type": "operation"
       },
       {
@@ -365,6 +407,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-update-backup-schedule",
+        "title": "Update backup schedule",
+        "slug": "v1-update-backup-schedule",
+        "type": "operation"
+      },
+      {
         "id": "v1-update-database-password",
         "title": "Update database password",
         "slug": "v1-update-database-password",
@@ -374,6 +422,12 @@
         "id": "v1-update-jit-access",
         "title": "Update jit access",
         "slug": "v1-update-jit-access",
+        "type": "operation"
+      },
+      {
+        "id": "v1-update-jit-access-config",
+        "title": "Update jit access config",
+        "slug": "v1-update-jit-access-config",
         "type": "operation"
       },
       {
@@ -665,6 +719,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-organization-entitlements",
+        "title": "Get organization entitlements",
+        "slug": "v1-get-organization-entitlements",
+        "type": "operation"
+      },
+      {
         "id": "v1-list-all-organizations",
         "title": "List all organizations",
         "slug": "v1-list-all-organizations",
@@ -674,6 +734,30 @@
         "id": "v1-list-organization-members",
         "title": "List organization members",
         "slug": "v1-list-organization-members",
+        "type": "operation"
+      },
+      {
+        "id": "v2-list-organization-members",
+        "title": "List organization members",
+        "slug": "v2-list-organization-members",
+        "type": "operation"
+      },
+      {
+        "id": "v2-list-organization-roles",
+        "title": "List organization roles",
+        "slug": "v2-list-organization-roles",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Profile",
+    "items": [
+      {
+        "id": "v1-get-profile",
+        "title": "Get profile",
+        "slug": "v1-get-profile",
         "type": "operation"
       }
     ]
@@ -716,6 +800,12 @@
         "id": "v1-get-available-regions",
         "title": "Get available regions",
         "slug": "v1-get-available-regions",
+        "type": "operation"
+      },
+      {
+        "id": "v1-get-database-disk",
+        "title": "Get database disk",
+        "slug": "v1-get-database-disk",
         "type": "operation"
       },
       {
@@ -803,9 +893,27 @@
         "type": "operation"
       },
       {
+        "id": "v2-preview-a-project-transfer",
+        "title": "Preview a project transfer",
+        "slug": "v2-preview-a-project-transfer",
+        "type": "operation"
+      },
+      {
+        "id": "v1-restart-a-project",
+        "title": "Restart a project",
+        "slug": "v1-restart-a-project",
+        "type": "operation"
+      },
+      {
         "id": "v1-restore-a-project",
         "title": "Restore a project",
         "slug": "v1-restore-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "v2-transfer-a-project",
+        "title": "Transfer a project",
+        "slug": "v2-transfer-a-project",
         "type": "operation"
       },
       {
@@ -836,6 +944,12 @@
         "id": "v1-get-realtime-config",
         "title": "Get realtime config",
         "slug": "v1-get-realtime-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-shutdown-realtime",
+        "title": "Shutdown realtime",
+        "slug": "v1-shutdown-realtime",
         "type": "operation"
       },
       {

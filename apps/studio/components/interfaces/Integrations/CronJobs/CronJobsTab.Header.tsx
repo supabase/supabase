@@ -1,12 +1,14 @@
 import { RefreshCw, Search, X } from 'lucide-react'
-import type { KeyboardEvent } from 'react'
-
+import type { KeyboardEvent, Ref } from 'react'
 import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
+import { onSearchInputEscape } from '@/lib/keyboard'
 
 interface CronJobsTabHeaderProps {
   search: string
   isRefreshing: boolean
+  searchInputRef?: Ref<HTMLInputElement>
   onSearchChange: (value: string) => void
   onSearchSubmit: () => void
   onClearSearch: () => void
@@ -17,6 +19,7 @@ interface CronJobsTabHeaderProps {
 export const CronJobsTabHeader = ({
   search,
   isRefreshing,
+  searchInputRef,
   onSearchChange,
   onSearchSubmit,
   onClearSearch,
@@ -24,6 +27,7 @@ export const CronJobsTabHeader = ({
   onCreateJob,
 }: CronJobsTabHeaderProps) => {
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    onSearchInputEscape(search, onClearSearch)(event)
     if (event.key === 'Enter' || event.code === 'NumpadEnter') {
       onSearchSubmit()
     }
@@ -32,6 +36,7 @@ export const CronJobsTabHeader = ({
   return (
     <div className="bg-surface-200 py-3 px-10 flex items-center justify-between flex-wrap gap-y-2">
       <Input
+        ref={searchInputRef}
         size="tiny"
         className="w-52"
         placeholder="Search for a job"
@@ -44,7 +49,7 @@ export const CronJobsTabHeader = ({
             <Button
               key="clear-search"
               size="tiny"
-              type="text"
+              variant="text"
               icon={<X />}
               onClick={onClearSearch}
               className="p-0 h-5 w-5"
@@ -54,7 +59,7 @@ export const CronJobsTabHeader = ({
       />
 
       <div className="flex items-center gap-x-2">
-        <Button type="default" icon={<RefreshCw />} loading={isRefreshing} onClick={onRefresh}>
+        <Button variant="default" icon={<RefreshCw />} loading={isRefreshing} onClick={onRefresh}>
           Refresh
         </Button>
         <Button onClick={onCreateJob}>Create job</Button>

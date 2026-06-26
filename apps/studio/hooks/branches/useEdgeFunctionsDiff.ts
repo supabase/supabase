@@ -1,16 +1,16 @@
+import { basename } from 'path'
 import { useQueries, useQueryClient } from '@tanstack/react-query'
+import { useCallback, useMemo } from 'react'
+
 import {
   getEdgeFunctionBody,
   type EdgeFunctionBodyData,
-} from 'data/edge-functions/edge-function-body-query'
+} from '@/data/edge-functions/edge-function-body-query'
 import {
   useEdgeFunctionsQuery,
   type EdgeFunctionsData,
-} from 'data/edge-functions/edge-functions-query'
-import { edgeFunctionsKeys } from 'data/edge-functions/keys'
-import { handleError } from 'data/fetchers'
-import { basename } from 'path'
-import { useCallback, useMemo } from 'react'
+} from '@/data/edge-functions/edge-functions-query'
+import { edgeFunctionsKeys } from '@/data/edge-functions/keys'
 
 interface UseEdgeFunctionsDiffProps {
   currentBranchRef?: string
@@ -161,18 +161,6 @@ export const useEdgeFunctionsDiff = ({
     ].some((q) => q.isLoading) ||
     isCurrentFunctionsLoading ||
     isMainFunctionsLoading
-
-  // Aggregate errors across all queries and handle the first encountered error.
-  const firstError = [
-    ...currentBodiesQueries,
-    ...mainBodiesQueries,
-    ...addedBodiesQueries,
-    ...removedBodiesQueries,
-  ].find((q) => q.error)?.error
-
-  if (firstError) {
-    handleError(firstError)
-  }
 
   // Build lookup maps --------------------------------------------------------
   const currentBodiesMap: Record<string, EdgeFunctionBodyData | undefined> = {}

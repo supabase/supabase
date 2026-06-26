@@ -1,13 +1,13 @@
-import { Input, Textarea, Button } from 'ui'
+import { Button, Input, Textarea } from 'ui'
 import {
-  FieldSet,
-  FieldLegend,
-  FieldDescription,
-  FieldSeparator,
   Field,
   FieldContent,
-  FieldLabel,
+  FieldDescription,
   FieldGroup,
+  FieldLabel,
+  FieldLegend,
+  FieldSeparator,
+  FieldSet,
 } from 'ui/src/components/shadcn/ui/field'
 
 export default function FieldResponsive() {
@@ -43,8 +43,8 @@ export default function FieldResponsive() {
             </Field>
             <FieldSeparator />
             <Field orientation="responsive">
-              <Button htmlType="submit">Submit</Button>
-              <Button htmlType="button" type="default">
+              <Button type="submit">Submit</Button>
+              <Button type="button" variant="default">
                 Cancel
               </Button>
             </Field>

@@ -1,10 +1,13 @@
+import fs from 'node:fs/promises'
+import os from 'node:os'
+import path from 'node:path'
 import { test as setup } from '@playwright/test'
 import dotenv from 'dotenv'
-import path from 'path'
+
 import { env } from '../env.config.js'
-import { setupProjectForTests } from '../scripts/setup-platform-tests.js'
 import { loginWithEmail } from '../scripts/login/email.js'
 import { loginWithGithubWithRetry } from '../scripts/login/github.js'
+import { setupProjectForTests } from '../scripts/setup-platform-tests.js'
 
 /**
  * Run any setup tasks for the tests.
@@ -27,6 +30,16 @@ setup('Global Setup', async ({ page }) => {
     - Is Platform: ${IS_PLATFORM}
     `)
 
+  // Cleanup once-per-file locks before any of the early returns below —
+  // tests using `withFileOnceSetup` rely on this running unconditionally.
+  const locksDirPath = path.join(os.tmpdir(), 'playwright-locks')
+  try {
+    await fs.access(locksDirPath)
+    await fs.rm(locksDirPath, { recursive: true, force: true })
+  } catch {
+    // Silently catch, no directory
+  }
+
   /**
    * Studio Check
    */
@@ -36,7 +49,7 @@ setup('Global Setup', async ({ page }) => {
 
   await page.goto(studioUrl).catch((err) => {
     console.error(
-      `\n 🚨 Setup Error 
+      `\n 🚨 Setup Error
 Studio is not available at: ${studioUrl}
 
 Please ensure:

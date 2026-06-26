@@ -1,15 +1,29 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
-
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from 'types'
+
 import { contentKeys } from './keys'
+import type { SnippetStatus } from './snippet-status'
+import { get, handleError } from '@/data/fetchers'
+import type { ResponseError, SqlSnippets, UseCustomInfiniteQueryOptions } from '@/types'
 
 export type SnippetFolderResponse = components['schemas']['GetUserContentFolderResponse']['data']
 export type SnippetFolder =
   components['schemas']['GetUserContentFolderResponse']['data']['folders'][number]
 export type Snippet =
   components['schemas']['GetUserContentFolderResponse']['data']['contents'][number]
+
+export interface SnippetWithContent extends Snippet {
+  content?: SqlSnippets.Content
+  status: SnippetStatus
+}
+
+// Attaches the 'saved' lifecycle status to a snippet as it crosses from the
+// database into the app. Generic so it preserves any loaded content on the
+// snippet, and types `status` as the full SnippetStatus (not the 'saved'
+// literal) so the result is a regular SnippetWithContent.
+export function withSavedStatus<T extends Snippet>(snippet: T): T & { status: SnippetStatus } {
+  return { ...snippet, status: 'saved' }
+}
 
 export type SQLSnippetFolderVariables = {
   projectRef?: string
@@ -48,6 +62,7 @@ export async function getSQLSnippetFolders(
   if (error) handleError(error)
   return {
     ...data.data,
+    contents: (data.data.contents ?? []).map(withSavedStatus),
     cursor: data.cursor,
   }
 }

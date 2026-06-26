@@ -1,5 +1,7 @@
-import { isValidEdgeFunctionURL } from 'lib/api/edgeFunctions'
+import { IS_PLATFORM } from 'common'
 import { NextApiRequest, NextApiResponse } from 'next'
+
+import { isValidEdgeFunctionURL } from '@/lib/api/edgeFunctions'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -20,9 +22,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
-    const { url, method, body: requestBody, headers: customHeaders } = req.body
+    const { url: requestUrl, method, body: requestBody, headers: customHeaders } = req.body
+    const url = IS_PLATFORM
+      ? requestUrl
+      : requestUrl.replace(process.env.SUPABASE_PUBLIC_URL, process.env.SUPABASE_URL)
 
-    const validEdgeFnUrl = isValidEdgeFunctionURL(url)
+    const validEdgeFnUrl = isValidEdgeFunctionURL(url, IS_PLATFORM)
 
     if (!validEdgeFnUrl) {
       return res.status(400).json({

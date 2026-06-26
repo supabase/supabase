@@ -1,50 +1,68 @@
-import { ActiveInput } from './hooks'
-import { FilterBarAction, FilterGroup, FilterProperty } from './types'
+import { ActiveInputState, FilterBarAction, FilterGroup, FilterProperty, MenuItem } from './types'
 import {
   findConditionByPath,
   isCustomOptionObject,
-  isFilterOptionObject,
   isFilterOperatorObject,
+  isFilterOptionObject,
 } from './utils'
 
-export type MenuItem = {
-  value: string
-  label: string
-  icon?: React.ReactNode
-  isCustom?: boolean
-  customOption?: (props: any) => React.ReactElement
-  isAction?: boolean
-  action?: FilterBarAction
-  actionInputValue?: string
-}
-
 export function buildOperatorItems(
-  activeInput: Extract<ActiveInput, { type: 'operator' }> | null,
+  activeInput: Extract<ActiveInputState, { type: 'operator' }> | null,
   activeFilters: FilterGroup,
   filterProperties: FilterProperty[],
-  hasTypedSinceFocus: boolean = true
+  hasTypedSinceFocus: boolean = true,
+  inputValue?: string
 ): MenuItem[] {
   if (!activeInput) return []
   const condition = findConditionByPath(activeFilters, activeInput.path)
   const property = filterProperties.find((p) => p.name === condition?.propertyName)
-  const operatorValue = condition?.operator?.toUpperCase() || ''
+  const operatorValue = (inputValue ?? condition?.operator ?? '').toUpperCase()
   const availableOperators = property?.operators || ['=']
 
   // Only filter if user has typed since focusing
   const shouldFilter = hasTypedSinceFocus && operatorValue.length > 0
 
-  return availableOperators
+  const items: MenuItem[] = availableOperators
     .filter((op) => {
       if (!shouldFilter) return true
-      const searchText = isFilterOperatorObject(op) ? op.value : op
-      return searchText.toUpperCase().includes(operatorValue)
+      if (isFilterOperatorObject(op)) {
+        return (
+          op.value.toUpperCase().includes(operatorValue) ||
+          op.label.toUpperCase().includes(operatorValue)
+        )
+      }
+      return op.toUpperCase().includes(operatorValue)
     })
     .map((op) => {
       if (isFilterOperatorObject(op)) {
-        return { value: op.value, label: op.label }
+        return {
+          value: op.value,
+          label: op.label,
+          group: op.group,
+          operatorSymbol: op.value,
+        }
       }
-      return { value: op, label: op }
+      return { value: op, label: op, operatorSymbol: op }
     })
+
+  if (shouldFilter && items.length === 0) {
+    const equalsOperator = availableOperators.find((op) =>
+      isFilterOperatorObject(op) ? op.value === '=' : op === '='
+    )
+
+    if (equalsOperator) {
+      const equalsLabel = isFilterOperatorObject(equalsOperator) ? equalsOperator.label : 'Equals'
+      items.push({
+        value: '=',
+        label: `${equalsLabel}: "${inputValue ?? condition?.operator ?? ''}"`,
+        operatorSymbol: '=',
+        isDefaultOperator: true,
+        defaultValue: inputValue ?? condition?.operator ?? '',
+      })
+    }
+  }
+
+  return items
 }
 
 export function buildPropertyItems(params: {
@@ -52,9 +70,22 @@ export function buildPropertyItems(params: {
   inputValue: string
   supportsOperators?: boolean
   actions?: FilterBarAction[]
+  freeformDefaultProperty?: FilterProperty
 }): MenuItem[] {
-  const { filterProperties, inputValue, supportsOperators, actions } = params
+  const { filterProperties, inputValue, supportsOperators, actions, freeformDefaultProperty } =
+    params
   const items: MenuItem[] = []
+
+  const trimmedInput = inputValue.trim()
+  if (freeformDefaultProperty && trimmedInput.length > 0) {
+    items.push({
+      value: '__freeform_search__',
+      label: `Search ${freeformDefaultProperty.label.toLowerCase()}: "${trimmedInput}"`,
+      isFreeformSearch: true,
+      freeformPropertyName: freeformDefaultProperty.name,
+      freeformValue: trimmedInput,
+    })
+  }
 
   items.push(
     ...filterProperties
@@ -63,10 +94,9 @@ export function buildPropertyItems(params: {
   )
 
   if (supportsOperators) {
-    items.push({ value: 'group', label: 'New Group' })
+    items.push({ value: '__new_group__', label: 'New Group' })
   }
 
-  const trimmedInput = inputValue.trim()
   if (actions && trimmedInput.length > 0) {
     actions.forEach((action) => {
       items.push({
@@ -83,8 +113,21 @@ export function buildPropertyItems(params: {
   return items
 }
 
+export function buildPropertyChangeItems(params: {
+  filterProperties: FilterProperty[]
+  currentPropertyName: string
+  inputValue: string
+}): MenuItem[] {
+  const { filterProperties, currentPropertyName, inputValue } = params
+
+  return filterProperties
+    .filter((prop) => prop.name !== currentPropertyName)
+    .filter((prop) => prop.label.toLowerCase().includes(inputValue.toLowerCase()))
+    .map((prop) => ({ value: prop.name, label: prop.label }))
+}
+
 export function buildValueItems(
-  activeInput: Extract<ActiveInput, { type: 'value' }> | null,
+  activeInput: Extract<ActiveInputState, { type: 'value' }> | null,
   activeFilters: FilterGroup,
   filterProperties: FilterProperty[],
   propertyOptionsCache: Record<string, { options: any[]; searchValue: string }>,
@@ -99,6 +142,10 @@ export function buildValueItems(
 
   if (!property) return items
 
+  if (activeCondition?.operator === 'is') {
+    return getIsOperatorValueItems(property, inputValue, hasTypedSinceFocus)
+  }
+
   if (!Array.isArray(property.options) && isCustomOptionObject(property.options)) {
     items.push({
       value: 'custom',
@@ -109,7 +156,14 @@ export function buildValueItems(
   } else if (loadingOptions[property.name]) {
     items.push({ value: 'loading', label: 'Loading options...' })
   } else if (Array.isArray(property.options)) {
-    items.push(...getArrayOptionItems(property.options, inputValue, hasTypedSinceFocus))
+    items.push(
+      ...getArrayOptionItems({
+        options: property.options,
+        inputValue,
+        hasTypedSinceFocus,
+        showCount: activeCondition?.operator === '=',
+      })
+    )
   } else if (propertyOptionsCache[property.name]) {
     items.push(...getCachedOptionItems(propertyOptionsCache[property.name].options))
   }
@@ -117,11 +171,17 @@ export function buildValueItems(
   return items
 }
 
-function getArrayOptionItems(
-  options: any[],
-  inputValue: string,
+function getArrayOptionItems({
+  options,
+  inputValue,
+  hasTypedSinceFocus,
+  showCount,
+}: {
+  options: any[]
+  inputValue: string
   hasTypedSinceFocus: boolean
-): MenuItem[] {
+  showCount?: boolean
+}): MenuItem[] {
   const items: MenuItem[] = []
   const normalizedInput = inputValue.toLowerCase()
 
@@ -135,7 +195,11 @@ function getArrayOptionItems(
       }
     } else if (isFilterOptionObject(option)) {
       if (!shouldFilter || option.label.toLowerCase().includes(normalizedInput)) {
-        items.push({ value: option.value, label: option.label })
+        items.push({
+          value: option.value,
+          label: option.label,
+          count: showCount ? option.count : undefined,
+        })
       }
     } else if (isCustomOptionObject(option)) {
       if (!shouldFilter || (option.label?.toLowerCase().includes(normalizedInput) ?? true)) {
@@ -158,4 +222,28 @@ function getCachedOptionItems(options: any[]): MenuItem[] {
     }
     return { value: option.value, label: option.label }
   })
+}
+
+function getIsOperatorValueItems(
+  property: FilterProperty,
+  inputValue: string,
+  hasTypedSinceFocus: boolean
+): MenuItem[] {
+  const options: { value: string; label: string }[] = [
+    { value: 'null', label: 'NULL' },
+    { value: 'not null', label: 'NOT NULL' },
+  ]
+
+  if (property.type === 'boolean') {
+    options.push({ value: 'true', label: 'TRUE' }, { value: 'false', label: 'FALSE' })
+  }
+
+  const shouldFilter = hasTypedSinceFocus && inputValue.length > 0
+  if (!shouldFilter) return options
+
+  const normalizedInput = inputValue.toLowerCase()
+  return options.filter(
+    (opt) =>
+      opt.label.toLowerCase().includes(normalizedInput) || opt.value.includes(normalizedInput)
+  )
 }

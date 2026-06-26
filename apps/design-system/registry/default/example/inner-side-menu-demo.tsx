@@ -2,8 +2,8 @@ import React from 'react'
 import { Card } from 'ui'
 import {
   InnerSideMenuCollapsible,
-  InnerSideMenuCollapsibleTrigger,
   InnerSideMenuCollapsibleContent,
+  InnerSideMenuCollapsibleTrigger,
   InnerSideMenuItem,
   InnerSideMenuSeparator,
 } from 'ui-patterns/InnerSideMenu'

@@ -1,24 +1,18 @@
 import parser from 'cron-parser'
 import dayjs from 'dayjs'
-import { Copy, Edit, MoreVertical, Play, Trash } from 'lucide-react'
+import { Copy, Edit, Minus, MoreVertical, Play, Trash } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useDatabaseCronJobRunCommandMutation } from 'data/database-cron-jobs/database-cron-job-run-mutation'
-import { CronJob } from 'data/database-cron-jobs/database-cron-jobs-infinite-query'
-import { useDatabaseCronJobToggleMutation } from 'data/database-cron-jobs/database-cron-jobs-toggle-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Badge,
   Button,
   cn,
-  CodeBlock,
-  ContextMenu_Shadcn_,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuSeparator_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuTrigger,
   copyToClipboard,
   Dialog,
   DialogContent,
@@ -42,14 +36,23 @@ import {
   TooltipTrigger,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+
+import { useDatabaseCronJobRunCommandMutation } from '@/data/database-cron-jobs/database-cron-job-run-mutation'
+import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
+import { useDatabaseCronJobToggleMutation } from '@/data/database-cron-jobs/database-cron-jobs-toggle-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const getNextRun = (schedule: string, lastRun?: string) => {
   // cron-parser can only deal with the traditional cron syntax but technically users can also
   // use strings like "30 seconds" now, For the latter case, we try our best to parse the next run
   // (can't guarantee as scope is quite big)
-  if (schedule.includes('*')) {
+  if (schedule.includes('*') || schedule.includes('$')) {
     try {
-      const interval = parser.parseExpression(schedule, { tz: 'UTC' })
+      // pg_cron uses '$' for "last day of month", but cron-parser uses 'L'
+      // Convert pg_cron syntax to cron-parser syntax before parsing
+      const normalizedSchedule = schedule.replace(/\$/g, 'L')
+      const interval = parser.parseExpression(normalizedSchedule, { tz: 'UTC' })
       return interval.next().getTime()
     } catch (error) {
       return undefined
@@ -103,6 +106,8 @@ export const CronJobTableCell = ({
           ? getNextRun(schedule, latest_run)
           : value
 
+  const hasValue = col.id === 'next_run' ? !!formattedValue : col.id in row
+
   const { mutate: runCronJob, isPending: isRunning } = useDatabaseCronJobRunCommandMutation({
     onSuccess: () => {
       toast.success(`Command from "${jobname}" ran successfully`)
@@ -142,14 +147,14 @@ export const CronJobTableCell = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              type="text"
+              variant="text"
               loading={isRunning}
               className="h-6 w-6"
               icon={<MoreVertical />}
               onClick={(e) => e.stopPropagation()}
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-60 space-y-1">
+          <DropdownMenuContent align="end" className="w-44 space-y-1">
             <Tooltip>
               <TooltipTrigger className="w-full">
                 <DropdownMenuItem
@@ -216,15 +221,16 @@ export const CronJobTableCell = ({
           <DialogSectionSeparator />
           <DialogSection>
             <p className="text-sm">
-              Are you sure you want to {active ? 'disable' : 'enable'} the cron job "{jobname}"?{' '}
+              Are you sure you want to {active ? 'disable' : 'enable'} the cron job "{jobname}
+              "?{' '}
             </p>
           </DialogSection>
           <DialogFooter>
-            <Button type="default" onClick={() => setShowToggleModal(false)}>
+            <Button variant="default" onClick={() => setShowToggleModal(false)}>
               Cancel
             </Button>
             <Button
-              type={active ? 'warning' : 'primary'}
+              variant={active ? 'warning' : 'primary'}
               loading={isToggling}
               onClick={onConfirmToggle}
             >
@@ -237,11 +243,13 @@ export const CronJobTableCell = ({
   }
 
   return (
-    <ContextMenu_Shadcn_>
-      <ContextMenuTrigger_Shadcn_ asChild>
+    <ContextMenu>
+      <ContextMenuTrigger asChild>
         <div className={cn('w-full flex items-center text-xs')}>
           {['latest_run', 'next_run'].includes(col.id) ? (
-            col.id === 'latest_run' && formattedValue === null ? (
+            !hasValue ? (
+              <Minus size={14} className="text-foreground-lighter" />
+            ) : col.id === 'latest_run' && formattedValue === null ? (
               <p className="text-foreground-lighter">Job has not been run yet</p>
             ) : col.id === 'next_run' && !formattedValue ? (
               <p className="text-foreground-lighter">Unable to parse next run for job</p>
@@ -296,18 +304,18 @@ export const CronJobTableCell = ({
             </Badge>
           )}
         </div>
-      </ContextMenuTrigger_Shadcn_>
-      <ContextMenuContent_Shadcn_ onClick={(e) => e.stopPropagation()}>
-        <ContextMenuItem_Shadcn_
+      </ContextMenuTrigger>
+      <ContextMenuContent onClick={(e) => e.stopPropagation()}>
+        <ContextMenuItem
           className="gap-x-2"
           onFocusCapture={(e) => e.stopPropagation()}
           onSelect={() => copyToClipboard(formattedValue)}
         >
           <Copy size={12} />
           <span>Copy {col.name.toLowerCase()}</span>
-        </ContextMenuItem_Shadcn_>
+        </ContextMenuItem>
 
-        <ContextMenuItem_Shadcn_
+        <ContextMenuItem
           disabled={!jobname}
           onFocusCapture={(e) => e.stopPropagation()}
           onSelect={() => onSelectEdit(row)}
@@ -326,19 +334,19 @@ export const CronJobTableCell = ({
               </TooltipContent>
             )}
           </Tooltip>
-        </ContextMenuItem_Shadcn_>
+        </ContextMenuItem>
 
-        <ContextMenuSeparator_Shadcn_ />
+        <ContextMenuSeparator />
 
-        <ContextMenuItem_Shadcn_
+        <ContextMenuItem
           className="gap-x-2"
           onFocusCapture={(e) => e.stopPropagation()}
           onSelect={() => onSelectDelete(row)}
         >
           <Trash size={12} />
           <span>Delete job</span>
-        </ContextMenuItem_Shadcn_>
-      </ContextMenuContent_Shadcn_>
-    </ContextMenu_Shadcn_>
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   )
 }

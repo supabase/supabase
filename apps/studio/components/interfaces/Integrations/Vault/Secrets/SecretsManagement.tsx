@@ -1,48 +1,44 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { sortBy } from 'lodash'
 import { RefreshCw, Search, X } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
-import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { handleErrorOnDelete, useQueryStateWithSelect } from 'hooks/misc/useQueryStateWithSelect'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import type { VaultSecret } from 'types'
 import {
   Button,
   cn,
-  Input,
   LoadingLine,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
-import AddNewSecretModal from './AddNewSecretModal'
-import DeleteSecretModal from './DeleteSecretModal'
-import EditSecretModal from './EditSecretModal'
+import { Input } from 'ui-patterns/DataInputs/Input'
+
+import { AddNewSecretModal } from './AddNewSecretModal'
+import { DeleteSecretModal } from './DeleteSecretModal'
+import { EditSecretModal } from './EditSecretModal'
 import { formatSecretColumns } from './Secrets.utils'
+import AlertError from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
+import type { VaultSecret } from '@/types'
 
 export const SecretsManagement = () => {
   const { search } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  // Track the ID being deleted to exclude it from error checking
-  const deletingSecretIdRef = useRef<string | null>(null)
-
   const [searchValue, setSearchValue] = useState<string>('')
-  const [showAddSecretModal, setShowAddSecretModal] = useQueryState(
-    'new',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
+  const [, setShowAddSecretModal] = useQueryState('new', parseAsBoolean.withDefault(false))
   const [selectedSort, setSelectedSort] = useState<'updated_at' | 'name'>('updated_at')
 
   const { can: canManageSecrets } = useAsyncCheckPermissions(
@@ -52,31 +48,16 @@ export const SecretsManagement = () => {
 
   const {
     data,
+    error,
+    isError,
     isPending: isLoading,
     isRefetching,
     refetch,
-    error,
-    isError,
   } = useVaultSecretsQuery({
-    projectRef: project?.ref!,
+    projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   const allSecrets = useMemo(() => data || [], [data])
-
-  const { setValue: setSelectedSecretToEdit, value: secretToEdit } = useQueryStateWithSelect({
-    urlKey: 'edit',
-    select: (id: string) => (id ? allSecrets?.find((secret) => secret.id === id) : undefined),
-    enabled: !!allSecrets && !isLoading,
-    onError: () => toast.error(`Secret not found`),
-  })
-
-  const { setValue: setSelectedSecretToRemove, value: secretToDelete } = useQueryStateWithSelect({
-    urlKey: 'delete',
-    select: (id: string) => (id ? allSecrets?.find((secret) => secret.id === id) : undefined),
-    enabled: !!allSecrets && !isLoading,
-    onError: (_error, selectedId) =>
-      handleErrorOnDelete(deletingSecretIdRef, selectedId, `Secret not found`),
-  })
 
   const secrets = useMemo(() => {
     const filtered =
@@ -94,18 +75,27 @@ export const SecretsManagement = () => {
     return sortBy(filtered, (s) => (s.name || '').toLowerCase())
   }, [allSecrets, searchValue, selectedSort])
 
+  const columns = useMemo(() => formatSecretColumns(), [])
+
   useEffect(() => {
     if (search !== undefined) setSearchValue(search)
   }, [search])
 
-  const columns = useMemo(
-    () =>
-      formatSecretColumns({
-        onSelectEdit: (secret) => setSelectedSecretToEdit(secret.id),
-        onSelectRemove: (secret) => setSelectedSecretToRemove(secret.id),
-      }),
-    [setSelectedSecretToEdit, setSelectedSecretToRemove]
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search secrets' }
   )
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setSearchValue(''))
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setShowAddSecretModal(true), {
+    label: 'Add new secret',
+    enabled: canManageSecrets,
+  })
 
   return (
     <>
@@ -114,47 +104,48 @@ export const SecretsManagement = () => {
           <div className="bg-surface-200 py-3 px-10 flex items-center justify-between flex-wrap">
             <div className="flex items-center gap-2">
               <Input
+                ref={searchInputRef}
                 size="tiny"
                 className="w-52"
                 placeholder="Search by name or key ID"
                 icon={<Search />}
                 value={searchValue ?? ''}
                 onChange={(e) => setSearchValue(e.target.value)}
+                onKeyDown={onSearchInputEscape(searchValue ?? '', setSearchValue)}
                 actions={[
                   searchValue && (
                     <Button
+                      key="clear"
                       size="tiny"
-                      type="text"
+                      variant="text"
                       icon={<X />}
-                      onClick={() => {
-                        setSearchValue('')
-                      }}
+                      onClick={() => setSearchValue('')}
                       className="p-0 h-5 w-5"
                     />
                   ),
                 ]}
               />
 
-              <Select_Shadcn_ value={selectedSort} onValueChange={(v) => setSelectedSort(v as any)}>
-                <SelectTrigger_Shadcn_ size="tiny" className="w-44">
-                  <SelectValue_Shadcn_ asChild>
+              <Select value={selectedSort} onValueChange={(v) => setSelectedSort(v as any)}>
+                <SelectTrigger size="tiny" className="w-44">
+                  <SelectValue asChild>
                     <>Sort by {selectedSort}</>
-                  </SelectValue_Shadcn_>
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectItem_Shadcn_ value="updated_at" className="text-xs">
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="updated_at" className="text-xs">
                     Updated at
-                  </SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="name" className="text-xs">
+                  </SelectItem>
+                  <SelectItem value="name" className="text-xs">
                     Name
-                  </SelectItem_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex items-center gap-x-2">
               <Button
-                type="default"
+                variant="default"
                 icon={<RefreshCw />}
                 loading={isRefetching}
                 onClick={() => refetch()}
@@ -163,7 +154,7 @@ export const SecretsManagement = () => {
               </Button>
               <DocsButton href={`${DOCS_URL}/guides/database/vault`} />
               <ButtonTooltip
-                type="primary"
+                variant="primary"
                 disabled={!canManageSecrets}
                 onClick={() => setShowAddSecretModal(true)}
                 tooltip={{
@@ -183,12 +174,12 @@ export const SecretsManagement = () => {
           <LoadingLine loading={isLoading || isRefetching} />
 
           {isError ? (
-            <div className="px-6 py-6 space-x-2 flex items-center justify-center">
-              <p className="text-sm text-foreground">Failed to load secrets</p>
+            <div className="grow p-4">
+              <AlertError error={error} subject="Failed to load secrets" />
             </div>
           ) : (
             <DataGrid
-              className="flex-grow border-t-0"
+              className="grow border-t-0! border-b-0!"
               rowHeight={52}
               headerRowHeight={36}
               columns={columns}
@@ -197,7 +188,7 @@ export const SecretsManagement = () => {
               rowClass={() => {
                 return cn(
                   'cursor-pointer',
-                  '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+                  '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
                   '[&>.rdg-cell:first-child>div]:pl-8'
                 )
               }}
@@ -226,27 +217,11 @@ export const SecretsManagement = () => {
         </div>
       </div>
 
-      <AddNewSecretModal
-        visible={showAddSecretModal}
-        onClose={() => setShowAddSecretModal(false)}
-      />
-      {secretToEdit && (
-        <EditSecretModal
-          visible={!!secretToEdit}
-          secret={secretToEdit}
-          onClose={() => setSelectedSecretToEdit(null)}
-        />
-      )}
-      <DeleteSecretModal
-        selectedSecret={secretToDelete}
-        onDeleteStart={(secretId) => {
-          deletingSecretIdRef.current = secretId
-        }}
-        onClose={() => {
-          deletingSecretIdRef.current = null
-          setSelectedSecretToRemove(null)
-        }}
-      />
+      <AddNewSecretModal />
+
+      <EditSecretModal />
+
+      <DeleteSecretModal />
     </>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import * as RadioGroupPrimitive from '@radix-ui/react-radio-group'
+import { RadioGroup as RadioGroupPrimitive } from 'radix-ui'
 import { Circle } from 'lucide-react'
 import * as React from 'react'
 
@@ -22,13 +22,13 @@ const RadioGroupItem = React.forwardRef<
     <RadioGroupPrimitive.Item
       ref={ref}
       className={cn(
-        'aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+        'relative aspect-square h-4 w-4 rounded-full border border-primary text-primary ring-offset-background focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
         className
       )}
       {...props}
     >
-      <RadioGroupPrimitive.Indicator className="flex items-center justify-center">
-        <Circle className="h-2.5 w-2.5 fill-current text-current" />
+      <RadioGroupPrimitive.Indicator className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <Circle size={10} strokeWidth={0} className="fill-current text-current" />
       </RadioGroupPrimitive.Indicator>
     </RadioGroupPrimitive.Item>
   )
@@ -55,7 +55,7 @@ const RadioGroupLargeItem = React.forwardRef<
         'bg-surface-200',
         'rounded-md border border-strong',
         'p-2',
-        'shadow-sm',
+        'shadow-xs',
         'hover:border-stronger hover:bg-surface-300',
         'data-[state=checked]:border-primary',
         'data-[state=checked]:ring-1 data-[state=checked]:ring-border',
@@ -73,7 +73,7 @@ const RadioGroupLargeItem = React.forwardRef<
               className={cn(
                 'absolute',
                 'w-[10px] h-[10px]',
-                'left-[1px] top-[1px]',
+                'left-px top-px',
                 'border border-background-surface-300',
                 'rounded-full',
                 'data-[state=checked]:border-background-surface-300',

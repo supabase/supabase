@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+
 import { BaseInjector } from './../base-injector'
 
 export const metadata: Metadata = {

@@ -26,18 +26,35 @@ type LogsBarChartDatum = {
 
 export const LogsBarChart = ({
   data,
+  error,
   onBarClick,
   EmptyState,
+  ErrorState,
   DateTimeFormat = 'MMM D, YYYY, hh:mma',
   isFullHeight = false,
+  chartConfig,
+  hideZeroValues = false,
+  hideDateRange = false,
+  hideXAxis = false,
 }: {
   data: LogsBarChartDatum[]
+  error?: unknown | null
   onBarClick?: (datum: LogsBarChartDatum, tooltipData?: CategoricalChartState) => void
   EmptyState?: ReactNode
+  ErrorState?: ReactNode
   DateTimeFormat?: string
   isFullHeight?: boolean
+  chartConfig?: ChartConfig
+  hideZeroValues?: boolean
+  hideDateRange?: boolean
+  hideXAxis?: boolean
 }) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
+
+  if (error) {
+    if (ErrorState) return ErrorState
+    return null
+  }
 
   if (data.length === 0) {
     if (EmptyState) return EmptyState
@@ -47,27 +64,24 @@ export const LogsBarChart = ({
   const startDate = dayjs(data[0]['timestamp']).format(DateTimeFormat)
   const endDate = dayjs(data[data?.length - 1]?.['timestamp']).format(DateTimeFormat)
 
+  const defaultChartConfig = {
+    error_count: {
+      label: 'Errors',
+    },
+    ok_count: {
+      label: 'Ok',
+    },
+    warning_count: {
+      label: 'Warnings',
+    },
+  } satisfies ChartConfig
+
   return (
     <div
       data-testid="logs-bar-chart"
       className={cn('flex flex-col gap-y-3', isFullHeight ? 'h-full' : 'h-24')}
     >
-      <ChartContainer
-        className="h-full"
-        config={
-          {
-            error_count: {
-              label: 'Errors',
-            },
-            ok_count: {
-              label: 'Ok',
-            },
-            warning_count: {
-              label: 'Warnings',
-            },
-          } satisfies ChartConfig
-        }
-      >
+      <ChartContainer className="h-full" config={chartConfig ?? defaultChartConfig}>
         <RechartBarChart
           data={data}
           onMouseMove={(e: any) => {
@@ -93,14 +107,36 @@ export const LogsBarChart = ({
             tick={false}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
+            {...(hideXAxis ? { height: 1 } : {})}
           />
           <ChartTooltip
-            content={
-              <ChartTooltipContent
-                className="text-foreground-light -mt-5"
-                labelFormatter={(v: string) => dayjs(v).format(DateTimeFormat)}
-              />
-            }
+            animationDuration={0}
+            position={{ y: 16 }}
+            content={(props) => {
+              if (!props.active || !props.payload || props.payload.length === 0) {
+                return null
+              }
+
+              // Filter payload based on hideZeroValues
+              const filteredPayload = hideZeroValues
+                ? props.payload.filter((item) => Number(item.value) !== 0)
+                : props.payload
+
+              // Don't show tooltip if all values are filtered out
+              if (filteredPayload.length === 0) {
+                return null
+              }
+
+              return (
+                <ChartTooltipContent
+                  active={props.active}
+                  payload={filteredPayload}
+                  label={props.label}
+                  className="text-foreground-light -mt-5 transition-none!"
+                  labelFormatter={(v: string) => dayjs(v).format(DateTimeFormat)}
+                />
+              )
+            }}
           />
 
           {/* Error bars */}
@@ -149,7 +185,7 @@ export const LogsBarChart = ({
           </Bar>
         </RechartBarChart>
       </ChartContainer>
-      {data && (
+      {data && !hideDateRange && (
         <div className="text-foreground-lighter -mt-10 flex items-center justify-between text-[10px] font-mono">
           <span>{startDate}</span>
           <span>{endDate}</span>

@@ -1,9 +1,10 @@
 import ProductIcon from 'components/ProductIcon'
-import { Fragment, ReactNode } from 'react'
-import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { FeatureKey } from 'shared-data/pricing'
 import Link from 'next/link'
+import { Fragment, ReactNode } from 'react'
+import { FeatureKey } from 'shared-data/pricing'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
+
+import { IconPricingIncludedCheck, IconPricingMinus } from './PricingIcons'
 
 type PricingTooltips = {
   [key in FeatureKey]?: {
@@ -37,6 +38,9 @@ export const pricingTooltips: PricingTooltips = {
   },
   'database.egress': {
     main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor, Log Drains) in GB throughout your billing period. Excludes cache hits.',
+  },
+  'database.replication': {
+    main: 'Supabase Pipelines is available as an add-on for paid plans. It provides change-data-capture pipelines that replicate your Postgres tables to analytical destinations in near real time.\nYou are billed for each active pipeline, the replicated bytes, and initial copies/backfills. Initial copies/backfills are billed at a lower rate.',
   },
   'storage.cachedEgress': {
     main: 'Billing is based on the total sum of outgoing Storage traffic in GB throughout your billing period that is served from our CDN cache.',

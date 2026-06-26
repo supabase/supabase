@@ -1,16 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-
-import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useSchemaCreateMutation } from 'data/database/schema-create-mutation'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Dialog,
@@ -21,12 +13,20 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormField,
+  Input,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import { getAnalyticsBucketFDWServerName } from './AnalyticsBucketDetails.utils'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useSchemaCreateMutation } from '@/data/database/schema-create-mutation'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useFDWImportForeignSchemaMutation } from '@/data/fdw/fdw-import-foreign-schema-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 // Create foreign tables for namespace tables
 export const InitializeForeignSchemaDialog = ({ namespace }: { namespace: string }) => {
@@ -90,10 +90,10 @@ export const InitializeForeignSchemaDialog = ({ namespace }: { namespace: string
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button type="default">Query from Postgres</Button>
+        <Button variant="default">Query from Postgres</Button>
       </DialogTrigger>
       <DialogContent size="medium" aria-describedby={undefined}>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
               <DialogTitle>Query this namespace from Postgres</DialogTitle>
@@ -105,29 +105,29 @@ export const InitializeForeignSchemaDialog = ({ namespace }: { namespace: string
                 Create a Postgres schema to expose tables from the "{namespace}" namespace as
                 foreign tables.
               </p>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="schema"
                 render={({ field }) => (
                   <FormItemLayout layout="vertical" label="Schema name">
-                    <Input_Shadcn_ {...field} placeholder="Provide a name for your schema" />
+                    <Input {...field} placeholder="Provide a name for your schema" />
                   </FormItemLayout>
                 )}
               />
             </DialogSection>
-            <DialogFooter className="!justify-between">
+            <DialogFooter className="justify-between!">
               <DocsButton href={`${DOCS_URL}/guides/storage/analytics/query-with-postgres`} />
               <div className="flex items-center gap-x-2">
-                <Button type="default" disabled={isCreating} onClick={() => setIsOpen(false)}>
+                <Button variant="default" disabled={isCreating} onClick={() => setIsOpen(false)}>
                   Cancel
                 </Button>
-                <Button htmlType="submit" type="primary" loading={isCreating}>
+                <Button type="submit" variant="primary" loading={isCreating}>
                   Create schema
                 </Button>
               </div>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

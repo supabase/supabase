@@ -1,39 +1,24 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { IS_PLATFORM, useFlag, useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import NoPermission from 'components/ui/NoPermission'
-import { UpgradeToPro } from 'components/ui/UpgradeToPro'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
-import { useLargestBucketSizeLimitsCheck } from 'data/storage/buckets-max-size-limit-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
-import { formatBytes } from 'lib/helpers'
 import {
   Button,
   Card,
   CardContent,
   CardFooter,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormMessage_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-  Select_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormMessage,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -41,6 +26,8 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import * as z from 'zod'
+
 import { StorageFileSizeLimitErrorMessage } from './StorageFileSizeLimitErrorMessage'
 import {
   StorageListV2MigratingCallout,
@@ -57,6 +44,19 @@ import {
   encodeBucketLimitErrorMessage,
 } from './StorageSettings.utils'
 import { ValidateSizeLimit } from './StorageSettings.ValidateSizeLimit'
+import AlertError from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import NoPermission from '@/components/ui/NoPermission'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import { useProjectStorageConfigUpdateUpdateMutation } from '@/data/config/project-storage-config-update-mutation'
+import { useLargestBucketSizeLimitsCheck } from '@/data/storage/buckets-max-size-limit-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
+import { formatBytes } from '@/lib/helpers'
 
 const formId = 'storage-settings-form'
 
@@ -84,7 +84,7 @@ export const StorageSettings = () => {
   const {
     data: config,
     error,
-    isPending: isLoading,
+    isPending: isLoadingProjectStorageConfig,
     isSuccess,
     isError,
   } = useProjectStorageConfigQuery({ projectRef })
@@ -104,17 +104,28 @@ export const StorageSettings = () => {
   const shouldAutoValidateBucketLimits = sizeLimitCheckCondition === 'auto'
 
   const { data: organization } = useSelectedOrganizationQuery()
-  const { getEntitlementNumericValue, isEntitlementUnlimited } =
-    useCheckEntitlements('storage.max_file_size')
-  const isFreeTier = organization?.plan.id === 'free'
+  const {
+    getEntitlementNumericValue,
+    isEntitlementUnlimited,
+    isLoading: isLoadingMaxFileSizeEntitlement,
+  } = useCheckEntitlements('storage.max_file_size')
+  const { hasAccess: hasAccessToFileSizeConfiguration, isLoading: isLoadingFileSizeConfigurable } =
+    useCheckEntitlements('storage.max_file_size.configurable')
+  const {
+    hasAccess: hasAccessToImageTransformations,
+    isLoading: isLoadingImageTransformationEntitlement,
+  } = useCheckEntitlements('storage.image_transformations')
+
   const isSpendCapOn =
     organization?.plan.id === 'pro' && organization?.usage_billing_enabled === false
+  const hasLimitedStorageAccess =
+    !hasAccessToImageTransformations && !hasAccessToFileSizeConfiguration
 
   const [isUpdating, setIsUpdating] = useState(false)
   const [initialValues, setInitialValues] = useState<StorageSettingsState>({
     fileSizeLimit: 0,
     unit: StorageSizeUnits.MB,
-    imageTransformationEnabled: !isFreeTier,
+    imageTransformationEnabled: false,
   })
 
   const maxBytes = useMemo(() => {
@@ -125,6 +136,12 @@ export const StorageSettings = () => {
     }
   }, [organization, isEntitlementUnlimited, getEntitlementNumericValue])
 
+  const isLoading =
+    isLoadingProjectStorageConfig ||
+    isLoadingPermissions ||
+    isLoadingMaxFileSizeEntitlement ||
+    isLoadingFileSizeConfigurable ||
+    isLoadingImageTransformationEntitlement
   const FormSchema = z
     .object({
       fileSizeLimit: z.coerce.number(),
@@ -218,10 +235,11 @@ export const StorageSettings = () => {
   }
 
   useEffect(() => {
-    if (isSuccess && config) {
+    if (isSuccess && config && !isLoading) {
       const { fileSizeLimit, features } = config
       const { value, unit } = convertFromBytes(fileSizeLimit ?? 0)
-      const imageTransformationEnabled = features?.imageTransformation?.enabled ?? !isFreeTier
+      const imageTransformationEnabled =
+        features?.imageTransformation?.enabled ?? hasAccessToImageTransformations
 
       setInitialValues({
         fileSizeLimit: value,
@@ -237,20 +255,20 @@ export const StorageSettings = () => {
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isSuccess, config])
+  }, [isSuccess, config, isLoading, hasAccessToImageTransformations])
 
   return (
     <PageContainer>
       <PageSection>
         <PageSectionContent className="flex flex-col gap-y-8">
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             {!IS_PLATFORM ? (
               <Admonition
                 type="default"
                 title="Storage settings are not available for self-hosted projects"
                 description="Storage settings are only available for Supabase Platform projects."
               />
-            ) : isLoading || isLoadingPermissions ? (
+            ) : isLoading ? (
               <GenericSkeletonLoader />
             ) : (
               <>
@@ -274,7 +292,7 @@ export const StorageSettings = () => {
                     <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
                       <Card>
                         <CardContent>
-                          <FormField_Shadcn_
+                          <FormField
                             control={form.control}
                             name="imageTransformationEnabled"
                             render={({ field }) => (
@@ -293,21 +311,23 @@ export const StorageSettings = () => {
                                   </>
                                 }
                               >
-                                <FormControl_Shadcn_>
+                                <FormControl>
                                   <Switch
                                     size="large"
-                                    disabled={isFreeTier}
-                                    checked={field.value}
+                                    disabled={
+                                      !hasAccessToImageTransformations || !canUpdateStorageSettings
+                                    }
+                                    checked={hasAccessToImageTransformations && field.value}
                                     onCheckedChange={field.onChange}
                                   />
-                                </FormControl_Shadcn_>
+                                </FormControl>
                               </FormItemLayout>
                             )}
                           />
                         </CardContent>
 
                         <CardContent>
-                          <FormField_Shadcn_
+                          <FormField
                             control={form.control}
                             name="fileSizeLimit"
                             render={({ field }) => (
@@ -315,7 +335,6 @@ export const StorageSettings = () => {
                                 hideMessage
                                 layout="flex-row-reverse"
                                 label="Global file size limit"
-                                className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full [&>div]:min-w-100"
                                 description={
                                   <>
                                     Restrict the size of files uploaded across all buckets.{' '}
@@ -334,9 +353,9 @@ export const StorageSettings = () => {
                                   </>
                                 }
                               >
-                                <FormControl_Shadcn_>
+                                <FormControl>
                                   <div className="flex items-center justify-end">
-                                    <Input_Shadcn_
+                                    <Input
                                       type="number"
                                       {...field}
                                       onChange={(e) => {
@@ -344,41 +363,47 @@ export const StorageSettings = () => {
                                         form.clearErrors('fileSizeLimit')
                                       }}
                                       className="w-32 rounded-r-none border-r-0"
-                                      disabled={isFreeTier || !canUpdateStorageSettings}
+                                      disabled={
+                                        !hasAccessToFileSizeConfiguration ||
+                                        !canUpdateStorageSettings
+                                      }
                                     />
-                                    <FormField_Shadcn_
+                                    <FormField
                                       control={form.control}
                                       name="unit"
                                       render={({ field: unitField }) => (
-                                        <Select_Shadcn_
+                                        <Select
                                           value={unitField.value}
                                           onValueChange={(val) => {
                                             unitField.onChange(val)
                                             form.clearErrors('fileSizeLimit')
                                           }}
-                                          disabled={isFreeTier || !canUpdateStorageSettings}
+                                          disabled={
+                                            !hasAccessToFileSizeConfiguration ||
+                                            !canUpdateStorageSettings
+                                          }
                                         >
-                                          <SelectTrigger_Shadcn_ className="w-[90px] text-xs font-mono rounded-l-none bg-surface-300">
-                                            <SelectValue_Shadcn_ placeholder="Choose a prefix">
+                                          <SelectTrigger className="w-[90px] text-xs font-mono rounded-l-none bg-surface-300">
+                                            <SelectValue placeholder="Choose a prefix">
                                               {storageUnit}
-                                            </SelectValue_Shadcn_>
-                                          </SelectTrigger_Shadcn_>
-                                          <SelectContent_Shadcn_>
+                                            </SelectValue>
+                                          </SelectTrigger>
+                                          <SelectContent>
                                             {Object.values(StorageSizeUnits).map((unit: string) => (
-                                              <SelectItem_Shadcn_
+                                              <SelectItem
                                                 key={unit}
-                                                disabled={isFreeTier}
+                                                disabled={!hasAccessToFileSizeConfiguration}
                                                 value={unit}
                                               >
                                                 {unit}
-                                              </SelectItem_Shadcn_>
+                                              </SelectItem>
                                             ))}
-                                          </SelectContent_Shadcn_>
-                                        </Select_Shadcn_>
+                                          </SelectContent>
+                                        </Select>
                                       )}
                                     />
                                   </div>
-                                </FormControl_Shadcn_>
+                                </FormControl>
                                 {sizeLimitCheckCondition === 'confirm' && (
                                   <ValidateSizeLimit
                                     onValidate={sizeLimitCheckQuery}
@@ -390,15 +415,15 @@ export const StorageSettings = () => {
                             )}
                           />
                           {fileSizeLimitError && (
-                            <FormMessage_Shadcn_ className="ml-auto mt-2 text-right w-1/2">
+                            <FormMessage className="ml-auto mt-2 text-right w-1/2">
                               <StorageFileSizeLimitErrorMessage
                                 error={fileSizeLimitError}
                                 projectRef={projectRef}
                               />
-                            </FormMessage_Shadcn_>
+                            </FormMessage>
                           )}
                         </CardContent>
-                        {isFreeTier && (
+                        {hasLimitedStorageAccess && (
                           <UpgradeToPro
                             fullWidth
                             variant="primary"
@@ -436,8 +461,8 @@ export const StorageSettings = () => {
                         <CardFooter className="justify-end space-x-2">
                           {form.formState.isDirty && (
                             <Button
-                              type="default"
-                              htmlType="reset"
+                              variant="default"
+                              type="reset"
                               onClick={() => form.reset()}
                               disabled={
                                 !form.formState.isDirty || !canUpdateStorageSettings || isUpdating
@@ -447,8 +472,8 @@ export const StorageSettings = () => {
                             </Button>
                           )}
                           <Button
-                            type={isFreeTier ? 'default' : 'primary'}
-                            htmlType="submit"
+                            variant={hasLimitedStorageAccess ? 'default' : 'primary'}
+                            type="submit"
                             loading={isUpdating}
                             disabled={
                               !canUpdateStorageSettings || isUpdating || !form.formState.isDirty
@@ -463,7 +488,7 @@ export const StorageSettings = () => {
                 )}
               </>
             )}
-          </Form_Shadcn_>
+          </Form>
         </PageSectionContent>
       </PageSection>
     </PageContainer>

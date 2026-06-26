@@ -1,4 +1,4 @@
-import { renderHook, cleanup } from '@testing-library/react'
+import { cleanup, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 beforeEach(() => {

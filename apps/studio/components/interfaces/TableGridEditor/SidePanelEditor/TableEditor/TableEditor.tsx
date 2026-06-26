@@ -1,32 +1,10 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, noop } from 'lodash'
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useDataApiGrantTogglesEnabled } from '@/hooks/misc/useDataApiGrantTogglesEnabled'
-import { checkDataApiPrivilegesNonEmpty } from '@/lib/data-api-types'
-import type { GeneratedPolicy } from 'components/interfaces/Auth/Policies/Policies.utils'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
-import { CONSTRAINT_TYPE, useTableConstraintsQuery } from 'data/database/constraints-query'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { useCustomContent } from 'hooks/custom-content/useCustomContent'
-import { useChanged } from 'hooks/misc/useChanged'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { RealtimeButtonVariant, useRealtimeExperiment } from 'hooks/misc/useRealtimeExperiment'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useTableCreateGeneratePolicies } from 'hooks/misc/useTableCreateGeneratePolicies'
-import { useUrlState } from 'hooks/ui/useUrlState'
-import { useProtectedSchemas } from 'hooks/useProtectedSchemas'
-import { DOCS_URL } from 'lib/constants'
-import { useTrack } from 'lib/telemetry/track'
-import { type PlainObject } from 'lib/type-helpers'
-import { TableEditorStateContext, useTableEditorStateSnapshot } from 'state/table-editor'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
 import { Admonition } from 'ui-patterns'
-import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { ActionBar } from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
@@ -34,19 +12,37 @@ import type { SaveTableParams } from '../SidePanelEditor'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { SpreadsheetImport } from '../SpreadsheetImport/SpreadsheetImport'
 import { ApiAccessToggle, type TableApiAccessHandlerWithHistoryReturn } from './ApiAccessToggle'
-import ColumnManagement from './ColumnManagement'
+import { ColumnManagement } from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
 import { HeaderTitle } from './HeaderTitle'
-import { RLSDisableModalContent } from './RLSDisableModal'
-import { RLSManagement } from './RLSManagement/RLSManagement'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import type { ImportContent, TableField } from './TableEditor.types'
 import {
   formatImportedContentToColumnFields,
   generateTableField,
-  generateTableFieldFromPostgresTable,
+  generateTableFieldFromPGTable,
+  mergeForeignKeyMeta,
   validateFields,
 } from './TableEditor.utils'
+import { RLSToggleDialog } from '@/components/interfaces/Database/RLSToggleDialog'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { CONSTRAINT_TYPE, useTableConstraintsQuery } from '@/data/database/constraints-query'
+import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
+import { useEnumeratedTypesQuery } from '@/data/enumerated-types/enumerated-types-query'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useChanged } from '@/hooks/misc/useChanged'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useUrlState } from '@/hooks/ui/useUrlState'
+import { useVisibleKey } from '@/hooks/ui/useVisibleKey'
+import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
+import { DOCS_URL } from '@/lib/constants'
+import type { SafePostgresTable } from '@/lib/postgres-types'
+import { useTrack } from '@/lib/telemetry/track'
+import { type PlainObject } from '@/lib/type-helpers'
+import { TableEditorStateContext, useTableEditorStateSnapshot } from '@/state/table-editor'
 
 type SaveTableParamsFor<Action extends SaveTableParams['action']> = Extract<
   SaveTableParams,
@@ -57,7 +53,7 @@ type SaveTablePayloadFor<Action extends SaveTableParams['action']> =
   SaveTableParamsFor<Action>['payload']
 
 export interface TableEditorProps {
-  table?: PostgresTable
+  table?: SafePostgresTable
   isDuplicating: boolean
   templateData?: Partial<TableField>
   visible: boolean
@@ -83,8 +79,6 @@ export const TableEditor = ({
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { docsRowLevelSecurityGuidePath } = useCustomContent(['docs:row_level_security_guide_path'])
 
-  const isApiGrantTogglesEnabled = useDataApiGrantTogglesEnabled()
-
   const [params, setParams] = useUrlState()
   const { data: project } = useSelectedProjectQuery()
   const { selectedSchema } = useQuerySchemaState()
@@ -95,18 +89,20 @@ export const TableEditor = ({
   const [errors, setErrors] = useState<PlainObject>({})
   const [tableFields, setTableFields] = useState<TableField>()
   const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
+  // Tracks whether tableFields has been initialized with fully-loaded server data
+  // for the current panel session. Prevents background refetches from resetting
+  // local edits (e.g. unsaved newly-added columns) while the panel is open.
+  const hasInitializedRef = useRef(false)
+  // Set true the moment the user makes any field change within the panel session.
+  // Used to switch the late FK-hydration paths from wholesale replace → merge so
+  // unsaved edits (e.g. a column added before foreignKeyMeta resolves) survive.
+  const hasUserEditsRef = useRef(false)
 
   const [isDuplicateRows, setIsDuplicateRows] = useState<boolean>(false)
   const [importContent, setImportContent] = useState<ImportContent>()
   const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
+  const spreadsheetImportKey = useVisibleKey(isImportingSpreadsheet)
   const [rlsConfirmVisible, setRlsConfirmVisible] = useState<boolean>(false)
-
-  const [generatedPolicies, setGeneratedPolicies] = useState<GeneratedPolicy[]>([])
-
-  const { enabled: generatePoliciesEnabled } = useTableCreateGeneratePolicies({
-    isNewRecord,
-    projectInsertedAt: project?.inserted_at,
-  })
 
   const { data: types } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
@@ -128,11 +124,6 @@ export const TableEditor = ({
   const isRealtimeEnabled = isNewRecord
     ? false
     : realtimeEnabledTables.some((t) => t.id === table?.id)
-
-  const { activeVariant: activeRealtimeVariant } = useRealtimeExperiment({
-    isTable: !isNewRecord,
-    isRealtimeEnabled,
-  })
 
   const { data: constraints } = useTableConstraintsQuery({
     projectRef: project?.ref,
@@ -166,6 +157,7 @@ export const TableEditor = ({
     const updatedTableFields = { ...tableFields, ...changes } as TableField
     setTableFields(updatedTableFields)
     updateEditorDirty()
+    hasUserEditsRef.current = true
 
     const updatedErrors = { ...errors }
     for (const key of Object.keys(changes)) {
@@ -182,7 +174,17 @@ export const TableEditor = ({
       relation.columns.forEach((column) => {
         const sourceColumn = tableFields.columns.find((col) => col.name === column.source)
         if (sourceColumn?.isNewColumn && column.targetType) {
-          updatedColumns.push({ ...sourceColumn, format: column.targetType })
+          const isArray = column.targetIsArray ?? false
+          const bareFormat =
+            isArray && column.targetType.startsWith('_')
+              ? column.targetType.slice(1)
+              : column.targetType
+          updatedColumns.push({
+            ...sourceColumn,
+            format: bareFormat,
+            formatSchema: column.targetTypeSchema,
+            isArray,
+          })
         }
       })
     })
@@ -197,6 +199,7 @@ export const TableEditor = ({
         }),
       }
       setTableFields(updatedTableFields)
+      hasUserEditsRef.current = true
     }
     setFkRelations(relations)
   }
@@ -239,7 +242,7 @@ export const TableEditor = ({
             columns,
             foreignKeyRelations: fkRelations,
             resolve,
-            generatedPolicies,
+            generatedPolicies: [],
           })
         } else if (isDuplicating) {
           const payload: SaveTablePayloadFor<'duplicate'> = {
@@ -289,7 +292,6 @@ export const TableEditor = ({
       setErrors({})
       setImportContent(undefined)
       setIsDuplicateRows(false)
-      setGeneratedPolicies([])
       if (isNewRecord) {
         const tableFields = generateTableField()
         if (templateData) {
@@ -298,15 +300,29 @@ export const TableEditor = ({
           setTableFields(tableFields)
         }
         setFkRelations([])
+        hasInitializedRef.current = true
       } else {
-        const tableFields = generateTableFieldFromPostgresTable(
+        const serverTableFields = generateTableFieldFromPGTable(
           table,
           foreignKeyMeta ?? [],
           isDuplicating,
           isRealtimeEnabled
         )
-        setTableFields(tableFields)
+        // Defensive: if a prior session somehow left edits in place, merge
+        // FK metadata in instead of clobbering. In normal flow this branch is
+        // pristine because the close handler resets hasUserEditsRef.
+        setTableFields((current) =>
+          hasUserEditsRef.current && current !== undefined
+            ? mergeForeignKeyMeta(current, serverTableFields)
+            : serverTableFields
+        )
+        // Only mark fully initialized once FK meta has loaded — otherwise we'll
+        // re-init below when it arrives.
+        hasInitializedRef.current = isSuccessForeignKeyMeta
       }
+    } else if (visibleChanged && !visible) {
+      hasInitializedRef.current = false
+      hasUserEditsRef.current = false
     }
   }, [
     visible,
@@ -317,19 +333,39 @@ export const TableEditor = ({
     isDuplicating,
     table,
     visibleChanged,
+    isSuccessForeignKeyMeta,
   ])
 
   useEffect(() => {
-    if (!isNewRecord) {
-      const tableFields = generateTableFieldFromPostgresTable(
+    // Re-init tableFields once if foreignKeyMeta arrives after the panel opened.
+    // After this fires (or after the panel-open effect above sets it true),
+    // subsequent background refetches must not clobber the user's local edits.
+    if (!isNewRecord && visible && isSuccessForeignKeyMeta && !hasInitializedRef.current) {
+      const serverTableFields = generateTableFieldFromPGTable(
         table,
         foreignKeyMeta ?? [],
         isDuplicating,
         isRealtimeEnabled
       )
-      setTableFields(tableFields)
+      // If the user has already started editing before FK meta resolved, only
+      // merge FK metadata in — never replace, or we'd lose their work
+      // (e.g. a column added while the FK section was still loading).
+      setTableFields((current) =>
+        hasUserEditsRef.current && current !== undefined
+          ? mergeForeignKeyMeta(current, serverTableFields)
+          : serverTableFields
+      )
+      hasInitializedRef.current = true
     }
-  }, [isNewRecord, table, foreignKeyMeta, isDuplicating, isRealtimeEnabled])
+  }, [
+    isNewRecord,
+    visible,
+    isSuccessForeignKeyMeta,
+    table,
+    foreignKeyMeta,
+    isDuplicating,
+    isRealtimeEnabled,
+  ])
 
   useEffect(() => {
     if (isSuccessForeignKeyMeta) setFkRelations(formatForeignKeys(foreignKeys))
@@ -345,16 +381,10 @@ export const TableEditor = ({
 
   if (!tableFields) return null
 
-  const isApiAccessAndPoliciesSectionShown = isApiGrantTogglesEnabled || generatePoliciesEnabled
-  const isExposed = isApiGrantTogglesEnabled
-    ? !!apiAccessToggleHandler.data?.schemaExposed &&
-      checkDataApiPrivilegesNonEmpty(apiAccessToggleHandler.data.privileges)
-    : undefined
-
   return (
     <SidePanel
       data-testid="table-editor-side-panel"
-      size="large"
+      size="xlarge"
       key="TableEditor"
       visible={visible}
       header={<HeaderTitle schema={selectedSchema} table={table} isDuplicating={isDuplicating} />}
@@ -367,118 +397,142 @@ export const TableEditor = ({
           applyButtonLabel="Save"
           closePanel={closePanel}
           applyFunction={(resolve: () => void) => onSaveChanges(resolve)}
+          visible={visible}
         />
       }
     >
       <SidePanel.Content className="space-y-10 py-6">
-        <Input
-          data-testid="table-name-input"
+        <FormItemLayout
+          id="name"
+          isReactForm={false}
+          layout="horizontal"
           label="Name"
-          layout="horizontal"
-          type="text"
           error={errors.name ? String(errors.name) : undefined}
-          value={tableFields?.name}
-          onChange={(event: any) => onUpdateField({ name: event.target.value })}
-        />
-        <Input
-          label="Description"
-          placeholder="Optional"
+        >
+          <Input
+            data-testid="table-name-input"
+            id="name"
+            type="text"
+            value={tableFields?.name}
+            onChange={(event) => onUpdateField({ name: event.target.value })}
+          />
+        </FormItemLayout>
+        <FormItemLayout
+          id="description"
+          isReactForm={false}
           layout="horizontal"
-          type="text"
-          value={tableFields?.comment ?? ''}
-          onChange={(event: any) => onUpdateField({ comment: event.target.value })}
-        />
+          label="Description"
+        >
+          <Input
+            id="description"
+            placeholder="Optional"
+            type="text"
+            value={tableFields?.comment ?? ''}
+            onChange={(event) => onUpdateField({ comment: event.target.value })}
+          />
+        </FormItemLayout>
       </SidePanel.Content>
 
       <SidePanel.Separator />
 
-      {!generatePoliciesEnabled && (
-        <>
-          <SidePanel.Content className="space-y-10 py-6">
-            <Checkbox
-              id="enable-rls"
-              // @ts-ignore
-              label={
-                <div className="flex items-center space-x-2">
-                  <span>Enable Row Level Security (RLS)</span>
-                  <Badge>Recommended</Badge>
-                </div>
-              }
-              description="Restrict access to your table by enabling RLS and writing Postgres policies."
-              checked={tableFields.isRLSEnabled}
-              onChange={() => {
-                // if isEnabled, show confirm modal to turn off
-                // if not enabled, allow turning on without modal confirmation
-                tableFields.isRLSEnabled
-                  ? setRlsConfirmVisible(true)
-                  : onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
-              }}
-              size="medium"
+      <SidePanel.Content className="space-y-10 py-6">
+        <div className="items-top flex space-x-2">
+          <Checkbox
+            id="enable-rls"
+            checked={tableFields.isRLSEnabled}
+            onCheckedChange={() => {
+              // if isEnabled, show confirm modal to turn off
+              // if not enabled, allow turning on without modal confirmation
+              tableFields.isRLSEnabled
+                ? setRlsConfirmVisible(true)
+                : onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
+            }}
+          />
+          <div className="grid gap-1.5 leading-none">
+            <label
+              htmlFor="enable-rls"
+              className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              <span>Enable Row Level Security (RLS)</span>
+              <Badge>Recommended</Badge>
+            </label>
+            <p className="text-sm text-foreground-muted">
+              Restrict access to your table by enabling RLS and writing Postgres policies.
+            </p>
+          </div>
+        </div>
+
+        {tableFields.isRLSEnabled ? (
+          <Admonition
+            type="default"
+            className="mt-3!"
+            title="Policies are required to query data"
+            description={
+              <>
+                You need to create an access policy before you can query data from this table.
+                Without a policy, querying this table will return an{' '}
+                <u className="text-foreground">empty array</u> of results.{' '}
+                {isNewRecord ? 'You can create policies after saving this table.' : ''}
+              </>
+            }
+          >
+            <DocsButton
+              abbrev={false}
+              className="mt-2 w-min"
+              href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
+          </Admonition>
+        ) : (
+          <Admonition
+            type="warning"
+            className="mt-3!"
+            title="You are allowing anonymous access to your table"
+            description={
+              <>
+                {tableFields.name ? `The table ${tableFields.name}` : 'Your table'} will be publicly
+                writable and readable
+              </>
+            }
+          >
+            <DocsButton
+              abbrev={false}
+              className="mt-2 w-min"
+              href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
+            />
+          </Admonition>
+        )}
 
-            {tableFields.isRLSEnabled ? (
-              <Admonition
-                type="default"
-                className="!mt-3"
-                title="Policies are required to query data"
-                description={
-                  <>
-                    You need to create an access policy before you can query data from this table.
-                    Without a policy, querying this table will return an{' '}
-                    <u className="text-foreground">empty array</u> of results.{' '}
-                    {isNewRecord ? 'You can create policies after saving this table.' : ''}
-                  </>
-                }
+        {realtimeEnabled && (
+          <div className="items-top flex space-x-2">
+            <Checkbox
+              id="enable-realtime"
+              checked={tableFields.isRealtimeEnabled}
+              onCheckedChange={() => {
+                track('realtime_toggle_table_clicked', {
+                  newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
+                  origin: 'tableSidePanel',
+                })
+                onUpdateField({
+                  isRealtimeEnabled: !tableFields.isRealtimeEnabled,
+                })
+              }}
+            />
+            <div className="grid gap-1.5 leading-none">
+              <label
+                htmlFor="enable-realtime"
+                className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                <DocsButton
-                  abbrev={false}
-                  className="mt-2"
-                  href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
-                />
-              </Admonition>
-            ) : (
-              <Admonition
-                type="warning"
-                className="!mt-3"
-                title="You are allowing anonymous access to your table"
-                description={
-                  <>
-                    {tableFields.name ? `The table ${tableFields.name}` : 'Your table'} will be
-                    publicly writable and readable
-                  </>
-                }
-              >
-                <DocsButton
-                  abbrev={false}
-                  className="mt-2"
-                  href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
-                />
-              </Admonition>
-            )}
+                Enable Realtime
+              </label>
+              <p className="text-sm text-foreground-muted">
+                Broadcast changes on this table to authorized subscribers.
+              </p>
+            </div>
+          </div>
+        )}
+      </SidePanel.Content>
 
-            {activeRealtimeVariant !== RealtimeButtonVariant.HIDE_BUTTON && realtimeEnabled && (
-              <Checkbox
-                id="enable-realtime"
-                label="Enable Realtime"
-                description="Broadcast changes on this table to authorized subscribers"
-                checked={tableFields.isRealtimeEnabled}
-                onChange={() => {
-                  track('realtime_toggle_table_clicked', {
-                    newState: tableFields.isRealtimeEnabled ? 'disabled' : 'enabled',
-                    origin: 'tableSidePanel',
-                  })
-                  onUpdateField({
-                    isRealtimeEnabled: !tableFields.isRealtimeEnabled,
-                  })
-                }}
-                size="medium"
-              />
-            )}
-          </SidePanel.Content>
-
-          <SidePanel.Separator />
-        </>
-      )}
+      <SidePanel.Separator />
 
       <SidePanel.Content className="space-y-10 py-6">
         {!isDuplicating && (
@@ -500,21 +554,30 @@ export const TableEditor = ({
         )}
         {isDuplicating && (
           <>
-            <Checkbox
-              id="duplicate-rows"
-              label="Duplicate table entries"
-              description="This will copy all the data in the table into the new table"
-              checked={isDuplicateRows}
-              onChange={() => setIsDuplicateRows(!isDuplicateRows)}
-              size="medium"
-            />
+            <div className="items-top flex space-x-2">
+              <Checkbox
+                id="duplicate-rows"
+                checked={isDuplicateRows}
+                onCheckedChange={() => setIsDuplicateRows(!isDuplicateRows)}
+              />
+              <div className="grid gap-1.5 leading-none">
+                <label
+                  htmlFor="duplicate-rows"
+                  className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  Duplicate table entries
+                </label>
+                <p className="text-sm text-foreground-muted">
+                  This will copy all the data in the table into the new table
+                </p>
+              </div>
+            </div>
           </>
         )}
 
         <SpreadsheetImport
+          key={spreadsheetImportKey}
           visible={isImportingSpreadsheet}
-          headers={importContent?.headers}
-          rows={importContent?.rows}
           saveContent={(prefillData: ImportContent) => {
             setImportContent(prefillData)
             setIsImportingSpreadsheet(false)
@@ -522,21 +585,16 @@ export const TableEditor = ({
           closePanel={() => setIsImportingSpreadsheet(false)}
         />
 
-        {!generatePoliciesEnabled && (
-          <ConfirmationModal
-            visible={rlsConfirmVisible}
-            title="Turn off Row Level Security"
-            confirmLabel="Confirm"
-            size="medium"
-            onCancel={() => setRlsConfirmVisible(false)}
-            onConfirm={() => {
-              onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
-              setRlsConfirmVisible(false)
-            }}
-          >
-            <RLSDisableModalContent />
-          </ConfirmationModal>
-        )}
+        <RLSToggleDialog
+          open={rlsConfirmVisible}
+          tableName={tableFields.name}
+          isEnabled={tableFields.isRLSEnabled}
+          onOpenChange={setRlsConfirmVisible}
+          onConfirm={() => {
+            onUpdateField({ isRLSEnabled: false })
+            setRlsConfirmVisible(false)
+          }}
+        />
       </SidePanel.Content>
 
       {!isDuplicating && (
@@ -554,39 +612,18 @@ export const TableEditor = ({
         </>
       )}
 
-      {isApiAccessAndPoliciesSectionShown && (
-        <>
-          <SidePanel.Separator />
-          <SidePanel.Content className="py-6 space-y-6">
-            {isApiGrantTogglesEnabled && (
-              <ApiAccessToggle
-                projectRef={project?.ref}
-                schemaName={isNewRecord ? selectedSchema : table?.schema}
-                tableName={
-                  isNewRecord || isDuplicating ? tableFields.name : tableFields.name || table?.name
-                }
-                handler={apiAccessToggleHandler}
-              />
-            )}
-
-            {/* [Joshen] Temporarily hide this section if duplicating, as we aren't duplicating policies atm when duplicating tables */}
-            {/* We should do this thought, but let's do this in another PR as the current one is already quite big */}
-            {generatePoliciesEnabled && !isDuplicating && (
-              <RLSManagement
-                table={table}
-                tableFields={tableFields}
-                foreignKeyRelations={isNewRecord ? fkRelations : undefined}
-                isNewRecord={isNewRecord}
-                isDuplicating={isDuplicating}
-                isExposed={isExposed}
-                generatedPolicies={generatedPolicies}
-                onGeneratedPoliciesChange={setGeneratedPolicies}
-                onRLSUpdate={(value) => onUpdateField({ isRLSEnabled: value })}
-              />
-            )}
-          </SidePanel.Content>
-        </>
-      )}
+      <SidePanel.Separator />
+      <SidePanel.Content className="py-6 space-y-6">
+        <ApiAccessToggle
+          projectRef={project?.ref}
+          schemaName={isNewRecord ? selectedSchema : table?.schema}
+          tableName={
+            isNewRecord || isDuplicating ? tableFields.name : tableFields.name || table?.name
+          }
+          isNewRecord={isNewRecord || isDuplicating}
+          handler={apiAccessToggleHandler}
+        />
+      </SidePanel.Content>
     </SidePanel>
   )
 }

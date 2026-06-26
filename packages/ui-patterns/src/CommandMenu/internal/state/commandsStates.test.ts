@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 
-import { type ICommandsState, type ICommandSection } from '../types'
-import { initCommandsState, orderSectionFirst } from './commandsState'
 import { section$new } from '../CommandSection'
+import { type ICommandSection, type ICommandsState } from '../types'
+import { initCommandsState, orderSectionFirst } from './commandsState'
 
 describe('orderSectionFirst', () => {
   it('Orders newly created section first', () => {

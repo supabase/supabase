@@ -1,49 +1,53 @@
-import type { QueryClient } from '@tanstack/react-query'
-
-import type { Entity } from 'data/table-editor/table-editor-types'
-import { tableRowKeys } from 'data/table-rows/keys'
-import type { TableRowsData } from 'data/table-rows/table-rows-query'
+import { isPendingAddRow, PendingAddRow, SupaRow } from '../types'
+import { isTableLike, type Entity } from '@/data/table-editor/table-editor-types'
 import {
+  EditCellContentOperation,
   NewQueuedOperation,
   QueuedOperation,
   QueuedOperationType,
-  type EditCellContentPayload,
 } from '@/state/table-editor-operation-queue.types'
-import type { Dictionary } from 'types'
-import { SupaRow } from '../types'
+import type { Dictionary } from '@/types'
 
-interface GenerateTableChangeKeyArgs {
-  type: QueuedOperationType
+interface EditCellKeyOperation extends Omit<
+  EditCellContentOperation,
+  'payload' | 'id' | 'timestamp'
+> {
+  type: QueuedOperationType.EDIT_CELL_CONTENT
   tableId: number
-  columnName?: string
-  rowIdentifiers?: Record<string, unknown>
+  payload: {
+    columnName: string
+    rowIdentifiers: Dictionary<unknown>
+  }
 }
 
-export function generateTableChangeKeyFromOperation(operation: NewQueuedOperation): string {
+export function generateTableChangeKey(
+  operation: NewQueuedOperation | EditCellKeyOperation
+): string {
   if (operation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
-    return generateTableChangeKey({
-      type: operation.type,
-      tableId: operation.tableId,
-      columnName: operation.payload.columnName,
-      rowIdentifiers: operation.payload.rowIdentifiers,
-    })
+    const { columnName, rowIdentifiers } = operation.payload
+    const rowIdentifiersKey = Object.entries(rowIdentifiers)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, value]) => `${key}:${value}`)
+      .join('|')
+    return `${operation.type}:${operation.tableId}:${columnName}:${rowIdentifiersKey}`
   }
 
-  // Need to explicitly handle other operations
-  throw new Error(`Unknown operation type: ${operation.type}`)
-}
+  if (operation.type === QueuedOperationType.ADD_ROW) {
+    return `${operation.type}:${operation.tableId}:${operation.payload.tempId}`
+  }
 
-export function generateTableChangeKey({
-  rowIdentifiers,
-  columnName,
-  tableId,
-  type,
-}: GenerateTableChangeKeyArgs): string {
-  const rowIdentifiersKey = Object.entries(rowIdentifiers ?? {})
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([key, value]) => `${key}:${value}`)
-    .join('|')
-  return `${type}:${tableId}:${columnName}:${rowIdentifiersKey}`
+  if (operation.type === QueuedOperationType.DELETE_ROW) {
+    const { rowIdentifiers } = operation.payload
+    const rowIdentifiersKey = Object.entries(rowIdentifiers)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([key, value]) => `${key}:${value}`)
+      .join('|')
+    return `${operation.type}:${operation.tableId}:${rowIdentifiersKey}`
+  }
+
+  // Exhaustive check - TypeScript will error if we miss a case
+  const _exhaustiveCheck: never = operation
+  throw new Error(`Unknown operation type: ${(_exhaustiveCheck as { type: string }).type}`)
 }
 
 export function rowMatchesIdentifiers(
@@ -55,27 +59,15 @@ export function rowMatchesIdentifiers(
   return identifierEntries.every(([key, value]) => row[key] === value)
 }
 
-export function applyCellEdit(
-  rows: SupaRow[],
-  columnName: string,
-  rowIdentifiers: Dictionary<unknown>,
-  newValue: unknown
-): SupaRow[] {
-  return rows.map((row) => {
-    const rowMatches = rowMatchesIdentifiers(row, rowIdentifiers)
-    if (rowMatches) {
-      return { ...row, [columnName]: newValue }
-    }
-    return row
-  })
+export function removeRow(rows: SupaRow[], rowIdentifiers: Dictionary<unknown>): SupaRow[] {
+  return rows.filter((row) => !rowMatchesIdentifiers(row, rowIdentifiers))
 }
 
 interface QueueCellEditParams {
-  queryClient: QueryClient
   queueOperation: (operation: NewQueuedOperation) => void
-  projectRef: string
   tableId: number
   table: Entity
+  row: SupaRow
   rowIdentifiers: Dictionary<unknown>
   columnName: string
   oldValue: unknown
@@ -84,17 +76,22 @@ interface QueueCellEditParams {
 }
 
 export function queueCellEditWithOptimisticUpdate({
-  queryClient,
   queueOperation,
-  projectRef,
   tableId,
   table,
-  rowIdentifiers,
+  row,
+  rowIdentifiers: callerRowIdentifiers,
   columnName,
   oldValue,
   newValue,
   enumArrayColumns,
 }: QueueCellEditParams) {
+  // Updated row identifiers to include __tempId for pending add rows so edits merge into ADD_ROW operation
+  const rowIdentifiers: Dictionary<unknown> = { ...callerRowIdentifiers }
+  if (isPendingAddRow(row)) {
+    rowIdentifiers.__tempId = row.__tempId
+  }
+
   // Queue the operation
   queueOperation({
     type: QueuedOperationType.EDIT_CELL_CONTENT,
@@ -108,54 +105,135 @@ export function queueCellEditWithOptimisticUpdate({
       enumArrayColumns,
     },
   })
+}
 
-  // Apply optimistic update to the UI
-  const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: tableId } })
-  queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
-    if (!old) return old
-    return {
-      ...old,
-      rows: applyCellEdit(old.rows, columnName, rowIdentifiers, newValue),
-    }
+interface QueueRowAddParams {
+  queueOperation: (operation: NewQueuedOperation) => void
+  tableId: number
+  table: Entity
+  rowData: PendingAddRow
+  enumArrayColumns?: string[]
+}
+
+export function queueRowAddWithOptimisticUpdate({
+  queueOperation,
+  tableId,
+  table,
+  rowData,
+  enumArrayColumns,
+}: QueueRowAddParams) {
+  // Generate unique idx and tempId for this pending row
+  const idx = -Date.now()
+  const tempId = String(idx)
+
+  // Queue the operation
+  queueOperation({
+    type: QueuedOperationType.ADD_ROW,
+    tableId,
+    payload: {
+      tempId,
+      rowData,
+      table,
+      enumArrayColumns,
+    },
   })
 }
 
-interface ReapplyOptimisticUpdatesParams {
-  queryClient: QueryClient
-  projectRef: string
-  tableId: number
-  operations: readonly QueuedOperation[]
-}
-
-export function reapplyOptimisticUpdates({
-  queryClient,
-  projectRef,
-  tableId,
+export const formatGridDataWithOperationValues = ({
   operations,
-}: ReapplyOptimisticUpdatesParams) {
-  const tableOperations = operations.filter((op) => op.tableId === tableId)
-  if (tableOperations.length === 0) return
+  rows,
+}: {
+  operations: QueuedOperation[]
+  rows: SupaRow[]
+}) => {
+  const formattedRows = rows.slice()
 
-  const queryKey = tableRowKeys.tableRows(projectRef, { table: { id: tableId } })
-  queryClient.setQueriesData<TableRowsData>({ queryKey }, (old) => {
-    if (!old) return old
+  operations.forEach((op) => {
+    if (op.type === QueuedOperationType.EDIT_CELL_CONTENT) {
+      const { rowIdentifiers, columnName, newValue } = op.payload
+      const rowIdx = formattedRows.findIndex((row) => rowMatchesIdentifiers(row, rowIdentifiers))
+      if (rowIdx !== -1) {
+        formattedRows[rowIdx] = { ...formattedRows[rowIdx], [columnName]: newValue }
+      }
+    } else if (op.type === QueuedOperationType.ADD_ROW) {
+      const { tempId, rowData } = op.payload
+      const idx = Number(tempId)
 
-    let rows = [...old.rows]
-    for (const operation of tableOperations) {
-      switch (operation.type) {
-        case QueuedOperationType.EDIT_CELL_CONTENT: {
-          const { rowIdentifiers, columnName, newValue } =
-            operation.payload as EditCellContentPayload
-          rows = applyCellEdit(rows, columnName, rowIdentifiers, newValue)
-          break
+      // Check if row with this tempId already exists
+      const existingIndex = formattedRows.findIndex(
+        (row) => isPendingAddRow(row) && row.__tempId === tempId
+      )
+      if (existingIndex >= 0) {
+        // Update existing row in place
+        formattedRows[existingIndex] = {
+          ...formattedRows[existingIndex],
+          ...rowData,
+          __tempId: tempId,
         }
-        default: {
-          // Need to explicitly handle other operations
-          throw new Error(`Unknown operation type: ${operation.type}`)
-        }
+      } else {
+        const newRow: PendingAddRow = { ...rowData, idx, __tempId: tempId }
+        formattedRows.unshift(newRow)
+      }
+    } else if (op.type === QueuedOperationType.DELETE_ROW) {
+      const { rowIdentifiers } = op.payload
+      const rowIdx = formattedRows.findIndex((row) => rowMatchesIdentifiers(row, rowIdentifiers))
+      if (rowIdx !== -1) {
+        formattedRows[rowIdx] = { ...formattedRows[rowIdx], __isDeleted: true }
       }
     }
-
-    return { ...old, rows }
   })
+
+  return formattedRows
+}
+
+interface QueueRowDeletesParams {
+  rows: SupaRow[]
+  table: Entity
+  queueOperation: (operation: NewQueuedOperation) => void
+  projectRef: string | undefined
+}
+
+/**
+ * Queue multiple row delete operations with optimistic updates.
+ * Caller is responsible for checking if queue mode is enabled before calling.
+ */
+export function queueRowDeletesWithOptimisticUpdate({
+  rows,
+  table,
+  queueOperation,
+  projectRef,
+}: QueueRowDeletesParams): void {
+  // [Ali] We can handle these better in the future
+  // right now this is a pretty abnormal case of this occurring
+  if (!projectRef) {
+    console.error('Cannot queue row deletes: projectRef is required')
+    return
+  }
+
+  if (!isTableLike(table)) {
+    console.error('Cannot queue row deletes: table must be a TableLike entity')
+    return
+  }
+
+  if (table.primary_keys.length === 0) {
+    console.error('Cannot queue row deletes: table has no primary keys')
+    return
+  }
+
+  for (const row of rows) {
+    const rowIdentifiers: Record<string, unknown> = {}
+    table.primary_keys.forEach((pk) => {
+      rowIdentifiers[pk.name] = row[pk.name]
+    })
+
+    queueOperation({
+      type: QueuedOperationType.DELETE_ROW,
+      tableId: table.id,
+      payload: {
+        rowIdentifiers,
+        originalRow: row,
+        table,
+      },
+    })
+  }
 }

@@ -7,7 +7,7 @@ sidebar_label: 'Architecture'
 
 Realtime is a globally distributed Elixir cluster. Clients can connect to any node in the cluster via WebSockets and send messages to any other client connected to the cluster.
 
-Realtime is written in [Elixir](https://elixir-lang.org/), which compiles to [Erlang](https://www.erlang.org/), and utilizes many tools the [Phoenix Framework](https://www.phoenixframework.org/) provides out of the box.
+Realtime is written in [Elixir](https://elixir-lang.org/), which compiles to [Erlang](https://www.erlang.org/), and uses many tools the [Phoenix Framework](https://www.phoenixframework.org/) provides out of the box.
 
 <Image
   alt="Architecture"
@@ -15,6 +15,9 @@ Realtime is written in [Elixir](https://elixir-lang.org/), which compiles to [Er
     light: '/docs/img/guides/platform/realtime/architecture--light.png',
     dark: '/docs/img/guides/platform/realtime/architecture--dark.png',
   }}
+
+width={1990}
+height={2226}
 />
 
 ## Elixir & Phoenix
@@ -31,7 +34,7 @@ Client-facing WebSocket servers need to handle many concurrent connections. Elix
 
 Channels are implemented using [Phoenix Channels](https://hexdocs.pm/phoenix/channels.html) which uses [Phoenix.PubSub](https://hexdocs.pm/phoenix_pubsub/Phoenix.PubSub.html) with the default `Phoenix.PubSub.PG2` adapter.
 
-The PG2 adapter utilizes Erlang [process groups](https://www.erlang.org/docs/18/man/pg2.html) to implement the PubSub model where a publisher can send messages to many subscribers.
+The PG2 adapter uses Erlang [process groups](https://www.erlang.org/docs/18/man/pg2.html) to implement the PubSub model where a publisher can send messages to many subscribers.
 
 ## Global cluster
 

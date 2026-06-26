@@ -1,20 +1,16 @@
 import { useIntersectionObserver } from '@uidotdev/usehooks'
 import { noop } from 'lodash'
-import { X } from 'lucide-react'
+import { ChevronDown, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-
 import {
   Button,
-  Checkbox_Shadcn_,
+  Checkbox,
   cn,
-  Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -35,6 +31,7 @@ interface FilterPopoverProps<T> {
   clearButtonText?: string
   className?: string
   isMinimized?: boolean
+  showOnlyButton?: boolean
   onSaveFilters: (options: string[]) => void
 
   // [Joshen] These props are to support async data with infinite loading if applicable
@@ -73,6 +70,7 @@ export const FilterPopover = <T extends Record<string, any>>({
   maxHeightClass = 'h-[205px]',
   clearButtonText = 'Clear',
   isMinimized = false,
+  showOnlyButton = true,
   onSaveFilters,
 
   search,
@@ -94,7 +92,7 @@ export const FilterPopover = <T extends Record<string, any>>({
     const icon = iconKey ? option[iconKey] : undefined
 
     const defaultLabel = (
-      <Label_Shadcn_
+      <Label
         htmlFor={option[valueKey]}
         className={cn('flex items-center gap-x-2 text-xs cursor-pointer', labelClass)}
       >
@@ -102,14 +100,14 @@ export const FilterPopover = <T extends Record<string, any>>({
           <img src={icon} alt={option[labelKey]} className={cn('w-4 h-4', option.iconClass)} />
         )}
         <span>{option[labelKey]}</span>
-      </Label_Shadcn_>
+      </Label>
     )
 
     const label = renderLabel ? renderLabel(option, value) : defaultLabel
 
     return (
       <div key={value} className="group flex items-center gap-x-2">
-        <Checkbox_Shadcn_
+        <Checkbox
           id={value}
           checked={selectedOptions.includes(value)}
           onCheckedChange={() => {
@@ -121,15 +119,17 @@ export const FilterPopover = <T extends Record<string, any>>({
           }}
         />
         <div className="flex-1">{label}</div>
-        <button
-          className="text-xs text-foreground-lighter hover:text-foreground-muted opacity-0 group-hover:opacity-100 transition-opacity"
-          onClick={(e) => {
-            e.preventDefault()
-            setSelectedOptions([value])
-          }}
-        >
-          Only
-        </button>
+        {showOnlyButton && (
+          <button
+            className="text-xs text-foreground-lighter hover:text-foreground-muted opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={(e) => {
+              e.preventDefault()
+              setSelectedOptions([value])
+            }}
+          >
+            Only
+          </button>
+        )}
       </div>
     )
   }
@@ -177,14 +177,15 @@ export const FilterPopover = <T extends Record<string, any>>({
   ])
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Button
           asChild
           disabled={disabled}
-          type={buttonType ?? (activeOptions.length > 0 ? 'default' : 'dashed')}
+          variant={buttonType ?? (activeOptions.length > 0 ? 'default' : 'dashed')}
           onClick={() => setOpen(false)}
           className={variant === 'rounded' ? 'rounded-full' : ''}
+          iconRight={<ChevronDown />}
         >
           <div>
             <span>{name}</span>
@@ -204,8 +205,8 @@ export const FilterPopover = <T extends Record<string, any>>({
             )}
           </div>
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent
         className={cn('p-0', search !== undefined ? 'w-64' : 'w-44', className)}
         align="start"
       >
@@ -259,16 +260,18 @@ export const FilterPopover = <T extends Record<string, any>>({
             )}
           </div>
           <div ref={sentinelRef} className="h-1 -mt-1" />
-          {hasNextPage && (
+          {hasNextPage ? (
             <div className="px-3 py-2">
               <ShimmeringLoader className="py-2" />
             </div>
+          ) : (
+            <div className="py-1.5" />
           )}
         </ScrollArea>
         <div className="flex items-center justify-end gap-2 border-t border-overlay bg-surface-200 py-2 px-3">
           <Button
             size="tiny"
-            type="default"
+            variant="default"
             onClick={() => {
               onSaveFilters([])
               setSelectedOptions([])
@@ -278,7 +281,7 @@ export const FilterPopover = <T extends Record<string, any>>({
             {clearButtonText}
           </Button>
           <Button
-            type="primary"
+            variant="primary"
             onClick={() => {
               // Order the selection based on the options provided
               const sortingOrder = options.map((option) => option[valueKey]) as string[]
@@ -292,7 +295,7 @@ export const FilterPopover = <T extends Record<string, any>>({
             Save
           </Button>
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

@@ -1,18 +1,9 @@
 import { useEscapeKeydown } from '@radix-ui/react-use-escape-keydown'
-import { isNil, noop } from 'lodash'
+import { useParams } from 'common'
+import dayjs from 'dayjs'
+import { isNil } from 'lodash'
 import { Archive, Clock12, Trash2, X } from 'lucide-react'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import { MonacoEditor } from 'components/grid/components/common/MonacoEditor'
-import { RowAction, RowData } from 'components/interfaces/Auth/Users/UserOverview'
-import { useDatabaseQueueMessageArchiveMutation } from 'data/database-queues/database-queue-messages-archive-mutation'
-import { useDatabaseQueueMessageDeleteMutation } from 'data/database-queues/database-queue-messages-delete-mutation'
-import { PostgresQueueMessage } from 'data/database-queues/database-queue-messages-infinite-query'
-import { useDatabaseQueueMessageReadMutation } from 'data/database-queues/database-queue-messages-read-mutation'
-import dayjs from 'dayjs'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { prettifyJSON } from 'lib/helpers'
 import {
   Button,
   ResizablePanel,
@@ -22,6 +13,15 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
 } from 'ui'
+
+import { RowAction, RowData } from '@/components/interfaces/Auth/Users/UserOverview'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { useDatabaseQueueMessageArchiveMutation } from '@/data/database-queues/database-queue-messages-archive-mutation'
+import { useDatabaseQueueMessageDeleteMutation } from '@/data/database-queues/database-queue-messages-delete-mutation'
+import { PostgresQueueMessage } from '@/data/database-queues/database-queue-messages-infinite-query'
+import { useDatabaseQueueMessageReadMutation } from '@/data/database-queues/database-queue-messages-read-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { prettifyJSON } from '@/lib/helpers'
 
 export const DATE_FORMAT = 'DD MMM, YYYY HH:mm'
 
@@ -77,15 +77,19 @@ export const MessageDetailsPanel = ({
 
   return (
     <ResizablePanel
-      defaultSize={30}
-      maxSize={45}
-      minSize={30}
+      defaultSize="30"
+      maxSize="45"
+      minSize="30"
       collapsible
-      onCollapse={() => setSelectedMessage(null)}
+      onResize={(panelSize) => {
+        if (panelSize.asPercentage === 0) {
+          setSelectedMessage(null)
+        }
+      }}
       className="bg-studio border-t pointer-events-auto"
     >
       <Button
-        type="text"
+        variant="text"
         className="absolute top-3 right-3 px-1"
         icon={<X />}
         onClick={() => setSelectedMessage(null)}
@@ -101,7 +105,7 @@ export const MessageDetailsPanel = ({
         <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[46px]">
           <TabsTrigger_Shadcn_
             value="details"
-            className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent !shadow-none"
+            className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent shadow-none!"
           >
             Overview
           </TabsTrigger_Shadcn_>
@@ -119,15 +123,15 @@ export const MessageDetailsPanel = ({
             />
             <RowData property="Retries" value={`${selectedMessage.read_ct}`} />
 
-            <div>
-              <h3 className="text-foreground-light py-1">Payload</h3>
-              <MonacoEditor
-                key={selectedMessage.msg_id}
-                onChange={noop}
-                width="100%"
+            <div className="mt-2">
+              <h4 className="text-foreground-light py-1">Payload</h4>
+              <CodeEditor
+                isReadOnly
+                hideLineNumbers
+                id={selectedMessage.msg_id.toString()}
                 value={jsonString || 'NULL'}
                 language="json"
-                readOnly
+                className="h-[200px]"
               />
             </div>
           </div>
@@ -168,7 +172,7 @@ export const MessageDetailsPanel = ({
                     icon: <Archive />,
                     text: 'Archive',
                     isLoading: isLoadingArchive,
-                    type: 'warning',
+                    variant: 'warning',
                     onClick: () => {
                       archiveMessage({
                         projectRef: project!.ref,
@@ -193,7 +197,7 @@ export const MessageDetailsPanel = ({
                   button={{
                     icon: <Trash2 />,
                     text: 'Delete',
-                    type: 'danger',
+                    variant: 'danger',
                     isLoading: isLoadingDelete,
                     onClick: () => {
                       deleteMessage({

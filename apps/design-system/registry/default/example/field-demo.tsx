@@ -1,19 +1,19 @@
-import { Input, Checkbox_Shadcn_ as Checkbox, Textarea, Button } from 'ui'
+import { Button, Checkbox, Input, Textarea } from 'ui'
 import {
-  FieldSet,
-  FieldLegend,
-  FieldDescription,
   Field,
-  FieldLabel,
+  FieldDescription,
   FieldGroup,
+  FieldLabel,
+  FieldLegend,
   FieldSeparator,
+  FieldSet,
 } from 'ui/src/components/shadcn/ui/field'
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui/src/components/shadcn/ui/select'
 
 export default function FieldDemo() {
@@ -112,8 +112,8 @@ export default function FieldDemo() {
             </FieldGroup>
           </FieldSet>
           <Field orientation="horizontal">
-            <Button htmlType="submit">Submit</Button>
-            <Button htmlType="button" type="default">
+            <Button type="submit">Submit</Button>
+            <Button type="button" variant="default">
               Cancel
             </Button>
           </Field>

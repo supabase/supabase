@@ -1,23 +1,17 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Plus, Search, X } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
-
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useFlag, useParams } from 'common'
-import { AlertError } from 'components/ui/AlertError'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useReplicationDestinationsQuery } from 'data/replication/destinations-query'
-import { replicationKeys } from 'data/replication/keys'
-import { fetchReplicationPipelineVersion } from 'data/replication/pipeline-version-query'
-import { useReplicationPipelinesQuery } from 'data/replication/pipelines-query'
-import { useReplicationSourcesQuery } from 'data/replication/sources-query'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
-import { DOCS_URL } from 'lib/constants'
+import { useParams } from 'common'
+import { MoreVertical, Plus, Search, X } from 'lucide-react'
+import { parseAsStringEnum, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   Card,
   CardContent,
   cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   Table,
   TableBody,
   TableCell,
@@ -25,27 +19,77 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+
 import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
+import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
-import { EnableReplicationCallout } from './EnableReplicationCallout'
-import { PIPELINE_ERROR_MESSAGES } from './Pipeline.utils'
+import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
+import {
+  useIsETLBigQueryPrivateAlpha,
+  useIsETLDucklakePrivateAlpha,
+  useIsETLIcebergPrivateAlpha,
+  useIsETLSnowflakePrivateAlpha,
+} from './useIsETLPrivateAlpha'
+import { AlertError } from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
+import { replicationKeys } from '@/data/replication/keys'
+import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
+import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { checkLocalETLNotSetUp } from '@/data/replication/utils'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const Destinations = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
-  const { hasAccess: hasETLReplicationAccess, isLoading: isLoadingEntitlement } =
-    useCheckEntitlements('replication.etl')
 
-  const unifiedReplication = useFlag('unifiedReplication')
+  const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
+  const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
+  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
+  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
+  const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
+
+  const newDestinationDefaultType = infrastructureReadReplicas
+    ? 'Read Replica'
+    : etlEnableBigQuery
+      ? 'BigQuery'
+      : etlEnableIceberg
+        ? 'Analytics Bucket'
+        : etlEnableDucklake
+          ? 'DuckLake'
+          : etlEnableSnowflake
+            ? 'Snowflake'
+            : null
 
   const prefetchedRef = useRef(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState<string>('')
-  const [showNewDestinationPanel, setShowNewDestinationPanel] = useState(false)
   const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
+  const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
+
+  const [_, setDestinationType] = useQueryState(
+    'destinationType',
+    parseAsStringEnum<DestinationType>([
+      'Read Replica',
+      'BigQuery',
+      'Analytics Bucket',
+      'DuckLake',
+      'Snowflake',
+    ]).withOptions({
+      history: 'push',
+      clearOnDefault: true,
+    })
+  )
 
   const {
     data: databases = [],
@@ -54,24 +98,22 @@ export const Destinations = () => {
     isError: isDatabasesError,
     isSuccess: isDatabasesSuccess,
   } = useReadReplicasQuery({ projectRef }, { refetchInterval: statusRefetchInterval })
-  const readReplicas = databases.filter((x) => x.identifier !== projectRef)
+  // Memoise so the array reference is stable across renders. Without this
+  // the polling useEffect below has an unstable dep, runs every render, and
+  // its `setStatusRefetchInterval(false)` churn keeps the parent re-rendering
+  // — which trips a latent ref-instability bug in @radix-ui/react-slot
+  // (`composeRefs` is called per render instead of `useComposedRefs`) and
+  // tanks the page with "Maximum update depth exceeded" via the Tooltip
+  // trigger refs.
+  const readReplicas = useMemo(
+    () => databases.filter((x) => x.identifier !== projectRef),
+    [databases, projectRef]
+  )
   const hasReplicas = isDatabasesSuccess && readReplicas.length > 0
   const filteredReplicas =
     filterString.length === 0
       ? readReplicas
       : readReplicas.filter((replica) => replica.identifier.includes(filterString.toLowerCase()))
-
-  const {
-    data: sourcesData,
-    error: sourcesError,
-    isPending: isSourcesLoading,
-    isError: isSourcesError,
-    isSuccess: isSourcesSuccess,
-  } = useReplicationSourcesQuery({
-    projectRef,
-  })
-  const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
-  const replicationNotEnabled = isSourcesSuccess && !sourceId
 
   const {
     data: destinationsData,
@@ -86,24 +128,51 @@ export const Destinations = () => {
   const hasDestinations = isDestinationsSuccess && destinationsData?.destinations.length > 0
   const filteredDestinations =
     filterString.length === 0
-      ? destinations ?? []
+      ? (destinations ?? [])
       : (destinations ?? []).filter((destination) =>
           destination.name.toLowerCase().includes(filterString.toLowerCase())
         )
 
-  const {
-    data: pipelinesData,
-    error: pipelinesError,
-    isPending: isPipelinesLoading,
-    isError: isPipelinesError,
-    isSuccess: isPipelinesSuccess,
-  } = useReplicationPipelinesQuery({
+  const { data: pipelinesData, isSuccess: isPipelinesSuccess } = useReplicationPipelinesQuery({
     projectRef,
   })
+  const pipelines = pipelinesData?.pipelines ?? []
 
-  const isLoading =
-    isSourcesLoading || isDestinationsLoading || isDatabasesLoading || isLoadingEntitlement
-  const hasErrorsFetchingData = isSourcesError || isDestinationsError || isDatabasesError
+  const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery({
+    projectRef,
+  })
+  const externalReplicationSource = useMemo(
+    () => sourcesData?.sources.find((source) => source.name === projectRef),
+    [projectRef, sourcesData?.sources]
+  )
+  const canDisablePipelines =
+    isSourcesSuccess &&
+    isDestinationsSuccess &&
+    isPipelinesSuccess &&
+    !!externalReplicationSource &&
+    destinations.length === 0 &&
+    pipelines.length === 0
+
+  const isLoading = isDestinationsLoading || isDatabasesLoading
+
+  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
+  const hasErrorsFetchingData = (!isLocalETLNotSetUp && isDestinationsError) || isDatabasesError
+
+  const openDestinationPanel = () => {
+    if (!newDestinationDefaultType) return
+    setDestinationType(newDestinationDefaultType)
+  }
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search destinations' }
+  )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setFilterString(''))
 
   useEffect(() => {
     if (
@@ -152,6 +221,7 @@ export const Destinations = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <Input
+              ref={searchInputRef}
               placeholder="Filter destinations"
               size="tiny"
               icon={<Search />}
@@ -161,7 +231,7 @@ export const Destinations = () => {
               actions={
                 filterString.length > 0 && (
                   <Button
-                    type="text"
+                    variant="text"
                     icon={<X />}
                     className="p-0 h-5 w-5"
                     onClick={() => setFilterString('')}
@@ -171,16 +241,35 @@ export const Destinations = () => {
             />
           </div>
           <div className="flex items-center gap-x-2">
-            {(unifiedReplication || !!sourceId) && (
+            <Shortcut
+              id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+              label="Add destination"
+              onTrigger={openDestinationPanel}
+              options={{ enabled: !!newDestinationDefaultType }}
+              side="bottom"
+            >
               <Button
-                type="default"
+                variant="default"
                 icon={<Plus />}
-                onClick={() => setShowNewDestinationPanel(true)}
+                disabled={!newDestinationDefaultType}
+                onClick={openDestinationPanel}
               >
                 Add destination
               </Button>
-            )}
+            </Shortcut>
             <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
+            {canDisablePipelines && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="default" icon={<MoreVertical />} className="w-7" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-52">
+                  <DropdownMenuItem onClick={() => setShowDisablePipelinesDialog(true)}>
+                    Disable Pipelines
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         </div>
       </div>
@@ -188,16 +277,21 @@ export const Destinations = () => {
       <div className="w-full overflow-hidden overflow-x-auto flex flex-col gap-y-4">
         {hasErrorsFetchingData && (
           <AlertError
-            error={sourcesError || destinationsError || databasesError}
-            subject={PIPELINE_ERROR_MESSAGES.RETRIEVE_DESTINATIONS}
+            error={destinationsError || databasesError}
+            subject="Failed to retrieve destinations"
+          />
+        )}
+
+        {isLocalETLNotSetUp && (
+          <Admonition
+            type="default"
+            title="ETL API not set up locally — destinations cannot be managed"
           />
         )}
 
         {isLoading ? (
           <GenericSkeletonLoader />
-        ) : !unifiedReplication && replicationNotEnabled ? (
-          <EnableReplicationCallout hasAccess={hasETLReplicationAccess} />
-        ) : (unifiedReplication && hasReplicas) || hasDestinations ? (
+        ) : hasReplicas || hasDestinations ? (
           <Card>
             <CardContent className="p-0">
               <Table>
@@ -210,7 +304,7 @@ export const Destinations = () => {
                     <TableHead key="status" className="w-[150px]">
                       Status
                     </TableHead>
-                    <TableHead key="lag" className="w-[80px]">
+                    <TableHead key="lag" className="w-[150px]">
                       Lag
                     </TableHead>
                     <TableHead key="publication">Publication</TableHead>
@@ -218,54 +312,29 @@ export const Destinations = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {unifiedReplication &&
-                    filteredReplicas.map((replica) => {
-                      return (
-                        <ReadReplicaRow
-                          key={replica.identifier}
-                          replica={replica}
-                          onUpdateReplica={() => setStatusRefetchInterval(5000)}
-                        />
-                      )
-                    })}
-
-                  {filteredDestinations.map((destination) => {
-                    const pipeline = pipelinesData?.pipelines.find(
-                      (p) => p.destination_id === destination.id
-                    )
-
-                    const type =
-                      'big_query' in destination.config
-                        ? 'BigQuery'
-                        : 'iceberg' in destination.config
-                          ? 'Analytics Bucket'
-                          : undefined
-
+                  {filteredReplicas.map((replica) => {
                     return (
-                      <DestinationRow
-                        key={destination.id}
-                        sourceId={sourceId}
-                        destinationId={destination.id}
-                        destinationName={destination.name}
-                        type={type}
-                        pipeline={pipeline}
-                        error={pipelinesError}
-                        isLoading={isPipelinesLoading}
-                        isError={isPipelinesError}
-                        isSuccess={isPipelinesSuccess}
+                      <ReadReplicaRow
+                        key={replica.identifier}
+                        replica={replica}
+                        onUpdateReplica={() => setStatusRefetchInterval(5000)}
                       />
                     )
                   })}
 
+                  {filteredDestinations.map((destination) => (
+                    <DestinationRow key={destination.id} destinationId={destination.id} />
+                  ))}
+
                   {!isLoading &&
                     filteredDestinations.length === 0 &&
                     filteredReplicas.length === 0 &&
-                    ((unifiedReplication && hasReplicas) || hasDestinations) && (
+                    (hasReplicas || hasDestinations) && (
                       <TableRow>
-                        <TableCell colSpan={5}>
+                        <TableCell colSpan={6}>
                           <p>No results found</p>
                           <p className="text-foreground-light">
-                            Your search for "{filterString}" did not return any results
+                            Your search for "{filterString}" did not return any results.
                           </p>
                         </TableCell>
                       </TableRow>
@@ -281,18 +350,18 @@ export const Destinations = () => {
               className={cn(
                 'w-full',
                 'border border-dashed bg-surface-100 border-overlay',
-                'flex flex-col px-10 rounded-lg justify-center items-center py-8 mt-4'
+                'flex flex-col px-16 rounded-lg justify-center items-center py-8 mt-4'
               )}
             >
-              <h4>Create your first destination</h4>
-              <p className="prose text-sm text-center mt-1 max-w-[70ch]">
-                Destinations are external platforms where your database changes are automatically
-                sent. Connect to various data warehouses and analytics platforms to enable real-time
-                data pipelines.
+              <h4>Replication keeps your data in sync across systems</h4>
+              <p className="text-foreground-light text-sm text-balance text-center mt-1">
+                Deploy Read Replicas for lower latency and workload isolation, or add a Pipelines
+                destination for analytics workloads.
               </p>
               <Button
                 icon={<Plus />}
-                onClick={() => setShowNewDestinationPanel(true)}
+                disabled={!newDestinationDefaultType}
+                onClick={openDestinationPanel}
                 className="mt-4"
               >
                 Add destination
@@ -302,10 +371,11 @@ export const Destinations = () => {
         )}
       </div>
 
-      <DestinationPanel
-        visible={showNewDestinationPanel}
-        onClose={() => setShowNewDestinationPanel(false)}
-        onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)}
+      <DestinationPanel onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)} />
+
+      <DisablePipelinesDialog
+        open={showDisablePipelinesDialog}
+        setOpen={setShowDisablePipelinesDialog}
       />
     </>
   )

@@ -1,31 +1,9 @@
-import { ChevronRight, CircleHelpIcon, Plus } from 'lucide-react'
+import { IS_PLATFORM, useParams } from 'common'
+import { ChevronRight, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
-
-import { IS_PLATFORM, useFlag, useParams } from 'common'
-import {
-  useFeaturePreviewModal,
-  useUnifiedLogsPreview,
-} from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useIsETLPrivateAlpha } from 'components/interfaces/Database/Replication/useIsETLPrivateAlpha'
-import { LOG_DRAIN_TYPES } from 'components/interfaces/LogDrains/LogDrains.constants'
-import SavedQueriesItem from 'components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
-import { LogsSidebarItem } from 'components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useContentQuery } from 'data/content/content-query'
-import { useReplicationSourcesQuery } from 'data/replication/sources-query'
-import { useCurrentOrgPlan } from 'hooks/misc/useCurrentOrgPlan'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import {
-  Badge,
-  Button,
-  cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Separator,
-} from 'ui'
+import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, Separator } from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideBarFilters,
@@ -33,24 +11,18 @@ import {
   InnerSideMenuItem,
 } from 'ui-patterns/InnerSideMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
 
-const SupaIcon = ({ className }: { className?: string }) => {
-  return (
-    <svg
-      stroke="currentColor"
-      fill="currentColor"
-      strokeWidth="0"
-      viewBox="0 0 24 24"
-      height="15px"
-      width="15px"
-      className={className}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path d="M10.9997 2.59833V13.9694H3.90013C3.23055 13.9694 2.83063 13.1846 3.25654 12.6326L10.9997 2.59833ZM12.9997 8.03061V2.33296C12.9997 0.521514 10.7034 -0.291434 9.58194 1.16185L1.67316 11.4108C0.246185 13.26 1.54768 15.9694 3.90013 15.9694H10.9997V21.6671C10.9997 23.4785 13.296 24.2915 14.4175 22.8382L22.3262 12.5892C23.7532 10.74 22.4517 8.03061 20.0993 8.03061H12.9997ZM12.9997 10.0306H20.0993C20.7688 10.0306 21.1688 10.8155 20.7429 11.3674L12.9997 21.4017V10.0306Z"></path>
-    </svg>
-  )
-}
+import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
+import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
+import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
+import SavedQueriesItem from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
+import { LogsSidebarItem } from '@/components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
+import { UnifiedLogsBanner } from '@/components/interfaces/UnifiedLogs/UnifiedLogsBanner'
+import { useContentQuery } from '@/data/content/content-query'
+import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
 
 export function SidebarCollapsible({
   children,
@@ -62,27 +34,23 @@ export function SidebarCollapsible({
   defaultOpen?: boolean
 }) {
   return (
-    <Collapsible_Shadcn_ defaultOpen={defaultOpen}>
-      <CollapsibleTrigger_Shadcn_ className="flex items-center gap-x-2 px-4 [&[data-state=open]>svg]:!rotate-90 pb-2">
+    <Collapsible defaultOpen={defaultOpen}>
+      <CollapsibleTrigger className="flex items-center gap-x-2 px-4 [&[data-state=open]>svg]:rotate-90! pb-2">
         <ChevronRight
           size={16}
           className={'text-foreground-light transition-transform duration-200'}
         />
 
         <span className="text-foreground-light font-mono text-sm uppercase">{title}</span>
-      </CollapsibleTrigger_Shadcn_>
-      <CollapsibleContent_Shadcn_>{children}</CollapsibleContent_Shadcn_>
-    </Collapsible_Shadcn_>
+      </CollapsibleTrigger>
+      <CollapsibleContent>{children}</CollapsibleContent>
+    </Collapsible>
   )
 }
 
 export function LogsSidebarMenuV2() {
   const router = useRouter()
   const { ref } = useParams() as { ref: string }
-
-  const unifiedLogsFlagEnabled = useFlag('unifiedLogs')
-  const { selectFeaturePreview } = useFeaturePreviewModal()
-  const { enable: enableUnifiedLogs } = useUnifiedLogsPreview()
 
   const [searchText, setSearchText] = useState('')
 
@@ -116,8 +84,8 @@ export function LogsSidebarMenuV2() {
   // [Jordi] We only want to show ETL logs if the user has the feature enabled AND they're using the feature aka they've created a source.
   const showETLLogs = enablePgReplicate && (etlData?.sources?.length ?? 0) > 0 && !isETLLoading
 
-  const { plan: orgPlan } = useCurrentOrgPlan()
-  const isFreePlan = orgPlan?.id === 'free'
+  const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
+  const showMultigresLogs = useShowMultigresLogs()
 
   const { data: savedQueriesRes, isPending: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
@@ -153,13 +121,13 @@ export function LogsSidebarMenuV2() {
     },
     IS_PLATFORM
       ? {
-          name: isFreePlan ? 'Pooler' : 'Shared Pooler',
+          name: hasDedicatedPooler ? 'Shared Pooler' : 'Pooler',
           key: 'pooler-logs',
           url: `/project/${ref}/logs/pooler-logs`,
           items: [],
         }
       : null,
-    !isFreePlan && IS_PLATFORM
+    hasDedicatedPooler && IS_PLATFORM
       ? {
           name: 'Dedicated Pooler',
           key: 'dedicated-pooler-logs',
@@ -211,6 +179,14 @@ export function LogsSidebarMenuV2() {
           items: [],
         }
       : null,
+    showMultigresLogs
+      ? {
+          name: 'Multigres',
+          key: 'multigres-logs',
+          url: `/project/${ref}/logs/multigres-logs`,
+          items: [],
+        }
+      : null,
   ].filter((x) => x !== null)
 
   const OPERATIONAL_COLLECTIONS = IS_PLATFORM
@@ -233,54 +209,11 @@ export function LogsSidebarMenuV2() {
 
   return (
     <div className="pb-4 relative">
-      {IS_PLATFORM && !unifiedLogsFlagEnabled && (
-        <FeaturePreviewSidebarPanel
-          className="mx-4 mt-4"
-          illustration={<Badge variant="default">Coming soon</Badge>}
-          title="New logs"
-          description="Get early access"
-          actions={
-            <Link href="https://forms.supabase.com/unified-logs-signup" target="_blank">
-              <Button type="default" size="tiny">
-                Early access
-              </Button>
-            </Link>
-          }
-        />
-      )}
-      {unifiedLogsFlagEnabled && (
-        <FeaturePreviewSidebarPanel
-          className="mx-4 mt-4"
-          title="Introducing unified logs"
-          description="A unified view across all services with improved filtering and real-time updates."
-          illustration={<Badge variant="success">New</Badge>}
-          actions={
-            <>
-              <Button
-                size="tiny"
-                type="default"
-                onClick={() => {
-                  enableUnifiedLogs()
-                  router.push(`/project/${ref}/logs`)
-                }}
-              >
-                Enable preview
-              </Button>
-              <ButtonTooltip
-                type="default"
-                className="px-1.5"
-                icon={<CircleHelpIcon />}
-                onClick={() => selectFeaturePreview('supabase-ui-preview-unified-logs')}
-                tooltip={{ content: { side: 'bottom', text: 'More information' } }}
-              />
-            </>
-          }
-        />
-      )}
+      <UnifiedLogsBanner />
 
       <div
         className={cn(
-          'flex gap-x-2 items-center sticky top-0 bg-background-200 z-[1] px-4',
+          'flex gap-x-2 items-center sticky top-0 bg-background-200 z-1 px-4',
           !templatesEnabled ? 'pt-4' : 'py-4'
         )}
       >
@@ -291,11 +224,11 @@ export function LogsSidebarMenuV2() {
             aria-labelledby="Search collections"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-          ></InnerSideBarFilterSearchInput>
+          />
         </InnerSideBarFilters>
 
         <Button
-          type="default"
+          variant="default"
           icon={<Plus className="text-foreground" />}
           className="w-[26px]"
           onClick={() => router.push(`/project/${ref}/logs/explorer`)}
@@ -324,7 +257,6 @@ export function LogsSidebarMenuV2() {
                   key={collection?.key ?? ''}
                   isActive={isItemActive}
                   href={collection?.url ?? ''}
-                  icon={<SupaIcon className="text-foreground-light" />}
                   label={collection?.name ?? ''}
                 />
               )
@@ -339,7 +271,6 @@ export function LogsSidebarMenuV2() {
                     key={collection.key}
                     isActive={isActive(collection.url)}
                     href={collection.url}
-                    icon={<SupaIcon className="text-foreground-light" />}
                     label={collection.name}
                   />
                 ))}
@@ -359,16 +290,18 @@ export function LogsSidebarMenuV2() {
           <InnerSideBarEmptyPanel
             className="mx-4"
             title="No queries created yet"
-            description="Create and save your queries to use them in the explorer"
+            description={
+              IS_PLATFORM ? 'Create and save your queries to use them in the explorer' : undefined
+            }
             actions={
-              <Button asChild type="default">
+              <Button asChild variant="default">
                 <Link href={`/project/${ref}/logs/explorer`}>Create query</Link>
               </Button>
             }
           />
         )}
         {savedQueries.map((query) => (
-          <SavedQueriesItem item={query as any} key={query.id} /> // kemal: i know, i know, temp any fix.
+          <SavedQueriesItem item={query} key={query.id} />
         ))}
       </SidebarCollapsible>
 
@@ -380,13 +313,15 @@ export function LogsSidebarMenuV2() {
         description="Send logs to your preferred observability or storage platform."
         illustration={
           <div className="flex items-center gap-4">
-            {LOG_DRAIN_TYPES.map((type) =>
-              React.cloneElement(type.icon, { height: 20, width: 20 })
+            {LOG_DRAIN_TYPES.filter((t) =>
+              ['datadog', 'sentry', 'webhook', 'loki'].includes(t.value)
+            ).map((type) =>
+              React.cloneElement(type.icon, { key: type.name, height: 20, width: 20 })
             )}
           </div>
         }
         actions={
-          <Button asChild type="default">
+          <Button asChild variant="default">
             <Link href={`/project/${ref}/settings/log-drains`}>Go to Log Drains</Link>
           </Button>
         }

@@ -1,8 +1,8 @@
 'use client'
 
+import { Key } from 'lucide-react'
 import { Button } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns'
-import { Key } from 'lucide-react'
 
 export default function CopyEmptyStates() {
   return (
@@ -25,7 +25,7 @@ export default function CopyEmptyStates() {
             title="No API keys"
             description="Generate a key to connect your application."
           >
-            <Button type="primary">Generate key</Button>
+            <Button variant="primary">Generate key</Button>
           </EmptyStatePresentational>
         </div>
       </div>

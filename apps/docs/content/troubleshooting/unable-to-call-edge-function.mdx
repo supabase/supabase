@@ -1,0 +1,107 @@
+---
+title = "Unable to call Edge Function"
+topics = [ "functions" ]
+keywords = [ "invoke", "call", "CORS", "authentication", "JWT", "edge function" ]
+database_id = "cd298838-6f13-4b70-a198-a8bd26b2c0bd"
+---
+
+If you're having trouble invoking an Edge Function or experiencing CORS issues, follow these steps to diagnose and resolve the problem.
+
+## Diagnose the issue
+
+1. **Review CORS configuration:** Check out the [CORS guide](/docs/guides/functions/cors) and ensure you've properly configured CORS headers
+2. **Check function logs:** Look for errors in Functions > Logs in the dashboard
+3. **Verify authentication:** Confirm JWT tokens and permissions are correct
+
+## Proper CORS handling
+
+Make sure your function handles OPTIONS preflight requests.
+
+### Recommended (v2.95.0+)
+
+<Admonition type="tip">
+
+**For `@supabase/supabase-js` v2.95.0 and later:** Import CORS headers directly from the SDK to ensure they stay synchronized with any new headers added to the client libraries.
+
+</Admonition>
+
+```tsx
+// Recommended approach
+import { corsHeaders } from '@supabase/supabase-js/cors' // v2.95.0+
+
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
+  // Your function logic here
+  return new Response(JSON.stringify({ status: 'Success' }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
+})
+```
+
+### For versions before 2.95.0
+
+If you're using `@supabase/supabase-js` before v2.95.0, you'll need to hardcode the CORS headers. Add a `cors.ts` file within a [`_shared` folder](/docs/guides/functions/quickstart#organizing-your-edge-functions):
+
+```ts
+// _shared/cors.ts
+export const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+```
+
+Then import it in your function:
+
+```tsx
+import { corsHeaders } from '../_shared/cors.ts'
+
+Deno.serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
+  // Your function logic here
+  return new Response(JSON.stringify({ status: 'Success' }), {
+    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+  })
+})
+```
+
+## Debugging tools
+
+Supabase provides two debugging tools for Edge Functions:
+
+- **Invocations:** Shows the Request and Response for each execution
+- **Logs:** Shows platform events, including deployments and errors
+
+Access these tools by navigating to Functions > [Your Function] in the dashboard.
+
+## Common issues
+
+### CORS errors
+
+- Missing `Access-Control-Allow-Origin` header in response
+- Not handling OPTIONS preflight requests
+- Mismatched allowed methods or headers
+
+### Authentication errors
+
+- Invalid or expired JWT token
+- Missing Authorization header
+- Incorrect permissions for the authenticated user
+
+### Network errors
+
+- Function not deployed
+- Incorrect function URL
+- Network connectivity issues
+
+## Additional resources
+
+- [CORS guide](/docs/guides/functions/cors)
+- [Edge Functions authentication](/docs/guides/functions/auth)
+- [Debugging Edge Functions](/docs/guides/functions/logging)

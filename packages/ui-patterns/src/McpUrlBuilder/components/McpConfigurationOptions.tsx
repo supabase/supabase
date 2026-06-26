@@ -2,6 +2,7 @@
 
 import { cn, Switch } from 'ui'
 import { Label } from 'ui/src/components/shadcn/ui/label'
+
 import { InfoTooltip } from '../../info-tooltip'
 import {
   MultiSelector,
@@ -13,7 +14,6 @@ import {
 import type { McpFeatureGroup } from '../types'
 
 interface McpConfigurationOptionsProps {
-  isPlatform: boolean
   readonly: boolean
   onReadonlyChange: (readonly: boolean) => void
   selectedFeatures: string[]
@@ -23,7 +23,6 @@ interface McpConfigurationOptionsProps {
 }
 
 export function McpConfigurationOptions({
-  isPlatform,
   readonly,
   onReadonlyChange,
   selectedFeatures,
@@ -34,7 +33,7 @@ export function McpConfigurationOptions({
   return (
     <div className={cn('flex flex-col gap-4 lg:flex-row lg:gap-12 lg:items-baseline', className)}>
       {/* Readonly Mode */}
-      <div className="space-y-3 lg:flex-shrink-0">
+      <div className="space-y-3 lg:shrink-0">
         <div className="flex items-center gap-2">
           <Label htmlFor="readonly" className="text-sm">
             Read-only

@@ -1,7 +1,7 @@
 ---
 id: 'pg_graphql'
-title: 'pg_graphql: GraphQL for PostgreSQL'
-description: 'A GraphQL Interface for PostgreSQL'
+title: 'pg_graphql: GraphQL for Postgres'
+description: 'A GraphQL Interface for Postgres'
 ---
 
 [pg_graphql](https://supabase.github.io/pg_graphql/) is Postgres extension for interacting with the database using [GraphQL](https://graphql.org) instead of SQL.
@@ -90,7 +90,7 @@ returning the JSON
       "edges": [
         {
           "node": {
-            "id": 1
+            "id": 1,
             "name": "My Blog"
           }
         }
@@ -100,7 +100,13 @@ returning the JSON
 }
 ```
 
-Note that `pg_graphql` fully supports schema introspection so you can connect any GraphQL IDE or schema inspection tool to see the full set of fields and arguments available in the API.
+Note that `pg_graphql` supports schema introspection, so you can connect any GraphQL IDE or schema inspection tool to see the full set of fields and arguments available in the API. Starting from `pg_graphql` 1.6.0, introspection is **disabled by default** and must be enabled per schema:
+
+```sql
+comment on schema public is e'@graphql({"introspection": true})';
+```
+
+See the [upgrade notes](/guides/platform/upgrading#upgrading-to-pg_graphql-160) for details.
 
 ## API
 

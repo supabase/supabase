@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export const useHorizontalScroll = (ref: React.RefObject<HTMLDivElement>) => {
+export const useHorizontalScroll = (ref: React.RefObject<HTMLDivElement | null>) => {
   const [hasHorizontalScroll, setHasHorizontalScroll] = React.useState(false)
   const [canScrollLeft, setCanScrollLeft] = React.useState(false)
   const [canScrollRight, setCanScrollRight] = React.useState(false)

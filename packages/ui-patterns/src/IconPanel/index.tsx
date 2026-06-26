@@ -3,7 +3,7 @@
 import { ChevronRight } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import * as React from 'react'
-import ReactTooltip from 'react-tooltip'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface Props {
   title?: string
@@ -18,7 +18,6 @@ interface Props {
   hasLightIcon?: boolean
 
   showLink?: boolean
-  hideArrow?: boolean
 }
 
 export const IconPanel = ({
@@ -30,7 +29,6 @@ export const IconPanel = ({
   background = true,
   hasLightIcon,
   showLink = false,
-  hideArrow = false,
 }: Props) => {
   const { theme } = useTheme()
 
@@ -57,70 +55,61 @@ export const IconPanel = ({
   }
 
   return (
-    <>
-      <div className={['relative', 'group'].join(' ')} data-tip={tooltip}>
-        <div className={['peer relative', 'flex flex-col', icon ? 'gap-6' : 'gap-2'].join(' ')}>
-          <div
-            className={[
-              'flex',
-              children ? 'items-start' : 'items-center',
-              (title || !hideArrow || showLink) && 'gap-3',
-            ].join(' ')}
-          >
-            {typeof icon === 'string' ? (
-              <IconContainer>
-                <img
-                  className={iconSize === 'lg' ? 'w-8' : 'w-5'}
-                  src={`${icon}${hasLightIcon && theme !== 'dark' ? '-light' : ''}.svg`}
-                  alt={
-                    title !== undefined
-                      ? `${title} Icon`
-                      : tooltip !== undefined
-                        ? `${tooltip} Icon`
-                        : 'Icon'
-                  }
-                />
-              </IconContainer>
-            ) : (
-              <IconContainer>{icon}</IconContainer>
-            )}
-            <div className="flex flex-col gap-1">
-              <div className="flex items-center gap-3">
-                {title && <h5 className="text-base text-foreground m-0">{title}</h5>}
-                {!hideArrow && (
-                  <div
-                    className="
-                transition-all ease-out -ml-1 opacity-0
-                text-foreground-muted
-                group-hover:opacity-100
-                group-hover:ml-0"
-                  >
-                    <ChevronRight strokeWidth={2} size={14} />
-                  </div>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className={['relative', 'group'].join(' ')} data-tip={tooltip}>
+          <div className={['peer relative', 'flex flex-col', icon ? 'gap-6' : 'gap-2'].join(' ')}>
+            <div
+              className={[
+                'flex',
+                children ? 'items-start' : 'items-center',
+                (title || showLink) && 'gap-3',
+              ].join(' ')}
+            >
+              {typeof icon === 'string' ? (
+                <IconContainer>
+                  <img
+                    className={iconSize === 'lg' ? 'w-8' : 'w-5'}
+                    src={`${icon}${hasLightIcon && theme !== 'dark' ? '-light' : ''}.svg`}
+                    alt={
+                      title !== undefined
+                        ? `${title} Icon`
+                        : tooltip !== undefined
+                          ? `${tooltip} Icon`
+                          : 'Icon'
+                    }
+                  />
+                </IconContainer>
+              ) : (
+                <IconContainer>{icon}</IconContainer>
+              )}
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-3">
+                  {title && <h5 className="text-base text-foreground m-0">{title}</h5>}
+                </div>
+                {children && (
+                  <span className="text-sm text-foreground-light not-prose">{children}</span>
+                )}
+                {showLink && (
+                  <span className="text-brand-link justify-end text-sm">Learn more</span>
                 )}
               </div>
-              {children && (
-                <span className="text-sm text-foreground-light not-prose">{children}</span>
-              )}
-              {showLink && <span className="text-brand-link justify-end text-sm">Learn more</span>}
             </div>
           </div>
-        </div>
-        <div
-          className="
+          <div
+            className="
         absolute transition-all ease-in
         -z-10 -inset-3 rounded-2xl
         bg-surface-100 opacity-0 peer-hover:opacity-100"
-        ></div>
-      </div>
+          ></div>
+        </div>
+      </TooltipTrigger>
+
       {tooltip && (
-        <ReactTooltip
-          effect="solid"
-          backgroundColor="hsl(var(--background-alternative-default))"
-          textColor="hsl(var(--foreground-light))"
-          className="!py-2 !px-4"
-        />
+        <TooltipContent side="top" className="">
+          {tooltip}
+        </TooltipContent>
       )}
-    </>
+    </Tooltip>
   )
 }

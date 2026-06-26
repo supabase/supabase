@@ -1,19 +1,43 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Textarea,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
 
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { Button, Form, Input, Modal } from 'ui'
+import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { uuidv4 } from '@/lib/helpers'
+import { useProfile } from '@/lib/profile'
 
-type CustomReport = { name: string; description?: string }
 export interface CreateReportModal {
   visible: boolean
   onCancel: () => void
   afterSubmit: () => void
 }
+
+const formSchema = z.object({
+  name: z.string().min(1, 'Required'),
+  description: z.string().optional(),
+})
+
+type CustomReport = z.infer<typeof formSchema>
 
 export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateReportModal) => {
   const router = useRouter()
@@ -47,7 +71,7 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
     },
   })
 
-  async function createCustomReport({ name, description }: { name: string; description?: string }) {
+  const createCustomReport: SubmitHandler<CustomReport> = async ({ name, description }) => {
     if (!ref) return console.error('Project ref is required')
     if (!profile) return console.error('Profile is required')
 
@@ -77,53 +101,69 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
     })
   }
 
+  const handleCancel = () => {
+    onCancel()
+    form.reset()
+  }
+
+  const form = useForm<CustomReport>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { name: '', description: '' },
+  })
+  const { isDirty } = form.formState
+
   return (
-    <Modal
-      visible={visible}
-      onCancel={onCancel}
-      hideFooter
-      header="Create a custom report"
-      size="small"
-    >
-      <Form
-        onReset={onCancel}
-        validateOnBlur
-        initialValues={{ name: '', description: '' }}
-        validate={(vals) => {
-          const errors: Partial<CustomReport> = {}
-
-          if (!vals.name) {
-            errors.name = 'Required'
-          }
-
-          return errors
-        }}
-        onSubmit={(newVals) => createCustomReport(newVals)}
-      >
-        {() => (
-          <>
-            <Modal.Content className="space-y-4">
-              <Input label="Name" id="name" name="name" />
-              <Input.TextArea
-                label="Description"
-                id="description"
-                placeholder="Describe your custom report"
-                size="medium"
-                textAreaClassName="resize-none"
+    <Dialog open={visible} onOpenChange={handleCancel}>
+      <DialogContent size="small">
+        <DialogHeader>
+          <DialogTitle>Create a custom report</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(createCustomReport)} noValidate>
+            <DialogSection>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItemLayout name="name" layout="vertical" label="Name">
+                    <FormControl>
+                      <Input {...field} id="name" />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
               />
-            </Modal.Content>
-            <Modal.Separator />
-            <Modal.Content className="flex items-center justify-end gap-2">
-              <Button htmlType="reset" type="default" onClick={onCancel} disabled={isCreating}>
+            </DialogSection>
+            <DialogSection>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItemLayout name="description" layout="vertical" label="Description">
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        id="description"
+                        rows={4}
+                        placeholder="Describe your custom report"
+                        className="resize-none"
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </DialogSection>
+            <DialogFooter>
+              <Button type="reset" variant="default" onClick={handleCancel} disabled={isCreating}>
                 Cancel
               </Button>
-              <Button htmlType="submit" loading={isCreating} disabled={isCreating}>
+              <Button type="submit" loading={isCreating} disabled={isCreating || !isDirty}>
                 Create report
               </Button>
-            </Modal.Content>
-          </>
-        )}
-      </Form>
-    </Modal>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }

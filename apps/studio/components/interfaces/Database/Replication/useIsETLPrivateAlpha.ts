@@ -1,19 +1,54 @@
 import { useFlag } from 'common'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
+
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 /**
- * Organization level opt in for ETL private alpha
+ * Organization-level access for Pipelines alpha destinations. The flag names still use
+ * the original ETL identifiers, but the UI checks whether the org has access to at least one
+ * destination type.
  */
-export const useIsETLPrivateAlpha = () => {
+const useIsCurrentOrgInFlagList = (flag: string) => {
+  const flagValue = useFlag(flag)
   const { data: organization } = useSelectedOrganizationQuery()
 
-  const etlPrivateAlpha = useFlag('etlPrivateAlpha')
-  const privateAlphaProjectRefs =
-    typeof etlPrivateAlpha === 'string'
-      ? (etlPrivateAlpha as string).split(',').map((x) => x.trim())
+  const allowedOrgSlugs =
+    typeof flagValue === 'string'
+      ? (flagValue as string).split(',').map((x: string) => x.trim())
       : []
 
-  const etlShowForAllProjects = useFlag('etlPrivateAlphaOverride')
+  // [Joshen] Override to enable for all organizations by setting the flag value as `all`
+  if (allowedOrgSlugs.includes('all')) return true
 
-  return etlShowForAllProjects || privateAlphaProjectRefs.includes(organization?.slug ?? '')
+  // [Joshen] Otherwise fallback to checking against org slug
+  return allowedOrgSlugs.includes(organization?.slug ?? '')
+}
+
+export const useIsETLBigQueryPrivateAlpha = () => {
+  return useIsCurrentOrgInFlagList('etlEnableBigQueryPrivateAlpha')
+}
+
+export const useIsETLIcebergPrivateAlpha = () => {
+  return useIsCurrentOrgInFlagList('etlEnableIcebergPrivateAlpha')
+}
+
+export const useIsETLDucklakePrivateAlpha = () => {
+  return useIsCurrentOrgInFlagList('etlEnableDucklakePrivateAlpha')
+}
+
+export const useIsETLSnowflakePrivateAlpha = () => {
+  return useIsCurrentOrgInFlagList('etlEnableSnowflakePrivateAlpha')
+}
+
+export const useIsETLPrivateAlpha = () => {
+  const hasAccessToETLBigQuery = useIsCurrentOrgInFlagList('etlEnableBigQueryPrivateAlpha')
+  const hasAccessToETLIceberg = useIsCurrentOrgInFlagList('etlEnableIcebergPrivateAlpha')
+  const hasAccessToETLDucklake = useIsCurrentOrgInFlagList('etlEnableDucklakePrivateAlpha')
+  const hasAccessToETLSnowflake = useIsCurrentOrgInFlagList('etlEnableSnowflakePrivateAlpha')
+
+  return (
+    hasAccessToETLBigQuery ||
+    hasAccessToETLIceberg ||
+    hasAccessToETLDucklake ||
+    hasAccessToETLSnowflake
+  )
 }

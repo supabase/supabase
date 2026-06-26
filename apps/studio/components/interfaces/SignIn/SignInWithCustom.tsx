@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { BASE_PATH } from 'lib/constants'
-import { captureCriticalError } from 'lib/error-reporting'
-import { auth, buildPathWithParams } from 'lib/gotrue'
 import { Button } from 'ui'
+
+import { BASE_PATH } from '@/lib/constants'
+import { captureCriticalError } from '@/lib/error-reporting'
+import { auth, buildPathWithParams } from '@/lib/gotrue'
 
 interface SignInWithCustomProps {
   providerName: string
@@ -41,7 +41,7 @@ export const SignInWithCustom = ({ providerName }: SignInWithCustomProps) => {
   }
 
   return (
-    <Button block onClick={handleCustomSignIn} size="large" type="default" loading={loading}>
+    <Button block onClick={handleCustomSignIn} size="large" variant="default" loading={loading}>
       Continue with {providerName}
     </Button>
   )

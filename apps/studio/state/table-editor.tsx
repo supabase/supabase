@@ -1,37 +1,40 @@
-import type { PostgresColumn } from '@supabase/postgres-meta'
+import * as Sentry from '@sentry/nextjs'
+import type { PGColumn } from '@supabase/pg-meta'
 import { useConstant } from 'common'
-import type { SupaRow } from 'components/grid/types'
-import {
-  generateTableChangeKey,
-  generateTableChangeKeyFromOperation,
-} from 'components/grid/utils/queueOperationUtils'
-import { ForeignKey } from 'components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
-import type { EditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
-import type { TableField } from 'components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
-import { PropsWithChildren, createContext, useContext } from 'react'
-import type { Dictionary } from 'types'
+import { createContext, PropsWithChildren, useContext } from 'react'
 import { proxy, useSnapshot } from 'valtio'
 
 import {
   NewQueuedOperation,
+  QueuedOperationType,
   type OperationQueueState,
   type QueueStatus,
-  type QueuedOperation,
-  QueuedOperationType,
 } from './table-editor-operation-queue.types'
+import type { SupaRow } from '@/components/grid/types'
+import {
+  resolveDeleteRowConflicts,
+  resolveEditCellConflicts,
+  upsertOperation,
+} from '@/components/grid/utils/queueConflictResolution'
+import { generateTableChangeKey } from '@/components/grid/utils/queueOperationUtils'
+import { ForeignKey } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ForeignKeySelector/ForeignKeySelector.types'
+import type { EditValue } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
+import type { TableField } from '@/components/interfaces/TableGridEditor/SidePanelEditor/TableEditor/TableEditor.types'
+import type { SafePostgresColumn } from '@/lib/postgres-types'
+import type { Dictionary } from '@/types'
 
 export const TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE = 100
 
 type ForeignKeyState = {
   foreignKey: ForeignKey
   row: Dictionary<any>
-  column: PostgresColumn
+  column: PGColumn
 }
 
 export type SidePanel =
   | { type: 'cell'; value?: { column: string; row: Dictionary<any> } }
   | { type: 'row'; row?: Dictionary<any> }
-  | { type: 'column'; column?: PostgresColumn }
+  | { type: 'column'; column?: SafePostgresColumn }
   | { type: 'table'; mode: 'new' | 'edit' | 'duplicate'; templateData?: Partial<TableField> }
   | { type: 'schema'; mode: 'new' | 'edit' }
   | { type: 'json'; jsonValue: EditValue }
@@ -44,7 +47,9 @@ export type SidePanel =
 
 export type ConfirmationDialog =
   | { type: 'table'; isDeleteWithCascade: boolean }
-  | { type: 'column'; column: PostgresColumn; isDeleteWithCascade: boolean }
+  | { type: 'view'; isDeleteWithCascade: boolean }
+  | { type: 'materialized-view'; isDeleteWithCascade: boolean }
+  | { type: 'column'; column: SafePostgresColumn; isDeleteWithCascade: boolean }
   // [Joshen] Just FYI callback, numRows, allRowsSelected is a temp workaround so that
   // DeleteConfirmationDialog can trigger dispatch methods after the successful deletion of rows.
   // Once we deprecate react tracked and move things to valtio, we can remove this.
@@ -104,6 +109,11 @@ export const createTableEditorState = () => {
 
     /* Tables */
     onAddTable: (templateData?: Partial<TableField>) => {
+      // Record that the table creator was opened
+      Sentry.startSpan({ name: 'table_creator.opened', op: 'ui.action' }, (span) => {
+        span.setAttribute('table_creator.opened', 1)
+      })
+
       state.ui = {
         open: 'side-panel',
         sidePanel: { type: 'table', mode: 'new', templateData },
@@ -127,6 +137,18 @@ export const createTableEditorState = () => {
         confirmationDialog: { type: 'table', isDeleteWithCascade: false },
       }
     },
+    onDeleteView: () => {
+      state.ui = {
+        open: 'confirmation-dialog',
+        confirmationDialog: { type: 'view', isDeleteWithCascade: false },
+      }
+    },
+    onDeleteMaterializedView: () => {
+      state.ui = {
+        open: 'confirmation-dialog',
+        confirmationDialog: { type: 'materialized-view', isDeleteWithCascade: false },
+      }
+    },
 
     /* Columns */
     onAddColumn: () => {
@@ -135,13 +157,13 @@ export const createTableEditorState = () => {
         sidePanel: { type: 'column' },
       }
     },
-    onEditColumn: (column: PostgresColumn) => {
+    onEditColumn: (column: SafePostgresColumn) => {
       state.ui = {
         open: 'side-panel',
         sidePanel: { type: 'column', column },
       }
     },
-    onDeleteColumn: (column: PostgresColumn) => {
+    onDeleteColumn: (column: SafePostgresColumn) => {
       state.ui = {
         open: 'confirmation-dialog',
         confirmationDialog: { type: 'column', column, isDeleteWithCascade: false },
@@ -217,7 +239,9 @@ export const createTableEditorState = () => {
       if (
         state.ui.open === 'confirmation-dialog' &&
         (state.ui.confirmationDialog.type === 'column' ||
-          state.ui.confirmationDialog.type === 'table')
+          state.ui.confirmationDialog.type === 'table' ||
+          state.ui.confirmationDialog.type === 'view' ||
+          state.ui.confirmationDialog.type === 'materialized-view')
       ) {
         state.ui.confirmationDialog.isDeleteWithCascade =
           overrideIsDeleteWithCascade ?? !state.ui.confirmationDialog.isDeleteWithCascade
@@ -236,34 +260,49 @@ export const createTableEditorState = () => {
     /**
      * Queue a new operation for later processing.
      * If an operation with the same key already exists, it will be overwritten.
+     * Handles conflict resolution:
+     * - DELETE_ROW on a row: remove any pending EDIT_CELL ops for that row
+     * - EDIT_CELL on a row pending deletion: reject (console.warn)
+     * - EDIT_CELL on a newly added row: merge edit into ADD_ROW's rowData
+     * - DELETE_ROW on a newly added row: cancel both operations
      */
     queueOperation: (operation: NewQueuedOperation) => {
-      const operationKey = generateTableChangeKeyFromOperation(operation)
-      const existingOpIndex = state.operationQueue.operations.findIndex(
-        (op) => op.id === operationKey
-      )
-
-      const newOperation: QueuedOperation = {
-        ...operation,
-        id: operationKey,
-        timestamp: Date.now(),
-      }
-
-      if (existingOpIndex >= 0) {
-        // [Ali] Keep the old value of the operation that is being overwritten, in case someone edits the cell again, it should reference the original value.
-        // When a user edits the same cell multiple times before saving, we need to preserve the original "before edit" value, not the intermediate value from the previous queued edit
-        if (newOperation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
-          newOperation.payload.oldValue =
-            state.operationQueue.operations[existingOpIndex].payload.oldValue
+      const updateQueueStatus = () => {
+        if (state.operationQueue.operations.length === 0) {
+          state.operationQueue.status = 'idle'
+        } else if (state.operationQueue.status === 'idle') {
+          state.operationQueue.status = 'pending'
         }
-        state.operationQueue.operations[existingOpIndex] = newOperation
-      } else {
-        state.operationQueue.operations.push(newOperation)
       }
 
-      if (state.operationQueue.status === 'idle') {
-        state.operationQueue.status = 'pending'
+      // Handle DELETE_ROW conflicts
+      if (operation.type === QueuedOperationType.DELETE_ROW) {
+        const result = resolveDeleteRowConflicts(state.operationQueue.operations, operation)
+        state.operationQueue.operations = result.filteredOperations
+        if (result.action === 'skip') {
+          updateQueueStatus()
+          return
+        }
       }
+
+      // Handle EDIT_CELL_CONTENT conflicts
+      if (operation.type === QueuedOperationType.EDIT_CELL_CONTENT) {
+        const result = resolveEditCellConflicts(state.operationQueue.operations, operation)
+        if (result.action === 'reject') {
+          console.warn(result.reason)
+          return
+        }
+        if (result.action === 'merge') {
+          state.operationQueue.operations = result.updatedOperations
+          updateQueueStatus()
+          return
+        }
+      }
+
+      // Normal upsert
+      const { operations } = upsertOperation(state.operationQueue.operations, operation)
+      state.operationQueue.operations = operations
+      updateQueueStatus()
     },
 
     /**
@@ -287,6 +326,16 @@ export const createTableEditorState = () => {
     },
 
     /**
+     * Undo the latest operation from the queue
+     */
+    undoLatestOperation: () => {
+      state.operationQueue.operations = state.operationQueue.operations.slice(0, -1)
+      if (state.operationQueue.operations.length === 0) {
+        state.operationQueue.status = 'idle'
+      }
+    },
+
+    /**
      * Update the queue status
      */
     setQueueStatus: (status: QueueStatus) => {
@@ -301,18 +350,29 @@ export const createTableEditorState = () => {
     },
 
     hasPendingCellChange: (
-      type: QueuedOperationType,
       tableId: number,
-      rowIdentifiers: Record<string, unknown>,
+      rowIdentifiers: Dictionary<unknown>,
       columnName: string
     ): boolean => {
       const key = generateTableChangeKey({
-        type,
+        type: QueuedOperationType.EDIT_CELL_CONTENT,
         tableId,
-        columnName,
-        rowIdentifiers,
+        payload: {
+          columnName,
+          rowIdentifiers,
+        },
       })
       return state.operationQueue.operations.some((op) => op.id === key)
+    },
+
+    /**
+     * Toggle the preflight check behaviour for each table
+     */
+    tablesToIgnorePreflightCheck: [] as number[],
+    setTableToIgnorePreflightCheck: (id: number) => {
+      const set = new Set<number>(state.tablesToIgnorePreflightCheck)
+      set.add(id)
+      state.tablesToIgnorePreflightCheck = [...set]
     },
   })
 

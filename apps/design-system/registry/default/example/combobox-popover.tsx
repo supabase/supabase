@@ -1,6 +1,5 @@
 'use client'
 
-import * as React from 'react'
 import {
   ArrowUpCircle,
   CheckCircle2,
@@ -10,17 +9,21 @@ import {
   Plus,
   XCircle,
 } from 'lucide-react'
+import * as React from 'react'
+import {
+  Button,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from 'ui'
 
 import { cn } from '@/lib/utils'
-import { Button, CommandList_Shadcn_ } from 'ui'
-import {
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-} from 'ui'
-import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
 
 type Status = {
   value: string
@@ -63,10 +66,10 @@ export default function ComboboxPopover() {
   return (
     <div className="flex items-center gap-4">
       <p className="text-sm text-muted-foreground">Status</p>
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button
-            type="default"
+            variant="default"
             size="small"
             className="w-[150px] justify-start rounded-full"
             icon={
@@ -79,15 +82,15 @@ export default function ComboboxPopover() {
           >
             {selectedStatus ? <>{selectedStatus.label}</> : <>Set status</>}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0" side="right" align="start">
-          <Command_Shadcn_>
-            <CommandInput_Shadcn_ placeholder="Change status..." />
-            <CommandList_Shadcn_>
-              <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-              <CommandGroup_Shadcn_>
+        </PopoverTrigger>
+        <PopoverContent className="p-0" side="right" align="start">
+          <Command>
+            <CommandInput placeholder="Change status..." />
+            <CommandList>
+              <CommandEmpty>No results found.</CommandEmpty>
+              <CommandGroup>
                 {statuses.map((status) => (
-                  <CommandItem_Shadcn_
+                  <CommandItem
                     key={status.value}
                     value={status.value}
                     onSelect={(value) => {
@@ -104,13 +107,13 @@ export default function ComboboxPopover() {
                       )}
                     />
                     <span>{status.label}</span>
-                  </CommandItem_Shadcn_>
+                  </CommandItem>
                 ))}
-              </CommandGroup_Shadcn_>
-            </CommandList_Shadcn_>
-          </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }

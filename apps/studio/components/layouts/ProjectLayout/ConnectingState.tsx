@@ -1,17 +1,17 @@
+import { useParams } from 'common'
 import { ExternalLink, Loader, Monitor, Server } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
+import { Badge, Button } from 'ui'
 
-import { useParams } from 'common'
-import ShimmerLine from 'components/ui/ShimmerLine'
+import ShimmerLine from '@/components/ui/ShimmerLine'
 import {
   useInvalidateProjectDetailsQuery,
   useSetProjectPostgrestStatus,
   type Project,
-} from 'data/projects/project-detail-query'
-import { DOCS_URL } from 'lib/constants'
-import pingPostgrest from 'lib/pingPostgrest'
-import { Badge, Button } from 'ui'
+} from '@/data/projects/project-detail-query'
+import { DOCS_URL } from '@/lib/constants'
+import pingPostgrest from '@/lib/pingPostgrest'
 
 export interface ConnectingStateProps {
   project: Project
@@ -19,7 +19,7 @@ export interface ConnectingStateProps {
 
 const ConnectingState = ({ project }: ConnectingStateProps) => {
   const { ref } = useParams()
-  const checkProjectConnectionIntervalRef = useRef<number>()
+  const checkProjectConnectionIntervalRef = useRef<number>(null)
 
   const { setProjectPostgrestStatus } = useSetProjectPostgrestStatus()
   const { invalidateProjectDetailsQuery } = useInvalidateProjectDetailsQuery()
@@ -31,14 +31,18 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
     // pingPostgrest timeouts in 2s, wait for another 2s before checking again
     checkProjectConnectionIntervalRef.current = window.setInterval(testProjectConnection, 4000)
     return () => {
-      clearInterval(checkProjectConnectionIntervalRef.current)
+      if (checkProjectConnectionIntervalRef.current) {
+        clearInterval(checkProjectConnectionIntervalRef.current)
+      }
     }
   }, [project])
 
   const testProjectConnection = async () => {
     const result = await pingPostgrest(project.ref)
     if (result) {
-      clearInterval(checkProjectConnectionIntervalRef.current)
+      if (checkProjectConnectionIntervalRef.current) {
+        clearInterval(checkProjectConnectionIntervalRef.current)
+      }
       setProjectPostgrestStatus(project.ref, 'ONLINE')
       await invalidateProjectDetailsQuery(project.ref)
     }
@@ -59,7 +63,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
               </Badge>
             </div>
           </div>
-          <div className="flex h-[500px] items-center justify-center rounded border border-overlay bg-surface-100 p-8">
+          <div className="flex h-[500px] items-center justify-center rounded-sm border border-overlay bg-surface-100 p-8">
             <div className="w-[440px] space-y-4">
               <div className="mx-auto flex max-w-[300px] items-center justify-center">
                 <div>
@@ -84,15 +88,15 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
               </div>
 
               <div className="flex items-center justify-center space-x-2">
-                <Button asChild type="default">
+                <Button asChild variant="default">
                   <Link href={`/project/${ref}/settings/infrastructure`}>
                     Check database health
                   </Link>
                 </Button>
-                <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
                   <Link
                     href={`${DOCS_URL}/guides/troubleshooting?products=platform#unable-to-connect-to-your-supabase-project`}
-                    className="translate-y-[1px]"
+                    className="translate-y-px"
                   >
                     Troubleshooting
                   </Link>

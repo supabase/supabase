@@ -1,14 +1,14 @@
 import dayjs from 'dayjs'
-import { AlertCircle } from 'lucide-react'
 import { useState } from 'react'
-
-import AlertError from 'components/ui/AlertError'
-import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
-import { DATETIME_FORMAT } from 'lib/constants'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { AddNewFactorModal } from './AddNewFactorModal'
 import DeleteFactorModal from './DeleteFactorModal'
+import AlertError from '@/components/ui/AlertError'
+import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
+import { DATETIME_FORMAT } from '@/lib/constants'
 
 export const TOTPFactors = () => {
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
@@ -19,8 +19,7 @@ export const TOTPFactors = () => {
     <>
       <section className="space-y-3">
         <p className="text-sm text-foreground-light">
-          Generate one-time passwords via authenticator apps like 1Password, Authy, etc. as a second
-          factor to verify your identity during sign-in.
+          Use an authenticator app (like 1Password or Authy) to verify your identity at sign-in.
         </p>
         <div>
           {isLoading && <GenericSkeletonLoader />}
@@ -30,15 +29,12 @@ export const TOTPFactors = () => {
           {isSuccess && (
             <>
               {data.totp.length === 1 && (
-                <Alert_Shadcn_ variant="default" className="mb-2">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle_Shadcn_>
-                    We recommend configuring two authenticator apps across different devices
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                    The two authenticator apps will serve as a backup for each other.
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
+                <Admonition
+                  type="warning"
+                  layout="horizontal"
+                  title="We recommend configuring two authenticator apps across different devices"
+                  description="The two authenticator apps will serve as a backup for each other."
+                />
               )}
               <div>
                 {data.totp.map((factor) => {
@@ -54,7 +50,7 @@ export const TOTPFactors = () => {
                         </p>
                         <Button
                           size="tiny"
-                          type="default"
+                          variant="default"
                           onClick={() => setFactorToBeDeleted(factor.id)}
                         >
                           Remove

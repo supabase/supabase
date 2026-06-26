@@ -1,19 +1,27 @@
-import { useOperationQueueActions } from 'components/grid/hooks/useOperationQueueActions'
-import { useOperationQueueShortcuts } from 'components/grid/hooks/useOperationQueueShortcuts'
-import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Eye } from 'lucide-react'
+import { Eye, MoreVertical, Trash } from 'lucide-react'
 import { createPortal } from 'react-dom'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { Button } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  KeyboardShortcut,
+} from 'ui'
 
-import { getModKeyLabel } from '@/lib/helpers'
+import { useOperationQueueActions } from '@/components/grid/hooks/useOperationQueueActions'
+import { useOperationQueueShortcuts } from '@/components/grid/hooks/useOperationQueueShortcuts'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 export const SaveQueueActionBar = () => {
-  const modKey = getModKeyLabel()
   const snap = useTableEditorStateSnapshot()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
-  const { handleSave } = useOperationQueueActions()
+  const { handleSave, handleCancel } = useOperationQueueActions()
 
   useOperationQueueShortcuts()
 
@@ -24,44 +32,84 @@ export const SaveQueueActionBar = () => {
   const isVisible =
     isQueueOperationsEnabled && snap.hasPendingOperations && !isOperationQueuePanelOpen
 
+  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+    checkIsDirty: () => true,
+    onClose: () => handleCancel(),
+  })
+
   const content = (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          transition={{ duration: 0.2 }}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50"
-        >
-          <div className="flex items-center gap-8 px-4 py-3 bg-surface-100 border rounded-lg shadow-lg">
-            <span className="text-sm text-foreground">
-              {operationCount} pending change{operationCount !== 1 ? 's' : ''}
-            </span>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => snap.toggleViewOperationQueue()}
-                className="text-foreground-light hover:text-foreground transition-colors flex items-center"
-                aria-label="View Details"
-              >
-                <Eye size={14} />
-                <span className="text-foreground-lighter text-[10px] ml-1">{`${modKey}.`}</span>
-              </button>
-              <Button
-                size="tiny"
-                type="primary"
-                onClick={handleSave}
-                disabled={isSaving}
-                loading={isSaving}
-              >
-                Save
-                <span className="text-foreground-lighter text-[10px] ml-1">{`${modKey}S`}</span>
-              </Button>
-            </div>
+    <>
+      <AnimatePresence>
+        {isVisible && (
+          <div className="fixed bottom-12 z-50 left-1/2 -translate-x-1/2">
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              transition={{
+                type: 'spring',
+                stiffness: 420,
+                damping: 30,
+                mass: 0.4,
+              }}
+            >
+              <div className="flex items-center gap-x-12 pl-4 pr-2 py-2 bg-surface-100 border rounded-lg shadow-lg">
+                <p className="text-xs text-foreground-light max-w-40 truncate">
+                  {operationCount} pending change{operationCount !== 1 ? 's' : ''}
+                </p>
+                <div className="flex items-center gap-x-2">
+                  <Button
+                    size="tiny"
+                    variant="primary"
+                    onClick={handleSave}
+                    disabled={isSaving}
+                    loading={isSaving}
+                    iconRight={
+                      isSaving ? undefined : (
+                        <KeyboardShortcut keys={['Meta', 's']} variant="inline" />
+                      )
+                    }
+                  >
+                    Save
+                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-7"
+                        icon={<MoreVertical />}
+                        aria-label="More options"
+                      />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-40">
+                      <DropdownMenuItem
+                        className="justify-between"
+                        onClick={() => snap.toggleViewOperationQueue()}
+                      >
+                        <div className="flex items-center gap-x-2">
+                          <Eye size={14} />
+                          <span>Review</span>
+                        </div>
+                        <KeyboardShortcut keys={['Meta', '.']} />
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={confirmOnClose}>
+                        <div className="flex items-center gap-x-2">
+                          <Trash size={14} />
+                          <span>Discard</span>
+                        </div>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </div>
+            </motion.div>
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
+
+      <DiscardChangesConfirmationDialog {...closeConfirmationModalProps} />
+    </>
   )
 
   if (typeof document === 'undefined' || !document.body) return null

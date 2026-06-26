@@ -1,30 +1,41 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { HTMLProps, ReactNode, useCallback, useState } from 'react'
-
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FDW, useFDWsQuery } from 'data/fdw/fdws-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useConfirmOnClose, type ConfirmOnCloseModalProps } from 'hooks/ui/useConfirmOnClose'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useCallback, useState } from 'react'
 import { Sheet, SheetContent } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { AddWrapperButton } from './AddWrapperButton'
 import { CreateWrapperSheet } from './CreateWrapperSheet'
-import DeleteWrapperModal from './DeleteWrapperModal'
 import { WRAPPERS } from './Wrappers.constants'
 import { wrapperMetaComparator } from './Wrappers.utils'
 import { WrapperTable } from './WrapperTable'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useFDWsQuery } from '@/data/fdw/fdws-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const WrappersTab = () => {
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const [selectedWrapperForDelete, setSelectedWrapperForDelete] = useState<FDW | null>(null)
-  const [createWrapperShown, setCreateWrapperShown] = useState(false)
+
+  const [isCreating, setIsCreating] = useQueryState(
+    'new',
+    parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
+  )
 
   const { can: canCreateWrapper } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'wrappers'
   )
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setIsCreating(true), {
+    label: 'Add new wrapper',
+    enabled: canCreateWrapper,
+  })
 
   const { data } = useFDWsQuery({
     projectRef: project?.ref,
@@ -34,98 +45,61 @@ export const WrappersTab = () => {
   const wrappers = data ?? []
   const wrapperMeta = WRAPPERS.find((w) => w.name === id)
 
-  // this contains a collection of all wrapper instances for the wrapper type
   const createdWrappers = wrapperMeta
     ? wrappers.filter((w) => wrapperMetaComparator(wrapperMeta, w))
     : []
 
   const [isDirty, setIsDirty] = useState(false)
-  const { confirmOnClose, modalProps: closeConfirmationModalProps } = useConfirmOnClose({
+  const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: useCallback(() => isDirty, [isDirty]),
     onClose: useCallback(() => {
-      setCreateWrapperShown(false)
+      setIsCreating(null)
       setIsDirty(false)
-    }, []),
+    }, [setIsCreating]),
   })
-
-  const Container = useCallback(
-    ({ ...props }: { children: ReactNode } & HTMLProps<HTMLDivElement>) => (
-      <div className="w-full mx-10 py-10 ">
-        {props.children}
-        <Sheet open={!!createWrapperShown} onOpenChange={confirmOnClose}>
-          <SheetContent size="lg" tabIndex={undefined}>
-            {wrapperMeta && (
-              <CreateWrapperSheet
-                wrapperMeta={wrapperMeta}
-                onDirty={setIsDirty}
-                onClose={() => setCreateWrapperShown(false)}
-                onCloseWithConfirmation={confirmOnClose}
-              />
-            )}
-          </SheetContent>
-        </Sheet>
-      </div>
-    ),
-    [createWrapperShown, wrapperMeta, confirmOnClose]
-  )
 
   if (!wrapperMeta) {
     return <div>Missing integration.</div>
   }
 
-  if (createdWrappers.length === 0) {
-    return (
-      <Container>
-        <div className=" w-full h-48 max-w-4xl">
+  return (
+    <div className="w-full p-10">
+      {createdWrappers.length === 0 ? (
+        <div className="w-full h-48 max-w-4xl">
           <div className="border rounded-lg h-full flex flex-col gap-y-2 items-center justify-center">
             <p className="text-sm text-foreground-light">
               No {wrapperMeta.label} wrappers have been installed
             </p>
-            <ButtonTooltip
-              type="default"
-              onClick={() => setCreateWrapperShown(true)}
-              disabled={!canCreateWrapper}
-              tooltip={{
-                content: {
-                  text: !canCreateWrapper
-                    ? 'You need additional permissions to create a foreign data wrapper'
-                    : undefined,
-                },
-              }}
-            >
-              Add new wrapper
-            </ButtonTooltip>
+            <AddWrapperButton onClick={() => setIsCreating(true)} />
           </div>
         </div>
-      </Container>
-    )
-  }
-
-  return (
-    <Container>
-      <WrapperTable />
-      {selectedWrapperForDelete && (
-        <DeleteWrapperModal
-          selectedWrapper={selectedWrapperForDelete}
-          onClose={() => setSelectedWrapperForDelete(null)}
-        />
+      ) : (
+        <>
+          <div className="max-w-5xl flex items-center gap-x-2 justify-end mb-4">
+            <DocsButton href={wrapperMeta.docsUrl} />
+            <AddWrapperButton variant="primary" onClick={() => setIsCreating(true)} />
+          </div>
+          <WrapperTable />
+        </>
       )}
-      <CloseConfirmationModal {...closeConfirmationModalProps} />
-    </Container>
+
+      <Sheet open={!!isCreating} onOpenChange={handleOpenChange}>
+        <SheetContent size="lg" tabIndex={undefined}>
+          {wrapperMeta && (
+            <CreateWrapperSheet
+              wrapperMeta={wrapperMeta}
+              onDirty={setIsDirty}
+              onClose={() => {
+                setIsCreating(null)
+                setIsDirty(false)
+              }}
+              onCloseWithConfirmation={confirmOnClose}
+            />
+          )}
+        </SheetContent>
+      </Sheet>
+
+      <DiscardChangesConfirmationDialog {...modalProps} />
+    </div>
   )
 }
-
-const CloseConfirmationModal = ({ visible, onClose, onCancel }: ConfirmOnCloseModalProps) => (
-  <ConfirmationModal
-    visible={visible}
-    title="Discard changes"
-    confirmLabel="Discard"
-    onCancel={onCancel}
-    onConfirm={onClose}
-  >
-    <p className="text-sm text-foreground-light">
-      There are unsaved changes. Are you sure you want to close the panel? Your changes will be
-      lost.
-    </p>
-  </ConfirmationModal>
-)

@@ -1,10 +1,11 @@
-import { useFlag, useParams } from 'common'
-import { useCheckEntitlements } from 'hooks/misc/useCheckEntitlements'
 import { ArrowUpRight } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
+import { useEffect } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
+  cn,
   DialogSectionSeparator,
   Sheet,
   SheetContent,
@@ -12,126 +13,148 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
-  cn,
 } from 'ui'
 
-import { EnableReplicationCallout } from '../EnableReplicationCallout'
+import { EnablePipelinesCallout } from '../EnablePipelinesCallout'
+import { PipelineStatusName } from '../Replication.constants'
+import { useDestinationInformation } from '../useDestinationInformation'
 import { useIsETLPrivateAlpha } from '../useIsETLPrivateAlpha'
 import { DestinationForm } from './DestinationForm'
 import { DestinationType } from './DestinationPanel.types'
 import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { ReadReplicaForm } from './ReadReplicaForm'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { DOCS_URL } from '@/lib/constants'
 
 interface DestinationPanelProps {
-  visible: boolean
-  type?: DestinationType
-  existingDestination?: {
-    sourceId?: number
-    destinationId: number
-    pipelineId?: number
-    enabled: boolean
-    statusName?: string
-  }
-  onClose: () => void
   onSuccessCreateReadReplica?: () => void
 }
 
-export const DestinationPanel = ({
-  visible,
-  type,
-  existingDestination,
-  onClose,
-  onSuccessCreateReadReplica,
-}: DestinationPanelProps) => {
-  const { ref: projectRef } = useParams()
+export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPanelProps) => {
   const enablePgReplicate = useIsETLPrivateAlpha()
-  const unifiedReplication = useFlag('unifiedReplication')
   const { hasAccess: hasETLReplicationAccess } = useCheckEntitlements('replication.etl')
 
-  const [selectedType, setSelectedType] = useState<DestinationType>(
-    type || (unifiedReplication ? 'Read Replica' : 'BigQuery')
+  const [urlDestinationType, setDestinationType] = useQueryState(
+    'destinationType',
+    parseAsStringEnum<DestinationType>([
+      'Read Replica',
+      'BigQuery',
+      'Analytics Bucket',
+      'DuckLake',
+      'Snowflake',
+    ]).withOptions({
+      history: 'push',
+      clearOnDefault: true,
+    })
   )
 
-  const editMode = !!existingDestination
+  const [edit, setEdit] = useQueryState(
+    'edit',
+    parseAsInteger.withOptions({
+      history: 'push',
+      clearOnDefault: true,
+    })
+  )
 
-  const { data: sourcesData, isSuccess: isSourcesSuccess } = useReplicationSourcesQuery({
-    projectRef,
-  })
-  const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
-  const replicationNotEnabled = isSourcesSuccess && !sourceId
+  const visible = urlDestinationType !== null || edit !== null
+  const editMode = edit !== null
+
+  const {
+    sourceId,
+    pipeline,
+    statusName,
+    replicationNotEnabled,
+    type: existingDestinationType,
+    destinationFetcher,
+  } = useDestinationInformation({ id: edit })
+  const destinationType = existingDestinationType ?? urlDestinationType
+  const invalidExistingDestination = destinationFetcher.error?.code === 404
+
+  const existingDestination = editMode
+    ? {
+        sourceId,
+        destinationId: edit,
+        pipelineId: pipeline?.id,
+        statusName,
+        enabled:
+          statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED,
+      }
+    : undefined
+
+  const onClose = () => {
+    setDestinationType(null)
+    setEdit(null)
+  }
+
+  useEffect(() => {
+    if (edit !== null && invalidExistingDestination) {
+      toast(`Unable to find destination ID ${edit}`)
+      setEdit(null)
+    }
+  }, [edit, invalidExistingDestination, setEdit])
 
   return (
     <>
       <Sheet open={visible} onOpenChange={onClose}>
-        <SheetContent
-          size="default"
-          showClose={false}
-          className={cn(unifiedReplication ? 'md:!w-[850px]' : 'md:!w-[700px]')}
-        >
+        <SheetContent size="lg" showClose={false}>
           <div className="flex flex-col h-full" tabIndex={-1}>
             <SheetHeader>
-              <SheetTitle>{editMode ? 'Edit destination' : 'Create a new destination'}</SheetTitle>
+              <SheetTitle>{editMode ? 'Edit destination' : 'Add destination'}</SheetTitle>
               <SheetDescription>
                 {editMode
-                  ? 'Update the configuration for this destination'
-                  : 'A destination is an external platform that automatically receives your database changes in real time.'}
+                  ? 'Update the configuration for this destination.'
+                  : 'A destination can be a read replica or an external destination that receives replicated data in near real time.'}
               </SheetDescription>
             </SheetHeader>
 
-            <DestinationTypeSelection
-              editMode={editMode}
-              selectedType={selectedType}
-              setSelectedType={setSelectedType}
-            />
+            <DestinationTypeSelection />
 
             <DialogSectionSeparator />
 
-            {selectedType === 'Read Replica' ? (
+            {destinationType === 'Read Replica' ? (
               <ReadReplicaForm onClose={onClose} onSuccess={() => onSuccessCreateReadReplica?.()} />
-            ) : unifiedReplication && !enablePgReplicate ? (
+            ) : !enablePgReplicate ? (
               <SheetSection>
                 <div className={cn('border rounded-md p-6 flex flex-col gap-y-4')}>
                   <div className="flex flex-col gap-y-1">
-                    <h4>Replicate data to external destinations in real-time</h4>
+                    <h4>Request Pipelines access</h4>
                     <p className="text-sm text-foreground-light">
-                      We are currently in <span className="text-foreground">private alpha</span> and
-                      slowly onboarding new customers to ensure stable data pipelines. Request
-                      access below to join the waitlist. Read replicas are available now.
+                      Pipelines is in <span className="text-foreground">alpha</span> and being
+                      rolled out gradually. Request access below to join the waitlist. Read replicas
+                      are available now.
                     </p>
                   </div>
                   <div className="flex gap-x-2">
                     <Button
                       asChild
-                      type="secondary"
+                      variant="secondary"
                       iconRight={<ArrowUpRight size={16} strokeWidth={1.5} />}
                     >
                       <Link
-                        href="https://forms.supabase.com/pg_replicate"
                         target="_blank"
                         rel="noreferrer"
+                        href="https://forms.supabase.com/pg_replicate"
                       >
                         Request alpha access
                       </Link>
                     </Button>
-                    <DocsButton href={`${DOCS_URL}/guides/database/replication#replication`} />
+                    <DocsButton href={`${DOCS_URL}/guides/database/replication#pipelines`} />
                   </div>
                 </div>
               </SheetSection>
-            ) : unifiedReplication && replicationNotEnabled ? (
+            ) : replicationNotEnabled ? (
               <SheetSection>
-                <EnableReplicationCallout
-                  className="!p-6"
-                  type={selectedType}
+                <EnablePipelinesCallout
+                  className="p-6!"
+                  type={destinationType}
                   hasAccess={hasETLReplicationAccess}
                 />
               </SheetSection>
             ) : (
               <DestinationForm
                 visible={visible}
-                selectedType={selectedType}
+                selectedType={destinationType ?? 'Read Replica'}
                 existingDestination={existingDestination}
                 onClose={onClose}
               />

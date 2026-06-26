@@ -1,8 +1,8 @@
 ---
 id: 'full-text-search'
 title: 'Full Text Search'
-description: 'How to use full text search in PostgreSQL.'
-subtitle: 'How to use full text search in PostgreSQL.'
+description: 'How to use full text search in Postgres.'
+subtitle: 'How to use full text search in Postgres.'
 tocVideo: 'GRwIa-ce7RA'
 ---
 
@@ -665,7 +665,7 @@ select title from books where to_tsvector(title) @@ to_tsquery('Lit:*');
 
 ### Extending functionality with RPC
 
-To make the partial search functionality accessible through the API, you can wrap the search logic in a stored procedure.
+To make the partial search functionality accessible through the API, you can wrap the search logic in a database function.
 
 After creating this function, you can invoke it from your application using the SDK for your platform. Here's an example:
 
@@ -831,7 +831,7 @@ don't need to be created at the time we execute the query. This will make our qu
 
 ### Searchable columns
 
-Let's create a new column `fts` inside the `books` table to store the searchable index of the `title` and `description` columns.
+Create a new column `fts` inside the `books` table to store the searchable index of the `title` and `description` columns.
 
 We can use a special feature of Postgres called
 [Generated Columns](https://www.postgresql.org/docs/current/ddl-generated-columns.html)
