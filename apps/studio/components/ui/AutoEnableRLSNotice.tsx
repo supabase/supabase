@@ -61,17 +61,17 @@ export const AutoEnableRLSNotice = ({ iconOnly }: { iconOnly?: boolean }) => {
   return (
     <Admonition
       type="note"
-      layout="horizontal"
-      title="Auto-enable RLS for new tables"
-      description="We recommend creating an event trigger that enables Row Level Security on all new tables."
+      layout="responsive"
+      title="Automatically enable RLS on new tables"
+      description="Protect future tables by automatically enabling Row Level Security whenever a table is created."
       actions={
         <>
           <CreateEnsureRLSTriggerDialog />
           <ButtonTooltip
             icon={<X />}
             variant="text"
-            className="w-7"
-            tooltip={{ content: { side: 'bottom', text: 'Minimize' } }}
+            className="w-6"
+            tooltip={{ content: { side: 'bottom', text: 'Dismiss' } }}
             onClick={() => setIsMinimized(true)}
           />
         </>
@@ -122,36 +122,38 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
             tooltip={{ content: { side: 'bottom', text: 'Auto-enable RLS for new tables' } }}
           />
         ) : (
-          <Button variant="default">Learn more</Button>
+          <Button variant="default">Set up trigger</Button>
         )}
       </DialogTrigger>
       <DialogContent size="large">
         <DialogHeader>
-          <DialogTitle>Automatically enable RLS for newly created tables</DialogTitle>
-          <DialogDescription>Secure your data using Postgres Row Level Security</DialogDescription>
+          <DialogTitle>Automatically enable RLS for new tables</DialogTitle>
+          <DialogDescription>
+            Protect future tables with a built-in database trigger.
+          </DialogDescription>
         </DialogHeader>
 
         <DialogSectionSeparator />
 
         <DialogSection className="text-sm flex flex-col gap-y-2">
           <p>
-            Tables in exposed schemas (default being the{' '}
-            <code className="text-code-inline">public</code> schema) are accessible to anyone.
-            Hence, we highly recommend enabling RLS on all such tables.
+            We recommend enabling Row Level Security (RLS) on all tables in exposed schemas, such as{' '}
+            <code className="text-code-inline">public</code>. This trigger automatically enables RLS
+            whenever a new table is created.
           </p>
-          <p>
-            You can set up a database trigger to enable RLS automatically on all new tables with the
-            following SQL:
-          </p>
+          <p>Review the SQL below before creating the trigger.</p>
         </DialogSection>
 
-        <CodeBlock language="sql" className="language-sql px-0 border-x-0 rounded-none h-64">
+        <CodeBlock
+          language="sql"
+          className="language-sql px-0 border-x-0 border-b-0 rounded-none h-64"
+        >
           {AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL.trim()}
         </CodeBlock>
 
         <DialogFooter>
           <Button variant="default" disabled={isCreating} onClick={() => setOpen(false)}>
-            Close
+            Cancel
           </Button>
           <ButtonTooltip
             disabled={!canCreateTriggers}
@@ -166,7 +168,7 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
               },
             }}
           >
-            Create ensure_rls trigger
+            Create trigger
           </ButtonTooltip>
         </DialogFooter>
       </DialogContent>
