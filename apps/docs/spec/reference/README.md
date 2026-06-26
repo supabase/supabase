@@ -135,7 +135,9 @@ Key tags the walker reads:
 Anything without `@category` is collected into `typeSpec.json` (for cross-reference
 by `$ref`) but does **not** appear in the navigation/section list.
 
-### Non-TypeDoc sources (Dart/Flutter)
+### Non-TypeDoc sources
+
+#### Dart/Flutter
 
 Not every SDK ships TypeDoc. Dart is adapted "as a pre-step": the committed
 legacy spec [`spec/supabase_dart_v2.yml`](../supabase_dart_v2.yml) plus the
