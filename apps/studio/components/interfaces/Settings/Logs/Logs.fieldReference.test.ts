@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { toOtelFieldSchemas, type LogFieldSchema } from './Logs.fieldReference'
+import { otelFieldsFromKeys, toOtelFieldSchemas, type LogFieldSchema } from './Logs.fieldReference'
 
 const edgeSchema: LogFieldSchema = {
   name: 'API Gateway',
@@ -49,5 +49,40 @@ describe('toOtelFieldSchemas', () => {
     const [otel] = toOtelFieldSchemas([edgeSchema])
     const asn = otel.fields.find((f) => f.path === "log_attributes['request.cf.asn']")
     expect(asn?.type).toBe('number')
+  })
+})
+
+describe('otelFieldsFromKeys', () => {
+  it('starts with the five base OTEL columns', () => {
+    const fields = otelFieldsFromKeys(['request.cf.asn'])
+    const paths = fields.map((f) => f.path)
+    expect(paths.slice(0, 5)).toEqual([
+      'id',
+      'timestamp',
+      'event_message',
+      'severity_text',
+      'source',
+    ])
+  })
+
+  it('maps discovered keys to log_attributes lookups', () => {
+    const fields = otelFieldsFromKeys(['request.cf.asn', 'response.headers.x-foo'])
+    const paths = fields.map((f) => f.path)
+    expect(paths).toContain("log_attributes['request.cf.asn']")
+    expect(paths).toContain("log_attributes['response.headers.x-foo']")
+  })
+
+  it('excludes keys that are real OTEL columns (id, timestamp, event_message)', () => {
+    const fields = otelFieldsFromKeys(['id', 'timestamp', 'event_message', 'trace_id'])
+    const paths = fields.map((f) => f.path)
+    // Real columns appear exactly once (as base fields), not duplicated as attribute paths.
+    expect(paths.filter((p) => p === 'id')).toHaveLength(1)
+    expect(paths).not.toContain("log_attributes['id']")
+    expect(paths).toContain("log_attributes['trace_id']")
+  })
+
+  it('returns only base fields for an empty key list', () => {
+    const fields = otelFieldsFromKeys([])
+    expect(fields).toHaveLength(5)
   })
 })

@@ -1,4 +1,4 @@
-import { useFlag } from 'common'
+import { useFlag, useParams } from 'common'
 import { BookOpen, Check, ChevronsUpDown, Copy, ExternalLink, List, X } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -24,7 +24,11 @@ import {
 
 import { DocsButton } from '../DocsButton'
 import { LOGS_EXPLORER_DOCS_URL } from '@/components/interfaces/Settings/Logs/Logs.constants'
-import { toOtelFieldSchemas } from '@/components/interfaces/Settings/Logs/Logs.fieldReference'
+import {
+  otelFieldsFromKeys,
+  toOtelFieldSchemas,
+} from '@/components/interfaces/Settings/Logs/Logs.fieldReference'
+import { useOtelLogKeysQuery } from '@/data/logs/otel-log-keys-query'
 import Table from '@/components/to-be-cleaned/Table'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -39,6 +43,12 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
   const schemas = useOtel ? toOtelFieldSchemas(logConstants.schemas) : logConstants.schemas
   const [selectedRef, setSelectedRef] = useState(schemas[0]?.reference)
   const selectedSchema = schemas.find((s) => s.reference === selectedRef) ?? schemas[0]
+
+  const { ref: projectRef } = useParams()
+  const { data: discoveredKeys, isPending: isLoadingKeys } = useOtelLogKeysQuery(
+    { projectRef, source: selectedRef },
+    { enabled: useOtel && showReference }
+  )
 
   return (
     <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 transition-all pb-6 justify-between">
@@ -159,19 +169,27 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                 </Command>
               </PopoverContent>
             </Popover>
-            <Table
-              head={[
-                <Table.th className="text-xs p-2!" key="path">
-                  Path
-                </Table.th>,
-                <Table.th key="type" className="text-xs p-2!">
-                  Type
-                </Table.th>,
-              ]}
-              body={selectedSchema.fields.map((field) => (
-                <Field key={field.path} field={field} />
-              ))}
-            />
+            {useOtel && isLoadingKeys ? (
+              <p className="text-sm text-foreground-light py-2">Loading fields…</p>
+            ) : (
+              <Table
+                head={[
+                  <Table.th className="text-xs p-2!" key="path">
+                    Path
+                  </Table.th>,
+                  <Table.th key="type" className="text-xs p-2!">
+                    Type
+                  </Table.th>,
+                ]}
+                body={(() => {
+                  const fields =
+                    useOtel && discoveredKeys && discoveredKeys.length > 0
+                      ? otelFieldsFromKeys(discoveredKeys)
+                      : selectedSchema.fields
+                  return fields.map((field) => <Field key={field.path} field={field} />)
+                })()}
+              />
+            )}
           </div>
         </SidePanel>
       </div>

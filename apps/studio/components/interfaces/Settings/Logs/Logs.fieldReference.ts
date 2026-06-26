@@ -35,3 +35,14 @@ const toOtelFieldSchema = (schema: LogFieldSchema): LogFieldSchema => ({
 
 export const toOtelFieldSchemas = (schemas: LogFieldSchema[]): LogFieldSchema[] =>
   schemas.map(toOtelFieldSchema)
+
+/**
+ * Builds a field list from live-discovered log_attributes keys: the base OTEL
+ * columns first, then each key (excluding real columns) as a map lookup path.
+ */
+export function otelFieldsFromKeys(keys: string[]): LogFieldSchema['fields'] {
+  const attributeFields = keys
+    .filter((key) => !OTEL_COLUMN_PATHS.has(key))
+    .map((key) => ({ path: `log_attributes['${key}']`, type: 'string' as const }))
+  return [...OTEL_BASE_FIELDS, ...attributeFields]
+}
