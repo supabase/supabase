@@ -103,10 +103,6 @@ function ContentListingsGridGroup({ group }: { group: ContentListingGroup }) {
   )
 }
 
-/**
- * Renders a standardized orientation link section (grid or list layout).
- * The `id` selects which content listing group to render from the data registry.
- */
 export function ContentListings({ id }: { id: string }) {
   const group = getContentListingById(id)
   if (!group || !group.items.length) return null

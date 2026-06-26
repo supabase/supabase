@@ -2,9 +2,6 @@ import { withDocsBasePath } from '~/internals/internal-links'
 
 import { isExternalContentListingHref, type ContentListingGroup } from './content-listings.schema'
 
-/**
- * Serialize a single content listing group to markdown for .md exports and machine consumers.
- */
 export function serializeContentListingGroupToMarkdown(
   group: ContentListingGroup,
   linkBaseUrl: string
