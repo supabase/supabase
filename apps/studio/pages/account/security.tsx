@@ -1,5 +1,6 @@
 import { Lock } from 'lucide-react'
 import { Badge, Card, CardContent, CardHeader } from 'ui'
+import { Admonition } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -40,6 +41,26 @@ const Security: NextPageWithLayout = () => {
         </PageHeaderMeta>
       </PageHeader>
       <PageContainer size="small">
+        {data?.totp.length === 1 && (
+          <Admonition
+            className="mt-8"
+            type="danger"
+            layout="horizontal"
+            title="Important: You can get permanently locked out"
+            description={
+              <>
+                <p>
+                  If you lose access to your authenticator app and don't have a second method set
+                  up,{' '}
+                  <strong className="text-destructive">
+                    you will lose access to your account.
+                  </strong>
+                </p>
+                <p>We strongly recommend adding authentication on a second device right now.</p>
+              </>
+            }
+          />
+        )}
         <Card className="mt-8">
           <CardHeader className="py-3 flex flex-row items-center justify-between">
             <div className="flex flex-row gap-4 items-center py-1 mb-0">

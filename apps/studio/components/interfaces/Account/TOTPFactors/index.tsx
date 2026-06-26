@@ -28,14 +28,6 @@ export const TOTPFactors = () => {
           )}
           {isSuccess && (
             <>
-              {data.totp.length === 1 && (
-                <Admonition
-                  type="warning"
-                  layout="horizontal"
-                  title="We recommend configuring two authenticator apps across different devices"
-                  description="The two authenticator apps will serve as a backup for each other."
-                />
-              )}
               <div>
                 {data.totp.map((factor) => {
                   return (
