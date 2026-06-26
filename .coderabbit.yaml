@@ -30,7 +30,7 @@ reviews:
         convention when adding to existing events). Flag any usage of
         useSendEventMutation. Verify @group Events and @source JSDoc tags are
         accurate. Check that new interfaces are added to the TelemetryEvent union type.
-    - path: 'apps/studio/components/**/*.tsx'
+    - path: 'apps/studio/components/**/!(*.test).tsx' # production components only, not tests
       instructions: |
         Only suggest adding PostHog event tracking (via useTrack from
         lib/telemetry/track, [object]_[verb] snake_case) when a new user-facing
