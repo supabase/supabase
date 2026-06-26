@@ -88,6 +88,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const editorRef = useRef<editor.IStandaloneCodeEditor>(null)
   const [editorId] = useState<string>(uuidv4())
+  // Bumped to force a fresh Monaco model (it caches by path) when we replace the
+  // editor content outside of typing, e.g. accepting a rewrite.
+  const [editorResetKey, setEditorResetKey] = useState<number>(0)
   const { search, setSearch, timestampStart, timestampEnd, setTimeRange } = useLogsUrlState()
   const defaultHelper = useMemo(() => getDefaultHelper(EXPLORER_DATEPICKER_HELPERS), [])
   const initialDatePickerValue = useMemo<DatePickerValue>(() => {
@@ -247,20 +250,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const acceptRewrite = () => {
     if (!rewriteProposal) return
-    const newSql = rewriteProposal.modified
-    setEditorValue(newSql)
-    if (editorRef.current && monaco) {
-      const editorModel = editorRef.current.getModel()
-      editorRef.current.pushUndoStop()
-      editorRef.current.executeEdits('rewrite-clickhouse', [
-        {
-          text: newSql,
-          range: editorModel?.getFullModelRange() ?? new monaco.Range(1, 1, 1, 1),
-        },
-      ])
-      editorRef.current.pushUndoStop()
-      editorRef.current.focus()
-    }
+    // The editor is unmounted while the diff is shown, and Monaco caches the model
+    // by path, so set the value via state and remount with a fresh model path.
+    setEditorValue(rewriteProposal.modified)
+    setEditorResetKey((key) => key + 1)
     setRewriteProposal(null)
     toast.success('Applied the ClickHouse rewrite')
   }
@@ -513,9 +506,10 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             </div>
           ) : (
             <CodeEditor
-              // Ensure we reset the editor to the query content whenever the selected query changes
-              key={queryId}
-              id={editorId}
+              // Ensure we reset the editor to the query content whenever the selected
+              // query changes or a rewrite is applied (new model path).
+              key={`${queryId}-${editorResetKey}`}
+              id={`${editorId}-${editorResetKey}`}
               editorRef={editorRef}
               language="pgsql"
               defaultValue={editorValue}
