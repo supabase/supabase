@@ -51,6 +51,13 @@ export const DEFAULT_COMPLETION_MODEL = openaiModelEntry({
   reasoningEffort: 'none',
 })
 
+// Rewriting a whole query to another dialect is a transformation, not autocomplete,
+// so it needs some reasoning rather than the zero-effort completion model.
+export const LOGS_REWRITE_MODEL = openaiModelEntry({
+  id: 'gpt-5.4-nano',
+  reasoningEffort: 'low',
+})
+
 // Single source of truth for all Assistant chat model variants and their reasoning levels.
 // Models with requiresAdvanceModelEntitlement false are available to all users; true requires the assistant.advance_model entitlement.
 export const ASSISTANT_MODELS = [

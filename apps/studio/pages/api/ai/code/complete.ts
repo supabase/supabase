@@ -9,7 +9,7 @@ import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { getOrgAIDetails } from '@/lib/ai/ai-details'
 import { getModel } from '@/lib/ai/model'
-import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
+import { DEFAULT_COMPLETION_MODEL, LOGS_REWRITE_MODEL } from '@/lib/ai/model.utils'
 import {
   CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS,
   COMPLETION_PROMPT,
@@ -173,7 +173,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       systemProviderOptions,
     } = await getModel({
       provider: 'openai',
-      modelEntry: DEFAULT_COMPLETION_MODEL,
+      modelEntry: isClickhouse ? LOGS_REWRITE_MODEL : DEFAULT_COMPLETION_MODEL,
     })
 
     if (modelError) {
@@ -234,33 +234,40 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           otherSchemas: schemas.filter((s) => !fetchedSchemaSet.has(s.name)).map((s) => s.name),
         }
 
-    // Important: keep this static per branch (no dynamic content) or Bedrock will not cache it
-    const dialectInstructions = isClickhouse
-      ? CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS
-      : language === 'sql'
-        ? `${SQL_COMPLETION_INSTRUCTIONS}\n${PG_BEST_PRACTICES}`
-        : EDGE_FUNCTION_PROMPT
-    const system = source`
-      ${COMPLETION_PROMPT}
-      ${dialectInstructions}
-      ${SECURITY_PROMPT}
-    `
+    // Important: keep this static per branch (no dynamic content) or Bedrock will not cache it.
+    // ClickHouse rewriting is a transformation, not cursor completion, so it skips the
+    // completion + <selection> framing (which made the model echo the input unchanged) and
+    // the Postgres schema, and sends the rewrite prompt directly.
+    const system = isClickhouse
+      ? source`
+          You rewrite SQL queries to ClickHouse SQL for the Supabase logs table.
+          Output only the rewritten SQL query: no explanation, no markdown, and no code fences.
+          ${CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS}
+          ${SECURITY_PROMPT}
+        `
+      : source`
+          ${COMPLETION_PROMPT}
+          ${language === 'sql' ? `${SQL_COMPLETION_INSTRUCTIONS}\n${PG_BEST_PRACTICES}` : EDGE_FUNCTION_PROMPT}
+          ${SECURITY_PROMPT}
+        `
 
-    const userMessage = source`
-      ## Database Schema
+    const userMessage = isClickhouse
+      ? prompt
+      : source`
+          ## Database Schema
 
-      ${buildDatabaseSchemaSection({ includeSchema, schemaListResult, schemaDDLResult })}
+          ${buildDatabaseSchemaSection({ includeSchema, schemaListResult, schemaDDLResult })}
 
-      ## Code
+          ## Code
 
-      \`\`\`${language ?? ''}
-      ${textBeforeCursor}<selection>${selection}</selection>${textAfterCursor}
-      \`\`\`
+          \`\`\`${language ?? ''}
+          ${textBeforeCursor}<selection>${selection}</selection>${textAfterCursor}
+          \`\`\`
 
-      ## Instruction
+          ## Instruction
 
-      ${prompt}
-    `
+          ${prompt}
+        `
 
     // Note: these must be of type `CoreMessage` to prevent AI SDK from stripping `providerOptions`
     // https://github.com/vercel/ai/blob/81ef2511311e8af34d75e37fc8204a82e775e8c3/packages/ai/core/prompt/standardize-prompt.ts#L83-L88
