@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
-import { ObservabilityReportToolbarActions } from '@/components/interfaces/Observability/ObservabilityReportToolbarActions'
 import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
@@ -20,6 +19,7 @@ import {
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
@@ -121,10 +121,8 @@ const PostgrestReport = () => {
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2 w-full">
-            <ObservabilityReportToolbarActions
-              docsHref={OBSERVABILITY_DOCS_HREFS.dataApi}
-              topic="Data API"
-            >
+            <div className="ml-auto flex items-center gap-2 flex-wrap">
+              <DocsButton href={OBSERVABILITY_DOCS_HREFS.dataApi} topic="Data API" />
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
                 label="Refresh report"
@@ -166,7 +164,7 @@ const PostgrestReport = () => {
                   </p>
                 </div>
               )}
-            </ObservabilityReportToolbarActions>
+            </div>
             <ReportFilterBar
               filters={filters}
               onAddFilter={addFilter}

@@ -7,7 +7,6 @@ import { useMemo, useState } from 'react'
 import { Button } from 'ui'
 
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
-import { ObservabilityReportToolbarActions } from '@/components/interfaces/Observability/ObservabilityReportToolbarActions'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
 import {
@@ -30,6 +29,7 @@ import DefaultLayout from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
 import { useChartHoverState } from '@/components/ui/Charts/useChartHoverState'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
@@ -149,10 +149,8 @@ const EdgeFunctionsUsage = () => {
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2 w-full">
-            <ObservabilityReportToolbarActions
-              docsHref={OBSERVABILITY_DOCS_HREFS.edgeFunctions}
-              topic="Edge Functions"
-            >
+            <div className="ml-auto flex items-center gap-2 flex-wrap">
+              <DocsButton href={OBSERVABILITY_DOCS_HREFS.edgeFunctions} topic="Edge Functions" />
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
                 label="Refresh report"
@@ -199,7 +197,7 @@ const EdgeFunctionsUsage = () => {
                   </p>
                 </div>
               )}
-            </ObservabilityReportToolbarActions>
+            </div>
             <div className="w-full flex items-center gap-2 flex-wrap">
               <ReportsSelectFilter
                 label="Function"

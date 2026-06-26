@@ -5,7 +5,6 @@ import { useState } from 'react'
 import { Button } from 'ui'
 
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
-import { ObservabilityReportToolbarActions } from '@/components/interfaces/Observability/ObservabilityReportToolbarActions'
 import {
   NetworkTrafficRenderer,
   ResponseSpeedChartRenderer,
@@ -29,6 +28,7 @@ import {
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useStorageReport } from '@/data/reports/storage-report-query'
@@ -94,10 +94,8 @@ export const StorageReport: NextPageWithLayout = () => {
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2 w-full">
-            <ObservabilityReportToolbarActions
-              docsHref={OBSERVABILITY_DOCS_HREFS.storage}
-              topic="Storage"
-            >
+            <div className="ml-auto flex items-center gap-2 flex-wrap">
+              <DocsButton href={OBSERVABILITY_DOCS_HREFS.storage} topic="Storage" />
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
                 label="Refresh report"
@@ -139,7 +137,7 @@ export const StorageReport: NextPageWithLayout = () => {
                 description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
                 source="storageReportDateRange"
               />
-            </ObservabilityReportToolbarActions>
+            </div>
             <ReportFilterBar
               onRemoveFilters={removeFilters}
               onDatepickerChange={handleDatepickerChange}

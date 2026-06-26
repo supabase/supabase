@@ -9,7 +9,6 @@ import { toast } from 'sonner'
 import { Alert, AlertDescription, Button } from 'ui'
 
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
-import { ObservabilityReportToolbarActions } from '@/components/interfaces/Observability/ObservabilityReportToolbarActions'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
@@ -27,6 +26,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { MultiAttribute } from '@/components/ui/Charts/ComposedChart.utils'
 import { LazyComposedChartHandler } from '@/components/ui/Charts/ComposedChartHandler'
 import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { analyticsKeys } from '@/data/analytics/keys'
@@ -232,57 +232,53 @@ const DatabaseUsage = () => {
       <ReportHeader showDatabaseSelector title="Database" />
       <ReportStickyNav
         content={
-          <>
-            <ObservabilityReportToolbarActions
-              docsHref={OBSERVABILITY_DOCS_HREFS.database}
-              topic="Database"
+          <div className="ml-auto flex items-center gap-2 flex-wrap">
+            <DocsButton href={OBSERVABILITY_DOCS_HREFS.database} topic="Database" />
+            <ShortcutTooltip
+              shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
+              label="Refresh report"
+              side="bottom"
             >
-              <ShortcutTooltip
-                shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
-                label="Refresh report"
-                side="bottom"
-              >
-                <Button
-                  variant="default"
-                  disabled={isRefreshing}
-                  icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-                  className="w-7"
-                  onClick={onRefreshReport}
-                />
-              </ShortcutTooltip>
-              <ReportSettings chartId="database-charts" />
-              <div className="flex items-center gap-3">
-                <LogsDatePicker
-                  onSubmit={handleDatePickerChange}
-                  value={datePickerValue}
-                  helpers={datePickerHelpers}
-                  open={showDatePicker}
-                  onOpenChange={setShowDatePicker}
-                  shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
-                />
-                <UpgradePrompt
-                  show={showUpgradePrompt}
-                  setShowUpgradePrompt={setShowUpgradePrompt}
-                  title="Report date range"
-                  description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
-                  source="databaseReportDateRange"
-                />
-                {selectedDateRange && (
-                  <div className="flex items-center gap-x-2 text-xs">
-                    <p className="text-foreground-light">
-                      {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
-                    </p>
-                    <p className="text-foreground-light">
-                      <ArrowRight size={12} />
-                    </p>
-                    <p className="text-foreground-light">
-                      {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </ObservabilityReportToolbarActions>
-          </>
+              <Button
+                variant="default"
+                disabled={isRefreshing}
+                icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                className="w-7"
+                onClick={onRefreshReport}
+              />
+            </ShortcutTooltip>
+            <ReportSettings chartId="database-charts" />
+            <div className="flex items-center gap-3">
+              <LogsDatePicker
+                onSubmit={handleDatePickerChange}
+                value={datePickerValue}
+                helpers={datePickerHelpers}
+                open={showDatePicker}
+                onOpenChange={setShowDatePicker}
+                shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
+              />
+              <UpgradePrompt
+                show={showUpgradePrompt}
+                setShowUpgradePrompt={setShowUpgradePrompt}
+                title="Report date range"
+                description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
+                source="databaseReportDateRange"
+              />
+              {selectedDateRange && (
+                <div className="flex items-center gap-x-2 text-xs">
+                  <p className="text-foreground-light">
+                    {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
+                  </p>
+                  <p className="text-foreground-light">
+                    <ArrowRight size={12} />
+                  </p>
+                  <p className="text-foreground-light">
+                    {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         }
       >
         {selectedDateRange &&
