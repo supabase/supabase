@@ -19,11 +19,20 @@ import {
 import { SqlRunButton } from './RunButton'
 import SavingIndicator from './SavingIndicator'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
+import { EXPLORER_DATEPICKER_HELPERS } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
+import { resolveLogDateRange } from '@/components/interfaces/Settings/Logs/logsDateRange'
+import {
+  isLogsSource,
+  SQL_EDITOR_LOGS_SOURCE_ID,
+} from '@/components/interfaces/SQLEditor/sqlEditorLogs'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { sqlEditorLogsState, useSqlEditorLogsStateSnapshot } from '@/state/sql-editor-logs'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 
 export type UtilityActionsProps = {
@@ -45,6 +54,9 @@ export const UtilityActions = ({
 }: UtilityActionsProps) => {
   const { ref } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const databaseSelectorState = useDatabaseSelectorStateSnapshot()
+  const logsTimeRange = useSqlEditorLogsStateSnapshot()
+  const queryingLogs = isLogsSource(databaseSelectorState.selectedDatabaseId)
 
   const [isAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
@@ -208,14 +220,35 @@ export const UtilityActions = ({
             <DatabaseSelector
               selectedDatabaseId={lastSelectedDb.length === 0 ? undefined : lastSelectedDb}
               variant="connected-on-right"
+              additionalOptions={[{ id: SQL_EDITOR_LOGS_SOURCE_ID, name: 'Logs' }]}
               onSelectId={onSelectDatabase}
             />
           )}
-          <RoleImpersonationPopover
-            serviceRoleLabel="postgres"
-            header="Run SQL query as a role"
-            variant={IS_PLATFORM ? 'connected-on-both' : 'connected-on-right'}
-          />
+          {queryingLogs ? (
+            <LogsDatePicker
+              buttonTriggerProps={{
+                variant: 'default',
+                className: IS_PLATFORM ? 'rounded-none border-x-0' : 'rounded-r-none',
+              }}
+              value={{
+                from: logsTimeRange.iso_timestamp_start,
+                to: logsTimeRange.iso_timestamp_end,
+                isHelper: false,
+              }}
+              onSubmit={(value) => {
+                const { from, to } = resolveLogDateRange(value)
+                sqlEditorLogsState.setTimeRange(from, to)
+                snapV2.resetResults(id)
+              }}
+              helpers={EXPLORER_DATEPICKER_HELPERS}
+            />
+          ) : (
+            <RoleImpersonationPopover
+              serviceRoleLabel="postgres"
+              header="Run SQL query as a role"
+              variant={IS_PLATFORM ? 'connected-on-both' : 'connected-on-right'}
+            />
+          )}
           <SqlRunButton
             hasSelection={hasSelection}
             isDisabled={isDisabled || isExecuting}

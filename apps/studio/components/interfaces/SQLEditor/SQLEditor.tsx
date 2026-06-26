@@ -56,6 +56,7 @@ import {
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
+import { isLogsSource, LOGS_SQL_AI_CONTEXT } from './sqlEditorLogs'
 import { useAddDefinitions } from './useAddDefinitions'
 import { UtilityPanel } from './UtilityPanel/UtilityPanel'
 import {
@@ -72,6 +73,7 @@ import { constructHeaders, isValidConnString } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
+import { useExecuteSQLEditorQuery } from '@/data/sql/use-execute-sql-editor-query'
 import { isError } from '@/data/utils/error-check'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -92,6 +94,7 @@ import {
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { useSqlEditorLogsStateSnapshot } from '@/state/sql-editor-logs'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
@@ -121,6 +124,8 @@ export const SQLEditor = () => {
   const snapV2 = useSqlEditorV2StateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
+  const logsTimeRange = useSqlEditorLogsStateSnapshot()
+  const queryingLogs = isLogsSource(databaseSelectorState.selectedDatabaseId)
   const { aiOptInLevel } = useOrgAiOptInLevel()
   const showPrettyExplain = useFlag('ShowPrettyExplain')
 
@@ -224,7 +229,7 @@ export const SQLEditor = () => {
   /* React query mutations */
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
   const track = useTrack()
-  const { mutate: execute, isPending: isExecuting } = useExecuteSqlMutation({
+  const { mutate: execute, isPending: isExecuting } = useExecuteSQLEditorQuery({
     onSuccess(data, vars) {
       if (id) {
         snapV2.addResult(id, data.result, vars.autoLimit)
@@ -413,6 +418,23 @@ export const SQLEditor = () => {
         setLineHighlights([])
       }
 
+      // The logs source runs against the ClickHouse endpoint, which has no
+      // connection string, roles, or auto-limit. Send the user SQL with a time range.
+      if (queryingLogs) {
+        execute({
+          projectRef: project.ref,
+          source: databaseSelectorState.selectedDatabaseId,
+          sql: rawSql(sql),
+          iso_timestamp_start: logsTimeRange.iso_timestamp_start,
+          iso_timestamp_end: logsTimeRange.iso_timestamp_end,
+          handleError: (error) => {
+            throw error
+          },
+        })
+        track('sql_editor_query_run_button_clicked')
+        return
+      }
+
       const impersonatedRoleState = getImpersonatedRoleState()
       const connectionString = databases?.find(
         (db) => db.identifier === databaseSelectorState.selectedDatabaseId
@@ -453,6 +475,9 @@ export const SQLEditor = () => {
       getImpersonatedRoleState,
       setAiTitle,
       databaseSelectorState.selectedDatabaseId,
+      queryingLogs,
+      logsTimeRange.iso_timestamp_start,
+      logsTimeRange.iso_timestamp_end,
       databases,
       eventTriggers,
       limit,
@@ -604,7 +629,7 @@ export const SQLEditor = () => {
         sqlSnippets: [
           (snippet.snippet.content?.unchecked_sql ?? '').replace(sqlAiDisclaimerComment, '').trim(),
         ],
-        initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${result.error.message}`,
+        initialInput: `${queryingLogs ? `${LOGS_SQL_AI_CONTEXT}\n\n` : ''}Help me to debug the attached sql snippet which gives the following error: \n\n${result.error.message}`,
       })
     } catch (error: unknown) {
       // [Joshen] There's a tendency for the SQL debug to chuck a lengthy error message
@@ -746,14 +771,18 @@ export const SQLEditor = () => {
 
       const authorizationHeader = headerData.get('Authorization')
 
-      await complete(prompt, {
+      // On the logs source, prepend the ClickHouse schema so the assistant writes
+      // logs SQL instead of Postgres.
+      const effectivePrompt = queryingLogs ? `${LOGS_SQL_AI_CONTEXT}\n\n${prompt}` : prompt
+
+      await complete(effectivePrompt, {
         ...(authorizationHeader ? { headers: { Authorization: authorizationHeader } } : undefined),
         body: {
           completionMetadata: {
             textBeforeCursor: context.beforeSelection,
             textAfterCursor: context.afterSelection,
             language: 'pgsql',
-            prompt,
+            prompt: effectivePrompt,
             selection: context.selection,
           },
         },
