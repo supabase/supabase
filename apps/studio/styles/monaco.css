@@ -5,6 +5,16 @@
   -webkit-text-size-adjust: 100%;
 }
 
+/* Monaco dynamically inserts a global `.monaco-editor { position: absolute !important }` rule at
+ * runtime when an editor initializes (observed via GraphiQL). On the @monaco-editor/react wrapper
+ * that's fatal: it pulls the wrapper out of flow so its only (absolutely-positioned) child gives
+ * it zero content height, collapsing the editor to ~5px. Re-assert Monaco's real default with a
+ * higher-specificity selector (`.monaco-editor.monaco-editor` = 0,2,0) so it beats the injected
+ * `!important` rule. Confirmed not to affect GraphiQL's own editor layout. */
+.monaco-editor.monaco-editor {
+  position: relative !important;
+}
+
 .monaco-editor-alt.monaco-editor-alt,
 .monaco-editor-alt > .monaco-editor {
   --vscode-editor-background: hsl(var(--background-surface-300)) !important;

@@ -1,14 +1,16 @@
-import 'graphiql/style.css'
-import 'graphiql/setup-workers/webpack'
+// Import GraphiQL's UI-only stylesheet (not `style.css`, which also bundles a second copy of
+// Monaco's CSS). Monaco's CSS now comes solely from the single shared instance (see
+// lib/monaco-setup), and workers are set up there too, so `graphiql/setup-workers` is dropped.
+import 'graphiql/graphiql.css'
 
-import { useMonaco, type GraphiQLPlugin } from '@graphiql/react'
+import { type GraphiQLPlugin } from '@graphiql/react'
 import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { GraphiQL, HISTORY_PLUGIN } from 'graphiql'
 import { User as IconUser } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { LogoLoader } from 'ui'
 
@@ -17,7 +19,6 @@ import styles from './graphiql.module.css'
 import { IntrospectionDisabledNotice } from './IntrospectionDisabledNotice'
 import { IntrospectionEnabledNotice } from './IntrospectionEnabledNotice'
 import { usePgGraphqlIntrospectionStatus } from './usePgGraphqlIntrospectionStatus'
-import { getTheme } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RoleImpersonationSelector } from '@/components/interfaces/RoleImpersonationSelector'
 import { useSessionAccessTokenQuery } from '@/data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
@@ -33,31 +34,11 @@ const ROLE_IMPERSONATION_PLUGIN: GraphiQLPlugin = {
   content: () => <RoleImpersonationSelector orientation="vertical" />,
 }
 
-const MONACO_THEME = { dark: 'supabase-graphql-dark', light: 'supabase-graphql-light' }
-
-const GraphiQLMonacoTheme = ({ resolvedTheme }: { resolvedTheme: 'dark' | 'light' }) => {
-  const { monaco } = useMonaco()
-
-  useEffect(() => {
-    if (!monaco) return
-    const dark = getTheme('dark')
-    const light = getTheme('light')
-    monaco.editor.defineTheme(MONACO_THEME.dark, {
-      ...dark,
-      rules: [...dark.rules, { token: 'argument.identifier.gql', foreground: '908aff' }],
-    })
-    monaco.editor.defineTheme(MONACO_THEME.light, {
-      ...light,
-      rules: [...light.rules, { token: 'argument.identifier.gql', foreground: '6c69ce' }],
-      // Match the dashboard's bg-default in light mode so the editor doesn't read
-      // as a darker square against the surrounding UI.
-      colors: { ...light.colors, 'editor.background': '#fcfcfc' },
-    })
-    monaco.editor.setTheme(MONACO_THEME[resolvedTheme])
-  }, [monaco, resolvedTheme])
-
-  return null
-}
+// Use Studio's primary `supabase` Monaco theme (defined globally by MonacoThemeProvider) for
+// GraphiQL too, instead of a separate `supabase-graphql-*` theme. With a single shared Monaco
+// instance the active theme is global, so GraphiQL and the SQL editor must agree on one theme —
+// the `supabase` theme is the canonical one.
+const SUPABASE_THEME = { dark: 'supabase', light: 'supabase' }
 
 export const GraphiQLTab = () => {
   const { resolvedTheme } = useTheme()
@@ -144,7 +125,6 @@ export const GraphiQLTab = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <GraphiQLMonacoTheme resolvedTheme={currentTheme} />
       {notice === 'opt-in' && (
         <IntrospectionDisabledNotice
           schema={DEFAULT_INTROSPECTION_SCHEMA}
@@ -164,7 +144,7 @@ export const GraphiQLTab = () => {
           key={graphiqlKey}
           fetcher={fetcher}
           forcedTheme={currentTheme}
-          editorTheme={MONACO_THEME}
+          editorTheme={SUPABASE_THEME}
           className={styles.root}
           plugins={plugins}
         />

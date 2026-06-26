@@ -14,7 +14,6 @@ import '@/styles/ui.css'
 import 'react-data-grid/lib/styles.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
 
-import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/nextjs'
 import { HydrationBoundary, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
@@ -119,13 +118,11 @@ const TimestampInfoTimezoneBridge = ({ children }: { children: React.ReactNode }
   return <TimestampInfoProvider timezone={timezone}>{children}</TimestampInfoProvider>
 }
 
-// [Ivan] Serve the Monaco assets locally from the public folder. The worker bootstrap
-// (vs/base/worker/workerMain.js) loads the language workers (e.g. tsWorker.js) via fetch()
-// from inside the web worker. A root-relative path fails to resolve there in some browsers
-// (Firefox throws "... is not a valid URL"), so we point `vs` at an absolute URL including
-// the origin. Guarded on `window` since this module is also evaluated during SSR.
+// Share a single bundled Monaco instance across Studio and GraphiQL (see lib/monaco-setup).
+// Imported dynamically and guarded on `window` because `monaco-editor` touches browser globals
+// on import and must not run during SSR.
 if (typeof window !== 'undefined') {
-  loader.config({ paths: { vs: `${window.location.origin}${BASE_PATH}/monaco-editor/vs` } })
+  void import('@/lib/monaco-setup')
 }
 
 // [Joshen TODO] Once we settle on the new nav layout - we'll need a lot of clean up in terms of our layout components
