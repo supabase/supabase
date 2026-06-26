@@ -9,6 +9,7 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
 import { useIcebergWrapperCreateMutation } from '@/data/storage/iceberg-wrapper-create-mutation'
 import { DOCS_URL } from '@/lib/constants'
+import { isLessThan } from '@/lib/semver'
 
 export const ExtensionNotInstalled = ({
   bucketName,
@@ -21,8 +22,10 @@ export const ExtensionNotInstalled = ({
   wrapperMeta: WrapperMeta
   wrappersExtension: DatabaseExtension
 }) => {
-  const databaseNeedsUpgrading =
-    (wrappersExtension?.default_version ?? '') < (wrapperMeta?.minimumExtensionVersion ?? '')
+  const databaseNeedsUpgrading = isLessThan(
+    wrappersExtension?.default_version ?? '',
+    wrapperMeta?.minimumExtensionVersion ?? ''
+  )
 
   return (
     <>

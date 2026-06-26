@@ -132,7 +132,12 @@ export const UpdateCatalogTokenDialog = ({ vaultTokenId }: { vaultTokenId?: stri
           <Button variant="default" disabled={isUpdating} onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button variant="primary" loading={isUpdating} onClick={() => onSubmit()}>
+          <Button
+            variant="primary"
+            disabled={!selectedKey}
+            loading={isUpdating}
+            onClick={() => onSubmit()}
+          >
             Update token
           </Button>
         </DialogFooter>
