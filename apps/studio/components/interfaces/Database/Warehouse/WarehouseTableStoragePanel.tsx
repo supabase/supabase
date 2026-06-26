@@ -1,13 +1,6 @@
-import { ChevronDown } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useState, type ReactNode } from 'react'
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from 'ui'
+import { Button } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import {
@@ -131,21 +124,9 @@ export function WarehouseTableStoragePanel({
             <Button type="button" variant="default" onClick={openCatalogConnect}>
               Connect externally
             </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button
-                  type="button"
-                  variant="default"
-                  icon={<ChevronDown />}
-                  aria-label="More storage actions"
-                />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setDetachConfirm(true)}>
-                  Detach Warehouse copy
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <Button type="button" variant="danger" onClick={() => setDetachConfirm(true)}>
+              Detach Warehouse copy
+            </Button>
           </div>
         )}
       </div>
