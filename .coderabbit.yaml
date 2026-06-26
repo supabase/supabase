@@ -1,12 +1,9 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 
-# Inherit org-level settings for anything not specified here. Matches the
-# CodeRabbit dashboard (schema default is false), so the repo keeps falling back
-# to organization config for unset values.
+# Fall back to organization-level CodeRabbit settings for anything not set here.
 inheritance: true
 
-# Enrich linked issues with related code / potential solutions. Matches the
-# dashboard (schema default is false).
+# Enrich linked issues with related code and potential solutions during review.
 issue_enrichment:
   auto_enrich:
     enabled: true
@@ -29,8 +26,7 @@ reviews:
     - '!packages/icons/__registry__/**'
     - '!packages/icons/src/icons/**' # generated icon components
 
-  # Targeted, path-scoped review guidance. Kept in the repo (rather than the
-  # CodeRabbit dashboard) so it's version-controlled, visible, and reviewable.
+  # Targeted, path-scoped review guidance, version-controlled alongside the code.
   path_instructions:
     - path: 'packages/common/telemetry-constants.ts'
       instructions: |
