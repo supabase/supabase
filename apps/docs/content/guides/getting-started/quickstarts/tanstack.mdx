@@ -2,160 +2,98 @@
 title: 'Use Supabase with TanStack Start'
 subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a TanStack Start app.'
 breadcrumb: 'Framework Quickstarts'
-hideToc: true
 ---
 
-<StepHikeCompact>
+<$Partial path="quickstart_db_setup.mdx" />
 
-  <StepHikeCompact.Step step={1}>
+## Create a TanStack Start app
 
-    <$Partial path="quickstart_db_setup.mdx" />
+- Create a TanStack Start app using the official CLI.
 
-  </StepHikeCompact.Step>
+<$Partial path="uiLibCta.mdx" />
 
-  <StepHikeCompact.Step step={2}>
+```bash
+npm create @tanstack/start@latest my-app -- --package-manager npm --toolchain biome
+```
 
-    <StepHikeCompact.Details title="Create a TanStack Start app">
+## Install the Supabase client library
 
-    - Create a TanStack Start app using the official CLI.
+The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a TanStack Start app.
 
-    <$Partial path="uiLibCta.mdx" />
+Navigate to the TanStack Start app and install `supabase-js`.
 
-    </StepHikeCompact.Details>
+```bash
+cd my-app && npm install @supabase/supabase-js
+```
 
-    <StepHikeCompact.Code>
+## Declare Supabase Environment Variables
 
-      ```bash name=Terminal
-      npm create @tanstack/start@latest my-app -- --package-manager npm --toolchain biome
-      ```
+Create a `.env` file in the root of your project and populate with your Supabase connection variables:
 
-    </StepHikeCompact.Code>
+<ProjectConfigVariables variable="url" />
+<ProjectConfigVariables variable="publishable" />
 
-  </StepHikeCompact.Step>
+<$CodeTabs>
 
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Install the Supabase client library">
+```text name=.env
+VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+```
 
-    The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a TanStack Start app.
+</$CodeTabs>
 
-    Navigate to the TanStack Start app and install `supabase-js`.
+<$Partial path="api_settings_steps.mdx" variables={{ "framework": "", "tab": "" }} />
 
-    </StepHikeCompact.Details>
+## Create a Supabase client utility
 
-    <StepHikeCompact.Code>
+Create a new file at `src/utils/supabase.ts` to initialize the Supabase client.
 
-      ```bash name=Terminal
-      cd my-app && npm install @supabase/supabase-js
-      ```
+```ts name=src/utils/supabase.ts
+import { createClient } from '@supabase/supabase-js'
 
-    </StepHikeCompact.Code>
+export const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+)
+```
 
-  </StepHikeCompact.Step>
+## Query data from the app
 
-  <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Declare Supabase Environment Variables">
+Replace the contents of `src/routes/index.tsx` with the following code to add a loader function that fetches the instruments data and displays it on the page.
 
-    Create a `.env` file in the root of your project and populate with your Supabase connection variables:
+```tsx name=src/routes/index.tsx
+import { createFileRoute } from '@tanstack/react-router'
 
-    <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="publishable" />
+import { supabase } from '../utils/supabase'
 
+export const Route = createFileRoute('/')({
+  loader: async () => {
+    const { data: instruments } = await supabase.from('instruments').select()
+    return { instruments }
+  },
+  component: Home,
+})
 
-    </StepHikeCompact.Details>
+function Home() {
+  const { instruments } = Route.useLoaderData()
 
-    <StepHikeCompact.Code>
+  return (
+    <ul>
+      {instruments?.map((instrument) => (
+        <li key={instrument.name}>{instrument.name}</li>
+      ))}
+    </ul>
+  )
+}
+```
 
-      <$CodeTabs>
+## Start the app
 
-        ```text name=.env
-        VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
-        VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
-        ```
+Run the development server, go to http://localhost:3000 in a browser and you should see the list of instruments.
 
-      </$CodeTabs>
-
-      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "", "tab": "" }} />
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={5}>
-    <StepHikeCompact.Details title="Create a Supabase client utility">
-
-    Create a new file at `src/utils/supabase.ts` to initialize the Supabase client.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```ts name=src/utils/supabase.ts
-      import { createClient } from "@supabase/supabase-js";
-
-      export const supabase = createClient(
-        import.meta.env.VITE_SUPABASE_URL,
-        import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
-      );
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={6}>
-    <StepHikeCompact.Details title="Query data from the app">
-
-    Replace the contents of `src/routes/index.tsx` with the following code to add a loader function that fetches the instruments data and displays it on the page.
-
-    </StepHikeCompact.Details>
-    <StepHikeCompact.Code>
-
-      ```tsx name=src/routes/index.tsx
-      import { createFileRoute } from '@tanstack/react-router'
-      import { supabase } from '../utils/supabase'
-
-      export const Route = createFileRoute('/')({
-        loader: async () => {
-          const { data: instruments } = await supabase.from('instruments').select()
-          return { instruments }
-        },
-        component: Home,
-      })
-
-      function Home() {
-        const { instruments } = Route.useLoaderData()
-
-        return (
-          <ul>
-            {instruments?.map((instrument) => (
-              <li key={instrument.name}>{instrument.name}</li>
-            ))}
-          </ul>
-        )
-      }
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={7}>
-    <StepHikeCompact.Details title="Start the app">
-
-    Run the development server, go to http://localhost:3000 in a browser and you should see the list of instruments.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```bash name=Terminal
-      npm run dev
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-</StepHikeCompact>
+```bash
+npm run dev
+```
 
 ## Next steps
 

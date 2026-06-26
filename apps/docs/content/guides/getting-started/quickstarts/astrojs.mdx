@@ -2,188 +2,113 @@
 title: 'Use Supabase with Astro'
 subtitle: 'Learn how to create a Supabase project, add sample data, and query from an Astro app.'
 breadcrumb: 'Framework Quickstarts'
-hideToc: false
 ---
 
-<StepHikeCompact>
+<$Partial path="quickstart_db_setup.mdx" />
 
-  <StepHikeCompact.Step step={1}>
+## Create an Astro app
 
-    <$Partial path="quickstart_db_setup.mdx" />
+- Create an Astro app using the `npm create` command.
 
-  </StepHikeCompact.Step>
+<$Partial path="uiLibCta.mdx" />
 
-  <StepHikeCompact.Step step={2}>
+```bash
+npm create astro@latest my-app
+cd my-app
+```
 
-    <StepHikeCompact.Details title="Create an Astro app">
+## Install Supabase client library and Node adapter
 
-    - Create an Astro app using the `npm create` command.
+Install the `supabase-js` client library and the `@astrojs/node` adapter to enable server-side rendering.
 
-    <$Partial path="uiLibCta.mdx" />
+```bash
+npm install @supabase/supabase-js @astrojs/node
+```
 
-    </StepHikeCompact.Details>
+## Configure Astro for SSR
 
-    <StepHikeCompact.Code>
+Update your `astro.config.mjs`.
 
-      ```bash name=Terminal
-      npm create astro@latest my-app
-      cd my-app
-      ```
+```js name=astro.config.mjs
+import node from '@astrojs/node'
+import { defineConfig } from 'astro/config'
 
-    </StepHikeCompact.Code>
+export default defineConfig({
+  output: 'server',
+  adapter: node({
+    mode: 'standalone',
+  }),
+})
+```
 
-  </StepHikeCompact.Step>
+## Declare Supabase environment variables
 
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Install Supabase client library and Node adapter">
+Create a `.env.local` file and populate with your Supabase connection variables:
 
-    Install the `supabase-js` client library and the `@astrojs/node` adapter to enable server-side rendering.
+<ProjectConfigVariables variable="url" />
+<ProjectConfigVariables variable="publishable" />
 
-    </StepHikeCompact.Details>
+<$CodeTabs>
 
-    <StepHikeCompact.Code>
+```text name=.env.local
+PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+```
 
-      ```bash name=Terminal
-      npm install @supabase/supabase-js @astrojs/node
-      ```
+</$CodeTabs>
 
-    </StepHikeCompact.Code>
+<$Partial path="api_settings_steps.mdx" variables={{ "framework": "astro", "tab": "frameworks" }} />
 
-  </StepHikeCompact.Step>
+## Create a Supabase client helper
 
-  <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Configure Astro for SSR">
+Create a utility file to initialize the Supabase client:
 
-    Update your `astro.config.mjs`.
+```ts name=src/lib/supabase.ts
+import { createClient } from '@supabase/supabase-js'
 
-    </StepHikeCompact.Details>
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL
+const supabasePublishableKey = import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
-    <StepHikeCompact.Code>
+export function createServerClient() {
+  return createClient(supabaseUrl, supabasePublishableKey)
+}
+```
 
-      ```js name=astro.config.mjs
-      import { defineConfig } from "astro/config";
-      import node from "@astrojs/node";
+## Query Supabase data from Astro
 
-      export default defineConfig({
-        output: "server",
-        adapter: node({
-          mode: "standalone",
-        }),
-      });
-      ```
+Create a new file at `src/pages/instruments.astro` and populate with the following.
 
-    </StepHikeCompact.Code>
+This queries all rows from the `instruments` table in Supabase and renders them on the page.
 
-  </StepHikeCompact.Step>
+```astro name=src/pages/instruments.astro
+---
+import { createServerClient } from "../lib/supabase";
 
-  <StepHikeCompact.Step step={5}>
-    <StepHikeCompact.Details title="Declare Supabase Environment Variables">
+const supabase = createServerClient();
+const { data: instruments } = await supabase.from("instruments").select();
+---
 
-    Create a `.env.local` file and populate with your Supabase connection variables:
+<html>
+  <head>
+    <title>Instruments</title>
+  </head>
+  <body>
+    <ul>
+      {instruments?.map((instrument) => (
+        <li>{instrument.name}</li>
+      ))}
+    </ul>
+  </body>
+</html>
+```
 
-    <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="publishable" />
+## Start the app
 
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      <$CodeTabs>
-
-        ```text name=.env.local
-        PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
-        PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
-        ```
-
-      </$CodeTabs>
-
-      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "astro", "tab": "frameworks" }} />
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={6}>
-    <StepHikeCompact.Details title="Create a Supabase client helper">
-
-    Create a utility file to initialize the Supabase client:
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```ts name=src/lib/supabase.ts
-      import { createClient } from "@supabase/supabase-js";
-
-      const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL
-      const supabasePublishableKey = import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY
-
-      export function createServerClient() {
-        return createClient(
-          supabaseUrl,
-          supabasePublishableKey
-        );
-      }
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={7}>
-    <StepHikeCompact.Details title="Query Supabase data from Astro">
-
-    Create a new file at `src/pages/instruments.astro` and populate with the following.
-
-    This queries all rows from the `instruments` table in Supabase and renders them on the page.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```astro name=src/pages/instruments.astro
-      ---
-      import { createServerClient } from "../lib/supabase";
-
-      const supabase = createServerClient();
-      const { data: instruments } = await supabase.from("instruments").select();
-      ---
-
-      <html>
-        <head>
-          <title>Instruments</title>
-        </head>
-        <body>
-          <ul>
-            {instruments?.map((instrument) => (
-              <li>{instrument.name}</li>
-            ))}
-          </ul>
-        </body>
-      </html>
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={8}>
-    <StepHikeCompact.Details title="Start the app">
-
-    Run the development server, go to http://localhost:4321/instruments in your browser of choice to check the list of instruments.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```bash name=Terminal
-      npm run dev
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-</StepHikeCompact>
+Run the development server, go to http://localhost:4321/instruments in your browser of choice to check the list of instruments.
+
+```bash
+npm run dev
+```
 
 ## Next steps
 
