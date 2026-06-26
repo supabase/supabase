@@ -59,6 +59,35 @@ const GraphiQLMonacoTheme = ({ resolvedTheme }: { resolvedTheme: 'dark' | 'light
   return null
 }
 
+/**
+ * Inset the editor content from the container edges without floating the scroll shadow.
+ *
+ * Monaco anchors its `.scroll-decoration` (the shadow shown when scrolled) to the editor's
+ * top edge and absolutely positions the line numbers at the gutter's left edge, so container
+ * padding can't move either — it would just push the whole editor (shadow included) inward.
+ * Instead use Monaco's own options:
+ * - `padding` insets the content top/bottom while leaving the shadow pinned to the top, so
+ *   `.graphiql-query-editor` can stay full-bleed (`p-0`) for a flush shadow.
+ * - `glyphMargin` reserves an empty column to the left of the line numbers (same gutter
+ *   background), giving them left breathing room.
+ *
+ * `onDidCreateEditor` covers editors that GraphiQL mounts after Monaco loads.
+ */
+const GraphiQLEditorOptions = () => {
+  const { monaco } = useMonaco()
+
+  useEffect(() => {
+    if (!monaco) return
+    const options = { padding: { top: 16, bottom: 16 }, glyphMargin: true }
+    monaco.editor.getEditors().forEach((editor) => editor.updateOptions(options))
+    const disposable = monaco.editor.onDidCreateEditor((editor) => editor.updateOptions(options))
+
+    return () => disposable.dispose()
+  }, [monaco])
+
+  return null
+}
+
 export const GraphiQLTab = () => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
@@ -145,6 +174,7 @@ export const GraphiQLTab = () => {
   return (
     <div className="flex flex-col h-full">
       <GraphiQLMonacoTheme resolvedTheme={currentTheme} />
+      <GraphiQLEditorOptions />
       {notice === 'opt-in' && (
         <IntrospectionDisabledNotice
           schema={DEFAULT_INTROSPECTION_SCHEMA}
