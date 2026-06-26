@@ -122,6 +122,20 @@ The platform-specific examples below demonstrate how to implement this pattern f
     6. Create a signing **Key** in the [Keys](https://developer.apple.com/account/resources/authkeys/list) section of the Apple Developer Console. You can use this key to generate a secret key using the tool below, which is added to your Supabase project's Auth configuration. Make sure you safely store the `AuthKey_XXXXXXXXXX.p8` file. If you ever lose access to it, or make it public accidentally, revoke it from the Apple Developer Console and create a new one immediately.
     7. Finally, add the information you configured above to the [Apple provider configuration in the Supabase dashboard](/dashboard/project/_/auth/providers).
 
+    <Admonition type="caution" label="Client ID Ordering for Combined Mobile and Web Apps">
+
+    If your project uses Sign in with Apple for **both** native mobile apps (iOS/macOS) **and** web applications, the **Services ID must be listed first** in the Client IDs field in your Supabase dashboard.
+
+    For example, if you have:
+    - A web app using Services ID: `com.example.app.web`
+    - A mobile app using App ID: `com.example.app`
+
+    Enter them in the Client IDs field as: `com.example.app.web, com.example.app`
+
+    Incorrect ordering may cause web-based Sign in with Apple to fail while mobile continues to work.
+
+    </Admonition>
+
 You can also configure the Apple auth provider using the Management API:
 
 ```bash
