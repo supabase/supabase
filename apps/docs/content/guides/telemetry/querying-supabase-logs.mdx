@@ -26,7 +26,7 @@ Each row has a small set of top-level columns. Everything specific to a service 
 | `source`         | string              | The service the log came from. Always filter on this.     |
 | `log_attributes` | Map(String, String) | Structured fields for the source, keyed by a dotted path. |
 
-The `timestamp` is a `DateTime64` in UTC, formatted like `2026-06-22T09:34:06.215000` (ISO 8601 with microseconds). You can order and compare it directly. The Logs Explorer already applies the selected time range, so you rarely need a `timestamp` filter of your own.
+The `timestamp` is a `DateTime64` in UTC, formatted like `2026-06-22T09:34:06.215000` (ISO 8601 with microseconds). You can order and compare it directly. The Logs Explorer already applies the selected time range, don't need to write a `timestamp` filter of your own.
 
 ## Sources
 
@@ -62,7 +62,7 @@ There are no unnesting joins. Where BigQuery nested a field under `metadata.requ
 Map values are strings. To compare or aggregate a numeric field, wrap it in `toInt32OrZero`:
 
 ```sql
-select count(*) as server_errors
+select count() as server_errors
 from logs
 where source = 'edge_logs'
   and toInt32OrZero(log_attributes['response.status_code']) between 500 and 599
@@ -88,7 +88,7 @@ Count requests by status code:
 ```sql
 select
   toInt32OrZero(log_attributes['response.status_code']) as status,
-  count(*) as count
+  count() as count
 from logs
 where source = 'edge_logs'
 group by status
