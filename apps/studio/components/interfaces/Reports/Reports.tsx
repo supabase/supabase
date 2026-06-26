@@ -368,12 +368,14 @@ const Reports = () => {
     return <NoPermission isFullPage resourceText="access this custom report" />
   }
 
+  const reportTitle = currentReport?.name || 'Reports'
+
   return (
     <>
       <div className="flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
         <div className="flex items-center justify-between">
           <div>
-            <h1>{currentReport?.name || 'Reports'}</h1>
+            <h1>{reportTitle}</h1>
             <p className="text-foreground-light">{currentReport?.description}</p>
           </div>
           {hasEdits && (
@@ -419,7 +421,7 @@ const Reports = () => {
           <div className="flex items-center gap-x-2">
             <DocsButton
               href={OBSERVABILITY_DOCS_HREFS.customReport}
-              topic={currentReport?.name ?? 'Custom report'}
+              topic={reportTitle}
             />
             <ButtonTooltip
               variant="default"

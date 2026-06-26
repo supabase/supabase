@@ -45,6 +45,8 @@ PostgRESTReport.getLayout = (page) => (
 export type UpdateDateRange = (from: string, to: string) => void
 export default PostgRESTReport
 
+const REPORT_TITLE = 'Data API'
+
 const PostgrestReport = () => {
   const { db, chart } = useParams()
   const {
@@ -117,12 +119,12 @@ const PostgrestReport = () => {
 
   return (
     <>
-      <ReportHeader showDatabaseSelector={false} title="Data API" />
+      <ReportHeader showDatabaseSelector={false} title={REPORT_TITLE} />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2 w-full">
             <div className="ml-auto flex items-center gap-2 flex-wrap">
-              <DocsButton href={OBSERVABILITY_DOCS_HREFS.dataApi} topic="Data API" />
+              <DocsButton href={OBSERVABILITY_DOCS_HREFS.dataApi} topic={REPORT_TITLE} />
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
                 label="Refresh report"

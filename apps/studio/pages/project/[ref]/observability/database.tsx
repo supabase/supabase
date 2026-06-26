@@ -67,6 +67,8 @@ DatabaseReport.getLayout = (page) => (
 export type UpdateDateRange = (from: string, to: string) => void
 export default DatabaseReport
 
+const REPORT_TITLE = 'Database'
+
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
@@ -229,11 +231,11 @@ const DatabaseUsage = () => {
 
   return (
     <>
-      <ReportHeader showDatabaseSelector title="Database" />
+      <ReportHeader showDatabaseSelector title={REPORT_TITLE} />
       <ReportStickyNav
         content={
           <div className="ml-auto flex items-center gap-2 flex-wrap">
-            <DocsButton href={OBSERVABILITY_DOCS_HREFS.database} topic="Database" />
+            <DocsButton href={OBSERVABILITY_DOCS_HREFS.database} topic={REPORT_TITLE} />
             <ShortcutTooltip
               shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
               label="Refresh report"

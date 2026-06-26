@@ -19,6 +19,8 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import type { NextPageWithLayout } from '@/types'
 
+const REPORT_TITLE = 'Query Performance'
+
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref } = useParams()
   const { data: project, isLoading: isLoadingProject } = useSelectedProjectQuery()
@@ -88,9 +90,9 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   return (
     <div className="h-full flex flex-col">
       <div className="w-full mb-0 flex lg:items-center justify-between gap-4 py-4 px-6 lg:flex-row flex-col">
-        <h3 className="text-foreground text-xl prose">Query Performance</h3>
+        <h3 className="text-foreground text-xl prose">{REPORT_TITLE}</h3>
         <div className="flex items-center gap-2 flex-wrap">
-          <DocsButton href={OBSERVABILITY_DOCS_HREFS.queryPerformance} topic="Query Performance" />
+          <DocsButton href={OBSERVABILITY_DOCS_HREFS.queryPerformance} topic={REPORT_TITLE} />
           <DatabaseSelector />
         </div>
       </div>

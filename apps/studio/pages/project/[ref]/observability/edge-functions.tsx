@@ -56,6 +56,8 @@ EdgeFunctionsReportV2.getLayout = (page) => (
 
 export default EdgeFunctionsReportV2
 
+const REPORT_TITLE = 'Edge Functions'
+
 const EdgeFunctionsUsage = () => {
   const { ref } = useParams()
   const { data: functions } = useEdgeFunctionsQuery({
@@ -145,12 +147,12 @@ const EdgeFunctionsUsage = () => {
 
   return (
     <>
-      <ReportHeader title="Edge Functions" showDatabaseSelector={false} />
+      <ReportHeader title={REPORT_TITLE} showDatabaseSelector={false} />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2 w-full">
             <div className="ml-auto flex items-center gap-2 flex-wrap">
-              <DocsButton href={OBSERVABILITY_DOCS_HREFS.edgeFunctions} topic="Edge Functions" />
+              <DocsButton href={OBSERVABILITY_DOCS_HREFS.edgeFunctions} topic={REPORT_TITLE} />
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
                 label="Refresh report"

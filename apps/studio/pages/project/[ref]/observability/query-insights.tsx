@@ -16,6 +16,8 @@ const PRESETS = [
   REPORT_DATERANGE_HELPER_LABELS.LAST_24_HOURS,
 ]
 
+const REPORT_TITLE = 'Query Insights'
+
 const QueryInsightsReport: NextPageWithLayout = () => {
   const { selectedDateRange, datePickerValue, datePickerHelpers, handleDatePickerChange } =
     useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
@@ -30,9 +32,9 @@ const QueryInsightsReport: NextPageWithLayout = () => {
   return (
     <div className="h-full flex flex-col">
       <div className="w-full mb-0 flex lg:items-center justify-between gap-4 py-2 px-6 lg:flex-row flex-col border-b lg:h-[48px]">
-        <h3 className="text-foreground text-xl prose">Query Insights</h3>
+        <h3 className="text-foreground text-xl prose">{REPORT_TITLE}</h3>
         <div className="flex items-center gap-2 flex-wrap">
-          <DocsButton href={OBSERVABILITY_DOCS_HREFS.queryInsights} topic="Query Insights" />
+          <DocsButton href={OBSERVABILITY_DOCS_HREFS.queryInsights} topic={REPORT_TITLE} />
           <DatabaseSelector />
           <Select
             value={datePickerValue.isHelper ? datePickerValue.text : undefined}

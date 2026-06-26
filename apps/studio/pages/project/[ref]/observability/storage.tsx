@@ -38,6 +38,8 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { NextPageWithLayout } from '@/types'
 
+const REPORT_TITLE = 'Storage'
+
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()
 
@@ -90,12 +92,12 @@ export const StorageReport: NextPageWithLayout = () => {
 
   return (
     <ReportPadding>
-      <ReportHeader title="Storage" showDatabaseSelector={false} />
+      <ReportHeader title={REPORT_TITLE} showDatabaseSelector={false} />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2 w-full">
             <div className="ml-auto flex items-center gap-2 flex-wrap">
-              <DocsButton href={OBSERVABILITY_DOCS_HREFS.storage} topic="Storage" />
+              <DocsButton href={OBSERVABILITY_DOCS_HREFS.storage} topic={REPORT_TITLE} />
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
                 label="Refresh report"

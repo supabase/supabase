@@ -25,6 +25,8 @@ import { useApiReport } from '@/data/reports/api-report-query'
 import { useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import type { NextPageWithLayout } from '@/types'
 
+const REPORT_TITLE = 'API Gateway'
+
 export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()
 
@@ -96,7 +98,7 @@ export const ApiReport: NextPageWithLayout = () => {
 
   return (
     <ReportPadding>
-      <ReportHeader title="API Gateway" showDatabaseSelector={false} />
+      <ReportHeader title={REPORT_TITLE} showDatabaseSelector={false} />
       <ReportStickyNav
         content={
           <div className="flex w-full items-center gap-3">
@@ -114,7 +116,7 @@ export const ApiReport: NextPageWithLayout = () => {
               className="flex-1 min-w-0"
               showDatabaseSelector={false}
             />
-            <DocsButton href={OBSERVABILITY_DOCS_HREFS.apiGateway} topic="API Gateway" />
+            <DocsButton href={OBSERVABILITY_DOCS_HREFS.apiGateway} topic={REPORT_TITLE} />
             <UpgradePrompt
               show={showUpgradePrompt}
               setShowUpgradePrompt={setShowUpgradePrompt}

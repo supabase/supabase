@@ -45,6 +45,8 @@ RealtimeReport.getLayout = (page) => (
 export type UpdateDateRange = (from: string, to: string) => void
 export default RealtimeReport
 
+const REPORT_TITLE = 'Realtime'
+
 const RealtimeUsage = () => {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [showDatePicker, setShowDatePicker] = useState(false)
@@ -142,12 +144,12 @@ const RealtimeUsage = () => {
 
   return (
     <>
-      <ReportHeader showDatabaseSelector={false} title="Realtime" />
+      <ReportHeader showDatabaseSelector={false} title={REPORT_TITLE} />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-3 w-full">
             <div className="ml-auto flex items-center gap-2 flex-wrap">
-              <DocsButton href={OBSERVABILITY_DOCS_HREFS.realtime} topic="Realtime" />
+              <DocsButton href={OBSERVABILITY_DOCS_HREFS.realtime} topic={REPORT_TITLE} />
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
                 label="Refresh report"

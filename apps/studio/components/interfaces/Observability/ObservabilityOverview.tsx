@@ -25,6 +25,8 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
+const REPORT_TITLE = 'Overview'
+
 type ChartIntervalKey = '1hr' | '1day' | '7day'
 
 export const ObservabilityOverview = () => {
@@ -169,7 +171,7 @@ export const ObservabilityOverview = () => {
     <ReportPadding>
       <div className="flex flex-row justify-between items-center">
         <div className="flex items-center gap-3">
-          <ReportHeader title="Overview" />
+          <ReportHeader title={REPORT_TITLE} />
           <Tooltip>
             <TooltipTrigger asChild>
               <Badge variant="warning">Beta</Badge>
@@ -180,7 +182,7 @@ export const ObservabilityOverview = () => {
           </Tooltip>
         </div>
         <div className="flex items-center gap-2">
-          <DocsButton href={OBSERVABILITY_DOCS_HREFS.overview} topic="Overview" />
+          <DocsButton href={OBSERVABILITY_DOCS_HREFS.overview} topic={REPORT_TITLE} />
           <ShortcutTooltip
             shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
             label="Refresh report"

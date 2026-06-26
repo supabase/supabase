@@ -60,6 +60,8 @@ AuthReport.getLayout = (page) => (
 export type UpdateDateRange = (from: string, to: string) => void
 export default AuthReport
 
+const REPORT_TITLE = 'Auth'
+
 const AuthUsage = () => {
   const { ref } = useParams()
   const chartSyncId = `auth-report`
@@ -211,12 +213,12 @@ const AuthUsage = () => {
 
   return (
     <>
-      <ReportHeader title="Auth" showDatabaseSelector={false} />
+      <ReportHeader title={REPORT_TITLE} showDatabaseSelector={false} />
       <ReportStickyNav
         content={
           <div className="flex flex-col gap-2 w-full">
             <div className="ml-auto flex items-center gap-2 flex-wrap">
-              <DocsButton href={OBSERVABILITY_DOCS_HREFS.auth} topic="Auth" />
+              <DocsButton href={OBSERVABILITY_DOCS_HREFS.auth} topic={REPORT_TITLE} />
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
                 label="Refresh report"
