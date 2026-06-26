@@ -1,0 +1,45 @@
+---
+title: 'Project Pausing'
+description: 'Free project pausing behavior.'
+---
+
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+Supabase pauses Free Plan projects that show low activity over a 7-day period to save server resources. This guide explains how pausing works, how to restore a paused project, and how to avoid pausing altogether.
+
+<Admonition type="note">
+
+Projects under a paid plan cannot be paused and are not subject to automatic pausing for inactivity. To pause a project currently under a paid plan, first transfer the project to an organization on the Free plan.
+
+</Admonition>
+
+## How automatic pausing works
+
+A Free plan project is considered inactive if it does not receive sufficient user database activity over the past week. Projects with too few user queries during that window are the clearest candidates for pausing. While you may be actively using the project, it's possible that usage is not enough to exclude it from automatic pausing. Typically a few user requests to the database each day over the previous week is enough to keep the project from being paused.
+
+Supabase sends two emails to the project owner regarding project pausing:
+
+1. A warning email roughly one week before the pause takes effect.
+2. A confirmation email once the project has been paused.
+
+After receiving an initial email warning, the pause can be prevented by taking one of the following steps:
+
+- Visit the project from the [Supabase Dashboard](/dashboard/project/_) to generate activity.
+- Generate a sufficient amount of activity by making API calls to your project or sending requests via your connected application.
+
+## Restoring a paused project
+
+You can restore a paused project for up to 90 days after it was paused:
+
+1. Open the [Supabase Dashboard](/dashboard/organizations)
+2. Select the organization, followed by the paused project
+3. Click **Resume project** and confirm
+
+The project will return to its previous state, including data and configurations.
+
+### 90-day window to restore
+
+Once the project is paused, there is a 90-day window to restore the project on the platform from within Supabase Studio. The 90-day window allows Supabase to introduce platform changes that may not be backward compatible with older backups. Unlike active projects, static backups can't be updated to accommodate such changes.
+
+## Preventing automatic project pausing
+
+To prevent future automatic pausing, upgrade to the Pro Plan from [Billing Settings](/dashboard/org/_/billing?panel=subscriptionPlan). Paid projects cannot be paused and are not subject to pausing for inactivity.

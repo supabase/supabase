@@ -10,8 +10,9 @@ import { Suspense, useMemo, useState } from 'react'
 import type PostTypes from 'types/post'
 import { InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 
-import BlogFilters from '../../../../components/Blog/BlogFilters'
-import SectionContainer from '../../../../components/Layouts/SectionContainer'
+import SectionContainerWithCn from '@/components/Layouts/SectionContainerWithCn'
+
+export type BlogView = 'list' | 'grid'
 
 interface Author {
   author_id: string
@@ -44,10 +45,9 @@ export default function AuthorClient({ author, authorId, blogs, initialView }: A
   }, [blogs, searchTerm])
 
   return (
-    <div>
-      {/* Header */}
-      <div className="mx-auto max-w-(--container-max-w,75rem) px-6 pt-8 md:pt-12 pb-8">
-        <div className="text-foreground-lighter flex space-x-1 mb-8">
+    <DefaultLayout>
+      <SectionContainerWithCn height="narrow" className="space-y-6">
+        <div className="text-foreground-lighter flex space-x-1">
           <h1 className="cursor-pointer">
             <Link href="/blog">Blog</Link>
             <span className="px-2">/</span>
@@ -88,20 +88,39 @@ export default function AuthorClient({ author, authorId, blogs, initialView }: A
             </div>
           </div>
         )}
-      </div>
+      </SectionContainerWithCn>
 
-      {/* Filters row — divider above the header, search aligned with the view toggle */}
-      <div className="sticky top-[65px] z-10 bg-background/80 backdrop-blur-sm border-b border-border">
-        <SectionContainer className="py-3!">
-          <Suspense fallback={null}>
-            <BlogFilters
-              view={view}
-              setView={setView}
-              onFilterChange={(_, search) => setSearchTerm(search ?? '')}
-            />
-          </Suspense>
-        </SectionContainer>
-      </div>
+      <div className="border-default border-t">
+        <SectionContainerWithCn height="narrow">
+          <div className="flex flex-row items-center justify-between gap-2 mb-6">
+            <div className="flex-1 max-w-[280px]">
+              <InputGroup className="w-full">
+                <InputGroupInput
+                  size="small"
+                  autoComplete="off"
+                  type="search"
+                  placeholder="Search posts"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+                <InputGroupAddon>
+                  <Search />
+                </InputGroupAddon>
+              </InputGroup>
+            </div>
+            <Button
+              variant="default"
+              title={isList ? 'Grid View' : 'List View'}
+              onClick={handleViewSelection}
+              className="h-full p-2 text-foreground-light"
+            >
+              {isList ? (
+                <Grid className="w-4 h-4 stroke-1.5" />
+              ) : (
+                <AlignJustify className="w-4 h-4 stroke-1.5" />
+              )}
+            </Button>
+          </div>
 
       {/* Posts */}
       <div className="mx-auto max-w-(--container-max-w,75rem)">
@@ -126,8 +145,8 @@ export default function AuthorClient({ author, authorId, blogs, initialView }: A
                 ? 'No posts found matching your search.'
                 : 'No posts found by this author.'}
             </p>
-          </div>
-        )}
+          )}
+        </SectionContainerWithCn>
       </div>
     </div>
   )

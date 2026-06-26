@@ -268,7 +268,7 @@ const BlogPostRenderer = async ({
               </div>
             </div>
           </div>
-        </div>
+        </SectionContainerWithCn>
 
         <div className="border-t">
           <CTASection />

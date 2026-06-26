@@ -1,7 +1,7 @@
 import dayjs from 'dayjs'
-import { AlertCircle } from 'lucide-react'
 import { useState } from 'react'
-import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AddNewFactorModal } from './AddNewFactorModal'
@@ -29,15 +29,12 @@ export const TOTPFactors = () => {
           {isSuccess && (
             <>
               {data.totp.length === 1 && (
-                <Alert variant="default" className="mb-2">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>
-                    We recommend configuring two authenticator apps across different devices
-                  </AlertTitle>
-                  <AlertDescription className="flex flex-col gap-3">
-                    The two authenticator apps will serve as a backup for each other.
-                  </AlertDescription>
-                </Alert>
+                <Admonition
+                  type="warning"
+                  layout="horizontal"
+                  title="We recommend configuring two authenticator apps across different devices"
+                  description="The two authenticator apps will serve as a backup for each other."
+                />
               )}
               <div>
                 {data.totp.map((factor) => {

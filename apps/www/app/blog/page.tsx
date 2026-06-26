@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 
 import { BLOG_VIEW_COOKIE, isBlogView, type BlogView } from './blog-view'
 import BlogClient from './BlogClient'
+import SectionContainer from '@/components/Layouts/SectionContainer'
 import { breadcrumbs } from '@/lib/breadcrumbs'
 import { breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 import { getSortedPosts } from '@/lib/posts'
