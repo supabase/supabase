@@ -63,7 +63,7 @@ export async function getSQLSnippetFolders(
   if (error) handleError(error)
   return {
     ...data.data,
-    contents: remapSqlContentFields((data.data.contents ?? []).map(withSavedStatus) as any) as any,
+    contents: remapSqlContentFields((data.data.contents ?? []).map(withSavedStatus)),
     cursor: data.cursor,
   }
 }
