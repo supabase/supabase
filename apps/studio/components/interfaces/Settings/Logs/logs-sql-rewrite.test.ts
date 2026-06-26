@@ -63,6 +63,7 @@ describe('rewriteLogsSqlWithAI', () => {
     const [url, init] = fetchMock.mock.calls[0]
     expect(url).toContain('/api/ai/code/complete')
     const body = JSON.parse(init.body)
+    expect(body.dialect).toBe('clickhouse')
     expect(body.completionMetadata.selection).toBe('select 1 from edge_logs')
     expect(body.completionMetadata.prompt.toLowerCase()).toContain('reply with only')
   })

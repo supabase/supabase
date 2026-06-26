@@ -38,10 +38,10 @@ export function buildClickhouseRewritePrompt(sql: string): string {
 Convert the BigQuery logs query below to ClickHouse SQL for the logs table. There are no per-service tables and no unnest joins in ClickHouse. Follow these rules exactly:
 
 1. Replace the FROM table with the single logs table and filter by source. The old table name is the source value: "from postgres_logs as t" becomes "from logs where source = 'postgres_logs'". This is required, never select from a table like postgres_logs or edge_logs.
-2. Remove every "cross join unnest(...)" clause.
+2. Remove every join that unnests metadata or its structs. This includes "cross join unnest(...)" and "left join unnest(...) on true".
 3. Replace any column that came from an unnest alias with a log_attributes lookup. A field off unnest(metadata) becomes log_attributes['field']; a field off a nested struct like unnest(m.parsed) becomes log_attributes['parsed.field'] (keep the struct name as a dotted prefix, drop the metadata root and every alias).
 4. Wrap numeric fields in toInt32OrZero(...) before comparing or aggregating them.
-5. Replace cast(timestamp as datetime) with timestamp, and use count() instead of count(*).
+5. Replace BigQuery functions with ClickHouse equivalents: regexp_contains(x, 'p') becomes match(x, 'p'), or x ILIKE '%p%' for a plain substring. Replace cast(timestamp as datetime) with timestamp. Use count() instead of count(*).
 6. Preserve the original select list, filters, group by, order by, and limit intent.
 
 Example.
@@ -102,6 +102,7 @@ export async function rewriteLogsSqlWithAI(args: RewriteLogsSqlArgs) {
       projectRef,
       connectionString,
       language: 'sql',
+      dialect: 'clickhouse',
       orgSlug,
       completionMetadata: {
         textBeforeCursor: '',

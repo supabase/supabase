@@ -11,6 +11,7 @@ import { getOrgAIDetails } from '@/lib/ai/ai-details'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
 import {
+  CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS,
   COMPLETION_PROMPT,
   EDGE_FUNCTION_PROMPT,
   PG_BEST_PRACTICES,
@@ -128,6 +129,9 @@ const requestBodySchema = z.object({
   connectionString: z.string().nullish(),
   orgSlug: z.string().optional(),
   language: z.string().optional(),
+  // 'clickhouse' targets the logs engine: skip the Postgres schema/best-practices
+  // so the model writes ClickHouse SQL instead of Postgres.
+  dialect: z.enum(['postgres', 'clickhouse']).optional(),
 })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -148,8 +152,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       return res.status(400).json({ error: 'Invalid request body', issues: parseError.issues })
     }
 
-    const { completionMetadata, projectRef, connectionString, orgSlug, language } = data
+    const { completionMetadata, projectRef, connectionString, orgSlug, language, dialect } = data
     const { textBeforeCursor, textAfterCursor, prompt, selection } = completionMetadata
+    const isClickhouse = dialect === 'clickhouse'
 
     const authorization = req.headers.authorization
     let aiOptInLevel: AiOptInLevel = IS_PLATFORM ? 'disabled' : 'schema'
@@ -180,7 +185,9 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       ...(authorization && { Authorization: authorization }),
     }
 
-    const includeSchema = aiOptInLevel !== 'disabled'
+    // The logs engine has no Postgres schema to inject; pulling it in only biases
+    // the model toward Postgres SQL.
+    const includeSchema = !isClickhouse && aiOptInLevel !== 'disabled'
 
     // Fetch schema list first so we can determine which schemas to load DDL for.
     // These are best-effort — if they fail, we proceed without DDL context.
@@ -227,11 +234,15 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           otherSchemas: schemas.filter((s) => !fetchedSchemaSet.has(s.name)).map((s) => s.name),
         }
 
-    // Important: do not use dynamic content in the system prompt or Bedrock will not cache it
+    // Important: keep this static per branch (no dynamic content) or Bedrock will not cache it
+    const dialectInstructions = isClickhouse
+      ? CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS
+      : language === 'sql'
+        ? `${SQL_COMPLETION_INSTRUCTIONS}\n${PG_BEST_PRACTICES}`
+        : EDGE_FUNCTION_PROMPT
     const system = source`
       ${COMPLETION_PROMPT}
-      ${language === 'sql' ? SQL_COMPLETION_INSTRUCTIONS : ''}
-      ${language === 'sql' ? PG_BEST_PRACTICES : EDGE_FUNCTION_PROMPT}
+      ${dialectInstructions}
       ${SECURITY_PROMPT}
     `
 
