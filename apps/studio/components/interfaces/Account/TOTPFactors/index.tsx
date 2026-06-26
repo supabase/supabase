@@ -1,7 +1,6 @@
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AddNewFactorModal } from './AddNewFactorModal'
