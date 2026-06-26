@@ -378,6 +378,221 @@ export const MCP_CLIENT_GROUPS = [
   },
 ] as const
 
+/**
+ * Portable content model for per-client setup instructions.
+ *
+ * Instruction prose used to live twice - as React JSX in `constants.tsx` (for
+ * the dashboard's Connect panel) and re-authored as mdast in the markdown docs.
+ * Expressing it as data instead lets both surfaces render from one source, so
+ * they can't drift. The React and markdown renderers are thin adapters over
+ * these blocks; adding or editing a client means editing data only.
+ */
+export type McpInline =
+  | string
+  | { code: string }
+  | { strong: string }
+  | { link: string; href: string }
+
+export interface McpTextBlock {
+  type: 'text'
+  content: McpInline[]
+}
+/** A copyable shell command. `value` may depend on the resolved MCP server URL. */
+export interface McpCommandBlock {
+  type: 'command'
+  value: string | ((url: string) => string)
+}
+export interface McpCalloutBlock {
+  type: 'callout'
+  variant: 'warning' | 'note'
+  content: McpInline[]
+}
+/** A purely illustrative screenshot. Rendered by the dashboard; omitted from
+ * markdown (the surrounding text already conveys the steps). `asset` keys into
+ * the renderer's image map so this stays free of bundler-specific imports. */
+export interface McpImageBlock {
+  type: 'image'
+  asset: string
+  alt: string
+}
+export type McpBlock = McpTextBlock | McpCommandBlock | McpCalloutBlock | McpImageBlock
+
+export interface McpClientInstructions {
+  /** Steps shown before the config-file block (e.g. CLI install). */
+  primary?: (options: { isPlatform: boolean }) => McpBlock[]
+  /** Steps shown after the config-file block (e.g. authentication). */
+  alternate?: (options: { isPlatform: boolean }) => McpBlock[]
+  /** Inline description shown above a deep-link/connector install. */
+  deepLinkDescription?: McpInline[]
+}
+
+const text = (...content: McpInline[]): McpTextBlock => ({ type: 'text', content })
+const command = (value: McpCommandBlock['value']): McpCommandBlock => ({ type: 'command', value })
+const warning = (...content: McpInline[]): McpCalloutBlock => ({
+  type: 'callout',
+  variant: 'warning',
+  content,
+})
+
+const GEMINI_EXTENSION_URL = 'https://github.com/supabase-community/gemini-extension'
+
+/**
+ * Per-client setup instructions as portable content. Shared by the dashboard's
+ * Connect panel and the generated markdown docs. Clients absent here are
+ * configured via their config file (and/or deep link) only.
+ */
+export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
+  'claude-code': {
+    primary: () => [
+      text('Add the MCP server to your project config using the command line:'),
+      command(MCP_CLI_COMMANDS['claude-code'].install!),
+    ],
+    alternate: () => [
+      text(
+        'After configuring the MCP server, you need to authenticate. In a regular terminal (not the IDE extension) run:'
+      ),
+      command(MCP_CLI_COMMANDS['claude-code'].authenticate!),
+      text('Select the "supabase" server, then "Authenticate" to begin the authentication flow.'),
+    ],
+  },
+  codex: {
+    primary: () => [
+      text('Add the Supabase MCP server to Codex:'),
+      command(MCP_CLI_COMMANDS['codex'].install!),
+    ],
+    alternate: () => [
+      text('Authenticate with the MCP server:'),
+      command(MCP_CLI_COMMANDS['codex'].authenticate!),
+      text('Finally, run ', { code: '/mcp' }, ' inside Codex to verify authentication.'),
+    ],
+  },
+  'gemini-cli': {
+    primary: ({ isPlatform }) => [
+      warning('Ensure you are running Gemini CLI version ', { code: '0.20.2' }, ' or higher.'),
+      ...(isPlatform
+        ? [
+            text(
+              'Install the Supabase ',
+              { link: 'extension', href: GEMINI_EXTENSION_URL },
+              ' for Gemini CLI. This bundles the Supabase MCP server connection, ',
+              { link: 'agent skills', href: 'https://github.com/supabase/agent-skills' },
+              ', and other context.'
+            ),
+            command(`gemini extensions install ${GEMINI_EXTENSION_URL}`),
+            text('Or add just the MCP server to Gemini CLI:'),
+          ]
+        : [text('Add the Supabase MCP server to Gemini CLI:')]),
+      command(MCP_CLI_COMMANDS['gemini-cli'].install!),
+    ],
+    alternate: () => [
+      text(
+        'After installation, start the Gemini CLI and run the following command to authenticate the server:'
+      ),
+      command(MCP_CLI_COMMANDS['gemini-cli'].authenticate!),
+    ],
+  },
+  'copilot-cli': {
+    primary: () => [
+      text('Add the MCP server to your GitHub Copilot config using the command line:'),
+      command(MCP_CLI_COMMANDS['copilot-cli'].install!),
+    ],
+    alternate: () => [
+      text('After configuring the MCP server, authenticate by running:'),
+      command(MCP_CLI_COMMANDS['copilot-cli'].authenticate!),
+      text('Follow the on-screen instructions to complete the authentication flow.'),
+    ],
+  },
+  antigravity: {
+    alternate: () => [
+      text(
+        'After saving the config, restart Antigravity. It will prompt you to complete the OAuth flow to authenticate with Supabase.'
+      ),
+      text(
+        'To edit the config from within Antigravity, click the ',
+        { strong: '···' },
+        ' menu at the top of the Agent pane > ',
+        { strong: 'MCP Servers' },
+        ' > ',
+        { strong: 'Manage MCP Servers' },
+        ' > ',
+        { strong: 'View raw config' },
+        '. From the Manage MCP Servers page you can also ',
+        { strong: 'Refresh' },
+        ' server configs and enable/disable servers.'
+      ),
+      text(
+        'If you run into authentication issues, open Agent Settings with ',
+        { strong: 'Cmd+,' },
+        ' (Mac) or ',
+        { strong: 'Ctrl+,' },
+        ' (Windows/Linux), navigate to the ',
+        { strong: 'Customizations' },
+        ' tab, and click the ',
+        { strong: 'Authenticate' },
+        ' button next to the Supabase server.'
+      ),
+      {
+        type: 'image',
+        asset: 'antigravity-auth',
+        alt: 'Antigravity MCP server settings showing the Authenticate button next to the Supabase server',
+      },
+    ],
+  },
+  windsurf: {
+    primary: () => [
+      warning('Ensure you are running Windsurf version ', { code: '0.1.37' }, ' or higher.'),
+    ],
+    alternate: () => [
+      text(
+        'Windsurf does not currently support remote MCP servers over HTTP transport. You need to use the mcp-remote package as a proxy.'
+      ),
+    ],
+  },
+  goose: {
+    primary: () => [
+      text('Start a Goose session with the Supabase extension:'),
+      command(MCP_CLI_COMMANDS['goose'].install!),
+    ],
+    alternate: () => [
+      text(
+        'For more details, see ',
+        {
+          link: 'Using Extensions',
+          href: 'https://block.github.io/goose/docs/getting-started/using-extensions',
+        },
+        ' in Goose.'
+      ),
+    ],
+  },
+  factory: {
+    primary: () => [
+      text('Add Supabase MCP server to Factory:'),
+      command(MCP_CLI_COMMANDS['factory'].install!),
+    ],
+    alternate: () => [
+      text(
+        'Restart Factory or type ',
+        { code: '/mcp' },
+        ' within droid to complete OAuth authentication flow.'
+      ),
+    ],
+  },
+  opencode: {
+    alternate: () => [
+      text('After adding the configuration, run the following command to authenticate:'),
+      command(MCP_CLI_COMMANDS['opencode'].authenticate!),
+      text('This will open your browser to complete the OAuth authentication flow.'),
+    ],
+  },
+  kiro: {
+    deepLinkDescription: [
+      'Install the Supabase ',
+      { link: 'power', href: 'https://kiro.dev/docs/powers/' },
+      ' for Kiro. This bundles the Supabase MCP server and steering files for best practices.',
+    ],
+  },
+}
+
 export const DEFAULT_MCP_URL_PLATFORM = 'http://localhost:8080/mcp'
 export const DEFAULT_MCP_URL_NON_PLATFORM = 'http://localhost:54321/mcp'
 

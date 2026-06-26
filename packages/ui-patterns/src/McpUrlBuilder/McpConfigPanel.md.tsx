@@ -4,20 +4,77 @@
 import {
   HOSTED_MCP_URL as HOSTED_URL,
   DEFAULT_MCP_URL_NON_PLATFORM as LOCAL_URL,
-  MCP_CLI_COMMANDS,
   MCP_CLIENT_DATA,
   MCP_CLIENT_GROUPS,
+  MCP_CLIENT_INSTRUCTIONS,
 } from './clients.data'
-import type { McpClientData } from './clients.data'
+import type { McpBlock, McpClientData, McpInline } from './clients.data'
 import { buildClientConfig } from './utils/getMcpUrl'
 import { serializeMcpConfig } from './utils/serializeMcpConfig'
 
 // Flatten the `as const` group tuples into the union of client keys.
 type McpClientKey = (typeof MCP_CLIENT_GROUPS)[number]['keys'][number]
 
+// The docs document the hosted platform, so instructions render their hosted variant.
+const IS_PLATFORM = true
+
+/** Renders inline spans (plain text, inline code, bold, links) as mdast. */
+function Inline({ parts }: { parts: McpInline[] }) {
+  return (
+    <>
+      {parts.map((part) => {
+        if (typeof part === 'string') return part
+        if ('code' in part) return <inlineCode value={part.code} />
+        if ('strong' in part) return <strong>{part.strong}</strong>
+        return <link url={part.href}>{part.link}</link>
+      })}
+    </>
+  )
+}
+
+/**
+ * Renders portable instruction blocks (see `clients.data.ts`) as markdown.
+ * The dashboard renders the same blocks via its own React adapter. Image blocks
+ * are dropped here - they're illustrative screenshots and the surrounding text
+ * already conveys the steps.
+ */
+function Blocks({ blocks }: { blocks: McpBlock[] }) {
+  return (
+    <>
+      {blocks.map((block) => {
+        switch (block.type) {
+          case 'text':
+            return (
+              <paragraph>
+                <Inline parts={block.content} />
+              </paragraph>
+            )
+          case 'callout':
+            return (
+              <paragraph>
+                <Inline
+                  parts={[block.variant === 'warning' ? 'Warning: ' : 'Note: ', ...block.content]}
+                />
+              </paragraph>
+            )
+          case 'command':
+            return (
+              <code
+                lang="bash"
+                value={typeof block.value === 'function' ? block.value(HOSTED_URL) : block.value}
+              />
+            )
+          case 'image':
+            return null
+        }
+      })}
+    </>
+  )
+}
+
 /** One client's section: a bold lead-in, then its install/config/connector steps and auth. */
 function Client({ client }: { client: McpClientData }) {
-  const cli = MCP_CLI_COMMANDS[client.key]
+  const instructions = MCP_CLIENT_INSTRUCTIONS[client.key]
   const config = client.configFile
     ? {
         file: client.configFile,
@@ -31,38 +88,33 @@ function Client({ client }: { client: McpClientData }) {
         <strong>{client.label}</strong>
       </paragraph>
 
-      {cli?.install ? (
-        <>
-          <paragraph>Add the server from the command line:</paragraph>
-          <code lang="bash" value={cli.install(HOSTED_URL)} />
-          {config && (
-            <>
-              <paragraph>
-                Or add it to <inlineCode value={config.file} /> directly:
-              </paragraph>
-              <code lang={config.lang} value={config.value} />
-            </>
-          )}
-        </>
-      ) : config ? (
+      {instructions?.deepLinkDescription && (
+        <paragraph>
+          <Inline parts={instructions.deepLinkDescription} />
+        </paragraph>
+      )}
+
+      {instructions?.primary && (
+        <Blocks blocks={instructions.primary({ isPlatform: IS_PLATFORM })} />
+      )}
+
+      {config ? (
         <>
           <paragraph>
-            Add the Supabase server to <inlineCode value={config.file} />:
+            {instructions?.primary ? 'Alternatively, add' : 'Add'} this configuration to{' '}
+            <inlineCode value={config.file} />:
           </paragraph>
           <code lang={config.lang} value={config.value} />
         </>
-      ) : client.externalDocsUrl ? (
+      ) : !instructions?.primary && client.externalDocsUrl ? (
         <paragraph>
           Available as a connector. Install it from the{' '}
           <link url={client.externalDocsUrl}>{client.label} directory</link>.
         </paragraph>
       ) : null}
 
-      {cli?.authenticate && (
-        <>
-          <paragraph>Then authenticate:</paragraph>
-          <code lang="bash" value={cli.authenticate} />
-        </>
+      {instructions?.alternate && (
+        <Blocks blocks={instructions.alternate({ isPlatform: IS_PLATFORM })} />
       )}
     </>
   )
