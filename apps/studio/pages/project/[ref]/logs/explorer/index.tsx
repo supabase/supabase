@@ -64,6 +64,16 @@ const PLATFORM_PLACEHOLDER_QUERY =
 const OTEL_PLACEHOLDER_QUERY =
   "select\n  timestamp,\n  event_message,\n  log_attributes\nfrom logs\nwhere source = 'edge_logs'\norder by timestamp desc\nlimit 5"
 
+// On OTEL there are no per-service tables; a source is a filter on the single
+// `logs` table. Used by the "Insert source" dropdown when the flag is on.
+const otelSourceQuery = (source: string) =>
+  `select\n  timestamp,\n  event_message,\n  log_attributes\nfrom logs\nwhere source = '${source}'\norder by timestamp desc\nlimit 100`
+
+// A query still written in the legacy BigQuery dialect, which the rewrite banner
+// offers to convert.
+const looksLikeBigQueryLogsQuery = (sql: string) =>
+  /\bcross\s+join\s+unnest\b/i.test(sql) || /\bmetadata\./i.test(sql)
+
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
   const monaco = useMonaco()
@@ -119,6 +129,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     modified: string
   } | null>(null)
   const [isRewriting, setIsRewriting] = useState<boolean>(false)
+  const [rewriteBannerDismissed, setRewriteBannerDismissed] = useState<boolean>(false)
 
   const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
     `project-content-${projectRef}-recent-log-sql`,
@@ -291,12 +302,22 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     if (editorRef.current && monaco) {
       const editorModel = editorRef.current?.getModel()
       const currentValue = editorRef.current.getValue()
-      const index = currentValue.indexOf('from')
 
-      const updatedValue =
-        index < 0
-          ? `${currentValue}${source}`
-          : `${currentValue.substring(0, index + 4)} ${source} ${currentValue.substring(index + 5)}`
+      let updatedValue: string
+      if (useOtelEndpoint) {
+        // OTEL: swap the source filter when there is one, otherwise drop in a
+        // starter query for the source.
+        const sourceFilter = /source\s*=\s*'[^']*'/i
+        updatedValue = sourceFilter.test(currentValue)
+          ? currentValue.replace(sourceFilter, `source = '${source}'`)
+          : otelSourceQuery(source)
+      } else {
+        const index = currentValue.indexOf('from')
+        updatedValue =
+          index < 0
+            ? `${currentValue}${source}`
+            : `${currentValue.substring(0, index + 4)} ${source} ${currentValue.substring(index + 5)}`
+      }
 
       editorRef.current.pushUndoStop()
       editorRef.current.executeEdits(`insert-identifier`, [
@@ -460,13 +481,15 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             onSelectTemplate={onSelectTemplate}
             warnings={warnings}
           />
-          {useOtelEndpoint && (
-            <LogsExplorerOtelBanner
-              projectRef={projectRef}
-              isRewriting={isRewriting}
-              onRewrite={handleRewrite}
-            />
-          )}
+          {useOtelEndpoint &&
+            !rewriteBannerDismissed &&
+            looksLikeBigQueryLogsQuery(editorValue) && (
+              <LogsExplorerOtelBanner
+                isRewriting={isRewriting}
+                onRewrite={handleRewrite}
+                onDismiss={() => setRewriteBannerDismissed(true)}
+              />
+            )}
           <ShimmerLine active={isLoading} />
           {rewriteProposal ? (
             <div className="flex h-full flex-col">
