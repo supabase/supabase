@@ -1,23 +1,7 @@
 import { storageGetStarted } from '~/data/content-listings/storage.data'
 import { ContentListings as ContentListingsMarkdownHandler } from '~/internals/markdown-schema/Listings'
 import { serializeContentListingGroupToMarkdown } from '~/lib/content-listings.markdown'
-import {
-  getContentListingGridItemClassName,
-  normalizeContentListingHref,
-} from '~/lib/content-listings.schema'
 import { describe, expect, it } from 'vitest'
-
-describe('getContentListingGridItemClassName', () => {
-  it('defaults to 3 columns when no argument is provided', () => {
-    expect(getContentListingGridItemClassName()).toBe('col-span-12 md:col-span-4')
-  })
-
-  it('maps column counts to tailwind grid spans', () => {
-    expect(getContentListingGridItemClassName(2)).toBe('col-span-12 md:col-span-6')
-    expect(getContentListingGridItemClassName(3)).toBe('col-span-12 md:col-span-4')
-    expect(getContentListingGridItemClassName(4)).toBe('col-span-12 md:col-span-3')
-  })
-})
 
 describe('serializeContentListingGroupToMarkdown', () => {
   it('renders grouped items with absolute URLs and descriptions', () => {
@@ -122,28 +106,6 @@ describe('ContentListings markdown handler', () => {
     const handler = ContentListingsMarkdownHandler({ props: { id: 'storage-get-started' } })
     const direct = serializeContentListingGroupToMarkdown(storageGetStarted, '')
     expect(handler).toBe(direct)
-  })
-})
-
-describe('normalizeContentListingHref', () => {
-  it('strips /docs prefix from /docs/guides paths', () => {
-    expect(normalizeContentListingHref('/docs/guides/auth')).toBe('/guides/auth')
-  })
-
-  it('strips /docs prefix from /docs/dashboard paths', () => {
-    expect(normalizeContentListingHref('/docs/dashboard/project/_/sql')).toBe(
-      '/dashboard/project/_/sql'
-    )
-  })
-
-  it('leaves /dashboard paths unchanged', () => {
-    expect(normalizeContentListingHref('/dashboard/project/_/sql')).toBe('/dashboard/project/_/sql')
-  })
-
-  it('leaves external URLs unchanged', () => {
-    expect(normalizeContentListingHref('https://github.com/supabase/supabase')).toBe(
-      'https://github.com/supabase/supabase'
-    )
   })
 })
 

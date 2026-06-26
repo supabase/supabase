@@ -2,10 +2,8 @@
 
 import { getContentListingById } from '~/data/content-listings'
 import {
-  getContentListingGridItemClassName,
   getContentListingGroupLabel,
   isExternalContentListingHref,
-  normalizeContentListingHref,
   type ContentListingGroup,
   type ContentListingItem,
 } from '~/lib/content-listings.schema'
@@ -13,6 +11,12 @@ import { useSendTelemetryEvent } from '~/lib/telemetry'
 import Link from 'next/link'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
+
+const GRID_ITEM_CLASS = {
+  2: 'col-span-12 md:col-span-6',
+  3: 'col-span-12 md:col-span-4',
+  4: 'col-span-12 md:col-span-3',
+} as const
 
 function useContentListingClickHandler(group: ContentListingGroup) {
   const sendTelemetryEvent = useSendTelemetryEvent()
@@ -49,12 +53,11 @@ function ContentListingsListGroup({ group }: { group: ContentListingGroup }) {
         {group.description && <p className="text-foreground-light">{group.description}</p>}
         <ul className="list-disc pl-6 space-y-2">
           {group.items.map((item) => {
-            const href = normalizeContentListingHref(item.href)
-            const external = isExternalContentListingHref(href)
+            const external = isExternalContentListingHref(item.href)
             return (
               <li key={`${group.id}-${item.href}`}>
                 <Link
-                  href={href}
+                  href={item.href}
                   onClick={trackClick(item)}
                   target={external ? '_blank' : undefined}
                 >
@@ -70,7 +73,7 @@ function ContentListingsListGroup({ group }: { group: ContentListingGroup }) {
 }
 
 function ContentListingsGridGroup({ group }: { group: ContentListingGroup }) {
-  const itemClassName = getContentListingGridItemClassName(group.columns ?? 3)
+  const itemClassName = GRID_ITEM_CLASS[group.columns ?? 3]
   const trackClick = useContentListingClickHandler(group)
 
   return (
@@ -80,12 +83,11 @@ function ContentListingsGridGroup({ group }: { group: ContentListingGroup }) {
         {group.description && <p className="text-foreground-light">{group.description}</p>}
         <div className="grid md:grid-cols-12 gap-4">
           {group.items.map((item) => {
-            const href = normalizeContentListingHref(item.href)
-            const external = isExternalContentListingHref(href)
+            const external = isExternalContentListingHref(item.href)
             return (
               <Link
                 key={`${group.id}-${item.href}`}
-                href={href}
+                href={item.href}
                 passHref
                 className={`${itemClassName} block h-full`}
                 onClick={trackClick(item)}
