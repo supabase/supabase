@@ -22,9 +22,20 @@ const DEFAULT_ACTIONS = {
   placeholderFill: { enabled: true },
 }
 
+export type ValidLanguages =
+  | 'pgsql'
+  | 'json'
+  | 'html'
+  | 'typescript'
+  | 'javascript'
+  | 'css'
+  | 'csv'
+  | 'plaintext'
+  | 'markdown'
+
 interface CodeEditorProps {
   id?: string
-  language: 'pgsql' | 'json' | 'html' | 'typescript' | 'plaintext' | 'markdown'
+  language: ValidLanguages
   autofocus?: boolean
   defaultValue?: string
   isReadOnly?: boolean
