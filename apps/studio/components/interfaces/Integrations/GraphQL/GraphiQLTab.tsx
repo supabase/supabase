@@ -14,6 +14,7 @@ import { LogoLoader } from 'ui'
 
 import { DEFAULT_INTROSPECTION_SCHEMA } from './constants'
 import styles from './graphiql.module.css'
+import { sanitizeIntrospectionResponse } from './GraphiQLTab.utils'
 import { IntrospectionDisabledNotice } from './IntrospectionDisabledNotice'
 import { IntrospectionEnabledNotice } from './IntrospectionEnabledNotice'
 import { usePgGraphqlIntrospectionStatus } from './usePgGraphqlIntrospectionStatus'
@@ -136,10 +137,23 @@ export const GraphiQLTab = () => {
   )
 
   const fetcher = useMemo(() => {
+    const graphqlUrl = `${API_URL}${IS_PLATFORM ? '' : '/platform'}/projects/${projectRef}/api/graphql`
     const fetcherFn = createGraphiQLFetcher({
       // [Joshen] Opting to hard code /platform for local to match the routes, so that it's clear what's happening
-      url: `${API_URL}${IS_PLATFORM ? '' : '/platform'}/projects/${projectRef}/api/graphql`,
+      url: graphqlUrl,
       fetch,
+      schemaFetcher: async (graphqlParams, opts) => {
+        const response = await fetch(graphqlUrl, {
+          method: 'POST',
+          body: JSON.stringify(graphqlParams),
+          headers: {
+            'content-type': 'application/json',
+            ...opts?.headers,
+          },
+        })
+
+        return sanitizeIntrospectionResponse(await response.json())
+      },
     })
     const customFetcher: Fetcher = async (graphqlParams, opts) => {
       let userAuthorization: string | undefined
@@ -154,8 +168,9 @@ export const GraphiQLTab = () => {
         try {
           const token = await getRoleImpersonationJWT(projectRef, jwtSecret, role)
           userAuthorization = 'Bearer ' + token
-        } catch (err: any) {
-          toast.error(`Failed to get JWT for role: ${err.message}`)
+        } catch (err) {
+          const message = err instanceof Error ? err.message : String(err)
+          toast.error(`Failed to get JWT for role: ${message}`)
         }
       }
 
