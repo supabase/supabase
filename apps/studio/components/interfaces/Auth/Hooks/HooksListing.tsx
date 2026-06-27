@@ -99,9 +99,9 @@ export const HooksListing = () => {
     !isBeforeFreeTierTemplateBlockCutoff(project.inserted_at) &&
     !isSmtpEnabled(authConfig)
 
-  const handleDeleteSendEmailHook = (): Promise<void> => {
-    if (!selectedHookForDeletion) return Promise.resolve()
-    return updateAuthHooksAsync({
+  const handleDeleteSendEmailHook = async (): Promise<void> => {
+    if (!selectedHookForDeletion) return
+    await updateAuthHooksAsync({
       projectRef: projectRef!,
       config: {
         [selectedHookForDeletion.enabledKey]: false,

@@ -292,7 +292,7 @@ const RedirectToTemplates = () => {
                 </PageSectionMeta>
               )}
               <PageSectionContent>
-                {isTemplateEditBlocked && (
+                {isTemplateEditBlocked && !hasSendEmailHook && (
                   <div className="mb-4">
                     <CustomEmailTemplateRestrictionAdmonition />
                   </div>

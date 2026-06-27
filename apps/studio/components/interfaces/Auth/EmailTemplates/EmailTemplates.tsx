@@ -139,7 +139,7 @@ export const EmailTemplates = () => {
       )}
       {isSuccess && (
         <>
-          {isTemplateEditBlocked && (
+          {isTemplateEditBlocked && !hasSendEmailHook && (
             <PageSection>
               <PageSectionContent>
                 <CustomEmailTemplateRestrictionAdmonition />
