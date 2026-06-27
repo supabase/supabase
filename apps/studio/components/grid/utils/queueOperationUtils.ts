@@ -59,12 +59,84 @@ export function rowMatchesIdentifiers(
   return identifierEntries.every(([key, value]) => row[key] === value)
 }
 
+function getQueuedCurrentRowIdentifiers(
+  operations: readonly QueuedOperation[],
+  tableId: number,
+  primaryKeyNames: string[],
+  originalIdentifiers: Dictionary<unknown>
+): Dictionary<unknown> {
+  const currentIdentifiers = { ...originalIdentifiers }
+
+  operations.forEach((operation) => {
+    if (operation.tableId !== tableId || operation.type !== QueuedOperationType.EDIT_CELL_CONTENT) {
+      return
+    }
+
+    if (!primaryKeyNames.includes(operation.payload.columnName)) {
+      return
+    }
+
+    if (rowMatchesIdentifiers(operation.payload.rowIdentifiers, originalIdentifiers)) {
+      currentIdentifiers[operation.payload.columnName] = operation.payload.newValue
+    }
+  })
+
+  return currentIdentifiers
+}
+
+export function getOriginalRowIdentifiersForQueuedOperation({
+  operations,
+  tableId,
+  table,
+  rowIdentifiers,
+}: {
+  operations: readonly QueuedOperation[]
+  tableId: number
+  table: Entity
+  rowIdentifiers: Dictionary<unknown>
+}): Dictionary<unknown> {
+  if (rowIdentifiers.__tempId !== undefined || !isTableLike(table)) {
+    return rowIdentifiers
+  }
+
+  const primaryKeyNames = table.primary_keys.map((primaryKey) => primaryKey.name)
+  if (primaryKeyNames.length === 0) {
+    return rowIdentifiers
+  }
+
+  const existingOriginalIdentifiers = operations
+    .filter((operation) => {
+      return (
+        operation.tableId === tableId &&
+        operation.type === QueuedOperationType.EDIT_CELL_CONTENT &&
+        primaryKeyNames.includes(operation.payload.columnName)
+      )
+    })
+    .map((operation) => operation.payload.rowIdentifiers)
+
+  for (const originalIdentifiers of existingOriginalIdentifiers) {
+    const currentIdentifiers = getQueuedCurrentRowIdentifiers(
+      operations,
+      tableId,
+      primaryKeyNames,
+      originalIdentifiers
+    )
+
+    if (rowMatchesIdentifiers(currentIdentifiers, rowIdentifiers)) {
+      return originalIdentifiers
+    }
+  }
+
+  return rowIdentifiers
+}
+
 export function removeRow(rows: SupaRow[], rowIdentifiers: Dictionary<unknown>): SupaRow[] {
   return rows.filter((row) => !rowMatchesIdentifiers(row, rowIdentifiers))
 }
 
 interface QueueCellEditParams {
   queueOperation: (operation: NewQueuedOperation) => void
+  operations?: readonly QueuedOperation[]
   tableId: number
   table: Entity
   row: SupaRow
@@ -77,6 +149,7 @@ interface QueueCellEditParams {
 
 export function queueCellEditWithOptimisticUpdate({
   queueOperation,
+  operations = [],
   tableId,
   table,
   row,
@@ -87,7 +160,14 @@ export function queueCellEditWithOptimisticUpdate({
   enumArrayColumns,
 }: QueueCellEditParams) {
   // Updated row identifiers to include __tempId for pending add rows so edits merge into ADD_ROW operation
-  const rowIdentifiers: Dictionary<unknown> = { ...callerRowIdentifiers }
+  const rowIdentifiers: Dictionary<unknown> = {
+    ...getOriginalRowIdentifiersForQueuedOperation({
+      operations,
+      tableId,
+      table,
+      rowIdentifiers: callerRowIdentifiers,
+    }),
+  }
   if (isPendingAddRow(row)) {
     rowIdentifiers.__tempId = row.__tempId
   }
@@ -189,6 +269,7 @@ export const formatGridDataWithOperationValues = ({
 interface QueueRowDeletesParams {
   rows: SupaRow[]
   table: Entity
+  operations?: readonly QueuedOperation[]
   queueOperation: (operation: NewQueuedOperation) => void
   projectRef: string | undefined
 }
@@ -200,6 +281,7 @@ interface QueueRowDeletesParams {
 export function queueRowDeletesWithOptimisticUpdate({
   rows,
   table,
+  operations = [],
   queueOperation,
   projectRef,
 }: QueueRowDeletesParams): void {
@@ -221,10 +303,23 @@ export function queueRowDeletesWithOptimisticUpdate({
   }
 
   for (const row of rows) {
-    const rowIdentifiers: Record<string, unknown> = {}
+    let rowIdentifiers: Record<string, unknown> = {}
     table.primary_keys.forEach((pk) => {
       rowIdentifiers[pk.name] = row[pk.name]
     })
+
+    rowIdentifiers = {
+      ...getOriginalRowIdentifiersForQueuedOperation({
+        operations,
+        tableId: table.id,
+        table,
+        rowIdentifiers,
+      }),
+    }
+
+    if (isPendingAddRow(row)) {
+      rowIdentifiers.__tempId = row.__tempId
+    }
 
     queueOperation({
       type: QueuedOperationType.DELETE_ROW,

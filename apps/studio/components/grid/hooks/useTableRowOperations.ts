@@ -18,6 +18,7 @@ import type { TableRowsData } from '@/data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import type { QueuedOperation } from '@/state/table-editor-operation-queue.types'
 import type { Dictionary } from '@/types'
 
 export interface EditCellParams {
@@ -64,6 +65,8 @@ export function useTableRowOperations() {
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
+  const queuedOperations = tableEditorSnap.operationQueue
+    .operations as unknown as readonly QueuedOperation[]
 
   // Non-queue mutation for cell edits with optimistic updates
   const { mutateAsync: mutateUpdateTableRow, isPending: isEditPending } = useTableRowUpdateMutation(
@@ -123,6 +126,7 @@ export function useTableRowOperations() {
       if (isQueueEnabled) {
         queueCellEditWithOptimisticUpdate({
           queueOperation: tableEditorSnap.queueOperation,
+          operations: queuedOperations,
           tableId: params.tableId,
           table: params.table,
           row: params.row,
@@ -149,7 +153,14 @@ export function useTableRowOperations() {
       })
       params.onSuccess?.()
     },
-    [isQueueEnabled, project, tableEditorSnap, mutateUpdateTableRow, getImpersonatedRoleState]
+    [
+      isQueueEnabled,
+      project,
+      tableEditorSnap,
+      queuedOperations,
+      mutateUpdateTableRow,
+      getImpersonatedRoleState,
+    ]
   )
 
   const updateRow = useCallback(
@@ -159,6 +170,7 @@ export function useTableRowOperations() {
         for (const columnName of Object.keys(params.payload)) {
           queueCellEditWithOptimisticUpdate({
             queueOperation: tableEditorSnap.queueOperation,
+            operations: queuedOperations,
             tableId: params.tableId,
             table: params.table,
             row: params.row,
@@ -185,7 +197,14 @@ export function useTableRowOperations() {
       })
       params.onSuccess?.()
     },
-    [isQueueEnabled, project, tableEditorSnap, mutateUpdateTableRow, getImpersonatedRoleState]
+    [
+      isQueueEnabled,
+      project,
+      tableEditorSnap,
+      queuedOperations,
+      mutateUpdateTableRow,
+      getImpersonatedRoleState,
+    ]
   )
 
   const addRow = useCallback(
@@ -225,6 +244,7 @@ export function useTableRowOperations() {
         queueRowDeletesWithOptimisticUpdate({
           rows: params.rows,
           table: params.table,
+          operations: queuedOperations,
           queueOperation: tableEditorSnap.queueOperation,
           projectRef: project?.ref,
         })
@@ -239,7 +259,7 @@ export function useTableRowOperations() {
         callback: params.callback,
       })
     },
-    [isQueueEnabled, project, tableEditorSnap]
+    [isQueueEnabled, project, tableEditorSnap, queuedOperations]
   )
 
   return {

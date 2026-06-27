@@ -1,16 +1,21 @@
 import { describe, expect, test } from 'vitest'
 
-import type { SupaRow } from '../types'
+import type { PendingAddRow, SupaRow } from '../types'
 import {
   formatGridDataWithOperationValues,
   generateTableChangeKey,
+  getOriginalRowIdentifiersForQueuedOperation,
+  queueRowDeletesWithOptimisticUpdate,
   rowMatchesIdentifiers,
 } from './queueOperationUtils'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import type { Entity } from '@/data/table-editor/table-editor-types'
 import {
   QueuedOperationType,
   type NewAddRowOperation,
   type NewDeleteRowOperation,
   type NewEditCellContentOperation,
+  type NewQueuedOperation,
   type QueuedOperation,
 } from '@/state/table-editor-operation-queue.types'
 
@@ -149,6 +154,170 @@ describe('rowMatchesIdentifiers', () => {
   test('should not match with undefined values in row', () => {
     const result = rowMatchesIdentifiers({ id: undefined, name: 'test' }, { id: 1 })
     expect(result).toBe(false)
+  })
+})
+
+describe('getOriginalRowIdentifiersForQueuedOperation', () => {
+  const table = {
+    id: 1,
+    entity_type: ENTITY_TYPE.TABLE,
+    primary_keys: [{ name: 'id' }],
+  } as unknown as Entity
+
+  test('keeps row identifiers unchanged when there are no queued primary key edits', () => {
+    const result = getOriginalRowIdentifiersForQueuedOperation({
+      operations: [],
+      tableId: 1,
+      table,
+      rowIdentifiers: { id: 2 },
+    })
+
+    expect(result).toEqual({ id: 2 })
+  })
+
+  test('returns original identifiers after a queued primary key edit', () => {
+    const operations: QueuedOperation[] = [
+      {
+        id: 'edit_cell_content:1:id:id:1',
+        tableId: 1,
+        timestamp: Date.now(),
+        type: QueuedOperationType.EDIT_CELL_CONTENT,
+        payload: {
+          rowIdentifiers: { id: 1 },
+          columnName: 'id',
+          oldValue: 1,
+          newValue: 2,
+          table,
+        },
+      },
+    ]
+
+    const result = getOriginalRowIdentifiersForQueuedOperation({
+      operations,
+      tableId: 1,
+      table,
+      rowIdentifiers: { id: 2 },
+    })
+
+    expect(result).toEqual({ id: 1 })
+  })
+
+  test('handles multiple queued primary key edits for composite identifiers', () => {
+    const compositeTable = {
+      id: 1,
+      entity_type: ENTITY_TYPE.TABLE,
+      primary_keys: [{ name: 'tenant_id' }, { name: 'user_id' }],
+    } as unknown as Entity
+    const operations: QueuedOperation[] = [
+      {
+        id: 'edit_cell_content:1:tenant_id:tenant_id:a|user_id:1',
+        tableId: 1,
+        timestamp: Date.now(),
+        type: QueuedOperationType.EDIT_CELL_CONTENT,
+        payload: {
+          rowIdentifiers: { tenant_id: 'a', user_id: 1 },
+          columnName: 'tenant_id',
+          oldValue: 'a',
+          newValue: 'b',
+          table: compositeTable,
+        },
+      },
+      {
+        id: 'edit_cell_content:1:user_id:tenant_id:a|user_id:1',
+        tableId: 1,
+        timestamp: Date.now(),
+        type: QueuedOperationType.EDIT_CELL_CONTENT,
+        payload: {
+          rowIdentifiers: { tenant_id: 'a', user_id: 1 },
+          columnName: 'user_id',
+          oldValue: 1,
+          newValue: 2,
+          table: compositeTable,
+        },
+      },
+    ]
+
+    const result = getOriginalRowIdentifiersForQueuedOperation({
+      operations,
+      tableId: 1,
+      table: compositeTable,
+      rowIdentifiers: { tenant_id: 'b', user_id: 2 },
+    })
+
+    expect(result).toEqual({ tenant_id: 'a', user_id: 1 })
+  })
+
+  test('leaves pending row temp identifiers unchanged', () => {
+    const result = getOriginalRowIdentifiersForQueuedOperation({
+      operations: [],
+      tableId: 1,
+      table,
+      rowIdentifiers: { __tempId: '-1', id: 2 },
+    })
+
+    expect(result).toEqual({ __tempId: '-1', id: 2 })
+  })
+})
+
+describe('queueRowDeletesWithOptimisticUpdate', () => {
+  const table = {
+    id: 1,
+    entity_type: ENTITY_TYPE.TABLE,
+    primary_keys: [{ name: 'id' }],
+  } as unknown as Entity
+
+  test('queues delete with original identifiers after a primary key edit', () => {
+    const queuedOperations: NewQueuedOperation[] = []
+    const operations: QueuedOperation[] = [
+      {
+        id: 'edit_cell_content:1:id:id:1',
+        tableId: 1,
+        timestamp: Date.now(),
+        type: QueuedOperationType.EDIT_CELL_CONTENT,
+        payload: {
+          rowIdentifiers: { id: 1 },
+          columnName: 'id',
+          oldValue: 1,
+          newValue: 2,
+          table,
+        },
+      },
+    ]
+
+    queueRowDeletesWithOptimisticUpdate({
+      rows: [{ idx: 0, id: 2, name: 'Alice' }],
+      table,
+      operations,
+      queueOperation: (operation) => queuedOperations.push(operation),
+      projectRef: 'project-ref',
+    })
+
+    expect(queuedOperations).toHaveLength(1)
+    expect(queuedOperations[0]).toMatchObject({
+      type: QueuedOperationType.DELETE_ROW,
+      payload: {
+        rowIdentifiers: { id: 1 },
+      },
+    })
+  })
+
+  test('queues pending row delete with temp identifier', () => {
+    const queuedOperations: NewQueuedOperation[] = []
+
+    queueRowDeletesWithOptimisticUpdate({
+      rows: [{ idx: -1, __tempId: '-1', id: 10, name: 'Draft' } as PendingAddRow],
+      table,
+      queueOperation: (operation) => queuedOperations.push(operation),
+      projectRef: 'project-ref',
+    })
+
+    expect(queuedOperations).toHaveLength(1)
+    expect(queuedOperations[0]).toMatchObject({
+      type: QueuedOperationType.DELETE_ROW,
+      payload: {
+        rowIdentifiers: { id: 10, __tempId: '-1' },
+      },
+    })
   })
 })
 
