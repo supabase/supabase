@@ -28,12 +28,13 @@ import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
 import { HTTPHeaders } from './HTTPHeaders'
 import { HTTPParameters } from './HTTPParameters'
 import { HTTPRequestConfig } from './HTTPRequestConfig'
+import { getEdgeFunctionAuthHeader } from '@/components/interfaces/Functions/httpHeaderAddActions'
 import {
   FormSection,
   FormSectionContent,
   FormSectionLabel,
 } from '@/components/ui/Forms/FormSection'
-import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { useTableNamesQuery } from '@/data/tables/table-names-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -61,7 +62,8 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
     projectRef: ref,
   })
 
-  const legacyServiceRole = keys.find((x) => x.name === 'service_role')?.api_key ?? '[YOUR API KEY]'
+  const { secretKey, serviceKey } = getKeys(keys)
+  const edgeFunctionApiKey = secretKey?.api_key ?? serviceKey?.api_key ?? '[YOUR API KEY]'
 
   const httpUrl = useWatch({ control: form.control, name: 'http_url' })
   const httpHeaders = useWatch({ control: form.control, name: 'httpHeaders' })
@@ -80,20 +82,27 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
     if (httpUrl && isEdgeFunctionSelected) {
       const fnSlug = httpUrl.split('/').at(-1)
       const fn = functions.find((x) => x.slug === fnSlug)
-      const authorizationHeader = httpHeaders.find((x) => x.name === 'Authorization')
-      const edgeFunctionAuthHeaderVal = `Bearer ${legacyServiceRole}`
+      const edgeFunctionAuthHeader = getEdgeFunctionAuthHeader(edgeFunctionApiKey)
+      const existingAuthHeader = httpHeaders.find(
+        (x) => x.name === 'Authorization' || x.name === 'apikey'
+      )
 
-      if (fn?.verify_jwt && authorizationHeader == null) {
+      if (fn?.verify_jwt && existingAuthHeader == null) {
         const newAuthHeader = {
           id: uuidv4(),
-          name: 'Authorization',
-          value: edgeFunctionAuthHeaderVal,
+          name: edgeFunctionAuthHeader.name,
+          value: edgeFunctionAuthHeader.value,
         }
         form.setValue('httpHeaders', [...httpHeaders, newAuthHeader])
-      } else if (fn?.verify_jwt && authorizationHeader?.value !== edgeFunctionAuthHeaderVal) {
+      } else if (
+        fn?.verify_jwt &&
+        (existingAuthHeader?.name !== edgeFunctionAuthHeader.name ||
+          existingAuthHeader?.value !== edgeFunctionAuthHeader.value)
+      ) {
         const updatedHttpHeaders = httpHeaders.map((x) => {
-          if (x.name === 'Authorization') return { ...x, value: edgeFunctionAuthHeaderVal }
-          else return x
+          if (x.id === existingAuthHeader?.id) {
+            return { ...x, name: edgeFunctionAuthHeader.name, value: edgeFunctionAuthHeader.value }
+          } else return x
         })
         form.setValue('httpHeaders', updatedHttpHeaders)
       }
