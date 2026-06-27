@@ -38,7 +38,3 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
 export const CONTENT_LISTINGS: Readonly<Record<string, ContentListingGroup>> = Object.fromEntries(
   ALL_GROUPS.map((group) => [group.id, group])
 )
-
-export function getContentListingById(id: string): ContentListingGroup | undefined {
-  return CONTENT_LISTINGS[id]
-}

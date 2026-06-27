@@ -1,7 +1,25 @@
 import { storageGetStarted } from '~/data/content-listings/storage.data'
-import { ContentListings as ContentListingsMarkdownHandler } from '~/internals/markdown-schema/Listings'
-import { serializeContentListingGroupToMarkdown } from '~/lib/content-listings.markdown'
+import {
+  ContentListings as ContentListingsMarkdownHandler,
+  serializeContentListingGroupToMarkdown,
+} from '~/internals/markdown-schema/ContentListings'
+import { isExternalContentListingHref } from '~/lib/content-listings.utils'
 import { describe, expect, it } from 'vitest'
+
+
+describe('isExternalContentListingHref', () => {
+  it('treats protocol-relative URLs as external', () => {
+    expect(isExternalContentListingHref('//example.com/path')).toBe(true)
+  })
+
+  it('treats absolute http(s) URLs as external', () => {
+    expect(isExternalContentListingHref('https://github.com/supabase/storage-api')).toBe(true)
+  })
+
+  it('treats internal guide paths as not external', () => {
+    expect(isExternalContentListingHref('/guides/storage/quickstart')).toBe(false)
+  })
+})
 
 describe('serializeContentListingGroupToMarkdown', () => {
   it('renders grouped items with absolute URLs and descriptions', () => {

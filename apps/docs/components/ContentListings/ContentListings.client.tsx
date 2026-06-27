@@ -1,12 +1,11 @@
 'use client'
 
-import { getContentListingById } from '~/data/content-listings'
 import {
+  getContentListingById,
   getContentListingGroupLabel,
   isExternalContentListingHref,
-  type ContentListingGroup,
-  type ContentListingItem,
-} from '~/lib/content-listings.schema'
+} from '~/lib/content-listings.utils'
+import type { ContentListingGroup, ContentListingItem } from '~/lib/content-listings.schema'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import Link from 'next/link'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
