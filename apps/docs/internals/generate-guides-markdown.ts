@@ -17,7 +17,7 @@ import { AuthProviders } from './markdown-schema/AuthProviders'
 import { ComputeDiskLimitsTable } from './markdown-schema/ComputeDiskLimitsTable'
 import { ErrorCodes } from './markdown-schema/ErrorCodes'
 import { Link } from './markdown-schema/Link'
-import { ContentListings as ContentListingsHandler } from './markdown-schema/Listings'
+import { ContentListings } from './markdown-schema/Listings'
 import { MetricsStackCards } from './markdown-schema/MetricsStackCards'
 import { NavData } from './markdown-schema/NavData'
 import { Panel } from './markdown-schema/Panel'
@@ -152,7 +152,7 @@ const SCHEMA: ComponentSchema = {
   ...StepHike,
   TabPanel,
   MetricsStackCards,
-  ContentListings: ContentListingsHandler,
+  ContentListings,
   NavData,
   SharedData,
 }

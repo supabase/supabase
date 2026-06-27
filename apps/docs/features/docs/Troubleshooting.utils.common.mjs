@@ -8,8 +8,6 @@
  * as required.
  */
 
-import { readdir, readFile, stat } from 'node:fs/promises'
-import { join, sep } from 'node:path'
 import matter from 'gray-matter'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { gfmFromMarkdown, gfmToMarkdown } from 'mdast-util-gfm'
@@ -17,6 +15,8 @@ import { mdxFromMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
+import { readdir, readFile, stat } from 'node:fs/promises'
+import { join, sep } from 'node:path'
 import { parse } from 'smol-toml'
 import { visit } from 'unist-util-visit'
 import { v4 as uuidv4 } from 'uuid'
@@ -61,7 +61,6 @@ export const TroubleshootingSchema = z
       z.enum([
         'ai',
         'ai-tools',
-        'api',
         'auth',
         'branching',
         'cli',
@@ -130,10 +129,12 @@ export async function getAllTroubleshootingEntriesInternal() {
 
     const parseResult = validateTroubleshootingMetadata(frontmatter)
     if ('error' in parseResult) {
-      throw Error(
-        `Error validating troubleshooting metadata for ${filePath}`,
-        { cause: parseResult.error }
+      console.error(
+        `Error validating troubleshooting metadata\nEntry:%O\nError:%O`,
+        frontmatter,
+        parseResult.error
       )
+      return null
     }
 
     const mdxTree = fromMarkdown(content, {
