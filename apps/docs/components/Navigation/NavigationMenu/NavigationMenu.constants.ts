@@ -2297,6 +2297,10 @@ export const ai: NavMenuConstant = {
           name: 'Generate Embeddings',
           url: '/guides/ai/quickstarts/generate-text-embeddings' as `/${string}`,
         },
+        {
+          name: 'Generate Multimodal Embeddings with Gemini',
+          url: '/guides/ai/quickstarts/generate-multimodal-embeddings-with-gemini' as `/${string}`,
+        },
 
         {
           name: 'Adding generative Q&A to your documentation',
