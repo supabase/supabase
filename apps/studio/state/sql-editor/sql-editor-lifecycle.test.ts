@@ -1,8 +1,10 @@
+import { untrustedSql } from '@supabase/pg-meta'
 import { describe, expect, it } from 'vitest'
 
 import {
   folderStatusOnSaveStart,
   hasUnsavedChanges,
+  hasUsableSnippetContent,
   isFolderEditing,
   isFolderSaving,
   isNewFolder,
@@ -15,6 +17,7 @@ import {
   type FolderStatus,
 } from './sql-editor-lifecycle'
 import type { SnippetStatus } from '@/data/content/snippet-status'
+import type { SqlSnippets } from '@/types'
 
 const NEVER_PERSISTED: Array<SnippetStatus> = ['new', 'new_saving', 'new_save_failed']
 const PERSISTED: Array<SnippetStatus> = ['saved', 'unsaved', 'saving', 'save_failed']
@@ -184,5 +187,40 @@ describe('folderStatusOnSaveStart', () => {
   it('moves a persisted folder to saving', () => {
     expect(folderStatusOnSaveStart('editing')).toBe('saving')
     expect(folderStatusOnSaveStart('idle')).toBe('saving')
+  })
+})
+
+describe('hasUsableSnippetContent', () => {
+  const usableContent: SqlSnippets.Content = {
+    content_id: 'snippet-1',
+    schema_version: '1.0',
+    unchecked_sql: untrustedSql('SELECT 1'),
+  }
+
+  it('is false when content is missing', () => {
+    expect(hasUsableSnippetContent(undefined)).toBe(false)
+  })
+
+  it('is false for unmapped API content that only has sql', () => {
+    const unmapped = {
+      content_id: 'snippet-1',
+      schema_version: '1.0',
+      sql: 'SELECT 1',
+    } as unknown as SqlSnippets.Content
+
+    expect(hasUsableSnippetContent(unmapped)).toBe(false)
+  })
+
+  it('is true when unchecked_sql is defined, even if empty', () => {
+    expect(
+      hasUsableSnippetContent({
+        ...usableContent,
+        unchecked_sql: untrustedSql(''),
+      })
+    ).toBe(true)
+  })
+
+  it('is true when unchecked_sql holds SQL text', () => {
+    expect(hasUsableSnippetContent(usableContent)).toBe(true)
   })
 })

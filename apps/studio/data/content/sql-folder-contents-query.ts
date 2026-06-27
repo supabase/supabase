@@ -1,5 +1,6 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
+import { remapSqlContentFields } from './content-remap'
 import { contentKeys } from './keys'
 import { SNIPPET_PAGE_LIMIT, withSavedStatus } from './sql-folders-query'
 import { get, handleError } from '@/data/fetchers'
@@ -39,7 +40,7 @@ export async function getSQLSnippetFolderContents(
   if (error) handleError(error)
   return {
     ...data.data,
-    contents: (data.data.contents ?? []).map(withSavedStatus),
+    contents: remapSqlContentFields((data.data.contents ?? []).map(withSavedStatus)),
     cursor: data.cursor,
   }
 }

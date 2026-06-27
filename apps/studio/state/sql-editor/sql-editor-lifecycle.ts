@@ -1,4 +1,14 @@
 import type { SnippetStatus } from '@/data/content/snippet-status'
+import type { SqlSnippets } from '@/types'
+
+/**
+ * True when snippet content is loaded in the frontend shape (has `unchecked_sql`).
+ * Unmapped API payloads may carry `content.sql` instead — those are not usable by
+ * the editor and should be replaced when fresher content arrives.
+ */
+export function hasUsableSnippetContent(content: SqlSnippets.Content | undefined): boolean {
+  return content !== undefined && content.unchecked_sql !== undefined
+}
 
 /**
  * True when the snippet has never been successfully written to the database.
