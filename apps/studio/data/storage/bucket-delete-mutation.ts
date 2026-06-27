@@ -45,8 +45,21 @@ export const useBucketDeleteMutation = ({
   return useMutation<BucketDeleteData, ResponseError, BucketDeleteVariables>({
     mutationFn: (vars) => deleteBucket(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef } = variables
-      await queryClient.invalidateQueries({ queryKey: storageKeys.buckets(projectRef) })
+      const { projectRef, id } = variables
+
+      const deletedBucketQueryKey = storageKeys.bucket(projectRef, id)
+      await queryClient.cancelQueries({ queryKey: deletedBucketQueryKey })
+      queryClient.removeQueries({
+        predicate: (query) =>
+          query.queryKey[0] === 'projects' &&
+          query.queryKey[1] === projectRef &&
+          query.queryKey[2] === 'buckets' &&
+          query.queryKey[3] === id,
+      })
+
+      await queryClient.invalidateQueries({
+        queryKey: [...storageKeys.buckets(projectRef), 'list'],
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
