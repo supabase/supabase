@@ -2,7 +2,7 @@ import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 
-import { getSQLSnippetFolders } from './sql-folders-query'
+import { getSQLSnippetFolders, type SnippetWithContent } from './sql-folders-query'
 import { addAPIMock } from '@/tests/lib/msw'
 
 type GetUserContentFolderResponse = components['schemas']['GetUserContentFolderResponse']
@@ -35,7 +35,7 @@ function createFolderListResponseWithInlineSql(sql: string): GetUserContentFolde
         },
       ],
     },
-  } as GetUserContentFolderResponse
+  } as unknown as GetUserContentFolderResponse
 }
 
 describe('getSQLSnippetFolders', () => {
@@ -52,8 +52,9 @@ describe('getSQLSnippetFolders', () => {
     const result = await getSQLSnippetFolders({ projectRef: 'default' })
 
     expect(result.contents).toHaveLength(1)
-    expect(result.contents[0].status).toBe('saved')
-    expect(result.contents[0].content?.unchecked_sql).toBeDefined()
-    expect(result.contents[0].content).not.toHaveProperty('sql')
+    const snippet = result.contents[0] as SnippetWithContent
+    expect(snippet.status).toBe('saved')
+    expect(snippet.content?.unchecked_sql).toBeDefined()
+    expect(snippet.content).not.toHaveProperty('sql')
   })
 })

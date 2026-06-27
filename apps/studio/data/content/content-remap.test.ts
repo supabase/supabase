@@ -54,8 +54,11 @@ describe('remapSqlContentFields', () => {
     const items = [SQL_SNIPPET, { id: '2', type: 'report' as const }]
 
     const result = remapSqlContentFields(items)
+    const remappedSql = result.find((item) => item.type === 'sql')
 
-    expect(result[0].content).toHaveProperty('unchecked_sql', untrustedSql('SELECT 1'))
+    expect(remappedSql && 'content' in remappedSql && remappedSql.content).toMatchObject({
+      unchecked_sql: untrustedSql('SELECT 1'),
+    })
     expect(result[1]).toBe(items[1])
   })
 })
