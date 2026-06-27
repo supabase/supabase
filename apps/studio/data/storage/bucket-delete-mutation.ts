@@ -57,10 +57,11 @@ export const useBucketDeleteMutation = ({
           query.queryKey[3] === id,
       })
 
-      await queryClient.invalidateQueries({
+      await onSuccess?.(data, variables, context)
+
+      void queryClient.invalidateQueries({
         queryKey: [...storageKeys.buckets(projectRef), 'list'],
       })
-      await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
