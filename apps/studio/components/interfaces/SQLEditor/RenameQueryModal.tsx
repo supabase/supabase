@@ -23,6 +23,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import { getSelfHostedSnippetStoreSyncPlan } from './self-hosted-snippet-store.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
@@ -129,21 +130,29 @@ export const RenameQueryModal = ({
         const tabId = createTabId('sql', { id })
         tabsSnap.updateTab(tabId, { label: name })
       } else if (changedSnippet) {
-        // In self-hosted, renaming changes the snippet id (filesystem path).
-        snapV2.addSnippet({ projectRef: ref, snippet: changedSnippet })
+        const syncPlan = getSelfHostedSnippetStoreSyncPlan({
+          previousId: id,
+          nextSnippetId: changedSnippet.id,
+          isViewingSnippet: activeSnippetId === id,
+          hasOldTab: tabsSnap.hasTab(createTabId('sql', { id })),
+        })
 
-        const isViewingRenamedSnippet = activeSnippetId === id
-        const oldTabId = createTabId('sql', { id })
+        if (syncPlan.action === 'replace') {
+          snapV2.addSnippet({ projectRef: ref, snippet: changedSnippet })
 
-        if (isViewingRenamedSnippet) {
-          await router.replace(`/project/${ref}/sql/${changedSnippet.id}`)
+          if (syncPlan.shouldNavigate) {
+            await router.replace(`/project/${ref}/sql/${syncPlan.nextSnippetId}`)
+          }
+
+          if (syncPlan.shouldRemoveOldTab) {
+            tabsSnap.removeTab(createTabId('sql', { id: syncPlan.previousId }))
+          }
+
+          snapV2.removeSnippet(syncPlan.previousId, true)
+        } else {
+          snapV2.renameSnippet({ id, name, description })
+          tabsSnap.updateTab(createTabId('sql', { id: syncPlan.snippetId }), { label: name })
         }
-
-        if (tabsSnap.hasTab(oldTabId)) {
-          tabsSnap.removeTab(oldTabId)
-        }
-
-        snapV2.removeSnippet(id, true)
       }
 
       toast.success('Successfully renamed snippet!')

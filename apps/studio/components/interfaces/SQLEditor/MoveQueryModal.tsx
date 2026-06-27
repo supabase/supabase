@@ -37,6 +37,7 @@ import {
 } from 'ui'
 import * as z from 'zod'
 
+import { getSelfHostedSnippetStoreSyncPlan } from './self-hosted-snippet-store.utils'
 import { getContentById } from '@/data/content/content-id-query'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { useSQLSnippetFolderCreateMutation } from '@/data/content/sql-folder-create-mutation'
@@ -169,23 +170,33 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                 skipSave: true,
               })
             } else if (movedSnippet) {
-              // On self-hosted, moving changes the snippet id (filesystem path). Keep the
-              // editor on the moved snippet and avoid removing the old id from the store
-              // while the URL still points at it — that leaves Monaco in a permanent loading state.
-              snapV2.addSnippet({ projectRef: ref, snippet: movedSnippet })
+              const targetFolderId = selectedId === 'root' ? null : folderId
+              const syncPlan = getSelfHostedSnippetStoreSyncPlan({
+                previousId: snippet.id,
+                nextSnippetId: movedSnippet.id,
+                isViewingSnippet: activeSnippetId === snippet.id,
+                hasOldTab: tabsSnap.hasTab(createTabId('sql', { id: snippet.id })),
+              })
 
-              const isViewingMovedSnippet = activeSnippetId === snippet.id
-              const oldTabId = createTabId('sql', { id: snippet.id })
+              if (syncPlan.action === 'replace') {
+                snapV2.addSnippet({ projectRef: ref, snippet: movedSnippet })
 
-              if (isViewingMovedSnippet) {
-                await router.replace(`/project/${ref}/sql/${movedSnippet.id}`)
+                if (syncPlan.shouldNavigate) {
+                  await router.replace(`/project/${ref}/sql/${syncPlan.nextSnippetId}`)
+                }
+
+                if (syncPlan.shouldRemoveOldTab) {
+                  tabsSnap.removeTab(createTabId('sql', { id: syncPlan.previousId }))
+                }
+
+                snapV2.removeSnippet(syncPlan.previousId, true)
+              } else {
+                snapV2.updateSnippet({
+                  id: snippet.id,
+                  snippet: { ...movedSnippet, folder_id: targetFolderId },
+                  skipSave: true,
+                })
               }
-
-              if (tabsSnap.hasTab(oldTabId)) {
-                tabsSnap.removeTab(oldTabId)
-              }
-
-              snapV2.removeSnippet(snippet.id, true)
             }
           }
         })
