@@ -79,11 +79,11 @@ const FormSchema = z
   })
   .superRefine((data, ctx) => {
     if (data.selectedType === 'https') {
-      if (!data.httpsValues.url.startsWith('https://')) {
+      if (!data.httpsValues.url.startsWith('http://') && !data.httpsValues.url.startsWith('https://')) {
         ctx.addIssue({
           path: ['httpsValues', 'url'],
           code: z.ZodIssueCode.custom,
-          message: 'The URL must start with https://',
+          message: 'The URL must start with http:// or https://',
         })
       }
       if (!data.httpsValues.secret) {
@@ -360,8 +360,8 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                           value="https"
                           id="https"
                           key="https"
-                          label="HTTPS"
-                          description="Used to call any HTTPS endpoint."
+                          label="HTTP"
+                          description="Used to call any HTTP endpoint."
                         />
                       </RadioGroupStacked>
                     </FormControl>
@@ -462,7 +462,7 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                     render={({ field }) => (
                       <FormItemLayout
                         label="URL"
-                        description="Supabase Auth will send a HTTPS POST request to this URL each time the hook is triggered."
+                        description="Supabase Auth will send an HTTP POST request to this URL each time the hook is triggered."
                       >
                         <FormControl>
                           <Input {...field} />
