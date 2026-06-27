@@ -58,17 +58,6 @@ const buttonVariants = cva(
           data-[state=open]:border-foreground-lighter
           data-[state=open]:outline-border-strong
         `,
-        /** @deprecated use 'primary' instead */
-        alternative: `
-          text-foreground
-          bg-brand-400 hover:bg-brand-500
-          border-brand-500
-          focus-visible:border-brand-500
-          focus-visible:outline-brand-600
-          data-[state=open]:bg-brand-500
-          data-[state=open]:border-brand-500
-          data-[state=open]:outline-brand-600
-        `,
         outline: `
           text-foreground
           bg-transparent
@@ -250,6 +239,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     // - Otherwise, default to 0 for keyboard accessibility
     const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
 
+    const renderIconContainer = (content: ReactNode) => (
+      <div aria-hidden className={cn(IconContainerVariants({ size, variant }))}>
+        {content}
+      </div>
+    )
+
     return (
       <Comp
         ref={ref}
@@ -271,35 +266,31 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               children,
               undefined,
               showIcon &&
-                (loading ? (
-                  <div className={cn(IconContainerVariants({ size, variant }))}>
-                    <Loader2 className={cn(loadingVariants({ loading, variant }))} />
-                  </div>
-                ) : _iconLeft ? (
-                  <div className={cn(IconContainerVariants({ size, variant }))}>{_iconLeft}</div>
-                ) : null),
+                (loading
+                  ? renderIconContainer(
+                      <Loader2 className={cn(loadingVariants({ loading, variant }))} />
+                    )
+                  : _iconLeft
+                    ? renderIconContainer(_iconLeft)
+                    : null),
               children.props.children && (
                 <span className={'truncate'}>{children.props.children}</span>
               ),
-              iconRight && !loading && (
-                <div className={cn(IconContainerVariants({ size, variant }))}>{iconRight}</div>
-              )
+              iconRight && !loading && renderIconContainer(iconRight)
             )
           ) : null
         ) : (
           <>
             {showIcon &&
-              (loading ? (
-                <div className={cn(IconContainerVariants({ size, variant }))}>
-                  <Loader2 className={cn(loadingVariants({ loading, variant }))} />
-                </div>
-              ) : _iconLeft ? (
-                <div className={cn(IconContainerVariants({ size, variant }))}>{_iconLeft}</div>
-              ) : null)}{' '}
+              (loading
+                ? renderIconContainer(
+                    <Loader2 className={cn(loadingVariants({ loading, variant }))} />
+                  )
+                : _iconLeft
+                  ? renderIconContainer(_iconLeft)
+                  : null)}{' '}
             {children && <span className={'truncate'}>{children}</span>}{' '}
-            {iconRight && !loading && (
-              <div className={cn(IconContainerVariants({ size, variant }))}>{iconRight}</div>
-            )}
+            {iconRight && !loading && renderIconContainer(iconRight)}
           </>
         )}
       </Comp>

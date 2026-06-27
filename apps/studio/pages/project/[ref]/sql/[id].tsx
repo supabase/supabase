@@ -13,11 +13,12 @@ import { EditorBaseLayout } from '@/components/layouts/editors/EditorBaseLayout'
 import { useEditorType } from '@/components/layouts/editors/EditorsLayout.hooks'
 import SQLEditorLayout from '@/components/layouts/SQLEditorLayout/SQLEditorLayout'
 import { SQLEditorMenu } from '@/components/layouts/SQLEditorLayout/SQLEditorMenu'
-import { useContentIdQuery } from '@/data/content/content-id-query'
+import { useSqlSnippetByIdQuery } from '@/data/content/content-id-query'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
-import { SnippetWithContent, useSnippets, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSnippets, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { wasNeverPersisted } from '@/state/sql-editor/sql-editor-lifecycle'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 import type { NextPageWithLayout } from '@/types'
 
@@ -40,9 +41,9 @@ const SqlEditor: NextPageWithLayout = () => {
   // [Joshen] May need to investigate separately, but occasionally addSnippet doesnt exist in
   // the snapV2 valtio store for some reason hence why the added typeof check here
   const canFetchContentBasedOnId = Boolean(
-    id !== 'new' && typeof snapV2.addSnippet === 'function' && !snippet?.isNotSavedInDatabaseYet
+    id !== 'new' && typeof snapV2.addSnippet === 'function' && !wasNeverPersisted(snippet?.status)
   )
-  const { data, error, isError } = useContentIdQuery(
+  const { data, error, isError } = useSqlSnippetByIdQuery(
     { projectRef: ref, id },
     {
       retry: false,
@@ -60,13 +61,13 @@ const SqlEditor: NextPageWithLayout = () => {
   // behaviour down to a very specific use case too with all these conditionals
   // More details: https://github.com/supabase/supabase/pull/39389
   const snippetMissingImmediatelyAfterCreating =
-    !!snippet && snippetMissing && previousRoute === 'new' && 'isNotSavedInDatabaseYet' in snippet
+    !!snippet && snippetMissing && previousRoute === 'new' && wasNeverPersisted(snippet.status)
 
   useEffect(() => {
     if (ref && data && project) {
       // [Joshen] Check if snippet belongs to the current project
       if (!IS_PLATFORM || data.project_id === project.id) {
-        snapV2.setSnippet(ref, data as unknown as SnippetWithContent)
+        snapV2.setSnippet(ref, data)
       } else {
         setLastVisitedSnippet(undefined)
         router.replace(`/project/${ref}/sql/new`)
