@@ -957,6 +957,111 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 
 Realtime offers filters so you can specify the data your client receives at a more granular level.
 
+### Combining filters (AND)
+
+You can combine multiple filters in a single subscription by separating them with a comma. All conditions must match for an event to be delivered (logical AND). For example, `id=gt.10,id=lt.100` receives events where the `id` is between 11 and 99.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'products',
+      filter: 'quantity=gt.10,quantity=lt.100',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase
+    .channel('changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.insert,
+        schema: 'public',
+        table: 'products',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.gt,
+          column: 'quantity',
+          value: 10,
+        ),
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+<Admonition type="note">
+
+Dart SDK does not support AND filter composition directly in `PostgresChangeFilter`. Pass the raw filter string via the `rawFilter` parameter instead.
+
+</Admonition>
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.channel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
+    table = "products"
+    filter = "quantity=gt.10,quantity=lt.100"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+myChannel.subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "INSERT",
+  schema="public",
+  table="products",
+  filter="quantity=gt.10,quantity=lt.100",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
+
+Commas inside an `in` filter list are not treated as AND boundaries — `name=in.(red,blue,yellow)` is correctly parsed as a single `in` filter. You can also combine `in` with other filters:
+
+```js
+filter: 'name=in.(red,blue),quantity=gt.0'
+```
+
+An empty or whitespace-only filter string is treated the same as providing no filter at all — the subscription will receive all matching events without any column filtering.
+
 ### Equal to (`eq`)
 
 To listen to changes when a column's value in a table equals a client-specified value:
