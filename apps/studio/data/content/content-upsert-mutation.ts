@@ -61,6 +61,7 @@ export const useContentUpsertMutation = ({
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: contentKeys.allContentLists(projectRef) }),
           queryClient.invalidateQueries({ queryKey: contentKeys.infiniteList(projectRef) }),
+          queryClient.invalidateQueries({ queryKey: contentKeys.folders(projectRef) }),
         ])
       }
       await onSuccess?.(data, variables, context)

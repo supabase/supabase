@@ -60,7 +60,7 @@ interface MoveQueryModalProps {
  */
 
 export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryModalProps) => {
-  const { ref } = useParams()
+  const { ref, id: activeSnippetId } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
   const router = useRouter()
@@ -125,11 +125,14 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
       let folderId = selectedId
 
       if (selectedId === 'new-folder' && 'name' in values) {
-        const { id } = await createFolder({
+        const createdFolder = await createFolder({
           projectRef: ref,
           name: values.name,
         })
-        folderId = id
+        folderId = createdFolder.id
+        if (!IS_PLATFORM) {
+          snapV2.addFolder({ projectRef: ref, folder: createdFolder })
+        }
       }
 
       await Promise.all(
@@ -166,20 +169,23 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                 skipSave: true,
               })
             } else if (movedSnippet) {
-              // On selfhosted, we need to update the state with the moved snippet because the snippet depends on the
-              // folder_id the moved snippet has a different id than the original snippet.
-
-              // remove the old snippet from the state without saving to API
-              snapV2.removeSnippet(snippet.id, true)
-
+              // On self-hosted, moving changes the snippet id (filesystem path). Keep the
+              // editor on the moved snippet and avoid removing the old id from the store
+              // while the URL still points at it — that leaves Monaco in a permanent loading state.
               snapV2.addSnippet({ projectRef: ref, snippet: movedSnippet })
 
-              // remove the tab for the old snippet if the snippet was open. Moving can also happen when the tab is not open.
-              const tabId = createTabId('sql', { id: snippet.id })
-              if (tabsSnap.hasTab(tabId)) {
-                tabsSnap.removeTab(tabId)
-                await router.push(`/project/${ref}/sql/${movedSnippet.id}`)
+              const isViewingMovedSnippet = activeSnippetId === snippet.id
+              const oldTabId = createTabId('sql', { id: snippet.id })
+
+              if (isViewingMovedSnippet) {
+                await router.replace(`/project/${ref}/sql/${movedSnippet.id}`)
               }
+
+              if (tabsSnap.hasTab(oldTabId)) {
+                tabsSnap.removeTab(oldTabId)
+              }
+
+              snapV2.removeSnippet(snippet.id, true)
             }
           }
         })
