@@ -11,6 +11,7 @@
     "build:reference-markdown": "tsx ./internals/generate-reference-markdown.ts",
     "build:markdown": "pnpm build:guides-markdown && pnpm build:reference-markdown",
     "build:markdown-manifest": "tsx ./internals/generate-markdown-manifest.ts",
+    "check:markdown-manifest": "tsx ./internals/generate-markdown-manifest.ts --check",
     "build:gz-archive": "tsx ./internals/generate-gz-archive.ts",
     "build:sitemap": "tsx ./internals/generate-sitemap.ts",
     "clean": "rimraf .next .turbo node_modules features/docs/generated examples __generated__",

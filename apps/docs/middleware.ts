@@ -1,6 +1,6 @@
-import { MARKDOWN_SLUGS } from '~/__generated__/markdown-manifest'
 import { clientSdkIds } from '~/content/navigation.references'
 import { BASE_PATH } from '~/lib/constants'
+import { MARKDOWN_SLUGS } from '~/lib/markdown-manifest'
 import { negotiateMarkdown } from 'common/markdown-negotiation'
 import { isbot } from 'isbot'
 import { NextResponse, type NextRequest } from 'next/server'
