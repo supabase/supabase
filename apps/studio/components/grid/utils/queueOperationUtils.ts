@@ -1,3 +1,5 @@
+import type { INTERNAL_Snapshot as Snapshot } from 'valtio/vanilla'
+
 import { isPendingAddRow, PendingAddRow, SupaRow } from '../types'
 import { isTableLike, type Entity } from '@/data/table-editor/table-editor-types'
 import {
@@ -7,6 +9,8 @@ import {
   QueuedOperationType,
 } from '@/state/table-editor-operation-queue.types'
 import type { Dictionary } from '@/types'
+
+type QueuedOperationSnapshot = Snapshot<QueuedOperation>
 
 interface EditCellKeyOperation extends Omit<
   EditCellContentOperation,
@@ -60,7 +64,7 @@ export function rowMatchesIdentifiers(
 }
 
 function getQueuedCurrentRowIdentifiers(
-  operations: readonly QueuedOperation[],
+  operations: readonly QueuedOperationSnapshot[],
   tableId: number,
   primaryKeyNames: string[],
   originalIdentifiers: Dictionary<unknown>
@@ -90,7 +94,7 @@ export function getOriginalRowIdentifiersForQueuedOperation({
   table,
   rowIdentifiers,
 }: {
-  operations: readonly QueuedOperation[]
+  operations: readonly QueuedOperationSnapshot[]
   tableId: number
   table: Entity
   rowIdentifiers: Dictionary<unknown>
@@ -104,17 +108,16 @@ export function getOriginalRowIdentifiersForQueuedOperation({
     return rowIdentifiers
   }
 
-  const existingOriginalIdentifiers = operations
-    .filter((operation) => {
-      return (
-        operation.tableId === tableId &&
-        operation.type === QueuedOperationType.EDIT_CELL_CONTENT &&
-        primaryKeyNames.includes(operation.payload.columnName)
-      )
-    })
-    .map((operation) => operation.payload.rowIdentifiers)
+  for (const operation of operations) {
+    if (
+      operation.tableId !== tableId ||
+      operation.type !== QueuedOperationType.EDIT_CELL_CONTENT ||
+      !primaryKeyNames.includes(operation.payload.columnName)
+    ) {
+      continue
+    }
 
-  for (const originalIdentifiers of existingOriginalIdentifiers) {
+    const originalIdentifiers = operation.payload.rowIdentifiers
     const currentIdentifiers = getQueuedCurrentRowIdentifiers(
       operations,
       tableId,
@@ -136,7 +139,7 @@ export function removeRow(rows: SupaRow[], rowIdentifiers: Dictionary<unknown>):
 
 interface QueueCellEditParams {
   queueOperation: (operation: NewQueuedOperation) => void
-  operations?: readonly QueuedOperation[]
+  operations?: readonly QueuedOperationSnapshot[]
   tableId: number
   table: Entity
   row: SupaRow
@@ -269,7 +272,7 @@ export const formatGridDataWithOperationValues = ({
 interface QueueRowDeletesParams {
   rows: SupaRow[]
   table: Entity
-  operations?: readonly QueuedOperation[]
+  operations?: readonly QueuedOperationSnapshot[]
   queueOperation: (operation: NewQueuedOperation) => void
   projectRef: string | undefined
 }

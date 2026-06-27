@@ -18,7 +18,6 @@ import type { TableRowsData } from '@/data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
-import type { QueuedOperation } from '@/state/table-editor-operation-queue.types'
 import type { Dictionary } from '@/types'
 
 export interface EditCellParams {
@@ -65,8 +64,7 @@ export function useTableRowOperations() {
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
-  const queuedOperations = tableEditorSnap.operationQueue
-    .operations as unknown as readonly QueuedOperation[]
+  const queuedOperations = tableEditorSnap.operationQueue.operations
 
   // Non-queue mutation for cell edits with optimistic updates
   const { mutateAsync: mutateUpdateTableRow, isPending: isEditPending } = useTableRowUpdateMutation(
