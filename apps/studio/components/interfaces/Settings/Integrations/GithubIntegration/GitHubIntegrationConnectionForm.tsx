@@ -505,7 +505,10 @@ export const GitHubIntegrationConnectionForm = ({
                             <Switch
                               checked={field.value}
                               onCheckedChange={field.onChange}
-                              disabled={!canUpdateGitHubConnection}
+                              disabled={
+                                (!connection && !canCreateGitHubConnection) ||
+                                (connection && !canUpdateGitHubConnection)
+                              }
                             />
                           </FormControl>
                         </FormItemLayout>
