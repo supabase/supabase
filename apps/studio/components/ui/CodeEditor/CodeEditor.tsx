@@ -260,7 +260,13 @@ export const CodeEditor = ({
       <Editor
         path={id}
         theme="supabase"
-        className={cn(className, 'monaco-editor')}
+        // `h-full` keeps this wrapper filling its container even if a global `.monaco-editor`
+        // rule flips it to `position: absolute` (which happens after visiting GraphiQL, since it
+        // injects a second copy of Monaco's CSS onto the shared instance). Without an explicit
+        // height, an absolutely-positioned wrapper collapses to 0 and Monaco lays out at ~5px.
+        // Order matters: `h-full` is a default, so a caller-supplied height in `className`
+        // (e.g. `h-96`) wins via tailwind-merge instead of being clobbered.
+        className={cn('monaco-editor', 'h-full', className)}
         wrapperProps={{ className: wrapperClassName }}
         value={value ?? undefined}
         language={language}
