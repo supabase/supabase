@@ -135,7 +135,7 @@ const LegacyIntegrationPage = () => {
         )}
       </PageHeader>
 
-      <div className="mx-auto w-full">{content}</div>
+      <div className="flex-1 min-h-0 mx-auto w-full">{content}</div>
     </>
   )
 }

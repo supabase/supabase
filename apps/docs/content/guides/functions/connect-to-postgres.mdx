@@ -31,7 +31,7 @@ export default {
 
       return Response.json({ data })
     } catch (err) {
-      return new Response(String(err?.message ?? err), { status: 500 })
+      return Response.json({ error: String(err?.message ?? err) }, { status: 500 })
     }
   }),
 }

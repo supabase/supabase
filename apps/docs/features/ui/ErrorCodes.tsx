@@ -1,8 +1,8 @@
+import _authErrorCodes from '~/data/errorCodes/authErrorCodes.json'
+import _realtimeErrorCodes from '~/data/errorCodes/realtimeErrorCodes.json'
+import { type ErrorCodeDefinition } from '~/resources/error/errorTypes'
 import Link from 'next/link'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import _authErrorCodes from '~/content/errorCodes/authErrorCodes.toml'
-import _realtimeErrorCodes from '~/content/errorCodes/realtimeErrorCodes.toml'
-import { type ErrorCodeDefinition } from '~/resources/error/errorTypes'
 
 const errorCodesByService = {
   auth: _authErrorCodes as Record<string, ErrorCodeDefinition>,

@@ -315,14 +315,18 @@ Because the dedicated pooler is hosted on the same machine as your database, it 
 
 See the [connection method matrix](#how-to-connect-to-your-postgres-databases) at the top of this page for a quick reference, or follow the decision flow in the diagram below to choose the right option for your environment.
 
-<Image
-  alt="Decision tree diagram showing when to connect directly to Postgres or use a connection pooler."
-  src={{
-    dark: '/docs/img/guides/database/connecting-to-postgres/connection-decision-tree.svg',
-    light: '/docs/img/guides/database/connecting-to-postgres/connection-decision-tree-light.svg',
-  }}
-  caption="Choosing between direct Postgres connections and connection pooling"
-  width={291}
-  height={150}
+```mermaid
+flowchart TD
+  A[Where are you connecting from?] --> B[Persistent Backend]
+  A --> C[Serverless / Edge]
+  B --> D{IPv6 Supported?<br/>IPv4 Add-on?}
+  B --> E{IPv4 Needed?}
+  C --> H{IPv6 Supported?<br/>IPv4 Add-on?}
+  C --> I{IPv4 Needed?}
+  D --> F[Use Direct Connection]
+  E --> G[Use Supavisor Session Mode]
+  H --> J[Use Dedicated Pooler PgBouncer Pro]
+  I --> K[Use Supavisor Transaction Mode]
+```
 
-/>
+The decision depends on where you connect from. For a **persistent backend**, use a direct connection if you can reach the database over IPv6 (or have the IPv4 add-on); otherwise use Supavisor in session mode. For **serverless or edge** environments, use the dedicated pooler (PgBouncer, Pro plan) when IPv6 or the IPv4 add-on is available, or Supavisor in transaction mode when you need IPv4.

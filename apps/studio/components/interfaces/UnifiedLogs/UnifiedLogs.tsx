@@ -29,7 +29,6 @@ import {
 
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
-import { ConnectionLogsToggle } from './components/ConnectionLogsToggle'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
@@ -275,13 +274,20 @@ export const UnifiedLogs = () => {
 
       // For hardcoded enum fields, keep the predefined options (facets only used for counts)
       if (field.value === 'log_type' || field.value === 'method' || field.value === 'level') {
-        return field
+        const fieldWithCounts = {
+          ...field,
+          options: field.options.map((x) => {
+            return { ...x, count: facetsField.rows.find((y) => y.value === x.value)?.total ?? 0 }
+          }),
+        }
+        return fieldWithCounts
       }
 
       // For dynamic fields, use faceted options
-      const options: Option[] = facetsField.rows.map(({ value }) => ({
+      const options: Option[] = facetsField.rows.map(({ value, total }) => ({
         label: `${value}`,
         value,
+        count: total,
       }))
 
       return { ...field, options }
@@ -370,7 +376,6 @@ export const UnifiedLogs = () => {
             isFilterBarOpen={isFilterBarOpen}
             setIsFilterBarOpen={setIsFilterBarOpen}
             dateRangeDisabled={{ after: new Date() }}
-            afterFilters={<ConnectionLogsToggle />}
           />
           <ResizableHandle withHandle />
           <ResizablePanel

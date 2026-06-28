@@ -1161,7 +1161,6 @@
                           },
                           "code": {
                             "type": "string",
-                            "minLength": 1,
                             "description": "Specific region code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
                             "enum": [
                               "us-east-1",
@@ -1239,6 +1238,10 @@
                     "type": "string",
                     "format": "uri",
                     "description": "Template URL used to create the project from the CLI."
+                  },
+                  "high_availability": {
+                    "type": "boolean",
+                    "description": "[Experimental] Whether to enable high availability for the project."
                   }
                 },
                 "required": ["db_pass", "name", "organization_slug"],
@@ -1827,6 +1830,14 @@
             "schema": {
               "pattern": "^[\\w-]+$",
               "example": "tsrqponmlkjihgfedcba",
+              "type": "string"
+            }
+          },
+          {
+            "name": "target_flow",
+            "required": false,
+            "in": "query",
+            "schema": {
               "type": "string"
             }
           },
@@ -8123,6 +8134,26 @@
                               "type": {
                                 "type": "string",
                                 "enum": ["pg_graphql_introspection_change"]
+                              }
+                            },
+                            "required": ["type"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["ltree_reindex_required"]
+                              }
+                            },
+                            "required": ["type"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["operator_estimator_gate"]
                               }
                             },
                             "required": ["type"]
@@ -23393,7 +23424,6 @@
                   },
                   "code": {
                     "type": "string",
-                    "minLength": 1,
                     "description": "Specific region code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
                     "enum": [
                       "us-east-1",
@@ -23471,6 +23501,10 @@
             "type": "string",
             "format": "uri",
             "description": "Template URL used to create the project from the CLI."
+          },
+          "high_availability": {
+            "type": "boolean",
+            "description": "[Experimental] Whether to enable high availability for the project."
           }
         },
         "required": ["db_pass", "name", "organization_slug"],
@@ -25395,6 +25429,26 @@
                     "type": {
                       "type": "string",
                       "enum": ["pg_graphql_introspection_change"]
+                    }
+                  },
+                  "required": ["type"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["ltree_reindex_required"]
+                    }
+                  },
+                  "required": ["type"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["operator_estimator_gate"]
                     }
                   },
                   "required": ["type"]
