@@ -65,7 +65,7 @@ export default function TextareaForm() {
             </FormItem>
           )}
         />
-        <Button htmlType="submit" type="alternative">
+        <Button type="submit" variant="primary">
           Submit
         </Button>
       </form>

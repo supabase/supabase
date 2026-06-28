@@ -62,7 +62,7 @@ test('generateV4 calls the tool sanitizer', async () => {
     }),
   }))
 
-  vi.mock('@/data/sql/execute-sql-query', () => ({
+  vi.mock('@/data/sql/execute-sql-mutation', () => ({
     executeSql: vi.fn().mockResolvedValue({ result: [] }),
   }))
 

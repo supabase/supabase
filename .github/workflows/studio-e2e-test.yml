@@ -23,8 +23,8 @@ jobs:
       tests_ran: ${{ steps.filter.outputs.studio == 'true' }}
 
     permissions:
-      contents: write
-
+      contents: read
+      id-token: write
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
@@ -84,10 +84,22 @@ jobs:
         if: steps.filter.outputs.studio == 'true'
         run: rm -rf supabase && pnpm exec supabase init && mkdir supabase/functions
 
+      # Authenticate with AWS ECR to avoid rate limiting
+      - name: configure aws credentials
+        if: steps.filter.outputs.studio == 'true' && !github.event.pull_request.head.repo.fork
+        uses: aws-actions/configure-aws-credentials@5fd3084fc36e372ff1fff382a39b10d03659f355 # v2.2.0
+        with:
+          role-to-assume: ${{ secrets.PROD_AWS_ROLE }}
+          aws-region: us-east-1
+      - uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+        if: steps.filter.outputs.studio == 'true' && !github.event.pull_request.head.repo.fork
+        with:
+          registry: public.ecr.aws
+
       - name: Pre-start diagnostics
         run: |
           docker ps -a
-          sudo ss -tlnp | grep 5432 || echo "5432 free"
+          sudo ss -tlnp | grep 54322 || echo "54322 free"
 
       - name: Start supabase
         if: steps.filter.outputs.studio == 'true'
@@ -97,7 +109,7 @@ jobs:
         if: failure()
         run: |
           docker ps -a
-          sudo ss -tlnp | grep 5432
+          sudo ss -tlnp | grep 54322 || echo "54322 not listening"
           docker logs $(docker ps -aq) 2>&1 || true
 
       - name: Build studio

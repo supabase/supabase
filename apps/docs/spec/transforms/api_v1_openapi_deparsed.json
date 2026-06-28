@@ -1161,7 +1161,6 @@
                           },
                           "code": {
                             "type": "string",
-                            "minLength": 1,
                             "description": "Specific region code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
                             "enum": [
                               "us-east-1",
@@ -1239,6 +1238,10 @@
                     "type": "string",
                     "format": "uri",
                     "description": "Template URL used to create the project from the CLI."
+                  },
+                  "high_availability": {
+                    "type": "boolean",
+                    "description": "[Experimental] Whether to enable high availability for the project."
                   }
                 },
                 "required": ["db_pass", "name", "organization_slug"],
@@ -1831,6 +1834,14 @@
             }
           },
           {
+            "name": "target_flow",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "name": "resource",
             "required": false,
             "in": "query",
@@ -1858,6 +1869,7 @@
     },
     "/v1/oauth/token": {
       "post": {
+        "description": "Supports `authorization_code`, `refresh_token`, and `urn:ietf:params:oauth:grant-type:jwt-bearer` grant types. The `jwt-bearer` grant type (IDJAG — identity-directed JWT assertion) is in beta and available on Team and Enterprise plans only.",
         "operationId": "v1-exchange-oauth-token",
         "parameters": [],
         "requestBody": {
@@ -1869,7 +1881,11 @@
                 "properties": {
                   "grant_type": {
                     "type": "string",
-                    "enum": ["authorization_code", "refresh_token"]
+                    "enum": [
+                      "authorization_code",
+                      "refresh_token",
+                      "urn:ietf:params:oauth:grant-type:jwt-bearer"
+                    ]
                   },
                   "client_id": {
                     "type": "string",
@@ -1889,6 +1905,10 @@
                   },
                   "refresh_token": {
                     "type": "string"
+                  },
+                  "assertion": {
+                    "type": "string",
+                    "description": "IDJAG assertion JWT for grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer. Beta - available on Team and Enterprise plans only."
                   },
                   "resource": {
                     "type": "string",
@@ -1925,7 +1945,8 @@
                       "type": "string"
                     },
                     "refresh_token": {
-                      "type": "string"
+                      "type": "string",
+                      "description": "The `urn:ietf:params:oauth:grant-type:jwt-bearer` grant type issues access tokens only, no refresh token is returned and the token cannot be revoked via `/v1/oauth/revoke`."
                     },
                     "expires_in": {
                       "type": "integer"
@@ -1935,7 +1956,7 @@
                       "enum": ["Bearer"]
                     }
                   },
-                  "required": ["access_token", "refresh_token", "expires_in", "token_type"],
+                  "required": ["access_token", "expires_in", "token_type"],
                   "additionalProperties": false
                 }
               }
@@ -8116,6 +8137,26 @@
                               }
                             },
                             "required": ["type"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["ltree_reindex_required"]
+                              }
+                            },
+                            "required": ["type"]
+                          },
+                          {
+                            "type": "object",
+                            "properties": {
+                              "type": {
+                                "type": "string",
+                                "enum": ["operator_estimator_gate"]
+                              }
+                            },
+                            "required": ["type"]
                           }
                         ]
                       }
@@ -8483,7 +8524,7 @@
           }
         },
         "responses": {
-          "201": {
+          "204": {
             "description": ""
           },
           "401": {
@@ -8560,7 +8601,7 @@
           }
         },
         "responses": {
-          "201": {
+          "204": {
             "description": ""
           },
           "401": {
@@ -13622,6 +13663,58 @@
         "x-oauth-scope": "projects:write"
       }
     },
+    "/v1/projects/{ref}/restart": {
+      "post": {
+        "operationId": "v1-restart-a-project",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          },
+          {
+            "fga_permissions": ["project_admin_write"]
+          }
+        ],
+        "summary": "Restarts the given project",
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:write",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["infra", "management-api"],
+        "x-oauth-scope": "projects:write"
+      }
+    },
     "/v1/projects/{ref}/restore": {
       "get": {
         "operationId": "v1-list-available-restore-versions",
@@ -13847,7 +13940,8 @@
                               "ipv4",
                               "auth_mfa_phone",
                               "auth_mfa_web_authn",
-                              "log_drain"
+                              "log_drain",
+                              "etl_pipeline"
                             ]
                           },
                           "variant": {
@@ -13901,6 +13995,10 @@
                                   {
                                     "type": "string",
                                     "enum": ["log_drain_default"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "enum": ["etl_pipeline_default"]
                                   }
                                 ]
                               },
@@ -13951,7 +14049,8 @@
                               "ipv4",
                               "auth_mfa_phone",
                               "auth_mfa_web_authn",
-                              "log_drain"
+                              "log_drain",
+                              "etl_pipeline"
                             ]
                           },
                           "name": {
@@ -14010,6 +14109,10 @@
                                     {
                                       "type": "string",
                                       "enum": ["log_drain_default"]
+                                    },
+                                    {
+                                      "type": "string",
+                                      "enum": ["etl_pipeline_default"]
                                     }
                                   ]
                                 },
@@ -14151,7 +14254,8 @@
                       "ipv4",
                       "auth_mfa_phone",
                       "auth_mfa_web_authn",
-                      "log_drain"
+                      "log_drain",
+                      "etl_pipeline"
                     ]
                   }
                 },
@@ -19469,6 +19573,43 @@
                     "logical_decoding_work_mem": {
                       "type": "string"
                     },
+                    "cron.log_statement": {
+                      "type": "boolean"
+                    },
+                    "log_autovacuum_min_duration": {
+                      "type": "string",
+                      "description": "Default unit: ms",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+                    },
+                    "log_checkpoints": {
+                      "type": "boolean"
+                    },
+                    "log_connections": {
+                      "type": "boolean"
+                    },
+                    "log_disconnections": {
+                      "type": "boolean"
+                    },
+                    "log_duration": {
+                      "type": "boolean"
+                    },
+                    "log_lock_waits": {
+                      "type": "boolean"
+                    },
+                    "log_recovery_conflict_waits": {
+                      "type": "boolean"
+                    },
+                    "log_replication_commands": {
+                      "type": "boolean"
+                    },
+                    "log_startup_progress_interval": {
+                      "type": "string",
+                      "description": "Default unit: ms",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+                    },
+                    "log_temp_files": {
+                      "type": "string"
+                    },
                     "maintenance_work_mem": {
                       "type": "string"
                     },
@@ -19624,6 +19765,43 @@
                   "logical_decoding_work_mem": {
                     "type": "string"
                   },
+                  "cron.log_statement": {
+                    "type": "boolean"
+                  },
+                  "log_autovacuum_min_duration": {
+                    "type": "string",
+                    "description": "Default unit: ms",
+                    "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+                  },
+                  "log_checkpoints": {
+                    "type": "boolean"
+                  },
+                  "log_connections": {
+                    "type": "boolean"
+                  },
+                  "log_disconnections": {
+                    "type": "boolean"
+                  },
+                  "log_duration": {
+                    "type": "boolean"
+                  },
+                  "log_lock_waits": {
+                    "type": "boolean"
+                  },
+                  "log_recovery_conflict_waits": {
+                    "type": "boolean"
+                  },
+                  "log_replication_commands": {
+                    "type": "boolean"
+                  },
+                  "log_startup_progress_interval": {
+                    "type": "string",
+                    "description": "Default unit: ms",
+                    "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+                  },
+                  "log_temp_files": {
+                    "type": "string"
+                  },
                   "maintenance_work_mem": {
                     "type": "string"
                   },
@@ -19739,6 +19917,43 @@
                       "type": "string"
                     },
                     "logical_decoding_work_mem": {
+                      "type": "string"
+                    },
+                    "cron.log_statement": {
+                      "type": "boolean"
+                    },
+                    "log_autovacuum_min_duration": {
+                      "type": "string",
+                      "description": "Default unit: ms",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+                    },
+                    "log_checkpoints": {
+                      "type": "boolean"
+                    },
+                    "log_connections": {
+                      "type": "boolean"
+                    },
+                    "log_disconnections": {
+                      "type": "boolean"
+                    },
+                    "log_duration": {
+                      "type": "boolean"
+                    },
+                    "log_lock_waits": {
+                      "type": "boolean"
+                    },
+                    "log_recovery_conflict_waits": {
+                      "type": "boolean"
+                    },
+                    "log_replication_commands": {
+                      "type": "boolean"
+                    },
+                    "log_startup_progress_interval": {
+                      "type": "string",
+                      "description": "Default unit: ms",
+                      "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+                    },
+                    "log_temp_files": {
                       "type": "string"
                     },
                     "maintenance_work_mem": {
@@ -23209,7 +23424,6 @@
                   },
                   "code": {
                     "type": "string",
-                    "minLength": 1,
                     "description": "Specific region code. The codes supported are not a stable API, and should be retrieved from the /available-regions endpoint.",
                     "enum": [
                       "us-east-1",
@@ -23287,6 +23501,10 @@
             "type": "string",
             "format": "uri",
             "description": "Template URL used to create the project from the CLI."
+          },
+          "high_availability": {
+            "type": "boolean",
+            "description": "[Experimental] Whether to enable high availability for the project."
           }
         },
         "required": ["db_pass", "name", "organization_slug"],
@@ -23558,7 +23776,11 @@
         "properties": {
           "grant_type": {
             "type": "string",
-            "enum": ["authorization_code", "refresh_token"]
+            "enum": [
+              "authorization_code",
+              "refresh_token",
+              "urn:ietf:params:oauth:grant-type:jwt-bearer"
+            ]
           },
           "client_id": {
             "type": "string",
@@ -23578,6 +23800,10 @@
           },
           "refresh_token": {
             "type": "string"
+          },
+          "assertion": {
+            "type": "string",
+            "description": "IDJAG assertion JWT for grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer. Beta - available on Team and Enterprise plans only."
           },
           "resource": {
             "type": "string",
@@ -23606,7 +23832,8 @@
             "type": "string"
           },
           "refresh_token": {
-            "type": "string"
+            "type": "string",
+            "description": "The `urn:ietf:params:oauth:grant-type:jwt-bearer` grant type issues access tokens only, no refresh token is returned and the token cannot be revoked via `/v1/oauth/revoke`."
           },
           "expires_in": {
             "type": "integer"
@@ -23616,7 +23843,7 @@
             "enum": ["Bearer"]
           }
         },
-        "required": ["access_token", "refresh_token", "expires_in", "token_type"],
+        "required": ["access_token", "expires_in", "token_type"],
         "additionalProperties": false
       },
       "OAuthRevokeTokenBody": {
@@ -25202,6 +25429,26 @@
                     "type": {
                       "type": "string",
                       "enum": ["pg_graphql_introspection_change"]
+                    }
+                  },
+                  "required": ["type"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["ltree_reindex_required"]
+                    }
+                  },
+                  "required": ["type"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["operator_estimator_gate"]
                     }
                   },
                   "required": ["type"]
@@ -28019,7 +28266,8 @@
                     "ipv4",
                     "auth_mfa_phone",
                     "auth_mfa_web_authn",
-                    "log_drain"
+                    "log_drain",
+                    "etl_pipeline"
                   ]
                 },
                 "variant": {
@@ -28073,6 +28321,10 @@
                         {
                           "type": "string",
                           "enum": ["log_drain_default"]
+                        },
+                        {
+                          "type": "string",
+                          "enum": ["etl_pipeline_default"]
                         }
                       ]
                     },
@@ -28123,7 +28375,8 @@
                     "ipv4",
                     "auth_mfa_phone",
                     "auth_mfa_web_authn",
-                    "log_drain"
+                    "log_drain",
+                    "etl_pipeline"
                   ]
                 },
                 "name": {
@@ -28182,6 +28435,10 @@
                           {
                             "type": "string",
                             "enum": ["log_drain_default"]
+                          },
+                          {
+                            "type": "string",
+                            "enum": ["etl_pipeline_default"]
                           }
                         ]
                       },
@@ -28273,7 +28530,8 @@
               "ipv4",
               "auth_mfa_phone",
               "auth_mfa_web_authn",
-              "log_drain"
+              "log_drain",
+              "etl_pipeline"
             ]
           }
         },
@@ -30021,6 +30279,43 @@
           "logical_decoding_work_mem": {
             "type": "string"
           },
+          "cron.log_statement": {
+            "type": "boolean"
+          },
+          "log_autovacuum_min_duration": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "log_checkpoints": {
+            "type": "boolean"
+          },
+          "log_connections": {
+            "type": "boolean"
+          },
+          "log_disconnections": {
+            "type": "boolean"
+          },
+          "log_duration": {
+            "type": "boolean"
+          },
+          "log_lock_waits": {
+            "type": "boolean"
+          },
+          "log_recovery_conflict_waits": {
+            "type": "boolean"
+          },
+          "log_replication_commands": {
+            "type": "boolean"
+          },
+          "log_startup_progress_interval": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "log_temp_files": {
+            "type": "string"
+          },
           "maintenance_work_mem": {
             "type": "string"
           },
@@ -30118,6 +30413,43 @@
             "type": "string"
           },
           "logical_decoding_work_mem": {
+            "type": "string"
+          },
+          "cron.log_statement": {
+            "type": "boolean"
+          },
+          "log_autovacuum_min_duration": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "log_checkpoints": {
+            "type": "boolean"
+          },
+          "log_connections": {
+            "type": "boolean"
+          },
+          "log_disconnections": {
+            "type": "boolean"
+          },
+          "log_duration": {
+            "type": "boolean"
+          },
+          "log_lock_waits": {
+            "type": "boolean"
+          },
+          "log_recovery_conflict_waits": {
+            "type": "boolean"
+          },
+          "log_replication_commands": {
+            "type": "boolean"
+          },
+          "log_startup_progress_interval": {
+            "type": "string",
+            "description": "Default unit: ms",
+            "pattern": "^(-?[0-9]+(?:\\.[0-9]+)?)(us|ms|s|min|h|d)?$"
+          },
+          "log_temp_files": {
             "type": "string"
           },
           "maintenance_work_mem": {

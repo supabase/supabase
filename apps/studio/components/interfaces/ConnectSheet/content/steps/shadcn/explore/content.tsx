@@ -5,7 +5,7 @@ import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Conn
 
 function ShadcnExploreContent(_props: StepContentProps) {
   return (
-    <Button asChild type="default" icon={<ExternalLink size={14} />}>
+    <Button asChild variant="default" icon={<ExternalLink size={14} />}>
       <a href="https://supabase.com/ui" target="_blank" rel="noreferrer">
         Explore supabase.com/ui
       </a>

@@ -375,7 +375,6 @@ export const PolicyEditorPanel = memo(function ({
                       }}
                     >
                       <RLSCodeEditor
-                        disableTabToUsePlaceholder
                         readOnly={!canUpdatePolicies}
                         id="rls-exp-one-editor"
                         placeholder={
@@ -439,7 +438,6 @@ export const PolicyEditorPanel = memo(function ({
                           }}
                         >
                           <RLSCodeEditor
-                            disableTabToUsePlaceholder
                             readOnly={!canUpdatePolicies}
                             id="rls-exp-two-editor"
                             placeholder="-- Provide a SQL expression for the with check statement"
@@ -520,7 +518,7 @@ export const PolicyEditorPanel = memo(function ({
                     )}
                     <SheetFooter className="flex items-center justify-end! px-5 py-4 w-full border-t">
                       <Button
-                        type="default"
+                        variant="default"
                         disabled={isExecuting || isUpdating}
                         onClick={confirmOnClose}
                       >
@@ -529,7 +527,7 @@ export const PolicyEditorPanel = memo(function ({
 
                       <ButtonTooltip
                         form={FORM_ID}
-                        htmlType="submit"
+                        type="submit"
                         loading={isExecuting || isUpdating}
                         disabled={!canUpdatePolicies || isExecuting || isUpdating}
                         tooltip={{

@@ -146,7 +146,7 @@ const ServiceCell = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                type="text"
+                variant="text"
                 size="tiny"
                 className="relative z-10 px-1 text-foreground-lighter group-hover:text-foreground transition-colors shrink-0"
                 aria-label={`Go to ${service.name} report`}

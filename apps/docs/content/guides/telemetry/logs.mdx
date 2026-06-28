@@ -8,7 +8,7 @@ The Supabase Platform includes a Logs Explorer that allows log tracing and debug
 
 ## Product logs
 
-Supabase provides a logging interface specific to each product. You can use simple regular expressions for keywords and patterns to search log event messages. You can also export and download the log events matching your query as a spreadsheet.
+Supabase provides a logging interface specific to each product. You can use regular expressions for keywords and patterns to search log event messages. You can also export and download the log events matching your query as a spreadsheet.
 
 {/* <!-- To update screenshots, ensure that at least one log line is selected to display the metadata. Can use meme.town as an example. --> */}
 
@@ -143,6 +143,16 @@ Do not log Personal Identifiable Information (PII) within the `User-Agent` heade
 
 </Admonition>
 
+## Logging Postgres connections
+
+Postgres can log connection lifecycle events to your project's Postgres logs, for example when a client connects or authenticates. By default, Supabase sets `log_connections` to off for new projects and you must enable it first.
+
+<$Partial path="log_connections_default_effective_date.mdx" />
+
+To enable connection logging for audit or compliance, see [Postgres connection logging](/docs/guides/platform/postgres-connection-logging).
+
+In the [Logs Explorer](/dashboard/project/_/logs-explorer), connection lifecycle messages may be hidden by default. Use the connection logs filter in the sidebar to show them.
+
 ## Logging Postgres queries
 
 To enable query logs for other categories of statements:
@@ -257,7 +267,7 @@ The Logs Explorer uses BigQuery and supports all [available SQL functions and op
 
 ### Timestamp display and behavior
 
-Each log entry is stored with a `timestamp` as a `TIMESTAMP` data type. Use the appropriate [timestamp function](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp) to utilize the `timestamp` field in a query.
+Each log entry is stored with a `timestamp` as a `TIMESTAMP` data type. Use the appropriate [timestamp function](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp) to use the `timestamp` field in a query.
 
 Raw top-level timestamp values are rendered as unix microsecond. To render the timestamps in a human-readable format, use the `DATETIME()` function to convert the unix timestamp display into an ISO-8601 timestamp.
 

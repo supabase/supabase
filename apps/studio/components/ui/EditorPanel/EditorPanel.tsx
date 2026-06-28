@@ -305,7 +305,7 @@ export const EditorPanel = () => {
           {activeSnippet && (
             <ButtonTooltip
               size="tiny"
-              type="text"
+              variant="text"
               className="w-7 h-7 p-0"
               icon={<PlusIcon size={14} />}
               tooltip={{ content: { side: 'bottom', text: 'New snippet' } }}
@@ -316,7 +316,7 @@ export const EditorPanel = () => {
             <PopoverTrigger asChild>
               <ButtonTooltip
                 size="tiny"
-                type="text"
+                variant="text"
                 role="combobox"
                 aria-expanded={isSnippetsOpen}
                 className="w-7 h-7 p-0"
@@ -369,7 +369,7 @@ export const EditorPanel = () => {
               <PopoverTrigger asChild>
                 <Button
                   size="tiny"
-                  type="default"
+                  variant="default"
                   role="combobox"
                   className="mr-2"
                   aria-expanded={isTemplatesOpen}
@@ -425,7 +425,7 @@ export const EditorPanel = () => {
             </Popover>
           )}
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="w-7 h-7 p-0"
             icon={<Maximize2 strokeWidth={1.5} />}
             tooltip={{
@@ -462,7 +462,7 @@ export const EditorPanel = () => {
           />
 
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="w-7 h-7 p-0"
             onClick={handleClosePanel}
             icon={<X strokeWidth={1.5} />}
@@ -507,7 +507,7 @@ export const EditorPanel = () => {
               wordWrap: 'on',
               lineNumbers: 'on',
               folding: false,
-              padding: { top: 16 },
+              padding: { top: 12 },
               lineNumbersMinChars: 3,
             }}
             executeQuery={onExecuteSql}
@@ -516,7 +516,6 @@ export const EditorPanel = () => {
             openAIAssistantShortcutEnabled={isAIAssistantHotkeyEnabled}
           />
         </div>
-
         {error !== undefined && (
           <div className="shrink-0">
             <Admonition
@@ -539,7 +538,6 @@ export const EditorPanel = () => {
             />
           </div>
         )}
-
         {showWarning && (
           <SqlWarningAdmonition
             className="border-t"
@@ -557,7 +555,6 @@ export const EditorPanel = () => {
             }}
           />
         )}
-
         {results !== undefined && results.length > 0 && (
           <div
             className={cn(
@@ -577,7 +574,7 @@ export const EditorPanel = () => {
               </span>
               <Button
                 size="tiny"
-                type="default"
+                variant="default"
                 className="ml-2"
                 onClick={() => setShowResults((prev) => !prev)}
               >
@@ -593,7 +590,6 @@ export const EditorPanel = () => {
             </p>
           </div>
         )}
-
         <div className="relative shrink-0 flex items-center gap-2 justify-end px-5 py-4 w-full border-t">
           {(isUpserting || saveStatus !== 'idle') && (
             <div
@@ -617,7 +613,7 @@ export const EditorPanel = () => {
             </div>
           )}
           <Button
-            type="default"
+            variant="default"
             size="tiny"
             disabled={
               !currentValue ||

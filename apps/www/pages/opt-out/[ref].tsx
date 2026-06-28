@@ -227,7 +227,7 @@ export default function OptOutPage() {
               )}
             </div>
 
-            <Button htmlType="submit" size="small" disabled={submissionType === 'success'}>
+            <Button type="submit" size="small" disabled={submissionType === 'success'}>
               Report spam
             </Button>
             <FormMessage

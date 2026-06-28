@@ -58,7 +58,7 @@ const EnumeratedTypeValueRow = <TFieldValues extends FieldValues>({
               </button>
               <Input {...inputField} className="w-full" />
               <Button
-                type="default"
+                variant="default"
                 size="small"
                 disabled={isDisabled}
                 icon={<Trash strokeWidth={1.5} size={16} />}

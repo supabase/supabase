@@ -153,9 +153,6 @@ export const analyticsKeys = {
   usageApiCounts: (projectRef: string | undefined, interval: string | undefined) =>
     ['projects', projectRef, 'usage.api-counts', interval] as const,
 
-  usageApiRequestsCount: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'usage.api-requests-count'] as const,
-
   serviceHealth: (
     projectRef: string | undefined,
     {

@@ -173,7 +173,7 @@ export const PauseDisabledState = () => {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="default" icon={<Download />} iconRight={<ChevronDown />}>
+            <Button variant="default" icon={<Download />} iconRight={<ChevronDown />}>
               Download backups
             </Button>
           </DropdownMenuTrigger>

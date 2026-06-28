@@ -184,7 +184,7 @@ export const TextConfirmModal = forwardRef<
                       Type{' '}
                       {enableCopy ? (
                         <Button
-                          type="default"
+                          variant="default"
                           className="h-[23px] px-1.5 py-0 border-muted text-sm whitespace-pre break-all"
                           iconRight={
                             showCopied ? <Check strokeWidth={2} className="text-brand" /> : <Copy />
@@ -218,21 +218,27 @@ export const TextConfirmModal = forwardRef<
               />
               <div className="flex gap-2">
                 {!blockDeleteButton && (
-                  <Button size="medium" block type="default" disabled={loading} onClick={onCancel}>
+                  <Button
+                    size="medium"
+                    block
+                    variant="default"
+                    disabled={loading}
+                    onClick={onCancel}
+                  >
                     {cancelLabel}
                   </Button>
                 )}
                 <Button
                   block
                   size="medium"
-                  type={
+                  variant={
                     variant === 'destructive'
                       ? 'danger'
                       : variant === 'warning'
                         ? 'warning'
                         : 'primary'
                   }
-                  htmlType="submit"
+                  type="submit"
                   loading={loading}
                   disabled={!isFormValid || loading}
                   className="truncate"

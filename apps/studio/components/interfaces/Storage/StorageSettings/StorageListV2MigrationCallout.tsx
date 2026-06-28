@@ -95,7 +95,7 @@ const StorageListV2MigrationDialog = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <ButtonTooltip
-          type="primary"
+          variant="primary"
           disabled={!canUpdateStorageSettings}
           tooltip={{
             content: {
@@ -151,10 +151,10 @@ const StorageListV2MigrationDialog = () => {
         </DialogSection>
 
         <DialogFooter>
-          <Button type="default" disabled={isUpdating} onClick={() => setOpen(false)}>
+          <Button variant="default" disabled={isUpdating} onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button type="primary" loading={isUpdating} onClick={() => onConfirmUpgrade()}>
+          <Button variant="primary" loading={isUpdating} onClick={() => onConfirmUpgrade()}>
             Upgrade now
           </Button>
         </DialogFooter>

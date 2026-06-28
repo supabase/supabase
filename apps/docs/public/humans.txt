@@ -12,6 +12,7 @@ Alaister Young
 Aleksi Immonen
 Alex Hall
 Alex Hsu
+Alexander Alexandrov
 Alexander Korotkov
 Ali Waseem
 Allan S
@@ -22,7 +23,6 @@ Ana Mogul
 Andrew Valleteau
 Andrey A
 Angelico de los Reyes
-Anna Weihl
 Ant Evans
 Ant Wilson
 Ariuna K
@@ -40,6 +40,8 @@ Brendan Stephens
 Brent Newson
 Brian Cullen
 Brent Schroeter
+Bruno Kilian
+Burhan A
 Carel de Waal
 Cameron Blackwood
 Cameron Michie
@@ -89,6 +91,7 @@ Eduardo Gurgel
 Eleftheria Trivyzaki
 Eliot Whalan
 Emmett Folger
+Erfi Anugrah
 Eric Kharitonashvili
 Etienne Stalmans
 Eyal Ehrlich
@@ -109,7 +112,9 @@ Greg Marzouka
 Greg P
 Greg Richardson
 Gregor Vand
+Guillaume Faas
 Guilherme Souza
+Hanefi Önaldı
 Hannah Bowers
 Hardik Maheshwari
 Haritabh Gupta
@@ -126,6 +131,7 @@ Jared Patterson
 Jason Farber
 Jean-Paul Argudo
 Jeff Smick
+Jefferson Venerando
 Jenny Kibiri
 Jeremias Menichelli
 Jess Fink
@@ -185,6 +191,7 @@ Manan Gupta
 Marcus Weiner
 Marija Milicevic
 Mark Burggraf
+Márton Boros
 Matthew Hambright
 Matt Hudson
 Matt Johnston
@@ -195,13 +202,17 @@ Mert Yerekapan
 Michal Kleczek
 Michelle Jubrey
 Miranda Limonczenko
+Mo Khan
 Monica Khoury
+Mrinal Paliwal
 Mykhailo Mischa Lieibenson
 Natalie Roberge
 Nick B
 Nick Littman
 Nick Nowlan
+Nicola Ferraro
 Nicolas Nosenzo
+Nik Richers
 Noah Moss
 Nyannyacha
 Oli R
@@ -235,6 +246,7 @@ Ryan Goulet
 Ryan Senior
 Ruan Maia
 Saba Pochkhua
+Sagar Shedge
 Sam Meech-Ward
 Sam Rome
 Sam Rose
@@ -262,6 +274,7 @@ Taha Le Bras
 Tanun Chalermsinsuwan
 Taryn King
 Terry Sutton
+Terry Wilcox
 Thomas E
 Tim Frietas
 Tim Palmer

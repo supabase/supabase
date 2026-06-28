@@ -205,6 +205,7 @@ export const TableList = ({
   const entities = formatAllEntities({ tables, views, materializedViews, foreignTables }).filter(
     (x) => visibleTypes.includes(x.type)
   )
+  const footerCount = hasNextTablesPage ? tables.length : entities.length
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
 
@@ -264,12 +265,18 @@ export const TableList = ({
           </Shortcut>
           <Popover>
             <PopoverTrigger asChild>
-              <Button
-                size="tiny"
-                type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
-                className="px-1"
-                icon={<Filter />}
-              />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="tiny"
+                    variant={visibleTypes.length !== 5 ? 'default' : 'dashed'}
+                    className="px-1"
+                    icon={<Filter />}
+                    aria-label="Filter"
+                  />
+                </TooltipTrigger>
+                <TooltipContent>Filter</TooltipContent>
+              </Tooltip>
             </PopoverTrigger>
             <PopoverContent className="p-0 w-56" side="bottom" align="center">
               <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
@@ -296,7 +303,7 @@ export const TableList = ({
                       </div>
                       <Button
                         size="tiny"
-                        type="default"
+                        variant="default"
                         onClick={() => setVisibleTypes([value])}
                         className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
                       >
@@ -499,7 +506,7 @@ export const TableList = ({
                         </TableCell>
                         <TableCell>
                           <div className="flex justify-end gap-2">
-                            <Button asChild type="default">
+                            <Button asChild variant="default">
                               <Link href={`/project/${ref}/database/tables/${x.id}`}>
                                 View columns
                               </Link>
@@ -509,7 +516,7 @@ export const TableList = ({
                               <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
                                   <Button
-                                    type="default"
+                                    variant="default"
                                     className="px-1"
                                     icon={<MoreVertical />}
                                     aria-label={`Table ${x.name} actions`}
@@ -608,7 +615,7 @@ export const TableList = ({
                   <TableCell colSpan={7} className="text-foreground-muted hover:bg-inherit">
                     {isFetchingNextTablesPage
                       ? 'Loading more tables…'
-                      : `${entities.length} ${entities.length === 1 ? 'table' : 'tables'}${
+                      : `${footerCount} ${footerCount === 1 ? 'table' : 'tables'}${
                           hasNextTablesPage ? ' loaded' : ''
                         }`}
                   </TableCell>

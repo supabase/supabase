@@ -8,8 +8,8 @@ import { Button, cn, SidePanel } from 'ui'
 import { ActionBar } from '../../ActionBar'
 import { isValueTruncated } from '../RowEditor.utils'
 import { DrilldownViewer } from './DrilldownViewer/DrilldownViewer'
-import { JsonCodeEditor } from './JsonCodeEditor'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
@@ -53,7 +53,10 @@ export const JsonEditor = ({
   // sometimes the value is a JSON object if it was truncated, then fully loaded from the grid.
   const value = row?.[column as keyof typeof row] as unknown
   const jsonString = typeof value === 'object' ? JSON.stringify(value) : (value as string)
-  const isTruncated = isValueTruncated(jsonString)
+  const columnFormat = selectedTable?.columns?.find(
+    (candidate) => candidate.name === column
+  )?.format
+  const isTruncated = isValueTruncated(jsonString, columnFormat)
 
   const { mutate: getCellValue, isPending, isSuccess, reset } = useGetCellValueMutation()
 
@@ -138,7 +141,7 @@ export const JsonEditor = ({
             <div className="flex items-center gap-x-2">
               {view === 'edit' && (
                 <ButtonTooltip
-                  type="default"
+                  variant="default"
                   icon={<AlignLeft />}
                   className="px-1"
                   onClick={() => prettify()}
@@ -170,11 +173,12 @@ export const JsonEditor = ({
       <div className="flex flex-auto h-full flex-col gap-y-4 relative">
         {view === 'edit' ? (
           <div className="w-full h-full grow">
-            <JsonCodeEditor
+            <CodeEditor
               key={jsonString}
-              readOnly={readOnly}
-              onInputChange={(val) => setJsonStr(val ?? '')}
+              isReadOnly={readOnly}
+              language="json"
               value={(jsonStr ?? '').toString()}
+              onInputChange={(val) => setJsonStr(val ?? '')}
             />
           </div>
         ) : (
@@ -195,7 +199,7 @@ export const JsonEditor = ({
                 performance issues
               </p>
             </div>
-            <Button type="default" loading={isPending} onClick={loadFullValue}>
+            <Button variant="default" loading={isPending} onClick={loadFullValue}>
               Load full JSON data
             </Button>
           </div>

@@ -104,7 +104,7 @@ const AwsMarketplaceOrgCreationDialog = ({
         <DialogFooter>
           <Button
             form={CREATE_AWS_MANAGED_ORG_FORM_ID}
-            htmlType="submit"
+            type="submit"
             loading={isCreatingOrganization}
           >
             Create and link organization

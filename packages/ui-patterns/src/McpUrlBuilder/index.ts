@@ -11,6 +11,7 @@ export {
   MCP_CLIENT_GROUPS,
 } from './constants'
 export { getMcpUrl } from './utils/getMcpUrl'
+export { getMcpClientIconSrc } from './utils/getMcpIconSrc'
 export { createMcpCopyHandler, type McpCopyType } from './utils/createMcpCopyHandler'
 export { McpConfigPanel, type McpConfigPanelProps } from './McpConfigPanel'
 export type {

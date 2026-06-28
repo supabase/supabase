@@ -26,8 +26,10 @@ type LogsBarChartDatum = {
 
 export const LogsBarChart = ({
   data,
+  error,
   onBarClick,
   EmptyState,
+  ErrorState,
   DateTimeFormat = 'MMM D, YYYY, hh:mma',
   isFullHeight = false,
   chartConfig,
@@ -36,8 +38,10 @@ export const LogsBarChart = ({
   hideXAxis = false,
 }: {
   data: LogsBarChartDatum[]
+  error?: unknown | null
   onBarClick?: (datum: LogsBarChartDatum, tooltipData?: CategoricalChartState) => void
   EmptyState?: ReactNode
+  ErrorState?: ReactNode
   DateTimeFormat?: string
   isFullHeight?: boolean
   chartConfig?: ChartConfig
@@ -46,6 +50,11 @@ export const LogsBarChart = ({
   hideXAxis?: boolean
 }) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
+
+  if (error) {
+    if (ErrorState) return ErrorState
+    return null
+  }
 
   if (data.length === 0) {
     if (EmptyState) return EmptyState

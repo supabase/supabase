@@ -1,5 +1,7 @@
 import { DatabaseZap } from 'lucide-react'
 
+import { InlineLink } from '@/components/ui/InlineLink'
+
 export const NoDestinationsAvailable = () => {
   return (
     <div className="flex flex-col items-center justify-center h-full px-8 py-16 text-center">
@@ -8,8 +10,9 @@ export const NoDestinationsAvailable = () => {
       </div>
       <h3 className="text-lg font-medium text-foreground mb-2">No destinations available</h3>
       <p className="text-sm text-foreground-light max-w-lg">
-        Replication destinations are not currently enabled for this project. Contact support to
-        enable real-time replication to external platforms.
+        No Pipelines destinations are available for this project yet. Request{' '}
+        <InlineLink href="https://forms.supabase.com/pg_replicate">alpha access</InlineLink> to use
+        managed replication pipelines.
       </p>
     </div>
   )

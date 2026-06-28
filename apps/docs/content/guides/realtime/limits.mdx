@@ -15,16 +15,19 @@ Upgrade your plan to increase your limits. Without a spend cap, or on an Enterpr
 
 ## Limits by plan
 
-|                                                                                     | Free     | Pro      | Pro (no spend cap) | Team     | Enterprise |
-| ----------------------------------------------------------------------------------- | -------- | -------- | ------------------ | -------- | ---------- |
-| **Concurrent connections**                                                          | 200      | 500      | 10,000             | 10,000   | 10,000+    |
-| **Messages per second**                                                             | 100      | 500      | 2,500              | 2,500    | 2,500+     |
-| **Channel joins per second**                                                        | 100      | 500      | 2,500              | 2,500    | 2,500+     |
-| **Channels per connection**                                                         | 100      | 100      | 100                | 100      | 100+       |
-| **Presence keys per object**                                                        | 10       | 10       | 10                 | 10       | 10+        |
-| **Presence messages per second**                                                    | 20       | 50       | 1,000              | 1,000    | 1,000+     |
-| **Broadcast payload size**                                                          | 256 KB   | 3,000 KB | 3,000 KB           | 3,000 KB | 3,000+ KB  |
-| **Postgres change payload size ([**read more**](#postgres-changes-payload-limit))** | 1,024 KB | 1,024 KB | 1,024 KB           | 1,024 KB | 1,024+ KB  |
+|                                                                                                    | Free     | Pro      | Pro (no spend cap) | Team     | Enterprise |
+| -------------------------------------------------------------------------------------------------- | -------- | -------- | ------------------ | -------- | ---------- |
+| **Concurrent connections**                                                                         | 200      | 500      | 10,000             | 10,000   | 10,000+    |
+| **Messages per second**                                                                            | 100      | 500      | 2,500              | 2,500    | 2,500+     |
+| **Channel joins per second**                                                                       | 100      | 500      | 2,500              | 2,500    | 2,500+     |
+| **Channels per connection**                                                                        | 100      | 100      | 100                | 100      | 100+       |
+| **Presence keys per object**                                                                       | 10       | 10       | 10                 | 10       | 10+        |
+| **Presence messages per second**                                                                   | 20       | 50       | 1,000              | 1,000    | 1,000+     |
+| **Presence calls per client, per 30 seconds**                                                      | 5        | 5        | 5                  | 5        | 5          |
+| **Broadcast payload size**                                                                         | 256 KB   | 3,000 KB | 3,000 KB           | 3,000 KB | 3,000+ KB  |
+| **Postgres change payload size ([**read more**](#postgres-changes-payload-limit))**                | 1,024 KB | 1,024 KB | 1,024 KB           | 1,024 KB | 1,024+ KB  |
+| **Broadcast replay retention ([**read more**](/docs/guides/realtime/broadcast#broadcast-replay))** | 72 hours | 72 hours | 72 hours           | 72 hours | 72 hours   |
+| **Broadcast replay messages per request**                                                          | 25       | 25       | 25                 | 25       | 25         |
 
 Beyond the Free and Pro Plan you can customize your limits by [contacting support](/dashboard/support/new).
 
