@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { PropsWithChildren, useCallback, useState } from 'react'
+import { PropsWithChildren, useCallback, useEffect, useState } from 'react'
 import { Button, KeyboardShortcut } from 'ui'
 
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -52,6 +52,28 @@ export const ActionBar = ({
   }, [isRunning, loading, disableApply, hideApply, formId, applyFunction, onSelectApply])
 
   useShortcut(SHORTCUT_IDS.ACTION_BAR_SAVE, handleSave, { enabled: visible })
+
+  useEffect(() => {
+    if (!visible) return
+
+    const handleKeydown = (event: KeyboardEvent) => {
+      if (
+        !(event.metaKey || event.ctrlKey) ||
+        event.altKey ||
+        event.shiftKey ||
+        event.key.toLowerCase() !== 'enter'
+      ) {
+        return
+      }
+
+      event.preventDefault()
+      event.stopPropagation()
+      handleSave()
+    }
+
+    window.addEventListener('keydown', handleKeydown, true)
+    return () => window.removeEventListener('keydown', handleKeydown, true)
+  }, [visible, handleSave])
 
   return (
     <div className="flex w-full items-center gap-3 border-t border-default px-3 py-4">
