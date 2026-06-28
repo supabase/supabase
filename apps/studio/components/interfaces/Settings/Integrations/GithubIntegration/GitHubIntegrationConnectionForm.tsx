@@ -363,7 +363,7 @@ export const GitHubIntegrationConnectionForm = ({
         new_branch_per_pr: connection.new_branch_per_pr,
         supabaseDirectory: connection.workdir || '',
         supabaseChangesOnly: connection.supabase_changes_only,
-        commentOnNoChanges: connection.comment_on_no_changes,
+        commentOnNoChanges: connection.comment_on_no_changes ?? true,
         branchLimit: String(connection.branch_limit),
       })
     }
