@@ -61,16 +61,19 @@ export const JsonEditor = ({
 
   const { mutate: getCellValue, isPending, isSuccess, reset } = useGetCellValueMutation()
 
-  const validateJSON = useCallback(async (resolve: () => void) => {
-    try {
-      const newJsonStr = removeJSONTrailingComma(jsonStr)
-      const minifiedJSON = minifyJSON(newJsonStr)
-      if (onSaveJSON) onSaveJSON(minifiedJSON, resolve)
-    } catch (error: any) {
-      resolve()
-      toast.error('JSON seems to have an invalid structure.')
-    }
-  }, [jsonStr, onSaveJSON])
+  const validateJSON = useCallback(
+    async (nextValue: string, resolve: () => void) => {
+      try {
+        const newJsonStr = removeJSONTrailingComma(nextValue)
+        const minifiedJSON = minifyJSON(newJsonStr)
+        if (onSaveJSON) onSaveJSON(minifiedJSON, resolve)
+      } catch (error: any) {
+        resolve()
+        toast.error('JSON seems to have an invalid structure.')
+      }
+    },
+    [onSaveJSON]
+  )
 
   const handleEditorMount: OnMount = useCallback(
     (editor, monaco) => {
@@ -80,7 +83,7 @@ export const JsonEditor = ({
         id: 'save-value',
         label: 'Save value',
         keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.Enter],
-        run: () => validateJSON(() => undefined),
+        run: () => validateJSON(editor.getValue(), () => undefined),
       })
     },
     [readOnly, validateJSON]
@@ -181,7 +184,7 @@ export const JsonEditor = ({
           closePanel={onClose}
           backButtonLabel={backButtonLabel}
           applyButtonLabel={applyButtonLabel}
-          applyFunction={readOnly ? undefined : validateJSON}
+          applyFunction={readOnly ? undefined : (resolve) => validateJSON(jsonStr, resolve)}
         />
       }
     >

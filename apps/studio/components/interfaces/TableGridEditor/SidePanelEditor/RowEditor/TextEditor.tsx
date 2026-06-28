@@ -78,9 +78,12 @@ export const TextEditor = ({
     )
   }
 
-  const saveValue = useCallback((resolve: () => void) => {
-    if (onSaveField) onSaveField(strValue, resolve)
-  }, [onSaveField, strValue])
+  const saveValue = useCallback(
+    (nextValue: string, resolve: () => void) => {
+      if (onSaveField) onSaveField(nextValue, resolve)
+    },
+    [onSaveField]
+  )
 
   const handleEditorMount: OnMount = useCallback(
     (editor, monaco) => {
@@ -90,7 +93,7 @@ export const TextEditor = ({
         id: 'save-value',
         label: 'Save value',
         keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.Enter],
-        run: () => saveValue(() => undefined),
+        run: () => saveValue(editor.getValue(), () => undefined),
       })
     },
     [readOnly, saveValue]
@@ -136,7 +139,7 @@ export const TextEditor = ({
           closePanel={onClose}
           backButtonLabel="Cancel"
           applyButtonLabel="Save value"
-          applyFunction={readOnly ? undefined : saveValue}
+          applyFunction={readOnly ? undefined : (resolve) => saveValue(strValue, resolve)}
         />
       }
     >
