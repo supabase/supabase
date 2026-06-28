@@ -1,4 +1,4 @@
-import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import type { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 
 export const checkHasNonPositiveValues = (data: Record<string, unknown>[], key: string): boolean =>
   data.some((row) => (row[key] as number) <= 0)
@@ -47,7 +47,7 @@ export const formatLogTick = (value: number): string => {
   return value.toLocaleString()
 }
 
-export const getCumulativeResults = (results: { rows: any[] }, config: ChartConfig) => {
+export const getCumulativeResults = (results: { rows: readonly any[] }, config: ChartConfig) => {
   if (!results?.rows?.length) {
     return []
   }
