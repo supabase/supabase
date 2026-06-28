@@ -1,3 +1,4 @@
+import type { OnMount } from '@monaco-editor/react'
 import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import { useParams } from 'common'
 import { useCallback, useEffect, useState } from 'react'
@@ -77,9 +78,23 @@ export const TextEditor = ({
     )
   }
 
-  const saveValue = (resolve: () => void) => {
+  const saveValue = useCallback((resolve: () => void) => {
     if (onSaveField) onSaveField(strValue, resolve)
-  }
+  }, [onSaveField, strValue])
+
+  const handleEditorMount: OnMount = useCallback(
+    (editor, monaco) => {
+      if (readOnly) return
+
+      editor.addAction({
+        id: 'save-value',
+        label: 'Save value',
+        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.Enter],
+        run: () => saveValue(() => undefined),
+      })
+    },
+    [readOnly, saveValue]
+  )
 
   useEffect(() => {
     if (visible) {
@@ -134,6 +149,7 @@ export const TextEditor = ({
               language="markdown"
               value={strValue ?? ''}
               onInputChange={(val) => setStrValue(val ?? '')}
+              onMount={handleEditorMount}
             />
           </div>
         ) : (
