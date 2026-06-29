@@ -30,7 +30,7 @@ import { EdgeFunctionsListItem } from '@/components/interfaces/Functions/EdgeFun
 import { FunctionsEmptyState } from '@/components/interfaces/Functions/FunctionsEmptyState'
 import { TerminalInstructionsDialog } from '@/components/interfaces/Functions/TerminalInstructionsDialog'
 import { useFunctionsListShortcuts } from '@/components/interfaces/Functions/useFunctionsListShortcuts'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import AlertError from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'

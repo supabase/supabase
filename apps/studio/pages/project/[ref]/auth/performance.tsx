@@ -13,7 +13,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { PerformanceSettingsForm } from '@/components/interfaces/Auth/PerformanceSettingsForm'
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import NoPermission from '@/components/ui/NoPermission'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'

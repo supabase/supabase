@@ -13,7 +13,7 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { HooksListing } from '@/components/interfaces/Auth/Hooks/HooksListing'
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { DocsButton } from '@/components/ui/DocsButton'
 import NoPermission from '@/components/ui/NoPermission'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
