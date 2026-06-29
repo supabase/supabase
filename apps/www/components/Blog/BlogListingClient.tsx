@@ -14,11 +14,27 @@ import SectionContainerWithCn from '@/components/Layouts/SectionContainerWithCn'
 interface Props {
   posts: PostTypes[]
   initialView: BlogView
+  /**
+   * When provided the component operates in controlled mode: the caller owns
+   * the view and search state and the built-in filter bar is not rendered.
+   */
+  view?: BlogView
+  searchTerm?: string
 }
 
-export default function BlogListingClient({ posts, initialView }: Props) {
-  const [view, setView] = useState<BlogView>(initialView)
-  const [searchTerm, setSearchTerm] = useState('')
+export default function BlogListingClient({
+  posts,
+  initialView,
+  view: viewProp,
+  searchTerm: searchTermProp,
+}: Props) {
+  const isControlled = viewProp !== undefined
+
+  const [internalView, setInternalView] = useState<BlogView>(initialView)
+  const [internalSearchTerm, setInternalSearchTerm] = useState('')
+
+  const view = isControlled ? viewProp : internalView
+  const searchTerm = isControlled ? (searchTermProp ?? '') : internalSearchTerm
   const isList = view === 'list'
 
   const visiblePosts = useMemo(() => {
@@ -34,28 +50,30 @@ export default function BlogListingClient({ posts, initialView }: Props) {
 
   return (
     <>
-      <div className="border-default border-t">
-        <SectionContainerWithCn height="none" className="py-6">
-          <div className="flex flex-row items-center justify-between gap-2">
-            <div className="flex-1 max-w-[280px]">
-              <InputGroup className="w-full">
-                <InputGroupInput
-                  size="small"
-                  autoComplete="off"
-                  type="search"
-                  placeholder="Search posts"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <InputGroupAddon>
-                  <Search />
-                </InputGroupAddon>
-              </InputGroup>
+      {!isControlled && (
+        <div className="border-default border-t">
+          <SectionContainerWithCn height="none" className="py-6">
+            <div className="flex flex-row items-center justify-between gap-2">
+              <div className="flex-1 max-w-[280px]">
+                <InputGroup className="w-full">
+                  <InputGroupInput
+                    size="small"
+                    autoComplete="off"
+                    type="search"
+                    placeholder="Search posts"
+                    value={internalSearchTerm}
+                    onChange={(e) => setInternalSearchTerm(e.target.value)}
+                  />
+                  <InputGroupAddon>
+                    <Search />
+                  </InputGroupAddon>
+                </InputGroup>
+              </div>
+              <BlogViewToggle view={internalView} setView={setInternalView} />
             </div>
-            <BlogViewToggle view={view} setView={setView} />
-          </div>
-        </SectionContainerWithCn>
-      </div>
+          </SectionContainerWithCn>
+        </div>
+      )}
 
       <SectionContainerWithCn height="none">
         {visiblePosts.length > 0 ? (

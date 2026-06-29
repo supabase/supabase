@@ -1,11 +1,12 @@
 'use client'
 
 import { type BlogView } from 'app/blog/blog-view'
+import BlogFilters from 'components/Blog/BlogFilters'
 import BlogListingClient from 'components/Blog/BlogListingClient'
-import Link from 'next/link'
+import { Suspense, useState } from 'react'
 import type PostTypes from 'types/post'
 
-import SectionContainerWithCn from '@/components/Layouts/SectionContainerWithCn'
+import SectionContainer from '@/components/Layouts/SectionContainer'
 
 interface Props {
   posts: PostTypes[]
@@ -13,21 +14,28 @@ interface Props {
   category: string
 }
 
-export default function CategoryClient({ posts, initialView, category }: Props) {
+export default function CategoryClient({ posts, initialView, category: _category }: Props) {
+  const [view, setView] = useState<BlogView>(initialView)
+  const [searchTerm, setSearchTerm] = useState('')
+
   return (
     <>
-      <SectionContainerWithCn height="narrow" className="space-y-6">
-        <div className="text-foreground-lighter flex space-x-1">
-          <h1>
-            <Link href="/blog">Blog</Link>
-            <span className="px-2">/</span>
-            <span>Categories</span>
-            <span className="px-2">/</span>
-            <span className="text-foreground">{category}</span>
-          </h1>
-        </div>
-      </SectionContainerWithCn>
-      <BlogListingClient posts={posts} initialView={initialView} />
+      <div className="sticky top-[65px] z-10 bg-background/80 backdrop-blur-sm border-b border-border">
+        <SectionContainer className="py-3!">
+          <Suspense fallback={null}>
+            <BlogFilters view={view} setView={setView} onSearch={setSearchTerm} />
+          </Suspense>
+        </SectionContainer>
+      </div>
+
+      <div className="my-6">
+        <BlogListingClient
+          posts={posts}
+          initialView={initialView}
+          view={view}
+          searchTerm={searchTerm}
+        />
+      </div>
     </>
   )
 }

@@ -7,7 +7,7 @@ const ScrollProgress = () => {
   const [progressPercentage, setProgressPercentage] = useState(0)
   const pathname = usePathname()
 
-  const isBlogPost = pathname?.includes('/blog/')
+  const isBlogPost = /^\/blog\/[^/]+\/?$/.test(pathname ?? '')
 
   const handleScroll = () => {
     if (typeof document === 'undefined') return null

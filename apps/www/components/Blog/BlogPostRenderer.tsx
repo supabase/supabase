@@ -123,7 +123,7 @@ const BlogPostRenderer = async ({
                     <>
                       <span className="text-foreground-muted"> / </span>
                       <Link
-                        href={`/blog?category=${blogMetaData.categories[0]}`}
+                        href={`/blog/categories/${blogMetaData.categories[0]}`}
                         className="capitalize hover:text-foreground"
                       >
                         {blogMetaData.categories[0]}
