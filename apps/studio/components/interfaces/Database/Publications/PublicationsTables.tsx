@@ -10,7 +10,7 @@ import { PublicationTablesSkeleton } from './PublicationSkeleton'
 import { PublicationsTableItem } from './PublicationsTableItem'
 import { AlertError } from '@/components/ui/AlertError'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
@@ -113,9 +113,9 @@ export const PublicationsTables = () => {
             <TableRow>
               <TableHead>Name</TableHead>
               <TableHead className="hidden lg:table-cell">Description</TableHead>
-              {/* 
-                    We've disabled All tables toggle for publications. 
-                    See https://github.com/supabase/supabase/pull/7233. 
+              {/*
+                    We've disabled All tables toggle for publications.
+                    See https://github.com/supabase/supabase/pull/7233.
                   */}
               <TableHead />
             </TableRow>
