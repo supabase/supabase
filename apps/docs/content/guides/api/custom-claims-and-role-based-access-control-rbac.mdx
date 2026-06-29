@@ -18,7 +18,7 @@ Custom Claims are special attributes attached to a user that you can use to cont
 }
 ```
 
-To implement Role-Based Access Control (RBAC) with `custom claims`, use a [Custom Access Token Auth Hook](/docs/guides/auth/auth-hooks#hook-custom-access-token). This hook runs before a token is issued. You can use it to add additional claims to the user's JWT.
+To implement Role-Based Access Control (RBAC) with `custom claims`, use a [Custom Access Token Auth Hook](/docs/guides/auth/auth-hooks/custom-access-token-hook). This hook runs before a token is issued. You can use it to add additional claims to the user's JWT.
 
 This guide uses the [Slack Clone example](https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone) to demonstrate how to add a `user_role` claim and use it in your [Row Level Security (RLS) policies](/docs/guides/database/postgres/row-level-security).
 
@@ -71,7 +71,7 @@ values
 
 ## Create Auth Hook to apply user role
 
-The [Custom Access Token Auth Hook](/docs/guides/auth/auth-hooks#hook-custom-access-token) runs before a token is issued. You can use it to edit the JWT.
+The [Custom Access Token Auth Hook](/docs/guides/auth/auth-hooks/custom-access-token-hook) runs before a token is issued. You can use it to edit the JWT.
 
 <Tabs
   scrollable
@@ -154,7 +154,7 @@ To learn more about Auth Hooks, see the [Auth Hooks docs](/docs/guides/auth/auth
 
 ## Accessing custom claims in RLS policies
 
-To utilize Role-Based Access Control (RBAC) in Row Level Security (RLS) policies, create an `authorize` method that reads the user's role from their JWT and checks the role's permissions:
+To use Role-Based Access Control (RBAC) in Row Level Security (RLS) policies, create an `authorize` method that reads the user's role from their JWT and checks the role's permissions:
 
 ```sql supabase/migrations/init.sql
 create or replace function public.authorize(

@@ -1,4 +1,4 @@
-import { useFlag, useParams } from 'common'
+import { useFeatureFlags, useFlag, useParams } from 'common'
 import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
@@ -69,6 +69,7 @@ export const RegionSelector = ({
   const { slug } = useParams()
   const cloudProvider = form.getValues('cloudProvider') as CloudProvider
 
+  const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = useFlag('enableSmartRegion')
 
   const { data: statusData } = useIncidentStatusQuery()
@@ -76,7 +77,7 @@ export const RegionSelector = ({
 
   const { isPending: isLoadingDefaultRegion } = useDefaultRegionQuery(
     { cloudProvider },
-    { enabled: !smartRegionEnabled }
+    { enabled: flagsLoaded && !smartRegionEnabled }
   )
 
   const {

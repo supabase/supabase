@@ -23,7 +23,7 @@ export const TABLE_EVENT_ACTIONS = {
 } as const satisfies {
   TableCreated: TableCreatedEvent['action']
   TableDataAdded: TableDataAddedEvent['action']
-  TableRLSEnabled: TableRLSEnabledEvent['action']
+  TableRLSEnabled: TableRlsEnabledEvent['action']
 }
 
 export type TableEventAction = (typeof TABLE_EVENT_ACTIONS)[keyof typeof TABLE_EVENT_ACTIONS]
@@ -430,6 +430,60 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
 }
 
 /**
+ * Project creation form was rendered and shown to the user. Passive impression that
+ * anchors the project-creation funnel (exposed -> completed). Fires once per form view,
+ * after the org and create-project permission have resolved, so it tracks the form
+ * actually being visible rather than the route loading. Disambiguate by `surface`.
+ * Completion is measured by `project_creation_simple_version_submitted` (which fires
+ * client-side on the create success callback).
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface ProjectCreationFormExposedEvent {
+  action: 'project_creation_form_exposed'
+  properties: {
+    /**
+     * Which surface rendered the form. 'main' is the standard project creation wizard.
+     */
+    surface?: 'main' | 'vercel'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * New-organization form was rendered and shown to the user. Passive impression that
+ * anchors the organization-creation funnel (exposed -> completed). Fires once per form
+ * view, after the user's profile has resolved (i.e. an authenticated session), so it
+ * does not count pre-auth redirects. No organization group: the org does not exist yet
+ * at this point in the flow.
+ *
+ * @group Events
+ * @source studio
+ * @page new
+ */
+export interface OrganizationCreationFormExposedEvent {
+  action: 'organization_creation_form_exposed'
+}
+
+/**
+ * Organization was created and the new org slug is available client-side. Fires from the
+ * create success callback (both the free path and the paid path that confirms a pending
+ * payment intent), so org-creation completion is measurable from frontend events without
+ * relying on the backend `organization_created` event (which fires across all surfaces).
+ * Closes the organization-creation funnel (exposed -> completed).
+ *
+ * @group Events
+ * @source studio
+ * @page new
+ */
+export interface OrganizationCreationCompletedEvent {
+  action: 'organization_creation_completed'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User toggled Data API access on a table via the switch in the table editor side panel.
  * Only fires for new tables — editing existing tables links out to the settings page instead.
  *
@@ -782,7 +836,7 @@ export interface AssistantEditInSqlEditorClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/reports/{id}
  */
-export interface CustomReportAddSQLBlockClickedEvent {
+export interface CustomReportAddSqlBlockClickedEvent {
   action: 'custom_report_add_sql_block_clicked'
   groups: TelemetryGroups
 }
@@ -794,7 +848,7 @@ export interface CustomReportAddSQLBlockClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/reports/{id}
  */
-export interface CustomReportAssistantSQLBlockAddedEvent {
+export interface CustomReportAssistantSqlBlockAddedEvent {
   action: 'custom_report_assistant_sql_block_added'
   groups: TelemetryGroups
 }
@@ -821,7 +875,7 @@ export interface DocsFeedbackClickedEvent {
  * @group Events
  * @source docs
  */
-export interface CopyAsMarkdownEvent {
+export interface CopyAsMarkdownClickedEvent {
   action: 'copy_as_markdown_clicked'
 }
 
@@ -831,10 +885,30 @@ export interface CopyAsMarkdownEvent {
  * @group Events
  * @source docs
  */
-export interface AskAIEvent {
+export interface AskAiClickedEvent {
   action: 'ask_ai_clicked'
   properties: {
     agent: 'chatgpt' | 'claude'
+  }
+}
+
+/**
+ * User clicked a recommended page card shown on a docs "not found" page.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface Docs404RecommendationClickedEvent {
+  action: 'docs_404_recommendation_clicked'
+  properties: {
+    /**
+     * The path of the recommended page that was clicked.
+     */
+    destinationPath: string
+    /**
+     * The path of the "not found" page where the recommendation was shown.
+     */
+    sourcePath: string
   }
 }
 
@@ -905,7 +979,7 @@ export interface WwwPricingPlanCtaClickedEvent {
  * @source www
  * @page /events/*
  */
-export interface EventPageCtaClickedEvent {
+export interface WwwEventPageCtaClickedEvent {
   action: 'www_event_page_cta_clicked'
   properties: {
     /**
@@ -922,7 +996,7 @@ export interface EventPageCtaClickedEvent {
  * @source www
  * @page /
  */
-export interface HomepageGitHubButtonClickedEvent {
+export interface HomepageGithubButtonClickedEvent {
   action: 'homepage_github_button_clicked'
 }
 
@@ -1121,7 +1195,7 @@ export interface ImportDataButtonClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/editor
  */
-export interface ImportDataFileAddedEvent {
+export interface ImportDataDropzoneFileAddedEvent {
   action: 'import_data_dropzone_file_added'
   groups: TelemetryGroups
 }
@@ -1228,7 +1302,7 @@ export interface ReportsDatabaseGrafanaBannerClickedEvent {
  * @source studio
  * @page /observability/*
  */
-export interface MetricsAPIBannerCtaButtonClickedEvent {
+export interface MetricsApiBannerCtaButtonClickedEvent {
   action: 'metrics_api_banner_cta_button_clicked'
   groups: TelemetryGroups
 }
@@ -1240,7 +1314,7 @@ export interface MetricsAPIBannerCtaButtonClickedEvent {
  * @source studio
  * @page /observability/*
  */
-export interface MetricsAPIBannerDismissButtonClickedEvent {
+export interface MetricsApiBannerDismissButtonClickedEvent {
   action: 'metrics_api_banner_dismiss_button_clicked'
   groups: TelemetryGroups
 }
@@ -1877,7 +1951,7 @@ export interface HomeProjectUsageServiceClickedEvent {
     /**
      * The service that was clicked
      */
-    service_type: 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
+    service_type: 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'data_api'
     /**
      * Total requests for this service
      */
@@ -1903,7 +1977,7 @@ export interface HomeProjectUsageChartClickedEvent {
     /**
      * The service type for this chart
      */
-    service_type: 'db' | 'functions' | 'auth' | 'storage' | 'realtime'
+    service_type: 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'data_api'
     /**
      * Timestamp of the bar clicked
      */
@@ -1977,7 +2051,7 @@ export interface HomeConnectActionClickedEvent {
     /**
      * The connect action/tile that was clicked
      */
-    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'api_keys'
+    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'server' | 'api_keys'
   }
   groups: TelemetryGroups
 }
@@ -2133,7 +2207,7 @@ export interface TableDataAddedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/editor or /dashboard/project/{ref}/sql
  */
-export interface TableRLSEnabledEvent {
+export interface TableRlsEnabledEvent {
   action: 'table_rls_enabled'
   properties: {
     /**
@@ -2159,7 +2233,7 @@ export interface TableRLSEnabledEvent {
  * @source studio
  * @page /dashboard/project/{ref}/editor
  */
-export interface RLSGeneratePoliciesClickedEvent {
+export interface RlsGeneratePoliciesClickedEvent {
   action: 'rls_generate_policies_clicked'
   groups: TelemetryGroups
 }
@@ -2171,7 +2245,7 @@ export interface RLSGeneratePoliciesClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/editor
  */
-export interface RLSGeneratedPolicyRemovedEvent {
+export interface RlsGeneratedPolicyRemovedEvent {
   action: 'rls_generated_policy_removed'
   groups: TelemetryGroups
 }
@@ -2183,7 +2257,7 @@ export interface RLSGeneratedPolicyRemovedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/editor
  */
-export interface RLSGeneratedPoliciesCreatedEvent {
+export interface RlsGeneratedPoliciesCreatedEvent {
   action: 'rls_generated_policies_created'
   groups: TelemetryGroups
 }
@@ -2676,7 +2750,7 @@ export interface AdvisorAssistantButtonClickedEvent {
  * @source studio
  * @page /dashboard/project/{ref}/observability/query-performance
  */
-export interface QueryPerformanceAIExplanationButtonClickedEvent {
+export interface QueryPerformanceExplainWithAiButtonClickedEvent {
   action: 'query_performance_explain_with_ai_button_clicked'
   groups: TelemetryGroups
 }
@@ -2822,7 +2896,7 @@ export interface DashboardErrorCreatedEvent {
     /**
      * Source of the error
      */
-    source?: 'admonition' | 'toast' | 'error_display'
+    source?: 'admonition' | 'toast' | 'error_display' | 'form'
     /**
      * Type of error matched (for error_display source)
      */
@@ -2831,6 +2905,22 @@ export interface DashboardErrorCreatedEvent {
      * Whether troubleshooting steps are available (for error_display source)
      */
     hasTroubleshooting?: boolean
+    /**
+     * Funnel the error occurred in (set only for instrumented funnel errors)
+     */
+    origin?: 'signup' | 'project_creation' | 'org_creation'
+    /**
+     * Coarse classification of the funnel error
+     */
+    errorCategory?: 'validation' | 'api' | 'network' | 'payment' | 'unknown'
+    /**
+     * Controlled-vocabulary slug describing the reason (no free text, no PII)
+     */
+    errorReason?: string
+    /**
+     * HTTP status code for api/network errors (absent for validation/payment)
+     */
+    errorCode?: number
   }
   groups: TelemetryGroups
 }
@@ -3405,7 +3495,7 @@ export interface HeaderLocalVersionPopoverOpenedEvent {
  * @group Events
  * @source studio
  */
-export interface RLSTesterRunQueryClickedEvent {
+export interface RlsTesterRunQueryClickedEvent {
   action: 'rls_tester_run_query_clicked'
   properties: { type: 'raw' | 'inferred' }
   groups: Partial<TelemetryGroups>
@@ -3435,6 +3525,9 @@ export type TelemetryEvent =
   | ProjectCreationGithubConnectClickedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
+  | ProjectCreationFormExposedEvent
+  | OrganizationCreationFormExposedEvent
+  | OrganizationCreationCompletedEvent
   | TableApiAccessToggleClickedEvent
   | RealtimeInspectorListenChannelClickedEvent
   | RealtimeInspectorBroadcastSentEvent
@@ -3458,18 +3551,19 @@ export type TelemetryEvent =
   | AssistantEditInSqlEditorClickedEvent
   | AssistantMessageRatingSubmittedEvent
   | DocsFeedbackClickedEvent
-  | CopyAsMarkdownEvent
-  | AskAIEvent
+  | CopyAsMarkdownClickedEvent
+  | AskAiClickedEvent
+  | Docs404RecommendationClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent
-  | EventPageCtaClickedEvent
-  | HomepageGitHubButtonClickedEvent
+  | WwwEventPageCtaClickedEvent
+  | HomepageGithubButtonClickedEvent
   | HomepageDiscordButtonClickedEvent
   | HomepageCustomerStoryCardClickedEvent
   | HomepageProjectTemplateCardClickedEvent
-  | CustomReportAddSQLBlockClickedEvent
-  | CustomReportAssistantSQLBlockAddedEvent
+  | CustomReportAddSqlBlockClickedEvent
+  | CustomReportAssistantSqlBlockAddedEvent
   | OpenSourceRepoCardClickedEvent
   | StartProjectButtonClickedEvent
   | SeeDocumentationButtonClickedEvent
@@ -3478,7 +3572,7 @@ export type TelemetryEvent =
   | HelpButtonClickedEvent
   | ExampleProjectCardClickedEvent
   | ImportDataButtonClickedEvent
-  | ImportDataFileAddedEvent
+  | ImportDataDropzoneFileAddedEvent
   | ImportDataAddedEvent
   | SendFeedbackButtonClickedEvent
   | SqlEditorQueryRunButtonClickedEvent
@@ -3491,8 +3585,8 @@ export type TelemetryEvent =
   | StudioBillingCancelSubscriptionClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
-  | MetricsAPIBannerCtaButtonClickedEvent
-  | MetricsAPIBannerDismissButtonClickedEvent
+  | MetricsApiBannerCtaButtonClickedEvent
+  | MetricsApiBannerDismissButtonClickedEvent
   | UnifiedLogsBannerCtaButtonClickedEvent
   | UnifiedLogsBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
@@ -3542,10 +3636,10 @@ export type TelemetryEvent =
   | HipaaRequestButtonClickedEvent
   | TableCreatedEvent
   | TableDataAddedEvent
-  | TableRLSEnabledEvent
-  | RLSGeneratePoliciesClickedEvent
-  | RLSGeneratedPolicyRemovedEvent
-  | RLSGeneratedPoliciesCreatedEvent
+  | TableRlsEnabledEvent
+  | RlsGeneratePoliciesClickedEvent
+  | RlsGeneratedPolicyRemovedEvent
+  | RlsGeneratedPoliciesCreatedEvent
   | AuthUsersSearchSubmittedEvent
   | CommandMenuOpenedEvent
   | CommandMenuClosedEvent
@@ -3560,7 +3654,7 @@ export type TelemetryEvent =
   | AuditLogDrainRemovedEvent
   | AdvisorDetailOpenedEvent
   | AdvisorAssistantButtonClickedEvent
-  | QueryPerformanceAIExplanationButtonClickedEvent
+  | QueryPerformanceExplainWithAiButtonClickedEvent
   | AiPromptCopiedEvent
   | AiAssistantDropdownButtonClickedEvent
   | AiExternalToolClickedEvent
@@ -3605,4 +3699,4 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
-  | RLSTesterRunQueryClickedEvent
+  | RlsTesterRunQueryClickedEvent

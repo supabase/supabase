@@ -141,7 +141,6 @@ There are a few other queries that may be useful for identifying patterns around
   size="medium"
   className="text-foreground-light mt-8 mb-6"
 >
-  <div className="border-b mt-3 pb-3">
     <AccordionItem
       header="Checking if a specific version is an offender"
       id="item-1"
@@ -169,8 +168,6 @@ order by pct_546;
 
     </AccordionItem>
 
-  </div>
-  <div className="border-b mt-3 pb-3">
     <AccordionItem
       header="Check error frequency by time"
       id="item-2"
@@ -208,9 +205,6 @@ LIMIT 24;
 
     </AccordionItem>
 
-  </div>
-
-      <div className="border-b mt-3 pb-3">
     <AccordionItem
       header="Check requests per isolate"
       id="item-3"
@@ -246,7 +240,6 @@ GROUP BY metadata.execution_id
 
     </AccordionItem>
 
-  </div>
 </Accordion>
 
 ## Step 3: Correcting the error

@@ -6,7 +6,21 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
+import {
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  Form,
+  FormControl,
+  FormField,
+  Switch,
+} from 'ui'
 import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -26,23 +40,17 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import {
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from 'ui/src/components/shadcn/ui/breadcrumb'
 import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/EmailTemplates/AuthTemplatesValidation'
 import { CustomEmailTemplateRestrictionAdmonition } from '@/components/interfaces/Auth/EmailTemplates/CustomEmailTemplateRestrictionAdmonition'
-import { EMAIL_TEMPLATE_DOCS_ANCHORS } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.constants'
+import { AUTH_EMAIL_TEMPLATES_DOCS_PATH } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.constants'
 import {
   isCustomEmailTemplateEditingRestricted,
   isCustomEmailTemplateRestrictionStatusKnown,
   slugifyTitle,
 } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
+import { SendEmailHookActiveAdmonition } from '@/components/interfaces/Auth/EmailTemplates/SendEmailHookActiveAdmonition'
 import { TemplateEditor } from '@/components/interfaces/Auth/EmailTemplates/TemplateEditor'
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -91,6 +99,9 @@ const RedirectToTemplates = () => {
       projectInsertedAt: selectedProject?.inserted_at,
     })
   const isTemplateEditorReadOnly = !isTemplateRestrictionStatusKnown || isTemplateEditBlocked
+  const hasSendEmailHook = !!(
+    authConfig?.HOOK_SEND_EMAIL_ENABLED && authConfig?.HOOK_SEND_EMAIL_URI
+  )
 
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
     onError: (error) => {
@@ -201,9 +212,7 @@ const RedirectToTemplates = () => {
             </PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
-            <DocsButton
-              href={`${DOCS_URL}/guides/local-development/customizing-email-templates#${EMAIL_TEMPLATE_DOCS_ANCHORS[template.id]}`}
-            />
+            <DocsButton href={`${DOCS_URL}${AUTH_EMAIL_TEMPLATES_DOCS_PATH}`} />
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
@@ -275,7 +284,7 @@ const RedirectToTemplates = () => {
             )}
 
             <PageSection>
-              {showConfigurationSection && (
+              {(showConfigurationSection || isTemplateEditBlocked) && (
                 <PageSectionMeta>
                   <PageSectionSummary>
                     <PageSectionTitle>Content</PageSectionTitle>
@@ -283,9 +292,14 @@ const RedirectToTemplates = () => {
                 </PageSectionMeta>
               )}
               <PageSectionContent>
-                {isTemplateEditBlocked && (
+                {isTemplateEditBlocked && !hasSendEmailHook && (
                   <div className="mb-4">
                     <CustomEmailTemplateRestrictionAdmonition />
+                  </div>
+                )}
+                {hasSendEmailHook && (
+                  <div className="mb-4">
+                    <SendEmailHookActiveAdmonition />
                   </div>
                 )}
                 <Card>

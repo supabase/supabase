@@ -10,7 +10,7 @@ Database performance is a large topic and many factors can contribute. Some of t
 - A lack of indexes causing slower than required queries over large tables
 - Unused indexes causing slow `INSERT`, `UPDATE` and `DELETE` operations
 - Not enough compute resources, such as memory, causing your database to go to disk for results too often
-- Lock contention from multiple queries operating on highly utilized tables
+- Lock contention from multiple queries operating on heavily used tables
 - Large amount of bloat on your tables causing poor query planning
 
 You can examine your database and queries for these issues using either the [Supabase CLI](/docs/guides/local-development/cli/getting-started) or SQL.

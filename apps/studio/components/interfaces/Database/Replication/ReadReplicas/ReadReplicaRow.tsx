@@ -118,11 +118,11 @@ export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => 
               disabled={status === 'GOING_DOWN'}
             >
               <Link href={`/project/${ref}/database/replication/replica/${replica.identifier}`}>
-                View replication
+                View replica
               </Link>
             </Button>
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger asChild>
                 <Button variant="default" icon={<MoreVertical />} className="w-7" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
