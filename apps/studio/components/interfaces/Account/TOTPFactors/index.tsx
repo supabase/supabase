@@ -1,7 +1,6 @@
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AddNewFactorModal } from './AddNewFactorModal'
@@ -28,14 +27,6 @@ export const TOTPFactors = () => {
           )}
           {isSuccess && (
             <>
-              {data.totp.length === 1 && (
-                <Admonition
-                  type="warning"
-                  layout="horizontal"
-                  title="We recommend configuring two authenticator apps across different devices"
-                  description="The two authenticator apps will serve as a backup for each other."
-                />
-              )}
               <div>
                 {data.totp.map((factor) => {
                   return (

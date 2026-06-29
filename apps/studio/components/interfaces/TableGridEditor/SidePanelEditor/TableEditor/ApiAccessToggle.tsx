@@ -320,7 +320,7 @@ export const ApiAccessToggle = ({
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h5>Data API Access</h5>
+            <h5>Data API access</h5>
             <p className="text-sm text-foreground-lighter">
               Allow this table to be queried via Supabase client libraries or the API directly
             </p>
