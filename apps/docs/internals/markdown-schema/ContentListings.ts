@@ -1,9 +1,6 @@
 import { withDocsBasePath } from '~/internals/internal-links'
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
-import {
-  getContentListingById,
-  isExternalContentListingHref,
-} from '~/lib/content-listings.utils'
+import { getContentListingById, isExternalContentListingHref } from '~/lib/content-listings.utils'
 
 import { getInternalLinkBaseUrl } from '../internal-links'
 

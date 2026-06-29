@@ -6,7 +6,6 @@ import {
 import { isExternalContentListingHref } from '~/lib/content-listings.utils'
 import { describe, expect, it } from 'vitest'
 
-
 describe('isExternalContentListingHref', () => {
   it('treats protocol-relative URLs as external', () => {
     expect(isExternalContentListingHref('//example.com/path')).toBe(true)

@@ -1,15 +1,14 @@
 'use client'
 
-import { useCallback } from 'react'
-
+import type { ContentListingGroup, ContentListingItem } from '~/lib/content-listings.schema'
 import {
   getContentListingById,
   getContentListingGroupLabel,
   isExternalContentListingHref,
 } from '~/lib/content-listings.utils'
-import type { ContentListingGroup, ContentListingItem } from '~/lib/content-listings.schema'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import Link from 'next/link'
+import { useCallback } from 'react'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
@@ -75,7 +74,11 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
                     onClick={() => trackClick(item)}
                     target={external ? '_blank' : undefined}
                   >
-                    <GlassPanel title={item.title} icon={item.icon} hasLightIcon={Boolean(item.icon)}>
+                    <GlassPanel
+                      title={item.title}
+                      icon={item.icon}
+                      hasLightIcon={Boolean(item.icon)}
+                    >
                       {item.description}
                     </GlassPanel>
                   </Link>
