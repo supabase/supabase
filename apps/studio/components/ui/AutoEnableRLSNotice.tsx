@@ -62,8 +62,8 @@ export const AutoEnableRLSNotice = ({ iconOnly }: { iconOnly?: boolean }) => {
     <Admonition
       type="note"
       layout="responsive"
-      title="Automatically enable RLS on new tables"
-      description="Protect future tables by automatically enabling Row Level Security whenever a table is created."
+      title="Automatically enable Row Level Security (RLS) on new tables"
+      description="Protect future tables by automatically enabling RLS whenever a table is created."
       actions={
         <>
           <CreateEnsureRLSTriggerDialog />
@@ -128,7 +128,7 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
       </DialogTrigger>
       <DialogContent size="large">
         <DialogHeader>
-          <DialogTitle>Automatically enable RLS for new tables</DialogTitle>
+          <DialogTitle>Automatically enable Row Level Security (RLS) for new tables</DialogTitle>
           <DialogDescription>
             Protect future tables with a built-in database trigger.
           </DialogDescription>
@@ -138,11 +138,15 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
 
         <DialogSection className="text-sm flex flex-col gap-y-2">
           <p>
-            We recommend enabling Row Level Security (RLS) on all tables in exposed schemas, such as{' '}
-            <code className="text-code-inline">public</code>. This trigger automatically enables RLS
-            whenever a new table is created.
+            Tables in exposed schemas, such as <code className="text-code-inline">public</code>, are
+            reachable through your project's API. We recommend enabling RLS on these tables so that
+            access is governed by policies you define — otherwise anyone with your publishable key
+            can read and write their contents.
           </p>
-          <p>Review the SQL below before creating the trigger.</p>
+          <p>
+            The trigger below automatically enables RLS whenever a new table is created. Review the
+            SQL before creating it:
+          </p>
         </DialogSection>
 
         <CodeBlock
