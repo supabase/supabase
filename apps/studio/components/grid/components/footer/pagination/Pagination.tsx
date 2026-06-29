@@ -190,12 +190,6 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isError, snap.enforceExactCount, error?.code])
 
-  useEffect(() => {
-    if (isSuccess && hasCountData && page > totalPages) {
-      snap.setPage(totalPages)
-    }
-  }, [isSuccess, hasCountData, page, totalPages])
-
   // Reset back to the first page whenever the filters change
   const hasMountedRef = useRef(false)
   useEffect(() => {
