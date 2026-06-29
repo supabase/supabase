@@ -85,6 +85,27 @@ describe('serializeContentListingGroupToMarkdown', () => {
     expect(markdown).toContain('### Get started')
   })
 
+  it('renders heading and description only once', () => {
+    const markdown = serializeContentListingGroupToMarkdown(
+      {
+        id: 'get-started',
+        heading: 'Get started',
+        description: 'Read these first.',
+        items: [
+          {
+            title: 'Connect',
+            href: '/guides/database/connecting-to-postgres',
+            description: 'Connection strings.',
+          },
+        ],
+      },
+      ''
+    )
+
+    expect(markdown.match(/^## Get started$/gm)).toHaveLength(1)
+    expect(markdown.match(/^Read these first\.$/gm)).toHaveLength(1)
+  })
+
   it('omits heading line when heading is not set', () => {
     const markdown = serializeContentListingGroupToMarkdown(
       {

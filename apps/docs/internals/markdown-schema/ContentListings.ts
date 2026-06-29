@@ -25,17 +25,6 @@ export function serializeContentListingGroupToMarkdown(
     lines.push(group.description)
     lines.push('')
   }
-  if (group.heading) {
-    const level = group.headingLevel ?? 'h2'
-    lines.push(`${HEADING_MARKDOWN[level]} ${group.heading}`)
-  }
-
-  if (group.description) {
-    if (lines.length) {
-      lines.push('')
-    }
-    lines.push(group.description)
-  }
 
   if (lines.length) {
     lines.push('')
