@@ -4,7 +4,7 @@ import { useFeatureFlags, useFlag, useParams } from 'common'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
+import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm, useFormState } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
@@ -71,13 +71,16 @@ import { usePHFlag } from '@/hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from '@/lib/constants'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { useProfile } from '@/lib/profile'
+import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 import type { NextPageWithLayout } from '@/types'
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
 const Wizard: NextPageWithLayout = () => {
   const track = useTrack()
+  const trackFunnelError = useTrackFunnelError()
   const router = useRouter()
   const { slug, projectName } = useParams()
   const { appTitle } = useCustomContent(['app:title'])
@@ -317,6 +320,10 @@ const Wizard: NextPageWithLayout = () => {
       )
       router.push(`/project/${res.ref}`)
     },
+    onError: (error) => {
+      toast.error(`Failed to create new project: ${error.message}`)
+      trackFunnelError('project_creation', classifyApiError('project_creation', error), 'toast')
+    },
   })
 
   const onSubmitWithComputeCostsConfirmation = async (values: z.infer<typeof FormSchema>) => {
@@ -356,6 +363,11 @@ const Wizard: NextPageWithLayout = () => {
     } = values
 
     if (useOrioleDb && !availableOrioleVersion) {
+      trackFunnelError(
+        'project_creation',
+        { errorCategory: 'validation', errorReason: 'oriole_unavailable' },
+        'toast'
+      )
       return toast.error('No available OrioleDB image found, only Postgres is available')
     }
 
@@ -415,6 +427,14 @@ const Wizard: NextPageWithLayout = () => {
 
     createProject(data)
   }
+
+  const hasTrackedFormExposed = useRef(false)
+  useEffect(() => {
+    if (hasTrackedFormExposed.current) return
+    if (!isOrganizationsSuccess || !canCreateProject || !currentOrg) return
+    hasTrackedFormExposed.current = true
+    track('project_creation_form_exposed', { surface: 'main' })
+  }, [isOrganizationsSuccess, canCreateProject, currentOrg, track])
 
   useEffect(() => {
     // Only set once to ensure compute credits dont change while project is being created
@@ -501,7 +521,15 @@ const Wizard: NextPageWithLayout = () => {
         <meta name="description" content="Supabase Studio" />
       </Head>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation)}>
+        <form
+          onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation, (errors) =>
+            trackFunnelError(
+              'project_creation',
+              classifyValidationError('project_creation', errors),
+              'form'
+            )
+          )}
+        >
           <Panel
             loading={!isOrganizationsSuccess}
             title={
