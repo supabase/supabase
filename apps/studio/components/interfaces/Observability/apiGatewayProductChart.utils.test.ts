@@ -27,7 +27,6 @@ describe('buildApiGatewayProductData', () => {
     expect(result).toHaveLength(1)
     expect(result[0].db).toBe(12)
     expect(result[0].auth).toBe(5)
-    // Products not present in the input still default to zero
     expect(result[0].storage).toBe(0)
   })
 
@@ -71,7 +70,6 @@ describe('buildApiGatewayProductData', () => {
       bucket.functions +
       bucket.storage +
       bucket.realtime
-    // 10 + 6 + 4 + 4 + 2 + 1
     expect(stackedHeight).toBe(27)
   })
 
@@ -80,7 +78,6 @@ describe('buildApiGatewayProductData', () => {
       data_api: { eventChartData: [datum('2024-01-01T00:00:00Z', 999, 0, 0)] },
     })
 
-    // data_api is the gateway entry point, not a product, so it contributes no buckets
     expect(result).toEqual([])
   })
 })
@@ -105,9 +102,7 @@ describe('calculateApiGatewayAggregate', () => {
     expect(result.total).toBe(100)
     expect(result.errorCount).toBe(4)
     expect(result.warningCount).toBe(16)
-    // 4 errors / 100 total
     expect(result.errorRate).toBe(4)
-    // 100 - (16 warnings + 4 errors) / 100
     expect(result.successRate).toBe(80)
   })
 
@@ -123,9 +118,6 @@ describe('calculateApiGatewayAggregate', () => {
 })
 
 describe('chart and header agreement', () => {
-  // The API Gateway header request count must equal the total stacked bar height.
-  // This locks that invariant for shared input where each product's `total` is the
-  // sum of its event buckets, matching how the live hook derives both values.
   it('aggregate total equals the summed bucket heights of the product chart', () => {
     const serviceData = {
       db: {

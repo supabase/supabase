@@ -41,8 +41,6 @@ type ServiceData = {
   isLoading: boolean
 }
 
-// Both the per-level and the by-product charts only expose `timestamp` to the
-// click handler, so the shared contract is just that field.
 type ServiceChartClickDatum = { timestamp: string }
 
 export type ServiceHealthTableProps = {
@@ -59,8 +57,6 @@ const colorClassMap: Record<string, string> = {
   brand: 'bg-brand',
 }
 
-// Tooltip labels for the per-level service charts. "Infos" keeps the level
-// wording consistent with "Errors" and "Warnings" across the page.
 const LEVEL_CHART_CONFIG: ChartConfig = {
   error_count: { label: 'Errors' },
   warning_count: { label: 'Warnings' },
@@ -97,8 +93,6 @@ type ServiceCellProps = {
   onBarClick: (datum: ServiceChartClickDatum) => void
   datetimeFormat: string
   className?: string
-  // When provided, the cell renders the API Gateway traffic stacked by product
-  // instead of the default per-level chart.
   productChartData?: ApiGatewayProductDatum[]
 }
 
@@ -221,8 +215,6 @@ export const ServiceHealthTable = ({
   onBarClick,
   datetimeFormat,
 }: ServiceHealthTableProps) => {
-  // The API Gateway row shows traffic grouped by product, with its request count
-  // and health derived from the same products so the header matches the chart.
   const apiGatewayProductData = useMemo(
     () => buildApiGatewayProductData(serviceData),
     [serviceData]

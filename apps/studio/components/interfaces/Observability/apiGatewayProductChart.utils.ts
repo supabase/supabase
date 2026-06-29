@@ -2,10 +2,6 @@ import { computeSuccessAndNonSuccessRates } from '../ProjectHome/ProjectUsage.me
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
 import type { ServiceKey } from './ObservabilityOverview.utils'
 
-/**
- * Products whose traffic flows through the API Gateway. The gateway itself
- * (data_api / edge_logs) is excluded since it is the entry point, not a product.
- */
 export const API_GATEWAY_PRODUCT_KEYS = [
   'db',
   'postgrest',
@@ -17,17 +13,14 @@ export const API_GATEWAY_PRODUCT_KEYS = [
 
 export type ApiGatewayProductKey = (typeof API_GATEWAY_PRODUCT_KEYS)[number]
 
-/** One timestamp bucket with a total-event count per product, ready for a stacked bar chart */
 export type ApiGatewayProductDatum = { timestamp: string } & Record<ApiGatewayProductKey, number>
 
 type ServiceChartData = { eventChartData: LogsBarChartDatum[] }
 type ServiceTotals = { total: number; errorCount: number; warningCount: number }
 
-/** Total events (infos + warnings + errors) in a single bucket */
 const bucketTotal = (datum: LogsBarChartDatum): number =>
   datum.ok_count + datum.warning_count + datum.error_count
 
-/** A fresh bucket with every product zeroed, so each datum always has the full product shape */
 const emptyDatum = (timestamp: string): ApiGatewayProductDatum => ({
   timestamp,
   db: 0,
@@ -38,12 +31,6 @@ const emptyDatum = (timestamp: string): ApiGatewayProductDatum => ({
   realtime: 0,
 })
 
-/**
- * Merges every product's per-level timeseries into one stacked-by-product series.
- * Each bar segment is a product's total event count for that timestamp bucket, so
- * the stacked bar height equals the aggregate request count for the API Gateway.
- * Services not in API_GATEWAY_PRODUCT_KEYS (e.g. data_api itself) are ignored.
- */
 export const buildApiGatewayProductData = (
   serviceData: Partial<Record<ServiceKey, ServiceChartData>>
 ): ApiGatewayProductDatum[] => {
@@ -63,12 +50,6 @@ export const buildApiGatewayProductData = (
   )
 }
 
-/**
- * Aggregates request count and health across all API Gateway products so the row
- * header matches the stacked-by-product chart. Each product's `total` is the sum of
- * its infos + warnings + errors, the same value the chart stacks, so the header
- * request count always equals the chart's total bar height.
- */
 export const calculateApiGatewayAggregate = (
   serviceData: Partial<Record<ServiceKey, ServiceTotals>>
 ): {

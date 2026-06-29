@@ -27,7 +27,6 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useTrack } from '@/lib/telemetry/track'
 
-// Services the homepage shows; matches the telemetry event types.
 type HomeServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'data_api'
 
 const isChartIntervalKey = (value: string): value is ChartIntervalKey =>
@@ -41,8 +40,6 @@ type ServiceEntry = {
   enabled: boolean
 }
 
-// Both the per-level and by-product charts only expose `timestamp` to the click
-// handler, so the shared contract is just that field.
 type ChartClickDatum = { timestamp: string }
 
 export const ProjectUsageSectionDeltas = () => {
@@ -116,8 +113,6 @@ export const ProjectUsageSectionDeltas = () => {
     [projectRef, authEnabled, storageEnabled, dataApiEnabled]
   )
 
-  // The API Gateway routes to every product, so its by-product breakdown is the
-  // headline: "Total Requests" and "Success Rate" equal the API Gateway chart total.
   const apiGatewayProductData = useMemo(
     () => buildApiGatewayProductData(serviceData),
     [serviceData]
@@ -126,8 +121,6 @@ export const ProjectUsageSectionDeltas = () => {
   const totalRequests = apiGateway.total
   const successRate = apiGateway.successRate
 
-  // The API Gateway card displays the by-product aggregate, so feed that total into
-  // card building too. This keeps its grid ordering and header in sync with the chart.
   const serviceCardStats = useMemo(
     () => ({
       ...serviceData,
@@ -150,8 +143,6 @@ export const ProjectUsageSectionDeltas = () => {
     (logRoute: string, serviceKey: HomeServiceKey) => (datum: ChartClickDatum) => {
       if (!datum?.timestamp) return
 
-      // Logs explorer reads the range from `its`/`ite` (iso_timestamp_start/end
-      // only set the label).
       const { start, end } = getBucketLogRange(datum.timestamp, interval)
 
       const queryParams = new URLSearchParams({
@@ -192,8 +183,6 @@ export const ProjectUsageSectionDeltas = () => {
       </div>
       <Row maxColumns={4} minWidth={280}>
         {services.map((s) => {
-          // The API Gateway card renders the by-product breakdown chart; its header
-          // counts already carry the aggregate via serviceCardStats above.
           const isApiGateway = s.key === 'data_api'
           const disabled = isServiceDisabled(s.total, isLoading)
           return (

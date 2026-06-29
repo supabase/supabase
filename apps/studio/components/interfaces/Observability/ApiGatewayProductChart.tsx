@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 import { ReactNode, useState } from 'react'
 import { Bar, Cell, BarChart as RechartBarChart, XAxis, YAxis } from 'recharts'
 import type { CategoricalChartState } from 'recharts/types/chart/types'
-import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
 
 import {
   API_GATEWAY_PRODUCT_KEYS,
@@ -12,7 +12,6 @@ import {
   type ApiGatewayProductKey,
 } from './apiGatewayProductChart.utils'
 
-/** Display label and color for each product stacked in the API Gateway chart */
 const PRODUCT_CONFIG: Record<ApiGatewayProductKey, { label: string; color: string }> = {
   db: { label: 'Database', color: 'hsl(var(--chart-1))' },
   postgrest: { label: 'PostgREST', color: 'hsl(var(--chart-2))' },
@@ -21,9 +20,6 @@ const PRODUCT_CONFIG: Record<ApiGatewayProductKey, { label: string; color: strin
   storage: { label: 'Storage', color: 'hsl(var(--chart-5))' },
   realtime: { label: 'Realtime', color: 'hsl(var(--chart-blue))' },
 }
-
-// PRODUCT_CONFIG already has the { label, color } shape ChartContainer expects
-const chartConfig: ChartConfig = PRODUCT_CONFIG
 
 export const ApiGatewayProductChart = ({
   data,
@@ -52,7 +48,7 @@ export const ApiGatewayProductChart = ({
 
   return (
     <div data-testid="api-gateway-product-chart" className="flex flex-col gap-y-3 h-full">
-      <ChartContainer className="h-full" config={chartConfig}>
+      <ChartContainer className="h-full" config={PRODUCT_CONFIG}>
         <RechartBarChart
           data={data}
           onMouseMove={(e: CategoricalChartState) => {
