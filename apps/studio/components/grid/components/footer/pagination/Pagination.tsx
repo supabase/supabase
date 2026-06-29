@@ -198,6 +198,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
       return
     }
     snap.setPage(1)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters])
 
   // [Joshen] One to revisit if we can consolidate this and the main return statement
