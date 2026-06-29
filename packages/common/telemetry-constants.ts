@@ -11,8 +11,6 @@
  * @module telemetry-frontend
  */
 
-import type { FunnelErrorReason } from './funnel-error-reasons'
-
 export type TelemetryGroups = {
   project: string
   organization: string
@@ -484,13 +482,9 @@ export interface OrganizationCreationCompletedEvent {
   action: 'organization_creation_completed'
   properties: {
     /**
-     * Plan selected at creation. Self-serve org creation only emits FREE, PRO, or TEAM.
+     * Billing tier provisioned at creation. tier_payg is uncapped PRO.
      */
-    plan: 'FREE' | 'PRO' | 'TEAM'
-    /**
-     * Billing tier slug, distinguishing uncapped PAYG from capped PRO. Absent for FREE.
-     */
-    tier?: 'tier_pro' | 'tier_payg' | 'tier_team'
+    tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -2928,7 +2922,7 @@ export interface DashboardErrorCreatedEvent {
     /**
      * Controlled-vocabulary slug describing the reason (no free text, no PII)
      */
-    errorReason?: FunnelErrorReason
+    errorReason?: string
     /**
      * HTTP status code for api/network errors (absent for validation/payment)
      */
