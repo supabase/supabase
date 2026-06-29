@@ -128,7 +128,7 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
       </DialogTrigger>
       <DialogContent size="large">
         <DialogHeader>
-          <DialogTitle>Automatically enable Row Level Security (RLS) for new tables</DialogTitle>
+          <DialogTitle>Automatically enable RLS for new tables</DialogTitle>
           <DialogDescription>
             Protect future tables with a built-in database trigger.
           </DialogDescription>
@@ -138,14 +138,13 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
 
         <DialogSection className="text-sm flex flex-col gap-y-2">
           <p>
-            Tables in exposed schemas, such as <code className="text-code-inline">public</code>, are
-            reachable through your project's API. We recommend enabling RLS on these tables so that
-            access is governed by policies you define — otherwise anyone with your publishable key
-            can read and write their contents.
+            Tables in exposed schemas such as <code className="text-code-inline">public</code> are
+            reachable through your project’s API. Enable Row Level Security (RLS) on these tables so
+            access is governed by the policies you define, not just the project API key.
           </p>
           <p>
-            The trigger below automatically enables RLS whenever a new table is created. Review the
-            SQL before creating it:
+            This trigger automatically enables RLS whenever a new table is created. Review the SQL
+            before creating it:
           </p>
         </DialogSection>
 
