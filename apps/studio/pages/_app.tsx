@@ -18,6 +18,7 @@ import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/nextjs'
 import { HydrationBoundary, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import { ColorSystemTinker, ColorTinkerProvider } from 'color-tinker'
 import {
   FeatureFlagProvider,
   getFlags,
@@ -32,8 +33,13 @@ import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { ColorSystemTinker, ColorTinkerProvider } from 'color-tinker'
-import { DevToolbar, DevToolsDock, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
+import {
+  DevToolbar,
+  DevToolbarProvider,
+  DevToolbarTrigger,
+  DevToolsDock,
+  type ExtraTab,
+} from 'dev-tools'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'

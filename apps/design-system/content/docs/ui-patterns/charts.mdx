@@ -199,27 +199,27 @@ type ChartConfig = {
 
 Line chart component for displaying time-series data.
 
-| Prop                | Type                                                                  | Default                  | Description                                                       |
-| ------------------- | --------------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------- |
-| `data`              | `ChartLineTick[]`                                                     | -                        | Array of data points with timestamp                               |
-| `dataKey`           | `string`                                                              | -                        | Key in data object to plot                                        |
-| `config`            | `ChartConfig?`                                                        | -                        | Chart configuration for styling                                   |
-| `onLineClick`       | `(datum: ChartLineTick, tooltipData?: CategoricalChartState) => void` | -                        | Click handler for line points                                     |
-| `DateTimeFormat`    | `string`                                                              | `'MMM D, YYYY, hh:mma'`  | Date format for tooltips and labels                               |
-| `isFullHeight`      | `boolean`                                                             | `false`                  | Whether chart should take full height                             |
-| `className`         | `string`                                                              | -                        | Additional CSS classes                                            |
+| Prop                | Type                                                                  | Default                       | Description                                                       |
+| ------------------- | --------------------------------------------------------------------- | ----------------------------- | ----------------------------------------------------------------- |
+| `data`              | `ChartLineTick[]`                                                     | -                             | Array of data points with timestamp                               |
+| `dataKey`           | `string`                                                              | -                             | Key in data object to plot                                        |
+| `config`            | `ChartConfig?`                                                        | -                             | Chart configuration for styling                                   |
+| `onLineClick`       | `(datum: ChartLineTick, tooltipData?: CategoricalChartState) => void` | -                             | Click handler for line points                                     |
+| `DateTimeFormat`    | `string`                                                              | `'MMM D, YYYY, hh:mma'`       | Date format for tooltips and labels                               |
+| `isFullHeight`      | `boolean`                                                             | `false`                       | Whether chart should take full height                             |
+| `className`         | `string`                                                              | -                             | Additional CSS classes                                            |
 | `color`             | `string`                                                              | `'hsl(var(--brand-default))'` | Line color                                                        |
 | `hoverColor`        | `string`                                                              | `'hsl(var(--brand-500))'`     | Line color on hover                                               |
-| `chartHighlight`    | `ChartHighlight`                                                      | -                        | Highlight selection configuration                                 |
-| `updateDateRange`   | `(from: string, to: string) => void`                                  | -                        | Callback when date range is updated via highlight                 |
-| `highlightActions`  | `ChartHighlightAction[]`                                              | -                        | Actions to show when area is highlighted                          |
-| `syncId`            | `string`                                                              | -                        | ID to sync multiple charts                                        |
-| `showHighlightArea` | `boolean`                                                             | `true`                   | Whether to show highlight area                                    |
-| `cursor`            | `string`                                                              | -                        | Cursor style (defaults to 'crosshair' if chartHighlight provided) |
-| `showGrid`          | `boolean`                                                             | `false`                  | Whether to show grid lines                                        |
-| `showYAxis`         | `boolean`                                                             | `false`                  | Whether to show Y-axis                                            |
-| `YAxisProps`        | `object`                                                              | -                        | Additional Y-axis props (tick, tickFormatter, width, etc.)        |
-| `strokeWidth`       | `number`                                                              | `1.5`                    | Line stroke width                                                 |
+| `chartHighlight`    | `ChartHighlight`                                                      | -                             | Highlight selection configuration                                 |
+| `updateDateRange`   | `(from: string, to: string) => void`                                  | -                             | Callback when date range is updated via highlight                 |
+| `highlightActions`  | `ChartHighlightAction[]`                                              | -                             | Actions to show when area is highlighted                          |
+| `syncId`            | `string`                                                              | -                             | ID to sync multiple charts                                        |
+| `showHighlightArea` | `boolean`                                                             | `true`                        | Whether to show highlight area                                    |
+| `cursor`            | `string`                                                              | -                             | Cursor style (defaults to 'crosshair' if chartHighlight provided) |
+| `showGrid`          | `boolean`                                                             | `false`                       | Whether to show grid lines                                        |
+| `showYAxis`         | `boolean`                                                             | `false`                       | Whether to show Y-axis                                            |
+| `YAxisProps`        | `object`                                                              | -                             | Additional Y-axis props (tick, tickFormatter, width, etc.)        |
+| `strokeWidth`       | `number`                                                              | `1.5`                         | Line stroke width                                                 |
 
 #### ChartLineTick Type
 
@@ -252,26 +252,26 @@ Line chart component for displaying time-series data.
 
 Bar chart component for displaying time-series data.
 
-| Prop                | Type                                                                 | Default                  | Description                                                       |
-| ------------------- | -------------------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------- |
-| `data`              | `ChartBarTick[]`                                                     | -                        | Array of data points with timestamp                               |
-| `dataKey`           | `string`                                                             | -                        | Key in data object to plot                                        |
-| `config`            | `ChartConfig?`                                                       | -                        | Chart configuration for styling                                   |
-| `onBarClick`        | `(datum: ChartBarTick, tooltipData?: CategoricalChartState) => void` | -                        | Click handler for bars                                            |
-| `DateTimeFormat`    | `string`                                                             | `'MMM D, YYYY, hh:mma'`  | Date format for tooltips and labels                               |
-| `isFullHeight`      | `boolean`                                                            | `false`                  | Whether chart should take full height                             |
-| `className`         | `string`                                                             | -                        | Additional CSS classes                                            |
+| Prop                | Type                                                                 | Default                       | Description                                                       |
+| ------------------- | -------------------------------------------------------------------- | ----------------------------- | ----------------------------------------------------------------- |
+| `data`              | `ChartBarTick[]`                                                     | -                             | Array of data points with timestamp                               |
+| `dataKey`           | `string`                                                             | -                             | Key in data object to plot                                        |
+| `config`            | `ChartConfig?`                                                       | -                             | Chart configuration for styling                                   |
+| `onBarClick`        | `(datum: ChartBarTick, tooltipData?: CategoricalChartState) => void` | -                             | Click handler for bars                                            |
+| `DateTimeFormat`    | `string`                                                             | `'MMM D, YYYY, hh:mma'`       | Date format for tooltips and labels                               |
+| `isFullHeight`      | `boolean`                                                            | `false`                       | Whether chart should take full height                             |
+| `className`         | `string`                                                             | -                             | Additional CSS classes                                            |
 | `color`             | `string`                                                             | `'hsl(var(--brand-default))'` | Bar color                                                         |
 | `hoverColor`        | `string`                                                             | `'hsl(var(--brand-500))'`     | Bar color on hover                                                |
-| `chartHighlight`    | `ChartHighlight`                                                     | -                        | Highlight selection configuration                                 |
-| `updateDateRange`   | `(from: string, to: string) => void`                                 | -                        | Callback when date range is updated via highlight                 |
-| `highlightActions`  | `ChartHighlightAction[]`                                             | -                        | Actions to show when area is highlighted                          |
-| `syncId`            | `string`                                                             | -                        | ID to sync multiple charts                                        |
-| `showHighlightArea` | `boolean`                                                            | `true`                   | Whether to show highlight area                                    |
-| `cursor`            | `string`                                                             | -                        | Cursor style (defaults to 'crosshair' if chartHighlight provided) |
-| `showGrid`          | `boolean`                                                            | `false`                  | Whether to show grid lines                                        |
-| `showYAxis`         | `boolean`                                                            | `false`                  | Whether to show Y-axis                                            |
-| `YAxisProps`        | `object`                                                             | -                        | Additional Y-axis props (tick, tickFormatter, width, etc.)        |
+| `chartHighlight`    | `ChartHighlight`                                                     | -                             | Highlight selection configuration                                 |
+| `updateDateRange`   | `(from: string, to: string) => void`                                 | -                             | Callback when date range is updated via highlight                 |
+| `highlightActions`  | `ChartHighlightAction[]`                                             | -                             | Actions to show when area is highlighted                          |
+| `syncId`            | `string`                                                             | -                             | ID to sync multiple charts                                        |
+| `showHighlightArea` | `boolean`                                                            | `true`                        | Whether to show highlight area                                    |
+| `cursor`            | `string`                                                             | -                             | Cursor style (defaults to 'crosshair' if chartHighlight provided) |
+| `showGrid`          | `boolean`                                                            | `false`                       | Whether to show grid lines                                        |
+| `showYAxis`         | `boolean`                                                            | `false`                       | Whether to show Y-axis                                            |
+| `YAxisProps`        | `object`                                                             | -                             | Additional Y-axis props (tick, tickFormatter, width, etc.)        |
 
 #### ChartBarTick Type
 

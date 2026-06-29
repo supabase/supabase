@@ -1,15 +1,7 @@
 'use client'
 
 import { EyeOff } from 'lucide-react'
-import {
-  Button,
-  PopoverContent,
-  Slider,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-  cn,
-} from 'ui'
+import { Button, PopoverContent, Slider, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
 
 import { COLOR_INPUTS } from './constants'
 import { useColorTinker } from './ColorTinkerContext'
@@ -37,7 +29,13 @@ export function ColorTinkerPanel({ values, updateVar, reset }: ColorTinkerPanelP
       <div className="flex items-center justify-between gap-2 border-b border-overlay px-3 py-3">
         <span className="heading-meta">Theme</span>
         <div className="flex items-center gap-1">
-          <Button type="button" variant="text" size="tiny" className="h-6 px-1.5 text-sm" onClick={reset}>
+          <Button
+            type="button"
+            variant="text"
+            size="tiny"
+            className="h-6 px-1.5 text-sm"
+            onClick={reset}
+          >
             Reset
           </Button>
           <Tooltip>

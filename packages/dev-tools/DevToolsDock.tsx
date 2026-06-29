@@ -9,13 +9,7 @@ import { cn } from 'ui'
 const env = process.env.NEXT_PUBLIC_ENVIRONMENT
 const IS_TOOLBAR_ENABLED = env === 'local' || env === 'staging'
 
-export function DevToolsDock({
-  children,
-  className,
-}: {
-  children: ReactNode
-  className?: string
-}) {
+export function DevToolsDock({ children, className }: { children: ReactNode; className?: string }) {
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
