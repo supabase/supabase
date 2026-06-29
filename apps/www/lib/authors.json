@@ -986,6 +986,14 @@
     "author_image_url": "/images/blog/avatars/david-dalmaso.png"
   },
   {
+    "author_id": "ekhar",
+    "author": "Eric Kharitonashvili",
+    "username": "ekhar",
+    "position": "Engineering",
+    "author_url": "https://github.com/ekhar",
+    "author_image_url": "https://github.com/ekhar.png"
+  },
+  {
     "author_id": "gary_qi",
     "author": "Gary Qi",
     "position": "Developer Operations Manager",
