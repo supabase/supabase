@@ -17,7 +17,7 @@ import Table from '@/components/to-be-cleaned/Table'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import {

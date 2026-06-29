@@ -22,7 +22,7 @@ import { EdgeFunctionRecentErrors } from './EdgeFunctionRecentErrors'
 import { EdgeFunctionUsageSection } from './EdgeFunctionUsageSection'
 import { useEdgeFunctionOverviewShortcuts } from './useEdgeFunctionOverviewShortcuts'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import {
   FunctionsCombinedStatsVariables,
   useFunctionsCombinedStatsQuery,

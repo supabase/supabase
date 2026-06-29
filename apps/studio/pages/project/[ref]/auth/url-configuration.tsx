@@ -14,7 +14,7 @@ import { RedirectUrls } from '@/components/interfaces/Auth/RedirectUrls/Redirect
 import SiteUrl from '@/components/interfaces/Auth/SiteUrl/SiteUrl'
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from '@/types'
 

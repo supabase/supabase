@@ -6,7 +6,7 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { SmtpForm } from '@/components/interfaces/Auth/SmtpForm/SmtpForm'
 import { AuthEmailsLayout } from '@/components/layouts/AuthLayout/AuthEmailsLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from '@/types'
 

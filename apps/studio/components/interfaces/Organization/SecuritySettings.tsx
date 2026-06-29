@@ -13,7 +13,7 @@ import { z } from 'zod'
 
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useOrganizationMfaToggleMutation } from '@/data/organizations/organization-mfa-mutation'

@@ -16,7 +16,7 @@ import { DiskType } from '@/components/interfaces/DiskManagement/ui/DiskManageme
 import { Markdown } from '@/components/interfaces/Markdown'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import Panel from '@/components/ui/Panel'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'

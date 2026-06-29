@@ -6,7 +6,7 @@ import { ThirdPartyAuthForm } from '@/components/interfaces/Auth/ThirdPartyAuthF
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
 import { AuthProvidersLayout } from '@/components/layouts/AuthLayout/AuthProvidersLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
