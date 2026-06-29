@@ -126,6 +126,14 @@ export const getAllTableRowsSql = ({
 }): { sql: QueryFilter; cursorColumns: string[] | false } => {
   const query = new Query()
 
+  // Drop any sorts/filters referencing columns no longer present on the table.
+  // Stale sort/filter state can persist (URL/local storage) after a column is
+  // dropped or renamed, which would otherwise generate a query against a
+  // non-existent column and fail. See getTableRowsSql for the equivalent guard.
+  const validColumnNames = new Set(table.columns.map((column) => column.name))
+  const validFilters = filters.filter((filter) => validColumnNames.has(filter.column))
+  const validSorts = sorts.filter((sort) => validColumnNames.has(sort.column))
+
   const arrayBasedColumns = table.columns
     .filter(
       (column) => (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
@@ -140,7 +148,7 @@ export const getAllTableRowsSql = ({
         : safeSql`*`
     )
 
-  filters
+  validFilters
     .filter((filter) => filter.value && filter.value !== '')
     .forEach((filter) => {
       const value = formatFilterValue(table, filter)
@@ -153,7 +161,7 @@ export const getAllTableRowsSql = ({
 
   const hasCtid = checkIfCtidAvailable(table)
 
-  if (sorts.length === 0) {
+  if (validSorts.length === 0) {
     if (cursorPaginationEligible.length > 0) {
       cursorColumns = cursorPaginationEligible[0]
       cursorPaginationEligible[0].forEach((col) => {
@@ -172,7 +180,7 @@ export const getAllTableRowsSql = ({
       }
     }
   } else {
-    sorts.forEach((sort) => {
+    validSorts.forEach((sort) => {
       queryChains = queryChains.order(sort.table, sort.column, sort.ascending, sort.nullsFirst)
     })
 
@@ -180,7 +188,7 @@ export const getAllTableRowsSql = ({
     const tieBreaker = cursorPaginationEligible[0]
     if (tieBreaker) {
       const sortedColumns = new Set(
-        sorts.filter((s) => s.table === table.name).map((s) => s.column)
+        validSorts.filter((s) => s.table === table.name).map((s) => s.column)
       )
       tieBreaker
         .filter((col) => !sortedColumns.has(col))
