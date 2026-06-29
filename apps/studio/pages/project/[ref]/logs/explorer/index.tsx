@@ -328,11 +328,18 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   useEffect(() => {
     if (search) {
       setEditorValue(search)
-    } else if (q) {
+    } else if (q && !queryId) {
       setEditorValue(q)
       setSearch(q)
     }
-  }, [q, search, setSearch])
+  }, [q, queryId, search, setSearch])
+
+  const querySql = (query?.content as LogSqlSnippets.Content | undefined)?.sql
+  useEffect(() => {
+    if (!queryId || !querySql || search) return
+    setEditorValue(querySql)
+    editorRef.current?.setValue(querySql)
+  }, [queryId, querySql, search])
 
   useEffect(() => {
     if (!useOtelEndpoint || q || search || queryId) return
