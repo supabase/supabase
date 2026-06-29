@@ -41,7 +41,7 @@ When your Supabase project is up and running, create a table for your data. You 
 
 <Admonition type="note">
 
-Use snake_case for table names. For example, use `friction_log` instead of `Friction log`. Postgres stores unquoted names in lowercase.
+Supabase recommends using snake_case for table names. For example, use `my_table` instead of `My table`. 
 
 </Admonition>
 
@@ -78,12 +78,12 @@ This example insert uses a table named `instruments`. Replace `<your-table>` wit
 
 Run the following example SQL:
 
-</StepHikeCompact.Details>
+</StepHikeCompact.Details:way>
 
 <StepHikeCompact.Code>
 
     ```sql SQL_EDITOR
-    -- Example only.
+    -- Example: insert sample data into the table
     insert into instruments (name)
     values
       ('violin'),
