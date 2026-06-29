@@ -210,7 +210,7 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
 
   const { mutate: updateAuthHooks, isPending: isUpdatingAuthHooks } = useAuthHooksUpdateMutation({
     onSuccess: () => {
-      toast.success(`Successfully created ${hookType}.`)
+      toast.success(`Successfully ${isCreating ? 'created' : 'updated'} ${hookType}.`)
       if (statements.length > 0) {
         executeSql({
           projectRef,

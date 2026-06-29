@@ -129,7 +129,12 @@ export const HookCard = ({ hook, onSelectEdit, onSelectDelete }: HookCardProps) 
           )}
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <Button variant="default" className="px-1" icon={<MoreVertical />} />
+              <Button
+                variant="default"
+                className="px-1"
+                icon={<MoreVertical />}
+                aria-label={`Open actions for ${hook.title}`}
+              />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
               <DropdownMenuItemTooltip

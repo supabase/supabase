@@ -47,14 +47,20 @@ export const DeleteHookConfirmationDialog = ({
 
       const { method } = hook
       if (method.type === 'postgres') {
-        const revokeStatements = getRevokePermissionStatements(method.schema, method.functionName)
-        await executeSql({
-          projectRef,
-          connectionString: project!.connectionString,
-          sql: joinSqlFragments(revokeStatements, '\n'),
-        })
+        try {
+          const revokeStatements = getRevokePermissionStatements(method.schema, method.functionName)
+          await executeSql({
+            projectRef,
+            connectionString: project!.connectionString,
+            sql: joinSqlFragments(revokeStatements, '\n'),
+          })
+          toast.success(`Successfully deleted ${hook.title}`)
+        } catch (error) {
+          toast.warning(
+            `Deleted ${hook.title}, but failed to revoke permissions on ${method.schema}.${method.functionName}. You may want to revoke them manually.`
+          )
+        }
       }
-      toast.success(`${hook.title} has been deleted.`)
       onDeleteSuccess()
     },
     onError: (error) => {
