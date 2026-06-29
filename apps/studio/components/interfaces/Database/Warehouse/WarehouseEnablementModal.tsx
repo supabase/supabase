@@ -13,12 +13,12 @@ import {
 } from 'ui'
 
 import { setTableMode } from './warehouseDemoStore'
+import { getWarehouseQualifiedTableName } from './warehouseNaming.utils'
 import { WarehouseProgressSteps } from './WarehouseProgressSteps'
 
 interface WarehouseEnablementModalProps {
   open: boolean
   tableKey: string
-  tableName: string
   onOpenChange: (open: boolean) => void
 }
 
@@ -31,13 +31,12 @@ const COMPLETION_HOLD_MS = 650
 export function WarehouseEnablementModal({
   open,
   tableKey,
-  tableName,
   onOpenChange,
 }: WarehouseEnablementModalProps) {
   const [isRunning, setIsRunning] = useState(false)
   const [progressIndex, setProgressIndex] = useState(0)
 
-  const warehouseCopyName = `warehouse.${tableName}`
+  const warehouseQualifiedName = getWarehouseQualifiedTableName(tableKey)
 
   useEffect(() => {
     if (!open) {
@@ -83,8 +82,8 @@ export function WarehouseEnablementModal({
             <DialogSectionSeparator />
             <DialogSection className="flex flex-col gap-4">
               <p className="text-sm text-foreground-light">
-                The Postgres heap will remain the source of truth. Changes in Postgres will
-                continuously sync to a Warehouse copy.
+                The Postgres heap remains the source of truth for writes and the Table Editor. Query
+                the Warehouse copy explicitly for analytical workloads.
               </p>
 
               <div className="rounded-lg border bg-surface-75 text-sm">
@@ -97,7 +96,7 @@ export function WarehouseEnablementModal({
                     <span className="text-foreground-lighter">Warehouse</span>
                     <Badge variant="success">New</Badge>
                   </div>
-                  <code className="text-code-inline">{warehouseCopyName}</code>
+                  <code className="text-code-inline">{warehouseQualifiedName}</code>
                 </div>
               </div>
             </DialogSection>

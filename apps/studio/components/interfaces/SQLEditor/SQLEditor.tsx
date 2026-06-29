@@ -58,6 +58,7 @@ import {
 } from './SQLEditor.utils'
 import { useAddDefinitions } from './useAddDefinitions'
 import { UtilityPanel } from './UtilityPanel/UtilityPanel'
+import { sqlReferencesWarehouse } from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
 import {
   isExplainQuery,
   isExplainSql,
@@ -296,6 +297,13 @@ export const SQLEditor = () => {
       }
     },
   })
+
+  const sql =
+    snapV2.snippets[id]?.snippet?.content?.unchecked_sql ??
+    snapV2.snippets[id]?.snippet?.content?.sql ??
+    ''
+  const servedByWarehouse =
+    Boolean(results) && !results?.error && !isExecuting && sqlReferencesWarehouse(sql)
 
   const setAiTitle = useCallback(
     async (id: string, sql: string) => {
@@ -1051,6 +1059,7 @@ export const SQLEditor = () => {
                       <span className="text-foreground-lighter ml-1">
                         {results.autoLimit !== undefined &&
                           ` (Limited to only ${results.autoLimit} rows)`}
+                        {servedByWarehouse && ' · Served by Warehouse'}
                       </span>
                     </p>
                   </TooltipTrigger>

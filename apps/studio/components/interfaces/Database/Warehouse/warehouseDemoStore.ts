@@ -1,5 +1,7 @@
 import { proxy, useSnapshot } from 'valtio'
 
+import { getWarehouseQualifiedTableName } from './warehouseNaming.utils'
+
 export type WarehouseMode = 'postgres' | 'has_warehouse_copy'
 export type SyncState = 'syncing' | 'live' | 'error'
 
@@ -22,13 +24,8 @@ export const warehouseDemoStore = proxy<{
 
 const DEMO_WAREHOUSE_SIZE_BYTES = 197_912_092_672 // ~184 GB
 
-function tableNameFromKey(key: string): string {
-  return key.split('.').pop() ?? key
-}
-
 export function setTableMode(key: string, mode: 'has_warehouse_copy'): void {
   const now = new Date().toISOString()
-  const tableName = tableNameFromKey(key)
 
   warehouseDemoStore.tables[key] = {
     mode,
@@ -36,7 +33,7 @@ export function setTableMode(key: string, mode: 'has_warehouse_copy'): void {
     syncState: 'live',
     lagSeconds: 12,
     lastSyncedAt: now,
-    copyName: `warehouse.${tableName}`,
+    copyName: getWarehouseQualifiedTableName(key),
   }
 }
 
