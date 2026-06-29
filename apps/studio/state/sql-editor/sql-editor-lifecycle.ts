@@ -23,6 +23,15 @@ export function isSaveFailed(status: SnippetStatus | undefined): boolean {
 }
 
 /**
+ * True when the snippet holds changes that are not safely persisted: never
+ * saved ('new' family), a save in flight, a failed save, or pending local edits
+ * ('unsaved'). Used to warn before the tab is closed. Only 'saved' is clean.
+ */
+export function hasUnsavedChanges(status: SnippetStatus | undefined): boolean {
+  return status !== undefined && status !== 'saved'
+}
+
+/**
  *  Transition when a save request begins, preserving the never-persisted axis.
  */
 export function statusOnSaveStart(status: SnippetStatus | undefined): SnippetStatus {
