@@ -115,6 +115,16 @@ describe('calculateApiGatewayAggregate', () => {
     expect(result.total).toBe(80)
     expect(result.errorCount).toBe(4)
   })
+
+  it('counts postgrest toward the aggregate even though it has no homepage card', () => {
+    const result = calculateApiGatewayAggregate({
+      db: { total: 30, errorCount: 0, warningCount: 0 },
+      postgrest: { total: 50, errorCount: 5, warningCount: 0 },
+    })
+
+    expect(result.total).toBe(80)
+    expect(result.errorCount).toBe(5)
+  })
 })
 
 describe('chart and header agreement', () => {
