@@ -98,9 +98,16 @@ const BlogPostRenderer = async ({
       {isDraftMode && <DraftModeBanner />}
       <div className="overflow-x-clip">
         <SectionContainerWithCn height="none">
-          <div className="grid grid-cols-12 xl:gap-x-8 xl:gap-y-0">
-            {/* Row 1, Col 1: Back button */}
-            <div className="col-span-12 xl:row-start-1 xl:col-start-1 xl:col-span-1 pt-8 xl:pt-12 flex items-start justify-start">
+          {/*
+           * Outer grid: back button | main container
+           *
+           * base/md : [back:1–12] stacked above [main:1–12]
+           * lg      : [back:1–12] stacked above [main:2–12]
+           * xl      : [back:1–2]  alongside      [main:3–12]
+           */}
+          <div className="flex justify-center lg:grid grid-cols-12 gap-x-8">
+            {/* Back button — full-width row below xl, 2-col left column at xl */}
+            <div className="col-span-12 xl:col-span-2 pt-8 xl:pt-12 hidden xl:flex items-start justify-start">
               <Link
                 href="/blog"
                 className="text-foreground-lighter hover:text-foreground inline-flex cursor-pointer items-center text-sm transition"
@@ -110,9 +117,10 @@ const BlogPostRenderer = async ({
               </Link>
             </div>
 
-            {/* Row 1, Col 2: Title + meta */}
-            <div className="col-span-12 xl:row-start-1 xl:col-start-2 xl:col-span-7 pt-4 xl:pt-12 pb-6 space-y-4">
-              <div className="space-y-4">
+            {/* Main container — indented 1 col at lg, alongside back button at xl */}
+            <div className="max-w-[65ch] lg:max-w-none col-span-12 lg:col-start-2 lg:col-span-11 xl:col-start-3 xl:col-span-10">
+              {/* Article header — spans the full main container width */}
+              <div className="py-6 md:py-12 space-y-4">
                 {(blogMetaData.tags as Tag[])?.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {(blogMetaData.tags as Tag[])?.map((tag) => {
@@ -130,16 +138,18 @@ const BlogPostRenderer = async ({
                     })}
                   </div>
                 )}
-                <h1 className="text-2xl sm:text-4xl max-w-3xl">{blogMetaData.title}</h1>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl max-w-3xl text-pretty">
+                  {blogMetaData.title}
+                </h1>
                 <div className="flex items-center gap-2">
                   <div className="text-foreground-lighter flex space-x-3 text-sm">
-                    <p>{dayjs(blogMetaData.date).format('DD MMM YYYY')}</p>
+                    <p>{dayjs(blogMetaData.date).format('D MMM YYYY')}</p>
                     <p>·</p>
                     <p>{(blogMetaData as any).readingTime}</p>
                   </div>
                 </div>
                 {authors.length > 0 && (
-                  <div className="flex items-center gap-4 mt-6">
+                  <div className="flex flex-row flex-wrap items-center gap-y-4 gap-x-6 md:gap-x-8 mt-6">
                     {authors.map((author, i: number) => {
                       const authorImageUrl = author.author_image_url
                       const authorId =
@@ -156,7 +166,7 @@ const BlogPostRenderer = async ({
                             {authorImageUrl && (
                               <Image
                                 src={authorImageUrl}
-                                className="border-default rounded-full border aspect-square object-cover"
+                                className="w-5 h-5 md:w-8 md:h-8 border-default rounded-full border aspect-square object-cover"
                                 alt={`${author.author} avatar`}
                                 width={32}
                                 height={32}
@@ -164,7 +174,7 @@ const BlogPostRenderer = async ({
                             )}
                             <div className="flex flex-col">
                               <span className="text-foreground text-sm">{author.author}</span>
-                              <span className="text-foreground-lighter text-xs">
+                              <span className="text-foreground-lighter text-xs hidden md:inline-block">
                                 {author.position}
                               </span>
                             </div>
@@ -175,96 +185,99 @@ const BlogPostRenderer = async ({
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* Row 2: Hero image — col-start-1 col-span-9 = equal overhang each side of content (col 2–8) */}
-            {!blogMetaData.youtubeHero && blogMetaData.imgThumb && imageUrl && (
-              <div className="col-span-12 xl:row-start-2 xl:col-start-1 xl:col-span-9 mb-6">
-                <div className="relative w-full aspect-[1.91/1] overflow-hidden rounded-lg border border-foreground/10">
-                  <Image
-                    src={imageUrl}
-                    alt={blogMetaData.title}
-                    fill
-                    quality={100}
-                    sizes="(max-width: 768px) 100vw, 75vw"
-                    className="object-cover"
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Row 3: Article */}
-            <div className="col-span-12 xl:row-start-3 xl:col-start-2 xl:col-span-7 pb-16">
-              <article>
-                <div className="prose prose-docs">
-                  {blogMetaData.youtubeHero ? (
-                    <iframe
-                      title="YouTube video player"
-                      className="w-full"
-                      width="700"
-                      height="350"
-                      src={blogMetaData.youtubeHero}
-                      allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen={true}
-                    />
-                  ) : null}
-                  {mdxRendered}
-                </div>
-              </article>
-
-              {isLaunchWeek7 && <BlogLinks />}
-              {isLaunchWeekX && <LWXSummary />}
-              {isGAWeek && <LW11Summary />}
-              {isLaunchWeek12 && <LW12Summary />}
-              {isLaunchWeek13 && <LW13Summary />}
-              {isLaunchWeek14 && <LW14Summary />}
-              {isLaunchWeek15 && <LW15Summary />}
-
-              <div className="block lg:hidden py-8">
-                <div className="text-foreground-lighter text-sm">Share this article</div>
-                <ShareArticleActions title={blogMetaData.title} slug={blogMetaData.slug} />
-              </div>
-
-              <div className="grid gap-8 py-8 lg:grid-cols-1">
-                <div>
-                  {prevPost && (
-                    <NextCard
-                      post={
-                        prevPost as unknown as {
-                          path: string
-                          title: string
-                          formattedDate: string
-                        }
-                      }
-                      label="Previous post"
-                    />
+              {/*
+               * Inner grid: article body | sidebar
+               *
+               * base/md : single column, sidebar hidden
+               * lg+     : [body:7fr] [sidebar:3fr]
+               */}
+              <div className="lg:grid lg:grid-cols-12 lg:gap-x-8 xl:gap-x-12">
+                {/* Article body */}
+                <div className="col-span-8 pb-16">
+                  {!blogMetaData.youtubeHero && blogMetaData.imgThumb && imageUrl && (
+                    <div className="hidden lg:block relative w-full aspect-[1.91/1] overflow-hidden rounded-lg border border-foreground/10 mb-6">
+                      <Image
+                        src={imageUrl}
+                        alt={blogMetaData.title}
+                        fill
+                        quality={100}
+                        sizes="(max-width: 768px) 100vw, 58vw"
+                        className="object-cover"
+                      />
+                    </div>
                   )}
-                </div>
-                <div>
-                  {nextPost && (
-                    <NextCard
-                      post={
-                        nextPost as unknown as {
-                          path: string
-                          title: string
-                          formattedDate: string
-                        }
-                      }
-                      label="Next post"
-                      className="text-right"
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
 
-            {/* TOC: starts at row 2 alongside image, sticky through article */}
-            <div className="hidden xl:block xl:row-start-2 xl:row-span-2 xl:col-start-10 xl:col-span-3 xl:pl-6">
-              <div className="sticky top-24 flex flex-col gap-6 max-h-[calc(100vh-7rem)] mb-4">
-                <div className="overflow-y-auto min-h-0 flex-1">{toc}</div>
-                <div className="shrink-0">
-                  <div className="text-foreground text-sm mb-2">Share this article</div>
-                  <ShareArticleActions title={blogMetaData.title} slug={blogMetaData.slug} />
+                  <article>
+                    <div className="prose prose-docs">
+                      {blogMetaData.youtubeHero ? (
+                        <iframe
+                          title="YouTube video player"
+                          className="w-full"
+                          width="700"
+                          height="350"
+                          src={blogMetaData.youtubeHero}
+                          allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen={true}
+                        />
+                      ) : null}
+                      {mdxRendered}
+                    </div>
+                  </article>
+
+                  {isLaunchWeek7 && <BlogLinks />}
+                  {isLaunchWeekX && <LWXSummary />}
+                  {isGAWeek && <LW11Summary />}
+                  {isLaunchWeek12 && <LW12Summary />}
+                  {isLaunchWeek13 && <LW13Summary />}
+                  {isLaunchWeek14 && <LW14Summary />}
+                  {isLaunchWeek15 && <LW15Summary />}
+
+                  <div className="block lg:hidden py-8">
+                    <ShareArticleActions title={blogMetaData.title} slug={blogMetaData.slug} />
+                  </div>
+
+                  <div className="grid gap-8 py-8 lg:grid-cols-1">
+                    <div>
+                      {prevPost && (
+                        <NextCard
+                          post={
+                            prevPost as unknown as {
+                              path: string
+                              title: string
+                              formattedDate: string
+                            }
+                          }
+                          label="Previous post"
+                        />
+                      )}
+                    </div>
+                    <div>
+                      {nextPost && (
+                        <NextCard
+                          post={
+                            nextPost as unknown as {
+                              path: string
+                              title: string
+                              formattedDate: string
+                            }
+                          }
+                          label="Next post"
+                          className="text-right"
+                        />
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Sidebar — only above lg */}
+                <div className="hidden lg:block col-span-4 col-start-9 lg:pl-6">
+                  <div className="sticky top-24 flex flex-col gap-6 max-h-[calc(100vh-7rem)] mb-4">
+                    <div className="overflow-y-auto min-h-0 flex-1">{toc}</div>
+                    <div className="shrink-0">
+                      <ShareArticleActions title={blogMetaData.title} slug={blogMetaData.slug} />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
