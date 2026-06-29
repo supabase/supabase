@@ -15,9 +15,9 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { PARTNER_TO_NAME } from '@/components/ui/PartnerManagedResource'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'

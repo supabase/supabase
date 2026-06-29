@@ -29,7 +29,7 @@ import {
   ScaffoldSection,
   ScaffoldSectionTitle,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useIcebergNamespacesQuery } from '@/data/storage/iceberg-namespaces-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'

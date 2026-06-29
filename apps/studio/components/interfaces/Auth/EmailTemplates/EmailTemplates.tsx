@@ -27,7 +27,7 @@ import {
   slugifyTitle,
 } from './EmailTemplates.utils'
 import { SendEmailHookActiveAdmonition } from './SendEmailHookActiveAdmonition'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'

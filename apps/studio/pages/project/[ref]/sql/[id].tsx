@@ -8,7 +8,7 @@ import { Admonition } from 'ui-patterns'
 
 import { SQLEditor } from '@/components/interfaces/SQLEditor/SQLEditor'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { EditorBaseLayout } from '@/components/layouts/editors/EditorBaseLayout'
 import { useEditorType } from '@/components/layouts/editors/EditorsLayout.hooks'
 import SQLEditorLayout from '@/components/layouts/SQLEditorLayout/SQLEditorLayout'
