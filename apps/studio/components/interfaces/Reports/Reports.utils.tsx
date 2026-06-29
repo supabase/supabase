@@ -13,7 +13,7 @@ import {
 import type { SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 import { REPORT_STATUS_CODE_COLORS } from '@/data/reports/report.utils'
 import useDbQuery, { DbQueryHook } from '@/hooks/analytics/useDbQuery'
-import useLogsQuery, { LogsQueryHook } from '@/hooks/analytics/useLogsQuery'
+import { useLogsQuery, type LogsQueryHook } from '@/hooks/analytics/useLogsQuery'
 import { getHttpStatusCodeInfo } from '@/lib/http-status-codes'
 
 /**

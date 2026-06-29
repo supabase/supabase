@@ -10,6 +10,7 @@ export type VaultSecretUpdateVariables = {
   projectRef: string
   connectionString?: string | null
   id: string
+  skipClearCache?: boolean
 } & Partial<VaultSecret>
 
 export async function updateVaultSecret({
@@ -40,9 +41,15 @@ export const useVaultSecretUpdateMutation = ({
   return useMutation<VaultSecretUpdateData, ResponseError, VaultSecretUpdateVariables>({
     mutationFn: (vars) => updateVaultSecret(vars),
     async onSuccess(data, variables, context) {
-      const { id, projectRef } = variables
+      const { id, projectRef, skipClearCache = false } = variables
       await Promise.all([
-        queryClient.removeQueries({ queryKey: vaultSecretsKeys.getDecryptedValue(projectRef, id) }),
+        !skipClearCache
+          ? queryClient.removeQueries({
+              queryKey: vaultSecretsKeys.getDecryptedValue(projectRef, id),
+            })
+          : queryClient.invalidateQueries({
+              queryKey: vaultSecretsKeys.getDecryptedValue(projectRef, id),
+            }),
         queryClient.invalidateQueries({ queryKey: vaultSecretsKeys.list(projectRef) }),
       ])
       await onSuccess?.(data, variables, context)
