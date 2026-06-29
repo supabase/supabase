@@ -283,13 +283,15 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   async function handleOnSave() {
     if (!projectRef) return console.error('Project ref is required')
 
+    const currentSql = editorRef.current?.getValue() ?? editorValue
+
     // if we have a queryId, we are editing a saved query
     if (queryId && query) {
       await upsertContent({
         projectRef: projectRef!,
         payload: {
           ...query,
-          content: { ...(query.content as LogSqlSnippets.Content), sql: editorValue },
+          content: { ...(query.content as LogSqlSnippets.Content), sql: currentSql },
         },
       })
 
