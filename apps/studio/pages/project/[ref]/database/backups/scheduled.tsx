@@ -17,7 +17,7 @@ import { BackupsList } from '@/components/interfaces/Database/Backups/BackupsLis
 import DatabaseBackupsNav from '@/components/interfaces/Database/Backups/DatabaseBackupsNav'
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import InformationBox from '@/components/ui/InformationBox'
 import NoPermission from '@/components/ui/NoPermission'

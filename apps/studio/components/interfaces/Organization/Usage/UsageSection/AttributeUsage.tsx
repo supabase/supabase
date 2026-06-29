@@ -13,7 +13,7 @@ import {
 } from '../Usage.utils'
 import UsageBarChart from '../UsageBarChart'
 import { ChartMeta } from './UsageSection'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import Panel from '@/components/ui/Panel'
 import SparkBar from '@/components/ui/SparkBar'
 import type { OrgSubscription } from '@/data/subscriptions/types'

@@ -32,7 +32,7 @@ import { TerminalInstructionsDialog } from '@/components/interfaces/Functions/Te
 import { useFunctionsListShortcuts } from '@/components/interfaces/Functions/useFunctionsListShortcuts'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'

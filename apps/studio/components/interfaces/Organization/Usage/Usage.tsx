@@ -23,7 +23,7 @@ import {
   ScaffoldSection,
   ScaffoldTitle,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import DateRangePicker from '@/components/ui/DateRangePicker'
 import NoPermission from '@/components/ui/NoPermission'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'

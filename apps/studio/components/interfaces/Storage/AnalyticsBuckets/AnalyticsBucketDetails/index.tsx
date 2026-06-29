@@ -30,7 +30,7 @@ import {
   ScaffoldSection,
   ScaffoldSectionTitle,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import {
   DatabaseExtension,

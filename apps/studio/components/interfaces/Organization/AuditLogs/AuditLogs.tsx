@@ -14,7 +14,7 @@ import { LogDetailsPanel } from '@/components/interfaces/AuditLogs/LogDetailsPan
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import Table from '@/components/to-be-cleaned/Table'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import NoPermission from '@/components/ui/NoPermission'

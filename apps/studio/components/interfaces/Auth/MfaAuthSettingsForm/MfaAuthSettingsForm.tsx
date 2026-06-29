@@ -40,7 +40,7 @@ import {
 import * as z from 'zod'
 
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import NoPermission from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'

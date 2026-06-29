@@ -19,7 +19,7 @@ import { PITRNotice } from '@/components/interfaces/Database/Backups/PITR/PITRNo
 import { PITRSelection } from '@/components/interfaces/Database/Backups/PITR/PITRSelection'
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
 import NoPermission from '@/components/ui/NoPermission'

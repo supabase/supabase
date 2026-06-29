@@ -20,7 +20,7 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import NoPermission from '@/components/ui/NoPermission'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
 import { organizationKeys } from '@/data/organizations/keys'
