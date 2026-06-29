@@ -17,10 +17,13 @@ hideToc: true
 
     <StepHikeCompact.Details title="Create a Next.js app">
 
-    Use the `create-next-app` command and the `with-supabase` template, to create a Next.js app pre-configured with:
-    - [Cookie-based Auth](/docs/guides/auth/server-side/creating-a-client?queryGroups=package-manager&package-manager=npm&queryGroups=framework&framework=nextjs&queryGroups=environment&environment=server)
-    - [TypeScript](https://www.typescriptlang.org/)
-    - [Tailwind CSS](https://tailwindcss.com/)
+    Create a Next.js app from the `with-supabase` template. The template includes cookie-based [Auth](/docs/guides/auth/server-side/creating-a-client?queryGroups=package-manager&package-manager=npm&queryGroups=framework&framework=nextjs&queryGroups=environment&environment=server), TypeScript, and Tailwind CSS.
+
+    <Admonition type="note">
+
+    If you already have a Next.js app, skip this step. [Add Supabase to your existing app](/docs/guides/auth/server-side/creating-a-client?queryGroups=package-manager&package-manager=npm&queryGroups=framework&framework=nextjs&queryGroups=environment&environment=server) instead.
+
+    </Admonition>
 
     <$Partial path="uiLibCta.mdx" />
 
@@ -29,7 +32,7 @@ hideToc: true
     <StepHikeCompact.Code>
 
       ```bash
-      npx create-next-app -e with-supabase
+      npx create-next-app my-app --example with-supabase
       ```
 
     </StepHikeCompact.Code>
@@ -39,7 +42,7 @@ hideToc: true
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Declare Supabase Environment Variables">
 
-    Rename `.env.example` to `.env.local` and populate with your Supabase connection variables:
+    Rename `.env.example` to `.env.local`. Set your Supabase connection variables in the file:
 
     <ProjectConfigVariables variable="url" />
     <ProjectConfigVariables variable="publishable" />
@@ -67,9 +70,7 @@ hideToc: true
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Query Supabase data from Next.js">
 
-    Create a new file at `app/instruments/page.tsx` and populate with the following.
-
-    This selects all the rows from the `instruments` table in Supabase and render them on the page.
+    Create `app/instruments/page.tsx` as an example. The page queries the `instruments` table from step 1 and renders the results.
 
     </StepHikeCompact.Details>
 
@@ -83,7 +84,17 @@ hideToc: true
 
       async function InstrumentsData() {
         const supabase = await createClient();
-        const { data: instruments } = await supabase.from("instruments").select();
+        const { data: instruments, error } = await supabase.from("instruments").select();
+
+        if (error) {
+          return (
+            <p>
+              Error loading instruments: {error.message}. Verify that the table exists. Verify that
+              the table name matches your query. Verify that Row Level Security policies allow
+              access for your role.
+            </p>
+          );
+        }
 
         return <pre>{JSON.stringify(instruments, null, 2)}</pre>;
       }
@@ -106,7 +117,7 @@ hideToc: true
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Start the app">
 
-    Run the development server, go to http://localhost:3000/instruments in a browser and you should see the list of instruments.
+    Run the development server. Open http://localhost:3000/instruments in a browser. The page shows the list of instruments.
 
     </StepHikeCompact.Details>
 
@@ -124,6 +135,7 @@ hideToc: true
 
 ## Next steps
 
-- Set up [Auth](/docs/guides/auth) for your app
+- Learn how to [manage tables and data](/docs/guides/database/tables) from your app
 - [Insert more data](/docs/guides/database/import-data) into your database
 - Upload and serve static files using [Storage](/docs/guides/storage)
+- Customize the [pre-configured auth](/docs/guides/auth/server-side/creating-a-client?queryGroups=package-manager&package-manager=npm&queryGroups=framework&framework=nextjs&queryGroups=environment&environment=server) in the template

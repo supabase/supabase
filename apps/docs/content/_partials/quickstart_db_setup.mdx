@@ -16,7 +16,7 @@ export SUPABASE_ACCESS_TOKEN="your-access-token"
 curl -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
   https://api.supabase.com/v1/organizations
 
-# Create a new project (replace <org-id> with your organization ID)
+# Create a new project. Replace <org-id> with your organization ID.
 curl -X POST https://api.supabase.com/v1/projects \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
@@ -32,18 +32,28 @@ curl -X POST https://api.supabase.com/v1/projects \
 
 <StepHikeCompact.Details>
 
-When your project is up and running, go to the [**Table Editor**](/dashboard/project/_/editor) section of the Dashboard, create a new table and insert some data. Then in the [**Integrations > Data API**](/dashboard/project/_/integrations/data_api/settings) section of the Dashboard, expose the specific tables or functions you want to access. To automatically grant access for new tables and functions in `public`, enable **Default privileges for new entities**.
+When your Supabase project is up and running, create an example `instruments` table. You can use the Table Editor or the SQL Editor.
 
-Alternatively, you can run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new).
+**Table Editor:** Open the [**Table Editor**](/dashboard/project/_/editor). Create a table named `instruments` and insert sample rows. Open [**Integrations > Data API**](/dashboard/project/_/integrations/data_api/settings) and expose the table. To expose future tables in `public` automatically, enable **Default privileges for new entities**.
 
-This creates an `instruments` table with some sample data, sets a secure baseline by setting only the privileges each Postgres role needs, and adds [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default.
+**SQL Editor:** Run the snippet below in your project's [SQL Editor](/dashboard/project/_/sql/new). The snippet creates the example `instruments` table with sample data.
+
+<Admonition type="note">
+
+Use snake_case for table names. For example, use `friction_log` instead of `Friction log`. Postgres stores unquoted names in lowercase.
+
+</Admonition>
+
+Run the snippets below regardless of the method you use. The snippets grant read access, enable [Row Level Security](/docs/guides/database/postgres/row-level-security), and add a policy. The Data API does not return rows until a Row Level Security policy allows access. This step applies even if you create the table in the Table Editor.
+
+If you use a different table name, replace `instruments` in the snippets below.
 
 </StepHikeCompact.Details>
 
 <StepHikeCompact.Code>
 
     ```sql SQL_EDITOR
-    -- Create the table
+    -- Create the example table. Skip this section if you already created the table in the Table Editor.
     create table instruments (
       id bigint primary key generated always as identity,
       name text not null
@@ -56,8 +66,8 @@ This creates an `instruments` table with some sample data, sets a secure baselin
       ('viola'),
       ('cello');
 
-    -- Grant the privileges the role needs, which is read access
-    grant select on public.instruments to anon;
+    -- Grant read access to API roles
+    grant select on public.instruments to anon, authenticated;
 
     -- Enable row level security for the table
     alter table instruments enable row level security;
@@ -67,17 +77,16 @@ This creates an `instruments` table with some sample data, sets a secure baselin
 
 <StepHikeCompact.Details>
 
-Create an RLS policy to make the data in your table publicly readable:
+Create a Row Level Security policy that allows reads from the `instruments` table. The policy applies to anonymous users and users who sign in. This matters if your app uses the pre-configured auth from the `with-supabase` template.
 
 </StepHikeCompact.Details>
 
 <StepHikeCompact.Code>
 
     ```sql SQL_EDITOR
-    -- Create a policy to allow the anon role to read from the instruments table
     create policy "public can read instruments"
     on public.instruments
-    for select to anon
+    for select
     using (true);
     ```
 
