@@ -9,6 +9,8 @@ export const SignInPartner = () => {
   const router = useRouter()
 
   useEffect(() => {
+    let isMounted = true
+
     ;(async () => {
       const params = new URLSearchParams(window.location.hash.substring(1))
 
@@ -21,12 +23,18 @@ export const SignInPartner = () => {
         try {
           await auth.signInWithIdToken({ provider: partner, token })
         } finally {
-          router.replace({ pathname: '/sign-in-mfa' })
+          if (isMounted) {
+            router.replace({ pathname: '/sign-in-mfa' })
+          }
         }
-      } else {
+      } else if (isMounted) {
         router.replace({ pathname: '/sign-in' })
       }
     })()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   return (
