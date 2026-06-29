@@ -6,7 +6,7 @@ import { RefObject, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
-import { alignEditor } from './CodeEditor.utils'
+import { alignEditor, BASE_MONACO_EDITOR_OPTIONS } from './CodeEditor.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -109,19 +109,13 @@ export const CodeEditor = ({
 
   const optionsMerged = merge(
     {
-      tabSize: 2,
-      fontSize: 13,
+      ...BASE_MONACO_EDITOR_OPTIONS,
       domReadOnly: isReadOnly,
       readOnly: isReadOnly,
-      minimap: { enabled: false },
-      wordWrap: 'on',
-      fixedOverflowWidgets: true,
-      contextmenu: true,
       lineNumbers: hideLineNumbers ? 'off' : undefined,
       glyphMargin: hideLineNumbers ? false : undefined,
       lineNumbersMinChars: hideLineNumbers ? 0 : 4,
       folding: hideLineNumbers ? false : undefined,
-      scrollBeyondLastLine: false,
     },
     options
   )

@@ -1,5 +1,5 @@
-import 'graphiql/style.css'
 import 'graphiql/setup-workers/webpack'
+import './graphiql-styles.css'
 
 import { useMonaco, type GraphiQLPlugin } from '@graphiql/react'
 import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
@@ -8,7 +8,7 @@ import { useParams } from 'common'
 import { GraphiQL, HISTORY_PLUGIN } from 'graphiql'
 import { User as IconUser } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { LogoLoader } from 'ui'
 
@@ -19,6 +19,7 @@ import { IntrospectionEnabledNotice } from './IntrospectionEnabledNotice'
 import { usePgGraphqlIntrospectionStatus } from './usePgGraphqlIntrospectionStatus'
 import { getTheme } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RoleImpersonationSelector } from '@/components/interfaces/RoleImpersonationSelector'
+import { BASE_MONACO_EDITOR_OPTIONS } from '@/components/ui/CodeEditor/CodeEditor.utils'
 import { useSessionAccessTokenQuery } from '@/data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -33,74 +34,46 @@ const ROLE_IMPERSONATION_PLUGIN: GraphiQLPlugin = {
   content: () => <RoleImpersonationSelector orientation="vertical" />,
 }
 
-// Use Studio's primary `supabase` theme for GraphiQL too (not a separate `supabase-graphql-*`
-// theme). Monaco's token-color classes (.mtk*) are global, so a second theme with extra rules
-// (e.g. GraphiQL's gql-argument color) reorders the palette and bleeds wrong syntax colors into
-// every other editor on the page. Sharing one theme keeps the palette identical.
-const SUPABASE_THEME = { dark: 'supabase', light: 'supabase' }
-
-const GraphiQLMonacoTheme = ({ resolvedTheme }: { resolvedTheme: 'dark' | 'light' }) => {
-  const { monaco } = useMonaco()
-
-  useEffect(() => {
-    if (!monaco) return
-    // GraphiQL runs on its own Monaco instance, so define the `supabase` theme on it (the same
-    // definition MonacoThemeProvider applies to the rest of Studio) before using it.
-    monaco.editor.defineTheme('supabase', getTheme(resolvedTheme))
-    monaco.editor.setTheme('supabase')
-  }, [monaco, resolvedTheme])
-
-  return null
-}
-
 /**
- * Inset the editor content from the container edges without floating the scroll shadow.
- *
- * Monaco anchors its `.scroll-decoration` (the shadow shown when scrolled) to the editor's
- * top edge and absolutely positions the line numbers at the gutter's left edge, so container
- * padding can't move either — it would just push the whole editor (shadow included) inward.
- * Instead use Monaco's own options:
- * - `padding` insets the content top/bottom while leaving the shadow pinned to the top, so
- *   `.graphiql-query-editor` can stay full-bleed (`p-0`) for a flush shadow.
- * - `glyphMargin` reserves an empty column to the left of the line numbers (same gutter
- *   background), giving them left breathing room.
- *
- * GraphiQL shares the global Monaco instance with the rest of Studio (the SQL editor etc.),
- * so we must scope `updateOptions` to editors that live inside the GraphiQL container —
- * `monaco.editor.getEditors()`/`onDidCreateEditor()` see every editor in the app, and
- * applying these options globally would shift the SQL editor's layout too. Filtering by
- * container also means there's nothing to revert on unmount: we never touch other editors.
+ * GraphiQL (@graphiql/react) bundles its own Monaco instance, separate from the AMD-loaded one
+ * the rest of Studio uses — they only share the global `.monaco-*` CSS class names, not JS state.
+ * So theme/options applied here via @graphiql/react's `useMonaco` touch GraphiQL's editors only
+ * and never leak onto Studio's editors
  */
-const GraphiQLEditorOptions = ({
-  containerRef,
-}: {
-  containerRef: RefObject<HTMLDivElement | null>
-}) => {
+const GraphiQLEditorSettings = ({ theme }: { theme: 'dark' | 'light' }) => {
   const { monaco } = useMonaco()
 
   useEffect(() => {
     if (!monaco) return
-    const options = { padding: { top: 16, bottom: 16 }, glyphMargin: true }
-    const applyToGraphiQLEditor = (editor: ReturnType<typeof monaco.editor.getEditors>[number]) => {
-      if (containerRef.current?.contains(editor.getContainerDomNode())) {
-        editor.updateOptions(options)
-      }
-    }
+    monaco.editor.defineTheme('supabase', getTheme(theme))
+    monaco.editor.setTheme('supabase')
+  }, [monaco, theme])
 
-    monaco.editor.getEditors().forEach(applyToGraphiQLEditor)
-    const disposable = monaco.editor.onDidCreateEditor(applyToGraphiQLEditor)
+  useEffect(() => {
+    if (!monaco) return
+    const options = {
+      ...BASE_MONACO_EDITOR_OPTIONS,
+      padding: { top: 16, bottom: 16 },
+      glyphMargin: true,
+    }
+    const applyToEditor = (editor: ReturnType<typeof monaco.editor.getEditors>[number]) =>
+      editor.updateOptions(options)
+
+    monaco.editor.getEditors().forEach(applyToEditor)
+    const disposable = monaco.editor.onDidCreateEditor(applyToEditor)
 
     return () => disposable.dispose()
-  }, [monaco, containerRef])
+  }, [monaco])
 
   return null
 }
 
 export const GraphiQLTab = () => {
-  const editorContainerRef = useRef<HTMLDivElement>(null)
-  const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
+
+  const { resolvedTheme } = useTheme()
   const currentTheme = resolvedTheme?.includes('dark') ? 'dark' : 'light'
+
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
   const { data: project } = useSelectedProjectQuery()
 
@@ -182,8 +155,7 @@ export const GraphiQLTab = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <GraphiQLMonacoTheme resolvedTheme={currentTheme} />
-      <GraphiQLEditorOptions containerRef={editorContainerRef} />
+      <GraphiQLEditorSettings theme={currentTheme} />
       {notice === 'opt-in' && (
         <IntrospectionDisabledNotice
           schema={DEFAULT_INTROSPECTION_SCHEMA}
@@ -198,12 +170,12 @@ export const GraphiQLTab = () => {
           onDisabled={handleIntrospectionChanged}
         />
       )}
-      <div ref={editorContainerRef} className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0">
         <GraphiQL
           key={graphiqlKey}
           fetcher={fetcher}
           forcedTheme={currentTheme}
-          editorTheme={SUPABASE_THEME}
+          editorTheme={{ dark: 'supabase', light: 'supabase' }}
           className={styles.root}
           plugins={plugins}
         />
