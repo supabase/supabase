@@ -22,8 +22,8 @@ export const LogsExplorerOtelBanner = ({
     <Admonition
       type="warning"
       className="mb-0 rounded-none border-x-0 border-t-0"
-      title="This looks like a BigQuery query"
-      description="Logs now run on a ClickHouse-backed engine, which uses a different SQL dialect than BigQuery. Rewrite this query to ClickHouse to run it."
+      title="Logs now run on a ClickHouse-backed engine"
+      description="You can use AI to rewrite this query to ClickHouse SQL."
       actions={
         <div className="flex items-center gap-2">
           <Button variant="default" size="tiny" loading={isRewriting} onClick={onRewrite}>

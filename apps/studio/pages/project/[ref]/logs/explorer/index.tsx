@@ -129,7 +129,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     modified: string
   } | null>(null)
   const [isRewriting, setIsRewriting] = useState<boolean>(false)
-  const [rewriteBannerDismissed, setRewriteBannerDismissed] = useState<boolean>(false)
+  // Persisted so a dismissed banner stays hidden across sessions; the Fix Query
+  // button in the header remains the way to trigger a rewrite afterwards.
+  const [rewriteBannerDismissed, setRewriteBannerDismissed] = useLocalStorage<boolean>(
+    `project-${projectRef}-logs-rewrite-banner-dismissed`,
+    false
+  )
 
   const [recentLogs, setRecentLogs] = useLocalStorage<LogSqlSnippets.Content[]>(
     `project-content-${projectRef}-recent-log-sql`,
