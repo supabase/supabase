@@ -18,6 +18,7 @@ import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.con
 import SavedQueriesItem from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from '@/components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
 import { UnifiedLogsBanner } from '@/components/interfaces/UnifiedLogs/UnifiedLogsBanner'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useContentQuery } from '@/data/content/content-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
@@ -227,12 +228,15 @@ export function LogsSidebarMenuV2() {
           />
         </InnerSideBarFilters>
 
-        <Button
+        <ButtonTooltip
+          asChild
           variant="default"
           icon={<Plus className="text-foreground" />}
           className="w-[26px]"
-          onClick={() => router.push(`/project/${ref}/logs/explorer`)}
-        />
+          tooltip={{ content: { text: 'New query', side: 'bottom' } }}
+        >
+          <Link href={`/project/${ref}/logs/explorer`} />
+        </ButtonTooltip>
       </div>
       {templatesEnabled && (
         <div className="px-2">
