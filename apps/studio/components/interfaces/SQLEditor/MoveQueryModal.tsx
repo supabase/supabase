@@ -37,6 +37,7 @@ import {
 } from 'ui'
 import * as z from 'zod'
 
+import { getSelfHostedSnippetStoreSyncPlan } from './self-hosted-snippet-store.utils'
 import { getContentById } from '@/data/content/content-id-query'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { useSQLSnippetFolderCreateMutation } from '@/data/content/sql-folder-create-mutation'
@@ -60,7 +61,7 @@ interface MoveQueryModalProps {
  */
 
 export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryModalProps) => {
-  const { ref } = useParams()
+  const { ref, id: activeSnippetId } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
   const router = useRouter()
@@ -125,11 +126,14 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
       let folderId = selectedId
 
       if (selectedId === 'new-folder' && 'name' in values) {
-        const { id } = await createFolder({
+        const createdFolder = await createFolder({
           projectRef: ref,
           name: values.name,
         })
-        folderId = id
+        folderId = createdFolder.id
+        if (!IS_PLATFORM) {
+          snapV2.addFolder({ projectRef: ref, folder: createdFolder })
+        }
       }
 
       await Promise.all(
@@ -166,19 +170,32 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                 skipSave: true,
               })
             } else if (movedSnippet) {
-              // On selfhosted, we need to update the state with the moved snippet because the snippet depends on the
-              // folder_id the moved snippet has a different id than the original snippet.
+              const targetFolderId = selectedId === 'root' ? null : folderId
+              const syncPlan = getSelfHostedSnippetStoreSyncPlan({
+                previousId: snippet.id,
+                nextSnippetId: movedSnippet.id,
+                isViewingSnippet: activeSnippetId === snippet.id,
+                hasOldTab: tabsSnap.hasTab(createTabId('sql', { id: snippet.id })),
+              })
 
-              // remove the old snippet from the state without saving to API
-              snapV2.removeSnippet(snippet.id, true)
+              if (syncPlan.action === 'replace') {
+                snapV2.addSnippet({ projectRef: ref, snippet: movedSnippet })
 
-              snapV2.addSnippet({ projectRef: ref, snippet: movedSnippet })
+                if (syncPlan.shouldNavigate) {
+                  await router.replace(`/project/${ref}/sql/${syncPlan.nextSnippetId}`)
+                }
 
-              // remove the tab for the old snippet if the snippet was open. Moving can also happen when the tab is not open.
-              const tabId = createTabId('sql', { id: snippet.id })
-              if (tabsSnap.hasTab(tabId)) {
-                tabsSnap.removeTab(tabId)
-                await router.push(`/project/${ref}/sql/${movedSnippet.id}`)
+                if (syncPlan.shouldRemoveOldTab) {
+                  tabsSnap.removeTab(createTabId('sql', { id: syncPlan.previousId }))
+                }
+
+                snapV2.removeSnippet(syncPlan.previousId, true)
+              } else {
+                snapV2.updateSnippet({
+                  id: snippet.id,
+                  snippet: { ...movedSnippet, folder_id: targetFolderId },
+                  skipSave: true,
+                })
               }
             }
           }

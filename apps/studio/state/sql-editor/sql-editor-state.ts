@@ -4,7 +4,11 @@ import { toast } from 'sonner'
 import { proxy, ref, snapshot, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
 
-import { folderStatusOnSaveStart, isNewFolder } from './sql-editor-lifecycle'
+import {
+  folderStatusOnSaveStart,
+  hasUsableSnippetContent,
+  isNewFolder,
+} from './sql-editor-lifecycle'
 import type { StateSnippet, StateSnippetFolder } from './types'
 import type { QueryPlanRow } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
 import { DiffType } from '@/components/interfaces/SQLEditor/SQLEditor.types'
@@ -126,7 +130,7 @@ export const sqlEditorState = proxy({
   setSnippet: (projectRef: string, snippet: SnippetWithContent) => {
     let storedSnippet = sqlEditorState.snippets[snippet.id]
     if (storedSnippet) {
-      if (!storedSnippet.snippet.content) {
+      if (!hasUsableSnippetContent(storedSnippet.snippet.content)) {
         storedSnippet.snippet.content = snippet.content
       }
     } else {

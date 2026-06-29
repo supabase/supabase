@@ -23,6 +23,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import { getSelfHostedSnippetStoreSyncPlan } from './self-hosted-snippet-store.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
@@ -56,7 +57,7 @@ export const RenameQueryModal = ({
   onCancel,
   onComplete,
 }: RenameQueryModalProps) => {
-  const { ref } = useParams()
+  const { ref, id: activeSnippetId } = useParams()
   const router = useRouter()
 
   const snapV2 = useSqlEditorV2StateSnapshot()
@@ -129,19 +130,28 @@ export const RenameQueryModal = ({
         const tabId = createTabId('sql', { id })
         tabsSnap.updateTab(tabId, { label: name })
       } else if (changedSnippet) {
-        // In self-hosted, the snippet also updates the id when renaming it. This code is to ensure the previous snippet
-        // is removed, new one is added, tab state is updated and the router is updated.
+        const syncPlan = getSelfHostedSnippetStoreSyncPlan({
+          previousId: id,
+          nextSnippetId: changedSnippet.id,
+          isViewingSnippet: activeSnippetId === id,
+          hasOldTab: tabsSnap.hasTab(createTabId('sql', { id })),
+        })
 
-        // remove the old snippet from the state without saving to API
-        snapV2.removeSnippet(id, true)
+        if (syncPlan.action === 'replace') {
+          snapV2.addSnippet({ projectRef: ref, snippet: changedSnippet })
 
-        snapV2.addSnippet({ projectRef: ref, snippet: changedSnippet })
+          if (syncPlan.shouldNavigate) {
+            await router.replace(`/project/${ref}/sql/${syncPlan.nextSnippetId}`)
+          }
 
-        // remove the tab for the old snippet if the snippet was open. Renaming can also happen when the tab is not open.
-        const tabId = createTabId('sql', { id })
-        if (tabsSnap.hasTab(tabId)) {
-          tabsSnap.removeTab(tabId)
-          await router.push(`/project/${ref}/sql/${changedSnippet.id}`)
+          if (syncPlan.shouldRemoveOldTab) {
+            tabsSnap.removeTab(createTabId('sql', { id: syncPlan.previousId }))
+          }
+
+          snapV2.removeSnippet(syncPlan.previousId, true)
+        } else {
+          snapV2.renameSnippet({ id, name, description })
+          tabsSnap.updateTab(createTabId('sql', { id: syncPlan.snippetId }), { label: name })
         }
       }
 
