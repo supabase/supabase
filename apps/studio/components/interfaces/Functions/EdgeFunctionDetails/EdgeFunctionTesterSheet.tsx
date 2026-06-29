@@ -396,7 +396,7 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
               </ResizablePanel>
               <ResizableHandle withHandle />
               <ResizablePanel defaultSize="41" minSize="41" maxSize="83">
-                <div className="h-full bg-surface-100 border-t flex-1 flex flex-col overflow-hidden">
+                <div className="h-full bg-surface-100 flex-1 flex flex-col overflow-hidden">
                   {response ? (
                     <div className="h-full bg-surface-100 flex flex-col overflow-hidden">
                       {error ? (
