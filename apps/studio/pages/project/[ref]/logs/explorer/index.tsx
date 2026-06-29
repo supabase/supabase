@@ -38,7 +38,7 @@ import {
   UpsertContentPayload,
   useContentUpsertMutation,
 } from '@/data/content/content-upsert-mutation'
-import useLogsQuery from '@/hooks/analytics/useLogsQuery'
+import { useLogsQuery } from '@/hooks/analytics/useLogsQuery'
 import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
