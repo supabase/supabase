@@ -21,6 +21,7 @@ import {
   createColumn,
   createTable,
   duplicateTable,
+  getForeignKeyUpdatePayload,
   getRowFromSidePanel,
   insertRowsViaSpreadsheet,
   insertTableRows,
@@ -345,18 +346,26 @@ export const SidePanelEditor = ({
     const selectedForeignKeyToEdit = snap.sidePanel.foreignKey
 
     try {
-      const { row } = selectedForeignKeyToEdit
+      const { row, column } = selectedForeignKeyToEdit
       const identifiers = {} as Dictionary<any>
-      selectedTable.primary_keys.forEach((column) => {
-        const col = selectedTable.columns?.find((x) => x.name === column.name)
-        identifiers[column.name] =
-          col?.format === 'bytea' ? convertByteaToHex(row![column.name]) : row![column.name]
+      selectedTable.primary_keys.forEach((primaryKey) => {
+        const col = selectedTable.columns?.find((x) => x.name === primaryKey.name)
+        identifiers[primaryKey.name] =
+          col?.format === 'bytea' ? convertByteaToHex(row![primaryKey.name]) : row![primaryKey.name]
       })
 
       const isNewRecord = false
       const configuration = { identifiers, rowIdx: row.idx }
 
-      await saveRow(value, isNewRecord, configuration, (error) => {
+      // Only persist the column the user actually edited. For composite foreign keys the selector
+      // returns a value for every column in the relation, and saving all of them would silently
+      // rewrite the sibling columns instead of letting the database validate the composite FK.
+      const payload = getForeignKeyUpdatePayload({ value, columnName: column?.name })
+      if (payload === undefined) {
+        return toast.error('Failed to save row: could not determine the edited foreign key column')
+      }
+
+      await saveRow(payload, isNewRecord, configuration, (error) => {
         if (error) {
           toast.error(`Failed to save row: ${error?.message ?? 'Unknown error'}`)
         }
