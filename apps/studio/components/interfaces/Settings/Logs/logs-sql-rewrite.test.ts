@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
   buildClickhouseRewritePrompt,
+  detectLogSource,
   rewriteLogsSqlWithAI,
   stripSqlCodeFences,
 } from './logs-sql-rewrite'
@@ -25,6 +26,43 @@ describe('buildClickhouseRewritePrompt', () => {
     expect(prompt).toContain('BigQuery:')
     expect(prompt).toContain('ClickHouse:')
     expect(prompt).toContain("log_attributes['parsed.error_severity']")
+  })
+
+  it('lists the real log_attributes keys when provided and demands exact paths', () => {
+    const prompt = buildClickhouseRewritePrompt('select 1 from edge_logs', [
+      'request.headers.x_real_ip',
+      'request.cf.country',
+    ])
+    expect(prompt).toContain("log_attributes['request.headers.x_real_ip']")
+    expect(prompt).toContain("log_attributes['request.cf.country']")
+    expect(prompt.toLowerCase()).toContain('exact')
+  })
+
+  it('omits the keys section when none are provided', () => {
+    const prompt = buildClickhouseRewritePrompt('select 1 from edge_logs')
+    expect(prompt).not.toContain('actual log_attributes keys present')
+  })
+})
+
+describe('detectLogSource', () => {
+  it('reads an explicit source filter', () => {
+    expect(detectLogSource("select 1 from logs where source = 'edge_logs'")).toBe('edge_logs')
+  })
+
+  it('falls back to the legacy FROM table name', () => {
+    expect(detectLogSource('select 1 from edge_logs as t')).toBe('edge_logs')
+  })
+
+  it('maps pg_cron_logs to postgres_logs', () => {
+    expect(detectLogSource('select 1 from pg_cron_logs')).toBe('postgres_logs')
+  })
+
+  it('returns undefined for the bare logs table with no source', () => {
+    expect(detectLogSource('select 1 from logs limit 5')).toBeUndefined()
+  })
+
+  it('returns undefined when nothing matches', () => {
+    expect(detectLogSource('select 1')).toBeUndefined()
   })
 })
 

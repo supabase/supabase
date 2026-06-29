@@ -28,18 +28,33 @@ Sources and their common log_attributes keys:
 Rules: always filter by source; the editor applies the selected time range so a timestamp filter is usually unnecessary; the old BigQuery unnest joins become log_attributes['key'] lookups (drop the metadata root).`
 
 /**
+ * Renders the real log_attributes keys discovered for the query's source so the
+ * model maps to actual paths. Without this the model guesses and drops dotted
+ * prefixes (e.g. request.headers.x_real_ip -> headers.x_real_ip, request.cf.country
+ * -> cf.country). Empty when no keys were discovered.
+ */
+function renderAvailableKeys(availableKeys?: string[]): string {
+  if (!availableKeys || availableKeys.length === 0) return ''
+  const list = availableKeys.map((key) => `- log_attributes['${key}']`).join('\n')
+  return `\nThe actual log_attributes keys present for this source are listed below. Use these EXACT keys — do not invent, shorten, or drop any dotted prefix. If a BigQuery field maps to one of these (e.g. request.headers.x_real_ip, request.cf.country), use the full key shown here:
+${list}\n`
+}
+
+/**
  * Prompt for the AI completion endpoint. Includes the schema and the query to
  * rewrite, and instructs the model to return only the SQL so the result can go
- * straight into the editor diff.
+ * straight into the editor diff. When `availableKeys` is provided (the real
+ * log_attributes keys discovered for the query's source), the model is told to
+ * map to those exact keys.
  */
-export function buildClickhouseRewritePrompt(sql: string): string {
+export function buildClickhouseRewritePrompt(sql: string, availableKeys?: string[]): string {
   return `${LOGS_SCHEMA_REFERENCE}
-
+${renderAvailableKeys(availableKeys)}
 Convert the BigQuery logs query below to ClickHouse SQL for the logs table. There are no per-service tables and no unnest joins in ClickHouse. Follow these rules exactly:
 
 1. Replace the FROM table with the single logs table and filter by source. The old table name is the source value: "from postgres_logs as t" becomes "from logs where source = 'postgres_logs'". This is required, never select from a table like postgres_logs or edge_logs.
 2. Remove every join that unnests metadata or its structs. This includes "cross join unnest(...)" and "left join unnest(...) on true".
-3. Replace any column that came from an unnest alias with a log_attributes lookup. A field off unnest(metadata) becomes log_attributes['field']; a field off a nested struct like unnest(m.parsed) becomes log_attributes['parsed.field'] (keep the struct name as a dotted prefix, drop the metadata root and every alias).
+3. Replace any column that came from an unnest alias with a log_attributes lookup. A field off unnest(metadata) becomes log_attributes['field']; a field off a nested struct like unnest(m.parsed) becomes log_attributes['parsed.field'] (keep the struct name as a dotted prefix, drop the metadata root and every alias). When the actual keys are listed above, match against them and use the full dotted key exactly.
 4. Wrap numeric fields in toInt32OrZero(...) before comparing or aggregating them.
 5. Replace BigQuery functions with ClickHouse equivalents: regexp_contains(x, 'p') becomes match(x, 'p'), or x ILIKE '%p%' for a plain substring. Replace cast(timestamp as datetime) with timestamp. Use count() instead of count(*).
 6. Preserve the original select list, filters, group by, order by, and limit intent.
@@ -77,12 +92,37 @@ export function stripSqlCodeFences(text: string): string {
   return (fenced ? fenced[1] : trimmed).trim()
 }
 
+// The old per-service table name doubles as the OTEL `source` value, except for
+// pg_cron logs which live under postgres_logs.
+const SOURCE_ALIASES: Record<string, string> = {
+  pg_cron_logs: 'postgres_logs',
+}
+
+/**
+ * Best-effort extraction of the source to fetch real keys for. Handles both a
+ * legacy BigQuery query (`from edge_logs`) and an already-rewritten ClickHouse
+ * query (`source = 'edge_logs'`). Returns undefined when nothing matches.
+ */
+export function detectLogSource(sql: string): string | undefined {
+  const bySource = sql.match(/source\s*=\s*'([^']+)'/i)
+  if (bySource) return bySource[1]
+  const byFrom = sql.match(/\bfrom\s+([a-z_][a-z0-9_]*)/i)
+  if (byFrom) {
+    const table = byFrom[1].toLowerCase()
+    if (table === 'logs') return undefined
+    return SOURCE_ALIASES[table] ?? table
+  }
+  return undefined
+}
+
 export interface RewriteLogsSqlArgs {
   sql: string
   projectRef?: string
   connectionString?: string | null
   orgSlug?: string
   authorizationHeader?: string | null
+  /** Real log_attributes keys for the query's source, fed to the model so it maps to exact paths. */
+  availableKeys?: string[]
 }
 
 /**
@@ -90,7 +130,7 @@ export interface RewriteLogsSqlArgs {
  * ClickHouse query. Throws on a failed request or an empty result.
  */
 export async function rewriteLogsSqlWithAI(args: RewriteLogsSqlArgs) {
-  const { sql, projectRef, connectionString, orgSlug, authorizationHeader } = args
+  const { sql, projectRef, connectionString, orgSlug, authorizationHeader, availableKeys } = args
 
   const response = await fetch(`${BASE_PATH}/api/ai/code/complete`, {
     method: 'POST',
@@ -108,7 +148,7 @@ export async function rewriteLogsSqlWithAI(args: RewriteLogsSqlArgs) {
         textBeforeCursor: '',
         textAfterCursor: '',
         language: 'pgsql',
-        prompt: buildClickhouseRewritePrompt(sql),
+        prompt: buildClickhouseRewritePrompt(sql, availableKeys),
         selection: sql,
       },
     }),

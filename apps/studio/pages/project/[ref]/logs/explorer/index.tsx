@@ -8,7 +8,10 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 
-import { rewriteLogsSqlWithAI } from '@/components/interfaces/Settings/Logs/logs-sql-rewrite'
+import {
+  detectLogSource,
+  rewriteLogsSqlWithAI,
+} from '@/components/interfaces/Settings/Logs/logs-sql-rewrite'
 import {
   EXPLORER_DATEPICKER_HELPERS,
   getDefaultHelper,
@@ -42,6 +45,7 @@ import {
   useContentUpsertMutation,
 } from '@/data/content/content-upsert-mutation'
 import { constructHeaders } from '@/data/fetchers'
+import { fetchOtelLogKeys } from '@/data/logs/otel-log-keys-query'
 import useLogsQuery from '@/hooks/analytics/useLogsQuery'
 import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
@@ -230,12 +234,19 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     setIsRewriting(true)
     try {
       const headerData = await constructHeaders()
+      // Feed the model the real log_attributes keys for the query's source so it
+      // maps to exact paths (e.g. request.headers.x_real_ip) instead of guessing.
+      const source = detectLogSource(currentSql)
+      const availableKeys = source
+        ? await fetchOtelLogKeys({ projectRef, source }).catch(() => undefined)
+        : undefined
       const rewritten = await rewriteLogsSqlWithAI({
         sql: currentSql,
         projectRef,
         connectionString: project?.connectionString,
         orgSlug: organization?.slug,
         authorizationHeader: headerData.get('Authorization'),
+        availableKeys,
       })
       setRewriteProposal({ original: currentSql, modified: rewritten })
     } catch (error) {
