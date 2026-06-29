@@ -2920,7 +2920,14 @@ export interface DashboardErrorCreatedEvent {
      */
     errorCategory?: 'validation' | 'api' | 'network' | 'payment' | 'unknown'
     /**
-     * Controlled-vocabulary slug describing the reason (no free text, no PII)
+     * Controlled-vocabulary slug describing the reason (no free text, no PII).
+     *
+     * Typed `string` rather than a literal union on purpose: the source-of-truth
+     * union `FunnelErrorReason` lives in `apps/studio/lib/telemetry/funnel-errors.ts`,
+     * and this `common` package cannot import from an app. The constraint is enforced
+     * at the only emit site instead: `useTrackFunnelError` accepts a classified
+     * `FunnelErrorReason`, so free text never reaches this field. Do not widen usage by
+     * setting `errorReason` from a raw error message.
      */
     errorReason?: string
     /**
