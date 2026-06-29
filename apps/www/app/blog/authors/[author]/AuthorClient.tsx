@@ -42,7 +42,8 @@ export default function AuthorClient({ author, authorId, blogs, initialView }: A
     return blogs.filter(
       (blog) =>
         (blog.title ?? '').toLowerCase().includes(term) ||
-        (blog.description ?? '').toLowerCase().includes(term)
+        (blog.description ?? '').toLowerCase().includes(term) ||
+        (blog.author ?? '').toLowerCase().includes(term)
     )
   }, [blogs, searchTerm])
 

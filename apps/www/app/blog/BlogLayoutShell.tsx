@@ -1,12 +1,10 @@
 'use client'
 
-import Footer from '~/components/Footer'
-import Nav from '~/components/Nav'
-import { useForceDeepDark } from 'lib/theme.utils'
 import { usePathname } from 'next/navigation'
 import type PostTypes from 'types/post'
 
 import BlogHero from './BlogHero'
+import DefaultLayout from '@/components/Layouts/Default'
 
 export default function BlogLayoutShell({
   featuredPost,
@@ -17,20 +15,14 @@ export default function BlogLayoutShell({
   secondaryPosts: PostTypes[]
   children: React.ReactNode
 }) {
-  useForceDeepDark()
-
   const pathname = usePathname()
   const isListingRoute = pathname === '/blog' || Boolean(pathname?.startsWith('/blog/categories/'))
 
   return (
-    <>
-      <Nav hideNavbar={false} />
-      <div className="relative w-full [--container-max-w:75rem]">
-        {isListingRoute && <h1 className="sr-only">Supabase Blog</h1>}
-        <BlogHero featuredPost={featuredPost} secondaryPosts={secondaryPosts} />
-        <main className="relative min-h-screen">{children}</main>
-      </div>
-      <Footer />
-    </>
+    <DefaultLayout>
+      {isListingRoute && <h1 className="sr-only">Supabase Blog</h1>}
+      <BlogHero featuredPost={featuredPost} secondaryPosts={secondaryPosts} />
+      {children}
+    </DefaultLayout>
   )
 }

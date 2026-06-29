@@ -47,7 +47,7 @@ export function BlogTableOfContents({ items }: Props) {
   return (
     <AnchorProvider toc={items} single>
       <SuppressUntilFirstAnchor items={items}>
-        <p className="text-foreground-light font-mono uppercase tracking-wide text-xs mb-4">
+        <p className="text-foreground font-mono uppercase tracking-wide text-xs mb-4">
           On this page
         </p>
         <Toc className="border-l">

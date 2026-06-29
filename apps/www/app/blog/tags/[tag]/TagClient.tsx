@@ -10,10 +10,10 @@ import SectionContainerWithCn from '@/components/Layouts/SectionContainerWithCn'
 interface Props {
   posts: PostTypes[]
   initialView: BlogView
-  category: string
+  tag: string
 }
 
-export default function CategoryClient({ posts, initialView, category }: Props) {
+export default function TagClient({ posts, initialView, tag }: Props) {
   return (
     <>
       <SectionContainerWithCn height="narrow" className="space-y-6">
@@ -21,9 +21,9 @@ export default function CategoryClient({ posts, initialView, category }: Props) 
           <h1>
             <Link href="/blog">Blog</Link>
             <span className="px-2">/</span>
-            <span>Categories</span>
+            <span>Tags</span>
             <span className="px-2">/</span>
-            <span className="text-foreground">{category}</span>
+            <span className="text-foreground">{tag}</span>
           </h1>
         </div>
       </SectionContainerWithCn>

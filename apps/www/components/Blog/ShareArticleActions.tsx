@@ -4,7 +4,7 @@ import { cn, IconLinkedinSolid, IconTwitterX, IconYCombinator } from 'ui'
 const ShareArticleActions = ({
   title,
   slug,
-  iconSize = 20,
+  iconSize = 16,
   basePath = 'https://supabase.com/blog/',
   className,
 }: {

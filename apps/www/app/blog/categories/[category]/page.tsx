@@ -48,7 +48,16 @@ export default async function CategoriesPage({
   })
   const blogs = [...staticPosts] as PostTypes[]
 
+  const capitalizedCategory = capitalize(params.category.replaceAll('-', ' '))
+
   // Key by category so state (search term, view) resets when switching between
   // category pages rather than persisting across the reused page component.
-  return <CategoryClient key={params.category} posts={blogs} initialView={initialView} />
+  return (
+    <CategoryClient
+      key={params.category}
+      posts={blogs}
+      initialView={initialView}
+      category={capitalizedCategory}
+    />
+  )
 }
