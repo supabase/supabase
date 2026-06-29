@@ -100,20 +100,20 @@ export default function BreadcrumbResponsiveDemo() {
           </>
         ) : null}
         {items.slice(-ITEMS_TO_DISPLAY + 1).map((item, index) => (
-          <BreadcrumbItem key={index}>
-            {item.href ? (
-              <>
+          <React.Fragment key={index}>
+            {index > 0 ? <BreadcrumbSeparator /> : null}
+            <BreadcrumbItem>
+              {item.href ? (
                 <BreadcrumbLink asChild className="max-w-20 truncate md:max-w-none">
                   <Link href={item.href}>{item.label}</Link>
                 </BreadcrumbLink>
-                <BreadcrumbSeparator />
-              </>
-            ) : (
-              <BreadcrumbPage className="max-w-20 truncate md:max-w-none">
-                {item.label}
-              </BreadcrumbPage>
-            )}
-          </BreadcrumbItem>
+              ) : (
+                <BreadcrumbPage className="max-w-20 truncate md:max-w-none">
+                  {item.label}
+                </BreadcrumbPage>
+              )}
+            </BreadcrumbItem>
+          </React.Fragment>
         ))}
       </BreadcrumbList>
     </Breadcrumb>
