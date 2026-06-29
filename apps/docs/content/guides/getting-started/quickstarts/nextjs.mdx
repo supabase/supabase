@@ -1,6 +1,6 @@
 ---
 title: 'Use Supabase with Next.js'
-subtitle: 'Learn how to create a Supabase project, add some sample data, and query from a Next.js app.'
+subtitle: 'Learn how to create a Supabase project, connect a Next.js app, and query your database.'
 breadcrumb: 'Framework Quickstarts'
 hideToc: true
 ---
@@ -27,7 +27,9 @@ hideToc: true
 
     <$Partial path="uiLibCta.mdx" />
 
-</StepHikeCompact.Details>
+    Run the following command to create a Next.js app:
+
+    </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
@@ -42,11 +44,12 @@ hideToc: true
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Declare Supabase Environment Variables">
 
-    Rename `.env.example` to `.env.local`. Set your Supabase connection variables in the file:
+    Rename `.env.example` to `.env.local`.
 
     <ProjectConfigVariables variable="url" />
     <ProjectConfigVariables variable="publishable" />
 
+    Add the following variables to `.env.local`:
 
     </StepHikeCompact.Details>
 
@@ -70,7 +73,14 @@ hideToc: true
   <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Query Supabase data from Next.js">
 
-    Create `app/instruments/page.tsx` as an example. The page queries the `instruments` table from step 1 and renders the results.
+    Create a page at `app/<your-page-path>/page.tsx`. The page queries your table and renders the results.
+
+    Replace the following:
+
+    - `<your-page-path>`: the route for your page
+    - `<your-table>`: the table name from step 1
+
+    The following code queries your table and renders the results:
 
     </StepHikeCompact.Details>
 
@@ -78,31 +88,33 @@ hideToc: true
 
     <$CodeTabs>
 
-      ```ts name=app/instruments/page.tsx
+      ```ts name=app/<your-page-path>/page.tsx
       import { createClient } from "@/lib/supabase/server";
       import { Suspense } from "react";
 
-      async function InstrumentsData() {
+      async function TableData() {
         const supabase = await createClient();
-        const { data: instruments, error } = await supabase.from("instruments").select();
+        const { data, error } = await supabase
+          .from("<your-table>")
+          .select();
 
         if (error) {
           return (
             <p>
-              Error loading instruments: {error.message}. Verify that the table exists. Verify that
-              the table name matches your query. Verify that Row Level Security policies allow
-              access for your role.
+              Error loading data: {error.message}. Verify that the table
+              exists. Verify that the table name matches your query. Verify
+              that Row Level Security policies allow access for your role.
             </p>
           );
         }
 
-        return <pre>{JSON.stringify(instruments, null, 2)}</pre>;
+        return <pre>{JSON.stringify(data, null, 2)}</pre>;
       }
 
-      export default function Instruments() {
+      export default function Page() {
         return (
-          <Suspense fallback={<div>Loading instruments...</div>}>
-            <InstrumentsData />
+          <Suspense fallback={<div>Loading...</div>}>
+            <TableData />
           </Suspense>
         );
       }
@@ -117,7 +129,7 @@ hideToc: true
   <StepHikeCompact.Step step={5}>
     <StepHikeCompact.Details title="Start the app">
 
-    Run the development server. Open http://localhost:3000/instruments in a browser. The page shows the list of instruments.
+    Run the following command to start the development server:
 
     </StepHikeCompact.Details>
 
@@ -128,6 +140,12 @@ hideToc: true
       ```
 
     </StepHikeCompact.Code>
+
+    <StepHikeCompact.Details>
+
+    Open http://localhost:3000/<your-page-path> in a browser. The page shows your query results.
+
+    </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
 

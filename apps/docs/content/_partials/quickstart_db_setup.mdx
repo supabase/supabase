@@ -9,7 +9,8 @@ Alternatively, you can create a project using the Management API:
 <StepHikeCompact.Code>
 
 ```bash
-# First, get your access token from https://supabase.com/dashboard/account/tokens
+# First, get your access token from
+# https://supabase.com/dashboard/account/tokens
 export SUPABASE_ACCESS_TOKEN="your-access-token"
 
 # List your organizations to get the organization ID
@@ -32,11 +33,11 @@ curl -X POST https://api.supabase.com/v1/projects \
 
 <StepHikeCompact.Details>
 
-When your Supabase project is up and running, create an example `instruments` table. You can use the Table Editor or the SQL Editor.
+When your Supabase project is up and running, create a table for your data. You can use the Table Editor or the SQL Editor.
 
-**Table Editor:** Open the [**Table Editor**](/dashboard/project/_/editor). Create a table named `instruments` and insert sample rows. Open [**Integrations > Data API**](/dashboard/project/_/integrations/data_api/settings) and expose the table. To expose future tables in `public` automatically, enable **Default privileges for new entities**.
+**Table Editor:** Open the [**Table Editor**](/dashboard/project/_/editor). Create a table and add columns. Open [**Integrations > Data API**](/dashboard/project/_/integrations/data_api/settings) and expose the table. To expose future tables in `public` automatically, enable **Default privileges for new entities**.
 
-**SQL Editor:** Run the snippet below in your project's [SQL Editor](/dashboard/project/_/sql/new). The snippet creates the example `instruments` table with sample data.
+**SQL Editor:** Run the SQL snippets in your project's [SQL Editor](/dashboard/project/_/sql/new).
 
 <Admonition type="note">
 
@@ -44,48 +45,80 @@ Use snake_case for table names. For example, use `friction_log` instead of `Fric
 
 </Admonition>
 
-Run the snippets below regardless of the method you use. The snippets grant read access, enable [Row Level Security](/docs/guides/database/postgres/row-level-security), and add a policy. The Data API does not return rows until a Row Level Security policy allows access. This step applies even if you create the table in the Table Editor.
+Run the SQL snippets regardless of the method you use. The snippets grant read access, enable [Row Level Security](/docs/guides/database/postgres/row-level-security), and add a policy. The Data API does not return rows until a Row Level Security policy allows access. This step applies even if you create the table in the Table Editor.
 
-If you use a different table name, replace `instruments` in the snippets below.
+Replace the following:
+
+- `<your-table>`: your table name in snake_case
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Details>
+
+Run the following SQL to create your table:
 
 </StepHikeCompact.Details>
 
 <StepHikeCompact.Code>
 
     ```sql SQL_EDITOR
-    -- Create the example table. Skip this section if you already created the table in the Table Editor.
-    create table instruments (
+    -- Omit the following statement if you already created the table in the
+    -- Table Editor.
+    create table <your-table> (
       id bigint primary key generated always as identity,
       name text not null
     );
-
-    -- Insert sample data into the table
-    insert into instruments (name)
-    values
-      ('violin'),
-      ('viola'),
-      ('cello');
-
-    -- Grant read access to API roles
-    grant select on public.instruments to anon, authenticated;
-
-    -- Enable row level security for the table
-    alter table instruments enable row level security;
     ```
 
 </StepHikeCompact.Code>
 
 <StepHikeCompact.Details>
 
-Create a Row Level Security policy that allows reads from the `instruments` table. The policy applies to anonymous users and users who sign in. This matters if your app uses the pre-configured auth from the `with-supabase` template.
+This example insert uses a table named `instruments`. Replace `<your-table>` with `instruments` in the other snippets if you use this example. Skip this section if you already have data in your table or you use a different table name.
+
+Run the following example SQL:
 
 </StepHikeCompact.Details>
 
 <StepHikeCompact.Code>
 
     ```sql SQL_EDITOR
-    create policy "public can read instruments"
-    on public.instruments
+    -- Example only.
+    insert into instruments (name)
+    values
+      ('violin'),
+      ('viola'),
+      ('cello');
+    ```
+
+</StepHikeCompact.Code>
+
+<StepHikeCompact.Details>
+
+Run the following SQL to grant read access and enable Row Level Security:
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+    ```sql SQL_EDITOR
+    grant select on public.<your-table> to anon, authenticated;
+    alter table <your-table> enable row level security;
+    ```
+
+</StepHikeCompact.Code>
+
+<StepHikeCompact.Details>
+
+Run the following SQL to create a Row Level Security policy. The policy applies to anonymous users and users who sign in.
+
+</StepHikeCompact.Details>
+
+<StepHikeCompact.Code>
+
+    ```sql SQL_EDITOR
+    create policy "Allow public read access"
+    on public.<your-table>
     for select
     using (true);
     ```
