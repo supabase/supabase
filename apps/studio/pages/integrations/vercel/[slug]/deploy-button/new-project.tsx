@@ -120,14 +120,10 @@ const CreateProject = () => {
   const hasTrackedFormExposed = useRef(false)
   useEffect(() => {
     if (hasTrackedFormExposed.current) return
-    if (!organization) return
+    if (!slug) return
     hasTrackedFormExposed.current = true
-    track(
-      'project_creation_form_exposed',
-      { surface: 'vercel' },
-      { organization: organization.slug }
-    )
-  }, [organization, track])
+    track('project_creation_form_exposed', { surface: 'vercel' }, { organization: slug })
+  }, [slug, track])
 
   /**
    * array of integrations installed
