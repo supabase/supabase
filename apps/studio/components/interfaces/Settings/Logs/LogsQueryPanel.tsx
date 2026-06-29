@@ -1,11 +1,12 @@
 import { useFlag, useParams } from 'common'
-import { BookOpen, Check, ChevronDown, ChevronsUpDown, Copy, ExternalLink, X } from 'lucide-react'
+import { BookOpen, Check, ChevronDown, ChevronsUpDown, Copy, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
 import { logConstants } from 'shared-data'
 import {
   Badge,
   Button,
+  Card,
   cn,
   Command,
   CommandEmpty,
@@ -21,11 +22,24 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-  SidePanel,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
+  SheetTrigger,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns'
 
 import {
   EXPLORER_DATEPICKER_HELPERS,
@@ -35,7 +49,6 @@ import {
 import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import { otelFieldsFromKeys, toOtelFieldSchemas } from './Logs.fieldReference'
 import { LogsWarning, LogTemplate } from './Logs.types'
-import TableDeprecated from '@/components/to-be-cleaned/Table'
 import { useOtelLogKeysQuery } from '@/data/logs/otel-log-keys-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
@@ -224,46 +237,29 @@ export const LogsQueryPanel = ({
                 </TooltipContent>
               </Tooltip>
             )}
-            <SidePanel
-              size="large"
-              header={
-                <div className="flex flex-row justify-between items-center">
-                  <h3>Field Reference</h3>
-                  <Button
-                    aria-label="Close field reference"
-                    variant="text"
-                    className="px-1"
-                    onClick={() => setShowReference(false)}
-                    icon={<X />}
-                  />
-                </div>
-              }
-              visible={showReference}
-              cancelText="Close"
-              onCancel={() => setShowReference(false)}
-              hideFooter
-              triggerElement={
-                <Button
-                  variant="text"
-                  onClick={() => setShowReference(true)}
-                  icon={<BookOpen />}
-                  className="px-2"
-                >
+
+            <Sheet open={showReference} onOpenChange={setShowReference}>
+              <SheetTrigger asChild>
+                <Button variant="text" icon={<BookOpen />} className="px-2">
                   <span>Field Reference</span>
                 </Button>
-              }
-            >
-              <SidePanel.Content>
-                <div className="pt-4 pb-2 space-y-1">
+              </SheetTrigger>
+              <SheetContent size="lg" className="flex w-full flex-col gap-0 p-0">
+                <SheetHeader>
+                  <SheetTitle>Field Reference</SheetTitle>
                   {useOtel ? (
-                    <p className="text-sm">
+                    <SheetDescription>
                       The following table shows the fields available on each source. Nested fields
-                      live in the <code className="text-xs">log_attributes</code> map and are read
-                      with <code className="text-xs">log_attributes['key']</code> — no unnesting
-                      joins needed.
-                    </p>
+                      live in the{' '}
+                      <code className="text-code-inline text-xs !break-keep">log_attributes</code>{' '}
+                      map and are read with{' '}
+                      <code className="text-code-inline text-xs !break-keep">
+                        log_attributes['key']
+                      </code>{' '}
+                      — no unnesting joins needed.
+                    </SheetDescription>
                   ) : (
-                    <p className="text-sm">
+                    <SheetDescription>
                       The following table shows all the available paths that can be queried from
                       each respective source. Do note that to access nested keys, you would need to
                       perform the necessary{' '}
@@ -280,81 +276,83 @@ export const LogsQueryPanel = ({
                           strokeWidth={1.5}
                         />
                       </Link>
-                    </p>
+                    </SheetDescription>
                   )}
-                </div>
-              </SidePanel.Content>
-              <SidePanel.Separator />
+                </SheetHeader>
 
-              <div className="px-4 pb-4 flex flex-col gap-4">
-                <Popover open={open} onOpenChange={setOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="default"
-                      role="combobox"
-                      size={'small'}
-                      aria-expanded={open}
-                      className="w-full justify-between"
-                      iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
-                    >
-                      {value ? selectedSchema?.name : 'Select source...'}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="p-0" sameWidthAsTrigger>
-                    <Command>
-                      <CommandInput placeholder="Search source..." />
-                      <CommandList>
-                        <CommandEmpty>No source found.</CommandEmpty>
-                        <CommandGroup>
-                          {schemas.map((schema) => (
-                            <CommandItem
-                              key={schema.reference}
-                              value={schema.reference}
-                              onSelect={() => {
-                                setSelectedRef(schema.reference)
-                                setOpen(false)
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  'mr-2 h-4 w-4',
-                                  selectedSchema?.reference === schema.reference
-                                    ? 'opacity-100'
-                                    : 'opacity-0'
-                                )}
-                              />
-                              {schema.name}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-                {useOtel && isLoadingKeys ? (
-                  <p className="text-sm text-foreground-light py-2">Loading fields…</p>
-                ) : (
-                  <>
-                    <TableDeprecated
-                      head={[
-                        <TableDeprecated.th className="text-xs p-2!" key="path">
-                          Path
-                        </TableDeprecated.th>,
-                        <TableDeprecated.th key="type" className="text-xs p-2!">
-                          Type
-                        </TableDeprecated.th>,
-                      ]}
-                      body={(() => {
-                        const fields = useOtel
-                          ? otelFieldsFromKeys(discoveredKeys ?? [])
-                          : selectedSchema.fields
-                        return fields.map((field) => <Field key={field.path} field={field} />)
-                      })()}
-                    />
-                  </>
-                )}
-              </div>
-            </SidePanel>
+                <SheetSection className="flex flex-col gap-y-4 overflow-y-auto ">
+                  <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="default"
+                        role="combobox"
+                        size={'small'}
+                        aria-expanded={open}
+                        className="w-full justify-between"
+                        iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                      >
+                        {value ? selectedSchema?.name : 'Select source...'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="p-0" sameWidthAsTrigger>
+                      <Command>
+                        <CommandInput placeholder="Search source..." />
+                        <CommandList>
+                          <CommandEmpty>No source found.</CommandEmpty>
+                          <CommandGroup>
+                            {schemas.map((schema) => (
+                              <CommandItem
+                                key={schema.reference}
+                                value={schema.reference}
+                                onSelect={() => {
+                                  setSelectedRef(schema.reference)
+                                  setOpen(false)
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4',
+                                    selectedSchema?.reference === schema.reference
+                                      ? 'opacity-100'
+                                      : 'opacity-0'
+                                  )}
+                                />
+                                {schema.name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+
+                  <Card className="overflow-y-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-xs p-2!">Path</TableHead>
+                          <TableHead className="text-xs p-2!">Type</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {useOtel && isLoadingKeys
+                          ? Array.from({ length: 3 }).map((_, i) => (
+                              <TableRow key={i}>
+                                <TableCell colSpan={2} className="p-2">
+                                  <ShimmeringLoader />
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          : (useOtel
+                              ? otelFieldsFromKeys(discoveredKeys ?? [])
+                              : selectedSchema.fields
+                            ).map((field) => <Field key={field.path} field={field} />)}
+                      </TableBody>
+                    </Table>
+                  </Card>
+                </SheetSection>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
       </div>
@@ -373,8 +371,8 @@ const Field = ({
   const [isCopied, setIsCopied] = useState(false)
 
   return (
-    <TableDeprecated.tr>
-      <TableDeprecated.td
+    <TableRow>
+      <TableCell
         className="font-mono text-xs p-2! cursor-pointer hover:text-foreground transition flex items-center space-x-2"
         onClick={() =>
           copyToClipboard(field.path, () => {
@@ -399,8 +397,8 @@ const Field = ({
             <TooltipContent side="bottom">Copy value</TooltipContent>
           </Tooltip>
         )}
-      </TableDeprecated.td>
-      <TableDeprecated.td className="font-mono text-xs p-2!">{field.type}</TableDeprecated.td>
-    </TableDeprecated.tr>
+      </TableCell>
+      <TableCell className="font-mono text-xs p-2!">{field.type}</TableCell>
+    </TableRow>
   )
 }
