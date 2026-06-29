@@ -18,7 +18,16 @@ export function serializeContentListingGroupToMarkdown(
   linkBaseUrl: string
 ): string {
   const lines: string[] = []
+  if (group.heading) {
+    const level = group.headingLevel ?? 'h2'
+    lines.push(`${HEADING_MARKDOWN[level]} ${group.heading}`)
+    lines.push('')
+  }
 
+  if (group.description) {
+    lines.push(group.description)
+    lines.push('')
+  }
   if (group.heading) {
     const level = group.headingLevel ?? 'h2'
     lines.push(`${HEADING_MARKDOWN[level]} ${group.heading}`)
