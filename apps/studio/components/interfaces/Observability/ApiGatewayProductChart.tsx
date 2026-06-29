@@ -2,7 +2,7 @@
 
 import dayjs from 'dayjs'
 import { ReactNode, useState } from 'react'
-import { Bar, Cell, BarChart as RechartBarChart, XAxis, YAxis } from 'recharts'
+import { Bar, Cell, BarChart as RechartBarChart, XAxis, YAxis, type TooltipProps } from 'recharts'
 import type { CategoricalChartState } from 'recharts/types/chart/types'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
 
@@ -19,6 +19,32 @@ const PRODUCT_CONFIG: Record<ApiGatewayProductKey, { label: string; color: strin
   functions: { label: 'Edge Functions', color: 'hsl(var(--chart-4))' },
   storage: { label: 'Storage', color: 'hsl(var(--chart-5))' },
   realtime: { label: 'Realtime', color: 'hsl(var(--chart-blue))' },
+}
+
+const ApiGatewayChartTooltip = ({
+  active,
+  payload,
+  label,
+  dateTimeFormat,
+}: TooltipProps<number, string> & { dateTimeFormat: string }) => {
+  if (!active || !payload || payload.length === 0) {
+    return null
+  }
+
+  const nonZeroPayload = payload.filter((item) => Number(item.value) !== 0)
+  if (nonZeroPayload.length === 0) {
+    return null
+  }
+
+  return (
+    <ChartTooltipContent
+      active={active}
+      payload={nonZeroPayload}
+      label={label}
+      className="text-foreground-light -mt-5 transition-none!"
+      labelFormatter={(value: string) => dayjs(value).format(dateTimeFormat)}
+    />
+  )
 }
 
 export const ApiGatewayProductChart = ({
@@ -74,26 +100,7 @@ export const ApiGatewayProductChart = ({
           <ChartTooltip
             animationDuration={0}
             position={{ y: 16 }}
-            content={(props) => {
-              if (!props.active || !props.payload || props.payload.length === 0) {
-                return null
-              }
-
-              const nonZeroPayload = props.payload.filter((item) => Number(item.value) !== 0)
-              if (nonZeroPayload.length === 0) {
-                return null
-              }
-
-              return (
-                <ChartTooltipContent
-                  active={props.active}
-                  payload={nonZeroPayload}
-                  label={props.label}
-                  className="text-foreground-light -mt-5 transition-none!"
-                  labelFormatter={(v: string) => dayjs(v).format(DateTimeFormat)}
-                />
-              )
-            }}
+            content={<ApiGatewayChartTooltip dateTimeFormat={DateTimeFormat} />}
           />
 
           {API_GATEWAY_PRODUCT_KEYS.map((productKey) => {
