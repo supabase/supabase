@@ -1,6 +1,10 @@
 import { proxy, useSnapshot } from 'valtio'
 
-import { getWarehouseQualifiedTableName } from './warehouseNaming.utils'
+import {
+  getSqlWarehouseRouting,
+  getWarehouseQualifiedNamesFromSql,
+  getWarehouseQualifiedTableName,
+} from './warehouseNaming.utils'
 
 export type WarehouseMode = 'postgres' | 'has_warehouse_copy'
 export type SyncState = 'syncing' | 'live' | 'error'
@@ -23,6 +27,35 @@ export const warehouseDemoStore = proxy<{
 })
 
 const DEMO_WAREHOUSE_SIZE_BYTES = 197_912_092_672 // ~184 GB
+export const DEMO_WAREHOUSE_LAG_SECONDS = 12
+
+function warehouseQualifiedNameToTableKey(qualifiedName: string): string {
+  const dotIndex = qualifiedName.indexOf('.')
+  if (dotIndex === -1) return qualifiedName
+
+  const schema = qualifiedName.slice(0, dotIndex)
+  const table = qualifiedName.slice(dotIndex + 1)
+  const sourceSchema = schema.endsWith('_warehouse')
+    ? schema.slice(0, -'_warehouse'.length)
+    : schema
+
+  return `${sourceSchema}.${table}`
+}
+
+export function getSqlWarehouseLagSeconds(sql: string): number | undefined {
+  if (getSqlWarehouseRouting(sql) === 'postgres') return undefined
+
+  const qualifiedNames = getWarehouseQualifiedNamesFromSql(sql)
+  const lagSeconds = qualifiedNames.map((qualifiedName) => {
+    const tableKey = warehouseQualifiedNameToTableKey(qualifiedName)
+    return warehouseDemoStore.tables[tableKey]?.lagSeconds
+  })
+
+  const knownLag = lagSeconds.filter((lag): lag is number => lag !== undefined)
+  if (knownLag.length > 0) return Math.max(...knownLag)
+
+  return DEMO_WAREHOUSE_LAG_SECONDS
+}
 
 export function setTableMode(key: string, mode: 'has_warehouse_copy'): void {
   const now = new Date().toISOString()
@@ -31,7 +64,7 @@ export function setTableMode(key: string, mode: 'has_warehouse_copy'): void {
     mode,
     warehouseSizeBytes: DEMO_WAREHOUSE_SIZE_BYTES,
     syncState: 'live',
-    lagSeconds: 12,
+    lagSeconds: DEMO_WAREHOUSE_LAG_SECONDS,
     lastSyncedAt: now,
     copyName: getWarehouseQualifiedTableName(key),
   }

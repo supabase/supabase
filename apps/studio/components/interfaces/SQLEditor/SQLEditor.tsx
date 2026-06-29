@@ -58,7 +58,12 @@ import {
 } from './SQLEditor.utils'
 import { useAddDefinitions } from './useAddDefinitions'
 import { UtilityPanel } from './UtilityPanel/UtilityPanel'
-import { sqlReferencesWarehouse } from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
+import { getSqlWarehouseLagSeconds } from '@/components/interfaces/Database/Warehouse/warehouseDemoStore'
+import {
+  getSqlWarehouseFooterLabel,
+  getSqlWarehouseRouting,
+  SQL_WAREHOUSE_ROUTING_TOOLTIPS,
+} from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
 import {
   isExplainQuery,
   isExplainSql,
@@ -302,8 +307,10 @@ export const SQLEditor = () => {
     snapV2.snippets[id]?.snippet?.content?.unchecked_sql ??
     snapV2.snippets[id]?.snippet?.content?.sql ??
     ''
-  const servedByWarehouse =
-    Boolean(results) && !results?.error && !isExecuting && sqlReferencesWarehouse(sql)
+  const resultWarehouseRouting =
+    Boolean(results) && !results?.error && !isExecuting ? getSqlWarehouseRouting(sql) : 'postgres'
+  const resultWarehouseLagSeconds =
+    resultWarehouseRouting !== 'postgres' ? getSqlWarehouseLagSeconds(sql) : undefined
 
   const setAiTitle = useCallback(
     async (id: string, sql: string) => {
@@ -1047,35 +1054,57 @@ export const SQLEditor = () => {
             )}
           </ResizablePanel>
 
-          <div className="h-9">
+          <div className="h-[59px]">
             {results?.rows !== undefined && !isExecuting && (
-              <GridFooter className="flex items-center justify-between gap-2">
-                <Tooltip>
-                  <TooltipTrigger>
-                    <p className="text-xs">
-                      <span className="text-foreground">
-                        {results.rows.length} row{results.rows.length > 1 ? 's' : ''}
-                      </span>
-                      <span className="text-foreground-lighter ml-1">
-                        {results.autoLimit !== undefined &&
-                          ` (Limited to only ${results.autoLimit} rows)`}
-                        {servedByWarehouse && ' · Served by Warehouse'}
-                      </span>
-                    </p>
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p className="flex flex-col gap-y-1">
-                      <span>
-                        Results are automatically limited to preserve browser performance, in
-                        particular if your query returns an exceptionally large number of rows.
-                      </span>
-
-                      <span className="text-foreground-light">
-                        You may change or remove this limit from the dropdown on the right
-                      </span>
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
+              <GridFooter className="h-full min-h-0 items-center justify-between gap-2 px-4">
+                <p className="flex items-center text-xs">
+                  {results.autoLimit !== undefined ? (
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className="text-foreground">
+                          {results.rows.length} row{results.rows.length > 1 ? 's' : ''}
+                          <span className="text-foreground-lighter ml-1">
+                            {` (Limited to only ${results.autoLimit} rows)`}
+                          </span>
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent className="max-w-xs">
+                        <p className="flex flex-col gap-y-1">
+                          <span>
+                            Results are limited to preserve browser performance when a query returns
+                            many rows.
+                          </span>
+                          <span className="text-foreground-light">
+                            Change or remove this limit from the dropdown on the right.
+                          </span>
+                        </p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ) : (
+                    <span className="text-foreground">
+                      {results.rows.length} row{results.rows.length > 1 ? 's' : ''}
+                    </span>
+                  )}
+                  {resultWarehouseRouting !== 'postgres' &&
+                    resultWarehouseLagSeconds !== undefined && (
+                      <>
+                        <span className="text-foreground-lighter mx-1.5">·</span>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="text-foreground-lighter cursor-default">
+                              {getSqlWarehouseFooterLabel(
+                                resultWarehouseRouting,
+                                resultWarehouseLagSeconds
+                              )}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-xs">
+                            {SQL_WAREHOUSE_ROUTING_TOOLTIPS[resultWarehouseRouting]}
+                          </TooltipContent>
+                        </Tooltip>
+                      </>
+                    )}
+                </p>
                 {results.autoLimit !== undefined && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

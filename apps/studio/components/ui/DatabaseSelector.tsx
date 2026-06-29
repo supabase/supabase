@@ -22,6 +22,11 @@ import {
   TooltipTrigger,
 } from 'ui'
 
+import {
+  SQL_WAREHOUSE_ROUTING_LABELS,
+  SQL_WAREHOUSE_ROUTING_TOOLTIPS,
+  type SqlWarehouseRouting,
+} from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
@@ -39,6 +44,8 @@ interface DatabaseSelectorProps {
   className?: string
   align?: 'start' | 'end'
   isForm?: boolean
+  /** Reflects inferred query routing from the current SQL. Does not change execution. */
+  warehouseRouting?: Exclude<SqlWarehouseRouting, 'postgres'>
 }
 
 export const DatabaseSelector = ({
@@ -50,6 +57,7 @@ export const DatabaseSelector = ({
   align = 'end',
   className,
   isForm = false,
+  warehouseRouting,
 }: DatabaseSelectorProps) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -79,6 +87,38 @@ export const DatabaseSelector = ({
     if (_selectedDatabaseId && !isForm) state.setSelectedDatabaseId(_selectedDatabaseId)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [_selectedDatabaseId])
+
+  if (warehouseRouting && !isForm) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className={cn('flex', className)}>
+            <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
+              Source
+            </span>
+            <Button
+              type="button"
+              variant="default"
+              tabIndex={-1}
+              className={cn(
+                'justify-start cursor-default',
+                'rounded-l-none',
+                variant === 'connected-on-right' && 'rounded-r-none',
+                variant === 'connected-on-left' && 'rounded-l-none border-l-0',
+                variant === 'connected-on-both' && 'rounded-none border-x-0',
+                buttonProps?.className
+              )}
+            >
+              {SQL_WAREHOUSE_ROUTING_LABELS[warehouseRouting]}
+            </Button>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" className="max-w-xs">
+          {SQL_WAREHOUSE_ROUTING_TOOLTIPS[warehouseRouting]}
+        </TooltipContent>
+      </Tooltip>
+    )
+  }
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
