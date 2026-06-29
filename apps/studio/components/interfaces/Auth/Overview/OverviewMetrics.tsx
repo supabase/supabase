@@ -40,7 +40,7 @@ import {
   getMetricValues,
 } from './OverviewUsage.constants'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ErrorCodeTooltip } from '@/components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
 import { Service } from '@/data/graphql/graphql'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'

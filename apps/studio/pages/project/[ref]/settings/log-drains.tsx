@@ -18,7 +18,7 @@ import { LogDrainDestinationSheetForm } from '@/components/interfaces/LogDrains/
 import { LogDrains } from '@/components/interfaces/LogDrains/LogDrains'
 import { LogDrainType } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import { useEnabledLogDrainTypes } from '@/components/interfaces/LogDrains/useEnabledLogDrainTypes'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'

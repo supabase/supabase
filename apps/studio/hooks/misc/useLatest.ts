@@ -5,5 +5,3 @@ export const useLatest = <T>(value: T): { readonly current: T } => {
   ref.current = value
   return ref
 }
-
-export default useLatest
