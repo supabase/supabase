@@ -408,17 +408,21 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     }))
   }
 
+  const querySql = (query?.content as LogSqlSnippets.Content | undefined)?.sql
   useEffect(() => {
     if (search) {
       setEditorValue(search)
-    } else if (q) {
+    } else if (q && !queryId) {
       setEditorValue(q)
       setSearch(q)
+    } else if (queryId && querySql) {
+      setEditorValue(querySql)
+      editorRef.current?.setValue(querySql)
     } else if (!queryId) {
       setEditorValue(PLACEHOLDER_QUERY)
       editorRef.current?.setValue(PLACEHOLDER_QUERY)
     }
-  }, [q, search, queryId, setSearch, PLACEHOLDER_QUERY])
+  }, [q, search, queryId, querySql, setSearch, PLACEHOLDER_QUERY])
 
   useEffect(() => {
     // prevents overwriting when the user selects a helper.
