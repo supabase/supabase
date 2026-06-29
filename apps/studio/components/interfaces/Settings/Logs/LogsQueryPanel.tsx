@@ -208,9 +208,19 @@ const LogsQueryPanel = ({
 
           <div className="flex items-center gap-1">
             {showRewriteAction && onRewrite && (
-              <Button variant="text" loading={isRewriting} onClick={onRewrite} className="px-2">
-                Rewrite to ClickHouse
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    loading={isRewriting}
+                    onClick={onRewrite}
+                    className="px-2"
+                  >
+                    Fix Query
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Use AI to rewrite the query in ClickHouse SQL</TooltipContent>
+              </Tooltip>
             )}
             <SidePanel
               size="large"
