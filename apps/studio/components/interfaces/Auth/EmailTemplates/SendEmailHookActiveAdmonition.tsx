@@ -21,7 +21,7 @@ export const SendEmailHookActiveAdmonition = () => {
       title="Email templates are not used"
       description={
         <>
-          A Send Email hook is active. Email data is sent to your endpoint instead of using these
+          A Send Email hook is active. Email data is sent to your hook instead of using these
           templates.{' '}
           <InlineLink href={`${DOCS_URL}/guides/auth/auth-hooks/send-email-hook`}>
             Learn more

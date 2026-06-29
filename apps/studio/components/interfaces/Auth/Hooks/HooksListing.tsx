@@ -1,11 +1,8 @@
-import { joinSqlFragments } from '@supabase/pg-meta/src/pg-format'
 import { useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { cn } from 'ui'
 import { EmptyStatePresentational, GenericSkeletonLoader } from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   PageSection,
   PageSectionAside,
@@ -17,26 +14,18 @@ import {
 
 import { AddHookDropdown } from './AddHookDropdown'
 import { CreateHookSheet } from './CreateHookSheet'
-import { DeleteSendEmailHookConfirmationDialog } from './DeleteSendEmailHookConfirmationDialog'
+import { DeleteHookConfirmationDialog } from './DeleteHookConfirmationDialog'
 import { HookCard } from './HookCard'
 import { Hook, HOOKS_DEFINITIONS } from './hooks.constants'
-import { extractMethod, getRevokePermissionStatements, isValidHook } from './hooks.utils'
-import { isBeforeFreeTierTemplateBlockCutoff } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
-import { isSmtpEnabled } from '@/components/interfaces/Auth/SmtpForm/SmtpForm.utils'
+import { extractMethod, isValidHook } from './hooks.utils'
 import { AlertError } from '@/components/ui/AlertError'
-import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
-import { useAuthHooksUpdateMutation } from '@/data/auth/auth-hooks-update-mutation'
-import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const HooksListing = () => {
   const { ref: projectRef } = useParams()
-  const { data: project } = useSelectedProjectQuery()
-  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+
   const {
     data: authConfig,
     error: authConfigError,
@@ -46,35 +35,9 @@ export const HooksListing = () => {
 
   const [hook, setHook] = useQueryState('hook', parseAsString)
 
-  const [selectedHookForDeletion, setSelectedHookForDeletion] = useState<Hook | null>(null)
+  const [selectedHookForDeletion, setSelectedHookForDeletion] = useState<Hook>()
   const [addHookAsideOpen, setAddHookAsideOpen] = useState(false)
   const [addHookEmptyOpen, setAddHookEmptyOpen] = useState(false)
-
-  const {
-    mutate: updateAuthHooks,
-    mutateAsync: updateAuthHooksAsync,
-    isPending: isDeletingAuthHook,
-  } = useAuthHooksUpdateMutation({
-    onSuccess: async () => {
-      if (!selectedHookForDeletion) return
-
-      const { method } = selectedHookForDeletion
-      if (method.type === 'postgres') {
-        const revokeStatements = getRevokePermissionStatements(method.schema, method.functionName)
-        await executeSql({
-          projectRef,
-          connectionString: project!.connectionString,
-          sql: joinSqlFragments(revokeStatements, '\n'),
-        })
-      }
-      toast.success(`${selectedHookForDeletion.title} has been deleted.`)
-      setSelectedHookForDeletion(null)
-      setHook(null)
-    },
-    onError: (error) => {
-      toast.error(`Failed to delete hook: ${error.message}`)
-    },
-  })
 
   const hooks: Hook[] = HOOKS_DEFINITIONS.map((definition) => {
     return {
@@ -89,27 +52,6 @@ export const HooksListing = () => {
 
   const validHooks = hooks.filter((h) => isValidHook(h))
   const hasValidHooks = validHooks.length > 0
-
-  // Whether deleting the Send Email hook will lock template editing:
-  // post-cutoff Free plan projects without custom SMTP.
-  const willLockTemplatesOnSendEmailDelete =
-    !!selectedOrganization &&
-    selectedOrganization.plan?.id === 'free' &&
-    !!project?.inserted_at &&
-    !isBeforeFreeTierTemplateBlockCutoff(project.inserted_at) &&
-    !isSmtpEnabled(authConfig)
-
-  const handleDeleteSendEmailHook = async (): Promise<void> => {
-    if (!selectedHookForDeletion) return
-    await updateAuthHooksAsync({
-      projectRef: projectRef!,
-      config: {
-        [selectedHookForDeletion.enabledKey]: false,
-        [selectedHookForDeletion.uriKey]: null,
-        [selectedHookForDeletion.secretsKey]: null,
-      },
-    })
-  }
 
   useShortcut(
     SHORTCUT_IDS.LIST_PAGE_NEW_ITEM,
@@ -188,7 +130,14 @@ export const HooksListing = () => {
 
         <div className="-space-y-px">
           {validHooks.map((hook) => {
-            return <HookCard key={hook.enabledKey} hook={hook} onSelect={() => setHook(hook.id)} />
+            return (
+              <HookCard
+                key={hook.enabledKey}
+                hook={hook}
+                onSelectEdit={() => setHook(hook.id)}
+                onSelectDelete={() => setSelectedHookForDeletion(hook)}
+              />
+            )
           })}
         </div>
 
@@ -203,63 +152,16 @@ export const HooksListing = () => {
           authConfig={authConfig!}
         />
 
-        <DeleteSendEmailHookConfirmationDialog
-          open={selectedHookForDeletion?.id === 'send-email'}
+        <DeleteHookConfirmationDialog
+          hook={selectedHookForDeletion}
           onOpenChange={(open) => {
-            if (!open) setSelectedHookForDeletion(null)
+            if (!open) setSelectedHookForDeletion(undefined)
           }}
-          onConfirm={handleDeleteSendEmailHook}
-          willLockTemplates={willLockTemplatesOnSendEmailDelete}
+          onDeleteSuccess={() => {
+            setSelectedHookForDeletion(undefined)
+            setHook(null)
+          }}
         />
-
-        <ConfirmationModal
-          visible={!!selectedHookForDeletion && selectedHookForDeletion.id !== 'send-email'}
-          size="large"
-          variant="destructive"
-          loading={isDeletingAuthHook}
-          title={`Confirm to delete ${selectedHookForDeletion?.title}`}
-          className={cn('md:px-0', selectedHookForDeletion?.method.type === 'postgres' && 'pb-0')}
-          confirmLabel="Delete"
-          confirmLabelLoading="Deleting"
-          onCancel={() => setSelectedHookForDeletion(null)}
-          onConfirm={() => {
-            if (!selectedHookForDeletion) return
-            updateAuthHooks({
-              projectRef: projectRef!,
-              config: {
-                [selectedHookForDeletion.enabledKey]: false,
-                [selectedHookForDeletion.uriKey]: null,
-                [selectedHookForDeletion.secretsKey]: null,
-              },
-            })
-          }}
-        >
-          <div>
-            <p className="md:px-5 text-sm text-foreground-light">
-              Are you sure you want to delete the {selectedHookForDeletion?.title}?
-            </p>
-            {selectedHookForDeletion?.method.type === 'postgres' && (
-              <>
-                <p className="md:px-5 text-sm text-foreground-light">
-                  The following statements will be executed on the{' '}
-                  {selectedHookForDeletion?.method.schema}.
-                  {selectedHookForDeletion?.method.functionName} function:
-                </p>
-                <div className="mt-4 h-72">
-                  <CodeEditor
-                    isReadOnly
-                    id="deletion-hook-editor"
-                    language="pgsql"
-                    value={getRevokePermissionStatements(
-                      selectedHookForDeletion?.method.schema,
-                      selectedHookForDeletion?.method.functionName
-                    ).join('\n\n')}
-                  />
-                </div>
-              </>
-            )}
-          </div>
-        </ConfirmationModal>
       </PageSectionContent>
     </PageSection>
   )
