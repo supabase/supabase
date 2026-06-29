@@ -117,6 +117,18 @@ const CreateProject = () => {
   const { data: organizationData } = useOrganizationsQuery()
   const organization = organizationData?.find((x) => x.slug === slug)
 
+  const hasTrackedFormExposed = useRef(false)
+  useEffect(() => {
+    if (hasTrackedFormExposed.current) return
+    if (!organization) return
+    hasTrackedFormExposed.current = true
+    track(
+      'project_creation_form_exposed',
+      { surface: 'vercel' },
+      { organization: organization.slug }
+    )
+  }, [organization, track])
+
   /**
    * array of integrations installed
    */

@@ -298,7 +298,11 @@ export const NewOrgForm = ({
   }
 
   const onOrganizationCreated = (org: { slug: string }) => {
-    track('organization_creation_completed', undefined, { organization: org.slug })
+    track(
+      'organization_creation_completed',
+      { plan: selectedPlan, tier: previewTier },
+      { organization: org.slug }
+    )
 
     const prefilledProjectName = user.profile?.username
       ? user.profile.username + `'s Project`
