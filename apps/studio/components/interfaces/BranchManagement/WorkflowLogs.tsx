@@ -18,7 +18,7 @@ import { GenericSkeletonLoader, TimestampInfo } from 'ui-patterns'
 
 import { ActionStatusBadge, ActionStatusBadgeCondensed, STATUS_TO_LABEL } from './ActionStatusBadge'
 import BranchStatusBadge from './BranchStatusBadge'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ActionRunData } from '@/data/actions/action-detail-query'
 import { useActionRunLogsQuery } from '@/data/actions/action-logs-query'
 import {

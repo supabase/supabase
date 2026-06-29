@@ -125,3 +125,9 @@ Forms in sheets:
 
 - `layout="horizontal"` for wider sheets
 - `layout="vertical"` for narrow sheets (`size="sm"` or below)
+
+## Copy
+
+Source of truth: `apps/design-system/content/docs/copywriting.mdx` — sentence case, title case, proper nouns, voice and tone.
+
+When changing visible copy, grep `e2e/studio/` for the old string.
