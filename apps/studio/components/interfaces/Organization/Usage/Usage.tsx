@@ -24,7 +24,7 @@ import {
   ScaffoldTitle,
 } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
-import DateRangePicker from '@/components/ui/DateRangePicker'
+import { DateRangePicker } from '@/components/ui/DateRangePicker'
 import NoPermission from '@/components/ui/NoPermission'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
 import { useOrgDailyStatsQuery } from '@/data/analytics/org-daily-stats-query'
