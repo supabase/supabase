@@ -680,5 +680,3 @@ export const EditorPanel = () => {
     </div>
   )
 }
-
-export default EditorPanel

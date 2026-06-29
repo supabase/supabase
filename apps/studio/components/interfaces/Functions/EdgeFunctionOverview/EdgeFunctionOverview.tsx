@@ -247,5 +247,3 @@ export const EdgeFunctionOverview = () => {
     </>
   )
 }
-
-export default EdgeFunctionOverview
