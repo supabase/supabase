@@ -1,0 +1,57 @@
+# Override layered on top of docker/docker-compose.yml to run the Supabase
+# self-hosted stack against an EXTERNAL Multigres database instead of the
+# bundled `db` container.
+#
+# Usage (see setup.sh, which wires the paths and service list):
+#   docker compose --env-file e2e/studio/multigres/multigres.env \
+#     -f docker/docker-compose.yml \
+#     -f e2e/studio/multigres/docker-compose.override.yml \
+#     up -d studio kong auth rest meta storage imgproxy functions realtime
+#
+# The `db` and `supavisor` services are not part of this setup (the external
+# database stands in for `db`).
+#
+# `!reset`/`!override` strip the base `depends_on: db` conditions so Compose
+# doesn't pull the bundled db back in. `extra_hosts` makes
+# `host.docker.internal` (the gateway address in multigres.env) resolve on Linux.
+
+services:
+  meta:
+    depends_on: !reset null
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  auth:
+    depends_on: !reset null
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  rest:
+    depends_on: !reset null
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  realtime:
+    depends_on: !reset null
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  storage:
+    depends_on: !override
+      rest:
+        condition: service_started
+      imgproxy:
+        condition: service_started
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  studio:
+    # Publish Studio so the Playwright e2e suite can reach it on the host.
+    ports:
+      - "8082:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  functions:
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
