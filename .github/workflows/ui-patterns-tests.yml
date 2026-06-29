@@ -40,5 +40,13 @@ jobs:
       - name: Install deps
         run: pnpm install --frozen-lockfile
 
+      - name: Validate exports
+        run: |
+          pnpm --filter ui-patterns generate
+          if ! git diff --ignore-space-at-eol --exit-code --quiet specific-file.ts then
+            echo "Detected uncommitted changes after build. See status below:"
+            git diff
+            exit 1
+          fi
       - name: Run tests
         run: pnpm run test:ui-patterns
