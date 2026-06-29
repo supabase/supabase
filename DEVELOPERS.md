@@ -49,7 +49,8 @@ You will need to install and configure the following dependencies on your machin
 
 This repo uses [Turborepo](https://turborepo.org/docs).
 
-All of our apps are in this [Turborepo](https://turborepo.org/docs), which make it easy to share packages and config between projects.
+All of our apps are organized within this [Turborepo](https://turborepo.org/docs), making it easy to share packages and configuration across projects.
+
 
 ### Fork the repo
 
