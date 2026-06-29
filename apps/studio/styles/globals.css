@@ -210,7 +210,7 @@ h3,
 h4,
 h5,
 h6 {
-  @apply font-heading font-medium;
+  @apply font-heading font-semibold;
 }
 
 .form-group .form-text,
