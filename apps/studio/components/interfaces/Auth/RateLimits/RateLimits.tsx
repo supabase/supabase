@@ -107,31 +107,31 @@ export const RateLimits = () => {
     RATE_LIMIT_TOKEN_REFRESH: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(2147483647, 'Must not be more than 2,147,483,647 an 5 minutes'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 in 5 minutes'),
     RATE_LIMIT_VERIFY: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(2147483647, 'Must not be more than 2,147,483,647 an 5 minutes'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 in 5 minutes'),
     RATE_LIMIT_EMAIL_SENT: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(2147483647, 'Must not be more than 2,147,483,647 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
     RATE_LIMIT_SMS_SENT: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(2147483647, 'Must not be more than 2,147,483,647 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
     RATE_LIMIT_ANONYMOUS_USERS: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(2147483647, 'Must not be more than 2,147,483,647 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
     RATE_LIMIT_OTP: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(2147483647, 'Must not be more than 2,147,483,647 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
     RATE_LIMIT_WEB3: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(2147483647, 'Must not be more than 2,147,483,647 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
   })
 
   const rateLimitForm = useForm<z.infer<typeof RateLimitFormSchema>>({
