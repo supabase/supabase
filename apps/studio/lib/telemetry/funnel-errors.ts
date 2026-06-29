@@ -19,7 +19,7 @@ export interface FunnelErrorClassification {
 
 const RATE_LIMIT_STATUS = 429
 
-const STATUS_REASONS: Readonly<Record<number, FunnelErrorReason>> = {
+const STATUS_REASONS: Readonly<Partial<Record<number, FunnelErrorReason>>> = {
   401: 'unauthorized',
   403: 'forbidden',
   404: 'not_found',
