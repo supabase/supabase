@@ -884,6 +884,9 @@ importers:
       '@aws-sdk/credential-providers':
         specifier: ^3.1041.0
         version: 3.1041.0
+      '@clickhouse/parser':
+        specifier: 0.2.1
+        version: 0.2.1
       '@dagrejs/dagre':
         specifier: ^1.0.4
         version: 1.0.4
@@ -3336,6 +3339,9 @@ packages:
   '@clack/prompts@1.5.0':
     resolution: {integrity: sha512-wKh+wTjmrUoUdkZg8KpJO5X+p9PWV+KE9mePseq9UYWkukgTKsGS47RRL2HstwVcvDQH+PenrPJWII8+MfiiyA==}
     engines: {node: '>= 20.12.0'}
+
+  '@clickhouse/parser@0.2.1':
+    resolution: {integrity: sha512-Si87lKbiTuSF/eOthsT7vjPz6hXBpVEkBaeE0ay7G1WwbO8x6x0VnXWvelyrBYqPgD5xk145tTiog1tNKWBE0w==}
 
   '@cloudflare/kv-asset-handler@0.4.2':
     resolution: {integrity: sha512-SIOD2DxrRRwQ+jgzlXCqoEFiKOFqaPjhnNTGKXSRLvp1HiOvapLaFG2kEr9dYQTYe8rKrd9uvDUzmAITeNyaHQ==}
@@ -18586,6 +18592,10 @@ snapshots:
       fast-string-width: 3.0.2
       fast-wrap-ansi: 0.2.2
       sisteransi: 1.0.5
+
+  '@clickhouse/parser@0.2.1':
+    dependencies:
+      zod: 4.4.3
 
   '@cloudflare/kv-asset-handler@0.4.2': {}
 

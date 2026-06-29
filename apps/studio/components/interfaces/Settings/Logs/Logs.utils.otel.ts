@@ -217,6 +217,27 @@ const OTEL_SOURCES: Record<LogsTableName, OtelSourceDescriptor> = {
   [LogsTableName.PG_UPGRADE]: { source: 'pg_upgrade_logs' },
 }
 
+// The single ClickHouse table backing every OTEL log source. Individual sources
+// are selected with the `source` column rather than separate tables.
+export const OTEL_LOGS_TABLE = 'logs'
+
+// Columns that exist on the `logs` table directly. Everything else lives in the
+// `log_attributes` map and is read via log_attributes['key'].
+export const OTEL_LOG_COLUMNS = [
+  'id',
+  'timestamp',
+  'event_message',
+  'source',
+  'severity_text',
+  'log_attributes',
+] as const
+
+// Valid values for the `source` column, derived from the source descriptors so
+// the two never drift apart.
+export const KNOWN_OTEL_SOURCES = Array.from(
+  new Set(Object.values(OTEL_SOURCES).map((desc) => desc.source))
+).sort()
+
 // Fallback for filter keys with no template: `log_attributes[key] = value`.
 // Drops the clause on non-scalar or un-encodable input.
 const resolveUnknownOtelClause = (dotKey: string, value: unknown): SafeLogSqlFragment | null => {

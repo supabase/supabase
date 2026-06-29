@@ -137,6 +137,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     error,
     isLoading: logsLoading,
     setParams,
+    validationWarnings,
   } = useLogsQuery(
     projectRef,
     {
@@ -399,7 +400,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             onSelectSource={handleInsertSource}
             templates={allTemplates.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
-            warnings={warnings}
+            warnings={warnings.concat(validationWarnings)}
           />
           <ShimmerLine active={isLoading} />
           <CodeEditor

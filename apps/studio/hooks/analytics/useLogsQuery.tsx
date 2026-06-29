@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
-import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
 
 import {
   EXPLORER_DATEPICKER_HELPERS,
@@ -10,11 +10,16 @@ import type {
   LogData,
   Logs,
   LogsEndpointParams,
+  LogsWarning,
 } from '@/components/interfaces/Settings/Logs/Logs.types'
 import {
   checkForILIKEClause,
   checkForWithClause,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
+import {
+  validateOtelLogQuery,
+  type LogQueryIssue,
+} from '@/components/interfaces/Settings/Logs/Logs.validation.otel'
 import { get } from '@/data/fetchers'
 import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -30,7 +35,14 @@ export interface LogsQueryHook {
   runQuery: () => void
   setParams: Dispatch<SetStateAction<LogsEndpointParams>>
   enabled?: boolean
+  validationWarnings: LogsWarning[]
 }
+
+// Append the parser's 1-based position to an issue message when it has one.
+const describeIssue = (issue: LogQueryIssue): string =>
+  issue.line !== undefined && issue.column !== undefined
+    ? `${issue.message} (line ${issue.line}, column ${issue.column})`
+    : issue.message
 
 export const useLogsQuery = (
   projectRef: string,
@@ -62,7 +74,17 @@ export const useLogsQuery = (
     }))
   }, [initialParams.sql, initialParams.iso_timestamp_start, initialParams.iso_timestamp_end])
 
-  const _enabled = enabled && typeof projectRef !== 'undefined' && Boolean(params.sql)
+  // The ClickHouse-backed OTEL endpoint gets full client-side parsing: syntax
+  // checks, a read-only statement allow-list, and schema hints. The BigQuery
+  // endpoint keeps its lighter regex checks below.
+  const validation = useMemo(
+    () => (useOtel ? validateOtelLogQuery(params.sql || '') : { errors: [], warnings: [] }),
+    [useOtel, params.sql]
+  )
+  const hasBlockingError = validation.errors.length > 0
+
+  const _enabled =
+    enabled && typeof projectRef !== 'undefined' && Boolean(params.sql) && !hasBlockingError
 
   const usesWith = checkForWithClause(params.sql || '')
   const usesILIKE = checkForILIKEClause(params.sql || '')
@@ -115,6 +137,17 @@ export const useLogsQuery = (
       }
     }
   }
+
+  // A blocked OTEL query never hits the endpoint, so surface the parser's
+  // verdict as the error instead.
+  if (useOtel && hasBlockingError) {
+    error = { message: describeIssue(validation.errors[0]) }
+  }
+
+  const validationWarnings: LogsWarning[] = validation.warnings.map((warning) => ({
+    text: describeIssue(warning),
+  }))
+
   const changeQuery = (newQuery = '') => {
     setParams((prev) => ({ ...prev, sql: newQuery }))
   }
@@ -136,6 +169,7 @@ export const useLogsQuery = (
     changeQuery,
     runQuery: () => refetch(),
     setParams,
+    validationWarnings,
   }
 }
 export default useLogsQuery
