@@ -12,7 +12,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { PauseDisabledState } from './PauseDisabledState'

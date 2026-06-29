@@ -17,8 +17,9 @@ import {
   PopoverTrigger,
   ScrollArea,
 } from 'ui'
-import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'

@@ -10,7 +10,7 @@ import { usePathname } from 'next/navigation'
 import React, { useState } from 'react'
 import { useWindowSize } from 'react-use'
 import { Button, buttonVariants, cn } from 'ui'
-import { AuthenticatedDropdownMenu } from 'ui-patterns'
+import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
 import {
   NavigationMenu,
   NavigationMenuContent,

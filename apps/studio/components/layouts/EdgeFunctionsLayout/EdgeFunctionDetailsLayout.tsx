@@ -25,7 +25,7 @@ import {
   PopoverTrigger,
   Separator,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageHeader,
