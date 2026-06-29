@@ -14,14 +14,15 @@ export const LogsExplorerOtelBanner = ({
 }: LogsExplorerOtelBannerProps) => {
   return (
     <Admonition
-      type="warning"
+      type="default"
+      layout="horizontal"
       className="mb-0 rounded-none border-x-0 border-t-0"
       title="Logs now run on a ClickHouse-backed engine"
-      description="You can use AI to rewrite this query to ClickHouse SQL."
+      description="This query needs to be adjusted to ClickHouse SQL, which the Assistant can do for you."
       actions={
         <div className="flex items-center gap-2">
           <Button variant="default" size="tiny" loading={isRewriting} onClick={onRewrite}>
-            Rewrite to ClickHouse
+            Rewrite with Assistant
           </Button>
           <Button variant="text" size="tiny" onClick={onDismiss}>
             Dismiss

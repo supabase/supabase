@@ -35,13 +35,13 @@ import {
 import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
 import { otelFieldsFromKeys, toOtelFieldSchemas } from './Logs.fieldReference'
 import { LogsWarning, LogTemplate } from './Logs.types'
-import Table from '@/components/to-be-cleaned/Table'
+import TableDeprecated from '@/components/to-be-cleaned/Table'
 import { useOtelLogKeysQuery } from '@/data/logs/otel-log-keys-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
 import { DOCS_URL } from '@/lib/constants'
 
-export interface LogsQueryPanelProps {
+interface LogsQueryPanelProps {
   templates?: LogTemplate[]
   value: DatePickerValue
   warnings: LogsWarning[]
@@ -62,7 +62,7 @@ function DropdownMenuItemContent({ name, desc }: { name: ReactNode; desc?: strin
   )
 }
 
-const LogsQueryPanel = ({
+export const LogsQueryPanel = ({
   templates = [],
   value,
   warnings,
@@ -215,10 +215,13 @@ const LogsQueryPanel = ({
                     onClick={onRewrite}
                     className="px-2"
                   >
-                    Fix Query
+                    Rewrite query to ClickHouse SQL
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent>Use AI to rewrite the query in ClickHouse SQL</TooltipContent>
+                <TooltipContent side="bottom" className="w-72 text-center">
+                  Logs now run on a ClickHouse-backed engine. Click to rewrite this query with the
+                  Assistant.
+                </TooltipContent>
               </Tooltip>
             )}
             <SidePanel
@@ -331,22 +334,24 @@ const LogsQueryPanel = ({
                 {useOtel && isLoadingKeys ? (
                   <p className="text-sm text-foreground-light py-2">Loading fields…</p>
                 ) : (
-                  <Table
-                    head={[
-                      <Table.th className="text-xs p-2!" key="path">
-                        Path
-                      </Table.th>,
-                      <Table.th key="type" className="text-xs p-2!">
-                        Type
-                      </Table.th>,
-                    ]}
-                    body={(() => {
-                      const fields = useOtel
-                        ? otelFieldsFromKeys(discoveredKeys ?? [])
-                        : selectedSchema.fields
-                      return fields.map((field) => <Field key={field.path} field={field} />)
-                    })()}
-                  />
+                  <>
+                    <TableDeprecated
+                      head={[
+                        <TableDeprecated.th className="text-xs p-2!" key="path">
+                          Path
+                        </TableDeprecated.th>,
+                        <TableDeprecated.th key="type" className="text-xs p-2!">
+                          Type
+                        </TableDeprecated.th>,
+                      ]}
+                      body={(() => {
+                        const fields = useOtel
+                          ? otelFieldsFromKeys(discoveredKeys ?? [])
+                          : selectedSchema.fields
+                        return fields.map((field) => <Field key={field.path} field={field} />)
+                      })()}
+                    />
+                  </>
                 )}
               </div>
             </SidePanel>
@@ -368,8 +373,8 @@ const Field = ({
   const [isCopied, setIsCopied] = useState(false)
 
   return (
-    <Table.tr>
-      <Table.td
+    <TableDeprecated.tr>
+      <TableDeprecated.td
         className="font-mono text-xs p-2! cursor-pointer hover:text-foreground transition flex items-center space-x-2"
         onClick={() =>
           copyToClipboard(field.path, () => {
@@ -394,10 +399,8 @@ const Field = ({
             <TooltipContent side="bottom">Copy value</TooltipContent>
           </Tooltip>
         )}
-      </Table.td>
-      <Table.td className="font-mono text-xs p-2!">{field.type}</Table.td>
-    </Table.tr>
+      </TableDeprecated.td>
+      <TableDeprecated.td className="font-mono text-xs p-2!">{field.type}</TableDeprecated.td>
+    </TableDeprecated.tr>
   )
 }
-
-export default LogsQueryPanel

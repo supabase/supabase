@@ -31,7 +31,7 @@ import {
   resolveLogDateRange,
 } from '@/components/interfaces/Settings/Logs/logsDateRange'
 import { LogsExplorerOtelBanner } from '@/components/interfaces/Settings/Logs/LogsExplorerOtelBanner'
-import LogsQueryPanel from '@/components/interfaces/Settings/Logs/LogsQueryPanel'
+import { LogsQueryPanel } from '@/components/interfaces/Settings/Logs/LogsQueryPanel'
 import { LogTable } from '@/components/interfaces/Settings/Logs/LogTable'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import DefaultLayout from '@/components/layouts/DefaultLayout'
@@ -59,6 +59,8 @@ import { uuidv4 } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
 import type { LogSqlSnippets, NextPageWithLayout } from '@/types'
+
+type SaveQueryFormValues = { name: string; description?: string }
 
 const LOCAL_PLACEHOLDER_QUERY =
   'select\n  timestamp, event_message, metadata\n  from edge_logs limit 5'
@@ -174,6 +176,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const results = logData
   const isLoading = logsLoading
+
+  const showRewriteCTA = useOtelEndpoint && looksLikeLegacyLogsQuery(editorValue)
 
   const { mutateAsync: upsertContent, isPending: isUpsertingContent } = useContentUpsertMutation({
     onError: (e) => {
@@ -330,8 +334,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     }
   }
 
-  type SaveQueryFormValues = { name: string; description?: string }
-
   const handleCreateQuery = async (values: SaveQueryFormValues) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!profile) return console.error('Profile is required')
@@ -410,20 +412,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     } else if (q) {
       setEditorValue(q)
       setSearch(q)
+    } else if (!queryId) {
+      setEditorValue(PLACEHOLDER_QUERY)
+      editorRef.current?.setValue(PLACEHOLDER_QUERY)
     }
-  }, [q, search, setSearch])
-
-  useEffect(() => {
-    if (!useOtelEndpoint || q || search || queryId) return
-    if (editorValue === OTEL_PLACEHOLDER_QUERY) return
-    const isUntouchedDefault =
-      editorValue === LOCAL_PLACEHOLDER_QUERY ||
-      editorValue === PLATFORM_PLACEHOLDER_QUERY ||
-      editorValue === logsDefaultQuery
-    if (!isUntouchedDefault) return
-    setEditorValue(OTEL_PLACEHOLDER_QUERY)
-    editorRef.current?.setValue(OTEL_PLACEHOLDER_QUERY)
-  }, [useOtelEndpoint, q, search, queryId, editorValue, logsDefaultQuery])
+  }, [q, search, queryId, setSearch, PLACEHOLDER_QUERY])
 
   useEffect(() => {
     // prevents overwriting when the user selects a helper.
@@ -479,11 +472,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             templates={allTemplates.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
             warnings={warnings}
-            showRewriteAction={useOtelEndpoint && rewriteBannerDismissed}
+            showRewriteAction={showRewriteCTA && rewriteBannerDismissed}
             isRewriting={isRewriting}
             onRewrite={handleRewrite}
           />
-          {useOtelEndpoint && !rewriteBannerDismissed && looksLikeLegacyLogsQuery(editorValue) && (
+          {showRewriteCTA && !rewriteBannerDismissed && (
             <LogsExplorerOtelBanner
               isRewriting={isRewriting}
               onRewrite={handleRewrite}
@@ -506,7 +499,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               <div className="absolute inset-0 z-10 flex flex-col bg-studio">
                 <div className="flex items-center justify-between gap-2 border-b bg-surface-100 px-4 py-2">
                   <span className="text-xs text-foreground-light">
-                    Review the ClickHouse rewrite before applying it
+                    Review the ClickHouse SQL rewrite before accepting it
                   </span>
                   <div className="flex items-center gap-2">
                     <Button variant="default" size="tiny" onClick={discardRewrite}>
@@ -522,7 +515,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
                     language="pgsql"
                     original={rewriteProposal.original}
                     modified={rewriteProposal.modified}
-                    options={{ renderSideBySide: true }}
+                    options={{ renderSideBySide: true, renderGutterMenu: false }}
                   />
                 </div>
               </div>
