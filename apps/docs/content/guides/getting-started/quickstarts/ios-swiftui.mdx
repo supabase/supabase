@@ -8,7 +8,7 @@ breadcrumb: 'Framework Quickstarts'
 
 ## Create an iOS SwiftUI app with Xcode
 
-Open Xcode > New Project > iOS > App. You can skip this step if you already have a working app.
+Select the **Xcode > New Project > iOS > App** menu item.
 
 ## Install the Supabase client library
 
@@ -17,6 +17,8 @@ Add the [supabase-swift](https://github.com/supabase/supabase-swift) package to 
 In Xcode, navigate to **File > Add Package Dependencies...** and enter the repository URL `https://github.com/supabase/supabase-swift` in the search bar. For detailed instructions, see Apple's [tutorial on adding package dependencies](https://developer.apple.com/documentation/xcode/adding-package-dependencies-to-your-app).
 
 Make sure to add `Supabase` product package as a dependency to your application target.
+
+<$Partial path="api_settings.mdx" variables={{ "framework": "swift", "tab": "mobiles" }} />
 
 ## Initialize the Supabase client
 
@@ -30,8 +32,6 @@ let supabase = SupabaseClient(
   supabaseKey: "YOUR_SUPABASE_PUBLISHABLE_KEY"
 )
 ```
-
-<$Partial path="api_settings.mdx" variables={{ "framework": "swift", "tab": "mobiles" }} />
 
 ## Create a data model for instruments
 

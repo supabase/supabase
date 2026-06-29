@@ -8,15 +8,19 @@ breadcrumb: 'Framework Quickstarts'
 
 ## Create an Android app with Android Studio
 
-Open Android Studio > New > New Android Project.
+Select the **Android Studio > New > New Android Project** menu item.
 
-## Install the Dependencies
+## Install dependencies
 
 Open `build.gradle.kts` (app) file and add the serialization plug, Ktor client, and Supabase client.
 
 Replace the version placeholders `$kotlin_version` with the Kotlin version of the project, and `$supabase_version` and `$ktor_version` with the respective latest versions.
 
-The latest supabase-kt version can be found [here](https://github.com/supabase-community/supabase-kt/releases) and Ktor version can be found [here](https://ktor.io/docs/welcome.html).
+<Admonition type="tip">
+
+You can find the latest supabase-kt version [on GitHub](https://github.com/supabase-community/supabase-kt/releases) and Ktor [in the Ktor documentation](https://ktor.io/docs/welcome.html).
+
+</Admonition>
 
 ```kotlin
 plugins {
@@ -42,11 +46,13 @@ Add the following line to the `AndroidManifest.xml` file under the `manifest` ta
 ...
 ```
 
+<$Partial path="api_settings.mdx" variables={{ "framework": "androidkotlin", "tab": "mobiles" }} />
+
 ## Initialize the Supabase client
 
 You can create a Supabase client whenever you need to perform an API call.
 
-For the sake of simplicity, we will create a client in the `MainActivity.kt` file at the top just below the imports.
+For a quick example, create a client at the top of the `MainActivity.kt` file below the imports.
 
 Replace the `supabaseUrl` and `supabaseKey` with your own:
 
@@ -61,8 +67,6 @@ val supabase = createSupabaseClient(
 }
 ...
 ```
-
-<$Partial path="api_settings.mdx" variables={{ "framework": "androidkotlin", "tab": "mobiles" }} />
 
 ## Create a data model for instruments
 
@@ -84,7 +88,11 @@ Use `LaunchedEffect` to fetch data from the database and display it in a `LazyCo
 
 Replace the default `MainActivity` class with the following code.
 
-Note that we are making a network request from our UI code. In production, you should probably use a `ViewModel` to separate the UI and data fetching logic.
+<Admonition type="note">
+
+This example application makes a network request from the UI code. In production, you should use a `ViewModel` to separate the UI and data fetching logic.
+
+</Admonition>
 
 ```kotlin
 class MainActivity : ComponentActivity() {
