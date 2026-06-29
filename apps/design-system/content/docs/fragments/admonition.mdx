@@ -46,6 +46,26 @@ Style the color of the button based upon the _context_ of the Admonition, not it
 
 Only ever use the `primary` (green) button `type` on a `default` Admonition. Even then—given that Admonition is an isolated callout—the `primary` button `type` should rarely be used.
 
+### Split button with dropdown
+
+When the primary action has related secondary actions, pair a main button with a chevron `DropdownMenu` trigger. Use this instead of crowding the callout with multiple buttons.
+
+<ComponentPreview
+  name="admonition-button-split"
+  className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
+  peekCode
+/>
+
+The shared middle border is the tricky part. Do **not** use `border-l-0` on the chevron button — that drops the divider on hover/focus. Instead:
+
+- Primary: `rounded-r-none` and `hover:z-10` so its border stacks above the chevron on hover.
+- Chevron trigger: `rounded-l-none`, `shrink-0`, `px-[4px] py-[5px]`, and `-ml-px` to overlap the adjacent border by one pixel.
+- Chevron trigger only: `aria-label` describing the menu (the icon is decorative).
+
+In responsive Admonitions, wrap the pair in `flex w-full @lg:w-auto`, give the primary `flex-1 @lg:flex-none`, and keep the chevron `shrink-0`.
+
+See also [Button — Split with dropdown](../components/button#split-with-dropdown) for the standalone pattern outside Admonition.
+
 ## Examples
 
 <ComponentPreview

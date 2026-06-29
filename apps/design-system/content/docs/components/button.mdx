@@ -121,6 +121,20 @@ Supports slot behavior with `asChild` prop.
 
 <ComponentPreview name="button-as-child" />
 
+### Split with dropdown
+
+Pair a primary button with a chevron `DropdownMenu` trigger when one action is default and the rest belong in a menu.
+
+<ComponentPreview name="button-split-dropdown" peekCode />
+
+Shared middle border rules:
+
+- Primary: `rounded-r-none` and `hover:z-10`.
+- Chevron trigger: `rounded-l-none`, `shrink-0`, `px-[4px] py-[5px]`, and `-ml-px` (overlap — do not use `border-l-0`).
+- Chevron trigger only: `aria-label` for the menu.
+
+Inside [Admonition](../fragments/admonition#split-button-with-dropdown) actions, also use `flex w-full @lg:w-auto` with `flex-1 @lg:flex-none` on the primary when `layout="responsive"`.
+
 ## Accessibility
 
 [Keyboard focus](../accessibility#focus-management) is automatically handled:

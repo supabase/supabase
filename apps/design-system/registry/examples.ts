@@ -26,6 +26,12 @@ export const examples: Registry = [
     files: ['example/admonition-button.tsx'],
   },
   {
+    name: 'admonition-button-split',
+    type: 'components:example',
+    registryDependencies: ['admonition', 'button', 'dropdown-menu'],
+    files: ['example/admonition-button-split.tsx'],
+  },
+  {
     name: 'admonition-description-only',
     type: 'components:example',
     registryDependencies: ['admonition'],
@@ -252,6 +258,12 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['button'],
     files: ['example/button-as-child.tsx'],
+  },
+  {
+    name: 'button-split-dropdown',
+    type: 'components:example',
+    registryDependencies: ['button', 'dropdown-menu'],
+    files: ['example/button-split-dropdown.tsx'],
   },
   {
     name: 'calendar-demo',
