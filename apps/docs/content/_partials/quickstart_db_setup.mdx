@@ -75,6 +75,8 @@ alter table instruments enable row level security;
 
 This creates an `instruments` table with some sample data, sets a secure baseline by setting only the privileges each Postgres role needs, and adds [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default.
 
+{/* Commented for now as really we're already getting people to paste SQL, so let's continue. Once we have this added as an example, then offer fully visual options. */}
+
 {/* Then in the [**Integrations > Data API**](/dashboard/project/_/integrations/data_api/settings) section of the Dashboard, expose the specific tables or functions you want to access. To automatically grant access for new tables and functions in `public`, enable **Default privileges for new entities**. */}
 
 Create an RLS policy to make the data in your table publicly readable:
