@@ -265,6 +265,36 @@ describe('sanitizeNameForDuplicateInColumn', () => {
       )
     })
 
+    it('counts existing duplicates correctly when the name contains regex-special characters', () => {
+      // `a+b` contains `+`, a regex quantifier. Without escaping, the generated
+      // pattern fails to match `a+b (1).txt`, so the count is wrong and the
+      // function returns `a+b (1).txt` - a name that already exists.
+      const state = makeState([[{ name: 'a+b.txt' }, { name: 'a+b (1).txt' }]])
+      expect(sanitizeNameForDuplicateInColumn(state, { name: 'a+b.txt', autofix: true })).toBe(
+        'a+b (2).txt'
+      )
+    })
+
+    it('does not throw when the name contains an unbalanced parenthesis', () => {
+      // `file(.txt` passes validateFolderName but, unescaped, produces an
+      // invalid RegExp (unterminated group) that throws.
+      const state = makeState([[{ name: 'file(.txt' }]])
+      expect(() =>
+        sanitizeNameForDuplicateInColumn(state, { name: 'file(.txt', autofix: true })
+      ).not.toThrow()
+      expect(sanitizeNameForDuplicateInColumn(state, { name: 'file(.txt', autofix: true })).toBe(
+        'file( (1).txt'
+      )
+    })
+
+    it('does not match across the literal extension dot', () => {
+      // The extension separator must be a literal dot, not "any character".
+      const state = makeState([[{ name: 'file.txt' }, { name: 'file (1)Xtxt' }]])
+      expect(sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', autofix: true })).toBe(
+        'file (1).txt'
+      )
+    })
+
     it('treats the whole name as the extension when there is no dot (existing behaviour)', () => {
       // NOTE: the function splits on '.' and always treats the last segment as the
       // extension, so a dotless name produces " (1).myfile" rather than "myfile (1)".
