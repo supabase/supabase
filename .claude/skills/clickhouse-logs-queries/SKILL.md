@@ -146,7 +146,9 @@ These are the substitutions that trip people up most:
 | Read the timestamp | `cast(timestamp as datetime)` | `timestamp` (use the column directly)        |
 | Map keys           | n/a (used unnest)             | `mapKeys(log_attributes)`                    |
 
-`select *` is not supported — list the columns you need.
+The `logs.all.otel` analytics endpoint (and the Logs Explorer on top of it)
+rejects `count(*)` and `select *` — use `count()` and list the columns you need.
+(Raw ClickHouse supports both; this is a constraint of the logs query surface.)
 
 ## Best practices
 
