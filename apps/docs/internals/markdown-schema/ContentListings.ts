@@ -26,10 +26,6 @@ export function serializeContentListingGroupToMarkdown(
     lines.push('')
   }
 
-  if (lines.length) {
-    lines.push('')
-  }
-
   for (const item of group.items) {
     const href = isExternalContentListingHref(item.href)
       ? item.href

@@ -104,6 +104,9 @@ describe('serializeContentListingGroupToMarkdown', () => {
 
     expect(markdown.match(/^## Get started$/gm)).toHaveLength(1)
     expect(markdown.match(/^Read these first\.$/gm)).toHaveLength(1)
+    expect(markdown).toBe(
+      '## Get started\n\nRead these first.\n\n- **[Connect](/docs/guides/database/connecting-to-postgres):** Connection strings.'
+    )
   })
 
   it('omits heading line when heading is not set', () => {
