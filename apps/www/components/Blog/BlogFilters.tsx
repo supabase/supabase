@@ -163,7 +163,6 @@ function BlogFilters({ view, setView, onFilterChange, onSearch }: Props) {
             <Link
               key={category}
               href={categoryHref(category)}
-              scroll={false}
               aria-label={
                 category === 'all'
                   ? 'Show all blog posts'
