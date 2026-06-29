@@ -1,0 +1,85 @@
+# docker-compose.metrics.yml
+#
+# Adds VictoriaMetrics, postgres_exporter, and OTel Collector to your
+# existing self-hosted Supabase stack.
+#
+# Usage:
+#   Copy this file to docker/ alongside docker-compose.yml. Then:
+#
+#     docker compose -f docker-compose.yml \
+#                    -f docker-compose.override.yml \
+#                    -f docker-compose.metrics.yml up -d
+#
+# See docs/monitoring/README.md for the full setup guide.
+
+services:
+
+  # ---------------------------------------------------------------------------
+  # VictoriaMetrics — metrics storage and scraping
+  #
+  # Prometheus-compatible time series database. Scrapes all Supabase pull
+  # endpoints and accepts Storage metrics forwarded by the OTel Collector.
+  #
+  # Targets page: http://localhost:8428/targets
+  # Query UI:     http://localhost:8428/vmui
+  # ---------------------------------------------------------------------------
+  victoriametrics:
+    image: victoriametrics/victoria-metrics:v1.122.0
+    container_name: supabase-victoriametrics
+    restart: unless-stopped
+    ports:
+      - "8428:8428"
+    volumes:
+      - ./volumes/monitoring/victoriametrics:/victoria-metrics-data
+      - ./volumes/monitoring/scrape.yml:/scrape.yml:ro
+      - ./volumes/monitoring/jwt:/etc/vm/jwt:ro
+    command:
+      - -storageDataPath=/victoria-metrics-data
+      - -retentionPeriod=30d
+      - -promscrape.config=/scrape.yml
+      - -httpListenAddr=:8428
+    networks:
+      - default
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------------------
+  # postgres_exporter — Postgres metrics sidecar
+  #
+  # Postgres does not expose Prometheus metrics natively. This sidecar
+  # connects to the Supabase Postgres container and exposes metrics at
+  # :9187/metrics for VictoriaMetrics to scrape.
+  # ---------------------------------------------------------------------------
+  postgres-exporter:
+    image: quay.io/prometheuscommunity/postgres-exporter:v0.19.1
+    container_name: supabase-postgres-exporter
+    restart: unless-stopped
+    environment:
+      DATA_SOURCE_NAME: "postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/postgres?sslmode=disable"
+    networks:
+      - default
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------------------
+  # OTel Collector — receives Storage metrics
+  #
+  # Storage uses the OpenTelemetry SDK and pushes metrics via gRPC every 60s.
+  # The Collector receives them on :4317 and forwards to VictoriaMetrics via
+  # Prometheus remote write. See docs/monitoring/otel-push.md.
+  # ---------------------------------------------------------------------------
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.152.0
+    container_name: supabase-otel-collector
+    restart: unless-stopped
+    volumes:
+      - ./volumes/monitoring/otelcol/config.yml:/etc/otelcol-contrib/config.yaml:ro
+    networks:
+      - default
+
+networks:
+  default:
+    name: ${COMPOSE_PROJECT_NAME:-supabase}_default
+    external: true

@@ -1,0 +1,106 @@
+# VictoriaMetrics scrape configuration for self-hosted Supabase.
+#
+# Mounted into the VictoriaMetrics container by docker-compose.metrics.yml.
+#
+# Bearer JWT for Supavisor and Realtime: ANON_KEY from your .env file.
+# Generate the jwt file with:
+#   grep '^ANON_KEY=' .env | cut -d= -f2 > volumes/monitoring/jwt
+#
+# API gateway: Supabase ships with Kong (default) and Envoy (optional).
+# Kong will be deprecated soon — Envoy is its replacement.
+# Enable the scrape job that matches your active gateway.
+
+global:
+  scrape_interval: 60s
+
+scrape_configs:
+
+  # Supavisor — connection pooler, on by default, requires Bearer JWT
+  - job_name: supabase-supavisor
+    metrics_path: /metrics
+    authorization:
+      type: Bearer
+      credentials_file: /etc/vm/jwt
+    static_configs:
+      - targets: ["supabase-pooler:4000"]
+        labels:
+          service: supavisor
+
+  # Realtime — on by default, requires Bearer JWT
+  - job_name: supabase-realtime
+    metrics_path: /metrics
+    authorization:
+      type: Bearer
+      credentials_file: /etc/vm/jwt
+    static_configs:
+      - targets: ["realtime-dev.supabase-realtime:4000"]
+        labels:
+          service: realtime
+
+  # Auth (GoTrue) — requires GOTRUE_METRICS_ENABLED=true
+  # (see docker-compose.override.yml)
+  - job_name: supabase-auth
+    metrics_path: /
+    static_configs:
+      - targets: ["supabase-auth:9100"]
+        labels:
+          service: auth
+
+  # PostgreSQL — via postgres_exporter sidecar
+  # (added by docker-compose.metrics.yml)
+  - job_name: supabase-postgres
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["postgres-exporter:9187"]
+        labels:
+          service: postgres
+
+  # Kong API Gateway (deprecation pending — use Envoy job below if on Envoy)
+  # Requires prometheus plugin + KONG_ADMIN_LISTEN=0.0.0.0:8001
+  # (see docker-compose.override.yml)
+  - job_name: supabase-kong
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["supabase-kong:8001"]
+        labels:
+          service: kong
+
+  # Envoy API Gateway (replaces Kong)
+  # Requires admin address set to 0.0.0.0 in volumes/api/envoy/envoy.yaml
+  # Only applies when running with docker-compose.envoy.yml
+  # ⚠️ Keep port 9901 internal to the Docker network — do not map to host.
+  #    See: https://supabase.com/docs/guides/self-hosting/self-hosted-envoy#security-hardening
+  - job_name: supabase-envoy
+    metrics_path: /stats/prometheus
+    static_configs:
+      - targets: ["supabase-envoy:9901"]
+        labels:
+          service: envoy
+
+  # PostgREST — requires PGRST_ADMIN_SERVER_PORT=3001
+  # (see docker-compose.override.yml)
+  - job_name: supabase-rest
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["supabase-rest:3001"]
+        labels:
+          service: rest
+
+  # imgproxy — requires IMGPROXY_PROMETHEUS_BIND=:8081
+  # (see docker-compose.override.yml)
+  - job_name: supabase-imgproxy
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["supabase-imgproxy:8081"]
+        labels:
+          service: imgproxy
+
+  # Vector (log pipeline)
+  # Requires vector.metrics.yml mounted alongside vector.yml
+  # (see docker-compose.override.yml)
+  - job_name: supabase-vector
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["supabase-vector:9598"]
+        labels:
+          service: vector

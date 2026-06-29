@@ -1,0 +1,20 @@
+# Vector internal metrics config.
+#
+# Mounted alongside the original vector.yml (not modifying it) to add a
+# Prometheus exporter for Vector's own operational metrics.
+#
+# Exposes Vector internal metrics at :9598/metrics including:
+# - Events received/sent per component
+# - Component errors
+# - Buffer utilization
+
+sources:
+  internal_metrics:
+    type: internal_metrics
+
+sinks:
+  prometheus_exporter:
+    type: prometheus_exporter
+    inputs:
+      - internal_metrics
+    address: "0.0.0.0:9598"
