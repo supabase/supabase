@@ -1,0 +1,29 @@
+---
+title = "Realtime: ChannelRateLimitReached"
+date_created = "2025-07-07T22:39:54+00:00"
+topics = [ "realtime" ]
+keywords = [ "ratelimits", "Realtime", "channels" ]
+---
+
+The error `ChannelRateLimitReached` means that an individual user session is trying to subscribe to more than 100 channels and has reached the limit for your plan.
+
+[Realtime Quotas](https://supabase.com/docs/guides/realtime/quotas):
+
+| Plan                  | Channels per connection |
+|-----------------------|-------------------------|
+| Free                  | 100                     |
+| Pro                   | 100                     |
+| Pro (no spend cap)    | 100                     |
+| Team                  | 100                     |
+| Enterprise            | 100+                    |
+
+
+
+### Example:
+If a user session on the free plan joins a channel called `chatroom1`, then continues joining additional channels like `chatroom2`, `chatroom3`, and so on up to `chatroom101`, they’ll hit the limit and receive the error `ChannelRateLimitReached`.
+
+### How to fix it
+
+- Make sure your code isn't joining channels in a loop
+- Unsubscribe from channels when they're no longer needed
+- If you genuinely need more than 100 channels per connection, consider upgrading your plan or reaching out to [Support](https://supabase.com/dashboard/support/new)
