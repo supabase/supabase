@@ -1,0 +1,256 @@
+---
+title: "RLS Policy Function Returns NULL - JWT Claims Not Available"
+github_url = "https://github.com/supabase/supabase/issues/42235"
+date_created = "2025-01-28T00:00:00+00:00"
+topics = [ "database", "auth", "rls" ]
+keywords = [ "rls", "jwt", "policies", "auth.uid", "row level security" ]
+---
+
+## Problem
+
+Custom PostgreSQL functions that successfully extract user ID from JWT claims when called via RPC (`supabase.rpc()`) return NULL when evaluated within Row Level Security (RLS) policy context. This causes RLS policies to fail and blocks legitimate database operations.
+
+### Symptoms
+
+- ✅ Function works correctly via RPC - returns authenticated user ID
+- ❌ Same function returns NULL in RLS policy context
+- ❌ RLS policies fail, blocking INSERT/UPDATE/DELETE operations
+- ✅ User is properly authenticated with valid JWT token
+- ✅ All client-side checks pass (session, token, headers)
+
+### Root Cause
+
+PostgREST does not make JWT claims available (`request.jwt.claim.*` settings) in RLS policy evaluation context, even though they are available in RPC function execution context. This creates an inconsistency where the same function behaves differently depending on execution context.
+
+**Affected Functions:**
+- `auth.uid()` - Returns NULL in RLS context (especially with ECC keys)
+- Custom functions using `current_setting('request.jwt.claim.sub', true)`
+- Any function that relies on JWT claims in RLS policies
+
+## Workaround Solution
+
+Until PostgREST fixes JWT claim availability in RLS context, use SECURITY DEFINER functions that can access JWT claims in their execution context.
+
+### Step 1: Create Workaround Function
+
+Run this migration to create a workaround function:
+
+```sql
+CREATE OR REPLACE FUNCTION public.get_current_user_id_rls()
+RETURNS uuid
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+  v_sub text;
+BEGIN
+  BEGIN
+    v_sub := current_setting('request.jwt.claim.sub', true);
+  EXCEPTION
+    WHEN OTHERS THEN
+      v_sub := NULL;
+  END;
+
+  IF v_sub IS NOT NULL AND v_sub != '' THEN
+    RETURN v_sub::uuid;
+  END IF;
+
+  RETURN NULL;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_current_user_id_rls() TO authenticated, anon;
+```
+
+### Step 2: Update RLS Policies
+
+Replace `auth.uid()` or custom functions with the workaround function:
+
+**Before (doesn't work):**
+```sql
+CREATE POLICY "Users can insert own rows"
+ON public.my_table
+FOR INSERT
+TO authenticated
+WITH CHECK (user_id = auth.uid());
+```
+
+**After (works with workaround):**
+```sql
+CREATE POLICY "Users can insert own rows"
+ON public.my_table
+FOR INSERT
+TO authenticated
+WITH CHECK (user_id = public.get_current_user_id_rls());
+```
+
+### Complete Example
+
+```sql
+-- Create table
+CREATE TABLE public.user_posts (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  content text,
+  created_at timestamp with time zone DEFAULT now()
+);
+
+-- Enable RLS
+ALTER TABLE public.user_posts ENABLE ROW LEVEL SECURITY;
+
+-- Grant permissions
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.user_posts TO authenticated;
+
+-- Create policies using workaround function
+CREATE POLICY "Users can view own posts"
+ON public.user_posts
+FOR SELECT
+TO authenticated
+USING (user_id = public.get_current_user_id_rls());
+
+CREATE POLICY "Users can create own posts"
+ON public.user_posts
+FOR INSERT
+TO authenticated
+WITH CHECK (user_id = public.get_current_user_id_rls());
+
+CREATE POLICY "Users can update own posts"
+ON public.user_posts
+FOR UPDATE
+TO authenticated
+USING (user_id = public.get_current_user_id_rls())
+WITH CHECK (user_id = public.get_current_user_id_rls());
+
+CREATE POLICY "Users can delete own posts"
+ON public.user_posts
+FOR DELETE
+TO authenticated
+USING (user_id = public.get_current_user_id_rls());
+```
+
+## Testing the Workaround
+
+### Test via RPC (should work)
+
+```typescript
+const { data, error } = await supabase.rpc('get_current_user_id_rls');
+console.log('User ID:', data); // Should return user UUID
+```
+
+### Test via INSERT (should now work)
+
+```typescript
+const { data, error } = await supabase
+  .from('user_posts')
+  .insert({
+    user_id: (await supabase.auth.getUser()).data.user?.id,
+    content: 'Test post'
+  });
+
+if (error) {
+  console.error('Insert failed:', error);
+} else {
+  console.log('Insert succeeded:', data);
+}
+```
+
+## Alternative: Enhanced Function
+
+If the basic workaround doesn't work, try the enhanced version with multiple fallback methods:
+
+```sql
+CREATE OR REPLACE FUNCTION public.get_current_user_id_enhanced()
+RETURNS uuid
+LANGUAGE plpgsql
+STABLE
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+  v_user_id uuid;
+  v_sub text;
+BEGIN
+  -- Method 1: Try auth.uid()
+  BEGIN
+    v_user_id := auth.uid();
+    IF v_user_id IS NOT NULL THEN
+      RETURN v_user_id;
+    END IF;
+  EXCEPTION
+    WHEN OTHERS THEN
+      NULL;
+  END;
+
+  -- Method 2: Try JWT claim 'sub'
+  BEGIN
+    v_sub := current_setting('request.jwt.claim.sub', true);
+    IF v_sub IS NOT NULL AND v_sub != '' THEN
+      RETURN v_sub::uuid;
+    END IF;
+  EXCEPTION
+    WHEN OTHERS THEN
+      NULL;
+  END;
+
+  -- Method 3: Try JWT claims JSON
+  BEGIN
+    v_sub := (current_setting('request.jwt.claims', true)::jsonb ->> 'sub');
+    IF v_sub IS NOT NULL AND v_sub != '' THEN
+      RETURN v_sub::uuid;
+    END IF;
+  EXCEPTION
+    WHEN OTHERS THEN
+      NULL;
+  END;
+
+  RETURN NULL;
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_current_user_id_enhanced() TO authenticated, anon;
+```
+
+## Why This Works
+
+The workaround uses `SECURITY DEFINER` which allows the function to execute with the privileges of the function owner (typically the `postgres` role). This gives the function access to JWT claims that are set by PostgREST in the function execution context, even though they're not available in the RLS policy evaluation context.
+
+**Important Security Note:**
+- The function uses `SET search_path = public, pg_temp` to prevent search path attacks
+- Only grant `EXECUTE` permission to `authenticated` and `anon` roles
+- The function is marked `STABLE` to allow optimization by PostgreSQL
+
+## Related Issues
+
+- [GitHub Issue #42235](https://github.com/supabase/supabase/issues/42235) - This issue
+- [GitHub Issue #4244](https://github.com/supabase/supabase/issues/4244) - `auth.uid()` returning empty string
+- [GitHub Issue #38611](https://github.com/supabase/supabase/issues/38611) - `auth.uid()` not working with ECC keys
+
+## Expected Fix
+
+The proper fix requires PostgREST to set `request.jwt.claim.*` settings **before** RLS policy evaluation, ensuring that:
+
+1. Functions called from RLS policies can access JWT claims
+2. `current_setting('request.jwt.claim.sub', true)` works in RLS context
+3. `auth.uid()` works in RLS context
+4. Custom functions using JWT claims work in RLS context
+5. Behavior is consistent between RPC and RLS contexts
+
+Until this fix is implemented in PostgREST, use the workaround functions provided above.
+
+## Migration Script
+
+To apply the workaround to your project, run:
+
+```bash
+supabase migration new fix_rls_jwt_claims_workaround
+```
+
+Then copy the migration SQL from the [migration file](https://github.com/supabase/supabase/blob/master/supabase/migrations/20250128000000_fix_rls_jwt_claims_workaround.sql).
+
+## Additional Resources
+
+- [RLS Simplified Guide](/docs/troubleshooting/rls-simplified-BJTcS8)
+- [PostgreSQL RLS Documentation](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)
+- [PostgREST Documentation](https://postgrest.org/)
