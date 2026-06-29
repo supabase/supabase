@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
 import {
+  API_GATEWAY_PRODUCT_KEYS,
   buildApiGatewayProductData,
   calculateApiGatewayAggregate,
 } from './apiGatewayProductChart.utils'
@@ -157,7 +158,8 @@ describe('chart and header agreement', () => {
     const aggregate = calculateApiGatewayAggregate(serviceData)
 
     const stackedHeight = chartData.reduce(
-      (sum, bucket) => sum + bucket.db + bucket.storage + bucket.realtime,
+      (sum, bucket) =>
+        sum + API_GATEWAY_PRODUCT_KEYS.reduce((bucketTotal, key) => bucketTotal + bucket[key], 0),
       0
     )
 
