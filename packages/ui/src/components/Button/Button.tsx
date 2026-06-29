@@ -239,6 +239,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     // - Otherwise, default to 0 for keyboard accessibility
     const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
 
+    const renderIconContainer = (content: ReactNode) => (
+      <div aria-hidden className={cn(IconContainerVariants({ size, variant }))}>
+        {content}
+      </div>
+    )
+
     return (
       <Comp
         ref={ref}
@@ -260,35 +266,31 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               children,
               undefined,
               showIcon &&
-                (loading ? (
-                  <div className={cn(IconContainerVariants({ size, variant }))}>
-                    <Loader2 className={cn(loadingVariants({ loading, variant }))} />
-                  </div>
-                ) : _iconLeft ? (
-                  <div className={cn(IconContainerVariants({ size, variant }))}>{_iconLeft}</div>
-                ) : null),
+                (loading
+                  ? renderIconContainer(
+                      <Loader2 className={cn(loadingVariants({ loading, variant }))} />
+                    )
+                  : _iconLeft
+                    ? renderIconContainer(_iconLeft)
+                    : null),
               children.props.children && (
                 <span className={'truncate'}>{children.props.children}</span>
               ),
-              iconRight && !loading && (
-                <div className={cn(IconContainerVariants({ size, variant }))}>{iconRight}</div>
-              )
+              iconRight && !loading && renderIconContainer(iconRight)
             )
           ) : null
         ) : (
           <>
             {showIcon &&
-              (loading ? (
-                <div className={cn(IconContainerVariants({ size, variant }))}>
-                  <Loader2 className={cn(loadingVariants({ loading, variant }))} />
-                </div>
-              ) : _iconLeft ? (
-                <div className={cn(IconContainerVariants({ size, variant }))}>{_iconLeft}</div>
-              ) : null)}{' '}
+              (loading
+                ? renderIconContainer(
+                    <Loader2 className={cn(loadingVariants({ loading, variant }))} />
+                  )
+                : _iconLeft
+                  ? renderIconContainer(_iconLeft)
+                  : null)}{' '}
             {children && <span className={'truncate'}>{children}</span>}{' '}
-            {iconRight && !loading && (
-              <div className={cn(IconContainerVariants({ size, variant }))}>{iconRight}</div>
-            )}
+            {iconRight && !loading && renderIconContainer(iconRight)}
           </>
         )}
       </Comp>
