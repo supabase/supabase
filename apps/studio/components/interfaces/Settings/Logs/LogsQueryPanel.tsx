@@ -228,6 +228,7 @@ const LogsQueryPanel = ({
                 <div className="flex flex-row justify-between items-center">
                   <h3>Field Reference</h3>
                   <Button
+                    aria-label="Close field reference"
                     variant="text"
                     className="px-1"
                     onClick={() => setShowReference(false)}
@@ -341,10 +342,11 @@ const LogsQueryPanel = ({
                       </Table.th>,
                     ]}
                     body={(() => {
-                      const fields =
-                        useOtel && discoveredKeys && discoveredKeys.length > 0
-                          ? otelFieldsFromKeys(discoveredKeys)
-                          : selectedSchema.fields
+                      // In OTEL mode show the discovered keys even when empty (only base
+                      // columns), so we don't imply legacy fields exist in log_attributes.
+                      const fields = useOtel
+                        ? otelFieldsFromKeys(discoveredKeys ?? [])
+                        : selectedSchema.fields
                       return fields.map((field) => <Field key={field.path} field={field} />)
                     })()}
                   />

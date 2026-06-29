@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   buildClickhouseRewritePrompt,
   detectLogSource,
+  looksLikeLegacyLogsQuery,
   rewriteLogsSqlWithAI,
   stripSqlCodeFences,
 } from './logs-sql-rewrite'
@@ -53,8 +54,11 @@ describe('detectLogSource', () => {
     expect(detectLogSource('select 1 from edge_logs as t')).toBe('edge_logs')
   })
 
-  it('maps pg_cron_logs to postgres_logs', () => {
+  it('maps pg_cron_logs to postgres_logs from either the FROM table or the source filter', () => {
     expect(detectLogSource('select 1 from pg_cron_logs')).toBe('postgres_logs')
+    expect(detectLogSource("select 1 from logs where source = 'pg_cron_logs'")).toBe(
+      'postgres_logs'
+    )
   })
 
   it('returns undefined for the bare logs table with no source', () => {
@@ -63,6 +67,25 @@ describe('detectLogSource', () => {
 
   it('returns undefined when nothing matches', () => {
     expect(detectLogSource('select 1')).toBeUndefined()
+  })
+})
+
+describe('looksLikeLegacyLogsQuery', () => {
+  it('flags per-service FROM tables', () => {
+    expect(looksLikeLegacyLogsQuery('select 1 from edge_logs')).toBe(true)
+  })
+
+  it('flags unnest joins and the cast-timestamp idiom', () => {
+    expect(looksLikeLegacyLogsQuery('select 1 from logs cross join unnest(metadata) as m')).toBe(
+      true
+    )
+    expect(looksLikeLegacyLogsQuery('select cast(timestamp as datetime) from logs')).toBe(true)
+  })
+
+  it('does not flag a ClickHouse query against the logs table', () => {
+    expect(
+      looksLikeLegacyLogsQuery("select timestamp from logs where source = 'edge_logs' limit 5")
+    ).toBe(false)
   })
 })
 
@@ -77,6 +100,12 @@ describe('stripSqlCodeFences', () => {
 
   it('leaves unfenced SQL untouched (trimmed)', () => {
     expect(stripSqlCodeFences('  select 1 from logs  ')).toBe('select 1 from logs')
+  })
+
+  it('extracts the fenced block when wrapped in prose', () => {
+    expect(stripSqlCodeFences('Here is the rewrite:\n```sql\nselect 1 from logs\n```')).toBe(
+      'select 1 from logs'
+    )
   })
 })
 
@@ -108,11 +137,15 @@ describe('rewriteLogsSqlWithAI', () => {
 
   it('throws when the request fails', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: false, text: async () => 'boom' }))
-    await expect(rewriteLogsSqlWithAI({ sql: 'select 1' })).rejects.toThrow('boom')
+    await expect(rewriteLogsSqlWithAI({ sql: 'select 1', projectRef: 'abc' })).rejects.toThrow(
+      'boom'
+    )
   })
 
   it('throws when the model returns an empty query', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue({ ok: true, json: async () => '   ' }))
-    await expect(rewriteLogsSqlWithAI({ sql: 'select 1' })).rejects.toThrow('empty')
+    await expect(rewriteLogsSqlWithAI({ sql: 'select 1', projectRef: 'abc' })).rejects.toThrow(
+      'empty'
+    )
   })
 })

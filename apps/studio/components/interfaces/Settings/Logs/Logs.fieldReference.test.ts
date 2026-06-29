@@ -72,13 +72,29 @@ describe('otelFieldsFromKeys', () => {
     expect(paths).toContain("log_attributes['response.headers.x-foo']")
   })
 
-  it('excludes keys that are real OTEL columns (id, timestamp, event_message)', () => {
-    const fields = otelFieldsFromKeys(['id', 'timestamp', 'event_message', 'trace_id'])
+  it('excludes keys that are real OTEL columns', () => {
+    const fields = otelFieldsFromKeys([
+      'id',
+      'timestamp',
+      'event_message',
+      'severity_text',
+      'source',
+      'trace_id',
+    ])
     const paths = fields.map((f) => f.path)
     // Real columns appear exactly once (as base fields), not duplicated as attribute paths.
-    expect(paths.filter((p) => p === 'id')).toHaveLength(1)
-    expect(paths).not.toContain("log_attributes['id']")
+    for (const column of ['id', 'timestamp', 'event_message', 'severity_text', 'source']) {
+      expect(paths.filter((p) => p === column)).toHaveLength(1)
+      expect(paths).not.toContain(`log_attributes['${column}']`)
+    }
     expect(paths).toContain("log_attributes['trace_id']")
+  })
+
+  it('escapes quotes and backslashes in discovered keys', () => {
+    const fields = otelFieldsFromKeys(["weird'key", 'back\\slash'])
+    const paths = fields.map((f) => f.path)
+    expect(paths).toContain("log_attributes['weird''key']")
+    expect(paths).toContain("log_attributes['back\\\\slash']")
   })
 
   it('returns only base fields for an empty key list', () => {

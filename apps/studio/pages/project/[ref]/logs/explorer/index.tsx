@@ -10,6 +10,7 @@ import { Button, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui
 
 import {
   detectLogSource,
+  looksLikeLegacyLogsQuery,
   rewriteLogsSqlWithAI,
 } from '@/components/interfaces/Settings/Logs/logs-sql-rewrite'
 import {
@@ -248,6 +249,13 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         authorizationHeader: headerData.get('Authorization'),
         availableKeys,
       })
+      // The editor may have changed while awaiting key discovery and the AI call;
+      // don't offer a proposal that would clobber intervening edits.
+      const latestSql = editorRef.current?.getValue() ?? editorValue
+      if (latestSql !== currentSql) {
+        toast.info('The query changed while rewriting. Please try again.')
+        return
+      }
       setRewriteProposal({ original: currentSql, modified: rewritten })
     } catch (error) {
       toast.error(`Couldn't rewrite the query: ${(error as Error).message}`)
@@ -480,7 +488,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             isRewriting={isRewriting}
             onRewrite={handleRewrite}
           />
-          {useOtelEndpoint && !rewriteBannerDismissed && (
+          {useOtelEndpoint && !rewriteBannerDismissed && looksLikeLegacyLogsQuery(editorValue) && (
             <LogsExplorerOtelBanner
               isRewriting={isRewriting}
               onRewrite={handleRewrite}

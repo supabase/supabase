@@ -88,7 +88,9 @@ ${sql}`
 // Strip a single surrounding fence so the editor gets raw SQL.
 export function stripSqlCodeFences(text: string): string {
   const trimmed = text.trim()
-  const fenced = trimmed.match(/^```(?:sql)?\s*\n?([\s\S]*?)\n?```$/i)
+  // Match the first fenced block anywhere so leading/trailing prose around the
+  // SQL ("Here is the rewrite: ```sql ... ```") is dropped, not passed through.
+  const fenced = trimmed.match(/```(?:sql)?\s*\n?([\s\S]*?)\n?```/i)
   return (fenced ? fenced[1] : trimmed).trim()
 }
 
@@ -105,7 +107,10 @@ const SOURCE_ALIASES: Record<string, string> = {
  */
 export function detectLogSource(sql: string): string | undefined {
   const bySource = sql.match(/source\s*=\s*'([^']+)'/i)
-  if (bySource) return bySource[1]
+  if (bySource) {
+    const source = bySource[1].toLowerCase()
+    return SOURCE_ALIASES[source] ?? source
+  }
   const byFrom = sql.match(/\bfrom\s+([a-z_][a-z0-9_]*)/i)
   if (byFrom) {
     const table = byFrom[1].toLowerCase()
@@ -115,9 +120,24 @@ export function detectLogSource(sql: string): string | undefined {
   return undefined
 }
 
+/**
+ * Whether a query still looks like legacy BigQuery logs SQL (so the OTEL rewrite
+ * banner is worth showing). A ClickHouse query reads `from logs`, so anything
+ * selecting from a per-service table, or using BigQuery-only unnest joins or the
+ * `cast(timestamp as datetime)` idiom, counts as legacy.
+ */
+export function looksLikeLegacyLogsQuery(sql: string): boolean {
+  const lower = sql.toLowerCase()
+  if (/\bunnest\s*\(/.test(lower)) return true
+  if (/cast\s*\(\s*timestamp\s+as\s+datetime\s*\)/.test(lower)) return true
+  const byFrom = lower.match(/\bfrom\s+([a-z_][a-z0-9_]*)/)
+  return byFrom ? byFrom[1] !== 'logs' : false
+}
+
 export interface RewriteLogsSqlArgs {
   sql: string
-  projectRef?: string
+  // Required: the completion API rejects requests without it (z.string()).
+  projectRef: string
   connectionString?: string | null
   orgSlug?: string
   authorizationHeader?: string | null

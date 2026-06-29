@@ -13,10 +13,15 @@ const OTEL_BASE_FIELDS: LogField[] = [
   { path: 'source', type: 'string' },
 ]
 
-const OTEL_COLUMN_PATHS = new Set(['id', 'timestamp', 'event_message'])
+const OTEL_COLUMN_PATHS = new Set(OTEL_BASE_FIELDS.map(({ path }) => path))
 
 // BigQuery field paths nest under `metadata`; the OTEL map keys drop that root.
 const toOtelAttributeKey = (path: string) => path.replace(/^metadata\./, '')
+
+// Keys come from live data, so escape quotes/backslashes to keep the generated
+// log_attributes['key'] path valid when copied or fed into rewrite context.
+const toLogAttributePath = (key: string) =>
+  `log_attributes['${key.replace(/\\/g, '\\\\').replace(/'/g, "''")}']`
 
 // Recasts a BigQuery source schema onto the OTEL logs schema: real columns stay,
 // everything else becomes a log_attributes['key'] lookup.
@@ -27,7 +32,7 @@ const toOtelFieldSchema = (schema: LogFieldSchema): LogFieldSchema => ({
     ...schema.fields
       .filter((field) => !OTEL_COLUMN_PATHS.has(field.path))
       .map((field) => ({
-        path: `log_attributes['${toOtelAttributeKey(field.path)}']`,
+        path: toLogAttributePath(toOtelAttributeKey(field.path)),
         type: field.type,
       })),
   ],
@@ -43,6 +48,6 @@ export const toOtelFieldSchemas = (schemas: LogFieldSchema[]): LogFieldSchema[] 
 export function otelFieldsFromKeys(keys: string[]): LogFieldSchema['fields'] {
   const attributeFields = keys
     .filter((key) => !OTEL_COLUMN_PATHS.has(key))
-    .map((key) => ({ path: `log_attributes['${key}']`, type: 'string' as const }))
+    .map((key) => ({ path: toLogAttributePath(key), type: 'string' as const }))
   return [...OTEL_BASE_FIELDS, ...attributeFields]
 }
