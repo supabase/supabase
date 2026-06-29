@@ -28,7 +28,12 @@
 
 Thank you for your interest in [Supabase](https://supabase.com) and your willingness to contribute!
 
-To ensure a positive and inclusive environment, please read our [code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md). We encourage you to explore the existing [issues](https://github.com/supabase/supabase/issues) to see how you can make a meaningful impact. This document will help you setup your development environment.
+To help maintain a positive and inclusive environment, please take a moment to read our [code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md).
+
+We encourage you to explore the existing [issues](https://github.com/supabase/supabase/issues) to find opportunities where you can make a meaningful impact.
+
+This document will guide you through setting up your development environment.
+
 
 ### Install dependencies
 
