@@ -48,7 +48,6 @@ export interface LogsQueryPanelProps {
   onSelectTemplate: (template: LogTemplate) => void
   onSelectSource: (source: string) => void
   onDateChange: (value: DatePickerValue) => void
-  // Shown next to Field Reference once the rewrite banner is dismissed.
   showRewriteAction?: boolean
   isRewriting?: boolean
   onRewrite?: () => void
@@ -342,8 +341,6 @@ const LogsQueryPanel = ({
                       </Table.th>,
                     ]}
                     body={(() => {
-                      // In OTEL mode show the discovered keys even when empty (only base
-                      // columns), so we don't imply legacy fields exist in log_attributes.
                       const fields = useOtel
                         ? otelFieldsFromKeys(discoveredKeys ?? [])
                         : selectedSchema.fields

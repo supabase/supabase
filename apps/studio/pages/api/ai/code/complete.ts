@@ -129,8 +129,6 @@ const requestBodySchema = z.object({
   connectionString: z.string().nullish(),
   orgSlug: z.string().optional(),
   language: z.string().optional(),
-  // 'clickhouse' targets the logs engine: skip the Postgres schema/best-practices
-  // so the model writes ClickHouse SQL instead of Postgres.
   dialect: z.enum(['postgres', 'clickhouse']).optional(),
 })
 
@@ -185,8 +183,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
       ...(authorization && { Authorization: authorization }),
     }
 
-    // The logs engine has no Postgres schema to inject; pulling it in only biases
-    // the model toward Postgres SQL.
     const includeSchema = !isClickhouse && aiOptInLevel !== 'disabled'
 
     // Fetch schema list first so we can determine which schemas to load DDL for.
@@ -234,10 +230,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
           otherSchemas: schemas.filter((s) => !fetchedSchemaSet.has(s.name)).map((s) => s.name),
         }
 
-    // Important: keep this static per branch (no dynamic content) or Bedrock will not cache it.
-    // ClickHouse rewriting is a transformation, not cursor completion, so it skips the
-    // completion + <selection> framing (which made the model echo the input unchanged) and
-    // the Postgres schema, and sends the rewrite prompt directly.
     const system = isClickhouse
       ? source`
           You rewrite SQL queries to ClickHouse SQL for the Supabase logs table.

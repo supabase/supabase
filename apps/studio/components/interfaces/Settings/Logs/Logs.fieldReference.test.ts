@@ -40,7 +40,6 @@ describe('toOtelFieldSchemas', () => {
     expect(paths).toContain("log_attributes['identifier']")
     expect(paths).toContain("log_attributes['request.method']")
     expect(paths).toContain("log_attributes['request.cf.asn']")
-    // The original BigQuery nested paths are gone.
     expect(paths).not.toContain('metadata.request.method')
     expect(paths).not.toContain('identifier')
   })
@@ -82,7 +81,6 @@ describe('otelFieldsFromKeys', () => {
       'trace_id',
     ])
     const paths = fields.map((f) => f.path)
-    // Real columns appear exactly once (as base fields), not duplicated as attribute paths.
     for (const column of ['id', 'timestamp', 'event_message', 'severity_text', 'source']) {
       expect(paths.filter((p) => p === column)).toHaveLength(1)
       expect(paths).not.toContain(`log_attributes['${column}']`)

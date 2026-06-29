@@ -182,8 +182,6 @@ const LogsExplorerHeader = ({ subtitle }: LogsExplorerHeaderProps) => {
                   </Table.th>,
                 ]}
                 body={(() => {
-                  // In OTEL mode show the discovered keys even when empty (only base
-                  // columns), so we don't imply legacy fields exist in log_attributes.
                   const fields = useOtel
                     ? otelFieldsFromKeys(discoveredKeys ?? [])
                     : selectedSchema.fields

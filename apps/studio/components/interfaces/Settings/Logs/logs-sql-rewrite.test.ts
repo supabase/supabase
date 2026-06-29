@@ -19,11 +19,9 @@ describe('buildClickhouseRewritePrompt', () => {
 
   it('spells out the FROM-to-logs conversion and shows a worked example', () => {
     const prompt = buildClickhouseRewritePrompt('select 1 from postgres_logs')
-    // The core rule the model kept getting wrong: target `logs` + source filter.
     expect(prompt).toContain("from logs where source = 'postgres_logs'")
     expect(prompt.toLowerCase()).toContain('remove every')
     expect(prompt).toContain('cross join unnest')
-    // A before/after example anchors the transformation.
     expect(prompt).toContain('BigQuery:')
     expect(prompt).toContain('ClickHouse:')
     expect(prompt).toContain("log_attributes['parsed.error_severity']")

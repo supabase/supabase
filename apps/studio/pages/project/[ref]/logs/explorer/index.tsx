@@ -69,8 +69,6 @@ const PLATFORM_PLACEHOLDER_QUERY =
 const OTEL_PLACEHOLDER_QUERY =
   "select\n  timestamp,\n  event_message,\n  log_attributes\nfrom logs\nwhere source = 'edge_logs'\norder by timestamp desc\nlimit 5"
 
-// On OTEL there are no per-service tables; a source is a filter on the single
-// `logs` table. Used by the "Insert source" dropdown when the flag is on.
 const otelSourceQuery = (source: string) =>
   `select\n  timestamp,\n  event_message,\n  log_attributes\nfrom logs\nwhere source = '${source}'\norder by timestamp desc\nlimit 100`
 
@@ -129,8 +127,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     modified: string
   } | null>(null)
   const [isRewriting, setIsRewriting] = useState<boolean>(false)
-  // Persisted so a dismissed banner stays hidden across sessions; the Fix Query
-  // button in the header remains the way to trigger a rewrite afterwards.
   const [rewriteBannerDismissed, setRewriteBannerDismissed] = useLocalStorage<boolean>(
     `project-${projectRef}-logs-rewrite-banner-dismissed`,
     false
@@ -240,8 +236,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     setIsRewriting(true)
     try {
       const headerData = await constructHeaders()
-      // Feed the model the real log_attributes keys for the query's source so it
-      // maps to exact paths (e.g. request.headers.x_real_ip) instead of guessing.
       const source = detectLogSource(currentSql)
       const availableKeys = source
         ? await fetchOtelLogKeys({ projectRef, source }).catch(() => undefined)
@@ -271,8 +265,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   const acceptRewrite = () => {
     if (!rewriteProposal) return
-    // The CodeEditor stays mounted behind the diff overlay, so its live instance can
-    // be updated directly. Keep editorValue in sync so reads of state agree with it.
     editorRef.current?.setValue(rewriteProposal.modified)
     setEditorValue(rewriteProposal.modified)
     setRewriteProposal(null)
@@ -314,8 +306,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
       let updatedValue: string
       if (useOtelEndpoint) {
-        // OTEL: swap the source filter when there is one, otherwise drop in a
-        // starter query for the source.
         const sourceFilter = /source\s*=\s*'[^']*'/i
         updatedValue = sourceFilter.test(currentValue)
           ? currentValue.replace(sourceFilter, `source = '${source}'`)
@@ -501,9 +491,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             />
           )}
           <ShimmerLine active={isLoading} />
-          {/* Keep CodeEditor mounted at all times; the diff renders as an opaque overlay
-              so accepting can update the live editor instance directly (Monaco's model
-              caching and remount lifecycle are then irrelevant). */}
           <div className="relative h-full">
             <CodeEditor
               // Ensure we reset the editor to the query content whenever the selected query changes

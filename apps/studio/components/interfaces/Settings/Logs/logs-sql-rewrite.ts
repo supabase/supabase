@@ -1,13 +1,5 @@
-/**
- * Rewrites a legacy BigQuery logs query into ClickHouse SQL for the OTEL
- * `logs.all.otel` endpoint by asking the AI completion endpoint, then returns
- * only the rewritten query. The Logs Explorer shows it as a diff to accept; the
- * AI Assistant panel is not opened.
- */
 import { BASE_PATH } from '@/lib/constants'
 
-// Schema reference given to the model so it writes ClickHouse logs SQL. Kept
-// backtick-free so it composes into the prompt cleanly.
 export const LOGS_SCHEMA_REFERENCE = `The logs table (ClickHouse) has these columns:
 - id (String)
 - timestamp (DateTime64, UTC) formatted like 2026-06-22T09:34:06.215000 (ISO 8601, microsecond precision, no trailing Z)
@@ -27,12 +19,6 @@ Sources and their common log_attributes keys:
 
 Rules: always filter by source; the editor applies the selected time range so a timestamp filter is usually unnecessary; the old BigQuery unnest joins become log_attributes['key'] lookups (drop the metadata root).`
 
-/**
- * Renders the real log_attributes keys discovered for the query's source so the
- * model maps to actual paths. Without this the model guesses and drops dotted
- * prefixes (e.g. request.headers.x_real_ip -> headers.x_real_ip, request.cf.country
- * -> cf.country). Empty when no keys were discovered.
- */
 function renderAvailableKeys(availableKeys?: string[]): string {
   if (!availableKeys || availableKeys.length === 0) return ''
   const list = availableKeys.map((key) => `- log_attributes['${key}']`).join('\n')
@@ -40,13 +26,6 @@ function renderAvailableKeys(availableKeys?: string[]): string {
 ${list}\n`
 }
 
-/**
- * Prompt for the AI completion endpoint. Includes the schema and the query to
- * rewrite, and instructs the model to return only the SQL so the result can go
- * straight into the editor diff. When `availableKeys` is provided (the real
- * log_attributes keys discovered for the query's source), the model is told to
- * map to those exact keys.
- */
 export function buildClickhouseRewritePrompt(sql: string, availableKeys?: string[]): string {
   return `${LOGS_SCHEMA_REFERENCE}
 ${renderAvailableKeys(availableKeys)}
@@ -84,27 +63,16 @@ Reply with ONLY the rewritten SQL query: no explanation, no comments, and no mar
 ${sql}`
 }
 
-// Models sometimes wrap SQL in a markdown code fence despite being asked not to.
-// Strip a single surrounding fence so the editor gets raw SQL.
 export function stripSqlCodeFences(text: string): string {
   const trimmed = text.trim()
-  // Match the first fenced block anywhere so leading/trailing prose around the
-  // SQL ("Here is the rewrite: ```sql ... ```") is dropped, not passed through.
   const fenced = trimmed.match(/```(?:sql)?\s*\n?([\s\S]*?)\n?```/i)
   return (fenced ? fenced[1] : trimmed).trim()
 }
 
-// The old per-service table name doubles as the OTEL `source` value, except for
-// pg_cron logs which live under postgres_logs.
 const SOURCE_ALIASES: Record<string, string> = {
   pg_cron_logs: 'postgres_logs',
 }
 
-/**
- * Best-effort extraction of the source to fetch real keys for. Handles both a
- * legacy BigQuery query (`from edge_logs`) and an already-rewritten ClickHouse
- * query (`source = 'edge_logs'`). Returns undefined when nothing matches.
- */
 export function detectLogSource(sql: string): string | undefined {
   const bySource = sql.match(/source\s*=\s*'([^']+)'/i)
   if (bySource) {
@@ -120,12 +88,6 @@ export function detectLogSource(sql: string): string | undefined {
   return undefined
 }
 
-/**
- * Whether a query still looks like legacy BigQuery logs SQL (so the OTEL rewrite
- * banner is worth showing). A ClickHouse query reads `from logs`, so anything
- * selecting from a per-service table, or using BigQuery-only unnest joins or the
- * `cast(timestamp as datetime)` idiom, counts as legacy.
- */
 export function looksLikeLegacyLogsQuery(sql: string): boolean {
   const lower = sql.toLowerCase()
   if (/\bunnest\s*\(/.test(lower)) return true
@@ -136,19 +98,13 @@ export function looksLikeLegacyLogsQuery(sql: string): boolean {
 
 export interface RewriteLogsSqlArgs {
   sql: string
-  // Required: the completion API rejects requests without it (z.string()).
   projectRef: string
   connectionString?: string | null
   orgSlug?: string
   authorizationHeader?: string | null
-  /** Real log_attributes keys for the query's source, fed to the model so it maps to exact paths. */
   availableKeys?: string[]
 }
 
-/**
- * Calls the AI completion endpoint in the background and returns the rewritten
- * ClickHouse query. Throws on a failed request or an empty result.
- */
 export async function rewriteLogsSqlWithAI(args: RewriteLogsSqlArgs) {
   const { sql, projectRef, connectionString, orgSlug, authorizationHeader, availableKeys } = args
 

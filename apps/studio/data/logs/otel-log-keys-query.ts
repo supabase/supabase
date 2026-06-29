@@ -4,15 +4,8 @@ import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsAllEndpointUrl } from './logs-endpoint'
 import { analyticsLiteral, safeSql } from './safe-analytics-sql'
 
-// Wide enough to capture most real-world key sets without scanning everything.
 const LOOKBACK_HOURS = 24 * 7
 
-/**
- * Fetches the distinct `log_attributes` keys seen for a source over the recent
- * lookback window, ordered by frequency. Shared by the Field Reference drawer and
- * the AI query rewrite (which feeds these real keys to the model so it maps to
- * actual paths instead of guessing).
- */
 export async function fetchOtelLogKeys({
   projectRef,
   source,

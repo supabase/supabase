@@ -7,12 +7,6 @@ interface LogsExplorerOtelBannerProps {
   onDismiss: () => void
 }
 
-/**
- * Shown in the Logs Explorer when it runs against the ClickHouse-backed OTEL
- * endpoint and the current query still looks like BigQuery. The rewrite action
- * asks the assistant in the background and proposes the result as a diff in the
- * editor. Visibility is controlled by the explorer.
- */
 export const LogsExplorerOtelBanner = ({
   isRewriting,
   onRewrite,

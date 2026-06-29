@@ -51,8 +51,6 @@ export const DEFAULT_COMPLETION_MODEL = openaiModelEntry({
   reasoningEffort: 'none',
 })
 
-// Rewriting a whole query to another dialect is a transformation, not autocomplete,
-// so it needs some reasoning rather than the zero-effort completion model.
 export const LOGS_REWRITE_MODEL = openaiModelEntry({
   id: 'gpt-5.4-nano',
   reasoningEffort: 'low',
