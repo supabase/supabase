@@ -147,9 +147,6 @@ describe('useGenerateSettingsMenu', () => {
     )
 
     expect(shortcutByKey.get('general')).toBe(SHORTCUT_IDS.NAV_PROJECT_SETTINGS_GENERAL)
-    expect(shortcutByKey.get('compute-and-disk')).toBe(
-      SHORTCUT_IDS.NAV_PROJECT_SETTINGS_COMPUTE_AND_DISK
-    )
     expect(shortcutByKey.get('infrastructure')).toBe(
       SHORTCUT_IDS.NAV_PROJECT_SETTINGS_INFRASTRUCTURE
     )

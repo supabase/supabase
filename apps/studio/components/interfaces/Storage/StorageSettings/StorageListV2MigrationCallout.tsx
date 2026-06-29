@@ -139,11 +139,11 @@ const StorageListV2MigrationDialog = () => {
 
           <p className="text-sm">
             Ensure that your database instance has not{' '}
-            <InlineLink href={`/project/${ref}/settings/compute-and-disk#disk-size`}>
+            <InlineLink href={`/project/${ref}/settings/infrastructure#disk-size`}>
               scaled disk
             </InlineLink>{' '}
             within the last 6h and you have at least 60%{' '}
-            <InlineLink href={`/project/${ref}/settings/infrastructure#infrastructure-activity`}>
+            <InlineLink href={`/project/${ref}/observability/database`}>
               CPU capacity
             </InlineLink>{' '}
             before proceeding.

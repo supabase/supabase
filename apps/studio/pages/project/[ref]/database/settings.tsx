@@ -20,6 +20,7 @@ import { DiskSizeConfiguration } from '@/components/interfaces/Settings/Database
 import { JitDbAccessConfiguration } from '@/components/interfaces/Settings/Database/JitDatabaseAccess/JitDbAccessConfiguration'
 import { NetworkRestrictions } from '@/components/interfaces/Settings/Database/NetworkRestrictions/NetworkRestrictions'
 import { PoolingModesModal } from '@/components/interfaces/Settings/Database/PoolingModesModal'
+import { ServiceVersionsSection } from '@/components/interfaces/Settings/Database/ServiceVersions/ServiceVersionsSection'
 import { SettingsDatabaseEmptyStateLocal } from '@/components/interfaces/Settings/Database/SettingsDatabaseEmptyStateLocal'
 import { SSLConfiguration } from '@/components/interfaces/Settings/Database/SSLConfiguration'
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
@@ -57,8 +58,9 @@ const DatabaseSettings: NextPageWithLayout = () => {
             {jitDbAccessEnabled && <JitDbAccessConfiguration />}
             <ConnectionPooling />
             <SSLConfiguration />
+            <ServiceVersionsSection />
             {showNewDiskManagementUI ? (
-              // This form is hidden if Disk and Compute form is enabled, new form is on ./settings/compute-and-disk
+              // This form is hidden if Disk and Compute form is enabled, new form is on ./settings/infrastructure
               <DiskManagementPanelForm />
             ) : (
               <DiskSizeConfiguration />

@@ -22,6 +22,8 @@ export function useDiskManagementReviewChanges(
   form: UseFormReturn<DiskStorageSchemaType>,
   numReplicas: number
 ) {
+  form.watch(['computeSize', 'totalSize', 'storageType', 'provisionedIOPS', 'throughput'])
+
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
   const isAwsNimbus = useIsAwsNimbusCloudProvider()
@@ -77,6 +79,24 @@ export function useDiskManagementReviewChanges(
     Number(diskSizePrice.newPrice) +
     Number(iopsPrice.newPrice) +
     Number(throughputPrice.newPrice)
+
+  const advancedBeforePrice = Number(iopsPrice.oldPrice) + Number(throughputPrice.oldPrice)
+  const advancedAfterPrice = Number(iopsPrice.newPrice) + Number(throughputPrice.newPrice)
+
+  const { isDirty, dirtyFields, errors } = form.formState
+
+  const showComputeBillingBadge = isDirty && !!dirtyFields.computeSize && !errors.computeSize
+
+  const showDiskBillingBadge =
+    isDirty &&
+    !errors.totalSize &&
+    Number(diskSizePrice.oldPrice) !== Number(diskSizePrice.newPrice)
+
+  const showAdvancedBillingBadge =
+    isDirty &&
+    advancedBeforePrice !== advancedAfterPrice &&
+    !errors.provisionedIOPS &&
+    !errors.throughput
 
   // --- Change flags ---
 
@@ -166,6 +186,11 @@ export function useDiskManagementReviewChanges(
     throughputPrice,
     totalBeforePrice,
     totalAfterPrice,
+    advancedBeforePrice,
+    advancedAfterPrice,
+    showComputeBillingBadge,
+    showDiskBillingBadge,
+    showAdvancedBillingBadge,
     // change flags
     hasComputeChanges,
     hasTotalSizeChanges,

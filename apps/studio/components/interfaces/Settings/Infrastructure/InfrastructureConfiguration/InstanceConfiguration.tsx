@@ -301,7 +301,7 @@ const InstanceConfigurationUI = ({ diagramOnly = false }: InstanceConfigurationU
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-52 *:space-x-2">
                         <DropdownMenuItem asChild>
-                          <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
+                          <Link href={`/project/${projectRef}/settings/infrastructure`}>
                             Resize databases
                           </Link>
                         </DropdownMenuItem>

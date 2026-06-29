@@ -1,6 +1,8 @@
 import { useParams } from 'common'
 import {
   Badge,
+  Card,
+  CardContent,
   Input,
   InputGroup,
   InputGroupAddon,
@@ -11,21 +13,22 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import {
+  PageSection,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
+import { ProjectUpgradeAlert } from '../../General/Infrastructure/ProjectUpgradeAlert'
 import {
   ReadReplicasWarning,
   ValidationErrorsWarning,
   ValidationWarningsAdmonition,
-} from './UpgradeWarnings'
-import {
-  ScaffoldContainer,
-  ScaffoldDivider,
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from '@/components/layouts/Scaffold'
+} from '../../Infrastructure/UpgradeWarnings'
 import AlertError from '@/components/ui/AlertError'
 import { useProjectUpgradeEligibilityQuery } from '@/data/config/project-upgrade-eligibility-query'
 import { useProjectServiceVersionsQuery } from '@/data/projects/project-service-versions'
@@ -33,7 +36,7 @@ import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-export const InfrastructureInfo = () => {
+export const ServiceVersionsSection = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -82,18 +85,18 @@ export const InfrastructureInfo = () => {
   const hasReadReplicas = (databases ?? []).length > 1
 
   return (
-    <>
-      <ScaffoldDivider />
-
-      <ScaffoldContainer>
-        <ScaffoldSection>
-          <ScaffoldSectionDetail>
-            <h4 className="text-base capitalize m-0">Service versions</h4>
-            <p className="text-foreground-light text-sm pr-8 mt-1">
-              Service versions and upgrade eligibility for your provisioned instance.
-            </p>
-          </ScaffoldSectionDetail>
-          <ScaffoldSectionContent>
+    <PageSection id="service-versions">
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Service versions</PageSectionTitle>
+          <PageSectionDescription>
+            Service versions and upgrade eligibility for your provisioned instance.
+          </PageSectionDescription>
+        </PageSectionSummary>
+      </PageSectionMeta>
+      <PageSectionContent>
+        <Card>
+          <CardContent className="flex flex-col gap-6">
             {isInactive ? (
               <Admonition
                 type="note"
@@ -103,7 +106,6 @@ export const InfrastructureInfo = () => {
               />
             ) : (
               <>
-                {/* [Joshen] Double check why we need this waterfall loading behaviour here */}
                 {isLoadingUpgradeEligibility && <GenericSkeletonLoader />}
                 {isErrorUpgradeEligibility && (
                   <AlertError error={error} subject="Failed to retrieve Postgres version" />
@@ -214,9 +216,9 @@ export const InfrastructureInfo = () => {
                 )}
               </>
             )}
-          </ScaffoldSectionContent>
-        </ScaffoldSection>
-      </ScaffoldContainer>
-    </>
+          </CardContent>
+        </Card>
+      </PageSectionContent>
+    </PageSection>
   )
 }
