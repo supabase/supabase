@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { PostReturnType, ProcessedBlogData, StaticAuthor, Tag } from 'types/post'
-import { Badge } from 'ui'
+import { Badge, cn } from 'ui'
 
 import { CTASection } from '../CTASection'
 import SectionContainerWithCn from '../Layouts/SectionContainerWithCn'
@@ -93,6 +93,8 @@ const BlogPostRenderer = async ({
     fallbackToPlaceholder: false,
   })
 
+  const MARGIN_BOTTOM_CN = 'mb-12'
+
   return (
     <>
       {isDraftMode && <DraftModeBanner />}
@@ -106,38 +108,29 @@ const BlogPostRenderer = async ({
            * xl      : [back:1–2]  alongside      [main:3–12]
            */}
           <div className="flex justify-center lg:grid grid-cols-12 gap-x-8">
-            {/* Back button — full-width row below xl, 2-col left column at xl */}
-            <div className="col-span-12 xl:col-span-2 pt-8 xl:pt-12 hidden xl:flex items-start justify-start">
-              <Link
-                href="/blog"
-                className="text-foreground-lighter hover:text-foreground inline-flex cursor-pointer items-center text-sm transition"
-              >
-                <ArrowLeft strokeWidth={1.5} className="size-4" />
-                Blog
-              </Link>
-            </div>
-
             {/* Main container — indented 1 col at lg, alongside back button at xl */}
-            <div className="max-w-[65ch] lg:max-w-none col-span-12 lg:col-start-2 lg:col-span-11 xl:col-start-3 xl:col-span-10">
+            <div className="max-w-[65ch] lg:max-w-none col-span-12 lg:col-start-2 lg:col-span-10 xl:col-start-2 xl:col-span-11">
               {/* Article header — spans the full main container width */}
-              <div className="py-6 md:py-12 space-y-4">
-                {(blogMetaData.tags as Tag[])?.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {(blogMetaData.tags as Tag[])?.map((tag) => {
-                      const tagName = typeof tag === 'string' ? tag : tag.name
-                      const tagId = typeof tag === 'string' ? tag : tag.id.toString()
-                      return (
-                        <Link
-                          className="flex"
-                          href={`/blog/tags/${tagName}`}
-                          key={`category-badge-${tagId}`}
-                        >
-                          <Badge>{tagName}</Badge>
-                        </Link>
-                      )
-                    })}
-                  </div>
-                )}
+              <div className="py-8 md:py-12 space-y-4">
+                <div className="flex items-center gap-1.5 text-foreground-lighter text-sm">
+                  <Link
+                    href="/blog"
+                    className="hover:text-foreground inline-flex items-center transition"
+                  >
+                    Blog
+                  </Link>
+                  {blogMetaData.categories && (
+                    <>
+                      <span className="text-foreground-muted"> / </span>
+                      <Link
+                        href={`/blog?category=${blogMetaData.categories[0]}`}
+                        className="capitalize hover:text-foreground"
+                      >
+                        {blogMetaData.categories[0]}
+                      </Link>
+                    </>
+                  )}
+                </div>
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl max-w-3xl text-pretty">
                   {blogMetaData.title}
                 </h1>
@@ -194,7 +187,7 @@ const BlogPostRenderer = async ({
                */}
               <div className="lg:grid lg:grid-cols-12 lg:gap-x-8 xl:gap-x-12">
                 {/* Article body */}
-                <div className="col-span-8 pb-16">
+                <div className={cn('col-span-8', MARGIN_BOTTOM_CN)}>
                   {!blogMetaData.youtubeHero && blogMetaData.imgThumb && imageUrl && (
                     <div className="hidden lg:block relative w-full aspect-[1.91/1] overflow-hidden rounded-lg border border-foreground/10 mb-6">
                       <Image
@@ -237,7 +230,7 @@ const BlogPostRenderer = async ({
                     <ShareArticleActions title={blogMetaData.title} slug={blogMetaData.slug} />
                   </div>
 
-                  <div className="grid gap-8 py-8 lg:grid-cols-1">
+                  <div className="grid gap-8 mt-8 lg:grid-cols-1">
                     <div>
                       {prevPost && (
                         <NextCard
@@ -271,8 +264,33 @@ const BlogPostRenderer = async ({
                 </div>
 
                 {/* Sidebar — only above lg */}
-                <div className="hidden lg:block col-span-4 col-start-9 lg:pl-6">
-                  <div className="sticky top-24 flex flex-col gap-6 max-h-[calc(100vh-7rem)] mb-4">
+                <div
+                  className={cn(
+                    'hidden lg:block col-span-4 col-start-9 space-y-8 lg:pl-6',
+                    MARGIN_BOTTOM_CN
+                  )}
+                >
+                  {(blogMetaData.tags as Tag[])?.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-2">
+                      {(blogMetaData.tags as Tag[])?.map((tag) => {
+                        const tagName = typeof tag === 'string' ? tag : tag.name
+                        const tagId = typeof tag === 'string' ? tag : tag.id.toString()
+                        return (
+                          <Link
+                            className="flex"
+                            href={`/blog/tags/${tagName}`}
+                            key={`category-badge-${tagId}`}
+                          >
+                            <Badge>{tagName}</Badge>
+                          </Link>
+                        )
+                      })}
+                    </div>
+                  )}
+                  <div className="sticky top-24 flex flex-col gap-6 max-h-[calc(100vh-7rem)]">
+                    <p className="text-foreground font-mono uppercase tracking-wide text-xs -mb-2">
+                      On this page
+                    </p>
                     <div className="overflow-y-auto min-h-0 flex-1">{toc}</div>
                     <div className="shrink-0">
                       <ShareArticleActions title={blogMetaData.title} slug={blogMetaData.slug} />
