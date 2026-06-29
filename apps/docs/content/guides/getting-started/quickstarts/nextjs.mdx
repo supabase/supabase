@@ -14,18 +14,15 @@ Use the `create-next-app` command and the `with-supabase` template, to create a 
 - [TypeScript](https://www.typescriptlang.org/)
 - [Tailwind CSS](https://tailwindcss.com/)
 
-<$Partial path="uiLibCta.mdx" />
-
 ```bash
 npx create-next-app -e with-supabase
 ```
 
+<$Partial path="api_settings.mdx" variables={{ "framework": "nextjs", "tab": "frameworks" }} />
+
 ## Declare Supabase Environment Variables
 
 Rename `.env.example` to `.env.local` and populate with your Supabase connection variables:
-
-<ProjectConfigVariables variable="url" />
-<ProjectConfigVariables variable="publishable" />
 
 <$CodeTabs>
 
@@ -36,13 +33,13 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 
 </$CodeTabs>
 
-<$Partial path="api_settings_steps.mdx" variables={{ "framework": "nextjs", "tab": "frameworks" }} />
-
 ## Query Supabase data from Next.js
+
+<$Partial path="uiLibCta.mdx" />
 
 Create a new file at `app/instruments/page.tsx` and populate with the following.
 
-This selects all the rows from the `instruments` table in Supabase and render them on the page.
+This selects all the rows from the `instruments` table you created earlier and renders them on the page.
 
 <$CodeTabs>
 

@@ -8,9 +8,7 @@ breadcrumb: 'Framework Quickstarts'
 
 ## Create an Astro app
 
-- Create an Astro app using the `npm create` command.
-
-<$Partial path="uiLibCta.mdx" />
+Create an Astro app using the `npm create` command.
 
 ```bash
 npm create astro@latest my-app
@@ -41,12 +39,11 @@ export default defineConfig({
 })
 ```
 
+<$Partial path="api_settings.mdx" variables={{ "framework": "astro", "tab": "frameworks" }} />
+
 ## Declare Supabase environment variables
 
 Create a `.env.local` file and populate with your Supabase connection variables:
-
-<ProjectConfigVariables variable="url" />
-<ProjectConfigVariables variable="publishable" />
 
 <$CodeTabs>
 
@@ -56,8 +53,6 @@ PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
 
 </$CodeTabs>
-
-<$Partial path="api_settings_steps.mdx" variables={{ "framework": "astro", "tab": "frameworks" }} />
 
 ## Create a Supabase client helper
 
@@ -76,9 +71,11 @@ export function createServerClient() {
 
 ## Query Supabase data from Astro
 
+<$Partial path="uiLibCta.mdx" />
+
 Create a new file at `src/pages/instruments.astro` and populate with the following.
 
-This queries all rows from the `instruments` table in Supabase and renders them on the page.
+This queries all rows from the `instruments` table you created earlier and renders them on the page.
 
 ```astro name=src/pages/instruments.astro
 ---

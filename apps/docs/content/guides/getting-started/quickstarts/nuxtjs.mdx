@@ -8,9 +8,7 @@ breadcrumb: 'Framework Quickstarts'
 
 ## Create a Nuxt app
 
-- Create a Nuxt app using the `npx nuxi` command.
-
-<$Partial path="uiLibCta.mdx" />
+Create a Nuxt app using the `npx nuxi` command.
 
 ```bash
 npx nuxi@latest init my-app
@@ -26,12 +24,11 @@ Navigate to the Nuxt app and install `supabase-js`.
 cd my-app && npm install @supabase/supabase-js
 ```
 
+<$Partial path="api_settings.mdx" variables={{ "framework": "nuxt", "tab": "frameworks" }} />
+
 ## Declare Supabase environment variables
 
 Create a `.env` file and populate with your Supabase connection variables:
-
-<ProjectConfigVariables variable="url" />
-<ProjectConfigVariables variable="publishable" />
 
 <$CodeTabs>
 
@@ -52,8 +49,6 @@ export default defineNuxtConfig({
 ```
 
 </$CodeTabs>
-
-<$Partial path="api_settings_steps.mdx" variables={{ "framework": "nuxt", "tab": "frameworks" }} />
 
 ## Query data from the app
 

@@ -4,6 +4,8 @@ subtitle: 'Learn how to create a Supabase project, add some sample data to your 
 breadcrumb: 'Framework Quickstarts'
 ---
 
+<$Partial path="quickstart_db_setup.mdx" />
+
 ## Create a Hono app
 
 Bootstrap the Hono example app from the Supabase Samples using the CLI.
@@ -20,21 +22,18 @@ The `package.json` file in the project includes the necessary dependencies, incl
 npm install
 ```
 
+{/* TODO: Not ideal for frameworks that have no entry in Connect */}
+<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "frameworks" }} />
+
 ## Set up the required environment variables
 
 Copy the `.env.example` file to `.env` and update the values with your Supabase project URL and publishable key.
 
 Lastly, [enable anonymous sign-ins](/dashboard/project/_/auth/providers) in the Auth settings.
 
-<ProjectConfigVariables variable="url" />
-<ProjectConfigVariables variable="publishable" />
-
 ```bash
 cp .env.example .env
 ```
-
-{/* TODO: Not ideal for frameworks that have no entry in Connect */}
-<$Partial path="api_settings_steps.mdx" variables={{ "framework": "", "tab": "frameworks" }} />
 
 ## Start the app
 

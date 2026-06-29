@@ -26,12 +26,11 @@ Install both packages using pip.
 pip install flask supabase
 ```
 
+<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
+
 ## Create Environment Variables file
 
 Create a `.env` file in your project root and populate it with your Supabase connection variables:
-
-<ProjectConfigVariables variable="url" />
-<ProjectConfigVariables variable="publishable" />
 
 <$CodeTabs>
 
@@ -41,8 +40,6 @@ SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
 
 </$CodeTabs>
-
-<$Partial path="api_settings_steps.mdx" variables={{ "framework": "", "tab": "" }} />
 
 ## Query data from the app
 

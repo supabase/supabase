@@ -24,12 +24,11 @@ Navigate to the SolidJS app and install `supabase-js`.
 cd my-app && npm install @supabase/supabase-js
 ```
 
+<$Partial path="api_settings.mdx" variables={{ "framework": "solidjs", "tab": "frameworks" }} />
+
 ## Declare Supabase environment variables
 
 Create a `.env.local` file and populate with your Supabase connection variables:
-
-<ProjectConfigVariables variable="url" />
-<ProjectConfigVariables variable="publishable" />
 
 <$CodeTabs>
 
@@ -39,8 +38,6 @@ VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
 
 </$CodeTabs>
-
-<$Partial path="api_settings_steps.mdx" variables={{ "framework": "solidjs", "tab": "frameworks" }} />
 
 ## Query data from the app
 

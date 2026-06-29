@@ -1,21 +1,28 @@
 ## Create a Supabase project
 
-Before you can use Supabase, you need a Supabase project. You can create a project visually in the Dashboard or programmatically using the Management API.
+Before you can use Supabase, you need a Supabase project. You can create a project visually in the Dashboard or programmatically using [the Management API](/docs/reference/api/introduction).
 
 <Tabs scrollable size="small" type="underlined" defaultActiveId="dashboard" queryGroup="create-project">
 
 <TabPanel id="dashboard" label="Dashboard">
 
-Go to [database.new](https://database.new) and create a new Supabase project.
+Create a new project from [the Dashboard of any organization](/dashboard/new/_) you belong to.
+
+<Admonition type="tip">
+
+You can also use [database.new](https://database.new) to create a new Supabase project.
+
+</Admonition>
 
 </TabPanel>
 
 <TabPanel id="management-api" label="Management API">
 
-Create a project using the Management API:
+First, get your access token from the [**Account Settings > Access Tokens**](/dashboard/account/tokens) section of the Dashboard.
+
+Then create a project using [the Management API](/docs/reference/api/introduction):
 
 ```bash
-# First, get your access token from https://supabase.com/dashboard/account/tokens
 export SUPABASE_ACCESS_TOKEN="your-access-token"
 
 # List your organizations to get the organization ID

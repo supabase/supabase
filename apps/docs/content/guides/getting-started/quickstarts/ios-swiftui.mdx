@@ -22,9 +22,6 @@ Make sure to add `Supabase` product package as a dependency to your application 
 
 Create a new `Supabase.swift` file add a new Supabase instance using your project URL and publishable key:
 
-<ProjectConfigVariables variable="url" />
-<ProjectConfigVariables variable="publishable" />
-
 ```swift name=Supabase.swift
 import Supabase
 
@@ -34,7 +31,7 @@ let supabase = SupabaseClient(
 )
 ```
 
-<$Partial path="api_settings_steps.mdx" variables={{ "framework": "swift", "tab": "mobiles" }} />
+<$Partial path="api_settings.mdx" variables={{ "framework": "swift", "tab": "mobiles" }} />
 
 ## Create a data model for instruments
 
