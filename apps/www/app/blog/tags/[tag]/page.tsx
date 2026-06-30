@@ -1,9 +1,8 @@
+import { BLOG_VIEW_COOKIE, isBlogView, type BlogView } from 'app/blog/blog-view'
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { cookies } from 'next/headers'
 
-import BlogGridItem from '@/components/Blog/BlogGridItem'
-import DefaultLayout from '@/components/Layouts/Default'
-import SectionContainer from '@/components/Layouts/SectionContainer'
+import TagClient from './TagClient'
 import { capitalize } from '@/lib/helpers'
 import { getAllTags, getSortedPosts } from '@/lib/posts'
 import type PostTypes from '@/types/post'
@@ -14,9 +13,6 @@ export async function generateStaticParams() {
   const tags = getAllTags('_blog')
   return tags.map((tag: string) => ({ tag }))
 }
-
-export const revalidate = 30
-export const dynamic = 'force-static'
 
 export async function generateMetadata({
   params: paramsPromise,
@@ -35,33 +31,13 @@ export async function generateMetadata({
 export default async function TagPage({ params: paramsPromise }: { params: Promise<Params> }) {
   const params = await paramsPromise
 
+  const cookieStore = await cookies()
+  const cookieView = cookieStore.get(BLOG_VIEW_COOKIE)?.value
+  const initialView: BlogView = isBlogView(cookieView) ? cookieView : 'list'
+
   const staticPosts = getSortedPosts({ directory: '_blog', limit: 0, tags: [params.tag] })
   const blogs = [...staticPosts] as PostTypes[]
   const capitalizedTag = capitalize(params?.tag.replaceAll('-', ' '))
 
-  return (
-    <>
-      <DefaultLayout>
-        <SectionContainer>
-          <div className="text-foreground-lighter flex space-x-1">
-            <h1 className="cursor-pointer">
-              <Link href="/blog">Blog</Link>
-              <span className="px-2">/</span>
-              <span>{capitalizedTag}</span>
-            </h1>
-          </div>
-          <ol className="grid grid-cols-12 gap-8 py-16 lg:gap-16">
-            {blogs.map((blog: PostTypes) => (
-              <div
-                className="col-span-12 mb-16 md:col-span-12 lg:col-span-6 xl:col-span-4"
-                key={blog.slug}
-              >
-                <BlogGridItem post={blog} />
-              </div>
-            ))}
-          </ol>
-        </SectionContainer>
-      </DefaultLayout>
-    </>
-  )
+  return <TagClient key={params.tag} posts={blogs} initialView={initialView} tag={capitalizedTag} />
 }

@@ -223,8 +223,11 @@ const resolveUnknownOtelClause = (dotKey: string, value: unknown): SafeLogSqlFra
   if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
     return null
   }
+  // OTEL drops the `metadata` root that BigQuery filter keys carry, so a
+  // `metadata.function_id` override maps to `log_attributes['function_id']`.
+  const attrKey = dotKey.startsWith('metadata.') ? dotKey.slice('metadata.'.length) : dotKey
   try {
-    return safeSql`${attr(dotKey)} = ${lit(value)}`
+    return safeSql`${attr(attrKey)} = ${lit(value)}`
   } catch {
     return null
   }
