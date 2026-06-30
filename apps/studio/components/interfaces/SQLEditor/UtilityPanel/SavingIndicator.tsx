@@ -8,6 +8,7 @@ import { useProfile } from '@/lib/profile'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { isSaveFailed, isSaving } from '@/state/sql-editor/sql-editor-lifecycle'
 import { isSnippetOwner } from '@/state/sql-editor/sql-editor-rules'
+import { useSqlEditorSaveCoordinator } from '@/state/sql-editor/sql-editor-save-coordinator'
 
 export type SavingIndicatorProps = { id: string }
 
@@ -23,6 +24,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
   const [showSavedText, setShowSavedText] = useState(false)
 
   const snippetIsOwned = !!snippet && isSnippetOwner(snippet.snippet, profile?.id)
+  const { requestSave } = useSqlEditorSaveCoordinator()
 
   useEffect(() => {
     let cancel = false
@@ -39,7 +41,7 @@ const SavingIndicator = ({ id }: SavingIndicatorProps) => {
     }
   }, [status, previousSaving])
 
-  const retry = () => snapV2.addNeedsSaving(id)
+  const retry = () => requestSave(id)
 
   return (
     <>

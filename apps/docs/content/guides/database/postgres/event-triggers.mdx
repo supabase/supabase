@@ -61,10 +61,10 @@ See how to [auto enable RLS for new tables](/docs/guides/database/postgres/row-l
 
 Event triggers can be triggered on:
 
-- `ddl_command_start` - occurs just before a DDL command for almost all objects within a schema
-- `ddl_command_end` - occurs just after a DDL command for almost all objects within a schema
-- `sql_drop` - occurs just before `ddl_command_end` for any DDL commands that `DROP` a database object (note that altering a table can cause it to be dropped)
-- `table_rewrite` - occurs just before a table is rewritten using the `ALTER TABLE` command
+- `ddl_command_start` - occurs before a DDL command for almost all objects within a schema
+- `ddl_command_end` - occurs after a DDL command for almost all objects within a schema
+- `sql_drop` - occurs before `ddl_command_end` for any DDL commands that `DROP` a database object (note that altering a table can cause it to be dropped)
+- `table_rewrite` - occurs before a table is rewritten using the `ALTER TABLE` command
 
 <Admonition type="caution">
 

@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 
 const supabaseUrl = process.env.VUE_APP_SUPABASE_URL
-const supabasePublishableKey = process.env.VUE_APP_SUPABASE_PUBLISHABLE_KEY
+const supabaseKey = process.env.VUE_APP_SUPABASE_KEY
 
 if (!supabaseUrl) {
   throw new Error(
@@ -9,10 +9,10 @@ if (!supabaseUrl) {
   )
 }
 
-if (!supabasePublishableKey) {
+if (!supabaseKey) {
   throw new Error(
-    'Environment variable VUE_APP_SUPABASE_PUBLISHABLE_KEY is not set. Please define it before starting the application.'
+    'Environment variable VUE_APP_SUPABASE_KEY is not set. Please define it before starting the application.'
   )
 }
 
-export const supabase = createClient(supabaseUrl, supabasePublishableKey)
+export const supabase = createClient(supabaseUrl, supabaseKey)
