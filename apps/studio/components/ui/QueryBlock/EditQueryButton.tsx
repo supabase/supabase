@@ -18,7 +18,7 @@ import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/L
 import { useTrack } from '@/lib/telemetry/track'
 import { editorPanelState } from '@/state/editor-panel-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorDiffRequestSnapshot } from '@/state/sql-editor/sql-editor-diff-request'
 
 interface EditQueryButtonProps {
   id?: string
@@ -38,7 +38,7 @@ export const EditQueryButton = ({
   const router = useRouter()
   const { newQuery } = useNewQuery()
 
-  const sqlEditorSnap = useSqlEditorV2StateSnapshot()
+  const diffRequest = useSqlEditorDiffRequestSnapshot()
   const { closeSidebar, openSidebar } = useSidebarManagerSnapshot()
 
   const isInSQLEditor = router.pathname.includes('/sql')
@@ -102,12 +102,10 @@ export const EditQueryButton = ({
       </DropdownMenuTrigger>
       {!!sql && (
         <DropdownMenuContent className="w-36">
-          <DropdownMenuItem onClick={() => sqlEditorSnap.setDiffContent(sql, DiffType.Addition)}>
+          <DropdownMenuItem onClick={() => diffRequest.requestDiff(sql, DiffType.Addition)}>
             Insert code
           </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => sqlEditorSnap.setDiffContent(sql, DiffType.Modification)}
-          >
+          <DropdownMenuItem onClick={() => diffRequest.requestDiff(sql, DiffType.Modification)}>
             Replace code
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => newQuery(sql, title)}>

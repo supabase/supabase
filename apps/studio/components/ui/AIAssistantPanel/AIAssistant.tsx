@@ -8,7 +8,7 @@ import { Eraser, Pencil, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, cn, KeyboardShortcut } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { AlertError } from '../AlertError'
 import { ButtonTooltip } from '../ButtonTooltip'

@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { Menu, Separator } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getCategoryParamFromAsPath, getIntegrationsPageFromPathname } from './Integrations.utils'
 import { generateIntegrationsMenu } from './IntegrationsMenu.utils'
