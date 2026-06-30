@@ -5,7 +5,6 @@ import { BarChart2, ChevronRight, ExternalLink, Telescope } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { AiIconAnimation, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { StatusCode } from 'ui-patterns'
 import {
   Chart,
   ChartActions,
@@ -24,6 +23,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { StatusCode } from 'ui-patterns/StatusCode'
 
 import {
   AuthErrorCodeRow,

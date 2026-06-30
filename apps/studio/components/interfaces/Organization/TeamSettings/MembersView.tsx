@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { MemberRow } from './MemberRow'

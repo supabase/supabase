@@ -1,6 +1,6 @@
 import { Box, Loader2, LogOut, RefreshCw } from 'lucide-react'
 import { Badge, Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { usePostgresSandbox } from '@/state/postgres-sandbox/sandbox'

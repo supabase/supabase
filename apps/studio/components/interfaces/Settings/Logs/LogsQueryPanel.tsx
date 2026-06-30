@@ -39,7 +39,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   EXPLORER_DATEPICKER_HELPERS,

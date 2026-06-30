@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { usePoliciesData } from '../PoliciesDataContext'

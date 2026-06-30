@@ -13,7 +13,7 @@ import {
 } from 'react'
 import { usePreviousDistinct } from 'react-use'
 import { Button, Switch } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { getApiEndpoint } from '@/components/interfaces/Integrations/DataApi/DataApi.utils'

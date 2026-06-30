@@ -23,15 +23,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import {
   PageSection,
   PageSectionContent,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-} from 'ui-patterns'
-import { Admonition } from 'ui-patterns/admonition'
-import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+} from 'ui-patterns/PageSection'
 
 import type { JitUserRule, SheetMode } from './JitDbAccess.types'
 import {

@@ -1,5 +1,5 @@
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 interface LogsExplorerOtelBannerProps {
   isRewriting: boolean
