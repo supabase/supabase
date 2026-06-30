@@ -107,7 +107,6 @@ const Wizard: NextPageWithLayout = () => {
   )
 
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
-  const smartRegionEnabled = useFlag('enableSmartRegion')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showInternalOnlyConfiguration = useFlag('newProjectInternalOnlyConfiguration')
 
@@ -172,6 +171,7 @@ const Wizard: NextPageWithLayout = () => {
   } = useWatch({ control: form.control })
   const { dirtyFields } = useFormState(form)
   const isDbRegionDirty = dirtyFields.dbRegion
+  const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
 
   // Read dirty state during render rather than depending on form.formState in the
   // effect — form.formState is a Proxy that gets a new reference every render, which
