@@ -31,27 +31,34 @@ import { Button, cn, copyToClipboard } from 'ui'
 
 import { monokaiCustomTheme } from './CodeBlock.utils'
 
-export type CodeBlockLang =
-  | 'js'
-  | 'jsx'
-  | 'sql'
-  | 'py'
-  | 'bash'
-  | 'ts'
-  | 'dart'
-  | 'json'
-  | 'csharp'
-  | 'kotlin'
-  | 'curl'
-  | 'http'
-  | 'php'
-  | 'python'
-  | 'go'
-  | 'pgsql'
-  | 'swift'
-  | 'yaml'
-  | 'toml'
-  | 'html'
+const codeBlockLangs = [
+  'js',
+  'jsx',
+  'sql',
+  'py',
+  'bash',
+  'ts',
+  'dart',
+  'json',
+  'csharp',
+  'kotlin',
+  'curl',
+  'http',
+  'php',
+  'python',
+  'go',
+  'pgsql',
+  'swift',
+  'yaml',
+  'toml',
+  'html',
+] as const
+
+export type CodeBlockLang = (typeof codeBlockLangs)[number]
+
+export function isCodeBlockLang(lang: string): lang is CodeBlockLang {
+  return (codeBlockLangs as readonly string[]).includes(lang)
+}
 
 export interface CodeBlockProps {
   title?: ReactNode

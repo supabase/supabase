@@ -4,7 +4,7 @@ import type { Content } from 'mdast'
 import Image, { type StaticImageData } from 'next/image'
 import { Fragment, type ReactNode } from 'react'
 import { cn } from 'ui'
-import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { CodeBlock, isCodeBlockLang } from 'ui-patterns/CodeBlock'
 
 import antigravityAuthenticateScreenshot from '../assets/antigravity-authenticate-screenshot.png'
 import { calloutVariant, type McpInstructionContent } from '../clients.instructions.md'
@@ -72,7 +72,7 @@ function reactRenderers(onCopy: (type?: McpOnCopyCallback) => void): Renderers {
     code: (node) => (
       <CodeBlock
         value={node.value}
-        language="bash"
+        language={node.lang && isCodeBlockLang(node.lang) ? node.lang : undefined}
         focusable={false}
         // CodeBlock renders inline code without a className; force a block.
         className="block"
