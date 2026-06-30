@@ -1,6 +1,8 @@
 import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
+import { aiCaseStudies, aiExamples, aiIntegrations } from './ai.data'
 import { authGetStarted, authNextSteps, authPricing } from './auth.data'
+import { cliResources } from './cli.data'
 import { databaseGetStarted, databaseNextSteps } from './database.data'
 import {
   functionsExamplesAiMedia,
@@ -15,9 +17,13 @@ import { realtimeExamples, realtimeGetStarted, realtimeResources } from './realt
 import { storageExamples, storageGetStarted, storageResources } from './storage.data'
 
 const ALL_GROUPS: readonly ContentListingGroup[] = [
+  aiExamples,
+  aiIntegrations,
+  aiCaseStudies,
   authGetStarted,
   authPricing,
   authNextSteps,
+  cliResources,
   databaseGetStarted,
   databaseNextSteps,
   functionsGetStarted,
