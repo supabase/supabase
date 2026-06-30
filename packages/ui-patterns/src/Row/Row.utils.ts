@@ -37,16 +37,13 @@ export const useMeasuredWidth = <T extends HTMLElement>(ref: React.RefObject<T |
   return measuredWidth
 }
 
-const findClippingAncestor = (element: HTMLElement) => {
+// Overflow values that establish a clipping box on the horizontal axis.
+const CLIPPING_OVERFLOW_VALUES = new Set(['hidden', 'auto', 'scroll', 'clip'])
+
+export const findClippingAncestor = (element: HTMLElement) => {
   let node = element.parentElement
   while (node) {
-    const overflowX = getComputedStyle(node).overflowX
-    if (
-      overflowX === 'hidden' ||
-      overflowX === 'auto' ||
-      overflowX === 'scroll' ||
-      overflowX === 'clip'
-    ) {
+    if (CLIPPING_OVERFLOW_VALUES.has(getComputedStyle(node).overflowX)) {
       return node
     }
     node = node.parentElement
@@ -65,8 +62,7 @@ export const useClipInsets = <T extends HTMLElement>(ref: React.RefObject<T | nu
     const element = ref.current
     if (!element) return
 
-    const measure = () => {
-      const clip = findClippingAncestor(element)
+    const measure = (clip = findClippingAncestor(element)) => {
       const row = element.getBoundingClientRect()
       const bounds = clip
         ? clip.getBoundingClientRect()
@@ -76,28 +72,30 @@ export const useClipInsets = <T extends HTMLElement>(ref: React.RefObject<T | nu
       setInsets((prev) => (prev.left === left && prev.right === right ? prev : { left, right }))
     }
 
-    measure()
+    const clip = findClippingAncestor(element)
+    measure(clip)
 
     if (typeof ResizeObserver === 'undefined') {
-      window.addEventListener('resize', measure)
-      return () => window.removeEventListener('resize', measure)
+      const onResize = () => measure()
+      window.addEventListener('resize', onResize)
+      return () => window.removeEventListener('resize', onResize)
     }
 
     let frame = 0
     const schedule = () => {
       if (frame) cancelAnimationFrame(frame)
-      frame = requestAnimationFrame(measure)
+      frame = requestAnimationFrame(() => measure())
     }
     const resizeObserver = new ResizeObserver(schedule)
+    // Observing both the row and its clip ancestor covers viewport resizes too:
+    // when the clip ancestor is the scroll container, its size tracks the
+    // viewport, so a separate window listener would be redundant.
     resizeObserver.observe(element)
-    const clip = findClippingAncestor(element)
     if (clip) resizeObserver.observe(clip)
-    window.addEventListener('resize', schedule)
 
     return () => {
       if (frame) cancelAnimationFrame(frame)
       resizeObserver.disconnect()
-      window.removeEventListener('resize', schedule)
     }
   }, [ref])
 
