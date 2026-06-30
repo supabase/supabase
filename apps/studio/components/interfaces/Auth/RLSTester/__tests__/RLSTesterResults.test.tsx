@@ -2,7 +2,7 @@ import type { SafeSqlFragment } from '@supabase/pg-meta'
 import { screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import type { ParseQueryResults } from '@/components/interfaces/Auth/RLSTester/RLSTester.types'
 import { RLSTesterResults } from '@/components/interfaces/Auth/RLSTester/RLSTesterResults'
 import { render } from '@/tests/helpers'

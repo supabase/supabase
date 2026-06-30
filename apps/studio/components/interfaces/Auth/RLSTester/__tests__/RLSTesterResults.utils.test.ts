@@ -1,7 +1,7 @@
 import type { SafeSqlFragment } from '@supabase/pg-meta'
 import { describe, expect, it } from 'vitest'
 
-import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import type { ParseQueryResults } from '@/components/interfaces/Auth/RLSTester/RLSTester.types'
 import { deriveRLSTestState } from '@/components/interfaces/Auth/RLSTester/RLSTesterResults.utils'
 

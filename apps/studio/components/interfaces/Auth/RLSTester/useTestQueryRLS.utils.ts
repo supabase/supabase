@@ -1,4 +1,4 @@
-import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import type { ParseSQLQueryResponse } from '@/data/misc/parse-query-mutation'
 
 export function filterTablePolicies({
