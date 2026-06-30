@@ -39,40 +39,77 @@ public = true
 objects_path = "./buckets/images"
 
 [functions.auth-hook-react-email-resend]
+verify_jwt = false
 [functions.background-upload-storage]
+verify_jwt = false
 [functions.browser-with-cors]
+verify_jwt = true
 [functions.cloudflare-turnstile]
+verify_jwt = false
+[functions.custom-jwt-validation]
+verify_jwt = false
 [functions.connect-supabase]
 [functions.discord-bot]
+[functions.elevenlabs-speech-to-text]
+verify_jwt = false
+[functions.elevenlabs-text-to-speech]
+verify_jwt = true
 [functions.file-upload-storage]
 [functions.get-tshirt-competition]
+verify_jwt = false
 [functions.github-action-deploy]
+verify_jwt = true
 [functions.huggingface-image-captioning]
+verify_jwt = false
 [functions.image-manipulation]
+verify_jwt = true
 [functions.location]
+verify_jwt = true
 [functions.oak-server]
 [functions.og-image-with-storage-cdn]
+verify_jwt = false
 [functions.openai]
+verify_jwt = true
+[functions.openai-image-generation]
+verify_jwt = false
 [functions.opengraph]
+verify_jwt = true
 [functions.postgres-on-the-edge]
 [functions.puppeteer]
+verify_jwt = true
+[functions.simple-mcp-server]
+verify_jwt = false
+entrypoint = "./functions/mcp/simple-mcp-server/index.ts"
 [functions.read-storage]
 [functions.restful-tasks]
 [functions.select-from-table-with-auth-rls]
 [functions.send-email-resend]
+verify_jwt = false
 [functions.send-email-smtp]
+verify_jwt = true
 [functions.sentry]
+verify_jwt = false
 [functions.sentryfied]
+verify_jwt = true
 [functions.slack-bot-mention]
+verify_jwt = false
 [functions.streams]
+verify_jwt = true
 [functions.stripe-webhooks]
+verify_jwt = false
 [functions.telegram-bot]
+verify_jwt = false
 [functions.tweet-to-image]
+verify_jwt = false
 [functions.upstash-redis-counter]
+verify_jwt = true
 [functions.upstash-redis-ratelimit]
+verify_jwt = true
 
 [functions.kysely-postgres]
+verify_jwt = true
 import_map = "./functions/import_map.json"
 
 [functions.wasm-modules]
+verify_jwt = true
 static_files = [ "./functions/wasm-modules/add-wasm/pkg/*.wasm"]

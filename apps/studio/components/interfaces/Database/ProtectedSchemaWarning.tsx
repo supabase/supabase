@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { isWarehouseSchema } from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
 import { getSourceSchemaFromWarehouseSchema } from '@/components/interfaces/Database/Warehouse/warehouseTableEditor.utils'

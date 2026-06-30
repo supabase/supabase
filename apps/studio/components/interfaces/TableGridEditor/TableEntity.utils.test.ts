@@ -181,7 +181,7 @@ describe('TableEntity.utils: formatTableRowsToSQL', () => {
 describe('TableEntity.utils: getTablePoliciesUrl', () => {
   it('builds the policies url for plain schema and name values', () => {
     expect(getTablePoliciesUrl('abc', 'public', 'users')).toBe(
-      '/project/abc/auth/policies?search=users&schema=public'
+      '/project/abc/database/policies?search=users&schema=public'
     )
   })
 

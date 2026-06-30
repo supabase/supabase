@@ -280,5 +280,3 @@ export const useEdgeFunctionsDiff = ({
     clearDiffsOptimistically,
   }
 }
-
-export default useEdgeFunctionsDiff

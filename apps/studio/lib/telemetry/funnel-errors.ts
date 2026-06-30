@@ -74,6 +74,9 @@ const GENERIC_REASONS = [
   'payment_failed',
   'payment_error',
   'oriole_unavailable',
+  'unauthorized',
+  'forbidden',
+  'not_found',
   'other',
 ] as const
 
@@ -84,6 +87,12 @@ export type FunnelErrorReason =
   | ValuesOf<(typeof VALIDATION_FIELD_REASONS)[FunnelOrigin]>
   | ValuesOf<typeof STRIPE_DECLINE_REASONS>
   | (typeof GENERIC_REASONS)[number]
+
+const STATUS_REASONS: Readonly<Partial<Record<number, FunnelErrorReason>>> = {
+  401: 'unauthorized',
+  403: 'forbidden',
+  404: 'not_found',
+}
 
 export function classifyApiError(origin: FunnelOrigin, error: unknown): FunnelErrorClassification {
   const err = error as { code?: unknown; errorType?: unknown; message?: unknown }
@@ -106,6 +115,10 @@ export function classifyApiError(origin: FunnelOrigin, error: unknown): FunnelEr
     if (pattern.test(message)) {
       return { errorCategory: 'api', errorReason: reason, errorCode: code }
     }
+  }
+  const statusReason = STATUS_REASONS[code]
+  if (statusReason) {
+    return { errorCategory: 'api', errorReason: statusReason, errorCode: code }
   }
   return { errorCategory: 'api', errorReason: 'other', errorCode: code }
 }

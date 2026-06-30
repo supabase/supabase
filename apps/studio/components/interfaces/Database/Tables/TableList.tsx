@@ -56,13 +56,17 @@ import {
   type WarehouseMode,
 } from '../Warehouse/warehouseDemoStore'
 import { WarehouseSyncChip } from '../Warehouse/WarehouseSyncChip'
+import {
+  getActiveWarehouseSchemas,
+  isTableEditorSchemaLocked,
+} from '../Warehouse/warehouseTableEditor.utils'
 import { formatAllEntities } from './Tables.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
@@ -304,7 +308,12 @@ export const TableList = ({
 
   const footerCount = hasNextTablesPage ? tables.length : entities.length
 
-  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
+  const warehouseSchemas = getActiveWarehouseSchemas(warehouseSnap.tables)
+
+  const { isSchemaLocked: isProtectedSchemaLocked } = useIsProtectedSchema({
+    schema: selectedSchema,
+  })
+  const isSchemaLocked = isProtectedSchemaLocked || isTableEditorSchemaLocked(selectedSchema)
 
   const canAddTables = canUpdateTables && !isSchemaLocked
 
@@ -355,6 +364,7 @@ export const TableList = ({
               size="tiny"
               showError={false}
               selectedSchemaName={selectedSchema}
+              additionalSchemas={warehouseSchemas}
               onSelectSchema={setSelectedSchema}
               open={schemaSelectorOpen}
               onOpenChange={setSchemaSelectorOpen}
@@ -736,7 +746,10 @@ export const TableList = ({
                                         <Edit size={12} />
                                         <p>Edit definitions</p>
                                       </DropdownMenuItemTooltip>
-                                      <DropdownMenuItem className="flex items-center space-x-2" asChild>
+                                      <DropdownMenuItem
+                                        className="flex items-center space-x-2"
+                                        asChild
+                                      >
                                         <Link href={`${tableDetailUrl}/settings`}>
                                           <Settings size={12} />
                                           <p>Edit settings</p>

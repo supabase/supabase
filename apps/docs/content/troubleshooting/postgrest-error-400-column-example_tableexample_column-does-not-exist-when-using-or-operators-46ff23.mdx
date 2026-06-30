@@ -17,7 +17,7 @@ The bug is triggered when an `or()` filter is included in a mutation request. Po
 ## How to confirm
 
 1. **Reproduce the asymmetry** — run the same filter as a `GET` request. If it succeeds but the `PATCH`/`POST`/`DELETE` fails with the same column reference, the bug is the likely cause.
-2. **Check your PostgREST version** — go to [Project Settings > Infrastructure](/dashboard/project/_/settings/infrastructure) and note the PostgreSQL version. PostgREST 14.1 and earlier are affected; 14.4+ includes the fix.
+2. **Check your PostgREST version** — go to [Project Settings > Infrastructure](/dashboard/project/_/settings/infrastructure) and note the Postgres version. PostgREST 14.1 and earlier are affected; 14.4+ includes the fix.
 3. **Check Postgres logs** — if you have logging enabled, you should see `column "example_column" does not exist` errors correlating with the timestamps of the failed mutation requests.
 
 ## Resolution

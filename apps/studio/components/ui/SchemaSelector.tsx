@@ -237,5 +237,3 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
 )
 
 SchemaSelector.displayName = 'SchemaSelector'
-
-export default SchemaSelector

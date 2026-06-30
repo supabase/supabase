@@ -7,6 +7,7 @@ packages:
 blockExoticSubdeps: true
 
 catalog:
+  '@monaco-editor/react': ^4.7.0
   '@sentry/nextjs': ^10.59.0
   '@supabase/auth-js': 2.108.2
   '@supabase/postgrest-js': 2.108.2
@@ -24,6 +25,7 @@ catalog:
   '@vitest/ui': ^4.1.4
   lodash: ^4.18.1
   lodash-es: ^4.18.1
+  monaco-editor: 0.52.2
   next: 16.2.6
   next-themes: ^0.4.6
   postcss: ^8.5.10
@@ -58,7 +60,6 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
-  # The following are excluded to fix vulnerablities.
   - react-use
 
 onlyBuiltDependencies:
@@ -67,12 +68,12 @@ onlyBuiltDependencies:
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
+  'monaco-editor': 'catalog:'
   '@mapbox/node-pre-gyp>tar': ^7.5.11
   '@sentry/webpack-plugin>uuid': ^11.1.1
   '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
-  'braintrust>uuid': ^11.1.1
-  'mdx-bundler>uuid': ^11.1.1
   braintrust>esbuild: ^0.28.1
+  braintrust>uuid: ^11.1.1
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
   express-rate-limit>ip-address: ^10.1.1
@@ -82,6 +83,7 @@ overrides:
   'h3@1': 1.15.11
   lodash: 'catalog:'
   lodash-es: 'catalog:'
+  mdx-bundler>uuid: ^11.1.1
   node-gyp>tar: ^7.5.11
   nodemailer: ^7.0.11
   postcss: 'catalog:'

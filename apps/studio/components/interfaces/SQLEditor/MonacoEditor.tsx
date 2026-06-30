@@ -4,7 +4,7 @@ import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { noop } from 'lodash'
 import { useRouter } from 'next/router'
 import { RefObject, useEffect, useRef, useState } from 'react'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'

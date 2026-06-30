@@ -35,11 +35,12 @@ import {
 import { TableEditor } from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
 import { useTableRowOperations } from '@/components/grid/hooks/useTableRowOperations'
+import { getStableRowIdentifiers } from '@/components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import {
   acceptGeneratedPolicy,
   type GeneratedPolicy,
-} from '@/components/interfaces/Auth/Policies/Policies.utils'
+} from '@/components/interfaces/Database/Policies/Policies.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { databasePoliciesKeys } from '@/data/database-policies/keys'
 import { useDatabasePublicationCreateMutation } from '@/data/database-publications/database-publications-create-mutation'
@@ -319,7 +320,7 @@ export const SidePanelEditor = ({
       const { row, column } = selectedValueForJsonEdit
       payload = { [column]: value === null ? null : JSON.parse(value as any) }
       selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
-      configuration = { identifiers, rowIdx: row.idx }
+      configuration = { identifiers: getStableRowIdentifiers(row!, identifiers), rowIdx: row.idx }
     } else if (snap.sidePanel?.type === 'cell') {
       const column = snap.sidePanel.value?.column
       const row = snap.sidePanel.value?.row
@@ -327,7 +328,7 @@ export const SidePanelEditor = ({
       if (!column || !row) return
       payload = { [column]: value === null ? null : value }
       selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
-      configuration = { identifiers, rowIdx: row.idx }
+      configuration = { identifiers: getStableRowIdentifiers(row!, identifiers), rowIdx: row.idx }
     }
 
     if (payload !== undefined && configuration !== undefined) {
@@ -355,7 +356,10 @@ export const SidePanelEditor = ({
       })
 
       const isNewRecord = false
-      const configuration = { identifiers, rowIdx: row.idx }
+      const configuration = {
+        identifiers: getStableRowIdentifiers(row, identifiers),
+        rowIdx: row.idx,
+      }
 
       await saveRow(value, isNewRecord, configuration, (error) => {
         if (error) {

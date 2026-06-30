@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Button, cn } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 export const UnknownInterface = ({
   urlBack,
