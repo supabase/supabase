@@ -123,15 +123,17 @@ Supports slot behavior with `asChild` prop.
 
 ### Split with dropdown
 
-Pair a primary button with a chevron `DropdownMenu` trigger when one action is default and the rest belong in a menu.
+Pair a button with a chevron `DropdownMenu` trigger when there are variations of the same action, or alternative ways to accomplish the same goal. The default or most likely option should be used on the exposed button.
+
+When secondary actions are related but distinct—not alternatives to the primary action—display the primary action as a button and place the rest in an overflow menu instead. See [Table multiple actions](./table#multiple-actions).
 
 <ComponentPreview name="button-split-dropdown" peekCode />
 
-Shared middle border rules:
+The shared middle border is the tricky part. Do **not** use `border-l-0` on the chevron button — that drops the divider on hover/focus. Instead:
 
-- Primary: `rounded-r-none` and `hover:z-10`.
-- Chevron trigger: `rounded-l-none`, `shrink-0`, `px-[4px] py-[5px]`, and `-ml-px` (overlap — do not use `border-l-0`).
-- Chevron trigger only: `aria-label` for the menu.
+- Primary: `rounded-r-none` and `hover:z-10` so its border stacks above the chevron on hover.
+- Chevron trigger: `rounded-l-none`, `shrink-0`, `px-[4px] py-[5px]`, and `-ml-px` to overlap the adjacent border by one pixel.
+- Chevron trigger only: `aria-label` describing the menu (the icon is decorative).
 
 Inside [Admonition](../fragments/admonition#split-button-with-dropdown) actions, also use `flex w-full @lg:w-auto` with `flex-1 @lg:flex-none` on the primary when `layout="responsive"`.
 
