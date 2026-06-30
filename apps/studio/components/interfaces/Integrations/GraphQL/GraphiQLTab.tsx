@@ -1,5 +1,5 @@
-import 'graphiql/style.css'
 import 'graphiql/setup-workers/webpack'
+import './graphiql-styles.css'
 
 import { useMonaco, type GraphiQLPlugin } from '@graphiql/react'
 import { createGraphiQLFetcher, Fetcher } from '@graphiql/toolkit'
@@ -19,6 +19,7 @@ import { IntrospectionEnabledNotice } from './IntrospectionEnabledNotice'
 import { usePgGraphqlIntrospectionStatus } from './usePgGraphqlIntrospectionStatus'
 import { getTheme } from '@/components/interfaces/App/MonacoThemeProvider'
 import { RoleImpersonationSelector } from '@/components/interfaces/RoleImpersonationSelector'
+import { BASE_MONACO_EDITOR_OPTIONS } from '@/components/ui/CodeEditor/CodeEditor.utils'
 import { useSessionAccessTokenQuery } from '@/data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -33,36 +34,46 @@ const ROLE_IMPERSONATION_PLUGIN: GraphiQLPlugin = {
   content: () => <RoleImpersonationSelector orientation="vertical" />,
 }
 
-const MONACO_THEME = { dark: 'supabase-graphql-dark', light: 'supabase-graphql-light' }
-
-const GraphiQLMonacoTheme = ({ resolvedTheme }: { resolvedTheme: 'dark' | 'light' }) => {
+/**
+ * GraphiQL (@graphiql/react) bundles its own Monaco instance, separate from the AMD-loaded one
+ * the rest of Studio uses — they only share the global `.monaco-*` CSS class names, not JS state.
+ * So theme/options applied here via @graphiql/react's `useMonaco` touch GraphiQL's editors only
+ * and never leak onto Studio's editors
+ */
+const GraphiQLEditorSettings = ({ theme }: { theme: 'dark' | 'light' }) => {
   const { monaco } = useMonaco()
 
   useEffect(() => {
     if (!monaco) return
-    const dark = getTheme('dark')
-    const light = getTheme('light')
-    monaco.editor.defineTheme(MONACO_THEME.dark, {
-      ...dark,
-      rules: [...dark.rules, { token: 'argument.identifier.gql', foreground: '908aff' }],
-    })
-    monaco.editor.defineTheme(MONACO_THEME.light, {
-      ...light,
-      rules: [...light.rules, { token: 'argument.identifier.gql', foreground: '6c69ce' }],
-      // Match the dashboard's bg-default in light mode so the editor doesn't read
-      // as a darker square against the surrounding UI.
-      colors: { ...light.colors, 'editor.background': '#fcfcfc' },
-    })
-    monaco.editor.setTheme(MONACO_THEME[resolvedTheme])
-  }, [monaco, resolvedTheme])
+    monaco.editor.defineTheme('supabase', getTheme(theme))
+    monaco.editor.setTheme('supabase')
+  }, [monaco, theme])
+
+  useEffect(() => {
+    if (!monaco) return
+    const options = {
+      ...BASE_MONACO_EDITOR_OPTIONS,
+      padding: { top: 16, bottom: 16 },
+      glyphMargin: true,
+    }
+    const applyToEditor = (editor: ReturnType<typeof monaco.editor.getEditors>[number]) =>
+      editor.updateOptions(options)
+
+    monaco.editor.getEditors().forEach(applyToEditor)
+    const disposable = monaco.editor.onDidCreateEditor(applyToEditor)
+
+    return () => disposable.dispose()
+  }, [monaco])
 
   return null
 }
 
 export const GraphiQLTab = () => {
-  const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
+
+  const { resolvedTheme } = useTheme()
   const currentTheme = resolvedTheme?.includes('dark') ? 'dark' : 'light'
+
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
   const { data: project } = useSelectedProjectQuery()
 
@@ -144,7 +155,7 @@ export const GraphiQLTab = () => {
 
   return (
     <div className="flex flex-col h-full">
-      <GraphiQLMonacoTheme resolvedTheme={currentTheme} />
+      <GraphiQLEditorSettings theme={currentTheme} />
       {notice === 'opt-in' && (
         <IntrospectionDisabledNotice
           schema={DEFAULT_INTROSPECTION_SCHEMA}
@@ -164,7 +175,7 @@ export const GraphiQLTab = () => {
           key={graphiqlKey}
           fetcher={fetcher}
           forcedTheme={currentTheme}
-          editorTheme={MONACO_THEME}
+          editorTheme={{ dark: 'supabase', light: 'supabase' }}
           className={styles.root}
           plugins={plugins}
         />

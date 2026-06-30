@@ -13,7 +13,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DocsButton } from '@/components/ui/DocsButton'

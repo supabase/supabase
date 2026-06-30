@@ -39,7 +39,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { ErrorInfo, useCallback, useEffect, useState, type ComponentProps } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { TooltipProvider } from 'ui'
-import { TimestampInfoProvider } from 'ui-patterns'
+import { TimestampInfoProvider } from 'ui-patterns/TimestampInfo'
 
 import { StudioCommandMenu } from '@/components/interfaces/App/CommandMenu'
 import { StudioCommandProvider as CommandProvider } from '@/components/interfaces/App/CommandMenu/StudioCommandProvider'

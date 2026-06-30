@@ -2,10 +2,11 @@ import { useParams } from 'common'
 import { SqlEditor } from 'icons'
 import { Edit, Trash } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { parseAsString, useQueryStates } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { DropdownMenuItem, DropdownMenuSeparator } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { UpdateSavedQueryModal } from './Logs.UpdateSavedQueryModal'
 import { LogsSidebarItem } from './SidebarV2/SidebarItem'
@@ -24,15 +25,26 @@ interface SavedQueriesItemProps {
   }
 }
 
-const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
+export const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref, queryId } = useParams()
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
   const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false)
 
+  const [_, setParams] = useQueryStates({
+    queryId: parseAsString.withDefault(''),
+    q: parseAsString.withDefault(''),
+    s: parseAsString.withDefault(''),
+    its: parseAsString.withDefault(''),
+    ite: parseAsString.withDefault(''),
+  })
+
   const { mutate: deleteContent } = useContentDeleteMutation({
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
       setShowConfirmModal(false)
+      if (queryId && vars.ids.includes(queryId)) {
+        setParams({ queryId: '', q: '', s: '', its: '', ite: '' })
+      }
       toast.success('Successfully deleted query')
     },
     onError: (error) => {
@@ -94,15 +106,13 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
             </DropdownMenuItem>
           </>
         }
-      ></LogsSidebarItem>
+      />
       <ConfirmationModal
         variant="destructive"
         visible={showConfirmModal}
         confirmLabel="Delete query"
         title="Confirm to delete saved query"
-        onCancel={() => {
-          setShowConfirmModal(false)
-        }}
+        onCancel={() => setShowConfirmModal(false)}
         onConfirm={onConfirmDelete}
       >
         <p className="text-sm text-foreground-light">
@@ -121,5 +131,3 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
     </>
   )
 }
-
-export default SavedQueriesItem

@@ -5,14 +5,14 @@ import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { TreeView } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   InnerSideBarEmptyPanel,
   InnerSideMenuCollapsible,
   InnerSideMenuCollapsibleContent,
   InnerSideMenuCollapsibleTrigger,
   InnerSideMenuSeparator,
-} from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+} from 'ui-patterns/InnerSideMenu'
 
 import { DeleteSnippetsModal } from './DeleteSnippetsModal'
 import { ReferenceSnippetsSection } from './ReferenceSnippetsSection'
@@ -39,6 +39,7 @@ import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
 import { useSnippetFolders, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { isNewFolder } from '@/state/sql-editor/sql-editor-lifecycle'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 interface SQLEditorNavProps {
@@ -719,10 +720,11 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                     onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
                     onEditSave={(name: string) => {
                       // [Joshen] Inline editing only for folders for now
-                      if (name.length === 0 && element.id === 'new-folder') {
-                        snapV2.removeFolder(element.id as string)
+                      const folderId = element.id as string
+                      if (name.length === 0 && isNewFolder(snapV2.folders[folderId]?.status)) {
+                        snapV2.removeFolder(folderId)
                       } else if (name.length > 0) {
-                        snapV2.saveFolder({ id: element.id as string, name })
+                        snapV2.saveFolder({ id: folderId, name })
                       }
                     }}
                     hasNextPage={hasNextPage}

@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { UnifiedLogs } from '@/components/interfaces/UnifiedLogs/UnifiedLogs'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { ProjectLayout } from '@/components/layouts/ProjectLayout'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
