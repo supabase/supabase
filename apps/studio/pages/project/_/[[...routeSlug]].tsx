@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   Header,

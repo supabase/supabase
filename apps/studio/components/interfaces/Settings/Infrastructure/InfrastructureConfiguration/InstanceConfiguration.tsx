@@ -36,7 +36,7 @@ import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceCo
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
 import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useLoadBalancersQuery } from '@/data/read-replicas/load-balancers-query'
 import { Database, useReadReplicasQuery } from '@/data/read-replicas/replicas-query'

@@ -6,7 +6,7 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { Results } from '../../SQLEditor/UtilityPanel/Results'
 import { RLSTableCard } from './RLSTableCard'

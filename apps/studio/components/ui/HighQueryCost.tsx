@@ -14,7 +14,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { DocsButton } from './DocsButton'
 import { InlineLinkClassName } from './InlineLink'
