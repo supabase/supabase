@@ -360,6 +360,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
         onCancel={() => setIsConfirmPreviousModalOpen(false)}
         onConfirm={() => {
           onConfirmPreviousPage()
+          setIsConfirmPreviousModalOpen(false)
         }}
       >
         <p className="text-sm text-foreground-light">
@@ -374,6 +375,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
         onCancel={() => setIsConfirmNextModalOpen(false)}
         onConfirm={() => {
           onConfirmNextPage()
+          setIsConfirmNextModalOpen(false)
         }}
       >
         <p className="text-sm text-foreground-light">
