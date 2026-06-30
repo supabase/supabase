@@ -67,6 +67,7 @@
     --text-7xl: 4.5rem;
     --text-8xl: 6rem;
     --text-9xl: 8rem;
+    --font-weight-normal: 400;
   }
 }
 
@@ -91,21 +92,19 @@ body {
   color: #333 !important;
 }
 
-@layer base {
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6,
-  .h1,
-  .h2,
-  .h3,
-  .h4,
-  .h5,
-  .h6 {
-    @apply font-heading font-semibold;
-  }
+h1:not(.font-mono),
+h2:not(.font-mono),
+h3:not(.font-mono),
+h4:not(.font-mono),
+h5:not(.font-mono),
+h6:not(.font-mono),
+.h1:not(.font-mono),
+.h2:not(.font-mono),
+.h3:not(.font-mono),
+.h4:not(.font-mono),
+.h5:not(.font-mono),
+.h6:not(.font-mono) {
+  @apply font-heading font-semibold;
 }
 
 .thin-scrollbar {
@@ -146,18 +145,26 @@ body {
   font-weight: inherit;
 }
 
-/* .prose :where(h1):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+.prose :where(h1, h2, h3, h4, h5, h6):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  @apply font-heading font-semibold;
+}
+
+.prose
+  :where(p, li, a, figcaption):not(:where([class~='not-prose'], [class~='not-prose'] *)):not(
+    :where(h1, h2, h3, h4, h5, h6) *
+  ) {
+  @apply text-base leading-7;
+}
+
+.prose :where(h1):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   @apply text-4xl;
 }
 .prose :where(h2):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   @apply text-2xl;
 }
 .prose :where(h3):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-  @apply text-xl;
+  @apply text-xl leading-7;
 }
-.prose :where(h4):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-  @apply text-xl;
-} */
 
 code[class*='language-'],
 pre[class*='language-'] {

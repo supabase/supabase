@@ -17,9 +17,9 @@ export function GuideHeader({ className }: GuideHeaderProps) {
         <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
       </h1>
       {meta?.subtitle && (
-        <p className="mt-3 text-xl text-foreground-light">
+        <div className="mt-3 text-xl text-foreground-light [&>p]:m-0">
           <ReactMarkdown>{meta.subtitle}</ReactMarkdown>
-        </p>
+        <div>
       )}
       <hr className="not-prose border-t-0 border-b my-8" />
     </div>
