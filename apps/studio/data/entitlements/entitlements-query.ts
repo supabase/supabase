@@ -32,7 +32,10 @@ export async function getEntitlements(
   })
   if (error) handleError(error)
 
-  return data
+  return {
+    ...data,
+    entitlements: Array.isArray(data?.entitlements) ? data.entitlements : [],
+  }
 }
 
 export type EntitlementsData = Awaited<ReturnType<typeof getEntitlements>>
