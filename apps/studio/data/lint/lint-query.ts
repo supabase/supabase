@@ -24,7 +24,7 @@ export async function getProjectLints({ projectRef }: ProjectLintsVariables, sig
 
   if (error) handleError(error)
 
-  return data
+  return Array.isArray(data) ? data : []
 }
 
 export type ProjectLintsData = Awaited<ReturnType<typeof getProjectLints>>
