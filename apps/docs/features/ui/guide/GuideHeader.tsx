@@ -19,7 +19,7 @@ export function GuideHeader({ className }: GuideHeaderProps) {
       {meta?.subtitle && (
         <div className="mt-3 text-xl text-foreground-light [&>p]:m-0">
           <ReactMarkdown>{meta.subtitle}</ReactMarkdown>
-        <div>
+        </div>
       )}
       <hr className="not-prose border-t-0 border-b my-8" />
     </div>
