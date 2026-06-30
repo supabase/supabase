@@ -18,7 +18,6 @@ import {
 
 import { SqlRunButton } from './RunButton'
 import SavingIndicator from './SavingIndicator'
-import { getSqlWarehouseRouting } from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
@@ -59,9 +58,6 @@ export const UtilityActions = ({
 
   const snippet = snapV2.snippets[id]
   const isFavorite = snippet !== undefined ? snippet.snippet.favorite : false
-  const sql = snippet?.snippet?.content?.unchecked_sql ?? snippet?.snippet?.content?.sql ?? ''
-  const warehouseRouting = getSqlWarehouseRouting(sql)
-  const warehouseRoutingOverride = warehouseRouting === 'postgres' ? undefined : warehouseRouting
 
   const hotkeySequnece: Hotkey | undefined =
     SHORTCUT_DEFINITIONS[SHORTCUT_IDS.SQL_EDITOR_FORMAT].sequence[0]
@@ -212,7 +208,6 @@ export const UtilityActions = ({
             <DatabaseSelector
               selectedDatabaseId={lastSelectedDb.length === 0 ? undefined : lastSelectedDb}
               variant="connected-on-right"
-              warehouseRouting={warehouseRoutingOverride}
               onSelectId={onSelectDatabase}
             />
           )}

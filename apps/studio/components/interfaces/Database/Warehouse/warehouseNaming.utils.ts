@@ -37,82 +37,8 @@ export function buildSqlEditorWarehouseUrl(projectRef: string, tableKey: string)
   )}`
 }
 
-const QUALIFIED_NAME_PATTERN = /\b([a-z_][\w]*)\.([a-z_][\w]*)\b/gi
-
-export type SqlWarehouseRouting = 'postgres' | 'warehouse' | 'mixed'
-
-function isWarehouseSchema(schema: string): boolean {
-  return schema.endsWith('_warehouse')
-}
-
-export function getSqlWarehouseRouting(sql: string): SqlWarehouseRouting {
-  const schemas = new Set<string>()
-
-  for (const match of sql.matchAll(QUALIFIED_NAME_PATTERN)) {
-    schemas.add(match[1].toLowerCase())
-  }
-
-  let hasWarehouseSchema = false
-  let hasPostgresHeapSchema = false
-
-  for (const schema of schemas) {
-    if (isWarehouseSchema(schema)) {
-      hasWarehouseSchema = true
-    } else {
-      hasPostgresHeapSchema = true
-    }
-  }
-
-  if (hasWarehouseSchema && hasPostgresHeapSchema) return 'mixed'
-  if (hasWarehouseSchema) return 'warehouse'
-  return 'postgres'
-}
-
-export function getWarehouseQualifiedNamesFromSql(sql: string): string[] {
-  const names: string[] = []
-
-  for (const match of sql.matchAll(QUALIFIED_NAME_PATTERN)) {
-    if (isWarehouseSchema(match[1].toLowerCase())) {
-      names.push(`${match[1]}.${match[2]}`)
-    }
-  }
-
-  return names
-}
+const WAREHOUSE_SCHEMA_PATTERN = /\b\w+_warehouse\./i
 
 export function sqlReferencesWarehouse(sql: string): boolean {
-  return getSqlWarehouseRouting(sql) !== 'postgres'
-}
-
-export const SQL_WAREHOUSE_ROUTING_LABELS: Record<
-  Exclude<SqlWarehouseRouting, 'postgres'>,
-  string
-> = {
-  warehouse: 'Warehouse',
-  mixed: 'Postgres + Warehouse',
-}
-
-export const SQL_WAREHOUSE_ROUTING_TOOLTIPS: Record<
-  Exclude<SqlWarehouseRouting, 'postgres'>,
-  string
-> = {
-  warehouse:
-    'Runs on the Warehouse analytical runtime. The warehouse copy may lag behind live Postgres.',
-  mixed:
-    'Joins Postgres heap tables with Warehouse copies. Warehouse-side data reflects the current sync lag.',
-}
-
-export function formatSqlWarehouseLagLabel(lagSeconds: number): string {
-  return `${lagSeconds}s lag`
-}
-
-export function getSqlWarehouseFooterLabel(
-  routing: Exclude<SqlWarehouseRouting, 'postgres'>,
-  lagSeconds: number
-): string {
-  const lag = formatSqlWarehouseLagLabel(lagSeconds)
-  const routingLabel =
-    routing === 'warehouse' ? 'Served by Warehouse' : SQL_WAREHOUSE_ROUTING_LABELS.mixed
-
-  return `${routingLabel} · ${lag}`
+  return WAREHOUSE_SCHEMA_PATTERN.test(sql)
 }
