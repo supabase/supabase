@@ -77,10 +77,14 @@ Once you call `.signInAnonymously()` you have moved the user into an authenticat
 
 Like a permanent user, anonymous users are persisted in the `auth.users` table:
 
+<div className="overflow-auto">
+
 | id                                   | role          | email             | is_anonymous |
 | ------------------------------------ | ------------- | ----------------- | ------------ |
 | e053e470-afa1-4625-8963-37adb862fd11 | authenticated | NULL              | true         |
 | 5563108e-ac81-4063-9288-4f3db068efa1 | authenticated | luke@starwars.com | false        |
+
+</div>
 
 An anonymous user can be identified by the `is_anonymous` claim returned in the user’s JWT, which is accessible from your Row Level Security policies (RLS). This is helpful if you want to limit access to certain features in your application.
 
