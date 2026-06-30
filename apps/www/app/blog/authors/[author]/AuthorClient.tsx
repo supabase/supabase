@@ -9,6 +9,7 @@ import { useMemo, useState } from 'react'
 import type PostTypes from 'types/post'
 import { Button, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 
+import BlogViewToggle from '../../../../components/Blog/BlogViewToggle'
 import DefaultLayout from '@/components/Layouts/Default'
 import SectionContainerWithCn from '@/components/Layouts/SectionContainerWithCn'
 
@@ -112,18 +113,7 @@ export default function AuthorClient({ author, authorId, blogs, initialView }: A
                 </InputGroupAddon>
               </InputGroup>
             </div>
-            <Button
-              variant="default"
-              title={isList ? 'Grid View' : 'List View'}
-              onClick={handleViewSelection}
-              className="h-full p-2 text-foreground-light"
-            >
-              {isList ? (
-                <Grid className="w-4 h-4 stroke-1.5" />
-              ) : (
-                <AlignJustify className="w-4 h-4 stroke-1.5" />
-              )}
-            </Button>
+            <BlogViewToggle view={view} setView={setView} />
           </div>
         </SectionContainerWithCn>
       </div>
