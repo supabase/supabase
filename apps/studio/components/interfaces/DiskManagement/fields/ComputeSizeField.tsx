@@ -14,7 +14,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition, ComputeBadge } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DiskStorageSchemaType } from '../DiskManagement.schema'

@@ -34,7 +34,7 @@ import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.c
 import StorageBucketsError from '@/components/interfaces/Storage/StorageBucketsError'
 import { StorageExplorer } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer'
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
 import { StorageExplorerStateContextProvider } from '@/state/storage-explorer'
 import type { NextPageWithLayout } from '@/types'

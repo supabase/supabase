@@ -6,13 +6,16 @@ import { useRouter } from 'next/router'
 import { useCallback, useMemo, useState } from 'react'
 import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import { useUnifiedLogsPreview } from '../App/FeaturePreview/FeaturePreviewContext'
 import { DatabaseInfrastructureSection } from './DatabaseInfrastructureSection'
+import { OBSERVABILITY_DOCS_HREFS } from './Observability.constants'
 import { useObservabilityOverviewData } from './ObservabilityOverview.utils'
 import { ObservabilityOverviewFooter } from './ObservabilityOverviewFooter'
 import { ServiceHealthTable } from './ServiceHealthTable'
 import { useSlowQueriesCount } from './useSlowQueriesCount'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
 import { CHART_INTERVALS } from '@/components/ui/Logs/logs.utils'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
@@ -22,6 +25,8 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
+const REPORT_TITLE = 'Overview'
+
 type ChartIntervalKey = '1hr' | '1day' | '7day'
 
 export const ObservabilityOverview = () => {
@@ -30,6 +35,7 @@ export const ObservabilityOverview = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const queryClient = useQueryClient()
 
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const { projectStorageAll: storageSupported } = useIsFeatureEnabled(['project_storage:all'])
   const { isEnabled: isDataApiEnabled } = useIsDataApiEnabled({ projectRef })
 
@@ -79,7 +85,9 @@ export const ObservabilityOverview = () => {
         key: 'db' as const,
         name: 'Database',
         reportUrl: `/project/${projectRef}/observability/database`,
-        logsUrl: `/project/${projectRef}/logs/postgres-logs`,
+        logsUrl: isUnifiedLogsEnabled
+          ? `/project/${projectRef}/logs?filter=log_type:eq:postgres`
+          : `/project/${projectRef}/logs/postgres-logs`,
         enabled: true,
         hasReport: true,
       },
@@ -87,7 +95,9 @@ export const ObservabilityOverview = () => {
         key: 'postgrest' as const,
         name: 'PostgREST',
         reportUrl: `/project/${projectRef}/observability/postgrest`,
-        logsUrl: `/project/${projectRef}/logs/postgrest-logs`,
+        logsUrl: isUnifiedLogsEnabled
+          ? `/project/${projectRef}/logs?filter=log_type:eq:postgrest`
+          : `/project/${projectRef}/logs/postgrest-logs`,
         enabled: true,
         hasReport: true,
       },
@@ -95,7 +105,9 @@ export const ObservabilityOverview = () => {
         key: 'auth' as const,
         name: 'Auth',
         reportUrl: `/project/${projectRef}/observability/auth`,
-        logsUrl: `/project/${projectRef}/logs/auth-logs`,
+        logsUrl: isUnifiedLogsEnabled
+          ? `/project/${projectRef}/logs?filter=log_type:eq:auth`
+          : `/project/${projectRef}/logs/auth-logs`,
         enabled: true,
         hasReport: true,
       },
@@ -103,7 +115,9 @@ export const ObservabilityOverview = () => {
         key: 'functions' as const,
         name: 'Edge Functions',
         reportUrl: `/project/${projectRef}/observability/edge-functions`,
-        logsUrl: `/project/${projectRef}/logs/edge-functions-logs`,
+        logsUrl: isUnifiedLogsEnabled
+          ? `/project/${projectRef}/logs?filter=log_type:eq:edge+function`
+          : `/project/${projectRef}/logs/edge-functions-logs`,
         enabled: true,
         hasReport: true,
       },
@@ -111,7 +125,9 @@ export const ObservabilityOverview = () => {
         key: 'storage' as const,
         name: 'Storage',
         reportUrl: `/project/${projectRef}/observability/storage`,
-        logsUrl: `/project/${projectRef}/logs/storage-logs`,
+        logsUrl: isUnifiedLogsEnabled
+          ? `/project/${projectRef}/logs?filter=log_type:eq:storage`
+          : `/project/${projectRef}/logs/storage-logs`,
         enabled: storageSupported,
         hasReport: true,
       },
@@ -119,12 +135,14 @@ export const ObservabilityOverview = () => {
         key: 'realtime' as const,
         name: 'Realtime',
         reportUrl: `/project/${projectRef}/observability/realtime`,
-        logsUrl: `/project/${projectRef}/logs/realtime-logs`,
+        logsUrl: isUnifiedLogsEnabled
+          ? `/project/${projectRef}/logs?filter=log_type:eq:realtime`
+          : `/project/${projectRef}/logs/realtime-logs`,
         enabled: true,
         hasReport: true,
       },
     ],
-    [projectRef, storageSupported, isDataApiEnabled]
+    [projectRef, storageSupported, isDataApiEnabled, isUnifiedLogsEnabled]
   )
 
   const enabledServices = serviceBase.filter((s) => s.enabled)
@@ -143,7 +161,8 @@ export const ObservabilityOverview = () => {
       const end = dayjs.utc(datum.timestamp).add(1, unit).toISOString()
 
       const queryParams = new URLSearchParams({ its: start, ite: end })
-      router.push(`${logsUrl}?${queryParams.toString()}`)
+      const separator = logsUrl.includes('?') ? '&' : '?'
+      router.push(`${logsUrl}${separator}${queryParams.toString()}`)
     },
     [router, interval]
   )
@@ -152,7 +171,7 @@ export const ObservabilityOverview = () => {
     <ReportPadding>
       <div className="flex flex-row justify-between items-center">
         <div className="flex items-center gap-3">
-          <ReportHeader title="Overview" />
+          <ReportHeader title={REPORT_TITLE} />
           <Tooltip>
             <TooltipTrigger asChild>
               <Badge variant="warning">Beta</Badge>
@@ -163,6 +182,7 @@ export const ObservabilityOverview = () => {
           </Tooltip>
         </div>
         <div className="flex items-center gap-2">
+          <DocsButton href={OBSERVABILITY_DOCS_HREFS.overview} topic={REPORT_TITLE} />
           <ShortcutTooltip
             shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
             label="Refresh report"

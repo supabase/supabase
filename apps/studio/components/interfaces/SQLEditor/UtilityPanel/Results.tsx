@@ -142,5 +142,3 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
     </>
   )
 }
-
-export default Results

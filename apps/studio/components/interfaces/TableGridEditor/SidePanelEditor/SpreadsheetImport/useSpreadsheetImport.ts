@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 
 import type { SpreadsheetData } from './SpreadsheetImport.types'
 import { parseSpreadsheet, parseSpreadsheetText } from './SpreadsheetImport.utils'
-import useLatest from '@/hooks/misc/useLatest'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 interface NoFileState {
