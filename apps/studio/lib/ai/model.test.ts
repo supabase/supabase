@@ -1,12 +1,16 @@
-import { openai } from '@ai-sdk/openai'
+import { createOpenAI } from '@ai-sdk/openai'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as bedrockModule from './bedrock'
 import { getModel } from './model'
 import { DEFAULT_COMPLETION_MODEL, openaiModelEntry } from './model.utils'
 
+const { mockOpenaiModelFn } = vi.hoisted(() => ({
+  mockOpenaiModelFn: vi.fn(() => 'openai-model'),
+}))
+
 vi.mock('@ai-sdk/openai', () => ({
-  openai: vi.fn(() => 'openai-model'),
+  createOpenAI: vi.fn(() => mockOpenaiModelFn),
 }))
 
 vi.mock('./bedrock', async () => ({
@@ -56,7 +60,8 @@ describe('getModel', () => {
     })
 
     expect(modelParams?.model).toEqual('openai-model')
-    expect(openai).toHaveBeenCalledWith('gpt-5.4-nano')
+    expect(createOpenAI).toHaveBeenCalledWith({ apiKey: 'test-key' })
+    expect(mockOpenaiModelFn).toHaveBeenCalledWith('gpt-5.4-nano')
     expect(systemProviderOptions).toBeUndefined()
   })
 
@@ -81,7 +86,7 @@ describe('getModel', () => {
 
     expect(error).toBeUndefined()
     expect(modelParams?.model).toEqual('openai-model')
-    expect(openai).toHaveBeenCalledWith('gpt-5.3-codex')
+    expect(mockOpenaiModelFn).toHaveBeenCalledWith('gpt-5.3-codex')
     expect(modelParams?.providerOptions?.openai?.reasoningEffort).toBe('low')
   })
 
@@ -94,7 +99,22 @@ describe('getModel', () => {
     })
 
     expect(error).toBeUndefined()
-    expect(openai).toHaveBeenCalledWith('gpt-5.4-nano')
+    expect(mockOpenaiModelFn).toHaveBeenCalledWith('gpt-5.4-nano')
     expect(modelParams?.providerOptions?.openai?.reasoningEffort).toBe('none')
+  })
+
+  it('passes OPENAI_BASE_URL to createOpenAI when set', async () => {
+    vi.stubEnv('OPENAI_API_KEY', 'test-key')
+    vi.stubEnv('OPENAI_BASE_URL', 'https://integrate.api.example.com/v1')
+
+    await getModel({
+      provider: 'openai',
+      modelEntry: openaiModelEntry({ id: 'gpt-5.4-nano' }),
+    })
+
+    expect(createOpenAI).toHaveBeenCalledWith({
+      apiKey: 'test-key',
+      baseURL: 'https://integrate.api.example.com/v1',
+    })
   })
 })
