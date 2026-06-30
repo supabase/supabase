@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
 import { TableDetailLayout } from '@/components/layouts/DatabaseLayout/TableDetailLayout'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import type { NextPageWithLayout } from '@/types'
 
 const TableStorageRedirect: NextPageWithLayout = () => {

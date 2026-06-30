@@ -2,7 +2,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { useSnapshot } from 'valtio'
 
 import { warehouseDemoStore, type WarehouseTableState } from './warehouseDemoStore'
-import { getSourceTableKeyFromWarehouseSchema, isWarehouseSchema } from './warehouseNaming.utils'
+import { getSourceTableKey, isWarehouseSchema } from './warehouseNaming.utils'
 import { formatWarehouseLagLabel } from './warehouseTableEditor.utils'
 
 function getTableEditorDataSourceSuffix(
@@ -11,7 +11,7 @@ function getTableEditorDataSourceSuffix(
   warehouseTables: Record<string, WarehouseTableState>
 ): { label: string; lagLabel?: string; tooltip: string } | null {
   if (isWarehouseSchema(schema)) {
-    const sourceTableKey = getSourceTableKeyFromWarehouseSchema(schema, table)
+    const sourceTableKey = getSourceTableKey(schema, table)
     const lagSeconds = warehouseTables[sourceTableKey]?.lagSeconds ?? 12
 
     return {
@@ -21,11 +21,11 @@ function getTableEditorDataSourceSuffix(
     }
   }
 
-  const tableKey = `${schema}.${table}`
+  const tableKey = getSourceTableKey(schema, table)
   if (warehouseTables[tableKey]?.mode === 'has_warehouse_copy') {
     return {
       label: 'Postgres (live)',
-      tooltip: 'This grid shows live Postgres rows.',
+      tooltip: 'Live Postgres rows',
     }
   }
 

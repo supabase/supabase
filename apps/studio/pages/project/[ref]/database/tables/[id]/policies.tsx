@@ -3,7 +3,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { TableDetailPoliciesTab } from '@/components/interfaces/Database/Tables/TableDetailPoliciesTab'
 import { TableDetailLayout } from '@/components/layouts/DatabaseLayout/TableDetailLayout'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'

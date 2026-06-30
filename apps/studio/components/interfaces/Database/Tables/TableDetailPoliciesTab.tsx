@@ -6,7 +6,7 @@ import { PoliciesDataProvider } from '@/components/interfaces/Auth/Policies/Poli
 import { PolicyEditorPanel } from '@/components/interfaces/Auth/Policies/PolicyEditorPanel'
 import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { getExposedSchemas } from '@/components/layouts/ProjectNeedsSecuring/ProjectNeedsSecuring.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import type { TableLike } from '@/data/table-editor/table-editor-types'

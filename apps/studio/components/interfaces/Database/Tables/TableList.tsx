@@ -55,11 +55,9 @@ import {
   warehouseDemoStore,
   type WarehouseMode,
 } from '../Warehouse/warehouseDemoStore'
+import { getSourceSchemaName, isWarehouseSchema } from '../Warehouse/warehouseNaming.utils'
 import { WarehouseSyncChip } from '../Warehouse/WarehouseSyncChip'
-import {
-  getActiveWarehouseSchemas,
-  isTableEditorSchemaLocked,
-} from '../Warehouse/warehouseTableEditor.utils'
+import { getActiveWarehouseSchemas } from '../Warehouse/warehouseTableEditor.utils'
 import { formatAllEntities } from './Tables.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { AlertError } from '@/components/ui/AlertError'
@@ -313,9 +311,10 @@ export const TableList = ({
   const { isSchemaLocked: isProtectedSchemaLocked } = useIsProtectedSchema({
     schema: selectedSchema,
   })
-  const isSchemaLocked = isProtectedSchemaLocked || isTableEditorSchemaLocked(selectedSchema)
+  const isWarehouseSchemaSelected = isWarehouseSchema(selectedSchema)
+  const isReadOnlySchema = isProtectedSchemaLocked || isWarehouseSchemaSelected
 
-  const canAddTables = canUpdateTables && !isSchemaLocked
+  const canAddTables = canUpdateTables && !isReadOnlySchema
 
   useShortcut(
     SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
@@ -338,7 +337,9 @@ export const TableList = ({
   const isSuccess =
     isSuccessTables && isSuccessViews && isSuccessMaterializedViews && isSuccessForeignTables
 
-  const formatTooltipText = (entityType: string) => {
+  const formatTooltipText = (entityType: string, isWarehouseEntity = false) => {
+    if (isWarehouseEntity) return 'Warehouse copy'
+
     const text =
       Object.entries(ENTITY_TYPE)
         .find(([, value]) => value === entityType)?.[0]
@@ -435,7 +436,7 @@ export const TableList = ({
             icon={<Search />}
           />
 
-          {!isSchemaLocked &&
+          {!isReadOnlySchema &&
             (canAddTables ? (
               <Shortcut
                 id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
@@ -465,7 +466,9 @@ export const TableList = ({
         </div>
       </div>
 
-      {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="tables" />}
+      {isProtectedSchemaLocked && (
+        <ProtectedSchemaWarning schema={selectedSchema} entity="tables" />
+      )}
 
       {isLoading && <GenericSkeletonLoader />}
 
@@ -573,6 +576,11 @@ export const TableList = ({
                     sortedEntities.map((x) => {
                       const tableDetailUrl = `/project/${ref}/database/tables/${x.id}`
                       const handleRowNavigation = createNavigationHandler(tableDetailUrl, router)
+                      const isWarehouseEntity =
+                        isWarehouseSchema(selectedSchema) || isWarehouseSchema(x.schema)
+                      const entityIconType = isWarehouseEntity
+                        ? ENTITY_TYPE.WAREHOUSE_TABLE
+                        : x.type
 
                       return (
                         <TableRow
@@ -587,11 +595,11 @@ export const TableList = ({
                             <Tooltip>
                               <TooltipTrigger asChild className="cursor-default">
                                 <div className="flex w-4 justify-center">
-                                  <EntityTypeIcon type={x.type} />
+                                  <EntityTypeIcon type={entityIconType} />
                                 </div>
                               </TooltipTrigger>
                               <TooltipContent side="bottom">
-                                {formatTooltipText(x.type)}
+                                {formatTooltipText(x.type, isWarehouseEntity)}
                               </TooltipContent>
                             </Tooltip>
                           </TableCell>
@@ -637,7 +645,7 @@ export const TableList = ({
                           <TableCell>
                             {x.type === ENTITY_TYPE.TABLE ? (
                               (() => {
-                                const tableKey = `${selectedSchema}.${x.name}`
+                                const tableKey = `${getSourceSchemaName(selectedSchema)}.${x.name}`
                                 const wState = warehouseSnap.tables[tableKey] ?? {
                                   mode: 'postgres',
                                 }
@@ -775,10 +783,10 @@ export const TableList = ({
 
                                       <DropdownMenuSeparator />
                                       <DropdownMenuItemTooltip
-                                        disabled={!canUpdateTables || isSchemaLocked}
+                                        disabled={!canUpdateTables || isReadOnlySchema}
                                         className="gap-x-2"
                                         onClick={() => {
-                                          if (canUpdateTables && !isSchemaLocked) {
+                                          if (canUpdateTables && !isReadOnlySchema) {
                                             onDeleteTable({ ...x, schema: selectedSchema })
                                           }
                                         }}

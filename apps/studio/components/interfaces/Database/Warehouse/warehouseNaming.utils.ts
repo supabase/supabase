@@ -2,17 +2,24 @@
  * Warehouse tables are exposed in a per-source schema to avoid name clashes
  * (e.g. public.events and foo.events both map to distinct warehouse schemas).
  */
-export function getWarehouseSchemaName(sourceSchema: string): string {
-  return `${sourceSchema}_warehouse`
-}
-
 export function isWarehouseSchema(schema: string): boolean {
   return schema.endsWith('_warehouse')
 }
 
+export function getSourceSchemaName(schema: string): string {
+  return isWarehouseSchema(schema) ? schema.slice(0, -'_warehouse'.length) : schema
+}
+
+export function getWarehouseSchemaName(sourceSchema: string): string {
+  return `${getSourceSchemaName(sourceSchema)}_warehouse`
+}
+
+export function getSourceTableKey(schema: string, table: string): string {
+  return `${getSourceSchemaName(schema)}.${table}`
+}
+
 export function getSourceTableKeyFromWarehouseSchema(schema: string, table: string): string {
-  const sourceSchema = schema.slice(0, -'_warehouse'.length)
-  return `${sourceSchema}.${table}`
+  return getSourceTableKey(schema, table)
 }
 
 export function parseTableKey(tableKey: string): { schema: string; table: string } {

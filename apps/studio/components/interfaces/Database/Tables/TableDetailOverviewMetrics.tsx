@@ -16,6 +16,7 @@ import {
   getWarehouseStorageSummaryLabel,
   warehouseDemoStore,
 } from '@/components/interfaces/Database/Warehouse/warehouseDemoStore'
+import { getSourceTableKey } from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
 import type { TableLike } from '@/data/table-editor/table-editor-types'
 import { formatBytes } from '@/lib/helpers'
 
@@ -70,7 +71,7 @@ interface TableDetailOverviewMetricsProps {
 
 export function TableDetailOverviewMetrics({ table }: TableDetailOverviewMetricsProps) {
   const warehouseSnap = useSnapshot(warehouseDemoStore)
-  const tableKey = `${table.schema}.${table.name}`
+  const tableKey = getSourceTableKey(table.schema, table.name)
   const warehouseState = warehouseSnap.tables[tableKey]
 
   const rowCount = table.live_rows_estimate ?? 0

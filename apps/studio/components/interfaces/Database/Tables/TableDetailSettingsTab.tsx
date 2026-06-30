@@ -1,4 +1,5 @@
 import { Realtime } from 'icons'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { Button, Card, CardContent } from 'ui'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
@@ -10,10 +11,15 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 
-import { TableDetailGeneralSettingsCard } from '@/components/interfaces/Database/Tables/TableDetailGeneralSettingsCard'
 import { TableDetailDataApiSection } from '@/components/interfaces/Database/Tables/TableDetailDataApiSection'
 import { TableDetailDeleteTableSection } from '@/components/interfaces/Database/Tables/TableDetailDeleteTableSection'
+import { TableDetailGeneralSettingsCard } from '@/components/interfaces/Database/Tables/TableDetailGeneralSettingsCard'
 import { TableDetailIndexAdvisorSection } from '@/components/interfaces/Database/Tables/TableDetailIndexAdvisorSection'
+import {
+  getSourceSchemaName,
+  getSourceTableKey,
+  getWarehouseSchemaName,
+} from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
 import { WarehouseTableStoragePanel } from '@/components/interfaces/Database/Warehouse/WarehouseTableStoragePanel'
 import { RealtimeToggleDialog } from '@/components/interfaces/TableGridEditor/RealtimeToggleDialog'
 import { useIsTableRealtimeEnabled } from '@/data/database-publications/database-publications-query'
@@ -30,7 +36,11 @@ export function TableDetailSettingsTab({ table }: TableDetailSettingsTabProps) {
   const { realtimeAll: isRealtimeFeatureEnabled } = useIsFeatureEnabled(['realtime:all'])
   const isRealtimeEnabled = useIsTableRealtimeEnabled({ id: table.id })
   const showStorage = table.entity_type === ENTITY_TYPE.TABLE
-  const tableKey = `${table.schema}.${table.name}`
+  const tableKey = getSourceTableKey(table.schema, table.name)
+  const sourceSchema = getSourceSchemaName(table.schema)
+  const warehouseSchema = getWarehouseSchemaName(sourceSchema)
+  const [schemaQuery] = useQueryState('schema', parseAsString)
+  const viewContext = schemaQuery === warehouseSchema ? 'warehouse' : 'source'
 
   return (
     <>
@@ -54,7 +64,12 @@ export function TableDetailSettingsTab({ table }: TableDetailSettingsTabProps) {
               </PageSectionSummary>
             </PageSectionMeta>
             <PageSectionContent>
-              <WarehouseTableStoragePanel tableKey={tableKey} postgresSize={table.size} />
+              <WarehouseTableStoragePanel
+                tableKey={tableKey}
+                tableId={table.id}
+                postgresSize={table.size}
+                viewContext={viewContext}
+              />
             </PageSectionContent>
           </PageSection>
         )}
@@ -77,7 +92,9 @@ export function TableDetailSettingsTab({ table }: TableDetailSettingsTabProps) {
                   >
                     <Button
                       variant="default"
-                      icon={<Realtime size={14} className={isRealtimeEnabled ? 'text-brand' : ''} />}
+                      icon={
+                        <Realtime size={14} className={isRealtimeEnabled ? 'text-brand' : ''} />
+                      }
                       onClick={() => setRealtimeDialogOpen(true)}
                     >
                       {isRealtimeEnabled ? 'Disable' : 'Enable'} realtime

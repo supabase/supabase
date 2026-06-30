@@ -12,8 +12,10 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
-import { isWarehouseSchema } from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
-import { getSourceSchemaFromWarehouseSchema } from '@/components/interfaces/Database/Warehouse/warehouseTableEditor.utils'
+import {
+  getSourceSchemaName,
+  isWarehouseSchema,
+} from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
 import { INTERNAL_SCHEMAS, useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 
 export const ProtectedSchemaDialog = ({ onClose }: { onClose: () => void }) => {
@@ -68,7 +70,7 @@ export const ProtectedSchemaWarning = ({
   const { isSchemaLocked, reason, fdwType } = useIsProtectedSchema({ schema })
 
   if (isWarehouseSchema(schema)) {
-    const sourceSchema = getSourceSchemaFromWarehouseSchema(schema)
+    const sourceSchema = getSourceSchemaName(schema)
 
     return (
       <Admonition

@@ -1,5 +1,11 @@
 import type { WarehouseTableState } from './warehouseDemoStore'
-import { getWarehouseSchemaName, isWarehouseSchema, parseTableKey } from './warehouseNaming.utils'
+import {
+  getSourceSchemaName,
+  getWarehouseSchemaName,
+  isWarehouseSchema,
+  parseTableKey,
+} from './warehouseNaming.utils'
+import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import type { Entity } from '@/data/entity-types/entity-types-infinite-query'
 
 export function formatWarehouseLagLabel(lagSeconds: number): string {
@@ -21,7 +27,7 @@ export function getActiveWarehouseSchemas(
 }
 
 export function getSourceSchemaFromWarehouseSchema(warehouseSchema: string): string {
-  return warehouseSchema.slice(0, -'_warehouse'.length)
+  return getSourceSchemaName(warehouseSchema)
 }
 
 export function mapEntitiesForWarehouseSchema(
@@ -53,4 +59,37 @@ export function getTableEditorViewSchema(
 
 export function isTableEditorSchemaLocked(schema: string): boolean {
   return isWarehouseSchema(schema)
+}
+
+export function buildTableDetailUrl(
+  projectRef: string,
+  tableId: number,
+  schema?: string,
+  section: 'overview' | 'settings' = 'settings'
+): string {
+  const path = section === 'settings' ? `/settings` : ''
+  const base = `/project/${projectRef}/database/tables/${tableId}${path}`
+  return schema !== undefined ? `${base}?schema=${encodeURIComponent(schema)}` : base
+}
+
+export function buildTableEditorUrlForTableKey({
+  projectRef,
+  tableId,
+  tableKey,
+  variant,
+}: {
+  projectRef: string
+  tableId: number
+  tableKey: string
+  variant: 'source' | 'warehouse'
+}) {
+  const { schema } = parseTableKey(tableKey)
+  const sourceSchema = getSourceSchemaName(schema)
+  const editorSchema = variant === 'warehouse' ? getWarehouseSchemaName(sourceSchema) : sourceSchema
+
+  return buildTableEditorUrl({
+    projectRef,
+    tableId,
+    schema: editorSchema,
+  })
 }

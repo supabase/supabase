@@ -34,6 +34,7 @@ import {
   getWarehouseStorageSummaryLabel,
   warehouseDemoStore,
 } from '@/components/interfaces/Database/Warehouse/warehouseDemoStore'
+import { getSourceTableKey } from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
 import { WarehouseSyncChip } from '@/components/interfaces/Database/Warehouse/WarehouseSyncChip'
 import DeleteConfirmationDialogs from '@/components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
@@ -82,7 +83,7 @@ export function TableDetailLayout({
   const warehouseSnap = useSnapshot(warehouseDemoStore)
   const tableKey =
     selectedTable?.schema !== undefined && selectedTable?.name !== undefined
-      ? `${selectedTable.schema}.${selectedTable.name}`
+      ? getSourceTableKey(selectedTable.schema, selectedTable.name)
       : undefined
   const warehouseState = tableKey ? warehouseSnap.tables[tableKey] : undefined
 

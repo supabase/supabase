@@ -1,12 +1,12 @@
 import { useParams } from 'common'
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { useSnapshot } from 'valtio'
 
+import { warehouseDemoStore } from '@/components/interfaces/Database/Warehouse/warehouseDemoStore'
 import type { WarehouseCatalogEngine } from '@/components/interfaces/Integrations/WarehouseCatalog/warehouseCatalog.constants'
 import { WarehouseCatalogCredentials } from '@/components/interfaces/Integrations/WarehouseCatalog/WarehouseCatalogCredentials'
-import { warehouseDemoStore } from '@/components/interfaces/Database/Warehouse/warehouseDemoStore'
 
 interface WarehouseCatalogPanelProps {
   queryEngine?: WarehouseCatalogEngine

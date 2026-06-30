@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDown, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useState, type ReactNode } from 'react'
@@ -20,8 +20,16 @@ import {
 } from './warehouseDemoStore'
 import { WarehouseDetachModal } from './WarehouseDetachModal'
 import { WarehouseEnablementModal } from './WarehouseEnablementModal'
-import { buildSqlEditorWarehouseUrl, getWarehouseQualifiedTableName } from './warehouseNaming.utils'
+import {
+  buildSqlEditorWarehouseUrl,
+  getSourceSchemaName,
+  getSourceTableKey,
+  getWarehouseQualifiedTableName,
+  getWarehouseSchemaName,
+  parseTableKey,
+} from './warehouseNaming.utils'
 import { WarehouseSyncChip } from './WarehouseSyncChip'
+import { buildTableDetailUrl } from './warehouseTableEditor.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 
 const TYPE_LABELS: Record<WarehouseMode, string> = {
@@ -38,20 +46,65 @@ function MetaRow({ label, children }: { label: string; children: ReactNode }) {
   )
 }
 
+function TableCopyRow({
+  label,
+  name,
+  tooltip,
+  detailUrl,
+}: {
+  label: string
+  name: string
+  tooltip: string
+  detailUrl?: string
+}) {
+  return (
+    <MetaRow label={label}>
+      <div className="flex items-center justify-end gap-1.5">
+        <code className="text-code-inline break-all">{name}</code>
+        {detailUrl !== undefined && (
+          <Button
+            type="button"
+            variant="text"
+            size="tiny"
+            className="h-6 w-6 shrink-0 p-0 text-foreground-lighter hover:text-foreground"
+            asChild
+          >
+            <Link href={detailUrl} aria-label={`Open ${name}`}>
+              <ExternalLink size={14} />
+            </Link>
+          </Button>
+        )}
+        <InfoTooltip side="top" className="max-w-72">
+          {tooltip}
+        </InfoTooltip>
+      </div>
+    </MetaRow>
+  )
+}
+
 interface WarehouseTableStoragePanelProps {
   tableKey: string
+  tableId: number
   postgresSize?: string
+  /** Which copy this panel is shown for — the other row gets an external link. */
+  viewContext?: 'source' | 'warehouse'
 }
 
 export function WarehouseTableStoragePanel({
   tableKey,
+  tableId,
   postgresSize,
+  viewContext = 'source',
 }: WarehouseTableStoragePanelProps) {
   const { ref: projectRef } = useParams()
-  const state = useWarehouseTableState(tableKey)
+  const { schema, table } = parseTableKey(tableKey)
+  const sourceTableKey = getSourceTableKey(schema, table)
+  const state = useWarehouseTableState(sourceTableKey)
   const { mode } = state
   const warehouseSize = formatWarehouseSize(state.warehouseSizeBytes)
-  const warehouseQualifiedName = state.copyName ?? getWarehouseQualifiedTableName(tableKey)
+  const warehouseQualifiedName = state.copyName ?? getWarehouseQualifiedTableName(sourceTableKey)
+  const sourceSchema = getSourceSchemaName(schema)
+  const warehouseSchema = getWarehouseSchemaName(sourceSchema)
 
   const [enablementModalOpen, setEnablementModalOpen] = useState(false)
   const [detachConfirm, setDetachConfirm] = useState(false)
@@ -66,7 +119,15 @@ export function WarehouseTableStoragePanel({
   }
 
   const sqlEditorWarehouseUrl =
-    projectRef !== undefined ? buildSqlEditorWarehouseUrl(projectRef, tableKey) : undefined
+    projectRef !== undefined ? buildSqlEditorWarehouseUrl(projectRef, sourceTableKey) : undefined
+  const postgresDetailUrl =
+    projectRef !== undefined && viewContext === 'warehouse'
+      ? buildTableDetailUrl(projectRef, tableId, sourceSchema)
+      : undefined
+  const warehouseDetailUrl =
+    projectRef !== undefined && viewContext === 'source'
+      ? buildTableDetailUrl(projectRef, tableId, warehouseSchema)
+      : undefined
 
   return (
     <>
@@ -88,22 +149,18 @@ export function WarehouseTableStoragePanel({
                   <span className="text-foreground-light">{state.lagSeconds}s</span>
                 </MetaRow>
               )}
-              <MetaRow label="Postgres table">
-                <div className="flex items-center justify-end gap-1.5">
-                  <code className="text-code-inline break-all">{tableKey}</code>
-                  <InfoTooltip side="top" className="max-w-72">
-                    Used by the Table Editor and application writes.
-                  </InfoTooltip>
-                </div>
-              </MetaRow>
-              <MetaRow label="Warehouse table">
-                <div className="flex items-center justify-end gap-1.5">
-                  <code className="text-code-inline break-all">{warehouseQualifiedName}</code>
-                  <InfoTooltip side="top" className="max-w-72">
-                    Query this name explicitly in the SQL Editor for analytical workloads.
-                  </InfoTooltip>
-                </div>
-              </MetaRow>
+              <TableCopyRow
+                label="Postgres table"
+                name={sourceTableKey}
+                tooltip="Used by the Table Editor and application writes."
+                detailUrl={postgresDetailUrl}
+              />
+              <TableCopyRow
+                label="Warehouse table"
+                name={warehouseQualifiedName}
+                tooltip="Read-only Warehouse copy. Query this explicitly for Warehouse-stored data."
+                detailUrl={warehouseDetailUrl}
+              />
               <MetaRow label="Postgres size">{postgresSize ?? '—'}</MetaRow>
               <MetaRow label="Warehouse size">{warehouseSize}</MetaRow>
             </>
@@ -165,7 +222,7 @@ export function WarehouseTableStoragePanel({
       {enablementModalOpen && (
         <WarehouseEnablementModal
           open={true}
-          tableKey={tableKey}
+          tableKey={sourceTableKey}
           onOpenChange={(open) => {
             if (!open) setEnablementModalOpen(false)
           }}
@@ -194,7 +251,7 @@ export function WarehouseTableStoragePanel({
       {detachProgress && (
         <WarehouseDetachModal
           open={true}
-          tableKey={tableKey}
+          tableKey={sourceTableKey}
           copyName={warehouseQualifiedName}
           onOpenChange={(open) => {
             if (!open) setDetachProgress(false)

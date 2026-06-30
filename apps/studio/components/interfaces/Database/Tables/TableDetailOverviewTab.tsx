@@ -10,11 +10,11 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { PageSectionTitle } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import AlertError from '@/components/ui/AlertError'
 import { TableDetailOverviewMetrics } from '@/components/interfaces/Database/Tables/TableDetailOverviewMetrics'
+import { AlertError } from '@/components/ui/AlertError'
 import type { TableLike } from '@/data/table-editor/table-editor-types'
 import { useTableRowsQuery } from '@/data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -66,83 +66,86 @@ export function TableDetailOverviewTab({ table, tableEditorUrl }: TableDetailOve
           </Button>
         </div>
 
-      <Card>
-        {isPending ? (
-          <div className="p-4">
-            <GenericSkeletonLoader />
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {columns.length === 0 ? (
-                  <TableHead className="text-foreground-muted">No columns</TableHead>
-                ) : (
-                  columns.map((column) => (
-                    <TableHead key={column.id} className="whitespace-nowrap">
-                      {column.name}
-                    </TableHead>
-                  ))
-                )}
-              </TableRow>
-            </TableHeader>
-
-            <TableBody>
-              {isError && (
-                <TableRow className="[&>td]:hover:bg-inherit">
-                  <TableCell colSpan={Math.max(columns.length, 1)}>
-                    <AlertError
-                      error={error}
-                      subject={`Failed to load rows for "${table.schema}.${table.name}"`}
-                    />
-                  </TableCell>
+        <Card>
+          {isPending ? (
+            <div className="p-4">
+              <GenericSkeletonLoader />
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {columns.length === 0 ? (
+                    <TableHead className="text-foreground-muted">No columns</TableHead>
+                  ) : (
+                    columns.map((column) => (
+                      <TableHead key={column.id} className="whitespace-nowrap">
+                        {column.name}
+                      </TableHead>
+                    ))
+                  )}
                 </TableRow>
-              )}
+              </TableHeader>
 
-              {!isError && rows.length === 0 && (
-                <TableRow className="[&>td]:hover:bg-inherit">
-                  <TableCell
-                    colSpan={Math.max(columns.length, 1)}
-                    className="text-center text-foreground-muted"
-                  >
-                    This table has no rows yet.
-                  </TableCell>
-                </TableRow>
-              )}
-
-              {!isError &&
-                rows.map((row, rowIndex) => (
-                  <TableRow key={row.idx ?? rowIndex}>
-                    {columns.map((column) => {
-                      const value = row[column.name]
-                      const formatted = formatPreviewValue(value)
-                      return (
-                        <TableCell key={column.id} className="max-w-64 truncate font-mono text-xs">
-                          <span className={value === null ? 'text-foreground-muted' : undefined}>
-                            {formatted}
-                          </span>
-                        </TableCell>
-                      )
-                    })}
+              <TableBody>
+                {isError && (
+                  <TableRow className="[&>td]:hover:bg-inherit">
+                    <TableCell colSpan={Math.max(columns.length, 1)}>
+                      <AlertError
+                        error={error}
+                        subject={`Failed to load rows for "${table.schema}.${table.name}"`}
+                      />
+                    </TableCell>
                   </TableRow>
-                ))}
-            </TableBody>
+                )}
 
-            {!isError && rows.length > 0 && (
-              <TableFooter>
-                <TableRow className="bg-transparent hover:bg-transparent">
-                  <TableCell
-                    colSpan={Math.max(columns.length, 1)}
-                    className="text-foreground-muted font-normal"
-                  >
-                    Showing up to {OVERVIEW_ROW_LIMIT} rows
-                  </TableCell>
-                </TableRow>
-              </TableFooter>
-            )}
-          </Table>
-        )}
-      </Card>
+                {!isError && rows.length === 0 && (
+                  <TableRow className="[&>td]:hover:bg-inherit">
+                    <TableCell
+                      colSpan={Math.max(columns.length, 1)}
+                      className="text-center text-foreground-muted"
+                    >
+                      This table has no rows yet.
+                    </TableCell>
+                  </TableRow>
+                )}
+
+                {!isError &&
+                  rows.map((row, rowIndex) => (
+                    <TableRow key={row.idx ?? rowIndex}>
+                      {columns.map((column) => {
+                        const value = row[column.name]
+                        const formatted = formatPreviewValue(value)
+                        return (
+                          <TableCell
+                            key={column.id}
+                            className="max-w-64 truncate font-mono text-xs"
+                          >
+                            <span className={value === null ? 'text-foreground-muted' : undefined}>
+                              {formatted}
+                            </span>
+                          </TableCell>
+                        )
+                      })}
+                    </TableRow>
+                  ))}
+              </TableBody>
+
+              {!isError && rows.length > 0 && (
+                <TableFooter>
+                  <TableRow className="bg-transparent hover:bg-transparent">
+                    <TableCell
+                      colSpan={Math.max(columns.length, 1)}
+                      className="text-foreground-muted font-normal"
+                    >
+                      Showing up to {OVERVIEW_ROW_LIMIT} rows
+                    </TableCell>
+                  </TableRow>
+                </TableFooter>
+              )}
+            </Table>
+          )}
+        </Card>
       </div>
     </div>
   )
