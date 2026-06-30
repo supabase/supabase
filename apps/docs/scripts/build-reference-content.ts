@@ -18,6 +18,7 @@ import matter from 'gray-matter'
 
 import {
   buildMap,
+  KIND_PROPERTY,
   KIND_VARIABLE,
   normalizeComment,
   parseSignature,
@@ -355,6 +356,19 @@ function collectFunctions(
         isConst: node.flags?.isConst ?? false,
       }
       out.typeSpec.variables[ref] = variableEntry
+    } else if (node.kind === KIND_PROPERTY && node.type && readTagFromDeclOrSignature(node, '@category')) {
+      // Store properties that carry @category (i.e., will appear in functions.json)
+      // as method-shaped entries with empty params and ret holding the property type.
+      // The renderer shows description + "Return Type", which is the closest fit
+      // without UI changes. JS properties never carry @category, so this only fires
+      // for SDKs like Swift that annotate all public symbols with @category.
+      const propertyEntry: MethodTypes = {
+        name: ref,
+        params: [],
+        ret: { type: parseType(node.type, idMap) },
+        comment: node.comment ? normalizeComment(node.comment as any) : undefined,
+      }
+      out.typeSpec.methods[ref] = propertyEntry
     }
   }
 

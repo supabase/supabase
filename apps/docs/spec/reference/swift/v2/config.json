@@ -1,0 +1,11 @@
+{
+  "categoryOrder": ["Authentication", "Database", "Edge Functions", "Realtime", "Storage", "Client"],
+  "partialsOrder": ["introduction", "installing"],
+  "navigationPrefixes": {
+    "Authentication": false,
+    "Database": false,
+    "Realtime": false,
+    "Edge Functions": "functions",
+    "Client": false
+  }
+}
