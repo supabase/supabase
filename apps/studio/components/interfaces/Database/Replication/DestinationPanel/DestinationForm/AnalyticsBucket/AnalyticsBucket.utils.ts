@@ -22,9 +22,13 @@ const ANALYTICS_BUCKET_REQUIRED_FIELDS: AnalyticsBucketValidationIssue[] = [
 ]
 
 export const getAnalyticsBucketValidationIssues = (
-  data: Pick<DestinationPanelSchemaType, AnalyticsBucketFieldPath>
+  data: Pick<DestinationPanelSchemaType, AnalyticsBucketFieldPath>,
+  options: { secretsOptional?: boolean } = {}
 ): AnalyticsBucketValidationIssue[] => {
-  const issues = ANALYTICS_BUCKET_REQUIRED_FIELDS.filter(({ path }) => !data[path]?.trim().length)
+  const requiredFields = options.secretsOptional
+    ? ANALYTICS_BUCKET_REQUIRED_FIELDS.filter(({ path }) => path !== 's3AccessKeyId')
+    : ANALYTICS_BUCKET_REQUIRED_FIELDS
+  const issues = requiredFields.filter(({ path }) => !data[path]?.trim().length)
 
   const isCreatingNewNamespace = data.namespace === CREATE_NEW_NAMESPACE
   const hasValidNamespace =
@@ -39,8 +43,20 @@ export const getAnalyticsBucketValidationIssues = (
     )
   }
 
+  if (
+    options.secretsOptional &&
+    data.s3SecretAccessKey?.trim().length &&
+    !data.s3AccessKeyId?.trim().length
+  ) {
+    issues.push({ path: 's3AccessKeyId', message: 'S3 Access Key ID is required' })
+  }
+
   // Creating a new key generates the secret later, so only require it for existing keys.
-  if (data.s3AccessKeyId !== CREATE_NEW_KEY && !data.s3SecretAccessKey?.trim().length) {
+  if (
+    data.s3AccessKeyId !== CREATE_NEW_KEY &&
+    (!options.secretsOptional || data.s3AccessKeyId?.trim().length) &&
+    !data.s3SecretAccessKey?.trim().length
+  ) {
     issues.push({ path: 's3SecretAccessKey', message: 'S3 Secret Access Key is required' })
   }
 

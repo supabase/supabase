@@ -7,6 +7,7 @@ import {
   buildDucklakeApiConfig,
   DestinationConfig,
 } from './create-destination-pipeline-mutation'
+import { optionalSecret } from './destination-secret-utils'
 import { replicationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -57,7 +58,7 @@ async function updateDestinationPipeline(
       big_query: {
         project_id: projectId,
         dataset_id: datasetId,
-        service_account_key: serviceAccountKey,
+        service_account_key: optionalSecret(serviceAccountKey),
         connection_pool_size: connectionPoolSize,
         max_staleness_mins: maxStalenessMins,
       },
@@ -78,17 +79,17 @@ async function updateDestinationPipeline(
           project_ref: icebergProjectRef,
           warehouse_name: warehouseName,
           namespace: namespace,
-          catalog_token: catalogToken,
-          s3_access_key_id: s3AccessKeyId,
-          s3_secret_access_key: s3SecretAccessKey,
+          catalog_token: optionalSecret(catalogToken),
+          s3_access_key_id: optionalSecret(s3AccessKeyId),
+          s3_secret_access_key: optionalSecret(s3SecretAccessKey),
           s3_region: s3Region,
         },
       },
-    }
+    } as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
   } else if ('ducklake' in destinationConfig) {
-    destination_config = buildDucklakeApiConfig(
-      destinationConfig.ducklake
-    ) as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
+    destination_config = buildDucklakeApiConfig(destinationConfig.ducklake, {
+      omitBlankSecrets: true,
+    }) as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
   } else if ('snowflake' in destinationConfig) {
     const { accountId, user, privateKey, privateKeyPassphrase, database, schema, role } =
       destinationConfig.snowflake
@@ -96,8 +97,8 @@ async function updateDestinationPipeline(
       snowflake: {
         account_id: accountId,
         user,
-        private_key: privateKey,
-        private_key_passphrase: privateKeyPassphrase,
+        private_key: optionalSecret(privateKey),
+        private_key_passphrase: optionalSecret(privateKeyPassphrase),
         database,
         schema,
         role,
