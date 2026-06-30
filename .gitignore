@@ -112,7 +112,8 @@ next-env.d.ts
 # DynamoDB Local files
 .dynamodb/
 
-.vscode
+.vscode/*
+!.vscode/content-listing.code-snippets
 .idea
 .vercel
 

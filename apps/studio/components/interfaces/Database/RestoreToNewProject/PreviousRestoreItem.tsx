@@ -1,6 +1,6 @@
 import { ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { StatusBadge } from './StatusBadge'
 import { CloneStatus } from '@/data/projects/clone-status-query'
