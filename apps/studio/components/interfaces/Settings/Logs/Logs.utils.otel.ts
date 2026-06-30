@@ -102,7 +102,9 @@ const SUPAVISOR_FILTERS: Record<string, SqlFilterEntry> = {
 }
 const ETL_FILTERS: Record<string, SqlFilterEntry> = {
   ...COMMON_FILTERS,
-  pipeline_id: (value: string | number) => safeSql`${attr('pipeline_id')} = ${lit(value)}`,
+  // pipeline_id arrives as a number, but log_attributes values are strings, so
+  // compare as a string. A numeric literal here is a ClickHouse type error.
+  pipeline_id: (value: string | number) => safeSql`${attr('pipeline_id')} = ${lit(String(value))}`,
 }
 
 const col = (key: string, alias: SafeLogSqlFragment): SafeLogSqlFragment =>

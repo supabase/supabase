@@ -11,7 +11,7 @@ export const getTablePoliciesHref = (
   schema: string | undefined,
   name: string | undefined
 ): string => {
-  return `/project/${projectRef ?? ''}/auth/policies?schema=${encodeURIComponent(
+  return `/project/${projectRef ?? ''}/database/policies?schema=${encodeURIComponent(
     schema ?? ''
   )}&search=${encodeURIComponent(name ?? '')}`
 }
