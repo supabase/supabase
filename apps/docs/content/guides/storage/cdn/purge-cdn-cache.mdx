@@ -7,7 +7,7 @@ sidebar_label: 'CDN'
 
 With Smart CDN enabled, Supabase Storage automatically invalidates the cache when files are updated or deleted. However, there are scenarios where you may need to manually purge the CDN cache for specific objects or entire buckets. The cache purge API allows you to immediately queue cache content invalidation across all CDN edge nodes.
 
-Manual cache purging is useful when you need to ensure that updates are propagated immediately, or when you want to clear the cache for debugging purposes. Once purged, the next request for that object will be served from the origin server, and the CDN cache will be repopulated.
+Manual cache purging is useful when you need to ensure that updates are propagated as soon as possible, or when you want to clear the cache for debugging purposes. Once purged, the next request for that object will be served from the origin server, and the CDN cache will be repopulated.
 
 <Admonition type="caution">
 
