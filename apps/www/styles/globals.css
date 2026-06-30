@@ -15,7 +15,7 @@
 @theme inline {
   --font-sans:
     var(--font-inter), Inter, Helvetica Neue, Helvetica, ui-sans-serif, system-ui, sans-serif;
-  --font-heading: var(--font-manrope), Manrope, sans-serif;
+  --font-heading: var(--font-heading, var(--font-sans));
   --font-mono:
     var(--font-geist-mono), 'Geist Mono', 'Source Code Pro', ui-monospace, Menlo, monospace;
 }
@@ -45,6 +45,9 @@
 
   --delay-1200: 1200ms;
   --delay-1500: 1500ms;
+
+  /* font sizing and weights optimized for Inter */
+  --font-weight-normal: 450;
 }
 
 @keyframes flash-code {
@@ -136,7 +139,7 @@
   .h4,
   .h5,
   .h6 {
-    font-family: var(--font-manrope, Manrope, sans-serif);
+    @apply font-heading tracking-tight;
   }
 }
 
