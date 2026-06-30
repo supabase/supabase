@@ -14,12 +14,11 @@
 @theme inline {
   --font-sans:
     var(--font-inter), Inter, Helvetica Neue, Helvetica, ui-sans-serif, system-ui, sans-serif;
-  --font-heading: var(--font-manrope), Manrope, ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-manrope, var(--font-sans));
   --font-mono: var(--font-source-code-pro), 'Source Code Pro', ui-monospace, Menlo, monospace;
 }
 
 @theme {
-  /* font sizing and weights optimized for Inter */
   --text-sm: 0.8125rem;
   --text-base: 0.9375rem;
   --text-lg: 1rem;
@@ -92,19 +91,21 @@ body {
   color: #333 !important;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6,
-.h1,
-.h2,
-.h3,
-.h4,
-.h5,
-.h6 {
-  @apply font-heading font-semibold;
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .h1,
+  .h2,
+  .h3,
+  .h4,
+  .h5,
+  .h6 {
+    @apply font-heading font-semibold;
+  }
 }
 
 .thin-scrollbar {
@@ -144,6 +145,19 @@ h6,
 .prose :where(ol > li):not(:where([class~='not-prose'], [class~='not-prose'] *))::marker {
   font-weight: inherit;
 }
+
+/* .prose :where(h1):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  @apply text-4xl;
+}
+.prose :where(h2):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  @apply text-2xl;
+}
+.prose :where(h3):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  @apply text-xl;
+}
+.prose :where(h4):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  @apply text-xl;
+} */
 
 code[class*='language-'],
 pre[class*='language-'] {
