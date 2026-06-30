@@ -640,6 +640,28 @@ describe('OTEL filter translation', () => {
         100"
     `)
   })
+
+  it('quotes a numeric etl pipeline_id so it compares as a string', () => {
+    // The replication "View logs" link puts pipeline_id in the `f` param as a
+    // number; JSON.parse keeps it numeric, so model that path here.
+    const filters = JSON.parse('{ "pipeline_id": 42 }')
+    expect(fmt(genDefaultQueryOtel(LogsTableName.ETL, filters))).toMatchInlineSnapshot(`
+      "-- Logs Preview Query (otel) ['etl_replication_logs']
+      select
+        id,
+        timestamp,
+        event_message
+      from
+        logs
+      where
+        source = 'etl_replication_logs'
+        and (log_attributes['pipeline_id'] = '42')
+      order by
+        timestamp desc
+      limit
+        100"
+    `)
+  })
 })
 
 describe('otelTimestampToMicros', () => {
