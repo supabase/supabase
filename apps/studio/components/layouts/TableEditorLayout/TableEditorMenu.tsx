@@ -21,6 +21,7 @@ import {
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
 } from 'ui-patterns/InnerSideMenu'
+import { useSnapshot } from 'valtio'
 
 import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import { EntityListItem } from './EntityListItem'
@@ -29,6 +30,14 @@ import { ExportDialog } from '@/components/grid/components/header/ExportDialog'
 import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import { SupaTable } from '@/components/grid/types'
 import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
+import { warehouseDemoStore } from '@/components/interfaces/Database/Warehouse/warehouseDemoStore'
+import { isWarehouseSchema } from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
+import {
+  getActiveWarehouseSchemas,
+  getSourceSchemaFromWarehouseSchema,
+  isTableEditorSchemaLocked,
+  mapEntitiesForWarehouseSchema,
+} from '@/components/interfaces/Database/Warehouse/warehouseTableEditor.utils'
 import { ErrorMatcher } from '@/components/interfaces/ErrorHandling/ErrorMatcher'
 import { EditorMenuListSkeleton } from '@/components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -63,6 +72,13 @@ export const TableEditorMenu = () => {
     'alphabetical'
   )
 
+  const warehouseSnap = useSnapshot(warehouseDemoStore)
+  const warehouseSchemas = getActiveWarehouseSchemas(warehouseSnap.tables)
+  const isWarehouseSchemaSelected = isWarehouseSchema(selectedSchema)
+  const entityQuerySchema = isWarehouseSchemaSelected
+    ? getSourceSchemaFromWarehouseSchema(selectedSchema)
+    : selectedSchema
+
   const { data: project } = useSelectedProjectQuery()
   const {
     data,
@@ -77,7 +93,7 @@ export const TableEditorMenu = () => {
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schemas: [selectedSchema],
+      schemas: [entityQuerySchema],
       search: searchText.trim() || undefined,
       sort,
       filterTypes: visibleTypes,
@@ -87,10 +103,22 @@ export const TableEditorMenu = () => {
     }
   )
 
-  const entityTypes = useMemo(
-    () => data?.pages.flatMap((page) => page.data.entities),
-    [data?.pages]
-  )
+  const entityTypes = useMemo(() => {
+    const base = data?.pages.flatMap((page) => page.data.entities) ?? []
+
+    if (!isWarehouseSchemaSelected) return base
+
+    const warehouseEntities = mapEntitiesForWarehouseSchema(
+      selectedSchema,
+      base,
+      warehouseSnap.tables
+    )
+
+    if (!searchText.trim()) return warehouseEntities
+
+    const query = searchText.trim().toLowerCase()
+    return warehouseEntities.filter((entity) => entity.name.toLowerCase().includes(query))
+  }, [data?.pages, isWarehouseSchemaSelected, searchText, selectedSchema, warehouseSnap.tables])
   const entityNames = useMemo(() => entityTypes?.map((entity) => entity.name) ?? [], [entityTypes])
 
   const { data: apiAccessByTableName } = useTableApiAccessQuery(
@@ -108,7 +136,10 @@ export const TableEditorMenu = () => {
     'tables'
   )
 
-  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
+  const { isSchemaLocked: isProtectedSchemaLocked } = useIsProtectedSchema({
+    schema: selectedSchema,
+  })
+  const isSchemaLocked = isProtectedSchemaLocked || isTableEditorSchemaLocked(selectedSchema)
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
@@ -178,6 +209,7 @@ export const TableEditorMenu = () => {
             <SchemaSelector
               className="mx-4"
               selectedSchemaName={selectedSchema}
+              additionalSchemas={warehouseSchemas}
               onSelectSchema={(name: string) => {
                 setSearchText('')
                 setSelectedSchema(name)

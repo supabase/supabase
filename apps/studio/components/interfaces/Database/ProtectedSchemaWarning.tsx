@@ -12,6 +12,8 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns'
 
+import { isWarehouseSchema } from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
+import { getSourceSchemaFromWarehouseSchema } from '@/components/interfaces/Database/Warehouse/warehouseTableEditor.utils'
 import { INTERNAL_SCHEMAS, useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 
 export const ProtectedSchemaDialog = ({ onClose }: { onClose: () => void }) => {
@@ -64,6 +66,24 @@ export const ProtectedSchemaWarning = ({
 }) => {
   const [showModal, setShowModal] = useState(false)
   const { isSchemaLocked, reason, fdwType } = useIsProtectedSchema({ schema })
+
+  if (isWarehouseSchema(schema)) {
+    const sourceSchema = getSourceSchemaFromWarehouseSchema(schema)
+
+    return (
+      <Admonition
+        showIcon={false}
+        type="note"
+        title="Viewing Warehouse copy"
+        description={
+          <p>
+            The <code className="text-code-inline">{schema}</code> schema contains read-only copies
+            of <code className="text-code-inline">{sourceSchema}</code> tables.
+          </p>
+        }
+      />
+    )
+  }
 
   if (!isSchemaLocked) return null
 

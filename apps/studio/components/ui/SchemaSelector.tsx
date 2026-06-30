@@ -32,6 +32,7 @@ type SchemaSelectorProps = Omit<ComponentPropsWithoutRef<'div'>, 'onSelect'> & {
   placeholderLabel?: string
   supportSelectAll?: boolean
   excludedSchemas?: string[]
+  additionalSchemas?: string[]
   stopScrollPropagation?: boolean
   onSelectSchema: (name: string) => void
   onSelectCreateSchema?: () => void
@@ -51,6 +52,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
       placeholderLabel = 'Choose a schema...',
       supportSelectAll = false,
       excludedSchemas = [],
+      additionalSchemas = [],
       stopScrollPropagation = false,
       onSelectSchema,
       onSelectCreateSchema,
@@ -88,6 +90,12 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
 
     const schemas = (data || [])
       .filter((schema) => !excludedSchemas.includes(schema.name))
+      .concat(
+        additionalSchemas
+          .filter((name) => !excludedSchemas.includes(name))
+          .filter((name) => !(data || []).some((schema) => schema.name === name))
+          .map((name, index) => ({ id: -(index + 1), name, owner: 'supabase' }))
+      )
       .sort((a, b) => a.name.localeCompare(b.name))
 
     return (

@@ -1,5 +1,15 @@
 import { useParams } from 'common'
-import { Columns2, Copy, Download, Edit, Globe, Lock, MoreVertical, Settings, Trash } from 'lucide-react'
+import {
+  Columns2,
+  Copy,
+  Download,
+  Edit,
+  Globe,
+  Lock,
+  MoreVertical,
+  Settings,
+  Trash,
+} from 'lucide-react'
 import Link from 'next/link'
 import { type CSSProperties, type MouseEvent } from 'react'
 import { toast } from 'sonner'
@@ -25,6 +35,7 @@ import {
 import { useExportAllRowsAsCsv, useExportAllRowsAsSql } from './ExportAllRows'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
+import { isWarehouseSchema } from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
 import { getEntityLintDetails } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -148,7 +159,11 @@ export const EntityListItem = ({
 
   const apiAccessData = apiAccessMap?.[entity.name]
 
+  const isWarehouseEntity = isWarehouseSchema(entity.schema)
+  const entityIconType = isWarehouseEntity ? ENTITY_TYPE.WAREHOUSE_TABLE : entity.type
+
   const formatTooltipText = (entityType: string) => {
+    if (isWarehouseEntity) return 'Warehouse copy'
     const text =
       Object.entries(ENTITY_TYPE)
         .find(([, value]) => value === entityType)?.[0]
@@ -202,7 +217,7 @@ export const EntityListItem = ({
         {isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
         <Tooltip disableHoverableContent={true}>
           <TooltipTrigger className="min-w-4">
-            <EntityTypeIcon type={entity.type} isActive={isActive} />
+            <EntityTypeIcon type={entityIconType} isActive={isActive} />
           </TooltipTrigger>
           <TooltipContent side="bottom">{formatTooltipText(entity.type)}</TooltipContent>
         </Tooltip>

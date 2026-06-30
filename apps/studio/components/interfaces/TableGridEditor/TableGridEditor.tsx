@@ -12,6 +12,7 @@ import { SidePanelEditor } from './SidePanelEditor/SidePanelEditor'
 import { TableDefinition } from './TableDefinition'
 import { SupabaseGrid } from '@/components/grid/SupabaseGrid'
 import { useSyncTableEditorStateFromLocalStorageWithUrl } from '@/components/grid/SupabaseGrid.utils'
+import { isTableEditorSchemaLocked } from '@/components/interfaces/Database/Warehouse/warehouseTableEditor.utils'
 import {
   Entity,
   isForeignTable,
@@ -85,7 +86,12 @@ export const TableGridEditor = ({
     }
   }, [router, selectedTable, setLastVisitedTable, tabs])
 
-  const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedTable?.schema ?? '' })
+  const { isSchemaLocked: isProtectedSchemaLocked } = useIsProtectedSchema({
+    schema: selectedSchema ?? selectedTable?.schema ?? '',
+  })
+  const isSchemaLocked =
+    isProtectedSchemaLocked ||
+    isTableEditorSchemaLocked(selectedSchema ?? selectedTable?.schema ?? '')
 
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable || !projectRef) {

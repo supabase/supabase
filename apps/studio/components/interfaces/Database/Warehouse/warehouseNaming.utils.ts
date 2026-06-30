@@ -6,6 +6,15 @@ export function getWarehouseSchemaName(sourceSchema: string): string {
   return `${sourceSchema}_warehouse`
 }
 
+export function isWarehouseSchema(schema: string): boolean {
+  return schema.endsWith('_warehouse')
+}
+
+export function getSourceTableKeyFromWarehouseSchema(schema: string, table: string): string {
+  const sourceSchema = schema.slice(0, -'_warehouse'.length)
+  return `${sourceSchema}.${table}`
+}
+
 export function parseTableKey(tableKey: string): { schema: string; table: string } {
   const dotIndex = tableKey.indexOf('.')
   if (dotIndex === -1) {

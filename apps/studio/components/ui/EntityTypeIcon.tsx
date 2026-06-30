@@ -32,6 +32,20 @@ export const EntityTypeIcon = ({
     )
   }
 
+  if (type === ENTITY_TYPE.WAREHOUSE_TABLE) {
+    return (
+      <div
+        className={cn(
+          'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
+          'text-brand-600/90 dark:text-brand bg-brand-400/20 dark:bg-brand/20',
+          isActive && 'text-brand bg-brand/30'
+        )}
+      >
+        W
+      </div>
+    )
+  }
+
   if (type === ENTITY_TYPE.TABLE) {
     return (
       <Table2

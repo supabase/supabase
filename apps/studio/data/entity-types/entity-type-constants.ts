@@ -4,4 +4,5 @@ export enum ENTITY_TYPE {
   MATERIALIZED_VIEW = 'm',
   FOREIGN_TABLE = 'f',
   PARTITIONED_TABLE = 'p',
+  WAREHOUSE_TABLE = 'w',
 }

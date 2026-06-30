@@ -11,10 +11,13 @@ import { DropdownControl } from '../../common/DropdownControl'
 import { formatEstimatedCount } from './Pagination.utils'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import { useTableSort } from '@/components/grid/hooks/useTableSort'
+import { TableEditorDataSourceSuffix } from '@/components/interfaces/Database/Warehouse/TableEditorDataSourceSuffix'
+import { getTableEditorViewSchema } from '@/components/interfaces/Database/Warehouse/warehouseTableEditor.utils'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isForeignTable, isTable } from '@/data/table-editor/table-editor-types'
 import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query'
 import { useTableRowsQuery } from '@/data/table-rows/table-rows-query'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { RoleImpersonationState } from '@/lib/role-impersonation'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
@@ -56,6 +59,8 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
 
+  const { selectedSchema } = useQuerySchemaState()
+
   const { sorts } = useTableSort()
   const { filters } = useTableFilter()
 
@@ -70,6 +75,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
     id,
   })
   const isForeignTableSelected = isForeignTable(selectedTable)
+  const viewSchema = getTableEditorViewSchema(selectedSchema, selectedTable?.schema)
 
   const page = snap.page
   // rowsCountEstimate is only applicable to table entities
@@ -305,9 +311,14 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
       ) : !isForeignTableSelected ? (
         <div className="flex items-center gap-x-2">
           {hasCountData && (
-            <p className="text-xs text-foreground-light">
-              {`${countString} ${count === 0 || count > 1 ? `records` : 'record'}`}{' '}
-              {data.is_estimate ? '(estimated)' : ''}
+            <p className="flex min-w-0 items-center truncate text-xs text-foreground-light">
+              <span className="truncate text-foreground">
+                {`${countString} ${count === 0 || count > 1 ? `records` : 'record'}`}
+                {data.is_estimate ? ' (estimated)' : ''}
+              </span>
+              {viewSchema !== undefined && selectedTable?.name !== undefined && (
+                <TableEditorDataSourceSuffix schema={viewSchema} table={selectedTable.name} />
+              )}
             </p>
           )}
 
