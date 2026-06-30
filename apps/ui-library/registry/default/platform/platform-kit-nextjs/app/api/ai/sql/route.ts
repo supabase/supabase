@@ -55,8 +55,40 @@ function formatSchemaForPrompt(schema: any) {
   return schemaString
 }
 
+// Verify user has access to the project using their own token
+async function verifyProjectAccess(callerToken: string, projectRef: string): Promise<boolean> {
+  try {
+    const response = await fetch('https://api.supabase.com/v1/projects', {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${callerToken}`,
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (!response.ok) {
+      return false
+    }
+
+    const projects = await response.json()
+    return Array.isArray(projects) && projects.some((p: any) => p.ref === projectRef)
+  } catch {
+    return false
+  }
+}
+
 export async function POST(request: Request) {
   try {
+    // Extract Bearer token from the incoming request
+    const authHeader = request.headers.get('Authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { message: 'Authorization header with Bearer token is required.' },
+        { status: 401 }
+      )
+    }
+    const callerToken = authHeader.slice(7)
+
     const { prompt, projectRef } = await request.json()
 
     if (!prompt) {
@@ -66,11 +98,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'projectRef is required.' }, { status: 400 })
     }
 
-    // Implement your permission check here (e.g. check if the user is a member of the project)
-    // In this example, everyone can access all projects
-    const userHasPermissionForProject = Boolean(projectRef)
-
-    if (!userHasPermissionForProject) {
+    // Verify the caller has access to the requested project
+    const hasAccess = await verifyProjectAccess(callerToken, projectRef)
+    if (!hasAccess) {
       return NextResponse.json(
         { message: 'You do not have permission to access this project.' },
         { status: 403 }
