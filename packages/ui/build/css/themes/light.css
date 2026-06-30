@@ -3,15 +3,15 @@
   --helpers-os-appearance: Light;
   --hue: 159;
   /* Warm-gray surface ramp against the green brand (--primary stays on --hue). */
-  --surface-hue: 35;
-  --chroma: 0.005;
+  --surface-hue: 34;
+  --chroma: 0.004;
   /*
    * Soft-gray canvas (not pure white) so elevated surfaces have headroom to
    * brighten toward white. --elevation-step is positive here: higher surfaces
    * get lighter, matching dark mode's direction. Tuned literal (previously
    * derived from 1 - surface); retune alongside --surface.
    */
-  --surface: 0.97;
+  --surface: 0.98;
   --elevation-step: 0.024;
   --contrast: 0.53;
   --foreground-lightness: 0.16;
