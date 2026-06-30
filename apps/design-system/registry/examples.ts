@@ -154,7 +154,7 @@ export const examples: Registry = [
   {
     name: 'breadcrumb-dropdown',
     type: 'components:example',
-    registryDependencies: ['breadcrumb'],
+    registryDependencies: ['breadcrumb', 'dropdown-menu'],
     files: ['example/breadcrumb-dropdown.tsx'],
   },
   {
@@ -172,7 +172,7 @@ export const examples: Registry = [
   {
     name: 'breadcrumb-responsive',
     type: 'components:example',
-    registryDependencies: ['breadcrumb'],
+    registryDependencies: ['breadcrumb', 'button', 'drawer', 'dropdown-menu'],
     files: ['example/breadcrumb-responsive.tsx'],
   },
   {

@@ -393,7 +393,7 @@ export const Index: Record<string, any> = {
     "breadcrumb-dropdown": {
       name: "breadcrumb-dropdown",
       type: "components:example",
-      registryDependencies: ["breadcrumb"],
+      registryDependencies: ["breadcrumb","dropdown-menu"],
       component: React.lazy(() => import("@/registry/default/example/breadcrumb-dropdown")),
       source: "",
       files: ["registry/default/example/breadcrumb-dropdown.tsx"],
@@ -426,7 +426,7 @@ export const Index: Record<string, any> = {
     "breadcrumb-responsive": {
       name: "breadcrumb-responsive",
       type: "components:example",
-      registryDependencies: ["breadcrumb"],
+      registryDependencies: ["breadcrumb","button","drawer","dropdown-menu"],
       component: React.lazy(() => import("@/registry/default/example/breadcrumb-responsive")),
       source: "",
       files: ["registry/default/example/breadcrumb-responsive.tsx"],

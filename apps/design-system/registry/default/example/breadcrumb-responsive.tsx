@@ -25,7 +25,23 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-import { useMediaQuery } from '@/hooks/use-media-query'
+function useMediaQuery(query: string) {
+  const [value, setValue] = React.useState(false)
+
+  React.useEffect(() => {
+    function onChange(event: MediaQueryListEvent) {
+      setValue(event.matches)
+    }
+
+    const result = matchMedia(query)
+    result.addEventListener('change', onChange)
+    setValue(result.matches)
+
+    return () => result.removeEventListener('change', onChange)
+  }, [query])
+
+  return value
+}
 
 const items = [
   { href: '#', label: 'Home' },
@@ -60,7 +76,7 @@ export default function BreadcrumbResponsiveDemo() {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="start">
                     {items.slice(1, -2).map((item, index) => (
-                      <DropdownMenuItem key={index}>
+                      <DropdownMenuItem key={index} asChild>
                         <Link href={item.href ? item.href : '#'}>{item.label}</Link>
                       </DropdownMenuItem>
                     ))}
