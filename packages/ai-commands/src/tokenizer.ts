@@ -3,6 +3,15 @@ import type OpenAI from 'openai'
 
 export const tokenizer = getEncoding('cl100k_base')
 
+// Define constants for versions
+const MODEL_VERSIONS = {
+  'gpt-3.5-turbo': 'gpt-3.5-turbo-0301',
+  'gpt-4': 'gpt-4-0314',
+  'gpt-3.5-turbo-0301': 4097,
+  'gpt-4-0314': 4097,
+  'gpt-4o-mini-2024-07-18': 4097,
+}
+
 /**
  * Count the tokens for multi-message chat completion requests
  */
@@ -10,7 +19,7 @@ export function getChatRequestTokenCount(
   messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[],
   model = 'gpt-4o-mini-2024-07-18'
 ): number {
-  const tokensPerRequest = 3 // every reply is primed with <|im_start|>assistant<|im_sep|>
+  const tokensPerRequest = 3 // every reply is primed with <|im_start|> <|im_sep|>
   const numTokens = messages.reduce((acc, message) => acc + getMessageTokenCount(message, model), 0)
 
   return numTokens + tokensPerRequest
@@ -18,44 +27,24 @@ export function getChatRequestTokenCount(
 
 /**
  * Count the tokens for a single message within a chat completion request
- *
- * See "Counting tokens for chat API calls"
- * from https://github.com/openai/openai-cookbook/blob/834181d5739740eb8380096dac7056c925578d9a/examples/How_to_count_tokens_with_tiktoken.ipynb
  */
 export function getMessageTokenCount(
   message: OpenAI.Chat.Completions.ChatCompletionMessageParam,
   model = 'gpt-4o-mini-2024-07-18'
 ): number {
-  let tokensPerMessage: number
-  let tokensPerName: number
-
-  switch (model) {
-    case 'gpt-3.5-turbo':
-      console.warn(
-        'Warning: gpt-3.5-turbo may change over time. Returning num tokens assuming gpt-3.5-turbo-0301.'
-      )
-      return getMessageTokenCount(message, 'gpt-3.5-turbo-0301')
-    case 'gpt-4':
-      console.warn('Warning: gpt-4 may change over time. Returning num tokens assuming gpt-4-0314.')
-      return getMessageTokenCount(message, 'gpt-4-0314')
-    case 'gpt-3.5-turbo-0301':
-      tokensPerMessage = 4 // every message follows <|start|>{role/name}\n{content}<|end|>\n
-      tokensPerName = -1 // if there's a name, the role is omitted
-      break
-    case 'gpt-4o-mini-2024-07-18':
-      tokensPerMessage = 3
-      tokensPerName = 1
-      break
-    case 'gpt-4-0314':
-      tokensPerMessage = 3
-      tokensPerName = 1
-      break
-    default:
-      throw new Error(
-        `Unknown model '${model}'. See https://github.com/openai/openai-python/blob/main/chatml.md for information on how messages are converted to tokens.`
-      )
+  // Handle default versions for gpt-3.5-turbo and gpt-4 with warnings
+  const effectiveModel = MODEL_VERSIONS[model] || model
+  
+  // Token adjustments based on the model
+  const tokenConfig = {
+    'gpt-3.5-turbo-0301': { tokensPerMessage: 4, tokensPerName: -1 },
+    'gpt-4o-mini-2024-07-18': { tokensPerMessage: 3, tokensPerName: 1 },
+    'gpt-4-0314': { tokensPerMessage: 3, tokensPerName: 1 },
   }
 
+  const { tokensPerMessage, tokensPerName } = tokenConfig[effectiveModel] || { tokensPerMessage: 3, tokensPerName: 1 }
+  
+  // Calculate tokens for the message
   return Object.entries(message).reduce((acc, [key, value]) => {
     acc += tokenizer.encode(value).length
     if (key === 'name') {
@@ -71,24 +60,11 @@ export function getMessageTokenCount(
  * Includes tokens in both message and completion.
  */
 export function getMaxTokenCount(model: string): number {
-  switch (model) {
-    case 'gpt-3.5-turbo':
-      console.warn(
-        'Warning: gpt-3.5-turbo may change over time. Returning max num tokens assuming gpt-3.5-turbo-0301.'
-      )
-      return getMaxTokenCount('gpt-3.5-turbo-0301')
-    case 'gpt-4':
-      console.warn(
-        'Warning: gpt-4 may change over time. Returning max num tokens assuming gpt-4-0314.'
-      )
-      return getMaxTokenCount('gpt-4-0314')
-    case 'gpt-3.5-turbo-0301':
-      return 4097
-    case 'gpt-4-0314':
-      return 4097
-    case 'gpt-4o-mini-2024-07-18':
-      return 4097
-    default:
-      throw new Error(`Unknown model '${model}'`)
+  const modelMaxTokens = MODEL_VERSIONS[model]
+  
+  if (!modelMaxTokens) {
+    throw new Error(`Unknown model '${model}'`)
   }
+
+  return modelMaxTokens
 }
