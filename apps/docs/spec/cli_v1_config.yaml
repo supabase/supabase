@@ -618,6 +618,17 @@ parameters:
       - name: 'Storage server configuration'
         link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
 
+  - id: 'storage.image_transformation.enabled'
+    title: 'storage.image_transformation.enabled'
+    tags: ['storage']
+    required: false
+    default: 'false'
+    description: |
+      Image transformation API is available to Supabase Pro plan.
+    links:
+      - name: 'Storage server configuration'
+        link: 'https://supabase.com/docs/guides/self-hosting/storage/config'
+
   - id: 'storage.buckets.bucket_name.public'
     title: 'storage.buckets.<bucket_name>.public'
     tags: ['storage']
