@@ -22,7 +22,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { getAvailableRegions } from './ProjectCreation.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'

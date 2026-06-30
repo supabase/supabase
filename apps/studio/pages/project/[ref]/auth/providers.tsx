@@ -5,7 +5,7 @@ import { AuthProvidersForm } from '@/components/interfaces/Auth/AuthProvidersFor
 import { BasicAuthSettingsForm } from '@/components/interfaces/Auth/BasicAuthSettingsForm'
 import { CustomAuthProviders } from '@/components/interfaces/Auth/CustomAuthProviders'
 import { AuthProvidersLayout } from '@/components/layouts/AuthLayout/AuthProvidersLayout'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import type { NextPageWithLayout } from '@/types'
 

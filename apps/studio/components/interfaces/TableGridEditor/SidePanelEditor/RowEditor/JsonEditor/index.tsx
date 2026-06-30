@@ -1,3 +1,4 @@
+import type { OnMount } from '@monaco-editor/react'
 import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import { useParams } from 'common'
 import { AlignLeft } from 'lucide-react'
@@ -60,16 +61,33 @@ export const JsonEditor = ({
 
   const { mutate: getCellValue, isPending, isSuccess, reset } = useGetCellValueMutation()
 
-  const validateJSON = async (resolve: () => void) => {
-    try {
-      const newJsonStr = removeJSONTrailingComma(jsonStr)
-      const minifiedJSON = minifyJSON(newJsonStr)
-      if (onSaveJSON) onSaveJSON(minifiedJSON, resolve)
-    } catch (error: any) {
-      resolve()
-      toast.error('JSON seems to have an invalid structure.')
-    }
-  }
+  const validateJSON = useCallback(
+    async (nextValue: string, resolve: () => void) => {
+      try {
+        const newJsonStr = removeJSONTrailingComma(nextValue)
+        const minifiedJSON = minifyJSON(newJsonStr)
+        if (onSaveJSON) onSaveJSON(minifiedJSON, resolve)
+      } catch (error: any) {
+        resolve()
+        toast.error('JSON seems to have an invalid structure.')
+      }
+    },
+    [onSaveJSON]
+  )
+
+  const handleEditorMount: OnMount = useCallback(
+    (editor, monaco) => {
+      if (readOnly) return
+
+      editor.addAction({
+        id: 'save-value',
+        label: 'Save value',
+        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.Enter],
+        run: () => validateJSON(editor.getValue(), () => undefined),
+      })
+    },
+    [readOnly, validateJSON]
+  )
 
   const prettify = () => {
     const res = prettifyJSON(jsonStr)
@@ -166,7 +184,7 @@ export const JsonEditor = ({
           closePanel={onClose}
           backButtonLabel={backButtonLabel}
           applyButtonLabel={applyButtonLabel}
-          applyFunction={readOnly ? undefined : validateJSON}
+          applyFunction={readOnly ? undefined : (resolve) => validateJSON(jsonStr, resolve)}
         />
       }
     >
@@ -179,6 +197,7 @@ export const JsonEditor = ({
               language="json"
               value={(jsonStr ?? '').toString()}
               onInputChange={(val) => setJsonStr(val ?? '')}
+              onMount={handleEditorMount}
             />
           </div>
         ) : (

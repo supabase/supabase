@@ -7,7 +7,7 @@ import {
 } from 'ui-patterns/PageHeader'
 
 import { DiskManagementForm } from '@/components/interfaces/DiskManagement/DiskManagementForm'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import type { NextPageWithLayout } from '@/types'
 

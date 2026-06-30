@@ -29,7 +29,7 @@ import {
   ValidationErrorsWarning,
   ValidationWarningsAdmonition,
 } from '../../Infrastructure/UpgradeWarnings'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useProjectUpgradeEligibilityQuery } from '@/data/config/project-upgrade-eligibility-query'
 import { useProjectServiceVersionsQuery } from '@/data/projects/project-service-versions'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'

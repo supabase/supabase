@@ -1058,6 +1058,11 @@
                       "type": "boolean",
                       "description": "Whether this member is a Single Sign-On user"
                     },
+                    "avatar_url": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Member's avatar URL"
+                    },
                     "roles": {
                       "type": "array",
                       "items": {
@@ -1092,7 +1097,14 @@
                       "description": "Roles assigned to this member. Includes both org-level and project-scoped roles."
                     }
                   },
-                  "required": ["username", "primary_email", "mfa_enabled", "is_sso_user", "roles"]
+                  "required": [
+                    "username",
+                    "primary_email",
+                    "mfa_enabled",
+                    "is_sso_user",
+                    "avatar_url",
+                    "roles"
+                  ]
                 }
               },
               "required": ["type", "id", "attributes"]
