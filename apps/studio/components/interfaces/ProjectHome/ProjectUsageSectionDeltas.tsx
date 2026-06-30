@@ -8,15 +8,12 @@ import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import {
   buildSortedServiceCards,
+  computeSuccessAndNonSuccessRates,
   getBucketLogRange,
   isServiceDisabled,
   type ChartIntervalKey,
+  type LogsBarChartDatum,
 } from './ProjectUsage.metrics'
-import { ApiGatewayProductChart } from '@/components/interfaces/Observability/ApiGatewayProductChart'
-import {
-  buildApiGatewayProductData,
-  calculateApiGatewayAggregate,
-} from '@/components/interfaces/Observability/apiGatewayProductChart.utils'
 import { useServiceHealthMetrics } from '@/components/interfaces/Observability/useServiceHealthMetrics'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
@@ -27,6 +24,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useTrack } from '@/lib/telemetry/track'
 
+// Services the homepage shows; matches the telemetry event types.
 type HomeServiceKey = 'db' | 'functions' | 'auth' | 'storage' | 'realtime' | 'data_api'
 
 const isChartIntervalKey = (value: string): value is ChartIntervalKey =>
@@ -39,8 +37,6 @@ type ServiceEntry = {
   route: string
   enabled: boolean
 }
-
-type ChartClickDatum = { timestamp: string }
 
 export const ProjectUsageSectionDeltas = () => {
   const router = useRouter()
@@ -113,36 +109,27 @@ export const ProjectUsageSectionDeltas = () => {
     [projectRef, authEnabled, storageEnabled, dataApiEnabled]
   )
 
-  const apiGatewayProductData = useMemo(
-    () => buildApiGatewayProductData(serviceData),
-    [serviceData]
-  )
-  const apiGateway = useMemo(() => calculateApiGatewayAggregate(serviceData), [serviceData])
-  const totalRequests = apiGateway.total
-  const successRate = apiGateway.successRate
-
-  const serviceCardStats = useMemo(
-    () => ({
-      ...serviceData,
-      data_api: {
-        ...serviceData.data_api,
-        total: apiGateway.total,
-        warningCount: apiGateway.warningCount,
-        errorCount: apiGateway.errorCount,
-      },
-    }),
-    [serviceData, apiGateway]
-  )
-
   const services = useMemo(
-    () => buildSortedServiceCards(serviceBase, serviceCardStats),
-    [serviceBase, serviceCardStats]
+    () => buildSortedServiceCards(serviceBase, serviceData),
+    [serviceBase, serviceData]
+  )
+
+  const totalRequests = services.reduce((sum, s) => sum + s.total, 0)
+  const totalErrors = services.reduce((sum, s) => sum + s.err, 0)
+  const totalWarnings = services.reduce((sum, s) => sum + s.warn, 0)
+
+  const { successRate } = computeSuccessAndNonSuccessRates(
+    totalRequests,
+    totalWarnings,
+    totalErrors
   )
 
   const handleBarClick =
-    (logRoute: string, serviceKey: HomeServiceKey) => (datum: ChartClickDatum) => {
+    (logRoute: string, serviceKey: HomeServiceKey) => (datum: LogsBarChartDatum) => {
       if (!datum?.timestamp) return
 
+      // Logs explorer reads the range from `its`/`ite` (iso_timestamp_start/end
+      // only set the label).
       const { start, end } = getBucketLogRange(datum.timestamp, interval)
 
       const queryParams = new URLSearchParams({
@@ -183,7 +170,6 @@ export const ProjectUsageSectionDeltas = () => {
       </div>
       <Row maxColumns={4} minWidth={280}>
         {services.map((s) => {
-          const isApiGateway = s.key === 'data_api'
           const disabled = isServiceDisabled(s.total, isLoading)
           return (
             <Card
@@ -233,48 +219,29 @@ export const ProjectUsageSectionDeltas = () => {
               </CardHeader>
               <CardContent className="p-card flex-1 h-full overflow-hidden">
                 <Loading isFullHeight active={isLoading}>
-                  {isApiGateway ? (
-                    <ApiGatewayProductChart
-                      data={apiGatewayProductData}
-                      DateTimeFormat={datetimeFormat}
-                      onBarClick={disabled ? undefined : handleBarClick(s.route, s.key)}
-                      EmptyState={
-                        isLoading ? (
-                          <></>
-                        ) : (
-                          <NoDataPlaceholder
-                            size="small"
-                            message="No data for selected period"
-                            isFullHeight
-                          />
-                        )
-                      }
-                    />
-                  ) : (
-                    <LogsBarChart
-                      isFullHeight
-                      data={s.data}
-                      DateTimeFormat={datetimeFormat}
-                      onBarClick={disabled ? undefined : handleBarClick(s.route, s.key)}
-                      hideZeroValues={true}
-                      chartConfig={{
-                        error_count: { label: 'Errors' },
-                        warning_count: { label: 'Warnings' },
-                        ok_count: { label: 'Infos' },
-                      }}
-                      EmptyState={
-                        isLoading ? (
-                          <></>
-                        ) : (
-                          <NoDataPlaceholder
-                            size="small"
-                            message="No data for selected period"
-                            isFullHeight
-                          />
-                        )
-                      }
-                    />
-                  )}
+                  <LogsBarChart
+                    isFullHeight
+                    data={s.data}
+                    DateTimeFormat={datetimeFormat}
+                    onBarClick={disabled ? undefined : handleBarClick(s.route, s.key)}
+                    hideZeroValues={true}
+                    chartConfig={{
+                      error_count: { label: 'Errors' },
+                      warning_count: { label: 'Warnings' },
+                      ok_count: { label: 'Infos' },
+                    }}
+                    EmptyState={
+                      isLoading ? (
+                        <></>
+                      ) : (
+                        <NoDataPlaceholder
+                          size="small"
+                          message="No data for selected period"
+                          isFullHeight
+                        />
+                      )
+                    }
+                  />
                 </Loading>
               </CardContent>
             </Card>

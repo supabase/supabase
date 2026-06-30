@@ -1,6 +1,5 @@
 import { ChevronRight, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo } from 'react'
 import {
   Button,
   Card,
@@ -16,12 +15,6 @@ import { ChartEmptyState, ChartLoadingState } from 'ui-patterns/Chart'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
-import { ApiGatewayProductChart } from './ApiGatewayProductChart'
-import {
-  buildApiGatewayProductData,
-  calculateApiGatewayAggregate,
-  type ApiGatewayProductDatum,
-} from './apiGatewayProductChart.utils'
 import { getHealthStatus, type ServiceKey } from './ObservabilityOverview.utils'
 
 type ServiceConfig = {
@@ -41,12 +34,10 @@ type ServiceData = {
   isLoading: boolean
 }
 
-type ServiceChartClickDatum = { timestamp: string }
-
 export type ServiceHealthTableProps = {
   services: ServiceConfig[]
   serviceData: Record<string, ServiceData>
-  onBarClick: (logsUrl: string) => (datum: ServiceChartClickDatum) => void
+  onBarClick: (logsUrl: string) => (datum: LogsBarChartDatum) => void
   datetimeFormat: string
 }
 
@@ -90,10 +81,9 @@ const getSubtitle = (data: ServiceData) => {
 type ServiceCellProps = {
   service: ServiceConfig
   data: ServiceData
-  onBarClick: (datum: ServiceChartClickDatum) => void
+  onBarClick: (datum: LogsBarChartDatum) => void
   datetimeFormat: string
   className?: string
-  productChartData?: ApiGatewayProductDatum[]
 }
 
 const ServiceCell = ({
@@ -102,7 +92,6 @@ const ServiceCell = ({
   onBarClick,
   datetimeFormat,
   className,
-  productChartData,
 }: ServiceCellProps) => {
   const reportUrl = service.reportUrl || service.logsUrl
   const { color } = getHealthStatus(data.errorRate, data.total)
@@ -183,15 +172,6 @@ const ServiceCell = ({
       <div className="relative z-10 h-16">
         {data.isLoading ? (
           <ChartLoadingState className="h-full" />
-        ) : productChartData ? (
-          <ApiGatewayProductChart
-            hideDateRange
-            hideXAxis
-            data={productChartData}
-            DateTimeFormat={datetimeFormat}
-            onBarClick={onBarClick}
-            EmptyState={<ChartEmptyState className="h-full" description="No traffic" />}
-          />
         ) : (
           <LogsBarChart
             isFullHeight
@@ -215,15 +195,6 @@ export const ServiceHealthTable = ({
   onBarClick,
   datetimeFormat,
 }: ServiceHealthTableProps) => {
-  const apiGatewayProductData = useMemo(
-    () => buildApiGatewayProductData(serviceData),
-    [serviceData]
-  )
-  const apiGatewayAggregate = useMemo(
-    () => calculateApiGatewayAggregate(serviceData),
-    [serviceData]
-  )
-
   return (
     <div>
       <h2 className="heading-section mb-4">Service Health</h2>
@@ -240,23 +211,11 @@ export const ServiceHealthTable = ({
               const lastRowCount = restCount % 2 === 0 ? 2 : 1
               const isInLastRow = !isFirst && index >= services.length - lastRowCount
 
-              const isApiGateway = service.key === 'data_api'
-              const cellData: ServiceData = isApiGateway
-                ? {
-                    ...data,
-                    total: apiGatewayAggregate.total,
-                    errorRate: apiGatewayAggregate.errorRate,
-                    errorCount: apiGatewayAggregate.errorCount,
-                    warningCount: apiGatewayAggregate.warningCount,
-                  }
-                : data
-
               return (
                 <ServiceCell
                   key={service.key}
                   service={service}
-                  data={cellData}
-                  productChartData={isApiGateway ? apiGatewayProductData : undefined}
+                  data={data}
                   onBarClick={onBarClick(service.logsUrl)}
                   datetimeFormat={datetimeFormat}
                   className={cn(
