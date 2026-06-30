@@ -1,10 +1,11 @@
 import * as Sentry from '@sentry/nextjs'
-import { PageTelemetry, posthogClient, useUser } from 'common'
+import { PageTelemetry, posthogClient, useParams, useUser } from 'common'
 import { useEffect, useRef } from 'react'
 import { useConsentToast } from 'ui-patterns/consent'
 
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { API_URL, IS_PLATFORM } from '@/lib/constants'
 
 export function Telemetry() {
@@ -18,6 +19,9 @@ export function Telemetry() {
   const { data: organization } = useSelectedOrganizationQuery()
 
   const user = useUser()
+
+  // Project ref from the URL params, mirroring the backend's `request.params.ref`
+  const { ref: projectRef } = useParams()
 
   // Mirror the user's org-list length into a PostHog person property so feature
   // flags and analytics can segment by current org membership. signup_timestamp
@@ -50,12 +54,16 @@ export function Telemetry() {
 
   useEffect(() => {
     // don't set the sentry user id if the user hasn't logged in (so that Sentry errors show null user id instead of anonymous id)
-    if (!user?.id) {
-      return
+    if (user?.id) {
+      Sentry.setUser({ id: user.id })
     }
 
-    Sentry.setUser({ id: user.id })
-  }, [user?.id])
+    // Tag Sentry events with the current project ref and customer org slug so backend/
+    // frontend errors can be filtered by project / org without a PostHog join. Passing a
+    // null value clears the tag, so stale values don't leak across navigation.
+    Sentry.setTag('project_ref', projectRef ?? null)
+    Sentry.setTag('org_slug', organization?.slug ?? null)
+  }, [user?.id, projectRef, organization?.slug])
 
   return (
     <PageTelemetry
