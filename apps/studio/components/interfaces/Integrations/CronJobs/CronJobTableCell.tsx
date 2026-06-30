@@ -35,8 +35,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { useDatabaseCronJobRunCommandMutation } from '@/data/database-cron-jobs/database-cron-job-run-mutation'
 import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'

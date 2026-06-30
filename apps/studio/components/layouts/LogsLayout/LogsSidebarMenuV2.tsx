@@ -1,17 +1,9 @@
-import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { ChevronRight, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
-import {
-  Badge,
-  Button,
-  cn,
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-  Separator,
-} from 'ui'
+import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, Separator } from 'ui'
 import {
   InnerSideBarEmptyPanel,
   InnerSideBarFilters,
@@ -21,15 +13,12 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
-import {
-  useFeaturePreviewModal,
-  useUnifiedLogsPreview,
-} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
 import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
-import SavedQueriesItem from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
+import { SavedQueriesItem } from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from '@/components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
 import { UnifiedLogsBanner } from '@/components/interfaces/UnifiedLogs/UnifiedLogsBanner'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useContentQuery } from '@/data/content/content-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
@@ -63,10 +52,6 @@ export function SidebarCollapsible({
 export function LogsSidebarMenuV2() {
   const router = useRouter()
   const { ref } = useParams() as { ref: string }
-
-  const unifiedLogsFlagEnabled = useFlag('unifiedLogs')
-  const { selectFeaturePreview } = useFeaturePreviewModal()
-  const { enable: enableUnifiedLogs, isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
 
   const [searchText, setSearchText] = useState('')
 
@@ -225,32 +210,7 @@ export function LogsSidebarMenuV2() {
 
   return (
     <div className="pb-4 relative">
-      {IS_PLATFORM && !unifiedLogsFlagEnabled && (
-        <FeaturePreviewSidebarPanel
-          className="mx-4 mt-4"
-          illustration={<Badge variant="default">Coming soon</Badge>}
-          title="New logs"
-          description="Get early access"
-          actions={
-            <Link href="https://forms.supabase.com/unified-logs-signup" target="_blank">
-              <Button variant="default" size="tiny">
-                Early access
-              </Button>
-            </Link>
-          }
-        />
-      )}
-      {isUnifiedLogsEligible && (
-        <UnifiedLogsBanner
-          variant="promo"
-          className="mx-4 mt-4"
-          onEnable={() => {
-            enableUnifiedLogs()
-            router.push(`/project/${ref}/logs`)
-          }}
-          onMoreInfo={() => selectFeaturePreview('supabase-ui-preview-unified-logs')}
-        />
-      )}
+      <UnifiedLogsBanner />
 
       <div
         className={cn(
@@ -265,15 +225,18 @@ export function LogsSidebarMenuV2() {
             aria-labelledby="Search collections"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-          ></InnerSideBarFilterSearchInput>
+          />
         </InnerSideBarFilters>
 
-        <Button
+        <ButtonTooltip
+          asChild
           variant="default"
           icon={<Plus className="text-foreground" />}
           className="w-[26px]"
-          onClick={() => router.push(`/project/${ref}/logs/explorer`)}
-        />
+          tooltip={{ content: { text: 'New query', side: 'bottom' } }}
+        >
+          <Link href={`/project/${ref}/logs/explorer`} />
+        </ButtonTooltip>
       </div>
       {templatesEnabled && (
         <div className="px-2">

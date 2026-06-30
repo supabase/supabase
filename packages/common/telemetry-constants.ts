@@ -430,6 +430,60 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
 }
 
 /**
+ * Project creation form was rendered and shown to the user. Passive impression that
+ * anchors the project-creation funnel (exposed -> completed). Fires once per form view,
+ * after the org and create-project permission have resolved, so it tracks the form
+ * actually being visible rather than the route loading. Disambiguate by `surface`.
+ * Completion is measured by `project_creation_simple_version_submitted` (which fires
+ * client-side on the create success callback).
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface ProjectCreationFormExposedEvent {
+  action: 'project_creation_form_exposed'
+  properties: {
+    /**
+     * Which surface rendered the form. 'main' is the standard project creation wizard.
+     */
+    surface?: 'main' | 'vercel'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * New-organization form was rendered and shown to the user. Passive impression that
+ * anchors the organization-creation funnel (exposed -> completed). Fires once per form
+ * view, after the user's profile has resolved (i.e. an authenticated session), so it
+ * does not count pre-auth redirects. No organization group: the org does not exist yet
+ * at this point in the flow.
+ *
+ * @group Events
+ * @source studio
+ * @page new
+ */
+export interface OrganizationCreationFormExposedEvent {
+  action: 'organization_creation_form_exposed'
+}
+
+/**
+ * Organization was created and the new org slug is available client-side. Fires from the
+ * create success callback (both the free path and the paid path that confirms a pending
+ * payment intent), so org-creation completion is measurable from frontend events without
+ * relying on the backend `organization_created` event (which fires across all surfaces).
+ * Closes the organization-creation funnel (exposed -> completed).
+ *
+ * @group Events
+ * @source studio
+ * @page new
+ */
+export interface OrganizationCreationCompletedEvent {
+  action: 'organization_creation_completed'
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User toggled Data API access on a table via the switch in the table editor side panel.
  * Only fires for new tables — editing existing tables links out to the settings page instead.
  *
@@ -835,6 +889,22 @@ export interface AskAiClickedEvent {
   action: 'ask_ai_clicked'
   properties: {
     agent: 'chatgpt' | 'claude'
+  }
+}
+
+/**
+ * User clicked a curated orientation link from a content listings MDX component.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsContentListingClickedEvent {
+  action: 'docs_content_listing_clicked'
+  properties: {
+    targetPath: string
+    linkTitle: string
+    groupTitle?: string
+    listingId?: string
   }
 }
 
@@ -2842,7 +2912,7 @@ export interface DashboardErrorCreatedEvent {
     /**
      * Source of the error
      */
-    source?: 'admonition' | 'toast' | 'error_display'
+    source?: 'admonition' | 'toast' | 'error_display' | 'form'
     /**
      * Type of error matched (for error_display source)
      */
@@ -2851,6 +2921,22 @@ export interface DashboardErrorCreatedEvent {
      * Whether troubleshooting steps are available (for error_display source)
      */
     hasTroubleshooting?: boolean
+    /**
+     * Funnel the error occurred in (set only for instrumented funnel errors)
+     */
+    origin?: 'signup' | 'project_creation' | 'org_creation'
+    /**
+     * Coarse classification of the funnel error
+     */
+    errorCategory?: 'validation' | 'api' | 'network' | 'payment' | 'unknown'
+    /**
+     * Controlled-vocabulary slug describing the reason (no free text, no PII)
+     */
+    errorReason?: string
+    /**
+     * HTTP status code for api/network errors (absent for validation/payment)
+     */
+    errorCode?: number
   }
   groups: TelemetryGroups
 }
@@ -3455,6 +3541,9 @@ export type TelemetryEvent =
   | ProjectCreationGithubConnectClickedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
+  | ProjectCreationFormExposedEvent
+  | OrganizationCreationFormExposedEvent
+  | OrganizationCreationCompletedEvent
   | TableApiAccessToggleClickedEvent
   | RealtimeInspectorListenChannelClickedEvent
   | RealtimeInspectorBroadcastSentEvent
@@ -3480,6 +3569,7 @@ export type TelemetryEvent =
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownClickedEvent
   | AskAiClickedEvent
+  | DocsContentListingClickedEvent
   | Docs404RecommendationClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent

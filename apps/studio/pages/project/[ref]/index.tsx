@@ -1,5 +1,5 @@
 import { ProjectHome } from '@/components/interfaces/ProjectHome/Home'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { ProjectLayoutWithAuth } from '@/components/layouts/ProjectLayout'
 import type { NextPageWithLayout } from '@/types'
 

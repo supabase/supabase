@@ -28,7 +28,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { InferredSQLViewer } from './InferredSQLViewer'
 import { type ParseQueryResults } from './RLSTester.types'

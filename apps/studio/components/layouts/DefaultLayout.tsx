@@ -126,5 +126,3 @@ export const DefaultLayout = ({
     </SidebarProvider>
   )
 }
-
-export default DefaultLayout
