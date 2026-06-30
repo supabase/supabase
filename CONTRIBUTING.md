@@ -12,10 +12,13 @@ To ensure a positive and inclusive environment, please read our [code of conduc
 
 ## Issues
 
-If you find a bug, please create an Issue and we’ll triage it.
+If you encounter a bug or unexpected behavior, please open an Issue so we can investigate and help resolve it.
 
-- Please search [existing Issues](https://github.com/supabase/supabase/issues) before creating a new one.
-- Please include a clear description of the problem along with steps to reproduce it. Exact steps with screenshots and urls really help here.
+Before creating a new Issue:
+
+* Search the [existing Issues](https://github.com/supabase/supabase/issues) to check whether the problem has already been reported.
+* Provide a clear description of the issue, including the expected behavior, actual behavior, and steps to reproduce it.
+* Include any relevant details such as screenshots, error messages, logs, or URLs. The more context you provide, the easier it is for us to investigate and resolve the issue.
 
 ## Pull Requests
 
