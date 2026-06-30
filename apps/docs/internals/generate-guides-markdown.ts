@@ -17,6 +17,7 @@ import { AuthProviders } from './markdown-schema/AuthProviders'
 import { ComputeDiskLimitsTable } from './markdown-schema/ComputeDiskLimitsTable'
 import { ErrorCodes } from './markdown-schema/ErrorCodes'
 import { Link } from './markdown-schema/Link'
+import { ContentListings } from './markdown-schema/ContentListings'
 import { MetricsStackCards } from './markdown-schema/MetricsStackCards'
 import { NavData } from './markdown-schema/NavData'
 import { Panel } from './markdown-schema/Panel'
@@ -152,6 +153,7 @@ const SCHEMA: ComponentSchema = {
   ...StepHike,
   TabPanel,
   MetricsStackCards,
+  ContentListings,
   NavData,
   SharedData,
 }
@@ -178,7 +180,9 @@ async function transformBody(content: string, data: Record<string, unknown>): Pr
 
   const header = headerParts.join('\n\n')
 
-  return header ? `${header}\n\n${body}` : body
+  let output = header ? `${header}\n\n${body}` : body
+
+  return output
 }
 
 async function generateOne(sourceFile: string, frontmatter: FrontmatterFormat): Promise<string> {

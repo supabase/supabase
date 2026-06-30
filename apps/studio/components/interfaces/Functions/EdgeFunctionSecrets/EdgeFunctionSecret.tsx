@@ -15,7 +15,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { ProjectSecret } from '@/data/secrets/secrets-query'

@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { extensions } from 'shared-data'
 import { toast } from 'sonner'
 import { Button, Switch, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { EnableExtensionModal } from './EnableExtensionModal'

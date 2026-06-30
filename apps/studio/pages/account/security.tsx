@@ -1,6 +1,6 @@
 import { Lock } from 'lucide-react'
 import { Badge, Card, CardContent, CardHeader } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,

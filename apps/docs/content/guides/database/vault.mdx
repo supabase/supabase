@@ -127,7 +127,7 @@ You should ensure that you protect access to this view with the appropriate SQL 
 
 ### Updating secrets
 
-A secret can be updated with the `vault.update_secret()` function, this function makes updating secrets easy, just provide the secret UUID as the first argument, and then an updated secret, updated optional unique name, or updated description:
+To update a secret, use the `vault.update_secret()` function. Provide the secret UUID as the first argument, followed by an updated secret, name, or description:
 
 ```sql
 select

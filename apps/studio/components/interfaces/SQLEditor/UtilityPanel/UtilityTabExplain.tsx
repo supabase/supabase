@@ -2,7 +2,7 @@ import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import Results from './Results'
+import { Results } from './Results'
 import { ExplainVisualizer } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer'
 import { ExplainHeader } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.Header'
 import {
