@@ -2,9 +2,9 @@ import type { SafeSqlFragment } from '@supabase/pg-meta'
 import { screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import type { ParseQueryResults } from '@/components/interfaces/Database/RLSTester/RLSTester.types'
 import { RLSTesterResults } from '@/components/interfaces/Database/RLSTester/RLSTesterResults'
-import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { render } from '@/tests/helpers'
 
 vi.mock('@/components/interfaces/Database/RLSTester/useTestQueryRLS', () => ({
