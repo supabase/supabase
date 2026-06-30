@@ -59,8 +59,8 @@ export function Telemetry() {
     }
 
     // Tag Sentry events with the current project ref and customer org slug so backend/
-    // frontend errors can be filtered by project / org without a PostHog join. Passing a
-    // null value clears the tag, so stale values don't leak across navigation.
+    // frontend errors can be filtered by project / org. Passing a null value clears
+    // the tag, so stale values don't leak across navigation.
     Sentry.setTag('project_ref', projectRef ?? null)
     Sentry.setTag('org_slug', organization?.slug ?? null)
   }, [user?.id, projectRef, organization?.slug])
