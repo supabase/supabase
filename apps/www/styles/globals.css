@@ -374,28 +374,7 @@ table {
 }
 .next-image--dynamic-fill.wide,
 video.wide {
-  @apply sm:my-0 sm:max-w-none sm:-mx-8 sm:w-[calc(100%+4rem)];
-}
-@media (min-width: 560px) {
-  .next-image--dynamic-fill.wide,
-  video.wide {
-    width: calc(100% + 6rem) !important;
-    margin: 0 -3rem;
-  }
-}
-@media (min-width: 1280px) {
-  .next-image--dynamic-fill.wide,
-  video.wide {
-    width: calc(100% + 10rem) !important;
-    margin: 0 -5rem;
-  }
-}
-@media (min-width: 1535px) {
-  .next-image--dynamic-fill.wide,
-  video.wide {
-    width: calc(100% + 14rem) !important;
-    margin: 0 -7rem;
-  }
+  @apply sm:max-w-none -mx-2 w-[calc(100%+1rem)] md:-mx-4 md:w-[calc(100%+2rem)] lg:-mx-8 lg:w-[calc(100%+4rem)];
 }
 
 .next-image--dynamic-fill > span {
