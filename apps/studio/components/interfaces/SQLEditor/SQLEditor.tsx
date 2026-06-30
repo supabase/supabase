@@ -12,7 +12,7 @@ import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { ChevronUp, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -837,7 +837,7 @@ export const SQLEditor = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccessReadReplicas, databases, ref])
 
-  useEffect(() => {
+  const drainDiffRequest = useEffectEvent(() => {
     const request = diffRequest.pending
     if (request === undefined) return
 
@@ -864,7 +864,11 @@ export const SQLEditor = () => {
     }
 
     // One-shot: drain the request so it can't re-apply to a later editor or session.
-    sqlEditorDiffRequestState.consumeDiffRequest()
+    diffRequest.consumeDiffRequest()
+  })
+  useEffect(() => {
+    drainDiffRequest()
+    // until we can upgrade eslint to ignore useEffectEvent
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [diffRequest.pending, editorMountCount])
 
