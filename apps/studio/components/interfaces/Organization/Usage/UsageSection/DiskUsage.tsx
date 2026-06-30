@@ -175,7 +175,7 @@ export const DiskUsage = ({
                           {project.name}
                         </span>
                         <Button asChild variant="default" size={'tiny'}>
-                          <Link href={`/project/${project.ref}/settings/compute-and-disk`}>
+                          <Link href={`/project/${project.ref}/settings/infrastructure`}>
                             Manage Disk
                           </Link>
                         </Button>

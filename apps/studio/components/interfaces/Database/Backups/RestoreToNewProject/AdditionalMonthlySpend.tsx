@@ -13,7 +13,7 @@ export const AdditionalMonthlySpend = ({
         be able to update the compute size and increase the disk size after the new project is
         created in{' '}
         <span className="font-mono text-xs tracking-tighter text-foreground-light">
-          Project Settings &gt; Compute and Disk
+          Project Settings &gt; Infrastructure
         </span>
       </p>
       <div className="flex flex-col gap-2 text-foreground mt-4">

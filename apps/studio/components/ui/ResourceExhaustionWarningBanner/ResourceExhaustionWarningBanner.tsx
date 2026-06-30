@@ -115,11 +115,11 @@ export const ResourceExhaustionWarningBanner = () => {
   const correctionUrlVariants = {
     undefined: undefined,
     null: '/project/[ref]/settings/[infra-path]',
-    disk_space: '/project/[ref]/settings/compute-and-disk',
-    read_only: '/project/[ref]/settings/compute-and-disk',
-    disk_io: '/project/[ref]/settings/compute-and-disk',
-    cpu: '/project/[ref]/settings/compute-and-disk',
-    ram: '/project/[ref]/settings/compute-and-disk',
+    disk_space: '/project/[ref]/settings/infrastructure',
+    read_only: '/project/[ref]/settings/infrastructure',
+    disk_io: '/project/[ref]/settings/infrastructure',
+    cpu: '/project/[ref]/settings/infrastructure',
+    ram: '/project/[ref]/settings/infrastructure',
     auth_email_rate_limit: '/project/[ref]/auth/rate-limits',
     auth_restricted_email_sending: '/project/[ref]/auth/smtp',
     default: (metric: string) => `/project/[ref]/settings/[infra-path]#${metric}`,
@@ -146,7 +146,7 @@ export const ResourceExhaustionWarningBanner = () => {
       return `/org/${organization?.slug ?? '_'}/billing?panel=subscriptionPlan&source=resource_exhaustion_banner`
     }
     if (isComputeUpgradeMetric && activeWarnings.length > 1) {
-      return `/project/${ref ?? 'default'}/settings/compute-and-disk`
+      return `/project/${ref ?? 'default'}/settings/infrastructure`
     }
     return getCorrectionUrl(metric)
       ?.replace('[ref]', ref ?? 'default')
@@ -182,15 +182,15 @@ export const ResourceExhaustionWarningBanner = () => {
     warningContent === undefined || (!warningContent?.title && !warningContent?.description)
   const isUsageOrInfraPage =
     router.pathname.endsWith('/usage') || router.pathname.endsWith('/infrastructure')
-  // Compute warnings now link to compute-and-disk, so they should remain visible on infrastructure
+  // Compute warnings now link to infrastructure, so they should remain visible on usage.
   const onUsageOrInfraAndNotInReadOnlyMode =
     isUsageOrInfraPage &&
     !activeWarnings.includes('is_readonly_mode_enabled') &&
     !isComputeUpgradeMetric
   // Suppress when already on the target page (no-op CTA). Paid-plan compute warnings link to
-  // compute-and-disk; free-plan links to billing instead, so we keep the banner visible for them.
+  // infrastructure; free-plan links to billing instead, so we keep the banner visible for them.
   const onDatabaseSettingsAndInReadOnlyMode =
-    router.pathname.endsWith('settings/compute-and-disk') &&
+    router.pathname.endsWith('settings/infrastructure') &&
     (activeWarnings.includes('is_readonly_mode_enabled') || (isComputeUpgradeMetric && !isFreePlan))
 
   // these take precedence over each other, so there's only one active warning to check
