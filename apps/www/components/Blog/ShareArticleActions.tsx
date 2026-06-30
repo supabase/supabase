@@ -1,8 +1,6 @@
 'use client'
 
 import { useCopyMarkdownFromUrl } from 'common'
-import { Chatgpt, Claude } from 'icons'
-import { Check, Copy } from 'lucide-react'
 import Link from 'next/link'
 import {
   cn,

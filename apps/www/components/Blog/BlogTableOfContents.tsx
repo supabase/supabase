@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, type ReactNode } from 'react'
-import { AnchorProvider, Toc, TOCItems, TocPrimitive, TOCScrollArea } from 'ui-patterns'
+import { AnchorProvider, Toc, TOCItems, TocPrimitive, TOCScrollArea } from 'ui-patterns/Toc'
 import type { TOCItemType } from 'ui-patterns/Toc/types'
 
 interface Props {

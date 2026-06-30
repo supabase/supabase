@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import { ArrowLeft } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { PostReturnType, ProcessedBlogData, StaticAuthor, Tag } from 'types/post'
