@@ -16,9 +16,7 @@ import type { McpOnCopyCallback } from '../types'
  * instructions module stays importable by the Node markdown build, which can't
  * resolve static png imports.
  */
-// `.png` imports resolve to `string` under some tsconfigs and `StaticImageData`
-// under others (e.g. Next's). `next/image` accepts both, so allow either.
-const INSTRUCTION_ASSETS: Record<string, string | StaticImageData> = {
+const INSTRUCTION_ASSETS: Record<string, StaticImageData> = {
   'antigravity-auth': antigravityAuthenticateScreenshot,
 }
 
