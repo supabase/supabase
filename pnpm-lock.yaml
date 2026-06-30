@@ -6,6 +6,9 @@ settings:
 
 catalogs:
   default:
+    '@monaco-editor/react':
+      specifier: ^4.7.0
+      version: 4.7.0
     '@sentry/nextjs':
       specifier: ^10.59.0
       version: 10.59.0
@@ -96,18 +99,19 @@ catalogs:
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
+  monaco-editor: 0.52.2
   '@mapbox/node-pre-gyp>tar': ^7.5.11
   '@sentry/webpack-plugin>uuid': ^11.1.1
   '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
-  braintrust>uuid: ^11.1.1
-  mdx-bundler>uuid: ^11.1.1
   braintrust>esbuild: ^0.28.1
+  braintrust>uuid: ^11.1.1
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
   express-rate-limit>ip-address: ^10.1.1
   h3@1: 1.15.11
   lodash: ^4.18.1
   lodash-es: ^4.18.1
+  mdx-bundler>uuid: ^11.1.1
   node-gyp>tar: ^7.5.11
   nodemailer: ^7.0.11
   postcss: ^8.5.10
@@ -927,8 +931,8 @@ importers:
         specifier: ^1.29.0
         version: 1.29.0(supports-color@8.1.1)(zod@3.25.76)
       '@monaco-editor/react':
-        specifier: ^4.6.0
-        version: 4.6.0(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: 'catalog:'
+        version: 4.7.0(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@next/bundle-analyzer':
         specifier: 16.2.3
         version: 16.2.3
@@ -1426,8 +1430,8 @@ importers:
         specifier: ^3.1.1
         version: 3.3.1(react-hook-form@7.72.1(react@19.2.6))
       '@monaco-editor/react':
-        specifier: ^4.6.0
-        version: 4.7.0(monaco-editor@0.55.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: 'catalog:'
+        version: 4.7.0(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@react-router/fs-routes':
         specifier: ^7.4.0
         version: 7.4.0(@react-router/dev@7.13.2(@react-router/serve@7.17.0(react-router@7.17.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(supports-color@8.1.1)(typescript@6.0.2))(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(jiti@2.7.0)(lightningcss@1.32.0)(react-router@7.17.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.22.4)(typescript@6.0.2)(vite@8.0.16(@types/node@22.13.14)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))(yaml@2.9.0))(typescript@6.0.2)
@@ -1486,8 +1490,8 @@ importers:
         specifier: '*'
         version: 0.436.0(react@19.2.6)
       monaco-editor:
-        specifier: ^0.55.1
-        version: 0.55.1
+        specifier: 0.52.2
+        version: 0.52.2
       next:
         specifier: 'catalog:'
         version: 16.2.6(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
@@ -1559,7 +1563,7 @@ importers:
         version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       y-monaco:
         specifier: ^0.1.6
-        version: 0.1.6(monaco-editor@0.55.1)(yjs@13.6.29)
+        version: 0.1.6(monaco-editor@0.52.2)(yjs@13.6.29)
       y-protocols:
         specifier: ^1.0.7
         version: 1.0.7(yjs@13.6.29)
@@ -2569,8 +2573,8 @@ importers:
         specifier: ^3.1.1
         version: 3.3.1(react-hook-form@7.72.1(react@19.2.6))
       '@monaco-editor/react':
-        specifier: ^4.6.0
-        version: 4.6.0(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: 'catalog:'
+        version: 4.7.0(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@std/toml':
         specifier: jsr:^1.0.11
         version: '@jsr/std__toml@1.0.11'
@@ -2629,7 +2633,7 @@ importers:
         specifier: ^11.12.1
         version: 11.15.0(supports-color@8.1.1)
       monaco-editor:
-        specifier: '*'
+        specifier: 0.52.2
         version: 0.52.2
       next:
         specifier: 'catalog:'
@@ -4659,25 +4663,13 @@ packages:
       '@cfworker/json-schema':
         optional: true
 
-  '@monaco-editor/loader@1.4.0':
-    resolution: {integrity: sha512-00ioBig0x642hytVspPl7DbQyaSWRaolYie/UFNjoTdvoKPzo6xrXLhTk9ixgIKcLH5b5vDOjVNiGyY+uDCUlg==}
-    peerDependencies:
-      monaco-editor: '>= 0.21.0 < 1'
-
   '@monaco-editor/loader@1.5.0':
     resolution: {integrity: sha512-hKoGSM+7aAc7eRTRjpqAZucPmoNOC4UUbknb/VNoTkEIkCPhqV8LfbsgM1webRM7S/z21eHEx9Fkwx8Z/C/+Xw==}
-
-  '@monaco-editor/react@4.6.0':
-    resolution: {integrity: sha512-RFkU9/i7cN2bsq/iTkurMWOEErmYcY6JiQI3Jn+WeR/FGISH8JbHERjpS9oRuSOPvDMJI0Z8nJeKkbOs9sBYQw==}
-    peerDependencies:
-      monaco-editor: '>= 0.25.0 < 1'
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
 
   '@monaco-editor/react@4.7.0':
     resolution: {integrity: sha512-cyzXQCtO47ydzxpQtCGSQGOC8Gk3ZUeBXFAxD+CWXYFo5OqZyZUonFl0DwUlTyAfRHntBfw2p3w4s9R6oe1eCA==}
     peerDependencies:
-      monaco-editor: '>= 0.25.0 < 1'
+      monaco-editor: 0.52.2
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -13076,11 +13068,6 @@ packages:
   markdown-wasm@1.2.0:
     resolution: {integrity: sha512-S12OTkyXCkOgI1n1rZY9cg4bK/PGu80Emjpvwp8BEjwCxhPV3yddF0U6+QhCitdBsI1tzWcoeahmW7k0Pq81OA==}
 
-  marked@14.0.0:
-    resolution: {integrity: sha512-uIj4+faQ+MgHgwUW1l2PsPglZLOLOT1uErt06dAPtx2kjteLAkbsd/0FiYg/MGS+i7ZKLb7w2WClxHkzOOuryQ==}
-    engines: {node: '>= 18'}
-    hasBin: true
-
   marked@16.3.0:
     resolution: {integrity: sha512-K3UxuKu6l6bmA5FUwYho8CfJBlsUWAooKtdGgMcERSpF7gcBUrCGsLH7wDaaNOzwq18JzSUDyoEb/YsrqMac3w==}
     engines: {node: '>= 20'}
@@ -13653,14 +13640,11 @@ packages:
   monaco-editor@0.52.2:
     resolution: {integrity: sha512-GEQWEZmfkOGLdd3XK8ryrfWz3AIP8YymVXiPHEdewrUq7mh0qrKrfHLNCXcbB6sTnMLnOZ3ztSiKcciFUkIJwQ==}
 
-  monaco-editor@0.55.1:
-    resolution: {integrity: sha512-jz4x+TJNFHwHtwuV9vA9rMujcZRb0CEilTEwG2rRSpe/A7Jdkuj8xPKttCgOh+v/lkHy7HsZ64oj+q3xoAFl9A==}
-
   monaco-graphql@1.7.3:
     resolution: {integrity: sha512-6LAIcg/vT2NGLjHnT+5iIZONsZCaCuz2orbg7qD/u4Ry9R7rDotLh0HAzIF/yKdzEA5fTZC+TofSx2O+Zi+0ow==}
     peerDependencies:
       graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
-      monaco-editor: '>= 0.20.0 < 0.53'
+      monaco-editor: 0.52.2
       prettier: ^2.8.0 || ^3.0.0
 
   moo@0.5.2:
@@ -17470,7 +17454,7 @@ packages:
     resolution: {integrity: sha512-sYRywMmcylt+Nupl+11AvizD2am06ST8lkVbUXuaEmrtV6Tf+TD4rsEm6u9YGGowYue+Vfg1IJ97SUP2J+PVXg==}
     engines: {node: '>=12.0.0', npm: '>=6.0.0'}
     peerDependencies:
-      monaco-editor: '>=0.20.0'
+      monaco-editor: 0.52.2
       yjs: ^13.3.1
 
   y-protocols@1.0.7:
@@ -20304,26 +20288,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@monaco-editor/loader@1.4.0(monaco-editor@0.52.2)':
-    dependencies:
-      monaco-editor: 0.52.2
-      state-local: 1.0.7
-
   '@monaco-editor/loader@1.5.0':
     dependencies:
       state-local: 1.0.7
 
-  '@monaco-editor/react@4.6.0(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
-    dependencies:
-      '@monaco-editor/loader': 1.4.0(monaco-editor@0.52.2)
-      monaco-editor: 0.52.2
-      react: 19.2.6
-      react-dom: 19.2.6(react@19.2.6)
-
-  '@monaco-editor/react@4.7.0(monaco-editor@0.55.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+  '@monaco-editor/react@4.7.0(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
     dependencies:
       '@monaco-editor/loader': 1.5.0
-      monaco-editor: 0.55.1
+      monaco-editor: 0.52.2
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
 
@@ -29669,8 +29641,6 @@ snapshots:
 
   markdown-wasm@1.2.0: {}
 
-  marked@14.0.0: {}
-
   marked@16.3.0: {}
 
   math-intrinsics@1.1.0: {}
@@ -30801,11 +30771,6 @@ snapshots:
   module-details-from-path@1.0.4: {}
 
   monaco-editor@0.52.2: {}
-
-  monaco-editor@0.55.1:
-    dependencies:
-      dompurify: 3.4.11
-      marked: 14.0.0
 
   monaco-graphql@1.7.3(graphql@16.11.0)(monaco-editor@0.52.2)(prettier@3.8.1):
     dependencies:
@@ -35390,10 +35355,10 @@ snapshots:
 
   xtend@4.0.2: {}
 
-  y-monaco@0.1.6(monaco-editor@0.55.1)(yjs@13.6.29):
+  y-monaco@0.1.6(monaco-editor@0.52.2)(yjs@13.6.29):
     dependencies:
       lib0: 0.2.117
-      monaco-editor: 0.55.1
+      monaco-editor: 0.52.2
       yjs: 13.6.29
 
   y-protocols@1.0.7(yjs@13.6.29):
