@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export const Route = createFileRoute('/project/$ref/database/triggers')({
