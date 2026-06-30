@@ -1,8 +1,8 @@
 import type { SafeSqlFragment } from '@supabase/pg-meta'
 import { describe, expect, it } from 'vitest'
 
-import type { ParseQueryResults } from '@/components/interfaces/Auth/RLSTester/RLSTester.types'
-import { deriveRLSTestState } from '@/components/interfaces/Auth/RLSTester/RLSTesterResults.utils'
+import type { ParseQueryResults } from '@/components/interfaces/Database/RLSTester/RLSTester.types'
+import { deriveRLSTestState } from '@/components/interfaces/Database/RLSTester/RLSTesterResults.utils'
 import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 
 const sql = (s: string) => s as unknown as SafeSqlFragment

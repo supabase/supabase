@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { filterTablePolicies } from '@/components/interfaces/Auth/RLSTester/useTestQueryRLS.utils'
+import { filterTablePolicies } from '@/components/interfaces/Database/RLSTester/useTestQueryRLS.utils'
 import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 
 const makePolicy = (overrides: Partial<Policy>): Policy =>

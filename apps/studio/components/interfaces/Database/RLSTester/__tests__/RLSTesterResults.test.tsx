@@ -2,16 +2,16 @@ import type { SafeSqlFragment } from '@supabase/pg-meta'
 import { screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
-import type { ParseQueryResults } from '@/components/interfaces/Auth/RLSTester/RLSTester.types'
-import { RLSTesterResults } from '@/components/interfaces/Auth/RLSTester/RLSTesterResults'
+import type { ParseQueryResults } from '@/components/interfaces/Database/RLSTester/RLSTester.types'
+import { RLSTesterResults } from '@/components/interfaces/Database/RLSTester/RLSTesterResults'
 import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { render } from '@/tests/helpers'
 
-vi.mock('@/components/interfaces/Auth/RLSTester/useTestQueryRLS', () => ({
+vi.mock('@/components/interfaces/Database/RLSTester/useTestQueryRLS', () => ({
   useTestQueryRLS: () => ({ limit: 100 }),
 }))
 
-vi.mock('@/components/interfaces/Auth/RLSTester/RLSTableCard', () => ({
+vi.mock('@/components/interfaces/Database/RLSTester/RLSTableCard', () => ({
   RLSTableCard: () => <div data-testid="rls-table-card" />,
 }))
 
