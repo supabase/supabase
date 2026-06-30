@@ -1,0 +1,81 @@
+---
+title: "Auth Go"
+description: "A Golang client library for the Supabase Auth API."
+repo: "auth-go"
+repoUrl: "https://github.com/supabase-community/auth-go"
+stars: 57
+forks: 16
+language: "Go"
+isTemplate: false
+tags:
+  - "auth"
+  - "postgres"
+  - "functions"
+  - "expo"
+category: "Auth"
+---
+
+> This page is generated from [auth-go](https://github.com/supabase-community/auth-go).
+
+## Getting started
+
+{/* Source: README.md */}
+
+### Usage
+
+```go
+package main
+
+import (
+    "github.com/supabase-community/auth-go"
+    "github.com/supabase-community/auth-go/types"
+)
+
+const (
+    projectReference = "<your_supabase_project_reference>"
+    apiKey = "<your_supabase_anon_key>"
+)
+
+func main() {
+    // Initialise client
+    client := auth.New(
+        projectReference,
+        apiKey,
+    )
+
+    // Log in a user (get access and refresh tokens)
+    resp, err := client.Token(types.TokenRequest{
+        GrantType: "password",
+        Email: "<user_email>",
+        Password: "<user_password>",
+    })
+    if err != nil {
+        log.Fatal(err.Error())
+    }
+    log.Printf("%+v", resp)
+}
+```
+
+{/* Source: CONTRIBUTING.md */}
+
+## Contributing
+
+### Prerequisites
+
+- **Go 1.18 or later** (Go 1.21+ recommended for development)
+- **Docker and Docker Compose** (for integration tests)
+- **Git**
+
+### Fork and Clone
+
+1. Fork the repository on GitHub
+2. Clone your fork:
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/auth-go.git
+   cd auth-go
+   ```
+
+3. Add upstream remote:
+   ```bash
+   git remote add upstream https://github.com/supabase-community/auth-go.git
+   ```

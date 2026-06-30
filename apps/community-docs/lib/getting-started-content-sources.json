@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "description": "Primary upstream URLs used for hand-written Getting started sections. Keys match frontmatter `repo` in apps/community-docs/content. Re-apply or merge after `pnpm --filter community-docs fetch-content` if MDX is regenerated.",
+  "sources": {
+    "sql-examples": {
+      "primaryDocUrl": "https://raw.githubusercontent.com/supabase-community/sql-examples/master/README.md",
+      "htmlUrl": "https://github.com/supabase-community/sql-examples/blob/master/README.md",
+      "note": "README text references historical supabase-sql / database.dev naming in places; clone URL in community listing uses sql-examples."
+    },
+    "next-server-components": {
+      "primaryDocUrl": "https://raw.githubusercontent.com/supabase-community/next-server-components/master/README.md",
+      "htmlUrl": "https://github.com/supabase-community/next-server-components/blob/master/README.md",
+      "note": "Archive points to auth-helpers nextjs-server-components example for current code."
+    },
+    "svelte-supabase": {
+      "primaryDocUrl": "https://raw.githubusercontent.com/supabase-community/svelte-supabase/master/README.md",
+      "htmlUrl": "https://github.com/supabase-community/svelte-supabase/blob/master/README.md",
+      "note": "Template workflow references joshnuss/svelte-supabase in issues; community fork is the Utility listing target."
+    },
+    "supabase-ui-svelte": {
+      "primaryDocUrl": "https://raw.githubusercontent.com/supabase-community/supabase-ui-svelte/main/README.md",
+      "htmlUrl": "https://github.com/supabase-community/supabase-ui-svelte/blob/main/README.md"
+    },
+    "supabase-sveltekit-example": {
+      "primaryDocUrl": "https://raw.githubusercontent.com/supabase-community/supabase-sveltekit-example/main/README.md",
+      "htmlUrl": "https://github.com/supabase-community/supabase-sveltekit-example/blob/main/README.md",
+      "note": "GitPod link in source still pointed at joshnuss fork; community-docs uses the supabase-community tree URL for Gitpod."
+    },
+    "svelte-kanban": {
+      "primaryDocUrl": "https://raw.githubusercontent.com/supabase-community/svelte-kanban/main/README.md",
+      "htmlUrl": "https://github.com/supabase-community/svelte-kanban/blob/main/README.md",
+      "note": "Some upstream links still say supabase-kanban; repo name is svelte-kanban."
+    }
+  }
+}

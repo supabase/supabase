@@ -1,0 +1,49 @@
+name: '[Community Docs] Sync generated content'
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 1'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync-community-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          ref: master
+
+      - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+        name: Install pnpm
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Fetch community docs content
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: pnpm --filter community-docs fetch-content
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@5e914681df9dc83aa4e4905692ca88beb2f9e91f # v7.0.5
+        with:
+          commit-message: '[bot] sync community docs content'
+          title: '[bot] sync community docs content'
+          body: |
+            Updates generated Community Docs MDX files from public repositories under `supabase-community`.
+          branch: 'bot/community-docs-sync'
+          branch-suffix: 'random'
+          labels: 'documentation'

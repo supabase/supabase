@@ -1,0 +1,107 @@
+---
+title: "Postgrest Py"
+description: "PostgREST client for Python. This library provides an ORM interface to PostgREST"
+repo: "postgrest-py"
+repoUrl: "https://github.com/supabase/postgrest-py"
+stars: 315
+forks: 68
+language: "Python"
+isTemplate: false
+tags:
+  - "community"
+  - "postgrest"
+  - "python"
+  - "supabase"
+  - "postgres"
+category: "Database"
+---
+
+> This page is generated from [postgrest-py](https://github.com/supabase/postgrest-py).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Installation
+
+### Requirements
+
+- Python >= 3.9
+- PostgreSQL >= 13
+- PostgREST >= 11
+
+### Local PostgREST server
+
+If you want to use a local PostgREST server for development, you can use our preconfigured instance via Docker Compose.
+
+```sh
+docker-compose up
+```
+
+Once Docker Compose started, PostgREST is accessible at <http://localhost:3000>.
+
+### Instructions
+
+#### With Poetry (recommended)
+
+```sh
+poetry add postgrest
+```
+
+#### With Pip
+
+```sh
+pip install postgrest
+```
+
+{/* Source: README.md */}
+
+## Usage
+
+### Basic example
+
+```py
+import asyncio
+from postgrest import AsyncPostgrestClient
+
+async def main():
+    async with AsyncPostgrestClient("http://localhost:3000") as client:
+        r = await client.from_("countries").select("*").execute()
+        countries = r.data
+
+asyncio.run(main())
+```
+
+### Create
+
+```py
+await client.from_("countries").insert({ "name": "Việt Nam", "capital": "Hà Nội" }).execute()
+```
+
+### Read
+
+```py
+r = await client.from_("countries").select("id", "name").execute()
+countries = r.data
+```
+
+### Update
+
+```py
+await client.from_("countries").update({"capital": "Hà Nội"}).eq("name", "Việt Nam").execute()
+```
+
+### Delete
+
+```py
+await client.from_("countries").delete().eq("name", "Việt Nam").execute()
+```
+
+### General filters
+
+### Stored procedures (RPC)
+```py
+await client.rpc("foobar", {"arg1": "value1", "arg2": "value2"}).execute()
+```
+
+{/* Source: README.md */}

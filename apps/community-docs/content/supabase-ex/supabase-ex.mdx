@@ -1,0 +1,48 @@
+---
+title: "Ex"
+description: "A complete Toolkit to interact with Supabase APIs from Elixir"
+repo: "supabase-ex"
+repoUrl: "https://github.com/supabase-community/supabase-ex"
+stars: 155
+forks: 11
+language: "Elixir"
+isTemplate: false
+tags:
+  - "hacktoberfest"
+  - "sdk-elixir"
+  - "supabase"
+  - "supabase-elixir"
+  - "auth"
+  - "storage"
+  - "realtime"
+  - "postgres"
+category: "Auth"
+---
+
+> This page is generated from [supabase-ex](https://github.com/supabase-community/supabase-ex).
+
+## Getting started
+
+{/* Source: README.md */}
+
+### Usage
+
+To create a `Supabase.Client`:
+
+```elixir
+iex> Supabase.init_client("https://<supabase-url>", "<supabase-api-key>")
+iex> {:ok, %Supabase.Client{}}
+```
+
+Any additional config can be passed as the third argument as an [Enumerable](https://hexdocs.pm/elixir/Enumerable.html):
+
+```elixir
+iex> Supabase.init_client("https://<supabase-url>", "<supabase-api-key>",
+  db: [schema: "another"],
+  auth: [flow_type: :pkce],
+  global: [headers: %{"custom-header" => "custom-value"}]
+)
+iex> {:ok, %Supabase.Client{}}
+```
+
+Initialized clients are Elixir structs without any managed state.

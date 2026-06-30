@@ -1,0 +1,199 @@
+---
+title: "Custom Claims"
+description: "How to implement custom claims with Supabase"
+repo: "supabase-custom-claims"
+repoUrl: "https://github.com/supabase-community/supabase-custom-claims"
+stars: 678
+forks: 50
+language: "JavaScript"
+isTemplate: false
+tags:
+  - "auth"
+  - "realtime"
+  - "database"
+  - "postgres"
+  - "functions"
+  - "custom"
+  - "claims"
+category: "Auth"
+---
+
+> This page is generated from [supabase-custom-claims](https://github.com/supabase-community/supabase-custom-claims).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Usage
+### Inside the Query Editor
+You can get, set, and delete claims for any user based on the user's `id` (uuid) with the following functions:
+
+#### `get_claims(uid uuid)` returns jsonb
+##### example
+`select get_claims('03acaa13-7989-45c1-8dfb-6eeb7cf0b92e');`
+##### result
+```
+| get_claims                                                                                                                                                                 |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| {"provider": "email", "userrole": "MANAGER", "providers": ["email"], "userlevel": 100, "useractive": true, "userjoined": "2022-05-20T14:07:27.742Z", "claims_admin": true} |
+```
+
+#### `get_claim(uid uuid, claim text)` returns jsonb
+##### example
+`select get_claim('03acaa13-7989-45c1-8dfb-6eeb7cf0b92e', 'userlevel');`
+##### result
+```
+| get_claim |
+| --------- |
+| 100       |
+```
+
+#### `set_claim(uid uuid, claim text, value jsonb) `returns text
+##### example
+Set a **number** value.  (Note `value` is passed as a `jsonb` value, so to set a number we need to pass it as a simple string.)
+`select set_claim('03acaa13-7989-45c1-8dfb-6eeb7cf0b92e', 'userlevel', '200');`
+
+Set a **text** value.  (Note `value` is passed as a `jsonb` value, so to set a number we need to pass it with double-quotes.)
+`select set_claim('03acaa13-7989-45c1-8dfb-6eeb7cf0b92e', 'userrole', '"MANAGER"');`
+
+**Common Mistake**: If you forget the double-quotes for a string, and try to do this: `select set_claim('03acaa13-7989-45c1-8dfb-6eeb7cf0b92e', 'userrole', 'MANAGER');`, the result will be an error: `invalid input syntax for type json`
+
+Set a **boolean** value.
+`select set_claim('03acaa13-7989-45c1-8dfb-6eeb7cf0b92e', 'useractive', 'true');`
+
+Set an **array** value.
+`select set_claim('03acaa13-7989-45c1-8dfb-6eeb7cf0b92e', 'items', '["bread", "cheese", "butter"]');`
+
+Set a complex, nested **json** / **object** value.
+`select set_claim('03acaa13-7989-45c1-8dfb-6eeb7cf0b92e', 'gamestate', '{"level": 5, "items": ["knife", "gun"], "position":{"x": 15, "y": 22}}');`
+
+##### result (for any of the above)
+```
+| set_claim |
+| --------- |
+| OK        |
+```
+
+#### `delete_claim(uid uuid, claim text)` returns text
+##### example
+`select delete_claim('03acaa13-7989-45c1-8dfb-6eeb7cf0b92e', 'gamestate');`
+##### result
+```
+| delete_claim |
+| ------------ |
+| OK           |
+```
+
+### Inside PostgreSQL Functions and Triggers
+When using custom claims from inside a PostgreSQL function or trigger, you can use any of the functions shown in the section above: `Inside the Query Editor`.
+
+In addition, you can use the following functions that are specific to the currently logged-in user:
+
+#### `is_claims_admin()` returns bool
+##### example
+`select is_claims_admin();`
+##### result
+```
+| is_claims_admin |
+| --------------- |
+| true            |
+```
+
+#### `get_my_claims()` returns jsonb
+##### example
+`select get_my_claims();`
+##### result
+```
+| get_my_claims                                                                                                                                                              |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| {"provider": "email", "userrole": "MANAGER", "providers": ["email"], "userlevel": 100, "useractive": true, "userjoined": "2022-05-20T14:07:27.742Z", "claims_admin": true} |
+```
+
+#### `get_my_claim(claim TEXT)` returns jsonb
+##### example
+`select get_my_claim('userlevel');`
+##### result
+```
+| get_my_claim |
+| ------------ |
+| 100          |
+```
+
+### Inside an RLS (Row Level Security) Policy
+To use custom claims in an RLS Policy, you'll normally use the `get_my_claim` to check a specific claim for the currently logged in user.
+#### examples
+##### only allow users with userrole "MANAGER"
+`get_my_claim('userrole') = '"MANAGER"'`
+(which the UI will change into the more formal):
+`((get_my_claim('userrole'::text)) = '"MANAGER"'::jsonb)`
+
+##### only allow users with userlevel over 100
+`coalesce(get_my_claim('userlevel')::numeric,0) > 100`
+
+##### only allow users with claim_admin = true
+`coalesce(get_my_claim('claims_admin')::bool,false)`
+
+### Inside your app (using `.rpc()`)
+
+#### Getting Claims Data from Local Session Data
+You can extract claims information from the `session` object you get when the user is logged in.  For example:
+
+```js
+		supabase.auth.onAuthStateChange((_event, session) => {
+            if (session?.user) {
+    			console.log(session?.user?.app_metadata) // show custom claims
+            }
+		})
+```
+
+If any claims have changed since your last log in, you may need to log out and back in to see these changes.
+
+#### Getting Claims Data from the Server
+You can also query the server to see what claims are set for the current user.
+
+Here are some sample functions that can be used by any authenticated (logged-in) user of your application:
+
+```js
+  public get_my_claims = async () => {
+    const { data, error } = await supabase
+    .rpc('get_my_claims', {});
+    return { data, error };
+  }
+  public get_my_claim = async (claim: string) => {
+    const { data, error } = await supabase
+    .rpc('get_my_claim', {claim});
+    return { data, error };
+  }
+  public is_claims_admin = async () => {
+    const { data, error } = await supabase
+    .rpc('is_claims_admin', {});
+    return { data, error };
+  }
+```
+
+The following functions can only be used by a **"claims admin"**, that is, a user who has the `claims_admin` custom claim set to `true`:
+
+(Note: these functions allow you to view, set, and delete claims for any user of your application, so these would be appropriate for an **administrative** branch of your application to be used only by high-level users with the proper security rights (i.e. `claims_admin` level users.))
+
+```js
+  public get_claims = async (uid: string) => {
+    const { data, error } = await supabase
+    .rpc('get_claims', {uid});
+    return { data, error };
+  }
+  public get_claim = async (uid: string, claim: string) => {
+    const { data, error } = await supabase
+    .rpc('get_claim', {uid, claim});
+    return { data, error };
+  }
+  public set_claim = async (uid: string, claim: string, value: object) => {
+    const { data, error } = await supabase
+    .rpc('set_claim', {uid, claim, value});
+    return { data, error };
+  }
+  public delete_claim = async (uid: string, claim: string) => {
+    const { data, error } = await supabase
+    .rpc('delete_claim', {uid, claim});
+    return { data, error };
+  }
+```

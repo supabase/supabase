@@ -1,0 +1,103 @@
+---
+title: "Gotrue Ex"
+description: "An Elixir client for the GoTrue authentication service"
+repo: "gotrue-ex"
+repoUrl: "https://github.com/supabase-community/gotrue-ex"
+stars: 20
+forks: 5
+language: "Elixir"
+isTemplate: false
+tags:
+  - "authentication"
+  - "elixir"
+  - "gotrue"
+  - "auth"
+category: "Auth"
+---
+
+> This page is generated from [gotrue-ex](https://github.com/supabase-community/gotrue-ex).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Installation
+
+Add `gotrue` to your list of dependencies in `mix.exs`:
+
+```elixir
+def deps do
+  [
+    {:gotrue, "~> 0.1.0"}
+  ]
+end
+```
+
+### Optional
+
+In your `config/dev.exs` & `config/prod.exs`, configure settings:
+
+```elixir
+config :gotrue,
+  # URL to your GoTrue instance
+  base_url: "http://0.0.0.0:9999",
+
+  # The project's API key
+  api_key: "your-super-secret-operator-token"
+
+```
+
+{/* Source: README.md */}
+
+## Usage
+
+## Creating a user account
+
+Several options exist to create an account:
+
+### Password based
+
+Pass credentials to `GoTrue.sign_up/1`, a new account will be created and a JWT token is returned.
+
+```elixir
+GoTrue.client("https://ttlzokxvatvexhtzrpsm.supabase.co/auth/v1", "my-supabase-project-api-key")
+|> GoTrue.sign_up(%{email: "user@example.com", password: "123456"})
+```
+
+### OAUTH2
+
+Oauth is performed on the client by redirecting the user. To get the redirection URL, call `GoTrue.url_for_provider/1`:
+
+```elixir
+GoTrue.url_for_provider(:google)
+GoTrue.url_for_provider(:github)
+GoTrue.url_for_provider(:gitlab)
+GoTrue.url_for_provider(:bitbucket)
+GoTrue.url_for_provider(:facebook)
+```
+
+### Magic Link
+
+Users can login without password, by requesting a magic link:
+
+```elixir
+GoTrue.client("https://ttlzokxvatvexhtzrpsm.supabase.co/auth/v1", "my-supabase-project-api-key")
+|> GoTrue.send_magic_link("user@example.com")
+```
+
+That sends them an email with a link to login. The link will contain the `access_token` & `refresh_token`.
+
+## Sign in
+
+If you're using password logins, sign in a user by passing the `email` & `password` to `GoTrue.sign_in/1`, it returns a JWT
+
+```elixir
+GoTrue.client("https://ttlzokxvatvexhtzrpsm.supabase.co/auth/v1", "my-supabase-project-api-key")
+|> GoTrue.sign_in(%{email: "user@example.com", password: "12345"})
+```
+
+## Refreshing JWT
+
+Each JWT expires based on your GoTrue server's settings. To refresh it, pass the `refresh_token` to `GoTrue.refresh_access_token/1`
+
+```elixir

@@ -1,0 +1,17 @@
+{
+  "$schema": "./../../node_modules/turbo/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "env": ["NEXT_PUBLIC_BASE_PATH", "NEXT_PUBLIC_VERCEL_ENV", "VERCEL", "VERCEL_ENV"],
+      "inputs": ["$TURBO_DEFAULT$", "content/**/*.mdx"],
+      "outputs": [".next/**", "!.next/cache/**"],
+    },
+    "fetch-content": {
+      "cache": false,
+      "env": ["GH_TOKEN", "GITHUB_TOKEN"],
+      "outputs": ["content/**/*.mdx"],
+    },
+  },
+}

@@ -1,0 +1,95 @@
+---
+title: "Pg Parser"
+description: "Postgres SQL parser that can run anywhere (WASM)"
+repo: "pg-parser"
+repoUrl: "https://github.com/supabase-community/pg-parser"
+stars: 15
+forks: 1
+language: "TypeScript"
+isTemplate: false
+tags:
+  - "auth"
+  - "database"
+  - "postgres"
+  - "functions"
+  - "expo"
+  - "parser"
+category: "Auth"
+---
+
+> This page is generated from [pg-parser](https://github.com/supabase-community/pg-parser).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Installation
+
+```bash
+npm install @supabase/pg-parser
+```
+
+```bash
+yarn add @supabase/pg-parser
+```
+
+```bash
+pnpm add @supabase/pg-parser
+```
+
+{/* Source: README.md */}
+
+## Usage
+
+### Parse SQL to AST
+
+```typescript
+import { PgParser } from '@supabase/pg-parser';
+
+const parser = new PgParser(); // Defaults to latest version (17)
+
+const { tree } = await parser.parse('SELECT * FROM users WHERE id = 1');
+
+console.log(tree);
+
+// { version: 170004, stmts: [ ... ] }
+```
+
+### Deparse AST to SQL
+
+```typescript
+import { PgParser } from '@supabase/pg-parser';
+
+const parser = new PgParser();
+
+// Parse SQL into an AST
+const { tree } = await parser.parse('SELECT * FROM users WHERE id = 1');
+
+// { version: 170004, stmts: [ ... ] }
+
+// Deparse the AST back into SQL
+const { sql } = await parser.deparse(tree);
+
+console.log(sql);
+
+// SELECT * FROM users WHERE id = 1
+```
+
+### Scan SQL into tokens
+
+```typescript
+import { PgParser, unwrapScanResult } from '@supabase/pg-parser';
+
+const parser = new PgParser();
+
+const tokens = await unwrapScanResult(parser.scan('SELECT 1 + 2'));
+
+console.log(tokens);
+
+// [
+//   { kind: 'SELECT', text: 'SELECT', start: 0, end: 6, keywordKind: 'reserved' },
+//   { kind: 'ICONST', text: '1', start: 7, end: 8, keywordKind: 'none' },
+//   { kind: 'ASCII_43', text: '+', start: 9, end: 10, keywordKind: 'none' },
+//   { kind: 'ICONST', text: '2', start: 11, end: 12, keywordKind: 'none' },
+// ]
+```

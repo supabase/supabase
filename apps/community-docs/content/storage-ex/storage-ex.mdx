@@ -1,0 +1,46 @@
+---
+title: "Storage Ex"
+description: "Elixir client to interact with Supabase Storage"
+repo: "storage-ex"
+repoUrl: "https://github.com/supabase-community/storage-ex"
+stars: 5
+forks: 3
+language: "Elixir"
+isTemplate: false
+tags:
+  - "elixir"
+  - "supabase"
+  - "supabase-storage"
+  - "storage"
+  - "functions"
+category: "Storage"
+---
+
+> This page is generated from [storage-ex](https://github.com/supabase-community/storage-ex).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Installation
+
+```elixir
+def deps do
+  [
+    {:supabase_potion, "~> 0.7"},
+    {:supabase_storage, "~> 0.6.0"} # x-release-please-version
+  ]
+end
+```
+
+{/* Source: README.md */}
+
+## Usage
+
+Firstly you need to initialize your Supabase client(s) as can be found on the [Supabase Potion documentation](https://hexdocs.pm/supabase_potion/readme.html#usage)
+
+Now you can pass the Client to the `Supabase.Storage` functions:
+
+```elixir
+iex> Supabase.Storage.list_buckets(%Supabase.Client{})
+```

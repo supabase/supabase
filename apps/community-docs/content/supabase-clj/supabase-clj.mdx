@@ -1,0 +1,46 @@
+---
+title: "Clj"
+description: "A complete Toolkit to interact with Supabase APIs from Clojure"
+repo: "supabase-clj"
+repoUrl: "https://github.com/supabase-community/supabase-clj"
+stars: 0
+forks: 0
+language: "Clojure"
+isTemplate: false
+tags:
+  - "auth"
+  - "storage"
+  - "realtime"
+  - "postgres"
+  - "functions"
+  - "clj"
+category: "Auth"
+---
+
+> This page is generated from [supabase-clj](https://github.com/supabase-community/supabase-clj).
+
+## Getting started
+
+{/* Source: README.md */}
+
+### Usage
+
+To create a client:
+
+```clojure
+(require '[supabase.core.client :as supabase])
+
+(supabase/make-client "https://<supabase-url>" "<supabase-api-key>")
+;; => {:base-url "https://..." :api-key "..." :auth-url "..." ...}
+```
+
+Any additional config can be passed as keyword arguments:
+
+```clojure
+(supabase/make-client "https://<supabase-url>" "<supabase-api-key>"
+  :db {:schema "another"}
+  :auth {:flow-type "pkce"}
+  :global {:headers {"custom-header" "custom-value"}})
+```
+
+Initialized clients are plain maps with no managed state.

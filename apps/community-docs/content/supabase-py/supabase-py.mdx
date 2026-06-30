@@ -1,0 +1,308 @@
+---
+title: "Py"
+description: "Python Client for Supabase. Query Postgres from Flask, Django, FastAPI. Python user authentication, security policies, edge functions, file storage, and realtime data streaming. Good first issue."
+repo: "supabase-py"
+repoUrl: "https://github.com/supabase/supabase-py"
+stars: 2496
+forks: 479
+language: "Python"
+isTemplate: false
+tags:
+  - "auth"
+  - "authentication"
+  - "authorization"
+  - "community"
+  - "data-science"
+  - "databases"
+  - "django"
+  - "fastapi"
+category: "Auth"
+---
+
+> This page is generated from [supabase-py](https://github.com/supabase/supabase-py).
+
+## Getting started
+
+{/* Source: src/supabase/README.md */}
+
+## Usage
+
+Set your Supabase environment variables in a dotenv file, or using the shell:
+
+```bash
+export SUPABASE_URL="my-url-to-my-awesome-supabase-instance"
+export SUPABASE_KEY="my-supa-dupa-secret-supabase-api-key"
+```
+
+Init client:
+
+```python
+import os
+from supabase import create_client, Client
+
+url: str = os.environ.get("SUPABASE_URL")
+key: str = os.environ.get("SUPABASE_KEY")
+supabase: Client = create_client(url, key)
+```
+
+Use the supabase client to interface with your database.
+
+### Sign-up
+
+```python
+user = supabase.auth.sign_up({ "email": users_email, "password": users_password })
+```
+
+### Sign-in
+
+```python
+user = supabase.auth.sign_in_with_password({ "email": users_email, "password": users_password })
+```
+
+### Insert Data
+
+```python
+data = supabase.table("countries").insert({"name":"Germany"}).execute()
+```
+
+{/* Source: src/realtime/README.md */}
+
+## Realtime
+
+### Installing the package
+
+```bash
+pip3 install realtime
+```
+
+or using `uv`
+
+```bash
+uv add realtime
+```
+
+### Creating a channel
+
+```python
+import asyncio
+from typing import Optional
+
+from realtime import AsyncRealtimeClient, RealtimeSubscribeStates
+
+
+async def main():
+    REALTIME_URL = "ws://localhost:4000/websocket"
+    API_KEY = "1234567890"
+
+    client = AsyncRealtimeClient(REALTIME_URL, API_KEY)
+    channel = client.channel("test-channel")
+
+    def _on_subscribe(status: RealtimeSubscribeStates, err: Optional[Exception]):
+        if status == RealtimeSubscribeStates.SUBSCRIBED:
+            print("Connected!")
+        elif status == RealtimeSubscribeStates.CHANNEL_ERROR:
+            print(f"There was an error subscribing to channel: {err.args}")
+        elif status == RealtimeSubscribeStates.TIMED_OUT:
+            print("Realtime server did not respond in time.")
+        elif status == RealtimeSubscribeStates.CLOSED:
+            print("Realtime channel was unexpectedly closed.")
+
+    await channel.subscribe(_on_subscribe)
+```
+
+### Notes:
+
+- `REALTIME_URL` is `ws://localhost:4000/socket` when developing locally and `wss://\<project_ref>.supabase.co/realtime/v1` when connecting to your Supabase project.
+- `API_KEY` is a JWT whose claims must contain `exp` and `role` (existing database role).
+- Channel name can be any `string`.
+
+### Broadcast
+
+Your client can send and receive messages based on the `event`.
+
+{/* Source: src/functions/README.md */}
+
+## Edge functions
+
+### Installation
+
+The package can be installed using pip, uv or poetry:
+### Pip
+```bash
+pip install supabase_functions
+```
+### UV
+```bash
+uv add supabase_functions
+```
+### Poetry
+```bash
+poetry add supabase_functions
+```
+
+{/* Source: src/functions/README.md */}
+
+### Usage
+
+Deploy your Edge Function following the [Supabase Functions documentation](https://supabase.com/docs/guides/functions).
+
+
+### Asynchronous Client
+
+```python
+import asyncio
+from supabase_functions import AsyncFunctionsClient
+
+async def run_func():
+    # Initialize the client with your project URL and optional headers
+    headers = {
+        "Authorization": "Bearer your-publishable-key",
+        # Add any other headers you might need
+    }
+    
+    fc = AsyncFunctionsClient("https://<project_ref>.functions.supabase.co", headers)
+    
+    try:
+        # Invoke your Edge Function
+        res = await fc.invoke("payment-sheet", {
+            "responseType": "json",
+            "body": {"amount": 1000, "currency": "usd"}
+        })
+        print("Response:", res)
+    except Exception as e:
+        print(f"Error: {e}")
+
+if __name__ == "__main__":
+    asyncio.run(run_func())
+```
+### Synchronous Client
+
+```python
+from supabase_functions import SyncFunctionsClient
+```
+
+{/* Source: src/postgrest/README.md */}
+
+## PostgREST installation
+
+### Requirements
+
+- Python >= 3.9
+- PostgreSQL >= 13
+- PostgREST >= 11
+
+### Local PostgREST server
+
+If you want to use a local PostgREST server for development, you can use our preconfigured instance via Docker Compose.
+
+```sh
+docker-compose up
+```
+
+Once Docker Compose started, PostgREST is accessible at <http://localhost:3000>.
+
+### Instructions
+
+#### With uv (recommended)
+
+```sh
+uv add postgrest
+```
+
+#### With Pip
+
+```sh
+pip install postgrest
+```
+
+{/* Source: src/postgrest/README.md */}
+
+## PostgREST usage
+
+### Basic example
+
+```py
+import asyncio
+from postgrest import AsyncPostgrestClient
+
+async def main():
+    async with AsyncPostgrestClient("http://localhost:3000") as client:
+        r = await client.from_("countries").select("*").execute()
+        countries = r.data
+
+asyncio.run(main())
+```
+
+### Create
+
+```py
+await client.from_("countries").insert({ "name": "Việt Nam", "capital": "Hà Nội" }).execute()
+```
+
+### Read
+
+```py
+r = await client.from_("countries").select("id", "name").execute()
+countries = r.data
+```
+
+### Update
+
+```py
+await client.from_("countries").update({"capital": "Hà Nội"}).eq("name", "Việt Nam").execute()
+```
+
+### Delete
+
+```py
+await client.from_("countries").delete().eq("name", "Việt Nam").execute()
+```
+
+### General filters
+
+### Stored procedures (RPC)
+```py
+await client.rpc("foobar", {"arg1": "value1", "arg2": "value2"}).execute()
+```
+
+{/* Source: src/auth/README.md */}
+
+## Auth
+
+### Installation
+
+The package can be installed using pip, uv or poetry:
+
+#### Pip
+
+```bash
+pip install supabase_auth
+```
+
+
+#### Uv
+
+```bash
+uv add supabase_auth
+```
+
+#### Poetry
+
+```bash
+poetry add supabase_auth
+```
+
+## Auth usage
+
+The library provides both synchronous and asynchronous clients. Here are some examples:
+
+### Synchronous Client
+
+```python
+from supabase_auth import SyncGoTrueClient
+
+headers = {
+    "apiKey": "my-mega-awesome-api-key",
+    # ... any other headers you might need.
+}
+client: SyncGoTrueClient = SyncGoTrueClient(url="www.genericauthwebsite.com", headers=headers)

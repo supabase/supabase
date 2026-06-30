@@ -1,0 +1,46 @@
+---
+title: "Next Server Components"
+description: "Experimental demo of React Server Components with Next.js. Deployed serverlessly on Vercel."
+repo: "next-server-components"
+repoUrl: "https://github.com/supabase-community/next-server-components"
+stars: 28
+forks: 0
+language: "JavaScript"
+isTemplate: false
+tags:
+  - "auth"
+  - "nextjs"
+  - "react"
+  - "next"
+  - "server"
+  - "components"
+category: "Auth"
+---
+
+> This page is generated from [next-server-components](https://github.com/supabase-community/next-server-components).
+
+## Getting started
+
+{/* community-docs: manual body from `https://raw.githubusercontent.com/supabase-community/next-server-components/master/README.md` (see `getting-started-content-sources.json`) */}
+
+This repository is **archived** and marked **out of date**. For a maintained Next.js Server Components + Supabase example, use the [auth-helpers example](https://github.com/supabase/auth-helpers/tree/main/examples/nextjs-server-components) (see upstream README).
+
+If you still run this demo locally, treat it as experimental (not for production).
+
+### Development
+
+Create a `.env` file with:
+
+```
+ENDPOINT='http://localhost:3000'
+NEXT_PUBLIC_ENDPOINT='http://localhost:3000'
+NEXT_PUBLIC_SUPABASE_URL='https://XXXX.supabase.co'
+NEXT_PUBLIC_SUPABASE_ANON_KEY='anon.key.xxx.yyy'
+```
+
+Then:
+
+1. `yarn install` (runs `postinstall`)
+2. `yarn dev`
+
+Open `http://localhost:3000`. The README also documents API routes, server-component plumbing, and caveats (`.js` only, hooks not available in server components, import `React` in server components).

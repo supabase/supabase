@@ -1,0 +1,65 @@
+---
+title: "Functions Go"
+description: "Golang client library to interact with Supabase Functions."
+repo: "functions-go"
+repoUrl: "https://github.com/supabase-community/functions-go"
+stars: 23
+forks: 3
+language: "Go"
+isTemplate: false
+tags:
+  - "functions"
+category: "Edge Functions"
+---
+
+> This page is generated from [functions-go](https://github.com/supabase-community/functions-go).
+
+## Getting started
+
+{/* Source: README.md */}
+
+### Installation
+
+Install the package using:
+
+```shell
+go get github.com/supabase-community/functions-go
+```
+
+{/* Source: README.md */}
+
+### Usage
+
+The following example demonstrates how to create a client, marshal data into JSON, and make a request to execute a function on the server.
+
+```go
+package main
+
+import (
+ "fmt"
+ "log"
+
+ "github.com/supabase-community/functions-go"
+)
+
+func main() {
+ client := functions.NewClient("https://abc.supabase.co/functions/v1", "<service-token>", nil)
+
+ // Define your data struct
+ type Post struct {
+  Title   string `json:"title"`
+  Content string `json:"content"`
+ }
+ post := Post{Title: "Hello, world!", Content: "This is a new post."}
+
+ // Invoke the function with the post data
+ response, err := client.Invoke("createPost", post)
+ if err != nil {
+  log.Fatal(err)
+ }
+
+ fmt.Println("Response from server:", response)
+}
+```
+
+This code will marshal the `Post` struct into JSON, send it to the `createPost` function, and print the response.

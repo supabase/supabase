@@ -1,0 +1,472 @@
+---
+title: "Kt Plugins"
+description: "This repository contains plugins for the [Supabase Kotlin SDK](https://github.com/supabase-community/supabase-kt). Each plugin extends the functionality of the SDK, allowing you to"
+repo: "supabase-kt-plugins"
+repoUrl: "https://github.com/supabase-community/supabase-kt-plugins"
+stars: 9
+forks: 5
+language: "Kotlin"
+isTemplate: false
+tags:
+  - "auth"
+  - "storage"
+  - "kotlin"
+  - "swift"
+  - "expo"
+  - "plugins"
+category: "Auth"
+---
+
+> This page is generated from [supabase-kt-plugins](https://github.com/supabase-community/supabase-kt-plugins).
+
+## Getting started
+
+{/* Source: Coil3Integration/README.md */}
+
+## Installation
+
+Newest version: [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=)](https://github.com/supabase-community/supabase-kt/releases)
+
+```kotlin
+dependencies {
+    implementation("io.github.jan-tennert.supabase:coil3-integration:VERSION")
+}
+```
+
+Install plugin in main SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
+```kotlin
+val client = createSupabaseClient(
+    supabaseUrl = "https://id.supabase.co",
+    supabaseKey = "apikey"
+) {
+    //...
+    install(Storage) {
+        //your config
+    }
+    install(Coil3Integration)
+}
+```
+
+If you don't have a coil-network artifact in your dependencies, you will need to add it. See the [Coil documentation](https://coil-kt.github.io/coil/upgrading_to_coil3/#network-images) for more information.
+
+{/* Source: Coil3Integration/README.md */}
+
+## Usage
+
+### Add Supabase Fetcher to Coil
+
+Create a new ImageLoader with the Supabase Fetcher and a [network fetcher](https://coil-kt.github.io/coil/upgrading_to_coil3/#network-images).
+
+```kotlin
+ImageLoader.Builder(context)
+    .components {
+        add(supabaseClient.coil3)
+        //You also need the add the network fetcher factory if you don't have it already
+        //Depending on the network artifact you added, this will be different
+        add(KtorNetworkFetcherFactory())
+    }
+    .build()
+```
+
+You can also replace the default Coil Image Loader in your application. 
+For Compose Multiplatform Applications using the `coil-compose` dependency, you can use the `setSingletonImageLoaderFactory` composable function:
+```kotlin
+setSingletonImageLoaderFactory { platformContext ->
+    ImageLoader.Builder(platformContext)
+        .components {
+            add(supabaseClient.coil3)
+            //Your network fetcher factory
+            add(KtorNetworkFetcherFactory())
+        }
+        .build()
+}
+```
+You call this composable before any `Image` composable is used. Presumably in your `Root` composable.
+
+See the [Coil documentation](https://coil-kt.github.io/coil/getting_started/#image-loaders) for more information.
+
+### Display images from Supabase Storage
+
+You can easily create an image request like this:
+
+```kotlin
+val request = ImageRequest.Builder(context)
+    .data(authenticatedStorageItem("icons", "profile.png")) //for non-public buckets
+    .build()
+```
+
+Or if you are using [Compose Multiplatform](https://coil-kt.github.io/coil/compose/):
+
+```kotlin
+AsyncImage(
+    model = publicStorageItem("icons", "profile.png"), //for public buckets
+    contentDescription = null,
+)
+```
+
+The Coil integration will automatically add the Authorization header to the request if the bucket is not public.
+
+{/* Source: CoilIntegration/README.md */}
+
+## Installation
+
+Newest version: [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=)](https://github.com/supabase-community/supabase-kt/releases)
+
+```kotlin
+dependencies {
+    implementation("io.github.jan-tennert.supabase:coil-integration:VERSION")
+}
+```
+
+Install plugin in main SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
+```kotlin
+val client = createSupabaseClient(
+    supabaseUrl = "https://id.supabase.co",
+    supabaseKey = "apikey"
+) {
+    //...
+    install(Storage) {
+        //your config
+    }
+    install(CoilIntegration)
+}
+```
+
+{/* Source: CoilIntegration/README.md */}
+
+## Usage
+
+### Add Supabase Fetcher to Coil
+
+Create a new ImageLoader with the Supabase Fetcher. See the [Coil documentation](https://coil-kt.github.io/coil/image_pipeline/) for more information.
+
+```kotlin
+ImageLoader.Builder(context)
+    .components {
+        add(supabaseClient.coil)
+    }
+    .build()
+```
+
+You can also replace the default Coil Image Loader in your application. See the [Coil documentation](https://coil-kt.github.io/coil/getting_started/#image-loaders) for more information.
+
+### Display images from Supabase Storage
+
+You can easily create an image request like this:
+
+```kotlin
+val request = ImageRequest.Builder(context)
+    .data(authenticatedStorageItem("icons", "profile.png")) //for non-public buckets
+    .build()
+```
+
+Or if you are using [Jetpack Compose](https://coil-kt.github.io/coil/compose/):
+
+```kotlin
+AsyncImage(
+    model = publicStorageItem("icons", "profile.png"), //for public buckets
+    contentDescription = null,
+)
+```
+
+The Coil integration will automatically add the Authorization header to the request if the bucket is not public.
+
+{/* Source: SketchIntegration/README.md */}
+
+## Installation
+
+Newest version: [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=)](https://github.com/supabase-community/supabase-kt/releases)
+
+```kotlin
+dependencies {
+    implementation("io.github.jan-tennert.supabase.plugins:sketch-integration:VERSION")
+}
+```
+
+Install plugin in main SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
+```kotlin
+val client = createSupabaseClient(
+    supabaseUrl = "https://id.supabase.co",
+    supabaseKey = "apikey"
+) {
+    //...
+    install(Storage) {
+        //your config
+    }
+    install(SketchIntegration)
+}
+```
+
+If you don't have a sketch-http artifact in your dependencies, you will need to add it. See the [Sketch documentation](https://github.com/panpf/sketch#install) for more information.
+
+{/* Source: SketchIntegration/README.md */}
+
+## Usage
+
+### Add Supabase Fetcher to Sketch
+
+Create Sketch with the Supabase Fetcher.
+
+```kotlin
+Sketch.Builder(it).apply {
+    components {
+        supportSupabaseStorage(supabase)
+    }
+}.build()
+```
+
+You can also replace the default Sketch object
+```kotlin
+SingletonSketch.setSafe {
+    Sketch.Builder(it).apply {
+        components {
+            supportSupabaseStorage(supabase)
+        }
+    }.build()
+}
+```
+
+See the [Sketch documentation](https://github.com/panpf/sketch/blob/main/docs/getting_started.md#singleton-mode) for more information.
+
+### Display images from Supabase Storage
+
+You can easily create an image request like this:
+
+```kotlin
+val request = ImageRequest(context, authenticatedStorageItem("icons", "profile.png").asSketchUri())
+```
+
+Or if you are using [Sketch Compose](https://github.com/panpf/sketch/blob/main/docs/compose.md):
+
+```kotlin
+AsyncImage(
+    uri = authenticatedStorageItem("icons", "profile.png").asSketchUri(),
+    contentDescription = "profile image"
+)
+```
+
+The Sketch integration will automatically add the Authorization header to the request if the bucket is not public.
+
+{/* Source: ApolloGraphQL/README.md */}
+
+## Installation
+
+Newest version: [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=)](https://github.com/supabase-community/supabase-kt/releases)
+
+```kotlin
+dependencies {
+    implementation("io.github.jan-tennert.supabase:apollo-graphql:VERSION")
+}
+```
+
+Install the plugin in your SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
+
+```kotlin
+val supabase = createSupabaseClient(
+    supabaseUrl = "https://id.supabase.co",
+    supabaseKey = "apikey"
+) {
+    //...
+
+    install(GraphQL) {
+        apolloConfiguration {
+            // settings
+        }
+    }
+
+}
+```
+
+{/* Source: ApolloGraphQL/README.md */}
+
+## Usage
+
+The plugin automatically creates an Apollo Client with the corresponding headers for Authorization depending on your session.
+
+To access the client, you can use the `apolloClient` property of the `GraphQL` plugin instance.
+
+```kotlin
+supabase.graphql.apolloClient.query(YourQuery()).execute().data //execute a query
+```
+
+To learn about how to use Apollo GraphQL, see [Apollo Kotlin](https://github.com/apollographql/apollo-kotlin#getting-started).
+
+{/* Source: ComposeAuth/README.md */}
+
+## Installation
+
+Newest version: [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=)](https://github.com/supabase-community/supabase-kt/releases)
+
+```kotlin
+dependencies {
+    implementation("io.github.jan-tennert.supabase:compose-auth:VERSION")
+}
+```
+
+Install the plugin in your SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
+
+```kotlin
+val supabase = createSupabaseClient(
+    supabaseUrl = "https://id.supabase.co",
+    supabaseKey = "apikey"
+) {
+    //...
+    install(Auth) {
+        //your config
+    }
+    install(ComposeAuth) {
+        googleNativeLogin(serverClientId = "google-client-id")
+        appleNativeLogin()
+    }
+}
+```
+
+{/* Source: ComposeAuth/README.md */}
+
+## Usage
+
+The composable can be accessed trough `composeAuth` property from `supabase`
+
+```kotlin
+val action = supabase.composeAuth.rememberSignInWithGoogle(
+    onResult = { result -> //optional error handling
+        when (result) {
+            is NativeSignInResult.Success -> {}
+            is NativeSignInResult.ClosedByUser -> {}
+            is NativeSignInResult.Error -> {}
+            is NativeSignInResult.NetworkError -> {}
+        }
+    },
+    onIdToken = ComposeAuth.LINK_IDENTITY_CALLBACK, // optional: if you want to link an identity to an existing account rather than signing in
+    fallback = { // optional: override custom fallback handling, not required by default
+
+    }
+)
+
+Button(
+    onClick = { action.startFlow() } //optional: you can also pass in extra data for the user like a name. A nonce is automatically generated, but you can also pass in a custom nonce 
+) {
+    Text("Google Login")
+}
+```
+
+You can also provide a custom `onIdToken` value, if you want to handle the signing-in yourself.
+
+{/* Source: ComposeAuthUI/README.md */}
+
+## Installation
+
+Newest version: [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=)](https://github.com/supabase-community/supabase-kt/releases)
+
+```kotlin
+dependencies {
+    implementation("io.github.jan-tennert.supabase:compose-auth-ui:VERSION")
+}
+```
+
+{/* Source: ComposeAuthUI/README.md */}
+
+## Usage
+
+### PasswordField
+You can set `rules` for the password like this:
+```kotlin
+OutlinedPasswordField(
+    value = password,
+    onValueChange = { password = it },
+    label = { Text("Password") },
+    rules = rememberPasswordRuleList(PasswordRule.minLength(6), PasswordRule.containsSpecialCharacter(), PasswordRule.containsDigit(), PasswordRule.containsLowercase(), PasswordRule.containsUppercase())
+)
+```
+Once set, the field will automatically display an error supporting text if the password doesn't match the criteria.
+Note that the built-in roles also accept a custom description as a parameter.
+You can also easily create your own rules:
+```kotlin
+val myRule = PasswordRule("description") { password ->
+    password.contains("-")
+}
+```
+
+### EmailField
+The email field has a validator parameter which defaults to a regex solution.
+Example:
+```kotlin
+OutlinedEmailField(
+    value = email,
+    onValueChange = { email = it },
+    label = { Text("E-Mail") },
+    validator = EmailValidator { 
+        //validate email
+    }
+)
+```
+
+### Phone Field
+The phone field also has a validator parameter, which just checks whether the phone number only consists of digits.
+On top of that you can provide a `mask` parameter, which changes how the phone number gets displayed. The value is just the raw number.
+Example with the default mask:
+```kotlin
+OutlinedPhoneField(
+    value = phone,
+    onValueChange = { phone = it },
+    label = { Text("Phone") }
+)
+```
+
+![image](https://github.com/supabase-community/supabase-kt/assets/26686035/5405772b-f6f8-45e7-a28d-a55003f48e75)
+
+Example with custom mask: (you can also set it to null, if you don't want a mask)
+```kotlin
+OutlinedPhoneField(
+    value = phone,
+    onValueChange = { phone = it },
+    label = { Text("Phone") },
+    mask = "(###) ###-####"
+)
+```
+
+![image](https://github.com/supabase-community/supabase-kt/assets/26686035/13251358-9147-4f49-8116-9776ec3266b8)
+
+**Note: You can customize the fields completely, they just all have default values. They also have a `mandatory´ option, you can use that to have optional fields. It is also possible to make fields only mandatory (=validation enabled) once the field is not empty. (See example)**
+
+### Provider Button
+This module provides a function to generate the button content independently of the variation:
+```kotlin
+OutlinedButton(
+    onClick = {}, //Login with Google,
+    content = { ProviderButtonContent(Google) }
+)
+Button(
+    onClick = {}, //Login with Twitch,
+    content = { ProviderButtonContent(Twitch) }
+)
+```
+
+![image](https://github.com/supabase-community/supabase-kt/assets/26686035/fb5263e7-272c-4a79-a3c4-1f6755922752)
+
+You can also only use the icon if you want a custom layout:
+```kotlin
+Button(
+    onClick = {},
+) {
+    ProviderIcon(Google)
+    Text("Login with Google")
+}
+```
+
+### Custom Form Components
+You can also easily make your own form components:
+```kotlin
+FormComponent(formKey = "accept_terms", mandatory = true) { valid ->
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Checkbox(
+            checked = valid.value,
+            onCheckedChange = { valid.value = it },
+        )
+        Text("Accept Terms", color = MaterialTheme.colorScheme.onBackground)
+    }
+}
+```
+Mandatory changes whether the `AuthState#validForm` property is affected by this component.

@@ -1,0 +1,138 @@
+---
+title: "Swift"
+description: "A Swift SDK for Supabase. Query your Supabase database, subscribe to realtime events, upload and download files, browse Swift examples, invoke postgres functions via rpc, invoke supabase edge functions, query pgvector."
+repo: "supabase-swift"
+repoUrl: "https://github.com/supabase/supabase-swift"
+stars: 1219
+forks: 242
+language: "Swift"
+isTemplate: false
+tags:
+  - "database"
+  - "ios"
+  - "supabase"
+  - "swift"
+  - "auth"
+  - "storage"
+  - "realtime"
+  - "postgres"
+category: "Auth"
+---
+
+> This page is generated from [supabase-swift](https://github.com/supabase/supabase-swift).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Usage
+
+### Requirements
+- iOS 13.0+ / macOS 10.15+ / tvOS 13+ / watchOS 6+ / visionOS 1+
+- Xcode 15.3+
+- Swift 5.10+
+
+> [!IMPORTANT]
+> Check the [Support Policy](#support-policy) to learn when dropping Xcode, Swift, and platform versions will not be considered a **breaking change**.
+
+### Installation
+Install the library using the Swift Package Manager.
+
+```swift
+let package = Package(
+    ...
+    dependencies: [
+        ...
+        .package(
+            url: "https://github.com/supabase/supabase-swift.git",
+            from: "2.0.0"
+        ),
+    ],
+    targets: [
+        .target(
+            name: "YourTargetName",
+            dependencies: [
+                .product(name: "Supabase", package: "supabase-swift") // Add as a dependency
+            ]
+        )
+    ]
+)
+```
+
+If you're using Xcode, [use this guide](https://developer.apple.com/documentation/swift_packages/adding_package_dependencies_to_your_app) to add `supabase-swift` to your project. Use `https://github.com/supabase-community/supabase-swift.git` for the url when Xcode asks.
+
+If you don't want the full Supabase environment, you can also add individual packages, such as `Functions`, `Auth`, `Realtime`, `Storage`, or `PostgREST`.
+
+Then you're able to import the package and establish the connection with the database.
+
+```swift
+/// Create a single supabase client for interacting with your database
+let client = SupabaseClient(
+    supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
+    supabaseKey: "public-anon-key"
+)
+```
+
+### Initialize with custom options
+
+```swift
+let client = SupabaseClient(
+    supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, 
+    supabaseKey: "public-anon-key",
+    options: SupabaseClientOptions(
+        db: .init(
+            schema: "public"
+        ),
+        auth: .init(
+            storage: MyCustomLocalStorage(),
+            flowType: .pkce
+        ),
+        global: .init(
+            headers: ["x-my-custom-header": "my-app-name"],
+            session: URLSession.myCustomSession
+        )
+    )
+)
+```
+
+Additional examples are available [here](https://github.com/supabase/supabase-swift/tree/main/Examples).
+
+{/* Source: README.md */}
+
+### Installation
+Install the library using the Swift Package Manager.
+
+```swift
+let package = Package(
+    ...
+    dependencies: [
+        ...
+        .package(
+            url: "https://github.com/supabase/supabase-swift.git",
+            from: "2.0.0"
+        ),
+    ],
+    targets: [
+        .target(
+            name: "YourTargetName",
+            dependencies: [
+                .product(name: "Supabase", package: "supabase-swift") // Add as a dependency
+            ]
+        )
+    ]
+)
+```
+
+If you're using Xcode, [use this guide](https://developer.apple.com/documentation/swift_packages/adding_package_dependencies_to_your_app) to add `supabase-swift` to your project. Use `https://github.com/supabase-community/supabase-swift.git` for the url when Xcode asks.
+
+If you don't want the full Supabase environment, you can also add individual packages, such as `Functions`, `Auth`, `Realtime`, `Storage`, or `PostgREST`.
+
+Then you're able to import the package and establish the connection with the database.
+
+```swift
+/// Create a single supabase client for interacting with your database
+let client = SupabaseClient(
+    supabaseURL: URL(string: "https://xyzcompany.supabase.co")!,
+    supabaseKey: "public-anon-key"
+)
+```

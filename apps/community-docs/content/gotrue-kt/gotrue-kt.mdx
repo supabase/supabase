@@ -1,0 +1,97 @@
+---
+title: "Gotrue Kt"
+description: "Kotlin Client for GoTrue API"
+repo: "gotrue-kt"
+repoUrl: "https://github.com/supabase-community/gotrue-kt"
+stars: 20
+forks: 3
+language: "Kotlin"
+isTemplate: false
+tags:
+  - "api"
+  - "client"
+  - "gotrue"
+  - "gradle"
+  - "http"
+  - "jackson"
+  - "kotlin"
+  - "auth"
+category: "Auth"
+---
+
+> This page is generated from [gotrue-kt](https://github.com/supabase-community/gotrue-kt).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Installation
+
+Maven
+
+```xml
+<dependency>
+    <groupId>io.supabase</groupId>
+    <artifactId>gotrue-kt</artifactId>
+    <version>{version}</version>
+    <type>pom</type>
+</dependency>
+```
+
+Gradle
+
+```groovy
+implementation 'io.supabase:gotrue-kt:{version}'
+```
+
+{/* Source: README.md */}
+
+## Usage
+
+```kotlin
+val goTrueClient = GoTrueClient.defaultGoTrueClient(
+    url = "<base-url>",
+    headers = mapOf("Authorization" to "foo", "apiKey" to "bar")
+)
+
+try {
+    goTrueClient.invite("e@ma.il")
+
+    val updatedUser = goTrueClient.updateUser(
+        accessToken = "eyJ...", // read from request header
+        data = mapOf(
+                "admin" = true
+        )
+    )
+
+    println(updatedUser.updatedAt)
+} catch (exc: GoTrueHttpException) {
+    // Exception is thrown on bad status (anything above 300)
+    println("Oops, status: ${exc.status}, body:\n${exc.httpBody}")
+}
+```
+
+You can also customize the DTO for example if you turn off email verification
+
+```kotlin
+data class CustomGoTrueUserResponse(
+    val accessToken: String,
+    val tokenType: String,
+    val refreshToken: String,
+    val user: User
+)
+
+data class User(
+    val id: UUID,
+    val email: String,
+    val phone: String
+
+)
+
+GoTrueClient.customApacheJacksonGoTrueClient<CustomGoTrueUserResponse, GoTrueTokenResponse>(
+    url = "<base-url>",
+    headers = mapOf("Authorization" to "foo", "apiKey" to "bar")
+)
+```
+
+If you are using [supabase](https://supabase.io/), the base URL will be `https://\<your-project-id>.supabase.co/auth/v1`

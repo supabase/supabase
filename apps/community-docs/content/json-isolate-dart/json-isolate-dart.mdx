@@ -1,0 +1,38 @@
+---
+title: "Json Isolate Dart"
+description: "> **Warning** > This repository has been moved to the [supabase-flutter repo](https://github.com/supabase/supabase-flutter/tree/main/packages/yet_another_json_isolate)."
+repo: "json-isolate-dart"
+repoUrl: "https://github.com/supabase-community/json-isolate-dart"
+stars: 0
+forks: 1
+language: "Dart"
+isTemplate: false
+tags:
+  - "flutter"
+  - "json"
+  - "isolate"
+  - "dart"
+category: "Other"
+---
+
+> This page is generated from [json-isolate-dart](https://github.com/supabase-community/json-isolate-dart).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Usage
+
+```dart
+// initialize an `YAJsonIsolate` instance
+final isolate = YAJsonIsolate()..initialize();
+
+// serialize a JSON using an isolate
+final requestBody = await isolate.encode(requestObject);
+
+// deserialize a JSON string using an isolate
+final json = await isolate.decode(responseBody);
+
+// dispose when no longer needed
+isolate.dispose();
+```

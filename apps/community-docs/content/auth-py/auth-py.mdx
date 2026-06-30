@@ -1,0 +1,59 @@
+---
+title: "Auth Py"
+description: "Python client implementation for Supabase Auth"
+repo: "auth-py"
+repoUrl: "https://github.com/supabase/auth-py"
+stars: 117
+forks: 54
+language: "Python"
+isTemplate: false
+tags:
+  - "auth"
+  - "authentication"
+  - "client"
+  - "client-library"
+  - "community"
+  - "gotrue"
+  - "python"
+  - "supabase"
+category: "Auth"
+---
+
+> This page is generated from [auth-py](https://github.com/supabase/auth-py).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Installation
+
+The package can be installed using pip or poetry:
+
+### Poetry
+
+```bash
+poetry add supabase_auth
+```
+
+### Pip
+
+```bash
+pip install supabase_auth
+```
+
+{/* Source: README.md */}
+
+## Usage
+
+The library provides both synchronous and asynchronous clients. Here are some examples:
+
+### Synchronous Client
+
+```python
+from supabase_auth import SyncGoTrueClient
+
+headers = {
+    "apiKey": "my-mega-awesome-api-key",
+    # ... any other headers you might need.
+}
+client: SyncGoTrueClient = SyncGoTrueClient(url="www.genericauthwebsite.com", headers=headers)

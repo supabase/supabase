@@ -1,0 +1,198 @@
+---
+title: "Postgrest Rs"
+description: "Rust client for PostgREST"
+repo: "postgrest-rs"
+repoUrl: "https://github.com/supabase-community/postgrest-rs"
+stars: 475
+forks: 50
+language: "Rust"
+isTemplate: false
+tags:
+  - "auth"
+  - "postgres"
+  - "postgrest"
+category: "Auth"
+---
+
+> This page is generated from [postgrest-rs](https://github.com/supabase-community/postgrest-rs).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Usage
+
+Add this to your `Cargo.toml`:
+
+```toml
+[dependencies]
+postgrest = "1.0"
+```
+
+Simple example:
+
+```rust
+use postgrest::Postgrest;
+
+let client = Postgrest::new("https://your.postgrest.endpoint");
+let resp = client
+    .from("your_table")
+    .select("*")
+    .execute()
+    .await?;
+let body = resp
+    .text()
+    .await?;
+```
+
+Simple example with JWT auth
+
+```rust
+use postgrest::Postgrest;
+
+let client = Postgrest::new("https://your.postgrest.endpoint");
+let resp = client
+    .from("your_table")
+    .auth("VerySensitiveJWTValueAsStringOrStr")
+    .select("*")
+    .execute()
+    .await?;
+let body = resp
+    .text()
+    .await?;
+```
+
+Simplified example using a custom header (e.g. for API gateway authentication with Supabase).
+
+```rust
+use postgrest::Postgrest;
+
+let client = Postgrest::new("https://your.supabase.endpoint/rest/v1")
+    .insert_header("apikey", "ExampleAPIKeyValue"); // EXAMPLE ONLY!
+// Don't actually hard code this value, that's really bad. Use environment
+// variables like with the dotenv(https://crates.io/crates/dotenv) crate to inject
+let resp = client
+    .from("your_table")
+    .select("*")
+    .execute()
+    .await?;
+let body = resp
+    .text()
+    .await?;
+```
+
+**Secure** example with authenticated API gateway using the dotenv crate to correctly retrieve sensitive values.
+
+```rust
+use postgrest::Postgrest;
+use dotenv;
+
+dotenv::dotenv().ok();
+
+let client = Postgrest::new("https://your.supabase.endpoint/rest/v1")
+    .insert_header(
+        "apikey",
+        dotenv::var("SUPABASE_PUBLIC_API_KEY").unwrap())
+let resp = client
+    .from("your_table")
+    .select("*")
+    .execute()
+    .await?;
+let body = resp
+    .text()
+    .await?;
+```
+
+if you have RLS enabled you're required to add an extra header for this libary to  function correctly.
+
+```rust
+use postgrest::Postgrest;
+use dotenv;
+
+dotenv::dotenv().ok();
+
+let client = Postgrest::new("https://your.supabase.endpoint/rest/v1/")
+    .insert_header(
+        "apikey",
+        dotenv::var("SUPABASE_PUBLIC_API_KEY").unwrap())
+    .insert_header("Authorization", format!("Bearer {}", SERVICE_KEY));
+
+let resp = client
+    .from("your_table")
+    .select("*")
+    .execute()
+    .await?;
+let body = resp
+    .text()
+    .await?;
+```
+
+### Building Queries
+
+These examples assume you've already initialized the client.  The methods `.from()` and `.rpc()` initalizes the query builder inside the client.
+
+Using filters:
+
+```rust
+let resp = client
+    .from("your_table")
+    .eq("country", "Germany")
+    .gte("id", "20")
+    .select("*")
+    .execute()
+    .await?;
+```
+
+Updating a table:
+
+```rust
+let resp = client
+    .from("your_table")
+    .eq("username", "soedirgo")
+    .update("{\"organization\": \"supabase\"}")
+    .execute()
+    .await?;
+```
+
+Executing stored procedures:
+
+```rust
+let resp = client
+    .rpc("add", "{\"a\": 1, \"b\": 2}")
+    .execute()
+    .await?;
+```
+
+_Not enough filters_:
+
+```rust
+let resp = client
+    .from("countries")
+    .eq("name", "New Zealand")                        // You can filter for equality...
+    .gt("id", "20")
+    .lt("id", "20")
+    .gte("id", "20")
+    .lte("id", "20")
+    .like("name", "%United%")                         // ...do pattern matching...
+    .ilike("name", "%United%")
+    .is("name", "null")
+    .in_("name", vec!["China", "France"])
+    .neq("name", "China")
+    .fts("phrase", "The Fat Cats", Some("english"))   // ...do full text search...
+    .plfts("phrase", "The Fat Cats", None)
+    .phfts("phrase", "The Fat Cats", Some("english"))
+    .wfts("phrase", "The Fat Cats", None)
+    .cs("countries", "(10,20)")
+    .cd("countries", "(10,20)")
+    .ov("population_range", "(100,500)")
+    .sl("population_range", (100, 500))               // ...and range operations!
+    .sr("population_range", (100, 500))               // Find out more about the filters at:
+    .nxl("population_range", (100, 500))              // https://postgrest.org/en/stable/api.html#operators
+    .nxr("population_range", (100, 500))
+    .adj("population_range", (100, 500))
+    .select("*")
+    .execute()
+    .await?;
+```
+
+Check out the [API docs](https://docs.rs/postgrest) for more info!

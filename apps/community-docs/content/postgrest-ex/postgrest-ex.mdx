@@ -1,0 +1,143 @@
+---
+title: "Postgrest Ex"
+description: "Isomorphic Elixir client for PostgREST"
+repo: "postgrest-ex"
+repoUrl: "https://github.com/supabase-community/postgrest-ex"
+stars: 7
+forks: 1
+language: "Elixir"
+isTemplate: false
+tags:
+  - "elixir"
+  - "postgrest"
+  - "supabase-postgrest"
+  - "auth"
+  - "database"
+  - "postgres"
+  - "functions"
+  - "expo"
+category: "Auth"
+---
+
+> This page is generated from [postgrest-ex](https://github.com/supabase-community/postgrest-ex).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Installation
+
+Add the following dependencies to your `mix.exs` file:
+
+```elixir
+def deps do
+  [
+    {:supabase_potion, "~> 0.7"},
+    {:supabase_postgrest, "~> 1.2.2"} # x-release-please-version
+  ]
+end
+```
+
+Then, run `mix deps.get` to fetch the dependencies.
+
+{/* Source: README.md */}
+
+## Usage
+
+### Initializing the Client
+
+Before using the `Supabase.PostgREST` module, you need to initialize a Supabase client. This client handles the authentication and configuration needed to interact with the Supabase services.
+
+You can initialize the client as can be found on the [Supabase Potion documentation](https://hexdocs.pm/supabase_potion/readme.html#usage)
+
+This client struct is passed to the various `Supabase.PostgREST` functions to perform operations on your Supabase database.
+
+### Basic Operations
+
+Here’s how you can perform common operations using the `Supabase.PostgREST` module.
+
+Note that all operations and filters on `Supabase.PostgREST` are **lazy**, that means that queries, insertions, deletions and updates are only executed when you explicit call `Supabase.PostgREST.execute/1`.
+
+#### Selecting Data
+
+To select records from a table, use the `from/2` and `select/3` functions:
+
+```elixir
+iex> alias Supabase.PostgREST, as: Q
+iex> Q.from(client, "users") |> Q.select("*", returning: true) |> Q.execute()
+iex> {:ok, result} | {:error, %Supabase.PostgREST.Error{}}
+```
+
+You can specify the columns to retrieve instead of using `*`:
+
+```elixir
+iex> Q.select(query, ["id", "name"], returning: true)
+```
+
+#### Inserting Data
+
+To insert new records, use the `insert/3` function:
+
+```elixir
+iex> alias Supabase.PostgREST, as: Q
+iex> Q.from(client, "users") |> Q.insert(%{name: "John Doe", age: 30}, returning: :representation) |> Q.execute()
+iex> {:ok, result} | {:error, %Supabase.PostgREST.Error{}}
+```
+
+#### Updating Data
+
+To update existing records, use the `update/3` function:
+
+```elixir
+iex> alias Supabase.PostgREST, as: Q
+iex> Q.from(client, "users") |> Q.eq("id", 1) |> Q.update(%{name: "John Smith"}, returning: :representation) |> Q.execute()
+iex> {:ok, result} | {:error, %Supabase.PostgREST.Error{}}
+```
+
+#### Deleting Data
+
+To delete records, use the `delete/2` function:
+
+```elixir
+iex> alias Supabase.PostgREST, as: Q
+iex> Q.from(client, "users") |> Q.eq("id", 1) |> Q.delete(query, returning: :representation) |> Q.execute()
+iex> {:ok, result} | {:error, %Supabase.PostgREST.Error{}}
+```
+
+### Filtering Data
+
+You can apply various filters to your queries using functions like `eq/3`, `lt/3`, `gt/3`, etc.
+
+```elixir
+iex> alias Supabase.PostgREST, as: Q
+iex> Q.from(client, "users") |> Q.eq("status", "active") |> Q.select("*", returning: true) |> Q.execute()
+iex> {:ok, result} | {:error, %Supabase.PostgREST.Error{}}
+```
+
+### Advanced Query Building
+
+You can also perform more advanced operations like full-text search, ordering, limiting, and combining filters using logical operators:
+
+```elixir
+iex> alias Supabase.PostgREST, as: Q
+iex> Q.from(client, "users")
+     |> Q.text_search("name", "John", type: :plain)
+     |> Q.order("created_at", asc: true)
+     |> Q.select(["id", "name", "created_at"], returning: true)
+     |> Q.execute()
+iex> {:ok, result} | {:error, %Supabase.PostgREST.Error{}}
+```
+
+### Executing Queries
+
+After constructing a query, you can execute it using the `execute/1` or `execute_to/2` functions. The `execute_to/2` function allows you to map the results directly to a specific schema:
+
+```elixir
+iex> defmodule User, do: defstruct([:id])
+iex> alias Supabase.PostgREST, as: Q
+iex> Q.from(client, "users")
+     |> Q.eq("id", 1)
+     |> Q.select(["id"], returning: true)
+     |> Q.execute_to(User)
+iex> {:ok, %User{} = user} | {:error, %Supabase.PostgREST.Error{}}
+```

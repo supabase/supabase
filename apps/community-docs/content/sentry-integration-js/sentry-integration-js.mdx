@@ -1,0 +1,106 @@
+---
+title: "Sentry Integration Js"
+description: "<br/>"
+repo: "sentry-integration-js"
+repoUrl: "https://github.com/supabase-community/sentry-integration-js"
+stars: 17
+forks: 5
+language: "JavaScript"
+isTemplate: false
+tags:
+  - "database"
+  - "functions"
+  - "nextjs"
+  - "expo"
+  - "sentry"
+  - "integration"
+category: "Auth"
+---
+
+> This page is generated from [sentry-integration-js](https://github.com/supabase-community/sentry-integration-js).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Usage
+
+```js
+import * as Sentry from "@sentry/browser";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { supabaseIntegration } from "@supabase/sentry-js-integration";
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  integrations: [
+    supabaseIntegration(SupabaseClient, Sentry, {
+      tracing: true,
+      breadcrumbs: true,
+      errors: true,
+    }),
+  ],
+});
+```
+
+or
+
+```js
+import * as Sentry from "@sentry/browser";
+import { createClient } from "@supabase/supabase-js";
+import { supabaseIntegration } from "@supabase/sentry-js-integration";
+
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  integrations: [
+    supabaseIntegration(supabaseClient, Sentry, {
+      tracing: true,
+      breadcrumbs: true,
+      errors: true,
+    }),
+  ],
+});
+```
+
+{/* Source: README-v7.md */}
+
+## Usage
+
+```js
+import * as Sentry from "@sentry/browser";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { SupabaseIntegration } from "@supabase/sentry-js-integration";
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  integrations: [
+    new SupabaseIntegration(SupabaseClient, {
+      tracing: true,
+      breadcrumbs: true,
+      errors: true,
+    }),
+  ],
+});
+```
+
+or
+
+```js
+import * as Sentry from "@sentry/browser";
+import { createClient } from "@supabase/supabase-js";
+import { SupabaseIntegration } from "@supabase/sentry-js-integration";
+
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  integrations: [
+    new SupabaseIntegration(supabaseClient, {
+      tracing: true,
+      breadcrumbs: true,
+      errors: true,
+    }),
+  ],
+});
+```

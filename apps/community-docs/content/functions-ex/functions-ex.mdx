@@ -1,0 +1,54 @@
+---
+title: "Functions Ex"
+description: "Elixir library to interact with Supabase Edge Functions"
+repo: "functions-ex"
+repoUrl: "https://github.com/supabase-community/functions-ex"
+stars: 1
+forks: 1
+language: "Elixir"
+isTemplate: false
+tags:
+  - "elixir"
+  - "supabase-functions"
+  - "functions"
+category: "Storage"
+---
+
+> This page is generated from [functions-ex](https://github.com/supabase-community/functions-ex).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Installation
+
+```elixir
+def deps do
+  [
+    {:supabase_potion, "~> 0.6"},
+    {:supabase_functions, "~> 0.1"}
+  ]
+end
+```
+
+{/* Source: README.md */}
+
+## Usage
+
+Given a simple Edge Function that simply echos a raw string:
+
+```ts
+// simple-text/index.ts
+Deno.serve(async (req) => {
+  return new Response("Hello from Deno!", {
+    headers: { "Content-Type": "text/plain" }
+  });
+});
+```
+
+From your Elixir server, after having started your `Supabase.Client` yo ucan inke this function as
+
+```elixir
+client = Supabase.init_client!("SUPABASE_URl", "SUPABASE_KEY")
+
+Supabase.Functions.invoke(client, "simple-text")

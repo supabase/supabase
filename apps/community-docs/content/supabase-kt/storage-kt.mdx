@@ -1,0 +1,59 @@
+---
+title: "Storage Kt"
+description: "A Kotlin Multiplatform Client for Supabase."
+repo: "storage-kt"
+repoUrl: "https://github.com/supabase-community/supabase-kt/tree/master/Storage"
+stars: 796
+forks: 89
+language: "Kotlin"
+isTemplate: false
+tags:
+  - "android"
+  - "auth"
+  - "authentication"
+  - "community"
+  - "compose"
+  - "compose-multiplatform"
+  - "jetpack-compose"
+  - "kotlin"
+category: "Auth"
+---
+
+> This page is generated from [storage-kt](https://github.com/supabase-community/supabase-kt/tree/master/Storage).
+
+## Getting started
+
+{/* Source: Storage/README.md */}
+
+## Installation
+
+Newest version: [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=)](https://github.com/supabase-community/supabase-kt/releases)
+
+```kotlin
+dependencies {
+    implementation("io.github.jan-tennert.supabase:storage-kt:VERSION")
+}
+```
+
+Install the plugin in your SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
+
+```kotlin
+val supabase = createSupabaseClient(
+    supabaseUrl = "https://id.supabase.co",
+    supabaseKey = "apikey"
+) {
+
+    //...
+
+    install(Storage) {
+        // settings
+    }
+
+}
+```
+
+{/* Source: Storage/README.md */}
+
+## Usage
+
+See [Storage documentation](https://supabase.com/docs/reference/kotlin/storage-createbucket) for usage

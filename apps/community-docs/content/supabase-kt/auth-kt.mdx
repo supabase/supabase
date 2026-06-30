@@ -1,0 +1,59 @@
+---
+title: "Auth Kt"
+description: "A Kotlin Multiplatform Client for Supabase."
+repo: "auth-kt"
+repoUrl: "https://github.com/supabase-community/supabase-kt/tree/master/Auth"
+stars: 796
+forks: 89
+language: "Kotlin"
+isTemplate: false
+tags:
+  - "android"
+  - "auth"
+  - "authentication"
+  - "community"
+  - "compose"
+  - "compose-multiplatform"
+  - "jetpack-compose"
+  - "kotlin"
+category: "Auth"
+---
+
+> This page is generated from [auth-kt](https://github.com/supabase-community/supabase-kt/tree/master/Auth).
+
+## Getting started
+
+{/* Source: Auth/README.md */}
+
+## Installation
+
+Newest version: [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=)](https://github.com/supabase-community/supabase-kt/releases)
+
+```kotlin
+dependencies {
+    implementation("io.github.jan-tennert.supabase:auth-kt:VERSION")
+}
+```
+
+Install the plugin in your SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
+
+```kotlin
+val supabase = createSupabaseClient(
+    supabaseUrl = "https://id.supabase.co",
+    supabaseKey = "apikey"
+) {
+
+    //...
+
+    install(Auth) {
+        // settings
+    }
+
+}
+```
+
+{/* Source: Auth/README.md */}
+
+## Usage
+
+See [Auth documentation](https://supabase.com/docs/reference/kotlin/auth-signup) for usage

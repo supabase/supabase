@@ -1,0 +1,89 @@
+---
+title: "Y Supabase"
+description: "A Yjs connection provider that enables real-time collaboration through Supabase Realtime"
+repo: "y-supabase"
+repoUrl: "https://github.com/supabase-community/y-supabase"
+stars: 3
+forks: 1
+language: "TypeScript"
+isTemplate: false
+tags:
+  - "realtime"
+  - "database"
+  - "postgres"
+  - "expo"
+category: "Auth"
+---
+
+> This page is generated from [y-supabase](https://github.com/supabase-community/y-supabase).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Installation
+
+```bash
+npm install @supabase-labs/y-supabase yjs @supabase/supabase-js
+```
+
+{/* Source: README.md */}
+
+### Usage
+
+```typescript
+import * as Y from 'yjs'
+import { createClient } from '@supabase/supabase-js'
+import { SupabasePersistence } from '@supabase-labs/y-supabase'
+
+const doc = new Y.Doc()
+const supabase = createClient('https://your-project.supabase.co', 'your-anon-key')
+
+const persistence = new SupabasePersistence('my-room', doc, supabase)
+
+persistence.on('synced', () => {
+  console.log('Document state loaded from Supabase')
+})
+
+persistence.on('error', (error) => {
+  console.error('Persistence error:', error)
+})
+```
+
+{/* Source: README.md */}
+
+## Usage with Editors
+
+### Monaco
+
+```typescript
+import * as Y from 'yjs'
+import { MonacoBinding } from 'y-monaco'
+import * as monaco from 'monaco-editor'
+import { createClient } from '@supabase/supabase-js'
+import { SupabaseProvider } from '@supabase-labs/y-supabase'
+
+const supabase = createClient('https://...', 'your-key')
+const doc = new Y.Doc()
+const provider = new SupabaseProvider('my-room', doc, supabase, {
+  awareness: true,
+  persistence: true
+})
+provider.getPersistence()?.on('synced', () => console.log('Document state loaded'))
+
+// Set user info for cursor display
+const awareness = provider.getAwareness()!
+awareness.setLocalStateField('user', {
+  name: 'User ' + Math.floor(Math.random() * 100),
+  color: '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')
+})
+
+const ytext = doc.getText('monaco')
+const editor = monaco.editor.create(document.getElementById('editor')!, {
+  value: '',
+  language: 'javascript',
+})
+
+// Pass awareness for cursor/selection sync
+new MonacoBinding(ytext, editor.getModel()!, new Set([editor]), awareness)
+```

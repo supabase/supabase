@@ -1,0 +1,405 @@
+---
+title: "Js"
+description: "An isomorphic Javascript client for Supabase. Query your Supabase database, subscribe to realtime events, upload and download files, browse typescript examples, invoke postgres functions via rpc, invoke supabase edge functions, query pgvector."
+repo: "supabase-js"
+repoUrl: "https://github.com/supabase/supabase-js"
+stars: 4414
+forks: 637
+language: "TypeScript"
+isTemplate: false
+tags:
+  - "client-library"
+  - "database"
+  - "isomorphic"
+  - "javascript"
+  - "js"
+  - "mit-license"
+  - "node-js"
+  - "nuxt"
+category: "Auth"
+---
+
+> This page is generated from [supabase-js](https://github.com/supabase/supabase-js).
+
+## Getting started
+
+{/* Source: README.md */}
+
+### Installation
+
+```bash
+npm install @supabase/supabase-js
+```
+
+Read more in each package's README file.
+
+{/* Source: packages/core/supabase-js/README.md */}
+
+## Usage
+
+First of all, you need to install the library:
+
+```sh
+npm install @supabase/supabase-js
+```
+
+Then you're able to import the library and establish the connection with the database:
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+// Create a single supabase client for interacting with your database
+const supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key')
+```
+
+### UMD
+
+You can use plain `<script>`s to import supabase-js from CDNs, like:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+```
+
+or even:
+
+```html
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+```
+
+Then you can use it from a global `supabase` variable:
+
+```html
+<script>
+  const { createClient } = supabase
+  const _supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key')
+
+  console.log('Supabase Instance: ', _supabase)
+  // ...
+</script>
+```
+
+### ESM
+
+You can use `<script type="module">` to import supabase-js from CDNs, like:
+
+```html
+<script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+  const supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key')
+
+  console.log('Supabase Instance: ', supabase)
+  // ...
+</script>
+```
+
+### Deno
+
+You can use supabase-js in the Deno runtime via [JSR](https://jsr.io/@supabase/supabase-js):
+
+```js
+import { createClient } from 'jsr:@supabase/supabase-js@2'
+```
+
+### Custom `fetch` implementation
+
+`supabase-js` uses the [`cross-fetch`](https://www.npmjs.com/package/cross-fetch) library to make HTTP requests, but an alternative `fetch` implementation can be provided as an option. This is most useful in environments where `cross-fetch` is not compatible, for instance Cloudflare Workers:
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+// Provide a custom `fetch` implementation as an option
+const supabase = createClient('https://xyzcompany.supabase.co', 'your-publishable-key', {
+  global: {
+    fetch: (...args) => fetch(...args),
+  },
+})
+```
+
+{/* Source: packages/core/realtime-js/README.md */}
+
+## Realtime
+
+### Installing the package
+
+```bash
+npm install @supabase/realtime-js
+```
+
+### Creating a channel
+
+```js
+import { RealtimeClient } from '@supabase/realtime-js'
+
+const client = new RealtimeClient(REALTIME_URL, {
+  params: {
+    apikey: API_KEY,
+  },
+})
+
+const channel = client.channel('test-channel', {})
+
+channel.subscribe((status, err) => {
+  if (status === 'SUBSCRIBED') {
+    console.log('Connected!')
+  }
+
+  if (status === 'CHANNEL_ERROR') {
+    console.log(`There was an error subscribing to channel: ${err.message}`)
+  }
+
+  if (status === 'TIMED_OUT') {
+    console.log('Realtime server did not respond in time.')
+  }
+
+  if (status === 'CLOSED') {
+    console.log('Realtime channel was unexpectedly closed.')
+  }
+})
+```
+
+### Notes:
+
+- `REALTIME_URL` is `'ws://localhost:4000/socket'` when developing locally and `'wss://\<project_ref>.supabase.co/realtime/v1'` when connecting to your Supabase project.
+- `API_KEY` is a JWT whose claims must contain `exp` and `role` (existing database role).
+- Channel name can be any `string`.
+- Setting `private` to `true` means that the client will use RLS to determine if the user can connect or not to a given channel.
+
+## Broadcast
+
+Your client can send and receive messages based on the `event`.
+
+```js
+// Setup...
+
+const channel = client.channel('broadcast-test', { broadcast: { ack: false, self: false } })
+
+channel.on('broadcast', { event: 'some-event' }, (payload) => console.log(payload))
+
+channel.subscribe(async (status) => {
+  if (status === 'SUBSCRIBED') {
+    // Send message to other clients listening to 'broadcast-test' channel
+    await channel.send({
+      type: 'broadcast',
+      event: 'some-event',
+      payload: { hello: 'world' },
+    })
+  }
+})
+```
+
+### Notes:
+
+- Setting `ack` to `true` means that the `channel.send` promise will resolve once server replies with acknowledgment that it received the broadcast message request.
+- Setting `self` to `true` means that the client will receive the broadcast message it sent out.
+
+### Broadcast Replay
+
+Broadcast Replay enables **private** channels to access messages that were sent earlier. Only messages published via [Broadcast From the Database](https://supabase.com/docs/guides/realtime/broadcast#trigger-broadcast-messages-from-your-database) are available for replay.
+
+You can configure replay with the following options:
+
+- **`since`** (Required): The epoch timestamp in milliseconds, specifying the earliest point from which messages should be retrieved.
+- **`limit`** (Optional): The number of messages to return. This must be a positive integer, with a maximum value of 25.
+
+Example:
+
+```typescript
+const twelveHours = 12 * 60 * 60 * 1000
+const twelveHoursAgo = Date.now() - twelveHours
+
+const config = { private: true, broadcast: { replay: { since: twelveHoursAgo, limit: 10 } } }
+
+supabase
+  .channel('main:room', { config })
+  .on('broadcast', { event: 'my_event' }, (payload) => {
+    if (payload?.meta?.replayed) {
+      console.log('This message was sent earlier:', payload)
+    } else {
+      console.log('This is a new message', payload)
+    }
+    // ...
+  })
+  .subscribe()
+```
+
+## Presence
+
+Your client can track and sync state that's stored in the channel.
+
+```js
+// Setup...
+
+const channel = client.channel('presence-test', {
+  config: {
+    presence: {
+      key: '',
+    },
+  },
+})
+
+channel.on('presence', { event: 'sync' }, () => {
+  console.log('Online users: ', channel.presenceState())
+})
+
+channel.on('presence', { event: 'join' }, ({ newPresences }) => {
+  console.log('New users have joined: ', newPresences)
+})
+
+channel.on('presence', { event: 'leave' }, ({ leftPresences }) => {
+  console.log('Users have left: ', leftPresences)
+})
+
+channel.subscribe(async (status) => {
+  if (status === 'SUBSCRIBED') {
+    const status = await channel.track({ user_id: 1 })
+    console.log(status)
+  }
+})
+```
+
+## Postgres CDC
+
+Receive database changes on the client.
+
+```js
+// Setup...
+
+const channel = client.channel('db-changes')
+
+channel.on('postgres_changes', { event: '*', schema: 'public' }, (payload) => {
+  console.log('All changes in public schema: ', payload)
+})
+
+channel.on(
+  'postgres_changes',
+  { event: 'INSERT', schema: 'public', table: 'messages' },
+  (payload) => {
+    console.log('All inserts in messages table: ', payload)
+  }
+)
+
+channel.on(
+  'postgres_changes',
+  { event: 'UPDATE', schema: 'public', table: 'users', filter: 'username=eq.Realtime' },
+  (payload) => {
+    console.log('All updates on users table when username is Realtime: ', payload)
+  }
+)
+
+channel.subscribe(async (status) => {
+  if (status === 'SUBSCRIBED') {
+    console.log('Ready to receive database changes!')
+  }
+})
+```
+
+## Get All Channels
+
+You can see all the channels that your client has instantiatied.
+
+```js
+// Setup...
+
+client.getChannels()
+```
+
+## Cleanup
+
+It is highly recommended that you clean up your channels after you're done with them.
+
+- Remove a single channel
+
+```js
+// Setup...
+
+const channel = client.channel('some-channel-to-remove')
+
+channel.unsubscribe()
+client.removeChannel(channel)
+```
+
+- Remove all channels and close the connection
+
+```js
+// Setup...
+
+client.removeAllChannels()
+client.disconnect()
+```
+
+## Development
+
+This package is part of the [Supabase JavaScript monorepo](https://github.com/supabase/supabase-js). To work on this package:
+
+### Building
+
+```bash
+
+{/* Source: packages/core/functions-js/README.md */}
+
+### Installation
+
+```bash
+npm install @supabase/functions-js
+```
+
+{/* Source: packages/core/functions-js/README.md */}
+
+### Usage
+
+```js
+import { FunctionsClient } from '@supabase/functions-js'
+
+const functionsUrl = 'https://<project_ref>.supabase.co/functions/v1'
+const publishableKey = '<publishable_key>'
+
+const functions = new FunctionsClient(functionsUrl, {
+  headers: {
+    Authorization: `Bearer ${publishableKey}`,
+  },
+})
+
+// Invoke a function
+const { data, error } = await functions.invoke('hello-world', {
+  body: { name: 'Functions' },
+})
+```
+
+{/* Source: CONTRIBUTING.md */}
+
+## Contributing
+
+### Prerequisites
+
+- **Node.js** (version 20 or higher)
+- **npm** (comes with Node.js)
+- **Docker** (required for integration tests)
+- **Git**
+
+### Initial Setup
+
+1. **Fork the repository** on GitHub
+2. **Clone your fork** locally:
+
+   ```bash
+   git clone git@github.com:YOUR_USERNAME/supabase-js.git
+   cd supabase-js
+   ```
+
+3. **Install dependencies**:
+
+   ```bash
+   npm install
+   ```
+
+4. **Build all packages**:
+
+   ```bash
+   npx nx run-many --target=build --all
+   ```
+
+5. **Run tests** to ensure everything works:
+
+   ```bash
+   npx nx affected --target=test
+   ```

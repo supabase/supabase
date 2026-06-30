@@ -1,0 +1,97 @@
+---
+title: "Postgrest Csharp"
+description: "A C# Client library for Postgrest"
+repo: "postgrest-csharp"
+repoUrl: "https://github.com/supabase-community/postgrest-csharp"
+stars: 158
+forks: 32
+language: "C#"
+isTemplate: false
+tags:
+  - "csharp"
+  - "postgresql"
+  - "postgrest"
+  - "supabase"
+  - "auth"
+  - "postgres"
+category: "Auth"
+---
+
+> This page is generated from [postgrest-csharp](https://github.com/supabase-community/postgrest-csharp).
+
+## Getting started
+
+{/* Source: README.md */}
+
+Postgrest-csharp is _heavily_ dependent on Models deriving from `BaseModel`. To interact with the API, one must have the
+associated
+model specified.
+
+To use this library on the Supabase Hosted service but separately from the `supabase-csharp`, you'll need to specify
+your url and public key like so:
+
+```c#
+var auth = new Supabase.Gotrue.Client(new ClientOptions<Session>
+{
+    Url = "https://PROJECT_ID.supabase.co/auth/v1",
+    Headers = new Dictionary<string, string>
+    {
+        { "apikey", SUPABASE_PUBLIC_KEY },
+        { "Authorization", $"Bearer {SUPABASE_USER_TOKEN}" }
+    }
+})
+```
+
+Leverage `Table`,`PrimaryKey`, and `Column` attributes to specify names of classes/properties that are different from
+their C# Versions.
+
+```c#
+[Table("messages")]
+public class Message : BaseModel
+{
+    [PrimaryKey("id")]
+    public int Id { get; set; }
+
+    [Column("username")]
+    public string UserName { get; set; }
+
+    [Column("channel_id")]
+    public int ChannelId { get; set; }
+
+    public override bool Equals(object obj)
+    {
+        return obj is Message message &&
+                Id == message.Id;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Id);
+    }
+}
+```
+
+Utilizing the client is then just a matter of instantiating it and specifying the Model one is working with.
+
+```c#
+void Initialize()
+{
+    var client = new Client("http://localhost:3000");
+
+    // Get All Messages
+    var response = await client.Table<Message>().Get();
+    List<Message> models = response.Models;
+
+    // Insert
+    var newMessage = new Message { UserName = "acupofjose", ChannelId = 1 };
+    await client.Table<Message>().Insert();
+
+    // Update
+    var model = response.Models.First();
+    model.UserName = "elrhomariyounes";
+    await model.Update();
+
+    // Delete
+    await response.Models.Last().Delete();
+}
+```

@@ -1,0 +1,63 @@
+---
+title: "Realtime Csharp"
+description: "A C# client library for supabase/realtime."
+repo: "realtime-csharp"
+repoUrl: "https://github.com/supabase-community/realtime-csharp"
+stars: 79
+forks: 19
+language: "C#"
+isTemplate: false
+tags:
+  - "realtime"
+  - "realtime-csharp"
+  - "socket"
+  - "supabase"
+  - "auth"
+  - "database"
+  - "postgres"
+  - "csharp"
+category: "Auth"
+---
+
+> This page is generated from [realtime-csharp](https://github.com/supabase-community/realtime-csharp).
+
+## Getting started
+
+{/* Source: README.md */}
+
+Care was had to make this API as _easy<sup>tm</sup>_ to interact with as possible. `Connect()` and `Subscribe()`
+have `await`-able signatures
+which allow Users to be assured that a connection exists prior to interacting with it.
+
+```c#
+var endpoint = "ws://realtime-dev.localhost:4000/socket";
+client = new Client(endpoint);
+
+await client.ConnectAsync();
+
+// Shorthand for registering a postgres_changes subscription
+var channel = client.Channel("realtime", "public", "todos");
+
+// Listen to Updates
+channel.AddPostgresChangeHandler(ListenType.Updates, (_, change) =>
+{
+    var model = change.Model<Todo>();
+    var oldModel = change.OldModel<Todo>();
+});
+await channel.Subscribe();
+```
+
+Leveraging `Postgrest.BaseModel`s, one ought to be able to coerce SocketResponse Records into their associated models by
+calling:
+
+```c#
+// ...
+var channel = client.Channel("realtime", "public", "users");
+
+channel.AddPostgresChangeHandler(ListenType.Inserts, (_, change) =>
+{
+    var model = change.Model<Todo>();
+});
+
+await channel.Subscribe();
+```

@@ -1,0 +1,50 @@
+---
+title: "Management Js"
+description: "Convenience wrapper for the Supabase Management API: https://supabase.com/docs/reference/api/introduction"
+repo: "supabase-management-js"
+repoUrl: "https://github.com/supabase-community/supabase-management-js"
+stars: 19
+forks: 23
+language: "TypeScript"
+isTemplate: false
+tags:
+  - "auth"
+  - "functions"
+  - "expo"
+  - "management"
+category: "Auth"
+---
+
+> This page is generated from [supabase-management-js](https://github.com/supabase-community/supabase-management-js).
+
+## Getting started
+
+{/* Source: README.md */}
+
+### Installation
+
+To install `supabase-management-js` in a Node.js project:
+
+```sh
+npm install supabase-management-js
+```
+
+`supabase-management-js` requires Node.js 18 and above because it relies on the native `fetch` client.
+
+{/* Source: README.md */}
+
+### Usage
+
+The recommended way to use the SDK is through the `SupabaseManagementAPI` class. It handles authentication automatically, so you only need to pass your access token — retrieved either through [OAuth](https://supabase.com/docs/guides/integrations/oauth-apps/authorize-an-oauth-app) or by generating an API token in your [account](https://supabase.com/dashboard/account/tokens) page — once at construction time. Your API tokens carry the same privileges as your user account, so be sure to keep them secret.
+
+```ts
+import { SupabaseManagementAPI } from "supabase-management-js";
+
+const api = new SupabaseManagementAPI({ accessToken: "<access token>" });
+
+const response = await api.listAllProjects();
+
+if (response.status === 200) {
+  console.log(`Found ${response.data.length} projects`);
+}
+```

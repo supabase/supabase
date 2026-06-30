@@ -1,0 +1,58 @@
+---
+title: "Functions Kt"
+description: "A Kotlin Multiplatform Client for Supabase."
+repo: "functions-kt"
+repoUrl: "https://github.com/supabase-community/supabase-kt/tree/master/Functions"
+stars: 796
+forks: 89
+language: "Kotlin"
+isTemplate: false
+tags:
+  - "android"
+  - "auth"
+  - "authentication"
+  - "community"
+  - "compose"
+  - "compose-multiplatform"
+  - "jetpack-compose"
+  - "kotlin"
+category: "Auth"
+---
+
+> This page is generated from [functions-kt](https://github.com/supabase-community/supabase-kt/tree/master/Functions).
+
+## Getting started
+
+{/* Source: Functions/README.md */}
+
+## Installation
+
+Newest version: [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=)](https://github.com/supabase-community/supabase-kt/releases)
+
+```kotlin
+dependencies {
+    implementation("io.github.jan-tennert.supabase:functions-kt:VERSION")
+}
+```
+
+Install the plugin in your SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
+```kotlin
+val client = createSupabaseClient(
+    supabaseUrl = "https://id.supabase.co",
+    supabaseKey = "apikey"
+) {
+    
+    //...
+    
+    install(Functions) {
+        // settings
+    }
+    
+}
+```
+
+{/* Source: Functions/README.md */}
+
+## Usage
+
+See [Functions documentation](https://supabase.com/docs/reference/kotlin/functions-invoke) for usage

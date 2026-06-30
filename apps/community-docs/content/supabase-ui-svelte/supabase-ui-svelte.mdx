@@ -1,0 +1,53 @@
+---
+title: "Ui Svelte"
+description: "Supabase authentication UI for Svelte"
+repo: "supabase-ui-svelte"
+repoUrl: "https://github.com/supabase-community/supabase-ui-svelte"
+stars: 137
+forks: 25
+language: "Svelte"
+isTemplate: false
+tags:
+  - "auth"
+  - "javascript"
+  - "login"
+  - "magiclink"
+  - "oauth"
+  - "supabase"
+  - "svelte"
+  - "react"
+category: "Auth"
+---
+
+> This page is generated from [supabase-ui-svelte](https://github.com/supabase-community/supabase-ui-svelte).
+
+## Getting started
+
+{/* community-docs: manual body from `https://raw.githubusercontent.com/supabase-community/supabase-ui-svelte/main/README.md` (see `getting-started-content-sources.json`) */}
+
+UI components for Supabase authentication in Svelte, inspired by the [React UI package](https://github.com/supabase/ui). Supports OAuth providers, email/password, magic links, password recovery, and more; see the upstream README for the full feature list.
+
+**Storybook:** [supabase-ui-svelte.vercel.app](https://supabase-ui-svelte.vercel.app/?path=/story/auth-auth--default)
+
+### Setup
+
+Install:
+
+```bash
+yarn add -D supabase-ui-svelte
+```
+
+Create a Supabase client and use the auth UI in a Svelte file (not in this MDX page):
+
+```js
+import Auth from 'supabase-ui-svelte'
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseClient = createClient('<your supabase url>', '<your supabase key>')
+```
+
+```svelte
+<Auth {supabaseClient} />
+```
+
+Props such as `view`, `providers`, `socialButtonSize`, `socialLayout`, and `socialColors` are documented in the [project README](https://github.com/supabase-community/supabase-ui-svelte/blob/main/README.md).

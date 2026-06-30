@@ -1,0 +1,59 @@
+---
+title: "Postgrest Kt"
+description: "A Kotlin Multiplatform Client for Supabase."
+repo: "postgrest-kt"
+repoUrl: "https://github.com/supabase-community/supabase-kt/tree/master/Postgrest"
+stars: 796
+forks: 89
+language: "Kotlin"
+isTemplate: false
+tags:
+  - "android"
+  - "auth"
+  - "authentication"
+  - "community"
+  - "compose"
+  - "compose-multiplatform"
+  - "jetpack-compose"
+  - "kotlin"
+category: "Auth"
+---
+
+> This page is generated from [postgrest-kt](https://github.com/supabase-community/supabase-kt/tree/master/Postgrest).
+
+## Getting started
+
+{/* Source: Postgrest/README.md */}
+
+## Installation
+
+Newest version: [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=)](https://github.com/supabase-community/supabase-kt/releases)
+
+```kotlin
+dependencies {
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:VERSION")
+}
+```
+
+Install the plugin in your SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
+
+```kotlin
+val supabase = createSupabaseClient(
+    supabaseUrl = "https://id.supabase.co",
+    supabaseKey = "apikey"
+) {
+
+    //...
+
+    install(Postgrest) {
+        // settings
+    }
+
+}
+```
+
+{/* Source: Postgrest/README.md */}
+
+## Usage
+
+See [Postgrest documentation](https://supabase.com/docs/reference/kotlin/select) for usage

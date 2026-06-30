@@ -1,0 +1,128 @@
+---
+title: "Kt"
+description: "A Kotlin Multiplatform Client for Supabase."
+repo: "supabase-kt"
+repoUrl: "https://github.com/supabase-community/supabase-kt"
+stars: 796
+forks: 89
+language: "Kotlin"
+isTemplate: false
+tags:
+  - "android"
+  - "auth"
+  - "authentication"
+  - "community"
+  - "compose"
+  - "compose-multiplatform"
+  - "jetpack-compose"
+  - "kotlin"
+category: "Auth"
+---
+
+> This page is generated from [supabase-kt](https://github.com/supabase-community/supabase-kt).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Installation
+
+### Add one or more modules to your project
+
+**Available modules**: `auth-kt`*, `postgrest-kt`, `functions-kt`, 
+`storage-kt`, `realtime-kt`, `apollo-graphql`, `compose-auth`, 
+`compose-auth-ui`, `coil-integration`, `coil3-integration`, `imageloader-integration`
+
+```kotlin
+dependencies {
+    implementation("io.github.jan-tennert.supabase:[module]:VERSION")
+}
+```
+
+\* Before version 3.0.0, the module was called `gotrue-kt`.
+
+If you use multiple modules, you can use the bom dependency to get the correct versions for all
+modules:
+
+```kotlin
+implementation(platform("io.github.jan-tennert.supabase:bom:VERSION"))
+implementation("io.github.jan-tennert.supabase:[module]")
+```
+
+*Note that the minimum Android SDK version is 26. For lower versions, you need to enable [core library desugaring](https://developer.android.com/studio/write/java8-support#library-desugaring).*
+
+### Add a Ktor Client Engine to each of your Kotlin targets
+
+You can find a list of available engines [here](https://ktor.io/docs/http-client-engines.html).
+If you plan to use the Realtime dependency, make sure to check if the engine supports WebSockets. See the [Ktor docs](https://ktor.io/docs/http-client-engines.html#limitations) for more information.
+
+
+```kotlin
+implementation("io.ktor:ktor-client-[engine]:VERSION")
+```
+
+<details>
+<summary>Multiplatform Example</summary>
+
+For targets: `jvm`, `android`, `js`, `ios`
+
+```kotlin
+sourceSets {
+    commonMain {
+        dependencies {
+            //Supabase modules
+        }
+    }
+    jvmMain {
+        dependencies {
+            implementation("io.ktor:ktor-client-cio:KTOR_VERSION")
+        }
+    }
+    androidMain {
+        dependsOn(jvmMain.get())
+    }
+    jsMain {
+        dependencies {
+            implementation("io.ktor:ktor-client-js:KTOR_VERSION")
+        }
+    }
+    iosMain {
+        dependencies {
+            implementation("io.ktor:ktor-client-darwin:KTOR_VERSION")
+        }
+    }
+}
+```
+</details>
+
+**Note:** It is recommended to use the same Ktor version as supabase-kt:
+
+__For 3.0.0 and above:__
+[![Ktor](https://img.shields.io/badge/ktor-3.4.0-blue)](https://ktor.io/)
+
+__For versions below 3.0.0:__
+[![Ktor](https://img.shields.io/badge/ktor-2.3.12-blue)](https://ktor.io/)
+
+## Main Modules
+
+- [Authentication](/Auth)
+- [Database/Postgrest](/Postgrest)
+- [Storage](/Storage)
+- [Realtime](/Realtime)
+- [Functions (Edge Functions)](/Functions)
+
+### Plugins
+
+There are several plugins available to extend the functionality of supabase-kt. They can be installed in the `createSupabaseClient` function.
+
+Some highlights include:
+
+- [Apollo GraphQL integration](https://github.com/supabase-community/supabase-kt-plugins/tree/main/ApolloGraphQL) - Creates an [Apollo GraphQL Client](https://github.com/apollographql/apollo-kotlin) for interacting with the Supabase API.
+- [Compose Auth](https://github.com/supabase-community/supabase-kt-plugins/tree/main/ComposeAuth) - Provides easy Native Google & Apple Auth for Compose Multiplatform targets.
+- [Compose Auth UI](https://github.com/supabase-community/supabase-kt-plugins/tree/main/ComposeAuthUI) - Provides UI Components for Compose Multiplatform.
+- [Coil3 Integration](https://github.com/supabase-community/supabase-kt-plugins/tree/main/Coil3Integration) - Provides a [Coil3](https://github.com/coil-kt/coil) Integration for displaying images stored in Supabase Storage. Supports all Compose Multiplatform targets.
+
+For more information, checkout [supabase-kt-plugins](https://github.com/supabase-community/supabase-kt-plugins).
+
+### Miscellaneous
+- [Supabase Edge Functions Kotlin](https://github.com/manriif/supabase-edge-functions-kt) - Build, serve and deploy Supabase Edge Functions with Kotlin and Gradle.

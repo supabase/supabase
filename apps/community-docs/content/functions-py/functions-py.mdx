@@ -1,0 +1,44 @@
+---
+title: "Functions Py"
+description: "> [!WARNING] > This repository has been moved to the [supabase-py monorepo](https://github.com/supabase/supabase-py/tree/main/src/functions)."
+repo: "functions-py"
+repoUrl: "https://github.com/supabase/functions-py"
+stars: 22
+forks: 9
+language: "Python"
+isTemplate: false
+tags:
+  - "hacktoberfest"
+  - "hacktoberfest2022"
+  - "functions"
+  - "python"
+category: "Edge Functions"
+---
+
+> This page is generated from [functions-py](https://github.com/supabase/functions-py).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Installation
+
+`pip3 install supabase_functions`
+
+{/* Source: README.md */}
+
+## Usage
+
+Deploy your function as per documentation.
+
+
+```python3
+import asyncio
+from supabase_functions import AsyncFunctionsClient
+async def run_func():
+    fc = AsyncFunctionsClient("https://<project_ref>.functions.supabase.co", {})
+    res = await fc.invoke("payment-sheet", {"responseType": "json"})
+
+if __name__ == "__main__":
+    asyncio.run(run_func())
+```

@@ -1,0 +1,121 @@
+---
+title: "Postgres Language Server"
+description: "A Language Server for Postgres"
+repo: "postgres-language-server"
+repoUrl: "https://github.com/supabase-community/postgres-language-server"
+stars: 5223
+forks: 114
+language: "Rust"
+isTemplate: false
+tags:
+  - "language-server-protocol"
+  - "postgres"
+  - "auth"
+  - "storage"
+  - "realtime"
+  - "database"
+  - "functions"
+  - "swift"
+category: "Auth"
+---
+
+> This page is generated from [postgres-language-server](https://github.com/supabase-community/postgres-language-server).
+
+## Getting started
+
+{/* Source: docs/getting_started.md */}
+
+The Postgres Language Server can be installed as a development dependency of your project, a standalone executable, or as an extension of your favorite editor.
+
+Install via your package manager if you use one:
+
+```sh
+pnpm add -D -E @postgres-language-server/cli
+```
+
+Alternatively, most [editor integrations](guides/ide_setup.md) will manage the installation for you, or you can install it as a [standalone executable](manual_installation.md).
+
+## Configuration
+
+We recommend creating a `postgres-language-server.jsonc` configuration file for each project. This eliminates repetitive CLI options and ensures that consistent configuration in your editor. Some options are only available from a configuration file. This step is optional though: if you are happy with the defaults, you don’t need a configuration file. To create the `postgres-language-server.jsonc` file, run the `init` command in the root folder of your project:
+
+```sh
+postgres-language-server init
+```
+
+You’ll now have a `postgres-language-server.jsonc` file in your directory:
+
+[//]: # "BEGIN DEFAULT_CONFIGURATION"
+
+```json
+{
+  "$schema": "https://pg-language-server.com/latest/schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false
+  },
+  "files": {
+    "ignore": []
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true
+    }
+  },
+  "db": {
+    "host": "127.0.0.1",
+    "port": 5432,
+    "username": "postgres",
+    "password": "postgres",
+    "database": "postgres",
+    "connTimeoutSecs": 10,
+    "allowStatementExecutionsAgainst": ["127.0.0.1/*", "localhost/*"]
+  }
+}
+```
+
+[//]: # "END DEFAULT_CONFIGURATION"
+
+Make sure to edit the database connection settings to connect to your local development database. To see all options, run `postgres-language-server --help`.
+
+You can use your current `postgres-language-server` version instead of "latest" in the `$schema` URL, e.g. `https://pg-language-server.com/0.0.0/schema.json`.
+
+## Usage
+
+Lets get a quick overview of how to use the Postgres Language Server in your project.
+
+### Command-line interface
+
+The CLI exposes a `check` command that will run all checks on the given files or paths.
+
+```sh
+
+{/* Source: docs/getting_started.md */}
+
+## Usage
+
+Lets get a quick overview of how to use the Postgres Language Server in your project.
+
+### Command-line interface
+
+The CLI exposes a `check` command that will run all checks on the given files or paths.
+
+```sh
+
+{/* Source: docs/guides/ide_setup.md */}
+
+### Installation via Mason (Recommended)
+
+The easiest way to install the language server is via [Mason](https://github.com/williamboman/mason.nvim):
+
+```vim
+:MasonInstall postgres-language-server
+```
+
+Then configure `nvim-lspconfig` to use it:
+
+```lua
+require('lspconfig').postgres_lsp.setup{}
+```

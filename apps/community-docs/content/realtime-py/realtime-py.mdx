@@ -1,0 +1,73 @@
+---
+title: "Realtime Py"
+description: "A Python Client for Phoenix Channels"
+repo: "realtime-py"
+repoUrl: "https://github.com/supabase/realtime-py"
+stars: 164
+forks: 61
+language: "Python"
+isTemplate: false
+tags:
+  - "community"
+  - "python"
+  - "realtime"
+  - "supabase"
+  - "database"
+  - "postgres"
+category: "Auth"
+---
+
+> This page is generated from [realtime-py](https://github.com/supabase/realtime-py).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Usage
+
+### Installing the package
+
+```bash
+pip3 install realtime
+```
+
+### Creating a channel
+
+```python
+import asyncio
+from typing import Optional
+
+from realtime import AsyncRealtimeClient, RealtimeSubscribeStates
+
+
+async def main():
+    REALTIME_URL = "ws://localhost:4000/websocket"
+    API_KEY = "1234567890"
+
+    socket = AsyncRealtimeClient(REALTIME_URL, API_KEY)
+    channel = socket.channel("test-channel")
+
+    def _on_subscribe(status: RealtimeSubscribeStates, err: Optional[Exception]):
+        if status == RealtimeSubscribeStates.SUBSCRIBED:
+            print("Connected!")
+        elif status == RealtimeSubscribeStates.CHANNEL_ERROR:
+            print(f"There was an error subscribing to channel: {err.args}")
+        elif status == RealtimeSubscribeStates.TIMED_OUT:
+            print("Realtime server did not respond in time.")
+        elif status == RealtimeSubscribeStates.CLOSED:
+            print("Realtime channel was unexpectedly closed.")
+
+    await channel.subscribe(_on_subscribe)
+```
+
+### Notes:
+
+- `REALTIME_URL` is `ws://localhost:4000/socket` when developing locally and `wss://\<project_ref>.supabase.co/realtime/v1` when connecting to your Supabase project.
+- `API_KEY` is a JWT whose claims must contain `exp` and `role` (existing database role).
+- Channel name can be any `string`.
+
+### Broadcast
+
+Your client can send and receive messages based on the `event`.
+
+```python

@@ -1,0 +1,215 @@
+---
+title: "Mcp"
+description: "Connect Supabase to your AI assistants"
+repo: "supabase-mcp"
+repoUrl: "https://github.com/supabase-community/supabase-mcp"
+stars: 2645
+forks: 342
+language: "TypeScript"
+isTemplate: false
+tags:
+  - "auth"
+  - "storage"
+  - "realtime"
+  - "database"
+  - "postgres"
+  - "functions"
+  - "edge-functions"
+  - "expo"
+category: "Auth"
+---
+
+> This page is generated from [supabase-mcp](https://github.com/supabase-community/supabase-mcp).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Usage with AI SDK's MCP Client
+
+The `@supabase/mcp-server-supabase` package exports `createToolSchemas()` to populate input and output schemas for Vercel AI SDK's [MCP client](https://ai-sdk.dev/docs/ai-sdk-core/mcp-tools). This allows Supabase MCP tools to be treated as static tools with client-side validation and inferred TypeScript types for their inputs and outputs.
+
+```ts
+import { createToolSchemas } from '@supabase/mcp-server-supabase';
+import { createMCPClient } from '@ai-sdk/mcp';
+import { streamText } from 'ai';
+
+const mcpClient = await createMCPClient({
+  transport: {
+    type: 'http',
+    url: 'https://mcp.supabase.com/mcp',
+  },
+});
+
+const tools = await mcpClient.tools({
+  schemas: createToolSchemas(),
+});
+
+const result = streamText({ model, tools, prompt: '...' });
+
+for (const step of await result.steps) {
+  for (const toolResult of step.staticToolResults) {
+    if (toolResult.toolName === 'get_project_url') {
+      toolResult.input;  // { project_id: string }
+      toolResult.output; // { url: string }
+    }
+  }
+}
+```
+
+`createToolSchemas()` accepts similar filtering options as the MCP server's URL parameters:
+
+- `features`: Restrict to specific [feature groups](#feature-groups) (e.g. `['database', 'docs']`). Defaults to all default feature groups.
+- `projectScoped`: When `true`, omits `project_id` from tool input schemas and excludes account-level tools — use when connecting to a server configured with `project_ref`. Defaults to `false`.
+- `readOnly`: When `true`, excludes mutating tools — use when connecting to a server configured with `read_only=true`. Defaults to `false`.
+
+```ts
+const mcpClient = await createMCPClient({
+  transport: {
+    type: 'http',
+    url: 'https://mcp.supabase.com/mcp?project_ref=<project-ref>&read_only=true&features=database,docs',
+  },
+});
+
+const tools = await mcpClient.tools({
+  schemas: createToolSchemas({
+    features: ['database', 'docs'],
+    projectScoped: true,
+    readOnly: true,
+  }),
+});
+```
+
+> [!NOTE]
+> This server does not send `structuredContent` in MCP tool results. AI SDK falls back to parsing JSON from `content` text.
+
+For more information, see [Schema Definition](https://ai-sdk.dev/docs/ai-sdk-core/mcp-tools#schema-definition) and [Typed Tool Outputs](https://ai-sdk.dev/docs/ai-sdk-core/mcp-tools#typed-tool-outputs) in the AI SDK docs.
+
+{/* Source: packages/mcp-server-postgrest/README.md */}
+
+## Usage
+
+### With Claude Desktop
+
+[Claude Desktop](https://claude.ai/download) is a popular LLM client that supports the Model Context Protocol. You can connect your PostgREST server to Claude Desktop to query your database via natural language commands.
+
+You can add MCP servers to Claude Desktop via its config file at:
+
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+
+- Windows:`%APPDATA%\Claude\claude_desktop_config.json`
+
+To add your Supabase project _(or any PostgREST server)_ to Claude Desktop, add the following configuration to the `mcpServers` object in the config file:
+
+```json
+{
+  "mcpServers": {
+    "todos": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-postgrest@latest",
+        "--apiUrl",
+        "https://your-project-ref.supabase.co/rest/v1",
+        "--apiKey",
+        "your-anon-key",
+        "--schema",
+        "public"
+      ]
+    }
+  }
+}
+```
+
+#### Configuration
+
+- `apiUrl`: The base URL of your PostgREST endpoint
+
+- `apiKey`: Your API key for authentication _(optional)_
+
+- `schema`: The Postgres schema to serve the API from (eg. `public`). Note any non-public schemas must be manually exposed from PostgREST.
+
+### Programmatically (custom MCP client)
+
+If you're building your own MCP client, you can connect to a PostgREST server programmatically using your preferred transport. The [MCP SDK](https://github.com/modelcontextprotocol/typescript-sdk) offers built-in [stdio](https://modelcontextprotocol.io/docs/concepts/transports#standard-input-output-stdio) and [SSE](https://modelcontextprotocol.io/docs/concepts/transports#server-sent-events-sse) transports. We also offer a [`StreamTransport`](../mcp-utils#streamtransport) if you wish to directly connect to MCP servers in-memory or by piping over your own stream-based transport.
+
+#### Installation
+
+```bash
+npm i @supabase/mcp-server-postgrest
+```
+
+```bash
+yarn add @supabase/mcp-server-postgrest
+```
+
+```bash
+pnpm add @supabase/mcp-server-postgrest
+```
+
+#### Example
+
+The following example uses the [`StreamTransport`](../mcp-utils#streamtransport) to connect directly between an MCP client and server.
+
+```ts
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StreamTransport } from '@supabase/mcp-utils';
+import { createPostgrestMcpServer } from '@supabase/mcp-server-postgrest';
+
+// Create a stream transport for both client and server
+const clientTransport = new StreamTransport();
+const serverTransport = new StreamTransport();
+
+// Connect the streams together
+clientTransport.readable.pipeTo(serverTransport.writable);
+serverTransport.readable.pipeTo(clientTransport.writable);
+
+const client = new Client(
+  {
+    name: 'MyClient',
+    version: '0.1.0',
+  },
+  {
+    capabilities: {},
+  }
+);
+
+const supabaseUrl = 'https://your-project-ref.supabase.co'; // http://127.0.0.1:54321 for local
+const apiKey = 'your-anon-key'; // or service role, or user JWT
+const schema = 'public'; // or any other exposed schema
+
+const server = createPostgrestMcpServer({
+  apiUrl: `${supabaseUrl}/rest/v1`,
+  apiKey,
+  schema,
+});
+
+// Connect the client and server to their respective transports
+await server.connect(serverTransport);
+await client.connect(clientTransport);
+
+// Call tools, etc
+const output = await client.callTool({
+  name: 'postgrestRequest',
+  arguments: {
+    method: 'GET',
+    path: '/todos',
+  },
+});
+```
+
+{/* Source: packages/mcp-utils/README.md */}
+
+## Installation
+
+```shell
+npm i @supabase/mcp-utils
+```
+
+```shell
+yarn add @supabase/mcp-utils
+```
+
+```shell
+pnpm add @supabase/mcp-utils
+```

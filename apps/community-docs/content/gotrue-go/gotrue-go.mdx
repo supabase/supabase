@@ -1,0 +1,58 @@
+---
+title: "Gotrue Go"
+description: "Typed Golang cilent for the Supabase fork of GoTrue"
+repo: "gotrue-go"
+repoUrl: "https://github.com/supabase-community/gotrue-go"
+stars: 29
+forks: 6
+language: "Go"
+isTemplate: false
+tags:
+  - "auth"
+  - "client"
+  - "go"
+  - "golang"
+  - "gotrue"
+  - "supabase"
+  - "supabase-auth"
+  - "postgres"
+category: "Auth"
+---
+
+> This page is generated from [gotrue-go](https://github.com/supabase-community/gotrue-go).
+
+## Getting started
+
+{/* Source: README.md */}
+
+### Usage
+
+```go
+package main
+
+import "github.com/supabase-community/gotrue-go"
+
+const (
+    projectReference = "<your_supabase_project_reference>"
+    apiKey = "<your_supabase_anon_key>"
+)
+
+func main() {
+    // Initialise client
+    client := gotrue.New(
+        projectReference,
+        apiKey,
+    )
+
+    // Log in a user (get access and refresh tokens)
+    resp, err := client.Token(gotrue.TokenRequest{
+        GrantType: "password",
+        Email: "<user_email>",
+        Password: "<user_password>",
+    })
+    if err != nil {
+        log.Fatal(err.Error())
+    }
+    log.Printf("%+v", resp)
+}
+```

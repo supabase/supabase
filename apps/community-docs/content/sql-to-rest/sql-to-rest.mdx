@@ -1,0 +1,184 @@
+---
+title: "Sql To Rest"
+description: "SQL to PostgREST translator"
+repo: "sql-to-rest"
+repoUrl: "https://github.com/supabase-community/sql-to-rest"
+stars: 47
+forks: 3
+language: "TypeScript"
+isTemplate: false
+tags:
+  - "auth"
+  - "database"
+  - "postgres"
+  - "functions"
+  - "flutter"
+  - "swift"
+  - "sql"
+  - "rest"
+category: "Auth"
+---
+
+> This page is generated from [sql-to-rest](https://github.com/supabase-community/sql-to-rest).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Usage
+
+_Note: This library is pre-1.0, so expect slight API changes over time._
+
+```js
+import { processSql, renderHttp, formatCurl } from '@supabase/sql-to-rest'
+
+// Process SQL into intermediate PostgREST AST
+const statement = await processSql(`
+  select
+    *
+  from
+    books
+`)
+
+// Render the AST into an HTTP request
+const httpRequest = await renderHttp(statement)
+
+// Format the HTTP request as a cURL command (requires base URL)
+const curlCommand = formatCurl('http://localhost:54321/rest/v1', httpRequest)
+
+console.log(curlCommand)
+// curl http://localhost:54321/rest/v1/books
+
+// Or use it directly
+const response = await fetch(`http://localhost:54321/rest/v1${httpRequest.fullPath}`, {
+  method: httpRequest.method,
+})
+```
+
+### `processSql()`
+
+Takes a SQL string and converts it into a PostgREST abstract syntax tree (AST) called a `Statement`. This is an intermediate object that can later be rendered to your language/protocol of choice.
+
+```js
+import { processSql } from '@supabase/sql-to-rest'
+
+const statement = await processSql(`
+  select
+    *
+  from
+    books
+`)
+```
+
+Outputs a `Promise<Statement>`:
+
+```js
+{
+  type: 'select',
+  from: 'books',
+  targets: [
+    {
+      type: 'column-target',
+      column: '*',
+      alias: undefined,
+    },
+  ],
+  filter: undefined,
+  sorts: [],
+  limit: undefined
+}
+```
+
+### `renderHttp()`
+
+Takes the intermediate `Statement` and renders it as an HTTP request.
+
+```js
+import { processSql, renderHttp } from '@supabase/sql-to-rest'
+
+const statement = await processSql(`
+  select
+    *
+  from
+    books
+`)
+
+const httpRequest = await renderHttp(statement)
+```
+
+Outputs a `Promise<HttpRequest>`:
+
+```js
+{
+  method: 'GET',
+  path: '/books',
+  params: URLSearchParams {},
+  fullPath: [Getter] // combines path with the query params
+}
+```
+
+An `HttpRequest` can also be formatted as a `cURL` command or as raw HTTP.
+
+#### cURL command
+
+```js
+import {
+  // ...
+  formatCurl,
+} from '@supabase/sql-to-rest'
+
+// ...
+
+const curlCommand = formatCurl('http://localhost:54321/rest/v1', httpRequest)
+```
+
+Outputs:
+
+```shell
+curl http://localhost:54321/rest/v1/books
+```
+
+#### Raw HTTP
+
+```js
+import {
+  // ...
+  formatHttp,
+} from '@supabase/sql-to-rest'
+
+// ...
+
+const rawHttp = formatHttp('http://localhost:54321/rest/v1', httpRequest)
+```
+
+Outputs:
+
+```http
+GET /rest/v1/books HTTP/1.1
+Host: localhost:54321
+```
+
+### `renderSupabaseJs()`
+
+Takes the intermediate `Statement` and renders it as [`supabase-js`](https://github.com/supabase/supabase-js) client code.
+
+```js
+import { processSql, renderSupabaseJs } from '@supabase/sql-to-rest'
+
+const statement = await processSql(`
+  select
+    *
+  from
+    books
+`)
+
+const { code } = await renderSupabaseJs(statement)
+```
+
+Outputs a `Promise<SupabaseJsQuery>`, where `code` contains:
+
+```js
+const { data, error } = await supabase.from('books').select()
+```
+
+The rendered JS code is automatically formatted using `prettier`.

@@ -1,0 +1,42 @@
+---
+title: "Adminpack"
+description: "A Trusted Language Extension containing a variety of useful databse admin queries."
+repo: "supabase-adminpack"
+repoUrl: "https://github.com/supabase-community/supabase-adminpack"
+stars: 10
+forks: 2
+isTemplate: false
+tags:
+  - "storage"
+  - "database"
+  - "postgres"
+  - "functions"
+  - "adminpack"
+category: "Auth"
+---
+
+> This page is generated from [supabase-adminpack](https://github.com/supabase-community/supabase-adminpack).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Installation
+
+Using dbdev:
+
+```
+postgres=> select dbdev.install('michelp-adminpack');
+ install
+---------
+ t
+(1 row)
+
+postgres=> create schema adminpack;
+CREATE SCHEMA
+postgres=> create extension "michelp-adminpack" with schema adminpack;
+CREATE EXTENSION
+```
+
+This will the extension into the `adminpack` schema, substitute with
+some other schema if you want it to go somewhere else.

@@ -1,0 +1,54 @@
+---
+title: "Gotrue Csharp"
+description: "C# implementation of Supabase's GoTrue"
+repo: "gotrue-csharp"
+repoUrl: "https://github.com/supabase-community/gotrue-csharp"
+stars: 48
+forks: 39
+language: "C#"
+isTemplate: false
+tags:
+  - "gotrue"
+  - "netstandard20"
+  - "supabase"
+  - "xamarin"
+  - "auth"
+  - "functions"
+  - "svelte"
+  - "expo"
+category: "Auth"
+---
+
+> This page is generated from [gotrue-csharp](https://github.com/supabase-community/gotrue-csharp).
+
+## Getting started
+
+{/* Source: README.md */}
+
+## Getting Started
+
+To use this library on the Supabase Hosted service but separately from the `supabase-csharp`, you'll need to specify
+your url and public key like so:
+
+```c#
+var auth = new Supabase.Gotrue.Client(new ClientOptions<Session>
+{
+    Url = "https://PROJECT_ID.supabase.co/auth/v1",
+    Headers = new Dictionary<string, string>
+    {
+        { "apikey", SUPABASE_PUBLIC_KEY }
+    }
+})
+```
+
+Otherwise, using it this library with a local instance:
+
+```c#
+var options = new ClientOptions { Url = "https://example.com/api" };
+var client = new Client(options);
+var user = await client.SignUp("new-user@example.com");
+
+// Alternatively, you can use a StatelessClient and do API interactions that way
+var options = new StatelessClientOptions { Url = "https://example.com/api" }
+await new StatelessClient().SignUp("new-user@example.com", options);
+```

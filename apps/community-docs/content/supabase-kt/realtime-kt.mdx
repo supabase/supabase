@@ -1,0 +1,59 @@
+---
+title: "Realtime Kt"
+description: "A Kotlin Multiplatform Client for Supabase."
+repo: "realtime-kt"
+repoUrl: "https://github.com/supabase-community/supabase-kt/tree/master/Realtime"
+stars: 796
+forks: 89
+language: "Kotlin"
+isTemplate: false
+tags:
+  - "android"
+  - "auth"
+  - "authentication"
+  - "community"
+  - "compose"
+  - "compose-multiplatform"
+  - "jetpack-compose"
+  - "kotlin"
+category: "Auth"
+---
+
+> This page is generated from [realtime-kt](https://github.com/supabase-community/supabase-kt/tree/master/Realtime).
+
+## Getting started
+
+{/* Source: Realtime/README.md */}
+
+## Installation
+
+Newest version: [![](https://img.shields.io/github/release/supabase-community/supabase-kt?label=)](https://github.com/supabase-community/supabase-kt/releases)
+
+```kotlin
+dependencies {
+    implementation("io.github.jan-tennert.supabase:realtime-kt:VERSION")
+}
+```
+
+Install the plugin in your SupabaseClient. See the [documentation](https://supabase.com/docs/reference/kotlin/initializing) for more information
+
+```kotlin
+val supabase = createSupabaseClient(
+    supabaseUrl = "https://id.supabase.co",
+    supabaseKey = "apikey"
+) {
+
+    //...
+
+    install(Realtime) {
+        // settings
+    }
+
+}
+```
+
+{/* Source: Realtime/README.md */}
+
+## Usage
+
+See [Realtime documentation](https://supabase.com/docs/reference/kotlin/subscribe) for usage

@@ -1,0 +1,135 @@
+---
+title: "Seed"
+description: "Automatically seed your database with production-like dummy data based on your schema for local development and testing."
+repo: "seed"
+repoUrl: "https://github.com/supabase-community/seed"
+stars: 777
+forks: 36
+language: "TypeScript"
+isTemplate: false
+tags:
+  - "auth"
+  - "database"
+  - "postgres"
+  - "functions"
+  - "expo"
+  - "seed"
+category: "Auth"
+---
+
+> This page is generated from [seed](https://github.com/supabase-community/seed).
+
+## Getting started
+
+{/* Source: README.md */}
+
+### Installation
+
+```bash
+cd docs
+pnpm install
+```
+
+{/* Source: docs/README.md */}
+
+### Installation
+
+```bash
+cd docs
+pnpm install
+```
+
+{/* Source: docs/pages/seed/getting-started/installation.mdx */}
+
+## Installation
+
+![Snappy installing Seed](/seed/getting-started/installation/docs-image-installation.svg)
+
+## Automatic Installation - Setup Wizard
+
+Run the following command in your terminal to start our handy install wizard:
+
+```bash >_&nbsp;terminal
+npx @snaplet/seed init
+```
+
+It will guide you through the installation process and help you set up your project. 
+
+Once you've completed installation, run your Seed script with the following command:
+
+```bash >_&nbsp;terminal
+npx tsx seed.ts
+```
+
+## Manual Installation
+
+If you prefer to do things manually, you can follow these steps.
+
+### 1. Install the required dev dependencies
+
+```bash >_&nbsp;terminal
+npm install -D @snaplet/seed @snaplet/copycat
+```
+
+### 2. Configure Seed
+
+Seed is configured using the `seed.config.ts` file.
+
+Your need to specify an [adapter](../reference/adapters.mdx) in order for Seed to connect to your database.
+
+For this example, we assume you are using PostgreSQL as your database and want to connect to it with the [Postgres.js](../reference/adapters.mdx#postgresjs) adapter:
+
+```ts seed.config.ts
+import { SeedPostgres } from "@snaplet/seed/adapter-postgres";
+import { defineConfig } from "@snaplet/seed/config";
+import postgres from "postgres";
+
+export default defineConfig({
+  adapter: () => {
+    const client = postgres(process.env.DATABASE_URL);
+    return new SeedPostgres(client);
+  },
+});
+```
+
+### 3. Generate your Seed Client
+
+Now that you have configured Seed, you can generate your Seed Client by running the following command:
+
+```bash >_&nbsp;terminal
+npx @snaplet/seed sync
+```
+
+This command will introspect your database schema and generate the necessary files for your Seed Client.
+
+### 4. Create and execute your first Seed script
+
+Create a new `seed.ts` file.
+
+We assume that you have a table called `users` in your database.
+
+```ts seed.ts
+import { createSeedClient } from "@snaplet/seed";
+
+const seed = await createSeedClient();
+
+// Truncate all tables in the database
+await seed.$resetDatabase();
+
+// Seed the database with 10 users
+await seed.users((x) => x(10));
+
+process.exit();
+```
+
+<Callout type="warning" emoji="⚠️">
+  Executing this script will delete all data in your database and seed it with 10 users. Make sure to adjust the script to your needs.
+</Callout>
+
+You can now execute your Seed script by running the following command:
+
+```bash >_&nbsp;terminal
+npx tsx seed.ts
+```
+
+Happy seeding! 🌱
