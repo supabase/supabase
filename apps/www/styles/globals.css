@@ -265,11 +265,6 @@ h6:not(.overwrite) {
   @apply text-foreground-lighter text-xs;
 }
 
-.sbui-border-fix select {
-  @apply border-solid;
-  border-width: 1px;
-}
-
 .section--masked {
   /* overflow: hidden; */
 }
@@ -313,20 +308,6 @@ h6:not(.overwrite) {
   @apply border border-strong;
 }
 
-.sbui-tabs--alt div[role='tablist'] .sbui-btn-primary {
-  @apply bg-border-stronger text-white;
-  text-shadow: none;
-  font-weight: 400;
-}
-.sbui-tabs--alt div[role='tablist'] .sbui-btn-text {
-  @apply text-border-muted;
-  font-weight: 400;
-  shadow: none;
-}
-
-.sbui-tabs--underline-alt div[role='tablist'] .sbui-tab-button-underline--active {
-  @apply border-foreground-muted;
-}
 /* override position of tabs  */
 .dashboard-tabs > div > div {
   justify-content: center;
@@ -349,14 +330,6 @@ h6:not(.overwrite) {
 table {
   margin-top: 1em;
   border-collapse: collapse;
-}
-
-.sbui-typography-container thead {
-  @apply text-border;
-}
-
-.sbui-typography a {
-  @apply wrap-break-word;
 }
 
 /*
