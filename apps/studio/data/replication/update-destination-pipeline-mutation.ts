@@ -28,6 +28,11 @@ export type UpdateDestinationPipelineParams = {
   }
 }
 
+type UpdateDestinationPipelineBody =
+  components['schemas']['UpdateReplicationDestinationPipelineBody']
+type UpdateDestinationConfig = UpdateDestinationPipelineBody['destination_config']
+type UpdatePipelineConfig = UpdateDestinationPipelineBody['pipeline_config']
+
 async function updateDestinationPipeline(
   {
     destinationId: destinationId,
@@ -49,7 +54,7 @@ async function updateDestinationPipeline(
   if (!projectRef) throw new Error('projectRef is required')
 
   // Build destination_config based on the type
-  let destination_config: components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
+  let destination_config: UpdateDestinationConfig
 
   if ('bigQuery' in destinationConfig) {
     const { projectId, datasetId, serviceAccountKey, connectionPoolSize, maxStalenessMins } =
@@ -62,7 +67,7 @@ async function updateDestinationPipeline(
         connection_pool_size: connectionPoolSize,
         max_staleness_mins: maxStalenessMins,
       },
-    } as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
+    } as UpdateDestinationConfig
   } else if ('iceberg' in destinationConfig) {
     const {
       projectRef: icebergProjectRef,
@@ -85,11 +90,11 @@ async function updateDestinationPipeline(
           s3_region: s3Region,
         },
       },
-    } as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
+    } as UpdateDestinationConfig
   } else if ('ducklake' in destinationConfig) {
     destination_config = buildDucklakeApiConfig(destinationConfig.ducklake, {
       omitBlankSecrets: true,
-    }) as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
+    }) as UpdateDestinationConfig
   } else if ('snowflake' in destinationConfig) {
     const { accountId, user, privateKey, privateKeyPassphrase, database, schema, role } =
       destinationConfig.snowflake
@@ -103,7 +108,7 @@ async function updateDestinationPipeline(
         schema,
         role,
       },
-    } as unknown as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
+    } as unknown as UpdateDestinationConfig
   } else {
     throw new Error(
       'Invalid destination config: must specify bigQuery, iceberg, ducklake, or snowflake'
@@ -126,8 +131,7 @@ async function updateDestinationPipeline(
         destination_config,
         source_id: sourceId,
         destination_name: destinationName,
-        pipeline_config:
-          pipeline_config as components['schemas']['UpdateReplicationDestinationPipelineBody']['pipeline_config'],
+        pipeline_config: pipeline_config as UpdatePipelineConfig,
       },
       signal,
     }
