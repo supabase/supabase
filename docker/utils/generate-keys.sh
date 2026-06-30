@@ -62,6 +62,7 @@ service_role_key=$(gen_token "$service_role_payload")
 
 secret_key_base=$(gen_base64 48)
 vault_enc_key=$(gen_hex 16)
+realtime_db_enc_key=$(gen_hex 8)
 pg_meta_crypto_key=$(gen_base64 24)
 
 logflare_public_access_token=$(gen_base64 24)
@@ -82,6 +83,7 @@ echo "SERVICE_ROLE_KEY=${service_role_key}"
 echo ""
 echo "SECRET_KEY_BASE=${secret_key_base}"
 echo "VAULT_ENC_KEY=${vault_enc_key}"
+echo "REALTIME_DB_ENC_KEY=${realtime_db_enc_key}"
 echo "PG_META_CRYPTO_KEY=${pg_meta_crypto_key}"
 echo "LOGFLARE_PUBLIC_ACCESS_TOKEN=${logflare_public_access_token}"
 echo "LOGFLARE_PRIVATE_ACCESS_TOKEN=${logflare_private_access_token}"
@@ -132,4 +134,5 @@ sed \
     -e "s|^MINIO_ROOT_PASSWORD=.*$|MINIO_ROOT_PASSWORD=${minio_root_password}|" \
     -e "s|^POSTGRES_PASSWORD=.*$|POSTGRES_PASSWORD=${postgres_password}|" \
     -e "s|^DASHBOARD_PASSWORD=.*$|DASHBOARD_PASSWORD=${dashboard_password}|" \
+    -e "s|^REALTIME_DB_ENC_KEY=.*$|REALTIME_DB_ENC_KEY=${realtime_db_enc_key}|" \
     .env
