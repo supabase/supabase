@@ -619,7 +619,7 @@ test.describe('Database', () => {
       await expect(triggerRow).toContainText(databaseTriggerName)
 
       // update trigger
-      await triggerRow.getByRole('button', { name: 'More options' }).click()
+      await triggerRow.getByRole('button', { name: /actions$/i }).click()
       await page.getByRole('menuitem', { name: 'Edit trigger' }).click()
       await page.getByRole('textbox', { name: 'Name of trigger' }).fill(databaseTriggerNameUpdated)
       const triggerUpdateWait = createApiResponseWaiter(
@@ -643,7 +643,7 @@ test.describe('Database', () => {
       await expect(updatedTriggerRow).toContainText(databaseTriggerNameUpdated)
 
       // delete trigger
-      await updatedTriggerRow.getByRole('button', { name: 'More options' }).click()
+      await updatedTriggerRow.getByRole('button', { name: /actions$/i }).click()
       await page.getByRole('menuitem', { name: 'Delete trigger' }).click()
       await page.getByPlaceholder('Type in name of trigger').fill(databaseTriggerNameUpdated)
       await page
@@ -1335,7 +1335,7 @@ test.describe('Database Functions', () => {
     await expect(functionRow).toContainText(databaseFunctionName)
 
     // update function
-    await functionRow.getByRole('button', { name: 'More options' }).click()
+    await functionRow.getByRole('button', { name: /actions$/i }).click()
     await page.getByRole('menuitem', { name: 'Edit function', exact: true }).click()
     await page.getByRole('textbox', { name: 'Name of function' }).fill(databaseFunctionNameUpdated)
     const functionUpdateWait = createApiResponseWaiter(
@@ -1358,7 +1358,7 @@ test.describe('Database Functions', () => {
     await expect(updatedFunctionRow).toContainText(databaseFunctionNameUpdated)
 
     // delete function
-    await updatedFunctionRow.getByRole('button', { name: 'More options' }).click()
+    await updatedFunctionRow.getByRole('button', { name: /actions$/i }).click()
     await page.getByRole('menuitem', { name: 'Delete function' }).click()
     await page.getByPlaceholder('Type in name of function').fill(databaseFunctionNameUpdated)
     const functionDeleteWait = createApiResponseWaiter(

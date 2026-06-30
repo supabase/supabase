@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { InviteMemberButton } from './InviteMemberButton'

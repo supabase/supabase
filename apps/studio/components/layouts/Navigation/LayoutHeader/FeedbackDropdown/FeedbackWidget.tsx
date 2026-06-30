@@ -17,7 +17,7 @@ import {
   PopoverSeparator,
   TextArea,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import {
   convertB64toBlob,

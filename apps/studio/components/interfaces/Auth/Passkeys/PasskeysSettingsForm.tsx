@@ -21,7 +21,7 @@ import * as z from 'zod'
 
 import { validateRpId, validateWebAuthnOrigins } from './PasskeysSettingsForm.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import type { components } from '@/data/api'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'

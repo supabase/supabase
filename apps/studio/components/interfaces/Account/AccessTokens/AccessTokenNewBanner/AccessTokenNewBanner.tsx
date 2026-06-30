@@ -1,7 +1,7 @@
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { useGroupedPermissions } from '../hooks/useGroupedPermissions'

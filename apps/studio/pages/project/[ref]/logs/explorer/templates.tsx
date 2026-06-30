@@ -5,7 +5,7 @@ import { Button, cn, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
 import { TEMPLATES } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type { LogTemplate } from '@/components/interfaces/Settings/Logs/Logs.types'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
 import CardButton from '@/components/ui/CardButton'
 import LogsExplorerHeader from '@/components/ui/Logs/LogsExplorerHeader'

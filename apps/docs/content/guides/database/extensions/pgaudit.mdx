@@ -193,7 +193,7 @@ You can then assign the role to monitor only approved object events, such as `se
 grant select on random_table to "some_audit_role";
 ```
 
-With this privilege granted, PGAudit will record all select statements that reference the `random_table`, regardless of _who_ or _what_ actually initiated the event. All assignable privileges can be viewed in the [Postgres documentation](https://www.postgresql.org/docs/current/ddl-priv.html).
+With this privilege granted, PGAudit will record all select statements that reference the `random_table`, regardless of _who_ or _what_ initiated the event. All assignable privileges can be viewed in the [Postgres documentation](https://www.postgresql.org/docs/current/ddl-priv.html).
 
 If you would no longer like to use object logging, you will need to unassign the `pgaudit.role` variable:
 

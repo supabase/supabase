@@ -53,6 +53,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-get-project-logs-all",
+        "title": "Get project logs all",
+        "slug": "v1-get-project-logs-all",
+        "type": "operation"
+      },
+      {
         "id": "v1-get-project-usage-api-count",
         "title": "Get project usage api count",
         "slug": "v1-get-project-usage-api-count",
@@ -221,6 +227,12 @@
     "title": "Database",
     "items": [
       {
+        "id": "v1-accept-invite-external-jit-access",
+        "title": "Accept invite external jit access",
+        "slug": "v1-accept-invite-external-jit-access",
+        "type": "operation"
+      },
+      {
         "id": "v1-apply-a-migration",
         "title": "Apply a migration",
         "slug": "v1-apply-a-migration",
@@ -236,6 +248,12 @@
         "id": "v1-create-login-role",
         "title": "Create login role",
         "slug": "v1-create-login-role",
+        "type": "operation"
+      },
+      {
+        "id": "v1-delete-invite-external-jit-access",
+        "title": "Delete invite external jit access",
+        "slug": "v1-delete-invite-external-jit-access",
         "type": "operation"
       },
       {
@@ -338,6 +356,12 @@
         "id": "v1-get-ssl-enforcement-config",
         "title": "Get ssl enforcement config",
         "slug": "v1-get-ssl-enforcement-config",
+        "type": "operation"
+      },
+      {
+        "id": "v1-invite-external-jit-access",
+        "title": "Invite external jit access",
+        "slug": "v1-invite-external-jit-access",
         "type": "operation"
       },
       {

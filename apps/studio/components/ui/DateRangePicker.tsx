@@ -251,5 +251,3 @@ export const DateRangePicker = ({
     </DropdownMenu>
   )
 }
-
-export default DateRangePicker
