@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
   Switch,
+  Textarea,
   WarningIcon,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -542,9 +543,10 @@ export const MfaAuthSettingsForm = () => {
                         description="To format the OTP code use `{{ .Code }}`"
                       >
                         <FormControl>
-                          <Input
-                            type="text"
+                          <Textarea
                             {...field}
+                            rows={4}
+                            className="resize-none"
                             disabled={!canUpdateConfig || !hasAccessToMFA}
                             data-1p-ignore // 1Password
                             data-lpignore="true" // LastPass
