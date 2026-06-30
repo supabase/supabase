@@ -8,6 +8,10 @@ import {
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import type { Entity } from '@/data/entity-types/entity-types-infinite-query'
 
+export const WAREHOUSE_TABLE_DETAIL_VIEW = 'warehouse'
+
+export type TableDetailSection = 'overview' | 'columns' | 'policies' | 'settings' | 'storage'
+
 export function formatWarehouseLagLabel(lagSeconds: number): string {
   return `${lagSeconds}s lag`
 }
@@ -61,15 +65,34 @@ export function isTableEditorSchemaLocked(schema: string): boolean {
   return isWarehouseSchema(schema)
 }
 
+export function isWarehouseTableDetailView({
+  viewFromQuery,
+  tableSchema,
+}: {
+  viewFromQuery?: string
+  tableSchema?: string
+}): boolean {
+  if (viewFromQuery === WAREHOUSE_TABLE_DETAIL_VIEW) return true
+  if (tableSchema !== undefined && isWarehouseSchema(tableSchema)) return true
+  return false
+}
+
 export function buildTableDetailUrl(
   projectRef: string,
   tableId: number,
-  schema?: string,
-  section: 'overview' | 'settings' = 'settings'
+  options?: {
+    view?: typeof WAREHOUSE_TABLE_DETAIL_VIEW
+    section?: TableDetailSection
+  }
 ): string {
-  const path = section === 'settings' ? `/settings` : ''
-  const base = `/project/${projectRef}/database/tables/${tableId}${path}`
-  return schema !== undefined ? `${base}?schema=${encodeURIComponent(schema)}` : base
+  const section = options?.section ?? 'overview'
+  const sectionPath =
+    section === 'overview' ? '' : section === 'storage' ? '/storage' : `/${section}`
+  const base = `/project/${projectRef}/database/tables/${tableId}${sectionPath}`
+  if (options?.view === WAREHOUSE_TABLE_DETAIL_VIEW) {
+    return `${base}?view=${WAREHOUSE_TABLE_DETAIL_VIEW}`
+  }
+  return base
 }
 
 export function buildTableEditorUrlForTableKey({

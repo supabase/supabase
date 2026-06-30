@@ -57,7 +57,11 @@ import {
 } from '../Warehouse/warehouseDemoStore'
 import { getSourceSchemaName, isWarehouseSchema } from '../Warehouse/warehouseNaming.utils'
 import { WarehouseSyncChip } from '../Warehouse/WarehouseSyncChip'
-import { getActiveWarehouseSchemas } from '../Warehouse/warehouseTableEditor.utils'
+import {
+  buildTableDetailUrl,
+  getActiveWarehouseSchemas,
+  WAREHOUSE_TABLE_DETAIL_VIEW,
+} from '../Warehouse/warehouseTableEditor.utils'
 import { formatAllEntities } from './Tables.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { AlertError } from '@/components/ui/AlertError'
@@ -574,7 +578,9 @@ export const TableList = ({
                   )}
                   {sortedEntities.length > 0 &&
                     sortedEntities.map((x) => {
-                      const tableDetailUrl = `/project/${ref}/database/tables/${x.id}`
+                      const tableDetailUrl = isWarehouseSchema(selectedSchema)
+                        ? buildTableDetailUrl(ref!, x.id, { view: WAREHOUSE_TABLE_DETAIL_VIEW })
+                        : buildTableDetailUrl(ref!, x.id)
                       const handleRowNavigation = createNavigationHandler(tableDetailUrl, router)
                       const isWarehouseEntity =
                         isWarehouseSchema(selectedSchema) || isWarehouseSchema(x.schema)
@@ -654,7 +660,14 @@ export const TableList = ({
                                   wState,
                                   x.size
                                 )
-                                const storageUrl = `${tableDetailUrl}/settings`
+                                const storageUrl = isWarehouseSchema(selectedSchema)
+                                  ? buildTableDetailUrl(ref!, x.id, {
+                                      view: WAREHOUSE_TABLE_DETAIL_VIEW,
+                                      section: 'storage',
+                                    })
+                                  : buildTableDetailUrl(ref!, x.id, {
+                                      section: 'settings',
+                                    })
                                 const showSyncChip =
                                   wState.syncState === 'syncing' || wState.syncState === 'error'
 
@@ -758,7 +771,11 @@ export const TableList = ({
                                         className="flex items-center space-x-2"
                                         asChild
                                       >
-                                        <Link href={`${tableDetailUrl}/settings`}>
+                                        <Link
+                                          href={buildTableDetailUrl(ref!, x.id, {
+                                            section: 'settings',
+                                          })}
+                                        >
                                           <Settings size={12} />
                                           <p>Edit settings</p>
                                         </Link>

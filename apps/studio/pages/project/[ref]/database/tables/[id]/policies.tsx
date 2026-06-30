@@ -7,6 +7,7 @@ import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useRedirectWarehouseDetailFromSubroutes } from '@/hooks/misc/useTableDetailWarehouseView'
 import type { NextPageWithLayout } from '@/types'
 
 const TableDetailPoliciesPage: NextPageWithLayout = () => {
@@ -18,6 +19,8 @@ const TableDetailPoliciesPage: NextPageWithLayout = () => {
     connectionString: project?.connectionString,
     id,
   })
+
+  useRedirectWarehouseDetailFromSubroutes(selectedTable?.schema)
 
   if (isPending) {
     return <ShimmeringLoader />

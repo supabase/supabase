@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useState, type ReactNode } from 'react'
 import {
+  Badge,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -15,6 +16,7 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import {
   formatWarehouseSize,
+  resolveWarehouseTableState,
   useWarehouseTableState,
   type WarehouseMode,
 } from './warehouseDemoStore'
@@ -22,14 +24,12 @@ import { WarehouseDetachModal } from './WarehouseDetachModal'
 import { WarehouseEnablementModal } from './WarehouseEnablementModal'
 import {
   buildSqlEditorWarehouseUrl,
-  getSourceSchemaName,
   getSourceTableKey,
   getWarehouseQualifiedTableName,
-  getWarehouseSchemaName,
   parseTableKey,
 } from './warehouseNaming.utils'
 import { WarehouseSyncChip } from './WarehouseSyncChip'
-import { buildTableDetailUrl } from './warehouseTableEditor.utils'
+import { buildTableDetailUrl, WAREHOUSE_TABLE_DETAIL_VIEW } from './warehouseTableEditor.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 
 const TYPE_LABELS: Record<WarehouseMode, string> = {
@@ -37,7 +37,7 @@ const TYPE_LABELS: Record<WarehouseMode, string> = {
   has_warehouse_copy: 'Postgres + Warehouse',
 }
 
-function MetaRow({ label, children }: { label: string; children: ReactNode }) {
+function MetaRow({ label, children }: { label: ReactNode; children: ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-4 px-4 py-2.5">
       <span className="shrink-0 text-foreground-lighter">{label}</span>
@@ -51,14 +51,23 @@ function TableCopyRow({
   name,
   tooltip,
   detailUrl,
+  isCurrent,
 }: {
   label: string
   name: string
   tooltip: string
   detailUrl?: string
+  isCurrent?: boolean
 }) {
   return (
-    <MetaRow label={label}>
+    <MetaRow
+      label={
+        <span className="inline-flex items-center gap-2">
+          {label}
+          {isCurrent && <Badge variant="default">Current</Badge>}
+        </span>
+      }
+    >
       <div className="flex items-center justify-end gap-1.5">
         <code className="text-code-inline break-all">{name}</code>
         {detailUrl !== undefined && (
@@ -86,6 +95,7 @@ interface WarehouseTableStoragePanelProps {
   tableKey: string
   tableId: number
   postgresSize?: string
+  warehouseSize?: string
   /** Which copy this panel is shown for — the other row gets an external link. */
   viewContext?: 'source' | 'warehouse'
 }
@@ -94,17 +104,19 @@ export function WarehouseTableStoragePanel({
   tableKey,
   tableId,
   postgresSize,
+  warehouseSize,
   viewContext = 'source',
 }: WarehouseTableStoragePanelProps) {
   const { ref: projectRef } = useParams()
   const { schema, table } = parseTableKey(tableKey)
   const sourceTableKey = getSourceTableKey(schema, table)
-  const state = useWarehouseTableState(sourceTableKey)
+  const storedState = useWarehouseTableState(sourceTableKey)
+  const state = resolveWarehouseTableState(sourceTableKey, storedState, {
+    isWarehouseView: viewContext === 'warehouse',
+  })
   const { mode } = state
-  const warehouseSize = formatWarehouseSize(state.warehouseSizeBytes)
+  const warehouseSizeLabel = warehouseSize ?? formatWarehouseSize(state.warehouseSizeBytes)
   const warehouseQualifiedName = state.copyName ?? getWarehouseQualifiedTableName(sourceTableKey)
-  const sourceSchema = getSourceSchemaName(schema)
-  const warehouseSchema = getWarehouseSchemaName(sourceSchema)
 
   const [enablementModalOpen, setEnablementModalOpen] = useState(false)
   const [detachConfirm, setDetachConfirm] = useState(false)
@@ -122,11 +134,11 @@ export function WarehouseTableStoragePanel({
     projectRef !== undefined ? buildSqlEditorWarehouseUrl(projectRef, sourceTableKey) : undefined
   const postgresDetailUrl =
     projectRef !== undefined && viewContext === 'warehouse'
-      ? buildTableDetailUrl(projectRef, tableId, sourceSchema)
+      ? buildTableDetailUrl(projectRef, tableId, { section: 'settings' })
       : undefined
   const warehouseDetailUrl =
     projectRef !== undefined && viewContext === 'source'
-      ? buildTableDetailUrl(projectRef, tableId, warehouseSchema)
+      ? buildTableDetailUrl(projectRef, tableId, { view: WAREHOUSE_TABLE_DETAIL_VIEW })
       : undefined
 
   return (
@@ -154,15 +166,17 @@ export function WarehouseTableStoragePanel({
                 name={sourceTableKey}
                 tooltip="Used by the Table Editor and application writes."
                 detailUrl={postgresDetailUrl}
+                isCurrent={viewContext === 'source'}
               />
               <TableCopyRow
                 label="Warehouse table"
                 name={warehouseQualifiedName}
                 tooltip="Read-only Warehouse copy. Query this explicitly for Warehouse-stored data."
                 detailUrl={warehouseDetailUrl}
+                isCurrent={viewContext === 'warehouse'}
               />
               <MetaRow label="Postgres size">{postgresSize ?? '—'}</MetaRow>
-              <MetaRow label="Warehouse size">{warehouseSize}</MetaRow>
+              <MetaRow label="Warehouse size">{warehouseSizeLabel}</MetaRow>
             </>
           )}
         </div>
@@ -182,7 +196,7 @@ export function WarehouseTableStoragePanel({
           <div className="flex w-fit">
             {sqlEditorWarehouseUrl ? (
               <Button type="button" variant="default" className="rounded-r-none hover:z-10" asChild>
-                <Link href={sqlEditorWarehouseUrl}>Query in Warehouse</Link>
+                <Link href={sqlEditorWarehouseUrl}>Query in SQL Editor</Link>
               </Button>
             ) : (
               <Button
@@ -191,7 +205,7 @@ export function WarehouseTableStoragePanel({
                 className="rounded-r-none hover:z-10"
                 disabled
               >
-                Query in Warehouse
+                Query in SQL Editor
               </Button>
             )}
             <DropdownMenu>

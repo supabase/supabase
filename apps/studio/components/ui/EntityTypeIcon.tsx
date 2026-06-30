@@ -4,7 +4,7 @@ import { cn, SQL_ICON } from 'ui'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 
 interface EntityTypeIconProps {
-  type: 'sql' | 'schema' | 'new' | 'r' | 'v' | 'm' | 'f' | 'p'
+  type: 'sql' | 'schema' | 'new' | 'r' | 'v' | 'm' | 'f' | 'p' | 'w'
   size?: number
   strokeWidth?: number
   isActive?: boolean
@@ -36,7 +36,7 @@ export const EntityTypeIcon = ({
     return (
       <div
         className={cn(
-          'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
+          'flex shrink-0 items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold leading-none',
           'text-brand-600/90 dark:text-brand bg-brand-400/20 dark:bg-brand/20',
           isActive && 'text-brand bg-brand/30'
         )}

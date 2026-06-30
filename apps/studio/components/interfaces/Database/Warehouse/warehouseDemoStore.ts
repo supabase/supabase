@@ -24,6 +24,31 @@ export const warehouseDemoStore = proxy<{
 
 const DEMO_WAREHOUSE_SIZE_BYTES = 197_912_092_672 // ~184 GB
 
+const DEFAULT_WAREHOUSE_COPY_FIELDS = {
+  syncState: 'live' as const,
+  lagSeconds: 12,
+  warehouseSizeBytes: DEMO_WAREHOUSE_SIZE_BYTES,
+}
+
+export function resolveWarehouseTableState(
+  tableKey: string,
+  storedState: WarehouseTableState,
+  { isWarehouseView }: { isWarehouseView: boolean }
+): WarehouseTableState {
+  const hasWarehouseCopy = storedState.mode === 'has_warehouse_copy' || isWarehouseView
+  if (!hasWarehouseCopy) return storedState
+
+  return {
+    mode: 'has_warehouse_copy',
+    syncState: storedState.syncState ?? DEFAULT_WAREHOUSE_COPY_FIELDS.syncState,
+    lagSeconds: storedState.lagSeconds ?? DEFAULT_WAREHOUSE_COPY_FIELDS.lagSeconds,
+    warehouseSizeBytes:
+      storedState.warehouseSizeBytes ?? DEFAULT_WAREHOUSE_COPY_FIELDS.warehouseSizeBytes,
+    lastSyncedAt: storedState.lastSyncedAt,
+    copyName: storedState.copyName ?? getWarehouseQualifiedTableName(tableKey),
+  }
+}
+
 export function setTableMode(key: string, mode: 'has_warehouse_copy'): void {
   const now = new Date().toISOString()
 

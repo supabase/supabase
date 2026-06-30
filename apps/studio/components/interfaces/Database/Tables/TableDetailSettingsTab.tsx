@@ -1,5 +1,4 @@
 import { Realtime } from 'icons'
-import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { Button, Card, CardContent } from 'ui'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
@@ -15,11 +14,7 @@ import { TableDetailDataApiSection } from '@/components/interfaces/Database/Tabl
 import { TableDetailDeleteTableSection } from '@/components/interfaces/Database/Tables/TableDetailDeleteTableSection'
 import { TableDetailGeneralSettingsCard } from '@/components/interfaces/Database/Tables/TableDetailGeneralSettingsCard'
 import { TableDetailIndexAdvisorSection } from '@/components/interfaces/Database/Tables/TableDetailIndexAdvisorSection'
-import {
-  getSourceSchemaName,
-  getSourceTableKey,
-  getWarehouseSchemaName,
-} from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
+import { getSourceTableKey } from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
 import { WarehouseTableStoragePanel } from '@/components/interfaces/Database/Warehouse/WarehouseTableStoragePanel'
 import { RealtimeToggleDialog } from '@/components/interfaces/TableGridEditor/RealtimeToggleDialog'
 import { useIsTableRealtimeEnabled } from '@/data/database-publications/database-publications-query'
@@ -37,10 +32,6 @@ export function TableDetailSettingsTab({ table }: TableDetailSettingsTabProps) {
   const isRealtimeEnabled = useIsTableRealtimeEnabled({ id: table.id })
   const showStorage = table.entity_type === ENTITY_TYPE.TABLE
   const tableKey = getSourceTableKey(table.schema, table.name)
-  const sourceSchema = getSourceSchemaName(table.schema)
-  const warehouseSchema = getWarehouseSchemaName(sourceSchema)
-  const [schemaQuery] = useQueryState('schema', parseAsString)
-  const viewContext = schemaQuery === warehouseSchema ? 'warehouse' : 'source'
 
   return (
     <>
@@ -68,7 +59,7 @@ export function TableDetailSettingsTab({ table }: TableDetailSettingsTabProps) {
                 tableKey={tableKey}
                 tableId={table.id}
                 postgresSize={table.size}
-                viewContext={viewContext}
+                viewContext="source"
               />
             </PageSectionContent>
           </PageSection>
