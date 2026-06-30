@@ -1,7 +1,5 @@
-import React from 'https://esm.sh/react@18.2.0?deno-std=0.177.0'
-import { ImageResponse } from 'https://deno.land/x/og_edge@0.0.4/mod.ts'
-import { createClient } from 'jsr:@supabase/supabase-js@2'
-import { corsHeaders } from '../_shared/cors.ts'
+import { ImageResponse } from 'npm:@vercel/og@^0'
+import React from 'npm:react@19'
 
 const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw6'
 const BACKGROUND_IMAGE_STD = `${STORAGE_URL}/lw6_ticket_regular.png`
@@ -13,7 +11,7 @@ const SUPA_CHECKMARK_GOLD = `${STORAGE_URL}/supaverified_gold.png?v=3`
 const FONT_URL = `${STORAGE_URL}/CircularStd-Book.otf`
 const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
 
-export async function handler(req: Request) {
+export async function handler(req: Request, ctx) {
   const url = new URL(req.url)
   const ticketNumber = url.searchParams.get('ticketNumber')
   const username = url.searchParams.get('username') ?? url.searchParams.get('amp;username')
@@ -21,10 +19,7 @@ export async function handler(req: Request) {
   const golden = url.searchParams.get('golden') ?? url.searchParams.get('amp;golden')
 
   if (!username || !ticketNumber || !name) {
-    return new Response(JSON.stringify({ error: 'missing params' }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
-    })
+    return Response.json({ error: 'missing params' }, { status: 400 })
   }
 
   try {
@@ -195,17 +190,8 @@ export async function handler(req: Request) {
       }
     )
 
-    const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
-
-    const supabaseAdminClient = createClient(
-      // Supabase API URL - env var exported by default when deployed.
-      Deno.env.get('SUPABASE_URL') ?? '',
-      // Supabase API SECRET KEY - env var exported by default when deployed.
-      SUPABASE_SECRET_KEYS['default'] ?? ''
-    )
-
     // Upload image to storage.
-    const { error } = await supabaseAdminClient.storage
+    const { error } = await ctx.supabaseAdmin.storage
       .from('images')
       .upload(`lw6/tickets/${username}.png`, generatedImage.body!, {
         contentType: 'image/png',
@@ -216,9 +202,6 @@ export async function handler(req: Request) {
 
     return await fetch(`${STORAGE_URL}/tickets/${username}.png?v=3`)
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
-    })
+    return Response.json({ error: error.message }, { status: 400 })
   }
 }

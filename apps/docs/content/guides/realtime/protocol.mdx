@@ -413,7 +413,7 @@ user-event                // User Event
 }
 ```
 
-The payload encoding is just a hint for the client to know if the payload should be treated as JSON or not.
+The payload encoding is a hint for the client to know if the payload should be treated as JSON or not.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -667,7 +667,7 @@ message                                       // User Event
 }
 ```
 
-The metadata field is JSON encoded. The payload encoding is just a hint for the client to know if the payload should be treated as JSON or not.
+The metadata field is JSON encoded. The payload encoding is a hint for the client to know if the payload should be treated as JSON or not.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -962,7 +962,7 @@ When `ack` is `true`, the server replies on error with `response.error` (an atom
 { "status": "error", "response": { "error": "payload_size_exceeded" } }
 ```
 
-Note that the JS client (`send()`) resolves to just the string `'error'` and does not expose the specific `error` atom to callers.
+Note that the JS client (`send()`) resolves to the string `'error'` and does not expose the specific `error` atom to callers.
 
 ### Presence errors
 

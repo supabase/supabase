@@ -4442,7 +4442,67 @@
     },
     "/v1/projects/{ref}/analytics/endpoints/logs.all": {
       "get": {
-        "description": "Executes a SQL query on the project's logs.\n\nEither the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n\nNote: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer:~:text=logs%20from%20the-,Sources,-drop%2Ddown%3A) for all available sources. \n",
+        "deprecated": true,
+        "description": "Executes a SQL query on the project's logs.\n\nEither the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n\nNote: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer:~:text=logs%20from%20the-,Sources,-drop%2Ddown%3A) for all available sources.\n",
+        "operationId": "v1-get-project-logs-all",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          },
+          {
+            "name": "sql",
+            "required": false,
+            "in": "query",
+            "description": "Custom SQL query to execute on the logs. See [querying logs](/docs/guides/telemetry/logs?queryGroups=product&product=postgres&queryGroups=source&source=edge_logs#querying-with-the-logs-explorer) for more details.",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "iso_timestamp_start",
+            "required": false,
+            "in": "query",
+            "schema": { "format": "date-time", "example": "2025-03-01T00:00:00Z", "type": "string" }
+          },
+          {
+            "name": "iso_timestamp_end",
+            "required": false,
+            "in": "query",
+            "schema": { "format": "date-time", "example": "2025-03-01T23:59:59Z", "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/AnalyticsResponse" } }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "402": { "description": "Usage exceeded. Enable additional usage to continue querying" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["analytics_logs_read"] }],
+        "summary": "Gets project's logs",
+        "tags": ["Analytics"],
+        "x-badges": [{ "name": "OAuth scope: analytics:read", "position": "after" }],
+        "x-endpoint-owners": ["analytics"],
+        "x-oauth-scope": "analytics:read"
+      }
+    },
+    "/v1/projects/{ref}/analytics/endpoints/logs": {
+      "get": {
+        "deprecated": false,
+        "description": "Executes an SQL or LQL query on the project's unified logs stream.\n\nEither the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.\nIf both are not provided, only the last 1 minute of logs will be queried.\nThe timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.\n\nFilter by the `source` column to specify specific log sources, such as edge_logs, postgres_logs, etc.\n\nNote: SQL must be written in **ClickHouse SQL dialect**.\n",
         "operationId": "v1-get-project-logs",
         "parameters": [
           {
@@ -4486,11 +4546,12 @@
             }
           },
           "401": { "description": "Unauthorized" },
+          "402": { "description": "Usage exceeded. Enable additional usage to continue querying" },
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["analytics_logs_read"] }],
-        "summary": "Gets project's logs",
+        "summary": "Gets all project's logs in a single log stream",
         "tags": ["Analytics"],
         "x-badges": [{ "name": "OAuth scope: analytics:read", "position": "after" }],
         "x-endpoint-owners": ["analytics"],
@@ -5310,7 +5371,7 @@
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden action" },
           "429": { "description": "Rate limit exceeded" },
-          "500": { "description": "Failed to upsert database migration" }
+          "500": { "description": "Failed to update JIT access" }
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_jit_write"] }],
         "summary": "Updates a user mapping for JIT access",
@@ -5353,6 +5414,137 @@
         },
         "security": [{ "bearer": [] }, { "fga_permissions": ["database_jit_read"] }],
         "summary": "List all user-id to role mappings for JIT access",
+        "tags": ["Database"],
+        "x-endpoint-owners": ["security"]
+      }
+    },
+    "/v1/projects/{ref}/database/jit/invite": {
+      "post": {
+        "description": "Invites the external user and sets initial roles that can be assumed and for how long",
+        "operationId": "v1-invite-external-jit-access",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/InviteExternalUserJitAccessBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InviteExternalUserJitResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to invite external user" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_jit_write"] }],
+        "summary": "Invites an external user to a database for JIT access",
+        "tags": ["Database"],
+        "x-endpoint-owners": ["security"]
+      }
+    },
+    "/v1/projects/{ref}/database/jit/invite/accept": {
+      "post": {
+        "description": "Accepts the invitation to JIT database access",
+        "operationId": "v1-accept-invite-external-jit-access",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AcceptInviteExternalUserJitAccessBody" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": { "schema": { "$ref": "#/components/schemas/JitAccessResponse" } }
+            }
+          },
+          "500": { "description": "Failed to accept invitation" }
+        },
+        "security": [{ "bearer": [] }],
+        "summary": "Accepts invitation for JIT database access",
+        "tags": ["Database"],
+        "x-endpoint-owners": ["security"]
+      }
+    },
+    "/v1/projects/{ref}/database/jit/invite/{invite_id}": {
+      "delete": {
+        "description": "Revokes and deletes the invitation",
+        "operationId": "v1-delete-invite-external-jit-access",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          },
+          {
+            "name": "invite_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "example": "55555555-5555-4555-8555-555555555555",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to revoke invite for external user" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["database_jit_write"] }],
+        "summary": "Deletes the invite for an external user to a database for JIT access",
         "tags": ["Database"],
         "x-endpoint-owners": ["security"]
       }
@@ -8553,11 +8745,7 @@
               "state": { "type": "string", "enum": ["unavailable"] },
               "unavailableReason": {
                 "type": "string",
-                "enum": [
-                  "manual_migration_required",
-                  "postgres_upgrade_required",
-                  "temporarily_unavailable"
-                ]
+                "enum": ["postgres_upgrade_required", "temporarily_unavailable"]
               }
             },
             "required": ["state", "unavailableReason"]
@@ -10976,7 +11164,7 @@
             }
           }
         },
-        "required": ["user_id", "user_roles"]
+        "required": ["user_roles"]
       },
       "AuthorizeJitAccessBody": {
         "type": "object",
@@ -11030,44 +11218,94 @@
           "items": {
             "type": "array",
             "items": {
-              "type": "object",
-              "properties": {
-                "user_id": { "type": "string", "format": "uuid" },
-                "user_roles": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "role": { "type": "string", "minLength": 1 },
-                      "expires_at": { "type": "number" },
-                      "allowed_networks": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "user_id": { "type": "string", "format": "uuid" },
+                    "primary_email": { "type": "string", "nullable": true },
+                    "invite_id": { "type": "null" },
+                    "expires_at": { "type": "null" },
+                    "user_roles": {
+                      "type": "array",
+                      "items": {
                         "type": "object",
                         "properties": {
-                          "allowed_cidrs": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": { "cidr": { "type": "string" } },
-                              "required": ["cidr"]
+                          "role": { "type": "string", "minLength": 1 },
+                          "expires_at": { "type": "number" },
+                          "allowed_networks": {
+                            "type": "object",
+                            "properties": {
+                              "allowed_cidrs": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": { "cidr": { "type": "string" } },
+                                  "required": ["cidr"]
+                                }
+                              },
+                              "allowed_cidrs_v6": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": { "cidr": { "type": "string" } },
+                                  "required": ["cidr"]
+                                }
+                              }
                             }
                           },
-                          "allowed_cidrs_v6": {
-                            "type": "array",
-                            "items": {
-                              "type": "object",
-                              "properties": { "cidr": { "type": "string" } },
-                              "required": ["cidr"]
+                          "branches_only": { "type": "boolean" }
+                        },
+                        "required": ["role"]
+                      }
+                    }
+                  },
+                  "required": ["user_id", "primary_email", "invite_id", "expires_at", "user_roles"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "user_id": { "type": "null" },
+                    "primary_email": { "type": "string" },
+                    "invite_id": { "type": "string", "format": "uuid" },
+                    "expires_at": { "type": "string" },
+                    "user_roles": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "role": { "type": "string", "minLength": 1 },
+                          "expires_at": { "type": "number" },
+                          "allowed_networks": {
+                            "type": "object",
+                            "properties": {
+                              "allowed_cidrs": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": { "cidr": { "type": "string" } },
+                                  "required": ["cidr"]
+                                }
+                              },
+                              "allowed_cidrs_v6": {
+                                "type": "array",
+                                "items": {
+                                  "type": "object",
+                                  "properties": { "cidr": { "type": "string" } },
+                                  "required": ["cidr"]
+                                }
+                              }
                             }
-                          }
-                        }
-                      },
-                      "branches_only": { "type": "boolean" }
-                    },
-                    "required": ["role"]
-                  }
+                          },
+                          "branches_only": { "type": "boolean" }
+                        },
+                        "required": ["role"]
+                      }
+                    }
+                  },
+                  "required": ["user_id", "primary_email", "invite_id", "expires_at", "user_roles"]
                 }
-              },
-              "required": ["user_id", "user_roles"]
+              ]
             }
           }
         },
@@ -11123,6 +11361,107 @@
             }
           ]
         }
+      },
+      "InviteExternalUserJitAccessBody": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "format": "email", "minLength": 1 },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "role": { "type": "string", "minLength": 1 },
+                "expires_at": { "type": "number" },
+                "allowed_networks": {
+                  "type": "object",
+                  "properties": {
+                    "allowed_cidrs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": { "cidr": { "type": "string" } },
+                        "required": ["cidr"]
+                      }
+                    },
+                    "allowed_cidrs_v6": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": { "cidr": { "type": "string" } },
+                        "required": ["cidr"]
+                      }
+                    }
+                  }
+                },
+                "branches_only": { "type": "boolean" }
+              },
+              "required": ["role"]
+            }
+          }
+        },
+        "required": ["email", "roles"],
+        "example": {
+          "email": "external-user@somedomain.xyz",
+          "roles": [
+            {
+              "role": "postgres",
+              "expires_at": 1740787200,
+              "allowed_networks": { "allowed_cidrs": [{ "cidr": "203.0.113.0/24" }] },
+              "branches_only": false
+            }
+          ]
+        }
+      },
+      "InviteExternalUserJitResponse": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "invite_id": { "type": "string", "format": "uuid" },
+          "user_roles": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "role": { "type": "string", "minLength": 1 },
+                "expires_at": { "type": "number" },
+                "allowed_networks": {
+                  "type": "object",
+                  "properties": {
+                    "allowed_cidrs": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": { "cidr": { "type": "string" } },
+                        "required": ["cidr"]
+                      }
+                    },
+                    "allowed_cidrs_v6": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": { "cidr": { "type": "string" } },
+                        "required": ["cidr"]
+                      }
+                    }
+                  }
+                },
+                "branches_only": { "type": "boolean" }
+              },
+              "required": ["role"]
+            }
+          }
+        },
+        "required": ["email", "invite_id", "user_roles"]
+      },
+      "AcceptInviteExternalUserJitAccessBody": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "format": "email", "minLength": 1 },
+          "token": { "type": "string", "minLength": 1 }
+        },
+        "required": ["email", "token"],
+        "example": { "email": "external-user@somedomain.xyz", "token": "" }
       },
       "FunctionResponse": {
         "type": "object",
@@ -12542,9 +12881,10 @@
           "user_name": { "type": "string" },
           "email": { "type": "string" },
           "role_name": { "type": "string" },
-          "mfa_enabled": { "type": "boolean" }
+          "mfa_enabled": { "type": "boolean" },
+          "avatar_url": { "type": "string", "nullable": true }
         },
-        "required": ["user_id", "user_name", "role_name", "mfa_enabled"]
+        "required": ["user_id", "user_name", "role_name", "mfa_enabled", "avatar_url"]
       },
       "V1OrganizationSlugResponse": {
         "type": "object",

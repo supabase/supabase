@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { type ReactNode } from 'react'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { InlineLink } from '@/components/ui/InlineLink'
 

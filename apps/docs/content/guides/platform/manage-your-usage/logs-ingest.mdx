@@ -65,7 +65,7 @@ Every service in your Supabase project automatically generates Logs — you don'
 
 - **Reduce log-level verbosity** in your Edge Functions and server-side code (for example, `info` → `warn` in production).
 - **Audit verbose logging in your application code.** Application-level logs forwarded to Supabase services count toward ingest.
-- **Cap log payload size.** Large structured payloads inflate GB-billed volume quickly.
+- **Cap log payload size.** Large structured payloads can inflate GB-billed volume.
 - **Investigate spikes.** Use the [**Logs Explorer**](/dashboard/project/_/logs-explorer) section of the Dashboard to find services or endpoints producing unusually high volume.
 
 ## Exceeding Quotas

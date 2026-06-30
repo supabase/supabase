@@ -9,7 +9,6 @@ import {
   type ReactNode,
 } from 'react'
 import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageSection,
@@ -19,6 +18,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'

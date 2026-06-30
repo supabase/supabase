@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ResourceGroupSection } from './ConnectedResourceGroupSection'
 import { type ApiKeyResource, type ResourceGroup } from './MarketplaceIntegrationSettingsTab.types'
