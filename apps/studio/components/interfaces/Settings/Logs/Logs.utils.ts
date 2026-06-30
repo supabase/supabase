@@ -387,10 +387,13 @@ const calcChartStart = (
   return [its.add(-extendValue, trunc), trunc]
 }
 
+// Use standard CAST() instead of Postgres-specific ::text so this works on both
+// PostgreSQL (self-hosted Logflare) and BigQuery (self-hosted Logflare + BigQuery backend).
+// regexp_contains() is BigQuery-only, so we use CAST+LIKE for cross-dialect compatibility.
 // TODO(qiao): workaround for self-hosted cron logs error until logflare is fixed
 const basePgCronConditions: SafeLogSqlFragment = IS_PLATFORM
   ? safeSql`( parsed.application_name = 'pg_cron' or regexp_contains(event_message, 'cron job') )`
-  : safeSql`( parsed.application_name = 'pg_cron' or event_message::text LIKE '%cron job%' )`
+  : safeSql`( parsed.application_name = 'pg_cron' or CAST(event_message AS VARCHAR) LIKE '%cron job%' )`
 const basePgCronWhere: SafeLogSqlFragment = safeSql`where ${basePgCronConditions}`
 
 const TRUNC_SQL: Record<'minute' | 'hour' | 'day', SafeLogSqlFragment> = {
@@ -398,6 +401,7 @@ const TRUNC_SQL: Record<'minute' | 'hour' | 'day', SafeLogSqlFragment> = {
   hour: safeSql`hour`,
   day: safeSql`day`,
 }
+
 /**
  *
  * generates log event chart query
