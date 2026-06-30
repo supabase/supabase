@@ -133,7 +133,7 @@ export const databaseNavRegistry: RegistryDefinations<DatabaseNavShortcutId> = {
   [DATABASE_NAV_SHORTCUT_IDS.NAV_DATABASE_POLICIES]: {
     id: DATABASE_NAV_SHORTCUT_IDS.NAV_DATABASE_POLICIES,
     label: 'Go to Policies',
-    sequence: ['D', 'P'],
+    sequence: ['D', 'A'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_DATABASE,
   },
