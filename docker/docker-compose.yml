@@ -478,6 +478,7 @@ services:
     image: supabase/postgres:17.6.1.136
     restart: unless-stopped
     volumes:
+      - ./docker-entrypoint.sh:/usr/local/bin/custom-docker-entrypoint.sh:Z
       - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
       # Must be superuser to create event trigger
       - ./volumes/db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:Z
@@ -518,6 +519,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXP: ${JWT_EXPIRY}
+    entrypoint: /usr/local/bin/custom-docker-entrypoint.sh
     command:
       [
         "postgres",
