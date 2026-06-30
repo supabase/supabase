@@ -26,7 +26,10 @@ import {
   type UsageMetricStatus,
 } from './ComputeAndDiskUsageCharts.utils'
 import type { InfraMonitoringAttribute } from '@/data/analytics/infra-monitoring-query'
-import { useInfraMonitoringAttributesQuery } from '@/data/analytics/infra-monitoring-query'
+import {
+  getInfraMonitoringAttributes,
+  useInfraMonitoringAttributesQuery,
+} from '@/data/analytics/infra-monitoring-query'
 import { formatBytes } from '@/lib/helpers'
 
 const USAGE_ATTRIBUTES = [
@@ -87,7 +90,7 @@ const getUsageCardClassName = (status: UsageMetricStatus) =>
 export const ComputeAndDiskUsageCharts = ({ className }: { className?: string }) => {
   const { ref: projectRef } = useParams()
 
-  // Intentionally anchored to mount time so the query key stays stable across re-renders.
+  // Anchor query key dates to mount time; fetch uses a rolling 7-day window on each refetch.
   const { startDate, endDate } = useMemo(() => {
     const now = dayjs()
 
@@ -101,13 +104,31 @@ export const ComputeAndDiskUsageCharts = ({ className }: { className?: string })
     data: usageData,
     isLoading,
     isError,
-  } = useInfraMonitoringAttributesQuery({
-    projectRef,
-    attributes: USAGE_ATTRIBUTES,
-    startDate,
-    endDate,
-    interval: '1d',
-  })
+  } = useInfraMonitoringAttributesQuery(
+    {
+      projectRef,
+      attributes: USAGE_ATTRIBUTES,
+      startDate,
+      endDate,
+      interval: '1d',
+    },
+    {
+      queryFn: ({ signal }) => {
+        const now = dayjs()
+
+        return getInfraMonitoringAttributes(
+          {
+            projectRef,
+            attributes: USAGE_ATTRIBUTES,
+            startDate: now.subtract(7, 'day').toISOString(),
+            endDate: now.toISOString(),
+            interval: '1d',
+          },
+          signal
+        )
+      },
+    }
+  )
 
   const { computeChartData, diskChartData } = useMemo(
     () => buildUsageChartData(usageData),
@@ -128,14 +149,15 @@ export const ComputeAndDiskUsageCharts = ({ className }: { className?: string })
     status: diskUsageStatus,
   } = useMemo(() => getDiskUsageSummary(diskChartData), [diskChartData])
 
-  const databaseReportUrl = `/project/${projectRef}/observability/database`
-  const chartActions = [
-    {
-      label: 'View database report',
-      href: databaseReportUrl,
-      icon: <ExternalLink size={12} />,
-    },
-  ]
+  const chartActions = projectRef
+    ? [
+        {
+          label: 'View database report',
+          href: `/project/${projectRef}/observability/database`,
+          icon: <ExternalLink size={12} />,
+        },
+      ]
+    : []
 
   const isComputeEmpty = computeChartData.length === 0
   const isDiskEmpty = diskChartData.length === 0

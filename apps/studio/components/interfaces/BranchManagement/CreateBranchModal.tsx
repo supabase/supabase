@@ -522,7 +522,7 @@ export const CreateBranchModal = () => {
                                     <InlineLink
                                       onClick={() => setShowCreateBranchModal(false)}
                                       className="pointer-events-auto"
-                                      href={`/project/${ref}/settings/infrastructure`}
+                                      href={`/project/${projectRef}/settings/infrastructure`}
                                     >
                                       Infrastructure
                                     </InlineLink>

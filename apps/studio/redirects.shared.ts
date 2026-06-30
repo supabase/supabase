@@ -123,7 +123,7 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   {
     source: '/project/:ref/settings/billing/subscription',
     has: [{ type: 'query', key: 'panel', value: 'computeInstance' }],
-    destination: '/project/:ref/settings/infrastructure',
+    destination: '/project/:ref/settings/infrastructure#cpu',
     permanent: true,
   },
   {

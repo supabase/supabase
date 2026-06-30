@@ -97,7 +97,7 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
                   <Button
                     variant="default"
                     onClick={() => {
-                      setValue('storageType', 'io2')
+                      setValue('storageType', 'io2', { shouldDirty: true })
                       trigger('provisionedIOPS')
                       trigger('totalSize')
                     }}
@@ -121,7 +121,10 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
               )}
 
               <DiskManagementDiskSizeReadReplicas
-                isDirty={dirtyFields.totalSize !== undefined}
+                isDirty={
+                  dirtyFields.totalSize !== undefined ||
+                  watchedStorageType !== defaultValues?.storageType
+                }
                 totalSize={(defaultValues?.totalSize || 0) * 1.25}
                 usedSize={mainDiskUsed}
                 newTotalSize={watchedTotalSize * 1.25}
@@ -157,6 +160,7 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
                     variant="default"
                     size="tiny"
                     className="px-2 text-foreground-light"
+                    aria-label="Reset disk size"
                     onClick={() => {
                       resetField('totalSize')
                       trigger('provisionedIOPS')

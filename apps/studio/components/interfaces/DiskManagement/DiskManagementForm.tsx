@@ -87,6 +87,8 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
 
   const autoscaleSettingsRef = useRef<HTMLDivElement>(null)
   const storageSettingsRef = useRef<HTMLDivElement>(null)
+  const computeSettingsRef = useRef<HTMLDivElement>(null)
+  const diskSizeSettingsRef = useRef<HTMLDivElement>(null)
 
   const isSpendCapEnabled =
     org?.plan.id !== 'free' && !org?.usage_billing_enabled && project?.cloud_provider !== 'FLY'
@@ -382,7 +384,11 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
         ? autoscaleSettingsRef
         : fieldErrors.includes('throughput') || fieldErrors.includes('provisionedIOPS')
           ? storageSettingsRef
-          : null
+          : fieldErrors.includes('totalSize')
+            ? diskSizeSettingsRef
+            : fieldErrors.includes('computeSize')
+              ? computeSettingsRef
+              : null
 
     if (!scrollTarget) return
 
@@ -458,7 +464,7 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
                     <DocsButton href={`${DOCS_URL}/guides/platform/compute-and-disk`} />
                   </PageSectionAside>
                 </PageSectionMeta>
-                <PageSectionContent>
+                <PageSectionContent ref={computeSettingsRef} className="scroll-mt-24">
                   <ComputeSizeField form={form} disabled={disableComputeInputs} />
                 </PageSectionContent>
               </PageSection>
@@ -480,7 +486,10 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
                     <DocsButton href={`${DOCS_URL}/guides/platform/database-size`} />
                   </PageSectionAside>
                 </PageSectionMeta>
-                <PageSectionContent className="flex flex-col gap-4">
+                <PageSectionContent
+                  ref={diskSizeSettingsRef}
+                  className="flex flex-col gap-4 scroll-mt-24"
+                >
                   {isAws && <DiskSpaceBar form={form} />}
 
                   <SpendCapDisabledSection currentDiskSizeGb={defaultValues.totalSize} />
@@ -578,7 +587,12 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
                               <Button
                                 variant="default"
                                 onClick={() => {
-                                  form.setValue('computeSize', 'ci_large')
+                                  form.setValue('computeSize', 'ci_large', {
+                                    shouldDirty: true,
+                                    shouldValidate: true,
+                                  })
+                                  form.trigger('provisionedIOPS')
+                                  form.trigger('throughput')
                                 }}
                               >
                                 Change to LARGE Compute
