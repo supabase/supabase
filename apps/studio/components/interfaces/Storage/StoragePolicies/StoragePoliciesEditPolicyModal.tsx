@@ -183,40 +183,42 @@ export const StoragePoliciesEditPolicyModal = ({
           </DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
-        <div className="min-h-0 flex-1 overflow-y-auto">
-          {view === POLICY_MODAL_VIEWS.SELECTION ? (
-            <PolicySelection
-              description="PostgreSQL policies control access to your files and folders"
-              onViewTemplates={onViewTemplates}
-              onViewEditor={() => onViewEditor('new')}
-              showAssistantPreview={false}
-            />
-          ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
-            <StoragePoliciesEditor
-              policyFormFields={policyFormFields}
-              onViewTemplates={onViewTemplates}
-              onUpdatePolicyName={onUpdatePolicyName}
-              onUpdatePolicyDefinition={onUpdatePolicyDefinition}
-              onToggleOperation={onToggleOperation}
-              onUpdatePolicyRoles={onUpdatePolicyRoles}
-              onReviewPolicy={validatePolicyEditorFormFields}
-            />
-          ) : view === POLICY_MODAL_VIEWS.TEMPLATES ? (
-            <PolicyTemplates
-              templates={STORAGE_POLICY_TEMPLATES as any[]}
-              onUseTemplate={onUseTemplate}
-              templatesNote={''}
-            />
-          ) : view === POLICY_MODAL_VIEWS.REVIEW ? (
-            <StoragePoliciesReview
-              policyStatements={policyStatementsForReview}
-              onSelectBack={onViewEditor}
-              onSelectSave={onReviewSave}
-            />
-          ) : (
-            <div />
-          )}
-        </div>
+        {view === POLICY_MODAL_VIEWS.REVIEW ? (
+          <StoragePoliciesReview
+            policyStatements={policyStatementsForReview}
+            onSelectBack={onViewEditor}
+            onSelectSave={onReviewSave}
+          />
+        ) : (
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            {view === POLICY_MODAL_VIEWS.SELECTION ? (
+              <PolicySelection
+                description="PostgreSQL policies control access to your files and folders"
+                onViewTemplates={onViewTemplates}
+                onViewEditor={() => onViewEditor('new')}
+                showAssistantPreview={false}
+              />
+            ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
+              <StoragePoliciesEditor
+                policyFormFields={policyFormFields}
+                onViewTemplates={onViewTemplates}
+                onUpdatePolicyName={onUpdatePolicyName}
+                onUpdatePolicyDefinition={onUpdatePolicyDefinition}
+                onToggleOperation={onToggleOperation}
+                onUpdatePolicyRoles={onUpdatePolicyRoles}
+                onReviewPolicy={validatePolicyEditorFormFields}
+              />
+            ) : view === POLICY_MODAL_VIEWS.TEMPLATES ? (
+              <PolicyTemplates
+                templates={STORAGE_POLICY_TEMPLATES as any[]}
+                onUseTemplate={onUseTemplate}
+                templatesNote={''}
+              />
+            ) : (
+              <div />
+            )}
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   )
