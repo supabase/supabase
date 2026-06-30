@@ -10,7 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { Admonition, TimestampInfo } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'

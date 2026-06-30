@@ -14,10 +14,6 @@
   },
   "exports": {
     "./package.json": "./package.json",
-    ".": {
-      "import": "./index.tsx",
-      "types": "./index.tsx"
-    },
     "./AssistantChat/AssistantChatForm": {
       "import": "./src/AssistantChat/AssistantChatForm.tsx",
       "types": "./src/AssistantChat/AssistantChatForm.tsx"
@@ -801,7 +797,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
-    "@monaco-editor/react": "^4.6.0",
+    "@monaco-editor/react": "catalog:",
     "@std/toml": "jsr:^1.0.11",
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",

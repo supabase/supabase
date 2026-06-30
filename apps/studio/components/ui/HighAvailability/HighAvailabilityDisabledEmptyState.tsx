@@ -2,7 +2,7 @@ import type { LucideIcon } from 'lucide-react'
 import { Server } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { cn } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 const DEFAULT_TITLE = 'This feature is unavailable on High Availability projects'
 const DEFAULT_DESCRIPTION =

@@ -992,5 +992,13 @@
     "company": "TRAE",
     "author_url": "https://www.linkedin.com/",
     "author_image_url": "/images/blog/avatars/gary-qi.png"
+  },
+  {
+    "author_id": "ekhar",
+    "author": "Eric Kharitonashvili",
+    "username": "ekhar",
+    "position": "Growth",
+    "author_url": "https://github.com/ekhar",
+    "author_image_url": "/images/blog/avatars/eric-kharitonashvili.png"
   }
 ]

@@ -20,7 +20,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import BarChart from '@/components/ui/Charts/BarChart'
