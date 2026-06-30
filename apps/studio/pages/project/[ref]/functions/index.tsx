@@ -2,7 +2,7 @@ import { useFlag, useParams } from 'common'
 import { ExternalLink, RefreshCw, Search, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
-import React, { useMemo, useRef } from 'react'
+import React, { useMemo, useRef, type PropsWithChildren } from 'react'
 import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -231,41 +231,45 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
   )
 }
 
-EdgeFunctionsPage.getLayout = (page: React.ReactElement) => {
-  return (
-    <DefaultLayout>
-      <EdgeFunctionsLayout title="Edge Functions">
-        <div className="w-full min-h-full flex flex-col items-stretch">
-          <PageHeader size="large">
-            <PageHeaderMeta>
-              <PageHeaderSummary>
-                <PageHeaderTitle>Edge Functions</PageHeaderTitle>
-                <PageHeaderDescription>
-                  Run server-side logic close to your users
-                </PageHeaderDescription>
-              </PageHeaderSummary>
-              <PageHeaderAside>
-                <DocsButton href={`${DOCS_URL}/guides/functions`} />
-                <Button asChild variant="default" icon={<ExternalLink />}>
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
-                  >
-                    Examples
-                  </a>
-                </Button>
-                {IS_PLATFORM && <DeployEdgeFunctionButton />}
-              </PageHeaderAside>
-            </PageHeaderMeta>
-          </PageHeader>
+// Hoisted out of `getLayout` so the TanStack route can import it
+// directly. Same body — accepts the page content as `children`.
+export const EdgeFunctionsIndexPageWrapper = ({ children }: PropsWithChildren) => (
+  <>
+    <div className="w-full min-h-full flex flex-col items-stretch">
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Edge Functions</PageHeaderTitle>
+            <PageHeaderDescription>Run server-side logic close to your users</PageHeaderDescription>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <DocsButton href={`${DOCS_URL}/guides/functions`} />
+            <Button asChild variant="default" icon={<ExternalLink />}>
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+              >
+                Examples
+              </a>
+            </Button>
+            {IS_PLATFORM && <DeployEdgeFunctionButton />}
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
 
-          {page}
-        </div>
-      </EdgeFunctionsLayout>
-      <TerminalInstructionsDialog />
-    </DefaultLayout>
-  )
-}
+      {children}
+    </div>
+    <TerminalInstructionsDialog />
+  </>
+)
+
+EdgeFunctionsPage.getLayout = (page: React.ReactElement) => (
+  <DefaultLayout>
+    <EdgeFunctionsLayout title="Edge Functions">
+      <EdgeFunctionsIndexPageWrapper>{page}</EdgeFunctionsIndexPageWrapper>
+    </EdgeFunctionsLayout>
+  </DefaultLayout>
+)
 
 export default EdgeFunctionsPage

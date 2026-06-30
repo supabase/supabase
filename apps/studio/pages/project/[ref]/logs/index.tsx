@@ -26,29 +26,29 @@ export const LogPage: NextPageWithLayout = () => {
 
   if (!logsEnabled) {
     return (
-      <DefaultLayout>
-        <ProjectLayout browserTitle={{ section: 'Logs' }}>
-          <UnknownInterface urlBack={`/project/${ref}`} />
-        </ProjectLayout>
-      </DefaultLayout>
+      <ProjectLayout browserTitle={{ section: 'Logs' }}>
+        <UnknownInterface urlBack={`/project/${ref}`} />
+      </ProjectLayout>
     )
   }
 
   if (isUnifiedLogsEnabled) {
     return (
-      <DefaultLayout>
-        {/* Omit the generic product segment here; project/org context already makes the route clear. */}
-        <ProjectLayout browserTitle={{ section: 'Unified Logs' }}>
-          <UnifiedLogs />
-        </ProjectLayout>
-      </DefaultLayout>
+      // Omit the generic product segment here; project/org context already makes the route clear.
+      <ProjectLayout browserTitle={{ section: 'Unified Logs' }}>
+        <UnifiedLogs />
+      </ProjectLayout>
     )
   }
 
   return null
 }
 
-// Don't use getLayout since we're handling layouts conditionally within the component
-LogPage.getLayout = (page) => page
+// DefaultLayout lives at the framework wrapper level, not in the page
+// body — both runtimes provide it externally (Next via `getLayout`,
+// TanStack via the parent `routes/project/$ref.tsx` shell). Wrapping it
+// inline would double-mount its SidebarProvider/ProjectContextProvider
+// chain under TanStack since the shell already supplies one.
+LogPage.getLayout = (page) => <DefaultLayout>{page}</DefaultLayout>
 
 export default LogPage
