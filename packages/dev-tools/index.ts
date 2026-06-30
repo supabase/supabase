@@ -3,7 +3,6 @@ import type { ReactNode } from 'react'
 import * as DevToolbarModule from './DevToolbar'
 import * as DevToolbarContextModule from './DevToolbarContext'
 import * as DevToolbarTriggerModule from './DevToolbarTrigger'
-import * as DevToolsDockModule from './DevToolsDock'
 import type { DevTelemetryToolbarContextType } from './types'
 
 // Tree-shaking pattern: conditionally export stubs outside local/staging.
@@ -39,9 +38,5 @@ export const DevToolbar = !isToolbarEnabled
 export const DevToolbarTrigger = !isToolbarEnabled
   ? () => null
   : DevToolbarTriggerModule.DevToolbarTrigger
-
-export const DevToolsDock = !isToolbarEnabled
-  ? (_props: { children: ReactNode; className?: string }) => null
-  : DevToolsDockModule.DevToolsDock
 
 export type { DevTelemetryEvent, DevToolbarConfig, ExtraTab } from './types'

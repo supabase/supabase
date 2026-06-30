@@ -18,7 +18,6 @@ import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/nextjs'
 import { HydrationBoundary, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ColorSystemTinker, ColorTinkerProvider } from 'color-tinker'
 import {
   FeatureFlagProvider,
   getFlags,
@@ -33,13 +32,7 @@ import duration from 'dayjs/plugin/duration'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import {
-  DevToolbar,
-  DevToolbarProvider,
-  DevToolbarTrigger,
-  DevToolsDock,
-  type ExtraTab,
-} from 'dev-tools'
+import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
@@ -218,31 +211,26 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                       <TooltipProvider>
                         <RouteValidationWrapper>
                           <ThemeProvider>
-                            <ColorTinkerProvider>
-                              <DevToolbarProvider apiUrl={API_URL}>
-                                <AiAssistantStateContextProvider>
-                                  <CommandProvider>
-                                    <BannerStackProvider>
-                                      <FeaturePreviewContextProvider>
-                                        <MainScrollContainerProvider>
-                                          {getLayout(<Component {...pageProps} />)}
-                                        </MainScrollContainerProvider>
-                                        <GlobalShortcuts />
-                                        <StudioCommandMenu />
-                                        <FeaturePreviewModal />
-                                      </FeaturePreviewContextProvider>
-                                    </BannerStackProvider>
-                                    <Toaster />
-                                    <MonacoThemeProvider />
-                                  </CommandProvider>
-                                </AiAssistantStateContextProvider>
-                                <DevToolbar extraTabs={devToolbarExtraTabs} />
-                                <DevToolsDock>
-                                  <ColorSystemTinker />
-                                  <DevToolbarTrigger />
-                                </DevToolsDock>
-                              </DevToolbarProvider>
-                            </ColorTinkerProvider>
+                            <DevToolbarProvider apiUrl={API_URL}>
+                              <AiAssistantStateContextProvider>
+                                <CommandProvider>
+                                  <BannerStackProvider>
+                                    <FeaturePreviewContextProvider>
+                                      <MainScrollContainerProvider>
+                                        {getLayout(<Component {...pageProps} />)}
+                                      </MainScrollContainerProvider>
+                                      <GlobalShortcuts />
+                                      <StudioCommandMenu />
+                                      <FeaturePreviewModal />
+                                    </FeaturePreviewContextProvider>
+                                  </BannerStackProvider>
+                                  <Toaster />
+                                  <MonacoThemeProvider />
+                                </CommandProvider>
+                              </AiAssistantStateContextProvider>
+                              <DevToolbar extraTabs={devToolbarExtraTabs} />
+                              <DevToolbarTrigger />
+                            </DevToolbarProvider>
                           </ThemeProvider>
                         </RouteValidationWrapper>
                       </TooltipProvider>
