@@ -7,11 +7,11 @@ export {
   DEFAULT_MCP_URL_NON_PLATFORM,
   FEATURE_GROUPS_PLATFORM,
   FEATURE_GROUPS_NON_PLATFORM,
-  MCP_CLIENTS,
   MCP_CLIENT_GROUPS,
-} from './constants'
-export { MCP_CLIENT_DATA } from './clients.data'
+  MCP_CLIENT_DATA,
+} from './clients.data'
 export type { McpClientData } from './clients.data'
+export { MCP_CLIENTS } from './mcpClients'
 export { getMcpUrl } from './utils/getMcpUrl'
 export { createMcpCopyHandler, type McpCopyType } from './utils/createMcpCopyHandler'
 export { McpConfigPanel, type McpConfigPanelProps } from './McpConfigPanel'

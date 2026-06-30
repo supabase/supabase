@@ -490,9 +490,9 @@
       "import": "./src/McpUrlBuilder/utils/serializeMcpConfig.ts",
       "types": "./src/McpUrlBuilder/utils/serializeMcpConfig.ts"
     },
-    "./McpUrlBuilder/constants": {
-      "import": "./src/McpUrlBuilder/constants.tsx",
-      "types": "./src/McpUrlBuilder/constants.tsx"
+    "./McpUrlBuilder/mcpClients": {
+      "import": "./src/McpUrlBuilder/mcpClients.tsx",
+      "types": "./src/McpUrlBuilder/mcpClients.tsx"
     },
     "./McpUrlBuilder": {
       "import": "./src/McpUrlBuilder/index.ts",
