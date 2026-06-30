@@ -17,9 +17,6 @@ import {
   FormControl,
   FormField,
   Switch,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -157,19 +154,14 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
         </CollapsibleTrigger>
         {!disabled && (
           <DropdownMenu>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="default"
-                    className="px-1"
-                    icon={<MoreVertical />}
-                    aria-label={`${role.name} actions`}
-                  />
-                </DropdownMenuTrigger>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">More options</TooltipContent>
-            </Tooltip>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="default"
+                className="px-1"
+                icon={<MoreVertical />}
+                aria-label={`${role.name} actions`}
+              />
+            </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="end" className="w-[120px]">
               <DropdownMenuItem
                 className="space-x-2"
