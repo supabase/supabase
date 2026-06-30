@@ -24,7 +24,11 @@ export async function getProjectAddons(
   })
 
   if (error) handleError(error)
-  return data
+  return {
+    ...data,
+    selected_addons: Array.isArray(data?.selected_addons) ? data.selected_addons : [],
+    available_addons: Array.isArray(data?.available_addons) ? data.available_addons : [],
+  }
 }
 
 export type ProjectAddonsData = Awaited<ReturnType<typeof getProjectAddons>>
