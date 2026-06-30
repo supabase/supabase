@@ -221,9 +221,10 @@ const Wizard: NextPageWithLayout = () => {
     ? 0
     : monthlyInstancePrice(instanceSize) - availableComputeCredits
 
+  const selectedCloudProvider = cloudProvider as CloudProvider
   const { data: autoDefaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {
-      cloudProvider: PROVIDERS[defaultProvider].id,
+      cloudProvider: selectedCloudProvider,
     },
     {
       enabled: flagsLoaded && !smartRegionEnabled,
@@ -255,7 +256,7 @@ const Wizard: NextPageWithLayout = () => {
     ? availableRegionsData?.recommendations.smartGroup.name
     : ''
 
-  const fixedDefaultRegion = PROVIDERS[defaultProvider].default_region.displayName
+  const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError =
     smartRegionEnabled && defaultProvider !== 'AWS_NIMBUS'
       ? availableRegionsError
