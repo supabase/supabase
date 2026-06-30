@@ -570,6 +570,30 @@ describe('OTEL filter translation', () => {
     `)
   })
 
+  it('drops the metadata root from an override key for function logs', () => {
+    expect(fmt(genDefaultQueryOtel(LogsTableName.FUNCTIONS, { 'metadata.function_id': 'abc-123' })))
+      .toMatchInlineSnapshot(`
+      "-- Logs Preview Query (otel) ['function_logs']
+      select
+        id,
+        timestamp,
+        event_message,
+        log_attributes['event_type'] as event_type,
+        log_attributes['function_id'] as function_id,
+        log_attributes['execution_id'] as execution_id,
+        log_attributes['level'] as level
+      from
+        logs
+      where
+        source = 'function_logs'
+        and (log_attributes['function_id'] = 'abc-123')
+      order by
+        timestamp desc
+      limit
+        100"
+    `)
+  })
+
   it('translates the etl pipeline_id filter', () => {
     expect(fmt(genDefaultQueryOtel(LogsTableName.ETL, { pipeline_id: '42' })))
       .toMatchInlineSnapshot(`
