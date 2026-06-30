@@ -28,7 +28,7 @@ export const RLSTesterPreview = () => {
           <li>
             Show the "Test" button on the{' '}
             <InlineLink href={`/project/${ref}/database/policies`}>
-              Authentication Policies page
+              Database Policies page
             </InlineLink>
           </li>
         </ul>
