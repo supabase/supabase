@@ -29,7 +29,7 @@ export type InviteUserModalProps = {
 }
 
 const formSchema = z.object({
-  email: z.string().min(1, 'Please enter a valid email').email('Please enter a valid email'),
+  email: z.string().trim().min(1, 'Please enter a valid email').email('Please enter a valid email'),
 })
 const formId = 'invite-user-form'
 
