@@ -11,7 +11,7 @@ Manual cache purging is useful when you need to ensure that updates are propagat
 
 <Admonition type="caution">
 
-Cache purging requires the **secret key**. Calls made with the anon key or a user JWT will be rejected by the server. Never expose your secret key in client-side code.
+Cache purging requires the **secret key**. The server rejects calls made with the legacy anon key or a user JWT. Never expose your secret key in client-side code.
 
 </Admonition>
 
