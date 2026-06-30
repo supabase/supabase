@@ -6,9 +6,6 @@ import styleHandler from '../../lib/theme/styleHandler'
 import { cn } from '../../lib/utils/cn'
 import { IconContext } from './IconContext'
 
-// @ts-ignore
-// import IconStyles from './Icon.module.css'
-
 interface Props {
   className?: string
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge' | 'xxxlarge' | number

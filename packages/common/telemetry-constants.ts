@@ -893,6 +893,22 @@ export interface AskAiClickedEvent {
 }
 
 /**
+ * User clicked a curated orientation link from a content listings MDX component.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsContentListingClickedEvent {
+  action: 'docs_content_listing_clicked'
+  properties: {
+    targetPath: string
+    linkTitle: string
+    groupTitle?: string
+    listingId?: string
+  }
+}
+
+/**
  * User clicked a recommended page card shown on a docs "not found" page.
  *
  * @group Events
@@ -3553,6 +3569,7 @@ export type TelemetryEvent =
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownClickedEvent
   | AskAiClickedEvent
+  | DocsContentListingClickedEvent
   | Docs404RecommendationClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent

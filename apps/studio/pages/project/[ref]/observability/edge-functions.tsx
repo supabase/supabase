@@ -25,7 +25,7 @@ import {
 } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
 import { useChartHoverState } from '@/components/ui/Charts/useChartHoverState'

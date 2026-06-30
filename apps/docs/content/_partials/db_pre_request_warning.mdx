@@ -22,7 +22,7 @@ on todos for select
 using ( set_information() AND (select auth.uid()) = user_id );
 ```
 
-This ensures the function is called when evaluating RLS policies for all products, not just Data API requests.
+This ensures the function is called when evaluating RLS policies for all products, not only Data API requests.
 
 **Performance consideration:**
 
