@@ -26,7 +26,7 @@ import { DateRangePicker } from '@/components/ui/DateRangePicker'
 import { DocsButton } from '@/components/ui/DocsButton'
 import Panel from '@/components/ui/Panel'
 import { DataPoint } from '@/data/analytics/constants'
-import { mapMultiResponseToAnalyticsData } from '@/data/analytics/infra-monitoring-queries'
+import { mapResponseToAnalyticsData } from '@/data/analytics/infra-monitoring-queries'
 import {
   InfraMonitoringAttribute,
   useInfraMonitoringAttributesQuery,
@@ -166,7 +166,7 @@ export const InfrastructureActivity = () => {
 
   const transformedData = useMemo(() => {
     if (!infraMonitoringData) return undefined
-    return mapMultiResponseToAnalyticsData(infraMonitoringData, INFRA_ATTRIBUTES, dateFormat)
+    return mapResponseToAnalyticsData(infraMonitoringData, INFRA_ATTRIBUTES, dateFormat)
   }, [infraMonitoringData, dateFormat])
 
   const cpuUsageData = transformedData?.max_cpu_usage

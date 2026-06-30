@@ -4,7 +4,7 @@ import { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from '../ProjectLayout'
 import { LogsSidebarMenuV2 } from './LogsSidebarMenuV2'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'

@@ -27,7 +27,7 @@ import { getGeneralPolicyTemplates } from './PolicyEditorModal.constants'
 import PolicyEditorModalTitle from './PolicyEditorModalTitle'
 import { useFeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import useLatest from '@/hooks/misc/useLatest'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 
 // Call only from a user-gesture handler (the Save click). Promotes the draft payload's

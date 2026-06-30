@@ -48,7 +48,7 @@ import { useDatabasePolicyUpdateMutation } from '@/data/database-policies/databa
 import { databasePoliciesKeys } from '@/data/database-policies/keys'
 import { QueryResponseError, useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import useLatest from '@/hooks/misc/useLatest'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 

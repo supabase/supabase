@@ -35,7 +35,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { FormActions } from '@/components/ui/Forms/FormActions'
 import { InlineLink } from '@/components/ui/InlineLink'

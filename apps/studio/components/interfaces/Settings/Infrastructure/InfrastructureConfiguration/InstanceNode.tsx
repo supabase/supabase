@@ -34,7 +34,7 @@ import {
 } from './InstanceConfiguration.constants'
 import { formatSeconds } from './InstanceConfiguration.utils'
 import { metricColor } from './InstanceNode.utils'
-import SparkBar from '@/components/ui/SparkBar'
+import { SparkBar } from '@/components/ui/SparkBar'
 import {
   DatabaseInitEstimations,
   ReplicaInitializationStatus,

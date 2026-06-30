@@ -149,5 +149,3 @@ export function useSqlEditorPrompt() {
     resetPrompt,
   }
 }
-
-export default useNewQuery
