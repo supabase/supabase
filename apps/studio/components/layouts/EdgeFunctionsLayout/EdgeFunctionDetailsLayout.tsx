@@ -25,7 +25,6 @@ import {
   PopoverTrigger,
   Separator,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageHeader,
@@ -37,6 +36,7 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
@@ -44,7 +44,7 @@ import { EdgeFunctionTesterSheet } from '@/components/interfaces/Functions/EdgeF
 import { useFunctionsDetailShortcuts } from '@/components/interfaces/Functions/useFunctionsDetailShortcuts'
 import CopyButton from '@/components/ui/CopyButton'
 import { DocsButton } from '@/components/ui/DocsButton'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
@@ -302,7 +302,7 @@ const EdgeFunctionDetailsLayout = ({
                 <div className="flex items-center gap-x-2">
                   <span className="flex items-center gap-2">{functionUrl}</span>
                   <ShortcutTooltip shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_COPY_URL} side="bottom">
-                    <CopyButton iconOnly type="text" text={functionUrl} />
+                    <CopyButton iconOnly variant="text" text={functionUrl} />
                   </ShortcutTooltip>
                 </div>
 
@@ -366,7 +366,7 @@ const EdgeFunctionDetailsLayout = ({
                     open={isDownloadOpen ? false : undefined}
                   >
                     <PopoverTrigger asChild>
-                      <Button type="default" icon={<Download />}>
+                      <Button variant="default" icon={<Download />}>
                         Download
                       </Button>
                     </PopoverTrigger>
@@ -390,7 +390,7 @@ const EdgeFunctionDetailsLayout = ({
                     )}
                     <div className="py-2 px-1">
                       <Button
-                        type="text"
+                        variant="text"
                         className="w-min hover:bg-transparent"
                         icon={<FileArchive />}
                         onClick={downloadFunction}
@@ -405,7 +405,7 @@ const EdgeFunctionDetailsLayout = ({
                     shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_TEST}
                     side="bottom"
                   >
-                    <Button type="default" icon={<Send />} onClick={openTestSheet}>
+                    <Button variant="default" icon={<Send />} onClick={openTestSheet}>
                       Test
                     </Button>
                   </ShortcutTooltip>

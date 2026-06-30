@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
-import { CalendarIcon, ExternalLink, Trash, Upload } from 'lucide-react'
+import { ExternalLink, Trash, Upload } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -19,9 +19,6 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
   RadioGroupStacked,
   RadioGroupStackedItem,
   Select,
@@ -33,6 +30,12 @@ import {
   Textarea,
 } from 'ui'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
+import {
+  DatePicker,
+  DatePickerButton,
+  DatePickerContent,
+  DatePickerTrigger,
+} from 'ui-patterns/DatePicker'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValueFieldArray/validation'
@@ -73,7 +76,7 @@ const formSchema = z
     region: z.string().min(1, 'Region is required'),
     schemas: z.array(z.string()).min(1, 'At least one schema is required'),
     queueType: z.enum(['basic', 'partitioned']),
-    expiryDate: z.date().optional(),
+    expiryDate: z.date(),
     password: z.string().min(8, 'Password must be at least 8 characters'),
     duration: z
       .union([
@@ -324,19 +327,20 @@ export default function FormPatternsPageLayout() {
                       >
                         <FormControl>
                           <div className="flex gap-4 items-center">
-                            <button
+                            <Button
                               type="button"
+                              variant="outline"
                               onClick={() => uploadButtonRef.current?.click()}
-                              className="flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong"
+                              className="flex items-center justify-center h-10 w-10 shrink-0 overflow-hidden rounded-full"
                               style={{
                                 backgroundImage: logoUrl ? `url("${logoUrl}")` : 'none',
                               }}
                             >
                               {!logoUrl && <Upload size={14} />}
-                            </button>
+                            </Button>
                             <div className="flex gap-2 items-center">
                               <Button
-                                type="default"
+                                variant="default"
                                 size="tiny"
                                 icon={<Upload size={14} />}
                                 onClick={() => uploadButtonRef.current?.click()}
@@ -345,7 +349,7 @@ export default function FormPatternsPageLayout() {
                               </Button>
                               {logoUrl && (
                                 <Button
-                                  type="default"
+                                  variant="default"
                                   size="tiny"
                                   icon={<Trash size={12} />}
                                   onClick={() => {
@@ -449,7 +453,7 @@ export default function FormPatternsPageLayout() {
                                         {file.name}
                                       </span>
                                       <Button
-                                        type="default"
+                                        variant="default"
                                         size="tiny"
                                         icon={<Trash size={12} />}
                                         onClick={() => {
@@ -664,32 +668,28 @@ export default function FormPatternsPageLayout() {
                   <FormField
                     control={form.control}
                     name="expiryDate"
-                    render={({ field }) => (
+                    render={({ field, fieldState }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
                         label="Date Picker"
                         description="Date selection with calendar popover"
                       >
                         <FormControl>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button
-                                type="outline"
-                                className="bg-control w-full justify-start text-left font-normal px-3 py-4"
-                                icon={<CalendarIcon className="h-4 w-4" />}
-                              >
+                          <DatePicker>
+                            <DatePickerTrigger asChild>
+                              <DatePickerButton block isInvalid={fieldState.invalid}>
                                 {field.value ? format(field.value, 'PPP') : 'Pick a date'}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
+                              </DatePickerButton>
+                            </DatePickerTrigger>
+                            <DatePickerContent>
                               <Calendar
                                 mode="single"
                                 selected={field.value}
                                 onSelect={field.onChange}
                                 initialFocus
                               />
-                            </PopoverContent>
-                          </Popover>
+                            </DatePickerContent>
+                          </DatePicker>
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -757,13 +757,13 @@ export default function FormPatternsPageLayout() {
                   >
                     <div className="flex gap-2 items-center justify-end">
                       <Button
-                        type="default"
+                        variant="default"
                         icon={<ExternalLink size={14} />}
                         onClick={() => console.log('Action performed')}
                       >
                         View documentation
                       </Button>
-                      <Button type="default" onClick={() => console.log('Reset action')}>
+                      <Button variant="default" onClick={() => console.log('Reset action')}>
                         Reset API key
                       </Button>
                     </div>
@@ -771,11 +771,11 @@ export default function FormPatternsPageLayout() {
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
                   {form.formState.isDirty && (
-                    <Button type="default" onClick={() => form.reset()}>
+                    <Button variant="default" onClick={() => form.reset()}>
                       Cancel
                     </Button>
                   )}
-                  <Button type="primary" htmlType="submit" disabled={!form.formState.isDirty}>
+                  <Button variant="primary" type="submit" disabled={!form.formState.isDirty}>
                     Save changes
                   </Button>
                 </CardFooter>

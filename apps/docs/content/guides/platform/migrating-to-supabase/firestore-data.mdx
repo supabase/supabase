@@ -124,7 +124,7 @@ module.exports = (collectionName, doc, recordCounters, writeRecord) => {
 - `writeRecord`: This function automatically handles the process of writing data to other JSON files (useful for "flatting" your document into separate JSON files to be written to separate database tables). `writeRecord` takes the following parameters:
   - `name`: Name of the JSON file to write to.
   - `doc`: The document to write to the file.
-  - `recordCounters`: The same `recordCounters` object that was passed to this hook (just passes it on).
+  - `recordCounters`: The same `recordCounters` object that was passed to this hook (passes it on).
 
 ### Examples
 

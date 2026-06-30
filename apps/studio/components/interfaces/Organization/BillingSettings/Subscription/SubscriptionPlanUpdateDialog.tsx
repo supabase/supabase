@@ -8,7 +8,7 @@ import { useMemo, useRef, useState } from 'react'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { toast } from 'sonner'
 import { Button, cn, Dialog, DialogContent } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -513,7 +513,7 @@ export const SubscriptionPlanUpdateDialog = ({
                 <Button
                   loading={isUpdating || paymentConfirmationLoading || isConfirming}
                   disabled={subscriptionPreviewIsLoading || subscriptionPreviewIsFetching}
-                  type="primary"
+                  variant="primary"
                   onClick={onUpdateSubscription}
                   className="flex-1"
                   size="small"

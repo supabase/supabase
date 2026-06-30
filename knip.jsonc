@@ -9,8 +9,24 @@
     "**/*.test.ts",
     // ignore studio public folder
     "apps/studio/public/**",
-    // ignore studio components, they're dynamically imported
-    "apps/studio/components/interfaces/Connect/content/**",
+    // ignore studio scripts
+    "apps/studio/scripts/**",
+    // ignore studio components that are dynamically imported
+    "apps/studio/components/interfaces/ConnectSheet/content/**",
+    "apps/studio/components/interfaces/ConnectSheet/ConnectionParameters.tsx",
+    "apps/studio/components/interfaces/ConnectSheet/DirectConnectionExamples.tsx",
+    "apps/studio/components/interfaces/ConnectSheet/useMcpUrl.ts",
+    // ignore studio data templates
+    "apps/studio/data/__templates/**",
+    // ignore studio NextJS to TanStack migration files
+    "apps/studio/compat/**",
+    "apps/studio/routes/**",
+    "apps/studio/router.ts",
+    "apps/studio/start.ts",
+    "apps/studio/routeTree.gen.ts",
+    "apps/studio/styles/fonts.css",
+    // ignore studio evals used in GH action
+    "apps/studio/evals/**",
     // ignore registry blocks in ui-library
     "apps/ui-library/registry/default/**",
     "apps/ui-library/contentlayer.config.js",

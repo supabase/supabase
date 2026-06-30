@@ -22,7 +22,7 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { AlgorithmHoverCard } from '../algorithm-hover-card'
 import { statusColors, statusLabels } from '../jwt.constants'
@@ -123,7 +123,7 @@ export const SigningKeyRow = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              type="text"
+              variant="text"
               className="px-1.5"
               loading={isLoading}
               icon={<MoreVertical className="size-4" />}

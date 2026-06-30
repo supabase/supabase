@@ -1,13 +1,14 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
+import { ChevronDown } from 'lucide-react'
 import { useCallback } from 'react'
-import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { isFilterRelatedError } from './GridError.utils'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import { useTableSort } from '@/components/grid/hooks/useTableSort'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { HighCostError } from '@/components/ui/HighQueryCost'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
@@ -53,6 +54,12 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
   const isForeignTableMissingVaultKeyError =
     isForeignTable && error?.message?.includes('query vault failed')
 
+  const isIcebergUnauthorizedError =
+    isForeignTable &&
+    error?.message.includes('iceberg error') &&
+    error?.message.includes('403 Forbidden') &&
+    error?.message.includes('Invalid Compact JWS')
+
   const hasActiveFilters = filters.length > 0
 
   const hasFilterRelatedError = hasActiveFilters && isFilterRelatedError(error?.message)
@@ -79,6 +86,8 @@ export const GridError = ({ error }: { error?: ResponseError | null }) => {
     return <FilterError removeAllFilters={removeAllFilters} />
   } else if (isInvalidOrderingOperatorError) {
     return <InvalidOrderingOperatorError error={error} />
+  } else if (isIcebergUnauthorizedError) {
+    return <IcebergUnauthorizedError error={error} />
   }
 
   return <GeneralError error={error} />
@@ -125,7 +134,7 @@ const FilterError = ({ removeAllFilters }: { removeAllFilters: () => void }) => 
         One or more of your filters may have a value or operator that doesn't match the column's
         data type. Try updating or removing the filter.
       </p>
-      <Button type="default" onClick={removeAllFilters}>
+      <Button variant="default" onClick={removeAllFilters}>
         Remove filters
       </Button>
     </Admonition>
@@ -158,9 +167,33 @@ const InvalidOrderingOperatorError = ({ error }: { error: ResponseError }) => {
         Error: <code className="text-code-inline">{error.message}</code>
       </p>
 
-      <Button type="default" onClick={() => onApplySorts([])}>
+      <Button variant="default" onClick={() => onApplySorts([])}>
         Remove sorts
       </Button>
+    </Admonition>
+  )
+}
+
+const IcebergUnauthorizedError = ({ error }: { error: ResponseError }) => {
+  const { ref } = useParams()
+
+  return (
+    <Admonition
+      type="warning"
+      className="pointer-events-auto"
+      title="Failed to retrieve rows from Iceberg foreign table"
+    >
+      <p className="text-balance">
+        The API key from your project that's used to retrieve data from your foreign table is either
+        incorrect or missing. Verify the API key (token) in your{' '}
+        <InlineLink href={`/project/${ref}/storage/analytics`}>Iceberg Bucket</InlineLink>.
+        Alternatively, you can also verify the token value in your{' '}
+        <InlineLink href={`/project/${ref}/integrations/iceberg_wrapper/wrappers`}>
+          wrapper's settings
+        </InlineLink>{' '}
+        or in <InlineLink href={`/project/${ref}/integrations/vault/overview`}>Vault</InlineLink>.
+      </p>
+      <ExpandError error={error} />
     </Admonition>
   )
 }
@@ -181,5 +214,21 @@ const GeneralError = ({ error }: { error: ResponseError }) => {
         </p>
       )}
     </AlertError>
+  )
+}
+
+const ExpandError = ({ error }: { error: ResponseError }) => {
+  return (
+    <Collapsible>
+      <CollapsibleTrigger className="mt-2 group font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">
+        <div className="flex items-center gap-x-2 w-full cursor-pointer">
+          <span className="font-mono uppercase tracking-tight">View error</span>
+          <ChevronDown className="transition-transform" size={14} />
+        </div>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="mt-1">
+        <code className="text-code-inline">{error.message}</code>
+      </CollapsibleContent>
+    </Collapsible>
   )
 }

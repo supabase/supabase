@@ -11,8 +11,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { LogDrainDestinationSheetForm } from './LogDrainDestinationSheetForm'
 import { LogDrainType } from './LogDrains.constants'
@@ -156,7 +156,7 @@ export function OrgAuditLogDrains() {
               <Button
                 disabled={!canManageLogDrains}
                 onClick={handleAddDestinationClick}
-                type="primary"
+                variant="primary"
                 className="rounded-r-none px-3"
               >
                 Add destination
@@ -165,7 +165,7 @@ export function OrgAuditLogDrains() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="primary"
+                  variant="primary"
                   title="Choose destination type"
                   className="rounded-l-none px-[4px] py-[5px]"
                   icon={<ChevronDown />}

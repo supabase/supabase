@@ -66,7 +66,7 @@ export const UnhealthyState = () => {
                 </div>
                 <div>
                   <Button
-                    type="default"
+                    variant="default"
                     size="tiny"
                     disabled={!canRestartProject}
                     loading={isRestarting}

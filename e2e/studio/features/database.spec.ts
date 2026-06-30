@@ -6,12 +6,7 @@ import { createTable, dropTable, query } from '../utils/db/index.js'
 import { dismissToastsIfAny } from '../utils/dismiss-toast.js'
 import { test, withSetupCleanup } from '../utils/test.js'
 import { toUrl } from '../utils/to-url.js'
-import {
-  createApiResponseWaiter,
-  waitForApiResponse,
-  waitForDatabaseToLoad,
-  waitForSchemaVisualizerToLoad,
-} from '../utils/wait-for-response.js'
+import { createApiResponseWaiter, waitForApiResponse } from '../utils/wait-for-response.js'
 
 async function focusTableInVisualizer(page: Page, tableName: string) {
   await page.getByTestId('find-table-selector').click()
@@ -33,16 +28,13 @@ test.describe('Database', () => {
         }
       )
 
-      const wait = createApiResponseWaiter(
-        page,
-        'pg-meta',
-        ref,
-        'query?key=project:default-schema:public-infinite_tables'
-      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
-      await wait
 
-      // focus the test table so it mounts inside the viewport
+      // Gate on the UI, not the pg-meta XHR: under the TanStack build the
+      // schema is delivered via the SSR stream, so a `waitForResponse` for the
+      // `public-infinite_tables` query never fires client-side and times out.
+      // Focusing the freshly-created table already auto-waits for the schema
+      // (including the new table) to load in the visualizer.
       await focusTableInVisualizer(page, databaseTableName)
 
       // validates table and column exists
@@ -91,8 +83,12 @@ test.describe('Database', () => {
       // changing schema -> auth
       await page.getByTestId('schema-selector').click()
       await page.getByRole('option', { name: 'auth' }).click()
-      await waitForSchemaVisualizerToLoad(page, ref, 'auth')
 
+      // No waitForResponse for auth-infinite_tables here: it fires on the
+      // schema switch above and can resolve before a listener registered now
+      // attaches (and is SSR-streamed under TanStack) — the same race that
+      // flaked this test. focusTableInVisualizer below already auto-waits for
+      // the auth schema's tables to load.
       for (const tableName of ['users', 'sso_providers', 'saml_providers']) {
         await focusTableInVisualizer(page, tableName)
         await expect(page.getByText(tableName, { exact: true })).toBeVisible()
@@ -110,16 +106,13 @@ test.describe('Database', () => {
           await dropTable(databaseTableName)
         }
       )
-      const wait = createApiResponseWaiter(
-        page,
-        'pg-meta',
-        ref,
-        'query?key=project:default-schema:public-infinite_tables'
-      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
-      await wait
 
-      // focus the test table so it mounts inside the viewport
+      // Gate on the UI, not the pg-meta XHR: under the TanStack build the
+      // schema is delivered via the SSR stream, so a `waitForResponse` for the
+      // `public-infinite_tables` query never fires client-side and times out.
+      // Focusing the freshly-created table already auto-waits for the schema
+      // (including the new table) to load in the visualizer.
       await focusTableInVisualizer(page, databaseTableName)
 
       // validates table and column exists
@@ -181,16 +174,13 @@ test.describe('Database', () => {
           await dropTable(databaseTableName)
         }
       )
-      const wait = createApiResponseWaiter(
-        page,
-        'pg-meta',
-        ref,
-        'query?key=project:default-schema:public-infinite_tables'
-      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/schemas?schema=public`))
-      await wait
 
-      // focus the test table so it mounts inside the viewport
+      // Gate on the UI, not the pg-meta XHR: under the TanStack build the
+      // schema is delivered via the SSR stream, so a `waitForResponse` for the
+      // `public-infinite_tables` query never fires client-side and times out.
+      // Focusing the freshly-created table already auto-waits for the schema
+      // (including the new table) to load in the visualizer.
       await focusTableInVisualizer(page, databaseTableName)
 
       // validates table and column exists
@@ -349,9 +339,9 @@ test.describe('Database', () => {
       )
       await page.getByRole('button', { name: 'Save' }).click()
 
-      // validate table update
+      // validate table update — the toBeVisible assertion below already waits
+      // for the list to refetch, so no racy post-mutation waitForResponse here.
       await updateTableWait
-      await waitForDatabaseToLoad(page, ref)
       await expect(page.getByText(databaseTableNameUpdated, { exact: true })).toBeVisible()
       await expect(
         page.getByText(`Successfully updated ${databaseTableNameUpdated}!`)
@@ -371,9 +361,9 @@ test.describe('Database', () => {
       const duplicateTableWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=')
       await page.getByRole('button', { name: 'Save' }).click()
 
-      // validate table duplicate
+      // validate table duplicate — the toBeVisible assertion below already
+      // waits for the list to refetch, so no racy post-mutation wait here.
       await duplicateTableWait
-      await waitForDatabaseToLoad(page, ref)
       await expect(page.getByText(databaseTableNameDuplicate, { exact: true })).toBeVisible()
       await expect(
         page.getByText(
@@ -629,7 +619,7 @@ test.describe('Database', () => {
       await expect(triggerRow).toContainText(databaseTriggerName)
 
       // update trigger
-      await triggerRow.getByRole('button', { name: 'More options' }).click()
+      await triggerRow.getByRole('button', { name: /actions$/i }).click()
       await page.getByRole('menuitem', { name: 'Edit trigger' }).click()
       await page.getByRole('textbox', { name: 'Name of trigger' }).fill(databaseTriggerNameUpdated)
       const triggerUpdateWait = createApiResponseWaiter(
@@ -653,7 +643,7 @@ test.describe('Database', () => {
       await expect(updatedTriggerRow).toContainText(databaseTriggerNameUpdated)
 
       // delete trigger
-      await updatedTriggerRow.getByRole('button', { name: 'More options' }).click()
+      await updatedTriggerRow.getByRole('button', { name: /actions$/i }).click()
       await page.getByRole('menuitem', { name: 'Delete trigger' }).click()
       await page.getByPlaceholder('Type in name of trigger').fill(databaseTriggerNameUpdated)
       await page
@@ -1274,7 +1264,8 @@ test.describe('Database Functions', () => {
     await page.waitForLoadState('networkidle')
 
     // create a new function button exists in public schema
-    await expect(page.getByRole('button', { name: 'Create a new function' })).toBeVisible()
+    const newFunctionButton = page.getByRole('button', { name: 'New function' }).first()
+    await expect(newFunctionButton).toBeVisible()
 
     // change schema -> auth
     await page.getByTestId('schema-selector').click()
@@ -1283,7 +1274,7 @@ test.describe('Database Functions', () => {
     await expect(page.getByText('email')).toBeVisible()
     await expect(page.getByText('jwt')).toBeVisible()
     // create a new function button does not exist in other schemas
-    await expect(page.getByRole('button', { name: 'Create a new function' })).not.toBeVisible()
+    await expect(page.getByRole('button', { name: 'New function' })).not.toBeVisible()
 
     // filter by querying
     await page.getByRole('textbox', { name: 'Search for a function' }).fill('email')
@@ -1311,7 +1302,7 @@ test.describe('Database Functions', () => {
     await page.waitForLoadState('networkidle')
 
     // create new function
-    await page.getByRole('button', { name: 'Create a new function' }).click()
+    await page.getByRole('button', { name: 'New function' }).first().click()
     await page.getByRole('textbox', { name: 'Name of function' }).fill(databaseFunctionName)
     const editor = page.getByRole('presentation')
     await editor.click()
@@ -1344,7 +1335,7 @@ test.describe('Database Functions', () => {
     await expect(functionRow).toContainText(databaseFunctionName)
 
     // update function
-    await functionRow.getByRole('button', { name: 'More options' }).click()
+    await functionRow.getByRole('button', { name: /actions$/i }).click()
     await page.getByRole('menuitem', { name: 'Edit function', exact: true }).click()
     await page.getByRole('textbox', { name: 'Name of function' }).fill(databaseFunctionNameUpdated)
     const functionUpdateWait = createApiResponseWaiter(
@@ -1367,7 +1358,7 @@ test.describe('Database Functions', () => {
     await expect(updatedFunctionRow).toContainText(databaseFunctionNameUpdated)
 
     // delete function
-    await updatedFunctionRow.getByRole('button', { name: 'More options' }).click()
+    await updatedFunctionRow.getByRole('button', { name: /actions$/i }).click()
     await page.getByRole('menuitem', { name: 'Delete function' }).click()
     await page.getByPlaceholder('Type in name of function').fill(databaseFunctionNameUpdated)
     const functionDeleteWait = createApiResponseWaiter(

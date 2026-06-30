@@ -15,7 +15,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
-import { Admonition, TimestampInfo } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -95,7 +96,7 @@ const StorageListV2MigrationDialog = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <ButtonTooltip
-          type="primary"
+          variant="primary"
           disabled={!canUpdateStorageSettings}
           tooltip={{
             content: {
@@ -151,10 +152,10 @@ const StorageListV2MigrationDialog = () => {
         </DialogSection>
 
         <DialogFooter>
-          <Button type="default" disabled={isUpdating} onClick={() => setOpen(false)}>
+          <Button variant="default" disabled={isUpdating} onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button type="primary" loading={isUpdating} onClick={() => onConfirmUpgrade()}>
+          <Button variant="primary" loading={isUpdating} onClick={() => onConfirmUpgrade()}>
             Upgrade now
           </Button>
         </DialogFooter>

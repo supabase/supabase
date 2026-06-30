@@ -22,7 +22,7 @@ export function ScheduleInfo() {
           </p>
         </div>
         <div className="px-10">
-          <Button asChild type="default">
+          <Button asChild variant="default">
             <Link href="/launch-week-register">Get a ticket</Link>
           </Button>
         </div>

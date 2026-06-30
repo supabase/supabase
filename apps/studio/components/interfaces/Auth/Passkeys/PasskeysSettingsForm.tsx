@@ -19,8 +19,9 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
+import { validateRpId, validateWebAuthnOrigins } from './PasskeysSettingsForm.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import type { components } from '@/data/api'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
@@ -29,88 +30,6 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 type GoTrueConfig = components['schemas']['GoTrueConfigResponse']
-
-function isLocalhost(hostname: string): boolean {
-  return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]'
-}
-
-function validateRpId(rpId: string): string | null {
-  const trimmed = rpId.trim().toLowerCase()
-  if (!trimmed) return null
-  try {
-    const url = new URL('https://' + trimmed)
-    if (url.hostname !== trimmed) return null
-    return trimmed
-  } catch {
-    return null
-  }
-}
-
-function validateWebAuthnOrigins(
-  value: string,
-  rpId: string | null
-): { valid: true } | { valid: false; message: string } {
-  const origins = value
-    .split(',')
-    .map((o) => o.trim())
-    .filter(Boolean)
-
-  if (origins.length === 0) {
-    return { valid: false, message: 'At least one origin is required' }
-  }
-
-  if (origins.length > 5) {
-    return { valid: false, message: 'A maximum of 5 origins is allowed' }
-  }
-
-  for (const origin of origins) {
-    let url: URL
-    try {
-      url = new URL(origin)
-    } catch {
-      return { valid: false, message: `"${origin}" is not a valid URL` }
-    }
-
-    if (url.protocol === 'http:') {
-      if (!isLocalhost(url.hostname)) {
-        return {
-          valid: false,
-          message: `"${origin}" must use HTTPS unless it is a localhost origin`,
-        }
-      }
-    } else if (url.protocol !== 'https:') {
-      return {
-        valid: false,
-        message: `"${origin}" must use HTTPS unless it is a localhost origin`,
-      }
-    }
-
-    if (url.href !== url.origin + '/') {
-      return {
-        valid: false,
-        message: `"${origin}" must be a plain origin without path, query, or fragment (e.g. "${url.origin}")`,
-      }
-    }
-
-    if (rpId && !isOriginCompatibleWithRpId(url.hostname, rpId)) {
-      return {
-        valid: false,
-        message: `"${origin}" is not compatible with Relying Party ID "${rpId}". The origin's hostname must match or be a subdomain of the RP ID.`,
-      }
-    }
-  }
-
-  return { valid: true }
-}
-
-function isOriginCompatibleWithRpId(originHostname: string, rpId: string): boolean {
-  const host = originHostname.toLowerCase()
-  const id = rpId.toLowerCase()
-  if (isLocalhost(host) && isLocalhost(id)) return true
-  if (host === id) return true
-  if (host.endsWith('.' + id)) return true
-  return false
-}
 
 const schema = z
   .object({
@@ -365,7 +284,7 @@ export const PasskeysSettingsForm = () => {
                     <FormItemLayout
                       layout="flex-row-reverse"
                       label="Relying Party Origins"
-                      description='Comma-separated list of allowed origins (e.g. "https://example.com"). HTTPS is required except for localhost.'
+                      description='Comma-separated list of allowed origins (e.g. "https://example.com"). HTTPS is required except for localhost. Android app origins are also accepted.'
                     >
                       <FormControl>
                         <Input {...field} placeholder="https://example.com" />
@@ -379,15 +298,15 @@ export const PasskeysSettingsForm = () => {
 
           <CardFooter className="justify-end space-x-2">
             <Button
-              type="default"
+              variant="default"
               onClick={() => form.reset(buildPasskeysFormValues(authConfig, project))}
               disabled={isPending}
             >
               Cancel
             </Button>
             <Button
-              type="primary"
-              htmlType="submit"
+              variant="primary"
+              type="submit"
               disabled={!canUpdateConfig || !form.formState.isDirty}
               loading={isPending}
             >

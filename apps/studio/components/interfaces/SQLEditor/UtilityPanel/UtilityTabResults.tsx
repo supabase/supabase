@@ -4,7 +4,7 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import { forwardRef } from 'react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import Results from './Results'
+import { Results } from './Results'
 import { getSqlErrorLines } from './UtilityTabResults.utils'
 import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
@@ -136,7 +136,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
               {readReplicaError && (
                 <Button
                   className="py-2"
-                  type="default"
+                  variant="default"
                   onClick={() => {
                     state.setSelectedDatabaseId(ref)
                     snapV2.resetResults(id)
@@ -148,7 +148,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
               {errorLines.length > 0 && (
                 <Tooltip>
                   <TooltipTrigger>
-                    <CopyButton iconOnly type="default" text={errorLines.join('\n')} />
+                    <CopyButton iconOnly variant="default" text={errorLines.join('\n')} />
                   </TooltipTrigger>
                   <TooltipContent side="bottom" align="center">
                     <span>Copy error</span>

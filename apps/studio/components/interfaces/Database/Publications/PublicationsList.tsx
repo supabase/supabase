@@ -22,7 +22,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { PublicationSkeleton } from './PublicationSkeleton'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import InformationBox from '@/components/ui/InformationBox'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
@@ -217,7 +217,11 @@ export const PublicationsList = () => {
                     ))}
                     <TableCell>
                       <div className="flex justify-end">
-                        <Button asChild type="default" style={{ paddingTop: 3, paddingBottom: 3 }}>
+                        <Button
+                          asChild
+                          variant="default"
+                          style={{ paddingTop: 3, paddingBottom: 3 }}
+                        >
                           <Link href={`/project/${ref}/database/publications/${x.id}`}>
                             {x.tables === null
                               ? 'All tables'

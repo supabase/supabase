@@ -74,7 +74,7 @@ const UpgradePrompt: React.FC<Props> = ({
           </div>
         </DialogSection>
         <DialogFooter className="flex justify-end gap-3">
-          <Button type="default" onClick={() => setShowUpgradePrompt(false)}>
+          <Button variant="default" onClick={() => setShowUpgradePrompt(false)}>
             Close
           </Button>
           <Button asChild size="tiny">

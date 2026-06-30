@@ -14,7 +14,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'ui'
-import { Admonition, ShimmeringLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { ApprovalState, IApprovalFormSchema } from './ApiAuthorization.Schema'
 import {
@@ -299,7 +300,7 @@ function FormFooter({
         onApprove={onApprove}
       />
       <Button
-        type="text"
+        variant="text"
         block
         loading={approvalState === 'declining'}
         disabled={approvalState !== 'indeterminate'}
@@ -333,7 +334,7 @@ function ApprovalButton({
 }: ApprovalButtonProps): ReactNode {
   return (
     <Button
-      type="primary"
+      variant="primary"
       block
       loading={approvalState === 'approving'}
       disabled={disabled}

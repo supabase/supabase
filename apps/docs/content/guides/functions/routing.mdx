@@ -27,7 +27,7 @@ To combine multiple endpoints into a single Edge Function, you can use web appli
 
 ## Basic routing example
 
-Here's a simple hello world example using some popular web frameworks:
+Here's a basic hello world example using some popular web frameworks:
 
 <Tabs
   scrollable
@@ -44,13 +44,13 @@ import { withSupabase } from 'npm:@supabase/server@^1'
 export default {
   fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
     if (req.method === 'GET') {
-      return new Response('Hello World!')
+      return Response.json({ message: 'Hello World!' })
     }
     const { name } = await req.json()
     if (name) {
-      return new Response(`Hello ${name}!`)
+      return Response.json({ message: `Hello ${name}!` })
     }
-    return new Response('Hello World!')
+    return Response.json({ message: 'Hello World!' })
   }),
 }
 ```
@@ -60,7 +60,7 @@ export default {
 <TabPanel id="expressjs" label="Express">
 
 ```ts
-import express from 'npm:express@4.18.2'
+import express from 'npm:express@^5'
 
 const app = express()
 app.use(express.json())
@@ -70,12 +70,12 @@ app.use(express.json())
 const port = 3000
 
 app.get('/hello-world', (req, res) => {
-  res.send('Hello World!')
+  res.json({ message: 'Hello World!' })
 })
 
 app.post('/hello-world', (req, res) => {
   const { name } = req.body
-  res.send(`Hello ${name}!`)
+  res.json({ message: `Hello ${name}!` })
 })
 
 app.listen(port, () => {
@@ -88,18 +88,18 @@ app.listen(port, () => {
 <TabPanel id="oak" label="Oak">
 
 ```ts
-import { Application } from 'jsr:@oak/oak@15/application'
-import { Router } from 'jsr:@oak/oak@15/router'
+import { Application } from 'jsr:@oak/oak@^17/application'
+import { Router } from 'jsr:@oak/oak@^17/router'
 
 const router = new Router()
 
 router.get('/hello-world', (ctx) => {
-  ctx.response.body = 'Hello world!'
+  ctx.response.body = { message: 'Hello World!' }
 })
 
 router.post('/hello-world', async (ctx) => {
   const { name } = await ctx.request.body.json()
-  ctx.response.body = `Hello ${name}!`
+  ctx.response.body = { message: `Hello ${name}!` }
 })
 
 const app = new Application()
@@ -114,17 +114,17 @@ app.listen({ port: 3000 })
 <TabPanel id="hono" label="Hono">
 
 ```ts
-import { Hono } from 'jsr:@hono/hono'
+import { Hono } from 'jsr:@hono/hono@^4'
 
 const app = new Hono()
 
 app.post('/hello-world', async (c) => {
   const { name } = await c.req.json()
-  return new Response(`Hello ${name}!`)
+  return c.json({ message: `Hello ${name}!` })
 })
 
 app.get('/hello-world', (c) => {
-  return new Response('Hello World!')
+  return c.json({ message: 'Hello World!' })
 })
 
 export default { fetch: app.fetch }
@@ -173,15 +173,15 @@ let tasks: Task[] = []
 const router = new Map<string, (req: Request) => Promise<Response>>()
 
 async function getAllTasks(): Promise<Response> {
-  return new Response(JSON.stringify(tasks))
+  return Response.json({ tasks })
 }
 
 async function getTask(id: string): Promise<Response> {
   const task = tasks.find((t) => t.id === id)
   if (task) {
-    return new Response(JSON.stringify(task))
+    return Response.json({ task })
   } else {
-    return new Response('Task not found', { status: 404 })
+    return Response.json({ error: 'Task not found' }, { status: 404 })
   }
 }
 
@@ -189,16 +189,17 @@ async function createTask(req: Request): Promise<Response> {
   const id = Math.random().toString(36).substring(7)
   const task = { id, name: '' }
   tasks.push(task)
-  return new Response(JSON.stringify(task), { status: 201 })
+  return Response.json({ task }, { status: 201 })
 }
 
 async function updateTask(id: string, req: Request): Promise<Response> {
   const index = tasks.findIndex((t) => t.id === id)
   if (index !== -1) {
-    tasks[index] = { ...tasks[index] }
-    return new Response(JSON.stringify(tasks[index]))
+    const updates = await req.json()
+    tasks[index] = { ...tasks[index], ...updates }
+    return Response.json({ task: tasks[index] })
   } else {
-    return new Response('Task not found', { status: 404 })
+    return Response.json({ error: 'Task not found' }, { status: 404 })
   }
 }
 
@@ -206,9 +207,9 @@ async function deleteTask(id: string): Promise<Response> {
   const index = tasks.findIndex((t) => t.id === id)
   if (index !== -1) {
     tasks.splice(index, 1)
-    return new Response('Task deleted successfully')
+    return Response.json({ message: 'Task deleted successfully' })
   } else {
-    return new Response('Task not found', { status: 404 })
+    return Response.json({ error: 'Task not found' }, { status: 404 })
   }
 }
 
@@ -234,19 +235,19 @@ export default {
           if (id) {
             return updateTask(id, req)
           } else {
-            return new Response('Bad Request', { status: 400 })
+            return Response.json({ error: 'Bad Request' }, { status: 400 })
           }
         case 'DELETE':
           if (id) {
             return deleteTask(id)
           } else {
-            return new Response('Bad Request', { status: 400 })
+            return Response.json({ error: 'Bad Request' }, { status: 400 })
           }
         default:
-          return new Response('Method Not Allowed', { status: 405 })
+          return Response.json({ error: 'Method Not Allowed' }, { status: 405 })
       }
     } catch (error) {
-      return new Response(`Internal Server Error: ${error}`, { status: 500 })
+      return Response.json({ error: `Internal Server Error: ${error}` }, { status: 500 })
     }
   }),
 }
@@ -257,7 +258,7 @@ export default {
 <TabPanel id="expressjs" label="Express">
 
 ```ts
-import express from 'npm:express@4.18.2'
+import express from 'npm:express@^5'
 
 const app = express()
 app.use(express.json())
@@ -293,8 +294,8 @@ app.delete('/tasks/:id', async (req, res) => {
 <TabPanel id="oak" label="Oak">
 
 ```ts
-import { Application } from 'jsr:@oak/oak/application'
-import { Router } from 'jsr:@oak/oak/router'
+import { Application } from 'jsr:@oak/oak@^17/application'
+import { Router } from 'jsr:@oak/oak@^17/router'
 
 const router = new Router()
 
@@ -357,7 +358,7 @@ app.listen({ port: 3000 })
 <TabPanel id="hono" label="Hono">
 
 ```ts
-import { Hono } from 'jsr:@hono/hono'
+import { Hono } from 'jsr:@hono/hono@^4'
 
 // You can set the basePath with Hono
 const functionName = 'tasks'
@@ -368,9 +369,9 @@ app.get('/:id', async (c) => {
   const id = c.req.param('id')
   const task = {} // Fetch task by id here
   if (task) {
-    return new Response(JSON.stringify(task))
+    return c.json({ task })
   } else {
-    return new Response('Task not found', { status: 404 })
+    return c.json({ error: 'Task not found' }, { status: 404 })
   }
 })
 
@@ -381,9 +382,9 @@ app.patch('/:id', async (c) => {
   const task = {} // Fetch task by id here
   if (task) {
     Object.assign(task, updates)
-    return new Response(JSON.stringify(task))
+    return c.json({ task })
   } else {
-    return new Response('Task not found', { status: 404 })
+    return c.json({ error: 'Task not found' }, { status: 404 })
   }
 })
 
@@ -392,9 +393,9 @@ app.delete('/:id', async (c) => {
   const task = {} // Fetch task by id here
   if (task) {
     // Delete task
-    return new Response('Task deleted successfully')
+    return c.json({ message: 'Task deleted successfully' })
   } else {
-    return new Response('Task not found', { status: 404 })
+    return c.json({ error: 'Task not found' }, { status: 404 })
   }
 })
 

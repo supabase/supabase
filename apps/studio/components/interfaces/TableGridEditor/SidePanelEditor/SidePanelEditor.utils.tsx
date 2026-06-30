@@ -26,8 +26,8 @@ import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './Si
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import type { ImportContent } from './TableEditor/TableEditor.types'
 import type { SupaRow } from '@/components/grid/types'
-import { type AcceptedGeneratedPolicy } from '@/components/interfaces/Auth/Policies/Policies.utils'
-import SparkBar from '@/components/ui/SparkBar'
+import { type AcceptedGeneratedPolicy } from '@/components/interfaces/Database/Policies/Policies.utils'
+import { SparkBar } from '@/components/ui/SparkBar'
 import { createDatabaseColumn } from '@/data/database-columns/database-column-create-mutation'
 import { deleteDatabaseColumn } from '@/data/database-columns/database-column-delete-mutation'
 import { updateDatabaseColumn } from '@/data/database-columns/database-column-update-mutation'
@@ -908,7 +908,9 @@ export const updateTable = async ({
     }),
     queryClient.invalidateQueries({ queryKey: databaseKeys.tableDefinition(projectRef, table.id) }),
     queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
-    queryClient.invalidateQueries({ queryKey: tableKeys.list(projectRef, table.schema, true) }),
+    queryClient.invalidateQueries({
+      queryKey: tableKeys.list(projectRef, table.schema, { includeColumns: true }),
+    }),
     queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
   ])
 

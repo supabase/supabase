@@ -2,7 +2,7 @@ import { Loader2 } from 'lucide-react'
 import { useState } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import Results from './Results'
+import { Results } from './Results'
 import { ExplainVisualizer } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer'
 import { ExplainHeader } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.Header'
 import {
@@ -57,7 +57,7 @@ export function UtilityTabExplain({ id, isExecuting }: UtilityTabExplainProps) {
             {formattedError.length > 0 && (
               <Tooltip>
                 <TooltipTrigger>
-                  <CopyButton iconOnly type="default" text={formattedError.join('\n')} />
+                  <CopyButton iconOnly variant="default" text={formattedError.join('\n')} />
                 </TooltipTrigger>
                 <TooltipContent side="bottom" align="center">
                   <span>Copy error</span>

@@ -9,7 +9,7 @@ interface IndexAdvisorFilterProps {
 export const IndexAdvisorFilter = ({ isActive, onToggle }: IndexAdvisorFilterProps) => {
   return (
     <Button
-      type={isActive ? 'default' : 'outline'}
+      variant={isActive ? 'default' : 'outline'}
       size="tiny"
       className={cn(isActive ? 'bg-surface-300' : 'border-dashed')}
       onClick={onToggle}

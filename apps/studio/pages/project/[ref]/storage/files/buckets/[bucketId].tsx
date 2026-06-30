@@ -34,7 +34,7 @@ import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.c
 import StorageBucketsError from '@/components/interfaces/Storage/StorageBucketsError'
 import { StorageExplorer } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer'
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
 import { StorageExplorerStateContextProvider } from '@/state/storage-explorer'
 import type { NextPageWithLayout } from '@/types'
@@ -80,7 +80,7 @@ const BucketPage: NextPageWithLayout = () => {
             <PageBreadcrumbsActions>
               <Button
                 asChild
-                type="outline"
+                variant="outline"
                 size="tiny"
                 icon={<Shield size={14} />}
                 iconRight={
@@ -99,7 +99,7 @@ const BucketPage: NextPageWithLayout = () => {
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="outline" size="tiny" iconRight={<ChevronDown size={14} />}>
+                  <Button variant="outline" size="tiny" iconRight={<ChevronDown size={14} />}>
                     Edit bucket
                   </Button>
                 </DropdownMenuTrigger>

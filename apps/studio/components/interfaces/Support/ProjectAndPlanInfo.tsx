@@ -7,9 +7,9 @@ import Link from 'next/link'
 import type { UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, cn, CommandGroup, CommandItem, FormControl, FormField } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { ExtendedSupportCategories } from './Support.constants'
 import type { SupportFormValues } from './SupportForm.schema'
@@ -84,7 +84,7 @@ function ProjectSelector({ form, orgSlug, projectRef }: ProjectSelectorProps) {
                 return (
                   <Button
                     block
-                    type="default"
+                    variant="default"
                     role="combobox"
                     aria-label="Select a project"
                     aria-expanded={open}
@@ -150,7 +150,7 @@ function ProjectRefHighlighted({ projectRef }: ProjectRefHighlightedProps) {
           </p>
           <CopyButton
             iconOnly
-            type="text"
+            variant="text"
             text={projectRef}
             onClick={() => toast.success('Copied project ID to clipboard')}
           />
@@ -207,7 +207,7 @@ export const PlanExpectationInfoContent = ({
               Upgrade plan
             </Link>
           </Button>
-          <Button asChild type="default" size="tiny" icon={<ExternalLink />}>
+          <Button asChild variant="default" size="tiny" icon={<ExternalLink />}>
             <Link href="https://supabase.com/contact/enterprise" target="_blank" rel="noreferrer">
               Enquire about Enterprise
             </Link>

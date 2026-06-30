@@ -1,5 +1,6 @@
 import { ChevronLeft, X } from 'lucide-react'
 import { Badge } from 'ui'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import type { AdvisorItem } from './AdvisorPanel.types'
 import {
@@ -20,21 +21,14 @@ interface AdvisorPanelHeaderProps {
 export const AdvisorPanelHeader = ({ selectedItem, onBack, onClose }: AdvisorPanelHeaderProps) => {
   const displayTitle = selectedItem ? getAdvisorPanelItemDisplayTitle(selectedItem) : undefined
   const secondaryText = selectedItem ? getAdvisorItemSecondaryText(selectedItem) : undefined
-  const metadataText = selectedItem
-    ? (secondaryText ??
-      (selectedItem.createdAt ? formatItemDate(selectedItem.createdAt) : undefined))
-    : undefined
-  // Only capitalize date strings (e.g. "a few seconds ago"); entity strings
-  // like "public.users" must not be case-altered.
-  const metadataCapitalize =
-    selectedItem !== undefined &&
-    secondaryText === undefined &&
-    selectedItem.createdAt !== undefined
+  const createdAt = selectedItem?.createdAt
+
+  const metadataCapitalize = selectedItem !== undefined && secondaryText === undefined
 
   return (
     <div className="border-b px-4 py-3 flex items-center gap-3">
       <ButtonTooltip
-        type="text"
+        variant="text"
         className="w-7 h-7 p-0 flex justify-center items-center"
         icon={<ChevronLeft size={16} strokeWidth={1.5} aria-hidden={true} />}
         onClick={onBack}
@@ -43,13 +37,19 @@ export const AdvisorPanelHeader = ({ selectedItem, onBack, onClose }: AdvisorPan
       <div className="flex items-center gap-2 overflow-hidden flex-1">
         <div className="flex-1 flex flex-col">
           <span className="heading-default">{displayTitle}</span>
-          {metadataText && (
+          {selectedItem?.source !== 'notification' && secondaryText ? (
             <span
               className={`text-xs text-foreground-light${metadataCapitalize ? ' capitalize-sentence' : ''}`}
             >
-              {metadataText}
+              {secondaryText}
             </span>
-          )}
+          ) : createdAt ? (
+            <TimestampInfo
+              className="w-fit capitalize-sentence"
+              utcTimestamp={createdAt}
+              label={formatItemDate(createdAt)}
+            />
+          ) : null}
         </div>
         {selectedItem && (
           <Badge variant={severityBadgeVariants[selectedItem.severity]}>
@@ -58,7 +58,7 @@ export const AdvisorPanelHeader = ({ selectedItem, onBack, onClose }: AdvisorPan
         )}
       </div>
       <ButtonTooltip
-        type="text"
+        variant="text"
         className="w-7 h-7 p-0"
         icon={<X strokeWidth={1.5} />}
         onClick={onClose}

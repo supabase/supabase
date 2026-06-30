@@ -6,8 +6,8 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Menu } from 'ui'
-import { InnerSideBarEmptyPanel } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { InnerSideBarEmptyPanel } from 'ui-patterns/InnerSideMenu'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { generateObservabilityMenuItems } from './ObservabilityMenu.utils'
@@ -188,7 +188,7 @@ const ObservabilityMenu = () => {
                         <span className="uppercase font-mono">Custom Reports</span>
                         {reportMenuItems.length > 0 && (
                           <ButtonTooltip
-                            type="default"
+                            variant="default"
                             size="tiny"
                             icon={<Plus />}
                             disabled={!canCreateCustomReport}
@@ -232,7 +232,7 @@ const ObservabilityMenu = () => {
                       description="Create and save custom reports to track your project metrics"
                       actions={
                         <ButtonTooltip
-                          type="default"
+                          variant="default"
                           icon={<Plus />}
                           disabled={!canCreateCustomReport}
                           onClick={() => {

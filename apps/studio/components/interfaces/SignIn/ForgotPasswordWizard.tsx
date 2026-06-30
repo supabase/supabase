@@ -5,7 +5,7 @@ import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Form, FormControl, FormField, Input } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -98,7 +98,7 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
 
         <div className="border-t border-overlay-border" />
 
-        <Button block form="code-input-form" htmlType="submit" size="medium" loading={isLoading}>
+        <Button block form="code-input-form" type="submit" size="medium" loading={isLoading}>
           Confirm reset code
         </Button>
       </form>
@@ -188,7 +188,7 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess: (email: string) => void 
         <Button
           block
           form="forgot-password-form"
-          htmlType="submit"
+          type="submit"
           size="medium"
           disabled={isPending}
           loading={isPending}

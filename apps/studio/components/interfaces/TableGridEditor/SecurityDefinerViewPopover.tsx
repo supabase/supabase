@@ -17,7 +17,7 @@ export const SecurityDefinerViewPopover = ({
   return (
     <Popover modal={false}>
       <PopoverTrigger asChild>
-        <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
+        <Button variant="warning" icon={<Unlock strokeWidth={1.5} />}>
           Security Definer view
         </Button>
       </PopoverTrigger>
@@ -35,11 +35,11 @@ export const SecurityDefinerViewPopover = ({
 
           <div className="mt-2 flex items-center gap-2">
             {!!onAutofix && (
-              <Button type="secondary" onClick={onAutofix}>
+              <Button variant="secondary" onClick={onAutofix}>
                 Autofix
               </Button>
             )}
-            <Button type="default" asChild>
+            <Button variant="default" asChild>
               <Link
                 target="_blank"
                 rel="noopener noreferrer"

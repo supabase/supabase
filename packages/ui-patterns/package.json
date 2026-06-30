@@ -14,10 +14,6 @@
   },
   "exports": {
     "./package.json": "./package.json",
-    ".": {
-      "import": "./index.tsx",
-      "types": "./index.tsx"
-    },
     "./AssistantChat/AssistantChatForm": {
       "import": "./src/AssistantChat/AssistantChatForm.tsx",
       "types": "./src/AssistantChat/AssistantChatForm.tsx"
@@ -313,6 +309,10 @@
     "./DataInputs/Input": {
       "import": "./src/DataInputs/Input.tsx",
       "types": "./src/DataInputs/Input.tsx"
+    },
+    "./DatePicker": {
+      "import": "./src/DatePicker/index.ts",
+      "types": "./src/DatePicker/index.ts"
     },
     "./Dialogs/ConfirmationModal": {
       "import": "./src/Dialogs/ConfirmationModal.tsx",
@@ -797,11 +797,11 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
-    "@monaco-editor/react": "^4.6.0",
+    "@monaco-editor/react": "catalog:",
     "@std/toml": "jsr:^1.0.11",
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
-    "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-table": "catalog:",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",

@@ -16,6 +16,7 @@
     },
     "dev": {
       "cache": false,
+      "persistent": true,
     },
     "test": {
       "cache": false,

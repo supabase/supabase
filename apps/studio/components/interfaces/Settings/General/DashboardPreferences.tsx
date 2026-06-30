@@ -21,7 +21,7 @@ import {
   FormControl,
   FormField,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -30,7 +30,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import ShimmeringLoader, { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
@@ -148,14 +148,14 @@ export const DashboardPreferences = () => {
                 <CardFooter className="justify-end space-x-2">
                   {form.formState.isDirty && (
                     <Button
-                      type="default"
-                      htmlType="button"
+                      variant="default"
+                      type="button"
                       onClick={() => form.reset(dashboardPreferences)}
                     >
                       Cancel
                     </Button>
                   )}
-                  <Button type="primary" htmlType="submit" disabled={!form.formState.isDirty}>
+                  <Button variant="primary" type="submit" disabled={!form.formState.isDirty}>
                     Save changes
                   </Button>
                 </CardFooter>
@@ -197,7 +197,7 @@ const DashboardQueriesDialog = () => {
 
         <DialogFooter>
           <DialogClose asChild className="opacity-100">
-            <Button type="default">Understood</Button>
+            <Button variant="default">Understood</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

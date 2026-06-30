@@ -12,7 +12,7 @@ import {
   AlertDialogTrigger,
   Button,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
@@ -92,7 +92,7 @@ export const OutOfDateNotice = ({
           <AlertDialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <AlertDialogTrigger asChild>
               <Button
-                type="default"
+                variant="default"
                 loading={isPushing}
                 icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
                 className="shrink-0"
@@ -120,7 +120,7 @@ export const OutOfDateNotice = ({
           </AlertDialog>
         ) : (
           <Button
-            type="default"
+            variant="default"
             loading={isPushing}
             onClick={() => handleUpdate()}
             icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
