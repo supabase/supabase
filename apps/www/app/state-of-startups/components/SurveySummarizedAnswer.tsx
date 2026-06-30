@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+
 import { useAccent } from './accent-context'
+
 import './surveyResults.css'
 
 const ROTATION_DURATION = 4000

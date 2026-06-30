@@ -64,7 +64,7 @@ Other useful Supabase Grafana guides:
 ### Esoteric factors
 
 **Webhooks**:
-Supabase webhooks use the pg_net extension to handle requests. The `net.http_request_queue` table isn't indexed to keep write costs low. However, if you upload millions of rows to a webhook-enabled table too quickly, it can significantly increase the read costs for the extension.
+Supabase webhooks use the pg_net extension to handle requests. The `net.http_request_queue` table isn't indexed to keep write costs low. However, if you upload millions of rows to a webhook-enabled table in rapid succession, it can significantly increase the read costs for the extension.
 
 To check if reads are becoming expensive, run:
 

@@ -37,7 +37,7 @@ import {
   GitHubRepositoryField,
   useGitHubRepositoryOptions,
 } from '@/components/interfaces/Settings/Integrations/GithubIntegration/GitHubRepositoryField'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { WizardLayoutWithoutAuth } from '@/components/layouts/WizardLayout'
 import Panel from '@/components/ui/Panel'
 import { useAvailableOrioleImageVersion } from '@/data/config/project-creation-postgres-versions-query'

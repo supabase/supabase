@@ -14,7 +14,7 @@ import {
   parseSupamonitorLogs,
   transformLogsToChartData,
 } from './utils/supamonitor.utils'
-import useLogsQuery from '@/hooks/analytics/useLogsQuery'
+import { useLogsQuery } from '@/hooks/analytics/useLogsQuery'
 
 dayjs.extend(utc)
 

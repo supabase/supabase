@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import type { ComponentProps } from 'react'
 import { useState } from 'react'
 import { Button, CommandGroup, CommandItem } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AppLayoutDropdownTriggerButton } from './AppLayoutDropdown'
 import { sanitizeRoute } from './ProjectDropdown.utils'

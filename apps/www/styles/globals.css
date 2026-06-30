@@ -13,7 +13,7 @@
 @source './../../../packages/marketing/src/**/*.{tsx,ts,js}';
 
 @utility section-container {
-  @apply mx-auto max-w-7xl px-6 lg:px-12 xl:px-24;
+  @apply w-full mx-auto max-w-7xl px-6 lg:px-12 xl:px-24;
 }
 
 @theme {

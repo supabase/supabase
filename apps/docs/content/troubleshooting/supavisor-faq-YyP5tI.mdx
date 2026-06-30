@@ -81,11 +81,11 @@ When clients connect to either Postgres or Supavisor, they do so with the Postgr
 ### What are "client connections"?
 
 In summary, they have nothing to do with front-end clients. They are the amount of backend-server connections that can connect to a serverside pooler.
-Imagine a chess tournament with 60 boards. Each board represents a connection in a database. When a player sits down at a board, it's like a client connecting to the database. They can take their time with their moves or just sit there, not making any.
+Imagine a chess tournament with 60 boards. Each board represents a connection in a database. When a player sits down at a board, it's like a client connecting to the database. They can take their time with their moves or sit there, not making any.
 
 But when the tournament fills up and all the boards are taken, new players are turned away, and told to check back at a later time to see if a table becomes available.
 
-Now, imagine the tournament organizers decide to expand the venue to house 200 people without adding more tables. Even when all boards are occupied, players don't have to leave. They can wait in the wings, and the moment a board opens up, someone from the waiting area can take their place. Likewise, if someone ends their game, but wants to play again, they can just go back to the waiting area. The waiting area represents the "Max Client Connections". Ultimately, the additional capacity provided by the pooler ensures fewer people are turned away from the "tournament".
+Now, imagine the tournament organizers decide to expand the venue to house 200 people without adding more tables. Even when all boards are occupied, players don't have to leave. They can wait in the wings, and the moment a board opens up, someone from the waiting area can take their place. Likewise, if someone ends their game, but wants to play again, they can go back to the waiting area. The waiting area represents the "Max Client Connections". Ultimately, the additional capacity provided by the pooler ensures fewer people are turned away from the "tournament".
 
 ### In the context of Supavisor, what does "pool size" mean?
 
@@ -93,14 +93,14 @@ Now, imagine the tournament organizers decide to expand the venue to house 200 p
 
 ### What is the "user+db+mode" combination?
 
-Postgres is not actually a database. It is a Relational Database Management System (RDMS). Within it, you can spawn Postgres databases. In Supabase, it is a common pattern to just use the default database called `postgres`, but you could create more:
+Postgres is not a database. It is a Relational Database Management System (RDMS). Within it, you can spawn Postgres databases. In Supabase, it is a common pattern to use the default database called `postgres`, but you could create more:
 
 ```sql
 CREATE DATABASE postgres;
 CREATE DATABASE another_database;
 ```
 
-Similarly, a database can have many database users, but most people just rely on the default user `postgres`.
+Similarly, a database can have many database users, but most people rely on the default user `postgres`.
 
 ```sql
 CREATE USER postgres WITH PASSWORD 'super-secret-password';

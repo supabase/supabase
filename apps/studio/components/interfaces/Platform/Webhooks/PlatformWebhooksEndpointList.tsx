@@ -17,8 +17,9 @@ import {
   TableHeadSort,
   TableRow,
 } from 'ui'
-import { EmptyStatePresentational, TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import type { WebhookEndpoint } from './PlatformWebhooks.types'
 import { getWebhookEndpointDisplayName } from './PlatformWebhooks.utils'

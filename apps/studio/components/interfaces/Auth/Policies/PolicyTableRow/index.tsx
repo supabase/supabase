@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { usePoliciesData } from '../PoliciesDataContext'
@@ -21,7 +21,7 @@ import type { PolicyTable } from './PolicyTableRow.types'
 import type { Policy } from './PolicyTableRow.utils'
 import { getTableAdmonitionMessage, getTableDataApiStatus } from './PolicyTableRow.utils'
 import { PolicyTableRowHeader } from './PolicyTableRowHeader'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
