@@ -93,10 +93,7 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
-import {
-  sqlEditorDiffRequestState,
-  useSqlEditorDiffRequestSnapshot,
-} from '@/state/sql-editor/sql-editor-diff-request'
+import { useSqlEditorDiffRequestSnapshot } from '@/state/sql-editor/sql-editor-diff-request'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
@@ -547,7 +544,7 @@ export const SQLEditor = () => {
     databaseSelectorState.selectedDatabaseId,
     databases,
     lineHighlights,
-    snapV2,
+    sessionSnap,
   ])
 
   useShortcut(SHORTCUT_IDS.SQL_EDITOR_EXPLAIN, executeExplainQuery, {
