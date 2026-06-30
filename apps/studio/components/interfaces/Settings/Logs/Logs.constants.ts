@@ -374,7 +374,7 @@ limit 100`,
   event_message
 from logs
 where source = 'auth_logs'
-  and match(event_message, 'level.{3}(info|warning||error|fatal)')
+  and match(event_message, 'level.{3}(info|warning|error|fatal)')
 order by timestamp desc
 limit 100`,
   'Auth Audit Logs': `select
