@@ -14,10 +14,6 @@
   },
   "exports": {
     "./package.json": "./package.json",
-    ".": {
-      "import": "./index.tsx",
-      "types": "./index.tsx"
-    },
     "./AssistantChat/AssistantChatForm": {
       "import": "./src/AssistantChat/AssistantChatForm.tsx",
       "types": "./src/AssistantChat/AssistantChatForm.tsx"

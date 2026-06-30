@@ -14,7 +14,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
 import { LastSignInWrapper } from './LastSignInWrapper'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
 import { getMfaAuthenticatorAssuranceLevel } from '@/data/profile/mfa-authenticator-assurance-level-query'
 import { useLastSignIn } from '@/hooks/misc/useLastSignIn'

@@ -1,10 +1,13 @@
 'use client'
 
-import type { BlogView } from 'app/blog/BlogClient'
-import { LOCAL_STORAGE_KEYS, useBreakpoint } from 'common'
+import { type BlogView } from 'app/blog/blog-view'
+import { useBreakpoint } from 'common'
+import BlogViewToggle from 'components/Blog/BlogViewToggle'
+import { motion } from 'framer-motion'
 import { startCase } from 'lib/helpers'
-import { AlignJustify, ChevronDown, X as CloseIcon, Grid, Search } from 'lucide-react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { ChevronDown, X as CloseIcon, Search } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import {
   Button,
@@ -20,68 +23,73 @@ import {
 } from 'ui'
 
 interface Props {
-  onFilterChange: (category?: string, search?: string) => void
   view: BlogView
   setView: (view: any) => void
+  /**
+   * Blog index search: keeps the query in the URL (`?q=`) and filters the full
+   * post set client-side via the index's fetch logic.
+   */
+  onFilterChange?: (category?: string, search?: string) => void
+  /**
+   * Category-page search: filters the in-memory posts for the current category.
+   * No URL sync / fetch. Mutually exclusive with `onFilterChange`.
+   */
+  onSearch?: (term: string) => void
 }
 
-/**
- * ✅ search via text input
- * ✅ update searchTerm when deleting text input
- * ✅ search via q param
- * ✅ search via category if no q param
- * ✅ search via category and reset q param if present
- */
+// Hard-coded so they can be curated/reordered. Each (except "all") maps to a
+// statically generated /blog/categories/<category> page, so selecting a
+// category is a navigation (prefetched, no client fetch / skeleton flash).
+const allCategories = [
+  'all',
+  'product',
+  'company',
+  'postgres',
+  'developers',
+  'engineering',
+  'launch-week',
+]
 
-function BlogFilters({ onFilterChange, view, setView }: Props) {
-  const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
-  const isList = view === 'list'
-  const [category, setCategory] = useState<string>('all')
+const categoryHref = (category: string) =>
+  category === 'all' ? '/blog' : `/blog/categories/${category}`
+
+const categoryLabel = (category: string) =>
+  category === 'all' ? 'All' : startCase(category.replaceAll('-', ' '))
+
+function BlogFilters({ view, setView, onFilterChange, onSearch }: Props) {
+  const showSearch = Boolean(onFilterChange) || Boolean(onSearch)
   const [searchTerm, setSearchTerm] = useState<string>('')
   const [showSearchInput, setShowSearchInput] = useState<boolean>(false)
 
   const router = useRouter()
+  const pathname = usePathname()
   const searchParams = useSearchParams()
   const q = searchParams?.get('q')
-  const activeCategory = searchParams?.get('category')
   const isMobile = useBreakpoint(1023)
-  const is2XL = useBreakpoint(1535)
 
-  // Use hard-coded categories here as they:
-  // - serve as a reference
-  // - are easier to reorder
-  const allCategories = [
-    'all',
-    'product',
-    'company',
-    'postgres',
-    'developers',
-    'engineering',
-    'launch-week',
-  ]
+  // Active category is derived from the URL: /blog or /blog/categories/<cat>.
+  const categoryMatch = pathname?.match(/^\/blog\/categories\/([^/]+)/)
+  const activeCategory = categoryMatch?.[1] ?? 'all'
 
-  // Debounced filter change to avoid too many API calls
+  // Debounced search to avoid too many API calls
   const debouncedFilterChange = useCallback(
     (() => {
       let timeoutId: NodeJS.Timeout
-      return (cat: string, search: string) => {
+      return (search: string) => {
         clearTimeout(timeoutId)
         timeoutId = setTimeout(() => {
-          onFilterChange(cat, search)
+          onFilterChange?.(undefined, search)
         }, 300)
       }
     })(),
     [onFilterChange]
   )
 
-  // Handle URL params on mount
+  // Reflect ?q= deep links into the search state on mount (index only)
   useEffect(() => {
-    if (q) {
+    if (onFilterChange && q) {
       setSearchTerm(q)
-      onFilterChange(category, q)
-    } else if (activeCategory && activeCategory !== 'all') {
-      setCategory(activeCategory)
-      onFilterChange(activeCategory, '')
+      onFilterChange(undefined, q)
     }
   }, []) // Only run on mount
 
@@ -89,17 +97,18 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
     (text: string) => {
       setSearchTerm(text)
 
-      // Update URL
-      if (text.length > 0) {
-        router?.replace(`/blog?q=${text}`, { scroll: false })
+      if (onFilterChange) {
+        // Index: keep the query in the URL and filter the full list (debounced).
+        router?.replace(text.length > 0 ? `/blog?q=${encodeURIComponent(text)}` : '/blog', {
+          scroll: false,
+        })
+        debouncedFilterChange(text)
       } else {
-        router?.replace('/blog', { scroll: false })
+        // Category: filter the in-memory posts; no URL change.
+        onSearch?.(text)
       }
-
-      // Trigger filter change (debounced)
-      debouncedFilterChange(category, text)
     },
-    [category, router, debouncedFilterChange]
+    [router, debouncedFilterChange, onFilterChange, onSearch]
   )
 
   useEffect(() => {
@@ -116,43 +125,9 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
     setShowSearchInput(!isMobile)
   }, [isMobile])
 
-  const handleSetCategory = useCallback(
-    (newCategory: string) => {
-      setSearchTerm('')
-      setCategory(newCategory)
-
-      // Update URL
-      if (newCategory === 'all') {
-        router?.replace('/blog', { scroll: false })
-      } else {
-        router?.replace(`/blog?category=${newCategory}`, { scroll: false })
-      }
-
-      // Trigger filter change immediately for category changes
-      onFilterChange(newCategory, '')
-    },
-    [router, onFilterChange]
-  )
-
-  const handleSearchChange = useCallback(
-    (event: any) => {
-      setCategory('all')
-      handleSearchByText(event.target.value)
-    },
-    [handleSearchByText]
-  )
-
-  const handleViewSelection = () => {
-    setView((prevView: 'list' | 'grid') => {
-      const newValue = prevView === 'list' ? 'grid' : 'list'
-      localStorage.setItem(BLOG_VIEW, newValue)
-
-      return newValue
-    })
-  }
-
   return (
     <div className="flex flex-row items-center justify-between gap-2">
+      {/* Mobile: category dropdown (hidden on lg+) */}
       {!showSearchInput && (
         <div className="flex lg:hidden">
           <DropdownMenu>
@@ -162,65 +137,72 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
                 iconRight={<ChevronDown />}
                 className="w-full min-w-[200px] flex justify-between items-center py-2"
               >
-                {!activeCategory ? 'All Posts' : startCase(activeCategory?.replaceAll('-', ' '))}
+                {activeCategory === 'all' ? 'All Posts' : categoryLabel(activeCategory)}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="start">
-              {allCategories.map((category: string, i: number) => (
+              {allCategories.map((category) => (
                 <DropdownMenuItem
-                  key={`item-${category}-${
-                    // biome-ignore lint/suspicious/noArrayIndexKey: to disambiguate emtpy values
-                    i
-                  }`}
-                  onClick={() => handleSetCategory(category)}
-                  className={cn(
-                    (category === 'all' && !activeCategory) || category === activeCategory
-                      ? 'text-brand-600'
-                      : ''
-                  )}
+                  key={category}
+                  onClick={() => router.push(categoryHref(category))}
+                  className={cn(category === activeCategory ? 'text-brand-600' : '')}
                 >
-                  {category === 'all' ? 'All Posts' : startCase(category.replaceAll('-', ' '))}
+                  {category === 'all' ? 'All Posts' : categoryLabel(category)}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       )}
-      <div className="hidden lg:flex flex-wrap items-center grow gap-2">
-        {allCategories.map((category: string) => (
-          <Button
-            key={category}
-            variant={
-              category === 'all' && !searchTerm && !activeCategory
-                ? 'default'
-                : category === activeCategory
-                  ? 'default'
-                  : 'outline'
-            }
-            onClick={() => handleSetCategory(category)}
-            size={is2XL ? 'tiny' : 'small'}
-            className="rounded-full"
-          >
-            {category === 'all' ? 'All' : startCase(category.replaceAll('-', ' '))}
-          </Button>
-        ))}
+
+      {/* Desktop: category pills */}
+      <div className="hidden lg:flex flex-wrap items-center grow gap-1">
+        {allCategories.map((category) => {
+          const isActive = category === activeCategory
+          return (
+            <Link
+              key={category}
+              href={categoryHref(category)}
+              aria-label={
+                category === 'all'
+                  ? 'Show all blog posts'
+                  : `Filter blog posts by category: ${categoryLabel(category)}`
+              }
+              aria-current={isActive ? 'page' : undefined}
+              className={cn(
+                'relative px-3 py-1.5 text-sm rounded-full transition-colors',
+                isActive ? 'text-foreground' : 'text-foreground-lighter hover:text-foreground-light'
+              )}
+            >
+              {isActive && (
+                <motion.span
+                  layoutId="blog-cat-bg"
+                  className="absolute inset-0 rounded-full bg-surface-300 border border-border"
+                  transition={{ type: 'spring', duration: 0.35, bounce: 0.15 }}
+                />
+              )}
+              <span className="relative z-10">{categoryLabel(category)}</span>
+            </Link>
+          )
+        })}
       </div>
 
-      {!showSearchInput && (
+      {/* Search (index only) */}
+      {showSearch && !showSearchInput && (
         <div className="flex-1 flex justify-end">
-          {' '}
           <Button
             className="px-2 h-full"
             size="medium"
             variant="default"
+            aria-label="Search posts"
             onClick={() => setShowSearchInput(true)}
           >
-            <Search size="14" />
+            <Search size="14" aria-hidden="true" />
           </Button>
         </div>
       )}
 
-      {showSearchInput && (
+      {showSearch && showSearchInput && (
         <div className="w-full h-auto flex justify-end gap-2 items-stretch lg:max-w-[240px] xl:max-w-[280px]">
           <InputGroup className="w-full">
             <InputGroupInput
@@ -229,10 +211,10 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
               type="search"
               placeholder="Search blog"
               value={searchTerm}
-              onChange={handleSearchChange}
+              onChange={(event) => handleSearchByText(event.target.value)}
             />
             <InputGroupAddon>
-              <Search />
+              <Search aria-hidden="true" />
             </InputGroupAddon>
             {isMobile && (
               <InputGroupAddon align="inline-end">
@@ -249,18 +231,9 @@ function BlogFilters({ onFilterChange, view, setView }: Props) {
           </InputGroup>
         </div>
       )}
-      <Button
-        variant="default"
-        title={isList ? 'Grid View' : 'List View'}
-        onClick={handleViewSelection}
-        className="h-full p-2 text-foreground-light"
-      >
-        {isList ? (
-          <Grid className="w-4 h-4 stroke-1.5" />
-        ) : (
-          <AlignJustify className="w-4 h-4 stroke-1.5" />
-        )}
-      </Button>
+
+      {/* View toggle */}
+      <BlogViewToggle view={view} setView={setView} />
     </div>
   )
 }

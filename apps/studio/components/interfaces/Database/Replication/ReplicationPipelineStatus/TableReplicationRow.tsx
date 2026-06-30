@@ -47,7 +47,7 @@ export const TableReplicationRow = ({
             className="px-1.5"
             icon={<ExternalLink />}
             tooltip={{
-              content: { side: 'bottom', text: 'Open in Table Editor' },
+              content: { side: 'bottom', text: 'Table Editor' },
             }}
           >
             <Link

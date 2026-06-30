@@ -192,7 +192,7 @@ val data = supabase.from("restaurants").insert(listOf(
 </$Show>
 </Tabs>
 
-Notice the order in which you pass the latitude and longitude. Longitude comes first, and is because longitude represents the x-axis of the location. Another thing to watch for is when inserting data from the client library, there is no comma between the two values, just a single space.
+Notice the order in which you pass the latitude and longitude. Longitude comes first, and is because longitude represents the x-axis of the location. Another thing to watch for is when inserting data from the client library, there is no comma between the two values, only a single space.
 
 At this point, if you go into your Supabase dashboard and look at the data, you will notice that the value of the `location` column looks something like this.
 

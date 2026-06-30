@@ -29,7 +29,7 @@ import {
   getIntegrationTypeLabel,
   INTEGRATION_TYPES,
 } from './ThirdPartyAuthForm.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useDeleteThirdPartyAuthIntegrationMutation } from '@/data/third-party-auth/integration-delete-mutation'

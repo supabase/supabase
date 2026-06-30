@@ -14,7 +14,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
 import { SupportLink } from '../Support/SupportLink'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
 import { useSignOut } from '@/lib/auth'

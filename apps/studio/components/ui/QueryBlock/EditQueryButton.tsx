@@ -12,7 +12,7 @@ import {
 
 import { ButtonTooltip } from '../ButtonTooltip'
 import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
-import useNewQuery from '@/components/interfaces/SQLEditor/hooks'
+import { useNewQuery } from '@/components/interfaces/SQLEditor/hooks'
 import { DiffType } from '@/components/interfaces/SQLEditor/SQLEditor.types'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useTrack } from '@/lib/telemetry/track'

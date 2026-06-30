@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { useCheckEligibilityDeployReplica } from './useCheckEligibilityDeployReplica'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
