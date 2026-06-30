@@ -235,7 +235,7 @@ export const UserImpersonationSelector = () => {
                 <InputGroup>
                   <InputGroupInput
                     size="tiny"
-                    className="table-editor-search border-none"
+                    className="pr-10 border-none"
                     placeholder="Search by id, email, phone, or name..."
                     onChange={(e) => setSearchText(e.target.value)}
                     value={searchText}

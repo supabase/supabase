@@ -762,14 +762,6 @@
       "import": "./src/form/Layout/FormLayout.tsx",
       "types": "./src/form/Layout/FormLayout.tsx"
     },
-    "./form/Layout/InputIconContainer.module.css": {
-      "import": "./src/form/Layout/InputIconContainer.module.css",
-      "types": "./src/form/Layout/InputIconContainer.module.css"
-    },
-    "./form/Layout/InputIconContainer": {
-      "import": "./src/form/Layout/InputIconContainer.tsx",
-      "types": "./src/form/Layout/InputIconContainer.tsx"
-    },
     "./form/utils": {
       "import": "./src/form/utils.tsx",
       "types": "./src/form/utils.tsx"
@@ -797,7 +789,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
-    "@monaco-editor/react": "^4.6.0",
+    "@monaco-editor/react": "catalog:",
     "@std/toml": "jsr:^1.0.11",
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",

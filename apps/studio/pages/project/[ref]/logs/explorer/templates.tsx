@@ -1,9 +1,9 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { CodeIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button, cn, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
-import { TEMPLATES } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import { getLogsTemplates } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type { LogTemplate } from '@/components/interfaces/Settings/Logs/Logs.types'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
@@ -17,14 +17,16 @@ export const LogsTemplatesPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const { logsTemplates: isTemplatesEnabled, logsShowMetadataIpTemplate: showMetadataIpTemplate } =
     useIsFeatureEnabled(['logs:templates', 'logs:show_metadata_ip_template'])
+  const useOtelEndpoint = useFlag('otelLegacyLogs')
 
   if (!isTemplatesEnabled) {
     return <UnknownInterface urlBack={`/project/${projectRef}/logs/explorer`} />
   }
 
+  const templates = getLogsTemplates(useOtelEndpoint)
   const allTemplates = showMetadataIpTemplate
-    ? TEMPLATES
-    : TEMPLATES.filter((template) => template.label !== 'Metadata IP')
+    ? templates
+    : templates.filter((template) => template.label !== 'Metadata IP')
 
   return (
     <div className="mx-auto h-full w-full px-5 py-6">

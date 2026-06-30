@@ -249,15 +249,7 @@ const TableNodeComponent = ({
                 )}
               >
                 {column.isPrimary && (
-                  <Key
-                    size={8}
-                    strokeWidth={1}
-                    className={cn(
-                      // 'sb-grid-column-header__inner__primary-key'
-                      'shrink-0',
-                      'text-light'
-                    )}
-                  />
+                  <Key size={8} strokeWidth={1} className={cn('shrink-0', 'text-light')} />
                 )}
                 {column.isNullable && (
                   <DiamondIcon size={8} strokeWidth={1} className="shrink-0 text-light" />
