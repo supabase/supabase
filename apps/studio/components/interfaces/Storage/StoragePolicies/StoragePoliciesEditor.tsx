@@ -3,8 +3,8 @@ import { Button, Checkbox, cn, DialogSection, DialogSectionSeparator } from 'ui'
 
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
 import { deriveAllowedClientLibraryMethods } from '../Storage.utils'
-import { PolicyName } from '@/components/interfaces/Auth/Policies/PolicyEditor/PolicyName'
-import { PolicyRoles } from '@/components/interfaces/Auth/Policies/PolicyEditor/PolicyRoles'
+import { PolicyName } from '@/components/interfaces/Database/Policies/PolicyEditor/PolicyName'
+import { PolicyRoles } from '@/components/interfaces/Database/Policies/PolicyEditor/PolicyRoles'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { DOCS_URL } from '@/lib/constants'
 

@@ -22,9 +22,9 @@ import { StoragePoliciesEditPolicyModal } from './StoragePoliciesEditPolicyModal
 import type {
   PostgresPolicyCreatePayload,
   PostgresPolicyUpdatePayload,
-} from '@/components/interfaces/Auth/Policies/Policies.types'
-import { PolicyEditorModal } from '@/components/interfaces/Auth/Policies/PolicyEditorModal'
-import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+} from '@/components/interfaces/Database/Policies/Policies.types'
+import { PolicyEditorModal } from '@/components/interfaces/Database/Policies/PolicyEditorModal'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useDatabasePolicyCreateMutation } from '@/data/database-policies/database-policy-create-mutation'
 import { useDatabasePolicyDeleteMutation } from '@/data/database-policies/database-policy-delete-mutation'

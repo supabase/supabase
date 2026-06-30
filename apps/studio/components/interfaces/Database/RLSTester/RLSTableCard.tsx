@@ -2,7 +2,7 @@ import { Check, ChevronDown, Edit, X } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger, WarningIcon } from 'ui'
 
-import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface RLSTableCardProps {

@@ -13,7 +13,7 @@ import { RLSTableCard } from './RLSTableCard'
 import { ParseQueryResults } from './RLSTester.types'
 import { deriveRLSTestState } from './RLSTesterResults.utils'
 import { useTestQueryRLS } from './useTestQueryRLS'
-import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 
 interface RLSTesterResultsProps {
   results: Object[]

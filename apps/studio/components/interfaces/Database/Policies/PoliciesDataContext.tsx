@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react'
 import { createContext, useCallback, useContext, useMemo } from 'react'
 
-import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import type { ResponseError } from '@/types'
 
 type TableKey = `${string}.${string}`
