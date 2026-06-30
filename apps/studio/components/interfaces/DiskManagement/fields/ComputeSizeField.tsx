@@ -297,58 +297,53 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                     />
                   )
                 })}
+                <div
+                  className={cn(
+                    'relative text-sm text-left flex flex-col gap-0 px-0 py-3 w-full h-[110px]',
+                    'bg-overlay rounded-md border p-2 hover:border-foreground-muted'
+                  )}
+                >
+                  <SupportLink
+                    queryParams={{
+                      projectRef: ref,
+                      category: SupportCategories.SALES_ENQUIRY,
+                      subject: 'Enquiry about larger instance sizes',
+                    }}
+                  >
+                    <div className="w-full flex flex-col gap-3 justify-between">
+                      <div className="relative px-3 flex justify-between">
+                        <ComputeBadge infraComputeSize=">16XL" />
+
+                        <div className="flex items-center space-x-1 opacity-50 ">
+                          <span className="text-foreground-light text-sm">Contact Us</span>
+                        </div>
+                      </div>
+                      <div className="w-full">
+                        <div className="px-3 text-sm flex flex-col gap-1">
+                          <div className="text-foreground-light flex gap-2 items-center">
+                            <Microchip
+                              strokeWidth={1}
+                              size={14}
+                              className="text-foreground-lighter"
+                            />
+                            <span>Custom memory</span>
+                          </div>
+                          <div className="text-foreground-light flex gap-2 items-center">
+                            <CpuIcon
+                              strokeWidth={1}
+                              size={14}
+                              className="text-foreground-lighter"
+                            />
+                            <span>Custom CPU</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </SupportLink>
+                </div>
               </>
             )}
           </RadioGroupCard>
-          {!isLoading && !addonsError && (
-            <div
-              className={cn(
-                'grid gap-4 grid-cols-[repeat(auto-fit,minmax(min(100%,13em),1fr))]',
-                'mt-4'
-              )}
-            >
-              <div
-                className={cn(
-                  'relative text-sm text-left flex flex-col gap-0 px-0 py-3 w-full h-[110px]',
-                  'bg-overlay rounded-md border p-2 hover:border-foreground-muted'
-                )}
-              >
-                <SupportLink
-                  queryParams={{
-                    projectRef: ref,
-                    category: SupportCategories.SALES_ENQUIRY,
-                    subject: 'Enquiry about larger instance sizes',
-                  }}
-                >
-                  <div className="w-full flex flex-col gap-3 justify-between">
-                    <div className="relative px-3 flex justify-between">
-                      <ComputeBadge infraComputeSize=">16XL" />
-
-                      <div className="flex items-center space-x-1 opacity-50 ">
-                        <span className="text-foreground-light text-sm">Contact Us</span>
-                      </div>
-                    </div>
-                    <div className="w-full">
-                      <div className="px-3 text-sm flex flex-col gap-1">
-                        <div className="text-foreground-light flex gap-2 items-center">
-                          <Microchip
-                            strokeWidth={1}
-                            size={14}
-                            className="text-foreground-lighter"
-                          />
-                          <span>Custom memory</span>
-                        </div>
-                        <div className="text-foreground-light flex gap-2 items-center">
-                          <CpuIcon strokeWidth={1} size={14} className="text-foreground-lighter" />
-                          <span>Custom CPU</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </SupportLink>
-              </div>
-            </div>
-          )}
         </>
       )}
     />
