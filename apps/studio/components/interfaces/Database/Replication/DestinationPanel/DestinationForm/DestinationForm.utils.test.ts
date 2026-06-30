@@ -574,6 +574,22 @@ describe('DestinationForm.utils Analytics Bucket', () => {
     expect(issues).toEqual([])
   })
 
+  it('allows an omitted S3 secret for an unchanged Analytics Bucket key in edit mode', () => {
+    const issues = getAnalyticsBucketValidationIssues(
+      {
+        warehouseName: 'bucket',
+        namespace: 'analytics',
+        newNamespaceName: '',
+        s3Region: 'us-east-1',
+        s3AccessKeyId: 'stored-key',
+        s3SecretAccessKey: '',
+      },
+      { secretsOptional: true, storedS3AccessKeyId: 'stored-key' }
+    )
+
+    expect(issues).toEqual([])
+  })
+
   it('requires an S3 secret when replacing an Analytics Bucket key in edit mode', () => {
     const issues = getAnalyticsBucketValidationIssues(
       {
@@ -581,10 +597,10 @@ describe('DestinationForm.utils Analytics Bucket', () => {
         namespace: 'analytics',
         newNamespaceName: '',
         s3Region: 'us-east-1',
-        s3AccessKeyId: 'key',
+        s3AccessKeyId: 'new-key',
         s3SecretAccessKey: '',
       },
-      { secretsOptional: true }
+      { secretsOptional: true, storedS3AccessKeyId: 'stored-key' }
     )
 
     expect(issues).toEqual([

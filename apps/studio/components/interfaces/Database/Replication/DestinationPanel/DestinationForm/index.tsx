@@ -163,11 +163,12 @@ export const DestinationForm = ({
             }
           )
         } else if (selectedType === 'Analytics Bucket') {
-          getAnalyticsBucketValidationIssues(data, { secretsOptional: editMode }).forEach(
-            ({ path, message }) => {
-              addRequiredFieldError(path, message)
-            }
-          )
+          getAnalyticsBucketValidationIssues(data, {
+            secretsOptional: editMode,
+            storedS3AccessKeyId: editMode ? defaultValues.s3AccessKeyId : undefined,
+          }).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
         } else if (selectedType === 'DuckLake') {
           getDucklakeValidationIssues(data, { secretsOptional: editMode }).forEach(
             ({ path, message }) => {
