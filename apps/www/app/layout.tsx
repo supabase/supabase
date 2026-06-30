@@ -3,7 +3,7 @@ import 'config/code-hike.css'
 import '../styles/globals.css'
 import '../pages/launch-week/launchWeek.css'
 
-import { geistMono, inter, manrope } from '~/lib/fonts'
+import { inter, manrope, sourceCodePro } from '~/lib/fonts'
 import type { Metadata, Viewport } from 'next'
 
 import Providers from './providers'
@@ -49,7 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${manrope.variable} ${inter.variable} ${geistMono.variable}`}
+      className={`${manrope.variable} ${inter.variable} ${sourceCodePro.variable}`}
     >
       <body>
         <Providers>{children}</Providers>

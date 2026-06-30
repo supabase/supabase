@@ -11,6 +11,30 @@
 @source './../../../packages/ui/src/**/*.{tsx,ts,js}';
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
 
+@theme inline {
+  --font-sans:
+    var(--font-inter), Inter, Helvetica Neue, Helvetica, ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-manrope), Manrope, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-source-code-pro), 'Source Code Pro', ui-monospace, Menlo, monospace;
+}
+
+@theme {
+  /* font sizing and weights optimized for Inter */
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-lg: 1rem;
+  --text-xl: 1.125rem;
+  --text-2xl: 1.375rem;
+  --text-3xl: 1.75rem;
+  --text-4xl: 2.125rem;
+  --text-5xl: 2.875rem;
+  --text-6xl: 3.625rem;
+  --text-7xl: 4.375rem;
+  --text-8xl: 5.875rem;
+  --text-9xl: 7.875rem;
+  --font-weight-normal: 450;
+}
+
 @layer utilities {
   .prose--remove-p-margin p {
     margin: 0;
@@ -27,34 +51,18 @@
   }
 }
 
-@font-face {
-  font-family: 'custom-font';
-  src:
-    url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
-    url(../../../packages/common/assets/fonts/CustomFont-Book.woff) format('woff');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'custom-font';
-  src:
-    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff2) format('woff2'),
-    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff) format('woff');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
 :root {
   --sidebar-width: 300px;
   --header-height: 50px;
 }
 
+html {
+  scroll-behavior: smooth;
+  font-weight: 450;
+}
+
 body {
   @apply bg-background text-foreground;
-  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -64,14 +72,19 @@ body {
   color: #333 !important;
 }
 
-/* a { */
-/*   text-decoration: none !important; */
-/* } */
-
-article h1 {
-  /* margin-bottom: 2rem !important; */
-  /* font-size: 3rem !important; */
-  /* font-weight: 400 !important; */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6 {
+  @apply font-heading font-semibold;
 }
 
 .thin-scrollbar {
@@ -103,8 +116,13 @@ article h1 {
   @apply text-foreground-muted text-xs;
 }
 
-.prose :where(p):not(:where([class~='not-prose'] *)) {
+.prose :where(p):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   white-space: pre-line;
+}
+
+.prose :where(p, a, code, pre):not(:where([class~='not-prose'], [class~='not-prose'] *)),
+.prose :where(ol > li):not(:where([class~='not-prose'], [class~='not-prose'] *))::marker {
+  font-weight: inherit;
 }
 
 code[class*='language-'],
@@ -136,7 +154,7 @@ pre[class*='language-'] {
 }
 
 .method-list-title-isChild {
-  font-family: var(--custom-font-size-xs);
+  font-family: var(--font-mono);
   & h5 {
     font-weight: 200;
   }

@@ -5,6 +5,7 @@ import '../styles/globals.css'
 import '../styles/prism-okaidia.css'
 
 import { GlobalProviders } from '~/features/app.providers'
+import { inter, manrope, sourceCodePro } from '~/fonts'
 import { TopNavSkeleton } from '~/layouts/MainSkeleton'
 import { BASE_PATH, IS_PRODUCTION } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
@@ -50,7 +51,11 @@ const viewport: Viewport = {
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html
+      lang="en"
+      suppressHydrationWarning
+      className={`${manrope.variable} ${inter.variable} ${sourceCodePro.variable}`}
+    >
       <body>
         <TelemetryTagManager />
         <GlobalProviders>
