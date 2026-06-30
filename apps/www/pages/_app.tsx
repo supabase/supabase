@@ -3,7 +3,7 @@ import 'config/code-hike.css'
 import '../styles/globals.css'
 import './launch-week/launchWeek.css'
 
-import { geistMono, inter, manrope } from '~/lib/fonts'
+import { inter, manrope, sourceCodePro } from '~/lib/fonts'
 import {
   AuthProvider,
   FeatureFlagProvider,
@@ -102,7 +102,7 @@ export default function App({ Component, pageProps }: AppProps) {
         }}
       />
 
-      <div className={`${manrope.variable} ${inter.variable} ${geistMono.variable}`}>
+      <div className={`${manrope.variable} ${inter.variable} ${sourceCodePro.variable}`}>
         <AuthProvider>
           {/* [TODO] I think we need to deconflict with the providers in layout.tsx? */}
           <FeatureFlagProvider API_URL={API_URL} enabled={{ cc: true, ph: false }}>

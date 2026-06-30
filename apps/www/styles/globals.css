@@ -15,9 +15,8 @@
 @theme inline {
   --font-sans:
     var(--font-inter), Inter, Helvetica Neue, Helvetica, ui-sans-serif, system-ui, sans-serif;
-  --font-heading: var(--font-heading, var(--font-sans));
-  --font-mono:
-    var(--font-geist-mono), 'Geist Mono', 'Source Code Pro', ui-monospace, Menlo, monospace;
+  --font-heading: var(--font-manrope, var(--font-sans));
+  --font-mono: var(--font-source-code-pro), 'Source Code Pro', ui-monospace, Menlo, monospace;
 }
 
 @utility section-container {
@@ -47,6 +46,18 @@
   --delay-1500: 1500ms;
 
   /* font sizing and weights optimized for Inter */
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-lg: 1rem;
+  --text-xl: 1.125rem;
+  --text-2xl: 1.375rem;
+  --text-3xl: 1.75rem;
+  --text-4xl: 2.125rem;
+  --text-5xl: 2.875rem;
+  --text-6xl: 3.625rem;
+  --text-7xl: 4.375rem;
+  --text-8xl: 5.875rem;
+  --text-9xl: 7.875rem;
   --font-weight-normal: 450;
 }
 
@@ -139,7 +150,7 @@
   .h4,
   .h5,
   .h6 {
-    @apply font-heading tracking-tight;
+    @apply font-heading font-semibold;
   }
 }
 
@@ -160,6 +171,7 @@
 
 html {
   scroll-behavior: smooth !important;
+  font-weight: 450;
 }
 
 body {
