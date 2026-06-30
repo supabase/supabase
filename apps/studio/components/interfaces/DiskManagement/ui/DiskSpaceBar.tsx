@@ -1,7 +1,6 @@
 import MotionNumber from '@number-flow/react'
 import { useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Info } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useMemo } from 'react'
 import { UseFormReturn } from 'react-hook-form'
@@ -183,8 +182,8 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
               >
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="absolute right-full bottom-0 border mr-2 px-2 py-1 bg-surface-400 rounded-sm text-xs text-foreground-light whitespace-nowrap flex items-center gap-x-1">
-                      Autoscaling <Info size={12} />
+                    <div className="h-full px-1 -mx-1 flex items-center cursor-help">
+                      <div className="w-px h-full bg-border" />
                     </div>
                   </TooltipTrigger>
                   <TooltipContent side="bottom" className="w-[310px] flex flex-col gap-y-1">
@@ -199,7 +198,6 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
                     </p>
                   </TooltipContent>
                 </Tooltip>
-                <div className="w-px h-full bg-border" />
               </div>
             </motion.div>
           )}
@@ -235,15 +233,6 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
           />
         </div>
       )}
-      <p className="text-xs text-foreground-lighter my-4">
-        <span className="font-semibold">Note:</span> Disk Size refers to the total space your
-        project occupies on disk, including the database itself (currently{' '}
-        <span>{formatBytes(diskBreakdownBytes?.dbSizeBytes, 2, 'GB')}</span>), additional files like
-        the write-ahead log (currently{' '}
-        <span>{formatBytes(diskBreakdownBytes?.walSizeBytes, 2, 'GB')}</span>), and other system
-        resources (currently <span>{formatBytes(diskBreakdownBytes?.systemBytes, 2, 'GB')}</span>).
-        Data can take 5 minutes to refresh.
-      </p>
     </div>
   )
 }

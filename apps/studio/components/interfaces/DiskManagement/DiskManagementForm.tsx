@@ -47,6 +47,7 @@ import {
   PLAN_DETAILS,
   RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
 } from './ui/DiskManagement.constants'
+import { DiskSpaceBar } from './ui/DiskSpaceBar'
 import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 import { PADDING_CLASSES } from '@/components/layouts/Scaffold'
@@ -480,6 +481,8 @@ export function DiskManagementForm({ chartsClassName }: { chartsClassName?: stri
                   </PageSectionAside>
                 </PageSectionMeta>
                 <PageSectionContent className="flex flex-col gap-4">
+                  {isAws && <DiskSpaceBar form={form} />}
+
                   <SpendCapDisabledSection currentDiskSizeGb={defaultValues.totalSize} />
 
                   <NoticeBar

@@ -143,9 +143,7 @@ const StorageListV2MigrationDialog = () => {
               scaled disk
             </InlineLink>{' '}
             within the last 6h and you have at least 60%{' '}
-            <InlineLink href={`/project/${ref}/observability/database`}>
-              CPU capacity
-            </InlineLink>{' '}
+            <InlineLink href={`/project/${ref}/observability/database`}>CPU capacity</InlineLink>{' '}
             before proceeding.
           </p>
         </DialogSection>

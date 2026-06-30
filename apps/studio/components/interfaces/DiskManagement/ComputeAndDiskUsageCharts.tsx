@@ -17,21 +17,17 @@ import {
   type ChartLineTick,
 } from 'ui-patterns/Chart'
 
+import {
+  buildUsageChartData,
+  formatUsagePercent,
+  getComputeUsageSummary,
+  getDiskUsageSummary,
+  getUsageMetricStatus,
+  type UsageMetricStatus,
+} from './ComputeAndDiskUsageCharts.utils'
 import type { InfraMonitoringAttribute } from '@/data/analytics/infra-monitoring-query'
 import { useInfraMonitoringAttributesQuery } from '@/data/analytics/infra-monitoring-query'
 import { formatBytes } from '@/lib/helpers'
-
-type UsageChartDatum = {
-  timestamp: string
-  maxCpuUsage?: number
-  ramUsage?: number
-  diskIoConsumption?: number
-  databaseBytes?: number
-  walBytes?: number
-  systemBytes?: number
-  diskSizeBytes?: number
-  diskUsagePercent?: number
-}
 
 const USAGE_ATTRIBUTES = [
   'max_cpu_usage',
@@ -81,50 +77,12 @@ const PERCENTAGE_Y_AXIS_PROPS = {
   width: 64,
 }
 
-const formatUsagePercent = (value: number | undefined) =>
-  value === undefined ? '—' : `${value.toFixed(0)}%`
-
-const getUsageMetricStatus = (value: number | undefined): 'default' | 'warning' | 'negative' => {
-  if (value === undefined) return 'default'
-  if (value >= 90) return 'negative'
-  if (value >= 75) return 'warning'
-  return 'default'
-}
-
-const getWorstUsageMetricStatus = (
-  ...values: Array<number | undefined>
-): 'default' | 'warning' | 'negative' => {
-  const statuses = values.map(getUsageMetricStatus)
-  if (statuses.includes('negative')) return 'negative'
-  if (statuses.includes('warning')) return 'warning'
-  return 'default'
-}
-
-const getUsageCardClassName = (status: 'default' | 'warning' | 'negative') =>
+const getUsageCardClassName = (status: UsageMetricStatus) =>
   cn(
     'h-full flex flex-col transition-colors',
     status === 'warning' && 'border-warning-400 bg-warning-200/30',
     status === 'negative' && 'border-destructive-400 bg-destructive-200/30'
   )
-
-const toNumber = (value: string | number | undefined) => {
-  const parsedValue = Number(value)
-  return Number.isFinite(parsedValue) ? parsedValue : 0
-}
-
-const clampPercentage = (value: number) => Math.min(Math.max(value, 0), 100)
-
-const getPeakChartValue = (data: UsageChartDatum[], dataKey: keyof UsageChartDatum) => {
-  if (data.length === 0) return undefined
-
-  const values = data
-    .map((point) => point[dataKey])
-    .filter((value): value is number => typeof value === 'number')
-
-  if (values.length === 0) return undefined
-
-  return Math.max(...values)
-}
 
 export const ComputeAndDiskUsageCharts = ({ className }: { className?: string }) => {
   const { ref: projectRef } = useParams()
@@ -151,67 +109,24 @@ export const ComputeAndDiskUsageCharts = ({ className }: { className?: string })
     interval: '1d',
   })
 
-  const { computeChartData, diskChartData } = useMemo(() => {
-    if (!usageData || !('series' in usageData)) {
-      return {
-        computeChartData: [],
-        diskChartData: [],
-      }
-    }
-
-    const computeChartData = usageData.data.map((point) => ({
-      timestamp: point.period_start,
-      maxCpuUsage: clampPercentage(toNumber(point.values.max_cpu_usage)),
-      ramUsage: clampPercentage(toNumber(point.values.ram_usage)),
-      diskIoConsumption: clampPercentage(toNumber(point.values.disk_io_consumption)),
-    }))
-
-    const diskChartData = usageData.data.flatMap((point) => {
-      const databaseBytes = toNumber(point.values.pg_database_size)
-      const walBytes = toNumber(point.values.disk_fs_used_wal)
-      const systemBytes = toNumber(point.values.disk_fs_used_system)
-      const totalBytes = toNumber(point.values.disk_fs_size)
-      if (totalBytes <= 0) return []
-
-      return {
-        timestamp: point.period_start,
-        databaseBytes,
-        walBytes,
-        systemBytes,
-        diskSizeBytes: totalBytes,
-        databaseUsagePercent: clampPercentage((databaseBytes / totalBytes) * 100),
-        walUsagePercent: clampPercentage((walBytes / totalBytes) * 100),
-        systemUsagePercent: clampPercentage((systemBytes / totalBytes) * 100),
-      }
-    })
-
-    return { computeChartData, diskChartData }
-  }, [usageData])
-
-  const peakCpuUsage = getPeakChartValue(computeChartData, 'maxCpuUsage')
-  const peakMemoryUsage = getPeakChartValue(computeChartData, 'ramUsage')
-  const peakDiskIoUsage = getPeakChartValue(computeChartData, 'diskIoConsumption')
-  const computePeaks = [peakCpuUsage, peakMemoryUsage, peakDiskIoUsage].filter(
-    (value): value is number => value !== undefined
+  const { computeChartData, diskChartData } = useMemo(
+    () => buildUsageChartData(usageData),
+    [usageData]
   )
-  const peakComputeUsage = computePeaks.length > 0 ? Math.max(...computePeaks) : undefined
-  const computeUsageStatus = getWorstUsageMetricStatus(
+
+  const {
     peakCpuUsage,
     peakMemoryUsage,
-    peakDiskIoUsage
-  )
+    peakDiskIoUsage,
+    peakComputeUsage,
+    status: computeUsageStatus,
+  } = useMemo(() => getComputeUsageSummary(computeChartData), [computeChartData])
 
-  const latestDiskDataPoint = diskChartData[diskChartData.length - 1]
-  const latestDiskUsedBytes =
-    (latestDiskDataPoint?.databaseBytes ?? 0) +
-    (latestDiskDataPoint?.walBytes ?? 0) +
-    (latestDiskDataPoint?.systemBytes ?? 0)
-  const latestDiskSizeBytes = latestDiskDataPoint?.diskSizeBytes ?? 0
-  const latestDiskUsage =
-    latestDiskSizeBytes > 0
-      ? clampPercentage((latestDiskUsedBytes / latestDiskSizeBytes) * 100)
-      : undefined
-  const diskUsageStatus = getUsageMetricStatus(latestDiskUsage)
+  const {
+    latestDataPoint: latestDiskDataPoint,
+    usagePercent: latestDiskUsage,
+    status: diskUsageStatus,
+  } = useMemo(() => getDiskUsageSummary(diskChartData), [diskChartData])
 
   const databaseReportUrl = `/project/${projectRef}/observability/database`
   const chartActions = [
