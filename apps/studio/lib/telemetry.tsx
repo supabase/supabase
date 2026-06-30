@@ -5,7 +5,6 @@ import { useConsentToast } from 'ui-patterns/consent'
 
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { API_URL, IS_PLATFORM } from '@/lib/constants'
 
 export function Telemetry() {
