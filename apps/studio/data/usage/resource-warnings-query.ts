@@ -26,7 +26,7 @@ export async function getResourceWarnings(
   })
   if (error) handleError(error)
 
-  return data
+  return Array.isArray(data) ? data : []
 }
 
 export type ResourceWarning = components['schemas']['ProjectResourceWarningsResponse']
