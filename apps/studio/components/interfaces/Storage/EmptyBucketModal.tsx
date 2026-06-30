@@ -10,7 +10,7 @@ import {
   DialogSectionSeparator,
   DialogTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { useBucketEmptyMutation } from '@/data/storage/bucket-empty-mutation'
 import type { Bucket } from '@/data/storage/buckets-query'

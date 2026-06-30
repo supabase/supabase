@@ -2,7 +2,7 @@ import { AppWindow, Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { PromoteInstallationModal } from '../../Installations/PromoteInstallationModal'
 import { PrivateApp, usePrivateApps } from '../../PrivateAppsContext'

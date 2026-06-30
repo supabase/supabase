@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from 'ui'
 
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
 
 export interface PrivilegesHeadProps {
   disabled: boolean

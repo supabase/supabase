@@ -13,19 +13,7 @@ class MyDocument extends Document {
   render() {
     return (
       <Html lang="en">
-        <Head>
-          {/* Workaround for https://github.com/suren-atoyan/monaco-react/issues/272 */}
-          <link
-            rel="stylesheet"
-            type="text/css"
-            data-name="vs/editor/editor.main"
-            href={
-              IS_PLATFORM
-                ? 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/editor/editor.main.css'
-                : `${BASE_PATH}/monaco-editor/editor/editor.main.css`
-            }
-          />
-        </Head>
+        <Head />
         <body className={`${inter.variable} ${sourceCodePro.variable}`}>
           <Main />
           <NextScript />
