@@ -25,7 +25,7 @@
   --background-alternative-200: var(--card);
   --background-selection: var(--accent);
   --background-control: var(--accent);
-  --background-surface-75: var(--background);
+  --background-surface-75: oklch(from var(--card) l c h / 50%);
   --background-surface-100: var(--card);
   --background-surface-200: var(--muted);
   --background-surface-300: var(--secondary);

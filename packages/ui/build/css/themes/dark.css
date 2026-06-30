@@ -2,9 +2,9 @@
 .dark {
   --helpers-os-appearance: Dark;
   --hue: 159;
-  --chroma: 0.016;
-  --surface: 0.18;
-  --elevation-step: 0.033;
+  --chroma: 0.005;
+  --surface: 0.19;
+  --elevation-step: 0.025;
   --contrast: 0.5;
   --foreground-lightness: 0.95;
   --muted-foreground-level: 0.8;

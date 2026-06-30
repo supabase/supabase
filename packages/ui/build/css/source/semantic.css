@@ -214,7 +214,7 @@
   --border-brand: oklch(from var(--primary) l c h / 30%);
 
   --border: oklch(
-    from var(--foreground) l calc(c * 0.54) h / calc(2% + 25% * var(--contrast-border))
+    from var(--foreground) l calc(c * 0.54) h / calc(2% + 20% * var(--contrast-border))
   );
   --input: oklch(
     from var(--foreground) l calc(c * 0.5) h / calc(3% + 38% * var(--contrast-border))
