@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce } from '@uidotdev/usehooks'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { FilePlus, FolderPlus, Plus, X } from 'lucide-react'
+import { ChevronDown, FolderPlus, List, Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -45,7 +45,6 @@ export const SQLEditorMenu = () => {
     'inserted_at'
   )
 
-  const appState = getAppStateSnapshot()
   const debouncedSearch = useDebounce(search, 500)
 
   const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
@@ -80,95 +79,100 @@ export const SQLEditorMenu = () => {
     }
   }
 
+  const openRunningQueries = () => {
+    getAppStateSnapshot().setOnGoingQueriesPanelOpen(true)
+  }
+
   useEffect(() => {
     setShowSearch(debouncedSearch.length > 0)
   }, [debouncedSearch])
 
   return (
-    <div className="h-full flex flex-col justify-between">
-      <div className="flex flex-col gap-y-4 grow">
-        <div className="mt-4 mx-4 flex items-center justify-between gap-x-2">
-          <InnerSideBarFilters className="w-full p-0 gap-0">
-            <InnerSideBarFilterSearchInput
-              name="search-queries"
-              placeholder="Search queries..."
-              aria-labelledby="Search queries"
-              value={search}
-              onChange={(e) => {
-                const value = e.target.value
-                setSearch(value)
-                if (value.length === 0) setShowSearch(false)
-              }}
-              onKeyDown={(e) => {
-                if (e.code === 'Escape') {
-                  setSearch('')
-                  setShowSearch(false)
-                }
-              }}
-            >
-              {showSearch ? (
-                <Tooltip>
-                  <TooltipTrigger
-                    className="absolute right-1 top-[.4rem] md:top-[.3rem] transition-colors text-foreground-light hover:text-foreground"
-                    onClick={() => {
-                      setSearch('')
-                      setShowSearch(false)
-                    }}
-                  >
-                    <X size={18} />
-                  </TooltipTrigger>
-                  <TooltipContent>Clear search</TooltipContent>
-                </Tooltip>
-              ) : (
-                <InnerSideBarFilterSortDropdown
-                  value={sort}
-                  onValueChange={(value: any) => setSort(value)}
-                >
-                  <InnerSideBarFilterSortDropdownItem key="name" value="name">
-                    Alphabetical
-                  </InnerSideBarFilterSortDropdownItem>
-                  <InnerSideBarFilterSortDropdownItem key="inserted_at" value="inserted_at">
-                    Created At
-                  </InnerSideBarFilterSortDropdownItem>
-                </InnerSideBarFilterSortDropdown>
-              )}
-            </InnerSideBarFilterSearchInput>
-          </InnerSideBarFilters>
-          <DropdownMenu>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    data-testid="sql-editor-new-query-button"
-                    variant="default"
-                    icon={<Plus className="text-foreground" />}
-                    className="w-[26px]"
-                    aria-label="Create a new query"
-                  />
-                </DropdownMenuTrigger>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">Create a new query</TooltipContent>
-            </Tooltip>
-            <DropdownMenuContent align="end" side="bottom" className="w-48">
-              <DropdownMenuItem className="gap-x-2" onClick={() => handleNewQuery()}>
-                <FilePlus size={14} />
-                Create a new snippet
-              </DropdownMenuItem>
-              <DropdownMenuItem className="gap-x-2" onClick={() => createNewFolder()}>
-                <FolderPlus size={14} />
-                Create a new folder
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-
-        {showSearch ? <SearchList search={debouncedSearch} /> : <SQLEditorNav sort={sort} />}
+    <div className="flex h-full grow flex-col gap-2 pt-5">
+      <div className="mx-4 flex min-w-0 shrink-0 items-center">
+        <Button
+          data-testid="sql-editor-new-query-button"
+          type="button"
+          size="tiny"
+          variant="default"
+          className="h-7 min-w-0 flex-1 justify-start rounded-r-none hover:z-10"
+          icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
+          onClick={handleNewQuery}
+        >
+          New query
+        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="default"
+              aria-label="More query actions"
+              className="h-7 w-7 shrink-0 rounded-l-none -ml-px px-0"
+              icon={<ChevronDown size={14} strokeWidth={1.5} />}
+            />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" side="bottom" className="w-52">
+            <DropdownMenuItem className="gap-x-2" onClick={createNewFolder}>
+              <FolderPlus size={14} />
+              New folder
+            </DropdownMenuItem>
+            <DropdownMenuItem className="gap-x-2" onClick={openRunningQueries}>
+              <List size={14} />
+              View running queries
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
-      <div className="p-4 border-t sticky bottom-0 bg-studio">
-        <Button block variant="default" onClick={() => appState.setOnGoingQueriesPanelOpen(true)}>
-          View running queries
-        </Button>
+      <div className="flex min-h-0 grow flex-col gap-2 pb-4">
+        <InnerSideBarFilters className="mx-2">
+          <InnerSideBarFilterSearchInput
+            name="search-queries"
+            placeholder="Search queries..."
+            aria-labelledby="Search queries"
+            value={search}
+            onChange={(e) => {
+              const value = e.target.value
+              setSearch(value)
+              if (value.length === 0) setShowSearch(false)
+            }}
+            onKeyDown={(e) => {
+              if (e.code === 'Escape') {
+                setSearch('')
+                setShowSearch(false)
+              }
+            }}
+          >
+            {showSearch ? (
+              <Tooltip>
+                <TooltipTrigger
+                  className="absolute right-1 top-[.4rem] transition-colors text-foreground-light hover:text-foreground md:top-[.3rem]"
+                  onClick={() => {
+                    setSearch('')
+                    setShowSearch(false)
+                  }}
+                >
+                  <X size={18} />
+                </TooltipTrigger>
+                <TooltipContent>Clear search</TooltipContent>
+              </Tooltip>
+            ) : (
+              <InnerSideBarFilterSortDropdown
+                value={sort}
+                onValueChange={(value: 'name' | 'inserted_at') => setSort(value)}
+              >
+                <InnerSideBarFilterSortDropdownItem key="name" value="name">
+                  Alphabetical
+                </InnerSideBarFilterSortDropdownItem>
+                <InnerSideBarFilterSortDropdownItem key="inserted_at" value="inserted_at">
+                  Created At
+                </InnerSideBarFilterSortDropdownItem>
+              </InnerSideBarFilterSortDropdown>
+            )}
+          </InnerSideBarFilterSearchInput>
+        </InnerSideBarFilters>
+
+        {showSearch ? <SearchList search={debouncedSearch} /> : <SQLEditorNav sort={sort} />}
       </div>
     </div>
   )

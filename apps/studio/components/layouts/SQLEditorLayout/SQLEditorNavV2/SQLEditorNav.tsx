@@ -1,6 +1,5 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { Heart } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -559,9 +558,8 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                   className="mx-2 px-3"
                   description={
                     <>
-                      Save a query to favorites for easy accessibility by clicking the{' '}
-                      <Heart size={12} className="inline-block relative align-center -top-px" />{' '}
-                      icon.
+                      Save a query to favorites from the query options menu in the editor, or by
+                      right-clicking a query in the sidebar.
                     </>
                   }
                 />

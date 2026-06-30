@@ -1,5 +1,8 @@
-import { Loader2 } from 'lucide-react'
-import { Button, KeyboardShortcut } from 'ui'
+import { CirclePlay, Loader2 } from 'lucide-react'
+import { Button } from 'ui'
+
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface SqlRunButtonProps {
   isDisabled?: boolean
@@ -17,22 +20,27 @@ export const SqlRunButton = ({
   onClick,
 }: SqlRunButtonProps) => {
   return (
-    <Button
-      onClick={onClick}
-      disabled={isDisabled}
-      variant="primary"
-      size="tiny"
-      data-testid="sql-run-button"
-      iconRight={
-        isExecuting ? (
-          <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
-        ) : (
-          <KeyboardShortcut keys={['Meta', 'Enter']} variant="inline" />
-        )
-      }
-      className={className}
+    <ShortcutTooltip
+      shortcutId={SHORTCUT_IDS.SQL_EDITOR_RUN}
+      label={hasSelection ? 'Run selected' : undefined}
     >
-      {hasSelection ? 'Run selected' : 'Run'}
-    </Button>
+      <Button
+        onClick={onClick}
+        disabled={isDisabled}
+        variant="primary"
+        size="tiny"
+        data-testid="sql-run-button"
+        icon={
+          isExecuting ? (
+            <Loader2 className="animate-spin" size={10} strokeWidth={1.5} />
+          ) : (
+            <CirclePlay size={12} strokeWidth={1.5} />
+          )
+        }
+        className={className}
+      >
+        {hasSelection ? 'Run selected' : 'Run'}
+      </Button>
+    </ShortcutTooltip>
   )
 }

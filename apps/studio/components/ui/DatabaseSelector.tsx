@@ -80,15 +80,27 @@ export const DatabaseSelector = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [_selectedDatabaseId])
 
+  const selectedDatabaseLabel = selectedAdditionalOption ? (
+    <span>{selectedAdditionalOption.name}</span>
+  ) : (
+    <>
+      <span className="capitalize">
+        {isLoading || selectedDatabase?.identifier === projectRef
+          ? 'Primary database'
+          : 'Read replica'}
+      </span>
+      {isSuccess && selectedDatabase?.identifier !== projectRef && (
+        <span>
+          ({selectedDatabaseRegion} - {formattedDatabaseId})
+        </span>
+      )}
+    </>
+  )
+
   return (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger asChild>
-        <div className={cn('flex cursor-pointer', className)}>
-          {!isForm && (
-            <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
-              Source
-            </span>
-          )}
+        {isForm ? (
           <Button
             variant="default"
             icon={isLoading && <Loader2 className="animate-spin" />}
@@ -96,31 +108,38 @@ export const DatabaseSelector = ({
             {...buttonProps}
             className={cn(
               'justify-start',
-              !isForm && 'rounded-l-none',
               variant === 'connected-on-right' && 'rounded-r-none',
               variant === 'connected-on-left' && 'rounded-l-none border-l-0',
               variant === 'connected-on-both' && 'rounded-none border-x-0',
+              className,
               buttonProps?.className
             )}
           >
-            {selectedAdditionalOption ? (
-              <span>{selectedAdditionalOption.name}</span>
-            ) : (
-              <>
-                <span className="capitalize">
-                  {isLoading || selectedDatabase?.identifier === projectRef
-                    ? 'Primary database'
-                    : 'Read replica'}
-                </span>{' '}
-                {isSuccess && selectedDatabase?.identifier !== projectRef && (
-                  <span>
-                    ({selectedDatabaseRegion} - {formattedDatabaseId})
-                  </span>
-                )}
-              </>
-            )}
+            {selectedDatabaseLabel}
           </Button>
-        </div>
+        ) : (
+          <Button
+            size="tiny"
+            variant="default"
+            {...buttonProps}
+            className={cn(
+              'h-[26px] justify-start gap-0 pr-3',
+              variant === 'connected-on-right' && 'rounded-r-none border-r-0',
+              variant === 'connected-on-left' && 'rounded-l-none border-l-0',
+              variant === 'connected-on-both' && 'rounded-none border-x-0',
+              className,
+              buttonProps?.className
+            )}
+          >
+            <div className="flex items-center gap-1">
+              <span className="text-foreground-muted">Source</span>
+              <span className="flex items-center gap-1">
+                {isLoading ? <Loader2 className="animate-spin" size={12} /> : selectedDatabaseLabel}
+              </span>
+              <ChevronDown className="text-muted" strokeWidth={1} size={12} />
+            </div>
+          </Button>
+        )}
       </PopoverTrigger>
       <PopoverContent className="p-0 w-64" side="bottom" align={align}>
         <Command>
