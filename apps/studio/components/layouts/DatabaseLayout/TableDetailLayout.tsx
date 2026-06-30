@@ -34,6 +34,7 @@ import { useSnapshot } from 'valtio'
 import DatabaseLayout from './DatabaseLayout'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import {
+  formatWarehouseSize,
   getWarehouseStorageSummaryLabel,
   resolveWarehouseTableState,
   warehouseDemoStore,
@@ -47,7 +48,6 @@ import {
 import { WarehouseSyncChip } from '@/components/interfaces/Database/Warehouse/WarehouseSyncChip'
 import {
   buildTableDetailUrl,
-  formatWarehouseLagLabel,
   WAREHOUSE_TABLE_DETAIL_VIEW,
   type TableDetailSection,
 } from '@/components/interfaces/Database/Warehouse/warehouseTableEditor.utils'
@@ -125,14 +125,11 @@ export function TableDetailLayout({
       : selectedTable?.schema
   const showPoliciesTab = isTable && !isWarehouseDetailView
   const showSettingsTab = isTable && !isWarehouseDetailView
-  const storageSyncError = warehouseState?.syncState === 'error'
+  const storageSyncError = warehouseState?.copyStatus === 'error'
   const hasWarehouseStorage = warehouseState?.mode === 'has_warehouse_copy'
   const tableSizeLabel =
     isWarehouseDetailView && isTable
-      ? (selectedTable.size ??
-        (warehouseState?.warehouseSizeBytes !== undefined
-          ? getWarehouseStorageSummaryLabel(warehouseState, undefined)?.split(' · ').pop()
-          : undefined))
+      ? (selectedTable.size ?? formatWarehouseSize(warehouseState?.warehouseSizeBytes))
       : isTable && selectedTable.size !== undefined
         ? (getWarehouseStorageSummaryLabel(warehouseState, selectedTable.size) ??
           selectedTable.size)
@@ -245,9 +242,9 @@ export function TableDetailLayout({
                 <PageHeaderTitle>
                   {isLoading ? <ShimmeringLoader className="w-40" /> : (selectedTable?.name ?? '')}
                 </PageHeaderTitle>
-                {storageSyncError && <WarehouseSyncChip syncState="error" />}
-                {isWarehouseDetailView && warehouseState?.syncState === 'live' && (
-                  <WarehouseSyncChip syncState="live" />
+                {storageSyncError && <WarehouseSyncChip copyStatus="error" />}
+                {isWarehouseDetailView && warehouseState?.copyStatus === 'live' && (
+                  <WarehouseSyncChip copyStatus="live" />
                 )}
               </div>
 
@@ -259,9 +256,6 @@ export function TableDetailLayout({
                       <span>{selectedTable.live_rows_estimate.toLocaleString()} rows</span>
                     )}
                     {tableSizeLabel && <span>{tableSizeLabel}</span>}
-                    {isWarehouseDetailView && warehouseState?.lagSeconds !== undefined && (
-                      <span>{formatWarehouseLagLabel(warehouseState.lagSeconds)}</span>
-                    )}
                     {isTable && !isWarehouseDetailView && (
                       <span className="inline-flex items-center gap-1">
                         RLS

@@ -9,9 +9,14 @@ import { Menu } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { InnerSideBarEmptyPanel } from 'ui-patterns/InnerSideMenu'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { useSnapshot } from 'valtio'
 
 import { generateObservabilityMenuItems } from './ObservabilityMenu.utils'
 import { ObservabilityMenuItem } from './ObservabilityMenuItem'
+import {
+  hasWarehouseTables as getHasWarehouseTables,
+  warehouseDemoStore,
+} from '@/components/interfaces/Database/Warehouse/warehouseDemoStore'
 import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { CreateReportModal } from '@/components/interfaces/Reports/CreateReportModal'
 import { UpdateCustomReportModal } from '@/components/interfaces/Reports/UpdateModal'
@@ -141,12 +146,16 @@ const ObservabilityMenu = () => {
 
   const reportMenuItems = getReportMenuItems()
 
+  useSnapshot(warehouseDemoStore)
+  const warehouseTablesEnabled = getHasWarehouseTables()
+
   const menuItems = generateObservabilityMenuItems({
     ref,
     preservedQueryParams,
     showOverview,
     isSupamonitorEnabled,
     storageSupported,
+    hasWarehouseTables: warehouseTablesEnabled,
     isPlatform: IS_PLATFORM,
   })
 

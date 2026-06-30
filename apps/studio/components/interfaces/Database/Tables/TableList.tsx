@@ -51,7 +51,8 @@ import { useSnapshot } from 'valtio'
 
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import {
-  getWarehouseStorageSummaryLabel,
+  getWarehouseStorageDisplay,
+  WAREHOUSE_STORAGE_CELL_TOOLTIP,
   warehouseDemoStore,
   type WarehouseMode,
 } from '../Warehouse/warehouseDemoStore'
@@ -662,10 +663,7 @@ export const TableList = ({
                                   mode: 'postgres',
                                 }
                                 const mode = wState.mode as WarehouseMode
-                                const storageSummary = getWarehouseStorageSummaryLabel(
-                                  wState,
-                                  x.size
-                                )
+                                const storageDisplay = getWarehouseStorageDisplay(wState, x.size)
                                 const storageUrl = isWarehouseSchema(selectedSchema)
                                   ? buildTableDetailUrl(ref!, x.id, {
                                       view: WAREHOUSE_TABLE_DETAIL_VIEW,
@@ -675,27 +673,36 @@ export const TableList = ({
                                       section: 'settings',
                                     })
                                 const showSyncChip =
-                                  wState.syncState === 'syncing' || wState.syncState === 'error'
+                                  wState.copyStatus === 'backfilling' ||
+                                  wState.copyStatus === 'error'
 
-                                if (mode === 'postgres') {
+                                if (mode === 'postgres' || !storageDisplay) {
                                   return (
                                     <p className="text-sm text-foreground-light">{x.size ?? '—'}</p>
                                   )
                                 }
 
                                 return (
-                                  <Link
-                                    href={storageUrl}
-                                    onClick={(event: MouseEvent) => event.stopPropagation()}
-                                    className="inline-flex max-w-full items-center gap-2 rounded-sm hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter"
-                                  >
-                                    <span className="text-sm text-foreground-light">
-                                      {storageSummary}
-                                    </span>
-                                    {showSyncChip && (
-                                      <WarehouseSyncChip syncState={wState.syncState!} />
-                                    )}
-                                  </Link>
+                                  <Tooltip>
+                                    <TooltipTrigger asChild>
+                                      <span className="inline-flex max-w-full items-center gap-2 text-sm text-foreground-light">
+                                        <span>{storageDisplay.postgresSize ?? '—'}</span>
+                                        <Link
+                                          href={storageUrl}
+                                          onClick={(event: MouseEvent) => event.stopPropagation()}
+                                          className="text-link-table-cell text-foreground-lighter hover:text-foreground duration-100"
+                                        >
+                                          (Copy: {storageDisplay.warehouseCopySize})
+                                        </Link>
+                                        {showSyncChip && (
+                                          <WarehouseSyncChip copyStatus={wState.copyStatus!} />
+                                        )}
+                                      </span>
+                                    </TooltipTrigger>
+                                    <TooltipContent side="top" className="max-w-xs">
+                                      {WAREHOUSE_STORAGE_CELL_TOOLTIP}
+                                    </TooltipContent>
+                                  </Tooltip>
                                 )
                               })()
                             ) : (

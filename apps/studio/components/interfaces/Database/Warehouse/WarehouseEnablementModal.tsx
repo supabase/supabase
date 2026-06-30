@@ -51,7 +51,7 @@ export function WarehouseEnablementModal({
     if (progressIndex >= ATTACH_PROGRESS.length) {
       const timeout = setTimeout(() => {
         setTableMode(tableKey, 'has_warehouse_copy')
-        toast.success('Warehouse copy is live')
+        toast.success('Warehouse copy started')
         onOpenChange(false)
       }, COMPLETION_HOLD_MS)
       return () => clearTimeout(timeout)

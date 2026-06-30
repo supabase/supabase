@@ -11,12 +11,19 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import {
+  clearTableCopyError,
   formatWarehouseSize,
   resolveWarehouseTableState,
+  setTableCopyError,
+  useProjectReplication,
   useWarehouseTableState,
   type WarehouseMode,
 } from './warehouseDemoStore'
@@ -28,7 +35,11 @@ import {
   getWarehouseQualifiedTableName,
   parseTableKey,
 } from './warehouseNaming.utils'
-import { WarehouseSyncChip } from './WarehouseSyncChip'
+import {
+  buildReplicationLogsUrl,
+  buildWarehouseObservabilityUrl,
+} from './warehouseObservability.utils'
+import { getCopyStatusTooltip, WarehouseSyncChip } from './WarehouseSyncChip'
 import { buildTableDetailUrl, WAREHOUSE_TABLE_DETAIL_VIEW } from './warehouseTableEditor.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 
@@ -43,6 +54,50 @@ function MetaRow({ label, children }: { label: ReactNode; children: ReactNode })
       <span className="shrink-0 text-foreground-lighter">{label}</span>
       <div className="min-w-0 text-right text-foreground">{children}</div>
     </div>
+  )
+}
+
+function RowIconLink({
+  href,
+  icon: Icon,
+  tooltip,
+  ariaLabel,
+}: {
+  href: string
+  icon: typeof ExternalLink
+  tooltip: string
+  ariaLabel: string
+}) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          type="button"
+          variant="text"
+          size="tiny"
+          className="h-6 w-6 shrink-0 p-0 text-foreground-lighter hover:text-foreground"
+          asChild
+        >
+          <Link href={href} aria-label={ariaLabel}>
+            <Icon size={14} />
+          </Link>
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side="top">{tooltip}</TooltipContent>
+    </Tooltip>
+  )
+}
+
+function MetaRowLabel({ children, tooltip }: { children: ReactNode; tooltip?: string }) {
+  if (!tooltip) return <>{children}</>
+
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      {children}
+      <InfoTooltip side="top" className="max-w-72">
+        {tooltip}
+      </InfoTooltip>
+    </span>
   )
 }
 
@@ -62,30 +117,24 @@ function TableCopyRow({
   return (
     <MetaRow
       label={
-        <span className="inline-flex items-center gap-2">
-          {label}
-          {isCurrent && <Badge variant="default">Current</Badge>}
-        </span>
+        <MetaRowLabel tooltip={tooltip}>
+          <span className="inline-flex items-center gap-2">
+            {label}
+            {isCurrent && <Badge variant="default">Current</Badge>}
+          </span>
+        </MetaRowLabel>
       }
     >
       <div className="flex items-center justify-end gap-1.5">
         <code className="text-code-inline break-all">{name}</code>
         {detailUrl !== undefined && (
-          <Button
-            type="button"
-            variant="text"
-            size="tiny"
-            className="h-6 w-6 shrink-0 p-0 text-foreground-lighter hover:text-foreground"
-            asChild
-          >
-            <Link href={detailUrl} aria-label={`Open ${name}`}>
-              <ExternalLink size={14} />
-            </Link>
-          </Button>
+          <RowIconLink
+            href={detailUrl}
+            icon={ExternalLink}
+            tooltip="View table"
+            ariaLabel={`View table ${name}`}
+          />
         )}
-        <InfoTooltip side="top" className="max-w-72">
-          {tooltip}
-        </InfoTooltip>
       </div>
     </MetaRow>
   )
@@ -111,6 +160,7 @@ export function WarehouseTableStoragePanel({
   const { schema, table } = parseTableKey(tableKey)
   const sourceTableKey = getSourceTableKey(schema, table)
   const storedState = useWarehouseTableState(sourceTableKey)
+  const projectReplication = useProjectReplication()
   const state = resolveWarehouseTableState(sourceTableKey, storedState, {
     isWarehouseView: viewContext === 'warehouse',
   })
@@ -140,6 +190,10 @@ export function WarehouseTableStoragePanel({
     projectRef !== undefined && viewContext === 'source'
       ? buildTableDetailUrl(projectRef, tableId, { view: WAREHOUSE_TABLE_DETAIL_VIEW })
       : undefined
+  const observabilityUrl =
+    projectRef !== undefined ? buildWarehouseObservabilityUrl(projectRef) : undefined
+  const replicationLogsUrl =
+    projectRef !== undefined ? buildReplicationLogsUrl(projectRef) : undefined
 
   return (
     <>
@@ -151,14 +205,54 @@ export function WarehouseTableStoragePanel({
 
           {mode === 'has_warehouse_copy' && (
             <>
-              {state.syncState && (
-                <MetaRow label="Sync status">
-                  <WarehouseSyncChip syncState={state.syncState} />
+              {state.copyStatus && (
+                <MetaRow
+                  label={
+                    <MetaRowLabel tooltip={getCopyStatusTooltip(state.copyStatus)}>
+                      Sync status
+                    </MetaRowLabel>
+                  }
+                >
+                  <WarehouseSyncChip copyStatus={state.copyStatus} />
                 </MetaRow>
               )}
-              {state.lagSeconds !== undefined && (
-                <MetaRow label="Lag">
-                  <span className="text-foreground-light">{state.lagSeconds}s</span>
+              {state.copyStatus === 'error' && (
+                <Admonition
+                  type="destructive"
+                  layout="responsive"
+                  title="Warehouse copy sync failed"
+                  description="This table’s Warehouse copy could not stay in sync with Postgres. Your Postgres table is unaffected."
+                  className="mb-0 rounded-none border-x-0 border-t-0 border-b-1 border-border"
+                  actions={
+                    replicationLogsUrl ? (
+                      <Button variant="default" asChild>
+                        <Link href={replicationLogsUrl}>View replication logs</Link>
+                      </Button>
+                    ) : undefined
+                  }
+                />
+              )}
+              {projectReplication && (
+                <MetaRow
+                  label={
+                    <MetaRowLabel tooltip="Replication lag for this project’s Warehouse pipeline. Applies to all Warehouse tables.">
+                      Lag
+                    </MetaRowLabel>
+                  }
+                >
+                  <div className="inline-flex items-center justify-end gap-1.5">
+                    <span className="text-foreground-light">
+                      {projectReplication.replicationLagSeconds}s
+                    </span>
+                    {observabilityUrl && (
+                      <RowIconLink
+                        href={observabilityUrl}
+                        icon={ExternalLink}
+                        tooltip="View in Observability"
+                        ariaLabel="View in Observability"
+                      />
+                    )}
+                  </div>
                 </MetaRow>
               )}
               <TableCopyRow
@@ -218,11 +312,20 @@ export function WarehouseTableStoragePanel({
                   aria-label="More warehouse actions"
                 />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuItem onClick={openCatalogConnect}>Connect externally</DropdownMenuItem>
                 {viewContext === 'source' && (
                   <>
                     <DropdownMenuSeparator />
+                    {state.copyStatus === 'error' ? (
+                      <DropdownMenuItem onClick={() => clearTableCopyError(sourceTableKey)}>
+                        Clear sync error (demo)
+                      </DropdownMenuItem>
+                    ) : (
+                      <DropdownMenuItem onClick={() => setTableCopyError(sourceTableKey)}>
+                        Simulate sync error (demo)
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
                       className="text-destructive focus:text-destructive"
                       onClick={() => setDetachConfirm(true)}

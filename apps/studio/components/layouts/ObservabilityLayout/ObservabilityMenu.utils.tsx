@@ -20,6 +20,7 @@ interface GenerateObservabilityMenuOptions {
   showOverview: boolean
   isSupamonitorEnabled: boolean
   storageSupported: boolean
+  hasWarehouseTables?: boolean
   isPlatform?: boolean
 }
 
@@ -32,6 +33,7 @@ export function generateObservabilityMenuItems(
     showOverview,
     isSupamonitorEnabled,
     storageSupported,
+    hasWarehouseTables = false,
     isPlatform = IS_PLATFORM,
   } = options
 
@@ -116,6 +118,15 @@ export function generateObservabilityMenuItems(
       url: `/project/${ref}/observability/realtime${preservedQueryParams}`,
       shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY_REALTIME,
     },
+    ...(hasWarehouseTables
+      ? [
+          {
+            name: 'Warehouse',
+            key: 'warehouse',
+            url: `/project/${ref}/observability/warehouse${preservedQueryParams}`,
+          },
+        ]
+      : []),
   ]
 
   const sections: ObservabilityMenuSection[] = [

@@ -8,12 +8,33 @@ Prototype Studio code uses `?view=warehouse` on table detail URLs and `warehouse
 - Replace `warehouseDemoStore` enable/detach/sync fields with API responses
 - Support **copy mode** (postgres + warehouse) and **warehouse-only** (post-Move, no postgres table)
 
+## Project-level replication status
+
+One Warehouse replication pipeline serves all linked tables. Lag and phase are **project-scoped**, not per-table.
+
+```ts
+type ReplicationPhase = 'initial_sync' | 'streaming' | 'error'
+type PipelineStatus = 'live' | 'error'
+
+interface WarehouseProjectReplicationStatus {
+  /** Seconds behind the Postgres WAL for this project’s Warehouse pipeline */
+  replication_lag_seconds: number
+  /** Overall pipeline phase */
+  replication_phase: ReplicationPhase
+  /** Pipeline health summary */
+  pipeline_status: PipelineStatus
+}
+```
+
+Consumed by **Observability → Warehouse** (mock sparklines in prototype; real monitor API later).
+
 ## Proposed fields on table metadata
 
 Returned by table editor / catalog queries (`getTableEditor`, table list, etc.):
 
 ```ts
 type TableStorageMode = 'postgres' | 'postgres_with_warehouse_copy' | 'warehouse_only'
+type CopyStatus = 'backfilling' | 'live' | 'error'
 
 interface WarehouseTableMetadata {
   /** How this table is stored and surfaced in Studio */
@@ -33,13 +54,14 @@ interface WarehouseTableMetadata {
   /** Qualified warehouse relation name (e.g. public_warehouse.events) */
   warehouse_qualified_name?: string
 
-  /** Warehouse-specific runtime fields */
-  warehouse_sync_state?: 'syncing' | 'live' | 'error'
-  warehouse_lag_seconds?: number
+  /** Table-scoped copy progress (not project lag) */
+  warehouse_copy_status?: CopyStatus
   warehouse_size_bytes?: number
   warehouse_last_synced_at?: string
 }
 ```
+
+**Do not** put `warehouse_lag_seconds` on per-table metadata. Lag belongs on `WarehouseProjectReplicationStatus`.
 
 ## Studio routing rules (target)
 
@@ -61,10 +83,17 @@ Detach (copy removed, postgres remains): `storage_mode` returns to `postgres`; w
 
 ## Demo store mapping (interim)
 
-| Demo store                   | API equivalent                                 |
-| ---------------------------- | ---------------------------------------------- |
-| `mode: 'postgres'`           | `storage_mode: 'postgres'`                     |
-| `mode: 'has_warehouse_copy'` | `storage_mode: 'postgres_with_warehouse_copy'` |
-| (not implemented)            | `storage_mode: 'warehouse_only'`               |
+| Demo store                                       | API equivalent                                 |
+| ------------------------------------------------ | ---------------------------------------------- |
+| `mode: 'postgres'`                               | `storage_mode: 'postgres'`                     |
+| `mode: 'has_warehouse_copy'`                     | `storage_mode: 'postgres_with_warehouse_copy'` |
+| `copyStatus: 'backfilling' \| 'live' \| 'error'` | `warehouse_copy_status`                        |
+| `projectReplication.replicationLagSeconds`       | `replication_lag_seconds` (project)            |
+| `projectReplication.replicationPhase`            | `replication_phase` (project)                  |
+| (not implemented)                                | `storage_mode: 'warehouse_only'`               |
 
-Remove `warehouseDemoStore` when list/detail queries return `WarehouseTableMetadata`.
+Remove `warehouseDemoStore` when list/detail queries return `WarehouseTableMetadata` and a project replication endpoint exists.
+
+## Observability
+
+**Observability → Warehouse** reads `WarehouseProjectReplicationStatus` plus a linked-table count derived from tables with `storage_mode = postgres_with_warehouse_copy`. Prototype uses mock sparklines until the monitor API is available.

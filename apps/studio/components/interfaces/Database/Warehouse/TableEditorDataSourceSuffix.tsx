@@ -1,7 +1,11 @@
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { useSnapshot } from 'valtio'
 
-import { warehouseDemoStore, type WarehouseTableState } from './warehouseDemoStore'
+import {
+  getProjectReplicationLagSeconds,
+  warehouseDemoStore,
+  type WarehouseTableState,
+} from './warehouseDemoStore'
 import {
   getSourceTableKey,
   getWarehouseCopyTooltip,
@@ -16,12 +20,12 @@ function getTableEditorDataSourceSuffix(
 ): { label: string; lagLabel?: string; tooltip: string } | null {
   if (isWarehouseSchema(schema)) {
     const sourceTableKey = getSourceTableKey(schema, table)
-    const lagSeconds = warehouseTables[sourceTableKey]?.lagSeconds ?? 12
+    const lagSeconds = getProjectReplicationLagSeconds() ?? 12
 
     return {
       label: 'Warehouse copy',
       lagLabel: formatWarehouseLagLabel(lagSeconds),
-      tooltip: getWarehouseCopyTooltip(sourceTableKey),
+      tooltip: `${getWarehouseCopyTooltip(sourceTableKey)} Project replication lag (${lagSeconds}s) applies to all Warehouse tables.`,
     }
   }
 
