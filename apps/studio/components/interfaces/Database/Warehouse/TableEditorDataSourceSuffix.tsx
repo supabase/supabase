@@ -2,7 +2,11 @@ import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { useSnapshot } from 'valtio'
 
 import { warehouseDemoStore, type WarehouseTableState } from './warehouseDemoStore'
-import { getSourceTableKey, isWarehouseSchema } from './warehouseNaming.utils'
+import {
+  getSourceTableKey,
+  getWarehouseCopyTooltip,
+  isWarehouseSchema,
+} from './warehouseNaming.utils'
 import { formatWarehouseLagLabel } from './warehouseTableEditor.utils'
 
 function getTableEditorDataSourceSuffix(
@@ -17,7 +21,7 @@ function getTableEditorDataSourceSuffix(
     return {
       label: 'Warehouse copy',
       lagLabel: formatWarehouseLagLabel(lagSeconds),
-      tooltip: `Read-only Warehouse copy of ${sourceTableKey}`,
+      tooltip: getWarehouseCopyTooltip(sourceTableKey),
     }
   }
 

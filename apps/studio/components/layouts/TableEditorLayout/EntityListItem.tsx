@@ -35,7 +35,11 @@ import {
 import { useExportAllRowsAsCsv, useExportAllRowsAsSql } from './ExportAllRows'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
-import { isWarehouseSchema } from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
+import {
+  getSourceTableKey,
+  getWarehouseCopyTooltip,
+  isWarehouseSchema,
+} from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
 import { getEntityLintDetails } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -163,7 +167,9 @@ export const EntityListItem = ({
   const entityIconType = isWarehouseEntity ? ENTITY_TYPE.WAREHOUSE_TABLE : entity.type
 
   const formatTooltipText = (entityType: string) => {
-    if (isWarehouseEntity) return 'Warehouse copy'
+    if (isWarehouseEntity) {
+      return getWarehouseCopyTooltip(getSourceTableKey(entity.schema, entity.name))
+    }
     const text =
       Object.entries(ENTITY_TYPE)
         .find(([, value]) => value === entityType)?.[0]

@@ -41,6 +41,7 @@ import {
 import {
   getSourceSchemaName,
   getSourceTableKey,
+  getWarehouseCopyTooltip,
   getWarehouseSchemaName,
 } from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
 import { WarehouseSyncChip } from '@/components/interfaces/Database/Warehouse/WarehouseSyncChip'
@@ -232,7 +233,11 @@ export function TableDetailLayout({
                         <EntityTypeIcon type={headerEntityType} />
                       </span>
                     </TooltipTrigger>
-                    <TooltipContent side="bottom">Warehouse copy</TooltipContent>
+                    <TooltipContent side="bottom">
+                      {getWarehouseCopyTooltip(
+                        getSourceTableKey(selectedTable.schema, selectedTable.name)
+                      )}
+                    </TooltipContent>
                   </Tooltip>
                 ) : (
                   selectedTable && headerEntityType && <EntityTypeIcon type={headerEntityType} />

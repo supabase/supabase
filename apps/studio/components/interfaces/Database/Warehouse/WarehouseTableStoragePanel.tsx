@@ -220,13 +220,17 @@ export function WarehouseTableStoragePanel({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
                 <DropdownMenuItem onClick={openCatalogConnect}>Connect externally</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  className="text-destructive focus:text-destructive"
-                  onClick={() => setDetachConfirm(true)}
-                >
-                  Detach Warehouse copy
-                </DropdownMenuItem>
+                {viewContext === 'source' && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="text-destructive focus:text-destructive"
+                      onClick={() => setDetachConfirm(true)}
+                    >
+                      Detach Warehouse copy
+                    </DropdownMenuItem>
+                  </>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

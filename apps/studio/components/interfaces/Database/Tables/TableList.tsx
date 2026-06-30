@@ -55,7 +55,12 @@ import {
   warehouseDemoStore,
   type WarehouseMode,
 } from '../Warehouse/warehouseDemoStore'
-import { getSourceSchemaName, isWarehouseSchema } from '../Warehouse/warehouseNaming.utils'
+import {
+  getSourceSchemaName,
+  getSourceTableKey,
+  getWarehouseCopyTooltip,
+  isWarehouseSchema,
+} from '../Warehouse/warehouseNaming.utils'
 import { WarehouseSyncChip } from '../Warehouse/WarehouseSyncChip'
 import {
   buildTableDetailUrl,
@@ -341,9 +346,10 @@ export const TableList = ({
   const isSuccess =
     isSuccessTables && isSuccessViews && isSuccessMaterializedViews && isSuccessForeignTables
 
-  const formatTooltipText = (entityType: string, isWarehouseEntity = false) => {
-    if (isWarehouseEntity) return 'Warehouse copy'
-
+  const formatTooltipText = (entityType: string, entity?: { schema: string; name: string }) => {
+    if (entity !== undefined && isWarehouseSchema(entity.schema)) {
+      return getWarehouseCopyTooltip(getSourceTableKey(entity.schema, entity.name))
+    }
     const text =
       Object.entries(ENTITY_TYPE)
         .find(([, value]) => value === entityType)?.[0]
@@ -605,7 +611,7 @@ export const TableList = ({
                                 </div>
                               </TooltipTrigger>
                               <TooltipContent side="bottom">
-                                {formatTooltipText(x.type, isWarehouseEntity)}
+                                {formatTooltipText(x.type, x)}
                               </TooltipContent>
                             </Tooltip>
                           </TableCell>

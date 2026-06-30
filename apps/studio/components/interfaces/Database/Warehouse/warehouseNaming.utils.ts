@@ -39,6 +39,10 @@ export function getWarehouseQualifiedTableName(tableKey: string): string {
   return `${getWarehouseSchemaName(schema)}.${table}`
 }
 
+export function getWarehouseCopyTooltip(sourceTableKey: string): string {
+  return `Warehouse copy of ${sourceTableKey}`
+}
+
 export function buildWarehouseSampleQuery(tableKey: string): string {
   const qualified = getWarehouseQualifiedTableName(tableKey)
 
