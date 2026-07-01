@@ -26,6 +26,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/go/external-replication-destinations',
+    destination: '/go/supabase-pipelines-new-destinations',
+  },
+  {
+    permanent: true,
+    source: '/go/external-replication-destinations/thank-you',
+    destination: '/go/supabase-pipelines-new-destinations/thank-you',
+  },
+  {
+    permanent: true,
     source: '/ui/docs/ai-editors-rules/prompts',
     destination: '/ui/docs/ai-editors-rules/skills',
   },
