@@ -28,7 +28,19 @@ import {
 } from 'react'
 import Markdown from 'react-markdown'
 import { format } from 'sql-formatter'
-import { Alert, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, Tabs } from 'ui'
+import {
+  Alert,
+  Button,
+  ButtonProps,
+  cn,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  Tabs_Shadcn_ as Tabs,
+  TabsContent_Shadcn_ as TabsContent,
+  TabsList_Shadcn_ as TabsList,
+  TabsTrigger_Shadcn_ as TabsTrigger,
+} from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { assumptions } from './assumptions'
@@ -355,8 +367,23 @@ export default function SqlToRest({
         )}
       >
         <div className="font-medium">Choose language to translate to</div>
-        <Tabs activeId={currentLanguage} onChange={(id: string) => setCurrentLanguage(id)}>
-          <Tabs.Panel id="curl" label="cURL" className="flex flex-col gap-4">
+        <Tabs
+          value={currentLanguage}
+          onValueChange={(id: string) => setCurrentLanguage(id)}
+          className="mb-4"
+        >
+          <TabsList className="w-full gap-1 border-0">
+            <TabsTrigger value="curl" asChild>
+              <TabsButton active={currentLanguage === 'curl'}>cURL</TabsButton>
+            </TabsTrigger>
+            <TabsTrigger value="http" asChild>
+              <TabsButton active={currentLanguage === 'http'}>HTTP</TabsButton>
+            </TabsTrigger>
+            <TabsTrigger value="js" asChild>
+              <TabsButton active={currentLanguage === 'js'}>JavaScript</TabsButton>
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="curl" className="flex flex-col gap-4">
             {httpRenderError && <Alert className="text-red-900">{httpRenderError.message}</Alert>}
             <CodeBlock
               language="curl"
@@ -369,8 +396,8 @@ export default function SqlToRest({
             >
               {curlCommand}
             </CodeBlock>
-          </Tabs.Panel>
-          <Tabs.Panel id="http" label="HTTP" className="flex flex-col gap-4">
+          </TabsContent>
+          <TabsContent value="http" className="flex flex-col gap-4">
             {httpRenderError && <Alert className="text-red-900">{httpRenderError.message}</Alert>}
             <CodeBlock
               language="http"
@@ -383,8 +410,8 @@ export default function SqlToRest({
             >
               {rawHttp}
             </CodeBlock>
-          </Tabs.Panel>
-          <Tabs.Panel id="js" label="JavaScript" className="flex flex-col gap-4">
+          </TabsContent>
+          <TabsContent value="js" className="flex flex-col gap-4">
             {supabaseJsRenderError && (
               <Alert className="text-red-900">{supabaseJsRenderError.message}</Alert>
             )}
@@ -399,7 +426,7 @@ export default function SqlToRest({
             >
               {jsCommand}
             </CodeBlock>
-          </Tabs.Panel>
+          </TabsContent>
         </Tabs>
         <div
           className={cn(
@@ -485,3 +512,14 @@ function getTheme(isDarkMode: boolean): editor.IStandaloneThemeData {
     colors: { 'editor.background': isDarkMode ? '#1f1f1f' : '#f0f0f0' },
   }
 }
+
+const TabsButton = ({ active, className, ...props }: { active: boolean } & ButtonProps) => (
+  <Button
+    size="tiny"
+    variant={active ? 'default' : 'outline'}
+    className={cn({
+      'text-muted hover:text-foreground': !active,
+    })}
+    {...props}
+  />
+)
