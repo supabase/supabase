@@ -126,4 +126,24 @@ describe('AddNewURLModal', () => {
     expect(await screen.findByText('URL already exists in the allow list')).toBeInTheDocument()
     expect(mutateMock).not.toHaveBeenCalled()
   })
+
+  it('rejects a whitespace-padded URL when it already exists in the allow list', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <AddNewURLModal visible allowList={['https://existing.example.com']} onClose={vi.fn()} />
+    )
+
+    await screen.findByRole('dialog')
+
+    await user.type(
+      screen.getByPlaceholderText('https://mydomain.com'),
+      ' https://existing.example.com '
+    )
+
+    fireEvent.submit(screen.getByRole('dialog').querySelector('form') as HTMLFormElement)
+
+    expect(await screen.findByText('URL already exists in the allow list')).toBeInTheDocument()
+    expect(mutateMock).not.toHaveBeenCalled()
+  })
 })
