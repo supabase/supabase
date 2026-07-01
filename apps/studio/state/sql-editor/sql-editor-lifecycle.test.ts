@@ -8,6 +8,7 @@ import {
   isNewFolder,
   isSaveFailed,
   isSaving,
+  statusOnEdit,
   statusOnSaveError,
   statusOnSaveStart,
   statusOnSaveSuccess,
@@ -105,6 +106,24 @@ describe('statusOnSaveError', () => {
     expect(statusOnSaveError('saving')).toBe('save_failed')
     expect(statusOnSaveError('saved')).toBe('save_failed')
     expect(statusOnSaveError(undefined)).toBe('save_failed')
+  })
+})
+
+describe('statusOnEdit', () => {
+  it('marks a persisted, clean snippet as unsaved', () => {
+    expect(statusOnEdit('saved')).toBe('unsaved')
+  })
+
+  it('leaves every already-dirty or in-flight status unchanged', () => {
+    for (const status of [...NEVER_PERSISTED, 'unsaved', 'saving', 'save_failed'] as const) {
+      expect(statusOnEdit(status)).toBe(status)
+    }
+  })
+
+  it('keeps hasUnsavedChanges true after an edit', () => {
+    for (const status of [...NEVER_PERSISTED, ...PERSISTED] as const) {
+      expect(hasUnsavedChanges(statusOnEdit(status))).toBe(true)
+    }
   })
 })
 

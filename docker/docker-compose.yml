@@ -4,8 +4,8 @@
 #   Dev mode:           docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up -d
 #   Reset everything:   sh reset.sh
 #
-# TODO:
-#   - Podman does not support nested variable interpolation (${A:-${B}})
+# Notes:
+#   - Nested variable interpolation (${A:-${B}}) requires podman-compose >= 1.6.0
 #
 
 name: supabase
@@ -312,7 +312,7 @@ services:
       DB_PASSWORD: ${POSTGRES_PASSWORD}
       DB_NAME: ${POSTGRES_DB}
       DB_AFTER_CONNECT_QUERY: 'SET search_path TO _realtime'
-      DB_ENC_KEY: supabaserealtime
+      DB_ENC_KEY: ${REALTIME_DB_ENC_KEY:-supabaserealtime}
 
       # Legacy symmetric HS256 key
       API_JWT_SECRET: ${JWT_SECRET}

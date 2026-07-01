@@ -23,8 +23,8 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { useIsRLSTesterEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Policies } from '@/components/interfaces/Database/Policies/Policies'
+import { getGeneralPolicyTemplates } from '@/components/interfaces/Database/Policies/Policies.constants'
 import { PoliciesDataProvider } from '@/components/interfaces/Database/Policies/PoliciesDataContext'
-import { getGeneralPolicyTemplates } from '@/components/interfaces/Database/Policies/PolicyEditorModal/PolicyEditorModal.constants'
 import { PolicyEditorPanel } from '@/components/interfaces/Database/Policies/PolicyEditorPanel'
 import {
   generatePolicyUpdateSQL,

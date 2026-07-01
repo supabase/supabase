@@ -94,7 +94,9 @@ const PolicyTableRowComponent = ({
 
   return (
     <Card className={cn(isPubliclyReadable && 'border-warning-500')}>
-      <CardHeader className={cn('py-3 px-4', status !== 'secured' && 'border-b-0')}>
+      <CardHeader
+        className={cn('py-3 px-4', status !== 'secured' && status !== 'unknown' && 'border-b-0')}
+      >
         <PolicyTableRowHeader
           table={table}
           isLocked={isLocked}

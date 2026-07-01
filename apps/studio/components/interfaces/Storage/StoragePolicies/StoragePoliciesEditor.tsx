@@ -3,8 +3,8 @@ import { Button, Checkbox, cn, DialogSection, DialogSectionSeparator } from 'ui'
 
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
 import { deriveAllowedClientLibraryMethods } from '../Storage.utils'
-import { PolicyName } from '@/components/interfaces/Database/Policies/PolicyEditor/PolicyName'
-import { PolicyRoles } from '@/components/interfaces/Database/Policies/PolicyEditor/PolicyRoles'
+import { PolicyName } from './PolicyEditor/PolicyName'
+import { PolicyRoles } from './PolicyEditor/PolicyRoles'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -149,7 +149,7 @@ const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () =>
 
 // [Refactor] All these update methods could be summarised into one single function probably
 
-const StoragePoliciesEditor = ({
+export const StoragePoliciesEditor = ({
   policyFormFields = {},
   onViewTemplates = noop,
   onUpdatePolicyName = noop,
@@ -194,5 +194,3 @@ const StoragePoliciesEditor = ({
     </>
   )
 }
-
-export default StoragePoliciesEditor
