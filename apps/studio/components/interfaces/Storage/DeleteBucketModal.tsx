@@ -31,6 +31,9 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
 
   const { mutate: deleteBucket, isPending: isDeletingBucket } = useBucketDeleteMutation({
     onSuccess: async () => {
+      // Close the modal and navigate away as soon as the bucket itself is deleted, so
+      // policy cleanup below (which can be slow) doesn't hold the loading state or block
+      // the success feedback.
       toast.success(`Successfully deleted bucket ${bucket.id}`)
       onClose()
       if (bucketId) router.push(`/project/${projectRef}/storage/files`)
