@@ -2,8 +2,9 @@ import { ImageResponse } from 'next/og'
 
 import { SEED_ICON_MAP } from '@/lib/assets/seed-icons'
 import { satoriFonts, measurementFont } from '@/lib/design/fonts'
-import { iconDataUri, normalizeStrokePx } from '@/lib/design/icons'
+import { iconDataUri } from '@/lib/design/icons'
 import {
+  PATTERN_SCALE_PX,
   clampPatternOpacity,
   patternDataUri,
   type PatternColor,
@@ -16,7 +17,7 @@ import {
   TEMPLATE_MAP,
   type TemplateDefaultPattern,
 } from '@/lib/design/templates'
-import { canvas, color, typography } from '@/lib/design/tokens'
+import { canvas, color, illustration, typography } from '@/lib/design/tokens'
 import { fitHeadline } from '@/lib/text/fit-headline'
 import { toSentenceCase } from '@/lib/text/sentence-case'
 
@@ -31,7 +32,7 @@ const HEADLINE = typography.roles.headline
 const EYEBROW = typography.roles.eyebrow
 
 const ICON_SIZE = 220 // OG icon size (1x design px)
-const ICON_STROKE = normalizeStrokePx(1.5)
+const ICON_STROKE = illustration.defaultStrokePx
 
 const THUMB_ICON_DEFAULT = 380
 const THUMB_ICON_MIN = 160
@@ -90,9 +91,9 @@ export async function GET(req: Request) {
       }
     }
 
-    const patternLayer = (cfg: PatternConfig) => {
+    const patternLayer = (cfg: PatternConfig, offsetX = 0, offsetY = 0) => {
       if (cfg.type === 'none') return null
-      const uri = patternDataUri({ ...cfg, width: W, height: H, scaleFactor: s })
+      const uri = patternDataUri({ ...cfg, width: W, height: H, scaleFactor: s, offsetX, offsetY })
       // eslint-disable-next-line @next/next/no-img-element
       return <img width={W} height={H} src={uri} style={{ position: 'absolute', top: 0, left: 0 }} />
     }
@@ -126,7 +127,7 @@ export async function GET(req: Request) {
               src={iconDataUri(iconObj, {
                 sizePx: thumbSize * s,
                 strokePx: ICON_STROKE * s,
-                color: color('brand.default'),
+                color: color('illustration.stroke'),
               })}
             />
           ) : null}
@@ -243,12 +244,17 @@ export async function GET(req: Request) {
         src={iconDataUri(iconObj, {
           sizePx: ICON_SIZE * s,
           strokePx: ICON_STROKE * s,
-          color: color('brand.default'),
+          color: color('illustration.stroke'),
         })}
       />
     ) : null
 
     const cfg = resolvePattern(template.defaultPattern)
+    // Grid-snap (§4): phase the pattern so a grid line lands on the safe-area
+    // inset, anchoring the composition's left/top edges to the background grid.
+    const gridUnit = PATTERN_SCALE_PX[cfg.scale] * s
+    const patternOffX = padX % gridUnit
+    const patternOffY = padY % gridUnit
 
     const root = template.build({
       W,
@@ -259,7 +265,7 @@ export async function GET(req: Request) {
       scaleFactor: s,
       textBlock,
       iconEl,
-      patternLayer: patternLayer(cfg),
+      patternLayer: patternLayer(cfg, patternOffX, patternOffY),
       hasIcon,
     })
 

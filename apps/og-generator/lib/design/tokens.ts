@@ -30,6 +30,7 @@ export const colorPalette = {
   'text.primary': '#FAFAFA',
   'text.secondary': '#B4B4B4',
   'text.muted': '#898989',
+  'illustration.stroke': '#A0A0A0',
 } as const
 
 export type ColorToken = keyof typeof colorPalette
@@ -73,7 +74,10 @@ export const headlineBoxWidth = canvas.width - canvas.headlineInset.x * 2 // 104
 
 // --- Composition aids + illustration constraints (brief §4) ------------------
 export const grid = { base: 8 } as const
-export const strokeWidthRange = { min: 1.22, max: 1.88 } as const
+// Illustration/icon stroke. Default 2px in a neutral gray (illustration.stroke)
+// per current direction — Design to finalize. Range widened to include 2px.
+export const strokeWidthRange = { min: 1.22, max: 2 } as const
+export const illustration = { defaultStrokePx: 2 } as const
 
 /**
  * Serialized v1 record — shape mirrors the future `design_tokens` DB row

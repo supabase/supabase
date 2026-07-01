@@ -2,14 +2,15 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 
+import { suggestArtDirection } from '@/lib/ai/suggest'
 import { SEED_ICONS } from '@/lib/assets/seed-icons'
 import { contrastRatio, rating } from '@/lib/design/contrast'
 import { DEFAULT_TEMPLATE_ID, TEMPLATES } from '@/lib/design/templates'
 import { color, typography } from '@/lib/design/tokens'
 
 /**
- * Editor (Phases 2–5). State maps 1:1 to /api/og query params — the stateless
- * layout recipe (§6.9). The asset library and team auth are later phases.
+ * Editor. State maps 1:1 to /api/og query params (the stateless recipe, §6.9).
+ * "Both" renders the OG and Thumb side by side from two independent renders.
  */
 
 const SOFT_LIMIT = 60
@@ -25,7 +26,7 @@ const OPACITY_MAX = 0.12
 const OUTER = { x: (64 / 1200) * 100, y: (64 / 630) * 100 }
 const HEADLINE_INSET = { x: (80 / 1200) * 100, y: (72 / 630) * 100 }
 
-type ImageType = 'og' | 'thumb'
+type View = 'og' | 'thumb' | 'both'
 type PatternTypeOpt = 'none' | 'dots' | 'grid' | 'hlines' | 'vlines'
 type PatternScaleOpt = 'sm' | 'md' | 'lg'
 type PatternColorOpt = 'white' | 'green'
@@ -45,6 +46,11 @@ const SCALE_OPTS: { value: PatternScaleOpt; label: string }[] = [
 const COLOR_OPTS: { value: PatternColorOpt; label: string }[] = [
   { value: 'white', label: 'White' },
   { value: 'green', label: 'Green' },
+]
+const VIEW_OPTS: { value: View; label: string }[] = [
+  { value: 'og', label: 'OG' },
+  { value: 'thumb', label: 'Thumb' },
+  { value: 'both', label: 'Both' },
 ]
 
 // Simulated platform unfurl frames (brief §11.1). The 1:1 "Messages" frame
@@ -100,7 +106,7 @@ function Segmented<T extends string>({
   onChange: (v: T) => void
 }) {
   return (
-    <div className="inline-flex rounded-md border border-default p-0.5">
+    <div className="inline-flex rounded-md border border-default bg-surface-100 p-0.5">
       {options.map((o) => (
         <button
           key={o.value}
@@ -118,8 +124,173 @@ function Segmented<T extends string>({
   )
 }
 
+/** Debounced fetch of a render endpoint → object URL + fit metadata from headers. */
+function useRenderedImage(endpoint: string, enabled: boolean) {
+  const [url, setUrl] = useState<string | null>(null)
+  const [fit, setFit] = useState<FitInfo | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const prevUrl = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (!enabled) return
+    let cancelled = false
+    const id = setTimeout(async () => {
+      setLoading(true)
+      setError(null)
+      try {
+        const res = await fetch(endpoint, { cache: 'no-store' })
+        if (!res.ok) throw new Error((await res.text()) || `HTTP ${res.status}`)
+        const blob = await res.blob()
+        if (cancelled) return
+        const u = URL.createObjectURL(blob)
+        if (prevUrl.current) URL.revokeObjectURL(prevUrl.current)
+        prevUrl.current = u
+        setUrl(u)
+        setFit({
+          fontSize: Number(res.headers.get('x-og-font-size')),
+          lineCount: Number(res.headers.get('x-og-line-count')),
+          fits: res.headers.get('x-og-fits') === 'true',
+          overflow: res.headers.get('x-og-overflow') === 'true',
+          mode: res.headers.get('x-og-mode') ?? 'auto',
+          widest: Number(res.headers.get('x-og-widest-line-px')),
+        })
+      } catch (e) {
+        if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to render')
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }, 300)
+    return () => {
+      cancelled = true
+      clearTimeout(id)
+    }
+  }, [endpoint, enabled])
+
+  useEffect(() => () => { if (prevUrl.current) URL.revokeObjectURL(prevUrl.current) }, [])
+
+  return { url, fit, loading, error }
+}
+
+function PreviewCard({
+  label,
+  imgUrl,
+  loading,
+  error,
+  alt,
+  showSafeArea,
+  showHeadlineInset,
+  showCrops,
+  copied,
+  onCopy,
+  onDownload,
+  children,
+}: {
+  label: string
+  imgUrl: string | null
+  loading: boolean
+  error: string | null
+  alt: string
+  showSafeArea: boolean
+  showHeadlineInset: boolean
+  showCrops: boolean
+  copied: boolean
+  onCopy: () => void
+  onDownload: () => void
+  children?: React.ReactNode
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-medium text-foreground-light">
+          {label}
+          <span className="ml-2 font-normal text-foreground-lighter">
+            1200 × 630{loading ? ' · rendering…' : ''}
+          </span>
+        </span>
+        <div className="flex gap-2">
+          <button
+            onClick={onCopy}
+            className="rounded-md border border-default bg-surface-100 px-2.5 py-1 text-xs text-foreground hover:border-strong"
+          >
+            {copied ? 'Copied!' : 'Copy URL'}
+          </button>
+          <button
+            onClick={onDownload}
+            disabled={!imgUrl}
+            className="rounded-md bg-brand px-2.5 py-1 text-xs font-medium text-background hover:bg-brand/90 disabled:opacity-50"
+          >
+            Download
+          </button>
+        </div>
+      </div>
+
+      <div
+        className="relative w-full overflow-hidden rounded-lg border border-default bg-surface-100"
+        style={{ aspectRatio: '1200 / 630' }}
+      >
+        {imgUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={imgUrl} alt={alt} className="h-full w-full" />
+        )}
+        {showSafeArea && (
+          <div className="pointer-events-none absolute inset-0">
+            <div
+              className="absolute border border-dashed border-brand/40"
+              style={{ top: `${OUTER.y}%`, bottom: `${OUTER.y}%`, left: `${OUTER.x}%`, right: `${OUTER.x}%` }}
+            />
+            {showHeadlineInset && (
+              <div
+                className="absolute border border-dashed border-warning/50"
+                style={{
+                  top: `${HEADLINE_INSET.y}%`,
+                  bottom: `${HEADLINE_INSET.y}%`,
+                  left: `${HEADLINE_INSET.x}%`,
+                  right: `${HEADLINE_INSET.x}%`,
+                }}
+              />
+            )}
+          </div>
+        )}
+      </div>
+
+      {children}
+
+      {showCrops && imgUrl && (
+        <div className="mt-1">
+          <p className="mb-2 text-[11px] text-foreground-lighter">
+            Platform crops — how feeds crop &amp; round it
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {PLATFORMS.map((pf) => (
+              <div key={pf.name} className="flex flex-col gap-1">
+                <div
+                  className="relative overflow-hidden border border-default bg-surface-200"
+                  style={{ width: 132, aspectRatio: pf.aspect, borderRadius: pf.radius }}
+                >
+                  {pf.accent && <div className="absolute left-0 top-0 z-10 h-full w-1 bg-brand" />}
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={imgUrl} alt="" className="h-full w-full object-cover" />
+                </div>
+                <span className="text-[10px] text-foreground-lighter">{pf.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <pre className="overflow-x-auto rounded-md border border-destructive-400 bg-destructive-200 p-3 text-xs text-destructive-600">
+          {error}
+        </pre>
+      )}
+    </div>
+  )
+}
+
 export default function Page() {
-  const [imageType, setImageType] = useState<ImageType>('og')
+  const [view, setView] = useState<View>('both')
+  const [aiDescription, setAiDescription] = useState('')
   const [headline, setHeadline] = useState('Postgres full text search just got faster')
   const [eyebrow, setEyebrow] = useState('Engineering')
   const [sentenceCase, setSentenceCase] = useState(true)
@@ -143,15 +314,48 @@ export default function Page() {
   )
   const [patternOpacity, setPatternOpacity] = useState(DEFAULT_TPL.defaultPattern.opacity)
 
-  const [imgUrl, setImgUrl] = useState<string | null>(null)
-  const [fit, setFit] = useState<FitInfo | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState<View | null>(null)
 
-  const prevUrlRef = useRef<string | null>(null)
+  const showOg = view !== 'thumb'
+  const showThumb = view !== 'og'
 
-  // Switching template resets the pattern to that template's curated default.
+  const patternParams = (p: URLSearchParams) => {
+    p.set('pattern', patternType)
+    if (patternType !== 'none') {
+      p.set('patternScale', patternScale)
+      p.set('patternColor', patternColor)
+      p.set('patternOpacity', String(patternOpacity))
+    }
+  }
+
+  const ogEndpoint = useMemo(() => {
+    const p = new URLSearchParams()
+    p.set('headline', headline)
+    if (eyebrow.trim()) p.set('eyebrow', eyebrow.trim())
+    if (!sentenceCase) p.set('sentenceCase', '0')
+    p.set('template', template)
+    if (!autoFit) p.set('fontSize', String(manualFontSize))
+    if (icon) p.set('icon', icon)
+    patternParams(p)
+    if (scale === 2) p.set('scale', '2')
+    return `/api/og?${p.toString()}`
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [headline, eyebrow, sentenceCase, template, autoFit, manualFontSize, icon, scale, patternType, patternScale, patternColor, patternOpacity])
+
+  const thumbEndpoint = useMemo(() => {
+    const p = new URLSearchParams()
+    p.set('type', 'thumb')
+    if (icon) p.set('icon', icon)
+    p.set('thumbSize', String(thumbSize))
+    patternParams(p)
+    if (scale === 2) p.set('scale', '2')
+    return `/api/og?${p.toString()}`
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [icon, thumbSize, scale, patternType, patternScale, patternColor, patternOpacity])
+
+  const og = useRenderedImage(ogEndpoint, showOg)
+  const thumb = useRenderedImage(thumbEndpoint, showThumb)
+
   const changeTemplate = (id: string) => {
     setTemplate(id)
     const t = TEMPLATES.find((x) => x.id === id)
@@ -163,95 +367,17 @@ export default function Page() {
     }
   }
 
-  const endpoint = useMemo(() => {
-    const p = new URLSearchParams()
-    const addPattern = () => {
-      p.set('pattern', patternType)
-      if (patternType !== 'none') {
-        p.set('patternScale', patternScale)
-        p.set('patternColor', patternColor)
-        p.set('patternOpacity', String(patternOpacity))
-      }
-    }
-    if (imageType === 'thumb') {
-      p.set('type', 'thumb')
-      if (icon) p.set('icon', icon)
-      p.set('thumbSize', String(thumbSize))
-      addPattern()
-      if (scale === 2) p.set('scale', '2')
-      return `/api/og?${p.toString()}`
-    }
-    p.set('headline', headline)
-    if (eyebrow.trim()) p.set('eyebrow', eyebrow.trim())
-    if (!sentenceCase) p.set('sentenceCase', '0')
-    p.set('template', template)
-    if (!autoFit) p.set('fontSize', String(manualFontSize))
-    if (icon) p.set('icon', icon)
-    addPattern()
-    if (scale === 2) p.set('scale', '2')
-    return `/api/og?${p.toString()}`
-  }, [
-    imageType,
-    thumbSize,
-    headline,
-    eyebrow,
-    sentenceCase,
-    template,
-    autoFit,
-    manualFontSize,
-    scale,
-    icon,
-    patternType,
-    patternScale,
-    patternColor,
-    patternOpacity,
-  ])
-
-  useEffect(() => {
-    let cancelled = false
-    const id = setTimeout(async () => {
-      setLoading(true)
-      setError(null)
-      try {
-        const res = await fetch(endpoint, { cache: 'no-store' })
-        if (!res.ok) throw new Error((await res.text()) || `HTTP ${res.status}`)
-        const blob = await res.blob()
-        if (cancelled) return
-        const url = URL.createObjectURL(blob)
-        if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current)
-        prevUrlRef.current = url
-        setImgUrl(url)
-        setFit({
-          fontSize: Number(res.headers.get('x-og-font-size')),
-          lineCount: Number(res.headers.get('x-og-line-count')),
-          fits: res.headers.get('x-og-fits') === 'true',
-          overflow: res.headers.get('x-og-overflow') === 'true',
-          mode: res.headers.get('x-og-mode') ?? 'auto',
-          widest: Number(res.headers.get('x-og-widest-line-px')),
-        })
-      } catch (e) {
-        if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to render')
-      } finally {
-        if (!cancelled) setLoading(false)
-      }
-    }, 300)
-    return () => {
-      cancelled = true
-      clearTimeout(id)
-    }
-  }, [endpoint])
-
-  useEffect(() => {
-    return () => {
-      if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current)
-    }
-  }, [])
+  const suggestion = useMemo(
+    () => (aiDescription.trim() ? suggestArtDirection(aiDescription) : null),
+    [aiDescription]
+  )
+  const applySuggestion = () => {
+    if (!suggestion) return
+    if (suggestion.iconName) setIcon(suggestion.iconName)
+    changeTemplate(suggestion.templateId)
+  }
 
   const count = [...headline].length
-  // Headline is large text (≥40px) → large-text WCAG thresholds; eyebrow (22px) → normal.
-  const headlineContrast = contrastRatio(color('text.primary'), color('bg.primary'))
-  const headlineRating = rating(headlineContrast, true)
-  const eyebrowContrast = contrastRatio(color('brand.default'), color('bg.primary'))
   const counterColor =
     count > HARD_LIMIT
       ? 'text-destructive-600'
@@ -259,70 +385,123 @@ export default function Page() {
         ? 'text-warning-600'
         : 'text-foreground-lighter'
 
-  const copyUrl = async () => {
+  // Headline is large text (≥40px) → large-text WCAG thresholds; eyebrow (22px) → normal.
+  const headlineContrast = contrastRatio(color('text.primary'), color('bg.primary'))
+  const headlineRating = rating(headlineContrast, true)
+  const eyebrowContrast = contrastRatio(color('brand.default'), color('bg.primary'))
+
+  const copyUrl = async (endpoint: string, key: View) => {
     const abs = typeof window !== 'undefined' ? window.location.origin + endpoint : endpoint
     await navigator.clipboard.writeText(abs)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 1500)
+    setCopied(key)
+    setTimeout(() => setCopied(null), 1500)
   }
 
-  const download = () => {
-    if (!imgUrl) return
+  const download = (url: string | null, name: string) => {
+    if (!url) return
     const a = document.createElement('a')
-    a.href = imgUrl
-    a.download = `${imageType}${scale === 2 ? '@2x' : ''}.png`
+    a.href = url
+    a.download = name
     a.click()
   }
 
-  const sliderValue = autoFit ? (fit?.fontSize ?? MAX_SIZE) : manualFontSize
-  const isThumb = imageType === 'thumb'
+  const sliderValue = autoFit ? (og.fit?.fontSize ?? MAX_SIZE) : manualFontSize
+  const suffix = scale === 2 ? '@2x' : ''
 
   return (
     <div className="flex h-screen flex-col bg-background text-foreground">
       {/* Top bar */}
       <header className="flex h-14 shrink-0 items-center justify-between border-b border-default px-5">
-        <div className="flex items-center gap-4">
-          <span className="text-sm font-medium text-foreground">OG Image Generator</span>
-          <Segmented
-            value={imageType}
-            onChange={(v) => setImageType(v)}
-            options={[
-              { value: 'og', label: 'OG' },
-              { value: 'thumb', label: 'Thumb' },
-            ]}
+        <span className="text-sm font-medium text-foreground">OG Image Generator</span>
+        <label className="flex items-center gap-1.5 text-xs text-foreground-light">
+          <input
+            type="checkbox"
+            id="toggle-scale"
+            checked={scale === 2}
+            onChange={(e) => setScale(e.target.checked ? 2 : 1)}
           />
-        </div>
-        <div className="flex items-center gap-3">
-          <label className="flex items-center gap-1.5 text-xs text-foreground-light">
-            <input
-              type="checkbox"
-              id="toggle-scale"
-              checked={scale === 2}
-              onChange={(e) => setScale(e.target.checked ? 2 : 1)}
-            />
-            Export @2x
-          </label>
-          <button
-            onClick={copyUrl}
-            className="rounded-md border border-default bg-surface-100 px-3 py-1.5 text-xs text-foreground hover:border-strong"
-          >
-            {copied ? 'Copied!' : 'Copy URL'}
-          </button>
-          <button
-            onClick={download}
-            disabled={!imgUrl}
-            className="rounded-md bg-brand px-3 py-1.5 text-xs font-medium text-background hover:bg-brand/90 disabled:opacity-50"
-          >
-            Download PNG
-          </button>
-        </div>
+          Export @2x
+        </label>
       </header>
 
       <div className="flex min-h-0 flex-1">
         {/* Sidebar */}
         <aside className="flex w-[340px] shrink-0 flex-col gap-7 overflow-y-auto border-r border-default p-5">
-          {!isThumb && (
+          {showOg && (
             <>
+              <Group title="AI art direction">
+                <div className="flex flex-col gap-2">
+                  <span className="text-sm font-medium text-foreground-light">
+                    Describe this post
+                    <Hint text="Suggests an icon + template from the library. Backend-free keyword match over the seed icons for now — the full version (embeddings + Claude API over the uploadable library) comes with Supabase (§6.6)." />
+                  </span>
+                  <textarea
+                    id="ai-describe"
+                    value={aiDescription}
+                    onChange={(e) => setAiDescription(e.target.value)}
+                    rows={2}
+                    className="resize-none rounded-md border border-default bg-surface-100 px-3 py-2 text-sm text-foreground outline-none focus:border-strong"
+                    placeholder="e.g. row-level security for multi-tenant apps"
+                  />
+                  {suggestion && (
+                    <div className="flex flex-col gap-2 rounded-md border border-default bg-surface-100 p-3">
+                      {suggestion.iconName ? (
+                        <>
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-default text-foreground-light">
+                              {(() => {
+                                const ic = SEED_ICONS.find((i) => i.name === suggestion.iconName)
+                                return ic ? (
+                                  <svg
+                                    width={20}
+                                    height={20}
+                                    viewBox={ic.viewBox}
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth={2}
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    dangerouslySetInnerHTML={{ __html: ic.body }}
+                                  />
+                                ) : null
+                              })()}
+                            </div>
+                            <div className="min-w-0 flex-1 text-xs">
+                              <div className="text-foreground">{suggestion.rationale}</div>
+                              <div className="text-foreground-lighter">
+                                Template: {TEMPLATES.find((t) => t.id === suggestion.templateId)?.label}
+                              </div>
+                            </div>
+                            <button
+                              onClick={applySuggestion}
+                              className="shrink-0 rounded-md bg-brand px-2.5 py-1 text-xs font-medium text-background hover:bg-brand/90"
+                            >
+                              Apply
+                            </button>
+                          </div>
+                          {suggestion.alternates.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-2">
+                              <span className="text-xs text-foreground-lighter">Also:</span>
+                              {suggestion.alternates.map((a) => (
+                                <button
+                                  key={a.iconName}
+                                  onClick={() => setIcon(a.iconName)}
+                                  className="rounded border border-default px-2 py-0.5 text-xs text-foreground-light hover:border-strong"
+                                >
+                                  {a.label}
+                                </button>
+                              ))}
+                            </div>
+                          )}
+                        </>
+                      ) : (
+                        <p className="text-xs text-warning-600">{suggestion.rationale}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </Group>
+
               <Group title="Content">
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-between">
@@ -398,7 +577,7 @@ export default function Page() {
                       <Hint text="Auto-fit picks the largest size that keeps the headline to 2 lines — the highest-leverage guardrail for legibility at thumbnail size." />
                     </span>
                     <span className="text-xs tabular-nums text-foreground-lighter">
-                      {autoFit ? `Auto · ${fit?.fontSize ?? '—'}px` : `${manualFontSize}px`}
+                      {autoFit ? `Auto · ${og.fit?.fontSize ?? '—'}px` : `${manualFontSize}px`}
                     </span>
                   </div>
                   <label className="flex items-center gap-2 text-xs text-foreground-light">
@@ -409,7 +588,7 @@ export default function Page() {
                       onChange={(e) => {
                         const on = e.target.checked
                         setAutoFit(on)
-                        if (!on) setManualFontSize(fit?.fontSize ?? manualFontSize)
+                        if (!on) setManualFontSize(og.fit?.fontSize ?? manualFontSize)
                       }}
                     />
                     Auto-fit
@@ -434,7 +613,7 @@ export default function Page() {
             <div className="flex flex-col gap-2">
               <span className="text-sm font-medium text-foreground-light">
                 Icon
-                <Hint text="Line-art icons only, stroke locked to 1.22–1.88px (§4). The icon is shared between the OG and Thumb." />
+                <Hint text="Line-art icons only, stroke locked to the illustration weight (§4). The icon is shared between the OG and Thumb." />
               </span>
               <div className="grid grid-cols-4 gap-2">
                 <button
@@ -467,7 +646,7 @@ export default function Page() {
                       viewBox={ic.viewBox}
                       fill="none"
                       stroke="currentColor"
-                      strokeWidth={1.7}
+                      strokeWidth={2}
                       strokeLinecap="round"
                       strokeLinejoin="round"
                       dangerouslySetInnerHTML={{ __html: ic.body }}
@@ -476,12 +655,12 @@ export default function Page() {
                 ))}
               </div>
               <p className="text-xs text-foreground-lighter">
-                {isThumb ? 'Shared with the OG image.' : 'Optional — appears per the chosen template.'}
+                {view === 'og' ? 'Optional — appears per the chosen template.' : 'Shared by the OG and Thumb.'}
               </p>
             </div>
           </Group>
 
-          {isThumb && (
+          {showThumb && (
             <Group title="Thumb">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
@@ -584,74 +763,43 @@ export default function Page() {
           </Group>
         </aside>
 
-        {/* Canvas */}
-        <main className="flex min-w-0 flex-1 items-center justify-center overflow-auto p-8">
-          <div className="w-full max-w-3xl">
-            <div className="mb-2 flex items-center justify-between text-xs text-foreground-lighter">
-              <span>{isThumb ? 'Thumb preview' : 'OG preview'}</span>
-              <span>1200 × 630{loading ? ' · rendering…' : ''}</span>
-            </div>
+        {/* Canvas — light workspace with a dot grid */}
+        <main
+          className="flex min-w-0 flex-1 flex-col items-center gap-5 overflow-auto p-8"
+          style={{
+            backgroundColor: '#f4f4f5',
+            backgroundImage: 'radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1px)',
+            backgroundSize: '16px 16px',
+          }}
+        >
+          <Segmented value={view} onChange={setView} options={VIEW_OPTS} />
 
-            <div
-              className="relative w-full overflow-hidden rounded-lg border border-default"
-              style={{ aspectRatio: '1200 / 630' }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              {imgUrl && (
-                <img src={imgUrl} alt={isThumb ? 'Thumbnail preview' : headline} className="h-full w-full" />
-              )}
-
-              {showSafeArea && (
-                <div className="pointer-events-none absolute inset-0">
-                  <div
-                    className="absolute border border-dashed border-brand/40"
-                    style={{
-                      top: `${OUTER.y}%`,
-                      bottom: `${OUTER.y}%`,
-                      left: `${OUTER.x}%`,
-                      right: `${OUTER.x}%`,
-                    }}
-                  />
-                  {!isThumb && (
-                    <div
-                      className="absolute border border-dashed border-warning/50"
-                      style={{
-                        top: `${HEADLINE_INSET.y}%`,
-                        bottom: `${HEADLINE_INSET.y}%`,
-                        left: `${HEADLINE_INSET.x}%`,
-                        right: `${HEADLINE_INSET.x}%`,
-                      }}
-                    />
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Status + guardrail warnings */}
-            <div className="mt-3 flex flex-col gap-2">
-              {isThumb ? (
-                <>
-                  <p className="text-xs text-foreground-light">
-                    No headline — the Thumb is icon-only and shares the OG’s icon (§3).
-                  </p>
-                  {!icon && (
-                    <p className="text-xs text-warning-600">
-                      ⚠ Pick an icon in Assets — the Thumb has no text to fall back on.
-                    </p>
-                  )}
-                </>
-              ) : (
-                <>
-                  {fit && (
+          <div className="flex w-full max-w-3xl flex-col gap-6">
+            {showOg && (
+              <PreviewCard
+                label="OG"
+                imgUrl={og.url}
+                loading={og.loading}
+                error={og.error}
+                alt={headline}
+                showSafeArea={showSafeArea}
+                showHeadlineInset
+                showCrops={showCrops}
+                copied={copied === 'og'}
+                onCopy={() => copyUrl(ogEndpoint, 'og')}
+                onDownload={() => download(og.url, `og${suffix}.png`)}
+              >
+                <div className="flex flex-col gap-2">
+                  {og.fit && (
                     <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-foreground-light">
                       <span>
-                        Font size: <span className="text-foreground">{fit.fontSize}px</span>
+                        Font size: <span className="text-foreground">{og.fit.fontSize}px</span>
                       </span>
                       <span>
-                        Lines: <span className="text-foreground">{fit.lineCount}</span>
+                        Lines: <span className="text-foreground">{og.fit.lineCount}</span>
                       </span>
                       <span>
-                        Mode: <span className="text-foreground">{fit.mode}</span>
+                        Mode: <span className="text-foreground">{og.fit.mode}</span>
                       </span>
                     </div>
                   )}
@@ -669,54 +817,46 @@ export default function Page() {
                       </span>
                     )}
                   </div>
-                  {headlineRating === 'Fail' && (
-                    <p className="text-xs text-destructive-600">
-                      ⚠ Headline contrast is below WCAG AA — adjust before export (§5.3).
-                    </p>
-                  )}
-                  {fit?.overflow && (
+                  {og.fit?.overflow && (
                     <p className="text-xs text-destructive-600">
                       ⚠ This headline won’t fit in 2 lines even at the minimum size. Shorten it
                       before exporting.
                     </p>
                   )}
-                  {fit && !fit.overflow && fit.mode === 'manual' && fit.lineCount > 2 && (
+                  {og.fit && !og.fit.overflow && og.fit.mode === 'manual' && og.fit.lineCount > 2 && (
                     <p className="text-xs text-warning-600">
                       ⚠ More than 2 lines — allowed in manual mode, but off-brand.
                     </p>
                   )}
-                </>
-              )}
-              {error && (
-                <pre className="overflow-x-auto rounded-md border border-destructive-400 bg-destructive-200 p-3 text-xs text-destructive-600">
-                  {error}
-                </pre>
-              )}
-            </div>
-
-            {showCrops && imgUrl && (
-              <div className="mt-5">
-                <p className="mb-2 text-xs font-medium text-foreground-lighter">
-                  Platform crops — how feeds crop &amp; round the 1200 × 630
-                </p>
-                <div className="flex flex-wrap gap-4">
-                  {PLATFORMS.map((pf) => (
-                    <div key={pf.name} className="flex flex-col gap-1">
-                      <div
-                        className="relative overflow-hidden border border-default bg-surface-100"
-                        style={{ width: 150, aspectRatio: pf.aspect, borderRadius: pf.radius }}
-                      >
-                        {pf.accent && (
-                          <div className="absolute left-0 top-0 z-10 h-full w-1 bg-brand" />
-                        )}
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={imgUrl} alt="" className="h-full w-full object-cover" />
-                      </div>
-                      <span className="text-[10px] text-foreground-lighter">{pf.name}</span>
-                    </div>
-                  ))}
                 </div>
-              </div>
+              </PreviewCard>
+            )}
+
+            {showThumb && (
+              <PreviewCard
+                label="Thumb"
+                imgUrl={thumb.url}
+                loading={thumb.loading}
+                error={thumb.error}
+                alt="Thumbnail preview"
+                showSafeArea={showSafeArea}
+                showHeadlineInset={false}
+                showCrops={showCrops}
+                copied={copied === 'thumb'}
+                onCopy={() => copyUrl(thumbEndpoint, 'thumb')}
+                onDownload={() => download(thumb.url, `thumb${suffix}.png`)}
+              >
+                <div className="flex flex-col gap-2">
+                  <p className="text-xs text-foreground-light">
+                    No headline — the Thumb is icon-only and shares the OG’s icon (§3).
+                  </p>
+                  {!icon && (
+                    <p className="text-xs text-warning-600">
+                      ⚠ Pick an icon in Assets — the Thumb has no text to fall back on.
+                    </p>
+                  )}
+                </div>
+              </PreviewCard>
             )}
           </div>
         </main>

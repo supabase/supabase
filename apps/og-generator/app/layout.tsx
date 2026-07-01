@@ -8,9 +8,10 @@ export const metadata: Metadata = {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  // Dark mode only (per brief §4). `dark` activates the Supabase dark theme tokens.
+  // App chrome is light mode. (The generated IMAGE is still dark-only per brief
+  // §4 — that's the renderer's design tokens, independent of this chrome theme.)
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="light">
       <body className="min-h-screen bg-background text-foreground antialiased">{children}</body>
     </html>
   )

@@ -40,6 +40,9 @@ interface PatternRenderOptions extends PatternConfig {
   height: number
   /** 1 or 2 — scales grid spacing + line weight with the export. */
   scaleFactor: number
+  /** Phase offset (px) to align the grid to the composition (§4 grid-snap). */
+  offsetX?: number
+  offsetY?: number
 }
 
 function tile(type: PatternType, g: number, lineW: number, hex: string): string {
@@ -64,7 +67,7 @@ export function patternSvg(o: PatternRenderOptions): string {
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" width="${o.width}" height="${o.height}" ` +
     `viewBox="0 0 ${o.width} ${o.height}">` +
-    `<defs><pattern id="p" width="${g}" height="${g}" patternUnits="userSpaceOnUse">` +
+    `<defs><pattern id="p" x="${o.offsetX ?? 0}" y="${o.offsetY ?? 0}" width="${g}" height="${g}" patternUnits="userSpaceOnUse">` +
     `${tile(o.type, g, lineW, hex)}</pattern></defs>` +
     `<rect width="100%" height="100%" fill="url(#p)" opacity="${clampPatternOpacity(o.opacity)}"/>` +
     `</svg>`
