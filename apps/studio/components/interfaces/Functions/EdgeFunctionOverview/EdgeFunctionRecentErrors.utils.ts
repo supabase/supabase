@@ -197,28 +197,27 @@ export const getRecentErrorInvocationsSql = (
   const id = escapeSqlString(functionId ?? '__pending__')
   return `
 -- errors since last deploy
-SELECT
-  toUnixTimestamp64Micro(Timestamp) AS timestamp,
-  Body AS event_message,
-  LogAttributes['request_method'] AS method,
-  LogAttributes['response_status_code'] AS status_code,
-  toFloat64OrZero(LogAttributes['execution_time_ms']) AS execution_time_ms,
-  LogAttributes['execution_id'] AS execution_id
-FROM logs
-WHERE
+select
+  toUnixTimestamp64Micro(timestamp) as timestamp,
+  event_message,
+  log_attributes['request.method'] as method,
+  log_attributes['response.status_code'] as status_code,
+  toFloat64OrZero(log_attributes['execution_time_ms']) as execution_time_ms,
+  log_attributes['execution_id'] as execution_id
+from logs
+where
   source = 'function_edge_logs'
-  AND LogAttributes['function_id'] = '${id}'
-  AND LogAttributes['event_type'] = 'Request'
-  AND toInt32OrZero(LogAttributes['response_status_code']) >= 500
-ORDER BY Timestamp DESC
-LIMIT ${limit}
+  and log_attributes['function_id'] = '${id}'
+  and toInt32OrZero(log_attributes['response.status_code']) >= 500
+order by timestamp desc
+limit ${limit}
 `.trim()
 }
 
 export const getSinceLastDeployInvocationCountSql = (functionId?: string): string => {
   const id = escapeSqlString(functionId ?? '__pending__')
   return `-- invocation count since last deploy
-SELECT count(*) AS count FROM logs WHERE source = 'function_edge_logs' AND LogAttributes['function_id'] = '${id}' AND LogAttributes['event_type'] = 'Request'`
+select count() as count from logs where source = 'function_edge_logs' and log_attributes['function_id'] = '${id}'`
 }
 
 export const getSinceLastDeployInvocationCount = (invocationCountRows: LogData[]) => {
@@ -256,21 +255,20 @@ export const getFunctionRuntimeLogsSql = ({
 
   return `
 -- runtime logs for error groups
-SELECT
-  toUnixTimestamp64Micro(Timestamp) AS timestamp,
-  Body AS event_message,
-  SeverityText AS level,
-  LogAttributes['event_type'] AS event_type,
-  LogAttributes['function_id'] AS function_id,
-  LogAttributes['execution_id'] AS execution_id
-FROM logs
-WHERE
+select
+  toUnixTimestamp64Micro(timestamp) as timestamp,
+  event_message,
+  log_attributes['level'] as level,
+  log_attributes['event_type'] as event_type,
+  log_attributes['function_id'] as function_id,
+  log_attributes['execution_id'] as execution_id
+from logs
+where
   source = 'function_logs'
-  AND LogAttributes['function_id'] = '${escapedFunctionId}'
-  AND LogAttributes['execution_id'] IN (${escapedExecutionIds})
-  AND LogAttributes['event_type'] = 'Log'
-ORDER BY Timestamp DESC
-LIMIT ${limit}
+  and log_attributes['function_id'] = '${escapedFunctionId}'
+  and log_attributes['execution_id'] in (${escapedExecutionIds})
+order by timestamp desc
+limit ${limit}
 `.trim()
 }
 
