@@ -16,6 +16,7 @@ EXECUTE FUNCTION event_trigger_fn();
 `
 
 export const AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL = safeSql`
+-- Event trigger: ensure_rls
 CREATE OR REPLACE FUNCTION rls_auto_enable()
 RETURNS EVENT_TRIGGER
 LANGUAGE plpgsql
