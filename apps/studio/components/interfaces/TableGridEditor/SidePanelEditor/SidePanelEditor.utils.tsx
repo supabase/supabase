@@ -49,14 +49,15 @@ import {
   updateTable as updateTableMutation,
 } from '@/data/tables/table-update-mutation'
 import { getTables } from '@/data/tables/tables-query'
-import { isObject, isObjectContainingKeys, timeout, tryParseJson } from '@/lib/helpers'
+import { isObject, isObjectContainingKeys, tryParseJson } from '@/lib/helpers'
 import type { SafePostgresColumn } from '@/lib/postgres-types'
 import type { useTrack } from '@/lib/telemetry/track'
 import type { DeepReadonly } from '@/lib/type-helpers'
 import type { SidePanel } from '@/state/table-editor'
 
-const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
+export const IMPORT_SQL_SIZE_LIMIT = 900 * 1024
+export const IMPORT_CHUNK_TIMEOUT_MS = 60_000
 
 type Track = ReturnType<typeof useTrack>
 
@@ -932,6 +933,126 @@ export const formatRowsForInsert = ({
   })
 }
 
+export type ImportInsertBatch = {
+  rows: Record<string, unknown>[]
+  sql: SafeSqlFragment
+}
+
+function getImportInsertSql(table: RetrieveTableResult, rows: Record<string, unknown>[]) {
+  return new Query().from(table.name, table.schema).insert(rows).toSql()
+}
+
+function getSqlByteSize(sql: SafeSqlFragment) {
+  return new Blob([sql]).size
+}
+
+function getRowTooLargeError(maxSqlBytes: number) {
+  return new Error(
+    `A row in this import is too large to be imported through the dashboard. The generated SQL for a single row exceeds ${Math.floor(
+      maxSqlBytes / 1024
+    )}KB.`
+  )
+}
+
+export function buildImportInsertBatches({
+  table,
+  rows,
+  maxSqlBytes = IMPORT_SQL_SIZE_LIMIT,
+}: {
+  table: RetrieveTableResult
+  rows: Record<string, unknown>[]
+  maxSqlBytes?: number
+}): ImportInsertBatch[] {
+  const batches: ImportInsertBatch[] = []
+  let batchRows: Record<string, unknown>[] = []
+  let batchSql: SafeSqlFragment | undefined
+
+  for (const row of rows) {
+    const candidateRows = [...batchRows, row]
+    const candidateSql = getImportInsertSql(table, candidateRows)
+
+    if (getSqlByteSize(candidateSql) <= maxSqlBytes) {
+      batchRows = candidateRows
+      batchSql = candidateSql
+      continue
+    }
+
+    if (batchRows.length === 0) {
+      throw getRowTooLargeError(maxSqlBytes)
+    }
+
+    batches.push({ rows: batchRows, sql: batchSql! })
+
+    const singleRowSql = getImportInsertSql(table, [row])
+    if (getSqlByteSize(singleRowSql) > maxSqlBytes) {
+      throw getRowTooLargeError(maxSqlBytes)
+    }
+
+    batchRows = [row]
+    batchSql = singleRowSql
+  }
+
+  if (batchRows.length > 0 && batchSql !== undefined) {
+    batches.push({ rows: batchRows, sql: batchSql })
+  }
+
+  return batches
+}
+
+export async function executeImportInsertBatch({
+  projectRef,
+  connectionString,
+  sql,
+  timeoutMs = IMPORT_CHUNK_TIMEOUT_MS,
+}: {
+  projectRef: string
+  connectionString: string | undefined | null
+  sql: SafeSqlFragment
+  timeoutMs?: number
+}) {
+  await executeWithRetry(() =>
+    executeSql({ projectRef, connectionString, sql }, AbortSignal.timeout(timeoutMs))
+  )
+}
+
+async function updateImportedRowsSequences({
+  projectRef,
+  connectionString,
+  table,
+}: {
+  projectRef: string
+  connectionString: string | undefined | null
+  table: RetrieveTableResult
+}) {
+  const sequenceColumns = (table.columns ?? []).filter(
+    (column) =>
+      column.is_identity ||
+      (typeof column.default_value === 'string' && column.default_value.includes('nextval('))
+  )
+
+  if (sequenceColumns.length === 0) {
+    return
+  }
+
+  const updateSequenceSQL = joinSqlFragments(
+    sequenceColumns.map((column) =>
+      getUpdateIdentitySequenceSQL({
+        schema: table.schema,
+        table: table.name,
+        column: column.name,
+      })
+    ),
+    ';\n'
+  )
+
+  await executeSql({
+    projectRef,
+    connectionString,
+    sql: updateSequenceSQL,
+    queryKey: ['sequences', 'update-batch'],
+  })
+}
+
 export async function insertRowsViaSpreadsheet({
   projectRef,
   connectionString,
@@ -953,6 +1074,15 @@ export async function insertRowsViaSpreadsheet({
   let insertError: unknown = undefined
   const t1 = new Date()
   return new Promise((resolve) => {
+    let isResolved = false
+
+    const resolveOnce = (value: { error: unknown }) => {
+      if (!isResolved) {
+        isResolved = true
+        resolve(value)
+      }
+    }
+
     Papa.parse(file, {
       header: true,
       // dynamicTyping has to be disabled so that "00001" doesn't get parsed as 1.
@@ -968,17 +1098,24 @@ export async function insertRowsViaSpreadsheet({
           headers: selectedHeaders,
           columns: table.columns,
           emptyStringAsNullHeaders,
-        })
+        }) as Record<string, unknown>[]
 
-        const insertQuery = new Query().from(table.name, table.schema).insert(formattedData).toSql()
         try {
-          await executeWithRetry(() =>
-            executeSql({ projectRef, connectionString, sql: insertQuery })
-          )
+          const batches = buildImportInsertBatches({ table, rows: formattedData })
+
+          for (const batch of batches) {
+            await executeImportInsertBatch({
+              projectRef,
+              connectionString,
+              sql: batch.sql,
+            })
+          }
         } catch (error) {
           console.warn(error)
           insertError = error
           parser.abort()
+          resolveOnce({ error })
+          return
         }
 
         chunkNumber += 1
@@ -987,47 +1124,27 @@ export async function insertRowsViaSpreadsheet({
         onProgressUpdate(progressPercentage)
         parser.resume()
       },
-      complete: () => {
+      complete: async () => {
         const t2 = new Date()
         console.log(
           `Total time taken for importing spreadsheet: ${(t2.getTime() - t1.getTime()) / 1000} seconds`
         )
-        if (insertError === undefined) {
-          const sequenceColumns = (table.columns ?? []).filter(
-            (column) =>
-              column.is_identity ||
-              (typeof column.default_value === 'string' &&
-                column.default_value.includes('nextval('))
-          )
 
-          if (sequenceColumns.length === 0) {
-            resolve({ error: insertError })
-            return
-          }
-
-          const updateSequenceSQL = joinSqlFragments(
-            sequenceColumns.map((column) =>
-              getUpdateIdentitySequenceSQL({
-                schema: table.schema,
-                table: table.name,
-                column: column.name,
-              })
-            ),
-            ';\n'
-          )
-
-          executeSql({
-            projectRef,
-            connectionString,
-            sql: updateSequenceSQL,
-            queryKey: ['sequences', 'update-batch'],
-          })
-            .then(() => resolve({ error: insertError }))
-            .catch((error) => resolve({ error }))
+        if (insertError !== undefined) {
+          resolveOnce({ error: insertError })
           return
         }
 
-        resolve({ error: insertError })
+        try {
+          await updateImportedRowsSequences({
+            projectRef,
+            connectionString,
+            table,
+          })
+          resolveOnce({ error: insertError })
+        } catch (error) {
+          resolveOnce({ error })
+        }
       },
     })
   })
@@ -1058,71 +1175,34 @@ export async function insertTableRows({
     headers: selectedHeaders,
     columns: table.columns,
     emptyStringAsNullHeaders,
-  })
+  }) as Record<string, unknown>[]
 
-  const batches = chunk(formattedRows, BATCH_SIZE)
-  const tasks = batches.map((batch) => {
-    return () => {
-      return Promise.race([
-        new Promise(async (resolve, reject) => {
-          const insertQuery = new Query().from(table.name, table.schema).insert(batch).toSql()
-          try {
-            await executeSql({ projectRef, connectionString, sql: insertQuery })
-          } catch (error) {
-            insertError = error
-            reject(error)
-          }
+  try {
+    const batches = buildImportInsertBatches({ table, rows: formattedRows })
 
-          insertProgress = insertProgress + batch.length / rows.length
-          resolve({})
-        }),
-        timeout(30_000),
-      ])
+    for (const batch of batches) {
+      await executeImportInsertBatch({
+        projectRef,
+        connectionString,
+        sql: batch.sql,
+      })
+
+      insertProgress = insertProgress + batch.rows.length / rows.length
+      onProgressUpdate(insertProgress * 100)
     }
-  })
-
-  const batchedPromises = chunk(tasks, 10)
-  for (const batchedPromise of batchedPromises) {
-    const res = await Promise.allSettled(batchedPromise.map((batch) => batch()))
-    const failedBatch = res.find((result) => result.status === 'rejected')
-    if (failedBatch?.status === 'rejected') {
-      if (insertError === undefined) insertError = failedBatch.reason
-      break
-    }
-    onProgressUpdate(insertProgress * 100)
+  } catch (error) {
+    insertError = error
   }
 
   if (insertError !== undefined) {
     return { error: insertError }
   }
 
-  const sequenceColumns = (table.columns ?? []).filter(
-    (column) =>
-      column.is_identity ||
-      (typeof column.default_value === 'string' && column.default_value.includes('nextval('))
-  )
-
-  if (sequenceColumns.length === 0) {
-    return { error: insertError }
-  }
-
-  const updateSequenceSQL = joinSqlFragments(
-    sequenceColumns.map((column) =>
-      getUpdateIdentitySequenceSQL({
-        schema: table.schema,
-        table: table.name,
-        column: column.name,
-      })
-    ),
-    ';\n'
-  )
-
   try {
-    await executeSql({
+    await updateImportedRowsSequences({
       projectRef,
       connectionString,
-      sql: updateSequenceSQL,
-      queryKey: ['sequences', 'update-batch'],
+      table,
     })
     return { error: insertError }
   } catch (error) {
