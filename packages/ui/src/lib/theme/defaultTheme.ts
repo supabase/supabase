@@ -524,19 +524,4 @@ export default {
       xxxlarge: '[&_svg]:h-[42px] [&_svg]:w-[42px] pl-3',
     },
   },
-
-  loading: {
-    base: `relative`,
-    content: {
-      base: `transition-opacity duration-300`,
-      active: `opacity-40`,
-    },
-    spinner: `
-      absolute
-      text-foreground-lighter animate-spin
-      inset-0
-      size-5
-      m-auto
-    `,
-  },
 } as const
