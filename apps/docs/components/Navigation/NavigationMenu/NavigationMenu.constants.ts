@@ -2719,7 +2719,7 @@ export const platform: NavMenuConstant = {
           name: 'Project Pausing',
           url: '/guides/platform/free-project-pausing' as `/${string}`,
         },
-           {
+        {
           name: 'Delete Project',
           url: '/guides/platform/delete-project',
         },
