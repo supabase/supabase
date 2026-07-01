@@ -14,6 +14,7 @@ import {
   parseConnectionsData,
   parseInfrastructureMetrics,
 } from './DatabaseInfrastructureSection.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useInfraMonitoringAttributesQuery } from '@/data/analytics/infra-monitoring-query'
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -100,9 +101,6 @@ export const DatabaseInfrastructureSection = ({
     [infraData, maxConnectionsData]
   )
 
-  // Show a friendly, static message instead of leaking the raw API error to the user
-  const metricErrorState = <span className="text-xs text-foreground-lighter">Unable to load</span>
-
   // Generate database report URL with time range parameters
   const getDatabaseReportUrl = () => {
     const now = dayjs()
@@ -164,102 +162,103 @@ export const DatabaseInfrastructureSection = ({
           </MetricCard>
         </Link>
 
-        <Link href={databaseReportUrl} className="block group">
-          <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
-              <MetricCardLabel tooltip="Highest concurrent database connections observed in the selected window, against the connection limit. Monitor to avoid connection exhaustion.">
-                Peak Connections
-              </MetricCardLabel>
-            </MetricCardHeader>
-            <MetricCardContent>
-              {infraError ? (
-                metricErrorState
-              ) : connections.max > 0 ? (
-                <MetricCardValue>
-                  {connections.peak}/{connections.max}
-                </MetricCardValue>
-              ) : (
-                <MetricCardValue>--</MetricCardValue>
-              )}
-            </MetricCardContent>
-          </MetricCard>
-        </Link>
+        {infraError ? (
+          <div className="col-span-2 flex items-center rounded-md border border-dashed px-4 py-3">
+            <p className="text-sm text-foreground-light">
+              Unable to load. Please try again in a few minutes. If the problem persists please check
+              our <InlineLink href="https://status.supabase.com">status page</InlineLink>.
+            </p>
+          </div>
+        ) : (
+          <>
+            <Link href={databaseReportUrl} className="block group">
+              <MetricCard isLoading={infraLoading}>
+                <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
+                  <MetricCardLabel tooltip="Highest concurrent database connections observed in the selected window, against the connection limit. Monitor to avoid connection exhaustion.">
+                    Peak Connections
+                  </MetricCardLabel>
+                </MetricCardHeader>
+                <MetricCardContent>
+                  {connections.max > 0 ? (
+                    <MetricCardValue>
+                      {connections.peak}/{connections.max}
+                    </MetricCardValue>
+                  ) : (
+                    <MetricCardValue>--</MetricCardValue>
+                  )}
+                </MetricCardContent>
+              </MetricCard>
+            </Link>
 
-        <Link href={databaseReportUrl} className="block group">
-          <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
-              <MetricCardLabel tooltip="Disk usage percentage of total disk space used">
-                Disk Usage
-              </MetricCardLabel>
-            </MetricCardHeader>
-            <MetricCardContent>
-              {infraError ? (
-                metricErrorState
-              ) : metrics ? (
-                <MetricCardValue>{metrics.disk.current.toFixed(0)}%</MetricCardValue>
-              ) : (
-                <MetricCardValue>--</MetricCardValue>
-              )}
-            </MetricCardContent>
-          </MetricCard>
-        </Link>
+            <Link href={databaseReportUrl} className="block group">
+              <MetricCard isLoading={infraLoading}>
+                <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
+                  <MetricCardLabel tooltip="Disk usage percentage of total disk space used">
+                    Disk Usage
+                  </MetricCardLabel>
+                </MetricCardHeader>
+                <MetricCardContent>
+                  {metrics ? (
+                    <MetricCardValue>{metrics.disk.current.toFixed(0)}%</MetricCardValue>
+                  ) : (
+                    <MetricCardValue>--</MetricCardValue>
+                  )}
+                </MetricCardContent>
+              </MetricCard>
+            </Link>
 
-        <Link href={databaseReportUrl} className="block group">
-          <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
-              <MetricCardLabel tooltip="Disk I/O consumption percentage. High values may indicate disk bottlenecks">
-                Disk IO
-              </MetricCardLabel>
-            </MetricCardHeader>
-            <MetricCardContent>
-              {infraError ? (
-                metricErrorState
-              ) : metrics ? (
-                <MetricCardValue>{metrics.diskIo.current.toFixed(0)}%</MetricCardValue>
-              ) : (
-                <MetricCardValue>--</MetricCardValue>
-              )}
-            </MetricCardContent>
-          </MetricCard>
-        </Link>
+            <Link href={databaseReportUrl} className="block group">
+              <MetricCard isLoading={infraLoading}>
+                <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
+                  <MetricCardLabel tooltip="Disk I/O consumption percentage. High values may indicate disk bottlenecks">
+                    Disk IO
+                  </MetricCardLabel>
+                </MetricCardHeader>
+                <MetricCardContent>
+                  {metrics ? (
+                    <MetricCardValue>{metrics.diskIo.current.toFixed(0)}%</MetricCardValue>
+                  ) : (
+                    <MetricCardValue>--</MetricCardValue>
+                  )}
+                </MetricCardContent>
+              </MetricCard>
+            </Link>
 
-        <Link href={databaseReportUrl} className="block group">
-          <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
-              <MetricCardLabel tooltip="RAM usage percentage. Sustained high usage may indicate memory pressure">
-                Memory
-              </MetricCardLabel>
-            </MetricCardHeader>
-            <MetricCardContent>
-              {infraError ? (
-                metricErrorState
-              ) : metrics ? (
-                <MetricCardValue>{metrics.ram.current.toFixed(0)}%</MetricCardValue>
-              ) : (
-                <MetricCardValue>--</MetricCardValue>
-              )}
-            </MetricCardContent>
-          </MetricCard>
-        </Link>
+            <Link href={databaseReportUrl} className="block group">
+              <MetricCard isLoading={infraLoading}>
+                <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
+                  <MetricCardLabel tooltip="RAM usage percentage. Sustained high usage may indicate memory pressure">
+                    Memory
+                  </MetricCardLabel>
+                </MetricCardHeader>
+                <MetricCardContent>
+                  {metrics ? (
+                    <MetricCardValue>{metrics.ram.current.toFixed(0)}%</MetricCardValue>
+                  ) : (
+                    <MetricCardValue>--</MetricCardValue>
+                  )}
+                </MetricCardContent>
+              </MetricCard>
+            </Link>
 
-        <Link href={databaseReportUrl} className="block group">
-          <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
-              <MetricCardLabel tooltip="CPU usage percentage. High values may suggest CPU-intensive queries or workloads">
-                CPU
-              </MetricCardLabel>
-            </MetricCardHeader>
-            <MetricCardContent>
-              {infraError ? (
-                metricErrorState
-              ) : metrics ? (
-                <MetricCardValue>{metrics.cpu.current.toFixed(0)}%</MetricCardValue>
-              ) : (
-                <MetricCardValue>--</MetricCardValue>
-              )}
-            </MetricCardContent>
-          </MetricCard>
-        </Link>
+            <Link href={databaseReportUrl} className="block group">
+              <MetricCard isLoading={infraLoading}>
+                <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
+                  <MetricCardLabel tooltip="CPU usage percentage. High values may suggest CPU-intensive queries or workloads">
+                    CPU
+                  </MetricCardLabel>
+                </MetricCardHeader>
+                <MetricCardContent>
+                  {metrics ? (
+                    <MetricCardValue>{metrics.cpu.current.toFixed(0)}%</MetricCardValue>
+                  ) : (
+                    <MetricCardValue>--</MetricCardValue>
+                  )}
+                </MetricCardContent>
+              </MetricCard>
+            </Link>
+          </>
+        )}
       </div>
     </div>
   )
