@@ -2,8 +2,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { useSnapshot } from 'valtio'
 
 import {
-  getProjectReplicationLagSeconds,
+  useProjectReplication,
   warehouseDemoStore,
+  type WarehouseProjectReplicationStatus,
   type WarehouseTableState,
 } from './warehouseDemoStore'
 import {
@@ -11,21 +12,42 @@ import {
   getWarehouseCopyTooltip,
   isWarehouseSchema,
 } from './warehouseNaming.utils'
-import { formatWarehouseLagLabel } from './warehouseTableEditor.utils'
+import { getReplicationLagDisplay } from './warehouseReplication.utils'
 
 function getTableEditorDataSourceSuffix(
   schema: string,
   table: string,
-  warehouseTables: Record<string, WarehouseTableState>
-): { label: string; lagLabel?: string; tooltip: string } | null {
+  warehouseTables: Record<string, WarehouseTableState>,
+  projectReplication: WarehouseProjectReplicationStatus | null
+): {
+  label: string
+  lagSuffix?: string
+  lagTone?: 'warning' | 'destructive'
+  tooltip: string
+} | null {
   if (isWarehouseSchema(schema)) {
     const sourceTableKey = getSourceTableKey(schema, table)
-    const lagSeconds = getProjectReplicationLagSeconds() ?? 12
+    const tableState = warehouseTables[sourceTableKey]
+
+    if (!projectReplication) {
+      return {
+        label: 'Warehouse copy',
+        tooltip: getWarehouseCopyTooltip(sourceTableKey),
+      }
+    }
+
+    const lagDisplay = getReplicationLagDisplay(projectReplication, tableState?.copyStatus)
 
     return {
       label: 'Warehouse copy',
-      lagLabel: formatWarehouseLagLabel(lagSeconds),
-      tooltip: `${getWarehouseCopyTooltip(sourceTableKey)} Project replication lag (${lagSeconds}s) applies to all Warehouse tables.`,
+      lagSuffix: lagDisplay.compactSuffix,
+      lagTone:
+        lagDisplay.tone === 'warning'
+          ? 'warning'
+          : lagDisplay.tone === 'destructive'
+            ? 'destructive'
+            : undefined,
+      tooltip: `${getWarehouseCopyTooltip(sourceTableKey)}. ${lagDisplay.tooltip}`,
     }
   }
 
@@ -47,9 +69,22 @@ interface TableEditorDataSourceSuffixProps {
 
 export function TableEditorDataSourceSuffix({ schema, table }: TableEditorDataSourceSuffixProps) {
   const warehouseSnap = useSnapshot(warehouseDemoStore)
-  const suffix = getTableEditorDataSourceSuffix(schema, table, warehouseSnap.tables)
+  const projectReplication = useProjectReplication()
+  const suffix = getTableEditorDataSourceSuffix(
+    schema,
+    table,
+    warehouseSnap.tables,
+    projectReplication
+  )
 
   if (!suffix) return null
+
+  const lagClassName =
+    suffix.lagTone === 'destructive'
+      ? 'text-destructive'
+      : suffix.lagTone === 'warning'
+        ? 'text-warning'
+        : 'text-foreground-lighter'
 
   return (
     <>
@@ -58,8 +93,8 @@ export function TableEditorDataSourceSuffix({ schema, table }: TableEditorDataSo
         <TooltipTrigger asChild>
           <span className="cursor-default truncate text-foreground">
             {suffix.label}
-            {suffix.lagLabel !== undefined && (
-              <span className="text-foreground-lighter ml-1">({suffix.lagLabel})</span>
+            {suffix.lagSuffix !== undefined && (
+              <span className={`ml-1 ${lagClassName}`}>({suffix.lagSuffix})</span>
             )}
           </span>
         </TooltipTrigger>

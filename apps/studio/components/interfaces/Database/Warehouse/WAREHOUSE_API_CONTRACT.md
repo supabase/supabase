@@ -15,16 +15,19 @@ One Warehouse replication pipeline serves all linked tables. Lag and phase are *
 ```ts
 type ReplicationPhase = 'initial_sync' | 'streaming' | 'error'
 type PipelineStatus = 'live' | 'error'
+type ReplicationHealth = 'healthy' | 'behind' | 'critical' | 'error'
 
 interface WarehouseProjectReplicationStatus {
-  /** Seconds behind the Postgres WAL for this project’s Warehouse pipeline */
-  replication_lag_seconds: number
-  /** Overall pipeline phase */
+  /** WAL backlog not yet flushed to Warehouse (bytes). Aligns with ETL `confirmed_flush_lsn_bytes`. */
+  replication_lag_bytes: number
+  /** Derived in Studio from thresholds on `replication_lag_bytes` plus pipeline/copy errors. */
+  replication_health?: ReplicationHealth
   replication_phase: ReplicationPhase
-  /** Pipeline health summary */
   pipeline_status: PipelineStatus
 }
 ```
+
+Platform may also expose `lag_ms` on linked-table responses; prefer **bytes** for user-facing copy (time-based flush lag is often NULL for logical slots). Studio only surfaces lag amounts when `replication_health` is `behind` or `critical`.
 
 Consumed by **Observability → Warehouse** (mock sparklines in prototype; real monitor API later).
 
@@ -61,7 +64,7 @@ interface WarehouseTableMetadata {
 }
 ```
 
-**Do not** put `warehouse_lag_seconds` on per-table metadata. Lag belongs on `WarehouseProjectReplicationStatus`.
+**Do not** put per-table lag on table metadata. Lag belongs on `WarehouseProjectReplicationStatus`.
 
 ## Studio routing rules (target)
 
@@ -88,7 +91,7 @@ Detach (copy removed, postgres remains): `storage_mode` returns to `postgres`; w
 | `mode: 'postgres'`                               | `storage_mode: 'postgres'`                     |
 | `mode: 'has_warehouse_copy'`                     | `storage_mode: 'postgres_with_warehouse_copy'` |
 | `copyStatus: 'backfilling' \| 'live' \| 'error'` | `warehouse_copy_status`                        |
-| `projectReplication.replicationLagSeconds`       | `replication_lag_seconds` (project)            |
+| `projectReplication.replicationLagBytes`         | `replication_lag_bytes` (project)              |
 | `projectReplication.replicationPhase`            | `replication_phase` (project)                  |
 | (not implemented)                                | `storage_mode: 'warehouse_only'`               |
 

@@ -22,11 +22,12 @@ import {
 import { ButtonTooltip } from '../ui/ButtonTooltip'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
 import { TimezoneDropdown } from './UserDropdown/TimezoneDropdown'
+import { WarehouseDemoMenu } from './UserDropdown/WarehouseDemoMenu'
 import { ProfileImage } from '@/components/ui/ProfileImage'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useUpgradeCtaExperiment } from '@/hooks/misc/useUpgradeCtaExperiment'
-import { IS_PLATFORM } from '@/lib/constants'
+import { IS_PLATFORM, IS_STAGING_OR_LOCAL } from '@/lib/constants'
 import { useProfileNameAndPicture } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
@@ -184,6 +185,7 @@ export function UserDropdown({
             </div>
           </>
         )}
+        {IS_STAGING_OR_LOCAL && <WarehouseDemoMenu />}
         {IS_PLATFORM && (
           <>
             <DropdownMenuSeparator />

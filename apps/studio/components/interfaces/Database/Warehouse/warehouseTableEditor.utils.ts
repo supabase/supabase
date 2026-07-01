@@ -12,10 +12,6 @@ export const WAREHOUSE_TABLE_DETAIL_VIEW = 'warehouse'
 
 export type TableDetailSection = 'overview' | 'columns' | 'policies' | 'settings' | 'storage'
 
-export function formatWarehouseLagLabel(lagSeconds: number): string {
-  return `${lagSeconds}s lag`
-}
-
 export function getActiveWarehouseSchemas(
   warehouseTables: Record<string, WarehouseTableState>
 ): string[] {

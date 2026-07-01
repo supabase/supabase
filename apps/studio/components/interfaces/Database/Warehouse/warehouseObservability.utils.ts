@@ -5,12 +5,12 @@ const DAY_MS = 24 * 60 * 60 * 1000
 
 export type WarehouseLagChartDatum = {
   timestamp: string
-  lag_seconds: number
+  lag_bytes: number
 }
 
 export const WAREHOUSE_LAG_CHART_CONFIG = {
-  lag_seconds: {
-    label: 'Lag',
+  lag_bytes: {
+    label: 'WAL backlog',
     color: 'hsl(var(--brand-default))',
   },
 } satisfies ChartConfig
@@ -20,22 +20,22 @@ function pseudoNoise(seed: number, index: number) {
 }
 
 export function buildWarehouseLagSparklineData({
-  currentLagSeconds,
+  currentLagBytes,
   now = Date.now(),
 }: {
-  currentLagSeconds: number
+  currentLagBytes: number
   now?: number
 }): WarehouseLagChartDatum[] {
-  const seed = Math.max(1, Math.round(currentLagSeconds))
+  const seed = Math.max(1, Math.round(currentLagBytes / (1024 * 1024)))
 
   return Array.from({ length: SPARKLINE_POINTS }, (_, index) => {
     const daysAgo = SPARKLINE_POINTS - 1 - index
     const progress = index / Math.max(SPARKLINE_POINTS - 1, 1)
     const timestamp = new Date(now - daysAgo * DAY_MS).toISOString()
     const scale = 0.75 + progress * 0.25 + pseudoNoise(seed, index)
-    const lagSeconds = Math.max(1, Math.round(currentLagSeconds * scale))
+    const lagBytes = Math.max(0, Math.round(currentLagBytes * scale))
 
-    return { timestamp, lag_seconds: lagSeconds }
+    return { timestamp, lag_bytes: lagBytes }
   })
 }
 

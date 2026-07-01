@@ -12,13 +12,19 @@ import {
   type CopyStatus,
   type PipelineStatus,
   type ReplicationPhase,
+  type WarehouseProjectReplicationStatus,
 } from './warehouseDemoStore'
 import {
   buildReplicationLogsUrl,
   buildWarehouseLagSparklineData,
   WAREHOUSE_LAG_CHART_CONFIG,
 } from './warehouseObservability.utils'
+import {
+  getReplicationLagDisplay,
+  REPLICATION_LAG_BEHIND_THRESHOLD_BYTES,
+} from './warehouseReplication.utils'
 import { WarehouseSyncChip } from './WarehouseSyncChip'
+import { formatBytes } from '@/lib/helpers'
 
 const DATE_TIME_FORMAT = 'MMM D'
 
@@ -75,37 +81,61 @@ function PipelineStatusMetric({ status }: { status: PipelineStatus }) {
   )
 }
 
-function LagMetric({ lagSeconds }: { lagSeconds: number }) {
+function LagMetric({ replication }: { replication: WarehouseProjectReplicationStatus }) {
+  const lagDisplay = getReplicationLagDisplay(replication)
+  const showSparkline = lagDisplay.health === 'behind' || lagDisplay.health === 'critical'
   const chartData = useMemo(
-    () => buildWarehouseLagSparklineData({ currentLagSeconds: lagSeconds }),
-    [lagSeconds]
+    () => buildWarehouseLagSparklineData({ currentLagBytes: replication.replicationLagBytes }),
+    [replication.replicationLagBytes]
   )
+
+  const value =
+    lagDisplay.lagAmount !== undefined
+      ? `${lagDisplay.headline} · ${lagDisplay.lagAmount}`
+      : lagDisplay.headline
+
+  const valueClassName =
+    lagDisplay.tone === 'destructive'
+      ? 'text-destructive'
+      : lagDisplay.tone === 'warning'
+        ? 'text-warning'
+        : undefined
 
   return (
     <div className="flex min-w-0 flex-col gap-2 px-4 py-3">
       <ChartMetric
         label="Replication lag"
-        value={`${lagSeconds}s`}
-        tooltip="Seconds behind Postgres for this project’s Warehouse pipeline. Applies to all Warehouse tables."
-        className="[&_span]:text-sm"
+        value={value}
+        tooltip={lagDisplay.tooltip}
+        className={valueClassName ? `[&_span]:text-sm ${valueClassName}` : '[&_span]:text-sm'}
       />
-      <div className="h-12">
-        <Chart>
-          <ChartContent isEmpty={chartData.length === 0}>
-            <ChartLine
-              data={chartData}
-              dataKey="lag_seconds"
-              config={WAREHOUSE_LAG_CHART_CONFIG}
-              DateTimeFormat={DATE_TIME_FORMAT}
-              className="h-12 gap-0"
-              isFullHeight
-              showYAxis={false}
-              showGrid={false}
-              YAxisProps={{ tickFormatter: (value) => `${value}s` }}
-            />
-          </ChartContent>
-        </Chart>
-      </div>
+      {showSparkline ? (
+        <div className="h-12">
+          <Chart>
+            <ChartContent isEmpty={chartData.length === 0}>
+              <ChartLine
+                data={chartData}
+                dataKey="lag_bytes"
+                config={WAREHOUSE_LAG_CHART_CONFIG}
+                DateTimeFormat={DATE_TIME_FORMAT}
+                className="h-12 gap-0"
+                isFullHeight
+                showYAxis={false}
+                showGrid={false}
+                YAxisProps={{
+                  tickFormatter: (value) => formatBytes(Number(value), 0),
+                }}
+              />
+            </ChartContent>
+          </Chart>
+        </div>
+      ) : (
+        <div className="flex h-12 items-center text-xs text-foreground-lighter">
+          {replication.replicationLagBytes < REPLICATION_LAG_BEHIND_THRESHOLD_BYTES
+            ? 'No backlog above threshold'
+            : null}
+        </div>
+      )}
     </div>
   )
 }
@@ -152,7 +182,7 @@ export function WarehouseObservabilityPanel() {
       <Card>
         <CardContent className="p-0">
           <div className="grid grid-cols-1 divide-y sm:grid-cols-2 lg:grid-cols-4 sm:divide-x sm:divide-y-0">
-            <LagMetric lagSeconds={projectReplication.replicationLagSeconds} />
+            <LagMetric replication={projectReplication} />
             <PhaseMetric phase={projectReplication.replicationPhase} />
             <LinkedTablesMetric count={linkedTableCount} />
             <PipelineStatusMetric status={projectReplication.pipelineStatus} />

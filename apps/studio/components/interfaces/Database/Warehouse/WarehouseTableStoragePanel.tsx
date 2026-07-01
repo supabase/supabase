@@ -19,10 +19,8 @@ import { Admonition } from 'ui-patterns/admonition'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import {
-  clearTableCopyError,
   formatWarehouseSize,
   resolveWarehouseTableState,
-  setTableCopyError,
   useProjectReplication,
   useWarehouseTableState,
   type WarehouseMode,
@@ -39,6 +37,7 @@ import {
   buildReplicationLogsUrl,
   buildWarehouseObservabilityUrl,
 } from './warehouseObservability.utils'
+import { getReplicationLagDisplay } from './warehouseReplication.utils'
 import { getCopyStatusTooltip, WarehouseSyncChip } from './WarehouseSyncChip'
 import { buildTableDetailUrl, WAREHOUSE_TABLE_DETAIL_VIEW } from './warehouseTableEditor.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
@@ -194,6 +193,16 @@ export function WarehouseTableStoragePanel({
     projectRef !== undefined ? buildWarehouseObservabilityUrl(projectRef) : undefined
   const replicationLogsUrl =
     projectRef !== undefined ? buildReplicationLogsUrl(projectRef) : undefined
+  const lagDisplay =
+    projectReplication !== null
+      ? getReplicationLagDisplay(projectReplication, state.copyStatus)
+      : null
+  const lagValueClassName =
+    lagDisplay?.tone === 'destructive'
+      ? 'text-destructive'
+      : lagDisplay?.tone === 'warning'
+        ? 'text-warning'
+        : 'text-foreground-light'
 
   return (
     <>
@@ -232,17 +241,31 @@ export function WarehouseTableStoragePanel({
                   }
                 />
               )}
-              {projectReplication && (
-                <MetaRow
-                  label={
-                    <MetaRowLabel tooltip="Replication lag for this project’s Warehouse pipeline. Applies to all Warehouse tables.">
-                      Lag
-                    </MetaRowLabel>
+              {projectReplication?.pipelineStatus === 'error' && state.copyStatus !== 'error' && (
+                <Admonition
+                  type="destructive"
+                  layout="responsive"
+                  title="Warehouse replication failed"
+                  description="The project Warehouse pipeline encountered an error. Query results from Warehouse copies may be stale."
+                  className="mb-0 rounded-none border-x-0 border-t-0 border-b-1 border-border"
+                  actions={
+                    replicationLogsUrl ? (
+                      <Button variant="default" asChild>
+                        <Link href={replicationLogsUrl}>View replication logs</Link>
+                      </Button>
+                    ) : undefined
                   }
+                />
+              )}
+              {projectReplication && lagDisplay && (
+                <MetaRow
+                  label={<MetaRowLabel tooltip={lagDisplay.tooltip}>Replication</MetaRowLabel>}
                 >
                   <div className="inline-flex items-center justify-end gap-1.5">
-                    <span className="text-foreground-light">
-                      {projectReplication.replicationLagSeconds}s
+                    <span className={lagValueClassName}>
+                      {lagDisplay.lagAmount !== undefined
+                        ? `${lagDisplay.headline} · ${lagDisplay.lagAmount}`
+                        : lagDisplay.headline}
                     </span>
                     {observabilityUrl && (
                       <RowIconLink
@@ -317,15 +340,6 @@ export function WarehouseTableStoragePanel({
                 {viewContext === 'source' && (
                   <>
                     <DropdownMenuSeparator />
-                    {state.copyStatus === 'error' ? (
-                      <DropdownMenuItem onClick={() => clearTableCopyError(sourceTableKey)}>
-                        Clear sync error (demo)
-                      </DropdownMenuItem>
-                    ) : (
-                      <DropdownMenuItem onClick={() => setTableCopyError(sourceTableKey)}>
-                        Simulate sync error (demo)
-                      </DropdownMenuItem>
-                    )}
                     <DropdownMenuItem
                       className="text-destructive focus:text-destructive"
                       onClick={() => setDetachConfirm(true)}

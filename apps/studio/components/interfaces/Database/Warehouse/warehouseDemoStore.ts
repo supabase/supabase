@@ -11,10 +11,18 @@ export type PipelineStatus = 'live' | 'error'
 export type SyncState = CopyStatus
 
 export interface WarehouseProjectReplicationStatus {
-  replicationLagSeconds: number
+  /** WAL backlog not yet flushed to Warehouse for this project (bytes). */
+  replicationLagBytes: number
   replicationPhase: ReplicationPhase
   pipelineStatus: PipelineStatus
 }
+
+export type WarehouseDemoReplicationPreset =
+  | 'healthy'
+  | 'behind'
+  | 'critical'
+  | 'pipeline_error'
+  | 'copy_error'
 
 export interface WarehouseTableState {
   mode: WarehouseMode
@@ -28,10 +36,13 @@ export const warehouseDemoStore = proxy<{
   tables: Record<string, WarehouseTableState>
   catalogEnabled: boolean
   projectReplication: WarehouseProjectReplicationStatus | null
+  /** Demo: next Copy to Warehouse fails instead of linking the table. */
+  simulateNextLinkFailure: boolean
 }>({
   tables: {},
   catalogEnabled: false,
   projectReplication: null,
+  simulateNextLinkFailure: false,
 })
 
 const DEMO_WAREHOUSE_SIZE_BYTES = 197_912_092_672 // ~184 GB
@@ -43,10 +54,13 @@ const DEFAULT_WAREHOUSE_COPY_FIELDS = {
 }
 
 const DEFAULT_PROJECT_REPLICATION: WarehouseProjectReplicationStatus = {
-  replicationLagSeconds: 12,
+  replicationLagBytes: 0,
   replicationPhase: 'streaming',
   pipelineStatus: 'live',
 }
+
+const DEMO_LAG_BEHIND_BYTES = 80 * 1024 * 1024
+const DEMO_LAG_CRITICAL_BYTES = 600 * 1024 * 1024
 
 export function repairProjectReplicationIfNeeded(): void {
   if (countLinkedWarehouseTablesInStore() === 0 || warehouseDemoStore.projectReplication) return
@@ -57,14 +71,8 @@ export function repairProjectReplicationIfNeeded(): void {
   }
 }
 
-export function getProjectReplicationLagSeconds(): number | undefined {
-  if (warehouseDemoStore.projectReplication) {
-    return warehouseDemoStore.projectReplication.replicationLagSeconds
-  }
-  if (countLinkedWarehouseTablesInStore() > 0) {
-    return DEFAULT_PROJECT_REPLICATION.replicationLagSeconds
-  }
-  return undefined
+export function setSimulateNextLinkFailure(enabled: boolean): void {
+  warehouseDemoStore.simulateNextLinkFailure = enabled
 }
 
 function countLinkedWarehouseTablesInStore(): number {
@@ -149,6 +157,72 @@ export function clearTableCopyError(key: string): void {
   }
 }
 
+export function applyWarehouseDemoReplicationPreset(
+  preset: WarehouseDemoReplicationPreset
+): boolean {
+  repairProjectReplicationIfNeeded()
+
+  const linkedTableKeys = Object.entries(warehouseDemoStore.tables)
+    .filter(([, table]) => table.mode === 'has_warehouse_copy')
+    .map(([key]) => key)
+
+  if (linkedTableKeys.length === 0) {
+    return false
+  }
+
+  switch (preset) {
+    case 'healthy':
+      warehouseDemoStore.projectReplication = {
+        replicationLagBytes: 0,
+        replicationPhase: 'streaming',
+        pipelineStatus: 'live',
+      }
+      for (const key of linkedTableKeys) {
+        clearTableCopyError(key)
+      }
+      break
+    case 'behind':
+      warehouseDemoStore.projectReplication = {
+        replicationLagBytes: DEMO_LAG_BEHIND_BYTES,
+        replicationPhase: 'streaming',
+        pipelineStatus: 'live',
+      }
+      for (const key of linkedTableKeys) {
+        clearTableCopyError(key)
+      }
+      break
+    case 'critical':
+      warehouseDemoStore.projectReplication = {
+        replicationLagBytes: DEMO_LAG_CRITICAL_BYTES,
+        replicationPhase: 'streaming',
+        pipelineStatus: 'live',
+      }
+      for (const key of linkedTableKeys) {
+        clearTableCopyError(key)
+      }
+      break
+    case 'pipeline_error':
+      warehouseDemoStore.projectReplication = {
+        replicationLagBytes: DEMO_LAG_CRITICAL_BYTES,
+        replicationPhase: 'error',
+        pipelineStatus: 'error',
+      }
+      break
+    case 'copy_error':
+      warehouseDemoStore.projectReplication = {
+        replicationLagBytes: 0,
+        replicationPhase: 'streaming',
+        pipelineStatus: 'live',
+      }
+      for (const key of linkedTableKeys) {
+        setTableCopyError(key)
+      }
+      break
+  }
+
+  return true
+}
+
 export function clearTableMode(key: string): void {
   delete warehouseDemoStore.tables[key]
 
@@ -226,7 +300,7 @@ export function formatWarehouseStorageSummaryLabel(display: WarehouseStorageDisp
 }
 
 export const WAREHOUSE_STORAGE_CELL_TOOLTIP =
-  'This table has a Postgres heap for writes and a separate Warehouse copy for analytics. Open Storage to manage both.'
+  'This table has a Postgres heap for writes and a separate Warehouse copy for analytics.'
 
 export function getWarehouseStorageSummaryLabel(
   state: Pick<WarehouseTableState, 'mode' | 'warehouseSizeBytes'> | undefined,
