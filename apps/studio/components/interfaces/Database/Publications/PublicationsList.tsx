@@ -22,10 +22,15 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { PublicationSkeleton } from './PublicationSkeleton'
+import { usePublicationsWithWarehousePrototype } from './usePublicationsWithWarehousePrototype'
+import {
+  isSupabaseManagedWarehousePublicationName,
+  MANAGED_WAREHOUSE_PUBLICATION_TOOLTIP,
+} from '@/components/interfaces/Database/Warehouse/managedWarehouse.resources'
+import { isWarehousePrototypePublication } from '@/components/interfaces/Database/Warehouse/warehousePublication.prototype'
 import { AlertError } from '@/components/ui/AlertError'
 import InformationBox from '@/components/ui/InformationBox'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
-import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -63,7 +68,7 @@ export const PublicationsList = () => {
     isPending: isLoading,
     isSuccess,
     isError,
-  } = useDatabasePublicationsQuery({
+  } = usePublicationsWithWarehousePrototype({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -174,64 +179,96 @@ export const PublicationsList = () => {
               )}
 
               {isSuccess &&
-                publications.map((x) => (
-                  <TableRow key={x.name}>
-                    <TableCell>
-                      <div className="flex items-center gap-x-2">
-                        {x.name}
-                        {/* [Joshen] Making this tooltip very specific for these 2 publications */}
-                        {['supabase_realtime', 'supabase_realtime_messages_publication'].includes(
-                          x.name
-                        ) && (
-                          <Tooltip>
-                            <TooltipTrigger>
-                              <Info size={14} className="text-foreground-light" />
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">
-                              {x.name === 'supabase_realtime'
-                                ? 'Managed by Supabase and handles Postgres changes'
-                                : x.name === 'supabase_realtime_messages_publication'
-                                  ? 'Managed by Supabase and handles broadcasts from the database'
-                                  : undefined}
-                            </TooltipContent>
-                          </Tooltip>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>{x.id}</TableCell>
-                    {publicationEvents.map((event) => (
-                      <TableCell key={event.key}>
-                        <Switch
-                          size="small"
-                          checked={(x as any)[event.key]}
-                          disabled={!canUpdatePublications}
-                          onClick={() => {
-                            setToggleListenEventValue({
-                              publication: x,
-                              event,
-                              currentStatus: (x as any)[event.key],
-                            })
-                          }}
-                        />
+                publications.map((x) => {
+                  const isWarehousePublication = isSupabaseManagedWarehousePublicationName(x.name)
+
+                  return (
+                    <TableRow key={x.name}>
+                      <TableCell>
+                        <div className="flex items-center gap-x-2">
+                          {x.name}
+                          {/* [Joshen] Making this tooltip very specific for these 2 publications */}
+                          {['supabase_realtime', 'supabase_realtime_messages_publication'].includes(
+                            x.name
+                          ) && (
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Info size={14} className="text-foreground-light" />
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom">
+                                {x.name === 'supabase_realtime'
+                                  ? 'Managed by Supabase and handles Postgres changes'
+                                  : x.name === 'supabase_realtime_messages_publication'
+                                    ? 'Managed by Supabase and handles broadcasts from the database'
+                                    : undefined}
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                          {isWarehousePublication && (
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <Info size={14} className="text-foreground-light" />
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom" className="max-w-xs">
+                                {MANAGED_WAREHOUSE_PUBLICATION_TOOLTIP}
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
+                        </div>
                       </TableCell>
-                    ))}
-                    <TableCell>
-                      <div className="flex justify-end">
-                        <Button
-                          asChild
-                          variant="default"
-                          style={{ paddingTop: 3, paddingBottom: 3 }}
-                        >
-                          <Link href={`/project/${ref}/database/publications/${x.id}`}>
-                            {x.tables === null
-                              ? 'All tables'
-                              : `${x.tables.length} ${x.tables.length === 1 ? 'table' : 'tables'}`}
-                          </Link>
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      <TableCell>{x.id}</TableCell>
+                      {publicationEvents.map((event) => (
+                        <TableCell key={event.key}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span className="inline-flex">
+                                <Switch
+                                  size="small"
+                                  checked={(x as any)[event.key]}
+                                  disabled={!canUpdatePublications || isWarehousePublication}
+                                  onClick={() => {
+                                    if (isWarehousePublication) return
+                                    setToggleListenEventValue({
+                                      publication: x,
+                                      event,
+                                      currentStatus: (x as any)[event.key],
+                                    })
+                                  }}
+                                />
+                              </span>
+                            </TooltipTrigger>
+                            {isWarehousePublication && (
+                              <TooltipContent side="bottom" className="max-w-xs">
+                                {MANAGED_WAREHOUSE_PUBLICATION_TOOLTIP}
+                              </TooltipContent>
+                            )}
+                          </Tooltip>
+                        </TableCell>
+                      ))}
+                      <TableCell>
+                        <div className="flex justify-end">
+                          <Button
+                            asChild
+                            variant="default"
+                            style={{ paddingTop: 3, paddingBottom: 3 }}
+                          >
+                            <Link
+                              href={
+                                isWarehousePrototypePublication(x)
+                                  ? `/project/${ref}/database/tables`
+                                  : `/project/${ref}/database/publications/${x.id}`
+                              }
+                            >
+                              {x.tables === null
+                                ? 'All tables'
+                                : `${x.tables.length} ${x.tables.length === 1 ? 'table' : 'tables'}`}
+                            </Link>
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
             </TableBody>
           </Table>
         </Card>

@@ -8,6 +8,10 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { PublicationTablesSkeleton } from './PublicationSkeleton'
 import { PublicationsTableItem } from './PublicationsTableItem'
+import {
+  isSupabaseManagedWarehousePublicationName,
+  MANAGED_WAREHOUSE_PUBLICATION_TOOLTIP,
+} from '@/components/interfaces/Database/Warehouse/managedWarehouse.resources'
 import { AlertError } from '@/components/ui/AlertError'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
@@ -49,6 +53,9 @@ export const PublicationsTables = () => {
     connectionString: project?.connectionString,
   })
   const selectedPublication = publications.find((pub) => pub.id === Number(id))
+  const isWarehousePublication = isSupabaseManagedWarehousePublicationName(
+    selectedPublication?.name ?? ''
+  )
 
   const {
     data: tablesData = [],
@@ -104,6 +111,15 @@ export const PublicationsTables = () => {
           type="warning"
           className="mb-4 w-full"
           description="You need additional permissions to update database replications."
+        />
+      )}
+
+      {isWarehousePublication && (
+        <Admonition
+          type="default"
+          className="mb-4 w-full"
+          title="Managed Warehouse publication"
+          description={MANAGED_WAREHOUSE_PUBLICATION_TOOLTIP}
         />
       )}
 

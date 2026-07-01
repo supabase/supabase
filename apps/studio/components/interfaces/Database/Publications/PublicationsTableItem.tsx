@@ -4,6 +4,10 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Switch, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import {
+  isSupabaseManagedWarehousePublicationName,
+  MANAGED_WAREHOUSE_PUBLICATION_TOOLTIP,
+} from '@/components/interfaces/Database/Warehouse/managedWarehouse.resources'
 import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -21,7 +25,7 @@ export const PublicationsTableItem = ({
   const { data: project } = useSelectedProjectQuery()
   const { data: protectedSchemas } = useProtectedSchemas()
   const enabledForAllTables = selectedPublication.tables == null
-
+  const isWarehousePublication = isSupabaseManagedWarehousePublicationName(selectedPublication.name)
   const isProtected = protectedSchemas.map((x) => x.name).includes(table.schema)
 
   const [checked, setChecked] = useState(
@@ -34,6 +38,8 @@ export const PublicationsTableItem = ({
   )
 
   const { mutate: updatePublications, isPending } = useDatabasePublicationUpdateMutation()
+  const isToggleDisabled =
+    !canUpdatePublications || isPending || isProtected || isWarehousePublication
 
   const toggleReplicationForTable = async (table: PGTable, publication: PGPublication) => {
     if (project === undefined) return console.error('Project is required')
@@ -90,14 +96,22 @@ export const PublicationsTableItem = ({
               <TooltipTrigger>
                 <Switch
                   size="small"
-                  disabled={!canUpdatePublications || isPending || isProtected}
+                  disabled={isToggleDisabled}
                   checked={checked}
-                  onClick={() => toggleReplicationForTable(table, selectedPublication)}
+                  onClick={() => {
+                    if (isWarehousePublication) return
+                    toggleReplicationForTable(table, selectedPublication)
+                  }}
                 />
               </TooltipTrigger>
               {isProtected && (
                 <TooltipContent side="bottom" className="w-64 text-center">
                   This table belongs to a protected schema, and its publication cannot be toggled
+                </TooltipContent>
+              )}
+              {isWarehousePublication && !isProtected && (
+                <TooltipContent side="bottom" className="max-w-xs text-center">
+                  {MANAGED_WAREHOUSE_PUBLICATION_TOOLTIP}
                 </TooltipContent>
               )}
             </Tooltip>
