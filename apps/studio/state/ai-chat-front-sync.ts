@@ -116,6 +116,16 @@ export async function syncSupportChatToFront(
       if (result.conversationId && !supportMetadata.frontConversationId) {
         supportMetadata.frontConversationId = result.conversationId
       }
+
+      // Flush a lifecycle transition that was requested before the Front
+      // conversation id existed (e.g. the assistant resolved/escalated the chat
+      // before this first message sync returned an id). syncSupportLifecycleToFront
+      // uses its own guard, so this won't contend with the message-sync flag.
+      if (supportMetadata.frontConversationId && supportMetadata.pendingLifecycleStatus) {
+        const pending = supportMetadata.pendingLifecycleStatus
+        supportMetadata.pendingLifecycleStatus = undefined
+        void syncSupportLifecycleToFront(chatId, state, pending).catch(() => {})
+      }
     }
   } finally {
     supportMetadata.isSyncing = false

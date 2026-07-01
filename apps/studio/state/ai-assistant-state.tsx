@@ -42,6 +42,10 @@ export type SupportChatMetadata = {
   threadRef?: string
   isSupportChat: true
   lifecycleStatus: AiSupportStatus
+  // A lifecycle transition requested before the Front conversation id existed
+  // (e.g. the assistant resolved the chat before the first message sync
+  // returned an id). Flushed by syncSupportChatToFront once the id is assigned.
+  pendingLifecycleStatus?: AiSupportStatus
   lifecycleClosedAt?: string
   lastSyncedMessageCount: number
   // Guards message syncs; lifecycle syncs use `isLifecycleSyncing` so the two
@@ -427,7 +431,14 @@ export const createAiAssistantState = (): AiAssistantState => {
         chat.supportMetadata.lifecycleClosedAt = new Date().toISOString()
       }
 
-      if (!chat.supportMetadata.frontConversationId) return
+      // No Front conversation yet (the initial message sync hasn't returned an
+      // id). Queue the transition so syncSupportChatToFront can flush it once the
+      // id is assigned, rather than silently dropping it.
+      if (!chat.supportMetadata.frontConversationId) {
+        chat.supportMetadata.pendingLifecycleStatus = status
+        return
+      }
+
       import('@/state/ai-chat-front-sync').then(({ syncSupportLifecycleToFront }) => {
         syncSupportLifecycleToFront(chatId, state, status).catch(() => {})
       })

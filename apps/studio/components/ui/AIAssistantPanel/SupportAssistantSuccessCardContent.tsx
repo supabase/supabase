@@ -110,9 +110,9 @@ export function SupportAssistantSuccessCardContent({
 
         // Flush any messages produced before the user engaged (the initial prompt
         // and any assistant reply). Subsequent turns sync via the onFinish hook.
-        void import('@/state/ai-chat-front-sync').then(({ syncSupportChatToFront }) =>
-          syncSupportChatToFront(chatId, aiAssistantState)
-        )
+        void import('@/state/ai-chat-front-sync')
+          .then(({ syncSupportChatToFront }) => syncSupportChatToFront(chatId, aiAssistantState))
+          .catch(() => {})
       }
 
       aiAssistantState.selectChat(chatId)

@@ -8,6 +8,8 @@ export const getSupportLifecycleTools = () => ({
     inputSchema: z.object({
       reason: z
         .string()
+        .trim()
+        .min(1, 'Escalation reason is required')
         .describe('A short reason that explains why this support chat should be escalated.'),
     }),
     execute: async () => {
@@ -20,6 +22,8 @@ export const getSupportLifecycleTools = () => ({
     inputSchema: z.object({
       summary: z
         .string()
+        .trim()
+        .min(1, 'Resolution summary is required')
         .describe('A concise summary of the fix or guidance that resolved the support request.'),
     }),
     execute: async () => {

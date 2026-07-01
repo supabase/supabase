@@ -124,7 +124,7 @@ export async function generateAssistantResponse({
       ? `The user's current project is ${projectRef || 'unknown'}. Their available schemas are: ${schemasString}. The current chat name is: ${chatName || 'unnamed'}.`
       : undefined
     const supportAssistantContent = supportMode
-      ? `This is an active support chat. Help the user while they wait for a human agent. Keep guidance practical and concise. If the user asks for a human, or if the issue cannot be safely resolved, call escalate_to_human with a short reason. If the issue is resolved, call resolve_support_conversation with a short summary.`
+      ? `This is an active support chat. Help the user while they wait for a human agent. Keep guidance practical and concise. If the user asks for a human, or if the issue cannot be safely resolved, call escalate_to_human with a short reason. Only call resolve_support_conversation after the user explicitly confirms the issue is resolved; otherwise keep helping.`
       : undefined
 
     const systemMessage: SystemModelMessage = {
