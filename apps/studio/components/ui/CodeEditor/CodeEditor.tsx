@@ -1,32 +1,47 @@
 import Editor, { EditorProps, Monaco, OnChange, OnMount, useMonaco } from '@monaco-editor/react'
 import { merge, noop } from 'lodash'
+import { Loader2 } from 'lucide-react'
 import type { editor } from 'monaco-editor'
-import { MutableRefObject, useEffect, useRef, useState } from 'react'
-import { cn, LogoLoader } from 'ui'
+import { RefObject, useEffect, useRef, useState } from 'react'
+import { cn } from 'ui'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
-import { alignEditor } from './CodeEditor.utils'
+import { alignEditor, BASE_MONACO_EDITOR_OPTIONS } from './CodeEditor.utils'
 import { Markdown } from '@/components/interfaces/Markdown'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
-import { timeout } from '@/lib/helpers'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 
 type CodeEditorActions = { enabled: boolean; callback: (value: any) => void }
+
 const DEFAULT_ACTIONS = {
   runQuery: { enabled: false, callback: noop },
-  explainCode: { enabled: false, callback: noop },
   formatDocument: { enabled: true, callback: noop },
   placeholderFill: { enabled: true },
-  closeAssistant: { enabled: false, callback: noop },
 }
 
+export type ValidLanguages =
+  | 'pgsql'
+  | 'json'
+  | 'html'
+  | 'typescript'
+  | 'javascript'
+  | 'css'
+  | 'csv'
+  | 'plaintext'
+  | 'markdown'
+
 interface CodeEditorProps {
-  id: string
-  language: 'pgsql' | 'json' | 'html' | 'typescript' | undefined
+  id?: string
+  language: ValidLanguages
   autofocus?: boolean
   defaultValue?: string
   isReadOnly?: boolean
   hideLineNumbers?: boolean
   className?: string
+  wrapperClassName?: string
   loading?: boolean
   options?: EditorProps['options']
   value?: string
@@ -36,11 +51,15 @@ interface CodeEditorProps {
     runQuery: CodeEditorActions
     formatDocument: CodeEditorActions
     placeholderFill: Omit<CodeEditorActions, 'callback'>
-    explainCode: CodeEditorActions
-    closeAssistant: CodeEditorActions
   }>
-  editorRef?: MutableRefObject<editor.IStandaloneCodeEditor | null>
+  editorRef?: RefObject<editor.IStandaloneCodeEditor | null>
+  monacoRef?: RefObject<Monaco | null>
   onInputChange?: (value?: string) => void
+  /**
+   * Fired after CodeEditor's own mount setup runs, so wrappers can register
+   * additional actions/keybindings on the shared editor instance.
+   */
+  onMount?: OnMount
 }
 
 export const CodeEditor = ({
@@ -51,13 +70,16 @@ export const CodeEditor = ({
   isReadOnly = false,
   hideLineNumbers = false,
   className,
+  wrapperClassName,
   loading,
   options,
   value,
   placeholder,
-  actions = DEFAULT_ACTIONS,
+  actions,
   editorRef: editorRefProps,
+  monacoRef: monacoRefProps,
   onInputChange = noop,
+  onMount: onMountProps,
 }: CodeEditorProps) => {
   const monaco = useMonaco()
   const { data: project } = useSelectedProjectQuery()
@@ -65,40 +87,40 @@ export const CodeEditor = ({
   const hasValue = useRef<editor.IContextKey<boolean>>(null)
   const ref = useRef<editor.IStandaloneCodeEditor>(null)
   const editorRef = editorRefProps || ref
-  const monacoRef = useRef<Monaco>(null)
+  const internalMonacoRef = useRef<Monaco | null>(null)
+  const monacoRef = monacoRefProps || internalMonacoRef
 
-  const { runQuery, placeholderFill, formatDocument, explainCode, closeAssistant } = {
+  const { runQuery, placeholderFill, formatDocument } = {
     ...DEFAULT_ACTIONS,
     ...actions,
   }
 
-  const runQueryCallbackRef = useRef(runQuery.callback)
-  useEffect(() => {
-    runQueryCallbackRef.current = runQuery.callback
-  }, [runQuery.callback])
+  // Monaco claims Cmd+K as a chord prefix, which swallows the global command menu
+  // shortcut while the editor is focused. CodeEditor intercepts it for every editor
+  // (see handleMount) so it behaves the same inside and outside the editor.
+  const commandMenuHotkeyEnabledRef = useLatest(
+    useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
+  )
+  const setCommandMenuOpenRef = useLatest(useSetCommandMenuOpen())
+  const runQueryCallbackRef = useLatest(runQuery.callback)
 
   const showPlaceholderDefault = placeholder !== undefined && (value ?? '').trim().length === 0
   const [showPlaceholder, setShowPlaceholder] = useState(showPlaceholderDefault)
 
   const optionsMerged = merge(
     {
-      tabSize: 2,
-      fontSize: 13,
+      ...BASE_MONACO_EDITOR_OPTIONS,
+      domReadOnly: isReadOnly,
       readOnly: isReadOnly,
-      minimap: { enabled: false },
-      wordWrap: 'on',
-      fixedOverflowWidgets: true,
-      contextmenu: true,
       lineNumbers: hideLineNumbers ? 'off' : undefined,
       glyphMargin: hideLineNumbers ? false : undefined,
       lineNumbersMinChars: hideLineNumbers ? 0 : 4,
       folding: hideLineNumbers ? false : undefined,
-      scrollBeyondLastLine: false,
     },
     options
   )
 
-  const onMount: OnMount = async (editor, monaco) => {
+  const handleMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
     monacoRef.current = monaco
     alignEditor(editor)
@@ -106,6 +128,12 @@ export const CodeEditor = ({
     hasValue.current = editor.createContextKey('hasValue', false)
     hasValue.current.set(value !== undefined && value.trim().length > 0)
     setShowPlaceholder(showPlaceholderDefault)
+
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK, () => {
+      if (commandMenuHotkeyEnabledRef.current) {
+        setCommandMenuOpenRef.current(true)
+      }
+    })
 
     if (placeholderFill.enabled) {
       editor.addCommand(
@@ -132,35 +160,14 @@ export const CodeEditor = ({
         contextMenuGroupId: 'operation',
         contextMenuOrder: 0,
         run: () => {
-          const selectedValue = (editorRef?.current as any)
-            .getModel()
-            .getValueInRange((editorRef?.current as any)?.getSelection())
-          runQueryCallbackRef.current(selectedValue || (editorRef?.current as any)?.getValue())
-        },
-      })
-    }
+          const selection = editorRef?.current?.getSelection()
+          if (!selection) return
 
-    if (explainCode.enabled) {
-      editor.addAction({
-        id: 'explain-code',
-        label: 'Explain Code',
-        contextMenuGroupId: 'operation',
-        contextMenuOrder: 1,
-        run: () => {
-          const selectedValue = (editorRef?.current as any)
-            .getModel()
-            .getValueInRange((editorRef?.current as any)?.getSelection())
-          explainCode.callback(selectedValue)
-        },
-      })
-    }
+          const selectedValue = editorRef?.current?.getModel()?.getValueInRange(selection)
+          const editorValue = editorRef?.current?.getValue()
 
-    if (closeAssistant.enabled) {
-      editor.addAction({
-        id: 'close-assistant',
-        label: 'Close Assistant',
-        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyI],
-        run: () => closeAssistant.callback(),
+          runQueryCallbackRef.current(selectedValue || editorValue)
+        },
       })
     }
 
@@ -170,8 +177,17 @@ export const CodeEditor = ({
       editor.setPosition(position)
     }
 
-    await timeout(500)
-    if (autofocus) editor?.focus()
+    // Run last so wrappers can register actions and have the final say on cursor
+    // position / focus before CodeEditor's own (timeout-deferred) autofocus.
+    onMountProps?.(editor, monaco)
+
+    // auto focus on mount
+    setTimeout(() => {
+      if (autofocus) {
+        if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
+        editor.focus()
+      }
+    }, 0)
   }
 
   const onChangeContent: OnChange = (value) => {
@@ -238,13 +254,20 @@ export const CodeEditor = ({
       <Editor
         path={id}
         theme="supabase"
-        className={cn(className, 'monaco-editor')}
+        // `h-full` keeps this wrapper filling its container even if a global `.monaco-editor`
+        // rule flips it to `position: absolute` (which happens after visiting GraphiQL, since it
+        // injects a second copy of Monaco's CSS onto the shared instance). Without an explicit
+        // height, an absolutely-positioned wrapper collapses to 0 and Monaco lays out at ~5px.
+        // Order matters: `h-full` is a default, so a caller-supplied height in `className`
+        // (e.g. `h-96`) wins via tailwind-merge instead of being clobbered.
+        className={cn('monaco-editor', 'h-full', className)}
+        wrapperProps={{ className: wrapperClassName }}
         value={value ?? undefined}
         language={language}
         defaultValue={defaultValue ?? undefined}
-        loading={loading || <LogoLoader />}
+        loading={loading || <Loader2 className="animate-spin" strokeWidth={2} size={20} />}
         options={optionsMerged}
-        onMount={onMount}
+        onMount={handleMount}
         onChange={onChangeContent}
       />
       {placeholder !== undefined && (
@@ -261,5 +284,3 @@ export const CodeEditor = ({
     </>
   )
 }
-
-export default CodeEditor

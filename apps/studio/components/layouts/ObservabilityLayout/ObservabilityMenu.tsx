@@ -6,8 +6,8 @@ import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Menu } from 'ui'
-import { InnerSideBarEmptyPanel } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { InnerSideBarEmptyPanel } from 'ui-patterns/InnerSideMenu'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { generateObservabilityMenuItems } from './ObservabilityMenu.utils'
@@ -65,15 +65,10 @@ const ObservabilityMenu = () => {
     projectRef: ref,
     type: 'report',
   })
-  const { mutate: deleteReport, isPending: isDeleting } = useContentDeleteMutation({
-    onSuccess: () => {
-      setDeleteModalOpen(false)
-      toast.success('Successfully deleted report')
-      router.push(`/project/${ref}/observability`)
-    },
-    onError: (error) => {
-      toast.error(`Failed to delete report: ${error.message}`)
-    },
+  const { mutateAsync: deleteReport } = useContentDeleteMutation({
+    // Toasts are driven by toast.promise in onConfirmDeleteReport. This no-op keeps the hook
+    // from showing its own default error toast, while its optimistic rollback still runs.
+    onError: () => {},
   })
 
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
@@ -87,7 +82,26 @@ const ObservabilityMenu = () => {
   const onConfirmDeleteReport = () => {
     if (ref === undefined) return console.error('Project ref is required')
     if (selectedReportToDelete?.id === undefined) return console.error('Report ID is required')
-    deleteReport({ projectRef: ref, ids: [selectedReportToDelete.id] })
+    const reportId = selectedReportToDelete.id
+    const isViewingDeletedReport = id === reportId
+    setDeleteModalOpen(false)
+
+    const deletion = deleteReport({ projectRef: ref, ids: [reportId] })
+    toast.promise(deletion, {
+      loading: 'Deleting report...',
+      success: 'Report deleted',
+      error: (err) => `Failed to delete report: ${err?.message ?? 'Unknown error'}`,
+    })
+
+    // Only navigate away when the open report is the one deleted, and only after it
+    // succeeds so a failed delete (which rolls the cache back) doesn't strand the route.
+    deletion
+      .then(() => {
+        if (isViewingDeletedReport) router.push(`/project/${ref}/observability`)
+      })
+      .catch(() => {
+        // Error is already surfaced by toast.promise; keep the user on the current route.
+      })
   }
 
   function isReportContent(c: Content): c is ContentBase & {
@@ -174,7 +188,7 @@ const ObservabilityMenu = () => {
                         <span className="uppercase font-mono">Custom Reports</span>
                         {reportMenuItems.length > 0 && (
                           <ButtonTooltip
-                            type="default"
+                            variant="default"
                             size="tiny"
                             icon={<Plus />}
                             disabled={!canCreateCustomReport}
@@ -218,7 +232,7 @@ const ObservabilityMenu = () => {
                       description="Create and save custom reports to track your project metrics"
                       actions={
                         <ButtonTooltip
-                          type="default"
+                          variant="default"
                           icon={<Plus />}
                           disabled={!canCreateCustomReport}
                           onClick={() => {
@@ -255,9 +269,8 @@ const ObservabilityMenu = () => {
           <ConfirmationModal
             title="Delete custom report"
             confirmLabel="Delete report"
-            confirmLabelLoading="Deleting report"
             size="medium"
-            loading={isDeleting}
+            loading={false}
             visible={deleteModalOpen}
             onCancel={() => setDeleteModalOpen(false)}
             onConfirm={onConfirmDeleteReport}

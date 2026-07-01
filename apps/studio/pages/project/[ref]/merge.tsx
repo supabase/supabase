@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, NavMenu, NavMenuItem } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useIsPgDeltaDiffEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -31,18 +31,16 @@ import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
 import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useProjectGitHubConnectionQuery } from '@/data/integrations/github-connections-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useBranchMergeDiff } from '@/hooks/branches/useBranchMergeDiff'
 import { useWorkflowManagement } from '@/hooks/branches/useWorkflowManagement'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 import type { NextPageWithLayout } from '@/types'
 
 const MergePage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref, workflow_run_id: currentWorkflowRunId } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
   const pgDeltaDiffEnabled = useIsPgDeltaDiffEnabled()
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -52,8 +50,12 @@ const MergePage: NextPageWithLayout = () => {
   const isBranch = project?.parent_project_ref !== undefined
   const parentProjectRef = project?.parent_project_ref
 
-  const { data: parentProject } = useProjectDetailQuery({ ref: parentProjectRef })
-  const { data: ghConnection } = useProjectGitHubConnectionQuery({ ref: parentProjectRef })
+  const { data: parentProject } = useProjectDetailQuery({
+    ref: parentProjectRef,
+  })
+  const { data: ghConnection } = useProjectGitHubConnectionQuery({
+    ref: parentProjectRef,
+  })
 
   const { data: branches } = useBranchesQuery(
     { projectRef: parentProjectRef },
@@ -179,24 +181,14 @@ const MergePage: NextPageWithLayout = () => {
         addWorkflowRun(data.workflow_run_id)
       }
 
-      // Track branch update
-      sendEvent({
-        action: 'branch_updated',
-        properties: {
-          source: 'merge_page',
-        },
-        groups: {
-          project: parentProjectRef ?? 'Unknown',
-          organization: selectedOrg?.slug ?? 'Unknown',
-        },
-      })
+      track('branch_updated', { source: 'merge_page' }, { project: parentProjectRef })
     },
     onError: (error) => {
       toast.error(`Failed to update branch: ${error.message}`)
     },
   })
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const { mutate: mergeBranch, isPending: isMerging } = useBranchMergeMutation({
     onSuccess: (data) => {
@@ -205,17 +197,11 @@ const MergePage: NextPageWithLayout = () => {
         toast.success('Branch merge initiated!')
         addWorkflowRun(data.workflowRunId)
 
-        // Track successful merge
-        sendEvent({
-          action: 'branch_merge_completed',
-          properties: {
-            branchType: currentBranch?.persistent ? 'persistent' : 'preview',
-          },
-          groups: {
-            project: parentProjectRef ?? 'Unknown',
-            organization: selectedOrg?.slug ?? 'Unknown',
-          },
-        })
+        track(
+          'branch_merge_completed',
+          { branchType: currentBranch?.persistent ? 'persistent' : 'preview' },
+          { project: parentProjectRef }
+        )
       } else {
         toast.info('No changes to merge')
       }
@@ -224,18 +210,14 @@ const MergePage: NextPageWithLayout = () => {
       setIsSubmitting(false)
       toast.error(`Failed to merge branch: ${error.message}`)
 
-      // Track failed merge
-      sendEvent({
-        action: 'branch_merge_failed',
-        properties: {
+      track(
+        'branch_merge_failed',
+        {
           branchType: currentBranch?.persistent ? 'persistent' : 'preview',
           error: error.message,
         },
-        groups: {
-          project: parentProjectRef ?? 'Unknown',
-          organization: selectedOrg?.slug ?? 'Unknown',
-        },
-      })
+        { project: parentProjectRef }
+      )
     },
   })
 
@@ -243,17 +225,7 @@ const MergePage: NextPageWithLayout = () => {
     onSuccess: () => {
       toast.success('Branch closed successfully')
       router.push(`/project/${parentProjectRef}/branches`)
-      // Track delete button click
-      sendEvent({
-        action: 'branch_delete_button_clicked',
-        properties: {
-          origin: 'merge_page',
-        },
-        groups: {
-          project: parentProjectRef ?? 'Unknown',
-          organization: selectedOrg?.slug ?? 'Unknown',
-        },
-      })
+      track('branch_delete_button_clicked', { origin: 'merge_page' }, { project: parentProjectRef })
     },
     onError: (error) => {
       toast.error(`Failed to close branch: ${error.message}`)
@@ -280,14 +252,7 @@ const MergePage: NextPageWithLayout = () => {
     if (!ref || !parentProjectRef) return
     setIsSubmitting(true)
 
-    // Track merge attempt
-    sendEvent({
-      action: 'branch_merge_submitted',
-      groups: {
-        project: parentProjectRef ?? 'Unknown',
-        organization: selectedOrg?.slug ?? 'Unknown',
-      },
-    })
+    track('branch_merge_submitted', undefined, { project: parentProjectRef })
 
     mergeBranch({
       branchProjectRef: ref,
@@ -425,7 +390,7 @@ const MergePage: NextPageWithLayout = () => {
                 overrideAction={
                   hasCurrentWorkflowFailed ? (
                     <Button
-                      type="default"
+                      variant="default"
                       asChild
                       icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
                       className="shrink-0"
@@ -434,7 +399,7 @@ const MergePage: NextPageWithLayout = () => {
                     </Button>
                   ) : hasCurrentWorkflowCompleted ? (
                     <Button
-                      type="default"
+                      variant="default"
                       onClick={handleCloseBranch}
                       loading={isDeleting}
                       icon={<X size={16} strokeWidth={1.5} />}
@@ -490,7 +455,9 @@ const MergePage: NextPageWithLayout = () => {
       <ConfirmationModal
         visible={showConfirmDialog}
         title="Confirm Branch Merge"
-        description={`Are you sure you want to merge "${currentBranch?.name}" into "${mainBranch?.name || 'main'}"? This action cannot be undone.`}
+        description={`Are you sure you want to merge "${
+          currentBranch?.name
+        }" into "${mainBranch?.name || 'main'}"? This action cannot be undone.`}
         confirmLabel="Merge branch"
         confirmLabelLoading="Merging..."
         onConfirm={() => {

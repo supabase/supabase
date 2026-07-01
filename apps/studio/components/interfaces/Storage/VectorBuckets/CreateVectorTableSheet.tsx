@@ -23,7 +23,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -34,6 +34,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { useFDWImportForeignSchemaMutation } from '@/data/fdw/fdw-import-foreign-schema-mutation'
 import { useVectorBucketIndexCreateMutation } from '@/data/storage/vector-bucket-index-create-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -104,6 +105,7 @@ interface CreateVectorTableSheetProps {
 
 export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
+  const { isCli } = useDeploymentMode()
 
   const [visible, setVisible] = useQueryState(
     'newTable',
@@ -117,7 +119,8 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
     ?.split('supabase_target_schema=')[1]
 
   // [Joshen] Can remove this once this restriction is removed
-  const showIndexCreationNotice = isStagingLocal && !!project && project?.region !== 'us-east-1'
+  const showIndexCreationNotice =
+    isStagingLocal && !isCli && !!project && project?.region !== 'us-east-1'
 
   const defaultValues = {
     name: '',
@@ -197,7 +200,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
         <ButtonTooltip
           block
           size="tiny"
-          type="primary"
+          variant="primary"
           className="w-fit"
           icon={<Plus size={14} />}
           disabled={!canCreateBuckets}
@@ -370,7 +373,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                       />
                     </div>
                     <Button
-                      type="text"
+                      variant="text"
                       className="w-[34px] h-[34px]" // Match the height of the input
                       size="tiny"
                       icon={<Trash2 size={12} />}
@@ -380,7 +383,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                 ))}
               </div>
               <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-3">
-                <Button type="default" size="tiny" onClick={() => append({ value: '' })}>
+                <Button variant="default" size="tiny" onClick={() => append({ value: '' })}>
                   Add metadata key
                 </Button>
               </div>
@@ -389,12 +392,12 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
         </Form>
 
         <SheetFooter>
-          <Button type="default" disabled={isCreating} onClick={() => setVisible(false)}>
+          <Button variant="default" disabled={isCreating} onClick={() => setVisible(false)}>
             Cancel
           </Button>
           <Button
             form={formId}
-            htmlType="submit"
+            type="submit"
             loading={isCreating}
             disabled={isCreating || !bucketName}
           >

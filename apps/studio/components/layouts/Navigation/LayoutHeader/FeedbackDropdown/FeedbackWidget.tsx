@@ -17,7 +17,7 @@ import {
   PopoverSeparator,
   TextArea,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import {
   convertB64toBlob,
@@ -28,11 +28,10 @@ import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useFeedbackCategoryQuery } from '@/data/feedback/feedback-category'
 import { useSendFeedbackMutation } from '@/data/feedback/feedback-send'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { timeout } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface FeedbackWidgetProps {
   onClose: () => void
@@ -43,7 +42,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
   const router = useRouter()
   const { profile } = useProfile()
   const { ref, slug } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const uploadButtonRef = useRef(null)
   const [feedback, setFeedback] = useState('')
@@ -68,7 +67,6 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
   const isLikelySupport = isLikelySupportRequest(feedback)
   const effectiveCategory = category ?? (isLikelySupport ? 'support' : null)
 
-  const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: submitFeedback } = useSendFeedbackMutation({
     onSuccess: () => {
       setIsFeedbackSent(true)
@@ -182,10 +180,10 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
       </div>
       <PopoverSeparator />
       <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
-        <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
+        <Button variant="default" size="tiny" onClick={onSwitchToIssueOptions}>
           Get help
         </Button>
-        <Button type="default" size="tiny" onClick={onClose}>
+        <Button variant="default" size="tiny" onClick={onClose}>
           Close
         </Button>
       </div>
@@ -239,7 +237,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
       <PopoverSeparator />
 
       <div className="px-4 pt-4 pb-4 flex flex-row items-center justify-between">
-        <Button type="default" size="tiny" onClick={onSwitchToIssueOptions}>
+        <Button variant="default" size="tiny" onClick={onSwitchToIssueOptions}>
           Get help instead
         </Button>
         <div className="flex items-center gap-2 flex-row">
@@ -270,7 +268,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="default"
+                  variant="default"
                   disabled={isSavingScreenshot}
                   loading={isSavingScreenshot}
                   className="w-7"
@@ -312,10 +310,7 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
             loading={isSending}
             onClick={() => {
               sendFeedback()
-              sendEvent({
-                action: 'send_feedback_button_clicked',
-                groups: { project: ref, organization: org?.slug },
-              })
+              track('send_feedback_button_clicked')
             }}
           >
             Send

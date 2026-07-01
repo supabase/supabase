@@ -2,7 +2,9 @@ import { useQuery } from '@tanstack/react-query'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import {
+  useCallback,
   useEffect,
+  useEffectEvent,
   useRef,
   useState,
   type Dispatch,
@@ -11,7 +13,7 @@ import {
 } from 'react'
 import { usePreviousDistinct } from 'react-use'
 import { Button, Switch } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { getApiEndpoint } from '@/components/interfaces/Integrations/DataApi/DataApi.utils'
@@ -23,7 +25,6 @@ import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useIsSchemaExposed } from '@/hooks/misc/useIsSchemaExposed'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import {
   checkDataApiPrivilegesNonEmpty,
   DEFAULT_DATA_API_PRIVILEGES,
@@ -157,24 +158,26 @@ const useTableApiAccessHandler = (
 
   const hasLoadedInitialData = useRef(false)
 
-  const resetState = useStaticEffectEvent(() => {
+  const resetState = useEffectEvent(() => {
     hasLoadedInitialData.current = !shouldReadExistingGrants
     setPrivileges(defaultPrivilegesForNewTable)
   })
   useEffect(() => {
     resetState()
-  }, [params.type, selectedSchema, permissionsTemplateSchema, permissionsTemplateTable, resetState])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [params.type, selectedSchema, permissionsTemplateSchema, permissionsTemplateTable])
 
-  const syncDefaultPrivileges = useStaticEffectEvent(() => {
+  const syncDefaultPrivileges = useEffectEvent(() => {
     if (!isNewTable) return
     if (!defaultPrivilegesQuery.isSuccess) return
     setPrivileges(defaultPrivilegesForNewTable)
   })
   useEffect(() => {
     syncDefaultPrivileges()
-  }, [defaultPrivilegesQuery.status, syncDefaultPrivileges])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [defaultPrivilegesQuery.status])
 
-  const syncApiPrivileges = useStaticEffectEvent(() => {
+  const syncApiPrivileges = useEffectEvent(() => {
     if (hasLoadedInitialData.current) return
     if (!apiAccessStatus.isSuccess) return
     if (!privilegesForTable) return
@@ -192,7 +195,8 @@ const useTableApiAccessHandler = (
   })
   useEffect(() => {
     syncApiPrivileges()
-  }, [apiAccessStatus.status, syncApiPrivileges])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [apiAccessStatus.status])
 
   const isPending =
     !enabled ||
@@ -246,17 +250,17 @@ export const useTableApiAccessHandlerWithHistory = (
   const privileges = innerResult.data?.schemaExposed ? innerResult.data.privileges : undefined
   const previous = usePreviousDistinct(privileges)
 
-  const clearAllPrivileges = useStaticEffectEvent(() => {
+  const clearAllPrivileges = useCallback(() => {
     if (!innerResult.isSuccess) return
     if (!innerResult.data.schemaExposed) return
     innerResult.data?.setPrivileges(EMPTY_DATA_API_PRIVILEGES)
-  })
+  }, [innerResult])
 
-  const restorePreviousPrivileges = useStaticEffectEvent(() => {
+  const restorePreviousPrivileges = useCallback(() => {
     if (!innerResult.isSuccess) return
     if (!innerResult.data.schemaExposed) return
     innerResult.data?.setPrivileges(previous ?? DEFAULT_DATA_API_PRIVILEGES)
-  })
+  }, [innerResult, previous])
 
   if (!innerResult.isSuccess) {
     return innerResult
@@ -316,7 +320,7 @@ export const ApiAccessToggle = ({
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h5>Data API Access</h5>
+            <h5>Data API access</h5>
             <p className="text-sm text-foreground-lighter">
               Allow this table to be queried via Supabase client libraries or the API directly
             </p>
@@ -328,7 +332,7 @@ export const ApiAccessToggle = ({
               disabled={isDisabled}
             />
           ) : (
-            <Button asChild type="default" icon={<ExternalLink />}>
+            <Button asChild variant="default" icon={<ExternalLink />}>
               <Link
                 target="_blank"
                 rel="noopener noreferrer"

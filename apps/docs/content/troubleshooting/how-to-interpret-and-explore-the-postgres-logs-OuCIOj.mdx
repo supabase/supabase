@@ -8,11 +8,11 @@ database_id = "8b000bb4-180b-4a6c-b280-ba02965060f6"
 
 > A complimentary guide was made for the [API logs](https://github.com/orgs/supabase/discussions/22849)
 
-# Debugging and monitoring Postgres with logs
+## Debugging and monitoring Postgres with logs
 
 Logs provide insights into Postgres operations. They help meet compliance requirements, detect suspicious activity, and troubleshoot problems.
 
-## Table of contents
+### Table of contents
 
 - Querying Logs
   - `postgres_logs` Table Structure
@@ -33,7 +33,7 @@ Logs provide insights into Postgres operations. They help meet compliance requir
 - Frequently Asked Questions
 - Other resources
 
-## Querying logs
+### Querying logs
 
 The most practical way to explore and filter logs is through the [Logs Explorer](/dashboard/project/_/logs/explorer).
 
@@ -47,7 +47,7 @@ Although there are many strategies to filter logs, such as `like` and `in` state
 
 The `postgres_logs` table contains Postgres events.
 
-### `postgres_logs` table structure
+#### `postgres_logs` table structure
 
 The table contains 3 fundamental columns:
 
@@ -73,9 +73,9 @@ cross join unnest(metadata) AS metadata
 cross join unnest(parsed) AS parsed;
 ```
 
-### Parsed metadata fields
+#### Parsed metadata fields
 
-#### Query information
+##### Query information
 
 | Field                 | Description                                                                                            | Example                         |
 | --------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------- |
@@ -88,7 +88,7 @@ cross join unnest(parsed) AS parsed;
 - Identifying slow queries
 - Identifying failing queries
 
-#### Error/Warning information
+##### Error/Warning information
 
 | Field                 | Description                                            | Example                                                                                             |
 | --------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------- |
@@ -103,7 +103,7 @@ cross join unnest(parsed) AS parsed;
 - Filter by error severity or SQL code
 - Get hints, details, and context about error events
 
-#### Connection/Identification information
+##### Connection/Identification information
 
 | Field                     | Description                                                                                                                                                    | Example              |
 | ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
@@ -124,9 +124,9 @@ cross join unnest(parsed) AS parsed;
 - Filter connections by sessions for debugging
 - identify extension events
 
-## Filtering logs
+### Filtering logs
 
-### Excluding routine events
+#### Excluding routine events
 
 Most Postgres logs during normal periods are routine events, such as connection authorizations and checkpoints. To see the default types of events that are logged, you can check this [guide](https://gist.github.com/TheOtherBrian1/991d32c2b00dbc75d29b80d4cdf41aa7).
 
@@ -136,10 +136,10 @@ When exploring the logs for atypical behavior, it's often strategic to filter ou
 ...query
 where
   -- Excluding routine events related to cron, PgBouncer, checkpoints, and successful connections
-  not regexp_contains(event_message, '^cron|PgBouncer|checkpoint|connection received|authenticated|authorized';
+  not regexp_contains(event_message, '^cron|PgBouncer|checkpoint|connection received|authenticated|authorized');
 ```
 
-### By timeframe
+#### By timeframe
 
 To investigate issues around a specific period:
 
@@ -150,7 +150,7 @@ where
   timestamp between '2024-05-06 04:44:00' and '2024-05-06 04:45:00'
 ```
 
-### By error severity
+#### By error severity
 
 This filter finds all errors, fatals, and panics:
 
@@ -169,7 +169,7 @@ where
 
 Failure events include an sql_state_code that can be referenced in the [Postgres Docs](https://www.postgresql.org/docs/current/errcodes-appendix.html)
 
-### By query
+#### By query
 
 > NOTE: Unless pg_audit is configured, only failed queries are logged
 
@@ -187,11 +187,11 @@ Queries can use complex syntax, so it is often helpful to isolate by referenced 
 - `^`: look for values at start of string
 - `|`: or operator
 
-## By APIs/roles
+### By APIs/roles
 
 All failed queries, including those from PostgREST, Auth, and external libraries (e.g., Prisma) are logged with helpful error messages for debugging.
 
-#### Server/Role mapping
+##### Server/Role mapping
 
 API servers have assigned database roles for connecting to the database:
 
@@ -217,7 +217,7 @@ where
 ...
 ```
 
-## By Dashboard queries
+### By Dashboard queries
 
 Queries from the Supabase Dashboard are executed under the `postgres` role and include the comment `-- source: dashboard`. To isolate or exclude Dashboard requests during debugging, you can filter by this comment.
 
@@ -228,7 +228,7 @@ where
   regexp_contains(parsed.query, '-- source: dashboard')
 ```
 
-## Full example for finding errors
+### Full example for finding errors
 
 ```sql
 select
@@ -255,15 +255,15 @@ order by timestamp desc
 limit 100;
 ```
 
-# Logging for compliance and security
+## Logging for compliance and security
 
-### Customized object and role activity logging
+#### Customized object and role activity logging
 
-> ⚠️ NOTE: This is specifically designated for those using the `postgres` role or [custom roles](/docs/guides/database/postgres/roles) to interact with their database. Those utilizing the Database REST API should reference the [Database API Logging Guide](https://github.com/orgs/supabase/discussions/22849) instead.
+> ⚠️ NOTE: This is specifically designated for those using the `postgres` role or [custom roles](/docs/guides/database/postgres/roles) to interact with their database. Those using the Database REST API should reference the [Database API Logging Guide](https://github.com/orgs/supabase/discussions/22849) instead.
 
 When recording what is accessed and by whom, logging based on database roles and objects is the most reliable way to ensure a proper trail of activity.
 
-You can use the [pg_audit](/docs/guides/database/extensions/pgaudit) extension to selectively log relevant queries (not just errors) by certain roles, against specific database objects.
+You can use the [pg_audit](/docs/guides/database/extensions/pgaudit) extension to selectively log relevant queries, not only errors, by certain roles, against specific database objects.
 
 You should take care when using the extension to not log all database events, but only what is absolutely necessary. Over-logging can strain the database and create log noise that makes it difficult to filter for relevant events.
 
@@ -279,7 +279,7 @@ where
  parsed.user_name = 'API_role'
 ```
 
-### Filtering by IP
+#### Filtering by IP
 
 > If you are connecting from a known, limited range of IP addresses, you should enable [network restrictions](/docs/guides/platform/network-restrictions).
 
@@ -306,7 +306,7 @@ order by ip_count desc
 limit 100;
 ```
 
-# Reviewing log settings
+## Reviewing log settings
 
 The `pg_settings` table describes system and logging configurations.
 
@@ -337,11 +337,11 @@ where
   and name like '%log%';
 ```
 
-## Changing log settings
+### Changing log settings
 
 > WARNING: lenient settings can lead to over-logging, impacting database performance while creating noise in the logs.
 
-#### Severity levels
+##### Severity levels
 
 The `log_min_messages` variable determines what is severe enough to log. Here are the severity thresholds from the [Postgres docs](https://www.postgresql.org/docs/current/runtime-config-logging.html).
 
@@ -365,7 +365,7 @@ alter role postgres set log_min_messages = '<NEW VALUE>';
 show log_min_messages; -- default WARNING
 ```
 
-#### Configuring queries logged
+##### Configuring queries logged
 
 By default, only failed queries are logged. The [PGAudit extension](/docs/guides/database/extensions/pgaudit) extends Postgres's built-in logging abilities. It can be used to selectively track all queries in your database by:
 
@@ -374,29 +374,29 @@ By default, only failed queries are logged. The [PGAudit extension](/docs/guides
 - database object
 - entire database
 
-#### Logging within database functions
+##### Logging within database functions
 
 To track or debug functions, logging can be configured by following the [function debugging guide](/docs/guides/database/functions#general-logging)
 
-# Frequently Asked Questions
+## Frequently Asked Questions
 
-#### How to join different log tables
+##### How to join different log tables
 
 No, log tables are independent from each other and do not share any primary/foreign key relations for joining.
 
-#### How to download logs
+##### How to download logs
 
 At the moment, the way to download logs is through the Log Dashboard as a CSV
 
-#### What is logged?
+##### What is logged?
 
 To see the default types of events that are logged, you can check this [guide](https://gist.github.com/TheOtherBrian1/991d32c2b00dbc75d29b80d4cdf41aa7).
 
-### Other resources:
+#### Other resources:
 
 - [Regex for filtering logs](https://github.com/orgs/supabase/discussions/22640)
 - [Debugging with the DB API logs](https://github.com/orgs/supabase/discussions/22849)
 - [Debugging Database Functions](/docs/guides/database/functions#debugging-functions)
 - [pg_audit](/docs/guides/database/extensions/pgaudit)
-- [Supabase Logging](/docs/guides/platform/logs)
+- [Supabase Logging](/docs/guides/telemetry/logs)
 - [Self-Hosting Logs](/docs/reference/self-hosting-analytics/introduction)

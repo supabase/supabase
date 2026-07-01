@@ -1,6 +1,31 @@
 module.exports = [
   {
     permanent: true,
+    source: '/blog/pricing',
+    destination: '/pricing',
+  },
+  {
+    permanent: true,
+    source: '/blog/introducing-supabase-etl',
+    destination: '/blog/introducing-supabase-pipelines',
+  },
+  {
+    permanent: true,
+    source: '/blog/supabase-etl',
+    destination: '/blog/introducing-supabase-pipelines',
+  },
+  {
+    permanent: true,
+    source: '/blog/realtime-or-etl-how-to-choose-the-right-tool',
+    destination: '/blog/realtime-or-pipelines-how-to-choose-the-right-tool',
+  },
+  {
+    permanent: true,
+    source: '/features/supabase-etl',
+    destination: '/features/supabase-pipelines',
+  },
+  {
+    permanent: true,
     source: '/ui/docs/ai-editors-rules/prompts',
     destination: '/ui/docs/ai-editors-rules/skills',
   },
@@ -2699,27 +2724,42 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/database/replication/etl-destinations',
-    destination: '/docs/guides/database/replication/external-replication-setup',
+    destination: '/docs/guides/database/replication/pipelines',
   },
   {
     permanent: true,
     source: '/docs/guides/storage/analytics/replication',
-    destination: '/docs/guides/database/replication/external-replication-setup',
+    destination: '/docs/guides/database/replication/pipelines',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/external-replication-setup',
+    destination: '/docs/guides/database/replication/pipelines',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/external-replication-monitoring',
+    destination: '/docs/guides/database/replication/pipelines-monitoring',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/external-replication-faq',
+    destination: '/docs/guides/database/replication/pipelines-faq',
   },
   {
     permanent: true,
     source: '/docs/guides/database/replication/replication-setup',
-    destination: '/docs/guides/database/replication/external-replication-setup',
+    destination: '/docs/guides/database/replication/pipelines',
   },
   {
     permanent: true,
     source: '/docs/guides/database/replication/replication-monitoring',
-    destination: '/docs/guides/database/replication/external-replication-monitoring',
+    destination: '/docs/guides/database/replication/pipelines-monitoring',
   },
   {
     permanent: true,
     source: '/docs/guides/database/replication/replication-faq',
-    destination: '/docs/guides/database/replication/external-replication-faq',
+    destination: '/docs/guides/database/replication/pipelines-faq',
   },
   {
     permanent: true,
@@ -3202,16 +3242,6 @@ module.exports = [
     ],
     destination: '/dashboard/redeem?code=:code',
     permanent: false,
-  },
-  {
-    permanent: true,
-    source: '/docs/llms.txt',
-    destination: '/llms.txt',
-  },
-  {
-    permanent: true,
-    source: '/docs/llms-full.txt',
-    destination: '/llms-full.txt',
   },
   // Legacy product .txt URLs → new .md routes
   { permanent: true, source: '/llms/homepage.txt', destination: '/homepage.md' },

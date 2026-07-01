@@ -19,7 +19,10 @@ import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/L
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
+import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 // TODO - format Logs as JSON, as markdown, and as prompt
@@ -42,10 +45,20 @@ export const RowSelectionHeader = () => {
       format === 'json' ? formatLogsAsJson(selectedRows) : formatLogsAsMarkdown(selectedRows)
     copyToClipboard(text, () => {
       toast.success(
-        `Copied ${selectedRows.length} log${selectedRows.length !== 1 ? 's' : ''} as ${format.toUpperCase()}`
+        `Copied ${selectedRows.length} log${selectedRows.length !== 1 ? 's' : ''} as ${format === 'json' ? format.toUpperCase() : format}`
       )
     })
   }
+
+  const hasSelection = selectedRows.length > 0
+  useShortcut(SHORTCUT_IDS.RESULTS_COPY_JSON, () => onCopy('json'), {
+    enabled: hasSelection,
+    registerInCommandMenu: true,
+  })
+  useShortcut(SHORTCUT_IDS.RESULTS_COPY_MARKDOWN, () => onCopy('markdown'), {
+    enabled: hasSelection,
+    registerInCommandMenu: true,
+  })
 
   return (
     <div className="relative">
@@ -72,7 +85,7 @@ export const RowSelectionHeader = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <ButtonTooltip
-                    type="default"
+                    variant="default"
                     size="tiny"
                     icon={<Copy size={12} />}
                     className="w-7"
@@ -83,10 +96,18 @@ export const RowSelectionHeader = () => {
                   <DropdownMenuItem onClick={() => onCopy('json')} className="gap-2 text-xs">
                     <Copy size={13} />
                     Copy as JSON
+                    <ShortcutBadge
+                      shortcutId={SHORTCUT_IDS.RESULTS_COPY_JSON}
+                      className="ml-auto"
+                    />
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => onCopy('markdown')} className="gap-2 text-xs">
                     <Copy size={13} />
                     Copy as Markdown
+                    <ShortcutBadge
+                      shortcutId={SHORTCUT_IDS.RESULTS_COPY_MARKDOWN}
+                      className="ml-auto"
+                    />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -99,7 +120,7 @@ export const RowSelectionHeader = () => {
               />
 
               <ButtonTooltip
-                type="text"
+                variant="text"
                 icon={<X />}
                 className="px-1"
                 onClick={() => table.resetRowSelection()}

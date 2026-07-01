@@ -4,22 +4,6 @@ import { cn } from 'ui'
 import { FacetMetadataSchema } from './UnifiedLogs.schema'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 
-export const logEventBus = {
-  listeners: new Map<string, Set<(rowId: string) => void>>(),
-
-  on(event: 'selectTraceTab', callback: (rowId: string) => void) {
-    if (!this.listeners.has(event)) {
-      this.listeners.set(event, new Set())
-    }
-    this.listeners.get(event)?.add(callback)
-    return () => this.listeners.get(event)?.delete(callback)
-  },
-
-  emit(event: 'selectTraceTab', rowId: string) {
-    this.listeners.get(event)?.forEach((callback) => callback(rowId))
-  },
-}
-
 export const getFacetedUniqueValues = <TData>(facets?: Record<string, FacetMetadataSchema>) => {
   return (_table: TTable<TData>, columnId: string) => {
     return new Map(facets?.[columnId]?.rows?.map(({ value, total }) => [value, total]) || [])
@@ -111,6 +95,9 @@ export function formatServiceTypeForDisplay(serviceType: string): string {
     postgres: 'Postgres',
     auth: 'Auth',
     storage: 'Storage',
+    realtime: 'Realtime',
+    supavisor: 'Supavisor',
+    pgbouncer: 'PgBouncer',
   }
 
   return specialCases[serviceType.toLowerCase()] || serviceType
@@ -136,10 +123,8 @@ export function parseAuthLogEventMessage(value: string | undefined): string | un
 
       const msg = parsed.msg
       if (typeof msg === 'string' && msg.trim()) {
-        const authEvent =
-          'action' in parsed || 'auth_event_action' in parsed
-            ? (parsed.action || parsed.auth_event.action).replaceAll('_', ' ')
-            : undefined
+        const action = parsed.action ?? parsed.auth_event?.action
+        const authEvent = typeof action === 'string' ? action.replaceAll('_', ' ') : undefined
         return `${authEvent ? `${authEvent}: ` : ''}${msg}`
       }
     }

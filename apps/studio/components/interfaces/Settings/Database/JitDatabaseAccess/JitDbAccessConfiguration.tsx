@@ -23,15 +23,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 import {
   PageSection,
   PageSectionContent,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-} from 'ui-patterns'
-import { Admonition } from 'ui-patterns/admonition'
-import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
+} from 'ui-patterns/PageSection'
 
 import type { JitUserRule, SheetMode } from './JitDbAccess.types'
 import {
@@ -43,7 +43,7 @@ import { JitDbAccessDeleteDialog } from './JitDbAccessDeleteDialog'
 import { JitDbAccessRuleSheet } from './JitDbAccessRuleSheet'
 import { JitDbAccessRulesTable } from './JitDbAccessRulesTable'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
@@ -374,11 +374,11 @@ export const JitDbAccessConfiguration = () => {
               }
               actions={
                 unavailableReason === 'postgres_upgrade_required' && ref ? (
-                  <Button type="default" asChild>
+                  <Button variant="default" asChild>
                     <Link href={`/project/${ref}/settings/infrastructure`}>Upgrade Postgres</Link>
                   </Button>
                 ) : (
-                  <Button type="default" asChild>
+                  <Button variant="default" asChild>
                     <SupportLink
                       queryParams={{
                         category: SupportCategories.PROBLEM,

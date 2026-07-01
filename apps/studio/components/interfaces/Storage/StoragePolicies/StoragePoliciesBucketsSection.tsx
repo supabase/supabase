@@ -1,8 +1,14 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { ChevronUp, Search, X } from 'lucide-react'
-import { forwardRef, useEffect, useState, type HTMLAttributes, type ReactNode } from 'react'
+import {
+  forwardRef,
+  useEffect,
+  useEffectEvent,
+  useState,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react'
 import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageSection,
@@ -12,14 +18,14 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
-import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { useMainScrollContainer } from '@/components/layouts/MainScrollContainerContext'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { type Bucket } from '@/data/storage/buckets-query'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
 export type SelectBucketPolicyForAction = {
   addPolicy: (bucketName?: string, table?: string) => void
@@ -97,7 +103,7 @@ export const BucketsPolicies = ({
                     search ? (
                       <Button
                         size="tiny"
-                        type="text"
+                        variant="text"
                         className="p-0 h-5 w-5"
                         icon={<X />}
                         onClick={() => setSearch('')}
@@ -151,12 +157,15 @@ const BucketsPoliciesVirtualizedList = ({
   const virtualItems = virtualizer.getVirtualItems()
   const lastItem = virtualItems[virtualItems.length - 1]
 
-  const fetchNext = useStaticEffectEvent(() => {
+  const fetchNext = useEffectEvent(() => {
     if (lastItem && lastItem.index >= items.length - 1 && hasNextPage && !isFetchingNextPage) {
       fetchNextPage()
     }
   })
-  useEffect(fetchNext, [lastItem, fetchNext])
+  useEffect(() => {
+    fetchNext()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [lastItem])
 
   return (
     <div

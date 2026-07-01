@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { OrganizationInviteByToken } from '@/data/organization-members/organization-invitation-token-query'
 import { useSignOut } from '@/lib/auth'
@@ -64,7 +64,7 @@ export const OrganizationInviteError = ({
             )
           }
         />
-        <Button type="default" block onClick={handleSignOut}>
+        <Button variant="default" block onClick={handleSignOut}>
           Sign out
         </Button>
       </div>

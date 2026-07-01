@@ -124,7 +124,7 @@ const renderTemplateEditor = ({
   })
   useAsyncCheckPermissionsMock.mockReturnValue({ can: canUpdateConfig })
   useAuthConfigUpdateMutationMock.mockReturnValue({ mutate: updateAuthConfigMock })
-  useAuthTemplateResetMutationMock.mockReturnValue({ mutate: resetTemplateMock })
+  useAuthTemplateResetMutationMock.mockReturnValue({ mutate: resetTemplateMock, isPending: false })
 
   return render(<TemplateEditor template={confirmationTemplate} />)
 }
@@ -199,10 +199,7 @@ describe('TemplateEditor reset to default', () => {
 
     await waitFor(() =>
       expect(resetTemplateMock).toHaveBeenCalledWith(
-        {
-          projectRef: 'project-ref',
-          template: 'confirmation',
-        },
+        { projectRef: 'project-ref', template: 'confirmation' },
         expect.any(Object)
       )
     )

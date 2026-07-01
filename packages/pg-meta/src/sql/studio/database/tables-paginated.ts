@@ -21,11 +21,13 @@ export const getTablesPaginatedSql = ({
   includeColumns = false,
   limit,
   afterOid,
+  nameFilter,
 }: {
   schema?: string
   includeColumns?: boolean
   limit: number
   afterOid: number
+  nameFilter?: string
 }): SafeSqlFragment => {
   const filter = filterByList(
     schema ? [schema] : undefined,
@@ -33,6 +35,16 @@ export const getTablesPaginatedSql = ({
     schema ? undefined : DEFAULT_SYSTEM_SCHEMAS
   )
   const schemaFilter = filter ? safeSql`and nc.nspname ${filter}` : safeSql``
+  const nameFilterClause =
+    nameFilter && nameFilter.length > 0
+      ? schema
+        ? safeSql`and c.relname ilike ${literal(`%${escapeIlikeLiteral(nameFilter)}%`)}`
+        : safeSql`and (
+            c.relname ilike ${literal(`%${escapeIlikeLiteral(nameFilter)}%`)}
+            or nc.nspname ilike ${literal(`%${escapeIlikeLiteral(nameFilter)}%`)}
+            or (nc.nspname || '.' || c.relname) ilike ${literal(`%${escapeIlikeLiteral(nameFilter)}%`)}
+          )`
+      : safeSql``
 
   const columnsCte = includeColumns
     ? safeSql`, columns as (${getColumnsSql({
@@ -70,6 +82,7 @@ export const getTablesPaginatedSql = ({
           or has_any_column_privilege(c.oid, 'SELECT, INSERT, UPDATE, REFERENCES')
         )
         ${schemaFilter}
+        ${nameFilterClause}
       order by c.oid
       limit ${literal(limit)}
     ),
@@ -196,3 +209,8 @@ export const getTablesPaginatedSql = ({
     order by tables.id
   `
 }
+
+// Escape LIKE/ILIKE wildcards so user input is matched literally. ILIKE's
+// default escape character is `\`, so we escape `\`, `%`, and `_` and let the
+// pattern carry its own surrounding `%`s as wildcards.
+const escapeIlikeLiteral = (value: string) => value.replace(/([\\%_])/g, '\\$1')

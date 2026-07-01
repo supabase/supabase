@@ -37,6 +37,7 @@ export type FeatureKey =
   | 'database.pausing'
   | 'database.branching'
   | 'database.egress'
+  | 'database.replication'
   | 'auth.totalUsers'
   | 'auth.maus'
   | 'auth.userDataOwnership'
@@ -190,6 +191,25 @@ export const pricing: Pricing = {
           free: '5 GB included',
           pro: ['250 GB included', 'then $0.09 per GB'],
           team: ['250 GB included', 'then $0.09 per GB'],
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
+      {
+        key: 'database.replication',
+        title: 'Pipelines',
+        plans: {
+          free: false,
+          pro: [
+            '$39 per pipeline per month',
+            '$3.00 per GB replicated data',
+            '$0.60 per GB backfill data',
+          ],
+          team: [
+            '$39 per pipeline per month',
+            '$3.00 per GB replicated data',
+            '$0.60 per GB backfill data',
+          ],
           enterprise: 'Custom',
         },
         usage_based: true,

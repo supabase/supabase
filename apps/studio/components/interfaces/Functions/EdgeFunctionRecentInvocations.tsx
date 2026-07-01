@@ -3,8 +3,9 @@ import { Clock, ExternalLink, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
-import { Admonition, TimestampInfo } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { parseEdgeFunctionEventMessage } from './EdgeFunctionRecentInvocations.utils'
 import { LOGS_TABLES } from '@/components/interfaces/Settings/Logs/Logs.constants'
@@ -39,7 +40,7 @@ export const EdgeFunctionRecentInvocations = ({
           </p>
         </div>
         <Button
-          type="default"
+          variant="default"
           loading={isLoading}
           disabled={isLoading}
           icon={<RefreshCw size={14} />}

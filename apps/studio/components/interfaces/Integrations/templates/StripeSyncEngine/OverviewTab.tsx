@@ -17,7 +17,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -303,7 +303,7 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
                   />
 
                   <div className="flex items-center gap-x-2">
-                    <Button asChild type="default" icon={<ExternalLink />}>
+                    <Button asChild variant="default" icon={<ExternalLink />}>
                       <Link
                         target="_blank"
                         rel="noopener noreferrer"
@@ -312,7 +312,7 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
                         Get Stripe API key
                       </Link>
                     </Button>
-                    <Button asChild type="default" icon={<ExternalLink />}>
+                    <Button asChild variant="default" icon={<ExternalLink />}>
                       <Link
                         target="_blank"
                         rel="noopener noreferrer"
@@ -335,7 +335,7 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
 
               <SheetFooter>
                 <Button
-                  type="default"
+                  variant="default"
                   disabled={isInstallRequested}
                   onClick={() => handleCloseInstallSheet(false)}
                 >
@@ -343,8 +343,8 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
                 </Button>
                 <Button
                   form={formId}
-                  htmlType="submit"
-                  type="primary"
+                  type="submit"
+                  variant="primary"
                   loading={isInstallRequested}
                   disabled={!form.formState.isValid || isInstallRequested}
                 >

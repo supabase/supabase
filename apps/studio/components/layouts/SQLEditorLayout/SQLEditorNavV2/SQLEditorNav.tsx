@@ -5,14 +5,14 @@ import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { TreeView } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   InnerSideBarEmptyPanel,
   InnerSideMenuCollapsible,
   InnerSideMenuCollapsibleContent,
   InnerSideMenuCollapsibleTrigger,
   InnerSideMenuSeparator,
-} from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+} from 'ui-patterns/InnerSideMenu'
 
 import { DeleteSnippetsModal } from './DeleteSnippetsModal'
 import { ReferenceSnippetsSection } from './ReferenceSnippetsSection'
@@ -34,11 +34,12 @@ import { useContentCountQuery } from '@/data/content/content-count-query'
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
 import { useSQLSnippetFoldersDeleteMutation } from '@/data/content/sql-folders-delete-mutation'
 import { Snippet, SnippetFolder, useSQLSnippetFoldersQuery } from '@/data/content/sql-folders-query'
-import { useSqlSnippetsQuery, type SqlSnippet } from '@/data/content/sql-snippets-query'
+import { useSqlSnippetsQuery } from '@/data/content/sql-snippets-query'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
 import { useSnippetFolders, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { isNewFolder } from '@/state/sql-editor/sql-editor-lifecycle'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 interface SQLEditorNavProps {
@@ -176,11 +177,6 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     [privateSnippetsTreeState]
   )
 
-  const validExpandedFolderIds = useMemo(
-    () => expandedFolderIds.filter((id) => privateSnippetsTreeNodeIds.has(id)),
-    [expandedFolderIds, privateSnippetsTreeNodeIds]
-  )
-
   const privateSnippetsLastItemIds = useMemo(
     () => getLastItemIds(privateSnippetsTreeState),
     [privateSnippetsTreeState]
@@ -209,7 +205,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     let snippets = favoriteSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? []
 
     if (snippet && snippet.favorite && !snippets.find((x) => x.id === snippet.id)) {
-      snippets.push(snippet as SqlSnippet)
+      snippets.push(snippet)
     }
 
     return (
@@ -260,7 +256,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
     let snippets = sharedSqlSnippetsData?.pages.flatMap((page) => page.contents ?? []) ?? []
 
     if (snippet && snippet.visibility === 'project' && !snippets.find((x) => x.id === snippet.id)) {
-      snippets.push(snippet as SqlSnippet)
+      snippets.push(snippet)
     }
 
     return (
@@ -407,7 +403,11 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
       } else if (snippet.visibility === 'user') {
         setSectionVisibility({ ...sectionVisibility, private: true })
       }
-      if (snippet.folder_id && !expandedFolderIds.includes(snippet.folder_id)) {
+      if (
+        snippet.folder_id &&
+        !expandedFolderIds.includes(snippet.folder_id) &&
+        privateSnippetsTreeNodeIds.has(snippet.folder_id)
+      ) {
         setExpandedFolderIds([...expandedFolderIds, snippet.folder_id])
       }
     }
@@ -421,7 +421,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
   useEffect(() => {
     if (projectRef && privateSnippetsPages?.pages) {
       privateSnippetsPages.pages.forEach((page) => {
-        page.contents?.forEach((snippet: Snippet) => {
+        page.contents?.forEach((snippet) => {
           snapV2.addSnippet({ projectRef, snippet })
         })
         page.folders?.forEach((folder) => snapV2.addFolder({ projectRef, folder }))
@@ -654,7 +654,7 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                   setExpandedFolderIds(expandedFolderIds.filter((x) => x !== folderId))
                 }
               }}
-              expandedIds={validExpandedFolderIds}
+              expandedIds={expandedFolderIds}
               nodeRenderer={({ element, ...props }) => {
                 const isOpened = Object.values(tabs.tabsMap).some(
                   (tab) => tab.metadata?.sqlId === element.metadata?.id
@@ -720,10 +720,11 @@ export const SQLEditorNav = ({ sort = 'inserted_at' }: SQLEditorNavProps) => {
                     onSelectShare={() => setSelectedSnippetToShare(element.metadata as Snippet)}
                     onEditSave={(name: string) => {
                       // [Joshen] Inline editing only for folders for now
-                      if (name.length === 0 && element.id === 'new-folder') {
-                        snapV2.removeFolder(element.id as string)
+                      const folderId = element.id as string
+                      if (name.length === 0 && isNewFolder(snapV2.folders[folderId]?.status)) {
+                        snapV2.removeFolder(folderId)
                       } else if (name.length > 0) {
-                        snapV2.saveFolder({ id: element.id as string, name })
+                        snapV2.saveFolder({ id: folderId, name })
                       }
                     }}
                     hasNextPage={hasNextPage}

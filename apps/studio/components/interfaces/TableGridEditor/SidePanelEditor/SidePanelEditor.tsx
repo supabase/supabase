@@ -35,11 +35,12 @@ import {
 import { TableEditor } from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
 import { useTableRowOperations } from '@/components/grid/hooks/useTableRowOperations'
+import { getStableRowIdentifiers } from '@/components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import {
   acceptGeneratedPolicy,
   type GeneratedPolicy,
-} from '@/components/interfaces/Auth/Policies/Policies.utils'
+} from '@/components/interfaces/Database/Policies/Policies.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { databasePoliciesKeys } from '@/data/database-policies/keys'
 import { useDatabasePublicationCreateMutation } from '@/data/database-publications/database-publications-create-mutation'
@@ -59,7 +60,6 @@ import { tableRowKeys } from '@/data/table-rows/keys'
 import { tableKeys } from '@/data/tables/keys'
 import { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import { getTables } from '@/data/tables/tables-query'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { useUrlState } from '@/hooks/ui/useUrlState'
@@ -196,7 +196,6 @@ export const SidePanelEditor = ({
   const track = useTrack()
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { updateRow, addRow, isEditPending } = useTableRowOperations()
 
@@ -320,7 +319,7 @@ export const SidePanelEditor = ({
       const { row, column } = selectedValueForJsonEdit
       payload = { [column]: value === null ? null : JSON.parse(value as any) }
       selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
-      configuration = { identifiers, rowIdx: row.idx }
+      configuration = { identifiers: getStableRowIdentifiers(row!, identifiers), rowIdx: row.idx }
     } else if (snap.sidePanel?.type === 'cell') {
       const column = snap.sidePanel.value?.column
       const row = snap.sidePanel.value?.row
@@ -328,7 +327,7 @@ export const SidePanelEditor = ({
       if (!column || !row) return
       payload = { [column]: value === null ? null : value }
       selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
-      configuration = { identifiers, rowIdx: row.idx }
+      configuration = { identifiers: getStableRowIdentifiers(row!, identifiers), rowIdx: row.idx }
     }
 
     if (payload !== undefined && configuration !== undefined) {
@@ -356,7 +355,10 @@ export const SidePanelEditor = ({
       })
 
       const isNewRecord = false
-      const configuration = { identifiers, rowIdx: row.idx }
+      const configuration = {
+        identifiers: getStableRowIdentifiers(row, identifiers),
+        rowIdx: row.idx,
+      }
 
       await saveRow(value, isNewRecord, configuration, (error) => {
         if (error) {
@@ -439,7 +441,10 @@ export const SidePanelEditor = ({
         }),
         queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
         queryClient.invalidateQueries({
-          queryKey: tableKeys.list(project?.ref, selectedTable?.schema, includeColumns),
+          queryKey: tableKeys.list(project?.ref, selectedTable?.schema, { includeColumns }),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: tableKeys.infiniteListPrefix(project?.ref, selectedTable?.schema),
         }),
       ])
 
@@ -507,7 +512,7 @@ export const SidePanelEditor = ({
         // Switch it to individual tables via an array of strings
         // Refer to PublicationStore for more information about this
         const publicTables = await queryClient.fetchQuery({
-          queryKey: tableKeys.list(project.ref, 'public', includeColumns),
+          queryKey: tableKeys.list(project.ref, 'public', { includeColumns }),
           queryFn: ({ signal }) =>
             getTables(
               {
@@ -645,10 +650,10 @@ export const SidePanelEditor = ({
                 .map(([, data]) => data?.pages?.[0]?.data?.count)
                 .find((count) => typeof count === 'number') ??
               queryClient.getQueryData<unknown[]>(
-                tableKeys.list(project?.ref, payload.schema, true)
+                tableKeys.list(project?.ref, payload.schema, { includeColumns: true })
               )?.length ??
               queryClient.getQueryData<unknown[]>(
-                tableKeys.list(project?.ref, payload.schema, false)
+                tableKeys.list(project?.ref, payload.schema, { includeColumns: false })
               )?.length
 
             createTableSpan.setAttributes({
@@ -684,9 +689,9 @@ export const SidePanelEditor = ({
                 foreignKeyRelations,
                 isRLSEnabled,
                 importContent,
-                organizationSlug: org?.slug,
                 generatedPolicies: acceptedPolicies,
                 onCreatePoliciesSuccess: () => track('rls_generated_policies_created'),
+                track,
               })
 
               createTableSpan.setAttribute('table.created', 1)
@@ -712,7 +717,10 @@ export const SidePanelEditor = ({
                 async () => {
                   await Promise.all([
                     queryClient.invalidateQueries({
-                      queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
+                      queryKey: tableKeys.list(project?.ref, table.schema, { includeColumns }),
+                    }),
+                    queryClient.invalidateQueries({
+                      queryKey: tableKeys.infiniteListPrefix(project?.ref, table.schema),
                     }),
                     queryClient.invalidateQueries({
                       queryKey: entityTypeKeys.list(project?.ref),
@@ -779,7 +787,10 @@ export const SidePanelEditor = ({
 
         await Promise.all([
           queryClient.invalidateQueries({
-            queryKey: tableKeys.list(project?.ref, table.schema, includeColumns),
+            queryKey: tableKeys.list(project?.ref, table.schema, { includeColumns }),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: tableKeys.infiniteListPrefix(project?.ref, table.schema),
           }),
           queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(project?.ref) }),
           queryClient.invalidateQueries({
@@ -806,7 +817,7 @@ export const SidePanelEditor = ({
           foreignKeyRelations,
           existingForeignKeyRelations,
           primaryKey,
-          organizationSlug: org?.slug,
+          track,
         })
 
         if (table === undefined) {

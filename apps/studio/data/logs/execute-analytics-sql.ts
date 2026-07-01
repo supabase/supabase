@@ -29,6 +29,11 @@ export interface ExecuteAnalyticsSqlVariables {
   iso_timestamp_end: string
   /** Defaults to 'post'. Use 'get' to preserve wire behavior when migrating legacy GET callers. */
   method?: 'get' | 'post'
+  /**
+   * Optional query-string key for network-tool identification.
+   * Not part of the OpenAPI schema; accepted by the server and visible in DevTools.
+   */
+  key?: string
   signal?: AbortSignal
   headers?: HeadersInit
 }
@@ -40,6 +45,7 @@ export async function executeAnalyticsSql({
   iso_timestamp_start,
   iso_timestamp_end,
   method = 'post',
+  key,
   signal,
   headers: headersInit,
 }: ExecuteAnalyticsSqlVariables) {
@@ -49,7 +55,7 @@ export async function executeAnalyticsSql({
     const { data, error } = await get(endpoint, {
       params: {
         path: { ref: projectRef },
-        query: { sql, iso_timestamp_start, iso_timestamp_end },
+        query: { sql, iso_timestamp_start, iso_timestamp_end, ...(key ? { key } : {}) },
       },
       signal,
       headers,
@@ -59,7 +65,8 @@ export async function executeAnalyticsSql({
   }
 
   const { data, error } = await post(endpoint, {
-    params: { path: { ref: projectRef } },
+    // @ts-ignore key is not in the OpenAPI schema; included only for network-tool identification
+    params: { path: { ref: projectRef }, ...(key ? { query: { key } } : {}) },
     body: { sql, iso_timestamp_start, iso_timestamp_end },
     signal,
     headers,

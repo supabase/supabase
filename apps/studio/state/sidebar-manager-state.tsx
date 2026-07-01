@@ -1,7 +1,7 @@
 import { ReactNode, useEffect } from 'react'
 import { proxy, snapshot, useSnapshot } from 'valtio'
 
-import useLatest from '@/hooks/misc/useLatest'
+import { useLatest } from '@/hooks/misc/useLatest'
 
 type SidebarHandlers = {
   onOpen?: () => void

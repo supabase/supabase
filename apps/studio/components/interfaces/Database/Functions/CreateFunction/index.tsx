@@ -40,11 +40,12 @@ import { CreateFunctionHeader } from './CreateFunctionHeader'
 import { FunctionEditor } from './FunctionEditor'
 import { POSTGRES_DATA_TYPES } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useDatabaseFunctionCreateMutation } from '@/data/database-functions/database-functions-create-mutation'
 import type { SavedDatabaseFunction } from '@/data/database-functions/database-functions-query'
 import { useDatabaseFunctionUpdateMutation } from '@/data/database-functions/database-functions-update-mutation'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
@@ -60,6 +61,7 @@ interface CreateFunctionProps {
 
 const FormSchema = z.object({
   name: z.string().trim().min(1),
+  type: z.enum(['function', 'procedure']),
   schema: z.string().trim().min(1),
   args: z.array(z.object({ name: z.string().trim().min(1), type: z.string().trim() })),
   behavior: z.enum(['IMMUTABLE', 'STABLE', 'VOLATILE']),
@@ -78,7 +80,9 @@ export const CreateFunction = ({
   isDuplicating = false,
   onClose,
 }: CreateFunctionProps) => {
+  const { selectedSchema } = useQuerySchemaState()
   const { data: project } = useSelectedProjectQuery()
+
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
   const [focusedEditor, setFocusedEditor] = useState(false)
 
@@ -87,7 +91,7 @@ export const CreateFunction = ({
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   })
-  const language = form.watch('language')
+  const { type, language } = form.watch()
 
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
@@ -147,10 +151,12 @@ export const CreateFunction = ({
   useEffect(() => {
     if (visible) {
       setFocusedEditor(false)
+      const type = func?.type ?? 'function'
       form.reset({
+        type,
         name: func?.name ?? '',
-        schema: func?.schema ?? 'public',
-        args: convertArgumentTypes(func?.argument_types || '').value,
+        schema: func?.schema ?? selectedSchema,
+        args: convertArgumentTypes({ type, value: func?.argument_types || '' }).value,
         behavior: func?.behavior ?? 'VOLATILE',
         definition: func?.definition ?? '',
         language: func?.language ?? 'plpgsql',
@@ -167,20 +173,46 @@ export const CreateFunction = ({
   return (
     <Sheet open={visible} onOpenChange={handleOpenChange}>
       <SheetContent
-        showClose={false}
-        size={'default'}
-        className={'p-0 flex flex-row gap-0 min-w-screen! lg:min-w-[600px]!'}
+        size="default"
+        className="p-0 flex flex-row gap-0 min-w-screen! lg:min-w-[600px]!"
       >
         <div className="flex flex-col grow w-full">
           <CreateFunctionHeader selectedFunction={func?.name} isDuplicating={isDuplicating} />
+
           <Separator />
+
           <Form {...form}>
             <form
               id={FORM_ID}
               className="grow overflow-auto"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <SheetSection className={focusedEditor ? 'hidden' : ''}>
+              <SheetSection className={cn(focusedEditor ? 'hidden' : '', 'flex flex-col gap-y-4')}>
+                <FormField
+                  control={form.control}
+                  name="schema"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Schema"
+                      description={
+                        <>
+                          Tables made in the table editor will be in{' '}
+                          <code className="text-code-inline">public</code>
+                        </>
+                      }
+                      layout="horizontal"
+                    >
+                      <FormControl>
+                        <SchemaSelector
+                          selectedSchemaName={field.value}
+                          excludedSchemas={protectedSchemas?.map((s) => s.name)}
+                          size="small"
+                          onSelectSchema={(name) => field.onChange(name)}
+                        />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="name"
@@ -197,36 +229,53 @@ export const CreateFunction = ({
                   )}
                 />
               </SheetSection>
+
               <Separator className={focusedEditor ? 'hidden' : ''} />
-              <SheetSection className={focusedEditor ? 'hidden' : 'space-y-4'}>
+
+              <SheetSection className={focusedEditor ? 'hidden' : 'flex flex-col gap-y-4'}>
                 <FormField
                   control={form.control}
-                  name="schema"
+                  name="type"
                   render={({ field }) => (
-                    <FormItemLayout
-                      label="Schema"
-                      description="Tables made in the table editor will be in 'public'"
-                      layout="horizontal"
-                    >
-                      <FormControl>
-                        <SchemaSelector
-                          selectedSchemaName={field.value}
-                          excludedSchemas={protectedSchemas?.map((s) => s.name)}
-                          size="small"
-                          onSelectSchema={(name) => field.onChange(name)}
-                        />
-                      </FormControl>
+                    <FormItemLayout label="Type" layout="horizontal">
+                      <Select
+                        disabled={isEditing}
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger className="col-span-8">
+                          {field.value === 'function' ? 'Function' : 'Stored procedure'}
+                        </SelectTrigger>
+                        <SelectContent align="end">
+                          <SelectItem value="function">
+                            <p>Function</p>
+                            <p className="text-foreground-lighter">
+                              For query logic, triggers, and RPC calls
+                            </p>
+                          </SelectItem>
+                          <SelectItem value="procedure">
+                            <p>Stored procedure</p>
+                            <p className="text-foreground-lighter">
+                              For batch or multi-step tasks that manages transactions
+                            </p>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </FormItemLayout>
                   )}
                 />
-                {!isEditing && (
+                {type === 'function' && (
                   <FormField
                     control={form.control}
                     name="return_type"
                     render={({ field }) => (
                       <FormItemLayout label="Return type" layout="horizontal">
                         {/* Form selects don't need form controls, otherwise the CSS gets weird */}
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select
+                          disabled={isEditing}
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
                           <SelectTrigger className="col-span-8">
                             <SelectValue />
                           </SelectTrigger>
@@ -247,11 +296,15 @@ export const CreateFunction = ({
                   />
                 )}
               </SheetSection>
+
               <Separator className={focusedEditor ? 'hidden' : ''} />
+
               <SheetSection className={focusedEditor ? 'hidden' : ''}>
                 <FormFieldArgs readonly={isEditing} />
               </SheetSection>
+
               <Separator className={focusedEditor ? 'hidden' : ''} />
+
               <SheetSection className={`${focusedEditor ? 'h-full' : ''} px-0!`}>
                 <FormField
                   control={form.control}
@@ -262,7 +315,8 @@ export const CreateFunction = ({
                         <FormLabel className="text-base text-foreground">Definition</FormLabel>
                         <FormDescription className="text-sm text-foreground-light">
                           <p>
-                            The language below should be written in <code>{language}</code>.
+                            The language below should be written in{' '}
+                            <code className="text-code-inline">{language}</code>.
                           </p>
                           {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
                         </FormDescription>
@@ -287,16 +341,14 @@ export const CreateFunction = ({
                 />
               </SheetSection>
               <Separator className={focusedEditor ? 'hidden' : ''} />
-              {isEditing ? (
-                <></>
-              ) : (
+              {isEditing ? null : (
                 <>
                   <SheetSection className={focusedEditor ? 'hidden' : ''}>
                     <div className="space-y-8 rounded-sm bg-studio py-4 px-6 border border-overlay">
                       <FormItem className="flex flex-row items-center justify-between">
                         <div className="space-y-0.5">
-                          <FormLabel className="text-base">Show advanced settings</FormLabel>
-                          <FormDescription>
+                          <FormLabel className="text-sm">Show advanced settings</FormLabel>
+                          <FormDescription className="text-foreground-lighter">
                             These are settings that might be familiar for Postgres developers
                           </FormDescription>
                         </div>
@@ -313,31 +365,33 @@ export const CreateFunction = ({
                     <>
                       <SheetSection className={focusedEditor ? 'hidden' : 'space-y-2 pt-0'}>
                         <FormFieldLanguage />
-                        <FormField
-                          control={form.control}
-                          name="behavior"
-                          render={({ field }) => (
-                            <FormItemLayout label="Behavior" layout="horizontal">
-                              {/* Form selects don't need form controls, otherwise the CSS gets weird */}
-                              <Select defaultValue={field.value} onValueChange={field.onChange}>
-                                <SelectTrigger className="col-span-8">
-                                  <SelectValue />
-                                </SelectTrigger>
-                                <SelectContent>
-                                  <SelectItem value="IMMUTABLE" key="IMMUTABLE">
-                                    immutable
-                                  </SelectItem>
-                                  <SelectItem value="STABLE" key="STABLE">
-                                    stable
-                                  </SelectItem>
-                                  <SelectItem value="VOLATILE" key="VOLATILE">
-                                    volatile
-                                  </SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </FormItemLayout>
-                          )}
-                        />
+                        {type === 'function' && (
+                          <FormField
+                            control={form.control}
+                            name="behavior"
+                            render={({ field }) => (
+                              <FormItemLayout label="Behavior" layout="horizontal">
+                                {/* Form selects don't need form controls, otherwise the CSS gets weird */}
+                                <Select defaultValue={field.value} onValueChange={field.onChange}>
+                                  <SelectTrigger className="col-span-8">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="IMMUTABLE" key="IMMUTABLE">
+                                      immutable
+                                    </SelectItem>
+                                    <SelectItem value="STABLE" key="STABLE">
+                                      stable
+                                    </SelectItem>
+                                    <SelectItem value="VOLATILE" key="VOLATILE">
+                                      volatile
+                                    </SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </FormItemLayout>
+                            )}
+                          />
+                        )}
                       </SheetSection>
                       <Separator className={focusedEditor ? 'hidden' : ''} />
                       <SheetSection className={focusedEditor ? 'hidden' : ''}>
@@ -394,12 +448,12 @@ export const CreateFunction = ({
             </form>
           </Form>
           <SheetFooter>
-            <Button disabled={isCreating || isUpdating} type="default" onClick={confirmOnClose}>
+            <Button disabled={isCreating || isUpdating} variant="default" onClick={confirmOnClose}>
               Cancel
             </Button>
             <Button
               form={FORM_ID}
-              htmlType="submit"
+              type="submit"
               disabled={isCreating || isUpdating}
               loading={isCreating || isUpdating}
             >
@@ -423,16 +477,16 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
   })
 
   return (
-    <>
-      <div className="flex flex-col">
+    <div className="flex flex-col gap-y-4">
+      <div>
         <h5 className="text-base text-foreground">Arguments</h5>
         <p className="text-sm text-foreground-light">
           Arguments can be referenced in the function body using either names or numbers.
         </p>
       </div>
-      <div className="space-y-2 pt-4">
+      <div className="space-y-2">
         {readonly && isEmpty(fields) && (
-          <span className="text-foreground-lighter">No argument for this function</span>
+          <span className="text-sm text-foreground-lighter">No argument for this function</span>
         )}
         {fields.map((field, index) => {
           return (
@@ -456,26 +510,24 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                       {readonly ? (
                         <Input value={field.value} disabled readOnly className="h-auto" />
                       ) : (
-                        <>
-                          <Select
-                            disabled={readonly}
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <SelectTrigger className="h-[38px]">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <ScrollArea className="h-52">
-                                {['integer', ...POSTGRES_DATA_TYPES].map((option) => (
-                                  <SelectItem value={option} key={option}>
-                                    {option}
-                                  </SelectItem>
-                                ))}
-                              </ScrollArea>
-                            </SelectContent>
-                          </Select>
-                        </>
+                        <Select
+                          disabled={readonly}
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger className="h-[34px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <ScrollArea className="h-52">
+                              {['integer', ...POSTGRES_DATA_TYPES].map((option) => (
+                                <SelectItem value={option} key={option}>
+                                  {option}
+                                </SelectItem>
+                              ))}
+                            </ScrollArea>
+                          </SelectContent>
+                        </Select>
                       )}
                     </FormControl>
                     <FormMessage />
@@ -485,10 +537,10 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
 
               {!readonly && (
                 <Button
-                  type="danger"
+                  variant="default"
                   icon={<Trash size={12} />}
                   onClick={() => remove(index)}
-                  className="h-[38px] w-[38px]"
+                  className="h-[34px] w-[34px]"
                 />
               )}
             </div>
@@ -497,7 +549,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
 
         {!readonly && (
           <Button
-            type="default"
+            variant="default"
             icon={<Plus size={12} />}
             onClick={() => append({ name: '', type: 'integer' })}
             disabled={readonly}
@@ -506,7 +558,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
           </Button>
         )}
       </div>
-    </>
+    </div>
   )
 }
 

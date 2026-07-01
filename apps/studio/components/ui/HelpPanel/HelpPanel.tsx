@@ -44,7 +44,7 @@ export const HelpPanel = ({
         <div className="flex min-w-0 items-center gap-1.5 text-xs">
           {isSupportView && (
             <ButtonTooltip
-              type="text"
+              variant="text"
               className="h-7 w-7"
               onClick={() => setView('home')}
               icon={<ChevronLeft strokeWidth={1.5} />}
@@ -56,7 +56,7 @@ export const HelpPanel = ({
         <div className="flex items-center gap-2">
           <SupportFormStatusButton />
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="w-7 h-7"
             onClick={() => closeSidebar(SIDEBAR_KEYS.HELP_PANEL)}
             icon={<X strokeWidth={1.5} />}
@@ -107,7 +107,7 @@ export const HelpPanel = ({
                       alt="Discord illustration"
                     />
                     <Button
-                      type="secondary"
+                      variant="secondary"
                       size="tiny"
                       icon={
                         <SVG src={`${router.basePath}/img/discord-icon.svg`} className="h-4 w-4" />

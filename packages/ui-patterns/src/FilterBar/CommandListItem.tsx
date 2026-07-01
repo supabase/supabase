@@ -25,7 +25,7 @@ export function CommandListItem({
       role="option"
       onClick={() => onSelect(item)}
       className={cn(
-        'relative flex items-center justify-between gap-2 px-2 py-1.5 text-xs cursor-pointer select-none outline-hidden text-foreground',
+        'relative flex items-center justify-between gap-2 px-2 h-[28px] text-xs cursor-pointer select-none outline-hidden text-foreground',
         isHighlighted && 'bg-surface-300',
         !isHighlighted && 'hover:bg-surface-200'
       )}
@@ -35,6 +35,9 @@ export function CommandListItem({
         {includeIcon && item.icon}
         <span className="truncate">{getActionItemLabel(item)}</span>
       </span>
+      {item.count !== undefined && (
+        <code className="text-code-inline text-foreground-light">{item.count}</code>
+      )}
       {item.operatorSymbol && <OperatorSymbolBadge symbol={item.operatorSymbol} />}
     </div>
   )

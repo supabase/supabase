@@ -1,6 +1,6 @@
 import { DndContext, DragEndEvent, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { arrayMove, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { useEffect, useRef } from 'react'
 import { cn } from 'ui'
@@ -9,15 +9,15 @@ import { AdvisorSection } from './AdvisorSection'
 import { ConnectSection } from './ConnectSection'
 import { CustomReportSection } from './CustomReportSection'
 import { DEFAULT_SECTION_ORDER, mergeSectionOrder } from './Home.utils'
-import { ProjectUsageSection as ProjectUsageSectionV2 } from './ProjectUsageSection'
-import { ProjectUsageSection as ProjectUsageSectionV1 } from '@/components/interfaces/Home/ProjectUsageSection'
+import { ProjectUsageSection } from './ProjectUsageSection'
+import { ProjectUsageSectionDeltas } from './ProjectUsageSectionDeltas'
 import { SortableSection } from '@/components/interfaces/ProjectHome/SortableSection'
 import { TopSection } from '@/components/interfaces/ProjectHome/TopSection'
 import { ProjectNeedsSecuring } from '@/components/layouts/ProjectNeedsSecuring/ProjectNeedsSecuring'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from '@/lib/constants'
+import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
@@ -27,7 +27,7 @@ export const ProjectHome = () => {
   const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
 
-  const showHomepageUsageV2 = useFlag('newHomepageUsageV2')
+  const showHomepageUsageDeltas = useFlag('newHomepageUsageDeltas')
 
   const isMatureProject = dayjs(project?.inserted_at).isBefore(dayjs().subtract(10, 'day'))
 
@@ -40,7 +40,7 @@ export const ProjectHome = () => {
     DEFAULT_SECTION_ORDER
   )
 
-  const UsageSection = showHomepageUsageV2 ? ProjectUsageSectionV2 : ProjectUsageSectionV1
+  const UsageSection = showHomepageUsageDeltas ? ProjectUsageSectionDeltas : ProjectUsageSection
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
@@ -73,10 +73,15 @@ export const ProjectHome = () => {
     setSectionOrder(mergeSectionOrder)
   }, [setSectionOrder])
 
-  const showConnectSection = !isMatureProject && !!project
+  // On self-hosted the project's `inserted_at` is hard-coded to a past date
+  // (so it always looks "mature"), and the home page is otherwise sparse —
+  // always surface the Get Connected pane there. Platform keeps the
+  // maturity gate so long-running projects don't see it forever.
+  const showConnectSection = !!project && (!IS_PLATFORM || !isMatureProject)
 
   const renderOrder = mergeSectionOrder(sectionOrder).filter((id) => {
     if (id === 'connect') return showConnectSection
+    if (id === 'usage' || id === 'custom-report') return IS_PLATFORM
     return true
   })
 
@@ -128,7 +133,7 @@ export const ProjectHome = () => {
                         </div>
                       )
                     }
-                    if (id === 'custom-report') {
+                    if (IS_PLATFORM && id === 'custom-report') {
                       return (
                         <div
                           key={id}

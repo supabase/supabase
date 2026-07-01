@@ -43,7 +43,7 @@ export const AdvancedSettings = ({
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-sm font-medium">Advanced settings</span>
               <span className="text-sm text-foreground-lighter font-normal">
-                Optional performance tuning
+                Optional settings to control the pipeline in more depth
               </span>
             </div>
           </AccordionTrigger>
@@ -165,7 +165,7 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   label="Invalidated slot behavior"
                   layout="horizontal"
-                  description="Behavior when the replication slot is invalidated"
+                  description="Behavior of the pipeline's replication slot when invalidated."
                 >
                   <FormControl>
                     <Select value={field.value ?? 'error'} onValueChange={field.onChange}>
@@ -174,13 +174,13 @@ export const AdvancedSettings = ({
                         <SelectItem value="error" className="[&>span]:top-2.5">
                           <p>Error</p>
                           <p className="text-foreground-lighter">
-                            Blocks startup for manual recovery
+                            Blocks startup for manual recovery.
                           </p>
                         </SelectItem>
                         <SelectItem value="recreate" className="[&>span]:top-2.5">
                           <p>Recreate</p>
                           <p className="text-foreground-lighter">
-                            Rebuilds the slot and restarts replication from scratch
+                            Rebuilds the slot and restarts replication from scratch.
                           </p>
                         </SelectItem>
                       </SelectContent>

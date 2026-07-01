@@ -1,22 +1,26 @@
 import { useIsMFAEnabled } from 'common'
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { ProjectList } from '@/components/interfaces/Home/ProjectList/ProjectList'
 import { HomePageActions } from '@/components/interfaces/HomePageActions'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { PlanUsageCard } from '@/components/interfaces/ProjectHome/PlanUsageCard'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import OrganizationLayout from '@/components/layouts/OrganizationLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useUpgradeCtaExperiment } from '@/hooks/misc/useUpgradeCtaExperiment'
 import type { NextPageWithLayout } from '@/types'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const isUserMFAEnabled = useIsMFAEnabled()
   const { data: org } = useSelectedOrganizationQuery()
+  const { variant: upgradeCtaVariant } = useUpgradeCtaExperiment()
 
   const disableAccessMfa = org?.organization_requires_mfa && !isUserMFAEnabled
+  const showOrgProjectsListUsageCard = upgradeCtaVariant === 'org_projects_list'
 
   return (
     <ScaffoldContainer className="grow flex">
@@ -33,15 +37,24 @@ const ProjectsPage: NextPageWithLayout = () => {
               </>
             }
             actions={
-              <Button asChild type="default">
+              <Button asChild variant="default">
                 <Link href="/account/security">Set up MFA</Link>
               </Button>
             }
           />
         ) : (
-          <div className="flex flex-col gap-y-4">
-            <HomePageActions />
-            <ProjectList />
+          <div className="flex flex-col gap-y-4 xl:flex-row xl:gap-x-6">
+            <div className="flex flex-col gap-y-4 flex-1 min-w-0">
+              <HomePageActions />
+              <ProjectList />
+            </div>
+            {showOrgProjectsListUsageCard && (
+              <aside className="xl:w-80 xl:shrink-0">
+                <ul className="list-none p-0 m-0">
+                  <PlanUsageCard />
+                </ul>
+              </aside>
+            )}
           </div>
         )}
       </ScaffoldSection>

@@ -140,7 +140,7 @@ Supabase maps every request to one of the roles:
 - `anon`: an unauthenticated request (the user is not logged in)
 - `authenticated`: an authenticated request (the user is logged in)
 
-These are actually [Postgres Roles](/docs/guides/database/postgres/roles). You can use these roles within your Policies using the `TO` clause:
+These are [Postgres Roles](/docs/guides/database/postgres/roles). You can use these roles within your Policies using the `TO` clause:
 
 ```sql
 create policy "Profiles are viewable by everyone"
@@ -172,7 +172,7 @@ Supabase provides some [helpers](#helper-functions) that simplify RLS if you're 
 
 You can specify select policies with the `using` clause.
 
-Let's say you have a table called `profiles` in the public schema and you want to enable read access to everyone.
+Say you have a table called `profiles` in the public schema and you want to enable read access to everyone.
 
 ```sql
 -- 1. Create table
@@ -204,7 +204,7 @@ for select using ( (select auth.uid()) = user_id );
 
 You can specify insert policies with the `with check` clause. The `with check` expression ensures that any new row data adheres to the policy constraints.
 
-Let's say you have a table called `profiles` in the public schema and you only want users to be able to create a profile for themselves. In that case, we want to check their User ID matches the value that they are trying to insert:
+Say you have a table called `profiles` in the public schema and you only want users to create a profile for themselves. In that case, we want to check their User ID matches the value that they are trying to insert:
 
 ```sql
 -- 1. Create table
@@ -230,7 +230,7 @@ You can specify update policies by combining both the `using` and `with check` e
 
 The `using` clause represents the condition that must be true for the update to be allowed, and `with check` clause ensures that the updates made adhere to the policy constraints.
 
-Let's say you have a table called `profiles` in the public schema and you only want users to be able to update their own profile.
+Say you have a table called `profiles` in the public schema and you only want users to update their own profile.
 
 You can create a policy where the `using` clause checks if the user owns the profile being updated. And the `with check` clause ensures that, in the resultant row, users do not change the `user_id` to a value that is not equal to their User ID, maintaining that the modified profile still meets the ownership condition.
 
@@ -265,7 +265,7 @@ To perform an `UPDATE` operation, a corresponding [`SELECT` policy](#select-poli
 
 You can specify delete policies with the `using` clause.
 
-Let's say you have a table called `profiles` in the public schema and you only want users to be able to delete their own profile:
+Say you have a table called `profiles` in the public schema and you only want users to be able to delete their own profile:
 
 ```sql
 -- 1. Create table

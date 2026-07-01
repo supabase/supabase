@@ -1,6 +1,6 @@
 import { AlertTriangle, ChevronRight, Inbox } from 'lucide-react'
 import { Badge, Button, cn } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { AdvisorItem } from './AdvisorPanel.types'
 import {
@@ -41,6 +41,7 @@ interface AdvisorPanelBodyProps {
   hiddenItemsCount: number
   hasAnyFilters: boolean
   hasProjectRef?: boolean
+  projectNameByRef?: ReadonlyMap<string, string>
 }
 
 export const AdvisorPanelBody = ({
@@ -54,6 +55,7 @@ export const AdvisorPanelBody = ({
   hiddenItemsCount,
   hasAnyFilters,
   hasProjectRef = true,
+  projectNameByRef,
 }: AdvisorPanelBodyProps) => {
   // Show notice if no project ref and trying to view project-specific tabs
   if (!hasProjectRef && activeTab !== 'messages' && activeTab !== 'all') {
@@ -101,7 +103,7 @@ export const AdvisorPanelBody = ({
           const isUnread = notification?.status === 'new'
 
           const primaryText = getAdvisorPanelItemDisplayTitle(item)
-          const secondaryText = getAdvisorItemSecondaryText(item)
+          const secondaryText = getAdvisorItemSecondaryText(item, projectNameByRef)
           const metadataText =
             secondaryText ?? (item.createdAt ? formatItemDate(item.createdAt) : undefined)
           // Date strings (e.g. "a few seconds ago") come from formatItemDate and
@@ -111,7 +113,7 @@ export const AdvisorPanelBody = ({
           return (
             <div key={`${item.source}-${item.id}`} className="border-b">
               <Button
-                type="text"
+                variant="text"
                 className={cn(
                   'justify-start w-full block rounded-none h-auto py-3 px-4 hover:text-foreground',
                   isUnread && 'bg-surface-100/50'
@@ -158,7 +160,7 @@ export const AdvisorPanelBody = ({
       </div>
       {severityFilters.length > 0 && hiddenItemsCount > 0 && (
         <div className="px-4 py-3">
-          <Button type="text" className="w-full" onClick={onClearFilters}>
+          <Button variant="text" className="w-full" onClick={onClearFilters}>
             Show {hiddenItemsCount} more issue{hiddenItemsCount !== 1 ? 's' : ''}
           </Button>
         </div>

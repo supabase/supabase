@@ -159,7 +159,7 @@ export const ColumnMenu = ({ column, isEncrypted }: ColumnMenuProps) => {
         <DropdownMenuTrigger asChild>
           <Button
             className="opacity-50 flex"
-            type="text"
+            variant="text"
             style={{ padding: '3px' }}
             onClick={(e) => {
               e.stopPropagation()

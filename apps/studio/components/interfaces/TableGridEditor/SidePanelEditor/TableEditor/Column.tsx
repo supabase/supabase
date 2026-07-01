@@ -146,7 +146,7 @@ export const Column = ({
           />
           {relations.filter((r) => !r.toRemove).length === 0 ? (
             <Button
-              type="dashed"
+              variant="dashed"
               className="rounded-l-none h-[30px] py-0 px-2"
               onClick={() => onEditForeignKey()}
             >
@@ -155,7 +155,7 @@ export const Column = ({
           ) : (
             <Popover open={open} onOpenChange={setOpen} modal={false}>
               <PopoverTrigger asChild>
-                <Button type="default" className="rounded-l-none h-[30px] py-0 px-2">
+                <Button variant="default" className="rounded-l-none h-[30px] py-0 px-2">
                   <Link size={12} />
                 </Button>
               </PopoverTrigger>
@@ -269,7 +269,7 @@ export const Column = ({
             size="small"
             value={column.defaultValue ?? ''}
             disabled={column.format.includes('int') && column.isIdentity}
-            className={`rounded-sm bg-surface-100 lg:gap-0 ${
+            className={`rounded-sm lg:gap-0 ${
               column.format.includes('int') && column.isIdentity ? 'opacity-50' : ''
             }`}
             suggestions={suggestions}

@@ -107,12 +107,12 @@ export const Hyperlink = memo(({ href, children }: { href?: string; children?: R
 
         <DialogFooter>
           <DialogClose asChild>
-            <Button type="default" className="opacity-100">
+            <Button variant="default" className="opacity-100">
               Cancel
             </Button>
           </DialogClose>
           <DialogClose asChild>
-            <Button asChild type="primary" className="opacity-100">
+            <Button asChild variant="primary" className="opacity-100">
               {isExternalURL ? (
                 <a href={safeUrl} target="_blank" rel="noreferrer noopener">
                   Head to link

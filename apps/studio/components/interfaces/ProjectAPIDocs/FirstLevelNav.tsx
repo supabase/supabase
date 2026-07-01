@@ -4,13 +4,14 @@ import Link from 'next/link'
 import { Fragment, type ReactNode } from 'react'
 import SVG from 'react-inlinesvg'
 import { Button, cn } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { navigateToSection } from './Content/Content.utils'
 import { API_DOCS_CATEGORIES, DOCS_CONTENT, DOCS_MENU } from './ProjectAPIDocs.constants'
+import { useApiDocsFunctions, useApiDocsTables } from './useApiDocsEntities'
 import { InfiniteListDefault, type RowComponentBaseProps } from '@/components/ui/InfiniteList'
+import { NotExposedEntitiesIndicator } from '@/components/ui/NotExposedEntitiesIndicator'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
-import { useOpenAPISpecQuery } from '@/data/open-api/api-spec-query'
 import { usePaginatedBucketsQuery, type Bucket } from '@/data/storage/buckets-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
@@ -106,7 +107,7 @@ export const FirstLevelNav = (): ReactNode => {
         <Button
           block
           asChild
-          type="text"
+          variant="text"
           size="small"
           icon={
             <SVG
@@ -122,7 +123,7 @@ export const FirstLevelNav = (): ReactNode => {
             GraphiQL
           </Link>
         </Button>
-        <Button block asChild type="text" size="small" icon={<BookOpen />}>
+        <Button block asChild variant="text" size="small" icon={<BookOpen />}>
           <Link
             href={`${DOCS_URL}/guides/graphql`}
             target="_blank"
@@ -135,12 +136,12 @@ export const FirstLevelNav = (): ReactNode => {
       </div>
 
       <div className="px-2 py-4">
-        <Button block asChild type="text" size="small" icon={<Book />}>
+        <Button block asChild variant="text" size="small" icon={<Book />}>
           <Link href={`${DOCS_URL}`} target="_blank" rel="noreferrer" className="justify-start!">
             Documentation
           </Link>
         </Button>
-        <Button block asChild type="text" size="small" icon={<BookOpen />}>
+        <Button block asChild variant="text" size="small" icon={<BookOpen />}>
           <Link
             href={`${DOCS_URL}/guides/api`}
             target="_blank"
@@ -184,20 +185,15 @@ const Subsections = ({ category }: SubsectionsProps): ReactNode => {
 }
 
 const TablesSubsections = (): ReactNode => {
-  const { ref } = useParams()
   const snap = useAppStateSnapshot()
 
-  const { data, isLoading } = useOpenAPISpecQuery(
-    { projectRef: ref },
-    { staleTime: 1000 * 60 * 10 }
-  )
-  const tables = data?.tables ?? []
+  const { visibleEntities: tables, excludedCount, isLoading } = useApiDocsTables()
 
   // TODO: handle infinite loading of tables
   return (
     <>
       {isLoading && <LoadingIndicator />}
-      {tables.length > 0 && <Separator />}
+      {(tables.length > 0 || excludedCount > 0) && <Separator />}
       {tables.map((table) => (
         <button
           key={table.name}
@@ -207,25 +203,26 @@ const TablesSubsections = (): ReactNode => {
           {table.name}
         </button>
       ))}
+      <NotExposedEntitiesIndicator
+        count={excludedCount}
+        entityNoun="table"
+        entityNounPlural="tables"
+        onNavigate={() => snap.setShowProjectApiDocs(false)}
+      />
     </>
   )
 }
 
 const DbFunctionsSubsections = (): ReactNode => {
-  const { ref } = useParams()
   const snap = useAppStateSnapshot()
 
-  const { data, isLoading } = useOpenAPISpecQuery(
-    { projectRef: ref },
-    { staleTime: 1000 * 60 * 10 }
-  )
-  const functions = data?.functions ?? []
+  const { visibleEntities: functions, excludedCount, isLoading } = useApiDocsFunctions()
 
   // TODO: handle virtualization of DB functions
   return (
     <>
       {isLoading && <LoadingIndicator />}
-      {functions.length > 0 && <Separator />}
+      {(functions.length > 0 || excludedCount > 0) && <Separator />}
       {functions.map((fn) => (
         <button
           key={fn.name}
@@ -237,6 +234,12 @@ const DbFunctionsSubsections = (): ReactNode => {
           {fn.name}
         </button>
       ))}
+      <NotExposedEntitiesIndicator
+        count={excludedCount}
+        entityNoun="function"
+        entityNounPlural="functions"
+        onNavigate={() => snap.setShowProjectApiDocs(false)}
+      />
     </>
   )
 }

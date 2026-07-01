@@ -1,21 +1,11 @@
 import * as Sentry from '@sentry/nextjs'
-import { LOCAL_STORAGE_KEYS, PageTelemetry, posthogClient, useUser } from 'common'
+import { PageTelemetry, posthogClient, useUser } from 'common'
 import { useEffect, useRef } from 'react'
 import { useConsentToast } from 'ui-patterns/consent'
 
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { API_URL, IS_PLATFORM } from '@/lib/constants'
-
-const getAnonId = async (id: string) => {
-  const encoder = new TextEncoder()
-  const data = encoder.encode(id)
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
-  const hashArray = Array.from(new Uint8Array(hashBuffer))
-  const base64String = btoa(hashArray.map((byte) => String.fromCharCode(byte)).join(''))
-
-  return base64String
-}
 
 export function Telemetry() {
   // Although this is "technically" breaking the rules of hooks
@@ -64,17 +54,7 @@ export function Telemetry() {
       return
     }
 
-    const setSentryId = async () => {
-      let sentryUserId = localStorage.getItem(LOCAL_STORAGE_KEYS.SENTRY_USER_ID)
-      if (!sentryUserId) {
-        sentryUserId = await getAnonId(user?.id)
-        localStorage.setItem(LOCAL_STORAGE_KEYS.SENTRY_USER_ID, sentryUserId)
-      }
-      Sentry.setUser({ id: sentryUserId })
-    }
-
-    // if an error happens, continue without setting a sentry id
-    setSentryId().catch((e) => console.error(e))
+    Sentry.setUser({ id: user.id })
   }, [user?.id])
 
   return (

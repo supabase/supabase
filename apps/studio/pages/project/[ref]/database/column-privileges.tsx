@@ -20,9 +20,9 @@ import PrivilegesHead from '@/components/interfaces/Database/Privileges/Privileg
 import PrivilegesTable from '@/components/interfaces/Database/Privileges/PrivilegesTable'
 import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { PgRole, useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
@@ -84,12 +84,12 @@ const PrivilegesPage: NextPageWithLayout = () => {
   } = useTablePrivilegesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    includedSchemas: [selectedSchema],
   })
 
   const tablePrivilege = useMemo(() => {
     const tablePrivilege = allTablePrivileges?.find(
-      (tablePrivilege) =>
-        tablePrivilege.schema === selectedSchema && tablePrivilege.name === selectedTable
+      (tablePrivilege) => tablePrivilege.name === selectedTable
     )
 
     if (tablePrivilege) {
@@ -100,7 +100,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
         ),
       }
     }
-  }, [allTablePrivileges, selectedRole, selectedSchema, selectedTable])
+  }, [allTablePrivileges, selectedRole, selectedTable])
 
   const {
     data: allColumnPrivileges,
@@ -110,6 +110,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
   } = useColumnPrivilegesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    schema: selectedSchema,
   })
 
   const columnPrivileges = useMemo(
@@ -253,7 +254,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                     You will need to manually apply these changes to your database.
                   </AlertDescription>
                   <Button
-                    type="outline"
+                    variant="outline"
                     aria-label="Dismiss"
                     className="absolute top-2 right-2 p-1 pl-1!"
                     onClick={() => {
@@ -281,7 +282,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                     <code className="text-code-inline">delete</code>) will fail.
                   </AlertDescription>
                   <Button
-                    type="outline"
+                    variant="outline"
                     aria-label="Dismiss"
                     className="absolute top-2 right-2 p-1 pl-1!"
                     onClick={() => {
@@ -353,7 +354,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                 You may access this feature by enabling it under dashboard feature previews.
               </AlertDescription>
               <div className="mt-4">
-                <Button type="default" onClick={() => toggleFeaturePreviewModal(true)}>
+                <Button variant="default" onClick={() => toggleFeaturePreviewModal(true)}>
                   View feature previews
                 </Button>
               </div>

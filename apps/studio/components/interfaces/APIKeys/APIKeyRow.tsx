@@ -1,4 +1,4 @@
-import { useFlag } from 'common'
+import { IS_PLATFORM, useFlag } from 'common'
 import { motion } from 'framer-motion'
 import { MoreVertical } from 'lucide-react'
 import {
@@ -9,7 +9,8 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
-import { ShimmeringLoader, TimestampInfo } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { APIKeyDeleteDialog } from './APIKeyDeleteDialog'
 import { ApiKeyPill } from './ApiKeyPill'
@@ -85,27 +86,29 @@ export const APIKeyRow = ({
           </TableCell>
         )}
 
-        <TableCell className="py-2">
-          <div className="flex justify-end">
-            <DropdownMenu>
-              <DropdownMenuTrigger className="px-1 focus-visible:outline-hidden" asChild>
-                <Button
-                  type="text"
-                  size="tiny"
-                  icon={
-                    <MoreVertical
-                      size="14"
-                      className="text-foreground-light hover:text-foreground"
-                    />
-                  }
-                />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="max-w-40" align="end">
-                <APIKeyDeleteDialog apiKey={apiKey} setKeyToDelete={setKeyToDelete} />
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </TableCell>
+        {IS_PLATFORM && (
+          <TableCell className="py-2">
+            <div className="flex justify-end">
+              <DropdownMenu>
+                <DropdownMenuTrigger className="px-1 focus-visible:outline-hidden" asChild>
+                  <Button
+                    variant="text"
+                    size="tiny"
+                    icon={
+                      <MoreVertical
+                        size="14"
+                        className="text-foreground-light hover:text-foreground"
+                      />
+                    }
+                  />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="max-w-40" align="end">
+                  <APIKeyDeleteDialog apiKey={apiKey} setKeyToDelete={setKeyToDelete} />
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </TableCell>
+        )}
       </MotionTableRow>
 
       <TextConfirmModal

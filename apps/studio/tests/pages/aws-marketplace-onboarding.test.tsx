@@ -1,5 +1,6 @@
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { platformComponents as components } from 'api-types'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
@@ -12,10 +13,11 @@ import type {
 import { CREATE_AWS_MANAGED_ORG_FORM_ID } from '@/components/interfaces/Organization/CloudMarketplace/NewAwsMarketplaceOrgForm'
 import { API_URL } from '@/lib/constants'
 import type { ProfileContextType } from '@/lib/profile'
-import { createMockOrganization } from '@/tests/helpers'
+import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer } from '@/tests/lib/msw'
-import type { Organization } from '@/types'
+
+type OrganizationResponse = components['schemas']['OrganizationResponse']
 
 const DEFAULT_PROFILE_CONTEXT: ProfileContextType = {
   profile: {
@@ -38,13 +40,13 @@ const DEFAULT_PROFILE_CONTEXT: ProfileContextType = {
   isSuccess: true,
 }
 
-const LINKABLE_ORG = createMockOrganization({
+const LINKABLE_ORG = createMockOrganizationResponse({
   id: 1,
   name: 'Acme Production',
   slug: 'acme-production',
   plan: { id: 'pro', name: 'Pro' },
 })
-const UNAVAILABLE_ORG = createMockOrganization({
+const UNAVAILABLE_ORG = createMockOrganizationResponse({
   id: 2,
   name: 'Legacy Billing',
   slug: 'legacy-billing',
@@ -63,7 +65,7 @@ function createOnboardingInfo({
   organizations = [LINKABLE_ORG, UNAVAILABLE_ORG],
   eligibleSlugs = [LINKABLE_ORG.slug],
 }: {
-  organizations?: Organization[]
+  organizations?: OrganizationResponse[]
   eligibleSlugs?: string[]
 } = {}): CloudMarketplaceOnboardingInfo {
   return {
@@ -86,24 +88,24 @@ function mockAwsEndpoints({
   eligibility = ELIGIBLE_CONTRACT,
   onboardingInfo = createOnboardingInfo({ organizations }),
 }: {
-  organizations?: Organization[]
+  organizations?: OrganizationResponse[]
   eligibility?: CloudMarketplaceContractLinkingEligibility
   onboardingInfo?: CloudMarketplaceOnboardingInfo
 } = {}) {
   addAPIMock({
     method: 'get',
     path: '/platform/organizations',
-    response: () => HttpResponse.json(organizations),
+    response: () => HttpResponse.json<OrganizationResponse[]>(organizations),
   })
   addAPIMock({
     method: 'get',
     path: '/platform/cloud-marketplace/buyers/:buyer_id/contract-linking-eligibility',
-    response: () => HttpResponse.json(eligibility),
+    response: () => HttpResponse.json<CloudMarketplaceContractLinkingEligibility>(eligibility),
   })
   addAPIMock({
     method: 'get',
     path: '/platform/cloud-marketplace/buyers/:buyer_id/onboarding-info',
-    response: () => HttpResponse.json(onboardingInfo),
+    response: () => HttpResponse.json<CloudMarketplaceOnboardingInfo>(onboardingInfo),
   })
 }
 
@@ -180,7 +182,7 @@ describe('AwsMarketplaceOnboardingScreen', () => {
       http.post(`${API_URL}/platform/organizations/cloud-marketplace`, async ({ request }) => {
         createRequest = await request.json()
         return HttpResponse.json(
-          createMockOrganization({
+          createMockOrganizationResponse({
             id: 3,
             name: 'Mock Marketplace Org',
             slug: 'mock-marketplace-org',
@@ -263,15 +265,15 @@ describe('AwsMarketplaceOnboardingScreen', () => {
 
   test('promotes the last visited organization into the first visible organizations', async () => {
     const organizations = [
-      createMockOrganization({ id: 1, name: 'Alpha Team', slug: 'alpha-team' }),
-      createMockOrganization({ id: 2, name: 'Beta Team', slug: 'beta-team' }),
-      createMockOrganization({ id: 3, name: 'Delta Team', slug: 'delta-team' }),
-      createMockOrganization({ id: 4, name: 'Gamma Team', slug: 'gamma-team' }),
-      createMockOrganization({ id: 5, name: 'Zeta Team', slug: 'zeta-team' }),
+      createMockOrganizationResponse({ id: 1, name: 'Alpha Team', slug: 'alpha-team' }),
+      createMockOrganizationResponse({ id: 2, name: 'Beta Team', slug: 'beta-team' }),
+      createMockOrganizationResponse({ id: 3, name: 'Delta Team', slug: 'delta-team' }),
+      createMockOrganizationResponse({ id: 4, name: 'Gamma Team', slug: 'gamma-team' }),
+      createMockOrganizationResponse({ id: 5, name: 'Zeta Team', slug: 'zeta-team' }),
     ]
 
     window.localStorage.setItem(
-      LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
+      LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION(DEFAULT_PROFILE_CONTEXT.profile?.id),
       JSON.stringify('zeta-team')
     )
     mockAwsEndpoints({

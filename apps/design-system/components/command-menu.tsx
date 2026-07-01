@@ -54,7 +54,7 @@ export function CommandMenu({ ...props }: DialogProps) {
   return (
     <>
       <Button
-        type="outline"
+        variant="outline"
         className={cn(
           `lg:flex hidden relative h-8 w-full justify-start rounded-lg bg-background text-sm font-normal text-foreground-muted shadow-none sm:pr-12 md:w-40 lg:w-64 hover:border-foreground-muted hover:bg-surface-100 hover:text-foreground-lighter
           `
@@ -69,7 +69,7 @@ export function CommandMenu({ ...props }: DialogProps) {
         </kbd>
       </Button>
       <Button
-        type="text"
+        variant="text"
         size="tiny"
         className="px-1 group lg:hidden"
         onClick={() => setOpen(true)}
@@ -78,7 +78,7 @@ export function CommandMenu({ ...props }: DialogProps) {
       <CommandDialog open={open} onOpenChange={setOpen}>
         <DialogTitle className="sr-only">Search Design System...</DialogTitle>
         <CommandInput placeholder="Type a command or search..." />
-        <CommandList>
+        <CommandList className="max-h-[300px]">
           <CommandEmpty>No results found.</CommandEmpty>
           {docsConfig.sidebarNav.map((group) => (
             <CommandGroup key={group.title} heading={group.title}>

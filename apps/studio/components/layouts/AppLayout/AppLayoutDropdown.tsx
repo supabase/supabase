@@ -30,7 +30,7 @@ export const AppLayoutDropdownTriggerButton = forwardRef<
     className={cn('px-1.5 py-4 [&_svg]:w-5 [&_svg]:h-5 ml-1', className)}
     iconRight={<ChevronsUpDown strokeWidth={1.5} />}
     {...props}
-    type="text"
+    variant="text"
   />
 ))
 AppLayoutDropdownTriggerButton.displayName = 'AppLayoutDropdownTriggerButton'

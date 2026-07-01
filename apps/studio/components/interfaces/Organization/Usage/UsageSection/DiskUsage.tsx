@@ -7,7 +7,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { SectionContent } from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import Panel from '@/components/ui/Panel'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
@@ -174,7 +174,7 @@ export const DiskUsage = ({
                         <span className="text-foreground-light flex items-center gap-2">
                           {project.name}
                         </span>
-                        <Button asChild type="default" size={'tiny'}>
+                        <Button asChild variant="default" size={'tiny'}>
                           <Link href={`/project/${project.ref}/settings/compute-and-disk`}>
                             Manage Disk
                           </Link>

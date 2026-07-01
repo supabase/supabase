@@ -16,7 +16,7 @@ import {
   QueryPerformanceSQLParams,
 } from './QueryPerformance.types'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import useDbQuery from '@/hooks/analytics/useDbQuery'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -138,7 +138,7 @@ export const useQueryPerformanceInfiniteQuery = (
   const { data: databases } = useReadReplicasQuery({ projectRef: project?.ref })
   const connectionString = (databases || []).find(
     (db) => db.identifier === state.selectedDatabaseId
-  )?.connectionString
+  )?.connection_string_read_only // default to read_only connection string
 
   // Clamp pageSize the same way generateQueryPerformanceSql does so getNextPageParam
   // and the queryKey are always consistent with the SQL actually executed.

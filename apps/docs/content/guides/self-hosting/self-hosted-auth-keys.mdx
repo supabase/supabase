@@ -10,7 +10,7 @@ You can configure self-hosted Supabase to use the [new API keys](/docs/guides/ge
 
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 
-- Complete the [Docker setup guide](/docs/guides/self-hosting/docker), including running `generate-keys.sh` so that `JWT_SECRET`, `ANON_KEY`, and `SERVICE_ROLE_KEY` are set in your `.env` file
+- Complete the [Docker setup guide](/docs/guides/self-hosting/docker) so that `JWT_SECRET`, `ANON_KEY`, and `SERVICE_ROLE_KEY` are set in your `.env` file. [Quick start (Linux)](/docs/guides/self-hosting/docker#quick-start-linux) handles this automatically; the manual path runs [`generate-keys.sh`](/docs/guides/self-hosting/docker#generate-keys-and-secrets).
 - If you are upgrading an existing self-hosted Supabase environment, make sure to check the [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md) and add/update the following files:
   - `.env.example` (merge new sections into your `.env` file)
   - `docker-compose.yml`
@@ -61,7 +61,7 @@ storage:
 
 <Admonition type="caution">
 
-Podman does not support nested variable interpolation (`${A:-${B}}`). If you are using Podman, replace each nested expression with the required variable directly - see the inline comments in `docker-compose.yml` for the exact substitutions.
+Nested variable interpolation (`${A:-${B}}`) requires `podman-compose >= 1.6.0`. Earlier versions (still shipped by some Linux distributions) do not support it - if you are on an older `podman-compose`, either upgrade or replace each nested expression with the required variable directly, see the inline comments in `docker-compose.yml` for the exact substitutions.
 
 </Admonition>
 
@@ -214,15 +214,17 @@ When new API keys have not been added yet, the `kong-entrypoint.sh` script remov
 
 To assist with the authorization flows a specialized configuration in `kong.yml` substitutes internal, gateway-level-only pre-signed JWTs for `sb_publishable` and `sb_secret` API keys. These pre-signed JWTs are also auto-configured in `.env` but **should not** be used in any application code.
 
-| Route                | Service              | API key required | Header substitution |
-| -------------------- | -------------------- | ---------------- | ------------------- |
-| `/auth/v1/*`         | Auth                 | Yes              | `Authorization`     |
-| `/rest/v1/*`         | PostgREST            | Yes              | `Authorization`     |
-| `/graphql/v1`        | PostgREST            | Yes              | `Authorization`     |
-| `/realtime/v1/api/*` | Realtime (REST)      | Yes              | `Authorization`     |
-| `/realtime/v1/*`     | Realtime (WebSocket) | Yes              | `x-api-key`         |
-| `/storage/v1/*`      | Storage              | No               | `Authorization`     |
-| `/functions/v1/*`    | Edge Functions       | No               | -                   |
+| Route                      | Service              | API key required | Header substitution |
+| -------------------------- | -------------------- | ---------------- | ------------------- |
+| `/auth/v1/*`               | Auth                 | Yes              | `Authorization`     |
+| `/rest/v1/*`               | PostgREST            | Yes              | `Authorization`     |
+| `/graphql/v1`              | PostgREST            | Yes              | `Authorization`     |
+| `/realtime/v1/api/tenants` | Realtime (REST)      | Denied (blocked) | -                   |
+| `/realtime/v1/api/openapi` | Realtime (REST)      | Denied (blocked) | -                   |
+| `/realtime/v1/api/*`       | Realtime (REST)      | Yes              | `Authorization`     |
+| `/realtime/v1/*`           | Realtime (WebSocket) | Yes              | `x-api-key`         |
+| `/storage/v1/*`            | Storage              | No               | `Authorization`     |
+| `/functions/v1/*`          | Edge Functions       | No               | -                   |
 
 ### Request flows
 

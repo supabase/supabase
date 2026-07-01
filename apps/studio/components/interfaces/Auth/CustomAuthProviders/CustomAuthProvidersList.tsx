@@ -38,7 +38,7 @@ import {
 } from './customProviders.utils'
 import { DeleteCustomProviderModal } from './DeleteCustomProviderModal'
 import { DisableCustomProviderModal } from './DisableCustomProviderModal'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
@@ -80,7 +80,7 @@ const NewProviderButton = ({
 }) => {
   return (
     <Button
-      type="primary"
+      variant="primary"
       disabled={!canCreateProvider}
       icon={<Plus />}
       onClick={() => setShowCreateSheet(true)}
@@ -264,7 +264,7 @@ export const CustomAuthProvidersList = () => {
         description="Enable custom OAuth/OIDC providers to configure your own identity providers for authentication."
       >
         <Button
-          type="primary"
+          variant="primary"
           loading={isEnabling}
           disabled={isEnabling}
           onClick={handleEnableCustomProviders}
@@ -284,7 +284,7 @@ export const CustomAuthProvidersList = () => {
           description="Enable custom OAuth/OIDC providers to configure your own identity providers for authentication."
         >
           <Button
-            type="primary"
+            variant="primary"
             loading={isEnabling}
             disabled={isEnabling}
             onClick={handleEnableCustomProviders}
@@ -341,7 +341,7 @@ export const CustomAuthProvidersList = () => {
             />
             {hasActiveFilters && (
               <Button
-                type="default"
+                variant="default"
                 size="tiny"
                 className="px-1"
                 icon={<X />}
@@ -367,7 +367,7 @@ export const CustomAuthProvidersList = () => {
                     <div className="flex flex-col gap-y-2">
                       <p>Custom providers are not enabled for this project.</p>
                       <Button
-                        type="primary"
+                        variant="primary"
                         size="tiny"
                         loading={isEnabling}
                         disabled={isEnabling}
@@ -395,7 +395,7 @@ export const CustomAuthProvidersList = () => {
                 side="bottom"
               >
                 <Button
-                  type="primary"
+                  variant="primary"
                   disabled={!canCreateProvider}
                   icon={<Plus />}
                   onClick={() => setShowCreateSheet(true)}
@@ -455,7 +455,7 @@ export const CustomAuthProvidersList = () => {
                     <TableRow key={provider.id} className="w-full">
                       <TableCell className="flex" title={provider.name}>
                         <Button
-                          type="text"
+                          variant="text"
                           className="text-link-table-cell text-sm p-0 hover:bg-transparent title [&>span]:w-full!"
                           onClick={() => setSelectedProviderToEdit(provider.id)}
                           title={provider.name}
@@ -478,7 +478,7 @@ export const CustomAuthProvidersList = () => {
                         <div className="absolute top-0 right-0 left-0 bottom-0 flex items-center justify-center border-l @[944px]:border-l-0">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button type="default" className="px-1" icon={<MoreVertical />} />
+                              <Button variant="default" className="px-1" icon={<MoreVertical />} />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent side="bottom" align="end" className="w-48">
                               <DropdownMenuItem

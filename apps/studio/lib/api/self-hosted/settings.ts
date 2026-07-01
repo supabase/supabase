@@ -1,6 +1,6 @@
 import { components } from 'api-types'
 
-import { POSTGRES_PORT } from './constants'
+import { AUTH_JWT_SECRET, POSTGRES_PORT } from './constants'
 import { assertSelfHosted } from './util'
 import { PROJECT_DB_HOST, PROJECT_ENDPOINT, PROJECT_ENDPOINT_PROTOCOL } from '@/lib/constants/api'
 
@@ -36,21 +36,20 @@ export function getProjectSettings() {
     db_port: POSTGRES_PORT,
     db_user: 'postgres',
     inserted_at: '2021-08-02T06:40:40.646Z',
-    jwt_secret:
-      process.env.AUTH_JWT_SECRET ?? 'super-secret-jwt-token-with-at-least-32-characters-long',
+    jwt_secret: AUTH_JWT_SECRET,
     name: process.env.DEFAULT_PROJECT_NAME || 'Default Project',
     ref: 'default',
-    region: 'ap-southeast-1',
+    region: 'local',
     service_api_keys: [
-      {
-        api_key: process.env.SUPABASE_SERVICE_KEY ?? '',
-        name: 'service_role key',
-        tags: 'service_role',
-      },
       {
         api_key: process.env.SUPABASE_ANON_KEY ?? '',
         name: 'anon key',
         tags: 'anon',
+      },
+      {
+        api_key: process.env.SUPABASE_SERVICE_KEY ?? '',
+        name: 'service_role key',
+        tags: 'service_role',
       },
     ],
     ssl_enforced: false,

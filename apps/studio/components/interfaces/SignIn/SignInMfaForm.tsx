@@ -14,7 +14,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
 import { SupportLink } from '../Support/SupportLink'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
 import { useSignOut } from '@/lib/auth'
@@ -106,10 +106,10 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
         hideContactSupport
         additionalActions={
           <>
-            <Button asChild type="default">
+            <Button asChild variant="default">
               <Link href="/sign-in">Back to sign in</Link>
             </Button>
-            <Button asChild type="default">
+            <Button asChild variant="default">
               <Link href="https://supabase.com/support" target="_blank" rel="noreferrer">
                 Contact support
               </Link>
@@ -128,7 +128,12 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
 
       {isSuccessFactors && (
         <Form {...form}>
-          <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            id={formId}
+            method="POST"
+            className="flex flex-col gap-4"
+            onSubmit={form.handleSubmit(onSubmit)}
+          >
             <FormField
               key="code"
               name="code"
@@ -168,7 +173,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
             <div className="flex items-center justify-between gap-x-2">
               <Button
                 block
-                type="outline"
+                variant="outline"
                 size="large"
                 disabled={isVerifying || isSuccess}
                 onClick={onClickLogout}
@@ -179,7 +184,7 @@ export const SignInMfaForm = ({ context = 'sign-in' }: SignInMfaFormProps) => {
               <Button
                 block
                 form={formId}
-                htmlType="submit"
+                type="submit"
                 size="large"
                 disabled={isVerifying || isSuccess}
                 loading={isVerifying || isSuccess}

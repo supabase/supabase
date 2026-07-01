@@ -4,7 +4,7 @@ import { useParams } from 'common'
 import { Check } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useQueryState } from 'nuqs'
-import { useEffect, useId, useMemo, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
@@ -18,7 +18,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -36,7 +36,6 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useHasEntitlementAccess } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import { BASE_PATH } from '@/lib/constants'
 
 interface ProviderFormProps {
@@ -84,7 +83,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
 
   const hasEntitlementAccess = useHasEntitlementAccess()
 
-  const getValuesForProvider = useStaticEffectEvent(
+  const getValuesForProvider = useCallback(
     (config: components['schemas']['GoTrueConfigResponse']) => {
       const values: { [x: string]: string | boolean } = {}
       Object.keys(provider.properties).forEach((key) => {
@@ -112,7 +111,8 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
         }
       })
       return values
-    }
+    },
+    [provider]
   )
 
   const INITIAL_VALUES = useMemo(() => {
@@ -279,8 +279,8 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
               <DocsButton href={provider.link} />
               <div className="flex items-center gap-x-3">
                 <Button
-                  type="default"
-                  htmlType="reset"
+                  variant="default"
+                  type="reset"
                   onClick={() => {
                     setOpen(false)
                     setUrlProvider(null)
@@ -292,7 +292,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                 </Button>
                 <ButtonTooltip
                   form={formId}
-                  htmlType="submit"
+                  type="submit"
                   loading={isUpdatingConfig}
                   disabled={isUpdatingConfig || !canUpdateConfig || !form.formState.isDirty}
                   tooltip={{

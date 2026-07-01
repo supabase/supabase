@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { usePgPartmanStatus } from '../usePgPartmanStatus'
 import { EnableExtensionModal } from '@/components/interfaces/Database/Extensions/EnableExtensionModal'
@@ -19,7 +19,7 @@ export function PgPartmanCallout() {
         description="Unlock partitioned queues for automatic data retention, lower storage costs, and faster performance at scale."
       >
         <Button
-          type="default"
+          variant="default"
           size="tiny"
           className="mt-2"
           onClick={() => setShowEnableModal(true)}

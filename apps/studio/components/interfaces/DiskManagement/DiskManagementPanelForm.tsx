@@ -1,14 +1,14 @@
 import { useParams } from 'common'
 import Link from 'next/link'
 import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import {
   PageSection,
   PageSectionContent,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-} from 'ui-patterns'
-import { Admonition } from 'ui-patterns/admonition'
+} from 'ui-patterns/PageSection'
 
 import { DocsButton } from '../../ui/DocsButton'
 import { DOCS_URL } from '@/lib/constants'
@@ -32,7 +32,7 @@ export function DiskManagementPanelForm() {
           title="Disk Management has moved"
           description="Disk configuration is now managed alongside Project Compute on the new Compute and Disk page."
           actions={
-            <Button type="default" asChild>
+            <Button variant="default" asChild>
               <Link href={`/project/${projectRef}/settings/compute-and-disk`}>
                 Go to Compute and Disk
               </Link>

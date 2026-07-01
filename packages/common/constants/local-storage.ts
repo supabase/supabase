@@ -1,3 +1,5 @@
+import { safeLocalStorage } from '../safe-storage'
+
 export const LOCAL_STORAGE_KEYS = {
   /**
    * STUDIO
@@ -56,8 +58,6 @@ export const LOCAL_STORAGE_KEYS = {
   LINTER_SHOW_FOOTER: 'supabase-linter-show-footer',
   // Key to track account deletion requests
   ACCOUNT_DELETION_REQUEST: 'supabase-account-deletion-request',
-  // Used for storing a user id when sending reports to Sentry. The id is hashed for anonymity.
-  SENTRY_USER_ID: 'supabase-sentry-user-id',
   // Used for storing the last sign in method used by the user
   LAST_SIGN_IN_METHOD: 'supabase-last-sign-in-method',
   // Key to track the last selected schema. The project ref is intentionally put at the end for easier search in the browser console.
@@ -69,10 +69,9 @@ export const LOCAL_STORAGE_KEYS = {
   EXPAND_NAVIGATION_PANEL: 'supabase-expand-navigation-panel',
   GITHUB_AUTHORIZATION_STATE: 'supabase-github-authorization-state',
   // Notice banner keys
-  FLY_DEPRECATION_2026_05_31: 'fly-deprecation-2026-05-31-dismissed',
   API_KEYS_FEEDBACK_DISMISSED: (ref: string) => `supabase-api-keys-feedback-dismissed-${ref}`,
   TERMS_OF_SERVICE_UPDATE: 'terms-of-service-update-2026-06-06',
-  SUPAVISOR_MAINTENANCE: (ref: string) => `supavisor-maintenance-2026-05-21-${ref}`,
+  SUPAVISOR_MAINTENANCE: (ref: string) => `supavisor-maintenance-2026-06-09-${ref}`,
   REPORT_DATERANGE: 'supabase-report-daterange',
   PROJECT_PAUSING_STARTED_AT: (ref: string) => `supabase-project-pausing-started-at-${ref}`,
   PROJECT_RESTORING_STARTED_AT: (ref: string) => `supabase-project-restoring-started-at-${ref}`,
@@ -86,7 +85,7 @@ export const LOCAL_STORAGE_KEYS = {
   // Shortcut preferences
   SHORTCUT_STORAGE_KEY: 'supabase-shortcut-preferences',
 
-  LAST_VISITED_ORGANIZATION: 'last-visited-organization',
+  LAST_VISITED_ORGANIZATION: (uid?: number) => `last-visited-organization-${uid}`,
 
   // user impersonation selector previous searches
   USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES: (ref: string) =>
@@ -115,6 +114,7 @@ export const LOCAL_STORAGE_KEYS = {
     `table-editor-queue-operations-banner-dismissed-${ref}`,
   FREE_MICRO_UPGRADE_BANNER_DISMISSED: (ref: string) =>
     `free-micro-upgrade-banner-dismissed-${ref}`,
+  UNIFIED_LOGS_BANNER_DISMISSED: 'unified-logs-banner-dismissed',
   STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
     `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
 
@@ -165,9 +165,9 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
 ]
 
 export function clearLocalStorage() {
-  for (const key in localStorage) {
+  for (const key of safeLocalStorage.keys()) {
     if (!LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key)) {
-      localStorage.removeItem(key)
+      safeLocalStorage.removeItem(key)
     }
   }
 }

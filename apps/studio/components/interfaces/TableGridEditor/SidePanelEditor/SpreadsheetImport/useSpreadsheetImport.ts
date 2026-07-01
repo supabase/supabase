@@ -1,10 +1,10 @@
 import { debounce, noop } from 'lodash'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 
 import type { SpreadsheetData } from './SpreadsheetImport.types'
 import { parseSpreadsheet, parseSpreadsheetText } from './SpreadsheetImport.utils'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 interface NoFileState {
@@ -212,32 +212,38 @@ export function useSpreadsheetImport({
     },
     [resetAbortController]
   )
-  const processTextStable = useStaticEffectEvent(processText)
+  const processTextRef = useLatest(processText)
   const processTextDebounced = useMemo(
-    () => debounce(processTextStable, debounceDuration),
-    [debounceDuration, processTextStable]
+    () =>
+      debounce(
+        (...args: Parameters<typeof processText>) => processTextRef.current(...args),
+        debounceDuration
+      ),
+    [debounceDuration, processTextRef]
   )
 
-  const cleanup = useStaticEffectEvent(function cleanup() {
+  const cleanup = useEffectEvent(function cleanup() {
     processTextDebounced.cancel()
     abortControllerRef.current.abort()
   })
   useEffect(() => {
     return cleanup
-  }, [cleanup])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [])
 
   // When the component mounts with a file already in global state (e.g. dropped onto the
   // grid), the useState initializer above sets _tag to 'parsing_file' but does not start
-  // the actual parse. Kick it off here. useStaticEffectEvent ensures we always read the
+  // the actual parse. Kick it off here. useEffectEvent ensures we always read the
   // latest state/treatEmptyAsNull without re-triggering the effect.
-  const processOnMount = useStaticEffectEvent(async function processOnMount() {
+  const processOnMount = useEffectEvent(async function processOnMount() {
     if (state._tag === 'parsing_file') {
       await processFile(state.file, { emptyStringAsNullHeaders: undefined })
     }
   })
   useEffect(() => {
     processOnMount()
-  }, [processOnMount])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [])
 
   const processSpreadsheet = useCallback(
     async function processSpreadsheet({

@@ -20,8 +20,8 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
-import NoPermission from '@/components/ui/NoPermission'
+import { AlertError } from '@/components/ui/AlertError'
+import { NoPermission } from '@/components/ui/NoPermission'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
 import { organizationKeys } from '@/data/organizations/keys'
 import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
@@ -230,12 +230,16 @@ export const BillingCustomerData = () => {
                           </span>
                         )}
                         <div className="flex items-center gap-2">
-                          <Button type="default" onClick={handleReset} disabled={isSubmitDisabled}>
+                          <Button
+                            variant="default"
+                            onClick={handleReset}
+                            disabled={isSubmitDisabled}
+                          >
                             Cancel
                           </Button>
                           <Button
-                            type="primary"
-                            htmlType="submit"
+                            variant="primary"
+                            type="submit"
                             disabled={isSubmitDisabled}
                             loading={isSubmitting}
                           >

@@ -1,6 +1,6 @@
 import { Plus } from 'lucide-react'
 import { Button } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import {
   PageSection,
   PageSectionAside,
@@ -19,7 +19,7 @@ export default function EmptyStatePresentationalIcon() {
             <PageSectionTitle>Providers</PageSectionTitle>
           </PageSectionSummary>
           <PageSectionAside>
-            <Button size="tiny" type="primary" icon={<Plus size={14} />}>
+            <Button size="tiny" variant="primary" icon={<Plus size={14} />}>
               Add provider
             </Button>
           </PageSectionAside>
@@ -29,7 +29,7 @@ export default function EmptyStatePresentationalIcon() {
             title="Add a provider"
             description="Use third-party authentication systems to access your project."
           >
-            <Button size="tiny" type="default" icon={<Plus size={14} />}>
+            <Button size="tiny" variant="default" icon={<Plus size={14} />}>
               Add provider
             </Button>
           </EmptyStatePresentational>

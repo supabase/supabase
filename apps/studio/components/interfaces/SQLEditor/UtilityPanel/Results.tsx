@@ -127,7 +127,7 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
           <DataGrid
             columns={columns}
             rows={rows}
-            className="grow min-h-0 border-t-0"
+            className="grow min-h-0 border-t-0! border-b-0!"
             rowClass={() => '[&>.rdg-cell]:items-center'}
             onCellKeyDown={handleCellKeyDown}
           />
@@ -142,5 +142,3 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
     </>
   )
 }
-
-export default Results

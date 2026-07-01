@@ -23,8 +23,9 @@ import { useTrack } from '@/lib/telemetry/track'
 const AUTO_OPTION_VALUE = '__auto__'
 
 export const TimezoneDropdown = () => {
-  const { timezone, storedTimezone, setTimezone, isAutoDetected } = useTimezone()
   const track = useTrack()
+  const { timezone, storedTimezone, setTimezone, isAutoDetected } = useTimezone()
+
   const [open, setOpen] = useState(false)
 
   // The "Auto detect" row always advertises the browser's own timezone, even
@@ -78,6 +79,19 @@ export const TimezoneDropdown = () => {
                       className={cn(
                         'ml-auto h-4 w-4',
                         isAutoDetected ? 'opacity-100' : 'opacity-0'
+                      )}
+                    />
+                  </CommandItem>
+                  <CommandItem
+                    key="UTC"
+                    value="UTC Coordinated Universal Time"
+                    onSelect={() => handleSelect('UTC')}
+                  >
+                    {'(UTC) Coordinated Universal Time'}
+                    <CheckIcon
+                      className={cn(
+                        'ml-auto h-4 w-4',
+                        !isAutoDetected && storedTimezone === 'UTC' ? 'opacity-100' : 'opacity-0'
                       )}
                     />
                   </CommandItem>
