@@ -74,6 +74,43 @@ describe('removeJSONTrailingComma', () => {
 
     expect(result).toEqual('{"test":"test"}')
   })
+
+  it('should remove a trailing comma in an array', () => {
+    const result = removeJSONTrailingComma('[1, 2, 3,]')
+
+    expect(result).toEqual('[1, 2, 3]')
+  })
+
+  it('should remove trailing commas separated by whitespace/newlines', () => {
+    const result = removeJSONTrailingComma('{\n  "a": 1,\n}')
+
+    expect(JSON.parse(result)).toEqual({ a: 1 })
+  })
+
+  it('should preserve commas inside string values followed by a bracket', () => {
+    const result = removeJSONTrailingComma('{"pattern": "[a-z,]"}')
+
+    expect(result).toEqual('{"pattern": "[a-z,]"}')
+    expect(JSON.parse(result)).toEqual({ pattern: '[a-z,]' })
+  })
+
+  it('should preserve commas inside string values followed by a brace', () => {
+    const result = removeJSONTrailingComma('{"note": "done,}"}')
+
+    expect(JSON.parse(result)).toEqual({ note: 'done,}' })
+  })
+
+  it('should preserve in-string commas while still removing a real trailing comma', () => {
+    const result = removeJSONTrailingComma('{"a": "1,2,]", "b": 2,}')
+
+    expect(JSON.parse(result)).toEqual({ a: '1,2,]', b: 2 })
+  })
+
+  it('should not be fooled by escaped quotes inside strings', () => {
+    const result = removeJSONTrailingComma('{"a": "he said \\"hi,]\\""}')
+
+    expect(JSON.parse(result)).toEqual({ a: 'he said "hi,]"' })
+  })
 })
 
 describe('timeout', () => {
