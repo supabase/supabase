@@ -23,9 +23,7 @@ export function HomeContent({ frameworksSlot }: { frameworksSlot: React.ReactNod
         <Hero />
       </header>
       <section id="products" className="relative">
-        <div className="-translate-y-16">
-          <Products {...content.productsSection} />
-        </div>
+        <Products {...content.productsSection} />
       </section>
       <section id="social-proof">
         <LogosGrid />
