@@ -1,7 +1,6 @@
-import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
-import { useEffect, useEffectEvent, useState } from 'react'
+import { useEffect, useEffectEvent } from 'react'
 
 import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -12,10 +11,14 @@ import { canEditSnippet } from '@/state/sql-editor/sql-editor-rules'
 import { useTabsStateSnapshot } from '@/state/tabs'
 
 /**
- * Owns the editing lifecycle of a single SQL snippet: tracking the editor text,
- * creating the snippet in the store on first edit (and routing to its URL),
- * persisting debounced changes via `setSql`, and seeding the editor from a
- * `?content=` deep link.
+ * Owns the editing lifecycle of a single SQL snippet: creating the snippet in
+ * the store on first edit (and routing to its URL), writing changes back to the
+ * store via `setSql`, and seeding the editor from a `?content=` deep link.
+ *
+ * Edits are written to the store synchronously on every change; debouncing the
+ * actual persistence is the save mechanism's job (see `createSaveMechanism`), so
+ * the store — and therefore the snippet's dirty status — always reflects the
+ * latest edit immediately.
  *
  * Extracted from `MonacoEditor` so that component stays a thin editor shell.
  */
@@ -27,9 +30,6 @@ export function useSnippetEditor({ id, snippetName }: { id: string; snippetName:
 
   const snapV2 = useSqlEditorV2StateSnapshot()
   const tabsSnap = useTabsStateSnapshot()
-
-  const [value, setValue] = useState('')
-  const debouncedValue = useDebounce(value, 1000)
 
   const snippet = snapV2.snippets[id]
   const disableEdit = !!snippet && !canEditSnippet(snippet.snippet, profile?.id)
@@ -57,16 +57,13 @@ export function useSnippetEditor({ id, snippetName }: { id: string; snippetName:
         router.push(`/project/${ref}/sql/${newSnippet.id}`, undefined, { shallow: true })
       }
     }
-    setValue(value)
-  }
 
-  useEffect(() => {
-    if (debouncedValue.length > 0 && snippet) {
-      const shouldInvalidate = wasNeverPersisted(snippet.snippet.status)
-      snapV2.setSql({ id, sql: value, shouldInvalidate })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedValue])
+    // A snippet that has never been persisted needs the snippet/folder lists
+    // invalidated so it shows up in the sidebar. If `snippet` was undefined at
+    // render we just created one above (status 'new'), which always qualifies.
+    const shouldInvalidate = snippet ? wasNeverPersisted(snippet.snippet.status) : true
+    snapV2.setSql({ id, sql: value, shouldInvalidate })
+  }
 
   // if an SQL query is passed by the content parameter, set the editor value to its content. This
   // is usually used for sending the user to SQL editor from other pages with SQL.
