@@ -5,7 +5,7 @@ export const selfHostingGetStarted: ContentListingGroup = {
   heading: 'Get started',
   headingLevel: 'h2',
   type: 'grid',
-  columns: 3,
+  columns: 2,
   description: 'The fastest and recommended way to self-host Supabase is to use Docker.',
   items: [
     {
