@@ -28,15 +28,12 @@ cd my-app && npm install @supabase/supabase-js
 
 ## 5. Declare Supabase environment variables
 
-Create a `.env.local` file and populate it with your Supabase connection variables:
+Create a `.env.local` file and populate it with your Supabase connection variables that you can get from the helper above, or [from the project **Connect** panel](https://supabase.com/dashboard/project/_?showConnect=true&framework=react&tab=frameworks):
 
 ```text name=.env.local
 VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
-
-<$Partial path="api_keys_deprecation.mdx" variables={{ "framework": "{{ .framework }}", "tab": "{{ .tab }}" }}
-/>
 
 ## 6. Query data from the app
 

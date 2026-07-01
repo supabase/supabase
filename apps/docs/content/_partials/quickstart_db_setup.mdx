@@ -47,44 +47,61 @@ curl -X POST https://api.supabase.com/v1/projects \
 
 ## 2. Set up your database
 
-When your Supabase project is up and running, create a table and insert some sample data.
+When your Supabase project is up and running, create an `instruments` table with some sample data.
 
-Run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new).
+Then set a secure baseline by setting only the privileges each Postgres role needs, add [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default, and create an RLS policy to make the data in your table publicly readable.
 
+You can click this button to prefil all the SQL needed in [the SQL editor of your project](/dashboard/project/_/sql/new?content=--%20Create%20the%20table%0Acreate%20table%20instruments%20%28%0A%20%20id%20bigint%20primary%20key%20generated%20always%20as%20identity%2C%0A%20%20name%20text%20not%20null%0A%29%3B%0A%0A--%20Insert%20sample%20data%20into%20the%20table%0Ainsert%20into%20instruments%20%28name%29%0Avalues%0A%20%20%28%27violin%27%29%2C%0A%20%20%28%27viola%27%29%2C%0A%20%20%28%27cello%27%29%3B%0A%0A--%20Grant%20the%20privileges%20the%20role%20needs%2C%20which%20is%20read%20access%0Agrant%20select%20on%20public.instruments%20to%20anon%3B%0A%0A--%20Enable%20row%20level%20security%20for%20the%20table%0Aalter%20table%20instruments%20enable%20row%20level%20security%3B%0A%0A--%20Create%20a%20policy%20to%20allow%20the%20anon%20role%20to%20read%20from%20the%20instruments%20table%0Acreate%20policy%20%22public%20can%20read%20instruments%22%0Aon%20public.instruments%0Afor%20select%20to%20anon%0Ausing%20%28true%29%3B) in the Dashboard.
 
-```sql SQL_EDITOR
--- Create the table
-create table instruments (
-  id bigint primary key generated always as identity,
-  name text not null
-);
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_/sql/new?content=--%20Create%20the%20table%0Acreate%20table%20instruments%20%28%0A%20%20id%20bigint%20primary%20key%20generated%20always%20as%20identity%2C%0A%20%20name%20text%20not%20null%0A%29%3B%0A%0A--%20Insert%20sample%20data%20into%20the%20table%0Ainsert%20into%20instruments%20%28name%29%0Avalues%0A%20%20%28%27violin%27%29%2C%0A%20%20%28%27viola%27%29%2C%0A%20%20%28%27cello%27%29%3B%0A%0A--%20Grant%20the%20privileges%20the%20role%20needs%2C%20which%20is%20read%20access%0Agrant%20select%20on%20public.instruments%20to%20anon%3B%0A%0A--%20Enable%20row%20level%20security%20for%20the%20table%0Aalter%20table%20instruments%20enable%20row%20level%20security%3B%0A%0A--%20Create%20a%20policy%20to%20allow%20the%20anon%20role%20to%20read%20from%20the%20instruments%20table%0Acreate%20policy%20%22public%20can%20read%20instruments%22%0Aon%20public.instruments%0Afor%20select%20to%20anon%0Ausing%20%28true%29%3B">Prefill SQL</a>
+</Button>
 
--- Insert sample data into the table
-insert into instruments (name)
-values
-  ('violin'),
-  ('viola'),
-  ('cello');
+<Accordion
+  type="default"
+  openBehaviour="single"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+    <AccordionItem
+      header="Want to learn more about the SQL and add it manually?"
+      id="manual-sql"
+    >
 
--- Grant the privileges the role needs, which is read access
-grant select on public.instruments to anon;
+    Run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new). You can also choose the SQL and prefil it from the **Reference > Samples** menu at the side of the SQL Editor.
 
--- Enable row level security for the table
-alter table instruments enable row level security;
-```
+    ```sql SQL_EDITOR
+    -- Create the table
+    create table instruments (
+      id bigint primary key generated always as identity,
+      name text not null
+    );
 
-This creates an `instruments` table with some sample data, sets a secure baseline by setting only the privileges each Postgres role needs, and adds [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default.
+    -- Insert sample data into the table
+    insert into instruments (name)
+    values
+      ('violin'),
+      ('viola'),
+      ('cello');
+
+    -- Grant the privileges the role needs, which is read access
+    grant select on public.instruments to anon;
+
+    -- Enable row level security for the table
+    alter table instruments enable row level security;
+
+    -- Create a policy to allow the anon role to read from the instruments table
+    create policy "public can read instruments"
+    on public.instruments
+    for select to anon
+    using (true);
+    ```
+
+    </AccordionItem>
+</Accordion>
 
 {/* Commented for now as really we're already getting people to paste SQL, so let's continue. Once we have this added as an example, then offer fully visual options. */}
 
 {/* Then in the [**Integrations > Data API**](/dashboard/project/_/integrations/data_api/settings) section of the Dashboard, expose the specific tables or functions you want to access. To automatically grant access for new tables and functions in `public`, enable **Default privileges for new entities**. */}
-
-Create an RLS policy to make the data in your table publicly readable:
-
-```sql SQL_EDITOR
--- Create a policy to allow the anon role to read from the instruments table
-create policy "public can read instruments"
-on public.instruments
-for select to anon
-using (true);
-```
