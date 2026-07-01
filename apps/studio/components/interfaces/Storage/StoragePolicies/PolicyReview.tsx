@@ -2,7 +2,7 @@ import { isEmpty, noop } from 'lodash'
 import { useState } from 'react'
 import { Button, DialogFooter, DialogSection } from 'ui'
 
-import type { PolicyForReview } from './Policies.types'
+import type { PolicyForReview } from './StoragePolicies.types'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 
 interface PolicyReviewProps {
@@ -10,8 +10,6 @@ interface PolicyReviewProps {
   onSelectBack: () => void
   onSelectSave: () => void
 }
-
-// [Joshen] This seems like dead code atm, clean up separately
 
 export const PolicyReview = ({
   policy = {},
@@ -24,7 +22,7 @@ export const PolicyReview = ({
     onSelectSave()
   }
 
-  let formattedSQLStatement = policy.statement || ''
+  const formattedSQLStatement = policy.statement || ''
 
   return (
     <>

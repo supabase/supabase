@@ -2,9 +2,9 @@ import { isEmpty, noop } from 'lodash'
 import { useState } from 'react'
 import { Button, DialogSectionSeparator } from 'ui'
 
-import { PolicyTemplate } from './PolicyTemplates.constants'
 import TemplatePreview from './TemplatePreview'
 import TemplatesList from './TemplatesList'
+import { type PolicyTemplate } from '@/components/interfaces/Database/Policies/Policies.constants'
 
 interface PolicyTemplatesProps {
   templates?: PolicyTemplate[]
@@ -12,7 +12,7 @@ interface PolicyTemplatesProps {
   onUseTemplate?: (template: PolicyTemplate) => void
 }
 
-const PolicyTemplates = ({
+export const PolicyTemplates = ({
   templates = [],
   templatesNote = '',
   onUseTemplate = noop,
@@ -45,5 +45,3 @@ const PolicyTemplates = ({
     </div>
   )
 }
-
-export default PolicyTemplates
