@@ -94,7 +94,8 @@ export const EdgeFunctionRecentErrors = ({
       iso_timestamp_start: isoTimestampStart,
       iso_timestamp_end: isoTimestampEnd,
     },
-    isQueryEnabled
+    isQueryEnabled,
+    { useOtel: true }
   )
 
   const recentErrorGroupsBase = useMemo(
@@ -112,7 +113,8 @@ export const EdgeFunctionRecentErrors = ({
       iso_timestamp_start: isoTimestampStart,
       iso_timestamp_end: isoTimestampEnd,
     },
-    Boolean(projectRef && sinceLastDeployInvocationCountSql && isoTimestampStart)
+    Boolean(projectRef && sinceLastDeployInvocationCountSql && isoTimestampStart),
+    { useOtel: true }
   )
 
   const relatedExecutionIds = useMemo(
@@ -136,7 +138,8 @@ export const EdgeFunctionRecentErrors = ({
       iso_timestamp_start: isoTimestampStart,
       iso_timestamp_end: isoTimestampEnd,
     },
-    Boolean(projectRef && functionRuntimeLogsSql && isoTimestampStart)
+    Boolean(projectRef && functionRuntimeLogsSql && isoTimestampStart),
+    { useOtel: true }
   )
   const queryError =
     toAlertError(recentErrorInvocationsError) ?? toAlertError(functionRuntimeLogsError)

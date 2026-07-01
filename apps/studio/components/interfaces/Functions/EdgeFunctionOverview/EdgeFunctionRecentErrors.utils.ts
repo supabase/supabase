@@ -2,11 +2,8 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 
 import { parseEdgeFunctionEventMessage } from '../EdgeFunctionRecentInvocations.utils'
-import { LOGS_TABLES } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type { LogData } from '@/components/interfaces/Settings/Logs/Logs.types'
 import {
-  genCountQuery,
-  genDefaultQuery,
   isUnixMicro,
   unixMicroToIsoTimestamp,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
@@ -196,20 +193,30 @@ export const getStatusBadgeVariant = (statusCode?: string) => {
 export const getRecentErrorInvocationsSql = (
   functionId?: string,
   limit = RECENT_ERROR_INVOCATIONS_LIMIT
-) =>
-  genDefaultQuery(
-    LOGS_TABLES.fn_edge,
-    {
-      function_id: functionId ?? '__pending__',
-      'status_code.error': true,
-    },
-    limit
-  )
+): string => {
+  const id = escapeSqlString(functionId ?? '__pending__')
+  return `
+SELECT
+  toUnixTimestamp64Micro(Timestamp) AS timestamp,
+  Body AS event_message,
+  LogAttributes['request_method'] AS method,
+  LogAttributes['response_status_code'] AS status_code,
+  toFloat64OrZero(LogAttributes['execution_time_ms']) AS execution_time_ms,
+  LogAttributes['execution_id'] AS execution_id
+FROM edge_logs
+WHERE
+  LogAttributes['function_id'] = '${id}'
+  AND LogAttributes['event_type'] = 'Request'
+  AND toInt32OrZero(LogAttributes['response_status_code']) >= 500
+ORDER BY Timestamp DESC
+LIMIT ${limit}
+`.trim()
+}
 
-export const getSinceLastDeployInvocationCountSql = (functionId?: string) =>
-  genCountQuery(LOGS_TABLES.fn_edge, {
-    function_id: functionId ?? '__pending__',
-  })
+export const getSinceLastDeployInvocationCountSql = (functionId?: string): string => {
+  const id = escapeSqlString(functionId ?? '__pending__')
+  return `SELECT count(*) AS count FROM edge_logs WHERE LogAttributes['function_id'] = '${id}' AND LogAttributes['event_type'] = 'Request'`
+}
 
 export const getSinceLastDeployInvocationCount = (invocationCountRows: LogData[]) => {
   const count = Number(invocationCountRows[0]?.count ?? 0)
@@ -238,16 +245,28 @@ export const getFunctionRuntimeLogsSql = ({
   functionId?: string
   executionIds: string[]
   limit?: number
-}) => {
+}): string => {
   if (!functionId || executionIds.length === 0) return ''
 
+  const escapedFunctionId = escapeSqlString(functionId)
   const escapedExecutionIds = executionIds.map((id) => `'${escapeSqlString(id)}'`).join(', ')
 
-  return `select id, function_logs.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.execution_id, metadata.level from function_logs
-cross join unnest(metadata) as metadata
-where metadata.function_id = '${escapeSqlString(functionId)}' and metadata.execution_id in (${escapedExecutionIds})
-order by timestamp desc
-limit ${limit}`
+  return `
+SELECT
+  toUnixTimestamp64Micro(Timestamp) AS timestamp,
+  Body AS event_message,
+  SeverityText AS level,
+  LogAttributes['event_type'] AS event_type,
+  LogAttributes['function_id'] AS function_id,
+  LogAttributes['execution_id'] AS execution_id
+FROM edge_logs
+WHERE
+  LogAttributes['function_id'] = '${escapedFunctionId}'
+  AND LogAttributes['execution_id'] IN (${escapedExecutionIds})
+  AND LogAttributes['event_type'] = 'Log'
+ORDER BY Timestamp DESC
+LIMIT ${limit}
+`.trim()
 }
 
 export const getRecentErrorGroupsBase = (
