@@ -36,10 +36,10 @@ export const ReportSettings = ({ chartId }: ReportSettingsProps) => {
 
         {syncHover && (
           <div className="flex items-start justify-between space-x-2">
-            <Label htmlFor="sync-hover" className="text-xs">
+            <Label htmlFor="sync-tooltips" className="text-xs">
               <p>Sync tooltips</p>
               <p className="text-xs text-foreground-light mt-1 text-balance">
-                When enabled, also shows tooltips on all charts.
+                Shows tooltips on all charts
               </p>
             </Label>
             <Switch
