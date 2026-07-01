@@ -309,7 +309,7 @@ select timestamp from logs;
 </TabPanel>
 </Tabs>
 
-### Unnesting arrays
+### Unnesting arrays (BigQuery only)
 
 Each log event stores metadata an array of objects with multiple levels, and can be seen by selecting single log events in the Logs Explorer. To query arrays, use `unnest()` on each array field and add it to the query as a join. This allows you to reference the nested objects with an alias and select their individual fields.
 
