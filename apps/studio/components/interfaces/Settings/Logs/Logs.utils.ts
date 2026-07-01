@@ -365,17 +365,18 @@ export const genCountQuery = (table: LogsTableName, filters: Filters): SafeLogSq
   return safeSql`SELECT count(*) as count FROM ${LOG_TABLE_SQL[table]} ${joins} ${where}`
 }
 
+export const resolveLogTimestamp = (value?: string): Dayjs => {
+  const parsed = dayjs(value)
+  return value && parsed.isValid() ? parsed : dayjs()
+}
+
 /** calculates how much the chart start datetime should be offset given the current datetime filter params */
 const calcChartStart = (
   params: Partial<LogsEndpointParams>
 ): [Dayjs, 'minute' | 'hour' | 'day'] => {
-  // Fall back to now when the param is missing or unparseable, otherwise an
-  // Invalid Date propagates and startOffset.toISOString() throws RangeError.
-  const parsedEnd = dayjs(params.iso_timestamp_end)
-  const ite = params.iso_timestamp_end && parsedEnd.isValid() ? parsedEnd : dayjs()
-  const parsedStart = dayjs(params.iso_timestamp_start)
+  const ite = resolveLogTimestamp(params.iso_timestamp_end)
   // todo @TzeYiing needs typing
-  const its: any = params.iso_timestamp_start && parsedStart.isValid() ? parsedStart : dayjs()
+  const its: any = resolveLogTimestamp(params.iso_timestamp_start)
 
   let trunc: 'minute' | 'hour' | 'day' = 'minute'
   let extendValue = 60 * 6
