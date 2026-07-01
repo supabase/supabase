@@ -13,6 +13,7 @@
     "clean": "rimraf node_modules .next .turbo tsconfig.tsbuildinfo"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.106.0",
     "fontkit": "^2.0.4",
     "next": "catalog:",
     "react": "catalog:",

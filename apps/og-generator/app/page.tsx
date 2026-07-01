@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { suggestArtDirection, type Suggestion } from '@/lib/ai/suggest'
+import type { Suggestion } from '@/lib/ai/suggest'
 import { SEED_ICONS } from '@/lib/assets/seed-icons'
 import { contrastRatio, rating } from '@/lib/design/contrast'
 import { DEFAULT_TEMPLATE_ID, TEMPLATES } from '@/lib/design/templates'
@@ -381,12 +381,69 @@ export default function Page() {
   }
 
   const [generated, setGenerated] = useState<Suggestion | null>(null)
-  const generate = () =>
-    setGenerated(aiDescription.trim() ? suggestArtDirection(aiDescription) : null)
+  const [generating, setGenerating] = useState(false)
+  const [exampleCopied, setExampleCopied] = useState(false)
+  // Server route decides the engine: Claude when ANTHROPIC_API_KEY is set,
+  // else the backend-free keyword matcher. Same Suggestion shape either way.
+  const generate = async () => {
+    const description = aiDescription.trim()
+    if (!description) {
+      setGenerated(null)
+      return
+    }
+    setGenerating(true)
+    try {
+      const res = await fetch('/api/suggest', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ description }),
+      })
+      if (!res.ok) throw new Error(`suggest failed: ${res.status}`)
+      setGenerated((await res.json()) as Suggestion)
+    } catch (err) {
+      console.error(err)
+      setGenerated({
+        iconName: null,
+        templateId: template,
+        rationale: 'Could not generate a suggestion — please try again.',
+        source: 'none',
+        alternates: [],
+      })
+    } finally {
+      setGenerating(false)
+    }
+  }
   const applySuggestion = () => {
     if (!generated) return
     if (generated.iconName) setIcon(generated.iconName)
     changeTemplate(generated.templateId)
+    if (generated.pattern) {
+      setPatternType(generated.pattern.type as PatternTypeOpt)
+      setPatternScale(generated.pattern.scale as PatternScaleOpt)
+      setPatternColor(generated.pattern.color as PatternColorOpt)
+      setPatternOpacity(generated.pattern.opacity)
+    }
+    if (generated.eyebrow && !eyebrow.trim()) setEyebrow(generated.eyebrow)
+  }
+
+  // Backend-free way to grow the featured-examples corpus (§6.8): copy the
+  // current composition as a ready-to-paste entry for lib/ai/examples.ts.
+  const saveAsExample = () => {
+    if (!icon) return
+    const entry: Record<string, unknown> = {
+      id: `ex-${Date.now().toString(36)}`,
+      subject: (aiDescription.trim() || headline).toLowerCase(),
+      iconName: icon,
+      templateId: template,
+    }
+    if (eyebrow.trim()) entry.eyebrow = eyebrow.trim()
+    if (patternType !== 'none') {
+      entry.pattern = { type: patternType, scale: patternScale, color: patternColor, opacity: patternOpacity }
+    }
+    entry.whyItWorks = '<why this composition works>'
+    navigator.clipboard.writeText(`${JSON.stringify(entry, null, 2)},`)
+    setExampleCopied(true)
+    setTimeout(() => setExampleCopied(false), 2500)
   }
 
   const count = [...headline].length
@@ -448,7 +505,7 @@ export default function Page() {
               <div className="flex flex-col gap-2">
                 <span className="text-sm font-medium text-foreground-light">
                   Describe this post
-                  <Hint text="Suggests an icon + template from the library. Backend-free keyword match over the seed icons for now — the full version (embeddings + Claude API over the uploadable library) comes with Supabase (§6.6)." />
+                  <Hint text="Picks an on-brand icon + template + background for your post. Uses Claude when an ANTHROPIC_API_KEY is set (see README) and falls back to a keyword match over the seed icons otherwise (§6.6)." />
                 </span>
                 <textarea
                   id="ai-describe"
@@ -460,14 +517,14 @@ export default function Page() {
                 />
                 <button
                   onClick={generate}
-                  disabled={!aiDescription.trim()}
+                  disabled={!aiDescription.trim() || generating}
                   className="flex items-center justify-center gap-1.5 rounded-md bg-brand px-3 py-2 text-xs font-medium text-background hover:bg-brand/90 disabled:opacity-50"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" />
                     <path d="M18.5 14.5l.85 2.65 2.65.85-2.65.85-.85 2.65-.85-2.65-2.65-.85 2.65-.85z" />
                   </svg>
-                  Generate
+                  {generating ? 'Generating…' : 'Generate'}
                 </button>
                 {generated && (
                   <div className="flex flex-col gap-2 rounded-md border border-default bg-surface-100 p-3">
@@ -495,7 +552,13 @@ export default function Page() {
                           <div className="min-w-0 flex-1 text-xs">
                             <div className="text-foreground">{generated.rationale}</div>
                             <div className="text-foreground-lighter">
-                              Template: {TEMPLATES.find((t) => t.id === generated.templateId)?.label}
+                              {generated.source === 'ai'
+                                ? '✨ AI suggestion'
+                                : generated.source === 'example'
+                                  ? '★ Featured example'
+                                  : 'Icon library'}{' '}
+                              ·{' '}
+                              {TEMPLATES.find((t) => t.id === generated.templateId)?.label}
                             </div>
                           </div>
                           <button
@@ -525,6 +588,15 @@ export default function Page() {
                     )}
                   </div>
                 )}
+                <button
+                  type="button"
+                  onClick={saveAsExample}
+                  disabled={!icon}
+                  title={icon ? 'Copy this composition as a featured example' : 'Pick an icon first'}
+                  className="self-start rounded-md border border-default px-2.5 py-1 text-xs text-foreground-light hover:border-strong disabled:opacity-50"
+                >
+                  {exampleCopied ? '✓ Copied — paste into lib/ai/examples.ts' : '★ Save current as example'}
+                </button>
               </div>
             </Group>
           )}
