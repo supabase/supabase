@@ -3,7 +3,7 @@
 import { useSearchParamsShallow } from 'common'
 import { xor } from 'lodash'
 import { Children, isValidElement, useEffect, useRef, type FC, type PropsWithChildren } from 'react'
-import { type TabsProps } from 'ui'
+import { type DocsTabs } from 'ui'
 
 const isString = (maybeStr: unknown): maybeStr is string => typeof maybeStr === 'string'
 
@@ -18,7 +18,7 @@ interface QueryParamsProps {
  * selection state in query params.
  */
 const withQueryParams =
-  <Props extends PropsWithChildren<TabsProps>>(
+  <Props extends PropsWithChildren<DocsTabs.TabsProps>>(
     Component: FC<Omit<Props, 'children' | 'queryGroup' | 'onClick'>>
   ) =>
   ({

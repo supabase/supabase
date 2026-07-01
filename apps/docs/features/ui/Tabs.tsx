@@ -1,15 +1,15 @@
 'use client'
 
-import { useCallback, type ComponentPropsWithoutRef, type PropsWithChildren } from 'react'
-import { Tabs as TabsPrimitive, type TabsProps } from 'ui'
-import { withQueryParams, withSticky, type QueryParamsProps } from 'ui-patterns/ComplexTabs'
 import { useTocRerenderTrigger } from '~/features/docs/GuidesMdx.state'
+import { useCallback, type ComponentPropsWithoutRef, type PropsWithChildren } from 'react'
+import { DocsTabs } from 'ui'
+import { withQueryParams, withSticky, type QueryParamsProps } from 'ui-patterns/ComplexTabs'
 
-const TabsWithStickyAndQueryParams = withSticky<PropsWithChildren<TabsProps & QueryParamsProps>>(
-  withQueryParams(TabsPrimitive)
-)
+const TabsWithStickyAndQueryParams = withSticky<
+  PropsWithChildren<DocsTabs.TabsProps & QueryParamsProps>
+>(withQueryParams(DocsTabs.Tabs))
 
-const TabPanel = TabsPrimitive.Panel
+const TabPanel = DocsTabs.Tabs.Panel
 const Tabs = ({
   onChange,
   stickyTabList,

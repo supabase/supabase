@@ -5,7 +5,7 @@ export * from './src/components/Icon/IconBackground'
 
 // DISPLAYS
 
-export * from './src/components/Tabs'
+export * as DocsTabs from './src/components/Tabs'
 
 // NAV
 
