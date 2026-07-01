@@ -33,7 +33,7 @@ import { getContentById, getSqlSnippetById } from '@/data/content/content-id-que
 import { useSQLSnippetFolderContentsQuery } from '@/data/content/sql-folder-contents-query'
 import { Snippet } from '@/data/content/sql-folders-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import useLatest from '@/hooks/misc/useLatest'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'

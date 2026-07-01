@@ -984,5 +984,21 @@
     "company": "Perplexity",
     "author_url": "https://www.linkedin.com/in/david-dalmaso-359791101/",
     "author_image_url": "/images/blog/avatars/david-dalmaso.png"
+  },
+  {
+    "author_id": "gary_qi",
+    "author": "Gary Qi",
+    "position": "Developer Operations Manager",
+    "company": "TRAE",
+    "author_url": "https://www.linkedin.com/",
+    "author_image_url": "/images/blog/avatars/gary-qi.png"
+  },
+  {
+    "author_id": "ekhar",
+    "author": "Eric Kharitonashvili",
+    "username": "ekhar",
+    "position": "Growth",
+    "author_url": "https://github.com/ekhar",
+    "author_image_url": "/images/blog/avatars/eric-kharitonashvili.png"
   }
 ]

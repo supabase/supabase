@@ -32,9 +32,9 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { NO_REQUIRED_CHARACTERS } from './Auth.constants'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -269,7 +269,7 @@ export const BasicAuthSettingsForm = () => {
                             <code className="text-code-inline">authenticated</code> roles. We
                             strongly advise{' '}
                             <Link
-                              href={`/project/${projectRef}/auth/policies`}
+                              href={`/project/${projectRef}/database/policies`}
                               className="text-foreground underline"
                             >
                               reviewing your RLS policies

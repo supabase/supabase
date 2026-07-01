@@ -112,6 +112,37 @@ pre_checksum=$(run_sql -A -t -c "SELECT md5(string_agg(name || value::text, ',' 
 echo "  Rows: $pre_count"
 echo "  Checksum: $pre_checksum"
 
+# --- Seed a Vault secret ---------------------------------------------------
+# Verifies the pgsodium root key survives the volume swap/chown AND that Vault
+# secrets still decrypt on Postgres 17. For legacy (key_id-based) secrets this
+# also exercises complete.sh's pgsodium->Vault re-encryption; on a stock
+# self-hosted stack the secret is already pgsodium-less, so this confirms the
+# round-trip and the post-upgrade invariant (key_id IS NULL).
+VAULT_SECRET_NAME="upgrade_test_secret"
+VAULT_SECRET_VALUE="upgrade-test-secret-value-42"
+vault_available="f"
+if [ "$(run_sql -A -t -c "SELECT EXISTS (SELECT 1 FROM pg_available_extensions WHERE name = 'supabase_vault');" | tr -d '[:space:]')" = "t" ]; then
+    echo ""
+    echo "Seeding Vault secret on Postgres 15..."
+    run_sql <<EOSQL
+CREATE EXTENSION IF NOT EXISTS supabase_vault;
+-- Pre-clean so a re-run after a mid-run failure (where the trailing cleanup
+-- never executed) does not abort on the unique (name) index.
+DELETE FROM vault.secrets WHERE name = '${VAULT_SECRET_NAME}';
+SELECT vault.create_secret('${VAULT_SECRET_VALUE}', '${VAULT_SECRET_NAME}', 'pg17 upgrade test');
+EOSQL
+    pre_secret=$(run_sql -A -t -c "SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = '${VAULT_SECRET_NAME}';" | tr -d '\n')
+    if [ "$pre_secret" = "$VAULT_SECRET_VALUE" ]; then
+        echo "  Seeded '${VAULT_SECRET_NAME}' (decrypts correctly on PG 15)"
+    else
+        echo "  Warning: seeded secret did not decrypt as expected on PG 15" >&2
+    fi
+    vault_available="t"
+else
+    echo ""
+    echo "Skipping Vault seed: supabase_vault extension not available."
+fi
+
 # --- Run upgrade -----------------------------------------------------------
 
 echo ""
@@ -127,11 +158,37 @@ echo ""
 echo "Running pgTAP verification..."
 echo ""
 
-# Use a non-quoted heredoc so $pre_count and $pre_checksum are interpolated
+# Optional Vault assertions, only when a secret was seeded above.
+vault_plan=0
+vault_tests=""
+if [ "$vault_available" = "t" ]; then
+    vault_plan=3
+    vault_tests=$(cat <<EOSQL
+-- Vault secret survived the upgrade and still decrypts (root key intact).
+SELECT ok(
+    EXISTS (SELECT 1 FROM vault.secrets WHERE name = '${VAULT_SECRET_NAME}'),
+    'Vault secret survived upgrade'
+);
+SELECT is(
+    (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = '${VAULT_SECRET_NAME}'),
+    '${VAULT_SECRET_VALUE}',
+    'Vault secret still decrypts to original plaintext after upgrade'
+);
+SELECT ok(
+    (SELECT key_id IS NULL FROM vault.secrets WHERE name = '${VAULT_SECRET_NAME}'),
+    'Vault secret is in pgsodium-less format (key_id IS NULL) after upgrade'
+);
+EOSQL
+)
+fi
+total_plan=$((16 + vault_plan))
+
+# Use a non-quoted heredoc so $pre_count, $pre_checksum, $total_plan and
+# $vault_tests are interpolated.
 run_sql <<EOSQL
 CREATE EXTENSION IF NOT EXISTS pgtap;
 
-SELECT plan(16);
+SELECT plan(${total_plan});
 
 -- Version
 SELECT ok(version() LIKE 'PostgreSQL 17%', 'Running Postgres 17');
@@ -215,7 +272,7 @@ SELECT is(
     (SELECT default_version FROM pg_available_extensions WHERE name = 'pg_net'),
     'pg_net version reconciled to image default'
 );
-
+${vault_tests}
 SELECT * FROM finish(true);
 EOSQL
 
@@ -273,6 +330,12 @@ DO $$
 BEGIN
     IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'upgrade_test_job') THEN
         PERFORM cron.unschedule('upgrade_test_job');
+    END IF;
+END $$;
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'supabase_vault') THEN
+        DELETE FROM vault.secrets WHERE name = 'upgrade_test_secret';
     END IF;
 END $$;
 EOSQL

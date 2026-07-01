@@ -56,8 +56,8 @@ export const ForeignKeyFormatter = (props: Props) => {
     foreignKeyColumn?.format === 'bytea' && !!value ? convertByteaToHex(value) : value
 
   return (
-    <div className="sb-grid-foreign-key-formatter flex justify-between">
-      <span className="sb-grid-foreign-key-formatter__text">
+    <div className="flex w-full items-center justify-between flex justify-between">
+      <span className="m-0 grow overflow-hidden text-ellipsis">
         {formattedValue === null ? <NullValue /> : formattedValue}
       </span>
       {isLoading && formattedValue !== null && (

@@ -49,6 +49,18 @@ export function statusOnSaveError(status: SnippetStatus | undefined): SnippetSta
 }
 
 /**
+ * Transition when the snippet is edited locally. A persisted-and-clean snippet
+ * becomes 'unsaved' so its dirty state is durable immediately (rather than only
+ * once the debounced save begins). Every other status is already dirty or
+ * in-flight — the never-persisted family, a save in progress, or a failed
+ * save — and is left unchanged so the persistence and progress axes are
+ * preserved.
+ */
+export function statusOnEdit(status: SnippetStatus): SnippetStatus {
+  return status === 'saved' ? 'unsaved' : status
+}
+
+/**
  * The lifecycle of a folder in the SQL editor nav, as a single set of
  * mutually-exclusive states. Like SnippetStatus, this collapses two orthogonal
  * axes — persistence (a locally-created placeholder vs a persisted folder) and

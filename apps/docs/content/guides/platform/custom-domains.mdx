@@ -53,7 +53,7 @@ You need to add a CNAME record to your domain's DNS settings to ensure your cust
 If your project's default domain is `abcdefghijklmnopqrst.supabase.co` you should:
 
 - Create a CNAME record for `api.example.com` that resolves to `abcdefghijklmnopqrst.supabase.co.`.
-- Use a low TTL value to quickly propagate changes in case you make a mistake.
+- Use a low TTL value to propagate changes in case you make a mistake.
 
 ### Verify ownership of the domain
 
@@ -73,7 +73,7 @@ Required outstanding validation records:
         _acme-challenge.api.example.com. TXT -> ca3-F1HvR9i938OgVwpCFwi1jTsbhe1hvT0Ic3efPY3Q
 ```
 
-Add the record to your domains' DNS settings. Make sure to trim surrounding whitespace. Use a low TTL value so you can quickly change the records if you make a mistake.
+Add the record to your domains' DNS settings. Make sure to trim surrounding whitespace. Use a low TTL value so you can change the records if you make a mistake.
 
 Some DNS registrars automatically append your domain name to the DNS entries being created. As such, creating a DNS record for `api.example.com` might instead create a record for `api.example.com.example.com`. In such cases, remove the domain name from the records you're creating; as an example, you would create a TXT record for `api`, instead of `api.example.com`.
 
@@ -168,7 +168,7 @@ Assume your Supabase project's domain is `abcdefghijklmnopqrst.supabase.co` and 
 Use the [`vanity-subdomains check-availability`](/docs/reference/cli/supabase-vanity-subdomains-check-availability) command of the CLI to check if your desired subdomain is available for use:
 
 ```bash
-supabase vanity-subdomains --project-ref abcdefghijklmnopqrst check-availability --desired-subdomain my-example-brand --experimental
+supabase vanity-subdomains check-availability --project-ref abcdefghijklmnopqrst --desired-subdomain my-example-brand --experimental
 ```
 
 ### Prepare to activate the subdomain
@@ -200,7 +200,7 @@ Once you've chosen an available subdomain and have done all the necessary prepar
 Use the [`vanity-subdomains activate`](/docs/reference/cli/supabase-vanity-subdomains-activate) command to activate and claim your subdomain:
 
 ```bash
-supabase vanity-subdomains --project-ref abcdefghijklmnopqrst activate --desired-subdomain my-example-brand --experimental
+supabase vanity-subdomains activate --project-ref abcdefghijklmnopqrst --desired-subdomain my-example-brand --experimental
 ```
 
 If you wish to use the new domain in client code, you can set it up like so:

@@ -38,7 +38,7 @@ import {
 } from './customProviders.utils'
 import { DeleteCustomProviderModal } from './DeleteCustomProviderModal'
 import { DisableCustomProviderModal } from './DisableCustomProviderModal'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'

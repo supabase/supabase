@@ -44,7 +44,7 @@ Calling `realtime.send` / `realtime.send_binary`, the broadcast REST endpoint, a
 
 ## How to avoid it
 
-- Connect a client before broadcasting from the database. A live WebSocket connection both creates the partitions and starts the consumer that actually receives the message.
+- Connect a client before broadcasting from the database. A live WebSocket connection both creates the partitions and starts the consumer that receives the message.
 - If you broadcast from the database on a schedule, make sure at least one subscriber is connected when you send. Otherwise the messages have no destination.
 
 ## When it is a real problem

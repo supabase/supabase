@@ -18,6 +18,7 @@ import {
   validateFields,
 } from './RowEditor.utils'
 import { TextEditor } from './TextEditor'
+import { getStableRowIdentifiers } from '@/components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -144,7 +145,7 @@ export const RowEditor = ({
           identifiers[column.name] =
             column.format === 'bytea' ? convertByteaToHex(row![column.name]) : row![column.name]
         })
-        configuration.identifiers = identifiers
+        configuration.identifiers = getStableRowIdentifiers(row!, identifiers)
         configuration.rowIdx = row!.idx
       }
 

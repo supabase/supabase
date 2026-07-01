@@ -1,12 +1,9 @@
 import { VectorBucket } from 'icons'
 import { AWS_REGIONS } from 'shared-data'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import {
-  EmptyStatePresentational,
-  PageContainer,
-  PageSection,
-  PageSectionContent,
-} from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { AVAILABLE_REPLICA_REGIONS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { AlphaNotice } from '@/components/ui/AlphaNotice'
