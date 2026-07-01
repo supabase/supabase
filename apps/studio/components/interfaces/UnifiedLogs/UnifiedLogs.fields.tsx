@@ -28,7 +28,15 @@ export const filterFields = [
       options:
         // [Joshen] Nested options are treated as just boolean toggles atm for simplicity
         // Refer to DataTableFilterCheckbox for their logic
-        value === 'postgres' ? [{ label: 'Connection logs', value: 'show_connection_logs' }] : [],
+        value === 'edge'
+          ? [
+              { label: 'Auth', value: 'edge_auth' },
+              { label: 'Storage', value: 'edge_storage' },
+              { label: 'Postgrest', value: 'edge_postgrest' },
+            ]
+          : value === 'postgres'
+            ? [{ label: 'Connection logs', value: 'show_connection_logs' }]
+            : [],
     })),
     component: (props: Option) => {
       return (
