@@ -1,50 +1,22 @@
-import localFont from 'next/font/local'
+import { Inter, Manrope, Source_Code_Pro } from 'next/font/google'
 
-export const manrope = localFont({
+export const manrope = Manrope({
   variable: '--font-manrope',
   display: 'swap',
   fallback: ['system-ui', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
-  src: [
-    {
-      path: './manrope/Manrope-VariableFont_wght.ttf',
-      weight: '100 900',
-      style: 'normal',
-    },
-  ],
+  subsets: ['latin'],
 })
 
-export const inter = localFont({
+export const inter = Inter({
   variable: '--font-inter',
   display: 'swap',
   fallback: ['system-ui', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
-  src: [
-    {
-      path: './inter/InterVariable.woff2',
-      weight: '100 900',
-      style: 'normal',
-    },
-    {
-      path: './inter/InterVariable-Italic.woff2',
-      weight: '100 900',
-      style: 'italic',
-    },
-  ],
+  subsets: ['latin'],
 })
 
-export const sourceCodePro = localFont({
+export const sourceCodePro = Source_Code_Pro({
   variable: '--font-source-code-pro',
   display: 'swap',
   fallback: ['Source Code Pro', 'Office Code Pro', 'Menlo', 'monospace'],
-  src: [
-    {
-      path: './source-code-pro/SourceCodePro-Variable.woff2',
-      weight: '200 900',
-      style: 'normal',
-    },
-    {
-      path: './source-code-pro/SourceCodePro-Variable-Italic.woff2',
-      weight: '200 900',
-      style: 'italic',
-    },
-  ],
+  subsets: ['latin'],
 })
