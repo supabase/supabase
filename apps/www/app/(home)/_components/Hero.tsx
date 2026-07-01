@@ -13,7 +13,7 @@ export function Hero() {
     <SectionContainer className="pt-12 pb-24 md:pt-40! md:pb-32">
       <div className="flex flex-col gap-6 lg:gap-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 items-end">
-          <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none">
+          <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none font-medium tracking-normal">
             <span className="block">Build in a weekend</span>
             <span className="text-brand block">Scale to millions</span>
           </h1>
