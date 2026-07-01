@@ -525,12 +525,6 @@ export default {
     },
   },
 
-  // Icon
-
-  icon: {
-    container: `shrink-0 flex items-center justify-center rounded-full p-3`,
-  },
-
   loading: {
     base: `relative`,
     content: {
