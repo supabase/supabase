@@ -27,6 +27,7 @@ import { RegionsList, SmartRegionsList } from './markdown-schema/RegionsList'
 import { SharedData } from './markdown-schema/SharedData'
 import { StepHike } from './markdown-schema/StepHike'
 import { TabPanel } from './markdown-schema/TabPanel'
+import { McpConfigPanel } from './markdown-schema/McpConfigPanel'
 import { collectMarkdownSources, type FrontmatterFormat } from './markdown-sources'
 
 const PARTIALS_DIR = path.join(process.cwd(), 'content', '_partials')
@@ -156,6 +157,7 @@ const SCHEMA: ComponentSchema = {
   ContentListings,
   NavData,
   SharedData,
+  McpConfigPanel,
 }
 
 function parseFrontmatter(raw: string, frontmatter: FrontmatterFormat) {
