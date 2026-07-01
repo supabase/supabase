@@ -12,7 +12,7 @@ export type IntegrationVariables = {
 export type IntegrationStatus =
   components['schemas']['PartnerIntegrationListResponse']['integrations'][0]
 
-export async function getIntegrations({ projectRef }: IntegrationVariables, signal?: AbortSignal) {
+async function getIntegrations({ projectRef }: IntegrationVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('Project ref is required')
 
   const { data, error } = await get(`/platform/integrations/partners/{ref}`, {
