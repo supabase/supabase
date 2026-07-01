@@ -100,10 +100,8 @@ export const DatabaseInfrastructureSection = ({
     [infraData, maxConnectionsData]
   )
 
-  const errorMessage =
-    infraError && typeof infraError === 'object' && 'message' in infraError
-      ? String(infraError.message)
-      : 'Error loading data'
+  // Show a friendly, static message instead of leaking the raw API error to the user
+  const metricErrorState = <span className="text-xs text-foreground-lighter">Unable to load</span>
 
   // Generate database report URL with time range parameters
   const getDatabaseReportUrl = () => {
@@ -175,7 +173,7 @@ export const DatabaseInfrastructureSection = ({
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
+                metricErrorState
               ) : connections.max > 0 ? (
                 <MetricCardValue>
                   {connections.peak}/{connections.max}
@@ -196,7 +194,7 @@ export const DatabaseInfrastructureSection = ({
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
+                metricErrorState
               ) : metrics ? (
                 <MetricCardValue>{metrics.disk.current.toFixed(0)}%</MetricCardValue>
               ) : (
@@ -215,7 +213,7 @@ export const DatabaseInfrastructureSection = ({
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
+                metricErrorState
               ) : metrics ? (
                 <MetricCardValue>{metrics.diskIo.current.toFixed(0)}%</MetricCardValue>
               ) : (
@@ -234,7 +232,7 @@ export const DatabaseInfrastructureSection = ({
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
+                metricErrorState
               ) : metrics ? (
                 <MetricCardValue>{metrics.ram.current.toFixed(0)}%</MetricCardValue>
               ) : (
@@ -253,7 +251,7 @@ export const DatabaseInfrastructureSection = ({
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
+                metricErrorState
               ) : metrics ? (
                 <MetricCardValue>{metrics.cpu.current.toFixed(0)}%</MetricCardValue>
               ) : (
