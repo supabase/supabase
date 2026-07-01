@@ -1,9 +1,8 @@
-import dayjs from 'dayjs'
 import { z } from 'zod'
 
 import { LogsTableName, type SqlFilterEntry } from './Logs.constants'
 import type { Filters, LogData, LogsEndpointParams, Metadata, QueryType } from './Logs.types'
-import { buildWhereClauses } from './Logs.utils'
+import { buildWhereClauses, resolveLogTimestamp } from './Logs.utils'
 import { parseOtelTimestamp } from '@/data/logs/otel-inspection.utils'
 import {
   joinSqlFragments,
@@ -280,12 +279,8 @@ SELECT count() AS count FROM logs ${genOtelWhere(table, filters)}`
 
 // Bucket by minute up to 12h, otherwise by hour (matches BigQuery).
 const otelChartTruncFn = (params: LogsEndpointParams): SafeLogSqlFragment => {
-  // Fall back to now when a param is missing or unparseable, so an Invalid Date
-  // never skews the bucket size.
-  const parsedEnd = dayjs(params.iso_timestamp_end)
-  const ite = params.iso_timestamp_end && parsedEnd.isValid() ? parsedEnd : dayjs()
-  const parsedStart = dayjs(params.iso_timestamp_start)
-  const its = params.iso_timestamp_start && parsedStart.isValid() ? parsedStart : dayjs()
+  const ite = resolveLogTimestamp(params.iso_timestamp_end)
+  const its = resolveLogTimestamp(params.iso_timestamp_start)
   const minuteDiff = ite.diff(its, 'minute')
   const hourDiff = ite.diff(its, 'hour')
   if (minuteDiff > 60 * 12) return safeSql`toStartOfHour`

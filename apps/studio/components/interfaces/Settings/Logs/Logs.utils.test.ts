@@ -300,9 +300,12 @@ describe('Logs.utils', () => {
   describe('genChartQuery', () => {
     // Regression: an unparseable iso_timestamp_start used to reach
     // startOffset.toISOString() as an Invalid Date and throw RangeError.
-    test('does not throw for an unparseable time range', () => {
+    test('falls back to minute buckets for an unparseable time range without throwing', () => {
       const params = { iso_timestamp_start: 'not-a-date', iso_timestamp_end: 'also-bad' }
       expect(() => genChartQuery(LogsTableName.AUTH, params as any, {})).not.toThrow()
+      expect(genChartQuery(LogsTableName.AUTH, params as any, {})).toContain(
+        'timestamp_trunc(t.timestamp, minute)'
+      )
     })
   })
 })
