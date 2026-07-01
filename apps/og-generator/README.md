@@ -52,6 +52,27 @@ To turn on the Claude-backed suggestions:
 `.env.local` is git-ignored — the key stays on your machine and is only read
 server-side (in `app/api/suggest`), never shipped to the browser.
 
+## Supabase (optional backend)
+
+The shared asset library, saved posts, and the editable featured-examples corpus
+live in a Supabase project (brief §3). The app runs fully without it — bundled
+seed data + local rendering — so this is opt-in.
+
+To connect a project:
+
+1. In `.env.local` set `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`,
+   and (for server-side writes) `SUPABASE_SECRET_KEY` — from the dashboard →
+   **Project Settings → API**.
+2. Apply the schema: dashboard → **SQL Editor**, paste the contents of
+   [`supabase/migrations/0001_init.sql`](supabase/migrations/0001_init.sql), and
+   **Run**. It creates the `featured_examples`, `assets`, and `posts` tables
+   (+ RLS), the `og-assets` Storage bucket, and seeds the featured examples.
+3. Restart `pnpm dev`. The suggester now reads featured examples from the DB,
+   falling back to the bundled corpus if the table is empty or unreachable.
+
+Only the URL + publishable key are needed for reads; the secret key is for
+server-side writes (uploads) and never reaches the browser.
+
 ## Architecture notes
 
 - **Design is data, not pixels.** A "post" is a structured recipe; the PNG is a

@@ -1,5 +1,6 @@
 import { hasClaude, suggestWithClaude } from '@/lib/ai/claude'
 import { suggestArtDirection } from '@/lib/ai/suggest'
+import { getFeaturedExamples } from '@/lib/supabase/featured-examples'
 
 // Node runtime — the Anthropic SDK is not edge-compatible, and the API key must
 // stay server-side (never shipped to the client).
@@ -26,15 +27,17 @@ export async function POST(req: Request): Promise<Response> {
     return Response.json(suggestArtDirection(''))
   }
 
+  // DB-backed corpus when Supabase is configured; bundled seed otherwise.
+  const examples = await getFeaturedExamples()
+
   if (hasClaude()) {
     try {
-      const suggestion = await suggestWithClaude(description)
-      return Response.json(suggestion)
+      return Response.json(await suggestWithClaude(description, examples))
     } catch (err) {
       // Fall through to the keyword matcher so the button always works.
       console.error('[api/suggest] Claude suggestion failed, using keyword fallback:', err)
     }
   }
 
-  return Response.json(suggestArtDirection(description))
+  return Response.json(suggestArtDirection(description, examples))
 }

@@ -75,7 +75,10 @@ function suggestTemplate(tokens: string[], hasIcon: boolean): string {
 
 const EXAMPLE_MATCH_THRESHOLD = 3
 
-export function suggestArtDirection(description: string): Suggestion {
+export function suggestArtDirection(
+  description: string,
+  examples: FeaturedExample[] = FEATURED_EXAMPLES
+): Suggestion {
   const tokens = tokenize(description)
 
   const rankedIcons = SEED_ICONS.map((icon) => ({ icon, score: scoreIcon(icon, tokens) })).sort(
@@ -88,7 +91,7 @@ export function suggestArtDirection(description: string): Suggestion {
       .map((r) => ({ iconName: r.icon.name, label: r.icon.label, score: r.score }))
 
   // 1. Featured examples first — grounded precedent (§6.8).
-  const rankedEx = FEATURED_EXAMPLES.map((ex) => ({ ex, score: scoreText(ex.subject, tokens) })).sort(
+  const rankedEx = examples.map((ex) => ({ ex, score: scoreText(ex.subject, tokens) })).sort(
     (a, b) => b.score - a.score
   )
   const topEx = rankedEx[0]

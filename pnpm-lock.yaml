@@ -866,6 +866,9 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ^0.106.0
         version: 0.106.0(zod@4.4.3)
+      '@supabase/supabase-js':
+        specifier: 'catalog:'
+        version: 2.108.2
       fontkit:
         specifier: ^2.0.4
         version: 2.0.4

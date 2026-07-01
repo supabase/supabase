@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk'
 
-import { FEATURED_EXAMPLES } from '@/lib/ai/examples'
+import { FEATURED_EXAMPLES, type FeaturedExample } from '@/lib/ai/examples'
 import type { Suggestion } from '@/lib/ai/suggest'
 import { SEED_ICONS, SEED_ICON_MAP } from '@/lib/assets/seed-icons'
 import {
@@ -53,14 +53,19 @@ const TEMPLATE_CATALOG = [
   '- stacked: headline top, icon bottom-left. Structured, technical feel for infrastructure/architecture posts.',
 ].join('\n')
 
-const EXAMPLE_CATALOG = FEATURED_EXAMPLES.map((ex) => {
-  const pattern = ex.pattern ? `${ex.pattern.type}/${ex.pattern.scale}/${ex.pattern.color}` : 'none'
-  return `- "${ex.subject}" → icon=${ex.iconName}, template=${ex.templateId}, eyebrow=${
-    ex.eyebrow ?? '—'
-  }, pattern=${pattern}\n  why: ${ex.whyItWorks}`
-}).join('\n')
+function buildSystem(examples: FeaturedExample[]): string {
+  const exampleCatalog = examples
+    .map((ex) => {
+      const pattern = ex.pattern
+        ? `${ex.pattern.type}/${ex.pattern.scale}/${ex.pattern.color}`
+        : 'none'
+      return `- "${ex.subject}" → icon=${ex.iconName}, template=${ex.templateId}, eyebrow=${
+        ex.eyebrow ?? '—'
+      }, pattern=${pattern}\n  why: ${ex.whyItWorks}`
+    })
+    .join('\n')
 
-const SYSTEM = `You are the art director for Supabase's blog OG images (1200×630, dark mode, headline of at most two lines). Given a short description of a blog post, choose the strongest, most on-brand composition using ONLY the vocabulary below. Do not invent icons, templates, or colors.
+  return `You are the art director for Supabase's blog OG images (1200×630, dark mode, headline of at most two lines). Given a short description of a blog post, choose the strongest, most on-brand composition using ONLY the vocabulary below. Do not invent icons, templates, or colors.
 
 ICONS (pick the single best \`name\`, or null if none genuinely fits — never force an unrelated icon):
 ${ICON_CATALOG}
@@ -71,7 +76,7 @@ ${TEMPLATE_CATALOG}
 BACKGROUND PATTERNS (subtle texture only): type ∈ grid|dots|hlines|vlines|none, scale ∈ sm|md|lg, color ∈ white|green, opacity between 0.04 and 0.10. Use green sparingly (launches, AI/vector). Prefer "none" over a busy pattern.
 
 FEATURED EXAMPLES (approved precedent — reuse the recipe when the subject is similar):
-${EXAMPLE_CATALOG}
+${exampleCatalog}
 
 RULES:
 - Match the post to the closest featured example first; if it fits, follow that recipe.
@@ -79,6 +84,7 @@ RULES:
 - rationale: ONE concrete sentence explaining why this icon + layout suits THIS post (like the examples' "why"). No preamble, no restating the brief.
 - alternateIconNames: up to 2 other plausible icon \`name\`s from the list (most relevant first), or [].
 - Respond with the JSON object only.`
+}
 
 // Structured-output schema (all objects: additionalProperties:false + every key
 // required, per the API's strict-schema rules).
@@ -178,7 +184,10 @@ function parseJson(text: string): RawSuggestion {
  * Ask Claude for an art-direction suggestion. Assumes `hasClaude()` — throws on
  * any failure (bad key, refusal, unparseable output) so the route can fall back.
  */
-export async function suggestWithClaude(description: string): Promise<Suggestion> {
+export async function suggestWithClaude(
+  description: string,
+  examples: FeaturedExample[] = FEATURED_EXAMPLES
+): Promise<Suggestion> {
   const client = new Anthropic() // reads ANTHROPIC_API_KEY from the environment
 
   const response = await client.messages.create({
@@ -186,7 +195,7 @@ export async function suggestWithClaude(description: string): Promise<Suggestion
     max_tokens: 2048,
     thinking: { type: 'adaptive' },
     output_config: { effort: 'low', format: { type: 'json_schema', schema: SCHEMA } },
-    system: SYSTEM,
+    system: buildSystem(examples),
     messages: [{ role: 'user', content: `Blog post: ${description}` }],
   })
 
