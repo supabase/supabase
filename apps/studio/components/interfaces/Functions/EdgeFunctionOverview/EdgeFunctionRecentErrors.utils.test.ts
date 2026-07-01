@@ -47,8 +47,7 @@ describe('EdgeFunctionRecentErrors.utils', () => {
         executionIds: ['exec_1', "exec_'2"],
         limit: 25,
       })
-    )
-      .toBe(`-- runtime logs for error groups
+    ).toBe(`-- runtime logs for error groups
 select
   toUnixTimestamp64Micro(timestamp) as timestamp,
   event_message,
