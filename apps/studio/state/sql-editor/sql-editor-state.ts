@@ -1,22 +1,14 @@
 import { untrustedSql } from '@supabase/pg-meta'
-import { debounce, memoize } from 'lodash'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
+import { proxy, snapshot, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
 
-import { buildUpsertPayload, isLoadedSnippet, validateMoveToFolder } from './sql-editor-rules'
-import type { SnippetWithContent, StateSnippet, StateSnippetFolder } from './types'
-import type { QueryPlanRow } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
-import { DiffType } from '@/components/interfaces/SQLEditor/SQLEditor.types'
-import { upsertContent, UpsertContentPayload } from '@/data/content/content-upsert-mutation'
-import { contentKeys } from '@/data/content/keys'
-import { createSQLSnippetFolder } from '@/data/content/sql-folder-create-mutation'
-import { updateSQLSnippetFolder } from '@/data/content/sql-folder-update-mutation'
+import { folderStatusOnSaveStart, isNewFolder } from './sql-editor-lifecycle'
+import { sqlEditorSessionState } from './sql-editor-session-state'
+import type { StateSnippet, StateSnippetFolder } from './types'
+import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 import { Snippet, SnippetFolder } from '@/data/content/sql-folders-query'
-import { getQueryClient } from '@/data/query-client'
-
-const NEW_FOLDER_ID = 'new-folder'
 
 export const sqlEditorState = proxy({
   // ========================================================================
@@ -38,54 +30,15 @@ export const sqlEditorState = proxy({
   },
 
   /**
-   * Query results, if any, for a snippet. Set as an array per snippetId as we were previously experimenting
-   * with having a Jupyter notebook like UI but it never took off. Nonetheless kept this data structure as
-   * we'd also want to support returning multiple results from a single query (e.g From a query that contains
-   * multiple select statements), and this will allow us to do quite easily.
-   */
-  results: {} as {
-    [snippetId: string]: {
-      rows: any[]
-      error?: any
-      autoLimit?: number
-    }[]
-  },
-
-  /**
-   * Explain results, if any, for a snippet
-   */
-  explainResults: {} as {
-    [snippetId: string]: {
-      rows: QueryPlanRow[]
-      error?: { message: string; formattedError?: string }
-    }
-  },
-  /**
-   * Synchronous saving of folders and snippets (debounce behavior). Key is the snippet id, value is shouldInvalidate
+   * Snippets queued for saving. Key is the snippet id, value is whether saving
+   * it should also invalidate the snippet/folder lists.
    */
   needsSaving: proxyMap<string, boolean>([]),
   /**
-   * Stores the state of each snippet
+   * Folders queued for saving (create or rename). Kept separate from
+   * `needsSaving` so snippet and folder saves are scheduled independently.
    */
-  savingStates: {} as {
-    [snippetId: string]: 'IDLE' | 'UPDATING' | 'UPDATING_FAILED'
-  },
-  /**
-   * UI-imposed limit for the number of results a query can return (applied to the SQL query being run if applicable).
-   * Acts as a safeguard to prevent accidentally taking down the database from a really large SELECT query.
-   * Related to `autoLimit` in `results`. Refer to `checkIfAppendLimitRequired` and `suffixWithLimit` for usage.
-   */
-  limit: 100,
-
-  /**
-   * Used for error handling after optimistical rendering from renaming a folder
-   */
-  lastUpdatedFolderName: '',
-
-  /**
-   * For Assistant to render diffing into the editor
-   */
-  diffContent: undefined as undefined | { sql: string; diffType: DiffType },
+  pendingFolderSaves: proxyMap<string, boolean>([]),
 
   get allFolderNames() {
     return Object.values(sqlEditorState.folders).map((x) => x.folder.name)
@@ -95,9 +48,6 @@ export const sqlEditorState = proxy({
   // ## Methods to interact the store with
   // ========================================================================
 
-  setDiffContent: (sql: string, diffType: DiffType) =>
-    (sqlEditorState.diffContent = { sql, diffType }),
-
   /**
    * Load snippet into SQL Editor Valtio store
    */
@@ -105,9 +55,6 @@ export const sqlEditorState = proxy({
     if (sqlEditorState.snippets[snippet.id]) return
 
     sqlEditorState.snippets[snippet.id] = { projectRef, splitSizes: [50, 50], snippet }
-    sqlEditorState.results[snippet.id] = []
-    sqlEditorState.explainResults[snippet.id] = { rows: [] }
-    sqlEditorState.savingStates[snippet.id] = 'IDLE'
   },
 
   /**
@@ -195,11 +142,8 @@ export const sqlEditorState = proxy({
     const { [id]: snippet, ...otherSnippets } = sqlEditorState.snippets
     sqlEditorState.snippets = otherSnippets
 
-    const { [id]: result, ...otherResults } = sqlEditorState.results
-    sqlEditorState.results = otherResults
-
-    const { [id]: explainResult, ...otherExplainResults } = sqlEditorState.explainResults
-    sqlEditorState.explainResults = otherExplainResults
+    // Results/explain live in the session store; drop this snippet's entries.
+    sqlEditorSessionState.clearForSnippet(id)
 
     if (!skipSave) sqlEditorState.needsSaving.delete(id)
   },
@@ -209,18 +153,19 @@ export const sqlEditorState = proxy({
    */
   addFolder: ({ projectRef, folder }: { projectRef: string; folder: SnippetFolder }) => {
     if (sqlEditorState.folders[folder.id]) return
-    sqlEditorState.folders[folder.id] = { projectRef, folder }
+    sqlEditorState.folders[folder.id] = { projectRef, status: 'idle', folder }
   },
 
   /**
-   * Adds a new folder placeholder for the UI to render
+   * Adds a new folder placeholder for the UI to render. The placeholder gets a
+   * unique local id and `status: 'new_editing'` to mark it as not-yet-persisted
+   * (the status, not the id, is what tags it as new).
    */
   addNewFolder: ({ projectRef }: { projectRef: string }) => {
-    // [Joshen] Use this to identify new folders that have yet to be saved
-    const id = NEW_FOLDER_ID
+    const id = crypto.randomUUID()
     sqlEditorState.folders[id] = {
       projectRef,
-      status: 'editing',
+      status: 'new_editing',
       folder: {
         id,
         name: '',
@@ -232,7 +177,10 @@ export const sqlEditorState = proxy({
   },
 
   editFolder: (id: string) => {
-    sqlEditorState.folders[id].status = 'editing'
+    const storeFolder = sqlEditorState.folders[id]
+    if (storeFolder) {
+      storeFolder.status = isNewFolder(storeFolder.status) ? 'new_editing' : 'editing'
+    }
   },
 
   /**
@@ -240,11 +188,11 @@ export const sqlEditorState = proxy({
    */
   saveFolder: ({ id, name }: { id: string; name: string }) => {
     let storeFolder = sqlEditorState.folders[id]
-    const isNewFolder = id === 'new-folder'
+    const isNew = isNewFolder(storeFolder.status)
     const hasChanges = storeFolder.folder.name !== name
     const folderNameTaken = sqlEditorState.allFolderNames.includes(name)
 
-    if (isNewFolder && folderNameTaken) {
+    if (isNew && folderNameTaken) {
       sqlEditorState.removeFolder(id)
       return toast.error('Unable to create new folder: This folder name already exists')
     } else if (hasChanges && folderNameTaken) {
@@ -254,13 +202,14 @@ export const sqlEditorState = proxy({
 
     const originalFolderName = storeFolder.folder.name.slice()
 
-    storeFolder.status = hasChanges ? 'saving' : 'idle'
+    storeFolder.status = hasChanges ? folderStatusOnSaveStart(storeFolder.status) : 'idle'
     storeFolder.folder.id = id
     storeFolder.folder.name = name
 
     if (hasChanges) {
-      sqlEditorState.lastUpdatedFolderName = originalFolderName
-      sqlEditorState.needsSaving.set(id, true)
+      // Remember this folder's own pre-rename name so a failed save can roll back.
+      storeFolder.previousName = originalFolderName
+      sqlEditorState.pendingFolderSaves.set(id, true)
     }
   },
 
@@ -273,11 +222,6 @@ export const sqlEditorState = proxy({
     const { [id]: folder, ...otherFolders } = sqlEditorState.folders
     sqlEditorState.folders = otherFolders
   },
-
-  /**
-   * Set the value for the auto limit for SELECT based SQL queries
-   */
-  setLimit: (value: number) => (sqlEditorState.limit = value),
 
   addNeedsSaving: (id: string) => sqlEditorState.needsSaving.set(id, true),
 
@@ -295,47 +239,6 @@ export const sqlEditorState = proxy({
       storeSnippet.snippet.favorite = false
       sqlEditorState.needsSaving.set(id, true)
     }
-  },
-
-  addResult: (id: string, results: any[], autoLimit?: number) => {
-    if (sqlEditorState.results[id]) {
-      // Use ref() to prevent Valtio from creating proxies for each row object.
-      // This is critical for large result sets - without ref(), Valtio wraps every
-      // row and nested property in a Proxy, causing massive memory overhead.
-      // Alright to use ref() in this case as the data is meant to be read-only and we
-      // don't need to track changes to the underlying data
-      sqlEditorState.results[id] = [{ rows: ref(results), autoLimit }]
-    }
-  },
-
-  addResultError: (id: string, error: any, autoLimit?: number) => {
-    if (sqlEditorState.results[id]) {
-      sqlEditorState.results[id] = [{ rows: ref([]), error, autoLimit }]
-    }
-  },
-
-  resetResult: (id: string) => {
-    if (sqlEditorState.results[id]) {
-      sqlEditorState.results[id] = []
-    }
-  },
-
-  addExplainResult: (id: string, results: QueryPlanRow[]) => {
-    // Use ref() to prevent Valtio from creating proxies for each row object
-    sqlEditorState.explainResults[id] = { rows: ref(results) }
-  },
-
-  addExplainResultError: (id: string, error: { message: string; formattedError?: string }) => {
-    sqlEditorState.explainResults[id] = { rows: ref([]), error }
-  },
-
-  resetExplainResult: (id: string) => {
-    sqlEditorState.explainResults[id] = { rows: [] }
-  },
-
-  resetResults: (id: string) => {
-    sqlEditorState.resetResult(id)
-    sqlEditorState.resetExplainResult(id)
   },
 })
 
@@ -377,111 +280,10 @@ export const useSnippets = (projectRef: string) => {
   )
 }
 
-// ========================================================================
-// ## Below are all the asynchronous saving logic for the SQL Editor
-// ========================================================================
-
-async function upsertSnippet(
-  id: string,
-  projectRef: string,
-  payload: UpsertContentPayload,
-  shouldInvalidate = false
-) {
-  try {
-    sqlEditorState.savingStates[id] = 'UPDATING'
-    await upsertContent({ projectRef, payload })
-
-    if (shouldInvalidate) {
-      const queryClient = getQueryClient()
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: contentKeys.count(projectRef, 'sql') }),
-        queryClient.invalidateQueries({ queryKey: contentKeys.sqlSnippets(projectRef) }),
-        queryClient.invalidateQueries({ queryKey: contentKeys.folders(projectRef) }),
-      ])
-    }
-
-    let snippet = sqlEditorState.snippets[id]?.snippet
-    if (snippet?.content && 'isNotSavedInDatabaseYet' in snippet) {
-      snippet.isNotSavedInDatabaseYet = false
-    }
-    sqlEditorState.savingStates[id] = 'IDLE'
-  } catch (error) {
-    sqlEditorState.savingStates[id] = 'UPDATING_FAILED'
-  }
-}
-
-const memoizedUpsertSnippet = memoize((_id: string) => debounce(upsertSnippet, 1000))
-
-const debouncedUpdateSnippet = (
-  id: string,
-  projectRef: string,
-  payload: UpsertContentPayload,
-  shouldInvalidate = false
-) => memoizedUpsertSnippet(id)(id, projectRef, payload, shouldInvalidate)
-
-async function upsertFolder(id: string, projectRef: string, name: string) {
-  try {
-    if (id === NEW_FOLDER_ID) {
-      const res = await createSQLSnippetFolder({ projectRef, name })
-      toast.success('Successfully created folder')
-      sqlEditorState.removeFolder(NEW_FOLDER_ID)
-      sqlEditorState.folders[res.id] = { projectRef, status: 'idle', folder: res }
-    } else {
-      await updateSQLSnippetFolder({ projectRef, id, name })
-      toast.success('Successfully updated folder')
-      sqlEditorState.folders[id].status = 'idle'
-    }
-  } catch (error: any) {
-    toast.error(`Failed to save folder: ${error.message}`)
-    if (error.message.includes('create')) {
-      sqlEditorState.removeFolder(id)
-    } else if (
-      error.message.includes('update') &&
-      sqlEditorState.lastUpdatedFolderName.length > 0
-    ) {
-      let storeFolder = sqlEditorState.folders[id]
-
-      storeFolder.status = 'idle'
-      storeFolder.folder.name = sqlEditorState.lastUpdatedFolderName
-    }
-  } finally {
-    sqlEditorState.lastUpdatedFolderName = ''
-  }
-}
-
 if (typeof window !== 'undefined') {
   devtools(sqlEditorState, {
     name: 'sqlEditorStateV2',
     // [Joshen] So that jest unit tests can ignore this
     enabled: process.env.NEXT_PUBLIC_ENVIRONMENT !== undefined,
-  })
-
-  subscribe(sqlEditorState.needsSaving, () => {
-    const state = getSqlEditorV2StateSnapshot()
-
-    state.needsSaving.forEach((shouldInvalidate, id) => {
-      const snippet = state.snippets[id]
-      const folder = state.folders[id]
-
-      if (snippet) {
-        const { visibility, folder_id } = snippet.snippet
-        const result = validateMoveToFolder({ visibility, folderId: folder_id })
-
-        if (!result.ok) {
-          toast.error(result.error)
-        } else if (isLoadedSnippet(snippet.snippet)) {
-          debouncedUpdateSnippet(
-            id,
-            snippet.projectRef,
-            buildUpsertPayload(snippet.snippet, id),
-            shouldInvalidate
-          )
-          sqlEditorState.needsSaving.delete(id)
-        }
-      } else if (folder) {
-        upsertFolder(id, folder.projectRef, folder.folder.name)
-        sqlEditorState.needsSaving.delete(id)
-      }
-    })
   })
 }

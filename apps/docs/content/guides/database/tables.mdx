@@ -579,7 +579,7 @@ from
 where courses.code != 'PG101';
 ```
 
-Without a view, we would need to go into every dependent query to add the new rule. This would increase in the likelihood of errors and inconsistencies, as well as introducing a lot of effort for a developer. With views, we can alter just the underlying query in the view **transcripts**. The change will be applied to all applications using this view.
+Without a view, we would need to go into every dependent query to add the new rule. This would increase in the likelihood of errors and inconsistencies, as well as introducing a lot of effort for a developer. With views, we can alter the underlying query in the view **transcripts**. The change will be applied to all applications using this view.
 
 #### Logical organization
 

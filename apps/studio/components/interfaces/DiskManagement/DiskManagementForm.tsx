@@ -17,7 +17,7 @@ import {
   Form,
   Separator,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
 import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'
@@ -41,7 +41,6 @@ import {
   PLAN_DETAILS,
   RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3,
 } from './ui/DiskManagement.constants'
-import { NoticeBar } from './ui/NoticeBar'
 import { SpendCapDisabledSection } from './ui/SpendCapDisabledSection'
 import {
   MAX_WIDTH_CLASSES,
@@ -396,18 +395,22 @@ export function DiskManagementForm() {
               title="Your project will now automatically restart."
               description="Your project will be unavailable for up to 2 mins."
             />
-            <NoticeBar
-              type="default"
-              visible={isProjectRequestingDiskChanges}
-              title="Disk configuration changes have been requested"
-              description="The requested changes will be applied to your disk shortly"
-            />
-            <NoticeBar
-              type="default"
-              visible={isEntitlementsLoaded && !isPlanUpgradeRequired && noPermissions}
-              title="You do not have permission to update disk configuration"
-              description="Please contact your organization administrator to update your disk configuration"
-            />
+            {isProjectRequestingDiskChanges && (
+              <Admonition
+                type="default"
+                layout="horizontal"
+                title="Disk configuration changes have been requested"
+                description="The requested changes will be applied to your disk shortly"
+              />
+            )}
+            {isEntitlementsLoaded && !isPlanUpgradeRequired && noPermissions && (
+              <Admonition
+                type="default"
+                layout="horizontal"
+                title="You do not have permission to update disk configuration"
+                description="Please contact your organization administrator to update your disk configuration"
+              />
+            )}
           </div>
         )}
 
@@ -428,19 +431,20 @@ export function DiskManagementForm() {
             <SpendCapDisabledSection currentDiskSizeGb={defaultValues.totalSize} />
 
             <div className="flex flex-col gap-y-4">
-              <NoticeBar
-                type="default"
-                visible={isDiskNoticeVisible}
-                title="Disk configuration is only available for projects in the AWS cloud provider"
-                description={
-                  isAwsK8s
-                    ? 'Configuring your disk for AWS (Revamped) projects is unavailable for now.'
-                    : isBranch
-                      ? 'Delete and recreate your Preview Branch to configure disk size. It was deployed on an older branching infrastructure.'
-                      : 'The Fly Postgres offering is deprecated - please migrate your instance to the AWS cloud prov to configure your disk.'
-                }
-              />
-
+              {isDiskNoticeVisible && (
+                <Admonition
+                  type="default"
+                  layout="horizontal"
+                  title="Disk configuration is only available for projects in the AWS cloud provider"
+                  description={
+                    isAwsK8s
+                      ? 'Configuring your disk for AWS (Revamped) projects is unavailable for now.'
+                      : isBranch
+                        ? 'Delete and recreate your Preview Branch to configure disk size. It was deployed on an older branching infrastructure.'
+                        : 'The Fly Postgres offering is deprecated - please migrate your instance to the AWS cloud prov to configure your disk.'
+                  }
+                />
+              )}
               {isAws && (
                 <>
                   <div className="flex flex-col gap-y-3">
@@ -517,54 +521,54 @@ export function DiskManagementForm() {
                       </div>
                       <DialogSectionSeparator />
                       <div className="px-card flex flex-col gap-y-8">
-                        <NoticeBar
-                          type="default"
-                          visible={!!disableIopsThroughputConfig}
-                          title="Adjusting disk configuration requires LARGE Compute size or above"
-                          description={`Increase your compute size to adjust your disk's storage type, ${form.getValues('storageType') === 'gp3' ? 'IOPS, ' : ''} and throughput`}
-                          actions={
-                            canUpdateDiskConfiguration ? (
-                              <Button
-                                variant="default"
-                                onClick={() => {
-                                  form.setValue('computeSize', 'ci_large')
-                                }}
-                              >
-                                Change to LARGE Compute
-                              </Button>
-                            ) : (
-                              <RequestUpgradeToBillingOwners
-                                addon="computeSize"
-                                featureProposition="adjust disk configuration"
-                              />
-                            )
-                          }
-                        />
-                        <NoticeBar
-                          type="default"
-                          visible={
-                            isDiskTooSmallForCustomIops &&
-                            !disableIopsThroughputConfig &&
-                            !disableDiskInputs
-                          }
-                          title={`Increase disk size to adjust IOPS or throughput`}
-                          description={`This disk is too small to update IOPS or throughput, since gp3 volumes are capped at 500 IOPS per GB with a 3,000 IOPS minimum. Resizing to ${suggestedDiskSizeForCustomIops} GB unlocks custom IOPS and throughput, and leaves headroom for further adjustments (disk config changes are locked for 4 hours after each resize).`}
-                          actions={
-                            !disableDiskSizeInput ? (
-                              <Button
-                                variant="default"
-                                onClick={() => {
-                                  form.setValue('totalSize', suggestedDiskSizeForCustomIops, {
-                                    shouldDirty: true,
-                                    shouldValidate: true,
-                                  })
-                                }}
-                              >
-                                Increase to {suggestedDiskSizeForCustomIops} GB
-                              </Button>
-                            ) : undefined
-                          }
-                        />
+                        {!!disableIopsThroughputConfig && (
+                          <Admonition
+                            type="default"
+                            title="Adjusting disk configuration requires LARGE Compute size or above"
+                            description={`Increase your compute size to adjust your disk's storage type, ${form.getValues('storageType') === 'gp3' ? 'IOPS, ' : ''} and throughput`}
+                            actions={
+                              canUpdateDiskConfiguration ? (
+                                <Button
+                                  variant="default"
+                                  onClick={() => {
+                                    form.setValue('computeSize', 'ci_large')
+                                  }}
+                                >
+                                  Change to LARGE Compute
+                                </Button>
+                              ) : (
+                                <RequestUpgradeToBillingOwners
+                                  addon="computeSize"
+                                  featureProposition="adjust disk configuration"
+                                />
+                              )
+                            }
+                          />
+                        )}
+                        {isDiskTooSmallForCustomIops &&
+                          !disableIopsThroughputConfig &&
+                          !disableDiskInputs && (
+                            <Admonition
+                              type="default"
+                              title="Increase disk size to adjust IOPS or throughput"
+                              description={`This disk is too small to update IOPS or throughput, since gp3 volumes are capped at 500 IOPS per GB with a 3,000 IOPS minimum. Resizing to ${suggestedDiskSizeForCustomIops} GB unlocks custom IOPS and throughput, and leaves headroom for further adjustments (disk config changes are locked for 4 hours after each resize).`}
+                              actions={
+                                !disableDiskSizeInput ? (
+                                  <Button
+                                    variant="default"
+                                    onClick={() => {
+                                      form.setValue('totalSize', suggestedDiskSizeForCustomIops, {
+                                        shouldDirty: true,
+                                        shouldValidate: true,
+                                      })
+                                    }}
+                                  >
+                                    Increase to {suggestedDiskSizeForCustomIops} GB
+                                  </Button>
+                                ) : undefined
+                              }
+                            />
+                          )}
                         <StorageTypeField
                           form={form}
                           disableInput={disableIopsThroughputConfig || disableDiskInputs}

@@ -180,7 +180,7 @@ Test with 2-3 additional users to verify:
 
 <Admonition type="caution">
 
-**Recent improvement:** Auto-join now applies on EVERY login, not just first signup. This resolves a common issue where org owners would test with auto-join disabled, enable it, then log in again expecting to auto-join.
+**Recent improvement:** Auto-join now applies on EVERY login, not only on first signup. This resolves a common issue where org owners would test with auto-join disabled, enable it, then log in again expecting to auto-join.
 
 </Admonition>
 
@@ -253,7 +253,7 @@ Test with 2-3 additional users to verify:
 - Auto-join works when enabled
 - Users receive correct default role
 - Non-matching domains are excluded (if using SP-initiated with domains)
-- Existing users auto-join on their next login (not just new signups)
+- Existing users auto-join on their next login (not only on new signups)
 - Auto-join can be disabled and re-enabled as needed
 - Auto-join is idempotent (no duplicate memberships)
 - Auto-join works with IdP-initiated only (no domains)
@@ -369,7 +369,7 @@ SSO accounts have specific restrictions to prevent accidental organization locko
 - SSO accounts CAN disable SSO providers
 - Non-SSO owners CAN delete SSO providers
 - Error messages clearly explain the restriction
-- Restriction applies to all SSO accounts (not just certain roles)
+- Restriction applies to all SSO accounts (not only certain roles)
 
 ## Common issues and troubleshooting
 
@@ -387,7 +387,7 @@ Based on customer pain points that previously required support intervention:
 
 **Solution:**
 
-- Auto-join now applies on **every login**, not just first signup
+- Auto-join now applies on **every login**, not only on first signup
 - To test: Enable auto-join, log out completely, log back in via SSO
 - If still not working, verify domain configuration matches user email exactly
 
@@ -795,7 +795,7 @@ Before rolling out SSO to your organization:
 
 - Auto-join adds users to correct organization (if enabled)
 - Auto-joined users receive correct default role
-- Auto-join works on first login (not just signup)
+- Auto-join works on first login (not only on signup)
 - Existing users auto-join when feature enabled
 - Auto-join is idempotent (no duplicate memberships)
 - Auto-join works with IdP-initiated (no domains required)

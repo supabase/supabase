@@ -79,7 +79,7 @@ function SolutionsStickyNav({ type, activeItem, className }: Props) {
             </DropdownMenu>
           </SectionContainer>
           {/* desktop */}
-          <SectionContainer className="py-0! hidden md:flex gap-3 items-center">
+          <SectionContainer className="w-full py-0! hidden md:flex gap-3 items-center">
             {items.map((item: any) => {
               const isActive = item.id === activeItem
 

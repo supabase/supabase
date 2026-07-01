@@ -1,4 +1,4 @@
-export type { StateSnippet, StateSnippetFolder, SnippetWithContent } from './types'
+export type { StateSnippet, StateSnippetFolder } from './types'
 export {
   sqlEditorState,
   getSqlEditorV2StateSnapshot,
