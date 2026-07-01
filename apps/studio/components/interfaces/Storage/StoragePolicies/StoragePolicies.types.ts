@@ -58,3 +58,8 @@ export interface DraftPostgresPolicyUpdatePayload extends Omit<
   definition?: DisplayableSqlFragment
   check?: DisplayableSqlFragment
 }
+
+export interface PolicyForReview {
+  description?: string
+  statement?: string
+}

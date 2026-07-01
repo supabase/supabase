@@ -2,7 +2,7 @@ import { noop } from 'lodash'
 import { ChevronLeft, FlaskConical } from 'lucide-react'
 import { Button } from 'ui'
 
-import { POLICY_MODAL_VIEWS } from '../Policies.constants'
+import { POLICY_MODAL_VIEWS } from './PolicyEditorModal.constants'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { DOCS_URL } from '@/lib/constants'
 
@@ -16,7 +16,7 @@ interface PolicyEditorModalTitleProps {
   onToggleFeaturePreviewModal: () => void
 }
 
-const PolicyEditorModalTitle = ({
+export const PolicyEditorModalTitle = ({
   view,
   schema,
   table,
@@ -65,5 +65,3 @@ const PolicyEditorModalTitle = ({
     </div>
   )
 }
-
-export default PolicyEditorModalTitle
