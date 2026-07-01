@@ -1,5 +1,6 @@
 import { FEATURED_EXAMPLES, type FeaturedExample } from '@/lib/ai/examples'
-import { SEED_ICONS, type SeedIcon } from '@/lib/assets/seed-icons'
+import { ICON_LIBRARY } from '@/lib/assets/icon-library'
+import { type SeedIcon } from '@/lib/assets/seed-icons'
 
 /**
  * Art-direction suggestion (brief §6.6), backend-free and grounded in §6.8.
@@ -81,7 +82,7 @@ export function suggestArtDirection(
 ): Suggestion {
   const tokens = tokenize(description)
 
-  const rankedIcons = SEED_ICONS.map((icon) => ({ icon, score: scoreIcon(icon, tokens) })).sort(
+  const rankedIcons = ICON_LIBRARY.map((icon) => ({ icon, score: scoreIcon(icon, tokens) })).sort(
     (a, b) => b.score - a.score
   )
   const iconAlternates = (excludeName?: string) =>

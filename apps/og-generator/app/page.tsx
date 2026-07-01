@@ -5,7 +5,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useDialKit } from 'dialkit'
 
 import type { Suggestion } from '@/lib/ai/suggest'
-import { SEED_ICONS, type SeedIcon } from '@/lib/assets/seed-icons'
+import { ICON_LIBRARY } from '@/lib/assets/icon-library'
+import { type SeedIcon } from '@/lib/assets/seed-icons'
 import { contrastRatio, rating } from '@/lib/design/contrast'
 import { DEFAULT_TEMPLATE_ID, TEMPLATES } from '@/lib/design/templates'
 import { color, typography } from '@/lib/design/tokens'
@@ -312,7 +313,7 @@ export default function Page() {
   const [uploadedIcons, setUploadedIcons] = useState<SeedIcon[]>([])
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
-  const allIcons = useMemo(() => [...SEED_ICONS, ...uploadedIcons], [uploadedIcons])
+  const allIcons = useMemo(() => [...ICON_LIBRARY, ...uploadedIcons], [uploadedIcons])
 
   // Load the shared asset library (uploaded icons); empty when Supabase is off.
   useEffect(() => {
@@ -582,7 +583,7 @@ export default function Page() {
                         <div className="flex items-center gap-3">
                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-default text-foreground-light">
                             {(() => {
-                              const ic = SEED_ICONS.find((i) => i.name === generated.iconName)
+                              const ic = allIcons.find((i) => i.name === generated.iconName)
                               return ic ? (
                                 <svg
                                   width={20}

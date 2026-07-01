@@ -903,6 +903,9 @@ importers:
       config:
         specifier: workspace:*
         version: link:../../packages/config
+      lucide-static:
+        specifier: 1.21.0
+        version: 1.21.0
       tailwindcss:
         specifier: 'catalog:'
         version: 4.2.4
@@ -13086,6 +13089,9 @@ packages:
     resolution: {integrity: sha512-w3hD8/SQB7+lzU2r4VdFyzzOzKnUjTZIF/MQJGSSvni7Llewni4vuViRppfRAa2guOsY5k4jZyxw/i9DQHv+dw==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
+  lucide-static@1.21.0:
+    resolution: {integrity: sha512-6248z2/4sEyKkYAPPUYxOPiB2RCfMmLdMHuoOhsTFnoD40ixAoHmTVhOPux8ADa1NTBmzpEKF7WNePm+Ms503Q==}
 
   lucide-vue-next@0.562.0:
     resolution: {integrity: sha512-LN0BLGKMFulv0lnfK29r14DcngRUhIqdcaL0zXTt2o0oS9odlrjCGaU3/X9hIihOjjN8l8e+Y9G/famcNYaI7Q==}
@@ -29678,6 +29684,8 @@ snapshots:
   lucide-react@0.542.0(react@19.2.6):
     dependencies:
       react: 19.2.6
+
+  lucide-static@1.21.0: {}
 
   lucide-vue-next@0.562.0(vue@3.5.35(typescript@6.0.2)):
     dependencies:

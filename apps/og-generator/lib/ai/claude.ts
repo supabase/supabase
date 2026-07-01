@@ -2,7 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 
 import { FEATURED_EXAMPLES, type FeaturedExample } from '@/lib/ai/examples'
 import type { Suggestion } from '@/lib/ai/suggest'
-import { SEED_ICONS, SEED_ICON_MAP } from '@/lib/assets/seed-icons'
+import { ICON_LIBRARY, ICON_MAP } from '@/lib/assets/icon-library'
 import {
   clampPatternOpacity,
   type PatternColor,
@@ -42,7 +42,7 @@ export function hasClaude(): boolean {
   return Boolean(process.env.ANTHROPIC_API_KEY)
 }
 
-const ICON_CATALOG = SEED_ICONS.map(
+const ICON_CATALOG = ICON_LIBRARY.map(
   (i) => `- ${i.name} (${i.label}) — represents: ${i.tags.join(', ')}`
 ).join('\n')
 
@@ -53,7 +53,7 @@ const TEMPLATE_CATALOG = [
   '- stacked: headline top, icon bottom-left. Structured, technical feel for infrastructure/architecture posts.',
 ].join('\n')
 
-function buildSystem(examples: FeaturedExample[]): string {
+export function buildSystem(examples: FeaturedExample[]): string {
   const exampleCatalog = examples
     .map((ex) => {
       const pattern = ex.pattern
@@ -88,7 +88,7 @@ RULES:
 
 // Structured-output schema (all objects: additionalProperties:false + every key
 // required, per the API's strict-schema rules).
-const SCHEMA = {
+export const SCHEMA = {
   type: 'object',
   additionalProperties: false,
   properties: {
@@ -112,7 +112,7 @@ const SCHEMA = {
   required: ['iconName', 'templateId', 'eyebrow', 'pattern', 'rationale', 'alternateIconNames'],
 } as const
 
-interface RawSuggestion {
+export interface RawSuggestion {
   iconName: string | null
   templateId: string
   eyebrow: string
@@ -128,9 +128,9 @@ function oneOf<T extends string>(value: unknown, allowed: readonly T[], fallback
 }
 
 /** Coerce the model's answer into a valid Suggestion — nothing off-menu survives. */
-function toSuggestion(raw: RawSuggestion): Suggestion {
+export function toSuggestion(raw: RawSuggestion): Suggestion {
   const iconName =
-    typeof raw.iconName === 'string' && SEED_ICON_MAP[raw.iconName] ? raw.iconName : null
+    typeof raw.iconName === 'string' && ICON_MAP[raw.iconName] ? raw.iconName : null
 
   let pattern: Suggestion['pattern']
   if (raw.pattern && raw.pattern.type && raw.pattern.type !== 'none') {
@@ -144,9 +144,9 @@ function toSuggestion(raw: RawSuggestion): Suggestion {
 
   const alternates = Array.isArray(raw.alternateIconNames)
     ? raw.alternateIconNames
-        .filter((n): n is string => typeof n === 'string' && !!SEED_ICON_MAP[n] && n !== iconName)
+        .filter((n): n is string => typeof n === 'string' && !!ICON_MAP[n] && n !== iconName)
         .slice(0, 2)
-        .map((n) => ({ iconName: n, label: SEED_ICON_MAP[n].label, score: 0 }))
+        .map((n) => ({ iconName: n, label: ICON_MAP[n].label, score: 0 }))
     : []
 
   const eyebrow = typeof raw.eyebrow === 'string' && raw.eyebrow.trim() ? raw.eyebrow.trim() : undefined
@@ -154,7 +154,7 @@ function toSuggestion(raw: RawSuggestion): Suggestion {
     typeof raw.rationale === 'string' && raw.rationale.trim()
       ? raw.rationale.trim()
       : iconName
-        ? `${SEED_ICON_MAP[iconName].label} suits this post.`
+        ? `${ICON_MAP[iconName].label} suits this post.`
         : 'Suggested composition for this post.'
 
   return {
@@ -169,7 +169,7 @@ function toSuggestion(raw: RawSuggestion): Suggestion {
 }
 
 /** Best-effort JSON extraction — tolerant of stray prose around the object. */
-function parseJson(text: string): RawSuggestion {
+export function parseJson(text: string): RawSuggestion {
   try {
     return JSON.parse(text) as RawSuggestion
   } catch {

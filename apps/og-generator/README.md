@@ -38,8 +38,11 @@ and background for a post.
 
 - **With a Claude API key** it reasons over the icon/template library and the
   featured examples (`lib/ai/examples.ts`) and picks the strongest composition.
-- **Without one** it still works — it falls back to a keyword match over the
-  seed icons, so the app is never blocked on a key.
+- **Self-hosted (no paid API):** run a local [Ollama](https://ollama.com) model
+  (`ollama pull llama3.1`) and set `OLLAMA_URL` in `.env.local` — same reasoning,
+  nothing leaves your infrastructure. Engine order is Claude → Ollama → keyword.
+- **Neither configured:** it still works — a keyword match over the icon library,
+  so the app is never blocked.
 
 To turn on the Claude-backed suggestions:
 

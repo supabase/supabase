@@ -1,4 +1,5 @@
-import { SEED_ICON_MAP, type SeedIcon } from '@/lib/assets/seed-icons'
+import { ICON_MAP } from '@/lib/assets/icon-library'
+import { type SeedIcon } from '@/lib/assets/seed-icons'
 import { getSupabase, getSupabaseAdmin } from '@/lib/supabase/server'
 
 /**
@@ -42,7 +43,7 @@ export async function listAssets(): Promise<SeedIcon[]> {
 
 /** Resolve an icon by name: bundled seed first, then an uploaded asset. */
 export async function resolveIcon(name: string): Promise<SeedIcon | null> {
-  if (SEED_ICON_MAP[name]) return SEED_ICON_MAP[name]
+  if (ICON_MAP[name]) return ICON_MAP[name]
   const supabase = getSupabase()
   if (!supabase) return null
   try {

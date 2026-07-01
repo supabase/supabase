@@ -1,4 +1,5 @@
 import { hasClaude, suggestWithClaude } from '@/lib/ai/claude'
+import { hasOllama, suggestWithOllama } from '@/lib/ai/ollama'
 import { suggestArtDirection } from '@/lib/ai/suggest'
 import { getFeaturedExamples } from '@/lib/supabase/featured-examples'
 
@@ -30,14 +31,22 @@ export async function POST(req: Request): Promise<Response> {
   // DB-backed corpus when Supabase is configured; bundled seed otherwise.
   const examples = await getFeaturedExamples()
 
+  // Engine order: Claude (paid API) → Ollama (self-hosted, free) → keyword.
   if (hasClaude()) {
     try {
       return Response.json(await suggestWithClaude(description, examples))
     } catch (err) {
-      // Fall through to the keyword matcher so the button always works.
-      console.error('[api/suggest] Claude suggestion failed, using keyword fallback:', err)
+      console.error('[api/suggest] Claude failed, trying next engine:', err)
+    }
+  }
+  if (hasOllama()) {
+    try {
+      return Response.json(await suggestWithOllama(description, examples))
+    } catch (err) {
+      console.error('[api/suggest] Ollama failed, using keyword fallback:', err)
     }
   }
 
+  // Always-available fallback so the button never breaks.
   return Response.json(suggestArtDirection(description, examples))
 }
