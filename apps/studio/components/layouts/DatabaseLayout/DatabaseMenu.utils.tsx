@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { ArrowUpRight } from 'lucide-react'
 
 import { useIsColumnLevelPrivilegesEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
@@ -12,8 +11,6 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
-
-const ExternalLinkIcon = <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
 
 export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
   const { ref } = useParams()
