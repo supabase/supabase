@@ -5,9 +5,15 @@ import * as bedrockModule from './bedrock'
 import { getModel } from './model'
 import { DEFAULT_COMPLETION_MODEL, openaiModelEntry } from './model.utils'
 
-vi.mock('@ai-sdk/openai', () => ({
-  openai: vi.fn(() => 'openai-model'),
-}))
+vi.mock('@ai-sdk/openai', () => {
+  const chat = vi.fn(() => 'openai-model')
+  const openai = vi.fn(() => 'openai-model')
+  openai.chat = chat
+  return {
+    openai,
+    createOpenAI: vi.fn(() => ({ chat })),
+  }
+})
 
 vi.mock('./bedrock', async () => ({
   ...(await vi.importActual('./bedrock')),
@@ -56,7 +62,7 @@ describe('getModel', () => {
     })
 
     expect(modelParams?.model).toEqual('openai-model')
-    expect(openai).toHaveBeenCalledWith('gpt-5.4-nano')
+    expect(openai.chat).toHaveBeenCalledWith('gpt-5.4-nano')
     expect(systemProviderOptions).toBeUndefined()
   })
 
@@ -81,7 +87,7 @@ describe('getModel', () => {
 
     expect(error).toBeUndefined()
     expect(modelParams?.model).toEqual('openai-model')
-    expect(openai).toHaveBeenCalledWith('gpt-5.3-codex')
+    expect(openai.chat).toHaveBeenCalledWith('gpt-5.3-codex')
     expect(modelParams?.providerOptions?.openai?.reasoningEffort).toBe('low')
   })
 
@@ -94,7 +100,7 @@ describe('getModel', () => {
     })
 
     expect(error).toBeUndefined()
-    expect(openai).toHaveBeenCalledWith('gpt-5.4-nano')
+    expect(openai.chat).toHaveBeenCalledWith('gpt-5.4-nano')
     expect(modelParams?.providerOptions?.openai?.reasoningEffort).toBe('none')
   })
 })
