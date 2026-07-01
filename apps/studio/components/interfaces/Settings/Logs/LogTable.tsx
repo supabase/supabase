@@ -323,86 +323,59 @@ export const LogTable = ({
         : String(value)
   }
 
-  // Arrow-key navigation. Unlike mouse-click (`onRowClick`), keyboard nav must
-  // preserve any existing multi-select checkmarks — clearing `selectedRows`
-  // here would wipe the user's checked rows the moment they press an arrow.
-  const navigate = (direction: 'down' | 'up') => {
-    if (logDataRows.length === 0) return
-    const focusRow = (row: LogData) => {
-      setSelectedRow(row)
-      onSelectedLogChange?.(row)
-    }
-    if (!selectedRow) {
-      focusRow(logDataRows[0])
-      return
-    }
+  const getRowKey = useCallback(
+    (row: LogData) => row.id ?? row.timestamp ?? JSON.stringify(row),
+    []
+  )
+
+  const getSelectedRowIndex = useCallback(() => {
+    if (!selectedRow) return -1
     const selectedKey = getRowKey(selectedRow)
-    const currentIdx = logDataRows.findIndex((row) => getRowKey(row) === selectedKey)
-    if (currentIdx === -1) {
-      focusRow(logDataRows[0])
-      return
-    }
-    if (direction === 'down' && currentIdx < logDataRows.length - 1) {
-      focusRow(logDataRows[currentIdx + 1])
-    } else if (direction === 'up' && currentIdx > 0) {
-      focusRow(logDataRows[currentIdx - 1])
-    }
-  }
+    return logDataRows.findIndex((row) => getRowKey(row) === selectedKey)
+  }, [logDataRows, selectedRow, getRowKey])
 
-  useShortcut(SHORTCUT_IDS.LOGS_PREVIEW_START_NAV_DOWN, () => navigate('down'), {
-    enabled: logDataRows.length > 0,
-  })
+  const navigate = useCallback(
+    (direction: 'down' | 'up') => {
+      if (logDataRows.length === 0) return
 
-  useShortcut(SHORTCUT_IDS.LOGS_PREVIEW_START_NAV_UP, () => navigate('up'), {
-    enabled: logDataRows.length > 0,
-  })
+      const currentIndex = getSelectedRowIndex()
 
-  useShortcut(
-    SHORTCUT_IDS.LOGS_PREVIEW_TOGGLE_ALL_SELECTION,
-    () => {
-      if (selectedRows.size === logDataRows.length) {
-        setSelectedRows(new Set())
+      if (direction === 'down') {
+        const nextIndex = currentIndex < 0 ? 0 : Math.min(currentIndex + 1, logDataRows.length - 1)
+        const nextRow = logDataRows[nextIndex]
+        setSelectedRow(nextRow)
+        onSelectedLogChange?.(nextRow)
       } else {
-        setSelectedRows(new Set(logDataRows.map((row) => getRowKey(row))))
+        const nextIndex = currentIndex <= 0 ? 0 : currentIndex - 1
+        const nextRow = logDataRows[nextIndex]
+        setSelectedRow(nextRow)
+        onSelectedLogChange?.(nextRow)
+      }
+    },
+    [logDataRows, getSelectedRowIndex, onSelectedLogChange]
+  )
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setSelectedRows(new Set())
         setSelectedRow(null)
         onSelectedLogChange?.(null)
+        return
+      }
+
+      if (!logDataRows.length || selectedRows.size > 0) return
+
+      if (event.key === 'ArrowUp') {
+        event.preventDefault()
+        navigate('up')
+      } else if (event.key === 'ArrowDown') {
+        event.preventDefault()
+        navigate('down')
       }
     },
-    { enabled: logDataRows.length > 0 }
+    [logDataRows, selectedRows, navigate, onSelectedLogChange]
   )
-
-  useShortcut(
-    SHORTCUT_IDS.LOGS_PREVIEW_TOGGLE_ROW_SELECTION,
-    () => {
-      if (!selectedRow) return
-      const key = getRowKey(selectedRow)
-      const next = new Set(selectedRows)
-      if (next.has(key)) {
-        next.delete(key)
-      } else {
-        next.add(key)
-      }
-      setSelectedRows(next)
-    },
-    { enabled: selectedRow !== null }
-  )
-
-  useShortcut(
-    SHORTCUT_IDS.LOGS_PREVIEW_CLOSE_PANEL,
-    () => {
-      onSelectedLogChange?.(null)
-      setSelectedRow(null)
-    },
-    { enabled: selectionOpen }
-  )
-
-  useShortcut(
-    SHORTCUT_IDS.LOGS_PREVIEW_EXIT_SELECTION,
-    () => {
-      setSelectedRows(new Set())
-      ;(document.activeElement as HTMLElement | null)?.blur()
-    },
-    { enabled: !selectionOpen && selectedRows.size > 0 }
   )
 
   useEffect(() => {
