@@ -4,6 +4,7 @@ import { keepPreviousData, useQueryClient } from '@tanstack/react-query'
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import {
+  AlertTriangle,
   ExternalLinkIcon,
   InfoIcon,
   RefreshCw,
@@ -215,7 +216,11 @@ export const UsersV2 = () => {
   const isCountWithinThresholdForSortBy = totalUsers <= SORT_BY_VALUE_COUNT_THRESHOLD
 
   const isImprovedUserSearchFlagEnabled = useFlag('improvedUserSearch')
-  const { data: authConfig, isLoading: isAuthConfigLoading } = useAuthConfigQuery({ projectRef })
+  const {
+    data: authConfig,
+    isLoading: isAuthConfigLoading,
+    isError: isAuthConfigError,
+  } = useAuthConfigQuery({ projectRef })
   const {
     data: userSearchIndexes,
     isError: isUserSearchIndexesError,
@@ -322,8 +327,12 @@ export const UsersV2 = () => {
       // [Joshen] This is to prevent the dashboard from invalidating when refocusing as it may create
       // a barrage of requests to invalidate each page esp when the project has many many users.
       staleTime: Infinity,
-      // NOTE(iat): query the user data only after we know whether to show improved search or not
-      enabled: !isUserSearchIndexesLoading && !isAuthConfigLoading && !isIndexWorkerStatusLoading,
+      // NOTE(iat): query the user data only after we know whether to show improved search or not.
+      // Treat auth config error as resolved so a frozen/unresponsive GoTrue does not block user list.
+      enabled:
+        !isUserSearchIndexesLoading &&
+        (!isAuthConfigLoading || isAuthConfigError) &&
+        !isIndexWorkerStatusLoading,
     }
   )
 
@@ -522,6 +531,17 @@ export const UsersV2 = () => {
     <>
       <div className="h-full flex flex-col">
         <FormHeader className="py-4 px-6 mb-0! border-b" title="Users" />
+
+        {isAuthConfigError && (
+          <Alert variant="warning" className="rounded-none mb-0 border-0 border-b relative">
+            <AlertTriangle className="size-4" />
+            <AlertTitle>Auth service is partially unavailable</AlertTitle>
+            <AlertDescription>
+              The Auth configuration could not be loaded. Some features may be limited. If this
+              persists, try restarting your project from Settings.
+            </AlertDescription>
+          </Alert>
+        )}
 
         {showImprovedSearchOptIn && (
           <Alert className="rounded-none mb-0 border-0 relative">
