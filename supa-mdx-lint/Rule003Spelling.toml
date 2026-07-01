@@ -117,6 +117,7 @@ allow_list = [
     "[Oo]h",
     "[Oo]nboard(ing)?",
     "[Oo]vercommit(s|ted|ting)?",
+    "[Pp]gcopydb",
     "[Pp]arallelization",
     "[Pp]arams?",
     "[Pp]asskeys?",

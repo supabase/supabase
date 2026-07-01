@@ -8,14 +8,16 @@ pgcopydb is a command line tool that can run continuous or one-time migrations b
 Within Supabase, you can use it to migrate data into, or out of, your project.
 
 There are 2 primary commands for pgcopydb:
+
 1. `pgcopydb clone` - A one-time migration between databases
 2. `pgcopydb clone --follow` - A continuous migration that keeps the target database in sync with the source database
 
 The steps to follow for migrating data into or out of Supabase are similar, and are outlined below. The `clone` command is a high-level wrapper for individual commands within pgcopydb, but you can use it to only dump the database schema, or users.
 
-The requirments for this guide are:
-1. A `source` database 
-2. A `target` database 
+The requirements for this guide are:
+
+1. A `source` database
+2. A `target` database
 3. A server (or your local machine) with `pgcopydb` installed and network access to both databases
 
 <StepHikeCompact>
@@ -60,9 +62,10 @@ The requirments for this guide are:
 
     Get your connection credentials for each database. Set all of your variables in an `.env` file, or export them as environment variables. You will need:
 
-
     <Admonition type="note" title="Replication role">
+
       You may want to create a dedicated user for pgcopydb, be sure that they have access to the right data and replication privileges.
+
     </Admonition>
     </StepHikeCompact.Details>
 
@@ -84,7 +87,7 @@ The requirments for this guide are:
 
     <StepHikeCompact.Details title="Run pgcopydb">
 
-    Depending on the size of your data, this can take some time. Make sure that the command can run uninterrupted. pgopydb uses logical replication under the hood so you can use the monitoring tips outlined in the [docs](/guides/database/replication/manual-replication-monitoring) to check the progress.
+    Depending on the size of your data, this can take some time. Make sure that the command can run uninterrupted. Pgcopydb uses logical replication under the hood so you can use the monitoring tips outlined in the [docs](/guides/database/replication/manual-replication-monitoring) to check the progress.
 
     </StepHikeCompact.Details>
 
@@ -102,9 +105,9 @@ The requirments for this guide are:
 
 ## Troubleshooting
 
-### pgcopydb fails to connect to the source or target database
+### Pgcopydb fails to connect to the source or target database
 
-Ensure that your connection details are a direct connection to the database and that your client supports IPv6 (or you have the IPv4 addon enabled).
+Ensure that your connection details are a direct connection to the database and that your client supports IPv6 (or you have the IPv4 add-on enabled).
 
 ### Permission errors
 
