@@ -135,7 +135,7 @@ export function BuiltWithSupabaseSection() {
                     <img
                       src={logo.src}
                       alt=""
-                      className={`h-5 w-fit object-contain ${logo.invert ? ' dark:invert' : ''}`}
+                      className={`h-5 w-fit object-contain object-left ${logo.invert ? ' dark:invert' : ''}`}
                     />
                   )}
                   <div>
