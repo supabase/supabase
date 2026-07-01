@@ -336,7 +336,7 @@ select timestamp, log_attributes from logs where source = 'edge_logs';
 </TabPanel>
 </Tabs>
 
-The resulting `metadata` key is rendered as an array of objects in the Logs Explorer. In the following diagram, each box represents a nested array of objects.
+The resulting `metadata` key is stored in the `log_atrributes` key, and is a single level map structure in the Logs Explorer. In the following diagram, each box represents a nested array of objects.
 
 <Image
   alt="A diagram showing the nested structure of the metadata key in the edge logs. The metadata key contains an array of objects, each of which contains a request object, which in turn contains an array of headers objects."
@@ -348,12 +348,12 @@ The resulting `metadata` key is rendered as an array of objects in the Logs Expl
   height={767}
 />
 
-Perform a `cross join unnest()` to work with the keys nested in the `metadata` key.
-
 To query for a nested value, add a join for each array level:
 
 <Tabs scrollable size="small" type="underlined" defaultActiveId="bigquery" queryGroup="logsEngine">
 <TabPanel id="bigquery" label="BigQuery">
+
+Perform a `cross join unnest()` to work with the keys nested in the `metadata` key.
 
 ```sql
 select timestamp, request.method, header.cf_ipcountry
