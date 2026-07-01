@@ -17,7 +17,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -158,7 +158,7 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
                     description={description}
                     actions={
                       account.status === 'READY' && (
-                        <Button type="default" className="w-min mt-2">
+                        <Button variant="default" className="w-min mt-2">
                           <Link
                             target="_blank"
                             rel="noopener noreferrer"
@@ -220,11 +220,11 @@ export const AWSPrivateLinkForm = ({ account, open, onOpenChange }: AWSPrivateLi
             </SheetSection>
 
             <SheetFooter>
-              <Button type="default" disabled={isPending} onClick={() => onOpenChange(false)}>
+              <Button variant="default" disabled={isPending} onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
               {isNew && (
-                <Button htmlType="submit" loading={isPending}>
+                <Button type="submit" loading={isPending}>
                   Add Account
                 </Button>
               )}

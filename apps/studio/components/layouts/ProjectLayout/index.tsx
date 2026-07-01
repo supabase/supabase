@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { XIcon } from 'lucide-react'
 import Head from 'next/head'
@@ -44,6 +44,7 @@ import { UpgradingState } from './UpgradingState'
 import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { BannerFreeMicroUpgrade } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade'
+import { BannerUnifiedLogs } from '@/components/ui/BannerStack/Banners/BannerUnifiedLogs'
 import { BANNER_ID, useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerIcon from '@/components/ui/PartnerIcon'
@@ -155,6 +156,10 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       LOCAL_STORAGE_KEYS.FREE_MICRO_UPGRADE_BANNER_DISMISSED(selectedProject?.ref ?? ''),
       false
     )
+    const [isUnifiedLogsBannerDismissed] = useLocalStorageQuery(
+      LOCAL_STORAGE_KEYS.UNIFIED_LOGS_BANNER_DISMISSED,
+      false
+    )
     const [isProjectIntegrationBannerDismissed, setIsProjectIntegrationBannerDismissed] =
       useLocalStorageQuery(
         getProjectIntegrationBannerDismissKey({
@@ -231,6 +236,20 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       addBanner,
       dismissBanner,
     ])
+
+    useEffect(() => {
+      if (!selectedProject?.ref) return
+      if (IS_PLATFORM && !isUnifiedLogsBannerDismissed) {
+        addBanner({
+          id: BANNER_ID.UNIFIED_LOGS,
+          isDismissed: false,
+          content: <BannerUnifiedLogs />,
+          priority: 1,
+        })
+      } else {
+        dismissBanner(BANNER_ID.UNIFIED_LOGS)
+      }
+    }, [selectedProject?.ref, isUnifiedLogsBannerDismissed, addBanner, dismissBanner])
 
     useLayoutEffect(() => {
       const unregister = registerOpenMenu(() => {
@@ -320,7 +339,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                       </AlertDescription>
                     </div>
                     <ButtonTooltip
-                      type="text"
+                      variant="text"
                       icon={<XIcon size={14} />}
                       className="h-7 w-7 p-0"
                       onClick={() => setIsProjectIntegrationBannerDismissed(true)}

@@ -9,7 +9,6 @@ import {
   type ReactNode,
 } from 'react'
 import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageSection,
@@ -19,10 +18,11 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
-import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { useMainScrollContainer } from '@/components/layouts/MainScrollContainerContext'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { type Bucket } from '@/data/storage/buckets-query'
@@ -103,7 +103,7 @@ export const BucketsPolicies = ({
                     search ? (
                       <Button
                         size="tiny"
-                        type="text"
+                        variant="text"
                         className="p-0 h-5 w-5"
                         icon={<X />}
                         onClick={() => setSearch('')}

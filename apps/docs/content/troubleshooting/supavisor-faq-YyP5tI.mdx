@@ -66,7 +66,7 @@ postgresql://postgres.ajrbwkcuthywfddihrmflo:[YOUR-PASSWORD]@aws-0-us-east-1.poo
 
 ### Supavisor: Transaction mode vs. Session mode?
 
-When a client forms a direct connection with Postgres, it usually will make a few queries, but may not utilize the connection the entire time. In transaction mode, a client is allowed to make a single query before being sent back to the figurative "waiting room". This prevents greedy or sedentary clients from hoarding connections. In most cases, this increases query throughput and is optimal.
+When a client forms a direct connection with Postgres, it usually makes a few queries but may not use the connection the entire time. In transaction mode, a client is allowed to make a single query before being sent back to the figurative "waiting room". This prevents greedy or sedentary clients from hoarding connections. In most cases, this increases query throughput and is optimal.
 
 In session mode, once the pooler assigns a direct connection, it stays with that client until voluntarily surrendered.
 
@@ -81,11 +81,11 @@ When clients connect to either Postgres or Supavisor, they do so with the Postgr
 ### What are "client connections"?
 
 In summary, they have nothing to do with front-end clients. They are the amount of backend-server connections that can connect to a serverside pooler.
-Imagine a chess tournament with 60 boards. Each board represents a connection in a database. When a player sits down at a board, it's like a client connecting to the database. They can take their time with their moves or just sit there, not making any.
+Imagine a chess tournament with 60 boards. Each board represents a connection in a database. When a player sits down at a board, it's like a client connecting to the database. They can take their time with their moves or sit there, not making any.
 
 But when the tournament fills up and all the boards are taken, new players are turned away, and told to check back at a later time to see if a table becomes available.
 
-Now, imagine the tournament organizers decide to expand the venue to house 200 people without adding more tables. Even when all boards are occupied, players don't have to leave. They can wait in the wings, and the moment a board opens up, someone from the waiting area can take their place. Likewise, if someone ends their game, but wants to play again, they can just go back to the waiting area. The waiting area represents the "Max Client Connections". Ultimately, the additional capacity provided by the pooler ensures fewer people are turned away from the "tournament".
+Now, imagine the tournament organizers decide to expand the venue to house 200 people without adding more tables. Even when all boards are occupied, players don't have to leave. They can wait in the wings, and the moment a board opens up, someone from the waiting area can take their place. Likewise, if someone ends their game, but wants to play again, they can go back to the waiting area. The waiting area represents the "Max Client Connections". Ultimately, the additional capacity provided by the pooler ensures fewer people are turned away from the "tournament".
 
 ### In the context of Supavisor, what does "pool size" mean?
 
@@ -93,17 +93,17 @@ Now, imagine the tournament organizers decide to expand the venue to house 200 p
 
 ### What is the "user+db+mode" combination?
 
-Postgres is not actually a database. It is a Relational Database Management System (RDMS). Within it, you can spawn Postgres databases. In Supabase, it is a common pattern to just use the default database called `postgres`, but you could create more:
+Postgres is not a database. It is a Relational Database Management System (RDMS). Within it, you can spawn Postgres databases. In Supabase, it is a common pattern to use the default database called `postgres`, but you could create more:
 
 ```sql
 CREATE DATABASE postgres;
 CREATE DATABASE another_database;
 ```
 
-Similarly, a database can have many database users, but most people just rely on the default user `postgres`.
+Similarly, a database can have many database users, but most people rely on the default user `postgres`.
 
 ```sql
-CREATE USER postgres WITH PASSWORD 'super-secret-password;
+CREATE USER postgres WITH PASSWORD 'super-secret-password';
 CREATE USER some_new_user WITH PASSWORD 'password';
 ```
 
@@ -119,7 +119,7 @@ When a distinct combination connects to your database, a new direct connection p
 
 ### **Does Supavisor immediately establish the max pool size?**
 
-No, it doesn't. Let's break it down:
+No, it doesn't. See why:
 
 - In transaction mode, the pooler will only add connections if there are not enough connections to service all pending queries simultaneously. If 10 clients connect, but a single direct connection can comfortably accommodate them all, the pooler will not create more.
 - If necessary, it can create as many connections to prevent queries from pending up to the limit specified by the "Pool Size".
@@ -159,7 +159,7 @@ As a rule of thumb, if you're using the DB REST API or multiple app-based "user+
 
 Connection usage can be monitored with a Supabase Grafana Dashboard. It provides realtime visibility of over 200 database metrics, such as graphs of CPU, EBS, and active direct/pooler connections. It can be extremely useful for monitoring and debugging instances.
 
-You can check our [GitHub repo](https://github.com/supabase/supabase-grafana) for setup instructions for local deployments or free cloud deployments on [Fly.io](http://fly.io/). Refer to Supabase [documentation](/docs/guides/platform/metrics) to learn more about the metrics endpoint.
+You can check our [GitHub repo](https://github.com/supabase/supabase-grafana) for setup instructions for local deployments or free cloud deployments on [Fly.io](http://fly.io/). Refer to Supabase [documentation](/docs/guides/telemetry/metrics) to learn more about the metrics endpoint.
 
 ### **Can Supavisor really support a million connections?**
 

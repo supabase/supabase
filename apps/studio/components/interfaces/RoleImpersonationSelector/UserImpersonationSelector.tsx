@@ -27,7 +27,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
 import { useCustomAccessTokenHookDetails } from '@/hooks/misc/useCustomAccessTokenHookDetails'
@@ -235,7 +235,7 @@ export const UserImpersonationSelector = () => {
                 <InputGroup>
                   <InputGroupInput
                     size="tiny"
-                    className="table-editor-search border-none"
+                    className="pr-10 border-none"
                     placeholder="Search by id, email, phone, or name..."
                     onChange={(e) => setSearchText(e.target.value)}
                     value={searchText}
@@ -253,7 +253,11 @@ export const UserImpersonationSelector = () => {
                   </InputGroupAddon>
                   <InputGroupAddon align="inline-end">
                     {searchText && (
-                      <InputGroupButton size="tiny" type="text" onClick={() => setSearchText('')}>
+                      <InputGroupButton
+                        size="tiny"
+                        variant="text"
+                        onClick={() => setSearchText('')}
+                      >
                         <span className="sr-only">Clear search</span>
                         <X size={12} />
                       </InputGroupButton>
@@ -314,7 +318,7 @@ export const UserImpersonationSelector = () => {
                             <CollapsibleContent className="mt-1 flex flex-col gap-y-4">
                               <Button
                                 size="tiny"
-                                type="text"
+                                variant="text"
                                 className="absolute right-0 top-0 py-2 hover:bg-muted flex items-center text"
                                 onClick={clearSearchHistory}
                               >
@@ -375,7 +379,7 @@ export const UserImpersonationSelector = () => {
                 </FormItemLayout>
                 <div className="flex items-center justify-end">
                   <Button
-                    type="default"
+                    variant="default"
                     disabled={!externalUserId}
                     onClick={impersonateExternalUser}
                   >
@@ -471,7 +475,7 @@ const BaseImpersonatingRow = ({
         </span>
       </div>
 
-      <Button type="default" onClick={onClick} disabled={isLoading} loading={isLoading}>
+      <Button variant="default" onClick={onClick} disabled={isLoading} loading={isLoading}>
         {isImpersonating ? 'Stop' : 'Impersonate'}
       </Button>
     </div>
@@ -567,7 +571,12 @@ const UserRow = ({ user, onClick, isImpersonating = false, isLoading = false }: 
         </span>
       </div>
 
-      <Button type="default" onClick={() => onClick(user)} disabled={isLoading} loading={isLoading}>
+      <Button
+        variant="default"
+        onClick={() => onClick(user)}
+        disabled={isLoading}
+        loading={isLoading}
+      >
         {isImpersonating ? 'Stop' : 'Impersonate'}
       </Button>
     </div>

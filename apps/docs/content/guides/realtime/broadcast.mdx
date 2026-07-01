@@ -128,6 +128,12 @@ Get the Project URL and key from [the project's **Connect** dialog](/dashboard/p
 
 You can receive Broadcast messages by providing a callback to the channel.
 
+<Admonition type="note">
+
+Binary payloads (`ArrayBuffer` / `ArrayBufferView`) are received automatically from **supabase-js 2.91.0** and **supabase-swift 2.44.0**. On older SDK versions, binary messages are silently dropped and never reach the callback.
+
+</Admonition>
+
 <Tabs
   scrollable
   size="small"
@@ -147,7 +153,7 @@ You can receive Broadcast messages by providing a callback to the channel.
     // Join a room/topic. Can be anything except for 'realtime'.
     const myChannel = supabase.channel('test-channel')
 
-    // Simple function to log any messages we receive
+    // Function to log any messages we receive
     function messageReceived(payload) {
       console.log(payload)
     }
@@ -170,7 +176,7 @@ You can receive Broadcast messages by providing a callback to the channel.
     ```dart
     final myChannel = supabase.channel('test-channel');
 
-    // Simple function to log any messages we receive
+    // Log any messages we receive
     void messageReceived(payload) {
       print(payload);
     }
@@ -235,7 +241,7 @@ You can receive Broadcast messages by providing a callback to the channel.
     # Join a room/topic. Can be anything except for 'realtime'.
     my_channel = supabase.channel('test-channel')
 
-    # Simple function to log any messages we receive
+    # Function to log any messages we receive
     def message_received(payload):
       print(f"Broadcast received: {payload}")
 
@@ -254,6 +260,12 @@ You can receive Broadcast messages by providing a callback to the channel.
 ### Broadcast using the client libraries
 
 You can use the Supabase client libraries to send Broadcast messages.
+
+<Admonition type="note">
+
+Broadcast payloads can be binary (`ArrayBuffer` or `ArrayBufferView`, e.g. `Uint8Array`) over WebSocket from **supabase-js 2.91.0** and **supabase-swift 2.44.0**. Binary payloads sent to clients running older SDK versions are **silently dropped** and never arrive over the WebSocket. The Dart, Kotlin, and Python clients don't support binary payloads yet.
+
+</Admonition>
 
 <Tabs
   scrollable
@@ -298,6 +310,16 @@ You can use the Supabase client libraries to send Broadcast messages.
         payload: { message: 'Hi' },
       })
     })
+
+    /**
+     * The payload can be binary (ArrayBuffer / ArrayBufferView) from supabase-js 2.91.0.
+     * Receivers on older SDK versions will not get the message.
+     */
+    myChannel.send({
+      type: 'broadcast',
+      event: 'cursor-pos',
+      payload: new Uint8Array([1, 2, 3]).buffer,
+    })
     ```
 
   </TabPanel>
@@ -334,6 +356,12 @@ You can use the Supabase client libraries to send Broadcast messages.
   </$Show>
   <$Show if="sdk:swift">
   <TabPanel id="swift" label="Swift">
+
+    <Admonition type="note">
+
+    Binary payloads over WebSocket are supported from supabase-swift 2.44.0. Receivers on older SDK versions will not get binary messages.
+
+    </Admonition>
 
     {/* prettier-ignore */}
     ```swift
@@ -385,7 +413,7 @@ You can use the Supabase client libraries to send Broadcast messages.
 
     <Admonition type="note">
 
-    When an asynchronous method needs to be used within a synchronous context, such as the callback for `.subscribe()`, utilize `asyncio.create_task()` to schedule the coroutine. This is why the [initialize the client](#initialize-the-client) example includes an import of `asyncio`.
+    When an asynchronous method needs to be used within a synchronous context, such as the callback for `.subscribe()`, use `asyncio.create_task()` to schedule the coroutine. This is why the [initialize the client](#initialize-the-client) example includes an import of `asyncio`.
 
     </Admonition>
 
@@ -440,11 +468,31 @@ By default, all database broadcasts are private, meaning clients must authentica
 
 </Admonition>
 
+To broadcast a binary payload from your database, use the `realtime.send_binary()` function with a `bytea` payload:
+
+{/* prettier-ignore */}
+```sql
+select
+  realtime.send_binary(
+    '\x012345'::bytea, -- bytea payload
+    'event',           -- Event name
+    'topic',           -- Topic
+    true               -- Private / Public flag (defaults to true)
+  );
+```
+
+The same public/private matching rule applies: a binary broadcast only reaches channels with the same private setting. Binary messages only reach clients on **supabase-js 2.91.0** and **supabase-swift 2.44.0** or later; older clients silently drop them.
+
 You can use the `realtime.broadcast_changes()` helper function to broadcast messages when a record is created, updated, or deleted. For more details, read [Subscribing to Database Changes](/docs/guides/realtime/subscribing-to-database-changes).
 
 ### Broadcast using the REST API
 
-You can send a Broadcast message by making an HTTP request to Realtime servers.
+You can send a single Broadcast message by making an HTTP request to Realtime servers. The endpoint embeds the topic and event in the path, and the `Content-Type` header determines the payload type:
+
+- `application/json` — JSON payload
+- `application/octet-stream` — binary payload
+
+Add `?private=true` to broadcast to a private channel.
 
 <Tabs
   scrollable
@@ -457,19 +505,19 @@ You can send a Broadcast message by making an HTTP request to Realtime servers.
 
     {/* prettier-ignore */}
     ```bash
+    # JSON payload
     curl -v \
     -H 'apikey: <SUPABASE_TOKEN>' \
     -H 'Content-Type: application/json' \
-    --data-raw '{
-      "messages": [
-        {
-          "topic": "test",
-          "event": "event",
-          "payload": { "test": "test" }
-        }
-      ]
-    }' \
-    'https://<PROJECT_REF>.supabase.co/realtime/v1/api/broadcast'
+    --data-raw '{ "test": "test" }' \
+    'https://<PROJECT_REF>.supabase.co/realtime/v1/api/broadcast/test/events/event'
+
+    # Binary payload
+    curl -v \
+    -H 'apikey: <SUPABASE_TOKEN>' \
+    -H 'Content-Type: application/octet-stream' \
+    --data-binary @payload.bin \
+    'https://<PROJECT_REF>.supabase.co/realtime/v1/api/broadcast/test/events/event?private=true'
     ```
 
   </TabPanel>
@@ -477,25 +525,38 @@ You can send a Broadcast message by making an HTTP request to Realtime servers.
 
     {/* prettier-ignore */}
     ```bash
-    POST /realtime/v1/api/broadcast HTTP/1.1
+    POST /realtime/v1/api/broadcast/test/events/event HTTP/1.1
     Host: {PROJECT_REF}.supabase.co
     Content-Type: application/json
     apikey: {SUPABASE_TOKEN}
-    {
-      "messages": [
-        {
-          "topic": "test",
-          "event": "event",
-          "payload": {
-            "test": "test"
-          }
-        }
-      ]
-    }
+    { "test": "test" }
     ```
 
   </TabPanel>
 </Tabs>
+
+<Admonition type="note">
+
+To send multiple messages in a single request, the batch endpoint `POST /realtime/v1/api/broadcast` is still available. It accepts a JSON body with a `messages` array (JSON payloads only):
+
+{/* prettier-ignore */}
+```bash
+curl -v \
+-H 'apikey: <SUPABASE_TOKEN>' \
+-H 'Content-Type: application/json' \
+--data-raw '{
+  "messages": [
+    {
+      "topic": "test",
+      "event": "event",
+      "payload": { "test": "test" }
+    }
+  ]
+}' \
+'https://<PROJECT_REF>.supabase.co/realtime/v1/api/broadcast'
+```
+
+</Admonition>
 
 ## Broadcast options
 
@@ -628,7 +689,7 @@ You can pass configuration options while initializing the Supabase Client.
 
     <Admonition type="note">
 
-    When an asynchronous method needs to be used within a synchronous context, such as the callback for `.subscribe()`, utilize `asyncio.create_task()` to schedule the coroutine. This is why the [initialize the client](#initialize-the-client) example includes an import of `asyncio`.
+    When an asynchronous method needs to be used within a synchronous context, such as the callback for `.subscribe()`, use `asyncio.create_task()` to schedule the coroutine. This is why the [initialize the client](#initialize-the-client) example includes an import of `asyncio`.
 
     </Admonition>
 
@@ -783,7 +844,7 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
   <TabPanel id="js" label="JavaScript">
     <Admonition type="note">
 
-    This is currently available only in the Supabase JavaScript client version 2.37.0 and later.
+    `channel.httpSend()` always uses the REST API regardless of WebSocket connection state, and is available from the Supabase JavaScript client version 2.107.0 and later. `ArrayBuffer` and `ArrayBufferView` (e.g. `Uint8Array`) payloads are sent as `application/octet-stream`; all other payloads are JSON-encoded.
 
     </Admonition>
 
@@ -792,13 +853,11 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
 
     // No need to subscribe to channel
 
-    channel
-      .send({
-        type: 'broadcast',
-        event: 'test',
-        payload: { message: 'Hi' },
-      })
-      .then((resp) => console.log(resp))
+    // JSON payload
+    await channel.httpSend('cursor-pos', { x: Math.random(), y: Math.random() })
+
+    // Binary payload (ArrayBuffer / ArrayBufferView) — sent as application/octet-stream
+    await channel.httpSend('cursor-pos', new Uint8Array([1, 2, 3]).buffer)
 
     // Remember to clean up the channel
 
@@ -982,6 +1041,12 @@ You can configure replay with the following options:
 
 - **`since`** (Required): The epoch timestamp in milliseconds (for example, `1697472000000`), specifying the earliest point from which messages should be retrieved.
 - **`limit`** (Optional): The number of messages to return. This must be a positive integer, with a maximum value of 25.
+
+<Admonition type="note">
+
+Messages are stored in daily partitions, and partitions older than 72 hours are dropped. Because whole days are removed at once, a message stays available for at least 72 hours and at most 4 days, depending on the time of day it was sent. Setting `since` further back than the retained window does not recover deleted messages. See [Realtime Limits](/docs/guides/realtime/limits) for details.
+
+</Admonition>
 
 <Tabs
   scrollable

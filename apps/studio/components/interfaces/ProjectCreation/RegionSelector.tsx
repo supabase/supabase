@@ -1,4 +1,4 @@
-import { useFlag, useParams } from 'common'
+import { useFeatureFlags, useFlag, useParams } from 'common'
 import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
@@ -22,7 +22,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { getAvailableRegions } from './ProjectCreation.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
@@ -69,6 +69,7 @@ export const RegionSelector = ({
   const { slug } = useParams()
   const cloudProvider = form.getValues('cloudProvider') as CloudProvider
 
+  const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const smartRegionEnabled = useFlag('enableSmartRegion')
 
   const { data: statusData } = useIncidentStatusQuery()
@@ -76,7 +77,7 @@ export const RegionSelector = ({
 
   const { isPending: isLoadingDefaultRegion } = useDefaultRegionQuery(
     { cloudProvider },
-    { enabled: !smartRegionEnabled }
+    { enabled: flagsLoaded && !smartRegionEnabled }
   )
 
   const {

@@ -12,10 +12,10 @@ import {
   ChartLine,
   ChartLoadingState,
   ChartMetric,
-  GenericSkeletonLoader,
-} from 'ui-patterns'
+} from 'ui-patterns/Chart'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
@@ -137,7 +137,7 @@ export const ReadReplicaDetails = () => {
                     isReactForm={false}
                     layout="horizontal"
                     label="Load Balancer URL"
-                    description="RESTful endpoint for querying and managing your databases through your load balancer"
+                    description="RESTful endpoint for querying and managing your databases through your load balancer."
                   >
                     <Input readOnly copy className="input-mono" value={loadBalancer?.endpoint} />
                   </FormItemLayout>
@@ -164,7 +164,7 @@ export const ReadReplicaDetails = () => {
                     isReactForm={false}
                     layout="horizontal"
                     label="Compute Size"
-                    description="Size of replica will be identical to the primary database"
+                    description="Size of replica will be identical to the primary database."
                   >
                     <Input readOnly className="input-mono" value={size} />
                   </FormItemLayout>

@@ -9,7 +9,7 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { databasePoliciesKeys } from '@/data/database-policies/keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { storageKeys } from '@/data/storage/keys'
 import { usePublicBucketsWithSelectPoliciesQuery } from '@/data/storage/public-buckets-with-select-policies-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -174,10 +174,10 @@ function PublicBucketWarningView(props: PublicBucketWarningViewProps): ReactNode
         }
         actions={
           <div className="flex gap-2">
-            <Button type="default" size="tiny" onClick={onDismiss}>
+            <Button variant="default" size="tiny" onClick={onDismiss}>
               Dismiss
             </Button>
-            <Button type="warning" size="tiny" onClick={onShowModal}>
+            <Button variant="warning" size="tiny" onClick={onShowModal}>
               Remove policy
             </Button>
           </div>

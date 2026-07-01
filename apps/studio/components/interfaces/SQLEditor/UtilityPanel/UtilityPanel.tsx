@@ -11,6 +11,7 @@ import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation
 import { Snippet } from '@/data/content/sql-folders-query'
 import { useTrack } from '@/lib/telemetry/track'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
 
 export type UtilityPanelProps = {
   id: string
@@ -22,6 +23,7 @@ export type UtilityPanelProps = {
   prettifyQuery: () => void
   executeQuery: () => void
   executeExplainQuery: () => void
+  showExplainTab?: boolean
   onDebug: () => void
   buildDebugPrompt: () => string
   activeTab?: string
@@ -47,6 +49,7 @@ export const UtilityPanel = ({
   prettifyQuery,
   executeQuery,
   executeExplainQuery,
+  showExplainTab = true,
   onDebug,
   buildDebugPrompt,
   activeTab = 'results',
@@ -55,9 +58,10 @@ export const UtilityPanel = ({
   const { ref } = useParams()
   const track = useTrack()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const sessionSnap = useSqlEditorSessionSnapshot()
 
   const snippet = snapV2.snippets[id]?.snippet
-  const result = snapV2.results[id]?.[0]
+  const result = sessionSnap.results[id]?.[0]
 
   const handleTabChange = (tab: string) => {
     // When switching to the explain tab, trigger the explain query
@@ -136,16 +140,18 @@ export const UtilityPanel = ({
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
             <span className="translate-y-px">Results</span>
           </TabsTrigger_Shadcn_>
-          <TabsTrigger_Shadcn_ className="py-3 text-xs" value="explain">
-            <span className="translate-y-px">Explain</span>
-          </TabsTrigger_Shadcn_>
+          {showExplainTab && (
+            <TabsTrigger_Shadcn_ className="py-3 text-xs" value="explain">
+              <span className="translate-y-px">Explain</span>
+            </TabsTrigger_Shadcn_>
+          )}
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
             <span className="translate-y-px">Chart</span>
           </TabsTrigger_Shadcn_>
 
           {result?.rows && (
             <DownloadResultsButton
-              type="text"
+              variant="text"
               results={result.rows as any[]}
               fileName={`Supabase Snippet ${snippet.name}`}
               onDownloadAsCSV={() => track('sql_editor_result_download_csv_clicked')}
@@ -177,9 +183,11 @@ export const UtilityPanel = ({
         />
       </TabsContent_Shadcn_>
 
-      <TabsContent_Shadcn_ asChild value="explain" className="mt-0 grow">
-        <UtilityTabExplain id={id} isExecuting={isExplainExecuting} />
-      </TabsContent_Shadcn_>
+      {showExplainTab && (
+        <TabsContent_Shadcn_ asChild value="explain" className="mt-0 grow">
+          <UtilityTabExplain id={id} isExecuting={isExplainExecuting} />
+        </TabsContent_Shadcn_>
+      )}
 
       <TabsContent_Shadcn_ asChild value="chart" className="mt-0 grow">
         <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />

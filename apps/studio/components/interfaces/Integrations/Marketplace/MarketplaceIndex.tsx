@@ -1,15 +1,15 @@
 import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { useMemo, useRef } from 'react'
 import { Button, Card, ShadowScrollArea, Table, TableBody, TableHeader } from 'ui'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
+import { PageContainer } from 'ui-patterns/PageContainer'
 import {
-  EmptyStatePresentational,
-  PageContainer,
   PageHeader,
   PageHeaderDescription,
   PageHeaderMeta,
   PageHeaderSummary,
   PageHeaderTitle,
-} from 'ui-patterns'
+} from 'ui-patterns/PageHeader'
 
 import {
   EXCLUDED_CATEGORY_SLUGS,
@@ -23,7 +23,7 @@ import {
   type MarketplaceSource,
 } from './Marketplace.constants'
 import { MarketplaceCard } from './MarketplaceCard'
-import { MarketplaceFeaturedHero } from './MarketplaceFeaturedHero'
+import { MarketplaceFeaturedHeroGrid } from './MarketplaceFeaturedHeroGrid'
 import { MarketplaceFilterBar, type ViewMode } from './MarketplaceFilterBar'
 import { MarketplaceListHeader, MarketplaceListRow } from './MarketplaceListRow'
 import { IntegrationLoadingCard } from '@/components/interfaces/Integrations/Landing/IntegrationCard'
@@ -208,14 +208,13 @@ export const MarketplaceIndex = () => {
 
   const activeFilters = [category, type, source].filter(Boolean)
   const pageTitle = useMemo(() => {
-    if (activeFilters.length !== 1) return 'Integrations Marketplace'
-    if (category)
-      return `Integrations Marketplace: ${formatCategoryLabel(category, categoryOptions)}`
+    if (activeFilters.length !== 1) return 'Extend your database'
+    if (category) return `Integrations: ${formatCategoryLabel(category, categoryOptions)}`
     if (type)
-      return `Integrations Marketplace: ${INTEGRATION_TYPES.find((t) => t.key === type)?.label ?? type}s`
+      return `Integrations: ${INTEGRATION_TYPES.find((t) => t.key === type)?.label ?? type}s`
     if (source)
-      return `Integrations Marketplace: ${MARKETPLACE_SOURCES.find((s) => s.key === source)?.label ?? source}`
-    return 'Integrations Marketplace'
+      return `Integrations: ${MARKETPLACE_SOURCES.find((s) => s.key === source)?.label ?? source}`
+    return 'Integrations'
   }, [activeFilters.length, category, type, source, categoryOptions])
 
   return (
@@ -239,7 +238,7 @@ export const MarketplaceIndex = () => {
         {isLoading && (
           <div className="grid gap-4 xl:grid-cols-3 2xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, idx) => (
-              <IntegrationLoadingCard key={`marketplace-loading-${idx}`} />
+              <IntegrationLoadingCard key={`integrations-loading-${idx}`} />
             ))}
           </div>
         )}
@@ -251,10 +250,11 @@ export const MarketplaceIndex = () => {
         {isSuccess && (
           <>
             {featured.length > 0 && (
-              <MarketplaceFeaturedHero
+              <MarketplaceFeaturedHeroGrid
                 integrations={featured}
                 installedIds={installedIds}
-                categoryOptions={categoryOptions}
+                primaryIntegrationId={featured[0].id}
+                secondaryIntegrationIds={featured.slice(1, 3).map((i) => i.id)}
               />
             )}
 
@@ -281,7 +281,7 @@ export const MarketplaceIndex = () => {
 
             {filtered.length === 0 && (
               <EmptyStatePresentational title="No results found">
-                <Button type="default" onClick={clearAll}>
+                <Button variant="default" onClick={clearAll}>
                   Clear filters
                 </Button>
               </EmptyStatePresentational>

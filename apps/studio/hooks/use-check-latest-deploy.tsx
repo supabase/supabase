@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { Button, StatusIcon } from 'ui'
 
 import { useDeploymentCommitQuery } from '@/data/utils/deployment-commit-query'
+import { BASE_PATH } from '@/lib/constants'
 
 const DeployCheckToast = ({ id }: { id: string | number }) => {
   const router = useRouter()
@@ -21,10 +22,19 @@ const DeployCheckToast = ({ id }: { id: string | number }) => {
       </div>
 
       <div className="flex gap-5 justify-end">
-        <Button type="outline" onClick={() => toast.dismiss(id)}>
+        <Button variant="outline" onClick={() => toast.dismiss(id)}>
           Not now
         </Button>
-        <Button onClick={() => router.reload()}>Refresh</Button>
+        <Button
+          onClick={() => {
+            // Clear the deployment pin so the reload lands on the latest
+            // version. No-op on Next (the cookie isn't set there).
+            document.cookie = `__vdpl=; Path=${BASE_PATH || '/'}; Max-Age=0`
+            router.reload()
+          }}
+        >
+          Refresh
+        </Button>
       </div>
     </div>
   )

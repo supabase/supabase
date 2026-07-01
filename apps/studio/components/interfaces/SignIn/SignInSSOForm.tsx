@@ -73,7 +73,12 @@ export const SignInSSOForm = () => {
 
   return (
     <Form {...form}>
-      <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        id={formId}
+        method="POST"
+        className="flex flex-col gap-4"
+        onSubmit={form.handleSubmit(onSubmit)}
+      >
         <FormField
           key="email"
           name="email"
@@ -107,7 +112,7 @@ export const SignInSSOForm = () => {
           />
         </div>
 
-        <Button block form={formId} htmlType="submit" size="large" loading={isSubmitting}>
+        <Button block form={formId} type="submit" size="large" loading={isSubmitting}>
           Sign in
         </Button>
       </form>

@@ -58,7 +58,7 @@ export const OperationItem = ({ operationId, tableId, content }: OperationItemPr
           </div>
         </div>
         <ButtonTooltip
-          type="text"
+          variant="text"
           aria-label="Discard change"
           className="px-1.5"
           icon={<Undo2 />}

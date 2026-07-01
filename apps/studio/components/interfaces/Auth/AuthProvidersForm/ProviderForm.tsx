@@ -18,7 +18,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -279,8 +279,8 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
               <DocsButton href={provider.link} />
               <div className="flex items-center gap-x-3">
                 <Button
-                  type="default"
-                  htmlType="reset"
+                  variant="default"
+                  type="reset"
                   onClick={() => {
                     setOpen(false)
                     setUrlProvider(null)
@@ -292,7 +292,7 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
                 </Button>
                 <ButtonTooltip
                   form={formId}
-                  htmlType="submit"
+                  type="submit"
                   loading={isUpdatingConfig}
                   disabled={isUpdatingConfig || !canUpdateConfig || !form.formState.isDirty}
                   tooltip={{

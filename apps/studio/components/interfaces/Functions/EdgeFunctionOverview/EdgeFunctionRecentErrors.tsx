@@ -45,8 +45,8 @@ import {
 } from './EdgeFunctionRecentErrors.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
-import AlertError from '@/components/ui/AlertError'
-import useLogsQuery from '@/hooks/analytics/useLogsQuery'
+import { AlertError } from '@/components/ui/AlertError'
+import { useLogsQuery } from '@/hooks/analytics/useLogsQuery'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -205,7 +205,7 @@ export const EdgeFunctionRecentErrors = ({
               </PageSectionSummary>
               <PageSectionAside>
                 <Button
-                  type="default"
+                  variant="default"
                   size="tiny"
                   icon={<ExternalLink size={14} />}
                   onClick={() =>

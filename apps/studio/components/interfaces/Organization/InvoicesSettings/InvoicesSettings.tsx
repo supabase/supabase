@@ -19,7 +19,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import InvoicePayButton from './InvoicePayButton'
 import { InvoiceStatus } from '@/components/interfaces/Billing/Invoices.types'
 import InvoiceStatusBadge from '@/components/interfaces/Billing/InvoiceStatusBadge'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
 import { getInvoice } from '@/data/invoices/invoice-query'
@@ -201,7 +201,7 @@ export const InvoicesSettings = () => {
                           )}
 
                         <ButtonTooltip
-                          type="outline"
+                          variant="outline"
                           className="w-7"
                           icon={<ScrollText size={16} strokeWidth={1.5} />}
                           onClick={() => fetchInvoice(x.id)}
@@ -210,7 +210,7 @@ export const InvoicesSettings = () => {
 
                         {x.status === InvoiceStatus.PAID && x.amount_due > 0 && (
                           <ButtonTooltip
-                            type="outline"
+                            variant="outline"
                             className="w-7"
                             icon={<Receipt size={16} strokeWidth={1.5} />}
                             onClick={() => fetchReceipt(x.id)}
@@ -239,7 +239,7 @@ export const InvoicesSettings = () => {
             <Button
               icon={<ChevronLeft />}
               aria-label="Previous page"
-              type="default"
+              variant="default"
               size="tiny"
               disabled={page === 1}
               onClick={async () => setPage(page - 1)}
@@ -247,7 +247,7 @@ export const InvoicesSettings = () => {
             <Button
               icon={<ChevronRight />}
               aria-label="Next page"
-              type="default"
+              variant="default"
               size="tiny"
               disabled={page * PAGE_LIMIT >= (count ?? 0)}
               onClick={async () => setPage(page + 1)}

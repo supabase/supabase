@@ -6,7 +6,13 @@ import uniqBy from 'lodash/uniqBy'
 import { useEffect } from 'react'
 import logConstants from 'shared-data/log-constants'
 
-import { LogsTableName, SQL_FILTER_TEMPLATES } from './Logs.constants'
+import {
+  AUTH_LOG_ERROR_CONDITION,
+  AUTH_LOG_WARNING_CONDITION,
+  LogsTableName,
+  SQL_FILTER_TEMPLATES,
+  type SqlFilterEntry,
+} from './Logs.constants'
 import type { Filters, LogData, LogsEndpointParams, QueryType } from './Logs.types'
 import { convertResultsToCSV } from '@/components/interfaces/SQLEditor/UtilityPanel/Results.utils'
 import BackwardIterator from '@/components/ui/CodeEditor/Providers/BackwardIterator'
@@ -61,43 +67,43 @@ const getDotKeys = (obj: { [k: string]: unknown }, parent?: string): string[] =>
   })
 }
 
+// Fallback for filter keys with no template: a plain `key = value`.
+// Drops the clause on non-scalar or un-encodable input.
+const defaultResolveUnknownClause = (dotKey: string, value: unknown): SafeLogSqlFragment | null => {
+  if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
+    return null
+  }
+  try {
+    return safeSql`${quotedIdent(dotKey)} = ${analyticsLiteral(value)}`
+  } catch {
+    return null
+  }
+}
+
 /**
- * Root keys in the filter object are considered to be AND filters.
- * Nested keys under a root key are considered to be OR filters.
+ * Builds the AND-joined WHERE clauses for a table's filters. Top-level keys are
+ * ANDed, nested keys under one key are ORed.
  *
- * For example:
- * ```
- * {my_value: 'something', nested: {id: 123, test: 123 }}
- * ```
- * This would be converted into `WHERE (my_value = 'something') and (id = 123 or test = 123)
- *
- * The template of the filter determines the actual filter statement. If no template is provided, a generic equality statement will be used.
- * This only applies for root keys of the filter.
- * For example:
- * ```
- * {'my.nested.value': 123}
- * ```
- * with no template, it will be converted into `WHERE (my.nested.value = 123)
- *
- * @returns a where statement with WHERE clause.
+ * `filterTemplates` and `resolveUnknownClause` can be passed in so the OTEL
+ * builders reuse this with their own ClickHouse conditions. Defaults keep the
+ * BigQuery behavior.
  */
-const buildWhereClauses = (table: LogsTableName, filters: Filters): SafeLogSqlFragment[] => {
+export const buildWhereClauses = (
+  table: LogsTableName,
+  filters: Filters,
+  filterTemplates: Record<string, SqlFilterEntry> = SQL_FILTER_TEMPLATES[table],
+  resolveUnknownClause: (
+    dotKey: string,
+    value: unknown
+  ) => SafeLogSqlFragment | null = defaultResolveUnknownClause
+): SafeLogSqlFragment[] => {
   const keys = Object.keys(filters)
-  const filterTemplates = SQL_FILTER_TEMPLATES[table]
   const _resolveTemplateToStatement = (dotKey: string): SafeLogSqlFragment | null => {
     const template = filterTemplates[dotKey]
     const value = get(filters, dotKey)
 
     if (template === undefined) {
-      // Unknown filter from a filter override — generic equality predicate; drop on bad input.
-      if (typeof value !== 'string' && typeof value !== 'number' && typeof value !== 'boolean') {
-        return null
-      }
-      try {
-        return safeSql`${quotedIdent(dotKey)} = ${analyticsLiteral(value)}`
-      } catch {
-        return null
-      }
+      return resolveUnknownClause(dotKey, value)
     }
 
     if (typeof template === 'function') {
@@ -136,8 +142,13 @@ const buildWhereClauses = (table: LogsTableName, filters: Filters): SafeLogSqlFr
     .filter((s) => s !== null)
 }
 
-const genWhereStatement = (table: LogsTableName, filters: Filters): SafeLogSqlFragment => {
-  const clauses = buildWhereClauses(table, filters)
+export const genWhereStatement = (
+  table: LogsTableName,
+  filters: Filters,
+  filterTemplates?: Record<string, SqlFilterEntry>,
+  resolveUnknownClause?: (dotKey: string, value: unknown) => SafeLogSqlFragment | null
+): SafeLogSqlFragment => {
+  const clauses = buildWhereClauses(table, filters, filterTemplates, resolveUnknownClause)
   return clauses.length > 0 ? safeSql`where ${joinSqlFragments(clauses, ' and ')}` : safeSql``
 }
 
@@ -713,7 +724,7 @@ function getErrorCondition(table: LogsTableName): SafeLogSqlFragment {
     case 'postgres_logs':
       return safeSql`parsed.error_severity IN ('ERROR', 'FATAL', 'PANIC')`
     case 'auth_logs':
-      return safeSql`metadata.level = 'error' OR SAFE_CAST(metadata.status AS INT64) >= 400`
+      return AUTH_LOG_ERROR_CONDITION
     case 'function_edge_logs':
       return safeSql`response.status_code >= 500`
     case 'function_logs':
@@ -734,7 +745,7 @@ function getWarningCondition(table: LogsTableName): SafeLogSqlFragment {
     case 'postgres_logs':
       return safeSql`parsed.error_severity IN ('WARNING')`
     case 'auth_logs':
-      return safeSql`metadata.level = 'warning'`
+      return AUTH_LOG_WARNING_CONDITION
     case 'function_edge_logs':
       return safeSql`response.status_code >= 400 AND response.status_code < 500`
     case 'function_logs':
@@ -744,6 +755,33 @@ function getWarningCondition(table: LogsTableName): SafeLogSqlFragment {
     default:
       return safeSql`false`
   }
+}
+
+export const HTTP_SERVER_ERROR_STATUS = 500
+export const HTTP_CLIENT_ERROR_STATUS = 400
+
+/**
+ * Derives the severity badge shown in the auth log table from the log level and
+ * HTTP status, matching the chart: 5xx → error, 4xx → warning, otherwise the
+ * log level. See the AUTH_LOG_*_CONDITION constants in Logs.constants.ts for the
+ * matching SQL and the reason auth logs need this.
+ */
+export function getAuthLogSeverity(level?: unknown, status?: unknown): string {
+  const normalizedLevel = typeof level === 'string' ? level : ''
+
+  // Preserve explicit error-class levels so we never downgrade them and so the
+  // original label (e.g. "fatal") is kept.
+  if (normalizedLevel === 'error' || normalizedLevel === 'fatal') return normalizedLevel
+
+  const statusCode =
+    typeof status === 'number' ? status : typeof status === 'string' ? Number(status) : NaN
+  const hasStatus = Number.isFinite(statusCode)
+
+  if (hasStatus && statusCode >= HTTP_SERVER_ERROR_STATUS) return 'error'
+  if (normalizedLevel === 'warning') return 'warning'
+  if (hasStatus && statusCode >= HTTP_CLIENT_ERROR_STATUS) return 'warning'
+
+  return normalizedLevel
 }
 
 export function jwtAPIKey(metadata: any) {

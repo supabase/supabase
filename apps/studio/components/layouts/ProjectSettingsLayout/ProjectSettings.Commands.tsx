@@ -58,7 +58,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         name: 'Auth Settings',
         route: authenticationSignInProviders
           ? `/project/${ref}/auth/providers`
-          : `/project/${ref}/auth/policies`,
+          : `/project/${ref}/database/policies`,
         defaultHidden: true,
       },
       ...(platformWebhooksEnabled
@@ -131,6 +131,12 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-project-settings-database-password',
         name: 'Database password',
+        route: `/project/${ref}/database/settings#database-password`,
+        defaultHidden: true,
+      },
+      {
+        id: 'nav-project-settings-reset-database-password',
+        name: 'Reset database password',
         route: `/project/${ref}/database/settings#database-password`,
         defaultHidden: true,
       },

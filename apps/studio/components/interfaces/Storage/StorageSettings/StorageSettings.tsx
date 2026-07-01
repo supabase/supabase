@@ -44,9 +44,9 @@ import {
   encodeBucketLimitErrorMessage,
 } from './StorageSettings.utils'
 import { ValidateSizeLimit } from './StorageSettings.ValidateSizeLimit'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from '@/data/config/project-storage-config-update-mutation'
@@ -335,7 +335,6 @@ export const StorageSettings = () => {
                                 hideMessage
                                 layout="flex-row-reverse"
                                 label="Global file size limit"
-                                className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full [&>div]:min-w-100"
                                 description={
                                   <>
                                     Restrict the size of files uploaded across all buckets.{' '}
@@ -462,8 +461,8 @@ export const StorageSettings = () => {
                         <CardFooter className="justify-end space-x-2">
                           {form.formState.isDirty && (
                             <Button
-                              type="default"
-                              htmlType="reset"
+                              variant="default"
+                              type="reset"
                               onClick={() => form.reset()}
                               disabled={
                                 !form.formState.isDirty || !canUpdateStorageSettings || isUpdating
@@ -473,8 +472,8 @@ export const StorageSettings = () => {
                             </Button>
                           )}
                           <Button
-                            type={hasLimitedStorageAccess ? 'default' : 'primary'}
-                            htmlType="submit"
+                            variant={hasLimitedStorageAccess ? 'default' : 'primary'}
+                            type="submit"
                             loading={isUpdating}
                             disabled={
                               !canUpdateStorageSettings || isUpdating || !form.formState.isDirty

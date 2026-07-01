@@ -36,13 +36,14 @@ import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { FileExplorerAndEditor } from '@/components/ui/FileExplorerAndEditor'
 import { FileData } from '@/components/ui/FileExplorerAndEditor/FileExplorerAndEditor.types'
 import { useEdgeFunctionDeployMutation } from '@/data/edge-functions/edge-functions-deploy-mutation'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
 import { BASE_PATH } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -276,6 +277,10 @@ const NewFunctionPage = () => {
   }, [template])
 
   const hasUnsavedChanges = useMemo(() => !isEqual(INITIAL_FILES, files), [files])
+  const { handleCancelNavigation, handleConfirmNavigation, shouldConfirmNavigation } =
+    usePreventNavigationOnUnsavedChanges({
+      hasChanges: hasUnsavedChanges && !hasDeployed,
+    })
 
   return (
     <PageLayout
@@ -294,7 +299,7 @@ const NewFunctionPage = () => {
             <PopoverTrigger asChild>
               <Button
                 size="tiny"
-                type="default"
+                variant="default"
                 role="combobox"
                 aria-expanded={open}
                 aria-controls={templatesListboxId}
@@ -343,7 +348,7 @@ const NewFunctionPage = () => {
           </Popover>
           <Button
             size="tiny"
-            type="default"
+            variant="default"
             onClick={handleChat}
             icon={<AiIconAnimation size={16} />}
           >
@@ -413,7 +418,11 @@ const NewFunctionPage = () => {
           </Button>
         </form>
       </Form>
-      <PreventNavigationOnUnsavedChanges hasChanges={hasUnsavedChanges && !hasDeployed} />
+      <DiscardChangesConfirmationDialog
+        visible={shouldConfirmNavigation}
+        onCancel={handleCancelNavigation}
+        onClose={handleConfirmNavigation}
+      />
     </PageLayout>
   )
 }

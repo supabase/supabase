@@ -13,11 +13,11 @@ import {
 } from 'ui'
 
 import { BlockKeys } from '../common/BlockKeys'
-import { MonacoEditor } from '../common/MonacoEditor'
 import { NullValue } from '../common/NullValue'
 import { TruncatedWarningOverlay } from './TruncatedWarningOverlay'
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
@@ -165,7 +165,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
         <div
           className={`${
             !!value && jsonString.trim().length == 0 ? 'sb-grid-fill-container' : ''
-          } sb-grid-json-editor__trigger`}
+          } text-grid overflow-hidden text-ellipsis px-2`}
           onClick={() => setIsPopoverOpen(!isPopoverOpen)}
         >
           {value === null || value === '' ? <NullValue /> : jsonString}
@@ -174,16 +174,24 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
       <PopoverContent side="bottom" align="start" sideOffset={-35} className="rounded-none p-0">
         {isTruncated && !isSuccess ? (
           <div className="flex items-center justify-center flex-col relative">
-            <MonacoEditor readOnly onChange={() => {}} value={value ?? ''} language="markdown" />
+            <CodeEditor
+              isReadOnly
+              hideLineNumbers
+              language="plaintext"
+              value={value ?? ''}
+              className="h-[200px]"
+            />
             <TruncatedWarningOverlay isLoading={isPending} loadFullValue={loadFullValue} />
           </div>
         ) : (
           <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>
-            <MonacoEditor
-              value={value ?? ''}
+            <CodeEditor
+              hideLineNumbers
+              isReadOnly={!isEditable}
               language="json"
-              readOnly={!isEditable}
-              onChange={onChange}
+              value={value ?? ''}
+              onInputChange={onChange}
+              className="h-[200px] border-b"
             />
             <div className="flex items-start justify-between p-2 bg-surface-200 gap-x-2">
               {isEditable && (

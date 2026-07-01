@@ -20,11 +20,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import BarChart from '@/components/ui/Charts/BarChart'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
+import { getCumulativeResults } from '@/components/ui/QueryBlock/QueryBlock.utils'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 type Results = { rows: readonly any[] }
@@ -40,21 +41,6 @@ export type ChartConfig = {
   logScale?: boolean
 }
 
-const getCumulativeResults = (results: Results, config: ChartConfig) => {
-  if (!results?.rows?.length) {
-    return []
-  }
-
-  const cumulativeResults = results.rows.reduce((acc, row) => {
-    const prev = acc[acc.length - 1] || {}
-    const next = {
-      ...row,
-      [config.yKey]: (prev[config.yKey] || 0) + row[config.yKey],
-    }
-    return [...acc, next]
-  }, [])
-  return cumulativeResults
-}
 const VALID_RESULT_KEY_TYPES = ['number', 'string', 'date']
 
 type ChartConfigProps = {
@@ -182,7 +168,7 @@ export const ChartConfig = ({
           <h2 className="text-sm text-foreground-lighter">Chart options</h2>
           {config.xKey && config.yKey && (
             <ButtonTooltip
-              type="text"
+              variant="text"
               size="tiny"
               onClick={onFlip}
               disabled={!canFlip}
@@ -220,7 +206,7 @@ export const ChartConfig = ({
             <p className="text-xs text-foreground-light mt-1!">
               SQL snippets can now be added and saved to your custom reports. Try it out now!
             </p>
-            <Button asChild size="tiny" type="default" className="mt-1">
+            <Button asChild size="tiny" variant="default" className="mt-1">
               <Link href={`/project/${ref}/reports`}>Head to Reports</Link>
             </Button>
           </Admonition>

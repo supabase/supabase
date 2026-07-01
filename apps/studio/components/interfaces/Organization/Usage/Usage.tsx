@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { Button, cn, CommandGroup, CommandItem } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Restriction } from '../BillingSettings/Restriction'
@@ -23,9 +23,9 @@ import {
   ScaffoldSection,
   ScaffoldTitle,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
-import DateRangePicker from '@/components/ui/DateRangePicker'
-import NoPermission from '@/components/ui/NoPermission'
+import { AlertError } from '@/components/ui/AlertError'
+import { DateRangePicker } from '@/components/ui/DateRangePicker'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
 import { useOrgDailyStatsQuery } from '@/data/analytics/org-daily-stats-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
@@ -167,7 +167,7 @@ export const Usage = () => {
                       return (
                         <Button
                           block
-                          type="default"
+                          variant="default"
                           role="combobox"
                           size="tiny"
                           aria-expanded={open}

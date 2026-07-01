@@ -17,8 +17,9 @@ import {
   TableHeadSort,
   TableRow,
 } from 'ui'
-import { EmptyStatePresentational, TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import type { WebhookEndpoint } from './PlatformWebhooks.types'
 import { getWebhookEndpointDisplayName } from './PlatformWebhooks.utils'
@@ -121,7 +122,7 @@ export const PlatformWebhooksEndpointList = ({
           label="New endpoint"
           onTrigger={onCreateEndpoint}
         >
-          <Button type="primary" icon={<Plus />} onClick={onCreateEndpoint}>
+          <Button variant="primary" icon={<Plus />} onClick={onCreateEndpoint}>
             New endpoint
           </Button>
         </Shortcut>
@@ -133,7 +134,7 @@ export const PlatformWebhooksEndpointList = ({
           title="No endpoints yet"
           description="Create an endpoint to start receiving webhook deliveries."
         >
-          <Button type="default" onClick={onCreateEndpoint}>
+          <Button variant="default" onClick={onCreateEndpoint}>
             Create endpoint
           </Button>
         </EmptyStatePresentational>
@@ -215,7 +216,7 @@ export const PlatformWebhooksEndpointList = ({
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
                             <Button
-                              type="default"
+                              variant="default"
                               icon={<MoreVertical />}
                               className="w-7 hit-area-2"
                             />

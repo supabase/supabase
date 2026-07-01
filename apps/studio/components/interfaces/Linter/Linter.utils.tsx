@@ -43,7 +43,7 @@ export const lintInfoMap: LintInfo[] = [
     name: 'auth_rls_initplan',
     title: 'Auth RLS Initialization Plan',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
-    link: ({ projectRef }) => `/project/${projectRef}/auth/policies`,
+    link: ({ projectRef }) => `/project/${projectRef}/database/policies`,
     linkText: 'View policies',
     docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0003_auth_rls_initplan`,
     category: 'performance',
@@ -72,7 +72,7 @@ export const lintInfoMap: LintInfo[] = [
     title: 'Multiple Permissive Policies',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/auth/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
+      `/project/${projectRef}/database/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View policies',
     docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0006_multiple_permissive_policies`,
     category: 'performance',
@@ -82,7 +82,7 @@ export const lintInfoMap: LintInfo[] = [
     title: 'Policy Exists RLS Disabled',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/auth/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
+      `/project/${projectRef}/database/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View policies',
     docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0007_policy_exists_rls_disabled`,
     category: 'security',
@@ -92,7 +92,7 @@ export const lintInfoMap: LintInfo[] = [
     title: 'RLS Enabled No Policy',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/auth/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
+      `/project/${projectRef}/database/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View table',
     docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0008_rls_enabled_no_policy`,
     category: 'security',
@@ -141,7 +141,7 @@ export const lintInfoMap: LintInfo[] = [
     title: 'RLS Disabled in Public',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/auth/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
+      `/project/${projectRef}/database/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View policies',
     docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0013_rls_disabled_in_public`,
     category: 'security',
@@ -187,7 +187,7 @@ export const lintInfoMap: LintInfo[] = [
     name: 'rls_references_user_metadata',
     title: 'RLS references user metadata',
     icon: <User className="text-foreground-muted" size={15} strokeWidth={1} />,
-    link: ({ projectRef }) => `/project/${projectRef}/auth/policies`,
+    link: ({ projectRef }) => `/project/${projectRef}/database/policies`,
     linkText: 'View policies',
     docsLink: `${DOCS_URL}/guides/database/database-linter?queryGroups=lint&lint=0015_rls_references_user_metadata`,
     category: 'security',
@@ -325,7 +325,7 @@ export const lintInfoMap: LintInfo[] = [
     title: 'RLS Policy Always True',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/auth/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
+      `/project/${projectRef}/database/policies?schema=${encodeURIComponent(metadata?.schema ?? '')}&search=${encodeURIComponent(metadata?.name ?? '')}`,
     linkText: 'View policies',
     docsLink: `${DOCS_URL}/guides/database/database-linter?lint=0024_permissive_rls_policy`,
     category: 'security',
@@ -417,7 +417,7 @@ export const LintCTA = ({
   const linkText = lintInfo.linkText
 
   return (
-    <Button asChild type="default">
+    <Button asChild variant="default">
       <Link href={link} rel="noreferrer" className="no-underline">
         {linkText}
       </Link>

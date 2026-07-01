@@ -2,7 +2,8 @@ import { FeatureFlagContext } from 'common'
 import { useRouter } from 'next/router'
 import { ReactNode, useContext, useEffect, useRef, useState } from 'react'
 import { Button, Card, CardContent } from 'ui'
-import { Admonition, ShimmeringLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { OrganizationSelector } from '../Connect/OrganizationSelector'
 import { CreditCodeRedemption } from '@/components/interfaces/Organization/BillingSettings/CreditCodeRedemption'
@@ -148,7 +149,7 @@ export const RedeemCreditsScreen = () => {
           <div className="flex flex-col gap-2">
             <Button
               block
-              type="primary"
+              variant="primary"
               disabled={!selectedOrgSlug || organizationOptions.length === 0}
               onClick={openRedemption}
             >

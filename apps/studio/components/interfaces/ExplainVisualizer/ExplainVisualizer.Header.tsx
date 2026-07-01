@@ -129,11 +129,11 @@ export function ExplainHeader({ mode, onToggleMode, summary, id, rows }: Explain
               onOpenAssistant={handleExplainWithAI}
               telemetrySource="explain_visualizer"
               size="tiny"
-              type="default"
+              variant="default"
             />
           )}
           <Button
-            type="default"
+            variant="default"
             size="tiny"
             icon={isVisual ? <Code size={14} /> : <Eye size={14} />}
             onClick={onToggleMode}

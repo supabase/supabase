@@ -82,7 +82,7 @@ const MobileHeader = ({
           planId={selectedPlan.planId}
         />
       ) : (
-        <Button asChild size="medium" type={plan === 'Enterprise' ? 'default' : 'primary'} block>
+        <Button asChild size="medium" variant={plan === 'Enterprise' ? 'default' : 'primary'} block>
           <Link
             href={selectedPlan.href}
             onClick={() =>
@@ -442,7 +442,7 @@ const PricingComparisonTable = ({
                           <Button
                             asChild
                             size="tiny"
-                            type={plan.name === 'Enterprise' ? 'default' : 'primary'}
+                            variant={plan.name === 'Enterprise' ? 'default' : 'primary'}
                             block
                           >
                             <Link

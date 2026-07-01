@@ -31,10 +31,10 @@ import { DeleteAppModal } from './DeleteAppModal'
 import { OAuthAppRow } from './OAuthAppRow'
 import { PublishAppSidePanel } from './PublishAppSidePanel'
 import { RevokeAppModal } from './RevokeAppModal'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import CopyButton from '@/components/ui/CopyButton'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { AuthorizedApp, useAuthorizedAppsQuery } from '@/data/oauth/authorized-apps-query'
 import { OAuthAppCreateResponse } from '@/data/oauth/oauth-app-create-mutation'
@@ -171,7 +171,7 @@ export const OAuthApps = () => {
               >
                 <ButtonTooltip
                   disabled={!canCreateOAuthApps}
-                  type="primary"
+                  variant="primary"
                   onClick={() => setShowPublishModal(true)}
                   tooltip={{
                     content: {
@@ -215,7 +215,7 @@ export const OAuthApps = () => {
               >
                 <div className="absolute top-4 right-4">
                   <Button
-                    type="text"
+                    variant="text"
                     icon={<X size={18} />}
                     className="px-1"
                     onClick={() => setCreatedApp(undefined)}
@@ -236,13 +236,13 @@ export const OAuthApps = () => {
                     <div className="flex items-center gap-2">
                       <p className="text-sm text-foreground-light">Client ID</p>
                       <p className="font-mono text-sm">{createdApp.client_id}</p>
-                      <CopyButton text={createdApp.client_id} type="default" iconOnly />
+                      <CopyButton text={createdApp.client_id} variant="default" iconOnly />
                     </div>
 
                     <div className="flex items-center gap-2">
                       <p className="text-sm text-foreground-light">Client Secret</p>
                       <p className="font-mono text-sm">{createdApp.client_secret}</p>
-                      <CopyButton text={createdApp.client_secret} type="default" iconOnly />
+                      <CopyButton text={createdApp.client_secret} variant="default" iconOnly />
                     </div>
                   </div>
                 </div>

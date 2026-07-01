@@ -94,7 +94,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
       <div ref={ref} className={className} {...rest}>
         {isSchemasLoading && (
           <Button
-            type="default"
+            variant="default"
             key="schema-selector-skeleton"
             className="w-full [&>span]:w-full"
             size={size}
@@ -110,7 +110,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
             <AlertDescription className="text-xs mb-2 wrap-break-word">
               Error: {(schemasError as any)?.message}
             </AlertDescription>
-            <Button type="default" size="tiny" onClick={() => refetchSchemas()}>
+            <Button variant="default" size="tiny" onClick={() => refetchSchemas()}>
               Reload schemas
             </Button>
           </Alert>
@@ -122,7 +122,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
               <Button
                 size={size}
                 disabled={disabled}
-                type="default"
+                variant="default"
                 data-testid="schema-selector"
                 className={`w-full [&>span]:w-full pr-1! space-x-1`}
                 iconRight={
@@ -229,5 +229,3 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
 )
 
 SchemaSelector.displayName = 'SchemaSelector'
-
-export default SchemaSelector

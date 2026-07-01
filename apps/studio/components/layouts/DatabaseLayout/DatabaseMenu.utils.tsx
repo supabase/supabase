@@ -1,7 +1,10 @@
 import { useParams } from 'common'
 import { ArrowUpRight } from 'lucide-react'
 
-import { useIsColumnLevelPrivilegesEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  useIsColumnLevelPrivilegesEnabled,
+  useIsMarketplaceEnabled,
+} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
 import type {
   ProductMenuGroup,
@@ -38,6 +41,12 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
   const enablePgReplicate = useIsETLPrivateAlpha()
 
   const getDatabaseURL = (path: string) => `/project/${ref}/database/${path}`
+
+  // In the new marketplace revamped page the `category=wrapper` query param has
+  // changed to `type=wrapper`. So fix this link below based on which version is
+  // the user viewing.
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
+  const wrappersLinkParamName = isMarketplaceEnabled ? 'type' : 'category'
 
   return [
     {
@@ -94,8 +103,14 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
       ],
     },
     {
-      title: 'Configuration',
+      title: 'Access Control',
       items: [
+        {
+          name: 'Policies',
+          key: 'policies',
+          url: getDatabaseURL('policies'),
+          shortcutId: SHORTCUT_IDS.NAV_DATABASE_POLICIES,
+        },
         showRoles && {
           name: 'Roles',
           key: 'roles',
@@ -108,12 +123,11 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
           url: getDatabaseURL('column-privileges'),
           shortcutId: SHORTCUT_IDS.NAV_DATABASE_COLUMN_PRIVILEGES,
         },
-        {
-          name: 'Policies',
-          key: 'policies',
-          url: `/project/${ref}/auth/policies`,
-          rightIcon: ExternalLinkIcon,
-        },
+      ].filter(Boolean) as ProductMenuGroupItem[],
+    },
+    {
+      title: 'Configuration',
+      items: [
         {
           name: 'Settings',
           key: 'settings',
@@ -148,7 +162,7 @@ export const useGenerateDatabaseMenu = (): ProductMenuGroup[] => {
         showWrappers && {
           name: 'Wrappers',
           key: 'wrappers',
-          url: `/project/${ref}/integrations?category=wrapper`,
+          url: `/project/${ref}/integrations?${wrappersLinkParamName}=wrapper`,
           rightIcon: ExternalLinkIcon,
         },
         pgNetExtensionExists && {

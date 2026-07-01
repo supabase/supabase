@@ -11,8 +11,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { LogDrainDestinationSheetForm } from './LogDrainDestinationSheetForm'
 import { LogDrainType } from './LogDrains.constants'
@@ -156,7 +156,7 @@ export function OrgAuditLogDrains() {
               <Button
                 disabled={!canManageLogDrains}
                 onClick={handleAddDestinationClick}
-                type="primary"
+                variant="primary"
                 className="rounded-r-none px-3"
               >
                 Add destination
@@ -165,7 +165,7 @@ export function OrgAuditLogDrains() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="primary"
+                  variant="primary"
                   title="Choose destination type"
                   className="rounded-l-none px-[4px] py-[5px]"
                   icon={<ChevronDown />}
@@ -210,7 +210,7 @@ export function OrgAuditLogDrains() {
         isLoading={isLoading}
         existingDrainNames={(logDrains ?? []).map((drain) => drain.name)}
         onSaveClick={(type) => {
-          track('log_drain_save_button_clicked', { destination: type })
+          track('audit_log_drain_save_button_clicked', { destination: type })
         }}
         onSubmit={({ name, description, type, ...values }) => {
           const logDrainValues = {
@@ -245,7 +245,7 @@ export function OrgAuditLogDrains() {
         onNewDrainClick={handleNewClick}
         onDeleteDrain={(drain) => {
           deleteLogDrain({ token: drain.token, slug })
-          track('log_drain_removed', { destination: drain.type })
+          track('audit_log_drain_removed', { destination: drain.type })
         }}
         onTestDrain={(drain) => testLogDrain({ token: drain.token, slug })}
       />

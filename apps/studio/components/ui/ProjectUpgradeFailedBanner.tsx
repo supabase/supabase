@@ -3,7 +3,7 @@ import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { InlineLink } from './InlineLink'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
@@ -46,7 +46,7 @@ export const ProjectUpgradeFailedBanner = () => {
         type="warning"
         title={`Postgres version upgrade was not successful (Initiated at ${initiatedAt})`}
         actions={
-          <Button asChild type="default">
+          <Button asChild variant="default">
             <SupportLink
               queryParams={{
                 category: SupportCategories.DATABASE_UNRESPONSIVE,

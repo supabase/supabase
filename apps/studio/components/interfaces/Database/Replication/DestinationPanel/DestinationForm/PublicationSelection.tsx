@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { useMemo } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { FormControl, FormField } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
@@ -24,11 +24,10 @@ export const PublicationSelection = ({
   const { ref: projectRef } = useParams()
   const { publicationName } = form.watch()
 
-  const {
-    data: publications = [],
-    isPending: isLoadingPublications,
-    isSuccess: isSuccessPublications,
-  } = useReplicationPublicationsQuery({ projectRef, sourceId })
+  const { data: publications, isSuccess: isSuccessPublications } = useReplicationPublicationsQuery({
+    projectRef,
+    sourceId,
+  })
 
   const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
   const isSelectedPublicationMissing =
@@ -42,13 +41,12 @@ export const PublicationSelection = ({
         <FormItemLayout
           layout="horizontal"
           label="Publication"
-          description="Tables in the selected publication will be replicated to this destination"
+          description="Tables in the selected publication will be replicated to this destination."
         >
           <FormControl>
             <PublicationsComboBox
-              publications={publications}
-              isLoadingPublications={isLoadingPublications}
               field={field}
+              sourceId={sourceId}
               onNewPublicationClick={() => onSelectNewPublication()}
             />
           </FormControl>

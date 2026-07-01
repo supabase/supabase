@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 import { RequiredExtensionsSection } from '../Integration/RequiredExtensionsSection'
@@ -36,7 +36,7 @@ const QueuesContent = () => {
       </p>
 
       {isQueuesInstalled && (
-        <Button asChild type="default" className="mt-2">
+        <Button asChild variant="default" className="mt-2">
           <Link href={`/project/${ref}/integrations/queues/settings`}>Manage queues settings</Link>
         </Button>
       )}

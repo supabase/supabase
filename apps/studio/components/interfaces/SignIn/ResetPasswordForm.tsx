@@ -76,7 +76,7 @@ export const ResetPasswordForm = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onResetPassword)} className="space-y-4 pt-4">
+      <form method="POST" onSubmit={form.handleSubmit(onResetPassword)} className="space-y-4 pt-4">
         {requireCurrentPassword && (
           <FormField
             control={form.control}
@@ -92,7 +92,7 @@ export const ResetPasswordForm = () => {
                     actions={
                       <Button
                         icon={currentPasswordHidden ? <Eye /> : <EyeOff />}
-                        type="default"
+                        variant="default"
                         className="w-7"
                         onClick={() => setCurrentPasswordHidden((prev) => !prev)}
                       />
@@ -124,7 +124,7 @@ export const ResetPasswordForm = () => {
                   actions={
                     <Button
                       icon={passwordHidden ? <Eye /> : <EyeOff />}
-                      type="default"
+                      variant="default"
                       className="w-7"
                       onClick={() => setPasswordHidden((prev) => !prev)}
                     />
@@ -153,7 +153,7 @@ export const ResetPasswordForm = () => {
 
         <Button
           block
-          htmlType="submit"
+          type="submit"
           size="medium"
           disabled={form.formState.isSubmitting}
           loading={form.formState.isSubmitting}

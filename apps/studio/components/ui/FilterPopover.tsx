@@ -182,7 +182,7 @@ export const FilterPopover = <T extends Record<string, any>>({
         <Button
           asChild
           disabled={disabled}
-          type={buttonType ?? (activeOptions.length > 0 ? 'default' : 'dashed')}
+          variant={buttonType ?? (activeOptions.length > 0 ? 'default' : 'dashed')}
           onClick={() => setOpen(false)}
           className={variant === 'rounded' ? 'rounded-full' : ''}
           iconRight={<ChevronDown />}
@@ -271,7 +271,7 @@ export const FilterPopover = <T extends Record<string, any>>({
         <div className="flex items-center justify-end gap-2 border-t border-overlay bg-surface-200 py-2 px-3">
           <Button
             size="tiny"
-            type="default"
+            variant="default"
             onClick={() => {
               onSaveFilters([])
               setSelectedOptions([])
@@ -281,7 +281,7 @@ export const FilterPopover = <T extends Record<string, any>>({
             {clearButtonText}
           </Button>
           <Button
-            type="primary"
+            variant="primary"
             onClick={() => {
               // Order the selection based on the options provided
               const sortingOrder = options.map((option) => option[valueKey]) as string[]
