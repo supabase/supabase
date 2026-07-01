@@ -18,12 +18,6 @@ export function formatFilterValue(
   const column = table.columns.find((x) => x.name == filter.column)
   if (column && isNumericalColumn(column.format)) {
     const numberValue = Number(filter.value)
-    // Keep the original string for values that can't be represented exactly as
-    // a JS number (e.g. large bigints), otherwise Number() silently loses
-    // precision and we'd filter on the wrong value. This must guard both the
-    // positive and negative ends of the safe-integer range — checking only the
-    // upper bound let large negative bigints (e.g. the int8 minimum
-    // -9223372036854775808) slip through and get rounded.
     if (Number.isNaN(numberValue) || Math.abs(numberValue) > Number.MAX_SAFE_INTEGER)
       return filter.value
     else return numberValue
