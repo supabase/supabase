@@ -61,7 +61,6 @@ anon_key=$(gen_token "$anon_payload")
 service_role_key=$(gen_token "$service_role_payload")
 
 secret_key_base=$(gen_base64 48)
-# Realtime uses DB_ENC_KEY directly as the AES-128 key bytes, so 16 hex chars = 16 ASCII bytes here.
 realtime_db_enc_key=$(gen_hex 8)
 vault_enc_key=$(gen_hex 16)
 pg_meta_crypto_key=$(gen_base64 24)
