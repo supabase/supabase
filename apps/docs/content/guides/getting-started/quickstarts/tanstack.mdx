@@ -6,7 +6,7 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## Create a TanStack Start app
+## 3. Create a TanStack Start app
 
 Create a TanStack Start app using the official CLI.
 
@@ -14,7 +14,7 @@ Create a TanStack Start app using the official CLI.
 npm create @tanstack/start@latest my-app -- --package-manager npm --toolchain biome
 ```
 
-## Install the Supabase client library
+## 4. Install the Supabase client library
 
 The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a TanStack Start app.
 
@@ -26,7 +26,7 @@ cd my-app && npm install @supabase/supabase-js
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
 
-## Declare Supabase Environment Variables
+## 5. Declare Supabase Environment Variables
 
 Create a `.env` file in the root of your project and populate with your Supabase connection variables:
 
@@ -39,7 +39,7 @@ VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 
 </$CodeTabs>
 
-## Create a Supabase client utility
+## 6. Create a Supabase client utility
 
 Create a new file at `src/utils/supabase.ts` to initialize the Supabase client.
 
@@ -52,7 +52,7 @@ export const supabase = createClient(
 )
 ```
 
-## Query data from the app
+## 7. Query data from the app
 
 <$Partial path="uiLibCta.mdx" />
 
@@ -84,7 +84,7 @@ function Home() {
 }
 ```
 
-## Start the app
+## 8. Start the app
 
 Run the development server, go to http://localhost:3000 in a browser and you should see the list of instruments.
 

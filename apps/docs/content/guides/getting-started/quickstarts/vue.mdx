@@ -6,7 +6,7 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## Create a Vue app
+## 3. Create a Vue app
 
 Create a Vue app using the `npm init` command.
 
@@ -14,7 +14,7 @@ Create a Vue app using the `npm init` command.
 npm init vue@latest my-app
 ```
 
-## Install the Supabase client library
+## 4. Install the Supabase client library
 
 The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a Vue app.
 
@@ -26,7 +26,7 @@ cd my-app && npm install @supabase/supabase-js
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "vue", "tab": "frameworks" }} />
 
-## Declare Supabase environment variables
+## 5. Declare Supabase environment variables
 
 Create a `.env.local` file and populate with your Supabase connection variables:
 
@@ -39,7 +39,7 @@ VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 
 </$CodeTabs>
 
-## Create the Supabase client
+## 6. Create the Supabase client
 
 Create a `/src/lib` directory in your Vue app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client:
 
@@ -52,7 +52,7 @@ const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
 export const supabase = createClient(supabaseUrl, supabasePublishableKey)
 ```
 
-## Query data from the app
+## 7. Query data from the app
 
 Replace the existing content in your `App.vue` file with the following code.
 
@@ -81,7 +81,7 @@ onMounted(() => {
 </template>
 ```
 
-## Start the app
+## 8. Start the app
 
 Start the app and go to http://localhost:5173 in a browser and you should see the list of instruments.
 

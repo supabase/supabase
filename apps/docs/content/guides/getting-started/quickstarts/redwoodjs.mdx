@@ -4,9 +4,7 @@ subtitle: 'Learn how to create a Supabase project, add some sample data to your 
 breadcrumb: 'Framework Quickstarts'
 ---
 
-<$Partial path="quickstart_db_setup.mdx" />
-
-## Setup your new Supabase project
+## 1. Setup your new Supabase project
 
 [Create a new project](/dashboard) in the Supabase Dashboard.
 
@@ -18,7 +16,7 @@ Be sure to make note of the Database Password you used as you will need this lat
 
 ![New project for redwoodjs](/docs/img/guides/getting-started/quickstarts/redwoodjs/new-project.png)
 
-## Gather database connection strings
+## 2. Gather database connection strings
 
 Open the project [**Connect** panel](/dashboard/project/_?showConnect=true). This quickstart connects using the [**Transaction pooler**](/dashboard/project/_?showConnect=true&method=transaction) and [**Session pooler**](/dashboard/project/_?showConnect=true&method=session) mode. Transaction mode is used for application queries and Session mode is used for running migrations with Prisma.
 
@@ -26,7 +24,7 @@ To do this, set the connection mode to `Transaction` in the [Database Settings p
 
 To get the Session mode connection pooler string, change the port of the connection string from the dashboard to 5432.
 
-You will need the Transaction mode connection string and the Session mode connection string to setup environment variables in Step 5.
+You will need the Transaction mode connection string and the Session mode connection string to set up environment variables in Step 4.
 
 <Admonition type="tip">
 
@@ -36,7 +34,7 @@ You can copy and paste these connection strings from the Supabase Dashboard when
 
 ![pooled connection for redwoodjs](/docs/img/guides/getting-started/quickstarts/redwoodjs/pooled-connection-strings.png)
 
-## Create a RedwoodJS app
+## 3. Create a RedwoodJS app
 
 Create a RedwoodJS app with TypeScript.
 
@@ -52,13 +50,13 @@ While TypeScript is recommended, If you want a JavaScript app, omit the `--ts` f
 yarn create redwood-app my-app --ts
 ```
 
-## Configure Environment Variables
+## 4. Configure Environment Variables
 
 In your `.env` file, add the following environment variables for your database connection:
 
-- The `DATABASE_URL` should use the Transaction mode connection string you copied in Step 1.
+- The `DATABASE_URL` should use the Transaction mode connection string you copied in Step 2.
 
-- The `DIRECT_URL` should use the Session mode connection string you copied in Step 1.
+- The `DIRECT_URL` should use the Session mode connection string you copied in Step 2.
 
 ```bash name=.env
 # Transaction mode connection string used for migrations
@@ -68,11 +66,11 @@ DATABASE_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabas
 DIRECT_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:5432/postgres"
 ```
 
-## Update your Prisma Schema
+## 5. Update your Prisma Schema
 
 By default, RedwoodJS ships with a SQLite database, but we want to use Postgres.
 
-Update your Prisma schema file `api/db/schema.prisma` to use your Supabase Postgres database connection environment variables you setup in Step 5.
+Update your Prisma schema file `api/db/schema.prisma` to use your Supabase Postgres database connection environment variables you set up in Step 4.
 
 ```prisma name=api/db/schema.prisma
 datasource db {
@@ -82,7 +80,7 @@ datasource db {
 }
 ```
 
-## Create the Instrument model and apply a schema migration
+## 6. Create the Instrument model and apply a schema migration
 
 Create the Instrument model in `api/db/schema.prisma` and then run `yarn rw prisma migrate dev` from your terminal to apply the migration.
 
@@ -93,7 +91,7 @@ model Instrument {
 }
 ```
 
-## Update seed script
+## 7. Update seed script
 
 Seed the database with a few instruments.
 
@@ -122,7 +120,7 @@ export default async () => {
 }
 ```
 
-## Seed your database
+## 8. Seed your database
 
 Run the seed database command to populate the `Instrument` table with the instruments you just created.
 
@@ -136,7 +134,7 @@ The reset database command `yarn rw prisma db reset` recreates the tables and al
 yarn rw prisma db seed
 ```
 
-## Scaffold the instrument UI
+## 9. Scaffold the instrument UI
 
 Use RedwoodJS generators to scaffold a CRUD UI for the `Instrument` model.
 
@@ -144,13 +142,13 @@ Use RedwoodJS generators to scaffold a CRUD UI for the `Instrument` model.
 yarn rw g scaffold instrument
 ```
 
-## Start the app
+## 10. Start the app
 
 Start the app via `yarn rw dev`. A browser will open to the RedwoodJS Splash page.
 
 ![RedwoodJS Splash Page](/docs/img/redwoodjs-qs-splash.png)
 
-## View instruments UI
+## 11. View instruments UI
 
 Click on `/instruments` to visit http://localhost:8910/instruments where should see the list of instruments.
 

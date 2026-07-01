@@ -6,11 +6,11 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## Create an Android app with Android Studio
+## 3. Create an Android app with Android Studio
 
 Select the **Android Studio > New > New Android Project** menu item.
 
-## Install dependencies
+## 4. Install dependencies
 
 Open `build.gradle.kts` (app) file and add the serialization plug, Ktor client, and Supabase client.
 
@@ -36,7 +36,7 @@ dependencies {
 }
 ```
 
-## Add internet access permission
+## 5. Add internet access permission
 
 Add the following line to the `AndroidManifest.xml` file under the `manifest` tag and outside the `application` tag.
 
@@ -48,7 +48,7 @@ Add the following line to the `AndroidManifest.xml` file under the `manifest` ta
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "androidkotlin", "tab": "mobiles" }} />
 
-## Initialize the Supabase client
+## 6. Initialize the Supabase client
 
 You can create a Supabase client whenever you need to perform an API call.
 
@@ -68,7 +68,7 @@ val supabase = createSupabaseClient(
 ...
 ```
 
-## Create a data model for instruments
+## 7. Create a data model for instruments
 
 Create a serializable data class to represent the data from the database.
 
@@ -82,7 +82,7 @@ data class Instrument(
 )
 ```
 
-## Query data from the app
+## 8. Query data from the app
 
 Use `LaunchedEffect` to fetch data from the database and display it in a `LazyColumn`.
 
@@ -135,6 +135,6 @@ fun InstrumentsList() {
 }
 ```
 
-## Start the app
+## 9. Start the app
 
 Run the app on an emulator or a physical device by clicking the `Run app` button in Android Studio.

@@ -4,7 +4,7 @@ subtitle: 'Learn how to create a Rails project and connect it to your Supabase P
 breadcrumb: 'Framework Quickstarts'
 ---
 
-## Create a Rails project
+## 1. Create a Rails project
 
 Make sure your Ruby and Rails versions are up to date, then use `rails new` to scaffold a new Rails project. Use the `-d=postgresql` flag to set it up for Postgres.
 
@@ -14,7 +14,7 @@ Go to the [Rails docs](https://guides.rubyonrails.org/getting_started.html) for 
 rails new blog -d=postgresql
 ```
 
-## Set up the Postgres connection details
+## 2. Set up the Postgres connection details
 
 Go to [database.new](https://database.new) and create a new Supabase project. Save your database password securely.
 
@@ -32,7 +32,7 @@ If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/
 export DATABASE_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
 ```
 
-## Create and run a database migration
+## 3. Create and run a database migration
 
 Rails includes Active Record as the ORM as well as database migration tooling which generates the SQL migration files for you.
 
@@ -43,7 +43,7 @@ bin/rails generate model Article title:string body:text
 bin/rails db:migrate
 ```
 
-## Use the model to interact with the database
+## 4. Use the model to interact with the database
 
 You can use the included Rails console to interact with the database. For example, you can create new entries or list all entries in a Model's table.
 
@@ -58,7 +58,7 @@ article.save # Saves the entry to the database
 Article.all
 ```
 
-## Start the app
+## 5. Start the app
 
 Run the development server. Go to http://127.0.0.1:3000 in a browser to see your application running.
 
