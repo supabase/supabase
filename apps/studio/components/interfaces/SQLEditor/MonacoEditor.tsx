@@ -65,6 +65,13 @@ export const MonacoEditor = ({
 
   const { snippet, disableEdit, handleEditorChange } = useSnippetEditor({ id, snippetName })
 
+  // The Monaco save action is registered once on mount, but `snippet` starts
+  // undefined for a new/deep-linked snippet and is only created on first edit.
+  // Read it through a ref so Cmd/Ctrl+S sees the latest value, not the stale
+  // mount-time closure.
+  const snippetRef = useRef(snippet)
+  snippetRef.current = snippet
+
   const executeExplainQueryRef = useRef(executeExplainQuery)
   executeExplainQueryRef.current = executeExplainQuery
 
@@ -128,7 +135,8 @@ export const MonacoEditor = ({
       contextMenuGroupId: 'operation',
       contextMenuOrder: 0,
       run: () => {
-        if (snippet) requestSaveRef.current(snippet.snippet.id)
+        const currentSnippet = snippetRef.current
+        if (currentSnippet) requestSaveRef.current(currentSnippet.snippet.id)
       },
     })
 
