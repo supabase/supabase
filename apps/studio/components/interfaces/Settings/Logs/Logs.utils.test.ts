@@ -8,6 +8,7 @@ import {
   formatLogsAsCsv,
   formatLogsAsJson,
   formatLogsAsMarkdown,
+  genChartQuery,
   genDefaultQuery,
   getAuthLogSeverity,
   parseMultigresEventMessage,
@@ -293,6 +294,15 @@ describe('Logs.utils', () => {
     test('info severity filter excludes error and warning rows', () => {
       const sql = queryFor({ info: true })
       expect(sql).toContain('NOT (')
+    })
+  })
+
+  describe('genChartQuery', () => {
+    // Regression: an unparseable iso_timestamp_start used to reach
+    // startOffset.toISOString() as an Invalid Date and throw RangeError.
+    test('does not throw for an unparseable time range', () => {
+      const params = { iso_timestamp_start: 'not-a-date', iso_timestamp_end: 'also-bad' }
+      expect(() => genChartQuery(LogsTableName.AUTH, params as any, {})).not.toThrow()
     })
   })
 })

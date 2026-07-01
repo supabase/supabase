@@ -369,9 +369,13 @@ export const genCountQuery = (table: LogsTableName, filters: Filters): SafeLogSq
 const calcChartStart = (
   params: Partial<LogsEndpointParams>
 ): [Dayjs, 'minute' | 'hour' | 'day'] => {
-  const ite = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
+  // Fall back to now when the param is missing or unparseable, otherwise an
+  // Invalid Date propagates and startOffset.toISOString() throws RangeError.
+  const parsedEnd = dayjs(params.iso_timestamp_end)
+  const ite = params.iso_timestamp_end && parsedEnd.isValid() ? parsedEnd : dayjs()
+  const parsedStart = dayjs(params.iso_timestamp_start)
   // todo @TzeYiing needs typing
-  const its: any = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
+  const its: any = params.iso_timestamp_start && parsedStart.isValid() ? parsedStart : dayjs()
 
   let trunc: 'minute' | 'hour' | 'day' = 'minute'
   let extendValue = 60 * 6
