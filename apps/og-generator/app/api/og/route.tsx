@@ -68,6 +68,17 @@ export async function GET(req: Request) {
     const iconName = searchParams.get('icon')
     // Seed icons first, then uploaded assets from Supabase (brief §6).
     const iconObj = iconName ? await resolveIcon(iconName) : null
+    // Dev-tuning overrides (DialKit "Render tuning" panel); no-op when absent.
+    const iconScaleParam = Number(searchParams.get('iconScale'))
+    const iconScale =
+      Number.isFinite(iconScaleParam) && iconScaleParam > 0
+        ? Math.min(2, Math.max(0.3, iconScaleParam))
+        : 1
+    const strokeParam = Number(searchParams.get('strokePx'))
+    const strokePx =
+      Number.isFinite(strokeParam) && strokeParam > 0
+        ? Math.min(4, Math.max(0.5, strokeParam))
+        : ICON_STROKE
     const type = searchParams.get('type') === 'thumb' ? 'thumb' : 'og'
 
     // Resolve the background pattern from query params, falling back to a default
@@ -123,11 +134,11 @@ export async function GET(req: Request) {
           {iconObj ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              width={thumbSize * s}
-              height={thumbSize * s}
+              width={thumbSize * s * iconScale}
+              height={thumbSize * s * iconScale}
               src={iconDataUri(iconObj, {
-                sizePx: thumbSize * s,
-                strokePx: ICON_STROKE * s,
+                sizePx: thumbSize * s * iconScale,
+                strokePx: strokePx * s,
                 color: color('illustration.stroke'),
               })}
             />
@@ -248,11 +259,11 @@ export async function GET(req: Request) {
     const iconEl = iconObj ? (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        width={ICON_SIZE * s}
-        height={ICON_SIZE * s}
+        width={ICON_SIZE * s * iconScale}
+        height={ICON_SIZE * s * iconScale}
         src={iconDataUri(iconObj, {
-          sizePx: ICON_SIZE * s,
-          strokePx: ICON_STROKE * s,
+          sizePx: ICON_SIZE * s * iconScale,
+          strokePx: strokePx * s,
           color: color('illustration.stroke'),
         })}
       />

@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 
+import { useDialKit } from 'dialkit'
+
 import type { Suggestion } from '@/lib/ai/suggest'
 import { SEED_ICONS, type SeedIcon } from '@/lib/assets/seed-icons'
 import { contrastRatio, rating } from '@/lib/design/contrast'
@@ -371,6 +373,18 @@ export default function Page() {
     }
   }
 
+  // DialKit dev-tuning (shown only via the dev-only DialRoot). Live-tunes render
+  // params without cluttering the end-user sidebar; the defaults (1, 2) leave the
+  // URL untouched, so production output is unaffected.
+  const tuning = useDialKit('Render tuning', {
+    iconScale: [1, 0.6, 1.5, 0.05],
+    strokePx: [2, 1, 3, 0.05],
+  })
+  const tuningParams = (p: URLSearchParams) => {
+    if (tuning.iconScale !== 1) p.set('iconScale', String(tuning.iconScale))
+    if (tuning.strokePx !== 2) p.set('strokePx', String(tuning.strokePx))
+  }
+
   const ogEndpoint = useMemo(() => {
     const p = new URLSearchParams()
     p.set('headline', headline)
@@ -383,10 +397,11 @@ export default function Page() {
     if (!autoFit) p.set('fontSize', String(manualFontSize))
     if (icon) p.set('icon', icon)
     patternParams(p)
+    tuningParams(p)
     if (scale === 2) p.set('scale', '2')
     return `/api/og?${p.toString()}`
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [headline, eyebrow, eyebrowStyle, sentenceCase, template, autoFit, manualFontSize, icon, scale, patternType, patternScale, patternColor, patternOpacity])
+  }, [headline, eyebrow, eyebrowStyle, sentenceCase, template, autoFit, manualFontSize, icon, scale, patternType, patternScale, patternColor, patternOpacity, tuning.iconScale, tuning.strokePx])
 
   const thumbEndpoint = useMemo(() => {
     const p = new URLSearchParams()
@@ -394,10 +409,11 @@ export default function Page() {
     if (icon) p.set('icon', icon)
     p.set('thumbSize', String(thumbSize))
     patternParams(p)
+    tuningParams(p)
     if (scale === 2) p.set('scale', '2')
     return `/api/og?${p.toString()}`
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [icon, thumbSize, scale, patternType, patternScale, patternColor, patternOpacity])
+  }, [icon, thumbSize, scale, patternType, patternScale, patternColor, patternOpacity, tuning.iconScale, tuning.strokePx])
 
   const og = useRenderedImage(ogEndpoint, showOg)
   const thumb = useRenderedImage(thumbEndpoint, showThumb)
