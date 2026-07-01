@@ -93,7 +93,7 @@ To remove all network restrictions:
 1. Run the `update` subcommand with the CIDR `0.0.0.0/0` to remove all restrictions:
 
    ```bash
-   > supabase network-restrictions --project-ref {ref} update --db-allow-cidr 0.0.0.0/0 --db-allow-cidr ::/0 --experimental
+   > supabase network-restrictions update --project-ref {ref} --db-allow-cidr 0.0.0.0/0 --db-allow-cidr ::/0 --experimental
    DB Allowed IPv4 CIDRs: &[0.0.0.0/0]
    DB Allowed IPv6 CIDRs: &[::/0]
    Restrictions applied successfully: true
