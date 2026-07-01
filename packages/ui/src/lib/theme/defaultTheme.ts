@@ -505,23 +505,4 @@ export default {
       text-red-900
     `,
   },
-
-  inputIconContainer: {
-    base: `
-    absolute inset-y-0
-    left-0 pl-2 flex
-    items-center pointer-events-none
-    text-foreground-light
-    [&_svg]:stroke-[1.5]
-    `,
-    size: {
-      tiny: '[&_svg]:h-[14px] [&_svg]:w-[14px]',
-      small: '[&_svg]:h-[18px] [&_svg]:w-[18px]',
-      medium: '[&_svg]:h-[20px] [&_svg]:w-[20px]',
-      large: '[&_svg]:h-[20px] [&_svg]:w-[20px] pl-3',
-      xlarge: '[&_svg]:h-[24px] [&_svg]:w-[24px] pl-3',
-      xxlarge: '[&_svg]:h-[30px] [&_svg]:w-[30px] pl-3',
-      xxxlarge: '[&_svg]:h-[42px] [&_svg]:w-[42px] pl-3',
-    },
-  },
 } as const
