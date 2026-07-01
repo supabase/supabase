@@ -79,6 +79,10 @@
 
 html {
   scroll-behavior: smooth;
+  font-weight: 500;
+}
+
+html[data-theme*='dark'] {
   font-weight: 450;
 }
 
