@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 
 import type { Suggestion } from '@/lib/ai/suggest'
-import { SEED_ICONS } from '@/lib/assets/seed-icons'
+import { SEED_ICONS, type SeedIcon } from '@/lib/assets/seed-icons'
 import { contrastRatio, rating } from '@/lib/design/contrast'
 import { DEFAULT_TEMPLATE_ID, TEMPLATES } from '@/lib/design/templates'
 import { color, typography } from '@/lib/design/tokens'
@@ -307,6 +307,39 @@ export default function Page() {
   const [autoFit, setAutoFit] = useState(true)
   const [manualFontSize, setManualFontSize] = useState(56)
   const [icon, setIcon] = useState<string | null>(null)
+  const [uploadedIcons, setUploadedIcons] = useState<SeedIcon[]>([])
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+  const allIcons = useMemo(() => [...SEED_ICONS, ...uploadedIcons], [uploadedIcons])
+
+  // Load the shared asset library (uploaded icons); empty when Supabase is off.
+  useEffect(() => {
+    fetch('/api/assets')
+      .then((r) => r.json())
+      .then((d) => setUploadedIcons(d.assets ?? []))
+      .catch(() => {})
+  }, [])
+
+  const uploadSvg = async (file: File) => {
+    setUploading(true)
+    setUploadError(null)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/assets', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok) {
+        setUploadError(data.error ?? 'Upload failed')
+        return
+      }
+      setUploadedIcons((prev) => [data.asset as SeedIcon, ...prev])
+      setIcon((data.asset as SeedIcon).name)
+    } catch {
+      setUploadError('Upload failed — please try again.')
+    } finally {
+      setUploading(false)
+    }
+  }
   const [thumbSize, setThumbSize] = useState(380)
   const [scale, setScale] = useState<1 | 2>(1)
   const [showSafeArea, setShowSafeArea] = useState(false)
@@ -679,7 +712,7 @@ export default function Page() {
                 >
                   None
                 </button>
-                {SEED_ICONS.map((ic) => (
+                {allIcons.map((ic) => (
                   <button
                     key={ic.name}
                     type="button"
@@ -705,17 +738,28 @@ export default function Page() {
                   </button>
                 ))}
               </div>
-              <button
-                type="button"
-                disabled
-                title="Custom uploads arrive with the shared asset library"
-                className="cursor-not-allowed rounded-md border border-dashed border-default px-3 py-2 text-xs text-foreground-lighter"
+              <label
+                className={`rounded-md border border-dashed border-default px-3 py-2 text-center text-xs text-foreground-light hover:border-strong ${
+                  uploading ? 'cursor-wait opacity-70' : 'cursor-pointer'
+                }`}
               >
-                + Upload SVG (soon)
-              </button>
+                {uploading ? 'Uploading…' : '+ Upload SVG icon'}
+                <input
+                  type="file"
+                  accept=".svg,image/svg+xml"
+                  className="hidden"
+                  disabled={uploading}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0]
+                    if (f) uploadSvg(f)
+                    e.target.value = ''
+                  }}
+                />
+              </label>
+              {uploadError && <p className="text-xs text-warning-600">{uploadError}</p>}
               <p className="text-xs text-foreground-lighter">
-                Custom icon/logo upload lands with the shared asset library (Supabase). For now,
-                pick from the set above.
+                Line-art SVGs become shared icons (stored in Supabase, re-drawn with the locked
+                stroke). Uploading needs the Supabase secret key configured.
               </p>
             </div>
           </Group>

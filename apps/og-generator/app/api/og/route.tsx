@@ -1,6 +1,6 @@
 import { ImageResponse } from 'next/og'
 
-import { SEED_ICON_MAP } from '@/lib/assets/seed-icons'
+import { resolveIcon } from '@/lib/supabase/assets'
 import { satoriFonts, measurementFont } from '@/lib/design/fonts'
 import { iconDataUri } from '@/lib/design/icons'
 import {
@@ -66,7 +66,8 @@ export async function GET(req: Request) {
     const bg = color('bg.primary')
 
     const iconName = searchParams.get('icon')
-    const iconObj = iconName ? (SEED_ICON_MAP[iconName] ?? null) : null
+    // Seed icons first, then uploaded assets from Supabase (brief §6).
+    const iconObj = iconName ? await resolveIcon(iconName) : null
     const type = searchParams.get('type') === 'thumb' ? 'thumb' : 'og'
 
     // Resolve the background pattern from query params, falling back to a default
