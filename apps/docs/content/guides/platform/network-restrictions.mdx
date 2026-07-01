@@ -40,7 +40,7 @@ To check your current network restrictions:
 1. Run the `get` subcommand to retrieve the restrictions currently in effect:
 
    ```bash
-   > supabase network-restrictions --project-ref {ref} get
+   > supabase network-restrictions --project-ref {ref} get --experimental
    DB Allowed IPv4 CIDRs: &[183.12.1.1/24]
    DB Allowed IPv6 CIDRs: &[2001:db8:3333:4444:5555:6666:7777:8888/64]
    Restrictions applied successfully: true
@@ -49,7 +49,7 @@ To check your current network restrictions:
    If restrictions have never been applied, the allowed CIDRs list is empty and `Restrictions applied successfully` is `false`. All IPs can connect:
 
    ```bash
-   > supabase network-restrictions --project-ref {ref} get
+   > supabase network-restrictions --project-ref {ref} get --experimental
    DB Allowed IPv4 CIDRs: []
    DB Allowed IPv6 CIDRs: []
    Restrictions applied successfully: false
@@ -63,7 +63,7 @@ To update your network restrictions:
 1. Run the `update` subcommand with the CIDRs you want to allow:
 
    ```bash
-   > supabase network-restrictions --project-ref {ref} update --db-allow-cidr 183.12.1.1/24 --db-allow-cidr 2001:db8:3333:4444:5555:6666:7777:8888/64
+   > supabase network-restrictions --project-ref {ref} update --db-allow-cidr 183.12.1.1/24 --db-allow-cidr 2001:db8:3333:4444:5555:6666:7777:8888/64 --experimental
    DB Allowed IPv4 CIDRs: &[183.12.1.1/24]
    DB Allowed IPv6 CIDRs: &[2001:db8:3333:4444:5555:6666:7777:8888/64]
    Restrictions applied successfully: true
@@ -79,7 +79,7 @@ To append a CIDR to your existing restrictions:
 1. Run the `update` subcommand with the `--append` flag to add a CIDR without replacing existing restrictions:
 
    ```bash
-   > supabase network-restrictions --project-ref {ref} update --db-allow-cidr 1.2.3.4/32 --append
+   > supabase network-restrictions --project-ref {ref} update --db-allow-cidr 1.2.3.4/32 --append --experimental
    DB Allowed IPv4 CIDRs: &[183.12.1.1/24 1.2.3.4/32]
    DB Allowed IPv6 CIDRs: &[2001:db8:3333:4444:5555:6666:7777:8888/64]
    Restrictions applied successfully: true
@@ -93,7 +93,7 @@ To remove all network restrictions:
 1. Run the `update` subcommand with the CIDR `0.0.0.0/0` to remove all restrictions:
 
    ```bash
-   > supabase network-restrictions --project-ref {ref} update --db-allow-cidr 0.0.0.0/0 --db-allow-cidr ::/0
+   > supabase network-restrictions --project-ref {ref} update --db-allow-cidr 0.0.0.0/0 --db-allow-cidr ::/0 --experimental
    DB Allowed IPv4 CIDRs: &[0.0.0.0/0]
    DB Allowed IPv6 CIDRs: &[::/0]
    Restrictions applied successfully: true
