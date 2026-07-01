@@ -46,6 +46,8 @@ const createRedirectUrlsSchema = (normalizedAllowList: string[]) => {
         .default([]),
     })
     .superRefine((data, ctx) => {
+      const seenUrls = new Set<string>()
+
       data.urls.forEach((url, index) => {
         if (!redirectUrlRegex.test(url.value)) {
           ctx.addIssue({
@@ -62,6 +64,16 @@ const createRedirectUrlsSchema = (normalizedAllowList: string[]) => {
             message: 'URL already exists in the allow list',
           })
         }
+
+        if (seenUrls.has(url.value)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['urls', index, 'value'],
+            message: 'URL already exists in this list',
+          })
+        }
+
+        seenUrls.add(url.value)
       })
     })
 }

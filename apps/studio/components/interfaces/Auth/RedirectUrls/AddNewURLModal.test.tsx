@@ -80,7 +80,7 @@ describe('AddNewURLModal', () => {
     expect(toast.success).toHaveBeenCalledWith('Successfully added 1 URL')
   })
 
-  it('dedupes URLs after normalising a trailing comma before submitting', async () => {
+  it('normalizes a trailing-comma URL before submitting', async () => {
     const user = userEvent.setup()
     mutateMock.mockImplementation((_vars, callbacks) => callbacks?.onSuccess?.())
 
@@ -88,11 +88,7 @@ describe('AddNewURLModal', () => {
 
     await screen.findByRole('dialog')
 
-    await user.type(screen.getByPlaceholderText('https://mydomain.com'), 'https://app.example.com')
-    await user.click(screen.getByRole('button', { name: 'Add URL' }))
-
-    const urlInputs = screen.getAllByPlaceholderText('https://mydomain.com')
-    await user.type(urlInputs[1], 'https://app.example.com,')
+    await user.type(screen.getByPlaceholderText('https://mydomain.com'), 'https://app.example.com,')
 
     fireEvent.submit(screen.getByRole('dialog').querySelector('form') as HTMLFormElement)
 
