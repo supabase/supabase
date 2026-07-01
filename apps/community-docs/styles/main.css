@@ -5,6 +5,7 @@
 @source '../content/**/*.mdx';
 @source '../lib/**/*.{ts,tsx}';
 @source './../../../packages/ui/src/**/*.{tsx,ts,js}';
+@source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
 
 @font-face {
   font-family: 'custom-font';
@@ -31,6 +32,14 @@
 }
 
 @layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: hsl(var(--border-default, currentColor));
+  }
+
   body {
     @apply bg-background text-foreground;
     -webkit-font-smoothing: antialiased;

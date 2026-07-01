@@ -598,7 +598,7 @@ const CommunityDocsHome = ({ sections }: { sections: CommunityDocSection[] }) =>
           <div className="relative left-1/2 mb-[2.75rem] mt-[2.5rem] h-px w-screen -translate-x-1/2 bg-overlay" />
         </div>
 
-        <div className="max-w-2xl lg:col-start-1 lg:row-start-2 lg:-mt-12">
+        <div className="lg:col-start-1 lg:row-start-2 lg:-mt-12">
           <FeaturedSectionsNav />
         </div>
 
