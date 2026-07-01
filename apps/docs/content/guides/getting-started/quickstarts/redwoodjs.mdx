@@ -50,7 +50,7 @@ While TypeScript is recommended, If you want a JavaScript app, omit the `--ts` f
 yarn create redwood-app my-app --ts
 ```
 
-## 4. Configure Environment Variables
+## 4. Configure environment variables
 
 In your `.env` file, add the following environment variables for your database connection:
 
@@ -66,7 +66,7 @@ DATABASE_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabas
 DIRECT_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:5432/postgres"
 ```
 
-## 5. Update your Prisma Schema
+## 5. Update your Prisma schema
 
 By default, RedwoodJS ships with a SQLite database, but we want to use Postgres.
 
@@ -80,7 +80,7 @@ datasource db {
 }
 ```
 
-## 6. Create the Instrument model and apply a schema migration
+## 6. Create the instrument model and apply a schema migration
 
 Create the Instrument model in `api/db/schema.prisma` and then run `yarn rw prisma migrate dev` from your terminal to apply the migration.
 
@@ -122,7 +122,7 @@ export default async () => {
 
 ## 8. Seed your database
 
-Run the seed database command to populate the `Instrument` table with the instruments you just created.
+Run the seed database command to populate the `Instrument` table with the instruments you created.
 
 <Admonition type="tip">
 
