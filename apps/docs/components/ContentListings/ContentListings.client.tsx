@@ -77,7 +77,7 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
                     <GlassPanel
                       title={item.title}
                       icon={item.icon}
-                      hasLightIcon={Boolean(item.icon)}
+                      hasLightIcon={item.hasLightIcon ?? Boolean(item.icon)}
                     >
                       {item.description}
                     </GlassPanel>

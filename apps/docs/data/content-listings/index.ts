@@ -10,7 +10,14 @@ import {
   functionsExamplesWebhooksPayments,
   functionsGetStarted,
 } from './functions.data'
-import { gettingStartedGetStarted } from './getting-started.data'
+import {
+  gettingStartedFrameworkQuickstarts,
+  gettingStartedGetStarted,
+  gettingStartedMobileTutorials,
+  gettingStartedNextSteps,
+  gettingStartedUseCases,
+  gettingStartedWebAppDemos,
+} from './getting-started.data'
 import { realtimeExamples, realtimeGetStarted, realtimeResources } from './realtime.data'
 import { storageExamples, storageGetStarted, storageResources } from './storage.data'
 
@@ -27,6 +34,11 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   functionsExamplesMessaging,
   functionsExamplesOperations,
   gettingStartedGetStarted,
+  gettingStartedUseCases,
+  gettingStartedFrameworkQuickstarts,
+  gettingStartedWebAppDemos,
+  gettingStartedMobileTutorials,
+  gettingStartedNextSteps,
   realtimeGetStarted,
   realtimeExamples,
   realtimeResources,
