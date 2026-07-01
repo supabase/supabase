@@ -5,8 +5,7 @@
 #   Reset everything:   sh reset.sh
 #
 # Notes:
-#   - Nested variable interpolation (${A:-${B}}) requires podman-compose >= 1.6.0.
-#     Earlier versions (still shipped by some distros) do not support it.
+#   - Nested variable interpolation (${A:-${B}}) requires podman-compose >= 1.6.0
 #
 
 name: supabase
