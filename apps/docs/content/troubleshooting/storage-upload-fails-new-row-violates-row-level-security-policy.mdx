@@ -32,10 +32,10 @@ Two details commonly cause confusion:
 A `WITH CHECK` failure means no **permissive** `INSERT` (or `ALL`) policy passed for the effective role, **or**
 a **restrictive** policy failed. The usual causes:
 
-- **A `RESTRICTIVE` policy is present.** Permissive policies are OR-ed together, but every `AS RESTRICTIVE`
-  policy must *also* pass. A single restrictive policy that evaluates false blocks the insert no matter how many
-  `WITH CHECK (true)` permissive policies you add. This is the most common reason "I added a policy for
-  everything and it still fails."
+- **A `RESTRICTIVE` policy is present.** Permissive policies are combined using OR logic, meaning if any
+  permissive policy passes the check succeeds. However, every `AS RESTRICTIVE` policy must *also* pass. A single
+  restrictive policy that evaluates false blocks the insert no matter how many `WITH CHECK (true)` permissive
+  policies you add. This is the most common reason checks still fail despite adding a policy for each case.
 - **No permissive policy targets the effective role.** Policies created `TO authenticated` do not apply to an
   `anon` request, and vice versa. A `TO public` policy applies to all roles.
 - **The policy is the wrong command or clause.** Only `FOR INSERT` / `FOR ALL` policies with a `WITH CHECK`
@@ -44,9 +44,9 @@ a **restrictive** policy failed. The usual causes:
 
 ## How to diagnose
 
-Run these in the [SQL Editor](/dashboard/project/_/sql/new).
-
 **1. List every policy on `storage.objects` — look for restrictive ones and the effective role.**
+
+Run this in the [SQL Editor](/dashboard/project/_/sql/new):
 
 ```sql
 select policyname, permissive, roles, cmd, qual, with_check
@@ -58,20 +58,24 @@ Any row with `permissive = 'RESTRICTIVE'` is a prime suspect. Confirm there is a
 row with `cmd` of `INSERT` or `ALL`, whose `roles` include the role you're uploading as (`anon` or
 `authenticated`, or `{public}`), and whose `with_check` your row satisfies.
 
-**2. Reproduce the insert under the request's role — this proves whether it's a policy issue or the service.**
+**2. Reproduce the upload the supported way and confirm the effective role.**
 
-```sql
-begin;
-  select set_config('request.jwt.claims', '{"role":"anon"}', true);
-  set local role anon;             -- use 'authenticated' if you upload with a user token
-  insert into storage.objects (bucket_id, name) values ('candidate-cvs', 'diagnostic-test.pdf');
-rollback;
-```
+Always exercise the real upload path — the [Storage dashboard](/dashboard/project/_/storage/buckets), the
+client library (`supabase.storage.from('candidate-cvs').upload(...)`), or the Storage API — rather than
+inserting into `storage.objects` directly, which bypasses Storage's internal bookkeeping. Retry the upload as
+the exact identity your app uses:
 
-- Fails with `42501` here too → the problem is purely in your policies on `storage.objects`; the Storage
-  service is behaving correctly. Fix the policies (next section).
-- Succeeds here but the live upload fails → the role/claims arriving on the request differ from what you
-  expect (for example the token isn't the role you think). Decode the token you send and confirm its `role`.
+- **Anonymous** (only the anon/publishable key, no user token) → the request runs as `anon`.
+- **Signed in** (a user access token in the `Authorization` header) → the request runs as `authenticated`.
+
+Read the result against step 1:
+
+- If step 1 has no `PERMISSIVE` `INSERT`/`ALL` policy matching that role (or a `RESTRICTIVE` policy that fails),
+  the upload keeps returning `42501` — it's a policy issue on `storage.objects`. Fix the policies (next
+  section).
+- If step 1 shows a matching permissive policy and no failing restrictive one, but the upload still fails, the
+  role/claims arriving on the request differ from what you expect — decode the token you send and confirm its
+  `role`.
 
 ## How to fix
 
