@@ -126,7 +126,6 @@ export const SQLEditor = () => {
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const { aiOptInLevel } = useOrgAiOptInLevel()
-  const showPrettyExplain = useFlag('ShowPrettyExplain')
 
   // [Ali] Kill switch to hide the SQL Editor Explain tab and its entry points
   const disablePrettyExplain = useFlag('DisablePrettyExplainOnSqlEditor')
@@ -236,7 +235,7 @@ export const SQLEditor = () => {
       if (id) {
         sessionSnap.addResult(id, data.result, vars.autoLimit)
 
-        if (!disablePrettyExplain && showPrettyExplain && isExplainQuery(data.result)) {
+        if (!disablePrettyExplain && isExplainQuery(data.result)) {
           sessionSnap.addExplainResult(id, data.result)
           setActiveUtilityTab('explain')
         } else if (activeUtilityTab === 'explain') {
