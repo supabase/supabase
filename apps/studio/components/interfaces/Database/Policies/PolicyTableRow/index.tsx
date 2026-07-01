@@ -92,8 +92,6 @@ const PolicyTableRowComponent = ({
 
   const admonitionMessage = useMemo(() => getTableAdmonitionMessage(status), [status])
 
-  console.log({ status, exposedSchemas })
-
   return (
     <Card className={cn(isPubliclyReadable && 'border-warning-500')}>
       <CardHeader
