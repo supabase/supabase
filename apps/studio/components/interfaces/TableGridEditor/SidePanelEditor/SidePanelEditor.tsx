@@ -211,12 +211,11 @@ export const SidePanelEditor = ({
     snap,
     selectedTable,
   })
-  const isTableDefinitionEdit = tableApiAccessParams?.type === 'edit'
   const apiAccessToggleHandler = useTableApiAccessHandlerWithHistory(
     // Dummy params used to appease TypeScript, actually gated by enabled flag
     tableApiAccessParams ?? DUMMY_TABLE_API_ACCESS_PARAMS,
     {
-      enabled: tableApiAccessParams !== undefined && !isTableDefinitionEdit,
+      enabled: tableApiAccessParams !== undefined,
     }
   )
 
@@ -605,7 +604,7 @@ export const SidePanelEditor = ({
     let toastId
     let saveTableError = false
 
-    if (action !== 'update' && !apiAccessToggleHandler.isSuccess) {
+    if (!apiAccessToggleHandler.isSuccess) {
       if (apiAccessToggleHandler.isPending) {
         toast.info(
           'Cannot save table yet because Data API settings are still loading. Please try again in a moment.'
@@ -824,7 +823,15 @@ export const SidePanelEditor = ({
         if (table === undefined) {
           return toast.error('Failed to update table')
         }
-        // Realtime and Data API access are managed on the table details Settings tab.
+        if (isTableLike(table)) {
+          await updateTableRealtime(table, isRealtimeEnabled)
+          const privilegesToSet = apiAccessToggleHandler.data?.schemaExposed
+            ? apiAccessToggleHandler.data.privileges
+            : undefined
+          if (privilegesToSet) {
+            await updateTableApiAccess(table, privilegesToSet)
+          }
+        }
 
         if (hasError) {
           toast.warning(
