@@ -13,6 +13,7 @@ import {
 } from 'react'
 
 import { useFeaturePreviews } from './useFeaturePreviews'
+import { IS_PLATFORM } from '@/lib/constants'
 import { EMPTY_OBJ } from '@/lib/void'
 
 type FeaturePreviewContextType = {
@@ -43,6 +44,11 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
   const initializeFlags = useEffectEvent(() => {
     setFlags(
       featurePreviews.reduce((a, b) => {
+        // Platform-only previews can never be enabled outside the hosted platform
+        if (!IS_PLATFORM && b.isPlatformOnly) {
+          return { ...a, [b.key]: false }
+        }
+
         const defaultOptIn = b.isDefaultOptIn
         const localStorageValue = safeLocalStorage.getItem(b.key)
         return {
@@ -101,8 +107,7 @@ export const useUnifiedLogsPreview = () => {
 
 export const useIsPgDeltaDiffEnabled = () => {
   const { flags } = useFeaturePreviewContext()
-  const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
-  return pgDeltaDiffEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF]
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PG_DELTA_DIFF]
 }
 
 export const useIsAdvisorRulesEnabled = () => {

@@ -35,8 +35,13 @@ function serialize(content: {
  * doesn't collapse deep / cyclic structures (typeSpec contains
  * self-referencing builder types) into `[Object]` placeholders — which would
  * make param renames, signature changes, and JSDoc edits invisible.
+ *
+ * ---
+ *
+ * Update on Jun 30th, 2026. Skipping this until we figure out a better way to
+ * avoid downloaded typedoc files to block build on unrelated PRs.
  */
-describe('build-reference-content: javascript/v2', () => {
+describe.skip('build-reference-content: javascript/v2', () => {
   it('matches snapshot', async () => {
     const content = await collectReferenceContent('javascript', 'v2')
     await expect(serialize(content)).toMatchFileSnapshot(
@@ -50,8 +55,14 @@ describe('build-reference-content: javascript/v2', () => {
  * committed `spec/supabase_dart_v2.yml` by `generate-dart-reference.ts`. We run
  * that converter first so the snapshot covers the full conversion + build path
  * (YAML to dump to content) and surfaces any drift in either step.
+ *
+ * ---
+ *
+ * Update on Jun 30th, 2026. Skipping this for the same reason as the
+ * javascript/v2 suite above, until snapshot updates are decoupled from
+ * unrelated builds.
  */
-describe('build-reference-content: dart/v2', () => {
+describe.skip('build-reference-content: dart/v2', () => {
   beforeAll(async () => {
     await generateDartReferenceDump()
   })

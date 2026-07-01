@@ -22,8 +22,10 @@ import {
   Input,
   Separator,
 } from 'ui'
-import { Admonition, ShimmeringLoader, TimestampInfo } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { z } from 'zod'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'

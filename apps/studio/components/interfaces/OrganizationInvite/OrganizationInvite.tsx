@@ -4,7 +4,8 @@ import { useRouter } from 'next/router'
 import type { ReactNode } from 'react'
 import { toast } from 'sonner'
 import { Button, Card, CardContent } from 'ui'
-import { Admonition, ShimmeringLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   getOrganizationInviteContent,

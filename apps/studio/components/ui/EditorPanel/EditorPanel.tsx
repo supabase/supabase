@@ -50,7 +50,7 @@ import {
   suffixWithLimit,
 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefinitions'
-import Results from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
+import { Results } from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
 import { SqlRunButton } from '@/components/interfaces/SQLEditor/UtilityPanel/RunButton'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useContentIdQuery } from '@/data/content/content-id-query'
@@ -680,5 +680,3 @@ export const EditorPanel = () => {
     </div>
   )
 }
-
-export default EditorPanel

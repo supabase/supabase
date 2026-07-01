@@ -298,7 +298,13 @@ export const NewOrgForm = ({
   }
 
   const onOrganizationCreated = (org: { slug: string }) => {
-    track('organization_creation_completed', undefined, { organization: org.slug })
+    if (submittedTier.current) {
+      track(
+        'organization_creation_completed',
+        { tier: submittedTier.current },
+        { organization: org.slug }
+      )
+    }
 
     const prefilledProjectName = user.profile?.username
       ? user.profile.username + `'s Project`
@@ -326,6 +332,8 @@ export const NewOrgForm = ({
     } as StripeElementsOptions
   }, [paymentIntentSecret, resolvedTheme])
 
+  const submittedTier = useRef<'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | null>(null)
+
   async function createOrg(
     formValues: z.infer<typeof formSchema>,
     paymentMethodId?: string,
@@ -336,15 +344,17 @@ export const NewOrgForm = ({
     }
   ) {
     const dbTier = formValues.plan === 'PRO' && !formValues.spend_cap ? 'PAYG' : formValues.plan
+    const tier = ('tier_' + dbTier.toLowerCase()) as
+      | 'tier_payg'
+      | 'tier_pro'
+      | 'tier_free'
+      | 'tier_team'
+    submittedTier.current = tier
 
     createOrganization({
       name: formValues.name,
       kind: formValues.kind,
-      tier: ('tier_' + dbTier.toLowerCase()) as
-        | 'tier_payg'
-        | 'tier_pro'
-        | 'tier_free'
-        | 'tier_team',
+      tier,
       ...(formValues.kind == 'COMPANY' ? { size: formValues.size } : {}),
       payment_method: paymentMethodId,
       billing_name: dbTier === 'FREE' ? undefined : customerData?.billing_name,

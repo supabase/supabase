@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { INTERNAL_SCHEMAS, useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 

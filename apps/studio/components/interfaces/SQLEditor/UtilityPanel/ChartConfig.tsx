@@ -20,11 +20,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import BarChart from '@/components/ui/Charts/BarChart'
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
+import { getCumulativeResults } from '@/components/ui/QueryBlock/QueryBlock.utils'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 type Results = { rows: readonly any[] }
@@ -40,21 +41,6 @@ export type ChartConfig = {
   logScale?: boolean
 }
 
-const getCumulativeResults = (results: Results, config: ChartConfig) => {
-  if (!results?.rows?.length) {
-    return []
-  }
-
-  const cumulativeResults = results.rows.reduce((acc, row) => {
-    const prev = acc[acc.length - 1] || {}
-    const next = {
-      ...row,
-      [config.yKey]: (prev[config.yKey] || 0) + row[config.yKey],
-    }
-    return [...acc, next]
-  }, [])
-  return cumulativeResults
-}
 const VALID_RESULT_KEY_TYPES = ['number', 'string', 'date']
 
 type ChartConfigProps = {
