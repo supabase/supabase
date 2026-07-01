@@ -20,8 +20,8 @@ const MIN_SIZE = typography.roles.headline.minSize
 const MAX_SIZE = typography.roles.headline.maxSize
 const THUMB_MIN = 160
 const THUMB_MAX = 480
-const OPACITY_MIN = 0.04
-const OPACITY_MAX = 0.12
+const OPACITY_MIN = 0.2
+const OPACITY_MAX = 0.35
 const ZOOM_MIN = 0.5
 const ZOOM_MAX = 2
 
@@ -32,6 +32,10 @@ type View = 'og' | 'thumb' | 'both'
 type PatternTypeOpt = 'none' | 'dots' | 'grid' | 'hlines' | 'vlines'
 type PatternScaleOpt = 'sm' | 'md' | 'lg'
 type PatternColorOpt = 'white' | 'green'
+/** Backgrounds are white-only for now — color picker removed from the UI. */
+const PATTERN_COLOR: PatternColorOpt = 'white'
+/** Collapse any legacy 'sm' value (still used by older examples) onto 'md'. */
+const normalizeScale = (s: PatternScaleOpt): PatternScaleOpt => (s === 'sm' ? 'md' : s)
 type EyebrowStyle = 'text' | 'pill'
 
 const PATTERN_TYPE_OPTS: { value: PatternTypeOpt; label: string }[] = [
@@ -42,13 +46,8 @@ const PATTERN_TYPE_OPTS: { value: PatternTypeOpt; label: string }[] = [
   { value: 'vlines', label: 'Vertical rules' },
 ]
 const SCALE_OPTS: { value: PatternScaleOpt; label: string }[] = [
-  { value: 'sm', label: 'S' },
-  { value: 'md', label: 'M' },
-  { value: 'lg', label: 'L' },
-]
-const COLOR_OPTS: { value: PatternColorOpt; label: string }[] = [
-  { value: 'white', label: 'White' },
-  { value: 'green', label: 'Green' },
+  { value: 'md', label: 'Default' },
+  { value: 'lg', label: 'Bigger' },
 ]
 const VIEW_OPTS: { value: View; label: string }[] = [
   { value: 'og', label: 'OG' },
@@ -351,12 +350,10 @@ export default function Page() {
     DEFAULT_TPL.defaultPattern.type as PatternTypeOpt
   )
   const [patternScale, setPatternScale] = useState<PatternScaleOpt>(
-    DEFAULT_TPL.defaultPattern.scale as PatternScaleOpt
+    normalizeScale(DEFAULT_TPL.defaultPattern.scale as PatternScaleOpt)
   )
-  const [patternColor, setPatternColor] = useState<PatternColorOpt>(
-    DEFAULT_TPL.defaultPattern.color as PatternColorOpt
-  )
-  const [patternOpacity, setPatternOpacity] = useState(DEFAULT_TPL.defaultPattern.opacity)
+  const patternColor = PATTERN_COLOR
+  const [patternOpacity, setPatternOpacity] = useState(OPACITY_MIN)
 
   const [copied, setCopied] = useState<View | null>(null)
 
@@ -408,9 +405,8 @@ export default function Page() {
     const t = TEMPLATES.find((x) => x.id === id)
     if (t) {
       setPatternType(t.defaultPattern.type as PatternTypeOpt)
-      setPatternScale(t.defaultPattern.scale as PatternScaleOpt)
-      setPatternColor(t.defaultPattern.color as PatternColorOpt)
-      setPatternOpacity(t.defaultPattern.opacity)
+      setPatternScale(normalizeScale(t.defaultPattern.scale as PatternScaleOpt))
+      setPatternOpacity(Math.max(OPACITY_MIN, t.defaultPattern.opacity))
     }
   }
 
@@ -453,9 +449,8 @@ export default function Page() {
     changeTemplate(generated.templateId)
     if (generated.pattern) {
       setPatternType(generated.pattern.type as PatternTypeOpt)
-      setPatternScale(generated.pattern.scale as PatternScaleOpt)
-      setPatternColor(generated.pattern.color as PatternColorOpt)
-      setPatternOpacity(generated.pattern.opacity)
+      setPatternScale(normalizeScale(generated.pattern.scale as PatternScaleOpt))
+      setPatternOpacity(Math.max(OPACITY_MIN, generated.pattern.opacity))
     }
     if (generated.eyebrow && !eyebrow.trim()) setEyebrow(generated.eyebrow)
   }
@@ -655,42 +650,6 @@ export default function Page() {
                   ))}
                 </select>
               </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-foreground-light">
-                    Font size
-                    <Hint text="Auto-fit picks the largest size that keeps the headline to 2 lines — the highest-leverage guardrail for legibility at thumbnail size." />
-                  </span>
-                  <span className="text-xs tabular-nums text-foreground-lighter">
-                    {autoFit ? `Auto · ${og.fit?.fontSize ?? '—'}px` : `${manualFontSize}px`}
-                  </span>
-                </div>
-                <label className="flex items-center gap-2 text-xs text-foreground-light">
-                  <input
-                    type="checkbox"
-                    id="toggle-autofit"
-                    checked={autoFit}
-                    onChange={(e) => {
-                      const on = e.target.checked
-                      setAutoFit(on)
-                      if (!on) setManualFontSize(og.fit?.fontSize ?? manualFontSize)
-                    }}
-                  />
-                  Auto-fit
-                </label>
-                <input
-                  type="range"
-                  id="font-size"
-                  min={MIN_SIZE}
-                  max={MAX_SIZE}
-                  step={2}
-                  value={sliderValue}
-                  disabled={autoFit}
-                  onChange={(e) => setManualFontSize(Number(e.target.value))}
-                  className="w-full min-w-0 accent-brand disabled:opacity-40"
-                />
-              </div>
             </Group>
           )}
 
@@ -804,15 +763,50 @@ export default function Page() {
                 <p className="text-xs text-foreground-lighter">
                   Press Enter for a manual line break (power-user mode). Otherwise it auto-fits.
                 </p>
+
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-foreground-light">
+                    Font size
+                    <Hint text="Auto-fit picks the largest size that keeps the headline to 2 lines — the highest-leverage guardrail for legibility at thumbnail size." />
+                  </span>
+                  <span className="text-xs tabular-nums text-foreground-lighter">
+                    {autoFit ? `Auto · ${og.fit?.fontSize ?? '—'}px` : `${manualFontSize}px`}
+                  </span>
+                </div>
+                <label className="flex items-center gap-2 text-xs text-foreground-light">
+                  <input
+                    type="checkbox"
+                    id="toggle-autofit"
+                    checked={autoFit}
+                    onChange={(e) => {
+                      const on = e.target.checked
+                      setAutoFit(on)
+                      if (!on) setManualFontSize(og.fit?.fontSize ?? manualFontSize)
+                    }}
+                  />
+                  Auto-fit
+                </label>
+                <input
+                  type="range"
+                  id="font-size"
+                  min={MIN_SIZE}
+                  max={MAX_SIZE}
+                  step={2}
+                  value={sliderValue}
+                  disabled={autoFit}
+                  onChange={(e) => setManualFontSize(Number(e.target.value))}
+                  className="w-full min-w-0 accent-brand disabled:opacity-40"
+                />
+
                 <label className="flex items-center gap-2 text-sm text-foreground-light">
                   <input
                     type="checkbox"
                     id="toggle-sentence-case"
-                    checked={sentenceCase}
-                    onChange={(e) => setSentenceCase(e.target.checked)}
+                    checked={!sentenceCase}
+                    onChange={(e) => setSentenceCase(!e.target.checked)}
                   />
-                  Auto sentence-case
-                  <Hint text="Sentence case, with brand terms (Postgres, pgvector, API…) preserved automatically." />
+                  Disable sentence-case
+                  <Hint text="By default headlines are sentence-cased, with brand terms (Postgres, pgvector, API…) preserved automatically. Check this to type it exactly as written." />
                 </label>
               </div>
             </Group>
@@ -849,7 +843,7 @@ export default function Page() {
             <div className="flex flex-col gap-2">
               <span className="text-sm font-medium text-foreground-light">
                 Pattern
-                <Hint text="Subtle background texture. Opacity is locked low (4–12%) so it can never threaten headline contrast (§6.7)." />
+                <Hint text="Subtle white background texture. Opacity is locked to a range (20–35%) that keeps it a texture, not foreground (§6.7)." />
               </span>
               <select
                 id="pattern"
@@ -870,10 +864,6 @@ export default function Page() {
                 <div className="flex items-center justify-between">
                   <Label>Scale</Label>
                   <Segmented value={patternScale} onChange={setPatternScale} options={SCALE_OPTS} />
-                </div>
-                <div className="flex items-center justify-between">
-                  <Label>Color</Label>
-                  <Segmented value={patternColor} onChange={setPatternColor} options={COLOR_OPTS} />
                 </div>
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center justify-between">

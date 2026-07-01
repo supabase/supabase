@@ -19,8 +19,8 @@ export const PATTERN_COLOR_HEX: Record<PatternColor, string> = {
   green: '#3ECF8E',
 }
 
-/** Opacity is locked low — these are texture, not foreground (§6.7). */
-export const PATTERN_OPACITY = { min: 0.04, max: 0.12, default: 0.06 }
+/** Opacity is locked to a range — these are texture, not foreground (§6.7). */
+export const PATTERN_OPACITY = { min: 0.2, max: 0.35, default: 0.2 }
 
 export function clampPatternOpacity(o: number): number {
   if (!Number.isFinite(o)) return PATTERN_OPACITY.default

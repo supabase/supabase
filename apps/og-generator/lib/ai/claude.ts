@@ -35,8 +35,10 @@ const TEMPLATE_IDS = ['bottom-left', 'split-right', 'centered', 'stacked'] as co
 const DEFAULT_TEMPLATE = 'split-right'
 
 const PATTERN_TYPES: PatternType[] = ['grid', 'dots', 'hlines', 'vlines']
-const PATTERN_SCALES: PatternScale[] = ['sm', 'md', 'lg']
-const PATTERN_COLORS: PatternColor[] = ['white', 'green']
+// Backgrounds are white-only, medium/large scale — kept in sync with the
+// editor's SCALE_OPTS/PATTERN_COLOR (app/page.tsx).
+const PATTERN_SCALES: PatternScale[] = ['md', 'lg']
+const PATTERN_COLORS: PatternColor[] = ['white']
 
 export function hasClaude(): boolean {
   return Boolean(process.env.ANTHROPIC_API_KEY)
@@ -73,7 +75,7 @@ ${ICON_CATALOG}
 TEMPLATES (pick one \`id\`):
 ${TEMPLATE_CATALOG}
 
-BACKGROUND PATTERNS (subtle texture only): type ∈ grid|dots|hlines|vlines|none, scale ∈ sm|md|lg, color ∈ white|green, opacity between 0.04 and 0.10. Use green sparingly (launches, AI/vector). Prefer "none" over a busy pattern.
+BACKGROUND PATTERNS (subtle white texture only — color is always white): type ∈ grid|dots|hlines|vlines|none, scale ∈ md|lg, opacity between 0.20 and 0.35. Prefer "none" over a busy pattern.
 
 FEATURED EXAMPLES (approved precedent — reuse the recipe when the subject is similar):
 ${exampleCatalog}
@@ -100,8 +102,8 @@ export const SCHEMA = {
       additionalProperties: false,
       properties: {
         type: { type: 'string', enum: ['grid', 'dots', 'hlines', 'vlines', 'none'] },
-        scale: { type: 'string', enum: ['sm', 'md', 'lg'] },
-        color: { type: 'string', enum: ['white', 'green'] },
+        scale: { type: 'string', enum: ['md', 'lg'] },
+        color: { type: 'string', enum: ['white'] },
         opacity: { type: 'number' },
       },
       required: ['type', 'scale', 'color', 'opacity'],

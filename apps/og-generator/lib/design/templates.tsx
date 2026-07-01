@@ -68,7 +68,7 @@ export const TEMPLATES: Template[] = [
     textAlign: 'left',
     anchorX: 'left',
     anchorY: 'bottom',
-    defaultPattern: { type: 'dots', scale: 'md', color: 'white', opacity: 0.06 },
+    defaultPattern: { type: 'dots', scale: 'md', color: 'white', opacity: 0.2 },
     build: (p) => (
       <div
         style={{
@@ -95,7 +95,7 @@ export const TEMPLATES: Template[] = [
     textAlign: 'left',
     anchorX: 'left',
     anchorY: 'center',
-    defaultPattern: { type: 'grid', scale: 'md', color: 'white', opacity: 0.05 },
+    defaultPattern: { type: 'grid', scale: 'md', color: 'white', opacity: 0.2 },
     build: (p) => (
       <div
         style={{
@@ -119,7 +119,7 @@ export const TEMPLATES: Template[] = [
     textAlign: 'center',
     anchorX: 'center',
     anchorY: 'center',
-    defaultPattern: { type: 'dots', scale: 'lg', color: 'green', opacity: 0.05 },
+    defaultPattern: { type: 'dots', scale: 'lg', color: 'green', opacity: 0.2 },
     build: (p) => (
       <div
         style={{
@@ -145,7 +145,7 @@ export const TEMPLATES: Template[] = [
     textAlign: 'left',
     anchorX: 'left',
     anchorY: 'top',
-    defaultPattern: { type: 'hlines', scale: 'md', color: 'white', opacity: 0.06 },
+    defaultPattern: { type: 'hlines', scale: 'md', color: 'white', opacity: 0.2 },
     build: (p) => (
       <div
         style={{

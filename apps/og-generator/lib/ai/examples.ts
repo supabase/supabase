@@ -38,7 +38,7 @@ export const FEATURED_EXAMPLES: FeaturedExample[] = [
     iconName: 'lock',
     templateId: 'split-right',
     eyebrow: 'Security',
-    pattern: { type: 'grid', scale: 'md', color: 'white', opacity: 0.05 },
+    pattern: { type: 'grid', scale: 'md', color: 'white', opacity: 0.2 },
     whyItWorks:
       'A padlock reads instantly as access control; the split layout keeps a longer security headline legible beside the icon.',
   },
@@ -48,7 +48,7 @@ export const FEATURED_EXAMPLES: FeaturedExample[] = [
     iconName: 'database',
     templateId: 'bottom-left',
     eyebrow: 'Engineering',
-    pattern: { type: 'dots', scale: 'md', color: 'white', opacity: 0.06 },
+    pattern: { type: 'dots', scale: 'md', color: 'white', opacity: 0.2 },
     whyItWorks:
       'A single database icon top-right keeps a technical scaling post clean; the bottom-left headline gives room for a longer title.',
   },
@@ -58,7 +58,7 @@ export const FEATURED_EXAMPLES: FeaturedExample[] = [
     iconName: 'zap',
     templateId: 'centered',
     eyebrow: 'Launch Week',
-    pattern: { type: 'dots', scale: 'lg', color: 'green', opacity: 0.05 },
+    pattern: { type: 'dots', scale: 'lg', color: 'green', opacity: 0.2 },
     whyItWorks:
       'A centered composition with the bolt icon signals a big launch moment and reads well at thumbnail size.',
   },
@@ -68,7 +68,7 @@ export const FEATURED_EXAMPLES: FeaturedExample[] = [
     iconName: 'globe',
     templateId: 'split-right',
     eyebrow: 'Product',
-    pattern: { type: 'grid', scale: 'md', color: 'white', opacity: 0.05 },
+    pattern: { type: 'grid', scale: 'md', color: 'white', opacity: 0.2 },
     whyItWorks:
       'The globe conveys global/edge reach; the split layout pairs it cleanly with the feature name.',
   },
@@ -78,7 +78,7 @@ export const FEATURED_EXAMPLES: FeaturedExample[] = [
     iconName: 'layers',
     templateId: 'stacked',
     eyebrow: 'Engineering',
-    pattern: { type: 'hlines', scale: 'md', color: 'white', opacity: 0.06 },
+    pattern: { type: 'hlines', scale: 'md', color: 'white', opacity: 0.2 },
     whyItWorks:
       'The layers icon suggests stacked infrastructure; headline-top / icon-bottom gives a structured, technical feel.',
   },
@@ -88,7 +88,7 @@ export const FEATURED_EXAMPLES: FeaturedExample[] = [
     iconName: 'zap',
     templateId: 'split-right',
     eyebrow: 'Product',
-    pattern: { type: 'dots', scale: 'md', color: 'green', opacity: 0.05 },
+    pattern: { type: 'dots', scale: 'md', color: 'green', opacity: 0.2 },
     whyItWorks:
       'The bolt reads as speed/real-time; a split layout keeps the feature headline front and center.',
   },
@@ -98,7 +98,7 @@ export const FEATURED_EXAMPLES: FeaturedExample[] = [
     iconName: 'database',
     templateId: 'split-right',
     eyebrow: 'AI',
-    pattern: { type: 'grid', scale: 'sm', color: 'green', opacity: 0.05 },
+    pattern: { type: 'grid', scale: 'sm', color: 'green', opacity: 0.2 },
     whyItWorks:
       'A database icon anchors a Postgres-native AI feature; the split layout supports a descriptive headline.',
   },
