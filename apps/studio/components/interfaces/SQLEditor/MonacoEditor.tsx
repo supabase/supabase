@@ -275,7 +275,7 @@ export const MonacoEditor = ({
         editorRef={editorRef}
         monacoRef={monacoRef}
         actions={{
-          runQuery: { enabled: true, callback: executeQuery },
+          runQuery: { enabled: true, callback: () => void executeQuery() },
           formatDocument: { enabled: false, callback: noop },
           placeholderFill: { enabled: false },
         }}
