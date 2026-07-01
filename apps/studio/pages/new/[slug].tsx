@@ -4,7 +4,7 @@ import { useFeatureFlags, useFlag, useParams } from 'common'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
+import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm, useFormState } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
@@ -37,7 +37,7 @@ import {
   GitHubRepositoryField,
   useGitHubRepositoryOptions,
 } from '@/components/interfaces/Settings/Integrations/GithubIntegration/GitHubRepositoryField'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { WizardLayoutWithoutAuth } from '@/components/layouts/WizardLayout'
 import Panel from '@/components/ui/Panel'
 import { useAvailableOrioleImageVersion } from '@/data/config/project-creation-postgres-versions-query'
@@ -71,13 +71,16 @@ import { usePHFlag } from '@/hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from '@/lib/constants'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { useProfile } from '@/lib/profile'
+import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 import type { NextPageWithLayout } from '@/types'
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
 const Wizard: NextPageWithLayout = () => {
   const track = useTrack()
+  const trackFunnelError = useTrackFunnelError()
   const router = useRouter()
   const { slug, projectName } = useParams()
   const { appTitle } = useCustomContent(['app:title'])
@@ -104,7 +107,6 @@ const Wizard: NextPageWithLayout = () => {
   )
 
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
-  const smartRegionEnabled = useFlag('enableSmartRegion')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showInternalOnlyConfiguration = useFlag('newProjectInternalOnlyConfiguration')
 
@@ -169,6 +171,7 @@ const Wizard: NextPageWithLayout = () => {
   } = useWatch({ control: form.control })
   const { dirtyFields } = useFormState(form)
   const isDbRegionDirty = dirtyFields.dbRegion
+  const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
 
   // Read dirty state during render rather than depending on form.formState in the
   // effect — form.formState is a Proxy that gets a new reference every render, which
@@ -218,9 +221,10 @@ const Wizard: NextPageWithLayout = () => {
     ? 0
     : monthlyInstancePrice(instanceSize) - availableComputeCredits
 
+  const selectedCloudProvider = cloudProvider as CloudProvider
   const { data: autoDefaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {
-      cloudProvider: PROVIDERS[defaultProvider].id,
+      cloudProvider: selectedCloudProvider,
     },
     {
       enabled: flagsLoaded && !smartRegionEnabled,
@@ -252,7 +256,7 @@ const Wizard: NextPageWithLayout = () => {
     ? availableRegionsData?.recommendations.smartGroup.name
     : ''
 
-  const fixedDefaultRegion = PROVIDERS[defaultProvider].default_region.displayName
+  const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError =
     smartRegionEnabled && defaultProvider !== 'AWS_NIMBUS'
       ? availableRegionsError
@@ -317,6 +321,10 @@ const Wizard: NextPageWithLayout = () => {
       )
       router.push(`/project/${res.ref}`)
     },
+    onError: (error) => {
+      toast.error(`Failed to create new project: ${error.message}`)
+      trackFunnelError('project_creation', classifyApiError('project_creation', error), 'toast')
+    },
   })
 
   const onSubmitWithComputeCostsConfirmation = async (values: z.infer<typeof FormSchema>) => {
@@ -356,6 +364,11 @@ const Wizard: NextPageWithLayout = () => {
     } = values
 
     if (useOrioleDb && !availableOrioleVersion) {
+      trackFunnelError(
+        'project_creation',
+        { errorCategory: 'validation', errorReason: 'oriole_unavailable' },
+        'toast'
+      )
       return toast.error('No available OrioleDB image found, only Postgres is available')
     }
 
@@ -415,6 +428,14 @@ const Wizard: NextPageWithLayout = () => {
 
     createProject(data)
   }
+
+  const hasTrackedFormExposed = useRef(false)
+  useEffect(() => {
+    if (hasTrackedFormExposed.current) return
+    if (!isOrganizationsSuccess || !canCreateProject || !currentOrg) return
+    hasTrackedFormExposed.current = true
+    track('project_creation_form_exposed', { surface: 'main' })
+  }, [isOrganizationsSuccess, canCreateProject, currentOrg, track])
 
   useEffect(() => {
     // Only set once to ensure compute credits dont change while project is being created
@@ -501,7 +522,15 @@ const Wizard: NextPageWithLayout = () => {
         <meta name="description" content="Supabase Studio" />
       </Head>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation)}>
+        <form
+          onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation, (errors) =>
+            trackFunnelError(
+              'project_creation',
+              classifyValidationError('project_creation', errors),
+              'form'
+            )
+          )}
+        >
           <Panel
             loading={!isOrganizationsSuccess}
             title={

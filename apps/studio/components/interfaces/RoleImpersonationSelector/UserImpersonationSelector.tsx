@@ -27,7 +27,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
 import { useCustomAccessTokenHookDetails } from '@/hooks/misc/useCustomAccessTokenHookDetails'
@@ -235,7 +235,7 @@ export const UserImpersonationSelector = () => {
                 <InputGroup>
                   <InputGroupInput
                     size="tiny"
-                    className="table-editor-search border-none"
+                    className="pr-10 border-none"
                     placeholder="Search by id, email, phone, or name..."
                     onChange={(e) => setSearchText(e.target.value)}
                     value={searchText}

@@ -45,9 +45,9 @@ const { data, error } = await supabase
 
 **- Seq Scan:** A sequential scan that reads all rows from a table. This is often seen in the absence of indexes that can be used for the query.
 
-**- Index Scan:** Uses an index to find rows quickly. This indicates that the query is able to use an index to efficiently locate data.
+**- Index Scan:** Uses an index to find rows efficiently. This indicates that the query is able to use an index to efficiently locate data.
 
-**- Bitmap Heap Scan:** Uses a bitmap index to find rows quickly and then retrieves the actual rows from the table. This type of scan is efficient when retrieving a moderate number of rows.
+**- Bitmap Heap Scan:** Uses a bitmap index to find rows efficiently and then retrieves the actual rows from the table. This type of scan is efficient when retrieving a moderate number of rows.
 
 ### 2. Cost
 
@@ -70,7 +70,7 @@ const { data, error } = await supabase
 
 ### 6. Execution time
 
-**Execution Time: 0.069 ms:** measures how long it took to actually execute the query, including retrieving the data, performing any sorts, joins, or other operations defined in the execution plan, and returning the final results. This time is measured in milliseconds.
+**Execution Time: 0.069 ms:** measures how long it took to execute the query, including retrieving the data, performing any sorts, joins, or other operations defined in the execution plan, and returning the final results. This time is measured in milliseconds.
 
 ![image](/docs/img/troubleshooting/10950be3-264b-4a41-bc71-3d431c2756b2.png)
 
@@ -78,7 +78,7 @@ const { data, error } = await supabase
 
 When running EXPLAIN ANALYZE, additional information is provided, including:
 
-- **Actual time:** Shows the time actually spent executing the scan and retrieving rows. This is split into the time to retrieve the first row (first) and the time to retrieve all rows (last).
+- **Actual time:** Shows the time spent executing the scan and retrieving rows. This is split into the time to retrieve the first row (first) and the time to retrieve all rows (last).
 
 - **Rows removed by filter:** Indicates how many rows were excluded due to not meeting the filter conditions.
 
@@ -135,25 +135,25 @@ On top of that, you have to multiply the cost and the time with the number of â€
 
 ### Common nodes in Postgres explain output
 
-| Node Type             | Description                                                                  |
-| --------------------- | ---------------------------------------------------------------------------- |
-| **Seq Scan**          | Scans each row of a table sequentially, often used without suitable indexes. |
-| **Index Scan**        | Uses an index to quickly find rows, efficient for small fractions of rows.   |
-| **Index Only Scan**   | Retrieves all needed data from the index itself, without visiting the table. |
-| **Bitmap Heap Scan**  | Uses a bitmap of row locations to efficiently retrieve rows from the table.  |
-| **Bitmap Index Scan** | Builds a bitmap by scanning the index to efficiently locate rows.            |
-| **`Tid` Scan**        | Fetches rows directly using tuple identifiers, used in sub-selects.          |
-| **Nested Loop**       | Joins two tables by scanning the first and then the second for each row.     |
-| **Merge Join**        | Joins two pre-sorted tables, efficient for large datasets.                   |
-| **Hash Join**         | Uses a hash table to perform joins, often faster for larger datasets.        |
-| **Aggregate**         | Performs aggregation calculations like `SUM`, `COUNT`, etc.                  |
-| **Sort**              | Sorts rows based on specified criteria, required for certain operations.     |
-| **Limit**             | Returns a specified number of rows quickly, used with `LIMIT` clause.        |
-| **CTE Scan**          | Scans a Common Table Expression, used for WITH clauses.                      |
-| **Materialize**       | Materializes the result of a subquery or node to reuse without re-running.   |
-| **Subquery Scan**     | Executes and provides the results of a subquery to the outer query.          |
-| **Foreign Scan**      | Fetches data from foreign data sources outside the local database.           |
-| **Function Scan**     | Retrieves results from a set-returning function.                             |
+| Node Type             | Description                                                                    |
+| --------------------- | ------------------------------------------------------------------------------ |
+| **Seq Scan**          | Scans each row of a table sequentially, often used without suitable indexes.   |
+| **Index Scan**        | Uses an index to efficiently find rows, efficient for small fractions of rows. |
+| **Index Only Scan**   | Retrieves all needed data from the index itself, without visiting the table.   |
+| **Bitmap Heap Scan**  | Uses a bitmap of row locations to efficiently retrieve rows from the table.    |
+| **Bitmap Index Scan** | Builds a bitmap by scanning the index to efficiently locate rows.              |
+| **`Tid` Scan**        | Fetches rows directly using tuple identifiers, used in sub-selects.            |
+| **Nested Loop**       | Joins two tables by scanning the first and then the second for each row.       |
+| **Merge Join**        | Joins two pre-sorted tables, efficient for large datasets.                     |
+| **Hash Join**         | Uses a hash table to perform joins, often faster for larger datasets.          |
+| **Aggregate**         | Performs aggregation calculations like `SUM`, `COUNT`, etc.                    |
+| **Sort**              | Sorts rows based on specified criteria, required for certain operations.       |
+| **Limit**             | Returns a specified number of rows efficiently, used with `LIMIT` clause.      |
+| **CTE Scan**          | Scans a Common Table Expression, used for WITH clauses.                        |
+| **Materialize**       | Materializes the result of a subquery or node to reuse without re-running.     |
+| **Subquery Scan**     | Executes and provides the results of a subquery to the outer query.            |
+| **Foreign Scan**      | Fetches data from foreign data sources outside the local database.             |
+| **Function Scan**     | Retrieves results from a set-returning function.                               |
 
 ### What to focus on in explain analyze output
 
@@ -182,11 +182,11 @@ Determining whether 100 milliseconds for e.g is noteworthy in the context of ide
 
 **Overall Query Execution Time:**
 
-If the total execution time of a query significantly exceeds 100 milliseconds, then this particular step may not represent the main bottleneck. For instance, in queries that take several seconds to execute, a component that consumes just 100 milliseconds may not be the critical target for optimization efforts.
+If the total execution time of a query significantly exceeds 100 milliseconds, then this particular step may not represent the main bottleneck. For instance, in queries that take several seconds to execute, a component that consumes only 100 milliseconds may not be the critical target for optimization efforts.
 
 **Complexity and Scale of the Query:**
 
-For complex queries that involve multiple joins, subqueries, or aggregation functions, an operation that takes 100 milliseconds might actually reflect good efficiency. Conversely, for simpler queries or operations expected to be quick (such as fetching a few rows from a well-indexed table), 100 milliseconds could suggest a lack of efficiency.
+For complex queries that involve multiple joins, subqueries, or aggregation functions, an operation that takes 100 milliseconds might reflect good efficiency. Conversely, for simpler queries or operations expected to be quick (such as fetching a few rows from a well-indexed table), 100 milliseconds could suggest a lack of efficiency.
 
 So, the acceptable performance threshold can vary by application. For real-time systems or high-frequency trading platforms, even a few milliseconds can be critical, whereas for batch processing or data warehousing, longer execution times might be acceptable.
 

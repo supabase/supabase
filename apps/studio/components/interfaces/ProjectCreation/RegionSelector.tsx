@@ -1,4 +1,4 @@
-import { useFeatureFlags, useFlag, useParams } from 'common'
+import { useFeatureFlags, useParams } from 'common'
 import { UseFormReturn } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
@@ -22,14 +22,14 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
 import { getAvailableRegions } from './ProjectCreation.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { useDefaultRegionQuery } from '@/data/misc/get-default-region-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
 import type { DesiredInstanceSize } from '@/data/projects/new-project.constants'
-import { BASE_PATH, PROVIDERS } from '@/lib/constants'
+import { BASE_PATH } from '@/lib/constants'
 
 interface RegionSelectorProps {
   form: UseFormReturn<CreateProjectForm>
@@ -70,7 +70,7 @@ export const RegionSelector = ({
   const cloudProvider = form.getValues('cloudProvider') as CloudProvider
 
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
-  const smartRegionEnabled = useFlag('enableSmartRegion')
+  const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
 
   const { data: statusData } = useIncidentStatusQuery()
   const { incidents = [] } = statusData ?? {}
@@ -100,7 +100,7 @@ export const RegionSelector = ({
     availableRegionsData?.recommendations.specific.map((region) => region.code)
   )
 
-  const availableRegions = getAvailableRegions(PROVIDERS[cloudProvider].id)
+  const availableRegions = getAvailableRegions(cloudProvider)
   const regionsArray = Object.entries(availableRegions).map(([_key, value]) => {
     return {
       code: value.code,

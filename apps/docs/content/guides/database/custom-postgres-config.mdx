@@ -153,6 +153,8 @@ Use the examples below with `supabase --experimental --project-ref <project-ref>
 
 Some Postgres settings are configurable through the [Management API](/docs/reference/api/v1-update-postgres-config) but not the CLI. These include logging settings such as `log_connections`. See [Postgres connection logging](/docs/guides/platform/postgres-connection-logging) for details.
 
+`cron.log_statement` (which logs each [pg_cron](/docs/guides/database/extensions/pg_cron) job statement before it runs) is also Management API only. It is a `postmaster`-context parameter, so updating it **requires a database restart** to take effect.
+
 #### Managing Postgres configuration with the CLI
 
 To start:
