@@ -50,6 +50,7 @@
   }
 
   code,
+  .code-content,
   pre,
   kbd,
   samp,
@@ -78,6 +79,10 @@
 
 html {
   scroll-behavior: smooth;
+  font-weight: 500;
+}
+
+html[data-theme*='dark'] {
   font-weight: 450;
 }
 
@@ -151,18 +156,18 @@ h6:not(.font-mono),
 
 .prose
   :where(p, li, a, figcaption):not(:where([class~='not-prose'], [class~='not-prose'] *)):not(
-    :where(h1, h2, h3, h4, h5, h6) *
+    :where(h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6) *
   ) {
   @apply text-base leading-7;
 }
 
-.prose :where(h1):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+.prose :where(h1, .h1):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   @apply text-4xl;
 }
-.prose :where(h2):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+.prose :where(h2, .h2):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   @apply text-2xl;
 }
-.prose :where(h3):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+.prose :where(h3, .h3):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   @apply text-xl leading-7;
 }
 
