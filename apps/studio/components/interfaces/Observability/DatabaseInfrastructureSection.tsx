@@ -209,8 +209,8 @@ export const DatabaseInfrastructureSection = ({
         {infraError ? (
           <div className="col-span-2 flex items-center rounded-md border border-dashed px-4 py-3">
             <p className="text-sm text-foreground-light">
-              Unable to load. Please try again in a few minutes. If the problem persists please check
-              our <InlineLink href="https://status.supabase.com">status page</InlineLink>.
+              Unable to load. Please try again in a few minutes. If the problem persists please
+              check our <InlineLink href="https://status.supabase.com">status page</InlineLink>.
             </p>
           </div>
         ) : (
