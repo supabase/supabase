@@ -34,6 +34,12 @@ const EYEBROW = typography.roles.eyebrow
 const ICON_SIZE = 220 // OG icon size (1x design px)
 const ICON_STROKE = illustration.defaultStrokePx
 
+/** Scale (naturalW, naturalH) to fit within a boxSize square, preserving aspect ratio. */
+function fitBox(naturalW: number, naturalH: number, boxSize: number): { w: number; h: number } {
+  const ratio = naturalW / naturalH || 1
+  return ratio >= 1 ? { w: boxSize, h: boxSize / ratio } : { w: boxSize * ratio, h: boxSize }
+}
+
 const THUMB_ICON_DEFAULT = 380
 const THUMB_ICON_MIN = 160
 const THUMB_ICON_MAX = 480
@@ -120,7 +126,15 @@ export async function GET(req: Request) {
           }}
         >
           {patternLayer(cfg)}
-          {iconObj ? (
+          {iconObj && iconObj.kind === 'logo' && iconObj.url ? (
+            // Custom color logo — rendered as-is (no stroke normalization),
+            // fit to its natural aspect ratio (brief follow-up: partnerships).
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              {...fitBox(iconObj.width ?? 1, iconObj.height ?? 1, thumbSize * s)}
+              src={iconObj.url}
+            />
+          ) : iconObj ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               width={thumbSize * s}
@@ -245,18 +259,23 @@ export async function GET(req: Request) {
       </div>
     )
 
-    const iconEl = iconObj ? (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        width={ICON_SIZE * s}
-        height={ICON_SIZE * s}
-        src={iconDataUri(iconObj, {
-          sizePx: ICON_SIZE * s,
-          strokePx: ICON_STROKE * s,
-          color: color('illustration.stroke'),
-        })}
-      />
-    ) : null
+    const iconEl =
+      iconObj && iconObj.kind === 'logo' && iconObj.url ? (
+        // Custom color logo — rendered as-is, fit to its natural aspect ratio.
+        // eslint-disable-next-line @next/next/no-img-element
+        <img {...fitBox(iconObj.width ?? 1, iconObj.height ?? 1, ICON_SIZE * s)} src={iconObj.url} />
+      ) : iconObj ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          width={ICON_SIZE * s}
+          height={ICON_SIZE * s}
+          src={iconDataUri(iconObj, {
+            sizePx: ICON_SIZE * s,
+            strokePx: ICON_STROKE * s,
+            color: color('illustration.stroke'),
+          })}
+        />
+      ) : null
 
     const cfg = resolvePattern(template.defaultPattern)
     // Grid-snap (§4): phase the pattern so a grid line lands on the safe-area

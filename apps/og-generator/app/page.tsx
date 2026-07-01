@@ -340,6 +340,48 @@ export default function Page() {
       setUploading(false)
     }
   }
+
+  // Custom color logos (partnerships, acquisitions, co-marketing) — rendered
+  // full-color, no stroke normalization. The browser measures natural pixel
+  // size before upload so /api/og can fit it without distortion.
+  const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [logoError, setLogoError] = useState<string | null>(null)
+  const uploadLogo = async (file: File) => {
+    setUploadingLogo(true)
+    setLogoError(null)
+    try {
+      const { width, height } = await new Promise<{ width: number; height: number }>((resolve, reject) => {
+        const url = URL.createObjectURL(file)
+        const img = new Image()
+        img.onload = () => {
+          resolve({ width: img.naturalWidth, height: img.naturalHeight })
+          URL.revokeObjectURL(url)
+        }
+        img.onerror = () => {
+          URL.revokeObjectURL(url)
+          reject(new Error('Could not read the image — is it a valid SVG/PNG/JPEG/WebP?'))
+        }
+        img.src = url
+      })
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('kind', 'logo')
+      fd.append('width', String(width))
+      fd.append('height', String(height))
+      const res = await fetch('/api/assets', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok) {
+        setLogoError(data.error ?? 'Upload failed')
+        return
+      }
+      setUploadedIcons((prev) => [data.asset as SeedIcon, ...prev])
+      setIcon((data.asset as SeedIcon).name)
+    } catch (err) {
+      setLogoError(err instanceof Error ? err.message : 'Upload failed — please try again.')
+    } finally {
+      setUploadingLogo(false)
+    }
+  }
   const [thumbSize, setThumbSize] = useState(380)
   const [scale, setScale] = useState<1 | 2>(1)
   const [showSafeArea, setShowSafeArea] = useState(false)
@@ -677,49 +719,77 @@ export default function Page() {
                     key={ic.name}
                     type="button"
                     onClick={() => setIcon(ic.name)}
-                    title={ic.label}
-                    className={`flex h-14 items-center justify-center rounded-md border ${
+                    title={ic.kind === 'logo' ? `${ic.label} (color logo)` : ic.label}
+                    className={`flex h-14 items-center justify-center rounded-md border p-1.5 ${
                       icon === ic.name
                         ? 'border-brand bg-brand/10 text-brand'
                         : 'border-default bg-surface-100 text-foreground-light hover:border-strong'
                     }`}
                   >
-                    <svg
-                      width={22}
-                      height={22}
-                      viewBox={ic.viewBox}
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      dangerouslySetInnerHTML={{ __html: ic.body }}
-                    />
+                    {ic.kind === 'logo' && ic.url ? (
+                      // Real colors, no forced stroke — this is the point of a logo.
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={ic.url} alt={ic.label} className="max-h-full max-w-full object-contain" />
+                    ) : (
+                      <svg
+                        width={22}
+                        height={22}
+                        viewBox={ic.viewBox}
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        dangerouslySetInnerHTML={{ __html: ic.body }}
+                      />
+                    )}
                   </button>
                 ))}
               </div>
-              <label
-                className={`rounded-md border border-dashed border-default px-3 py-2 text-center text-xs text-foreground-light hover:border-strong ${
-                  uploading ? 'cursor-wait opacity-70' : 'cursor-pointer'
-                }`}
-              >
-                {uploading ? 'Uploading…' : '+ Upload SVG icon'}
-                <input
-                  type="file"
-                  accept=".svg,image/svg+xml"
-                  className="hidden"
-                  disabled={uploading}
-                  onChange={(e) => {
-                    const f = e.target.files?.[0]
-                    if (f) uploadSvg(f)
-                    e.target.value = ''
-                  }}
-                />
-              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <label
+                  className={`rounded-md border border-dashed border-default px-3 py-2 text-center text-xs text-foreground-light hover:border-strong ${
+                    uploading ? 'cursor-wait opacity-70' : 'cursor-pointer'
+                  }`}
+                >
+                  {uploading ? 'Uploading…' : '+ Upload SVG icon'}
+                  <input
+                    type="file"
+                    accept=".svg,image/svg+xml"
+                    className="hidden"
+                    disabled={uploading}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0]
+                      if (f) uploadSvg(f)
+                      e.target.value = ''
+                    }}
+                  />
+                </label>
+                <label
+                  className={`rounded-md border border-dashed border-default px-3 py-2 text-center text-xs text-foreground-light hover:border-strong ${
+                    uploadingLogo ? 'cursor-wait opacity-70' : 'cursor-pointer'
+                  }`}
+                >
+                  {uploadingLogo ? 'Uploading…' : '+ Upload logo (color)'}
+                  <input
+                    type="file"
+                    accept=".svg,.png,.jpg,.jpeg,.webp,image/svg+xml,image/png,image/jpeg,image/webp"
+                    className="hidden"
+                    disabled={uploadingLogo}
+                    onChange={(e) => {
+                      const f = e.target.files?.[0]
+                      if (f) uploadLogo(f)
+                      e.target.value = ''
+                    }}
+                  />
+                </label>
+              </div>
               {uploadError && <p className="text-xs text-warning-600">{uploadError}</p>}
+              {logoError && <p className="text-xs text-warning-600">{logoError}</p>}
               <p className="text-xs text-foreground-lighter">
-                Line-art SVGs become shared icons (stored in Supabase, re-drawn with the locked
-                stroke). Uploading needs the Supabase secret key configured.
+                Line-art SVGs become shared icons, re-drawn with the locked stroke. Logos (SVG, PNG,
+                JPEG, or WebP) keep their original colors — for partnerships, acquisitions, and
+                co-marketing. Both are stored in Supabase and need the secret key configured.
               </p>
             </div>
           </Group>

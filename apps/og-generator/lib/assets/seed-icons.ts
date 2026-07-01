@@ -16,6 +16,18 @@ export interface SeedIcon {
   viewBox: string
   /** Inner SVG markup — strokes use currentColor, fill none. */
   body: string
+  /**
+   * Asset kind. Seed/Lucide icons and uploaded line icons are 'icon' (the
+   * default when omitted) — rendered stroke-only via lib/design/icons.ts.
+   * Custom color logos (partnerships, acquisitions) are 'logo' — rendered
+   * full-color, fit to their natural aspect ratio, no stroke normalization.
+   */
+  kind?: 'icon' | 'logo'
+  /** Public URL for a logo stored in Supabase Storage (kind: 'logo'). */
+  url?: string
+  /** Natural pixel dimensions, client-measured at upload (kind: 'logo'). */
+  width?: number
+  height?: number
 }
 
 export const SEED_ICONS: SeedIcon[] = [
