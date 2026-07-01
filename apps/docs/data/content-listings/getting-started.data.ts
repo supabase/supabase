@@ -59,6 +59,7 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       title: 'React',
       href: '/guides/getting-started/quickstarts/reactjs',
       icon: '/docs/img/icons/react-icon',
+      hasLightIcon: false,
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a React app.',
     },
@@ -73,6 +74,7 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       title: 'Nuxt',
       href: '/guides/getting-started/quickstarts/nuxtjs',
       icon: '/docs/img/icons/nuxt-icon',
+      hasLightIcon: false,
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Nuxt app.',
     },
@@ -80,6 +82,7 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       title: 'Hono',
       href: '/guides/getting-started/quickstarts/hono',
       icon: '/docs/img/icons/hono-icon',
+      hasLightIcon: false,
       description:
         'Learn how to create a Supabase project, add some sample data to your database, secure it with auth, and query the data from a Hono app.',
     },
@@ -87,6 +90,7 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       title: 'RedwoodJS',
       href: '/guides/getting-started/quickstarts/redwoodjs',
       icon: '/docs/img/icons/redwood-icon',
+      hasLightIcon: false,
       description:
         'Learn how to create a Supabase project, add some sample data to your database using Prisma migration and seeds, and query the data from a RedwoodJS app.',
     },
@@ -94,6 +98,7 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       title: 'Flutter',
       href: '/guides/getting-started/quickstarts/flutter',
       icon: '/docs/img/icons/flutter-icon',
+      hasLightIcon: false,
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Flutter app.',
     },
@@ -101,6 +106,7 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       title: 'iOS SwiftUI',
       href: '/guides/getting-started/quickstarts/ios-swiftui',
       icon: '/docs/img/icons/swift-icon',
+      hasLightIcon: false,
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from an iOS app.',
     },
@@ -108,6 +114,7 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       title: 'Android Kotlin',
       href: '/guides/getting-started/quickstarts/kotlin',
       icon: '/docs/img/icons/kotlin-icon',
+      hasLightIcon: false,
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from an Android Kotlin app.',
     },
@@ -115,6 +122,7 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       title: 'SvelteKit',
       href: '/guides/getting-started/quickstarts/sveltekit',
       icon: '/docs/img/icons/svelte-icon',
+      hasLightIcon: false,
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a SvelteKit app.',
     },
@@ -122,6 +130,7 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       title: 'SolidJS',
       href: '/guides/getting-started/quickstarts/solidjs',
       icon: '/docs/img/icons/solidjs-icon',
+      hasLightIcon: false,
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a SolidJS app.',
     },
@@ -129,6 +138,7 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       title: 'Vue',
       href: '/guides/getting-started/quickstarts/vue',
       icon: '/docs/img/icons/vuejs-icon',
+      hasLightIcon: false,
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Vue app.',
     },
@@ -143,6 +153,7 @@ export const gettingStartedFrameworkQuickstarts: ContentListingGroup = {
       title: 'Refine',
       href: '/guides/getting-started/quickstarts/refine',
       icon: '/docs/img/icons/refine-icon',
+      hasLightIcon: false,
       description:
         'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Refine app.',
     },
@@ -166,6 +177,7 @@ export const gettingStartedWebAppDemos: ContentListingGroup = {
       title: 'React',
       href: '/guides/getting-started/tutorials/with-react',
       icon: '/docs/img/icons/react-icon',
+      hasLightIcon: false,
       description:
         'Learn how to build a user management app with React and Supabase Database, Auth, and Storage functionality.',
     },
@@ -173,6 +185,7 @@ export const gettingStartedWebAppDemos: ContentListingGroup = {
       title: 'Vue 3',
       href: '/guides/getting-started/tutorials/with-vue-3',
       icon: '/docs/img/icons/vuejs-icon',
+      hasLightIcon: false,
       description:
         'Learn how to build a user management app with Vue 3 and Supabase Database, Auth, and Storage functionality.',
     },
@@ -180,6 +193,7 @@ export const gettingStartedWebAppDemos: ContentListingGroup = {
       title: 'Nuxt 3',
       href: '/guides/getting-started/tutorials/with-nuxt-3',
       icon: '/docs/img/icons/nuxt-icon',
+      hasLightIcon: false,
       description:
         'Learn how to build a user management app with Nuxt 3 and Supabase Database, Auth, and Storage functionality.',
     },
@@ -187,6 +201,7 @@ export const gettingStartedWebAppDemos: ContentListingGroup = {
       title: 'Angular',
       href: '/guides/getting-started/tutorials/with-angular',
       icon: '/docs/img/icons/angular-icon',
+      hasLightIcon: false,
       description:
         'Learn how to build a user management app with Angular and Supabase Database, Auth, and Storage functionality.',
     },
@@ -194,6 +209,7 @@ export const gettingStartedWebAppDemos: ContentListingGroup = {
       title: 'RedwoodJS',
       href: '/guides/getting-started/tutorials/with-redwoodjs',
       icon: '/docs/img/icons/redwood-icon',
+      hasLightIcon: false,
       description:
         'Learn how to build a user management app with RedwoodJS and Supabase Database, Auth, and Storage functionality.',
     },
@@ -201,6 +217,7 @@ export const gettingStartedWebAppDemos: ContentListingGroup = {
       title: 'Svelte',
       href: '/guides/getting-started/tutorials/with-svelte',
       icon: '/docs/img/icons/svelte-icon',
+      hasLightIcon: false,
       description:
         'Learn how to build a user management app with Svelte and Supabase Database, Auth, and Storage functionality.',
     },
@@ -208,6 +225,7 @@ export const gettingStartedWebAppDemos: ContentListingGroup = {
       title: 'SvelteKit',
       href: '/guides/getting-started/tutorials/with-sveltekit',
       icon: '/docs/img/icons/svelte-icon',
+      hasLightIcon: false,
       description:
         'Learn how to build a user management app with SvelteKit and Supabase Database, Auth, and Storage functionality.',
     },
@@ -215,6 +233,7 @@ export const gettingStartedWebAppDemos: ContentListingGroup = {
       title: 'Refine',
       href: '/guides/getting-started/tutorials/with-refine',
       icon: '/docs/img/icons/refine-icon',
+      hasLightIcon: false,
       description:
         'Learn how to build a user management app with Refine and Supabase Database, Auth, and Storage functionality.',
     },
@@ -231,6 +250,7 @@ export const gettingStartedMobileTutorials: ContentListingGroup = {
       title: 'Flutter',
       href: '/guides/getting-started/tutorials/with-flutter',
       icon: '/docs/img/icons/flutter-icon',
+      hasLightIcon: false,
       description:
         'Learn how to build a user management app with Flutter and Supabase Database, Auth, and Storage functionality.',
     },
@@ -252,6 +272,7 @@ export const gettingStartedMobileTutorials: ContentListingGroup = {
       title: 'Android Kotlin',
       href: '/guides/getting-started/tutorials/with-kotlin',
       icon: '/docs/img/icons/kotlin-icon',
+      hasLightIcon: false,
       description:
         'Learn how to build a product management app with Android and Supabase Database, Auth, and Storage functionality.',
     },
@@ -259,6 +280,7 @@ export const gettingStartedMobileTutorials: ContentListingGroup = {
       title: 'iOS Swift',
       href: '/guides/getting-started/tutorials/with-swift',
       icon: '/docs/img/icons/swift-icon',
+      hasLightIcon: false,
       description:
         'Learn how to build a user management app with iOS and Supabase Database, Auth, and Storage functionality.',
     },
@@ -266,6 +288,7 @@ export const gettingStartedMobileTutorials: ContentListingGroup = {
       title: 'Ionic React',
       href: '/guides/getting-started/tutorials/with-ionic-react',
       icon: '/docs/img/icons/ionic-icon',
+      hasLightIcon: false,
       description:
         'Learn how to build a user management app with Ionic React and Supabase Database, Auth, and Storage functionality.',
     },
@@ -273,6 +296,7 @@ export const gettingStartedMobileTutorials: ContentListingGroup = {
       title: 'Ionic Vue',
       href: '/guides/getting-started/tutorials/with-ionic-vue',
       icon: '/docs/img/icons/ionic-icon',
+      hasLightIcon: false,
       description:
         'Learn how to build a user management app with Ionic Vue and Supabase Database, Auth, and Storage functionality.',
     },
@@ -280,6 +304,7 @@ export const gettingStartedMobileTutorials: ContentListingGroup = {
       title: 'Ionic Angular',
       href: '/guides/getting-started/tutorials/with-ionic-angular',
       icon: '/docs/img/icons/ionic-icon',
+      hasLightIcon: false,
       description:
         'Learn how to build a user management app with Ionic Angular and Supabase Database, Auth, and Storage functionality.',
     },

@@ -5,6 +5,7 @@ export const contentListingItemSchema = z.object({
   href: z.string().min(1),
   description: z.string().min(1),
   icon: z.string().min(1).optional(),
+  hasLightIcon: z.boolean().optional(),
 })
 
 export const contentListingGroupTypeSchema = z.enum(['list', 'grid'])
