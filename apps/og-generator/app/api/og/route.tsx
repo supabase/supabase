@@ -35,9 +35,9 @@ const ICON_SIZE = 220 // OG icon size (1x design px)
 const ICON_STROKE = illustration.defaultStrokePx
 
 /** Scale (naturalW, naturalH) to fit within a boxSize square, preserving aspect ratio. */
-function fitBox(naturalW: number, naturalH: number, boxSize: number): { w: number; h: number } {
+function fitBox(naturalW: number, naturalH: number, boxSize: number): { width: number; height: number } {
   const ratio = naturalW / naturalH || 1
-  return ratio >= 1 ? { w: boxSize, h: boxSize / ratio } : { w: boxSize * ratio, h: boxSize }
+  return ratio >= 1 ? { width: boxSize, height: boxSize / ratio } : { width: boxSize * ratio, height: boxSize }
 }
 
 const THUMB_ICON_DEFAULT = 380
