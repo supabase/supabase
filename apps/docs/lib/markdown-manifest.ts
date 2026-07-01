@@ -225,6 +225,7 @@ export const MARKDOWN_SLUGS: readonly string[] = [
   "database/query-optimization",
   "database/replication",
   "database/replication/bigquery",
+  "database/replication/manual-pgcopydb",
   "database/replication/manual-replication-faq",
   "database/replication/manual-replication-monitoring",
   "database/replication/manual-replication-setup",
