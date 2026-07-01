@@ -114,6 +114,12 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   // Add a ref to store the last user message
   const lastUserMessageRef = useRef<MessageType | null>(null)
 
+  // Keep latest selected organization to avoid stale values in useChat transport
+  const selectedOrganizationRef = useRef(selectedOrganization)
+  useEffect(() => {
+    selectedOrganizationRef.current = selectedOrganization
+  }, [selectedOrganization])
+
   const [value, setValue] = useState<string>(snap.initialInput || '')
   const [editingMessageId, setEditingMessageId] = useState<string | null>(null)
   const [isResubmitting, setIsResubmitting] = useState(false)
@@ -144,10 +150,10 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   useEffect(() => {
     state.setContext({
       projectRef: project?.ref,
-      orgSlug: selectedOrganization?.slug,
+      orgSlug: selectedOrganizationRef.current?.slug,
       connectionString: project?.connectionString ?? '',
     })
-  }, [project?.ref, project?.connectionString, selectedOrganization?.slug, state])
+  }, [project?.ref, project?.connectionString, selectedOrganizationRef.current?.slug, state])
 
   const track = useTrack()
 
@@ -178,19 +184,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
   const supportConversationId = supportMetadata?.frontConversationId
   const isChatInputDisabled =
     !isApiKeySet || disablePrompts || isLoadingOrganization || isSupportChatClosed
-
-  const aiAccessLevelCopy = useMemo(() => {
-    switch (aiOptInLevel) {
-      case 'schema_and_log_and_data':
-        return 'Schema, Logs, and Data'
-      case 'schema_and_log':
-        return 'Schema and Logs'
-      case 'schema':
-        return 'Schema'
-      default:
-        return 'Basic'
-    }
-  }, [aiOptInLevel])
 
   const deleteMessageFromHere = useCallback(
     (messageId: string) => {
@@ -236,13 +229,13 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         }
       }, 100)
     },
-    [chatMessages]
+    [chatMessages, setValue]
   )
 
   const cancelEdit = useCallback(() => {
     setEditingMessageId(null)
     setValue('')
-  }, [])
+  }, [setValue])
 
   const handleRateMessage = useCallback(
     async (messageId: string, rating: 'positive' | 'negative', reason?: string) => {
@@ -405,7 +398,8 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     if (isOpen && isInSQLEditor && !!snippetContent) {
       snap.setSqlSnippets([{ label: 'Current Query', content: snippetContent }])
     }
-  }, [activeSidebar?.id, isInSQLEditor, snippetContent, snap])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSidebar?.id, isInSQLEditor, snippetContent])
 
   return (
     <ErrorBoundary
@@ -436,14 +430,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           isHipaaProjectDisallowed={isHipaaProjectDisallowed}
           aiOptInLevel={aiOptInLevel}
         />
-        {isSupportChat && (
-          <div className="px-4 py-2 border-b bg-surface-100">
-            <p className="text-xs text-foreground-light">
-              AI assistant access level:{' '}
-              <span className="text-foreground">{aiAccessLevelCopy}</span>
-            </p>
-          </div>
-        )}
         {hasMessages ? (
           <Conversation className={cn('flex-1')}>
             <ConversationContent className="w-full px-7 py-8 mb-10">
@@ -573,7 +559,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               <div className="mb-3 border-t" />
               <div className="flex items-center gap-2">
                 <Button
-                  type="outline"
+                  variant="outline"
                   size="tiny"
                   disabled={!activeChatId || !supportConversationId}
                   onClick={() =>
@@ -583,7 +569,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
                   Escalate to human
                 </Button>
                 <Button
-                  type="outline"
+                  variant="outline"
                   size="tiny"
                   disabled={!activeChatId || !supportConversationId}
                   onClick={() =>

@@ -44,7 +44,10 @@ export type SupportChatMetadata = {
   lifecycleStatus: AiSupportStatus
   lifecycleClosedAt?: string
   lastSyncedMessageCount: number
+  // Guards message syncs; lifecycle syncs use `isLifecycleSyncing` so the two
+  // never block each other.
   isSyncing: boolean
+  isLifecycleSyncing: boolean
 }
 
 type ChatSession = {
@@ -549,7 +552,7 @@ export const createAiAssistantState = (): AiAssistantState => {
           ? storedModel
           : INITIAL_AI_ASSISTANT.model
 
-      // Reset isSyncing on any support chats (can't be mid-sync after reload)
+      // Reset sync guards on any support chats (can't be mid-sync after reload)
       Object.values(state.chats).forEach((chat) => {
         if (chat.supportMetadata) {
           if (!chat.supportMetadata.isSupportChat) {
@@ -559,6 +562,7 @@ export const createAiAssistantState = (): AiAssistantState => {
             chat.supportMetadata.lifecycleStatus = 'bot_active'
           }
           chat.supportMetadata.isSyncing = false
+          chat.supportMetadata.isLifecycleSyncing = false
         }
       })
 

@@ -132,9 +132,12 @@ export async function syncSupportLifecycleToFront(
 
   const { supportMetadata } = chat
   if (!supportMetadata.frontConversationId) return
-  if (supportMetadata.isSyncing) return
+  // Use a dedicated guard so an in-flight message sync (`isSyncing`) can never
+  // short-circuit a lifecycle transition. A dropped lifecycle call is never
+  // retried, unlike message syncs, so the two must not share a flag.
+  if (supportMetadata.isLifecycleSyncing) return
 
-  supportMetadata.isSyncing = true
+  supportMetadata.isLifecycleSyncing = true
 
   try {
     let result = null
@@ -158,6 +161,6 @@ export async function syncSupportLifecycleToFront(
       supportMetadata.lifecycleStatus = result.aiSupportStatus
     }
   } finally {
-    supportMetadata.isSyncing = false
+    supportMetadata.isLifecycleSyncing = false
   }
 }

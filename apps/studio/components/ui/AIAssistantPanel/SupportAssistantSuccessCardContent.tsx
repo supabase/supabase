@@ -105,6 +105,7 @@ export function SupportAssistantSuccessCardContent({
           lifecycleStatus: 'bot_active',
           lastSyncedMessageCount: 0,
           isSyncing: false,
+          isLifecycleSyncing: false,
         }
 
         // Flush any messages produced before the user engaged (the initial prompt

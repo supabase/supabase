@@ -1,118 +1,71 @@
 import * as Sentry from '@sentry/nextjs'
+import type { components } from 'api-types'
 
-import { fetchPost } from '@/data/fetchers'
-import { API_URL } from '@/lib/constants'
+import { post } from '@/data/fetchers'
 
 export type AiSupportStatus = 'bot_active' | 'escalated' | 'user_resolved' | 'bot_resolved'
 
-export type SyncConversationMessagesVariables = {
-  chatId: string
-  subject: string
-  messages: Array<{ id: string; role: 'user' | 'assistant'; content: string }>
-  isInitial?: boolean
-  conversationId?: string
-  organizationSlug?: string
-  projectRef?: string
-  category?: string
-  severity?: string
-  affectedServices?: string
-  library?: string
-  allowSupportAccess?: boolean
-  browserInformation?: string
-}
+export type SyncConversationMessagesVariables =
+  components['schemas']['SyncConversationMessagesBody']
 
-type SyncConversationMessagesResponse = {
-  result: 'success'
-  conversationId?: string
-}
+type SyncConversationMessagesResponse = components['schemas']['SyncConversationMessagesResponse']
 
-type UpdateConversationLifecycleVariables = {
-  chatId: string
-  conversationId: string
-}
+type EscalateConversationVariables = components['schemas']['EscalateConversationBody']
 
-type ResolveConversationVariables = UpdateConversationLifecycleVariables & {
-  aiSupportStatus: Extract<AiSupportStatus, 'user_resolved' | 'bot_resolved'>
-}
+type ResolveConversationVariables = components['schemas']['ResolveConversationBody']
 
-type UpdateConversationLifecycleResponse = {
-  result: 'success'
-  conversationId: string
-  aiSupportStatus: AiSupportStatus
-}
-
-function hasErrorResponse(value: unknown): value is { error: unknown } {
-  return typeof value === 'object' && value !== null && 'error' in value
-}
+type UpdateConversationLifecycleResponse =
+  components['schemas']['UpdateConversationLifecycleResponse']
 
 /**
  * Sync AI support chat messages to Front via the Platform API.
- * This is a fire-and-forget function - errors are logged to Sentry but never thrown.
+ *
+ * These are fire-and-forget helpers: failures are reported to Sentry and return
+ * `null` so a Front outage never breaks the user's chat. The caller leaves its
+ * sync bookkeeping untouched on `null` and retries the same delta on the next
+ * turn (the server de-dupes by external_id).
  */
 export async function syncConversationMessagesToFront(
   variables: SyncConversationMessagesVariables
 ): Promise<SyncConversationMessagesResponse | null> {
-  try {
-    const url = `${API_URL}/feedback/conversations/messages`
-    const res = await fetchPost<SyncConversationMessagesResponse>(url, variables)
+  const { data, error } = await post('/platform/feedback/conversations/messages', {
+    body: variables,
+  })
 
-    if (res instanceof Error || !res || hasErrorResponse(res)) {
-      const error = res instanceof Error ? res : new Error(`Sync failed: ${JSON.stringify(res)}`)
-      console.error('syncConversationMessagesToFront - Error:', error)
-      Sentry.captureException(error)
-      return null
-    }
-
-    return res
-  } catch (error) {
-    console.error('syncConversationMessagesToFront - Error:', error)
+  if (error) {
     Sentry.captureException(error)
     return null
   }
+
+  return data
 }
 
 export async function escalateConversationInFront(
-  variables: UpdateConversationLifecycleVariables
+  variables: EscalateConversationVariables
 ): Promise<UpdateConversationLifecycleResponse | null> {
-  try {
-    const url = `${API_URL}/feedback/conversations/escalation`
-    const res = await fetchPost<UpdateConversationLifecycleResponse>(url, variables)
+  const { data, error } = await post('/platform/feedback/conversations/escalation', {
+    body: variables,
+  })
 
-    if (res instanceof Error || !res || hasErrorResponse(res)) {
-      const error =
-        res instanceof Error ? res : new Error(`Escalation failed: ${JSON.stringify(res)}`)
-      console.error('escalateConversationInFront - Error:', error)
-      Sentry.captureException(error)
-      return null
-    }
-
-    return res
-  } catch (error) {
-    console.error('escalateConversationInFront - Error:', error)
+  if (error) {
     Sentry.captureException(error)
     return null
   }
+
+  return data
 }
 
 export async function resolveConversationInFront(
   variables: ResolveConversationVariables
 ): Promise<UpdateConversationLifecycleResponse | null> {
-  try {
-    const url = `${API_URL}/feedback/conversations/resolve`
-    const res = await fetchPost<UpdateConversationLifecycleResponse>(url, variables)
+  const { data, error } = await post('/platform/feedback/conversations/resolve', {
+    body: variables,
+  })
 
-    if (res instanceof Error || !res || hasErrorResponse(res)) {
-      const error =
-        res instanceof Error ? res : new Error(`Resolution failed: ${JSON.stringify(res)}`)
-      console.error('resolveConversationInFront - Error:', error)
-      Sentry.captureException(error)
-      return null
-    }
-
-    return res
-  } catch (error) {
-    console.error('resolveConversationInFront - Error:', error)
+  if (error) {
     Sentry.captureException(error)
     return null
   }
+
+  return data
 }
