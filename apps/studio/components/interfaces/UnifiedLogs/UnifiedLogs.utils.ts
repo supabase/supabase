@@ -1,8 +1,30 @@
 import { type Table as TTable } from '@tanstack/react-table'
 import { cn } from 'ui'
 
+import { LOG_TYPES_LABELS } from './UnifiedLogs.constants'
 import { FacetMetadataSchema } from './UnifiedLogs.schema'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
+
+export type UnifiedLogType = keyof typeof LOG_TYPES_LABELS
+
+export const buildUnifiedLogsUrl = ({
+  projectRef,
+  logType,
+  start,
+  end,
+}: {
+  projectRef: string
+  logType: UnifiedLogType
+  start?: string | Date
+  end?: string | Date
+}) => {
+  const params = new URLSearchParams()
+  params.append('filter', `log_type:eq:${logType}`)
+  if (start && end) {
+    params.set('date', `${new Date(start).valueOf()}-${new Date(end).valueOf()}`)
+  }
+  return `/project/${projectRef}/logs?${params.toString()}`
+}
 
 export const getFacetedUniqueValues = <TData>(facets?: Record<string, FacetMetadataSchema>) => {
   return (_table: TTable<TData>, columnId: string) => {
