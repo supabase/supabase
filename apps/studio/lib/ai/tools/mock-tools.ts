@@ -313,6 +313,8 @@ export async function getMockTools(overrides?: MockToolOverrides) {
     accessToken: 'mock-access-token',
     projectRef: 'mock-project-ref',
     aiOptInLevel: 'schema_and_log_and_data',
+    // Evals are short-lived and don't manage connection lifecycle
+    signal: new AbortController().signal,
   })
 
   assert(search_docs, 'search_docs tool not available from MCP server')
