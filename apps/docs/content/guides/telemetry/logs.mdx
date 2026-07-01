@@ -276,6 +276,68 @@ The two backends store logs differently:
 
 </Admonition>
 
+### The ClickHouse logs table
+
+On ClickHouse, every log line from every part of the stack lives in a single `logs` table, tagged by a `source` column. To read logs from one service, filter on `source`:
+
+```sql
+select timestamp, event_message
+from logs
+where source = 'edge_logs'
+order by timestamp desc
+limit 100;
+```
+
+Each row has a small set of top-level columns. Everything specific to a service lives in `log_attributes`.
+
+| Column           | Type                | Description                                               |
+| ---------------- | ------------------- | --------------------------------------------------------- |
+| `id`             | string              | Unique log identifier.                                    |
+| `timestamp`      | datetime            | When the log was produced, in UTC.                        |
+| `event_message`  | string              | The raw log line.                                         |
+| `severity_text`  | string              | Log level, when the source sets one.                      |
+| `source`         | string              | The service the log came from. Always filter on this.     |
+| `log_attributes` | Map(String, String) | Structured fields for the source, keyed by a dotted path. |
+
+#### Reading fields from log_attributes
+
+`log_attributes` is a map from a string key to a string value. Read a field with bracket access:
+
+```sql
+select
+  log_attributes['request.method'] as method,
+  log_attributes['request.path'] as path,
+  log_attributes['response.status_code'] as status
+from logs
+where source = 'edge_logs'
+```
+
+Where BigQuery nested a field under `metadata.request.method`, ClickHouse stores it at `log_attributes['request.method']`.
+
+#### Casting numeric fields
+
+Map values are strings. To compare or aggregate a numeric field, wrap it in `toInt32OrZero`:
+
+```sql
+select count() as server_errors
+from logs
+where source = 'edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) between 500 and 599
+```
+
+`toInt32OrZero` returns `0` for missing or non-numeric values, so it never errors on partial data.
+
+#### Discovering the available keys
+
+To see which keys a source sets, read `mapKeys` from a recent row:
+
+```sql
+select mapKeys(log_attributes)
+from logs
+where source = 'postgres_logs'
+limit 1;
+```
+
 ### Timestamp display and behavior
 
 Each log entry is stored with a `timestamp`.
