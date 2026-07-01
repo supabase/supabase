@@ -8,6 +8,7 @@
     "clean": "rimraf .next .turbo node_modules",
     "dev": "next dev --port 3002",
     "fetch-content": "tsx ./scripts/fetch-content.ts",
+    "sync-repos": "node --env-file-if-exists=.env.local --import tsx ./scripts/sync-repos-to-supabase.ts",
     "lint": "eslint .",
     "preinstall": "npx only-allow pnpm",
     "pretypecheck": "next typegen",
@@ -17,6 +18,7 @@
   "dependencies": {
     "@mdx-js/react": "^3.0.0",
     "@next/mdx": "15.3.1",
+    "@supabase/supabase-js": "catalog:",
     "config": "workspace:*",
     "eslint-config-supabase": "workspace:*",
     "gray-matter": "^4.0.3",

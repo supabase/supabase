@@ -185,6 +185,9 @@ importers:
       '@next/mdx':
         specifier: 15.3.1
         version: 15.3.1(@mdx-js/loader@3.1.1(supports-color@8.1.1)(webpack@5.105.4))(@mdx-js/react@3.1.1(@types/react@19.2.14)(react@19.2.6))
+      '@supabase/supabase-js':
+        specifier: 'catalog:'
+        version: 2.108.2
       config:
         specifier: workspace:*
         version: link:../../packages/config

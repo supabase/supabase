@@ -54,6 +54,20 @@ category: Auth
 
 For this proof of concept, metadata is inferred locally from the repo name, topics, description, and extracted content. There is no AI normalization step.
 
+## Quality sync to Supabase
+
+A second script, `scripts/sync-repos-to-supabase.ts`, writes an append-only history of repo metadata and a computed quality score to Supabase Postgres. Content generation (`fetch-content`) stays untouched — the two pipelines are decoupled.
+
+Copy `.env.example` to `.env.local` and set `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` (prefer a Supabase branch of your project during testing). Then run:
+
+```bash
+pnpm --filter community-docs sync-repos
+```
+
+Each run inserts one row into `community_sync_runs`, upserts `community_repos`, and appends one row per repo to `community_repo_snapshots`. Dashboards read from `latest_repo_metrics` and `quality_deltas_by_week` — see `supabase/migrations/20260630120000_community_repos.sql`.
+
+Human tier grades (`A`/`B`/`C`) live in `community_repo_grades` and are updated manually via SQL in Studio.
+
 ## Monorepo fit
 
 This app follows the same conventions as `apps/docs`: Next.js App Router, shared Tailwind config from `config`, TypeScript config from `packages/tsconfig`, and UI primitives from `packages/ui`.
