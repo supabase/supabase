@@ -68,7 +68,7 @@ DATABASE_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabas
 DIRECT_URL="postgres://postgres.[project-ref]:[db-password]@xxx.pooler.supabase.com:5432/postgres"
 ```
 
-## Update your Prisma Schema
+## Update your Prisma schema
 
 By default, RedwoodJS ships with a SQLite database, but we want to use Postgres.
 
@@ -82,7 +82,7 @@ datasource db {
 }
 ```
 
-## Create the Instrument model and apply a schema migration
+## Create the instrument model and apply a schema migration
 
 Create the Instrument model in `api/db/schema.prisma` and then run `yarn rw prisma migrate dev` from your terminal to apply the migration.
 
@@ -124,7 +124,7 @@ export default async () => {
 
 ## Seed your database
 
-Run the seed database command to populate the `Instrument` table with the instruments you just created.
+Run the seed database command to populate the `Instrument` table with the instruments you created.
 
 <Admonition type="tip">
 
