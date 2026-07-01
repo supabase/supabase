@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { useMemo } from 'react'
+import { useMemo, type ReactNode } from 'react'
 import {
   MetricCard,
   MetricCardContent,
@@ -18,6 +18,32 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { useInfraMonitoringAttributesQuery } from '@/data/analytics/infra-monitoring-query'
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+// A single metric tile: a linked card with a labelled header and a value slot
+const MetricLinkCard = ({
+  href,
+  linkTooltip,
+  label,
+  labelTooltip,
+  isLoading,
+  children,
+}: {
+  href: string
+  linkTooltip: string
+  label: string
+  labelTooltip: string
+  isLoading?: boolean
+  children: ReactNode
+}) => (
+  <Link href={href} className="block group">
+    <MetricCard isLoading={isLoading}>
+      <MetricCardHeader href={href} linkTooltip={linkTooltip}>
+        <MetricCardLabel tooltip={labelTooltip}>{label}</MetricCardLabel>
+      </MetricCardHeader>
+      <MetricCardContent>{children}</MetricCardContent>
+    </MetricCard>
+  </Link>
+)
 
 type DatabaseInfrastructureSectionProps = {
   interval: '1hr' | '1day' | '7day'
@@ -138,29 +164,47 @@ export const DatabaseInfrastructureSection = ({
 
   const databaseReportUrl = getDatabaseReportUrl()
 
+  const slowQueriesUrl = `/project/${projectRef}/observability/query-performance?totalTimeFilter=${encodeURIComponent(
+    JSON.stringify({ operator: '>', value: 1000 })
+  )}`
+
+  const infraMetrics = [
+    {
+      label: 'Disk Usage',
+      tooltip: 'Disk usage percentage of total disk space used',
+      value: metrics?.disk.current,
+    },
+    {
+      label: 'Disk IO',
+      tooltip: 'Disk I/O consumption percentage. High values may indicate disk bottlenecks',
+      value: metrics?.diskIo.current,
+    },
+    {
+      label: 'Memory',
+      tooltip: 'RAM usage percentage. Sustained high usage may indicate memory pressure',
+      value: metrics?.ram.current,
+    },
+    {
+      label: 'CPU',
+      tooltip: 'CPU usage percentage. High values may suggest CPU-intensive queries or workloads',
+      value: metrics?.cpu.current,
+    },
+  ]
+
   return (
     <div>
       <h2 className="mb-4">Database</h2>
       {/* First row: Metrics */}
       <div className="grid grid-cols-3 gap-2">
-        <Link
-          href={`/project/${projectRef}/observability/query-performance?totalTimeFilter=${encodeURIComponent(JSON.stringify({ operator: '>', value: 1000 }))}`}
-          className="block group"
+        <MetricLinkCard
+          href={slowQueriesUrl}
+          linkTooltip="Go to query performance"
+          label="Slow Queries"
+          labelTooltip="Queries with total execution time (execution time + planning time) greater than 1000ms. High values may indicate query optimization opportunities"
+          isLoading={slowQueriesLoading}
         >
-          <MetricCard isLoading={slowQueriesLoading}>
-            <MetricCardHeader
-              href={`/project/${projectRef}/observability/query-performance?totalTimeFilter=${encodeURIComponent(JSON.stringify({ operator: '>', value: 1000 }))}`}
-              linkTooltip="Go to query performance"
-            >
-              <MetricCardLabel tooltip="Queries with total execution time (execution time + planning time) greater than 1000ms. High values may indicate query optimization opportunities">
-                Slow Queries
-              </MetricCardLabel>
-            </MetricCardHeader>
-            <MetricCardContent>
-              <MetricCardValue>{slowQueriesCount}</MetricCardValue>
-            </MetricCardContent>
-          </MetricCard>
-        </Link>
+          <MetricCardValue>{slowQueriesCount}</MetricCardValue>
+        </MetricLinkCard>
 
         {infraError ? (
           <div className="col-span-2 flex items-center rounded-md border border-dashed px-4 py-3">
@@ -171,92 +215,32 @@ export const DatabaseInfrastructureSection = ({
           </div>
         ) : (
           <>
-            <Link href={databaseReportUrl} className="block group">
-              <MetricCard isLoading={infraLoading}>
-                <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
-                  <MetricCardLabel tooltip="Highest concurrent database connections observed in the selected window, against the connection limit. Monitor to avoid connection exhaustion.">
-                    Peak Connections
-                  </MetricCardLabel>
-                </MetricCardHeader>
-                <MetricCardContent>
-                  {connections.max > 0 ? (
-                    <MetricCardValue>
-                      {connections.peak}/{connections.max}
-                    </MetricCardValue>
-                  ) : (
-                    <MetricCardValue>--</MetricCardValue>
-                  )}
-                </MetricCardContent>
-              </MetricCard>
-            </Link>
+            <MetricLinkCard
+              href={databaseReportUrl}
+              linkTooltip="Go to database report"
+              label="Peak Connections"
+              labelTooltip="Highest concurrent database connections observed in the selected window, against the connection limit. Monitor to avoid connection exhaustion."
+              isLoading={infraLoading}
+            >
+              <MetricCardValue>
+                {connections.max > 0 ? `${connections.peak}/${connections.max}` : '--'}
+              </MetricCardValue>
+            </MetricLinkCard>
 
-            <Link href={databaseReportUrl} className="block group">
-              <MetricCard isLoading={infraLoading}>
-                <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
-                  <MetricCardLabel tooltip="Disk usage percentage of total disk space used">
-                    Disk Usage
-                  </MetricCardLabel>
-                </MetricCardHeader>
-                <MetricCardContent>
-                  {metrics ? (
-                    <MetricCardValue>{metrics.disk.current.toFixed(0)}%</MetricCardValue>
-                  ) : (
-                    <MetricCardValue>--</MetricCardValue>
-                  )}
-                </MetricCardContent>
-              </MetricCard>
-            </Link>
-
-            <Link href={databaseReportUrl} className="block group">
-              <MetricCard isLoading={infraLoading}>
-                <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
-                  <MetricCardLabel tooltip="Disk I/O consumption percentage. High values may indicate disk bottlenecks">
-                    Disk IO
-                  </MetricCardLabel>
-                </MetricCardHeader>
-                <MetricCardContent>
-                  {metrics ? (
-                    <MetricCardValue>{metrics.diskIo.current.toFixed(0)}%</MetricCardValue>
-                  ) : (
-                    <MetricCardValue>--</MetricCardValue>
-                  )}
-                </MetricCardContent>
-              </MetricCard>
-            </Link>
-
-            <Link href={databaseReportUrl} className="block group">
-              <MetricCard isLoading={infraLoading}>
-                <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
-                  <MetricCardLabel tooltip="RAM usage percentage. Sustained high usage may indicate memory pressure">
-                    Memory
-                  </MetricCardLabel>
-                </MetricCardHeader>
-                <MetricCardContent>
-                  {metrics ? (
-                    <MetricCardValue>{metrics.ram.current.toFixed(0)}%</MetricCardValue>
-                  ) : (
-                    <MetricCardValue>--</MetricCardValue>
-                  )}
-                </MetricCardContent>
-              </MetricCard>
-            </Link>
-
-            <Link href={databaseReportUrl} className="block group">
-              <MetricCard isLoading={infraLoading}>
-                <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
-                  <MetricCardLabel tooltip="CPU usage percentage. High values may suggest CPU-intensive queries or workloads">
-                    CPU
-                  </MetricCardLabel>
-                </MetricCardHeader>
-                <MetricCardContent>
-                  {metrics ? (
-                    <MetricCardValue>{metrics.cpu.current.toFixed(0)}%</MetricCardValue>
-                  ) : (
-                    <MetricCardValue>--</MetricCardValue>
-                  )}
-                </MetricCardContent>
-              </MetricCard>
-            </Link>
+            {infraMetrics.map((metric) => (
+              <MetricLinkCard
+                key={metric.label}
+                href={databaseReportUrl}
+                linkTooltip="Go to database report"
+                label={metric.label}
+                labelTooltip={metric.tooltip}
+                isLoading={infraLoading}
+              >
+                <MetricCardValue>
+                  {metric.value !== undefined ? `${metric.value.toFixed(0)}%` : '--'}
+                </MetricCardValue>
+              </MetricLinkCard>
+            ))}
           </>
         )}
       </div>
