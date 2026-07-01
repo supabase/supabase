@@ -6,7 +6,7 @@ import type { ReactNode } from 'react'
 import { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, cn } from 'ui'
 
-import { useMeasuredWidth } from './Row.utils'
+import { useClipInsets, useMeasuredWidth } from './Row.utils'
 
 interface RowProps extends React.HTMLAttributes<HTMLDivElement> {
   // Maximum number of columns visible in the row at once
@@ -60,6 +60,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
 
   const [scrollPosition, setScrollPosition] = useState(0)
   const measuredWidth = useMeasuredWidth(containerRef)
+  const clipInsets = useClipInsets(containerRef)
 
   const numberOfColumns = useMemo(
     () =>
@@ -149,7 +150,8 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
         <Button
           variant="default"
           onClick={scrollLeft}
-          className="absolute w-8 h-8 left-0 top-1/2 -translate-y-1/2 z-10 rounded-full p-2"
+          className="absolute w-8 h-8 top-1/2 -translate-y-1/2 z-10 rounded-full p-2"
+          style={{ left: -clipInsets.left }}
           aria-label="Scroll left"
         >
           <ChevronLeft className="w-4 h-4" />
@@ -160,7 +162,8 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
         <Button
           variant="default"
           onClick={scrollRight}
-          className="absolute w-8 h-8 right-0 top-1/2 -translate-y-1/2 z-10 rounded-full p-2"
+          className="absolute w-8 h-8 top-1/2 -translate-y-1/2 z-10 rounded-full p-2"
+          style={{ right: -clipInsets.right }}
           aria-label="Scroll right"
         >
           <ChevronRight className="w-4 h-4" />
@@ -169,7 +172,7 @@ export const Row = forwardRef<HTMLDivElement, RowProps>(function Row(
 
       <div
         ref={containerRef}
-        className="w-full overflow-visible focus:outline-hidden"
+        className="w-full overflow-hidden focus:outline-hidden"
         tabIndex={0}
         role="region"
         aria-roledescription="carousel"
