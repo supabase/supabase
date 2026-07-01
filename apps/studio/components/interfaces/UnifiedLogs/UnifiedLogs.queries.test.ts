@@ -128,16 +128,11 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       ['edge_auth', '%/auth/%'],
       ['edge_storage', '%/storage/%'],
       ['edge_postgrest', '%/rest/%'],
-    ] as const)(
-      'excludes %s-pathed requests from edge_logs when %s=false',
-      (key, pathFilter) => {
-        const sql = getUnifiedLogsQuery({ ...baseSearch, [key]: false } as any)
-        expect(sql).toContain("source != 'edge_logs'")
-        expect(sql).toContain(
-          `log_attributes['request.path'] NOT LIKE '${pathFilter}'`
-        )
-      }
-    )
+    ] as const)('excludes %s-pathed requests from edge_logs when %s=false', (key, pathFilter) => {
+      const sql = getUnifiedLogsQuery({ ...baseSearch, [key]: false } as any)
+      expect(sql).toContain("source != 'edge_logs'")
+      expect(sql).toContain(`log_attributes['request.path'] NOT LIKE '${pathFilter}'`)
+    })
 
     it('does not filter edge_logs by service path by default (all edge_* toggles true)', () => {
       const sql = getUnifiedLogsQuery(baseSearch)
@@ -157,9 +152,15 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
         edge_storage: false,
         edge_postgrest: false,
       } as any)
-      expect(sql).toContain("(source != 'edge_logs' OR log_attributes['request.path'] NOT LIKE '%/auth/%')")
-      expect(sql).toContain("(source != 'edge_logs' OR log_attributes['request.path'] NOT LIKE '%/storage/%')")
-      expect(sql).toContain("(source != 'edge_logs' OR log_attributes['request.path'] NOT LIKE '%/rest/%')")
+      expect(sql).toContain(
+        "(source != 'edge_logs' OR log_attributes['request.path'] NOT LIKE '%/auth/%')"
+      )
+      expect(sql).toContain(
+        "(source != 'edge_logs' OR log_attributes['request.path'] NOT LIKE '%/storage/%')"
+      )
+      expect(sql).toContain(
+        "(source != 'edge_logs' OR log_attributes['request.path'] NOT LIKE '%/rest/%')"
+      )
     })
 
     it('does not emit subqueries or CTEs (rejected by the OTEL endpoint)', () => {

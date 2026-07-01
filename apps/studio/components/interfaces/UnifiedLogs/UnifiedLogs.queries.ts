@@ -304,12 +304,11 @@ const buildBaseWhere = (
 // (API Gateway) row was routed to. Mirrors the convention already used by
 // the sibling Logs Explorer (Logs.constants.ts / Logs.utils.otel.ts) and by
 // ServiceFlow.sql.ts within this same feature.
-const EDGE_SERVICE_PATH_FILTER: Record<'edge_auth' | 'edge_storage' | 'edge_postgrest', string> =
-  {
-    edge_auth: '%/auth/%',
-    edge_storage: '%/storage/%',
-    edge_postgrest: '%/rest/%',
-  }
+const EDGE_SERVICE_PATH_FILTER: Record<'edge_auth' | 'edge_storage' | 'edge_postgrest', string> = {
+  edge_auth: '%/auth/%',
+  edge_storage: '%/storage/%',
+  edge_postgrest: '%/rest/%',
+}
 
 /**
  * Returns view-option WHERE conditions — toggles from the filter sidebar that
