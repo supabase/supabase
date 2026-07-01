@@ -22,11 +22,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 import * as z from 'zod'
 
-import {
-  normalizeRedirectUrl,
-  parseRedirectUrls,
-  urlRegex,
-} from '../Auth.constants'
+import { normalizeRedirectUrl, parseRedirectUrls, urlRegex } from '../Auth.constants'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 
 const MAX_URLS_LENGTH = 2 * 1024
