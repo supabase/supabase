@@ -328,16 +328,6 @@ For example, to query the edge logs without any joins:
 select timestamp, metadata from edge_logs as t;
 ```
 
-</TabPanel>
-<TabPanel id="clickhouse" label="ClickHouse">
-
-```sql
-select timestamp, log_attributes from logs where source = 'edge_logs';
-```
-
-</TabPanel>
-</Tabs>
-
 The resulting `metadata` key is stored in the `log_atrributes` key, and is a single level map structure in the Logs Explorer. In the following diagram, each box represents a nested array of objects.
 
 <Image
@@ -349,6 +339,16 @@ The resulting `metadata` key is stored in the `log_atrributes` key, and is a sin
   width={1600}
   height={767}
 />
+
+</TabPanel>
+<TabPanel id="clickhouse" label="ClickHouse">
+
+```sql
+select timestamp, log_attributes from logs where source = 'edge_logs';
+```
+
+</TabPanel>
+</Tabs>
 
 To query for a nested value, add a join for each array level:
 
