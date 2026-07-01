@@ -8,7 +8,7 @@ import {
 } from 'ui-patterns/PageHeader'
 
 import { IntegrationSettings } from '@/components/interfaces/Organization/IntegrationSettings/IntegrationSettings'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import OrganizationLayout from '@/components/layouts/OrganizationLayout'
 import type { NextPageWithLayout } from '@/types'
 

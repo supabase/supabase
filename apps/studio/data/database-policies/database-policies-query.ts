@@ -2,7 +2,7 @@ import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constan
 import { useQuery } from '@tanstack/react-query'
 
 import { databasePoliciesKeys } from './keys'
-import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { get, handleError } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
