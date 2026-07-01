@@ -63,6 +63,8 @@ interface Declaration {
   parameters?: Param[]
   type?: unknown
   flags?: { isOptional?: boolean; isConst?: boolean }
+  // Non-TypeDoc field: pre-rendered legacy function content (see FunctionEntry.content).
+  content?: Record<string, unknown>
 }
 
 interface FunctionEntry {
@@ -70,6 +72,14 @@ interface FunctionEntry {
   category: string
   subcategory: string | null
   $ref: string
+  /**
+   * Optional pre-rendered content (description, notes, params, examples) carried
+   * directly on a declaration. TypeDoc never emits this; it exists so non-TypeDoc
+   * sources adapted "as a pre-step" (e.g. the Dart YAML converter) can ship the
+   * legacy function shape straight onto the functions.json entry without a
+   * typeSpec round-trip. Absent for real TypeDoc dumps, so JS output is unchanged.
+   */
+  content?: Record<string, unknown>
 }
 
 interface FunctionsEntry {
@@ -363,7 +373,7 @@ function collectFunctions(
     if (category) {
       const subcategory = readTagFromDeclOrSignature(node, '@subcategory')
       const $ref = normalizeRefPath([ctx.pkg, ...ctx.path, node.name].join('.'))
-      out.functions.push({ name: node.name, category, subcategory, $ref })
+      out.functions.push({ name: node.name, category, subcategory, $ref, content: node.content })
     }
   }
 
@@ -519,7 +529,9 @@ function buildBySlug(
     items.push(entry)
     // functions.json `id` must match the bySlug entry's `id` (not the slug) —
     // the renderer in Reference.sections.tsx does `fns.find(f => f.id === section.id)`.
-    functionsList.push({ id: entry.id, $ref: fn.$ref })
+    // `fn.content`, when present, carries the legacy function shape for non-TypeDoc
+    // sources; spread it so the renderer reads those fields without a typeSpec.
+    functionsList.push({ id: entry.id, $ref: fn.$ref, ...(fn.content ?? {}) })
   }
 
   // Sort items alphabetically (case-insensitive) within categories and within

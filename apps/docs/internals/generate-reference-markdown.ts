@@ -99,12 +99,11 @@ const REFERENCES: Ref[] = [
     contentDir: path.join(process.cwd(), 'content/reference/javascript/v2'),
   },
   {
-    kind: 'sdk-legacy',
+    kind: 'sdk-new',
     title: 'Dart Client Library Reference',
     outFile: 'dart.md',
     mdxDir: path.join(MDX_ROOT, 'dart'),
-    sectionsPath: path.join(GENERATED, 'dart.v2.sections.json'),
-    functionsPath: path.join(GENERATED, 'dart.v2.functions.json'),
+    contentDir: path.join(process.cwd(), 'content/reference/dart/v2'),
     feature: 'sdk:dart',
   },
   {
