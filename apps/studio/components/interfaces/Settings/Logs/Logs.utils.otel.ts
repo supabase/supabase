@@ -280,8 +280,12 @@ SELECT count() AS count FROM logs ${genOtelWhere(table, filters)}`
 
 // Bucket by minute up to 12h, otherwise by hour (matches BigQuery).
 const otelChartTruncFn = (params: LogsEndpointParams): SafeLogSqlFragment => {
-  const ite = params.iso_timestamp_end ? dayjs(params.iso_timestamp_end) : dayjs()
-  const its = params.iso_timestamp_start ? dayjs(params.iso_timestamp_start) : dayjs()
+  // Fall back to now when a param is missing or unparseable, so an Invalid Date
+  // never skews the bucket size.
+  const parsedEnd = dayjs(params.iso_timestamp_end)
+  const ite = params.iso_timestamp_end && parsedEnd.isValid() ? parsedEnd : dayjs()
+  const parsedStart = dayjs(params.iso_timestamp_start)
+  const its = params.iso_timestamp_start && parsedStart.isValid() ? parsedStart : dayjs()
   const minuteDiff = ite.diff(its, 'minute')
   const hourDiff = ite.diff(its, 'hour')
   if (minuteDiff > 60 * 12) return safeSql`toStartOfHour`
