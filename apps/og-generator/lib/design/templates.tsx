@@ -39,6 +39,9 @@ export interface Template {
   /** Headline text-box width (1x px) the auto-fit measures against. */
   headlineBox: number
   textAlign: 'left' | 'center'
+  /** Where the content sits — used to grid-snap the background to it (§4). */
+  anchorX: 'left' | 'center'
+  anchorY: 'top' | 'center' | 'bottom'
   defaultPattern: TemplateDefaultPattern
   build: (p: TemplateParts) => ReactElement
 }
@@ -63,6 +66,8 @@ export const TEMPLATES: Template[] = [
     label: 'Headline bottom-left',
     headlineBox: FULL_BOX,
     textAlign: 'left',
+    anchorX: 'left',
+    anchorY: 'bottom',
     defaultPattern: { type: 'dots', scale: 'md', color: 'white', opacity: 0.06 },
     build: (p) => (
       <div
@@ -88,6 +93,8 @@ export const TEMPLATES: Template[] = [
     label: 'Headline left, icon right',
     headlineBox: 1200 - 80 * 2 - 220 - 56, // 764 — leaves room for the icon column
     textAlign: 'left',
+    anchorX: 'left',
+    anchorY: 'center',
     defaultPattern: { type: 'grid', scale: 'md', color: 'white', opacity: 0.05 },
     build: (p) => (
       <div
@@ -110,6 +117,8 @@ export const TEMPLATES: Template[] = [
     label: 'Centered',
     headlineBox: 900,
     textAlign: 'center',
+    anchorX: 'center',
+    anchorY: 'center',
     defaultPattern: { type: 'dots', scale: 'lg', color: 'green', opacity: 0.05 },
     build: (p) => (
       <div
@@ -134,6 +143,8 @@ export const TEMPLATES: Template[] = [
     label: 'Headline top, icon bottom',
     headlineBox: FULL_BOX,
     textAlign: 'left',
+    anchorX: 'left',
+    anchorY: 'top',
     defaultPattern: { type: 'hlines', scale: 'md', color: 'white', opacity: 0.06 },
     build: (p) => (
       <div

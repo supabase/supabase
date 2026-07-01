@@ -151,6 +151,7 @@ export async function GET(req: Request) {
 
     const rawHeadline = (searchParams.get('headline') ?? DEFAULT_HEADLINE).slice(0, 200)
     const eyebrow = searchParams.get('eyebrow')?.trim() || null
+    const eyebrowPill = searchParams.get('eyebrowStyle') === 'pill'
     const sentenceCase = searchParams.get('sentenceCase') !== '0'
     const manualBreaks = searchParams.get('manual') === '1' || /\n/.test(rawHeadline)
 
@@ -184,7 +185,7 @@ export async function GET(req: Request) {
     const eyebrowLetterSpacing = EYEBROW.letterSpacing * eyebrowSize
     const eyebrowGap = 16 * s
 
-    const fonts = await satoriFonts([EYEBROW.weight, HEADLINE.weight])
+    const fonts = await satoriFonts([...new Set([EYEBROW.weight, HEADLINE.weight])])
 
     const textBlock = (
       <div
@@ -204,6 +205,13 @@ export async function GET(req: Request) {
               fontWeight: EYEBROW.weight,
               letterSpacing: eyebrowLetterSpacing,
               textTransform: 'uppercase',
+              ...(eyebrowPill
+                ? {
+                    backgroundColor: color('brand.tint'),
+                    borderRadius: 999,
+                    padding: `${8 * s}px ${18 * s}px`,
+                  }
+                : {}),
             }}
           >
             {eyebrow}
@@ -253,8 +261,13 @@ export async function GET(req: Request) {
     // Grid-snap (§4): phase the pattern so a grid line lands on the safe-area
     // inset, anchoring the composition's left/top edges to the background grid.
     const gridUnit = PATTERN_SCALE_PX[cfg.scale] * s
-    const patternOffX = padX % gridUnit
-    const patternOffY = padY % gridUnit
+    // Grid-snap on BOTH axes: align a grid line to where THIS template's content
+    // actually sits (left/center × top/center/bottom), not just the top-left.
+    const anchorPxX = template.anchorX === 'center' ? W / 2 : padX
+    const anchorPxY =
+      template.anchorY === 'center' ? H / 2 : template.anchorY === 'bottom' ? H - padY : padY
+    const patternOffX = ((anchorPxX % gridUnit) + gridUnit) % gridUnit
+    const patternOffY = ((anchorPxY % gridUnit) + gridUnit) % gridUnit
 
     const root = template.build({
       W,

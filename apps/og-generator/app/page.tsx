@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 
-import { suggestArtDirection } from '@/lib/ai/suggest'
+import { suggestArtDirection, type Suggestion } from '@/lib/ai/suggest'
 import { SEED_ICONS } from '@/lib/assets/seed-icons'
 import { contrastRatio, rating } from '@/lib/design/contrast'
 import { DEFAULT_TEMPLATE_ID, TEMPLATES } from '@/lib/design/templates'
@@ -10,7 +10,7 @@ import { color, typography } from '@/lib/design/tokens'
 
 /**
  * Editor. State maps 1:1 to /api/og query params (the stateless recipe, §6.9).
- * "Both" renders the OG and Thumb side by side from two independent renders.
+ * "Both" renders the OG and Thumb together from two independent renders.
  */
 
 const SOFT_LIMIT = 60
@@ -21,8 +21,9 @@ const THUMB_MIN = 160
 const THUMB_MAX = 480
 const OPACITY_MIN = 0.04
 const OPACITY_MAX = 0.12
+const ZOOM_MIN = 0.5
+const ZOOM_MAX = 2
 
-// Safe-area insets as % of the canvas, for the editor-only overlay (§3, §5.4).
 const OUTER = { x: (64 / 1200) * 100, y: (64 / 630) * 100 }
 const HEADLINE_INSET = { x: (80 / 1200) * 100, y: (72 / 630) * 100 }
 
@@ -30,6 +31,7 @@ type View = 'og' | 'thumb' | 'both'
 type PatternTypeOpt = 'none' | 'dots' | 'grid' | 'hlines' | 'vlines'
 type PatternScaleOpt = 'sm' | 'md' | 'lg'
 type PatternColorOpt = 'white' | 'green'
+type EyebrowStyle = 'text' | 'pill'
 
 const PATTERN_TYPE_OPTS: { value: PatternTypeOpt; label: string }[] = [
   { value: 'none', label: 'None' },
@@ -52,9 +54,11 @@ const VIEW_OPTS: { value: View; label: string }[] = [
   { value: 'thumb', label: 'Thumb' },
   { value: 'both', label: 'Both' },
 ]
+const EYEBROW_STYLE_OPTS: { value: EyebrowStyle; label: string }[] = [
+  { value: 'text', label: 'Plain' },
+  { value: 'pill', label: 'Pill' },
+]
 
-// Simulated platform unfurl frames (brief §11.1). The 1:1 "Messages" frame
-// center-crops the 1.91:1 image, showing why edge content is risky.
 const PLATFORMS: { name: string; aspect: string; radius: number; accent?: boolean }[] = [
   { name: 'X / Twitter', aspect: '1.91 / 1', radius: 16 },
   { name: 'LinkedIn', aspect: '1.91 / 1', radius: 4 },
@@ -85,15 +89,19 @@ function Hint({ text }: { text: string }) {
   )
 }
 
+// Section header — deliberately dominant (bold, uppercase, dark, with a divider)
+// so it reads clearly above the lighter option labels within each section.
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="flex flex-col gap-3">
-      <h2 className="text-xs font-semibold uppercase tracking-wide text-foreground-lighter">
-        {title}
-      </h2>
+    <section className="flex flex-col gap-3 border-t border-default pt-5 first:border-t-0 first:pt-0">
+      <h2 className="text-xs font-semibold uppercase tracking-wider text-foreground">{title}</h2>
       {children}
     </section>
   )
+}
+
+function Label({ children }: { children: React.ReactNode }) {
+  return <span className="text-sm text-foreground-light">{children}</span>
 }
 
 function Segmented<T extends string>({
@@ -200,7 +208,7 @@ function PreviewCard({
   children?: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex min-w-0 flex-col gap-2">
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium text-foreground-light">
           {label}
@@ -266,7 +274,7 @@ function PreviewCard({
               <div key={pf.name} className="flex flex-col gap-1">
                 <div
                   className="relative overflow-hidden border border-default bg-surface-200"
-                  style={{ width: 132, aspectRatio: pf.aspect, borderRadius: pf.radius }}
+                  style={{ width: 120, aspectRatio: pf.aspect, borderRadius: pf.radius }}
                 >
                   {pf.accent && <div className="absolute left-0 top-0 z-10 h-full w-1 bg-brand" />}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -293,6 +301,7 @@ export default function Page() {
   const [aiDescription, setAiDescription] = useState('')
   const [headline, setHeadline] = useState('Postgres full text search just got faster')
   const [eyebrow, setEyebrow] = useState('Engineering')
+  const [eyebrowStyle, setEyebrowStyle] = useState<EyebrowStyle>('text')
   const [sentenceCase, setSentenceCase] = useState(true)
   const [template, setTemplate] = useState(DEFAULT_TEMPLATE_ID)
   const [autoFit, setAutoFit] = useState(true)
@@ -302,6 +311,7 @@ export default function Page() {
   const [scale, setScale] = useState<1 | 2>(1)
   const [showSafeArea, setShowSafeArea] = useState(false)
   const [showCrops, setShowCrops] = useState(false)
+  const [zoom, setZoom] = useState(1)
 
   const [patternType, setPatternType] = useState<PatternTypeOpt>(
     DEFAULT_TPL.defaultPattern.type as PatternTypeOpt
@@ -331,7 +341,10 @@ export default function Page() {
   const ogEndpoint = useMemo(() => {
     const p = new URLSearchParams()
     p.set('headline', headline)
-    if (eyebrow.trim()) p.set('eyebrow', eyebrow.trim())
+    if (eyebrow.trim()) {
+      p.set('eyebrow', eyebrow.trim())
+      if (eyebrowStyle === 'pill') p.set('eyebrowStyle', 'pill')
+    }
     if (!sentenceCase) p.set('sentenceCase', '0')
     p.set('template', template)
     if (!autoFit) p.set('fontSize', String(manualFontSize))
@@ -340,7 +353,7 @@ export default function Page() {
     if (scale === 2) p.set('scale', '2')
     return `/api/og?${p.toString()}`
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [headline, eyebrow, sentenceCase, template, autoFit, manualFontSize, icon, scale, patternType, patternScale, patternColor, patternOpacity])
+  }, [headline, eyebrow, eyebrowStyle, sentenceCase, template, autoFit, manualFontSize, icon, scale, patternType, patternScale, patternColor, patternOpacity])
 
   const thumbEndpoint = useMemo(() => {
     const p = new URLSearchParams()
@@ -367,14 +380,13 @@ export default function Page() {
     }
   }
 
-  const suggestion = useMemo(
-    () => (aiDescription.trim() ? suggestArtDirection(aiDescription) : null),
-    [aiDescription]
-  )
+  const [generated, setGenerated] = useState<Suggestion | null>(null)
+  const generate = () =>
+    setGenerated(aiDescription.trim() ? suggestArtDirection(aiDescription) : null)
   const applySuggestion = () => {
-    if (!suggestion) return
-    if (suggestion.iconName) setIcon(suggestion.iconName)
-    changeTemplate(suggestion.templateId)
+    if (!generated) return
+    if (generated.iconName) setIcon(generated.iconName)
+    changeTemplate(generated.templateId)
   }
 
   const count = [...headline].length
@@ -385,10 +397,8 @@ export default function Page() {
         ? 'text-warning-600'
         : 'text-foreground-lighter'
 
-  // Headline is large text (≥40px) → large-text WCAG thresholds; eyebrow (22px) → normal.
   const headlineContrast = contrastRatio(color('text.primary'), color('bg.primary'))
   const headlineRating = rating(headlineContrast, true)
-  const eyebrowContrast = contrastRatio(color('brand.default'), color('bg.primary'))
 
   const copyUrl = async (endpoint: string, key: View) => {
     const abs = typeof window !== 'undefined' ? window.location.origin + endpoint : endpoint
@@ -405,8 +415,14 @@ export default function Page() {
     a.click()
   }
 
+  const nudgeZoom = (d: number) =>
+    setZoom((z) => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, +(z + d).toFixed(2))))
+
   const sliderValue = autoFit ? (og.fit?.fontSize ?? MAX_SIZE) : manualFontSize
   const suffix = scale === 2 ? '@2x' : ''
+
+  const zoomBtn =
+    'flex h-6 w-6 items-center justify-center rounded border border-default bg-surface-100 text-foreground-light hover:border-strong'
 
   return (
     <div className="flex h-screen flex-col bg-background text-foreground">
@@ -426,187 +442,150 @@ export default function Page() {
 
       <div className="flex min-h-0 flex-1">
         {/* Sidebar */}
-        <aside className="flex w-[340px] shrink-0 flex-col gap-7 overflow-y-auto border-r border-default p-5">
+        <aside className="flex w-[340px] shrink-0 flex-col overflow-y-auto overflow-x-hidden border-r border-default p-5">
           {showOg && (
-            <>
-              <Group title="AI art direction">
-                <div className="flex flex-col gap-2">
-                  <span className="text-sm font-medium text-foreground-light">
-                    Describe this post
-                    <Hint text="Suggests an icon + template from the library. Backend-free keyword match over the seed icons for now — the full version (embeddings + Claude API over the uploadable library) comes with Supabase (§6.6)." />
-                  </span>
-                  <textarea
-                    id="ai-describe"
-                    value={aiDescription}
-                    onChange={(e) => setAiDescription(e.target.value)}
-                    rows={2}
-                    className="resize-none rounded-md border border-default bg-surface-100 px-3 py-2 text-sm text-foreground outline-none focus:border-strong"
-                    placeholder="e.g. row-level security for multi-tenant apps"
-                  />
-                  {suggestion && (
-                    <div className="flex flex-col gap-2 rounded-md border border-default bg-surface-100 p-3">
-                      {suggestion.iconName ? (
-                        <>
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-default text-foreground-light">
-                              {(() => {
-                                const ic = SEED_ICONS.find((i) => i.name === suggestion.iconName)
-                                return ic ? (
-                                  <svg
-                                    width={20}
-                                    height={20}
-                                    viewBox={ic.viewBox}
-                                    fill="none"
-                                    stroke="currentColor"
-                                    strokeWidth={2}
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    dangerouslySetInnerHTML={{ __html: ic.body }}
-                                  />
-                                ) : null
-                              })()}
-                            </div>
-                            <div className="min-w-0 flex-1 text-xs">
-                              <div className="text-foreground">{suggestion.rationale}</div>
-                              <div className="text-foreground-lighter">
-                                Template: {TEMPLATES.find((t) => t.id === suggestion.templateId)?.label}
-                              </div>
-                            </div>
-                            <button
-                              onClick={applySuggestion}
-                              className="shrink-0 rounded-md bg-brand px-2.5 py-1 text-xs font-medium text-background hover:bg-brand/90"
-                            >
-                              Apply
-                            </button>
+            <Group title="AI art direction">
+              <div className="flex flex-col gap-2">
+                <span className="text-sm font-medium text-foreground-light">
+                  Describe this post
+                  <Hint text="Suggests an icon + template from the library. Backend-free keyword match over the seed icons for now — the full version (embeddings + Claude API over the uploadable library) comes with Supabase (§6.6)." />
+                </span>
+                <textarea
+                  id="ai-describe"
+                  value={aiDescription}
+                  onChange={(e) => setAiDescription(e.target.value)}
+                  rows={2}
+                  className="resize-none rounded-md border border-default bg-surface-100 px-3 py-2 text-sm text-foreground outline-none focus:border-strong"
+                  placeholder="e.g. row-level security for multi-tenant apps"
+                />
+                <button
+                  onClick={generate}
+                  disabled={!aiDescription.trim()}
+                  className="flex items-center justify-center gap-1.5 rounded-md bg-brand px-3 py-2 text-xs font-medium text-background hover:bg-brand/90 disabled:opacity-50"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M12 2.5l1.9 5.6 5.6 1.9-5.6 1.9L12 17.5l-1.9-5.6L4.5 10l5.6-1.9z" />
+                    <path d="M18.5 14.5l.85 2.65 2.65.85-2.65.85-.85 2.65-.85-2.65-2.65-.85 2.65-.85z" />
+                  </svg>
+                  Generate
+                </button>
+                {generated && (
+                  <div className="flex flex-col gap-2 rounded-md border border-default bg-surface-100 p-3">
+                    {generated.iconName ? (
+                      <>
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-default text-foreground-light">
+                            {(() => {
+                              const ic = SEED_ICONS.find((i) => i.name === generated.iconName)
+                              return ic ? (
+                                <svg
+                                  width={20}
+                                  height={20}
+                                  viewBox={ic.viewBox}
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth={2}
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  dangerouslySetInnerHTML={{ __html: ic.body }}
+                                />
+                              ) : null
+                            })()}
                           </div>
-                          {suggestion.alternates.length > 0 && (
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span className="text-xs text-foreground-lighter">Also:</span>
-                              {suggestion.alternates.map((a) => (
-                                <button
-                                  key={a.iconName}
-                                  onClick={() => setIcon(a.iconName)}
-                                  className="rounded border border-default px-2 py-0.5 text-xs text-foreground-light hover:border-strong"
-                                >
-                                  {a.label}
-                                </button>
-                              ))}
+                          <div className="min-w-0 flex-1 text-xs">
+                            <div className="text-foreground">{generated.rationale}</div>
+                            <div className="text-foreground-lighter">
+                              Template: {TEMPLATES.find((t) => t.id === generated.templateId)?.label}
                             </div>
-                          )}
-                        </>
-                      ) : (
-                        <p className="text-xs text-warning-600">{suggestion.rationale}</p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </Group>
-
-              <Group title="Content">
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <label htmlFor="headline" className="text-sm font-medium text-foreground-light">
-                      Headline
-                    </label>
-                    <span className={`text-xs tabular-nums ${counterColor}`}>
-                      {count} / {HARD_LIMIT}
-                    </span>
+                          </div>
+                          <button
+                            onClick={applySuggestion}
+                            className="shrink-0 rounded-md bg-brand px-2.5 py-1 text-xs font-medium text-background hover:bg-brand/90"
+                          >
+                            Apply
+                          </button>
+                        </div>
+                        {generated.alternates.length > 0 && (
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="text-xs text-foreground-lighter">Also:</span>
+                            {generated.alternates.map((a) => (
+                              <button
+                                key={a.iconName}
+                                onClick={() => setIcon(a.iconName)}
+                                className="rounded border border-default px-2 py-0.5 text-xs text-foreground-light hover:border-strong"
+                              >
+                                {a.label}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <p className="text-xs text-warning-600">{generated.rationale}</p>
+                    )}
                   </div>
-                  <textarea
-                    id="headline"
-                    value={headline}
-                    onChange={(e) => setHeadline(e.target.value)}
-                    rows={3}
-                    className="resize-none rounded-md border border-default bg-surface-100 px-3 py-2 text-sm text-foreground outline-none focus:border-strong"
-                    placeholder="Type a blog headline…"
-                  />
-                  <p className="text-xs text-foreground-lighter">
-                    Press Enter for a manual line break (power-user mode). Otherwise it auto-fits.
-                  </p>
-                </div>
+                )}
+              </div>
+            </Group>
+          )}
 
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="eyebrow" className="text-sm font-medium text-foreground-light">
-                    Eyebrow <span className="text-foreground-lighter">(optional)</span>
-                  </label>
-                  <input
-                    id="eyebrow"
-                    value={eyebrow}
-                    onChange={(e) => setEyebrow(e.target.value)}
-                    className="rounded-md border border-default bg-surface-100 px-3 py-2 text-sm text-foreground outline-none focus:border-strong"
-                    placeholder="e.g. Launch Week, Engineering"
-                  />
-                </div>
+          {showOg && (
+            <Group title="Layout">
+              <div className="flex flex-col gap-2">
+                <span className="text-sm font-medium text-foreground-light">
+                  Template
+                  <Hint text="Prebuilt layouts that already satisfy the safe area + alignment rules (§5.6). Pick one, then customize within it." />
+                </span>
+                <select
+                  id="template"
+                  value={template}
+                  onChange={(e) => changeTemplate(e.target.value)}
+                  className="rounded-md border border-default bg-surface-100 px-3 py-2 text-sm text-foreground outline-none focus:border-strong"
+                >
+                  {TEMPLATES.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-                <label className="flex items-center gap-2 text-sm text-foreground-light">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-foreground-light">
+                    Font size
+                    <Hint text="Auto-fit picks the largest size that keeps the headline to 2 lines — the highest-leverage guardrail for legibility at thumbnail size." />
+                  </span>
+                  <span className="text-xs tabular-nums text-foreground-lighter">
+                    {autoFit ? `Auto · ${og.fit?.fontSize ?? '—'}px` : `${manualFontSize}px`}
+                  </span>
+                </div>
+                <label className="flex items-center gap-2 text-xs text-foreground-light">
                   <input
                     type="checkbox"
-                    id="toggle-sentence-case"
-                    checked={sentenceCase}
-                    onChange={(e) => setSentenceCase(e.target.checked)}
+                    id="toggle-autofit"
+                    checked={autoFit}
+                    onChange={(e) => {
+                      const on = e.target.checked
+                      setAutoFit(on)
+                      if (!on) setManualFontSize(og.fit?.fontSize ?? manualFontSize)
+                    }}
                   />
-                  Auto sentence-case
-                  <Hint text="Headlines are sentence case, with brand terms (Postgres, pgvector, API…) preserved automatically." />
+                  Auto-fit
                 </label>
-              </Group>
-
-              <Group title="Layout">
-                <div className="flex flex-col gap-2">
-                  <span className="text-sm font-medium text-foreground-light">
-                    Template
-                    <Hint text="Prebuilt layouts that already satisfy the safe area + alignment rules (§5.6). Pick one, then customize within it." />
-                  </span>
-                  <select
-                    id="template"
-                    value={template}
-                    onChange={(e) => changeTemplate(e.target.value)}
-                    className="rounded-md border border-default bg-surface-100 px-3 py-2 text-sm text-foreground outline-none focus:border-strong"
-                  >
-                    {TEMPLATES.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-foreground-light">
-                      Font size
-                      <Hint text="Auto-fit picks the largest size that keeps the headline to 2 lines — the highest-leverage guardrail for legibility at thumbnail size." />
-                    </span>
-                    <span className="text-xs tabular-nums text-foreground-lighter">
-                      {autoFit ? `Auto · ${og.fit?.fontSize ?? '—'}px` : `${manualFontSize}px`}
-                    </span>
-                  </div>
-                  <label className="flex items-center gap-2 text-xs text-foreground-light">
-                    <input
-                      type="checkbox"
-                      id="toggle-autofit"
-                      checked={autoFit}
-                      onChange={(e) => {
-                        const on = e.target.checked
-                        setAutoFit(on)
-                        if (!on) setManualFontSize(og.fit?.fontSize ?? manualFontSize)
-                      }}
-                    />
-                    Auto-fit
-                  </label>
-                  <input
-                    type="range"
-                    id="font-size"
-                    min={MIN_SIZE}
-                    max={MAX_SIZE}
-                    step={2}
-                    value={sliderValue}
-                    disabled={autoFit}
-                    onChange={(e) => setManualFontSize(Number(e.target.value))}
-                    className="w-full accent-brand disabled:opacity-40"
-                  />
-                </div>
-              </Group>
-            </>
+                <input
+                  type="range"
+                  id="font-size"
+                  min={MIN_SIZE}
+                  max={MAX_SIZE}
+                  step={2}
+                  value={sliderValue}
+                  disabled={autoFit}
+                  onChange={(e) => setManualFontSize(Number(e.target.value))}
+                  className="w-full min-w-0 accent-brand disabled:opacity-40"
+                />
+              </div>
+            </Group>
           )}
 
           <Group title="Assets">
@@ -654,11 +633,73 @@ export default function Page() {
                   </button>
                 ))}
               </div>
+              <button
+                type="button"
+                disabled
+                title="Custom uploads arrive with the shared asset library"
+                className="cursor-not-allowed rounded-md border border-dashed border-default px-3 py-2 text-xs text-foreground-lighter"
+              >
+                + Upload SVG (soon)
+              </button>
               <p className="text-xs text-foreground-lighter">
-                {view === 'og' ? 'Optional — appears per the chosen template.' : 'Shared by the OG and Thumb.'}
+                Custom icon/logo upload lands with the shared asset library (Supabase). For now,
+                pick from the set above.
               </p>
             </div>
           </Group>
+
+          {showOg && (
+            <Group title="Content">
+              <div className="flex flex-col gap-2">
+                <label htmlFor="eyebrow" className="text-sm font-medium text-foreground-light">
+                  Eyebrow <span className="text-foreground-lighter">(optional)</span>
+                </label>
+                <input
+                  id="eyebrow"
+                  value={eyebrow}
+                  onChange={(e) => setEyebrow(e.target.value)}
+                  className="rounded-md border border-default bg-surface-100 px-3 py-2 text-sm text-foreground outline-none focus:border-strong"
+                  placeholder="e.g. Launch Week, Engineering"
+                />
+                <div className="flex items-center justify-between">
+                  <Label>Style</Label>
+                  <Segmented value={eyebrowStyle} onChange={setEyebrowStyle} options={EYEBROW_STYLE_OPTS} />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-between">
+                  <label htmlFor="headline" className="text-sm font-medium text-foreground-light">
+                    Headline
+                  </label>
+                  <span className={`text-xs tabular-nums ${counterColor}`}>
+                    {count} / {HARD_LIMIT}
+                  </span>
+                </div>
+                <textarea
+                  id="headline"
+                  value={headline}
+                  onChange={(e) => setHeadline(e.target.value)}
+                  rows={3}
+                  className="resize-none rounded-md border border-default bg-surface-100 px-3 py-2 text-sm text-foreground outline-none focus:border-strong"
+                  placeholder="Type a blog headline…"
+                />
+                <p className="text-xs text-foreground-lighter">
+                  Press Enter for a manual line break (power-user mode). Otherwise it auto-fits.
+                </p>
+                <label className="flex items-center gap-2 text-sm text-foreground-light">
+                  <input
+                    type="checkbox"
+                    id="toggle-sentence-case"
+                    checked={sentenceCase}
+                    onChange={(e) => setSentenceCase(e.target.checked)}
+                  />
+                  Auto sentence-case
+                  <Hint text="Sentence case, with brand terms (Postgres, pgvector, API…) preserved automatically." />
+                </label>
+              </div>
+            </Group>
+          )}
 
           {showThumb && (
             <Group title="Thumb">
@@ -678,7 +719,7 @@ export default function Page() {
                   step={20}
                   value={thumbSize}
                   onChange={(e) => setThumbSize(Number(e.target.value))}
-                  className="w-full accent-brand"
+                  className="w-full min-w-0 accent-brand"
                 />
                 <p className="text-xs text-foreground-lighter">
                   No text by design — the Thumb shares the OG’s icon (§3).
@@ -710,16 +751,16 @@ export default function Page() {
             {patternType !== 'none' && (
               <>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-foreground-light">Scale</span>
+                  <Label>Scale</Label>
                   <Segmented value={patternScale} onChange={setPatternScale} options={SCALE_OPTS} />
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-foreground-light">Color</span>
+                  <Label>Color</Label>
                   <Segmented value={patternColor} onChange={setPatternColor} options={COLOR_OPTS} />
                 </div>
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-foreground-light">Opacity</span>
+                    <Label>Opacity</Label>
                     <span className="text-xs tabular-nums text-foreground-lighter">
                       {Math.round(patternOpacity * 100)}%
                     </span>
@@ -732,7 +773,7 @@ export default function Page() {
                     step={0.01}
                     value={patternOpacity}
                     onChange={(e) => setPatternOpacity(Number(e.target.value))}
-                    className="w-full accent-brand"
+                    className="w-full min-w-0 accent-brand"
                   />
                 </div>
               </>
@@ -765,98 +806,108 @@ export default function Page() {
 
         {/* Canvas — light workspace with a dot grid */}
         <main
-          className="flex min-w-0 flex-1 flex-col items-center gap-5 overflow-auto p-8"
+          className="@container flex min-w-0 flex-1 flex-col items-center overflow-auto p-8"
           style={{
             backgroundColor: '#f4f4f5',
             backgroundImage: 'radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1px)',
             backgroundSize: '16px 16px',
           }}
         >
-          <Segmented value={view} onChange={setView} options={VIEW_OPTS} />
-
-          <div className="flex w-full max-w-3xl flex-col gap-6">
-            {showOg && (
-              <PreviewCard
-                label="OG"
-                imgUrl={og.url}
-                loading={og.loading}
-                error={og.error}
-                alt={headline}
-                showSafeArea={showSafeArea}
-                showHeadlineInset
-                showCrops={showCrops}
-                copied={copied === 'og'}
-                onCopy={() => copyUrl(ogEndpoint, 'og')}
-                onDownload={() => download(og.url, `og${suffix}.png`)}
+          {/* view toggle (center) + zoom (right) */}
+          <div className="mb-5 flex w-full items-center justify-between">
+            <span className="w-24" />
+            <Segmented value={view} onChange={setView} options={VIEW_OPTS} />
+            <div className="flex w-24 items-center justify-end gap-1 text-xs text-foreground-lighter">
+              <button onClick={() => nudgeZoom(-0.1)} className={zoomBtn} title="Zoom out">
+                −
+              </button>
+              <button
+                onClick={() => setZoom(1)}
+                className="w-10 tabular-nums hover:text-foreground"
+                title="Reset zoom"
               >
-                <div className="flex flex-col gap-2">
-                  {og.fit && (
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-foreground-light">
-                      <span>
-                        Font size: <span className="text-foreground">{og.fit.fontSize}px</span>
-                      </span>
-                      <span>
-                        Lines: <span className="text-foreground">{og.fit.lineCount}</span>
-                      </span>
-                      <span>
-                        Mode: <span className="text-foreground">{og.fit.mode}</span>
-                      </span>
-                    </div>
-                  )}
-                  <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-foreground-light">
-                    <span>
-                      Headline contrast:{' '}
-                      <span className={headlineRating === 'Fail' ? 'text-destructive-600' : 'text-brand'}>
-                        {headlineContrast.toFixed(1)}:1 · {headlineRating}
-                      </span>
-                    </span>
-                    {eyebrow.trim() && (
-                      <span>
-                        Eyebrow:{' '}
-                        <span className="text-foreground">{eyebrowContrast.toFixed(1)}:1</span>
-                      </span>
+                {Math.round(zoom * 100)}%
+              </button>
+              <button onClick={() => nudgeZoom(0.1)} className={zoomBtn} title="Zoom in">
+                +
+              </button>
+            </div>
+          </div>
+
+          <div className="flex w-full flex-col gap-6 @4xl:flex-row" style={{ zoom }}>
+            {showOg && (
+              <div className="min-w-0 @4xl:flex-1">
+                <PreviewCard
+                  label="OG"
+                  imgUrl={og.url}
+                  loading={og.loading}
+                  error={og.error}
+                  alt={headline}
+                  showSafeArea={showSafeArea}
+                  showHeadlineInset
+                  showCrops={showCrops}
+                  copied={copied === 'og'}
+                  onCopy={() => copyUrl(ogEndpoint, 'og')}
+                  onDownload={() => download(og.url, `og${suffix}.png`)}
+                >
+                  <div className="flex flex-col gap-2">
+                    {og.fit && (
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 self-start rounded-full bg-surface-200 px-3 py-1 text-xs text-foreground-light">
+                        <span className="text-foreground">{og.fit.fontSize}px</span>
+                        <span className="text-foreground-lighter">·</span>
+                        <span>
+                          {og.fit.lineCount} {og.fit.lineCount === 1 ? 'line' : 'lines'}
+                        </span>
+                        <span className="text-foreground-lighter">·</span>
+                        <span>{og.fit.mode}</span>
+                        <span className="text-foreground-lighter">·</span>
+                        <span className={headlineRating === 'Fail' ? 'text-destructive-600' : 'text-brand'}>
+                          {headlineContrast.toFixed(1)}:1 {headlineRating}
+                        </span>
+                      </div>
+                    )}
+                    {og.fit?.overflow && (
+                      <p className="text-xs text-destructive-600">
+                        ⚠ Won’t fit in 2 lines even at the minimum size — shorten it before export.
+                      </p>
+                    )}
+                    {og.fit && !og.fit.overflow && og.fit.mode === 'manual' && og.fit.lineCount > 2 && (
+                      <p className="text-xs text-warning-600">
+                        ⚠ More than 2 lines — allowed in manual mode, but off-brand.
+                      </p>
                     )}
                   </div>
-                  {og.fit?.overflow && (
-                    <p className="text-xs text-destructive-600">
-                      ⚠ This headline won’t fit in 2 lines even at the minimum size. Shorten it
-                      before exporting.
-                    </p>
-                  )}
-                  {og.fit && !og.fit.overflow && og.fit.mode === 'manual' && og.fit.lineCount > 2 && (
-                    <p className="text-xs text-warning-600">
-                      ⚠ More than 2 lines — allowed in manual mode, but off-brand.
-                    </p>
-                  )}
-                </div>
-              </PreviewCard>
+                </PreviewCard>
+              </div>
             )}
 
             {showThumb && (
-              <PreviewCard
-                label="Thumb"
-                imgUrl={thumb.url}
-                loading={thumb.loading}
-                error={thumb.error}
-                alt="Thumbnail preview"
-                showSafeArea={showSafeArea}
-                showHeadlineInset={false}
-                showCrops={showCrops}
-                copied={copied === 'thumb'}
-                onCopy={() => copyUrl(thumbEndpoint, 'thumb')}
-                onDownload={() => download(thumb.url, `thumb${suffix}.png`)}
-              >
-                <div className="flex flex-col gap-2">
-                  <p className="text-xs text-foreground-light">
-                    No headline — the Thumb is icon-only and shares the OG’s icon (§3).
-                  </p>
-                  {!icon && (
-                    <p className="text-xs text-warning-600">
-                      ⚠ Pick an icon in Assets — the Thumb has no text to fall back on.
+              <div className="min-w-0 @4xl:flex-1">
+                <PreviewCard
+                  label="Thumb"
+                  imgUrl={thumb.url}
+                  loading={thumb.loading}
+                  error={thumb.error}
+                  alt="Thumbnail preview"
+                  showSafeArea={showSafeArea}
+                  showHeadlineInset={false}
+                  showCrops={showCrops}
+                  copied={copied === 'thumb'}
+                  onCopy={() => copyUrl(thumbEndpoint, 'thumb')}
+                  onDownload={() => download(thumb.url, `thumb${suffix}.png`)}
+                >
+                  <div className="flex flex-col gap-2">
+                    <p className="text-xs text-foreground-light">
+                      No headline — the Thumb is icon-only and shares the OG’s icon (§3).
                     </p>
-                  )}
-                </div>
-              </PreviewCard>
+                    {!icon && (
+                      <p className="text-xs text-warning-600">
+                        ⚠ Pick an icon in Assets — the Thumb has no text to fall back on.
+                      </p>
+                    )}
+                  </div>
+                </PreviewCard>
+              </div>
             )}
           </div>
         </main>

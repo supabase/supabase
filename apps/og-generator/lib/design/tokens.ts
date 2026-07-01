@@ -27,6 +27,7 @@ export const colorPalette = {
   'border.strong': '#363636',
   'brand.default': '#3ECF8E',
   'brand.dark': '#249361',
+  'brand.tint': 'rgba(62, 207, 142, 0.14)',
   'text.primary': '#FAFAFA',
   'text.secondary': '#B4B4B4',
   'text.muted': '#898989',
@@ -46,7 +47,7 @@ export const typography = {
   family: 'Manrope',
   roles: {
     headline: {
-      weight: 600 as const,
+      weight: 500 as const,
       minSize: 40,
       maxSize: 64,
       lineHeight: 1.1,
