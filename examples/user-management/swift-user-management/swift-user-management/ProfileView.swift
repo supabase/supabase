@@ -96,7 +96,7 @@ struct ProfileView: View {
     do {
       let currentUser = try await supabase.auth.session.user
 
-      let profile: Profile = try await supabase.database
+      let profile: Profile = try await supabase
         .from("profiles")
         .select()
         .eq("id", value: currentUser.id)
@@ -133,7 +133,7 @@ struct ProfileView: View {
           avatarURL: imageURL
         )
 
-        try await supabase.database
+        try await supabase
           .from("profiles")
           .update(updatedProfile)
           .eq("id", value: currentUser.id)
@@ -167,8 +167,8 @@ struct ProfileView: View {
     try await supabase.storage
       .from("avatars")
       .upload(
-        path: filePath,
-        file: data,
+        filePath,
+        data: data,
         options: FileOptions(contentType: "image/jpeg")
       )
 
