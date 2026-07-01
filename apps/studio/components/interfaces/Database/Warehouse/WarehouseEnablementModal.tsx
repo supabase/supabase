@@ -1,3 +1,5 @@
+import { useParams } from 'common'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -14,6 +16,7 @@ import {
 
 import { setTableMode, warehouseDemoStore } from './warehouseDemoStore'
 import { getWarehouseQualifiedTableName } from './warehouseNaming.utils'
+import { buildReplicationLogsUrl } from './warehouseObservability.utils'
 import { WarehouseProgressSteps } from './WarehouseProgressSteps'
 
 interface WarehouseEnablementModalProps {
@@ -36,12 +39,15 @@ export function WarehouseEnablementModal({
   tableKey,
   onOpenChange,
 }: WarehouseEnablementModalProps) {
+  const { ref: projectRef } = useParams()
   const [isRunning, setIsRunning] = useState(false)
   const [progressIndex, setProgressIndex] = useState(0)
   const [failedStepIndex, setFailedStepIndex] = useState<number | null>(null)
 
   const warehouseQualifiedName = getWarehouseQualifiedTableName(tableKey)
   const showProgress = isRunning || failedStepIndex !== null
+  const replicationLogsUrl =
+    projectRef !== undefined ? buildReplicationLogsUrl(projectRef) : undefined
 
   const resetProgress = () => {
     setIsRunning(false)
@@ -95,7 +101,7 @@ export function WarehouseEnablementModal({
     >
       <DialogContent size="small">
         <DialogHeader>
-          <DialogTitle>Create Warehouse copy</DialogTitle>
+          <DialogTitle>Copy table to Warehouse</DialogTitle>
         </DialogHeader>
 
         {showProgress ? (
@@ -111,19 +117,26 @@ export function WarehouseEnablementModal({
               )}
             </DialogSection>
             {failedStepIndex !== null && (
-              <DialogFooter>
-                <Button variant="default" onClick={() => onOpenChange(false)}>
-                  Close
-                </Button>
-                <Button
-                  variant="primary"
-                  onClick={() => {
-                    resetProgress()
-                    setIsRunning(true)
-                  }}
-                >
-                  Try again
-                </Button>
+              <DialogFooter className="gap-2 sm:justify-between">
+                {replicationLogsUrl && (
+                  <Button variant="default" asChild className="mr-auto">
+                    <Link href={replicationLogsUrl}>View logs</Link>
+                  </Button>
+                )}
+                <div className="flex gap-2">
+                  <Button variant="default" onClick={() => onOpenChange(false)}>
+                    Close
+                  </Button>
+                  <Button
+                    variant="primary"
+                    onClick={() => {
+                      resetProgress()
+                      setIsRunning(true)
+                    }}
+                  >
+                    Try again
+                  </Button>
+                </div>
               </DialogFooter>
             )}
           </>
@@ -132,8 +145,8 @@ export function WarehouseEnablementModal({
             <DialogSectionSeparator />
             <DialogSection className="flex flex-col gap-4">
               <p className="text-sm text-foreground-light">
-                The Postgres heap will remain the source of truth. Use the Warehouse copy for more
-                performant analytical workloads.
+                The Postgres heap will remain the source of truth. A Warehouse copy will be created
+                for analytical queries.
               </p>
 
               <div className="rounded-lg border bg-surface-75 text-sm">

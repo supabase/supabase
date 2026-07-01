@@ -61,7 +61,7 @@ export function getReplicationLagDisplay(
       health,
       headline: 'Replication error',
       compactSuffix: hasSignificantLag ? `${lagFormatted} behind` : 'Replication error',
-      tooltip: 'The Warehouse replication pipeline encountered an error. Check replication logs.',
+      tooltip: 'Warehouse replication pipeline encountered an error. Check replication logs.',
       tone: 'destructive',
     }
   }

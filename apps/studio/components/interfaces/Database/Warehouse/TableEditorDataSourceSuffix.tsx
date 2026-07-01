@@ -1,4 +1,4 @@
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { useSnapshot } from 'valtio'
 
 import {
@@ -21,18 +21,20 @@ function getTableEditorDataSourceSuffix(
   projectReplication: WarehouseProjectReplicationStatus | null
 ): {
   label: string
+  labelTooltip: string
   lagSuffix?: string
+  lagTooltip?: string
   lagTone?: 'warning' | 'destructive'
-  tooltip: string
 } | null {
   if (isWarehouseSchema(schema)) {
     const sourceTableKey = getSourceTableKey(schema, table)
     const tableState = warehouseTables[sourceTableKey]
+    const labelTooltip = getWarehouseCopyTooltip(sourceTableKey)
 
     if (!projectReplication) {
       return {
         label: 'Warehouse copy',
-        tooltip: getWarehouseCopyTooltip(sourceTableKey),
+        labelTooltip,
       }
     }
 
@@ -40,14 +42,15 @@ function getTableEditorDataSourceSuffix(
 
     return {
       label: 'Warehouse copy',
+      labelTooltip,
       lagSuffix: lagDisplay.compactSuffix,
+      lagTooltip: lagDisplay.compactSuffix !== undefined ? lagDisplay.tooltip : undefined,
       lagTone:
         lagDisplay.tone === 'warning'
           ? 'warning'
           : lagDisplay.tone === 'destructive'
             ? 'destructive'
             : undefined,
-      tooltip: `${getWarehouseCopyTooltip(sourceTableKey)}. ${lagDisplay.tooltip}`,
     }
   }
 
@@ -55,7 +58,7 @@ function getTableEditorDataSourceSuffix(
   if (warehouseTables[tableKey]?.mode === 'has_warehouse_copy') {
     return {
       label: 'Postgres (live)',
-      tooltip: 'Live Postgres rows',
+      labelTooltip: 'Live Postgres rows',
     }
   }
 
@@ -89,17 +92,24 @@ export function TableEditorDataSourceSuffix({ schema, table }: TableEditorDataSo
   return (
     <>
       <span className="mx-1.5">·</span>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span className="cursor-default truncate text-foreground">
-            {suffix.label}
-            {suffix.lagSuffix !== undefined && (
-              <span className={`ml-1 ${lagClassName}`}>({suffix.lagSuffix})</span>
-            )}
-          </span>
-        </TooltipTrigger>
-        <TooltipContent className="max-w-xs">{suffix.tooltip}</TooltipContent>
-      </Tooltip>
+      <span className="inline-flex min-w-0 items-baseline truncate text-foreground">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="cursor-default truncate">{suffix.label}</span>
+          </TooltipTrigger>
+          <TooltipContent className="max-w-xs">{suffix.labelTooltip}</TooltipContent>
+        </Tooltip>
+        {suffix.lagSuffix !== undefined && suffix.lagTooltip !== undefined && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className={cn('ml-1 shrink-0 cursor-help', lagClassName)}>
+                ({suffix.lagSuffix})
+              </span>
+            </TooltipTrigger>
+            <TooltipContent className="max-w-xs">{suffix.lagTooltip}</TooltipContent>
+          </Tooltip>
+        )}
+      </span>
     </>
   )
 }
