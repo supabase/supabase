@@ -14,7 +14,8 @@ import {
   DialogTrigger,
   StatusIcon,
 } from 'ui'
-import { GenericSkeletonLoader, TimestampInfo } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { ActionStatusBadge, ActionStatusBadgeCondensed, STATUS_TO_LABEL } from './ActionStatusBadge'
 import BranchStatusBadge from './BranchStatusBadge'

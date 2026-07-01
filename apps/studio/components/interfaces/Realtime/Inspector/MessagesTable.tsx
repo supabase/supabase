@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
 import { Button, cn, IconBroadcast, IconDatabaseChanges, IconPresence } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { LogData } from './Messages.types'
 import MessageSelection from './MessageSelection'

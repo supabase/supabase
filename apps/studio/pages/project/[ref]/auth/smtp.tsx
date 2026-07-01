@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { SmtpForm } from '@/components/interfaces/Auth/SmtpForm/SmtpForm'
 import { AuthEmailsLayout } from '@/components/layouts/AuthLayout/AuthEmailsLayout'

@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react'
 import { Card, CardContent } from 'ui'
-import { Admonition, ShimmeringLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type {
   CloudMarketplaceContractLinkingIneligibilityReason,

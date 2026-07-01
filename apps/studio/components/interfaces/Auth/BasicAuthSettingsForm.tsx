@@ -269,7 +269,7 @@ export const BasicAuthSettingsForm = () => {
                             <code className="text-code-inline">authenticated</code> roles. We
                             strongly advise{' '}
                             <Link
-                              href={`/project/${projectRef}/auth/policies`}
+                              href={`/project/${projectRef}/database/policies`}
                               className="text-foreground underline"
                             >
                               reviewing your RLS policies

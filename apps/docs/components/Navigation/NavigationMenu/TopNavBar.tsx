@@ -10,7 +10,8 @@ import Link from 'next/link'
 import type { FC } from 'react'
 import { memo, useState } from 'react'
 import { Button, buttonVariants, cn } from 'ui'
-import { AuthenticatedDropdownMenu, CommandMenuTriggerInput } from 'ui-patterns'
+import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
+import { CommandMenuTriggerInput } from 'ui-patterns/CommandMenu'
 
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
@@ -47,6 +48,7 @@ const TopNavBar: FC = () => {
             <div className="flex gap-2 items-center">
               <DevToolbarTrigger />
               <CommandMenuTriggerInput
+                className="[&>div>p]:text-foreground-lighter"
                 placeholder={
                   <>
                     Search

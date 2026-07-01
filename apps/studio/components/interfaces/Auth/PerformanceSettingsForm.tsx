@@ -21,8 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'ui'
-import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { ScaffoldSection, ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
