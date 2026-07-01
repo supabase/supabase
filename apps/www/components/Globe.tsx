@@ -54,12 +54,15 @@ const Globe = () => {
         rotation += 0.0025
       },
     })
-    setTimeout(() => (canvasRef.current.style.opacity = '0.8'), 10)
+    const opacityTimeout = setTimeout(() => {
+      if (canvasRef.current) canvasRef.current.style.opacity = '0.8'
+    }, 10)
     return () => {
-      window.removeEventListener('resize', onResize)
+      window.removeEventListener('resize', debouncedResize)
+      clearTimeout(opacityTimeout)
       cobe.destroy()
     }
-  }, [resolvedTheme])
+  }, [onResize, resolvedTheme])
 
   return (
     <canvas

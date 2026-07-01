@@ -1,4 +1,4 @@
-import { openai } from '@ai-sdk/openai'
+import { createOpenAI, openai as defaultOpenAI } from '@ai-sdk/openai'
 import { LanguageModel } from 'ai'
 
 import { checkAwsCredentials, createRoutedBedrock } from './bedrock'
@@ -87,13 +87,16 @@ export async function getModel(params: GetModelParams): Promise<ModelResponse> {
     if (!process.env.OPENAI_API_KEY) {
       return { error: new Error('OPENAI_API_KEY not available') }
     }
+    const openaiProvider = process.env.OPENAI_BASE_URL
+      ? createOpenAI({ baseURL: process.env.OPENAI_BASE_URL })
+      : defaultOpenAI
     const baseProviderOptions = providerRegistry.providerOptions?.openai ?? {}
     const openaiProviderOptions = modelEntry?.reasoningEffort
       ? { ...baseProviderOptions, reasoningEffort: modelEntry.reasoningEffort }
       : baseProviderOptions
     return {
       modelParams: {
-        model: openai(chosenModelId as OpenAIModelId),
+        model: openaiProvider.chat(chosenModelId as OpenAIModelId),
         providerOptions: { openai: openaiProviderOptions },
       },
       systemProviderOptions: models[chosenModelId as OpenAIModelId]?.systemProviderOptions,
