@@ -1,4 +1,5 @@
 @import 'config/tailwind.config.css';
+@import './../../../packages/ui/build/css/themes/faux-classic-dark.css';
 
 @source '../app/**/*.{ts,tsx,mdx}';
 @source '../components/**/*.{ts,tsx}';
@@ -44,6 +45,11 @@
     @apply bg-background text-foreground;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Match docs ContentListings: GlassPanel links inherit prose-body color */
+  main a:has(> div.bg-surface-75) {
+    color: hsl(var(--foreground-light));
   }
 }
 

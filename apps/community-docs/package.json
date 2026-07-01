@@ -21,6 +21,7 @@
     "eslint-config-supabase": "workspace:*",
     "gray-matter": "^4.0.3",
     "next": "^15.5.15",
+    "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-markdown": "^10.1.0",
