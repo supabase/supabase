@@ -136,6 +136,14 @@ await Supabase.initialize(
 final supabase = Supabase.instance.client;
 ```
 
+`supabase_flutter` performs the server side of the WebAuthn ceremony for you and delegates the platform prompt (FaceID/TouchID/security key) to an authenticator you supply, instead of depending on a passkey plugin directly. Add a passkey plugin to your own app and pass its authenticator to `registerPasskey()` and `signInWithPasskey()`. The [`passkeys`](https://pub.dev/packages/passkeys) plugin's `PasskeyAuthenticator` implements the `PasskeyAuthenticatorInterface` these methods expect (since `passkeys` `2.21.0`), but you can pass any implementation of that interface:
+
+```dart
+import 'package:passkeys/authenticator.dart';
+
+final authenticator = PasskeyAuthenticator();
+```
+
 Platform setup that the library cannot do for you (Associated Domains on iOS/macOS, Digital Asset Links on Android, and including the [`passkeys`](https://pub.dev/packages/passkeys) web SDK in `index.html` on web) is documented in the `supabase_flutter` package README.
 
 </TabPanel>
@@ -185,7 +193,7 @@ if (error) {
 
 ```dart
 try {
-  final Passkey passkey = await supabase.auth.registerPasskey();
+  final Passkey passkey = await supabase.auth.registerPasskey(authenticator);
   print('Registered passkey ${passkey.id}');
 } on AuthException catch (e) {
   // The Supabase server rejected the credential.
@@ -261,7 +269,7 @@ if (error) {
 
 ```dart
 try {
-  final AuthResponse res = await supabase.auth.signInWithPasskey();
+  final AuthResponse res = await supabase.auth.signInWithPasskey(authenticator);
   // res.session and res.user are set; the client also fires AuthChangeEvent.signedIn
   print('Signed in as ${res.user?.email}');
 } on AuthException catch (e) {
