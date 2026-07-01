@@ -77,7 +77,9 @@ export const ObservabilityOverview = () => {
         key: 'data_api' as const,
         name: 'API Gateway',
         reportUrl: undefined,
-        logsUrl: `/project/${projectRef}/logs/edge-logs`,
+        logsUrl: isUnifiedLogsEnabled
+          ? `/project/${projectRef}/logs?filter=log_type:eq:edge`
+          : `/project/${projectRef}/logs/edge-logs`,
         enabled: isDataApiEnabled,
         hasReport: false,
       },
@@ -160,11 +162,13 @@ export const ObservabilityOverview = () => {
       const start = datum.timestamp
       const end = dayjs.utc(datum.timestamp).add(1, unit).toISOString()
 
-      const queryParams = new URLSearchParams({ its: start, ite: end })
+      const queryParams = isUnifiedLogsEnabled
+        ? new URLSearchParams({ date: `${new Date(start).valueOf()}-${new Date(end).valueOf()}` })
+        : new URLSearchParams({ its: start, ite: end })
       const separator = logsUrl.includes('?') ? '&' : '?'
       router.push(`${logsUrl}${separator}${queryParams.toString()}`)
     },
-    [router, interval]
+    [router, interval, isUnifiedLogsEnabled]
   )
 
   return (
