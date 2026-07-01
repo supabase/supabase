@@ -9,9 +9,29 @@
 @source './../../../packages/ui/src/**/*.{tsx,ts,js}';
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
 
+@theme inline {
+  --font-sans:
+    var(--font-inter), Inter, Helvetica Neue, Helvetica, ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-manrope, var(--font-sans));
+  --font-mono: 'Source Code Pro', ui-monospace, Menlo, monospace;
+}
+
 @theme {
   /* added to get max-w-site */
   --container-site: 128rem;
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-lg: 1rem;
+  --text-xl: 1.125rem;
+  --text-2xl: 1.375rem;
+  --text-3xl: 1.75rem;
+  --text-4xl: 2.125rem;
+  --text-5xl: 2.875rem;
+  --text-6xl: 3.625rem;
+  --text-7xl: 4.375rem;
+  --text-8xl: 5.875rem;
+  --text-9xl: 7.875rem;
+  --font-weight-normal: 450;
 }
 
 @layer base {
@@ -30,9 +50,7 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
   }
@@ -46,6 +64,36 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: hsl(var(--border-default, currentColor));
+  }
+
+  code,
+  .code-content,
+  pre,
+  kbd,
+  samp,
+  .font-mono {
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+    --text-5xl: 3rem;
+    --text-6xl: 3.75rem;
+    --text-7xl: 4.5rem;
+    --text-8xl: 6rem;
+    --text-9xl: 8rem;
+    --font-weight-normal: 400;
   }
 }
 
@@ -74,6 +122,21 @@
   .container {
     @apply px-4;
   }
+}
+
+h1:not(.font-mono),
+h2:not(.font-mono),
+h3:not(.font-mono),
+h4:not(.font-mono),
+h5:not(.font-mono),
+h6:not(.font-mono),
+.h1:not(.font-mono),
+.h2:not(.font-mono),
+.h3:not(.font-mono),
+.h4:not(.font-mono),
+.h5:not(.font-mono),
+.h6:not(.font-mono) {
+  @apply font-heading font-semibold;
 }
 
 .rdg-cell {

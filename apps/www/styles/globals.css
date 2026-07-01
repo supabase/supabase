@@ -138,19 +138,22 @@
     border-color: hsl(var(--border-default, currentColor));
   }
 
-  h1,
   h2,
   h3,
   h4,
   h5,
   h6,
-  .h1,
   .h2,
   .h3,
   .h4,
   .h5,
   .h6 {
     @apply font-heading font-semibold;
+  }
+
+  h1,
+  .h1 {
+    @apply font-heading font-medium tracking-normal;
   }
 }
 

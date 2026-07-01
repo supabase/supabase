@@ -12,7 +12,7 @@ import { TelemetryTagManager } from 'common'
 import { genFaviconData } from 'common/MetaFavicons/app-router'
 import type { Metadata, Viewport } from 'next'
 
-import { inter, manrope } from '@/fonts'
+import { inter, manrope } from '@/lib/fonts'
 
 const { metadataApplicationName, metadataTitle } = getCustomContent([
   'metadata:application_name',
