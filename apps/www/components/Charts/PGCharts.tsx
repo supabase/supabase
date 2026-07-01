@@ -43,7 +43,7 @@ const CustomizedAxisTick = (props: any) => {
         y={-12}
         dy={16}
         textAnchor="end"
-        fill="hsl(var(--foreground-lighter))"
+        fill="var(--foreground-lighter)"
         transform="rotate(-35)"
         className="text-xs"
       >
@@ -72,14 +72,14 @@ const Chart = () => {
         @ts-ignore */}
           <BarChart data={data[selection]} layout="vertical">
             <XAxis
-              axisLine={{ stroke: 'hsl(var(--border-default))' }}
-              tickLine={{ stroke: 'hsl(var(--border-default))' }}
+              axisLine={{ stroke: 'var(--border-default)' }}
+              tickLine={{ stroke: 'var(--border-default)' }}
               type="number"
               tickMargin={8}
               style={{
                 fontSize: '14px',
                 marginBottom: '32px',
-                color: 'hsl(var(--foreground-default))',
+                color: 'var(--foreground-default)',
               }}
               tick={<CustomizedAxisTick />}
               label={{
@@ -91,7 +91,7 @@ const Chart = () => {
                       : 'Number of results',
                 position: 'insideBottom',
                 offset: -32,
-                fill: 'hsl(var(--foreground-default))',
+                fill: 'var(--foreground-default)',
               }}
             />
             <YAxis
@@ -100,12 +100,12 @@ const Chart = () => {
               style={{
                 fontSize: '14px',
                 marginBottom: '32px',
-                color: 'hsl(var(--foreground-lighter))',
+                color: 'var(--foreground-lighter)',
               }}
               minTickGap={16}
               tickMargin={8}
-              axisLine={{ stroke: 'hsl(var(--border-default))' }}
-              tickLine={{ stroke: 'hsl(var(--border-default))' }}
+              axisLine={{ stroke: 'var(--border-default)' }}
+              tickLine={{ stroke: 'var(--border-default)' }}
               tick={<CustomizedAxisTick />}
             />
             {dimensions.map((dimension: string, index: number) => {

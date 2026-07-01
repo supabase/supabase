@@ -105,7 +105,7 @@ export const CPU_TIME_CHART_CONFIG = {
 export const EXECUTION_TIME_CHART_CONFIG = {
   avg_execution_time: {
     label: 'Average Execution Time',
-    color: 'hsl(var(--foreground-default))',
+    color: 'var(--foreground-default)',
   },
   max_execution_time: {
     label: 'Max Execution Time',

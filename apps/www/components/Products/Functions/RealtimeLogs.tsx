@@ -75,13 +75,13 @@ const RealtimeLogs: FC<Props> = ({ isActive, isInView, className }) => {
     <div className={cn('absolute inset-0 overflow-hidden', className)}>
       <div
         className={cn(
-          'visual-overlay absolute z-20 pointer-events-none inset-0 bottom-auto h-32 bg-[linear-gradient(to_bottom,hsl(var(--background-surface-75))_0%,transparent_100%)] transition-opacity duration-300',
+          'visual-overlay absolute z-20 pointer-events-none inset-0 bottom-auto h-32 bg-[linear-gradient(to_bottom,var(--background-surface-75)_0%,transparent_100%)] transition-opacity duration-300',
           isPlaying ? 'opacity-100' : 'opacity-0'
         )}
       />
       <div
         className={cn(
-          'visual-overlay absolute z-20 pointer-events-none inset-0 top-auto h-32 bg-[linear-gradient(to_top,hsl(var(--background-surface-75))_0%,transparent_100%)] transition-opacity duration-300',
+          'visual-overlay absolute z-20 pointer-events-none inset-0 top-auto h-32 bg-[linear-gradient(to_top,var(--background-surface-75)_0%,transparent_100%)] transition-opacity duration-300',
           isPlaying ? 'opacity-100' : 'opacity-0'
         )}
       />

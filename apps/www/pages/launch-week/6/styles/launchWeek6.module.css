@@ -7,7 +7,7 @@
     closest-side at 50% 50%,
     #132121,
     #132121db,
-    hsl(var(--background-default))
+    var(--background-default)
   );
 }
 

@@ -188,9 +188,9 @@ export const APIKeys = () => {
               className="absolute inset-0 rounded-md -mt-px"
               style={{
                 backgroundImage: `
-                  linear-gradient(to top, hsl(var(--background-surface-100)/1) 0%, hsl(var(--background-surface-100)/1) 30%, hsl(var(--background-surface-75)/0) 100%),
-                  linear-gradient(to right, hsl(var(--border-default)/0.33) 1px, transparent 1px),
-                  linear-gradient(to bottom, hsl(var(--border-default)/0.33) 1px, transparent 1px)
+                  linear-gradient(to top, oklch(from var(--background-surface-100) l c h / 1) 0%, oklch(from var(--background-surface-100) l c h / 1) 30%, oklch(from var(--background-surface-75) l c h / 0) 100%),
+                  linear-gradient(to right, oklch(from var(--border-default) l c h / 0.33) 1px, transparent 1px),
+                  linear-gradient(to bottom, oklch(from var(--border-default) l c h / 0.33) 1px, transparent 1px)
                 `,
                 backgroundSize: '100% 100%, 15px 15px, 15px 15px',
                 backgroundPosition: '0 0, 0 0, 0 0',

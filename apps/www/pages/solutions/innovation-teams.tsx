@@ -113,7 +113,7 @@ const InnovationTeams: NextPage = () => {
                 <svg className="w-[300px] h-[120px]" viewBox="0 0 300 120" fill="none">
                   <path
                     d="M 150 0 L 30 120"
-                    stroke="hsl(var(--border-strong))"
+                    stroke="var(--border-strong)"
                     strokeWidth="2"
                     strokeDasharray="6 4"
                     strokeOpacity="0.5"
@@ -121,7 +121,7 @@ const InnovationTeams: NextPage = () => {
                   />
                   <path
                     d="M 150 0 L 100 120"
-                    stroke="hsl(var(--border-strong))"
+                    stroke="var(--border-strong)"
                     strokeWidth="2"
                     strokeDasharray="6 4"
                     strokeOpacity="0.5"
@@ -129,13 +129,13 @@ const InnovationTeams: NextPage = () => {
                   />
                   <path
                     d="M 150 0 L 150 120"
-                    stroke="hsl(var(--border-strong))"
+                    stroke="var(--border-strong)"
                     strokeWidth="2"
                     fill="none"
                   />
                   <path
                     d="M 150 0 L 200 120"
-                    stroke="hsl(var(--border-strong))"
+                    stroke="var(--border-strong)"
                     strokeWidth="2"
                     strokeDasharray="6 4"
                     strokeOpacity="0.5"
@@ -143,7 +143,7 @@ const InnovationTeams: NextPage = () => {
                   />
                   <path
                     d="M 150 0 L 270 120"
-                    stroke="hsl(var(--border-strong))"
+                    stroke="var(--border-strong)"
                     strokeWidth="2"
                     strokeDasharray="6 4"
                     strokeOpacity="0.5"
@@ -268,7 +268,7 @@ const InnovationTeams: NextPage = () => {
                         <svg className="w-8 h-full" viewBox="0 0 32 100" fill="none">
                           <path
                             d="M 0 50 L 32 50"
-                            stroke="hsl(var(--border-strong))"
+                            stroke="var(--border-strong)"
                             strokeWidth="2"
                             strokeDasharray="4 4"
                           />

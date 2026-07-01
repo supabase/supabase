@@ -103,7 +103,7 @@
    * (--background-surface-300) already resolves per theme — so only --color-base below
    * needs to branch on light/dark. */
   --color-primary: 153, 50%, 50%;
-  --graphiql-response-bg: hsl(var(--background-surface-300));
+  --graphiql-response-bg: var(--background-surface-300);
 }
 
 :global(body.graphiql-dark) .root {

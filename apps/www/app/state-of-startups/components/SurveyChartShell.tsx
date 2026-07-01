@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 
 const CHART_GRADIENT =
-  'radial-gradient(circle at center -150%, hsl(var(--brand-300)), transparent 80%), radial-gradient(ellipse at center 230%, hsl(var(--background-surface-200)), transparent 75%)'
+  'radial-gradient(circle at center -150%, hsl(var(--brand-300)), transparent 80%), radial-gradient(ellipse at center 230%, var(--background-surface-200), transparent 75%)'
 
 /** Shared frame for every survey chart: gradient container + Q&A/eyebrow header.
  *  When `isEmpty` is set (no data for the active year), renders the

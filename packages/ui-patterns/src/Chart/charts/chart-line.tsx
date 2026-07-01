@@ -16,8 +16,8 @@ import type { CategoricalChartState } from 'recharts/types/chart/types'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 
 const CHART_COLORS = {
-  TICK: 'hsl(var(--background-overlay-hover))',
-  AXIS: 'hsl(var(--background-overlay-hover))',
+  TICK: 'var(--background-overlay-hover)',
+  AXIS: 'var(--background-overlay-hover)',
   BRAND: 'hsl(var(--brand-default))',
   BRAND_HOVER: 'hsl(var(--brand-500))',
 }

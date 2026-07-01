@@ -65,7 +65,7 @@ export const Success = ({
         <Button
           asChild
           variant="default"
-          icon={<IconDiscord size={16} fill="hsl(var(--background-default))" />}
+          icon={<IconDiscord size={16} fill="var(--background-default)" />}
         >
           <Link href="https://discord.supabase.com/" target="_blank">
             Join Discord

@@ -1,5 +1,7 @@
 import { SurveyPullQuote } from './SurveyPullQuote'
+
 import './surveyResults.css'
+
 import { DecorativeProgressBar } from './DecorativeProgressBar'
 
 interface SurveyChapterProps {
