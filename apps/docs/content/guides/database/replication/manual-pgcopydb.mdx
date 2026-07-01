@@ -1,0 +1,121 @@
+---
+id: 'using-pgcopydb'
+title: 'Using pgcopydb to migrate data to/from Supabase'
+description: 'Convert TimescaleDB hypertables to Postgres native partitions managed by pg_partman.'
+---
+
+pgcopydb is a command line tool that can run continuous or one-time migrations between Postgres and Postgres-compatible databases.
+Within Supabase, you can use it to migrate data into, or out of, your project.
+
+There are 2 primary commands for pgcopydb:
+1. `pgcopydb clone` - A one-time migration between databases
+2. `pgcopydb clone --follow` - A continuous migration that keeps the target database in sync with the source database
+
+The steps to follow for migrating data into or out of Supabase are similar, and are outlined below. The `clone` command is a high-level wrapper for individual commands within pgcopydb, but you can use it to only dump the database schema, or users.
+
+The requirments for this guide are:
+1. A `source` database 
+2. A `target` database 
+3. A server (or your local machine) with `pgcopydb` installed and network access to both databases
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+
+    <StepHikeCompact.Details title="Prepare your source database">
+
+    On your source database, you will need to create a logical replication slot.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```sql
+    select pg_create_logical_replication_slot('pgcopydb_slot', 'wal2json');
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Prepare your target database">
+
+    On your target database, you will need to add a replication origin. Your target database should be empty before you run pgcopydb.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+        ```sql
+          select pg_replication_origin_create('pgcopydb_origin');
+        ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+
+    <StepHikeCompact.Details title="Prepare your connection credentials">
+
+    Get your connection credentials for each database. Set all of your variables in an `.env` file, or export them as environment variables. You will need:
+
+
+    <Admonition type="note" title="Replication role">
+      You may want to create a dedicated user for pgcopydb, be sure that they have access to the right data and replication privileges.
+    </Admonition>
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```bash
+      PGCOPYDB_SOURCE_URI=postgres://username:password@host:port/database?sslmode=require
+      PGCOPYDB_TARGET_URI=postgres://username:password@host:port/database?sslmode=require
+      PGCOPYDB_OUTPUT_PLUGIN=wal2json
+      SLOT_NAME=pgcopydb_slot
+      ORIGIN_NAME=pgcopydb_origin
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+    <StepHikeCompact.Step step={4}>
+
+    <StepHikeCompact.Details title="Run pgcopydb">
+
+    Depending on the size of your data, this can take some time. Make sure that the command can run uninterrupted. pgopydb uses logical replication under the hood so you can use the monitoring tips outlined in the [docs](/guides/database/replication/manual-replication-monitoring) to check the progress.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+        ```bash
+          pgcopydb clone --follow --no-owner  --no-acl  --verbose --debug --resume --not-consistent --slot-name $SLOT_NAME --origin $ORIGIN_NAME
+        ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>
+
+## Troubleshooting
+
+### pgcopydb fails to connect to the source or target database
+
+Ensure that your connection details are a direct connection to the database and that your client supports IPv6 (or you have the IPv4 addon enabled).
+
+### Permission errors
+
+Your user needs to have the `replication` role on your database and it must have access to the data you are trying to migrate. If you experience this with a Supabase database, the default `postgres` has all of the necessary permissions.
+
+You may not need all of the steps that `clone` uses, in which case you can use the individual commands, this is covered in their [docs](https://pgcopydb.readthedocs.io/en/latest/ref/pgcopydb_clone.html#postgres-privileges-superuser-and-dump-and-restore)
+
+### Disk space errors on the server
+
+The default directory for storing intermediate data is `/tmp/pgcopydb`. You can change this by setting the `TMPDIR` environment variable.
+
+## Additional resources
+
+- [pgcopydb documentation](https://pgcopydb.readthedocs.io/en/latest/)

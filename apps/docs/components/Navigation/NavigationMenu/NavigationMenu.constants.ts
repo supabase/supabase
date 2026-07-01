@@ -1211,6 +1211,10 @@ export const database: NavMenuConstant = {
               name: 'Monitoring',
               url: '/guides/database/replication/manual-replication-monitoring' as `/${string}`,
             },
+            {
+              name: 'Using pgcopydb',
+              url: '/guides/database/replication/manual-pgcopydb' as `/${string}`,
+            },
             { name: 'FAQ', url: '/guides/database/replication/manual-replication-faq' },
           ],
         },
