@@ -4,7 +4,7 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { billingMetricUnit, formatUsage } from '../helpers'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import {

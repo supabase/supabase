@@ -13,10 +13,15 @@ const sectionContainerVariants = cva('section-container relative', {
       narrow: 'py-6 md:py-8 lg:py-8 xl:py-10',
       none: '',
     },
+    spacing: {
+      none: '',
+      sections: 'space-y-8 md:space-y-16',
+    },
   },
   defaultVariants: {
     width: 'normal',
     height: 'normal',
+    spacing: 'none',
   },
 })
 
@@ -33,8 +38,12 @@ interface Props extends VariantProps<typeof sectionContainerVariants> {
  * @param height - 'normal' (default) or 'narrow'
  */
 const SectionContainerWithCn = forwardRef(
-  ({ children, className, id, width, height }: Props, ref: Ref<HTMLDivElement>) => (
-    <div ref={ref} id={id} className={cn(sectionContainerVariants({ width, height }), className)}>
+  ({ children, className, id, width, height, spacing }: Props, ref: Ref<HTMLDivElement>) => (
+    <div
+      ref={ref}
+      id={id}
+      className={cn(sectionContainerVariants({ width, height, spacing }), className)}
+    >
       {children}
     </div>
   )

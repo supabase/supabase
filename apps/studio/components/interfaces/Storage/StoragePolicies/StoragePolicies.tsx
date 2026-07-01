@@ -3,7 +3,6 @@ import { isEmpty } from 'lodash'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -14,6 +13,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { formatPoliciesForStorage, UNGROUPED_POLICY_SYMBOL } from '../Storage.utils'
 import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
@@ -22,9 +22,9 @@ import { StoragePoliciesEditPolicyModal } from './StoragePoliciesEditPolicyModal
 import type {
   PostgresPolicyCreatePayload,
   PostgresPolicyUpdatePayload,
-} from '@/components/interfaces/Auth/Policies/Policies.types'
-import { PolicyEditorModal } from '@/components/interfaces/Auth/Policies/PolicyEditorModal'
-import type { Policy } from '@/components/interfaces/Auth/Policies/PolicyTableRow/PolicyTableRow.utils'
+} from '@/components/interfaces/Database/Policies/Policies.types'
+import { PolicyEditorModal } from '@/components/interfaces/Database/Policies/PolicyEditorModal'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useDatabasePolicyCreateMutation } from '@/data/database-policies/database-policy-create-mutation'
 import { useDatabasePolicyDeleteMutation } from '@/data/database-policies/database-policy-delete-mutation'
