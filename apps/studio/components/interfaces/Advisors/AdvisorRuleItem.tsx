@@ -12,15 +12,15 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { LintInfo } from '../Linter/Linter.constants'
 import { generateRuleText } from './AdvisorRules.utils'
 import { CreateRuleSheet } from './CreateRuleSheet'
 import { DisableRuleModal } from './DisableRuleModal'
 import { EnableRuleModal } from './EnableRuleModal'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useLintRuleDeleteMutation } from '@/data/lint/delete-lint-rule-mutation'

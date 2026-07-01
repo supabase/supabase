@@ -193,13 +193,15 @@ export const DestinationForm = ({
 
   const getSubmitButtonText = () => {
     if (editMode) {
-      return existingDestination?.enabled ? 'Apply and restart' : 'Apply and start'
+      return existingDestination?.enabled
+        ? 'Apply and restart pipeline'
+        : 'Apply and start pipeline'
     } else {
       if (hasRunValidation && validationWarnings.length > 0 && !hasValidationFailures) {
-        return 'Create and start anyway'
+        return 'Create and start pipeline anyway'
       }
 
-      return 'Create and start'
+      return 'Create and start pipeline'
     }
   }
 
@@ -365,7 +367,11 @@ export const DestinationForm = ({
               <p className="text-foreground-light text-sm">
                 {isValidating
                   ? 'Validating destination configuration...'
-                  : `${editMode ? 'Updating' : 'Creating'} destination...`}
+                  : editMode
+                    ? existingDestination?.enabled
+                      ? 'Updating destination and restarting pipeline...'
+                      : 'Updating destination and starting pipeline...'
+                    : 'Creating pipeline...'}
               </p>
             </motion.div>
           ) : (

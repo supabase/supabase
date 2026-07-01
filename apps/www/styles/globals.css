@@ -12,6 +12,10 @@
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
 @source './../../../packages/marketing/src/**/*.{tsx,ts,js}';
 
+@utility section-container {
+  @apply w-full mx-auto max-w-7xl px-6 lg:px-12 xl:px-24;
+}
+
 @theme {
   --color-purple-sos-100: hsl(293 80% 97%);
   --color-purple-sos-200: hsl(293 85% 91%);
@@ -261,11 +265,6 @@ h6:not(.overwrite) {
   @apply text-foreground-lighter text-xs;
 }
 
-.sbui-border-fix select {
-  @apply border-solid;
-  border-width: 1px;
-}
-
 .section--masked {
   /* overflow: hidden; */
 }
@@ -293,10 +292,6 @@ h6:not(.overwrite) {
   overflow: hidden;
 }
 
-.section-container {
-  position: relative;
-}
-
 .stroke-text {
   -webkit-text-fill-color: transparent; /* Will override color (regardless of order) */
   -webkit-text-stroke-width: 1px;
@@ -313,20 +308,6 @@ h6:not(.overwrite) {
   @apply border border-strong;
 }
 
-.sbui-tabs--alt div[role='tablist'] .sbui-btn-primary {
-  @apply bg-border-stronger text-white;
-  text-shadow: none;
-  font-weight: 400;
-}
-.sbui-tabs--alt div[role='tablist'] .sbui-btn-text {
-  @apply text-border-muted;
-  font-weight: 400;
-  shadow: none;
-}
-
-.sbui-tabs--underline-alt div[role='tablist'] .sbui-tab-button-underline--active {
-  @apply border-foreground-muted;
-}
 /* override position of tabs  */
 .dashboard-tabs > div > div {
   justify-content: center;
@@ -351,14 +332,6 @@ table {
   border-collapse: collapse;
 }
 
-.sbui-typography-container thead {
-  @apply text-border;
-}
-
-.sbui-typography a {
-  @apply wrap-break-word;
-}
-
 /*
  * sets the image in @Next/Image components to respect the height of the content
  */
@@ -371,28 +344,7 @@ table {
 }
 .next-image--dynamic-fill.wide,
 video.wide {
-  @apply sm:my-0 sm:max-w-none sm:-mx-8 sm:w-[calc(100%+4rem)];
-}
-@media (min-width: 560px) {
-  .next-image--dynamic-fill.wide,
-  video.wide {
-    width: calc(100% + 6rem) !important;
-    margin: 0 -3rem;
-  }
-}
-@media (min-width: 1280px) {
-  .next-image--dynamic-fill.wide,
-  video.wide {
-    width: calc(100% + 10rem) !important;
-    margin: 0 -5rem;
-  }
-}
-@media (min-width: 1535px) {
-  .next-image--dynamic-fill.wide,
-  video.wide {
-    width: calc(100% + 14rem) !important;
-    margin: 0 -7rem;
-  }
+  @apply sm:max-w-none -mx-2 w-[calc(100%+1rem)] md:-mx-4 md:w-[calc(100%+2rem)] lg:-mx-8 lg:w-[calc(100%+4rem)];
 }
 
 .next-image--dynamic-fill > span {

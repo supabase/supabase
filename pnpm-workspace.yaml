@@ -7,12 +7,16 @@ packages:
 blockExoticSubdeps: true
 
 catalog:
-  '@sentry/nextjs': ^10.26.0
+  '@monaco-editor/react': ^4.7.0
+  '@sentry/nextjs': ^10.59.0
   '@supabase/auth-js': 2.108.2
   '@supabase/postgrest-js': 2.108.2
   '@supabase/realtime-js': 2.108.2
   '@supabase/ssr': 0.10.2
   '@supabase/supabase-js': 2.108.2
+  '@tanstack/react-router': ^1.169.2
+  '@tanstack/react-start': ^1.167.65
+  '@tanstack/react-table': ^8.21.3
   '@types/node': ^22.0.0
   '@types/react': ^19.2.14
   '@types/react-dom': ^19.2.3
@@ -21,6 +25,7 @@ catalog:
   '@vitest/ui': ^4.1.4
   lodash: ^4.18.1
   lodash-es: ^4.18.1
+  monaco-editor: 0.52.2
   next: 16.2.6
   next-themes: ^0.4.6
   postcss: ^8.5.10
@@ -55,7 +60,6 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
-  # The following are excluded to fix vulnerablities.
   - react-use
 
 onlyBuiltDependencies:
@@ -64,17 +68,22 @@ onlyBuiltDependencies:
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
+  'monaco-editor': 'catalog:'
   '@mapbox/node-pre-gyp>tar': ^7.5.11
   '@sentry/webpack-plugin>uuid': ^11.1.1
   '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
-  'braintrust>uuid': ^11.1.1
-  'mdx-bundler>uuid': ^11.1.1
   braintrust>esbuild: ^0.28.1
+  braintrust>uuid: ^11.1.1
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
   express-rate-limit>ip-address: ^10.1.1
+  # Pin h3 v1 to a single version so the Nuxt registry example (vue-blocks)
+  # doesn't end up with two copies (1.15.10 + 1.15.11) and hit nominal
+  # H3Event type mismatches. v2 (h3@2) is intentionally left untouched.
+  'h3@1': 1.15.11
   lodash: 'catalog:'
   lodash-es: 'catalog:'
+  mdx-bundler>uuid: ^11.1.1
   node-gyp>tar: ^7.5.11
   nodemailer: ^7.0.11
   postcss: 'catalog:'

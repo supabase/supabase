@@ -76,7 +76,7 @@ export const ResetPasswordForm = () => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onResetPassword)} className="space-y-4 pt-4">
+      <form method="POST" onSubmit={form.handleSubmit(onResetPassword)} className="space-y-4 pt-4">
         {requireCurrentPassword && (
           <FormField
             control={form.control}

@@ -12,7 +12,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
@@ -25,7 +25,7 @@ import { STORAGE_BUCKET_SORT } from '../Storage.constants'
 import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
 import { BucketsTable } from './BucketsTable'
 import { useFilesBucketsShortcuts } from './useFilesBucketsShortcuts'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'

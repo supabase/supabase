@@ -3,8 +3,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, cn, Loading } from 'ui'
-import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
+import { Row } from 'ui-patterns/Row'
 
 import {
   buildSortedServiceCards,
@@ -76,6 +76,7 @@ export const ProjectUsageSectionDeltas = () => {
       {
         key: 'functions',
         title: 'Edge Functions',
+        href: `/project/${projectRef}/functions`,
         route: '/logs/edge-functions-logs',
         enabled: true,
       },
@@ -96,12 +97,14 @@ export const ProjectUsageSectionDeltas = () => {
       {
         key: 'realtime',
         title: 'Realtime',
+        href: `/project/${projectRef}/realtime/inspector`,
         route: '/logs/realtime-logs',
         enabled: true,
       },
       {
         key: 'data_api',
         title: 'API Gateway',
+        href: `/project/${projectRef}/integrations/data_api/overview`,
         route: '/logs/edge-logs',
         enabled: dataApiEnabled,
       },

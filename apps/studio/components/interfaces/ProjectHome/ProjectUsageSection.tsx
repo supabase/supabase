@@ -4,9 +4,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, Loading, WarningIcon } from 'ui'
-import { Row } from 'ui-patterns'
 import { ChartEmptyState } from 'ui-patterns/Chart'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
+import { Row } from 'ui-patterns/Row'
 
 import NoDataPlaceholder from '@/components/ui/Charts/NoDataPlaceholder'
 import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
@@ -135,6 +135,7 @@ export const ProjectUsageSection = () => {
       {
         key: 'realtime',
         title: 'Realtime requests',
+        href: `/project/${projectRef}/realtime/inspector`,
         route: '/logs/realtime-logs',
         enabled: true,
       },

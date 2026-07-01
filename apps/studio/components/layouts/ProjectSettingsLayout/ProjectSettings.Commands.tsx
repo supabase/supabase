@@ -58,7 +58,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         name: 'Auth Settings',
         route: authenticationSignInProviders
           ? `/project/${ref}/auth/providers`
-          : `/project/${ref}/auth/policies`,
+          : `/project/${ref}/database/policies`,
         defaultHidden: true,
       },
       ...(platformWebhooksEnabled

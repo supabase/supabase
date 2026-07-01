@@ -19,7 +19,7 @@ import {
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useQueryAbortMutation } from '@/data/sql/abort-query-mutation'
 import { useOngoingQueriesQuery } from '@/data/sql/ongoing-queries-query'
