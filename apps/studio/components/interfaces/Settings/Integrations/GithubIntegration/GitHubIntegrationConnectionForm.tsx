@@ -134,6 +134,7 @@ export const GitHubIntegrationConnectionForm = ({
       new_branch_per_pr: z.boolean().default(true),
       supabaseDirectory: z.string().default('.'),
       supabaseChangesOnly: z.boolean().default(true),
+      commentOnNoChanges: z.boolean().default(true),
       branchLimit: z.string().default('50'),
     })
     .superRefine(async (val, ctx) => {
@@ -170,6 +171,7 @@ export const GitHubIntegrationConnectionForm = ({
       new_branch_per_pr: true,
       supabaseDirectory: '.',
       supabaseChangesOnly: true,
+      commentOnNoChanges: true,
       branchLimit: '3',
     },
   })
@@ -217,6 +219,7 @@ export const GitHubIntegrationConnectionForm = ({
         project_ref: selectedProject.ref,
         repository_id: Number(selectedRepo.id),
         workdir: data.supabaseDirectory,
+        comment_on_no_changes: data.commentOnNoChanges,
         ...(hasAccessToBranching && {
           supabase_changes_only: data.supabaseChangesOnly,
           branch_limit: Number(data.branchLimit),
@@ -268,6 +271,7 @@ export const GitHubIntegrationConnectionForm = ({
       organizationId: selectedOrganization.id,
       connection: {
         workdir: data.supabaseDirectory,
+        comment_on_no_changes: data.commentOnNoChanges,
         ...(hasAccessToBranching && {
           supabase_changes_only: data.supabaseChangesOnly,
           branch_limit: Number(data.branchLimit),
@@ -318,6 +322,7 @@ export const GitHubIntegrationConnectionForm = ({
         new_branch_per_pr: true,
         supabaseDirectory: '.',
         supabaseChangesOnly: true,
+        commentOnNoChanges: true,
         branchLimit: '3',
       })
     } catch (error) {
@@ -358,6 +363,7 @@ export const GitHubIntegrationConnectionForm = ({
         new_branch_per_pr: connection.new_branch_per_pr,
         supabaseDirectory: connection.workdir || '',
         supabaseChangesOnly: connection.supabase_changes_only,
+        commentOnNoChanges: connection.comment_on_no_changes ?? true,
         branchLimit: String(connection.branch_limit),
       })
     }
@@ -448,6 +454,30 @@ export const GitHubIntegrationConnectionForm = ({
                               placeholder="."
                               autoComplete="off"
                               disabled={!canUpdateGitHubConnection}
+                            />
+                          </FormControl>
+                        </FormItemLayout>
+                      )}
+                    />
+                  </CardContent>
+                  <CardContent>
+                    <FormField
+                      control={githubSettingsForm.control}
+                      name="commentOnNoChanges"
+                      render={({ field }) => (
+                        <FormItemLayout
+                          layout="flex-row-reverse"
+                          label="Comment when there are no Supabase changes"
+                          description="Comment on pull requests even when no Supabase files have changed. Turn this off to stop the integration from commenting on pull requests with no Supabase changes."
+                        >
+                          <FormControl>
+                            <Switch
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                              disabled={
+                                (!connection && !canCreateGitHubConnection) ||
+                                (connection && !canUpdateGitHubConnection)
+                              }
                             />
                           </FormControl>
                         </FormItemLayout>
