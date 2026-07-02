@@ -15,8 +15,13 @@ import { collectReferenceContent } from './build-reference-content'
  * doesn't collapse deep / cyclic structures (typeSpec contains
  * self-referencing builder types) into `[Object]` placeholders — which would
  * make param renames, signature changes, and JSDoc edits invisible.
+ *
+ * ---
+ *
+ * Update on Jun 30th, 2026. Skipping this until we figure out a better way to
+ * avoid downloaded typedoc files to block build on unrelated PRs.
  */
-describe('build-reference-content — javascript/v2', () => {
+describe.skip('build-reference-content — javascript/v2', () => {
   it('matches snapshot', async () => {
     const { bySlug, flat, sections, functionsList, typeSpec } = await collectReferenceContent(
       'javascript',

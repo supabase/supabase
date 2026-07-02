@@ -9,6 +9,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  type ChartConfig,
 } from 'ui'
 import { ChartEmptyState, ChartLoadingState } from 'ui-patterns/Chart'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
@@ -45,6 +46,12 @@ const colorClassMap: Record<string, string> = {
   destructive: 'bg-destructive',
   warning: 'bg-warning',
   brand: 'bg-brand',
+}
+
+const LEVEL_CHART_CONFIG: ChartConfig = {
+  error_count: { label: 'Errors' },
+  warning_count: { label: 'Warnings' },
+  ok_count: { label: 'Infos' },
 }
 
 const SERVICE_DESCRIPTIONS: Record<ServiceKey, string> = {
@@ -171,6 +178,7 @@ const ServiceCell = ({
             hideDateRange
             hideXAxis
             data={data.eventChartData}
+            chartConfig={LEVEL_CHART_CONFIG}
             DateTimeFormat={datetimeFormat}
             onBarClick={onBarClick}
             EmptyState={<ChartEmptyState className="h-full" description="No traffic" />}

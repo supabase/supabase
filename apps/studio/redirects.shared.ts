@@ -48,6 +48,11 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
     permanent: true,
   },
   {
+    source: '/project/:ref/auth/policies',
+    destination: '/project/:ref/database/policies',
+    permanent: true,
+  },
+  {
     source: '/project/:ref/database',
     destination: '/project/:ref/database/tables',
     permanent: true,

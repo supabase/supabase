@@ -1,13 +1,12 @@
 import { untrustedSql } from '@supabase/pg-meta'
 import { useMemo } from 'react'
 import { toast } from 'sonner'
-import { proxy, ref, snapshot, useSnapshot } from 'valtio'
+import { proxy, snapshot, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
 
-import { folderStatusOnSaveStart, isNewFolder } from './sql-editor-lifecycle'
+import { folderStatusOnSaveStart, isNewFolder, statusOnEdit } from './sql-editor-lifecycle'
+import { sqlEditorSessionState } from './sql-editor-session-state'
 import type { StateSnippet, StateSnippetFolder } from './types'
-import type { QueryPlanRow } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.types'
-import { DiffType } from '@/components/interfaces/SQLEditor/SQLEditor.types'
 import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 import { Snippet, SnippetFolder } from '@/data/content/sql-folders-query'
 
@@ -31,29 +30,6 @@ export const sqlEditorState = proxy({
   },
 
   /**
-   * Query results, if any, for a snippet. Set as an array per snippetId as we were previously experimenting
-   * with having a Jupyter notebook like UI but it never took off. Nonetheless kept this data structure as
-   * we'd also want to support returning multiple results from a single query (e.g From a query that contains
-   * multiple select statements), and this will allow us to do quite easily.
-   */
-  results: {} as {
-    [snippetId: string]: {
-      rows: any[]
-      error?: any
-      autoLimit?: number
-    }[]
-  },
-
-  /**
-   * Explain results, if any, for a snippet
-   */
-  explainResults: {} as {
-    [snippetId: string]: {
-      rows: QueryPlanRow[]
-      error?: { message: string; formattedError?: string }
-    }
-  },
-  /**
    * Snippets queued for saving. Key is the snippet id, value is whether saving
    * it should also invalidate the snippet/folder lists.
    */
@@ -63,17 +39,6 @@ export const sqlEditorState = proxy({
    * `needsSaving` so snippet and folder saves are scheduled independently.
    */
   pendingFolderSaves: proxyMap<string, boolean>([]),
-  /**
-   * UI-imposed limit for the number of results a query can return (applied to the SQL query being run if applicable).
-   * Acts as a safeguard to prevent accidentally taking down the database from a really large SELECT query.
-   * Related to `autoLimit` in `results`. Refer to `checkIfAppendLimitRequired` and `suffixWithLimit` for usage.
-   */
-  limit: 100,
-
-  /**
-   * For Assistant to render diffing into the editor
-   */
-  diffContent: undefined as undefined | { sql: string; diffType: DiffType },
 
   get allFolderNames() {
     return Object.values(sqlEditorState.folders).map((x) => x.folder.name)
@@ -83,9 +48,6 @@ export const sqlEditorState = proxy({
   // ## Methods to interact the store with
   // ========================================================================
 
-  setDiffContent: (sql: string, diffType: DiffType) =>
-    (sqlEditorState.diffContent = { sql, diffType }),
-
   /**
    * Load snippet into SQL Editor Valtio store
    */
@@ -93,8 +55,6 @@ export const sqlEditorState = proxy({
     if (sqlEditorState.snippets[snippet.id]) return
 
     sqlEditorState.snippets[snippet.id] = { projectRef, splitSizes: [50, 50], snippet }
-    sqlEditorState.results[snippet.id] = []
-    sqlEditorState.explainResults[snippet.id] = { rows: [] }
   },
 
   /**
@@ -150,6 +110,10 @@ export const sqlEditorState = proxy({
     let snippet = sqlEditorState.snippets[id]?.snippet
     if (snippet?.content) {
       snippet.content.unchecked_sql = untrustedSql(sql)
+      // Mark dirty immediately so `status` (not the transient needsSaving queue)
+      // is the durable source of truth for unsaved changes, even before the
+      // debounced save begins.
+      snippet.status = statusOnEdit(snippet.status)
       sqlEditorState.needsSaving.set(id, shouldInvalidate)
     }
   },
@@ -182,11 +146,8 @@ export const sqlEditorState = proxy({
     const { [id]: snippet, ...otherSnippets } = sqlEditorState.snippets
     sqlEditorState.snippets = otherSnippets
 
-    const { [id]: result, ...otherResults } = sqlEditorState.results
-    sqlEditorState.results = otherResults
-
-    const { [id]: explainResult, ...otherExplainResults } = sqlEditorState.explainResults
-    sqlEditorState.explainResults = otherExplainResults
+    // Results/explain live in the session store; drop this snippet's entries.
+    sqlEditorSessionState.clearForSnippet(id)
 
     if (!skipSave) sqlEditorState.needsSaving.delete(id)
   },
@@ -266,11 +227,6 @@ export const sqlEditorState = proxy({
     sqlEditorState.folders = otherFolders
   },
 
-  /**
-   * Set the value for the auto limit for SELECT based SQL queries
-   */
-  setLimit: (value: number) => (sqlEditorState.limit = value),
-
   addNeedsSaving: (id: string) => sqlEditorState.needsSaving.set(id, true),
 
   addFavorite: (id: string) => {
@@ -287,47 +243,6 @@ export const sqlEditorState = proxy({
       storeSnippet.snippet.favorite = false
       sqlEditorState.needsSaving.set(id, true)
     }
-  },
-
-  addResult: (id: string, results: any[], autoLimit?: number) => {
-    if (sqlEditorState.results[id]) {
-      // Use ref() to prevent Valtio from creating proxies for each row object.
-      // This is critical for large result sets - without ref(), Valtio wraps every
-      // row and nested property in a Proxy, causing massive memory overhead.
-      // Alright to use ref() in this case as the data is meant to be read-only and we
-      // don't need to track changes to the underlying data
-      sqlEditorState.results[id] = [{ rows: ref(results), autoLimit }]
-    }
-  },
-
-  addResultError: (id: string, error: any, autoLimit?: number) => {
-    if (sqlEditorState.results[id]) {
-      sqlEditorState.results[id] = [{ rows: ref([]), error, autoLimit }]
-    }
-  },
-
-  resetResult: (id: string) => {
-    if (sqlEditorState.results[id]) {
-      sqlEditorState.results[id] = []
-    }
-  },
-
-  addExplainResult: (id: string, results: QueryPlanRow[]) => {
-    // Use ref() to prevent Valtio from creating proxies for each row object
-    sqlEditorState.explainResults[id] = { rows: ref(results) }
-  },
-
-  addExplainResultError: (id: string, error: { message: string; formattedError?: string }) => {
-    sqlEditorState.explainResults[id] = { rows: ref([]), error }
-  },
-
-  resetExplainResult: (id: string) => {
-    sqlEditorState.explainResults[id] = { rows: [] }
-  },
-
-  resetResults: (id: string) => {
-    sqlEditorState.resetResult(id)
-    sqlEditorState.resetExplainResult(id)
   },
 })
 

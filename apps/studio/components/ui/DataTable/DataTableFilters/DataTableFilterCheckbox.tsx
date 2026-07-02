@@ -111,7 +111,7 @@ export function DataTableFilterCheckbox<TData>({
                   />
                   <Label
                     htmlFor={`${value}-${option.value}`}
-                    className="flex w-full items-center justify-between gap-2 text-foreground/70 group-hover:text-accent-foreground text-[0.8rem] min-w-0"
+                    className="relative flex w-full items-center justify-between gap-2 text-foreground/70 group-hover:text-accent-foreground text-[0.8rem] min-w-0"
                   >
                     <div className="flex-1 min-w-0 overflow-hidden">
                       {Component ? (
@@ -126,7 +126,11 @@ export function DataTableFilterCheckbox<TData>({
                         aria-label={isExpanded ? 'Collapse' : 'Expand'}
                         aria-expanded={isExpanded}
                         onClick={() => toggleExpanded(optionKey)}
-                        className="flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-foreground-lighter hover:bg-selection hover:text-foreground mr-2.5"
+                        className={cn(
+                          'flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-foreground-lighter',
+                          'hover:bg-selection hover:text-foreground',
+                          'absolute top-0 right-10'
+                        )}
                       >
                         {isExpanded ? <Minus size={12} /> : <Plus size={12} />}
                       </button>
@@ -148,15 +152,17 @@ export function DataTableFilterCheckbox<TData>({
                         'rounded-md ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
                       )}
                     >
-                      <span className="px-2">only</span>
+                      <span className="pr-2">only</span>
                     </button>
                   </Label>
                 </div>
+
                 {hasNested &&
                   isExpanded &&
                   option.options?.map((optionNested, nestedIndex) => {
                     const nestedChecked = getBooleanParam(optionNested.value)
                     const isLastNested = nestedIndex === (option.options?.length ?? 0) - 1
+
                     return (
                       <div
                         key={optionNested.value}

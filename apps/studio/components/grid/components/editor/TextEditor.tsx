@@ -119,7 +119,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
           <div
             className={cn(
               !!value && value.toString().trim().length === 0 && 'sb-grid-fill-container',
-              'sb-grid-text-editor__trigger'
+              'text-grid overflow-hidden text-ellipsis px-2'
             )}
             onClick={() => setIsPopoverOpen(!isPopoverOpen)}
           >

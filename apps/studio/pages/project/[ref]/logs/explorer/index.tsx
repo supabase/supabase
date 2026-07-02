@@ -16,8 +16,8 @@ import {
 import {
   EXPLORER_DATEPICKER_HELPERS,
   getDefaultHelper,
+  getLogsTemplates,
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
-  TEMPLATES,
 } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import { LogData, LogsWarning, LogTemplate } from '@/components/interfaces/Settings/Logs/Logs.types'
@@ -85,11 +85,13 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const track = useTrack()
   const projectRef = ref as string
   const { logsShowMetadataIpTemplate } = useIsFeatureEnabled(['logs:show_metadata_ip_template'])
+  const useOtelEndpoint = useFlag('otelLegacyLogs')
 
   const allTemplates = useMemo(() => {
-    if (logsShowMetadataIpTemplate) return TEMPLATES
-    else return TEMPLATES.filter((x) => x.label !== 'Metadata IP')
-  }, [logsShowMetadataIpTemplate])
+    const templates = getLogsTemplates(useOtelEndpoint)
+    if (logsShowMetadataIpTemplate) return templates
+    else return templates.filter((x) => x.label !== 'Metadata IP')
+  }, [logsShowMetadataIpTemplate, useOtelEndpoint])
 
   const editorRef = useRef<editor.IStandaloneCodeEditor>(null)
   const [editorId] = useState<string>(uuidv4())
@@ -110,8 +112,6 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     }
   }, [timestampStart, timestampEnd, defaultHelper])
   const [datePickerValue, setDatePickerValue] = useState<DatePickerValue>(initialDatePickerValue)
-
-  const useOtelEndpoint = useFlag('otelLegacyLogs')
 
   const { logsDefaultQuery } = useCustomContent(['logs:default_query'])
   const PLACEHOLDER_QUERY = useOtelEndpoint
