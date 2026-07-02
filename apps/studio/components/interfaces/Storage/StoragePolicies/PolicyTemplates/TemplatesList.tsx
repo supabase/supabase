@@ -1,7 +1,7 @@
 import { noop } from 'lodash'
 import { Menu } from 'ui'
 
-import { PolicyTemplate } from './PolicyTemplates.constants'
+import { type PolicyTemplate } from '@/components/interfaces/Database/Policies/Policies.constants'
 
 interface TemplatesListProps {
   templates: PolicyTemplate[]

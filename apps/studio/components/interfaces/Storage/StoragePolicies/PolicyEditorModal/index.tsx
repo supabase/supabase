@@ -4,7 +4,10 @@ import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from 'ui'
 
-import { POLICY_MODAL_VIEWS } from '../Policies.constants'
+import { PolicyEditor } from '../PolicyEditor'
+import { PolicyReview } from '../PolicyReview'
+import { PolicySelection } from '../PolicySelection'
+import { PolicyTemplates } from '../PolicyTemplates'
 import {
   DraftPostgresPolicyCreatePayload,
   DraftPostgresPolicyUpdatePayload,
@@ -12,20 +15,19 @@ import {
   PolicyForReview,
   PostgresPolicyCreatePayload,
   PostgresPolicyUpdatePayload,
-} from '../Policies.types'
+} from '../StoragePolicies.types'
 import {
   createPayloadForCreatePolicy,
   createPayloadForUpdatePolicy,
   createSQLPolicy,
-} from '../Policies.utils'
-import { PolicyEditor } from '../PolicyEditor'
-import { PolicyReview } from '../PolicyReview'
-import PolicySelection from '../PolicySelection'
-import PolicyTemplates from '../PolicyTemplates'
-import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
-import { getGeneralPolicyTemplates } from './PolicyEditorModal.constants'
-import PolicyEditorModalTitle from './PolicyEditorModalTitle'
+} from '../StoragePolicies.utils'
+import { POLICY_MODAL_VIEWS } from './PolicyEditorModal.constants'
+import { PolicyEditorModalTitle } from './PolicyEditorModalTitle'
 import { useFeaturePreviewModal } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  getGeneralPolicyTemplates,
+  type PolicyTemplate,
+} from '@/components/interfaces/Database/Policies/Policies.constants'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'

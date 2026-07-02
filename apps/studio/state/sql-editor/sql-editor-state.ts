@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { proxy, snapshot, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
 
-import { folderStatusOnSaveStart, isNewFolder } from './sql-editor-lifecycle'
+import { folderStatusOnSaveStart, isNewFolder, statusOnEdit } from './sql-editor-lifecycle'
 import { sqlEditorSessionState } from './sql-editor-session-state'
 import type { StateSnippet, StateSnippetFolder } from './types'
 import type { SnippetWithContent } from '@/data/content/sql-folders-query'
@@ -110,6 +110,10 @@ export const sqlEditorState = proxy({
     let snippet = sqlEditorState.snippets[id]?.snippet
     if (snippet?.content) {
       snippet.content.unchecked_sql = untrustedSql(sql)
+      // Mark dirty immediately so `status` (not the transient needsSaving queue)
+      // is the durable source of truth for unsaved changes, even before the
+      // debounced save begins.
+      snippet.status = statusOnEdit(snippet.status)
       sqlEditorState.needsSaving.set(id, shouldInvalidate)
     }
   },

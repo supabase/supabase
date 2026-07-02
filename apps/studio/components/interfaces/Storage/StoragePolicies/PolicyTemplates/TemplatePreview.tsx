@@ -1,6 +1,6 @@
 import { isEmpty } from 'lodash'
 
-import { PolicyTemplate } from './PolicyTemplates.constants'
+import { type PolicyTemplate } from '@/components/interfaces/Database/Policies/Policies.constants'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 
 interface TemplatePreviewProps {

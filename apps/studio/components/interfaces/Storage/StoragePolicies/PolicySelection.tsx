@@ -12,7 +12,7 @@ interface PolicySelectionProps {
   onToggleFeaturePreviewModal?: () => void
 }
 
-const PolicySelection = ({
+export const PolicySelection = ({
   description = '',
   showAssistantPreview,
   onViewTemplates = noop,
@@ -89,5 +89,3 @@ const PolicySelection = ({
     </DialogSection>
   )
 }
-
-export default PolicySelection

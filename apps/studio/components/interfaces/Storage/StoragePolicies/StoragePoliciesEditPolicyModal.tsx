@@ -8,13 +8,13 @@ import {
   createPayloadsForAddPolicy,
   createSQLPolicies,
 } from '../Storage.utils'
+import { POLICY_MODAL_VIEWS } from './PolicyEditorModal/PolicyEditorModal.constants'
+import { PolicySelection } from './PolicySelection'
+import { PolicyTemplates } from './PolicyTemplates'
 import { STORAGE_POLICY_TEMPLATES } from './StoragePolicies.constants'
-import StoragePoliciesEditor from './StoragePoliciesEditor'
-import StoragePoliciesReview from './StoragePoliciesReview'
+import { StoragePoliciesEditor } from './StoragePoliciesEditor'
+import { StoragePoliciesReview } from './StoragePoliciesReview'
 import { StoragePolicyEditorModalTitle } from './StoragePolicyEditorModalTitle'
-import { POLICY_MODAL_VIEWS } from '@/components/interfaces/Database/Policies/Policies.constants'
-import PolicySelection from '@/components/interfaces/Database/Policies/PolicySelection'
-import PolicyTemplates from '@/components/interfaces/Database/Policies/PolicyTemplates'
 
 const newPolicyTemplate: any = {
   name: '',
