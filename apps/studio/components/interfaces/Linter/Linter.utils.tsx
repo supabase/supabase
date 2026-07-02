@@ -311,6 +311,15 @@ export const lintInfoMap: LintInfo[] = [
     category: 'security',
   },
   {
+    name: 'project_enabled_legacy_api_keys',
+    title: 'Disable legacy JWT-based API keys (anon, service_role)',
+    icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/settings/api-keys/legacy`,
+    linkText: 'Disable legacy API keys (anon, service_role)',
+    docsLink: `${DOCS_URL}/guides/api/api-keys`,
+    category: 'security',
+  },
+  {
     name: 'sensitive_columns_exposed',
     title: 'Sensitive Columns Exposed',
     icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
