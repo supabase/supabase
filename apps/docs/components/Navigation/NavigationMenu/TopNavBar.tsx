@@ -98,13 +98,7 @@ const HeaderLogo = memo(() => {
   const { navigationLogo } = getCustomContent(['navigation:logo'])
 
   return (
-    <Link
-      href="/"
-      className={cn(
-        buttonVariants({ variant: 'default' }),
-        'flex shrink-0 items-center w-fit bg-transparent! border-none! shadow-none!'
-      )}
-    >
+    <Link href="/" className="flex shrink-0 items-center gap-1.5 w-fit">
       <Image
         className={cn('hidden dark:block m-0!', largeLogo && 'h-[36px]')}
         src={navigationLogo?.dark ?? '/docs/supabase-dark.svg'}
