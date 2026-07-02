@@ -555,11 +555,15 @@ export default function Page() {
           backgroundSize: '16px 16px',
         }}
       >
-        {/* view toggle */}
+        {/* view toggle — stays pinned near the top */}
         <div className="mb-5 flex w-full items-center justify-center">
           <Segmented value={view} onChange={setView} options={VIEW_OPTS} />
         </div>
 
+        {/* Fills the remaining canvas height; on wide/side-by-side screens the
+            row centers within it. (flex-1 items don't shrink below their
+            content, so this can't clip an overflowing row — it just grows.) */}
+        <div className="flex w-full flex-1 flex-col @4xl:items-center @4xl:justify-center">
           <div className="flex w-full flex-col gap-6 @4xl:flex-row @4xl:items-start">
             {showOg && (
               <div className="min-w-0 @4xl:flex-1">
@@ -579,16 +583,17 @@ export default function Page() {
                   <div className="flex flex-col gap-2">
                     {og.fit && (
                       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 self-start rounded-full border border-default bg-background px-3 py-1 text-xs text-foreground-light shadow-sm">
-                        <span className="text-foreground">{og.fit.fontSize}px</span>
+                        <span className="font-medium text-foreground">Headline:</span>
+                        <span className="text-foreground">
+                          {og.fit.fontSize}px{og.fit.mode === 'auto' ? ' (auto on)' : ''}
+                        </span>
                         <span className="text-foreground-lighter">·</span>
                         <span>
                           {og.fit.lineCount} {og.fit.lineCount === 1 ? 'line' : 'lines'}
                         </span>
                         <span className="text-foreground-lighter">·</span>
-                        <span>{og.fit.mode}</span>
-                        <span className="text-foreground-lighter">·</span>
                         <span className={headlineRating === 'Fail' ? 'text-destructive-600' : 'text-brand'}>
-                          {headlineContrast.toFixed(1)}:1 {headlineRating}
+                          WCAG: {headlineContrast.toFixed(1)}:1 {headlineRating}
                         </span>
                       </div>
                     )}
@@ -636,6 +641,7 @@ export default function Page() {
               </div>
             )}
           </div>
+        </div>
       </main>
 
       {/* Floating tool panel — packaged top bar + all controls, docked right.
