@@ -965,3 +965,35 @@ withTestDatabase(
     expect(column?.format_schema).toBe('pg_catalog')
   }
 )
+
+withTestDatabase('alter column from identity to default value', async ({ executeQuery }) => {
+  // Setup table with identity column
+  await executeQuery('CREATE TABLE t (id int4 GENERATED ALWAYS AS IDENTITY)')
+
+  // Retrieve the column first
+  const { sql: retrieveSql, zod: retrieveZod } = pgMeta.columns.retrieve({
+    schema: 'public',
+    table: 't',
+    name: 'id',
+  })
+  const column = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+
+  // Update from identity to default value
+  const { sql: updateSql } = pgMeta.columns.update(column!, {
+    is_identity: false,
+    default_value: 100,
+  })
+  await executeQuery(updateSql)
+
+  // Verify the updated column has the default value and is not identity
+  const { sql: verifySql, zod: verifyZod } = pgMeta.columns.retrieve({
+    schema: 'public',
+    table: 't',
+    name: 'id',
+  })
+  const updatedColumn = verifyZod.parse((await executeQuery(verifySql))[0])
+
+  expect(updatedColumn?.is_identity).toBe(false)
+  expect(updatedColumn?.default_value).toBe('100')
+})
+

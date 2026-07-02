@@ -237,3 +237,22 @@ withTestDatabase('retrieve, create, update, delete roles', async ({ executeQuery
   const finalRoles = finalListZod.parse(await executeQuery(finalListSql))
   expect(finalRoles.find((role) => role.name === 'config_role')).toBeUndefined()
 })
+
+withTestDatabase('error handling for non-existent roles', async ({ executeQuery }) => {
+  // Try to update a non-existent role by ID - should raise the custom exception
+  const { sql: updateSql } = pgMeta.roles.update({ id: 999999 }, { canLogin: true })
+  await expect(executeQuery(updateSql)).rejects.toThrowError('Cannot find role 999999')
+
+  // Try to update a non-existent role by name - should raise the custom exception
+  const { sql: updateByNameSql } = pgMeta.roles.update({ name: 'non_existent_role' }, { canLogin: true })
+  await expect(executeQuery(updateByNameSql)).rejects.toThrowError('Cannot find role non_existent_role')
+
+  // Try to remove a non-existent role by name with ifExists: false (default) - should raise exception
+  const { sql: removeSql } = pgMeta.roles.remove({ name: 'non_existent_role' })
+  await expect(executeQuery(removeSql)).rejects.toThrowError('Cannot find role non_existent_role')
+
+  // Try to remove a non-existent role by name with ifExists: true - should succeed silently
+  const { sql: removeIfExistsSql } = pgMeta.roles.remove({ name: 'non_existent_role' }, { ifExists: true })
+  await executeQuery(removeIfExistsSql)
+})
+

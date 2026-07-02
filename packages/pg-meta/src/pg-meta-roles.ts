@@ -23,6 +23,15 @@ const pgRoleOptionalZod = z.optional(pgRoleZod)
 
 export type PGRole = z.infer<typeof pgRoleZod>
 
+/**
+ * Lists all Postgres roles.
+ *
+ * @param options - Options to filter and paginate the role list.
+ * @param options.includeDefaultRoles - Whether to include default/predefined Postgres roles (e.g., those starting with `pg_`).
+ * @param options.limit - The maximum number of roles to return.
+ * @param options.offset - The number of roles to skip.
+ * @returns An object containing the generated safe SQL fragment and the zod validator.
+ */
 function list({
   includeDefaultRoles: includeDefaultRoles = false,
   limit,
@@ -70,6 +79,12 @@ where
 
 type RoleIdentifier = Pick<PGRole, 'id'> | Pick<PGRole, 'name'>
 
+/**
+ * Generates the SQL WHERE clause to identify a role by either its OID (id) or name.
+ *
+ * @param identifier - The identifier object containing the role's id or name.
+ * @returns The SQL fragment containing the comparison.
+ */
 function getIdentifierWhereClause(identifier: RoleIdentifier): SafeSqlFragment {
   if ('id' in identifier && identifier.id) {
     return safeSql`${ident('id')} = ${literal(identifier.id)}`
@@ -79,6 +94,12 @@ function getIdentifierWhereClause(identifier: RoleIdentifier): SafeSqlFragment {
   throw new Error('Must provide either id or name')
 }
 
+/**
+ * Retrieves a single Postgres role by its identifier (id or name).
+ *
+ * @param identifier - The unique identifier of the role (either id or name).
+ * @returns An object containing the generated safe SQL fragment and the zod validator.
+ */
 function retrieve(identifier: RoleIdentifier): {
   sql: SafeSqlFragment
   zod: typeof pgRoleOptionalZod
@@ -107,6 +128,13 @@ type RoleCreateParams = {
   admins?: Array<string>
   config?: Record<string, string>
 }
+
+/**
+ * Generates SQL to create a new Postgres role.
+ *
+ * @param params - Configuration options for creating the role.
+ * @returns An object containing the generated safe SQL fragment.
+ */
 function create({
   name,
   isSuperuser = false,
@@ -163,6 +191,14 @@ type RoleUpdateParams = {
   password?: string
   validUntil?: string
 }
+
+/**
+ * Generates SQL to update an existing Postgres role.
+ *
+ * @param identifier - The unique identifier of the role to update.
+ * @param params - Configuration options to alter on the role.
+ * @returns An object containing the generated safe SQL fragment.
+ */
 function update(identifier: RoleIdentifier, params: RoleUpdateParams): { sql: SafeSqlFragment } {
   const {
     name: newName,
@@ -177,15 +213,17 @@ function update(identifier: RoleIdentifier, params: RoleUpdateParams): { sql: Sa
     password,
     validUntil,
   } = params
+  const searchVal = 'id' in identifier ? String((identifier as any).id) : (identifier as any).name
   const sql = safeSql`
 do $$
 declare
+  search_val text := ${literal(searchVal)};
   old record;
 begin
   with roles as (${ROLES_SQL})
   select * into old from roles where ${getIdentifierWhereClause(identifier)};
   if old is null then
-    raise exception 'Cannot find role with id %', id;
+    raise exception 'Cannot find role %', search_val;
   end if;
 
   execute(format('alter role %I
@@ -220,22 +258,33 @@ $$;
 type RoleRemoveParams = {
   ifExists?: boolean
 }
+
+/**
+ * Generates SQL to drop an existing Postgres role.
+ *
+ * @param identifier - The unique identifier of the role to drop.
+ * @param options - Configuration options for dropping the role.
+ * @param options.ifExists - If true, skips dropping or raising an error if the role does not exist.
+ * @returns An object containing the generated safe SQL fragment.
+ */
 function remove(
   identifier: RoleIdentifier,
   { ifExists = false }: RoleRemoveParams = {}
 ): { sql: SafeSqlFragment } {
+  const searchVal = 'id' in identifier ? String((identifier as any).id) : (identifier as any).name
   const sql = safeSql`
 do $$
 declare
+  search_val text := ${literal(searchVal)};
   old record;
 begin
   with roles as (${ROLES_SQL})
   select * into old from roles where ${getIdentifierWhereClause(identifier)};
   if old is null then
-    raise exception 'Cannot find role with id %', id;
+    ${ifExists ? safeSql`null;` : safeSql`raise exception 'Cannot find role %', search_val;`}
+  else
+    execute(format('drop role if exists %I;', old.name));
   end if;
-
-  execute(format('drop role ${ifExists ? safeSql`if exists` : safeSql``} %I;', old.name));
 end
 $$;
 `

@@ -35,6 +35,18 @@ const pgColumnOptionalZod = z.optional(pgColumnZod)
 
 export type PGColumn = z.infer<typeof pgColumnZod>
 
+/**
+ * Lists all columns across schemas, tables, and views.
+ *
+ * @param options - Options to filter and paginate the column list.
+ * @param options.tableId - Optional OID of the table to filter columns by.
+ * @param options.includeSystemSchemas - Whether to include system schemas (like pg_catalog) in the results.
+ * @param options.includedSchemas - Explicit list of schemas to include.
+ * @param options.excludedSchemas - Explicit list of schemas to exclude.
+ * @param options.limit - The maximum number of columns to return.
+ * @param options.offset - The number of columns to skip.
+ * @returns An object containing the generated safe SQL fragment and the zod validator.
+ */
 function list({
   tableId,
   includeSystemSchemas = false,
@@ -61,7 +73,7 @@ select
 from
   columns
 where
- true
+  true
 `
 
   const filter = filterByList(
@@ -90,6 +102,12 @@ where
 
 type ColumnIdentifier = Pick<PGColumn, 'id'> | Pick<PGColumn, 'name' | 'schema' | 'table'>
 
+/**
+ * Generates the SQL WHERE clause to identify a column by either its compound key or ID.
+ *
+ * @param identifier - The unique identifier of the column.
+ * @returns The SafeSqlFragment representing the WHERE condition.
+ */
 function getIdentifierWhereClause(identifier: ColumnIdentifier): SafeSqlFragment {
   if ('id' in identifier && identifier.id) {
     return safeSql`${ident('id')} = ${literal(identifier.id)}`
@@ -99,6 +117,12 @@ function getIdentifierWhereClause(identifier: ColumnIdentifier): SafeSqlFragment
   throw new Error('Must provide either id or schema, name and table')
 }
 
+/**
+ * Retrieves a single column's details.
+ *
+ * @param identifier - The unique identifier of the column.
+ * @returns An object containing the generated safe SQL fragment and the zod validator.
+ */
 function retrieve(identifier: ColumnIdentifier): {
   sql: SafeSqlFragment
   zod: typeof pgColumnOptionalZod
@@ -143,6 +167,12 @@ type CreateOptionsNotDefaultExpression = {
 
 type CreateOptions = CreateOptionsDefaultExpression | CreateOptionsNotDefaultExpression
 
+/**
+ * Generates SQL to create/add a column to a table.
+ *
+ * @param params - Options to define the new column.
+ * @returns An object containing the generated safe SQL fragment.
+ */
 function create({
   schema,
   table,
@@ -207,6 +237,12 @@ function create({
   }
 }
 
+/**
+ * Formats a Postgres column type reference into a safe SQL fragment, appending `[]` if the type is an array.
+ *
+ * @param type - The column type reference containing optional schema, type name, and array flag.
+ * @returns The formatted SQL identifier fragment.
+ */
 function typeIdent(type: ColumnTypeRef): SafeSqlFragment {
   const base =
     type.schema !== undefined
@@ -215,6 +251,13 @@ function typeIdent(type: ColumnTypeRef): SafeSqlFragment {
   return type.isArray ? safeSql`${base}[]` : base
 }
 
+/**
+ * Generates SQL to update an existing column.
+ *
+ * @param old - The metadata representing the original column state.
+ * @param params - The updates to apply.
+ * @returns An object containing the generated safe SQL fragment.
+ */
 function update(
   old: Pick<
     PGColumn,
@@ -357,18 +400,15 @@ BEGIN
 END
 $$;`
   }
-
-  // TODO: Can't set default if column is previously identity even if
-  // is_identity: false. Must do two separate PATCHes (once to drop identity
-  // and another to set default).
-  // NOTE: nameSql must be last. defaultValueSql must be after typeSql.
+  // identitySql must be before defaultValueSql so that we can drop identity and set default in one go.
+  // NOTE: nameSql must be last. defaultValueSql must be after typeSql and identitySql.
   // identitySql must be after isNullableSql.
   const sql = safeSql`
 BEGIN;
   ${isNullableSql}
   ${typeSql}
-  ${defaultValueSql}
   ${identitySql}
+  ${defaultValueSql}
   ${isUniqueSql}
   ${commentSql}
   ${checkSql}
@@ -378,6 +418,14 @@ COMMIT;`
   return { sql }
 }
 
+/**
+ * Generates SQL to drop a column from a table.
+ *
+ * @param column - The table schema, name, and column name.
+ * @param options - Drop behavior options (e.g., cascade vs restrict).
+ * @param options.cascade - Whether to drop dependent objects recursively.
+ * @returns An object containing the generated safe SQL fragment.
+ */
 function remove(
   column: Pick<PGColumn, 'name' | 'schema' | 'table'>,
   { cascade = false } = {}
