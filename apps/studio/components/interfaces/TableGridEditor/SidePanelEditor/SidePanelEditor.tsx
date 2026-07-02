@@ -427,6 +427,7 @@ export const SidePanelEditor = ({
         tableId: selectedTable?.id,
         tableName: selectedTable?.name,
         includeRows: true,
+        includeLint: true,
       })
 
       setIsEdited(false)

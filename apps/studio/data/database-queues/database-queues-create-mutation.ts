@@ -76,12 +76,14 @@ export const useDatabaseQueueCreateMutation = ({
     mutationFn: (vars) => createDatabaseQueue(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, name } = variables
-      await queryClient.invalidateQueries({ queryKey: databaseQueuesKeys.list(projectRef) })
-      await invalidateTableMetadata(queryClient, {
-        projectRef,
-        schema: 'pgmq',
-        tableName: pgmqQueueTable(name),
-      })
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: databaseQueuesKeys.list(projectRef) }),
+        invalidateTableMetadata(queryClient, {
+          projectRef,
+          schema: 'pgmq',
+          tableName: pgmqQueueTable(name),
+        }),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {
