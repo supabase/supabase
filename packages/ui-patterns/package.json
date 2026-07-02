@@ -422,13 +422,21 @@
       "import": "./src/Markdown/index.tsx",
       "types": "./src/Markdown/index.tsx"
     },
+    "./McpUrlBuilder/McpConfigPanel.md": {
+      "import": "./src/McpUrlBuilder/McpConfigPanel.md.tsx",
+      "types": "./src/McpUrlBuilder/McpConfigPanel.md.tsx"
+    },
     "./McpUrlBuilder/McpConfigPanel": {
       "import": "./src/McpUrlBuilder/McpConfigPanel.tsx",
       "types": "./src/McpUrlBuilder/McpConfigPanel.tsx"
     },
-    "./McpUrlBuilder/McpConfigPanel.md": {
-      "import": "./src/McpUrlBuilder/McpConfigPanel.md.tsx",
-      "types": "./src/McpUrlBuilder/McpConfigPanel.md.tsx"
+    "./McpUrlBuilder/clients.data": {
+      "import": "./src/McpUrlBuilder/clients.data.ts",
+      "types": "./src/McpUrlBuilder/clients.data.ts"
+    },
+    "./McpUrlBuilder/clients.instructions.md": {
+      "import": "./src/McpUrlBuilder/clients.instructions.md.tsx",
+      "types": "./src/McpUrlBuilder/clients.instructions.md.tsx"
     },
     "./McpUrlBuilder/components/ClientSelectDropdown": {
       "import": "./src/McpUrlBuilder/components/ClientSelectDropdown.tsx",
@@ -438,6 +446,10 @@
       "import": "./src/McpUrlBuilder/components/ConnectionIcon.tsx",
       "types": "./src/McpUrlBuilder/components/ConnectionIcon.tsx"
     },
+    "./McpUrlBuilder/components/InstructionBlocks": {
+      "import": "./src/McpUrlBuilder/components/InstructionBlocks.tsx",
+      "types": "./src/McpUrlBuilder/components/InstructionBlocks.tsx"
+    },
     "./McpUrlBuilder/components/McpConfigurationDisplay": {
       "import": "./src/McpUrlBuilder/components/McpConfigurationDisplay.tsx",
       "types": "./src/McpUrlBuilder/components/McpConfigurationDisplay.tsx"
@@ -446,21 +458,13 @@
       "import": "./src/McpUrlBuilder/components/McpConfigurationOptions.tsx",
       "types": "./src/McpUrlBuilder/components/McpConfigurationOptions.tsx"
     },
-    "./McpUrlBuilder/clients.data": {
-      "import": "./src/McpUrlBuilder/clients.data.ts",
-      "types": "./src/McpUrlBuilder/clients.data.ts"
-    },
-    "./McpUrlBuilder/utils/serializeMcpConfig": {
-      "import": "./src/McpUrlBuilder/utils/serializeMcpConfig.ts",
-      "types": "./src/McpUrlBuilder/utils/serializeMcpConfig.ts"
+    "./McpUrlBuilder": {
+      "import": "./src/McpUrlBuilder/index.ts",
+      "types": "./src/McpUrlBuilder/index.ts"
     },
     "./McpUrlBuilder/mcpClients": {
       "import": "./src/McpUrlBuilder/mcpClients.tsx",
       "types": "./src/McpUrlBuilder/mcpClients.tsx"
-    },
-    "./McpUrlBuilder": {
-      "import": "./src/McpUrlBuilder/index.ts",
-      "types": "./src/McpUrlBuilder/index.ts"
     },
     "./McpUrlBuilder/types": {
       "import": "./src/McpUrlBuilder/types.ts",
@@ -485,6 +489,10 @@
     "./McpUrlBuilder/utils/mcpIconAssets": {
       "import": "./src/McpUrlBuilder/utils/mcpIconAssets.ts",
       "types": "./src/McpUrlBuilder/utils/mcpIconAssets.ts"
+    },
+    "./McpUrlBuilder/utils/serializeMcpConfig": {
+      "import": "./src/McpUrlBuilder/utils/serializeMcpConfig.ts",
+      "types": "./src/McpUrlBuilder/utils/serializeMcpConfig.ts"
     },
     "./Mermaid/Mermaid": {
       "import": "./src/Mermaid/Mermaid.tsx",
