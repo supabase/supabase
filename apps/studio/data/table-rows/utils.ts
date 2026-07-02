@@ -18,9 +18,9 @@ export function formatFilterValue(
   const column = table.columns.find((x) => x.name == filter.column)
   if (column && isNumericalColumn(column.format)) {
     const numberValue = Number(filter.value)
-    // Supports BigInt filter values
-    if (Number.isNaN(numberValue) || numberValue > Number.MAX_SAFE_INTEGER) return filter.value
-    else return Number(filter.value)
+    if (Number.isNaN(numberValue) || Math.abs(numberValue) > Number.MAX_SAFE_INTEGER)
+      return filter.value
+    else return numberValue
   }
   return filter.value
 }
