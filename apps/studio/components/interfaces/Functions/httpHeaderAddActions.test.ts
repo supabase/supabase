@@ -1,30 +1,46 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildEdgeFunctionHeaderAddActions } from './httpHeaderAddActions'
+import {
+  buildEdgeFunctionHeaderAddActions,
+  getEdgeFunctionAuthHeader,
+} from './httpHeaderAddActions'
 
 describe('buildEdgeFunctionHeaderAddActions', () => {
-  it('includes the apikey header when requested', () => {
+  it('includes the apikey header for secret keys', () => {
     const [authAction] = buildEdgeFunctionHeaderAddActions({
-      apiKey: 'secret-key',
-      includeApiKeyHeader: true,
+      apiKey: 'sb_secret_123',
       createRow: (name, value) => ({ name, value }),
     })
 
-    expect(authAction.createRows()).toEqual([
-      { name: 'Authorization', value: 'Bearer secret-key' },
-      { name: 'apikey', value: 'secret-key' },
-    ])
+    expect(authAction.label).toBe('Add secret key')
+    expect(authAction.createRows()).toEqual([{ name: 'apikey', value: 'sb_secret_123' }])
   })
 
-  it('omits the apikey header when not requested', () => {
+  it('falls back to the Authorization header for legacy keys', () => {
     const [authAction] = buildEdgeFunctionHeaderAddActions({
-      apiKey: 'service-key',
-      includeApiKeyHeader: false,
+      apiKey: 'legacy-service-role-jwt',
       createRow: (name, value) => ({ name, value }),
     })
 
+    expect(authAction.label).toBe('Add secret key')
     expect(authAction.createRows()).toEqual([
-      { name: 'Authorization', value: 'Bearer service-key' },
+      { name: 'Authorization', value: 'Bearer legacy-service-role-jwt' },
     ])
+  })
+})
+
+describe('getEdgeFunctionAuthHeader', () => {
+  it('returns the apikey header for publishable keys', () => {
+    expect(getEdgeFunctionAuthHeader('sb_publishable_123')).toEqual({
+      name: 'apikey',
+      value: 'sb_publishable_123',
+    })
+  })
+
+  it('returns the Authorization header for non-prefixed keys', () => {
+    expect(getEdgeFunctionAuthHeader('legacy-service-role-jwt')).toEqual({
+      name: 'Authorization',
+      value: 'Bearer legacy-service-role-jwt',
+    })
   })
 })
