@@ -273,7 +273,7 @@ test.beforeAll(async ({ browser, ref }) => {
   })
 })
 
-test.afterAll(async () => {
+test.after all(async () => {
   await releaseFileOnceCleanup(import.meta.url)
 })
 ```

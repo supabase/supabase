@@ -37,7 +37,7 @@ Za informacije kako doprinijeti razvoju, posjetite [Početak rada](./DEVELOPERS.
 
 - [Forum zajednice](https://github.com/supabase/supabase/discussions). Najbolje služi za: pomoć pri izgradnji, diskusiji o najboljoj praksi oko baza podataka.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Najbolje služi za: bugove i greške na koje ste naišli koristeći Supabase.
-- [Email potpora](https://supabase.com/docs/support#business-support). Najbolje služi za: probleme oko vaše baze podataka ili oko infrastrukture.
+- [Email potpora](https://supabase.com/docs/support#business-support). Najbolje služi za: problem oko vaše baze podataka ili oko infrastrukture.
 - [Discord](https://discord.supabase.com). Najbolje služi za: pokazati vaše aplikacije i druženje sa ostatkom zajednice.
 
 ## Kako funkcionira
@@ -46,7 +46,7 @@ Supabase je kombinacija alata otvorenog koda. Izgrađujemo funkcionalnosti Fireb
 
 **Arhitektura**
 
-Supabase je [hostana platforma](https://supabase.com/dashboard). Možete se registrirati i odmah počet koristiti Supabase bez ikakvih instalacija.
+Supabase je [hostana platforms](https://supabase.com/dashboard). Možete se registrirati i odmah počet koristiti Supabase bez ikakvih instalacija.
 Također možete ju [samostalno hostati](https://supabase.com/docs/guides/hosting/overview) i [razvijati lokalno](https://supabase.com/docs/guides/local-development).
 
 ![Arhitektura](apps/docs/public/img/supabase-architecture.svg)
@@ -62,7 +62,7 @@ Također možete ju [samostalno hostati](https://supabase.com/docs/guides/hostin
 
 #### Klijentske knjižnice
 
-Naš pristup za klijentske knjižnice je modularan. Svaka pod-knjižnica je samostalna implementacija za svaki vanjski sistem. Ovo je jedan od načina kako podržavamo postojeće alate.
+Naš pristup za klijentske knjižnice je modularan. Svaka pod-knjižnica je samostalna implementacija za svaki vanjski system. Ovo je jedan od načina kako podržavamo postojeće alate.
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>

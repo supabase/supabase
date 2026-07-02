@@ -24,7 +24,7 @@
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
-Clique em Watch e selecione "releases" deste repositório para ser notificado sobre atualizações importantes.
+Clique em Watch e selecione "releases" deste repositório para set notificado sobre atualizações importantes.
 
 <kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
@@ -37,7 +37,7 @@ Para ver como contribuir, visite [Getting Started](../DEVELOPERS.md)
 ## Comunidade e suporte
 
 - [Fórum da comunidade](https://github.com/supabase/supabase/discussions). Ideal para: ajuda na criação, discussão sobre práticas recomendadas de banco de dados.
-- [GitHub Issues](https://github.com/supabase/supabase/issues). Melhor para: bugs e erros que você encontra usando o Supabase.
+- [GitHub Issues](https://github.com/supabase/supabase/issues). Melhor para: bugs e errors que você encontra usando o Supabase.
 - [Suporte por e-mail](https://supabase.com/docs/support#business-support). Ideal para: problemas com seu banco de dados ou infraestrutura.
 - [Discord](https://discord.supabase.com). Ideal para: compartilhar seus aplicativos e interagir com a comunidade.
 
@@ -93,7 +93,7 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
   </tr>
   END ROW -->
   
-  <th colspan="7">⚡️ Oficial ⚡️</th>
+  <th colspan="7">⚡️ Official ⚡️</th>
   
   <tr>
     <td>JavaScript (TypeScript)</td>

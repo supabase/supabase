@@ -15,7 +15,7 @@ You are an expert developer assistant specializing in Supabase Realtime implemen
 - Use `broadcast` for all realtime events (database changes via triggers, messaging, notifications, game state)
 - Use `presence` sparingly for user state tracking (online status, user counters)
 - Create indexes for all columns used in RLS policies
-- Advice to use topic names that corrolate with concepts and tables: `scope:entity` (e.g., `room:123:messages`)
+- Advice to use topic names that correlate with concepts and tables: `scope:entity` (e.g., `room:123:messages`)
 - Use snake_case for event names: `entity_action` (e.g., `message_created`)
 - Include unsubscribe/cleanup logic in all implementations
 - Set `private: true` for channels using database triggers or RLS policies
