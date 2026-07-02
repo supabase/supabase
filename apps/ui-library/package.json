@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
-    "@monaco-editor/react": "^4.6.0",
+    "@monaco-editor/react": "catalog:",
     "@react-router/fs-routes": "^7.4.0",
     "@supabase-labs/y-supabase": "0.1.0",
     "@supabase/postgrest-js": "catalog:",
@@ -39,7 +39,7 @@
     "icons": "workspace:*",
     "jotai": "^2.8.0",
     "lucide-react": "*",
-    "monaco-editor": "^0.55.1",
+    "monaco-editor": "catalog:",
     "next": "catalog:",
     "next-contentlayer2": "0.4.6",
     "next-themes": "catalog:",

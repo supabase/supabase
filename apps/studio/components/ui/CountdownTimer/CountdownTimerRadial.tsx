@@ -35,7 +35,7 @@ const CountdownTimerRadial = ({ progress }: CountdownTimerRadialProps) => {
             className="first:fill-foreground-muted/50 last:fill-background-200"
             polarRadius={[16, 11]}
           />
-          <RadialBar dataKey="timeRemaining" cornerRadius={2} />
+          <RadialBar dataKey="timeRemaining" cornerRadius={2} isAnimationActive={false} />
         </RadialBarChart>
       </ChartContainer>
 
@@ -48,7 +48,7 @@ const CountdownTimerRadial = ({ progress }: CountdownTimerRadialProps) => {
           innerRadius={14}
           outerRadius={5}
         >
-          <RadialBar dataKey="hand" cornerRadius={2} isAnimationActive={true} />
+          <RadialBar dataKey="hand" cornerRadius={2} isAnimationActive={false} />
         </RadialBarChart>
       </ChartContainer>
     </div>

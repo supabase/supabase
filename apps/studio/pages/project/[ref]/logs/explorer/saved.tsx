@@ -3,8 +3,8 @@ import { Save } from 'lucide-react'
 import Link from 'next/link'
 import { Loading } from 'ui'
 
-import LogsSavedQueriesItem from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { SavedQueriesItem } from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
 import Table from '@/components/to-be-cleaned/Table'
 import LogsExplorerHeader from '@/components/ui/Logs/LogsExplorerHeader'
@@ -44,7 +44,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
               </>
             }
             body={saved.map((item) => (
-              <LogsSavedQueriesItem key={item.id} item={item} />
+              <SavedQueriesItem key={item.id} item={item} />
             ))}
           />
         </div>

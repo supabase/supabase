@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import type { ReactNode } from 'react'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import {
   AuthorizeRequesterDetails,

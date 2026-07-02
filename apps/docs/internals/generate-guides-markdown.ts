@@ -1,6 +1,5 @@
 import fs from 'node:fs/promises'
 import path from 'node:path'
-import { globby } from 'globby'
 import matter from 'gray-matter'
 import type { Content, Parent, Root } from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
@@ -10,6 +9,7 @@ import type { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
+import { parse as parseToml } from 'smol-toml'
 
 import { addBaseUrlPrefix } from './internal-links'
 import { Admonition } from './markdown-schema/Admonition'
@@ -17,6 +17,7 @@ import { AuthProviders } from './markdown-schema/AuthProviders'
 import { ComputeDiskLimitsTable } from './markdown-schema/ComputeDiskLimitsTable'
 import { ErrorCodes } from './markdown-schema/ErrorCodes'
 import { Link } from './markdown-schema/Link'
+import { ContentListings } from './markdown-schema/ContentListings'
 import { MetricsStackCards } from './markdown-schema/MetricsStackCards'
 import { NavData } from './markdown-schema/NavData'
 import { Panel } from './markdown-schema/Panel'
@@ -26,6 +27,7 @@ import { RegionsList, SmartRegionsList } from './markdown-schema/RegionsList'
 import { SharedData } from './markdown-schema/SharedData'
 import { StepHike } from './markdown-schema/StepHike'
 import { TabPanel } from './markdown-schema/TabPanel'
+import { collectMarkdownSources, type FrontmatterFormat } from './markdown-sources'
 
 const PARTIALS_DIR = path.join(process.cwd(), 'content', '_partials')
 
@@ -151,14 +153,19 @@ const SCHEMA: ComponentSchema = {
   ...StepHike,
   TabPanel,
   MetricsStackCards,
+  ContentListings,
   NavData,
   SharedData,
 }
 
-async function generateOne(filePath: string): Promise<string> {
-  const raw = await fs.readFile(filePath, 'utf8')
-  const { content, data } = matter(raw)
+function parseFrontmatter(raw: string, frontmatter: FrontmatterFormat) {
+  if (frontmatter === 'toml') {
+    return matter(raw, { language: 'toml', engines: { toml: parseToml } })
+  }
+  return matter(raw)
+}
 
+async function transformBody(content: string, data: Record<string, unknown>): Promise<string> {
   const tree = parseMdx(content)
   await inlinePartials(tree)
   addBaseUrlPrefix(tree)
@@ -166,42 +173,42 @@ async function generateOne(filePath: string): Promise<string> {
   const body = serializeMdx(tree)
 
   const headerParts: string[] = []
-  if (data.title) headerParts.push(`# ${data.title}`)
+  if (data.title) headerParts.push(`# ${String(data.title)}`)
   if (data.subtitle) headerParts.push(String(data.subtitle))
-  // Add description only when differs from subtitle.
   if (data.description && String(data.description) !== String(data.subtitle))
     headerParts.push(String(data.description))
 
   const header = headerParts.join('\n\n')
 
-  return header ? `${header}\n\n${body}` : body
+  let output = header ? `${header}\n\n${body}` : body
+
+  return output
+}
+
+async function generateOne(sourceFile: string, frontmatter: FrontmatterFormat): Promise<string> {
+  const raw = await fs.readFile(sourceFile, 'utf8')
+  const { content, data } = parseFrontmatter(raw, frontmatter)
+  return transformBody(content, data)
 }
 
 async function generate() {
-  const files = await globby(['content/guides/**/!(_)*.mdx'])
+  const sources = await collectMarkdownSources()
   let warnings = 0
 
   await Promise.all(
-    files.map(async (filePath) => {
-      // content/guides/ai/vector-columns.mdx → public/markdown/guides/ai/vector-columns.md
-      // Placing under public/markdown/ ensures the file is served at /docs/guides/...
-      // matching the URL of the rendered page.
-      const outPath = filePath
-        .replace(/^content\/guides\//, 'public/markdown/guides/')
-        .replace(/\.mdx$/, '.md')
-
+    sources.map(async ({ sourceFile, outPath, frontmatter }) => {
       let output: string
       try {
-        output = await generateOne(filePath)
+        output = await generateOne(sourceFile, frontmatter)
       } catch (err) {
         warnings++
         console.warn(
-          `[warn] Failed to process ${filePath}: ${err instanceof Error ? err.message : err}`
+          `[warn] Failed to process ${sourceFile}: ${err instanceof Error ? err.message : err}`
         )
         try {
-          output = await fs.readFile(filePath, 'utf8')
+          output = await fs.readFile(sourceFile, 'utf8')
         } catch {
-          output = `<!-- failed to generate: ${filePath} -->`
+          output = `<!-- failed to generate: ${sourceFile} -->`
         }
       }
 
@@ -211,7 +218,7 @@ async function generate() {
   )
 
   const summary = warnings ? ` (${warnings} with warnings)` : ''
-  console.log(`Generated ${files.length} markdown files under public/markdown/guides/${summary}`)
+  console.log(`Generated ${sources.length} markdown files under public/markdown/guides/${summary}`)
 }
 
 generate()

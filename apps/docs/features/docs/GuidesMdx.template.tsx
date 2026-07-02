@@ -101,9 +101,9 @@ const GuideTemplate = ({
               <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
             </h1>
             {meta?.subtitle && (
-              <h2 className="mt-3 text-xl text-foreground-light">
+              <div className="mt-6 not-prose [&_p]:text-xl [&_p]:leading-7 text-foreground-light [&>p]:m-0">
                 <ReactMarkdown>{meta.subtitle}</ReactMarkdown>
-              </h2>
+              </div>
             )}
             <hr className="not-prose border-t-0 border-b my-8" />
 
