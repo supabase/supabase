@@ -1,26 +1,4 @@
-import {
-  BadgeCheck,
-  BarChart3,
-  Boxes,
-  Cable,
-  Cpu,
-  CreditCard,
-  Database,
-  Fingerprint,
-  KeyRound,
-  Mail,
-  MessageSquare,
-  MousePointerClick,
-  Package2,
-  Plug,
-  Server,
-  ShieldCheck,
-  Users,
-  Webhook,
-  Wrench,
-  Zap,
-  type LucideIcon,
-} from 'lucide-react'
+import { BadgeCheck, Cable, Database, Package2, Plug, Users, type LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Badge, cn, IconPartners } from 'ui'
 
@@ -28,6 +6,8 @@ import type {
   IntegrationDefinition,
   MarketplaceSource,
 } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
+
+export { getCategoryIcon, CATEGORY_ICONS } from 'common/marketplace-categories'
 
 export type { MarketplaceSource } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 
@@ -47,29 +27,6 @@ export const INTEGRATION_TYPES: Array<{
   { key: 'wrapper', label: 'Wrapper', icon: Cable },
 ]
 
-// Lucide icon per marketplace category slug. New categories fall back to a
-// neutral icon (Boxes) so nothing breaks when the marketplaceDB is updated.
-export const CATEGORY_ICONS: Record<string, LucideIcon> = {
-  observability: BarChart3,
-  security: ShieldCheck,
-  billing: CreditCard,
-  secrets: KeyRound,
-  email: Mail,
-  wrappers: Database,
-  ai: Cpu,
-  ai_vectors: Cpu,
-  storage: Package2,
-  postgres_extension: Database,
-  wrapper: Cable,
-  devtools: Wrench,
-  auth: Fingerprint,
-  'low-code': MousePointerClick,
-  'data-platform': Server,
-  api: Webhook,
-  'caching-offline-first': Zap,
-  messaging: MessageSquare,
-}
-
 export const FEATURED_CATEGORIES: Array<{ slug: string; name: string }> = [
   { slug: 'observability', name: 'Observability' },
   { slug: 'security', name: 'Security' },
@@ -86,11 +43,6 @@ export const EXCLUDED_CATEGORY_SLUGS = new Set([
   'foreign-data-wrapper',
   'app-templates',
 ])
-
-export const getCategoryIcon = (slug: string | null | undefined): LucideIcon => {
-  if (!slug) return Boxes
-  return CATEGORY_ICONS[slug] ?? Boxes
-}
 
 export const formatCategoryLabel = (
   slug: string | null | undefined,
