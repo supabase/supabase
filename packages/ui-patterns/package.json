@@ -86,6 +86,10 @@
       "import": "./src/CommandMenu/api/CommandHeader.tsx",
       "types": "./src/CommandMenu/api/CommandHeader.tsx"
     },
+    "./CommandMenu/api/CommandMenu": {
+      "import": "./src/CommandMenu/api/CommandMenu.tsx",
+      "types": "./src/CommandMenu/api/CommandMenu.tsx"
+    },
     "./CommandMenu/api/CommandMenuInput": {
       "import": "./src/CommandMenu/api/CommandMenuInput.tsx",
       "types": "./src/CommandMenu/api/CommandMenuInput.tsx"
@@ -93,10 +97,6 @@
     "./CommandMenu/api/CommandMenuList": {
       "import": "./src/CommandMenu/api/CommandMenuList.tsx",
       "types": "./src/CommandMenu/api/CommandMenuList.tsx"
-    },
-    "./CommandMenu/api/CommandMenu": {
-      "import": "./src/CommandMenu/api/CommandMenu.tsx",
-      "types": "./src/CommandMenu/api/CommandMenu.tsx"
     },
     "./CommandMenu/api/CommandProvider": {
       "import": "./src/CommandMenu/api/CommandProvider.tsx",
@@ -162,10 +162,6 @@
       "import": "./src/CommandMenu/index.tsx",
       "types": "./src/CommandMenu/index.tsx"
     },
-    "./CommandMenu/internal/CommandMenuItem": {
-      "import": "./src/CommandMenu/internal/CommandMenuItem.tsx",
-      "types": "./src/CommandMenu/internal/CommandMenuItem.tsx"
-    },
     "./CommandMenu/internal/CommandMenuEmpty": {
       "import": "./src/CommandMenu/internal/CommandMenuEmpty.tsx",
       "types": "./src/CommandMenu/internal/CommandMenuEmpty.tsx"
@@ -173,6 +169,10 @@
     "./CommandMenu/internal/CommandMenuGroup": {
       "import": "./src/CommandMenu/internal/CommandMenuGroup.tsx",
       "types": "./src/CommandMenu/internal/CommandMenuGroup.tsx"
+    },
+    "./CommandMenu/internal/CommandMenuItem": {
+      "import": "./src/CommandMenu/internal/CommandMenuItem.tsx",
+      "types": "./src/CommandMenu/internal/CommandMenuItem.tsx"
     },
     "./CommandMenu/internal/CommandSection": {
       "import": "./src/CommandMenu/internal/CommandSection.tsx",
@@ -309,6 +309,10 @@
     "./DataInputs/Input": {
       "import": "./src/DataInputs/Input.tsx",
       "types": "./src/DataInputs/Input.tsx"
+    },
+    "./DatePicker/DatePicker": {
+      "import": "./src/DatePicker/DatePicker.tsx",
+      "types": "./src/DatePicker/DatePicker.tsx"
     },
     "./DatePicker": {
       "import": "./src/DatePicker/index.ts",
@@ -450,6 +454,10 @@
       "import": "./src/LogsBarChart/index.tsx",
       "types": "./src/LogsBarChart/index.tsx"
     },
+    "./Markdown/components": {
+      "import": "./src/Markdown/components.tsx",
+      "types": "./src/Markdown/components.tsx"
+    },
     "./Markdown": {
       "import": "./src/Markdown/index.tsx",
       "types": "./src/Markdown/index.tsx"
@@ -534,18 +542,6 @@
       "import": "./src/MobileSheetNav/index.ts",
       "types": "./src/MobileSheetNav/index.ts"
     },
-    "./MultiSelectDeprecated/Badges": {
-      "import": "./src/MultiSelectDeprecated/Badges.tsx",
-      "types": "./src/MultiSelectDeprecated/Badges.tsx"
-    },
-    "./MultiSelectDeprecated/MultiSelectV2": {
-      "import": "./src/MultiSelectDeprecated/MultiSelectV2.tsx",
-      "types": "./src/MultiSelectDeprecated/MultiSelectV2.tsx"
-    },
-    "./MultiSelectDeprecated": {
-      "import": "./src/MultiSelectDeprecated/index.tsx",
-      "types": "./src/MultiSelectDeprecated/index.tsx"
-    },
     "./MultipleCodeBlock/index.test": {
       "import": "./src/MultipleCodeBlock/index.test.tsx",
       "types": "./src/MultipleCodeBlock/index.test.tsx"
@@ -554,6 +550,10 @@
       "import": "./src/MultipleCodeBlock/index.tsx",
       "types": "./src/MultipleCodeBlock/index.tsx"
     },
+    "./PageBreadcrumbs": {
+      "import": "./src/PageBreadcrumbs/index.tsx",
+      "types": "./src/PageBreadcrumbs/index.tsx"
+    },
     "./PageContainer": {
       "import": "./src/PageContainer/index.tsx",
       "types": "./src/PageContainer/index.tsx"
@@ -561,10 +561,6 @@
     "./PageHeader": {
       "import": "./src/PageHeader/index.tsx",
       "types": "./src/PageHeader/index.tsx"
-    },
-    "./PageBreadcrumbs": {
-      "import": "./src/PageBreadcrumbs/index.tsx",
-      "types": "./src/PageBreadcrumbs/index.tsx"
     },
     "./PageNav": {
       "import": "./src/PageNav/index.tsx",
@@ -666,6 +662,18 @@
       "import": "./src/StatusCode/index.tsx",
       "types": "./src/StatusCode/index.tsx"
     },
+    "./Table/TanStackTableHeadSort.test": {
+      "import": "./src/Table/TanStackTableHeadSort.test.tsx",
+      "types": "./src/Table/TanStackTableHeadSort.test.tsx"
+    },
+    "./Table/TanStackTableHeadSort": {
+      "import": "./src/Table/TanStackTableHeadSort.tsx",
+      "types": "./src/Table/TanStackTableHeadSort.tsx"
+    },
+    "./Table": {
+      "import": "./src/Table/index.ts",
+      "types": "./src/Table/index.ts"
+    },
     "./TextLink": {
       "import": "./src/TextLink/index.tsx",
       "types": "./src/TextLink/index.tsx"
@@ -674,13 +682,13 @@
       "import": "./src/ThemeToggle.tsx",
       "types": "./src/ThemeToggle.tsx"
     },
+    "./TimestampInfo/TimestampInfoProvider": {
+      "import": "./src/TimestampInfo/TimestampInfoProvider.tsx",
+      "types": "./src/TimestampInfo/TimestampInfoProvider.tsx"
+    },
     "./TimestampInfo": {
       "import": "./src/TimestampInfo/index.tsx",
       "types": "./src/TimestampInfo/index.tsx"
-    },
-    "./Table": {
-      "import": "./src/Table/index.ts",
-      "types": "./src/Table/index.ts"
     },
     "./Toc": {
       "import": "./src/Toc/index.ts",
@@ -718,17 +726,21 @@
       "import": "./src/TweetCard/index.tsx",
       "types": "./src/TweetCard/index.tsx"
     },
+    "./admonition.test": {
+      "import": "./src/admonition.test.tsx",
+      "types": "./src/admonition.test.tsx"
+    },
     "./admonition": {
       "import": "./src/admonition.tsx",
       "types": "./src/admonition.tsx"
     },
-    "./consent": {
-      "import": "./src/consent.tsx",
-      "types": "./src/consent.tsx"
-    },
     "./collapsible-alert": {
       "import": "./src/collapsible-alert.tsx",
       "types": "./src/collapsible-alert.tsx"
+    },
+    "./consent": {
+      "import": "./src/consent.tsx",
+      "types": "./src/consent.tsx"
     },
     "./form/FormItemLayout/FormItemLayout": {
       "import": "./src/form/FormItemLayout/FormItemLayout.tsx",
@@ -746,9 +758,17 @@
       "import": "./src/form/KeyValueFieldArray/KeyValueFieldArray.tsx",
       "types": "./src/form/KeyValueFieldArray/KeyValueFieldArray.tsx"
     },
+    "./form/KeyValueFieldArray/validation.test": {
+      "import": "./src/form/KeyValueFieldArray/validation.test.ts",
+      "types": "./src/form/KeyValueFieldArray/validation.test.ts"
+    },
     "./form/KeyValueFieldArray/validation": {
       "import": "./src/form/KeyValueFieldArray/validation.ts",
       "types": "./src/form/KeyValueFieldArray/validation.ts"
+    },
+    "./form/Layout/FormLayout": {
+      "import": "./src/form/Layout/FormLayout.tsx",
+      "types": "./src/form/Layout/FormLayout.tsx"
     },
     "./form/SingleValueFieldArray/SingleValueFieldArray.test": {
       "import": "./src/form/SingleValueFieldArray/SingleValueFieldArray.test.tsx",
@@ -757,10 +777,6 @@
     "./form/SingleValueFieldArray/SingleValueFieldArray": {
       "import": "./src/form/SingleValueFieldArray/SingleValueFieldArray.tsx",
       "types": "./src/form/SingleValueFieldArray/SingleValueFieldArray.tsx"
-    },
-    "./form/Layout/FormLayout": {
-      "import": "./src/form/Layout/FormLayout.tsx",
-      "types": "./src/form/Layout/FormLayout.tsx"
     },
     "./form/utils": {
       "import": "./src/form/utils.tsx",
