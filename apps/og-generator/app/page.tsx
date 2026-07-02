@@ -22,8 +22,6 @@ const THUMB_MIN = 160
 const THUMB_MAX = 480
 const OPACITY_MIN = 0.2
 const OPACITY_MAX = 0.35
-const ZOOM_MIN = 0.5
-const ZOOM_MAX = 2
 
 const OUTER = { x: (64 / 1200) * 100, y: (64 / 630) * 100 }
 const HEADLINE_INSET = { x: (80 / 1200) * 100, y: (72 / 630) * 100 }
@@ -386,7 +384,6 @@ export default function Page() {
   const [scale, setScale] = useState<1 | 2>(1)
   const [showSafeArea, setShowSafeArea] = useState(false)
   const [showCrops, setShowCrops] = useState(false)
-  const [zoom, setZoom] = useState(1)
 
   const [patternType, setPatternType] = useState<PatternTypeOpt>(
     DEFAULT_TPL.defaultPattern.type as PatternTypeOpt
@@ -543,48 +540,27 @@ export default function Page() {
     a.click()
   }
 
-  const nudgeZoom = (d: number) =>
-    setZoom((z) => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, +(z + d).toFixed(2))))
-
   const sliderValue = autoFit ? (og.fit?.fontSize ?? MAX_SIZE) : manualFontSize
   const suffix = scale === 2 ? '@2x' : ''
 
-  const zoomBtn =
-    'flex h-6 w-6 items-center justify-center rounded border border-default bg-surface-100 text-foreground-light hover:border-strong'
-
   return (
-    <div className="flex h-screen bg-background text-foreground">
-      {/* Canvas — light workspace with a dot grid */}
+    <div className="relative h-screen overflow-hidden bg-background text-foreground">
+      {/* Canvas — one continuous full-bleed dot-grid surface; the tool panel
+          floats on top of it (absolutely positioned), not beside it. */}
       <main
-        className="@container flex min-w-0 flex-1 flex-col items-center overflow-auto p-8"
+        className="@container absolute inset-0 flex flex-col items-center overflow-auto p-8 pr-[380px]"
         style={{
           backgroundColor: '#f4f4f5',
           backgroundImage: 'radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1px)',
           backgroundSize: '16px 16px',
         }}
       >
-        {/* view toggle (center) + zoom (right) */}
-          <div className="mb-5 flex w-full items-center justify-between">
-            <span className="w-24" />
-            <Segmented value={view} onChange={setView} options={VIEW_OPTS} />
-            <div className="flex w-24 items-center justify-end gap-1 text-xs text-foreground-lighter">
-              <button onClick={() => nudgeZoom(-0.1)} className={zoomBtn} title="Zoom out">
-                −
-              </button>
-              <button
-                onClick={() => setZoom(1)}
-                className="w-10 tabular-nums hover:text-foreground"
-                title="Reset zoom"
-              >
-                {Math.round(zoom * 100)}%
-              </button>
-              <button onClick={() => nudgeZoom(0.1)} className={zoomBtn} title="Zoom in">
-                +
-              </button>
-            </div>
-          </div>
+        {/* view toggle */}
+        <div className="mb-5 flex w-full items-center justify-center">
+          <Segmented value={view} onChange={setView} options={VIEW_OPTS} />
+        </div>
 
-          <div className="flex w-full flex-col gap-6 @4xl:flex-row @4xl:items-center" style={{ zoom }}>
+          <div className="flex w-full flex-col gap-6 @4xl:flex-row @4xl:items-start">
             {showOg && (
               <div className="min-w-0 @4xl:flex-1">
                 <PreviewCard
@@ -602,7 +578,7 @@ export default function Page() {
                 >
                   <div className="flex flex-col gap-2">
                     {og.fit && (
-                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 self-start rounded-full bg-surface-200 px-3 py-1 text-xs text-foreground-light">
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 self-start rounded-full border border-default bg-background px-3 py-1 text-xs text-foreground-light shadow-sm">
                         <span className="text-foreground">{og.fit.fontSize}px</span>
                         <span className="text-foreground-lighter">·</span>
                         <span>
@@ -662,8 +638,10 @@ export default function Page() {
           </div>
       </main>
 
-      {/* Floating tool panel — packaged top bar + all controls, docked right */}
-      <aside className="my-4 mr-4 flex w-[340px] shrink-0 flex-col overflow-hidden rounded-xl border border-default bg-background shadow-lg">
+      {/* Floating tool panel — packaged top bar + all controls, docked right.
+          Absolutely positioned (not a flex sibling) so the canvas behind it
+          is one continuous surface, not two boxes split by a shared edge. */}
+      <aside className="absolute right-4 top-4 bottom-4 z-10 flex w-[340px] flex-col overflow-hidden rounded-xl border border-default bg-background shadow-lg">
         <div className="flex h-14 shrink-0 items-center justify-between border-b border-default px-5">
           <span className="text-sm font-medium text-foreground">OG Image Generator</span>
           <label className="flex items-center gap-1.5 text-xs text-foreground-light">
