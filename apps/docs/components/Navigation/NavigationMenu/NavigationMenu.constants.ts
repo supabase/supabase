@@ -609,6 +609,11 @@ export const SocialLoginItems: Array<Partial<NavMenuSection>> = [
     url: '/guides/auth/social-login/auth-keycloak',
   },
   {
+    name: 'LINE',
+    icon: '/docs/img/icons/line-icon',
+    url: '/guides/auth/social-login/auth-line',
+  },
+  {
     name: 'LinkedIn',
     icon: '/docs/img/icons/linkedin-icon',
     url: '/guides/auth/social-login/auth-linkedin',

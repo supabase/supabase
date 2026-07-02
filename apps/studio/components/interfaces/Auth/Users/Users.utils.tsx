@@ -79,6 +79,7 @@ const providers = {
     { google: 'google-icon' },
     { kakao: 'kakao-icon' },
     { keycloak: 'keycloak-icon' },
+    { line: 'line-icon' },
     { linkedin_oidc: 'linkedin-icon' },
     { notion: 'notion-icon' },
     { twitch: 'twitch-icon' },
