@@ -888,12 +888,17 @@ functions:
     notes: |
       Signs the user in with a passkey (WebAuthn).
       - Available on `supabase_flutter` 2.15.0 and later as an extension on `GoTrueClient`.
-      - Drives the full WebAuthn ceremony end to end: starts the challenge with the Supabase server, prompts the user for biometrics or a security key via the platform passkey API, and verifies the credential with the server.
+      - Drives the full WebAuthn ceremony end to end: starts the challenge with the Supabase server, calls the `authenticator` you supply to prompt the user for biometrics or a security key, and verifies the credential with the server.
       - Does not require an existing session. On success the session is persisted and an `AuthChangeEvent.signedIn` event is fired.
+      - `supabase_flutter` does not depend on a passkey plugin directly. Pass an implementation of `PasskeyAuthenticatorInterface`, such as the [`passkeys`](https://pub.dev/packages/passkeys) plugin's `PasskeyAuthenticator` (since `passkeys` `2.21.0`).
       - For native flows or custom UI, use the lower-level [`auth.passkey`](/docs/reference/dart/auth-passkey-api) namespace instead.
       - Passkeys are a BETA feature and must be enabled for your project in the Supabase Dashboard under Authentication > Configuration > Passkeys.
       - Platform setup the library cannot perform (Associated Domains on iOS/macOS, Digital Asset Links on Android, the `passkeys` web SDK on web) is documented in the `supabase_flutter` package README.
     params:
+      - name: authenticator
+        isOptional: false
+        type: PasskeyAuthenticatorInterface
+        description: Performs the platform passkey ceremony (FaceID/TouchID/security key). For example, a `PasskeyAuthenticator` from the `passkeys` package.
       - name: captchaToken
         isOptional: true
         type: String
@@ -904,7 +909,11 @@ functions:
         isSpotlight: true
         code: |
           ```dart
-          final AuthResponse res = await supabase.auth.signInWithPasskey();
+          import 'package:passkeys/authenticator.dart';
+
+          final authenticator = PasskeyAuthenticator();
+
+          final AuthResponse res = await supabase.auth.signInWithPasskey(authenticator);
           final Session? session = res.session;
           final User? user = res.user;
           ```
@@ -913,17 +922,27 @@ functions:
     notes: |
       Registers a new passkey (WebAuthn credential) for the signed in user.
       - Available on `supabase_flutter` 2.15.0 and later as an extension on `GoTrueClient`.
-      - Drives the full WebAuthn ceremony end to end: starts the registration with the Supabase server, prompts the user to create a credential on the device, and verifies it with the server.
+      - Drives the full WebAuthn ceremony end to end: starts the registration with the Supabase server, calls the `authenticator` you supply to create a credential on the device, and verifies it with the server.
       - Requires a signed in (non-anonymous) user. If the user has verified MFA factors, the session has to be at `aal2` to manage passkeys.
+      - `supabase_flutter` does not depend on a passkey plugin directly. Pass an implementation of `PasskeyAuthenticatorInterface`, such as the [`passkeys`](https://pub.dev/packages/passkeys) plugin's `PasskeyAuthenticator` (since `passkeys` `2.21.0`).
       - For native flows or custom UI, use the lower-level [`auth.passkey`](/docs/reference/dart/auth-passkey-api) namespace instead.
       - Passkeys are a BETA feature and must be enabled for your project in the Supabase Dashboard under Authentication > Configuration > Passkeys.
+    params:
+      - name: authenticator
+        isOptional: false
+        type: PasskeyAuthenticatorInterface
+        description: Performs the platform passkey ceremony (FaceID/TouchID/security key). For example, a `PasskeyAuthenticator` from the `passkeys` package.
     examples:
       - id: register-passkey
         name: Register a passkey for the current user
         isSpotlight: true
         code: |
           ```dart
-          final Passkey passkey = await supabase.auth.registerPasskey();
+          import 'package:passkeys/authenticator.dart';
+
+          final authenticator = PasskeyAuthenticator();
+
+          final Passkey passkey = await supabase.auth.registerPasskey(authenticator);
           ```
   - id: sign-out
     title: 'signOut()'

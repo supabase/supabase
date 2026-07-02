@@ -12,6 +12,8 @@ import { TelemetryTagManager } from 'common'
 import { genFaviconData } from 'common/MetaFavicons/app-router'
 import type { Metadata, Viewport } from 'next'
 
+import { inter, manrope } from '@/fonts'
+
 const { metadataApplicationName, metadataTitle } = getCustomContent([
   'metadata:application_name',
   'metadata:title',
@@ -50,7 +52,7 @@ const viewport: Viewport = {
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={`${manrope.variable} ${inter.variable}`} suppressHydrationWarning>
       <body>
         <TelemetryTagManager />
         <GlobalProviders>

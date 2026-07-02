@@ -23,8 +23,9 @@ import { useTrack } from '@/lib/telemetry/track'
 const AUTO_OPTION_VALUE = '__auto__'
 
 export const TimezoneDropdown = () => {
-  const { timezone, storedTimezone, setTimezone, isAutoDetected } = useTimezone()
   const track = useTrack()
+  const { timezone, storedTimezone, setTimezone, isAutoDetected } = useTimezone()
+
   const [open, setOpen] = useState(false)
 
   // The "Auto detect" row always advertises the browser's own timezone, even

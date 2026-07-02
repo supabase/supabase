@@ -324,7 +324,7 @@
 
   /* misc theme tokens — typography, breakpoints, sizing, transform-origin */
   --font-sans: var(
-    --font-custom,
+    --font-sans,
     Circular,
     custom-font,
     Helvetica Neue,
