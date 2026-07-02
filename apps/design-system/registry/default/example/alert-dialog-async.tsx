@@ -19,7 +19,7 @@ export default function AlertDialogAsync() {
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button type="outline">Show Alert Dialog</Button>
+        <Button variant="outline">Show Alert Dialog</Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>

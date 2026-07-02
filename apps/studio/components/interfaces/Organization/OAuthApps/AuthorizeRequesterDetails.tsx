@@ -1,5 +1,6 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { Check, ChevronDown } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import { useMemo, useState } from 'react'
 import {
   Badge,
@@ -11,6 +12,7 @@ import {
   CollapsibleTrigger,
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { getMcpClientIconSrc } from 'ui-patterns/McpUrlBuilder'
 
 import { PERMISSIONS_DESCRIPTIONS } from './OAuthApps.constants'
 import { LogoBox } from '@/components/layouts/InterstitialLayout'
@@ -165,15 +167,66 @@ const PERMISSION_GROUPS: PermissionGroup[] = [
   },
 ]
 
-export const RequesterLogo = ({ icon, name }: { icon: string | null; name: string }) => (
-  <LogoBox>
-    {icon ? (
-      <img alt={name} src={icon} className="size-full object-cover" />
-    ) : (
-      <span className="text-lg font-medium text-foreground-light">{name.slice(0, 1)}</span>
-    )}
-  </LogoBox>
-)
+const CUSTOM_LOGO_KEYS = {
+  perplexity: { icon: 'perplexity', hasDistinctDarkIcon: true },
+  cursor: { icon: 'cursor', hasDistinctDarkIcon: true },
+  claude: { icon: 'claude', hasDistinctDarkIcon: false },
+  chatgpt: { icon: 'openai', hasDistinctDarkIcon: true },
+  openai: { icon: 'openai', hasDistinctDarkIcon: true },
+} as const
+
+function getRequesterLogo({
+  icon,
+  name,
+  useDarkVariant,
+}: {
+  icon: string | null
+  name: string
+  useDarkVariant: boolean
+}) {
+  const searchableText = `${icon ?? ''} ${name}`.toLowerCase()
+
+  for (const [match, asset] of Object.entries(CUSTOM_LOGO_KEYS)) {
+    if (searchableText.includes(match)) {
+      const customLogoUrl = getMcpClientIconSrc({
+        icon: asset.icon,
+        useDarkVariant,
+        hasDistinctDarkIcon: asset.hasDistinctDarkIcon,
+      })
+
+      if (customLogoUrl) return { src: customLogoUrl, isKnownClient: true }
+    }
+  }
+
+  return { src: icon || '', isKnownClient: false }
+}
+
+export const RequesterLogo = ({ icon, name }: { icon: string | null; name: string }) => {
+  const [failedIcon, setFailedIcon] = useState<string | null>(null)
+  const { resolvedTheme } = useTheme()
+
+  const logo = useMemo(
+    () => getRequesterLogo({ icon, name, useDarkVariant: resolvedTheme === 'dark' }),
+    [icon, name, resolvedTheme]
+  )
+
+  const showLetter = !logo.src || failedIcon === logo.src
+
+  return (
+    <LogoBox className="bg-surface-75">
+      {showLetter ? (
+        <span className="text-lg font-medium text-foreground-light">{name.slice(0, 1)}</span>
+      ) : (
+        <img
+          alt={name}
+          src={logo.src}
+          className={cn(logo.isKnownClient ? 'size-7 object-contain' : 'size-full object-cover')}
+          onError={() => setFailedIcon(logo.src)}
+        />
+      )}
+    </LogoBox>
+  )
+}
 
 export const AuthorizeRequesterDetails = ({
   name,

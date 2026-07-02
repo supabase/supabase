@@ -27,7 +27,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 interface NewPublicationPanelProps {
   visible: boolean
   sourceId?: number
-  onClose: () => void
+  onClose: (newPublication?: string) => void
 }
 
 export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicationPanelProps) => {
@@ -38,10 +38,10 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
 
   const { mutate: createPublication, isPending: creatingPublication } =
     useCreatePublicationMutation({
-      onSuccess: () => {
+      onSuccess: (_, vars) => {
         toast.success('Successfully created publication')
         form.reset(defaultValues)
-        onClose()
+        onClose(vars.name)
       },
     })
 
@@ -82,7 +82,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
 
   return (
     <>
-      <Sheet open={visible} onOpenChange={onClose}>
+      <Sheet open={visible} onOpenChange={() => onClose()}>
         <SheetContent size="default">
           <div className="flex flex-col h-full">
             <SheetHeader>
@@ -147,10 +147,10 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
               </Form>
             </SheetSection>
             <SheetFooter>
-              <Button type="default" disabled={creatingPublication} onClick={onClose}>
+              <Button variant="default" disabled={creatingPublication} onClick={() => onClose()}>
                 Cancel
               </Button>
-              <Button type="primary" disabled={creatingPublication} form={formId} htmlType="submit">
+              <Button variant="primary" disabled={creatingPublication} form={formId} type="submit">
                 Create publication
               </Button>
             </SheetFooter>

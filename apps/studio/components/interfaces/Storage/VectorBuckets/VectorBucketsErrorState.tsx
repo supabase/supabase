@@ -1,5 +1,5 @@
 import { VectorBucketsLocalDisabledState } from './VectorBucketsLocalDisabledState'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import type { ResponseError } from '@/types'
 

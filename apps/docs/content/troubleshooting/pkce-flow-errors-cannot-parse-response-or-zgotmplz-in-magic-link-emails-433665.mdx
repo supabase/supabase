@@ -61,7 +61,7 @@ Now that your `SITE_URL` is correctly set to a web domain, you can safely use th
 
 This is the most crucial step to resolve both the broken PKCE handshake and the email link scanner issues.
 
-- **Create a Web Callback Page**: Develop a simple web page on your `SITE_URL` (e.g., `https://example.com/auth/callback`). This page will be the initial destination when the user clicks the magic link in the email.
+- **Create a Web Callback Page**: Create a web page on your `SITE_URL` (e.g., `https://example.com/auth/callback`). This page is the initial destination when the user clicks the magic link in the email.
 - **Add a User-Initiated Button**: On this callback page, include a button or explicit action that the user _must_ click to proceed. For example, a button labeled "Verify & Open App."
   - **Why this is essential**:
     - It prevents email link scanners from automatically triggering the final deep link, ensuring the one-time token is not consumed prematurely.

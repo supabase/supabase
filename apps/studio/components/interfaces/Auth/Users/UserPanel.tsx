@@ -59,7 +59,7 @@ export const UserPanel = () => {
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize="35" maxSize="45" minSize="35" className="bg-studio border-t">
         <Button
-          type="text"
+          variant="text"
           className="absolute top-3 right-3 px-1"
           icon={<X />}
           onClick={() => setSelectedId(null)}
@@ -124,7 +124,7 @@ export const UserPanel = () => {
                     className="mr-2"
                   />
                   <Button
-                    type="text"
+                    variant="text"
                     disabled={!searchQuery}
                     onClick={() => setSearchQuery('')}
                     className="text-xs"

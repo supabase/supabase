@@ -311,7 +311,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                         for this branch.
                       </p>
                     </div>
-                    <Button type="default" icon={<Github />} onClick={openLinkerPanel}>
+                    <Button variant="default" icon={<Github />} onClick={openLinkerPanel}>
                       Connect to GitHub
                     </Button>
                   </div>
@@ -319,7 +319,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
             </DialogSection>
 
             <DialogFooter padding="medium">
-              <Button disabled={isUpdating} type="default" onClick={onClose}>
+              <Button disabled={isUpdating} variant="default" onClick={onClose}>
                 Cancel
               </Button>
               <Button
@@ -331,8 +331,8 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                   isChecking
                 }
                 loading={isUpdating}
-                type="primary"
-                htmlType="submit"
+                variant="primary"
+                type="submit"
               >
                 Update branch
               </Button>

@@ -57,7 +57,7 @@ export default function CalendarForm() {
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
-                      type={'default'}
+                      variant="default"
                       size="small"
                       className={cn(
                         'w-[240px] justify-start',
@@ -84,7 +84,7 @@ export default function CalendarForm() {
             </FormItem>
           )}
         />
-        <Button htmlType="submit">Submit</Button>
+        <Button type="submit">Submit</Button>
       </form>
     </Form>
   )

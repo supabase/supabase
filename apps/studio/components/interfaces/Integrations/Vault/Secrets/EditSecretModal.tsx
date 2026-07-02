@@ -201,7 +201,7 @@ export const EditSecretModal = () => {
                               }}
                             />
                             <Button
-                              type="default"
+                              variant="default"
                               title={showSecretValue ? `Hide secret value` : `Show secret value`}
                               aria-label={
                                 showSecretValue ? `Hide secret value` : `Show secret value`
@@ -220,7 +220,7 @@ export const EditSecretModal = () => {
             </DialogSection>
             <DialogFooter>
               <Button
-                type="default"
+                variant="default"
                 disabled={isSubmitting}
                 onClick={() => {
                   form.reset()
@@ -229,7 +229,7 @@ export const EditSecretModal = () => {
               >
                 Cancel
               </Button>
-              <Button form={formId} htmlType="submit" loading={isSubmitting}>
+              <Button form={formId} type="submit" loading={isSubmitting}>
                 Update secret
               </Button>
             </DialogFooter>

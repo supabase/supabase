@@ -85,7 +85,7 @@ const PauseProjectButton = () => {
   return (
     <>
       <ButtonTooltip
-        type="default"
+        variant="default"
         icon={<CirclePause />}
         onClick={() => setIsModalOpen(true)}
         loading={isPausing}

@@ -20,10 +20,10 @@ const page: GoPageInput = {
       description: 'Explore Supabase and get ready to build with AI-assisted development.',
       children: (
         <div className="flex items-center justify-center gap-4">
-          <Button asChild type="default" size="small">
+          <Button asChild variant="default" size="small">
             <Link href="https://supabase.com/docs">Read the docs</Link>
           </Button>
-          <Button asChild type="text" size="small">
+          <Button asChild variant="text" size="small">
             <Link href="https://supabase.com/dashboard">Start a project</Link>
           </Button>
         </div>

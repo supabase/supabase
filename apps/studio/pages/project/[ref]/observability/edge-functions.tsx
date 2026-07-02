@@ -6,6 +6,7 @@ import { parseAsJson, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { Button } from 'ui'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
 import {
@@ -24,10 +25,11 @@ import {
 } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
 import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
 import { useChartHoverState } from '@/components/ui/Charts/useChartHoverState'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
@@ -53,6 +55,8 @@ EdgeFunctionsReportV2.getLayout = (page) => (
 )
 
 export default EdgeFunctionsReportV2
+
+const REPORT_TITLE = 'Edge Functions'
 
 const EdgeFunctionsUsage = () => {
   const { ref } = useParams()
@@ -143,18 +147,19 @@ const EdgeFunctionsUsage = () => {
 
   return (
     <>
-      <ReportHeader title="Edge Functions" showDatabaseSelector={false} />
+      <ReportHeader title={REPORT_TITLE} showDatabaseSelector={false} />
       <ReportStickyNav
         content={
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-2 w-full">
+            <div className="ml-auto flex items-center gap-2 flex-wrap">
+              <DocsButton href={OBSERVABILITY_DOCS_HREFS.edgeFunctions} topic={REPORT_TITLE} />
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
                 label="Refresh report"
                 side="bottom"
               >
                 <Button
-                  type="default"
+                  variant="default"
                   disabled={isRefreshing}
                   icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
                   className="w-7"

@@ -84,7 +84,7 @@ export const SpreadsheetImportPreview = ({
               )}
             </div>
             <Button
-              type="text"
+              variant="text"
               icon={
                 <ChevronDown
                   size={18}

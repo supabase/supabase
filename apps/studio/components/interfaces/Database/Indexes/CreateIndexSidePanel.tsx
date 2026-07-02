@@ -33,7 +33,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
@@ -46,7 +46,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { INDEX_TYPES } from './Indexes.constants'
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDatabaseIndexCreateMutation } from '@/data/database-indexes/index-create-mutation'
 import { useSchemasQuery } from '@/data/database/schemas-query'
@@ -209,7 +209,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                         <PopoverTrigger asChild>
                           <Button
                             id="schema"
-                            type="default"
+                            variant="default"
                             size={'medium'}
                             className={`w-full [&>span]:w-full text-left`}
                             iconRight={
@@ -307,7 +307,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                         >
                           <Button
                             id="table"
-                            type="default"
+                            variant="default"
                             size="medium"
                             className={cn(
                               'w-full [&>span]:w-full text-left',
@@ -513,7 +513,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                 <SheetSection>
                   <div className="flex items-center justify-between">
                     <p className="text-sm">Preview of SQL statement</p>
-                    <Button asChild type="default">
+                    <Button asChild variant="default">
                       <Link
                         href={
                           project !== undefined
@@ -545,7 +545,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
         </Form>
         <SheetFooter>
           <Button
-            type="default"
+            variant="default"
             disabled={isExecuting}
             onClick={() => {
               form.reset()
@@ -555,9 +555,9 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
             Cancel
           </Button>
           <Button
-            type="primary"
+            variant="primary"
             form={formId}
-            htmlType="submit"
+            type="submit"
             disabled={isExecuting}
             loading={isExecuting}
           >

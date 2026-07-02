@@ -1,17 +1,16 @@
+import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
+import Panel from '~/components/Panel'
+import data from '~/data/support'
+import { Command, Search } from 'lucide-react'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
+import { questions } from 'shared-data'
 import Typed from 'typed.js'
 import { Button, ButtonProps, cn } from 'ui'
 import { CommandMenuTrigger } from 'ui-patterns/CommandMenu'
-
-import { questions } from 'shared-data'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import Panel from '~/components/Panel'
-import data from '~/data/support'
-import { Search, Command } from 'lucide-react'
 
 const Index = () => {
   const router = useRouter()
@@ -49,7 +48,7 @@ const Index = () => {
       />
       <DefaultLayout className="min-h-fit!">
         <div className="bg-alternative">
-          <SectionContainer className="space-y-2 text-center">
+          <SectionContainerWithCn className="space-y-2 text-center">
             <h1 className="text-brand font-mono text-base uppercase tracking-widest">
               {data.hero.h1}
             </h1>
@@ -70,7 +69,7 @@ const Index = () => {
                   border
                   border-control
                   hover:bg-surface-100
-                  transition 
+                  transition
                   rounded-sm"
               >
                 <div className="flex items-center flex-1 space-x-2">
@@ -88,9 +87,12 @@ const Index = () => {
                 </div>
               </button>
             </CommandMenuTrigger>
-          </SectionContainer>
+          </SectionContainerWithCn>
         </div>
-        <SectionContainer className="text grid gap-5 md:grid-cols-2 xl:grid-cols-3 max-w-7xl pb-8!">
+        <SectionContainerWithCn
+          height="narrow"
+          className="text grid gap-5 md:grid-cols-2 xl:grid-cols-3"
+        >
           {data.cards.map((card) => (
             <Panel
               key={card.title}
@@ -107,7 +109,7 @@ const Index = () => {
                 {card.links.map((link) => (
                   <Button
                     size="small"
-                    type={(link.type as ButtonProps['type']) ?? 'default'}
+                    variant={(link.type as ButtonProps['variant']) ?? 'default'}
                     iconRight={link.icon}
                     asChild
                   >
@@ -119,9 +121,7 @@ const Index = () => {
               </div>
             </Panel>
           ))}
-        </SectionContainer>
-        <SectionContainer className="pt-0! max-w-7xl">
-          <div className="mx-auto bg-alternative border rounded-xl p-6 lg:p-10">
+          <div className="col-span-full bg-alternative border rounded-xl p-6 lg:p-10">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 xl:gap-16 justify-between">
               <div className="gap-2 flex flex-col">
                 <h2 className="text-xl lg:text-2xl tracking-tight">{data.banner.title}</h2>
@@ -132,7 +132,7 @@ const Index = () => {
                   {data.banner.links.map((link) => (
                     <Button
                       size="tiny"
-                      type={(link.type as ButtonProps['type']) ?? 'default'}
+                      variant={(link.type as ButtonProps['variant']) ?? 'default'}
                       iconRight={link.icon}
                       asChild
                     >
@@ -150,7 +150,7 @@ const Index = () => {
               </div>
             </div>
           </div>
-        </SectionContainer>
+        </SectionContainerWithCn>
       </DefaultLayout>
     </>
   )

@@ -52,10 +52,10 @@ export const useTableCreateMutation = ({
 
       await Promise.all([
         queryClient.invalidateQueries({
-          queryKey: tableKeys.list(projectRef, payload.schema, true),
+          queryKey: tableKeys.list(projectRef, payload.schema, { includeColumns: true }),
         }),
         queryClient.invalidateQueries({
-          queryKey: tableKeys.list(projectRef, payload.schema, false),
+          queryKey: tableKeys.list(projectRef, payload.schema, { includeColumns: false }),
         }),
         queryClient.invalidateQueries({
           queryKey: privilegeKeys.tablePrivilegesList(projectRef),

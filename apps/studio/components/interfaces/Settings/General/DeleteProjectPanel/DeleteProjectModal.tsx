@@ -1,4 +1,3 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -12,7 +11,7 @@ import { useSendDowngradeFeedbackMutation } from '@/data/feedback/exit-survey-se
 import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 import { useProjectDeleteMutation } from '@/data/projects/project-delete-mutation'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import type { Organization } from '@/types'
@@ -36,10 +35,7 @@ export const DeleteProjectModal = ({
   const project = projectProp || projectFromQuery
   const organization = organizationProp || organizationFromQuery
 
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const projectRef = project?.ref
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })

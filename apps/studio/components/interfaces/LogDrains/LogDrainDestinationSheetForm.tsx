@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IS_PLATFORM, useFlag } from 'common'
+import { IS_PLATFORM } from 'common'
 import Link from 'next/link'
 import { ReactNode, useEffect, useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
@@ -51,6 +51,7 @@ import {
   logDrainHeaderEntriesSchema,
   type LogDrainHeaderRow,
 } from './LogDrains.utils'
+import { useEnabledLogDrainTypes } from './useEnabledLogDrainTypes'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { LogDrainData } from '@/data/log-drains/log-drains-query'
@@ -347,12 +348,7 @@ export function LogDrainDestinationSheetForm({
     )
   }, [defaultValues, mode])
 
-  const sentryEnabled = useFlag('SentryLogDrain')
-  const s3Enabled = useFlag('S3logdrain')
-  const axiomEnabled = useFlag('axiomLogDrain')
-  const otlpEnabled = useFlag('otlpLogDrain')
-  const last9Enabled = useFlag('Last9LogDrain')
-  const syslogEnabled = useFlag('syslogLogDrain')
+  const enabledLogDrainTypes = useEnabledLogDrainTypes()
 
   const formRef = useRef<HTMLFormElement>(null)
 
@@ -474,15 +470,7 @@ export function LogDrainDestinationSheetForm({
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
                       </SelectTrigger>
                       <SelectContent>
-                        {LOG_DRAIN_TYPES.filter((t) => {
-                          if (t.value === 'sentry') return sentryEnabled
-                          if (t.value === 's3') return s3Enabled
-                          if (t.value === 'axiom') return axiomEnabled
-                          if (t.value === 'otlp') return otlpEnabled
-                          if (t.value === 'last9') return last9Enabled
-                          if (t.value === 'syslog') return syslogEnabled
-                          return true
-                        }).map((type) => (
+                        {enabledLogDrainTypes.map((type) => (
                           <SelectItem
                             value={type.value}
                             key={type.value}
@@ -1042,7 +1030,7 @@ export function LogDrainDestinationSheetForm({
               options={{ enabled: open && !isLoading }}
               side="top"
             >
-              <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
+              <Button form={FORM_ID} loading={isLoading} type="submit" variant="primary">
                 Save destination
               </Button>
             </Shortcut>

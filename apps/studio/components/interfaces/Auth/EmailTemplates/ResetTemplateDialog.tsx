@@ -60,7 +60,7 @@ export const ResetTemplateDialog = ({
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button type="default" htmlType="button" disabled={!canUpdateConfig}>
+        <Button variant="default" type="button" disabled={!canUpdateConfig}>
           Reset template
         </Button>
       </AlertDialogTrigger>

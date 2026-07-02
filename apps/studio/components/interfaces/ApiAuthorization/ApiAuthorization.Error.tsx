@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 import type { ResourceError } from '@/data/api-authorization/api-authorization-query'
@@ -27,7 +27,7 @@ export function ApiAuthorizationErrorScreen({
             </>
           }
         />
-        <Button type="default" block asChild>
+        <Button variant="default" block asChild>
           <Link href="/">Back to dashboard</Link>
         </Button>
       </div>

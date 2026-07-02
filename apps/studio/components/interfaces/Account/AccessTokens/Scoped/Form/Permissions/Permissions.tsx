@@ -25,7 +25,7 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
           <div className="flex items-center gap-2">
             {permissionRows.length > 0 && (
               <ButtonTooltip
-                type="default"
+                variant="default"
                 size="tiny"
                 className="p-1"
                 onClick={() => {
@@ -82,7 +82,7 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button
-                              type="default"
+                              variant="default"
                               size="tiny"
                               className="w-[150px] flex text-sm justify-between h-7 "
                               iconRight={
@@ -131,7 +131,7 @@ export const Permissions = <TFormValues extends PermissionsFormValues = Permissi
                         </Popover>
                       )}
                       <Button
-                        type="text"
+                        variant="text"
                         size="tiny"
                         className="p-1"
                         onClick={() => {

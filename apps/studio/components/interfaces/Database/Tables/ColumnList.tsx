@@ -48,7 +48,7 @@ import {
 } from './ColumnList.utils'
 import { ConstraintToken } from './ConstraintToken'
 import { displayColumnType } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
@@ -162,6 +162,7 @@ export const ColumnList = ({
         {!isSchemaLocked && isTableEntity && (
           <ButtonTooltip
             icon={<Plus />}
+            variant="default"
             disabled={!canUpdateColumns}
             onClick={() => onAddColumn()}
             tooltip={{
@@ -363,7 +364,7 @@ export const ColumnList = ({
                         {!isSchemaLocked && isTableEntity && (
                           <div className="flex justify-end gap-2">
                             <ButtonTooltip
-                              type="default"
+                              variant="default"
                               disabled={!canUpdateColumns}
                               onClick={() => onEditColumn(column)}
                               tooltip={{
@@ -379,7 +380,11 @@ export const ColumnList = ({
                             </ButtonTooltip>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button type="default" className="px-1" icon={<MoreVertical />} />
+                                <Button
+                                  variant="default"
+                                  className="px-1"
+                                  icon={<MoreVertical />}
+                                />
                               </DropdownMenuTrigger>
                               <DropdownMenuContent side="bottom" align="end" className="w-32">
                                 <DropdownMenuItemTooltip

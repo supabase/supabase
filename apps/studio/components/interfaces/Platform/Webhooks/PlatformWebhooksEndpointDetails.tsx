@@ -23,9 +23,9 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { TanStackTableHeadSort } from 'ui-patterns/Table'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 import { statusBadgeVariant } from './PlatformWebhooksView.utils'
@@ -123,7 +123,7 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
         <div className="flex h-full items-center justify-end">
           {row.original.status !== 'success' ? (
             <ButtonTooltip
-              type="default"
+              variant="default"
               size="tiny"
               className="w-7 shrink-0 hit-area-2"
               icon={<RotateCcw />}
@@ -137,7 +137,7 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
             />
           ) : (
             <Button
-              type="default"
+              variant="default"
               size="tiny"
               className="w-7 shrink-0 hit-area-2 invisible pointer-events-none"
               icon={<RotateCcw />}
@@ -216,7 +216,7 @@ export const PlatformWebhooksEndpointDetails = ({
                   label="Copy endpoint URL"
                 >
                   <Button
-                    type="text"
+                    variant="text"
                     size="tiny"
                     className="mt-0.5 shrink-0 h-5 w-5 p-0"
                     icon={<Copy size={12} />}
@@ -366,7 +366,7 @@ export const PlatformWebhooksEndpointDetails = ({
                   icon={<ChevronLeft />}
                   className="w-7 hit-area-2"
                   aria-label="Previous page"
-                  type="default"
+                  variant="default"
                   size="tiny"
                   disabled={!table.getCanPreviousPage()}
                   onClick={() => table.previousPage()}
@@ -375,7 +375,7 @@ export const PlatformWebhooksEndpointDetails = ({
                   icon={<ChevronRight />}
                   className="w-7 hit-area-2"
                   aria-label="Next page"
-                  type="default"
+                  variant="default"
                   size="tiny"
                   disabled={!table.getCanNextPage()}
                   onClick={() => table.nextPage()}

@@ -234,10 +234,10 @@ export default function PageLayoutEdgeFunction() {
       <PageBreadcrumbs
         actions={
           <PageBreadcrumbsActions>
-            <Button type="default" size="tiny">
+            <Button variant="default" size="tiny">
               Test
             </Button>
-            <Button type="primary" size="tiny">
+            <Button variant="primary" size="tiny">
               Deploy
             </Button>
           </PageBreadcrumbsActions>
@@ -394,7 +394,7 @@ function OverviewPage() {
                   {CHART_INTERVALS.map((item, index) => (
                     <Button
                       key={item.key}
-                      type={interval === item.key ? 'secondary' : 'default'}
+                      variant={interval === item.key ? 'secondary' : 'default'}
                       onClick={() => setInterval(item.key)}
                       className={getSegmentedButtonClassName(index, CHART_INTERVALS.length)}
                     >
@@ -425,7 +425,7 @@ function OverviewPage() {
               <PageSectionTitle>Errors since last deploy</PageSectionTitle>
             </PageSectionSummary>
             <PageSectionAside>
-              <Button type="default" size="tiny" icon={<ExternalLink size={14} />}>
+              <Button variant="default" size="tiny" icon={<ExternalLink size={14} />}>
                 View logs
               </Button>
             </PageSectionAside>
@@ -703,7 +703,7 @@ function CodePage() {
             <h3 className="text-sm font-normal font-mono uppercase text-lighter tracking-wide">
               Files
             </h3>
-            <Button size="tiny" type="default" icon={<Plus size={14} />} onClick={addNewFile}>
+            <Button size="tiny" variant="default" icon={<Plus size={14} />} onClick={addNewFile}>
               Add File
             </Button>
           </div>
@@ -735,7 +735,7 @@ function CodePage() {
 
       <div className="flex shrink-0 items-center justify-end border-t bg-surface-100 p-4">
         <Button
-          type="primary"
+          variant="primary"
           size="medium"
           iconRight={<CornerDownLeft size={10} strokeWidth={1.5} />}
         >

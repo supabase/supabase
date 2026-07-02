@@ -2,7 +2,7 @@ import { AppWindow, Plus } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { PromoteInstallationModal } from '../../Installations/PromoteInstallationModal'
 import { PrivateApp, usePrivateApps } from '../../PrivateAppsContext'
@@ -77,12 +77,12 @@ export function AppsList({ onCreateApp, createShortcutId }: AppsListProps) {
         >
           {createShortcutId ? (
             <Shortcut id={createShortcutId} onTrigger={onCreateApp} side="bottom">
-              <Button type="primary" icon={<Plus size={14} />} onClick={onCreateApp}>
+              <Button variant="primary" icon={<Plus size={14} />} onClick={onCreateApp}>
                 Create app
               </Button>
             </Shortcut>
           ) : (
-            <Button type="primary" icon={<Plus size={14} />} onClick={onCreateApp}>
+            <Button variant="primary" icon={<Plus size={14} />} onClick={onCreateApp}>
               Create app
             </Button>
           )}

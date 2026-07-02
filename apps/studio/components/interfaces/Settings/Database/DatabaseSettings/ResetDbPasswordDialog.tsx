@@ -32,7 +32,7 @@ export type ResetDbPasswordDialogProps = {
   triggerClassName?: string
   triggerIcon?: ReactNode
   triggerLabel?: string
-  triggerType?: ComponentProps<typeof ButtonTooltip>['type']
+  triggerVariant?: ComponentProps<typeof ButtonTooltip>['variant']
 }
 
 export const ResetDbPasswordDialog = ({
@@ -41,7 +41,7 @@ export const ResetDbPasswordDialog = ({
   triggerClassName,
   triggerIcon,
   triggerLabel = 'Reset password',
-  triggerType = 'default',
+  triggerVariant = 'default',
 }: ResetDbPasswordDialogProps) => {
   const { ref } = useParams()
   const isProjectActive = useIsProjectActive()
@@ -131,7 +131,7 @@ export const ResetDbPasswordDialog = ({
     <Dialog open={showResetDbPass} onOpenChange={(open) => setShowResetDbPass(open)}>
       <DialogTrigger asChild>
         <ButtonTooltip
-          type={triggerType}
+          variant={triggerVariant}
           className={triggerClassName}
           icon={triggerIcon}
           disabled={!canResetDbPassword || !isProjectActive || disabled}
@@ -181,14 +181,14 @@ export const ResetDbPasswordDialog = ({
         </DialogSection>
         <DialogFooter>
           <Button
-            type="default"
+            variant="default"
             disabled={isUpdatingPassword}
             onClick={() => setShowResetDbPass(false)}
           >
             Cancel
           </Button>
           <Button
-            type="primary"
+            variant="primary"
             loading={isUpdatingPassword}
             disabled={isUpdatingPassword}
             onClick={() => confirmResetDbPass()}

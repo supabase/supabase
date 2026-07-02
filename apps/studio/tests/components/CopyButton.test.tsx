@@ -14,7 +14,7 @@ test('shows copied text', async () => {
 })
 
 test('does not show a green copied icon for primary buttons', async () => {
-  const { container } = render(<CopyButton text="some text" type="primary" />)
+  const { container } = render(<CopyButton text="some text" variant="primary" />)
 
   await userEvent.click(await screen.findByText('Copy'))
   await screen.findByText('Copied')

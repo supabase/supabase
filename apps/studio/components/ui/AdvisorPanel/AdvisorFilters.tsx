@@ -85,7 +85,7 @@ export const AdvisorFilters = ({
             }}
           />
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="w-7 h-7 p-0"
             icon={<X strokeWidth={1.5} />}
             onClick={onClose}

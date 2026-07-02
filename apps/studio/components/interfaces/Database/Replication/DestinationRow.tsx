@@ -169,7 +169,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
             ) : (
               <div>
                 <p>
-                  {type} (ID: {pipeline?.id})
+                  {type} (Pipeline ID: {pipeline?.id})
                 </p>
                 <p className="text-foreground-lighter">{destinationName}</p>
               </div>
@@ -226,9 +226,9 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                   </TooltipContent>
                 </Tooltip>
               )}
-              <Button asChild type="default" className="relative">
+              <Button asChild variant="default" className="relative">
                 <Link href={`/project/${projectRef}/database/replication/${pipeline?.id}`}>
-                  View replication
+                  View pipeline
                 </Link>
               </Button>
               <RowMenu

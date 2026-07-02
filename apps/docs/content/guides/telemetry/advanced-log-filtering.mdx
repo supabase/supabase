@@ -21,7 +21,7 @@ The Logs Explorer uses BigQuery and supports all [available SQL functions and op
 
 ## Timestamp display and behavior
 
-BigQuery stores each log entry with a `timestamp` as a `TIMESTAMP` data type. Use the appropriate [timestamp function](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp) to utilize the `timestamp` field in a query.
+BigQuery stores each log entry with a `timestamp` as a `TIMESTAMP` data type. Use the appropriate [timestamp function](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp) to use the `timestamp` field in a query.
 
 BigQuery renders raw top-level timestamp values as Unix microseconds. To render the timestamps in a human-readable format, use the `DATETIME()` function to convert the Unix timestamp display into an ISO-8601 timestamp.
 

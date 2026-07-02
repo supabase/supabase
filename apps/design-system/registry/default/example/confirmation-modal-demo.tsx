@@ -24,7 +24,7 @@ export default function ConfirmationModalDemo() {
 
   return (
     <>
-      <Button type="default" onClick={() => setVisible(!visible)}>
+      <Button variant="default" onClick={() => setVisible(!visible)}>
         Show Confirmation Modal
       </Button>
       <ConfirmationModal

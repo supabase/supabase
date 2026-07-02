@@ -129,7 +129,7 @@ const PricingComputeSection = () => {
             </h3>
           </div>
 
-          <Button asChild size="tiny" type="default">
+          <Button asChild size="tiny" variant="default">
             <Link href="https://supabase.com/docs/guides/platform/compute-add-ons">
               Learn about Compute add-ons
             </Link>

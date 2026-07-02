@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, Button } from 'ui'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
@@ -18,13 +19,14 @@ import { POOLING_OPTIMIZATIONS } from '@/components/interfaces/Settings/Database
 import DiskSizeConfigurationModal from '@/components/interfaces/Settings/Database/DiskSizeConfigurationModal'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
 import Table from '@/components/to-be-cleaned/Table'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { MultiAttribute } from '@/components/ui/Charts/ComposedChart.utils'
 import { LazyComposedChartHandler } from '@/components/ui/Charts/ComposedChartHandler'
 import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { analyticsKeys } from '@/data/analytics/keys'
@@ -64,6 +66,8 @@ DatabaseReport.getLayout = (page) => (
 
 export type UpdateDateRange = (from: string, to: string) => void
 export default DatabaseReport
+
+const REPORT_TITLE = 'Database'
 
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
@@ -227,17 +231,18 @@ const DatabaseUsage = () => {
 
   return (
     <>
-      <ReportHeader showDatabaseSelector title="Database" />
+      <ReportHeader showDatabaseSelector title={REPORT_TITLE} />
       <ReportStickyNav
         content={
-          <>
+          <div className="ml-auto flex items-center gap-2 flex-wrap">
+            <DocsButton href={OBSERVABILITY_DOCS_HREFS.database} topic={REPORT_TITLE} />
             <ShortcutTooltip
               shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
               label="Refresh report"
               side="bottom"
             >
               <Button
-                type="default"
+                variant="default"
                 disabled={isRefreshing}
                 icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
                 className="w-7"
@@ -275,7 +280,7 @@ const DatabaseUsage = () => {
                 </div>
               )}
             </div>
-          </>
+          </div>
         }
       >
         {selectedDateRange &&
@@ -367,14 +372,14 @@ const DatabaseUsage = () => {
 
                   <div className="ml-auto">
                     {project?.cloud_provider === 'AWS' ? (
-                      <Button asChild type="default">
+                      <Button asChild variant="default">
                         <Link href={`/project/${ref}/settings/compute-and-disk`}>
                           Increase disk size
                         </Link>
                       </Button>
                     ) : (
                       <ButtonTooltip
-                        type="default"
+                        variant="default"
                         disabled={!canUpdateDiskSizeConfig}
                         onClick={() => setshowIncreaseDiskSizeModal(true)}
                         tooltip={{
@@ -443,7 +448,7 @@ const DatabaseUsage = () => {
                       inactive.
                     </p>
 
-                    <Button asChild type="default" icon={<ExternalLink />}>
+                    <Button asChild variant="default" icon={<ExternalLink />}>
                       <Link
                         href={`${DOCS_URL}/guides/platform/database-size#disk-space-usage`}
                         target="_blank"

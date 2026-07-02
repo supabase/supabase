@@ -9,12 +9,12 @@ This guide assumes you have already followed [the Build a Supabase Integration g
 
 When a Supabase user clicks the **Install Integration** button in the Dashboard, they are redirected to your system to begin the OAuth flow. You can implement this redirect in one of two ways:
 
-- **[Simple redirect](#method-1-simple-redirect)**: Easier to build, but your system cannot verify that the incoming user was sent by Supabase.
+- **[Redirect](#method-1-redirect)**: Easier to build, but your system cannot verify that the incoming user was sent by Supabase.
 - **[Signed redirect](#method-2-signed-redirect)**: More work to build, but cryptographically verifies that the redirect originated from Supabase. **Recommended for production integrations.**
 
 Pick the method that fits your security requirements, then follow the matching section below.
 
-## Method 1: Simple redirect
+## Method 1: Redirect
 
 In this method, you implement a single `GET` endpoint. Supabase redirects the user to this endpoint when they click **Install Integration**, and your endpoint kicks off the OAuth flow.
 
@@ -54,6 +54,8 @@ sequenceDiagram
 
   Browser->>User: Display "Integration Installed" Message
 ```
+
+The user clicks **Install Integration** in the Supabase Dashboard, which routes them through the partner's click-handler page and on to the Supabase authorization page. Supabase shows a consent screen. Once the user consents, Supabase redirects back to the partner with an authorization code. The partner exchanges that code for a token, uses the token to request Management API resources, and finally shows the user an "Integration Installed" message.
 
 ### Step 1: Implement the redirect endpoint
 
@@ -135,6 +137,8 @@ sequenceDiagram
 
   Browser->>User: Display "Integration Installed" Message
 ```
+
+Walking through the sequence: when the user clicks **Install Integration**, Supabase sends the partner a signed JWT and asks it to generate a redirect URL. The partner validates the JWT, generates a unique redirect record and URL, and returns it. Supabase redirects the user to that URL; the partner validates the redirect record, optionally has the user complete extra steps, and then sends them to the Supabase authorization page. From there the flow matches Method 1: the user consents, Supabase returns an authorization code, the partner exchanges it for a token, requests Management API resources, and the integration completes.
 
 ### Step 1: Exchange public keys with Supabase
 

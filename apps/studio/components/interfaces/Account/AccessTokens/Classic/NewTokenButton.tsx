@@ -34,7 +34,7 @@ export const NewTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              type="primary"
+              variant="primary"
               title="Choose token scope"
               className="rounded-l-none px-[4px] py-[5px]"
               icon={<ChevronDown />}

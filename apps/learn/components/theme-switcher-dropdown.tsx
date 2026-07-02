@@ -56,7 +56,7 @@ const ThemeSwitcherDropdown = () => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            type="text"
+            variant="text"
             size="tiny"
             className="px-1 group"
             icon={

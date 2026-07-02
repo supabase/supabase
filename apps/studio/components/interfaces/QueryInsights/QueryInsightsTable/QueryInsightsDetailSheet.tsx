@@ -121,7 +121,7 @@ export const QueryInsightsDetailSheet = ({
                 <div className="flex items-center justify-between px-5 py-2 border-b shrink-0">
                   <p className="text-xs text-foreground-lighter">EXPLAIN ANALYZE output</p>
                   <Button
-                    type="default"
+                    variant="default"
                     size="tiny"
                     icon={<AiIconAnimation size={14} />}
                     onClick={() => {

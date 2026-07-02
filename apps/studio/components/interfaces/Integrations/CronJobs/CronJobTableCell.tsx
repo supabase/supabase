@@ -35,8 +35,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { useDatabaseCronJobRunCommandMutation } from '@/data/database-cron-jobs/database-cron-job-run-mutation'
 import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
@@ -147,7 +147,7 @@ export const CronJobTableCell = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              type="text"
+              variant="text"
               loading={isRunning}
               className="h-6 w-6"
               icon={<MoreVertical />}
@@ -226,11 +226,11 @@ export const CronJobTableCell = ({
             </p>
           </DialogSection>
           <DialogFooter>
-            <Button type="default" onClick={() => setShowToggleModal(false)}>
+            <Button variant="default" onClick={() => setShowToggleModal(false)}>
               Cancel
             </Button>
             <Button
-              type={active ? 'warning' : 'primary'}
+              variant={active ? 'warning' : 'primary'}
               loading={isToggling}
               onClick={onConfirmToggle}
             >

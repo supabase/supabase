@@ -13,7 +13,7 @@ export default function EmptyStateMissingRoute() {
         title="Unable to find bucket"
         description={`${bucketId ? `The bucket “${bucketId}”` : 'This bucket'} doesn’t seem to exist.`}
       >
-        <Button asChild type="default" className="mt-2">
+        <Button asChild variant="default" className="mt-2">
           <Link
             href="/"
             onClick={(e) => {

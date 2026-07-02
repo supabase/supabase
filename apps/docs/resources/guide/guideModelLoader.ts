@@ -1,13 +1,13 @@
+import matter from 'gray-matter'
 import { promises as fs } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
+
 import { extractMessageFromAnyError, FileNotFoundError, MultiError } from '~/app/api/utils'
 import { preprocessMdxWithDefaults } from '~/features/directives/utils'
 import { checkGuidePageEnabled } from '~/features/docs/NavigationPageStatus.utils'
 import { Both, Result } from '~/features/helpers.fn'
 import { GUIDES_DIRECTORY } from '~/lib/docs'
 import { processMdx } from '~/scripts/helpers.mdx'
-import matter from 'gray-matter'
-
 import { GuideModel } from './guideModel'
 
 /**
@@ -140,7 +140,7 @@ export class GuideModelLoader {
       },
       (error) => {
         if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
-          throw new FileNotFoundError(join(GUIDES_DIRECTORY, relPath), error)
+          throw new FileNotFoundError('', error)
         }
         throw new Error(
           `Failed to load guide from ${relPath}: ${extractMessageFromAnyError(error)}`,

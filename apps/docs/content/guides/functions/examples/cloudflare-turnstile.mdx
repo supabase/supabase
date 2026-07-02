@@ -54,9 +54,9 @@ export default {
     const outcome = await result.json()
     console.log(outcome)
     if (outcome.success) {
-      return new Response('success')
+      return Response.json({ success: true })
     }
-    return new Response('failure')
+    return Response.json({ success: false })
   }),
 }
 ```

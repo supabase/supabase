@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Fragment, type ReactNode } from 'react'
 import SVG from 'react-inlinesvg'
 import { Button, cn } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { navigateToSection } from './Content/Content.utils'
 import { API_DOCS_CATEGORIES, DOCS_CONTENT, DOCS_MENU } from './ProjectAPIDocs.constants'
@@ -107,7 +107,7 @@ export const FirstLevelNav = (): ReactNode => {
         <Button
           block
           asChild
-          type="text"
+          variant="text"
           size="small"
           icon={
             <SVG
@@ -123,7 +123,7 @@ export const FirstLevelNav = (): ReactNode => {
             GraphiQL
           </Link>
         </Button>
-        <Button block asChild type="text" size="small" icon={<BookOpen />}>
+        <Button block asChild variant="text" size="small" icon={<BookOpen />}>
           <Link
             href={`${DOCS_URL}/guides/graphql`}
             target="_blank"
@@ -136,12 +136,12 @@ export const FirstLevelNav = (): ReactNode => {
       </div>
 
       <div className="px-2 py-4">
-        <Button block asChild type="text" size="small" icon={<Book />}>
+        <Button block asChild variant="text" size="small" icon={<Book />}>
           <Link href={`${DOCS_URL}`} target="_blank" rel="noreferrer" className="justify-start!">
             Documentation
           </Link>
         </Button>
-        <Button block asChild type="text" size="small" icon={<BookOpen />}>
+        <Button block asChild variant="text" size="small" icon={<BookOpen />}>
           <Link
             href={`${DOCS_URL}/guides/api`}
             target="_blank"

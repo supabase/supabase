@@ -9,6 +9,7 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 export type DatabaseFunctionsVariables = {
   projectRef?: string
   connectionString?: string | null
+  schema?: string
 }
 
 export type DatabaseFunction = z.infer<typeof pgMeta.functions.pgFunctionZod>
@@ -25,17 +26,19 @@ export type SavedDatabaseFunction = Omit<
   identity_argument_types: SafeSqlFragment
   return_type: SafeSqlFragment
   config_params: Record<string, SafeSqlFragment> | null
+  type: 'function' | 'procedure'
 }
 
-const pgMetaFunctionsList = pgMeta.functions.list()
-
 export async function getDatabaseFunctions(
-  { projectRef, connectionString }: DatabaseFunctionsVariables,
+  { projectRef, connectionString, schema }: DatabaseFunctionsVariables,
   signal?: AbortSignal,
   headersInit?: HeadersInit
 ) {
   let headers = new Headers(headersInit)
 
+  const pgMetaFunctionsList = pgMeta.functions.list({
+    includedSchemas: schema ? [schema] : undefined,
+  })
   const { result } = await executeSql(
     {
       projectRef,
@@ -54,15 +57,17 @@ export type DatabaseFunctionsData = Awaited<ReturnType<typeof getDatabaseFunctio
 export type DatabaseFunctionsError = ResponseError
 
 export const useDatabaseFunctionsQuery = <TData = DatabaseFunctionsData>(
-  { projectRef, connectionString }: DatabaseFunctionsVariables,
+  vars: DatabaseFunctionsVariables,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<DatabaseFunctionsData, DatabaseFunctionsError, TData> = {}
-) =>
-  useQuery<DatabaseFunctionsData, DatabaseFunctionsError, TData>({
-    queryKey: databaseKeys.databaseFunctions(projectRef),
-    queryFn: ({ signal }) => getDatabaseFunctions({ projectRef, connectionString }, signal),
+) => {
+  const { projectRef, schema } = vars
+  return useQuery<DatabaseFunctionsData, DatabaseFunctionsError, TData>({
+    queryKey: databaseKeys.databaseFunctions(projectRef, schema),
+    queryFn: ({ signal }) => getDatabaseFunctions(vars, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...options,
   })
+}

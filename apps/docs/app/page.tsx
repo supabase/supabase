@@ -1,11 +1,10 @@
 import { isFeatureEnabled } from 'common'
 import { type Metadata, type ResolvingMetadata } from 'next'
 import Link from 'next/link'
-import { cn, IconBackground } from 'ui'
+import { cn } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import { TextLink } from 'ui-patterns/TextLink'
 
-import MenuIconPicker from '@/components/Navigation/NavigationMenu/MenuIconPicker'
 import { MIGRATION_PAGES } from '@/components/Navigation/NavigationMenu/NavigationMenu.constants'
 import { GlassPanelWithIconPicker } from '@/features/ui/GlassPanelWithIconPicker'
 import { IconPanelWithIconPicker } from '@/features/ui/IconPanelWithIconPicker'
@@ -324,10 +323,10 @@ const HomePage = () => (
       )}
 
       <div className="flex flex-col gap-6 py-12 border-b">
-        <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
-          <h3 id="additional-resources" className="group scroll-mt-24">
+        <div className="col-span-4 flex flex-col gap-1">
+          <h2 id="additional-resources" className="group scroll-mt-24 m-0">
             Additional resources
-          </h3>
+          </h2>
         </div>
 
         <ul className="grid grid-cols-12 gap-6 not-prose">
@@ -351,17 +350,14 @@ const HomePage = () => (
       </div>
       {isFeatureEnabled('docs:full_getting_started') && (
         <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12">
-          <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
+          <div className="col-span-4 flex flex-col gap-1">
             <div className="md:max-w-xs 2xl:max-w-none">
               <div className="flex items-center gap-3 mb-3 text-brand-600">
-                <IconBackground>
-                  <MenuIconPicker icon="self-hosting" width={18} height={18} />
-                </IconBackground>
-                <h3 id="self-hosting" className="group scroll-mt-24">
+                <h2 id="self-hosting" className="group scroll-mt-24 m-0">
                   Self-Hosting
-                </h3>
+                </h2>
               </div>
-              <p className="text-foreground-light text-sm">
+              <p className="text-foreground-light text-sm m-0 p-0">
                 Get started with self-hosting Supabase.
               </p>
               <TextLink

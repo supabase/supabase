@@ -231,7 +231,7 @@ const ProjectLinker = ({
                 renderTrigger={() => {
                   return (
                     <Button
-                      type="default"
+                      variant="default"
                       block
                       disabled={defaultSupabaseProjectRef !== undefined || loadingSupabaseProjects}
                       loading={loadingSupabaseProjects}
@@ -302,7 +302,7 @@ const ProjectLinker = ({
               >
                 <PopoverTrigger asChild>
                   <Button
-                    type="default"
+                    variant="default"
                     block
                     disabled={loadingForeignProjects}
                     loading={loadingForeignProjects}
@@ -378,7 +378,7 @@ const ProjectLinker = ({
         {onSkip !== undefined && (
           <Button
             size="medium"
-            type="default"
+            variant="default"
             onClick={() => {
               onSkip()
             }}

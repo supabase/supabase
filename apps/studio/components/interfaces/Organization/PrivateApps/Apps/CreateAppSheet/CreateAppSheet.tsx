@@ -182,7 +182,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                     <div className="flex items-center gap-2">
                       {selectedPermissions.length > 0 && (
                         <Button
-                          type="default"
+                          variant="default"
                           size="tiny"
                           className="p-1"
                           icon={<RotateCcw size={16} />}
@@ -197,7 +197,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                       >
                         <PopoverTrigger asChild>
                           <Button
-                            type="default"
+                            variant="default"
                             size="tiny"
                             icon={<Plus size={14} />}
                             disabled={isLoading}
@@ -263,7 +263,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                                 )}
                               </div>
                               <Button
-                                type="text"
+                                variant="text"
                                 size="tiny"
                                 className="p-1"
                                 icon={<X size={16} />}
@@ -316,7 +316,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                         <h3 className="text-sm font-medium">Private key</h3>
                         <div className="flex items-center gap-2">
                           <Button
-                            type="default"
+                            variant="default"
                             size="tiny"
                             icon={<Copy size={12} />}
                             onClick={() => copy(generatedKey.private_key, { withToast: true })}
@@ -324,7 +324,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                             Copy
                           </Button>
                           <Button
-                            type="default"
+                            variant="default"
                             size="tiny"
                             icon={<Download size={12} />}
                             onClick={() => {
@@ -368,12 +368,12 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
 
           <SheetFooter className="justify-end! w-full mt-auto py-4 border-t">
             <div className="flex gap-2">
-              <Button type="default" onClick={handleRequestClose} disabled={isLoading}>
+              <Button variant="default" onClick={handleRequestClose} disabled={isLoading}>
                 Cancel
               </Button>
               {keyRevealed ? (
                 <Button
-                  type="primary"
+                  variant="primary"
                   disabled={!keyCopied}
                   onClick={() => {
                     onCreated(createdApp!)
@@ -384,7 +384,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                 </Button>
               ) : (
                 <Button
-                  type="primary"
+                  variant="primary"
                   disabled={!canCreate}
                   loading={isLoading}
                   onClick={handleCreate}

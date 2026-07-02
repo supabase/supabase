@@ -30,7 +30,7 @@ export const ContactSupportButton = ({
   error?: { message: string } | null
 }) => {
   return (
-    <Button asChild type="default" className="w-min">
+    <Button asChild variant="default" className="w-min">
       <SupportLink
         queryParams={{
           category: SupportCategories.DASHBOARD_BUG,
@@ -112,5 +112,3 @@ export const AlertError = ({
     />
   )
 }
-
-export default AlertError

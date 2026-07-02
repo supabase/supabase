@@ -2,10 +2,10 @@
 
 // End of third-party imports
 import { isFeatureEnabled, useBreakpoint } from 'common'
-import { ChevronRight, Play, Sparkles } from 'lucide-react'
+import { ChevronRight, Sparkles } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
-import { cn, IconBackground } from 'ui'
+import { cn } from 'ui'
 import { IconPanel } from 'ui-patterns/IconPanel'
 
 import { getCustomContent } from '../lib/custom-content/getCustomContent'
@@ -127,15 +127,12 @@ const HomePageCover = (props) => {
     >
       <div className="col-span-full flex flex-col md:flex-row xl:flex-col justify-between gap-3">
         <div className="md:max-w-xs shrink w-fit xl:max-w-none">
-          <div className="flex items-center gap-3 mb-3">
-            <IconBackground>
-              <Play aria-hidden="true" className="text-brand-600 w-4" strokeWidth={2} />
-            </IconBackground>
-            <h2 className="text-2xl m-0 text-foreground">Getting Started</h2>
+          <div className="flex flex-col gap-1 mb-3">
+            <h2 className="text-2xl text-foreground">Getting Started</h2>
+            <p className="text-foreground-light text-sm">
+              Set up and connect a database in just a few minutes.
+            </p>
           </div>
-          <p className="text-foreground-light text-sm">
-            Set up and connect a database in just a few minutes.
-          </p>
         </div>
         <div className="shrink-0">
           <div className="flex flex-wrap md:grid md:grid-cols-5 gap-2 sm:gap-3">

@@ -110,7 +110,7 @@ export const ReviewWithAI = ({
 
   return (
     <ButtonTooltip
-      type="default"
+      variant="default"
       disabled={disabled || !currentBranch || !mainBranch}
       className="px-1"
       onClick={handleReviewWithAssistant}

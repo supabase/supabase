@@ -2,7 +2,7 @@ import { THRESHOLD_COUNT } from '@supabase/pg-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { AlertCircle, ArrowLeft, ArrowRight, HelpCircle, Loader2 } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -41,7 +41,7 @@ const RowCountSelector = ({
       side="top"
       align="start"
     >
-      <Button asChild type="outline" style={{ padding: '3px 10px' }}>
+      <Button asChild variant="outline" style={{ padding: '3px 10px' }}>
         <span>{`${tableEditorSnap.rowsPerPage} rows`}</span>
       </Button>
     </DropdownControl>
@@ -190,6 +190,17 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isError, snap.enforceExactCount, error?.code])
 
+  // Reset back to the first page whenever the filters change
+  const hasMountedRef = useRef(false)
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true
+      return
+    }
+    snap.setPage(1)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters])
+
   // [Joshen] One to revisit if we can consolidate this and the main return statement
   if (isForeignTableSelected) {
     return (
@@ -197,7 +208,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
         <Button
           aria-label="Previous page"
           icon={<ArrowLeft />}
-          type="outline"
+          variant="outline"
           className="px-1.5"
           disabled={page <= 1}
           onClick={onPreviousPage}
@@ -223,7 +234,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
         <Button
           aria-label="Next page"
           icon={<ArrowRight />}
-          type="outline"
+          variant="outline"
           className="px-1.5"
           disabled={isLastPage || !enableForeignRowsQuery}
           loading={isLoadingRows && enableForeignRowsQuery}
@@ -240,7 +251,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
         <Button
           aria-label="Previous page"
           icon={<ArrowLeft />}
-          type="outline"
+          variant="outline"
           className="px-1.5"
           disabled={page <= 1 || isLoading}
           onClick={onPreviousPage}
@@ -274,7 +285,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
         <Button
           aria-label="Next page"
           icon={<ArrowRight />}
-          type="outline"
+          variant="outline"
           className="px-1.5"
           disabled={isLastPage}
           onClick={onNextPage}
@@ -284,13 +295,17 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
       </div>
 
       {isLoading ? (
-        <Button type="text" className="w-7" icon={<Loader2 size={12} className="animate-spin" />} />
+        <Button
+          variant="text"
+          className="w-7"
+          icon={<Loader2 size={12} className="animate-spin" />}
+        />
       ) : isError ? (
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               size="tiny"
-              type="text"
+              variant="text"
               className="w-7"
               loading={isFetching}
               icon={<AlertCircle />}
@@ -312,7 +327,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
               <TooltipTrigger asChild>
                 <Button
                   size="tiny"
-                  type="text"
+                  variant="text"
                   className="w-7"
                   loading={isFetching}
                   icon={<HelpCircle />}

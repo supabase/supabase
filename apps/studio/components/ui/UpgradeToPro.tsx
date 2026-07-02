@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { cn } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { DocsButton } from './DocsButton'
 import { UpgradePlanButton } from './UpgradePlanButton'

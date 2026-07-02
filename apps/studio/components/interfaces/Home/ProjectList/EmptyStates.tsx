@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { ShimmeringCard } from './ShimmeringCard'
 import { HomeIcon } from '@/components/layouts/Navigation/LayoutHeader/HomeIcon'
@@ -86,7 +86,7 @@ export const NoProjectsState = ({ slug }: { slug: string }) => {
       description="Launch a complete backend built on Postgres."
     >
       {projectCreationEnabled && (
-        <Button size="tiny" type="default" asChild icon={<Plus />}>
+        <Button size="tiny" variant="default" asChild icon={<Plus />}>
           <Link href={`/new/${slug}`}>New project</Link>
         </Button>
       )}
@@ -100,7 +100,7 @@ export const NoOrganizationsState = () => {
       title="Create an organization"
       description="Manage your team and projects in one place."
     >
-      <Button size="tiny" type="primary" asChild icon={<Plus />}>
+      <Button size="tiny" variant="primary" asChild icon={<Plus />}>
         <Link href="/new">New organization</Link>
       </Button>
     </EmptyStatePresentational>

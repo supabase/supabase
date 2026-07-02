@@ -1,12 +1,12 @@
 import { useIsMFAEnabled } from 'common'
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { ProjectList } from '@/components/interfaces/Home/ProjectList/ProjectList'
 import { HomePageActions } from '@/components/interfaces/HomePageActions'
 import { PlanUsageCard } from '@/components/interfaces/ProjectHome/PlanUsageCard'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import OrganizationLayout from '@/components/layouts/OrganizationLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
@@ -37,7 +37,7 @@ const ProjectsPage: NextPageWithLayout = () => {
               </>
             }
             actions={
-              <Button asChild type="default">
+              <Button asChild variant="default">
                 <Link href="/account/security">Set up MFA</Link>
               </Button>
             }

@@ -124,7 +124,7 @@ const renderTemplateEditor = ({
   })
   useAsyncCheckPermissionsMock.mockReturnValue({ can: canUpdateConfig })
   useAuthConfigUpdateMutationMock.mockReturnValue({ mutate: updateAuthConfigMock })
-  useAuthTemplateResetMutationMock.mockReturnValue({ mutate: resetTemplateMock })
+  useAuthTemplateResetMutationMock.mockReturnValue({ mutate: resetTemplateMock, isPending: false })
 
   return render(<TemplateEditor template={confirmationTemplate} />)
 }

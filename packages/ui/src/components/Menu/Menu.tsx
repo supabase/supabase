@@ -4,7 +4,6 @@ import React from 'react'
 
 import styleHandler from '../../lib/theme/styleHandler'
 import { cn } from '../../lib/utils/cn'
-import Typography from '../Typography'
 import { MenuContextProvider, useMenuContext } from './MenuContext'
 
 interface MenuProps {
@@ -104,27 +103,6 @@ export function Group({ children, icon, title }: GroupProps) {
   )
 }
 
-interface MiscProps {
-  children: React.ReactNode
-}
-
-export function Misc({ children }: MiscProps) {
-  return (
-    <div
-    // className={MenuStyles['sbui-menu__misc']}
-    >
-      <Typography.Text>
-        <span
-        // className={MenuStyles['sbui-menu__content']}
-        >
-          {children}
-        </span>
-      </Typography.Text>
-    </div>
-  )
-}
-
 Menu.Item = Item
 Menu.Group = Group
-Menu.Misc = Misc
 export default Menu

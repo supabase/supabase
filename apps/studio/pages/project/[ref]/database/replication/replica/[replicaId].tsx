@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { Badge, Button } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ReadReplicaDetails } from '@/components/interfaces/Database/Replication/ReadReplicas/ReadReplicaDetails'
 import {
@@ -113,7 +113,7 @@ const DatabaseReadReplicaPage: NextPageWithLayout = () => {
         ) : (
           <div className="flex items-center gap-x-2 mt-0!">
             <ScaffoldDescription>ID: {identifier}</ScaffoldDescription>
-            <CopyButton iconOnly type="default" text={identifier ?? ''} />
+            <CopyButton iconOnly variant="default" text={identifier ?? ''} />
           </div>
         )
       }
@@ -133,7 +133,7 @@ const DatabaseReadReplicaPage: NextPageWithLayout = () => {
       ]}
       secondaryActions={
         <ButtonTooltip
-          type="default"
+          variant="default"
           className="w-7"
           icon={<Trash />}
           tooltip={{
@@ -143,7 +143,7 @@ const DatabaseReadReplicaPage: NextPageWithLayout = () => {
         />
       }
       primaryActions={[
-        <Button asChild key="logs" type="default">
+        <Button asChild key="logs" variant="default">
           <Link
             href={`/project/${ref}/logs/postgres-logs${!!identifier ? `?db=${identifier}` : ''}`}
           >
@@ -152,7 +152,7 @@ const DatabaseReadReplicaPage: NextPageWithLayout = () => {
         </Button>,
         <Button
           key="drop"
-          type="default"
+          variant="default"
           disabled={status !== 'ACTIVE_HEALTHY'}
           onClick={() => setShowConfirmRestart(true)}
         >

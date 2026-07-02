@@ -21,7 +21,7 @@ import {
   InputGroupText,
   Separator,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -35,7 +35,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { FormActions } from '@/components/ui/Forms/FormActions'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -172,7 +172,7 @@ export const ConnectionPooling = () => {
             title="Dedicated pooler uses IPv6 by default"
             description="Connections from IPv4-only networks require enabling the IPv4 add-on on your project instance."
             actions={
-              <Button type="default" asChild>
+              <Button variant="default" asChild>
                 <Link href={`/project/${projectRef}/settings/addons?panel=ipv4`}>
                   Enable IPv4 add-on
                 </Link>

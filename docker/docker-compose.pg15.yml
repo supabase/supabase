@@ -1,0 +1,18 @@
+# Postgres 15 override for self-hosted Supabase.
+#
+# Postgres 17 is now the default in docker-compose.yml. Use this override to pin
+# Postgres 15, for two cases:
+#   1. An existing Postgres 15 deployment that has not been upgraded yet.
+#   2. As the rollback target for utils/upgrade-pg17.sh (PG 15 and PG 17 use
+#      different postgres UIDs, so rollback must start with the PG 15 image).
+#
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.pg15.yml up -d
+#
+# To upgrade an existing Postgres 15 database to Postgres 17 in place, see:
+# - https://supabase.com/docs/guides/self-hosting/postgres-upgrade-17
+# - utils/upgrade-pg17.sh
+
+services:
+  db:
+    image: supabase/postgres:15.8.1.085

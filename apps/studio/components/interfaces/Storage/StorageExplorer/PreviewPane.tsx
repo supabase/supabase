@@ -187,7 +187,7 @@ export const PreviewPane = () => {
         {/* Actions */}
         <div className="flex space-x-2 border-b border-overlay pb-4">
           <Button
-            type="default"
+            variant="default"
             icon={<Download />}
             disabled={file.isCorrupted}
             onClick={() => downloadFile(file)}
@@ -196,7 +196,7 @@ export const PreviewPane = () => {
           </Button>
           {selectedBucket.public ? (
             <Button
-              type="outline"
+              variant="outline"
               icon={<Copy />}
               onClick={() => onCopyUrl(file.path!)}
               disabled={file.isCorrupted}
@@ -207,7 +207,7 @@ export const PreviewPane = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="outline"
+                  variant="outline"
                   icon={<Copy />}
                   iconRight={<ChevronDown />}
                   disabled={file.isCorrupted}
@@ -245,7 +245,7 @@ export const PreviewPane = () => {
           )}
         </div>
         <ButtonTooltip
-          type="outline"
+          variant="outline"
           disabled={!canUpdateFiles}
           size="tiny"
           icon={<Trash2 />}

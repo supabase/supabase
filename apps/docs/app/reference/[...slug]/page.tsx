@@ -1,5 +1,6 @@
+import { notFound } from 'next/navigation'
+
 import { REFERENCES } from '~/content/navigation.references'
-import { notFoundWithPathname } from '~/features/docs/notFound.utils'
 import { ApiReferencePage } from '~/features/docs/Reference.apiPage'
 import { CliReferencePage } from '~/features/docs/Reference.cliPage'
 import { ClientSdkReferencePage } from '~/features/docs/Reference.sdkPage'
@@ -17,10 +18,9 @@ export default async function ReferencePage(props: { params: Promise<{ slug: Arr
   const params = await props.params
 
   const { slug } = params
-  const referencePath = `/reference/${slug.join('/')}`
 
   if (!Object.keys(REFERENCES).includes(slug[0].replaceAll('-', '_'))) {
-    notFoundWithPathname(referencePath)
+    notFound()
   }
 
   const parsedPath = parseReferencePath(slug)
@@ -34,7 +34,7 @@ export default async function ReferencePage(props: { params: Promise<{ slug: Arr
 
     const sdkData = REFERENCES[sdkId]
     if (sdkData.enabled === false) {
-      notFoundWithPathname(referencePath)
+      notFound()
     }
 
     const latestVersion = sdkData.versions[0]
@@ -52,7 +52,7 @@ export default async function ReferencePage(props: { params: Promise<{ slug: Arr
       <SelfHostingReferencePage service={parsedPath.service} servicePath={parsedPath.servicePath} />
     )
   } else {
-    notFoundWithPathname(referencePath)
+    notFound()
   }
 }
 

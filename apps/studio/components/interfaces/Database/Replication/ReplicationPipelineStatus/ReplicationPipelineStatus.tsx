@@ -30,8 +30,8 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { BatchRestartDialog } from '../BatchRestartDialog'
 import { ErrorDetailsDialog } from '../ErrorDetailsDialog'
@@ -267,7 +267,7 @@ export const ReplicationPipelineStatus = () => {
       <div className="flex flex-col gap-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-x-3">
-            <Button asChild type="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
+            <Button asChild variant="outline" icon={<ChevronLeft />} style={{ padding: '5px' }}>
               <Link href={`/project/${projectRef}/database/replication`} />
             </Button>
             <div className="flex items-center gap-x-3">
@@ -287,7 +287,7 @@ export const ReplicationPipelineStatus = () => {
           <div className="flex items-center gap-x-2">
             {hasUpdate && (
               <Button
-                type="primary"
+                variant="primary"
                 icon={<ArrowUpCircle />}
                 onClick={() => setShowUpdateVersionModal(true)}
               >
@@ -295,12 +295,12 @@ export const ReplicationPipelineStatus = () => {
               </Button>
             )}
 
-            <Button asChild type="default">
+            <Button asChild variant="default">
               <Link href={logsUrl}>View logs</Link>
             </Button>
 
             <Button
-              type={statusName === PipelineStatusName.STOPPED ? 'primary' : 'default'}
+              variant={statusName === PipelineStatusName.STOPPED ? 'primary' : 'default'}
               onClick={onPrimaryAction}
               loading={
                 isPipelineError ||
@@ -423,7 +423,7 @@ export const ReplicationPipelineStatus = () => {
               <div className="flex items-center">
                 <Button
                   size="tiny"
-                  type="default"
+                  variant="default"
                   className="rounded-r-none hover:z-2"
                   icon={<RotateCcw />}
                   disabled={isAnyRestartInProgress || showDisabledState || isPipelineError}
@@ -438,7 +438,7 @@ export const ReplicationPipelineStatus = () => {
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      type="default"
+                      variant="default"
                       icon={<ChevronDown />}
                       className="w-7 rounded-l-none -ml-px"
                       disabled={showDisabledState || isPipelineError}

@@ -432,7 +432,7 @@ export function FilterCondition({
         </PopoverContent>
       </Popover>
       <Button
-        type="text"
+        variant="text"
         size="tiny"
         icon={
           <X

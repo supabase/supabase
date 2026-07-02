@@ -22,13 +22,13 @@ import {
   PopoverTrigger,
   ScrollArea,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import {
   createMcpCopyHandler,
   McpConfigPanel as McpConfigPanelBase,
   type McpClient,
 } from 'ui-patterns/McpUrlBuilder'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 type PlatformType = (typeof PLATFORMS)[number]['value']
 
@@ -104,7 +104,7 @@ function ProjectSelector({
         </span>
 
         {!isUserLoading && !isLoggedIn ? (
-          <Button size="small" type="default" className="gap-0 rounded-l-none" asChild>
+          <Button size="small" variant="default" className="gap-0 rounded-l-none" asChild>
             <Link href="https://supabase.com/dashboard" rel="noreferrer noopener" target="_blank">
               <div className="flex items-center gap-2">Log in to choose a project</div>
             </Link>
@@ -113,7 +113,7 @@ function ProjectSelector({
           <PopoverTrigger asChild disabled={isUserLoading || isLoading || isError}>
             <Button
               size="small"
-              type="default"
+              variant="default"
               className="gap-0 rounded-l-none"
               iconRight={
                 <ChevronDown
@@ -214,7 +214,7 @@ function PlatformSelector({
         <PopoverTrigger asChild>
           <Button
             size="small"
-            type="default"
+            variant="default"
             className="gap-0 rounded-l-none"
             iconRight={
               <ChevronDown

@@ -111,7 +111,7 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
             <div className="*:px-1.5 *:text-foreground-lighter ml-auto flex gap-1 absolute right-2 top-2">
               <ButtonTooltip
                 disabled={!log || isLoading}
-                type="text"
+                variant="text"
                 tooltip={{
                   content: {
                     side: 'left',
@@ -125,7 +125,7 @@ const LogSelection = ({ log, onClose, queryType, isLoading, error }: LogSelectio
                 }}
               />
 
-              <Button type="text" onClick={onClose}>
+              <Button variant="text" onClick={onClose}>
                 <X size={14} strokeWidth={2} />
               </Button>
             </div>

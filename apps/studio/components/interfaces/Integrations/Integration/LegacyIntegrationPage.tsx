@@ -9,9 +9,9 @@ import {
   NavMenu,
   NavMenuItem,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { PageContainer } from 'ui-patterns/PageContainer'
 import {
-  Admonition,
-  PageContainer,
   PageHeader,
   PageHeaderBreadcrumb,
   PageHeaderDescription,
@@ -20,10 +20,9 @@ import {
   PageHeaderNavigationTabs,
   PageHeaderSummary,
   PageHeaderTitle,
-  PageSection,
-  PageSectionContent,
-} from 'ui-patterns'
-import ShimmeringLoader, { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+} from 'ui-patterns/PageHeader'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { IntegrationLogo } from '@/components/interfaces/Integrations/Integration/IntegrationLogo'
 import { InstallOAuthIntegrationButton } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/InstallIntegrationSheet/InstallOAuthIntegrationButton'
@@ -135,7 +134,7 @@ const LegacyIntegrationPage = () => {
         )}
       </PageHeader>
 
-      <div className="mx-auto w-full">{content}</div>
+      <div className="flex-1 min-h-0 mx-auto w-full">{content}</div>
     </>
   )
 }

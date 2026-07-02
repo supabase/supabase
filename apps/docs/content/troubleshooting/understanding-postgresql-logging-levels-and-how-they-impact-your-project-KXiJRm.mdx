@@ -7,7 +7,7 @@ keywords = [ "logging", "disk", "i/o", "lockups" ]
 database_id = "10186830-8cce-4f10-8cb9-7cbf39310763"
 ---
 
-Since each Supabase project uses Postgres as its underlying database engine, it’s common to adjust logging settings for various reasons—whether for debugging issues, monitoring database performance, or auditing actions. However, modifying logging levels improperly can lead to an excessive amount of log data being generated, which can quickly fill up your disk space and cause significant performance degradation or even system failure.
+Since each Supabase project uses Postgres as its underlying database engine, it’s common to adjust logging settings for various reasons—whether for debugging issues, monitoring database performance, or auditing actions. However, modifying logging levels improperly can lead to an excessive amount of log data being generated, which can fill up your disk space and cause significant performance degradation or even system failure.
 
 ### 1. Overview of Postgres logging levels
 
@@ -41,7 +41,7 @@ The default log level is set to **WARNING** through the log_min_messages setting
 
 ### 2. How high log levels can affect your database
 
-When users alter a high level of log settings, the database can start generating an overwhelming number of log entries. This can quickly escalate to issues such as:
+When users alter a high level of log settings, the database can start generating an overwhelming number of log entries. This can escalate to issues such as:
 
 - Disk Space Exhaustion: Log files can grow exponentially if verbose levels like DEBUG, INFO, or NOTICE are enabled for long periods. And running out of disk space due to log bloat can cause your database to stop accepting writes and slow down query performance.
 

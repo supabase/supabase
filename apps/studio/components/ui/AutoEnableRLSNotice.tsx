@@ -5,8 +5,6 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
-  Card,
-  CardContent,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -17,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
@@ -60,32 +59,25 @@ export const AutoEnableRLSNotice = ({ iconOnly }: { iconOnly?: boolean }) => {
   }
 
   return (
-    <Card>
-      <CardContent className="flex items-center justify-between">
-        <div className="flex items-center gap-x-4">
-          <div className="rounded-lg bg-surface-300 text-foreground-light w-10 h-10 flex items-center justify-center">
-            <ShieldCheck size={18} />
-          </div>
-          <div className="text-sm">
-            <p>Auto-enable RLS for new tables</p>
-            <p className="text-foreground-lighter">
-              Create an event trigger that enables Row Level Security on all new tables
-            </p>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-x-2">
+    <Admonition
+      type="note"
+      layout="responsive"
+      title="Automatically enable Row Level Security (RLS) on new tables"
+      description="Protect future tables by automatically enabling RLS whenever a table is created."
+      actions={
+        <>
           <CreateEnsureRLSTriggerDialog />
           <ButtonTooltip
             icon={<X />}
-            type="text"
-            className="w-7"
-            tooltip={{ content: { side: 'bottom', text: 'Minimize' } }}
+            variant="text"
+            className="w-6"
+            tooltip={{ content: { side: 'bottom', text: 'Dismiss' } }}
+            aria-label="Dismiss RLS notice"
             onClick={() => setIsMinimized(true)}
           />
-        </div>
-      </CardContent>
-    </Card>
+        </>
+      }
+    />
   )
 }
 
@@ -125,42 +117,47 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
       <DialogTrigger asChild>
         {iconOnly ? (
           <ButtonTooltip
-            type="default"
+            variant="default"
             icon={<ShieldCheck />}
             className="w-7"
             tooltip={{ content: { side: 'bottom', text: 'Auto-enable RLS for new tables' } }}
           />
         ) : (
-          <Button type="primary">Learn more</Button>
+          <Button variant="default">Set up trigger</Button>
         )}
       </DialogTrigger>
       <DialogContent size="large">
         <DialogHeader>
-          <DialogTitle>Automatically enable RLS for newly created tables</DialogTitle>
-          <DialogDescription>Secure your data using Postgres Row Level Security</DialogDescription>
+          <DialogTitle>Automatically enable RLS for new tables</DialogTitle>
+          <DialogDescription>
+            Protect future tables with a built-in database trigger.
+          </DialogDescription>
         </DialogHeader>
 
         <DialogSectionSeparator />
 
         <DialogSection className="text-sm flex flex-col gap-y-2">
           <p>
-            Tables in exposed schemas (default being the{' '}
-            <code className="text-code-inline">public</code> schema) are accessible to anyone.
-            Hence, we highly recommend enabling RLS on all such tables.
+            Tables in exposed schemas such as <code className="text-code-inline">public</code> are
+            reachable through your project’s API. Enable Row Level Security (RLS) on these tables so
+            access is governed by the policies you define, not just the project API key.
           </p>
           <p>
-            You can set up a database trigger to enable RLS automatically on all new tables with the
-            following SQL:
+            This trigger automatically enables RLS whenever a new table is created. Review the SQL
+            before creating it:
           </p>
         </DialogSection>
 
-        <CodeBlock language="sql" className="language-sql px-0 border-x-0 rounded-none h-64">
+        <CodeBlock
+          language="sql"
+          className="language-sql px-0 border-x-0 border-b-0 rounded-none h-64"
+        >
           {AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL.trim()}
         </CodeBlock>
 
         <DialogFooter>
-          <Button type="default" disabled={isCreating} onClick={() => setOpen(false)}>
-            Close
+          <Button variant="default" disabled={isCreating} onClick={() => setOpen(false)}>
+            Cancel
           </Button>
           <ButtonTooltip
             disabled={!canCreateTriggers}
@@ -175,7 +172,7 @@ const CreateEnsureRLSTriggerDialog = ({ iconOnly }: { iconOnly?: boolean }) => {
               },
             }}
           >
-            Create ensure_rls trigger
+            Create trigger
           </ButtonTooltip>
         </DialogFooter>
       </DialogContent>

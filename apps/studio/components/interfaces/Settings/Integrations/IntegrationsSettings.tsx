@@ -1,5 +1,5 @@
 import { Card } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { AWSPrivateLinkSection } from './AWSPrivateLink/AWSPrivateLinkSection'
 import { GitHubSection } from './GithubIntegration/GithubSection'
@@ -79,7 +79,7 @@ export const IntegrationSettings = () => {
         </Admonition>
       )}
 
-      <GitHubSection />
+      <GitHubSection isProjectScoped={true} />
 
       {showVercelIntegration && (
         <>

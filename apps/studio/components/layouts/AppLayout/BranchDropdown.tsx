@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { useState } from 'react'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AppLayoutDropdownError, AppLayoutDropdownWithPopover } from './AppLayoutDropdown'
 import { BranchBadge } from './BranchBadge'

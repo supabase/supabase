@@ -58,8 +58,6 @@ export const LOCAL_STORAGE_KEYS = {
   LINTER_SHOW_FOOTER: 'supabase-linter-show-footer',
   // Key to track account deletion requests
   ACCOUNT_DELETION_REQUEST: 'supabase-account-deletion-request',
-  // Used for storing a user id when sending reports to Sentry. The id is hashed for anonymity.
-  SENTRY_USER_ID: 'supabase-sentry-user-id',
   // Used for storing the last sign in method used by the user
   LAST_SIGN_IN_METHOD: 'supabase-last-sign-in-method',
   // Key to track the last selected schema. The project ref is intentionally put at the end for easier search in the browser console.
@@ -87,7 +85,7 @@ export const LOCAL_STORAGE_KEYS = {
   // Shortcut preferences
   SHORTCUT_STORAGE_KEY: 'supabase-shortcut-preferences',
 
-  LAST_VISITED_ORGANIZATION: 'last-visited-organization',
+  LAST_VISITED_ORGANIZATION: (uid?: number) => `last-visited-organization-${uid}`,
 
   // user impersonation selector previous searches
   USER_IMPERSONATION_SELECTOR_PREVIOUS_SEARCHES: (ref: string) =>

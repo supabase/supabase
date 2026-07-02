@@ -49,7 +49,7 @@ export function BranchDropdownCommandContent({
       <Command className={cn(className, 'flex flex-col flex-1 min-h-0 overflow-hidden')}>
         <div className="grid grid-cols-2 gap-2 shrink-0 p-2 border-b">
           <Button
-            type="text"
+            variant="text"
             size="small"
             asChild
             block
@@ -64,7 +64,7 @@ export function BranchDropdownCommandContent({
             </Link>
           </Button>
           <Button
-            type="text"
+            variant="text"
             size="small"
             asChild
             block
@@ -81,7 +81,7 @@ export function BranchDropdownCommandContent({
             </a>
           </Button>
           <Button
-            type="default"
+            variant="default"
             size="small"
             block
             className="col-span-full text-xs text-foreground-light hover:text-foreground"

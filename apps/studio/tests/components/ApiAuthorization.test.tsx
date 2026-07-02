@@ -1,14 +1,16 @@
-import { screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import dayjs from 'dayjs'
 import { HttpResponse } from 'msw'
+import { getMcpClientIconSrc } from 'ui-patterns/McpUrlBuilder'
 import { describe, expect, test, vi } from 'vitest'
 
 import {
   ApiAuthorizationScreen,
   type ApiAuthorizationScreenProps,
 } from '@/components/interfaces/ApiAuthorization/ApiAuthorization'
+import { RequesterLogo } from '@/components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
 import type { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
 import type { ProfileContextType } from '@/lib/profile'
 import { createMockOrganizationResponse } from '@/tests/helpers'
@@ -120,12 +122,39 @@ function renderScreen(props: Partial<ApiAuthorizationScreenProps> = {}) {
 
 // --- Tests ---
 
+describe('RequesterLogo', () => {
+  test.each([
+    ['Cursor', 'cursor'],
+    ['Claude', 'claude'],
+    ['ChatGPT', 'openai'],
+    ['OpenAI', 'openai'],
+    ['Perplexity', 'perplexity'],
+  ])('resolves %s to a shared MCP icon asset', (name, iconKey) => {
+    customRender(<RequesterLogo icon={null} name={name} />)
+
+    expect(screen.getByAltText(name)).toHaveAttribute(
+      'src',
+      getMcpClientIconSrc({ icon: iconKey, useDarkVariant: false })
+    )
+  })
+
+  test('falls back to the requester initial when the icon fails to load', () => {
+    customRender(<RequesterLogo icon="https://example.com/broken-logo.svg" name="Unknown App" />)
+
+    fireEvent.error(screen.getByAltText('Unknown App'))
+
+    expect(screen.getByText('U')).toBeInTheDocument()
+  })
+})
+
 describe('ApiAuthorizationScreen', () => {
   describe('when auth_id is missing', () => {
-    test('renders invalid screen when auth_id is undefined', () => {
+    test('renders invalid interstitial when auth_id is undefined', () => {
       renderScreen({ auth_id: undefined })
-      expect(screen.getByText('Missing parameters')).toBeInTheDocument()
+      expect(screen.getByText('Missing authorization link')).toBeInTheDocument()
       expect(screen.getByText(/auth_id/)).toBeInTheDocument()
+      expect(screen.getByAltText('Supabase')).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: 'Back to dashboard' })).toHaveAttribute('href', '/')
     })
   })
 
@@ -148,6 +177,20 @@ describe('ApiAuthorizationScreen', () => {
         method: 'get',
         path: '/platform/oauth/authorizations/:id',
         response: () => HttpResponse.json<APIErrorBody>({ message: 'Not found' }, { status: 404 }),
+      })
+      renderScreen()
+      await screen.findByText('Unable to load authorization')
+    })
+
+    test('renders error screen when authorization query returns no requester', async () => {
+      mockOrgsEndpoint()
+      addAPIMock({
+        method: 'get',
+        path: '/platform/oauth/authorizations/:id',
+        response: () =>
+          HttpResponse.json<GetOAuthAuthorizationResponse>(
+            null as unknown as GetOAuthAuthorizationResponse
+          ),
       })
       renderScreen()
       await screen.findByText('Unable to load authorization')
@@ -238,6 +281,7 @@ describe('ApiAuthorizationScreen', () => {
           mockBothEndpoints(createMockAuthResponse({ name: 'My OAuth App' }))
           renderScreen()
           await screen.findByText('Authorize API access for My OAuth App')
+          expect(screen.getByAltText('Supabase')).toBeInTheDocument()
           expect(screen.getByRole('combobox')).toBeInTheDocument()
           expect(screen.getByRole('button', { name: /Authorize My OAuth App/ })).toBeInTheDocument()
           expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument()

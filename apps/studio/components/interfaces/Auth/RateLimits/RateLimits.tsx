@@ -35,9 +35,9 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { isSmtpEnabled } from '../SmtpForm/SmtpForm.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -107,31 +107,31 @@ export const RateLimits = () => {
     RATE_LIMIT_TOKEN_REFRESH: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an 5 minutes'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 in 5 minutes'),
     RATE_LIMIT_VERIFY: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an 5 minutes'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 in 5 minutes'),
     RATE_LIMIT_EMAIL_SENT: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
     RATE_LIMIT_SMS_SENT: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
     RATE_LIMIT_ANONYMOUS_USERS: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
     RATE_LIMIT_OTP: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
     RATE_LIMIT_WEB3: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
-      .max(32767, 'Must not be more than 32,767 an hour'),
+      .max(2147483647, 'Must not be more than 2,147,483,647 per hour'),
   })
 
   const rateLimitForm = useForm<z.infer<typeof RateLimitFormSchema>>({
@@ -263,7 +263,7 @@ export const RateLimits = () => {
                                     Enable email-based logins to update this rate limit
                                   </p>
                                   <div className="mt-3">
-                                    <Button asChild type="default" size="tiny">
+                                    <Button asChild variant="default" size="tiny">
                                       <Link href={`/project/${projectRef}/auth/providers`}>
                                         View auth providers
                                       </Link>
@@ -282,12 +282,12 @@ export const RateLimits = () => {
                                     your email rate limit
                                   </p>
                                   <div className="mt-3 flex gap-2">
-                                    <Button asChild type="default" size="tiny">
+                                    <Button asChild variant="default" size="tiny">
                                       <Link href={`/project/${projectRef}/auth/smtp`}>
                                         View SMTP settings
                                       </Link>
                                     </Button>
-                                    <Button asChild type="default" size="tiny">
+                                    <Button asChild variant="default" size="tiny">
                                       <Link href={`/project/${projectRef}/auth/hooks`}>
                                         View hooks
                                       </Link>
@@ -338,7 +338,7 @@ export const RateLimits = () => {
                                 Enable phone-based logins to update this rate limit
                               </p>
                               <div className="mt-3">
-                                <Button asChild type="default" size="tiny">
+                                <Button asChild variant="default" size="tiny">
                                   <Link href={`/project/${projectRef}/auth/providers`}>
                                     View auth providers
                                   </Link>
@@ -481,7 +481,7 @@ export const RateLimits = () => {
                                 control this rate limit.
                               </p>
                               <div className="mt-3">
-                                <Button asChild type="default" size="tiny">
+                                <Button asChild variant="default" size="tiny">
                                   <Link href={`/project/${projectRef}/auth/providers`}>
                                     View auth settings
                                   </Link>
@@ -576,7 +576,7 @@ export const RateLimits = () => {
                                 control this rate limit.
                               </p>
                               <div className="mt-3">
-                                <Button asChild type="default" size="tiny">
+                                <Button asChild variant="default" size="tiny">
                                   <Link href={`/project/${projectRef}/auth/providers`}>
                                     View Auth provider settings
                                   </Link>
@@ -592,13 +592,13 @@ export const RateLimits = () => {
 
                 <CardFooter className="justify-end space-x-2">
                   {rateLimitForm.formState.isDirty && (
-                    <Button type="default" onClick={() => rateLimitForm.reset()}>
+                    <Button variant="default" onClick={() => rateLimitForm.reset()}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={
                       !canUpdateConfig || isUpdatingConfig || !rateLimitForm.formState.isDirty
                     }
@@ -657,13 +657,13 @@ export const RateLimits = () => {
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
                   {ipForwardingForm.formState.isDirty && (
-                    <Button type="default" onClick={() => ipForwardingForm.reset()}>
+                    <Button variant="default" onClick={() => ipForwardingForm.reset()}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={
                       !canUpdateConfig || isUpdatingConfig || !ipForwardingForm.formState.isDirty
                     }

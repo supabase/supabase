@@ -8,6 +8,7 @@ Adam Mohammed
 Adam Mokan
 AJ Matias
 Akash Manimaran
+Akilesh Sethu
 Alaister Young
 Aleksi Immonen
 Alex Hall
@@ -40,6 +41,8 @@ Brendan Stephens
 Brent Newson
 Brian Cullen
 Brent Schroeter
+Bruno Kilian
+Burhan A
 Carel de Waal
 Cameron Blackwood
 Cameron Michie
@@ -110,6 +113,7 @@ Greg Marzouka
 Greg P
 Greg Richardson
 Gregor Vand
+Guillaume Faas
 Guilherme Souza
 Hanefi Önaldı
 Hannah Bowers
@@ -128,6 +132,7 @@ Jared Patterson
 Jason Farber
 Jean-Paul Argudo
 Jeff Smick
+Jefferson Venerando
 Jenny Kibiri
 Jeremias Menichelli
 Jess Fink
@@ -155,6 +160,7 @@ Julian Domke
 Julien Goux
 Kai M
 Kalleby Santos
+Kanad Gupta
 Kanishk Dudeja
 Kamil Ogórek
 Kang Ming Tay
@@ -180,6 +186,7 @@ Liam Cloud Hogan
 Lindsay Moss
 Lukas Bernert
 Lukas Klingsbo
+Łukasz Korbasiewicz
 Łukasz Niemier
 Maksym Ionutsa
 Manuel Mendez
@@ -187,6 +194,7 @@ Manan Gupta
 Marcus Weiner
 Marija Milicevic
 Mark Burggraf
+Márton Boros
 Matthew Hambright
 Matt Hudson
 Matt Johnston
@@ -197,6 +205,7 @@ Mert Yerekapan
 Michal Kleczek
 Michelle Jubrey
 Miranda Limonczenko
+Mo Khan
 Monica Khoury
 Mrinal Paliwal
 Mykhailo Mischa Lieibenson
@@ -206,12 +215,14 @@ Nick Littman
 Nick Nowlan
 Nicola Ferraro
 Nicolas Nosenzo
+Nik Richers
 Noah Moss
 Nyannyacha
 Oli R
 Pamela Chia
 Patricia Szasz
 Patrick Crane
+Paul Bauer
 Paul Caselton
 Paul Cioanca
 Paul Copplestone
@@ -239,6 +250,7 @@ Ryan Goulet
 Ryan Senior
 Ruan Maia
 Saba Pochkhua
+Sagar Shedge
 Sam Meech-Ward
 Sam Rome
 Sam Rose
@@ -266,6 +278,7 @@ Taha Le Bras
 Tanun Chalermsinsuwan
 Taryn King
 Terry Sutton
+Terry Wilcox
 Thomas E
 Tim Frietas
 Tim Palmer

@@ -97,7 +97,7 @@ export const MarketplaceFilterBar = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" iconRight={<ChevronDown />} className={triggerCls}>
+          <Button variant="default" iconRight={<ChevronDown />} className={triggerCls}>
             <span className="truncate">Category: {categoryLabel}</span>
           </Button>
         </DropdownMenuTrigger>
@@ -136,7 +136,7 @@ export const MarketplaceFilterBar = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" iconRight={<ChevronDown />} className={triggerCls}>
+          <Button variant="default" iconRight={<ChevronDown />} className={triggerCls}>
             <span className="truncate">Type: {typeLabel}</span>
           </Button>
         </DropdownMenuTrigger>
@@ -170,7 +170,7 @@ export const MarketplaceFilterBar = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" iconRight={<ChevronDown />} className={triggerCls}>
+          <Button variant="default" iconRight={<ChevronDown />} className={triggerCls}>
             <span className="truncate">Source: {sourceLabel}</span>
           </Button>
         </DropdownMenuTrigger>

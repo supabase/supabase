@@ -119,7 +119,7 @@ export const CustomDomainsConfigureHostname = () => {
                   <code className="text-code-inline">{endpoint}</code>
                   <CopyButton
                     iconOnly
-                    type="text"
+                    variant="text"
                     className="h-5 w-5 min-w-0 p-0 [&_svg]:h-3 [&_svg]:w-3"
                     text={endpoint}
                   />
@@ -146,7 +146,7 @@ export const CustomDomainsConfigureHostname = () => {
           <CardFooter className="justify-end space-x-2">
             {form.formState.isDirty && (
               <Button
-                type="default"
+                variant="default"
                 disabled={isSubmitting}
                 onClick={() => form.reset({ domain: '' })}
               >
@@ -154,8 +154,8 @@ export const CustomDomainsConfigureHostname = () => {
               </Button>
             )}
             <Button
-              type="primary"
-              htmlType="submit"
+              variant="primary"
+              type="submit"
               loading={isSubmitting}
               disabled={!form.formState.isDirty || isSubmitting || !canConfigureCustomDomain}
             >

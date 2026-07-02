@@ -89,7 +89,7 @@ Never expose your secret keys publicly. Your data is at risk. **Do not:**
 - Never use in a browser, even on `localhost`.
 - Do not pass in URLs or query params, as these are often logged.
 - Be careful passing them in request headers without prior log sanitization.
-- Take extra care logging even potentially **invalid API keys**. Simple typos might reveal the real key in the future.
+- Take extra care logging even potentially **invalid API keys**. Typos might reveal the real key in the future.
 - Reveal, copy, use or manipulate on hardware devices without full disk encryption and which you do not directly own or control (such as public computers, friend's laptop, etc.)
 
 Ensure you handle them with care and using [secure coding practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/stable-en/).

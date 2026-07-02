@@ -151,7 +151,7 @@ export const AddNewSecretModal = () => {
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
-                              type="text"
+                              variant="text"
                               className="absolute right-1 top-1 px-1"
                               aria-label={
                                 isSecretVisible ? 'Hide secret value' : 'Show secret value'
@@ -173,12 +173,12 @@ export const AddNewSecretModal = () => {
           </Form>
         </DialogSection>
         <DialogFooter>
-          <Button type="default" disabled={isSubmitting} onClick={handleClose}>
+          <Button variant="default" disabled={isSubmitting} onClick={handleClose}>
             Cancel
           </Button>
           <Button
             form={formId}
-            htmlType="submit"
+            type="submit"
             disabled={!isDirty || isSubmitting}
             loading={isSubmitting}
           >

@@ -32,13 +32,15 @@ export type PostgresQueueMessage = {
 
 export const QUEUE_MESSAGES_PAGE_SIZE = 30
 
+export type QueueMessagesPageParam = { enqueuedAt: string; msgId: number }
+
 export async function getDatabaseQueue({
   projectRef,
   connectionString,
   queueName,
-  afterTimestamp,
+  after,
   status,
-}: DatabaseQueueVariables & { afterTimestamp: string | undefined }) {
+}: DatabaseQueueVariables & { after: QueueMessagesPageParam | undefined }) {
   if (!projectRef) throw new Error('Project ref is required')
   if (!isQueueNameValid(queueName)) {
     throw new Error(
@@ -76,8 +78,13 @@ export async function getDatabaseQueue({
     safeSql``
   )
 
-  const whereClause = afterTimestamp
-    ? safeSql` WHERE enqueued_at > ${literal(afterTimestamp)}`
+  // Keyset pagination on a composite (enqueued_at, msg_id) cursor. enqueued_at is
+  // not unique: pgmq defaults it to now(), so every message from one send_batch
+  // shares a timestamp. A plain `enqueued_at > last` cursor skips the rows that
+  // share the last page's timestamp, dropping them from the list. msg_id is unique
+  // within each queue/archive table and breaks the tie.
+  const whereClause = after
+    ? safeSql` WHERE (enqueued_at, msg_id) > (${literal(after.enqueuedAt)}, ${literal(after.msgId)})`
     : safeSql``
 
   const sql = safeSql`SELECT
@@ -85,7 +92,7 @@ export async function getDatabaseQueue({
     FROM
       (
         ${unionFragment}
-      ) AS combined${whereClause} order by enqueued_at LIMIT ${literal(QUEUE_MESSAGES_PAGE_SIZE)}`
+      ) AS combined${whereClause} order by enqueued_at, msg_id LIMIT ${literal(QUEUE_MESSAGES_PAGE_SIZE)}`
 
   const { result } = await executeSql({
     projectRef,
@@ -108,7 +115,7 @@ export const useQueueMessagesInfiniteQuery = <TData = DatabaseQueueData>(
     DatabaseQueueError,
     InfiniteData<TData>,
     readonly unknown[],
-    string | undefined
+    QueueMessagesPageParam | undefined
   > = {}
 ) =>
   useInfiniteQuery({
@@ -118,17 +125,19 @@ export const useQueueMessagesInfiniteQuery = <TData = DatabaseQueueData>(
         projectRef,
         connectionString,
         queueName,
-        afterTimestamp: pageParam,
+        after: pageParam,
         status,
       })
     },
     staleTime: 0,
     enabled: enabled && typeof projectRef !== 'undefined',
-    initialPageParam: undefined,
+    initialPageParam: undefined as QueueMessagesPageParam | undefined,
     getNextPageParam(lastPage) {
       const hasNextPage = lastPage.length >= QUEUE_MESSAGES_PAGE_SIZE
       if (!hasNextPage) return undefined
-      return last(lastPage)?.enqueued_at
+      const lastRow = last(lastPage)
+      if (!lastRow) return undefined
+      return { enqueuedAt: lastRow.enqueued_at, msgId: lastRow.msg_id }
     },
     ...options,
   })

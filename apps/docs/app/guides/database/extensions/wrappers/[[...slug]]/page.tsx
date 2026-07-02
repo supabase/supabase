@@ -5,7 +5,6 @@ import {
   genGuidesStaticParams,
   removeRedundantH1,
 } from '~/features/docs/GuidesMdx.utils'
-import { notFoundWithPathname } from '~/features/docs/notFound.utils'
 import { newEditLink } from '~/features/helpers.edit-link'
 import { Guide, GuideArticle, GuideFooter, GuideHeader, GuideMdxContent } from '~/features/ui/guide'
 // End of third-party imports
@@ -21,10 +20,11 @@ import type { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 import { isFeatureEnabled } from 'common'
 import matter from 'gray-matter'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 import rehypeSlug from 'rehype-slug'
 import emoji from 'remark-emoji'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -334,14 +334,11 @@ interface Params {
 }
 
 const WrappersDocs = async (props: { params: Promise<Params> }) => {
-  const params = await props.params
-
   if (!isFeatureEnabled('docs:fdw')) {
-    notFoundWithPathname(
-      `/guides/database/extensions/wrappers${params.slug?.length ? `/${params.slug.join('/')}` : ''}`
-    )
+    notFound()
   }
 
+  const params = await props.params
   const { isExternal, meta, assetsBaseUrl, ...data } = await getContent(params)
 
   // Create a combined URL transformer that handles both regular URLs and asset URLs

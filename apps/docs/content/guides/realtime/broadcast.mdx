@@ -153,7 +153,7 @@ Binary payloads (`ArrayBuffer` / `ArrayBufferView`) are received automatically f
     // Join a room/topic. Can be anything except for 'realtime'.
     const myChannel = supabase.channel('test-channel')
 
-    // Simple function to log any messages we receive
+    // Function to log any messages we receive
     function messageReceived(payload) {
       console.log(payload)
     }
@@ -176,7 +176,7 @@ Binary payloads (`ArrayBuffer` / `ArrayBufferView`) are received automatically f
     ```dart
     final myChannel = supabase.channel('test-channel');
 
-    // Simple function to log any messages we receive
+    // Log any messages we receive
     void messageReceived(payload) {
       print(payload);
     }
@@ -241,7 +241,7 @@ Binary payloads (`ArrayBuffer` / `ArrayBufferView`) are received automatically f
     # Join a room/topic. Can be anything except for 'realtime'.
     my_channel = supabase.channel('test-channel')
 
-    # Simple function to log any messages we receive
+    # Function to log any messages we receive
     def message_received(payload):
       print(f"Broadcast received: {payload}")
 
@@ -413,7 +413,7 @@ Broadcast payloads can be binary (`ArrayBuffer` or `ArrayBufferView`, e.g. `Uint
 
     <Admonition type="note">
 
-    When an asynchronous method needs to be used within a synchronous context, such as the callback for `.subscribe()`, utilize `asyncio.create_task()` to schedule the coroutine. This is why the [initialize the client](#initialize-the-client) example includes an import of `asyncio`.
+    When an asynchronous method needs to be used within a synchronous context, such as the callback for `.subscribe()`, use `asyncio.create_task()` to schedule the coroutine. This is why the [initialize the client](#initialize-the-client) example includes an import of `asyncio`.
 
     </Admonition>
 
@@ -689,7 +689,7 @@ You can pass configuration options while initializing the Supabase Client.
 
     <Admonition type="note">
 
-    When an asynchronous method needs to be used within a synchronous context, such as the callback for `.subscribe()`, utilize `asyncio.create_task()` to schedule the coroutine. This is why the [initialize the client](#initialize-the-client) example includes an import of `asyncio`.
+    When an asynchronous method needs to be used within a synchronous context, such as the callback for `.subscribe()`, use `asyncio.create_task()` to schedule the coroutine. This is why the [initialize the client](#initialize-the-client) example includes an import of `asyncio`.
 
     </Admonition>
 
@@ -1041,6 +1041,12 @@ You can configure replay with the following options:
 
 - **`since`** (Required): The epoch timestamp in milliseconds (for example, `1697472000000`), specifying the earliest point from which messages should be retrieved.
 - **`limit`** (Optional): The number of messages to return. This must be a positive integer, with a maximum value of 25.
+
+<Admonition type="note">
+
+Messages are stored in daily partitions, and partitions older than 72 hours are dropped. Because whole days are removed at once, a message stays available for at least 72 hours and at most 4 days, depending on the time of day it was sent. Setting `since` further back than the retained window does not recover deleted messages. See [Realtime Limits](/docs/guides/realtime/limits) for details.
+
+</Admonition>
 
 <Tabs
   scrollable

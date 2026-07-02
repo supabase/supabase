@@ -390,7 +390,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
                               within your cron jobs
                             </span>
                             <ButtonTooltip
-                              type="default"
+                              variant="default"
                               className="w-min"
                               disabled={!canToggleExtensions}
                               onClick={() => setShowEnableExtensionModal(true)}
@@ -437,8 +437,8 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
             <SheetFooter>
               <Button
                 size="tiny"
-                type="default"
-                htmlType="button"
+                variant="default"
+                type="button"
                 onClick={confirmOnClose}
                 disabled={isLoading}
               >
@@ -446,9 +446,9 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
               </Button>
               <Button
                 size="tiny"
-                type="primary"
+                variant="primary"
                 form={FORM_ID}
-                htmlType="submit"
+                type="submit"
                 disabled={isLoading}
                 loading={isLoading}
               >

@@ -1,9 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
-import { Button, cn } from 'ui'
+import { cn } from 'ui'
 import {
   PageSection,
   PageSectionContent,
@@ -23,7 +22,7 @@ import {
   IntegrationInstallation,
 } from '@/components/interfaces/Integrations/VercelGithub/IntegrationPanels'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrgIntegrationsQuery } from '@/data/integrations/integrations-query-org-only'
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from '@/data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
@@ -217,22 +216,15 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
                   </EmptyIntegrationConnection>
                 </div>
               ) : (
-                <div>
-                  <Button
-                    icon={<ExternalLink />}
-                    asChild={!isBranch}
-                    type="default"
-                    disabled={isBranch}
-                  >
-                    {isBranch ? (
-                      <p>Install Vercel Integration</p>
-                    ) : (
-                      <Link href={integrationUrl} target="_blank" rel="noreferrer">
-                        Install Vercel Integration
-                      </Link>
-                    )}
-                  </Button>
-                </div>
+                <EmptyIntegrationConnection
+                  showNode={false}
+                  disabled={isBranch}
+                  href={integrationUrl}
+                  icon={<ExternalLink />}
+                  disabledTooltip="Install Vercel Integration on your project's main branch"
+                >
+                  Install Vercel Integration
+                </EmptyIntegrationConnection>
               )}
             </div>
             {vercelProjectCount > 0 && vercelIntegration !== undefined && (

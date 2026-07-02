@@ -582,7 +582,7 @@ export const PlatformWebhooksEndpointSheet = ({
           </Form>
         </SheetSection>
         <SheetFooter>
-          <Button type="default" onClick={confirmOnClose}>
+          <Button variant="default" onClick={confirmOnClose}>
             Cancel
           </Button>
           <Shortcut
@@ -590,7 +590,7 @@ export const PlatformWebhooksEndpointSheet = ({
             label={mode === 'create' ? 'Create endpoint' : 'Save changes'}
             onTrigger={() => form.handleSubmit(onSubmit)()}
           >
-            <Button form="platform-webhook-endpoint-form" htmlType="submit">
+            <Button form="platform-webhook-endpoint-form" type="submit">
               {mode === 'create' ? 'Create endpoint' : 'Save changes'}
             </Button>
           </Shortcut>

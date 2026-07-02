@@ -19,7 +19,7 @@ interface DatePickerProps {
   onChange?: (args: DatePickerToFrom) => void
   to?: string // ISO string
   from?: string // ISO string
-  triggerButtonType?: ButtonProps['type']
+  triggerButtonVariant?: ButtonProps['variant']
   triggerButtonClassName?: string
   triggerButtonTitle?: string
   triggerButtonSize?: 'tiny' | 'small'
@@ -59,7 +59,7 @@ export function DatePicker({
   to,
   from,
   onChange,
-  triggerButtonType = 'default',
+  triggerButtonVariant = 'default',
   triggerButtonClassName = '',
   triggerButtonTitle,
   triggerButtonSize,
@@ -214,7 +214,7 @@ export function DatePicker({
       <PopoverTrigger asChild>
         <Button
           title={triggerButtonTitle}
-          type={triggerButtonType}
+          variant={triggerButtonVariant}
           icon={<Calendar />}
           size={triggerButtonSize}
           className={triggerButtonClassName}
@@ -310,7 +310,7 @@ export function DatePicker({
           <PopoverSeparator />
           <div className="flex items-center justify-end gap-2 py-2 px-3 pb-4">
             {!hideClear && (
-              <Button type="default" onClick={() => handleClear()}>
+              <Button variant="default" onClick={() => handleClear()}>
                 Clear
               </Button>
             )}

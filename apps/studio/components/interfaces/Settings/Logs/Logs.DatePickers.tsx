@@ -337,7 +337,7 @@ export const LogsDatePicker = ({
 
   const triggerButton = (
     <PopoverTrigger asChild>
-      <Button type="default" icon={<Clock size={12} />} {...buttonTriggerProps}>
+      <Button variant="default" icon={<Clock size={12} />} {...buttonTriggerProps}>
         {value.isHelper
           ? value.text
           : `${dayjs(value.from).format('DD MMM, HH:mm')} - ${dayjs(value.to || new Date()).format('DD MMM, HH:mm')}`}
@@ -433,7 +433,7 @@ export const LogsDatePicker = ({
                   },
                 }}
                 icon={<HistoryIcon size={14} />}
-                type="text"
+                variant="text"
                 size="tiny"
                 className="px-1.5"
                 onClick={() => {
@@ -462,7 +462,7 @@ export const LogsDatePicker = ({
           <div className="flex items-center justify-end gap-2 p-2 border-t">
             {startDate && endDate ? (
               <Button
-                type="text"
+                variant="text"
                 size="tiny"
                 onClick={handleCopy}
                 className={cn({
@@ -474,7 +474,7 @@ export const LogsDatePicker = ({
             ) : null}
 
             <Button
-              type="default"
+              variant="default"
               onClick={() => {
                 const today = new Date()
                 setCurrentMonth(today)

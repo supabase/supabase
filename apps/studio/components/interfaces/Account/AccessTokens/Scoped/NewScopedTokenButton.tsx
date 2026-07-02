@@ -14,7 +14,7 @@ export const NewScopedTokenButton = ({ onCreateToken }: NewScopedTokenButtonProp
   return (
     <>
       <Button
-        type="primary"
+        variant="primary"
         onClick={() => {
           setVisible(true)
         }}

@@ -3,9 +3,9 @@ import { Button, Checkbox, cn, DialogSection, DialogSectionSeparator } from 'ui'
 
 import { STORAGE_CLIENT_LIBRARY_MAPPINGS } from '../Storage.constants'
 import { deriveAllowedClientLibraryMethods } from '../Storage.utils'
-import { PolicyName } from '@/components/interfaces/Auth/Policies/PolicyEditor/PolicyName'
-import { PolicyRoles } from '@/components/interfaces/Auth/Policies/PolicyEditor/PolicyRoles'
-import SqlEditor from '@/components/ui/SqlEditor'
+import { PolicyName } from './PolicyEditor/PolicyName'
+import { PolicyRoles } from './PolicyEditor/PolicyRoles'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { DOCS_URL } from '@/lib/constants'
 
 const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {} }) => {
@@ -20,7 +20,11 @@ const PolicyDefinition = ({ definition = '', onUpdatePolicyDefinition = () => {}
         </p>
       </div>
       <div className="h-56 md:w-2/3">
-        <SqlEditor defaultValue={definition} onInputChange={onUpdatePolicyDefinition} />
+        <CodeEditor
+          language="pgsql"
+          defaultValue={definition}
+          onInputChange={onUpdatePolicyDefinition}
+        />
       </div>
     </div>
   )
@@ -134,10 +138,10 @@ const PolicyAllowedOperations = ({ allowedOperations = [], onToggleOperation = (
 
 const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () => {} }) => (
   <div className="flex w-full items-center justify-end gap-x-2 border-t px-6 py-3 border-default">
-    <Button type="default" onClick={onViewTemplates}>
+    <Button variant="default" onClick={onViewTemplates}>
       View templates
     </Button>
-    <Button type="primary" onClick={onReviewPolicy}>
+    <Button variant="primary" onClick={onReviewPolicy}>
       Review
     </Button>
   </div>
@@ -145,7 +149,7 @@ const PolicyEditorFooter = ({ onViewTemplates = () => {}, onReviewPolicy = () =>
 
 // [Refactor] All these update methods could be summarised into one single function probably
 
-const StoragePoliciesEditor = ({
+export const StoragePoliciesEditor = ({
   policyFormFields = {},
   onViewTemplates = noop,
   onUpdatePolicyName = noop,
@@ -190,5 +194,3 @@ const StoragePoliciesEditor = ({
     </>
   )
 }
-
-export default StoragePoliciesEditor

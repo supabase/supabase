@@ -17,11 +17,11 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { BlockKeys } from '../common/BlockKeys'
 import { EmptyValue } from '../common/EmptyValue'
-import { MonacoEditor } from '../common/MonacoEditor'
 import { NullValue } from '../common/NullValue'
 import { TruncatedWarningOverlay } from './TruncatedWarningOverlay'
 import { useTableRowOperations } from '@/components/grid/hooks/useTableRowOperations'
 import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
@@ -119,7 +119,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
           <div
             className={cn(
               !!value && value.toString().trim().length === 0 && 'sb-grid-fill-container',
-              'sb-grid-text-editor__trigger'
+              'text-grid overflow-hidden text-ellipsis px-2'
             )}
             onClick={() => setIsPopoverOpen(!isPopoverOpen)}
           >
@@ -129,7 +129,13 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
         <PopoverContent className="rounded-none p-0" side="bottom" align="start" sideOffset={-35}>
           {isTruncated && !isSuccess ? (
             <div className="flex items-center justify-center flex-col relative">
-              <MonacoEditor readOnly onChange={() => {}} value={value ?? ''} language="markdown" />
+              <CodeEditor
+                hideLineNumbers
+                isReadOnly
+                language="plaintext"
+                value={value ?? ''}
+                className="h-[200px]"
+              />
               <TruncatedWarningOverlay isLoading={isPending} loadFullValue={loadFullValue} />
             </div>
           ) : (
@@ -139,7 +145,15 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
               onEnter={saveChanges}
               ignoreOutsideClicks={isConfirmNextModalOpen}
             >
-              <MonacoEditor value={value ?? ''} readOnly={!isEditable} onChange={onChange} />
+              <CodeEditor
+                hideLineNumbers
+                isReadOnly={!isEditable}
+                language="plaintext"
+                value={value ?? ''}
+                onInputChange={onChange}
+                className="h-[200px] border-b"
+              />
+
               {isEditable && (
                 <div className="flex items-start justify-between p-2 bg-surface-200 space-x-2">
                   <div className="space-y-1">
@@ -160,7 +174,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
-                          type="default"
+                          variant="default"
                           className="px-1"
                           onClick={() => onSelectExpand()}
                           icon={<Maximize size={12} strokeWidth={2} />}
@@ -172,8 +186,8 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                     {isNullable && (
                       <Button
                         size="tiny"
-                        type="default"
-                        htmlType="button"
+                        variant="default"
+                        type="button"
                         onClick={() => {
                           // Skip confirmation when queue mode is enabled - changes can be reviewed/cancelled
                           if (isQueueEnabled) {

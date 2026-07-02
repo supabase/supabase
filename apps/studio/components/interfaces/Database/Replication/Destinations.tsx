@@ -19,14 +19,15 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { REPLICA_STATUS } from '../../Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DestinationRow } from './DestinationRow'
-import { DisableExternalReplicationDialog } from './DisableExternalReplicationDialog'
+import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { ReadReplicaRow } from './ReadReplicas/ReadReplicaRow'
 import {
   useIsETLBigQueryPrivateAlpha,
@@ -43,6 +44,7 @@ import { replicationKeys } from '@/data/replication/keys'
 import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -74,8 +76,7 @@ export const Destinations = () => {
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState<string>('')
   const [statusRefetchInterval, setStatusRefetchInterval] = useState<number | false>(5000)
-  const [showDisableExternalReplicationDialog, setShowDisableExternalReplicationDialog] =
-    useState(false)
+  const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
 
   const [_, setDestinationType] = useQueryState(
     'destinationType',
@@ -98,7 +99,17 @@ export const Destinations = () => {
     isError: isDatabasesError,
     isSuccess: isDatabasesSuccess,
   } = useReadReplicasQuery({ projectRef }, { refetchInterval: statusRefetchInterval })
-  const readReplicas = databases.filter((x) => x.identifier !== projectRef)
+  // Memoise so the array reference is stable across renders. Without this
+  // the polling useEffect below has an unstable dep, runs every render, and
+  // its `setStatusRefetchInterval(false)` churn keeps the parent re-rendering
+  // — which trips a latent ref-instability bug in @radix-ui/react-slot
+  // (`composeRefs` is called per render instead of `useComposedRefs`) and
+  // tanks the page with "Maximum update depth exceeded" via the Tooltip
+  // trigger refs.
+  const readReplicas = useMemo(
+    () => databases.filter((x) => x.identifier !== projectRef),
+    [databases, projectRef]
+  )
   const hasReplicas = isDatabasesSuccess && readReplicas.length > 0
   const filteredReplicas =
     filterString.length === 0
@@ -135,7 +146,7 @@ export const Destinations = () => {
     () => sourcesData?.sources.find((source) => source.name === projectRef),
     [projectRef, sourcesData?.sources]
   )
-  const canDisableExternalReplication =
+  const canDisablePipelines =
     isSourcesSuccess &&
     isDestinationsSuccess &&
     isPipelinesSuccess &&
@@ -144,7 +155,9 @@ export const Destinations = () => {
     pipelines.length === 0
 
   const isLoading = isDestinationsLoading || isDatabasesLoading
-  const hasErrorsFetchingData = isDestinationsError || isDatabasesError
+
+  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
+  const hasErrorsFetchingData = (!isLocalETLNotSetUp && isDestinationsError) || isDatabasesError
 
   const openDestinationPanel = () => {
     if (!newDestinationDefaultType) return
@@ -219,7 +232,7 @@ export const Destinations = () => {
               actions={
                 filterString.length > 0 && (
                   <Button
-                    type="text"
+                    variant="text"
                     icon={<X />}
                     className="p-0 h-5 w-5"
                     onClick={() => setFilterString('')}
@@ -237,7 +250,7 @@ export const Destinations = () => {
               side="bottom"
             >
               <Button
-                type="default"
+                variant="default"
                 icon={<Plus />}
                 disabled={!newDestinationDefaultType}
                 onClick={openDestinationPanel}
@@ -246,14 +259,14 @@ export const Destinations = () => {
               </Button>
             </Shortcut>
             <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
-            {canDisableExternalReplication && (
+            {canDisablePipelines && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="default" icon={<MoreVertical />} className="w-7" />
+                  <Button variant="default" icon={<MoreVertical />} className="w-7" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-52">
-                  <DropdownMenuItem onClick={() => setShowDisableExternalReplicationDialog(true)}>
-                    Disable external replication
+                  <DropdownMenuItem onClick={() => setShowDisablePipelinesDialog(true)}>
+                    Disable Pipelines
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -267,6 +280,13 @@ export const Destinations = () => {
           <AlertError
             error={destinationsError || databasesError}
             subject="Failed to retrieve destinations"
+          />
+        )}
+
+        {isLocalETLNotSetUp && (
+          <Admonition
+            type="default"
+            title="ETL API not set up locally — destinations cannot be managed"
           />
         )}
 
@@ -336,8 +356,8 @@ export const Destinations = () => {
             >
               <h4>Replication keeps your data in sync across systems</h4>
               <p className="text-foreground-light text-sm text-balance text-center mt-1">
-                Deploy read replicas for lower latency and better resource management, or capture
-                database changes to external destinations for real-time data pipelines.
+                Deploy Read Replicas for lower latency and workload isolation, or add a Pipelines
+                destination for analytics workloads.
               </p>
               <Button
                 icon={<Plus />}
@@ -354,9 +374,9 @@ export const Destinations = () => {
 
       <DestinationPanel onSuccessCreateReadReplica={() => setStatusRefetchInterval(5000)} />
 
-      <DisableExternalReplicationDialog
-        open={showDisableExternalReplicationDialog}
-        setOpen={setShowDisableExternalReplicationDialog}
+      <DisablePipelinesDialog
+        open={showDisablePipelinesDialog}
+        setOpen={setShowDisablePipelinesDialog}
       />
     </>
   )

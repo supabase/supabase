@@ -47,12 +47,12 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
   return (
     <>
       {isIntegrationInstalled ? (
-        <Button disabled type="outline" className="shrink-0">
+        <Button disabled variant="outline" className="shrink-0">
           Installed
         </Button>
       ) : (
         <Button
-          type="primary"
+          variant="primary"
           className="shrink-0"
           loading={isInstalling || isLoading}
           disabled={isLoading}

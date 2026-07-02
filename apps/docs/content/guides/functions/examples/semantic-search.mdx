@@ -62,14 +62,14 @@ export default {
       .eq('id', id)
     if (error) console.warn(error.message)
 
-    return new Response('ok')
+    return Response.json({ ok: true })
   }),
 }
 ```
 
 ## Create a Database Function and RPC
 
-With the embeddings now stored in your Postgres database table, you can query them from Supabase Edge Functions by utilizing [Remote Procedure Calls (RPC)](/docs/guides/database/functions?language=js).
+With the embeddings now stored in your Postgres database table, you can query them from Supabase Edge Functions by using [Remote Procedure Calls (RPC)](/docs/guides/database/functions?language=js).
 
 Given the [following Postgres Function](https://github.com/supabase/supabase/blob/master/examples/ai/edge-functions/supabase/migrations/20240410031515_vector-search.sql):
 
@@ -112,7 +112,7 @@ const model = new Supabase.ai.Session('gte-small')
 export default {
   fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
     const { search } = await req.json()
-    if (!search) return new Response('Please provide a search param!')
+    if (!search) return Response.json({ error: 'Please provide a search param!' }, { status: 400 })
     // Generate embedding for search term.
     const embedding = await model.run(search, {
       mean_pool: true,
@@ -128,7 +128,7 @@ export default {
       .select('content')
       .limit(3)
     if (error) {
-      return Response.json(error)
+      return Response.json({ error: error.message }, { status: 500 })
     }
 
     return Response.json({ search, result })
@@ -136,4 +136,4 @@ export default {
 }
 ```
 
-You now have AI powered semantic search set up without any external dependencies! Just you, pgvector, and Supabase Edge Functions!
+You now have AI powered semantic search set up without any external dependencies! All you need: you, pgvector, and Supabase Edge Functions!

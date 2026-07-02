@@ -90,7 +90,7 @@ export const PauseFailedState = () => {
             </div>
 
             <div className="border-t border-overlay flex items-center justify-end gap-x-2 py-4 px-8">
-              <Button asChild type="default">
+              <Button asChild variant="default">
                 <SupportLink
                   queryParams={{
                     category: SupportCategories.DATABASE_UNRESPONSIVE,
@@ -102,7 +102,7 @@ export const PauseFailedState = () => {
                 </SupportLink>
               </Button>
               <ButtonTooltip
-                type="default"
+                variant="default"
                 icon={<Download />}
                 disabled={isLoadingBackups}
                 loading={isDownloading || isLoadingBackups}
@@ -118,7 +118,7 @@ export const PauseFailedState = () => {
               </ButtonTooltip>
               <DropdownMenu>
                 <DropdownMenuTrigger>
-                  <Button type="default" className="px-1.5" icon={<MoreVertical />} />
+                  <Button variant="default" className="px-1.5" icon={<MoreVertical />} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-72" align="end">
                   <DropdownMenuItemTooltip

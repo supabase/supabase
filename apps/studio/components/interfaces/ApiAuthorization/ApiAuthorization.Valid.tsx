@@ -193,7 +193,9 @@ export function ApiAuthorizationValidScreen({
     ? buildStudioPageTitle({ section: `Authorize ${effectiveRequester.name}`, brand: 'Supabase' })
     : undefined
 
-  if (!effectiveRequester) return null
+  if (!effectiveRequester) {
+    return <ApiAuthorizationErrorScreen error={undefined} />
+  }
 
   if (isApproved) {
     const approvedOrganization =

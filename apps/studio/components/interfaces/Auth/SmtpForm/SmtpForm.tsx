@@ -19,9 +19,10 @@ import {
   InputGroupText,
   Switch,
 } from 'ui'
-import { Admonition, PageSection, PageSectionContent } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import * as z from 'zod'
 
 import { urlRegex } from '../Auth.constants'
@@ -519,7 +520,7 @@ export const SmtpForm = () => {
                 <div className="flex items-center gap-x-2">
                   {isDirty && (
                     <Button
-                      type="default"
+                      variant="default"
                       onClick={() => {
                         form.reset()
                         setEnableSmtp(isSmtpEnabled(authConfig))
@@ -529,8 +530,8 @@ export const SmtpForm = () => {
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     loading={isUpdatingConfig}
                     disabled={!canUpdateConfig || !isDirty}
                   >

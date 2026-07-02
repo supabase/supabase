@@ -16,7 +16,7 @@ import type { CSSProperties, DragEvent, ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { Row } from 'ui-patterns'
+import { Row } from 'ui-patterns/Row'
 
 import { SnippetDropdown } from '@/components/interfaces/ProjectHome/SnippetDropdown'
 import { ReportBlock } from '@/components/interfaces/Reports/ReportBlock/ReportBlock'
@@ -338,7 +338,7 @@ export function CustomReportSection() {
         <div className="flex items-center gap-x-2">
           {layout.length > 0 && (
             <ButtonTooltip
-              type="default"
+              variant="default"
               icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
               className="w-7"
               disabled={isRefreshing}
@@ -351,7 +351,7 @@ export function CustomReportSection() {
               projectRef={ref}
               onSelect={addSnippetToReport}
               trigger={
-                <Button type="default" icon={<Plus />}>
+                <Button variant="default" icon={<Plus />}>
                   Add block
                 </Button>
               }
@@ -382,7 +382,7 @@ export function CustomReportSection() {
                 projectRef={ref}
                 onSelect={addSnippetToReport}
                 trigger={
-                  <Button type="default" iconRight={<Plus size={14} />}>
+                  <Button variant="default" iconRight={<Plus size={14} />}>
                     Add your first block
                   </Button>
                 }

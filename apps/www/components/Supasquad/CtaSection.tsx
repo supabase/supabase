@@ -42,7 +42,7 @@ const CtaSection = ({ id, title, subtitle, primaryCta, secondaryCta, className }
               </Link>
             </Button>
             {secondaryCta && (
-              <Button asChild size="medium" type="default">
+              <Button asChild size="medium" variant="default">
                 <Link href={secondaryCta.url}>{secondaryCta.label}</Link>
               </Button>
             )}

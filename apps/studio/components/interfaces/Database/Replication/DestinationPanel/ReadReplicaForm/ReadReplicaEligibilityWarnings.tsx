@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { useCheckEligibilityDeployReplica } from './useCheckEligibilityDeployReplica'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
@@ -66,7 +66,7 @@ export const ReadReplicaEligibilityWarnings = () => {
     return (
       <Admonition type="warning" title="Your organization has overdue invoices">
         <p>Please resolve all outstanding invoices first before deploying a new read replica.</p>
-        <Button asChild type="default" className="mt-2">
+        <Button asChild variant="default" className="mt-2">
           <Link href={`/org/${org?.slug}/billing#invoices`}>View invoices</Link>
         </Button>
       </Admonition>
@@ -109,7 +109,7 @@ export const ReadReplicaEligibilityWarnings = () => {
         title="Read replicas can only be deployed with projects on Postgres version 15 and above"
       >
         <p>If you'd like to use read replicas, please contact us via support.</p>
-        <Button asChild type="default" className="mt-2">
+        <Button asChild variant="default" className="mt-2">
           <SupportLink
             queryParams={{
               projectRef,
@@ -177,7 +177,7 @@ export const ReadReplicaEligibilityWarnings = () => {
         {refetchInterval === false && (
           <div className="flex items-center gap-x-2 mt-2">
             <Button
-              type="default"
+              variant="default"
               loading={isEnabling}
               disabled={isEnabling}
               onClick={() => {

@@ -222,14 +222,16 @@ export const ConnectSheet = () => {
             />
           </div>
 
-          <div className="border-b p-8">
-            <ConnectConfigSection
-              state={state}
-              activeFields={activeFields}
-              onFieldChange={handleFieldChange}
-              getFieldOptions={getFieldOptions}
-            />
-          </div>
+          {activeFields.length > 0 && (
+            <div className="border-b p-8">
+              <ConnectConfigSection
+                state={state}
+                activeFields={activeFields}
+                onFieldChange={handleFieldChange}
+                getFieldOptions={getFieldOptions}
+              />
+            </div>
+          )}
 
           <ConnectStepsSection steps={resolvedSteps} state={state} projectKeys={projectKeys} />
         </div>

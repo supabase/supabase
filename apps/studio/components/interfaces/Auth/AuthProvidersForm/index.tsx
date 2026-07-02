@@ -14,7 +14,7 @@ import {
 import { getPhoneProviderValidationSchema, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import type { Provider } from './AuthProvidersForm.types'
 import { ProviderForm } from './ProviderForm'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
 import { HorizontalShimmerWithIcon } from '@/components/ui/Shimmers'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
@@ -58,7 +58,7 @@ export const AuthProvidersForm = () => {
                       set to more than an hour. It is recommended to set this value to less than an
                       hour.
                     </p>
-                    <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
+                    <Button asChild variant="default" className="w-min" icon={<ExternalLink />}>
                       <Link href="https://supabase.com/docs/guides/platform/going-into-prod#security">
                         View security recommendations
                       </Link>

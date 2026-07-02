@@ -238,7 +238,7 @@ export function ServiceFlowPanel({
               <div className="sticky top-2 z-10 flex justify-end px-2 -mb-9 pointer-events-none">
                 <Button
                   size="tiny"
-                  type="default"
+                  variant="default"
                   className="pointer-events-auto px-1.5"
                   icon={jsonCopied ? <Check size={12} /> : <Copy size={12} />}
                   onClick={() => {

@@ -297,7 +297,7 @@ const MapView = ({
                       {database.identifier !== ref && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button type="text" icon={<MoreVertical />} className="px-1" />
+                            <Button variant="text" icon={<MoreVertical />} className="px-1" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className="w-40" side="bottom" align="end">
                             <DropdownMenuItem
@@ -360,7 +360,7 @@ const MapView = ({
             }`}
           >
             <ButtonTooltip
-              type="default"
+              variant="default"
               disabled={!canManageReplicas}
               onClick={() => onSelectDeployNewReplica(selectedRegion.key)}
               tooltip={{
@@ -375,7 +375,7 @@ const MapView = ({
               Deploy new replica here
             </ButtonTooltip>
             <Button
-              type="default"
+              variant="default"
               onClick={() => {
                 setCenter([14, 7])
                 setZoom(1.5)

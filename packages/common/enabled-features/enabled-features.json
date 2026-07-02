@@ -64,6 +64,9 @@
   "docs:pgtap": true,
   "docs:production_checklist": true,
   "docs:web_apps": true,
+  "docs:agent_plugin": true,
+  "docs:agent_skills": true,
+  "docs:prompts": true,
 
   "edge_functions:show_stripe_example": true,
   "edge_functions:show_all_edge_function_invocation_examples": true,

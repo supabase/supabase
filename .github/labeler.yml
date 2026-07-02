@@ -4,6 +4,11 @@ documentation:
   - changed-files:
       - any-glob-to-any-file: 'apps/docs/**/*'
 
+# Add 'self-hosted' to any change in the self-hosting docs
+self-hosted:
+  - changed-files:
+      - any-glob-to-any-file: 'apps/docs/content/guides/self-hosting/**/*'
+
 # Add 'api-deploy-required' to any change in packages/api-types/types
 api-deploy-required:
   - changed-files:

@@ -59,10 +59,10 @@ export const DatabaseReadOnlyAlert = () => {
             </ul>
           </AlertDescription>
           <div className="mt-4 flex items-center space-x-2">
-            <Button type="default" onClick={() => setShowConfirmationModal(true)}>
+            <Button variant="default" onClick={() => setShowConfirmationModal(true)}>
               Disable read-only mode
             </Button>
-            <Button asChild type="default" icon={<ExternalLink />}>
+            <Button asChild variant="default" icon={<ExternalLink />}>
               <a
                 href={`${DOCS_URL}/guides/platform/database-size#disabling-read-only-mode`}
                 target="_blank"

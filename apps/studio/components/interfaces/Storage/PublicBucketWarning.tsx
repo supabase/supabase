@@ -174,10 +174,10 @@ function PublicBucketWarningView(props: PublicBucketWarningViewProps): ReactNode
         }
         actions={
           <div className="flex gap-2">
-            <Button type="default" size="tiny" onClick={onDismiss}>
+            <Button variant="default" size="tiny" onClick={onDismiss}>
               Dismiss
             </Button>
-            <Button type="warning" size="tiny" onClick={onShowModal}>
+            <Button variant="warning" size="tiny" onClick={onShowModal}>
               Remove policy
             </Button>
           </div>

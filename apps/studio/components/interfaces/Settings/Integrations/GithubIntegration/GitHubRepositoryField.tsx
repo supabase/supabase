@@ -137,9 +137,9 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
           {gitHubAuthorization === null ? (
             <FormControl>
               <Button
-                type="default"
+                variant="default"
                 size="small"
-                htmlType="button"
+                type="button"
                 disabled={disabled}
                 onClick={() => {
                   onConnectClick?.()
@@ -155,8 +155,8 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
               <PopoverTrigger asChild>
                 <FormControl>
                   <Button
-                    type="default"
-                    htmlType="button"
+                    variant="default"
+                    type="button"
                     className="justify-start h-[34px] w-full"
                     disabled={disabled || isLoading}
                     loading={isLoading}

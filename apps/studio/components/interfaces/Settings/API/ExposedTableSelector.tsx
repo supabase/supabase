@@ -95,7 +95,7 @@ export const ExposedTableSelector = ({
         <Button
           size="small"
           disabled={disabled}
-          type="default"
+          variant="default"
           className="w-full [&>span]:w-full pr-1! space-x-1"
           iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
         >

@@ -156,7 +156,7 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="default"
+                variant="default"
                 className="px-1"
                 icon={<MoreVertical />}
                 aria-label={`${role.name} actions`}
@@ -214,12 +214,12 @@ export const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps
             </div>
             {!disabled && (
               <div className="py-4 flex items-center space-x-2 justify-end">
-                <Button type="default" disabled={!isDirty || isUpdating} onClick={() => reset()}>
+                <Button variant="default" disabled={!isDirty || isUpdating} onClick={() => reset()}>
                   Cancel
                 </Button>
                 <Button
-                  type="primary"
-                  htmlType="submit"
+                  variant="primary"
+                  type="submit"
                   disabled={!isDirty || isUpdating}
                   loading={isUpdating}
                 >

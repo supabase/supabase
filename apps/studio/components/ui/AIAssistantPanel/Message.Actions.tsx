@@ -34,7 +34,7 @@ export function MessageActions({
 function MessageActionsEdit({ onClick, tooltip }: { onClick: () => void; tooltip: string }) {
   return (
     <ButtonTooltip
-      type="text"
+      variant="text"
       icon={<Pencil size={14} strokeWidth={1.5} />}
       onClick={onClick}
       className="text-foreground-light hover:text-foreground p-1 rounded-sm"
@@ -53,7 +53,7 @@ MessageActions.Edit = MessageActionsEdit
 function MessageActionsDelete({ onClick }: { onClick: () => void }) {
   return (
     <ButtonTooltip
-      type="text"
+      variant="text"
       icon={<Trash2 size={14} strokeWidth={1.5} />}
       tooltip={{ content: { side: 'bottom', text: 'Delete message' } }}
       onClick={onClick}
@@ -76,7 +76,7 @@ function MessageActionsThumbsUp({
 }) {
   return (
     <Button
-      type="text"
+      variant="text"
       disabled={disabled}
       icon={
         <ThumbsUp
@@ -154,7 +154,7 @@ function MessageActionsThumbsDown({
     <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button
-          type="text"
+          variant="text"
           disabled={disabled}
           onClick={() => !disabled && setOpen(true)}
           className={cn(
@@ -199,7 +199,7 @@ function MessageActionsThumbsDown({
                 )}
               />
               <div className="flex justify-end">
-                <Button type="primary" htmlType="submit" size="tiny">
+                <Button variant="primary" type="submit" size="tiny">
                   Submit feedback
                 </Button>
               </div>

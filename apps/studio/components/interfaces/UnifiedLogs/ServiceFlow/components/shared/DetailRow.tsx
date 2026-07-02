@@ -78,7 +78,7 @@ export const DetailRow = ({
             table={table!}
             label={label}
           >
-            <Button type="text" className="px-1" icon={<MoreVertical />} />
+            <Button variant="text" className="px-1" icon={<MoreVertical />} />
           </DataTableSheetRowAction>
         )}
       </div>

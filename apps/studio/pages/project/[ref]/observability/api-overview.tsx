@@ -1,5 +1,6 @@
 import { useCallback } from 'react'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import {
   ErrorCountsChartRenderer,
   NetworkTrafficRenderer,
@@ -16,12 +17,15 @@ import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
 import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
 import { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { useApiReport } from '@/data/reports/api-report-query'
 import { useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import type { NextPageWithLayout } from '@/types'
+
+const REPORT_TITLE = 'API Gateway'
 
 export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()
@@ -94,10 +98,10 @@ export const ApiReport: NextPageWithLayout = () => {
 
   return (
     <ReportPadding>
-      <ReportHeader title="API Gateway" showDatabaseSelector={false} />
+      <ReportHeader title={REPORT_TITLE} showDatabaseSelector={false} />
       <ReportStickyNav
         content={
-          <div className="flex items-center gap-3">
+          <div className="flex w-full items-center gap-3">
             <ReportFilterBar
               onRemoveFilters={removeFilters}
               onDatepickerChange={handleDatepickerChange}
@@ -109,9 +113,10 @@ export const ApiReport: NextPageWithLayout = () => {
               filters={filters}
               datepickerHelpers={datePickerHelpers}
               initialDatePickerValue={datePickerValue}
-              className="w-full"
+              className="flex-1 min-w-0"
               showDatabaseSelector={false}
             />
+            <DocsButton href={OBSERVABILITY_DOCS_HREFS.apiGateway} topic={REPORT_TITLE} />
             <UpgradePrompt
               show={showUpgradePrompt}
               setShowUpgradePrompt={setShowUpgradePrompt}

@@ -1,16 +1,13 @@
+import Examples from '~/data/Examples'
+import { ArrowLeft, ArrowRight, BookOpen, Github } from 'lucide-react'
+import Link from 'next/link'
 import { useRef } from 'react'
-
-import { Swiper, SwiperSlide } from 'swiper/react'
 // import Swiper core and required modules
 import SwiperCore from 'swiper'
 import { Navigation, Pagination } from 'swiper/modules'
-
-import { Github } from 'lucide-react'
-import Link from 'next/link'
+import { Swiper, SwiperSlide } from 'swiper/react'
 import { Button } from 'ui'
 
-import { ArrowLeft, ArrowRight, BookOpen } from 'lucide-react'
-import Examples from '~/data/Examples'
 import ExampleCard from '../ExampleCard'
 
 // install Swiper modules
@@ -29,10 +26,10 @@ function GithubExamples() {
             Supported by a network of early advocates, contributors, and champions.
           </p>
           <div className="flex items-center justify-center gap-2 py-4">
-            <Button asChild size="small" type="default" icon={<BookOpen size={12} />}>
+            <Button asChild size="small" variant="default" icon={<BookOpen size={12} />}>
               <Link href="/docs/guides/resources/examples">View guides</Link>
             </Button>
-            <Button asChild size="small" type="default" icon={<Github size={12} />}>
+            <Button asChild size="small" variant="default" icon={<Github size={12} />}>
               <Link
                 href="https://github.com/supabase/supabase/tree/master/examples"
                 as="https://github.com/supabase/supabase/tree/master/examples"

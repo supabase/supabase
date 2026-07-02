@@ -58,7 +58,7 @@ export default function ComboBoxResponsive() {
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
-            type="default"
+            variant="default"
             size="small"
             className="w-[150px] justify-start"
             icon={!selectedStatus && <Plus className="text-foreground-muted" />}
@@ -76,7 +76,7 @@ export default function ComboBoxResponsive() {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button type="outline" className="w-[150px] justify-start">
+        <Button variant="outline" className="w-[150px] justify-start">
           {selectedStatus ? <>{selectedStatus.label}</> : <>+ Set status</>}
         </Button>
       </DrawerTrigger>

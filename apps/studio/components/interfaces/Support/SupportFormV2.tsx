@@ -114,6 +114,7 @@ export const SupportFormV2 = ({ form, initialError, state, dispatch }: SupportFo
       dispatch({
         type: 'ERROR',
         message: error.message,
+        code: error.code,
       })
     },
   })

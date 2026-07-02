@@ -34,7 +34,7 @@ const IndexesPage: NextPageWithLayout = () => {
               className="no-underline"
               href={`${DOCS_URL}/guides/database/query-optimization`}
             />
-            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+            <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <a
                 target="_blank"
                 rel="noreferrer"

@@ -26,6 +26,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const { snippets } = await getSnippets({
       searchTerm: params?.name,
+      includeContent: false,
     })
     if (params?.name) {
       return res.status(200).json({

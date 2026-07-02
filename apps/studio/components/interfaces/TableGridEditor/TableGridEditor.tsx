@@ -5,7 +5,8 @@ import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useCallback } from 'react'
 import { Button } from 'ui'
-import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
 import { SidePanelEditor } from './SidePanelEditor/SidePanelEditor'
@@ -129,7 +130,7 @@ export const TableGridEditor = ({
             >
               {!!tabId ? (
                 <Button
-                  type="default"
+                  variant="default"
                   className="mt-2"
                   onClick={() => {
                     tabs.handleTabClose({
@@ -145,7 +146,7 @@ export const TableGridEditor = ({
               ) : openTabs.length > 0 ? (
                 <Button
                   asChild
-                  type="default"
+                  variant="default"
                   className="mt-2"
                   onClick={() => setLastVisitedTable(undefined)}
                 >
@@ -156,7 +157,7 @@ export const TableGridEditor = ({
               ) : (
                 <Button
                   asChild
-                  type="default"
+                  variant="default"
                   className="mt-2"
                   onClick={() => setLastVisitedTable(undefined)}
                 >

@@ -3,6 +3,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 
 import { ApiAuthorizationScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization'
+import { ApiAuthorizationLoadingScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization.Loading'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import type { NextPageWithLayout } from '@/types'
@@ -15,7 +16,14 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   const { auth_id, organization_slug } = useParams()
 
   if (!routerReady) {
-    return null
+    return (
+      <>
+        <Head>
+          <title>{PAGE_TITLE}</title>
+        </Head>
+        <ApiAuthorizationLoadingScreen />
+      </>
+    )
   }
 
   return (

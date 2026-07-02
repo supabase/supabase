@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { Archive, Cpu, Database, GitBranch, Github } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn, Skeleton } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { HighAvailabilityBadge } from './HighAvailabilityBadge'
 import { ServiceStatus } from './ServiceStatus'

@@ -12,8 +12,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { PauseDisabledState } from './PauseDisabledState'
 import { ResumeProjectButton } from '@/components/interfaces/Project/ResumeProjectButton'
@@ -135,12 +135,12 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
       {isPauseStatusSuccess && !isRestoreDisabled && (
         <CardFooter className="flex flex-wrap justify-end items-center gap-2">
-          <ResumeProjectButton size="tiny" type="default" />
+          <ResumeProjectButton size="tiny" variant="default" />
 
           {isFreePlan ? (
             <UpgradePlanButton source="projectPausedStateRestore" />
           ) : (
-            <Button asChild type="default">
+            <Button asChild variant="default">
               <Link href={`/project/${ref}/settings/general`}>View project settings</Link>
             </Button>
           )}

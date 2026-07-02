@@ -10,7 +10,7 @@ Database performance is a large topic and many factors can contribute. Some of t
 - A lack of indexes causing slower than required queries over large tables
 - Unused indexes causing slow `INSERT`, `UPDATE` and `DELETE` operations
 - Not enough compute resources, such as memory, causing your database to go to disk for results too often
-- Lock contention from multiple queries operating on highly utilized tables
+- Lock contention from multiple queries operating on heavily used tables
 - Large amount of bloat on your tables causing poor query planning
 
 You can examine your database and queries for these issues using either the [Supabase CLI](/docs/guides/local-development/cli/getting-started) or SQL.
@@ -47,7 +47,7 @@ Most inspection commands are Postgres agnostic. You can run inspection routines 
 For example you can connect to your local Postgres instance:
 
 ```
-supabase --db-url postgresql://postgres:postgres@localhost:5432/postgres inspect db bloat
+supabase inspect db bloat --db-url postgresql://postgres:postgres@localhost:5432/postgres
 ```
 
 ### Connect to a Supabase instance
@@ -250,9 +250,9 @@ Postgres has built in tooling to help you optimize poorly performing queries. Yo
 explain analyze <query-statement-here>;
 ```
 
-When you include `analyze` in the explain statement, the database attempts to execute the query and provides a detailed query plan along with actual execution times. So, be careful using `explain analyze` with `insert`/`update`/`delete` queries, because the query will actually run, and could have unintended side-effects.
+When you include `analyze` in the explain statement, the database attempts to execute the query and provides a detailed query plan along with actual execution times. So, be careful using `explain analyze` with `insert`/`update`/`delete` queries, because the query will run, and could have unintended side-effects.
 
-If you run just `explain` without the `analyze` keyword, the database will only perform query planning without actually executing the query. This approach can be beneficial when you want to inspect the query plan without affecting the database or if you encounter timeouts in your queries.
+If you run `explain` without the `analyze` keyword, the database will only perform query planning without executing the query. This approach can be beneficial when you want to inspect the query plan without affecting the database or if you encounter timeouts in your queries.
 
 Using the query plan analyzer to optimize your queries is a large topic, with a number of online resources available:
 

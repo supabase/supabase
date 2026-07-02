@@ -90,7 +90,7 @@ const Input = forwardRef<
             {copy && !(reveal && hidden) ? (
               <InputGroupButton
                 size="tiny"
-                type="default"
+                variant="default"
                 className={cn(showCopyOnHover && 'opacity-0 group-hover:opacity-100 transition')}
                 icon={<Copy size={16} className="text-foreground-muted" />}
                 onClick={() => _onCopy(props.value)}
@@ -99,7 +99,7 @@ const Input = forwardRef<
               </InputGroupButton>
             ) : null}
             {reveal && hidden ? (
-              <InputGroupButton size="tiny" type="default" onClick={onReveal}>
+              <InputGroupButton size="tiny" variant="default" onClick={onReveal}>
                 Reveal
               </InputGroupButton>
             ) : null}

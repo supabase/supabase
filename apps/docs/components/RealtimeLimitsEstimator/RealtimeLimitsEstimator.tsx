@@ -14,6 +14,13 @@ import {
   SelectValue,
 } from 'ui'
 
+import {
+  COMPUTE_LABELS,
+  COMPUTE_OPTIONS,
+  THROUGHPUT_METRIC_HEADINGS,
+  THROUGHPUT_TABLE_HEADINGS,
+} from './RealtimeLimitsEstimator.constants'
+
 export default function RealtimeLimitsEstimater({}) {
   const findTableValue = ({ computeAddOn, filters, rls, concurrency }) => {
     return throughputTable.find(
@@ -71,9 +78,11 @@ export default function RealtimeLimitsEstimater({}) {
               <SelectValue className="font-mono" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="micro">Micro</SelectItem>
-              <SelectItem value="small">Small to medium</SelectItem>
-              <SelectItem value="large">Large to 16XL</SelectItem>
+              {COMPUTE_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -129,10 +138,11 @@ export default function RealtimeLimitsEstimater({}) {
           <table className="table-auto">
             <thead>
               <tr>
-                <th className="px-4 py-2">Total DB changes /sec</th>
-                <th className="px-4 py-2">Max messages per client /sec</th>
-                <th className="px-4 py-2">Max total messages /sec</th>
-                <th className="px-4 py-2">Latency p95</th>
+                {THROUGHPUT_METRIC_HEADINGS.map((heading) => (
+                  <th key={heading} className="px-4 py-2">
+                    {heading}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -154,7 +164,7 @@ export default function RealtimeLimitsEstimater({}) {
           <div className="py-1 flex items-center">
             <p className="text-sm">View raw throughput table</p>
             <Button
-              type="text"
+              variant="text"
               icon={
                 <ChevronDown
                   size={18}
@@ -174,23 +184,15 @@ export default function RealtimeLimitsEstimater({}) {
               .filter((v, i, a) => a.indexOf(v) === i)
               .map((computeAddOn) => (
                 <div>
-                  <h4>
-                    {computeAddOn === 'micro'
-                      ? 'Micro'
-                      : computeAddOn === 'small'
-                        ? 'Small to medium'
-                        : 'Large to 16XL'}
-                  </h4>
+                  <h4>{COMPUTE_LABELS[computeAddOn]}</h4>
                   <table className="table-auto">
                     <thead>
                       <tr>
-                        <th className="px-4 py-2">Filters</th>
-                        <th className="px-4 py-2">RLS</th>
-                        <th className="px-4 py-2">Connected clients</th>
-                        <th className="px-4 py-2">Total DB changes /sec</th>
-                        <th className="px-4 py-2">Max messages per client /sec</th>
-                        <th className="px-4 py-2">Max total messages /sec</th>
-                        <th className="px-4 py-2">Latency p95</th>
+                        {THROUGHPUT_TABLE_HEADINGS.map((heading) => (
+                          <th key={heading} className="px-4 py-2">
+                            {heading}
+                          </th>
+                        ))}
                       </tr>
                     </thead>
                     <tbody>

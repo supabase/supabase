@@ -1,3 +1,4 @@
+import type { OnMount } from '@monaco-editor/react'
 import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import { useParams } from 'common'
 import { AlignLeft } from 'lucide-react'
@@ -8,8 +9,8 @@ import { Button, cn, SidePanel } from 'ui'
 import { ActionBar } from '../../ActionBar'
 import { isValueTruncated } from '../RowEditor.utils'
 import { DrilldownViewer } from './DrilldownViewer/DrilldownViewer'
-import { JsonCodeEditor } from './JsonCodeEditor'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
@@ -60,16 +61,33 @@ export const JsonEditor = ({
 
   const { mutate: getCellValue, isPending, isSuccess, reset } = useGetCellValueMutation()
 
-  const validateJSON = async (resolve: () => void) => {
-    try {
-      const newJsonStr = removeJSONTrailingComma(jsonStr)
-      const minifiedJSON = minifyJSON(newJsonStr)
-      if (onSaveJSON) onSaveJSON(minifiedJSON, resolve)
-    } catch (error: any) {
-      resolve()
-      toast.error('JSON seems to have an invalid structure.')
-    }
-  }
+  const validateJSON = useCallback(
+    async (nextValue: string, resolve: () => void) => {
+      try {
+        const newJsonStr = removeJSONTrailingComma(nextValue)
+        const minifiedJSON = minifyJSON(newJsonStr)
+        if (onSaveJSON) onSaveJSON(minifiedJSON, resolve)
+      } catch (error: any) {
+        resolve()
+        toast.error('JSON seems to have an invalid structure.')
+      }
+    },
+    [onSaveJSON]
+  )
+
+  const handleEditorMount: OnMount = useCallback(
+    (editor, monaco) => {
+      if (readOnly) return
+
+      editor.addAction({
+        id: 'save-value',
+        label: 'Save value',
+        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.Enter],
+        run: () => validateJSON(editor.getValue(), () => undefined),
+      })
+    },
+    [readOnly, validateJSON]
+  )
 
   const prettify = () => {
     const res = prettifyJSON(jsonStr)
@@ -141,7 +159,7 @@ export const JsonEditor = ({
             <div className="flex items-center gap-x-2">
               {view === 'edit' && (
                 <ButtonTooltip
-                  type="default"
+                  variant="default"
                   icon={<AlignLeft />}
                   className="px-1"
                   onClick={() => prettify()}
@@ -166,18 +184,20 @@ export const JsonEditor = ({
           closePanel={onClose}
           backButtonLabel={backButtonLabel}
           applyButtonLabel={applyButtonLabel}
-          applyFunction={readOnly ? undefined : validateJSON}
+          applyFunction={readOnly ? undefined : (resolve) => validateJSON(jsonStr, resolve)}
         />
       }
     >
       <div className="flex flex-auto h-full flex-col gap-y-4 relative">
         {view === 'edit' ? (
           <div className="w-full h-full grow">
-            <JsonCodeEditor
+            <CodeEditor
               key={jsonString}
-              readOnly={readOnly}
-              onInputChange={(val) => setJsonStr(val ?? '')}
+              isReadOnly={readOnly}
+              language="json"
               value={(jsonStr ?? '').toString()}
+              onInputChange={(val) => setJsonStr(val ?? '')}
+              onMount={handleEditorMount}
             />
           </div>
         ) : (
@@ -198,7 +218,7 @@ export const JsonEditor = ({
                 performance issues
               </p>
             </div>
-            <Button type="default" loading={isPending} onClick={loadFullValue}>
+            <Button variant="default" loading={isPending} onClick={loadFullValue}>
               Load full JSON data
             </Button>
           </div>

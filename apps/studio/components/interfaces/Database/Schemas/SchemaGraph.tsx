@@ -53,9 +53,9 @@ import {
 } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
 import { useExportSchemaToImage } from './useExportSchemaToImage'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
@@ -388,7 +388,7 @@ export const SchemaGraph = () => {
               <div className="flex items-center gap-x-2">
                 <div className="flex items-center gap-0">
                   <ButtonTooltip
-                    type="default"
+                    variant="default"
                     className="rounded-r-none border-r-0"
                     icon={copied ? <Check data-testid="copy-sql-ready" /> : <Copy />}
                     onClick={copyAsSQL}
@@ -412,7 +412,7 @@ export const SchemaGraph = () => {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
-                        type="default"
+                        variant="default"
                         size="tiny"
                         className="rounded-l-none pl-1 pr-0"
                         icon={<ChevronDown size={12} />}
@@ -463,7 +463,7 @@ export const SchemaGraph = () => {
                     tooltipOpen={autoLayoutDialogOpen ? false : undefined}
                   >
                     <AlertDialogTrigger asChild>
-                      <Button type="default">Auto layout</Button>
+                      <Button variant="default">Auto layout</Button>
                     </AlertDialogTrigger>
                   </Shortcut>
                   <AlertDialogContent>
@@ -513,7 +513,7 @@ export const SchemaGraph = () => {
                 }
               >
                 {canAddTables && (
-                  <Button asChild className="mt-2" type="default" icon={<Plus />}>
+                  <Button asChild className="mt-2 w-min" variant="default" icon={<Plus />}>
                     <Link href={`/project/${ref}/editor?create=table`}>New table</Link>
                   </Button>
                 )}
@@ -559,7 +559,7 @@ export const SchemaGraph = () => {
                   {hasNextPage && (
                     <Panel position="bottom-center" className="mb-11!">
                       <Button
-                        type="default"
+                        variant="default"
                         size="tiny"
                         loading={isFetchingNextPage}
                         onClick={() => {

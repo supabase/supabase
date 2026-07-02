@@ -94,7 +94,7 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
               <Button
                 key="clear"
                 size="tiny"
-                type="text"
+                variant="text"
                 icon={<X />}
                 onClick={() => setSearch('')}
                 className="p-0 h-5 w-5"
@@ -155,7 +155,7 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
             }}
             side="bottom"
           >
-            <Button asChild icon={<Plus />} type="primary" size="tiny">
+            <Button asChild icon={<Plus />} variant="primary" size="tiny">
               <Link href={`/new/${slug}`}>New project</Link>
             </Button>
           </Shortcut>

@@ -119,7 +119,7 @@ export const TerminalInstructions = forwardRef<
                 You can create a secure access token in your account section
               </p>
             </div>
-            <Button type="default" onClick={() => router.push('/account/tokens')}>
+            <Button variant="default" onClick={() => router.push('/account/tokens')}>
               Access tokens
             </Button>
           </div>
@@ -133,7 +133,7 @@ export const TerminalInstructions = forwardRef<
             </div>
             <div className="flex gap-2">
               <DocsButton href={`${DOCS_URL}/guides/functions`} />
-              <Button asChild type="default" icon={<ExternalLink />}>
+              <Button asChild variant="default" icon={<ExternalLink />}>
                 <a
                   target="_blank"
                   rel="noreferrer"

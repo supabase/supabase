@@ -88,12 +88,12 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
               </div>
 
               <div className="flex items-center justify-center space-x-2">
-                <Button asChild type="default">
+                <Button asChild variant="default">
                   <Link href={`/project/${ref}/settings/infrastructure`}>
                     Check database health
                   </Link>
                 </Button>
-                <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
                   <Link
                     href={`${DOCS_URL}/guides/troubleshooting?products=platform#unable-to-connect-to-your-supabase-project`}
                     className="translate-y-px"

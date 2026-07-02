@@ -48,7 +48,7 @@ export const NewOAuthAppBanner = ({ oauthApp, onClose }: NewOAuthAppBannerProps)
       }
     >
       <Button
-        type="text"
+        variant="text"
         icon={<X />}
         className="w-7 h-7 absolute top-0 right-0"
         onClick={onClose}

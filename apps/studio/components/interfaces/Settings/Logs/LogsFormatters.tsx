@@ -46,7 +46,7 @@ export const SelectionDetailedRow = ({
         iconOnly
         text={value}
         className="group-hover:opacity-100 opacity-0 p-0 h-6 w-6"
-        type="text"
+        variant="text"
         title="Copy to clipboard"
       />
     </div>

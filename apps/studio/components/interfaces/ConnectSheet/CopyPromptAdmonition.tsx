@@ -6,6 +6,8 @@ import { BASE_PATH } from '@/lib/constants'
 
 interface CopyPromptAdmonitionProps {
   stepsContainerRef: RefObject<HTMLDivElement | null>
+  /** When set, the Copy prompt button uses this verbatim instead of scraping the steps. */
+  customPrompt?: string
 }
 
 const normalizeTextLines = (value: string) => {
@@ -123,9 +125,12 @@ export const buildConnectPrompt = (stepsContainer: HTMLElement | null) => {
   return promptContent
 }
 
-export function CopyPromptAdmonition({ stepsContainerRef }: CopyPromptAdmonitionProps) {
+export function CopyPromptAdmonition({
+  stepsContainerRef,
+  customPrompt,
+}: CopyPromptAdmonitionProps) {
   const handleCopyPrompt = () => {
-    return buildConnectPrompt(stepsContainerRef.current)
+    return customPrompt ?? buildConnectPrompt(stepsContainerRef.current)
   }
 
   return (
@@ -133,7 +138,9 @@ export function CopyPromptAdmonition({ stepsContainerRef }: CopyPromptAdmonition
       type="tip"
       showIcon={false}
       layout="horizontal"
-      actions={<CopyButton type="default" copyLabel="Copy prompt" asyncText={handleCopyPrompt} />}
+      actions={
+        <CopyButton variant="default" copyLabel="Copy prompt" asyncText={handleCopyPrompt} />
+      }
     >
       <div className="absolute -inset-16 z-0 opacity-50">
         <img

@@ -13,12 +13,6 @@ type OrganizationInviteStatusVariables = {
   profileExists: boolean
 }
 
-type OrganizationInviteContentVariables = {
-  data?: OrganizationInviteByToken
-  isSignUpEnabled: boolean
-  status: OrganizationInviteStatus
-}
-
 export type OrganizationInviteStatus =
   | 'signed-out'
   | 'loading'
@@ -65,9 +59,15 @@ export function getOrganizationInviteStatus({
 
 export function getOrganizationInviteContent({
   data,
+  error,
   isSignUpEnabled,
   status,
-}: OrganizationInviteContentVariables) {
+}: {
+  data?: OrganizationInviteByToken
+  error?: ResponseError | null
+  isSignUpEnabled: boolean
+  status: OrganizationInviteStatus
+}) {
   const signedOutDescription = `Sign in${
     isSignUpEnabled ? ' or create an account' : ''
   } to view this invitation`
@@ -90,7 +90,14 @@ export function getOrganizationInviteContent({
   if (status === 'expired') return { title: 'Invite expired' }
   if (status === 'invalid') return { title: 'Invite invalid' }
   if (status === 'no-longer-valid') return { title: 'Invite no longer available' }
-  if (status === 'error') return { title: 'Unable to load invitation' }
+  if (status === 'error') {
+    if (error?.message.includes('MFA required')) {
+      return {
+        title: 'Set up MFA for your account',
+        description: 'MFA needs to be enabled on your account to join this organization',
+      }
+    } else return { title: 'Unable to load invitation' }
+  }
 
   return {}
 }

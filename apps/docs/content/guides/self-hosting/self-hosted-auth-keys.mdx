@@ -61,7 +61,7 @@ storage:
 
 <Admonition type="caution">
 
-Podman does not support nested variable interpolation (`${A:-${B}}`). If you are using Podman, replace each nested expression with the required variable directly - see the inline comments in `docker-compose.yml` for the exact substitutions.
+Nested variable interpolation (`${A:-${B}}`) requires `podman-compose >= 1.6.0`. Earlier versions (still shipped by some Linux distributions) do not support it - if you are on an older `podman-compose`, either upgrade or replace each nested expression with the required variable directly, see the inline comments in `docker-compose.yml` for the exact substitutions.
 
 </Admonition>
 

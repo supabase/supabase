@@ -20,14 +20,15 @@ For your bot to seamlessly interact with Slack, you'll need to configure Slack A
 Deploy the following code as an Edge function using the CLI:
 
 ```bash
-supabase --project-ref nacho_slacker secrets \
-set SLACK_TOKEN=<xoxb-0000000000-0000000000-01010101010nacho101010>
+supabase secrets set \
+  SLACK_TOKEN=<xoxb-0000000000-0000000000-01010101010nacho101010> \
+  --project-ref nacho_slacker
 ```
 
 Here's the code of the Edge Function, you can change the response to handle the text received:
 
 ```ts index.ts
-import { WebClient } from 'https://deno.land/x/slack_web_api@6.7.2/mod.js'
+import { WebClient } from 'npm:@slack/web-api@^7'
 import { withSupabase } from 'npm:@supabase/server@^1'
 
 const slackBotToken = Deno.env.get('SLACK_TOKEN') ?? ''
@@ -55,7 +56,7 @@ export default {
           text: `Hello <@${user}>!`,
           thread_ts: ts,
         })
-        return new Response('ok', { status: 200 })
+        return Response.json({ ok: true })
       }
     } catch (error) {
       return Response.json({ error: error.message }, { status: 500 })
