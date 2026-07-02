@@ -514,14 +514,19 @@ export const TableList = ({
 
                             {!isSchemaLocked && (
                               <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="default"
-                                    className="px-1"
-                                    icon={<MoreVertical />}
-                                    aria-label={`Table ${x.name} actions`}
-                                  />
-                                </DropdownMenuTrigger>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button
+                                        variant="default"
+                                        className="px-1"
+                                        icon={<MoreVertical />}
+                                        aria-label={`Table ${x.name} actions`}
+                                      />
+                                    </DropdownMenuTrigger>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="bottom">More options</TooltipContent>
+                                </Tooltip>
                                 <DropdownMenuContent side="bottom" align="end" className="w-40">
                                   <DropdownMenuItem
                                     className="flex items-center space-x-2"
