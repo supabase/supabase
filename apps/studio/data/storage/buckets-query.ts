@@ -227,6 +227,11 @@ export const useBucketInfoQueryPreferCached = (bucketId?: string, projectRef?: s
 
 const shouldRetryBucketsQuery = (failureCount: number, error: unknown) => {
   if (error instanceof ResponseError) {
+    // If the bucket doesn't exist or was deleted, don't retry — it will never succeed.
+    if (error.code === 404) {
+      return false
+    }
+
     if (
       error.message.includes('Missing tenant config') ||
       error.message.includes('Project has no active API keys')

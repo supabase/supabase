@@ -17,7 +17,7 @@ interface StoragePoliciesReviewProps {
   onSelectSave: any
 }
 
-const StoragePoliciesReview = ({
+export const StoragePoliciesReview = ({
   policyStatements = [],
   onSelectBack = () => {},
   onSelectSave = () => {},
@@ -74,5 +74,3 @@ const StoragePoliciesReview = ({
     </>
   )
 }
-
-export default StoragePoliciesReview

@@ -123,7 +123,7 @@ const some_num = 5
 some_num() // TypeError: some_num is not a function
 ```
 
-This issue often appears when working with returned objects from external APIs. One may assume a response has a certain shape, but if the value is actually `null` or `undefined`, using it without checking can lead to a `TypeError`.
+This issue often appears when working with returned objects from external APIs. One may assume a response has a certain shape, but if the value is `null` or `undefined`, using it without checking can lead to a `TypeError`.
 
 ```js
 const data = await req.json() // returns undefined if request body is empty
@@ -277,7 +277,7 @@ if (req.method === 'OPTIONS') {
 }
 ```
 
-So, when encountering these errors, it is still important to check the logs or run the request outside the browser to make sure it is actually the primary factor and not a side-effect of a larger issue.
+So, when encountering these errors, it is still important to check the logs or run the request outside the browser to make sure it is the primary factor and not a side-effect of a larger issue.
 
 ## Still stuck?
 

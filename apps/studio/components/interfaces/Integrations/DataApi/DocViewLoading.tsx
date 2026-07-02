@@ -1,4 +1,4 @@
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export const DocViewLoading = () => {
   return (

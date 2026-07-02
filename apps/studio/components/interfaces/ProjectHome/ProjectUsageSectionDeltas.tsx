@@ -3,8 +3,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, cn, Loading } from 'ui'
-import { Row } from 'ui-patterns'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
+import { Row } from 'ui-patterns/Row'
 
 import {
   buildSortedServiceCards,
@@ -207,14 +207,14 @@ export const ProjectUsageSectionDeltas = () => {
                   <div className="flex flex-col items-end">
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 bg-warning rounded-full" />
-                      <span className="heading-meta">Warn</span>
+                      <span className="heading-meta">Warnings</span>
                     </div>
                     <span className="text-foreground text-base">{s.warn.toLocaleString()}</span>
                   </div>
                   <div className="flex flex-col items-end">
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 bg-destructive rounded-full" />
-                      <span className="heading-meta">Err</span>
+                      <span className="heading-meta">Errors</span>
                     </div>
                     <span className="text-foreground text-base">{s.err.toLocaleString()}</span>
                   </div>
@@ -231,7 +231,7 @@ export const ProjectUsageSectionDeltas = () => {
                     chartConfig={{
                       error_count: { label: 'Errors' },
                       warning_count: { label: 'Warnings' },
-                      ok_count: { label: 'Requests' },
+                      ok_count: { label: 'Infos' },
                     }}
                     EmptyState={
                       isLoading ? (
