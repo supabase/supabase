@@ -564,7 +564,11 @@ export default function Page() {
             row centers within it. (flex-1 items don't shrink below their
             content, so this can't clip an overflowing row — it just grows.) */}
         <div className="flex w-full flex-1 flex-col items-center @4xl:justify-center">
-          <div className="flex w-[65%] flex-col gap-6 @4xl:flex-row @4xl:items-start">
+          <div
+            className={`flex flex-col gap-6 @4xl:flex-row @4xl:items-start ${
+              view === 'both' ? 'w-full' : 'w-[65%]'
+            }`}
+          >
             {showOg && (
               <div className="min-w-0 @4xl:flex-1">
                 <PreviewCard
