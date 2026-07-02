@@ -38,6 +38,7 @@ may_uppercase = [
     "Chrome",
     "Chrome Developer Tools",
     "Clerk",
+    "ClickHouse",
     "Cloudflare",
     "Cloudflare Workers?",
     "Claude Code",
