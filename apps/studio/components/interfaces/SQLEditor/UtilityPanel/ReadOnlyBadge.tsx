@@ -1,7 +1,7 @@
 import { Badge } from 'ui'
 
 import { useProfile } from '@/lib/profile'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 import { isSnippetOwner } from '@/state/sql-editor/sql-editor-rules'
 
 export type ReadOnlyBadgeProps = { id: string }
