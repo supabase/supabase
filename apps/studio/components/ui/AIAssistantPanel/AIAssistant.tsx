@@ -177,7 +177,13 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
 
   const isChatLoading = chatStatus === 'submitted' || chatStatus === 'streaming'
   const hasPendingApproval = hasPendingToolApproval(chatMessages)
-  const isChatInputDisabled = !isApiKeySet || disablePrompts || isLoadingOrganization
+  const supportMetadata = snap.activeChat?.supportMetadata
+  const isSupportChat = !!supportMetadata?.isSupportChat
+  const isSupportChatClosed = isSupportChat && supportMetadata.lifecycleStatus !== 'bot_active'
+  const activeChatId = snap.activeChatId
+  const supportConversationId = supportMetadata?.frontConversationId
+  const isChatInputDisabled =
+    !isApiKeySet || disablePrompts || isLoadingOrganization || isSupportChatClosed
 
   const deleteMessageFromHere = useCallback(
     (messageId: string) => {
@@ -548,6 +554,33 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         </AnimatePresence>
 
         <div className="px-3 pb-3 z-20 relative">
+          {isSupportChat && !isSupportChatClosed && (
+            <div className="mb-3">
+              <div className="mb-3 border-t" />
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="tiny"
+                  disabled={!activeChatId || !supportConversationId}
+                  onClick={() =>
+                    activeChatId && state.setSupportLifecycleStatus(activeChatId, 'escalated')
+                  }
+                >
+                  Escalate to human
+                </Button>
+                <Button
+                  variant="outline"
+                  size="tiny"
+                  disabled={!activeChatId || !supportConversationId}
+                  onClick={() =>
+                    activeChatId && state.setSupportLifecycleStatus(activeChatId, 'user_resolved')
+                  }
+                >
+                  Resolve
+                </Button>
+              </div>
+            </div>
+          )}
           {disablePrompts && (
             <Admonition
               showIcon={false}
@@ -581,10 +614,14 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
             disabled={isChatInputDisabled}
             placeholder={
               hasMessages
-                ? 'Ask a follow up question...'
+                ? isSupportChat
+                  ? 'Share details so the assistant can help with your support request...'
+                  : 'Ask a follow up question...'
                 : (snap.sqlSnippets ?? [])?.length > 0
                   ? 'Ask a question or make a change...'
-                  : 'Chat to Postgres...'
+                  : isSupportChat
+                    ? 'Describe your support issue...'
+                    : 'Chat to Postgres...'
             }
             value={value}
             onValueChange={(e) => setValue(e.target.value)}

@@ -7,6 +7,7 @@ import { createContext, PropsWithChildren, useContext, useEffect, useState } fro
 import { v4 as uuidv4 } from 'uuid'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
+import type { AiSupportStatus } from '@/data/feedback/ai-chat-front-sync'
 import { constructHeaders } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { prepareMessagesForAPI } from '@/lib/ai/message-utils'
@@ -25,12 +26,41 @@ export type SqlSnippet = string | { label: string; content: string }
 
 export type AssistantModel = AssistantModelId
 
+export type SupportChatMetadata = {
+  subject: string
+  category: string
+  severity: string
+  organizationSlug?: string
+  projectRef?: string
+  library?: string
+  affectedServices?: string
+  allowSupportAccess: boolean
+  browserInformation?: string
+  frontConversationId?: string
+  // Front thread_ref shared with the submit-time conversation. Sent as the sync
+  // API `chatId` so AI messages thread into that same Front conversation.
+  threadRef?: string
+  isSupportChat: true
+  lifecycleStatus: AiSupportStatus
+  // A lifecycle transition requested before the Front conversation id existed
+  // (e.g. the assistant resolved the chat before the first message sync
+  // returned an id). Flushed by syncSupportChatToFront once the id is assigned.
+  pendingLifecycleStatus?: AiSupportStatus
+  lifecycleClosedAt?: string
+  lastSyncedMessageCount: number
+  // Guards message syncs; lifecycle syncs use `isLifecycleSyncing` so the two
+  // never block each other.
+  isSyncing: boolean
+  isLifecycleSyncing: boolean
+}
+
 type ChatSession = {
   id: string
   name: string
   messages: AssistantMessageType[]
   createdAt: Date
   updatedAt: Date
+  supportMetadata?: SupportChatMetadata
 }
 
 export type AiAssistantContext = {
@@ -259,6 +289,7 @@ function createChatInstance(
             connectionString: state.context.connectionString,
             chatId: options.id,
             chatName: chat?.name,
+            supportMode: chat?.supportMetadata?.isSupportChat ?? false,
             orgSlug: state.context.orgSlug,
             context: state.context,
             model: state.model,
@@ -270,6 +301,16 @@ function createChatInstance(
     }),
     async onToolCall({ toolCall }) {
       if (toolCall.dynamic) {
+        return
+      }
+
+      if (toolCall.toolName === 'escalate_to_human') {
+        state.setSupportLifecycleStatus(options.id, 'escalated')
+        return
+      }
+
+      if (toolCall.toolName === 'resolve_support_conversation') {
+        state.setSupportLifecycleStatus(options.id, 'bot_resolved')
         return
       }
 
@@ -300,6 +341,13 @@ function createChatInstance(
             state.messageSpanIds[lastAssistantMsg.id] = pendingSpanId
           }
           delete state.pendingSpanIds[options.id]
+        }
+
+        // Sync support chat messages to Front (fire-and-forget, dynamic import to avoid SSR issues)
+        if (chat?.supportMetadata) {
+          import('@/state/ai-chat-front-sync')
+            .then(({ syncSupportChatToFront }) => syncSupportChatToFront(options.id, state))
+            .catch(() => {})
         }
       }
     },
@@ -372,6 +420,28 @@ export const createAiAssistantState = (): AiAssistantState => {
       state.tables = options?.tables ?? INITIAL_AI_ASSISTANT.tables
 
       return chatId
+    },
+
+    setSupportLifecycleStatus: (chatId: string, status: AiSupportStatus) => {
+      const chat = state.chats[chatId]
+      if (!chat?.supportMetadata) return
+
+      chat.supportMetadata.lifecycleStatus = status
+      if (status !== 'bot_active') {
+        chat.supportMetadata.lifecycleClosedAt = new Date().toISOString()
+      }
+
+      // No Front conversation yet (the initial message sync hasn't returned an
+      // id). Queue the transition so syncSupportChatToFront can flush it once the
+      // id is assigned, rather than silently dropping it.
+      if (!chat.supportMetadata.frontConversationId) {
+        chat.supportMetadata.pendingLifecycleStatus = status
+        return
+      }
+
+      import('@/state/ai-chat-front-sync').then(({ syncSupportLifecycleToFront }) => {
+        syncSupportLifecycleToFront(chatId, state, status).catch(() => {})
+      })
     },
 
     selectChat: (id: string) => {
@@ -493,6 +563,20 @@ export const createAiAssistantState = (): AiAssistantState => {
           ? storedModel
           : INITIAL_AI_ASSISTANT.model
 
+      // Reset sync guards on any support chats (can't be mid-sync after reload)
+      Object.values(state.chats).forEach((chat) => {
+        if (chat.supportMetadata) {
+          if (!chat.supportMetadata.isSupportChat) {
+            chat.supportMetadata.isSupportChat = true
+          }
+          if (!chat.supportMetadata.lifecycleStatus) {
+            chat.supportMetadata.lifecycleStatus = 'bot_active'
+          }
+          chat.supportMetadata.isSyncing = false
+          chat.supportMetadata.isLifecycleSyncing = false
+        }
+      })
+
       // Ensure an active chat exists after loading
       if (!state.activeChat) {
         const chatIds = Object.keys(state.chats)
@@ -545,6 +629,7 @@ export type AiAssistantState = AiAssistantData & {
       Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
     >
   ) => string
+  setSupportLifecycleStatus: (chatId: string, status: AiSupportStatus) => void
   selectChat: (id: string) => void
   deleteChat: (id: string) => void
   renameChat: (id: string, name: string) => void
