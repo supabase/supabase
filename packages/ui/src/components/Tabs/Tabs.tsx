@@ -171,7 +171,7 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
       ref={refs?.base}
     >
       <TabsPrimitive.List
-        className={tabsListVariants({ type, scrollable, wrappable })}
+        className={tabsListVariants({ type, scrollable, wrappable, className: listClassNames })}
         ref={refs?.list}
       >
         {addOnBefore}
