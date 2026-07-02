@@ -2977,10 +2977,6 @@ export const telemetry: NavMenuConstant = {
           url: '/guides/telemetry/advanced-log-filtering' as `/${string}`,
         },
         {
-          name: 'Querying Supabase logs',
-          url: '/guides/telemetry/querying-supabase-logs' as `/${string}`,
-        },
-        {
           name: 'Logs field reference',
           url: '/guides/telemetry/log-field-reference' as `/${string}`,
         },
