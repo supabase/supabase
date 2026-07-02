@@ -439,14 +439,12 @@ export default function Page() {
   const og = useRenderedImage(ogEndpoint, showOg)
   const thumb = useRenderedImage(thumbEndpoint, showThumb)
 
+  // Template and background are independent controls — switching templates
+  // must not touch whatever pattern the user already has set. (AI suggestions
+  // still set a pattern explicitly, right after calling this, when the
+  // suggestion includes one — see applySuggestion below.)
   const changeTemplate = (id: string) => {
     setTemplate(id)
-    const t = TEMPLATES.find((x) => x.id === id)
-    if (t) {
-      setPatternType(t.defaultPattern.type as PatternTypeOpt)
-      setPatternScale(normalizeScale(t.defaultPattern.scale as PatternScaleOpt))
-      setPatternOpacity(Math.max(OPACITY_MIN, t.defaultPattern.opacity))
-    }
   }
 
   const [generated, setGenerated] = useState<Suggestion | null>(null)
