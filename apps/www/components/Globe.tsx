@@ -56,7 +56,7 @@ const Globe = () => {
     })
     setTimeout(() => (canvasRef.current.style.opacity = '0.8'), 10)
     return () => {
-      window.removeEventListener('resize', onResize)
+      window.removeEventListener('resize', debouncedResize)
       cobe.destroy()
     }
   }, [resolvedTheme])
