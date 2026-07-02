@@ -78,4 +78,37 @@ describe('buildDucklakeApiConfig', () => {
       },
     })
   })
+
+  it('omits blank custom secret fields when requested', () => {
+    expect(
+      buildDucklakeApiConfig(
+        {
+          catalogUrl: '  ',
+          dataPath: 's3://bucket/path',
+          poolSize: 4,
+          s3AccessKeyId: '',
+          s3SecretAccessKey: '\n',
+          s3Region: 'eu-west-1',
+          s3Endpoint: 's3.example.com',
+          s3UrlStyle: 'path',
+          s3UseSsl: true,
+          metadataSchema: 'ducklake',
+        },
+        { omitBlankSecrets: true }
+      )
+    ).toEqual({
+      ducklake: {
+        catalog_url: undefined,
+        data_path: 's3://bucket/path',
+        pool_size: 4,
+        s3_access_key_id: undefined,
+        s3_secret_access_key: undefined,
+        s3_region: 'eu-west-1',
+        s3_endpoint: 's3.example.com',
+        s3_url_style: 'path',
+        s3_use_ssl: true,
+        metadata_schema: 'ducklake',
+      },
+    })
+  })
 })

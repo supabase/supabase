@@ -2,7 +2,7 @@ import { type DestinationPanelSchemaType } from '../DestinationForm.schema'
 import { DUCKLAKE_MODE_SUPABASE } from './DuckLake.constants'
 
 export type DucklakeApiConfig = {
-  catalog_url: string
+  catalog_url?: string
   data_path: string
   pool_size?: number
   s3_access_key_id?: string
@@ -69,6 +69,12 @@ const DUCKLAKE_CUSTOM_REQUIRED_FIELDS: DucklakeValidationIssue[] = [
   { path: 'ducklakeS3Endpoint', message: 'S3 Endpoint is required' },
 ]
 
+const DUCKLAKE_CUSTOM_SECRET_FIELDS = new Set<DucklakeFieldPath>([
+  'ducklakeCatalogUrl',
+  'ducklakeS3AccessKeyId',
+  'ducklakeS3SecretAccessKey',
+])
+
 // Catalog metadata schema is optional, but must be a valid Postgres identifier when set.
 const METADATA_SCHEMA_PATTERN = /^[A-Za-z0-9_]+$/
 const METADATA_SCHEMA_ISSUE: DucklakeValidationIssue = {
@@ -82,7 +88,8 @@ const getMissingRequiredFieldIssues = (
 ) => requiredFields.filter(({ path }) => !data[path]?.trim().length)
 
 export const getDucklakeValidationIssues = (
-  data: DucklakeValidationData
+  data: DucklakeValidationData,
+  options: { secretsOptional?: boolean } = {}
 ): DucklakeValidationIssue[] => {
   if (data.ducklakeMode === DUCKLAKE_MODE_SUPABASE) {
     const issues = getMissingRequiredFieldIssues(data, DUCKLAKE_SUPABASE_REQUIRED_FIELDS)
@@ -94,7 +101,32 @@ export const getDucklakeValidationIssues = (
     return issues
   }
 
-  const issues = getMissingRequiredFieldIssues(data, DUCKLAKE_CUSTOM_REQUIRED_FIELDS)
+  const requiredFields = options.secretsOptional
+    ? DUCKLAKE_CUSTOM_REQUIRED_FIELDS.filter(({ path }) => !DUCKLAKE_CUSTOM_SECRET_FIELDS.has(path))
+    : DUCKLAKE_CUSTOM_REQUIRED_FIELDS
+  const issues = getMissingRequiredFieldIssues(data, requiredFields)
+
+  if (
+    options.secretsOptional &&
+    data.ducklakeS3SecretAccessKey?.trim().length &&
+    !data.ducklakeS3AccessKeyId?.trim().length
+  ) {
+    issues.push({
+      path: 'ducklakeS3AccessKeyId',
+      message: 'S3 Access Key ID is required',
+    })
+  }
+
+  if (
+    options.secretsOptional &&
+    data.ducklakeS3AccessKeyId?.trim().length &&
+    !data.ducklakeS3SecretAccessKey?.trim().length
+  ) {
+    issues.push({
+      path: 'ducklakeS3SecretAccessKey',
+      message: 'S3 Secret Access Key is required',
+    })
+  }
 
   // Format checks only apply once a value is present; missing values are already flagged above.
   if (

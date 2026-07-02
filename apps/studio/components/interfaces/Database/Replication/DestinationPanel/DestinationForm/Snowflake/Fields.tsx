@@ -5,9 +5,16 @@ import { Button, FormControl, FormField, Input, TextArea } from 'ui'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 
-export const SnowflakeFields = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
+export const SnowflakeFields = ({
+  form,
+  editMode,
+}: {
+  form: UseFormReturn<DestinationPanelSchemaType>
+  editMode: boolean
+}) => {
   const [showPrivateKeyPassphrase, setShowPrivateKeyPassphrase] = useState(false)
 
   return (
@@ -118,14 +125,22 @@ export const SnowflakeFields = ({ form }: { form: UseFormReturn<DestinationPanel
             <FormItemLayout
               layout="horizontal"
               label="Private key"
-              description="RSA private key PEM contents in PKCS#8 or PKCS#1 format"
+              description={
+                editMode
+                  ? 'Stored private key is hidden. Enter a new private key to replace it.'
+                  : 'RSA private key PEM contents in PKCS#8 or PKCS#1 format'
+              }
             >
               <FormControl>
                 <TextArea
                   {...field}
                   rows={8}
                   maxLength={10000}
-                  placeholder={'-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----'}
+                  placeholder={
+                    editMode
+                      ? STORED_SECRET_PLACEHOLDER
+                      : '-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----'
+                  }
                   value={field.value ?? ''}
                   className="font-mono text-xs"
                 />
@@ -141,13 +156,17 @@ export const SnowflakeFields = ({ form }: { form: UseFormReturn<DestinationPanel
             <FormItemLayout
               layout="horizontal"
               label="Private key passphrase"
-              description="Optional passphrase for encrypted private keys"
+              description={
+                editMode
+                  ? 'Stored passphrase setting is hidden. Enter a new passphrase to replace it.'
+                  : 'Optional passphrase for encrypted private keys'
+              }
             >
               <FormControl>
                 <PasswordInput
                   value={field.value ?? ''}
                   type={showPrivateKeyPassphrase ? 'text' : 'password'}
-                  placeholder="Optional"
+                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : 'Optional'}
                   onChange={(event) => field.onChange(event.target.value)}
                   actions={
                     <div className="flex items-center justify-center">

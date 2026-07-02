@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { components } from 'api-types'
 import { toast } from 'sonner'
 
+import { optionalSecret } from './destination-secret-utils'
 import { replicationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -66,9 +67,20 @@ function isDucklakeSupabaseConfig(
   return 'catalogProjectRef' in config
 }
 
+const maybeOmitBlankSecret = (value: string | undefined, omitBlankSecrets: boolean) => {
+  if (omitBlankSecrets) return optionalSecret(value)
+
+  return value
+}
+
 // Maps the studio-side DuckLake config to the snake_case `{ ducklake: ... }` payload accepted
 // by the platform API. Shared by the create / update / validate mutations.
-export function buildDucklakeApiConfig(config: DucklakeDestinationConfig) {
+export function buildDucklakeApiConfig(
+  config: DucklakeDestinationConfig,
+  options: { omitBlankSecrets?: boolean } = {}
+) {
+  const omitBlankSecrets = options.omitBlankSecrets ?? false
+
   if (isDucklakeSupabaseConfig(config)) {
     return {
       ducklake: {
@@ -92,11 +104,11 @@ export function buildDucklakeApiConfig(config: DucklakeDestinationConfig) {
 
   return {
     ducklake: {
-      catalog_url: config.catalogUrl,
+      catalog_url: maybeOmitBlankSecret(config.catalogUrl, omitBlankSecrets),
       data_path: config.dataPath,
       pool_size: config.poolSize,
-      s3_access_key_id: config.s3AccessKeyId,
-      s3_secret_access_key: config.s3SecretAccessKey,
+      s3_access_key_id: maybeOmitBlankSecret(config.s3AccessKeyId, omitBlankSecrets),
+      s3_secret_access_key: maybeOmitBlankSecret(config.s3SecretAccessKey, omitBlankSecrets),
       s3_region: config.s3Region,
       s3_endpoint: config.s3Endpoint,
       s3_url_style: config.s3UrlStyle,
