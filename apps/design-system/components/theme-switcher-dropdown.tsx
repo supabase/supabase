@@ -13,7 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   singleThemes,
-  Theme,
 } from 'ui'
 
 const ThemeSwitcherDropdown = () => {
@@ -59,7 +58,7 @@ const ThemeSwitcherDropdown = () => {
             value={theme}
             onValueChange={(themeValue) => setTheme(themeValue)}
           >
-            {singleThemes.map((theme: Theme) => (
+            {singleThemes.map((theme) => (
               <DropdownMenuRadioItem key={theme.value} value={theme.value}>
                 {theme.name}
               </DropdownMenuRadioItem>

@@ -19,9 +19,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
+  singleThemes,
 } from 'ui'
-import { themes } from 'ui/src/components/ThemeProvider/themes'
-import type { Theme } from 'ui/src/components/ThemeProvider/themes'
 
 interface Props {
   menu: menuItem[][]
@@ -116,11 +115,11 @@ export const AuthenticatedDropdownMenu = ({ user, menu, site }: Props) => {
                           setTheme(value)
                         }}
                       >
-                        {themes
+                        {singleThemes
                           .filter(
                             (x) => x.value === 'light' || x.value === 'dark' || x.value === 'system'
                           )
-                          .map((theme: Theme) => (
+                          .map((theme) => (
                             <DropdownMenuRadioItem
                               key={`${site}-auth-dropdown-theme-${theme.value}`}
                               value={theme.value}

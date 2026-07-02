@@ -43,10 +43,10 @@ jobs:
       - name: Validate exports
         run: |
           pnpm --filter ui-patterns gen:exports
-          if ! git diff --ignore-space-at-eol --exit-code --quiet packages/ui-patterns/package.json then
-            echo "Detected uncommitted changes after build. Run pnpm --filter ui-patterns gen:exports to fix it."
-            git diff
-            exit 1
+          if ! git diff --ignore-space-at-eol --exit-code --quiet packages/ui-patterns/package.json; then
+            echo "Detected uncommitted changes after build. Run pnpm --filter ui-patterns gen:exports to fix it.";
+            git diff;
+            exit 1;
           fi
       - name: Run tests
         run: pnpm run test:ui-patterns

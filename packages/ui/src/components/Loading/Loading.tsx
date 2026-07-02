@@ -1,7 +1,6 @@
 import { Loader2 } from 'lucide-react'
 import React from 'react'
 
-import styleHandler from '../../lib/theme/styleHandler'
 import { cn } from '../../lib/utils/cn'
 
 interface Props {
@@ -10,22 +9,26 @@ interface Props {
   isFullHeight?: boolean
 }
 export default function Loading({ children, active, isFullHeight = false }: Props) {
-  const __styles = styleHandler('loading')
-
-  let classNames = [__styles.base]
-
-  let contentClasses = [__styles.content.base]
-
-  if (active) {
-    contentClasses.push(__styles.content.active)
-  }
-
-  let spinnerClasses = [__styles.spinner]
-
   return (
-    <div className={cn(classNames.join(' '), isFullHeight && 'h-full')}>
-      <div className={cn(contentClasses.join(' '), isFullHeight && 'h-full')}>{children}</div>
-      {active && <Loader2 size={24} className={spinnerClasses.join(' ')} />}
+    <div
+      className={cn('relative', {
+        'opacity-40': active,
+        'h-full': isFullHeight,
+      })}
+    >
+      <div
+        className={cn('transition-opacity duration-300', {
+          'h-full': isFullHeight,
+        })}
+      >
+        {children}
+      </div>
+      {active && (
+        <Loader2
+          size={24}
+          className="absolute text-foreground-lighter animate-spin inset-0 size-5 m-auto"
+        />
+      )}
     </div>
   )
 }

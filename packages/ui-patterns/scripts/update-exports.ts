@@ -48,10 +48,6 @@ function updatePackageJson(exportsMap: ExportMap): void {
 
   packageJson.exports = {
     './package.json': './package.json',
-    '.': {
-      import: './index.tsx',
-      types: './index.tsx',
-    },
     ...exportsMap,
   }
 
