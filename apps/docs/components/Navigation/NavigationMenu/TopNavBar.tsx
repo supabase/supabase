@@ -102,7 +102,7 @@ const HeaderLogo = memo(() => {
       href="/"
       className={cn(
         buttonVariants({ variant: 'default' }),
-        'flex shrink-0 items-center w-fit bg-transparent! border-none! shadow-none!'
+        'flex shrink-0 items-center gap-2 w-fit bg-transparent! border-none! shadow-none!'
       )}
     >
       <Image
