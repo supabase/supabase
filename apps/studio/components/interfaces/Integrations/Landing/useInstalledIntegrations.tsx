@@ -38,7 +38,7 @@ export const useInstalledIntegrations = () => {
   } = useProjectOAuthIntegrationData(project?.ref, { enabled: hasOAuthIntegration })
 
   const {
-    data: wrappersData,
+    data: wrappers = EMPTY_ARR,
     error: fdwError,
     isError: isErrorFDWs,
     isPending: isFDWLoading,
@@ -48,7 +48,7 @@ export const useInstalledIntegrations = () => {
     connectionString: project?.connectionString,
   })
   const {
-    data: extensionsData,
+    data: extensions = EMPTY_ARR,
     error: extensionsError,
     isError: isErrorExtensions,
     isPending: isExtensionsLoading,
@@ -59,7 +59,7 @@ export const useInstalledIntegrations = () => {
   })
 
   const {
-    data: schemasData,
+    data: schemas = EMPTY_ARR,
     error: schemasError,
     isError: isErrorSchemas,
     isPending: isSchemasLoading,
@@ -68,12 +68,6 @@ export const useInstalledIntegrations = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-
-  // These queries hit pg-meta and can return a non-array body when the database
-  // isn't queryable (paused/unhealthy/etc.), so coerce before iterating.
-  const wrappers = Array.isArray(wrappersData) ? wrappersData : EMPTY_ARR
-  const extensions = Array.isArray(extensionsData) ? extensionsData : EMPTY_ARR
-  const schemas = Array.isArray(schemasData) ? schemasData : EMPTY_ARR
 
   const isHooksEnabled = schemas.some((schema) => schema.name === 'supabase_functions')
 
