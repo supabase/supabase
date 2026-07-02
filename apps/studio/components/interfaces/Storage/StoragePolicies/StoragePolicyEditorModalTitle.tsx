@@ -3,7 +3,7 @@ import { ChevronLeft, X } from 'lucide-react'
 import { Dialog as DialogPrimitive } from 'radix-ui'
 import { cn } from 'ui'
 
-import { POLICY_MODAL_VIEWS } from '@/components/interfaces/Auth/Policies/Policies.constants'
+import { POLICY_MODAL_VIEWS } from './PolicyEditorModal/PolicyEditorModal.constants'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { DOCS_URL } from '@/lib/constants'
 

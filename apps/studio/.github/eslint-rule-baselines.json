@@ -122,7 +122,7 @@
       "pages/logout.tsx": 1,
       "pages/new/index.tsx": 1,
       "pages/organizations.tsx": 1,
-      "pages/project/[ref]/auth/policies.tsx": 2,
+      "pages/project/[ref]/database/policies.tsx": 2,
       "pages/project/[ref]/editor/[id].tsx": 1,
       "pages/project/[ref]/integrations/[id]/index.tsx": 1,
       "pages/project/[ref]/settings/jwt/legacy.tsx": 1,

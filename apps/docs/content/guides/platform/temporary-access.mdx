@@ -97,6 +97,12 @@ curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/database/jit" \
 
 ## Using temporary access
 
+<Admonition type="note">
+
+This feature does not work with IPv6 Transaction pooler (PgBouncer). Direct connections and connections through the IPv4 connection pooler are fully supported.
+
+</Admonition>
+
 To log in to the database using temporary access, existing connection strings can be used and only the password needs to be changed to the user's API or dashboard token.
 
 For example, if a user has been authorized to assume the `postgres` role:
@@ -111,8 +117,8 @@ Connecting via the shared connection pooler requires the addition of a new conne
 
 ```
 # directly in the URI
-psql 'postgres://postgres.{project-ref}:sbp_111222333aaabbbccc@aws-1-us-west-1.pooler.supabase.com:5432/postgres?options=-c%20jit%3don'
+psql 'postgres://postgres.{project-ref}:sbp_111222333aaabbbccc@aws-1-us-west-1.pooler.supabase.com:5432/postgres?options=-c%20jit%3dtrue'
 
 # or as a connection info string
-psql "host=aws-1-us-west-1.pooler.supabase.com user=postgres.{project-ref} options='-c jit=on'"
+psql "host=aws-1-us-west-1.pooler.supabase.com user=postgres.{project-ref} options='-c jit=true'"
 ```

@@ -6,6 +6,9 @@ settings:
 
 catalogs:
   default:
+    '@monaco-editor/react':
+      specifier: ^4.7.0
+      version: 4.7.0
     '@sentry/nextjs':
       specifier: ^10.59.0
       version: 10.59.0
@@ -96,18 +99,19 @@ catalogs:
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
+  monaco-editor: 0.52.2
   '@mapbox/node-pre-gyp>tar': ^7.5.11
   '@sentry/webpack-plugin>uuid': ^11.1.1
   '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
-  braintrust>uuid: ^11.1.1
-  mdx-bundler>uuid: ^11.1.1
   braintrust>esbuild: ^0.28.1
+  braintrust>uuid: ^11.1.1
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
   express-rate-limit>ip-address: ^10.1.1
   h3@1: 1.15.11
   lodash: ^4.18.1
   lodash-es: ^4.18.1
+  mdx-bundler>uuid: ^11.1.1
   node-gyp>tar: ^7.5.11
   nodemailer: ^7.0.11
   postcss: ^8.5.10
@@ -927,23 +931,14 @@ importers:
         specifier: ^1.29.0
         version: 1.29.0(supports-color@8.1.1)(zod@3.25.76)
       '@monaco-editor/react':
-        specifier: ^4.6.0
-        version: 4.6.0(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: 'catalog:'
+        version: 4.7.0(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@next/bundle-analyzer':
         specifier: 16.2.3
         version: 16.2.3
       '@number-flow/react':
         specifier: ^0.3.2
         version: 0.3.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      '@radix-ui/react-slider':
-        specifier: ^1.1.2
-        version: 1.3.6(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      '@radix-ui/react-slot':
-        specifier: ^1.2.0
-        version: 1.2.4(@types/react@19.2.14)(react@19.2.6)
-      '@radix-ui/react-visually-hidden':
-        specifier: ^1.2.3
-        version: 1.2.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@sentry/nextjs':
         specifier: 'catalog:'
         version: 10.59.0(@opentelemetry/core@2.8.0(@opentelemetry/api@1.9.1))(@opentelemetry/sdk-trace-base@2.8.0(@opentelemetry/api@1.9.1))(encoding@0.1.13)(next@16.2.6(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react@19.2.6)(supports-color@8.1.1)(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))(webpack@5.105.4(esbuild@0.28.1))
@@ -977,9 +972,6 @@ importers:
       '@supabase/shared-types':
         specifier: 0.1.88
         version: 0.1.88
-      '@supabase/sql-to-rest':
-        specifier: ^0.1.6
-        version: 0.1.6(encoding@0.1.13)(supports-color@8.1.1)
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.108.2
@@ -1091,9 +1083,6 @@ importers:
       idb:
         specifier: ^8.0.2
         version: 8.0.2
-      immutability-helper:
-        specifier: ^3.1.1
-        version: 3.1.1
       ip-num:
         specifier: ^1.5.1
         version: 1.5.1
@@ -1109,9 +1098,6 @@ importers:
       markdown-table:
         specifier: ^3.0.3
         version: 3.0.3
-      memoize-one:
-        specifier: ^5.0.1
-        version: 5.2.1
       mime-db:
         specifier: ^1.53.0
         version: 1.53.0
@@ -1139,9 +1125,6 @@ importers:
       path-to-regexp:
         specifier: ^8.0.0
         version: 8.4.1
-      pg-minify:
-        specifier: ^1.6.3
-        version: 1.6.3
       radix-ui:
         specifier: 'catalog:'
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -1202,9 +1185,6 @@ importers:
       sql-formatter:
         specifier: ^15.0.0
         version: 15.4.9
-      sqlstring:
-        specifier: ^2.3.2
-        version: 2.3.3
       streamdown:
         specifier: ^1.3.0
         version: 1.3.0(@types/react@19.2.14)(react@19.2.6)(supports-color@8.1.1)
@@ -1257,9 +1237,6 @@ importers:
       '@smithy/property-provider':
         specifier: ^4.0.4
         version: 4.0.4
-      '@tailwindcss/container-queries':
-        specifier: ^0.1.1
-        version: 0.1.1(tailwindcss@4.2.4)
       '@tailwindcss/vite':
         specifier: 4.2.4
         version: 4.2.4(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))
@@ -1293,9 +1270,6 @@ importers:
       '@types/lodash':
         specifier: ^4.14.172
         version: 4.17.5
-      '@types/markdown-table':
-        specifier: ^3.0.0
-        version: 3.0.0
       '@types/mime-db':
         specifier: ^1.43.5
         version: 1.43.5
@@ -1311,12 +1285,6 @@ importers:
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.14
-      '@types/react-beautiful-dnd':
-        specifier: ^13.1.2
-        version: 13.1.5
-      '@types/react-datepicker':
-        specifier: ^4.3.4
-        version: 4.15.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@types/react-dom':
         specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
@@ -1326,12 +1294,6 @@ importers:
       '@types/react-simple-maps':
         specifier: ^3.0.1
         version: 3.0.4
-      '@types/recharts':
-        specifier: ^1.8.23
-        version: 1.8.25
-      '@types/sqlstring':
-        specifier: ^2.3.0
-        version: 2.3.0
       '@types/zxcvbn':
         specifier: ^4.4.1
         version: 4.4.2
@@ -1398,9 +1360,6 @@ importers:
       require-in-the-middle:
         specifier: ^8.0.0
         version: 8.0.1(supports-color@8.1.1)
-      tailwindcss:
-        specifier: 'catalog:'
-        version: 4.2.4
       tsconfig:
         specifier: workspace:*
         version: link:../../packages/tsconfig
@@ -1426,8 +1385,8 @@ importers:
         specifier: ^3.1.1
         version: 3.3.1(react-hook-form@7.72.1(react@19.2.6))
       '@monaco-editor/react':
-        specifier: ^4.6.0
-        version: 4.7.0(monaco-editor@0.55.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: 'catalog:'
+        version: 4.7.0(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@react-router/fs-routes':
         specifier: ^7.4.0
         version: 7.4.0(@react-router/dev@7.13.2(@react-router/serve@7.17.0(react-router@7.17.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(supports-color@8.1.1)(typescript@6.0.2))(@types/node@22.13.14)(babel-plugin-macros@3.1.0)(jiti@2.7.0)(lightningcss@1.32.0)(react-router@7.17.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(sass@1.77.4)(supports-color@8.1.1)(terser@5.39.0)(tsx@4.22.4)(typescript@6.0.2)(vite@8.0.16(@types/node@22.13.14)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))(yaml@2.9.0))(typescript@6.0.2)
@@ -1486,8 +1445,8 @@ importers:
         specifier: '*'
         version: 0.436.0(react@19.2.6)
       monaco-editor:
-        specifier: ^0.55.1
-        version: 0.55.1
+        specifier: 0.52.2
+        version: 0.52.2
       next:
         specifier: 'catalog:'
         version: 16.2.6(@babel/core@7.29.7(supports-color@8.1.1))(@opentelemetry/api@1.9.1)(@playwright/test@1.59.1)(babel-plugin-macros@3.1.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
@@ -1559,7 +1518,7 @@ importers:
         version: 1.1.2(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       y-monaco:
         specifier: ^0.1.6
-        version: 0.1.6(monaco-editor@0.55.1)(yjs@13.6.29)
+        version: 0.1.6(monaco-editor@0.52.2)(yjs@13.6.29)
       y-protocols:
         specifier: ^1.0.7
         version: 1.0.7(yjs@13.6.29)
@@ -2569,8 +2528,8 @@ importers:
         specifier: ^3.1.1
         version: 3.3.1(react-hook-form@7.72.1(react@19.2.6))
       '@monaco-editor/react':
-        specifier: ^4.6.0
-        version: 4.6.0(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+        specifier: 'catalog:'
+        version: 4.7.0(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@std/toml':
         specifier: jsr:^1.0.11
         version: '@jsr/std__toml@1.0.11'
@@ -2629,7 +2588,7 @@ importers:
         specifier: ^11.12.1
         version: 11.15.0(supports-color@8.1.1)
       monaco-editor:
-        specifier: '*'
+        specifier: 0.52.2
         version: 0.52.2
       next:
         specifier: 'catalog:'
@@ -4659,25 +4618,13 @@ packages:
       '@cfworker/json-schema':
         optional: true
 
-  '@monaco-editor/loader@1.4.0':
-    resolution: {integrity: sha512-00ioBig0x642hytVspPl7DbQyaSWRaolYie/UFNjoTdvoKPzo6xrXLhTk9ixgIKcLH5b5vDOjVNiGyY+uDCUlg==}
-    peerDependencies:
-      monaco-editor: '>= 0.21.0 < 1'
-
   '@monaco-editor/loader@1.5.0':
     resolution: {integrity: sha512-hKoGSM+7aAc7eRTRjpqAZucPmoNOC4UUbknb/VNoTkEIkCPhqV8LfbsgM1webRM7S/z21eHEx9Fkwx8Z/C/+Xw==}
-
-  '@monaco-editor/react@4.6.0':
-    resolution: {integrity: sha512-RFkU9/i7cN2bsq/iTkurMWOEErmYcY6JiQI3Jn+WeR/FGISH8JbHERjpS9oRuSOPvDMJI0Z8nJeKkbOs9sBYQw==}
-    peerDependencies:
-      monaco-editor: '>= 0.25.0 < 1'
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
 
   '@monaco-editor/react@4.7.0':
     resolution: {integrity: sha512-cyzXQCtO47ydzxpQtCGSQGOC8Gk3ZUeBXFAxD+CWXYFo5OqZyZUonFl0DwUlTyAfRHntBfw2p3w4s9R6oe1eCA==}
     peerDependencies:
-      monaco-editor: '>= 0.25.0 < 1'
+      monaco-editor: 0.52.2
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -5838,9 +5785,6 @@ packages:
 
   '@polka/url@1.0.0-next.25':
     resolution: {integrity: sha512-j7P6Rgr3mmtdkeDGTe0E/aYyWEWVtc5yFXtHCRHs28/jptDEWfaVOc5T7cblqy1XKPPfCxJc/8DwQ5YgLOZOVQ==}
-
-  '@popperjs/core@2.11.8':
-    resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
 
   '@poppinss/colors@4.1.6':
     resolution: {integrity: sha512-H9xkIdFswbS8n1d6vmRd8+c10t2Qe+rZITbbDHHkQixH5+2x1FDGmi/0K+WgWiqQFKPSlIYB7jlH6Kpfn6Fleg==}
@@ -7787,11 +7731,6 @@ packages:
   '@swc/helpers@0.5.15':
     resolution: {integrity: sha512-JQ5TuMi45Owi4/BIMAJBoSQoOJu12oOk/gADqlcUL9JEdHB8vyjUSsxqeNXnmXHjYKMi2WcYtezGEEhqUI/E2g==}
 
-  '@tailwindcss/container-queries@0.1.1':
-    resolution: {integrity: sha512-p18dswChx6WnTSaJCSGx6lTmrGzNNvm2FtXmiO6AuA1V4U5REyoqwmT6kgAsIMdjo07QdAfYXHJ4hnMtfHzWgA==}
-    peerDependencies:
-      tailwindcss: '>=3.2.0'
-
   '@tailwindcss/forms@0.5.11':
     resolution: {integrity: sha512-h9wegbZDPurxG22xZSoWtdzc41/OlNEUQERNqI/0fOwa2aVlWGu7C35E/x6LDyD3lgtztFSSjKZyuVM0hxhbgA==}
     peerDependencies:
@@ -8369,9 +8308,6 @@ packages:
   '@types/d3-selection@3.0.10':
     resolution: {integrity: sha512-cuHoUgS/V3hLdjJOLTT691+G2QoqAjCVLmr4kJXR4ha56w1Zdu8UUQ5TxLRqudgNjwXeQxKMq4j+lyf9sWuslg==}
 
-  '@types/d3-shape@1.3.9':
-    resolution: {integrity: sha512-NX8FSlYqN4MPjiOwJAu5a3y6iEj7lS8nb8zP5dQpHOWh24vMJLTXno7c7wm72SfTFNAalfvZVsatMUrEa686gg==}
-
   '@types/d3-shape@3.1.3':
     resolution: {integrity: sha512-cHMdIq+rhF5IVwAV7t61pcEXfEHsEsrbBUPkFGBwTXuxtTAkBBrnrNA8++6OWm3jwVsXoZYQM8NEekg6CPJ3zw==}
 
@@ -8487,10 +8423,6 @@ packages:
     resolution: {integrity: sha512-s84fKOrzqqNCAPljhVyC5TjAo6BH4jKHw9NRNFNiRUY5QSgZCmVm5XILlWbisiKl+0OcS7eWihmKGS5akc2iQw==}
     deprecated: This is a stub types definition. lz-string provides its own type definitions, so you do not need this installed.
 
-  '@types/markdown-table@3.0.0':
-    resolution: {integrity: sha512-vX5zya26rnLLHdAKA3E9ZOT07CJslYp2gZfAZiXKUY5vd2RRiJyOQKrSlmUjyJ+eNoDAPkHflebG3PsfqC32aA==}
-    deprecated: This is a stub types definition. markdown-table provides its own type definitions, so you do not need this installed.
-
   '@types/mdast@3.0.15':
     resolution: {integrity: sha512-LnwD+mUEfxWMa1QpDraczIn6k0Ee3SMicuYSSzS6ZYl2gKS09EClnJYGd8Du6rfc5r/GZEk5o1mRb8TaTj03sQ==}
 
@@ -8542,14 +8474,8 @@ packages:
   '@types/randombytes@2.0.3':
     resolution: {integrity: sha512-+NRgihTfuURllWCiIAhm1wsJqzsocnqXM77V/CalsdJIYSRGEHMnritxh+6EsBklshC+clo1KgnN14qgSGeQdw==}
 
-  '@types/react-beautiful-dnd@13.1.5':
-    resolution: {integrity: sha512-mzohmMtV48b0bXF2dP8188LzUv9HAGHKucOORYsd5Sqq830pJ4gseFyDDAH0TR4TeD1ceG9DxTQ0FOFbtCSy4Q==}
-
   '@types/react-copy-to-clipboard@5.0.5':
     resolution: {integrity: sha512-en3JGqPA4RX4aUlo6q6uUbnqLp31Dhm2E/thiMvFTIvU+dUDG249jBG2MJ0rPMXE/MbKVrpmi/1r1G4QLhIHKQ==}
-
-  '@types/react-datepicker@4.15.1':
-    resolution: {integrity: sha512-6/LthK0pTDBKjjVJqA2ygY3jJsHH7uZXIk8WPQcGHUiFOQLOKIv3krOxFZ2mt3BB3guMB6jVTc6ansQAd0r7xQ==}
 
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
@@ -8568,17 +8494,11 @@ packages:
   '@types/react@19.2.14':
     resolution: {integrity: sha512-ilcTH/UniCkMdtexkoCN0bI7pMcJDvmQFPvuPvmEaYA/NSfFTAgdUSLAoVjaRJm7+6PvcM+q1zYOwS4wTYMF9w==}
 
-  '@types/recharts@1.8.25':
-    resolution: {integrity: sha512-n00qkrMF77KJ3yaxXlomOv/dIgLKvkI84Js6AoZzhqz2F+RRJAIrLYU6gDnOUM1JsgT2+dMNmnOQ2kgdqTX7fA==}
-
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
 
   '@types/resolve@1.20.6':
     resolution: {integrity: sha512-A4STmOXPhMUtHH+S6ymgE2GiBSMqf4oTvcQZMcHzokuTLVYzXTB8ttjcgxOVaAp2lGwEdzZ0J+cRbbeevQj1UQ==}
-
-  '@types/sqlstring@2.3.0':
-    resolution: {integrity: sha512-kMFecDYYFk/f5fljO0UFrSPwU1JxY4mIjX6ic7MHv5nD6sEd3NYLoWcOV/3s6Drs7RHdCwTQdD5NdgVl0I2zzg==}
 
   '@types/stats.js@0.17.3':
     resolution: {integrity: sha512-pXNfAD3KHOdif9EQXZ9deK82HVNaXP5ZIF5RP2QG6OQFNTaY2YIetfrE9t528vEreGQvEPRDDc8muaoYeK0SxQ==}
@@ -12041,9 +11961,6 @@ packages:
   immer@10.1.1:
     resolution: {integrity: sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==}
 
-  immutability-helper@3.1.1:
-    resolution: {integrity: sha512-Q0QaXjPjwIju/28TsugCHNEASwoCcJSyJV3uO1sOIQGI0jKgm9f41Lvz0DZj3n46cNCyAZTsEYoY4C2bVRUzyQ==}
-
   immutable@3.8.3:
     resolution: {integrity: sha512-AUY/VyX0E5XlibOmWt10uabJzam1zlYjwiEgQSDc5+UIkFNaF9WM0JxXKaNMGf+F/ffUF+7kRKXM9A7C0xXqMg==}
     engines: {node: '>=0.10.0'}
@@ -13076,11 +12993,6 @@ packages:
   markdown-wasm@1.2.0:
     resolution: {integrity: sha512-S12OTkyXCkOgI1n1rZY9cg4bK/PGu80Emjpvwp8BEjwCxhPV3yddF0U6+QhCitdBsI1tzWcoeahmW7k0Pq81OA==}
 
-  marked@14.0.0:
-    resolution: {integrity: sha512-uIj4+faQ+MgHgwUW1l2PsPglZLOLOT1uErt06dAPtx2kjteLAkbsd/0FiYg/MGS+i7ZKLb7w2WClxHkzOOuryQ==}
-    engines: {node: '>= 18'}
-    hasBin: true
-
   marked@16.3.0:
     resolution: {integrity: sha512-K3UxuKu6l6bmA5FUwYho8CfJBlsUWAooKtdGgMcERSpF7gcBUrCGsLH7wDaaNOzwq18JzSUDyoEb/YsrqMac3w==}
     engines: {node: '>= 20'}
@@ -13234,9 +13146,6 @@ packages:
   memfs@4.14.1:
     resolution: {integrity: sha512-Fq5CMEth+2iprLJ5mNizRcWuiwRZYjNkUD0zKk224jZunE9CRacTRDK8QLALbMBlNX2y3nY6lKZbesCwDwacig==}
     engines: {node: '>= 4.0.0'}
-
-  memoize-one@5.2.1:
-    resolution: {integrity: sha512-zYiwtZUcYyXKo/np96AGZAckk+FWWsUdJ3cHGGmld7+AhvcWmQyGCYUh1hc4Q/pkOhb65dQR/pqCyK0cOaHz4Q==}
 
   memorystream@0.3.1:
     resolution: {integrity: sha512-S3UwM3yj5mtUSEfP41UZmt/0SCoVYUcU1rkXv+BQ5Ig8ndL4sPoJNBUJERafdPb5jjHJGuMgytgKvKIf58XNBw==}
@@ -13653,14 +13562,11 @@ packages:
   monaco-editor@0.52.2:
     resolution: {integrity: sha512-GEQWEZmfkOGLdd3XK8ryrfWz3AIP8YymVXiPHEdewrUq7mh0qrKrfHLNCXcbB6sTnMLnOZ3ztSiKcciFUkIJwQ==}
 
-  monaco-editor@0.55.1:
-    resolution: {integrity: sha512-jz4x+TJNFHwHtwuV9vA9rMujcZRb0CEilTEwG2rRSpe/A7Jdkuj8xPKttCgOh+v/lkHy7HsZ64oj+q3xoAFl9A==}
-
   monaco-graphql@1.7.3:
     resolution: {integrity: sha512-6LAIcg/vT2NGLjHnT+5iIZONsZCaCuz2orbg7qD/u4Ry9R7rDotLh0HAzIF/yKdzEA5fTZC+TofSx2O+Zi+0ow==}
     peerDependencies:
       graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
-      monaco-editor: '>= 0.20.0 < 0.53'
+      monaco-editor: 0.52.2
       prettier: ^2.8.0 || ^3.0.0
 
   moo@0.5.2:
@@ -14470,10 +14376,6 @@ packages:
     resolution: {integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==}
     engines: {node: '>=4.0.0'}
 
-  pg-minify@1.6.3:
-    resolution: {integrity: sha512-NoSsPqXxbkD8RIe+peQCqiea4QzXgosdTKY8p7PsbbGsh2F8TifDj/vJxfuR8qJwNYrijdSs7uf0tAe6WOyCsQ==}
-    engines: {node: '>=12.0.0'}
-
   pg-numeric@1.0.2:
     resolution: {integrity: sha512-BM/Thnrw5jm2kKLE5uJkXqqExRUY/toLHda65XgFTBTFYZyopbKjBe29Ii3RbkvlsMoFwD+tHeGaCjjv0gHlyw==}
     engines: {node: '>=4'}
@@ -15042,9 +14944,6 @@ packages:
     peerDependencies:
       react: '>=16.13.1'
 
-  react-fast-compare@3.2.2:
-    resolution: {integrity: sha512-nsO+KSNgo1SbJqJEYRE9ERzo7YtYbou/OqjSQKxV7jcKox7+usiUVZOAC+XnDOABXggQTno0Y1CpVnuWEc1boQ==}
-
   react-from-dom@0.6.2:
     resolution: {integrity: sha512-qvWWTL/4xw4k/Dywd41RBpLQUSq97csuv15qrxN+izNeLYlD9wn5W8LspbfYe5CWbaSdkZ72BsaYBPQf2x4VbQ==}
     peerDependencies:
@@ -15096,13 +14995,6 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-
-  react-popper@2.3.0:
-    resolution: {integrity: sha512-e1hj8lL3uM+sgSR4Lxzn5h1GxBlpa4CQz0XLF8kx4MDrDRWY0Ena4c97PUeSX9i5W3UAfDP0z0FXCTQkoXUl3Q==}
-    peerDependencies:
-      '@popperjs/core': ^2.0.0
-      react: ^16.8.0 || ^17 || ^18
-      react-dom: ^16.8.0 || ^17 || ^18
 
   react-refresh@0.14.2:
     resolution: {integrity: sha512-jCvmsr+1IUSMUyzOkRcvnVbX3ZYC6g9TDrDbFuFmRDq7PD4yaGbLKNQL6k2jnArV8hjYxh7hVhAZB6s9HDGpZA==}
@@ -15963,10 +15855,6 @@ packages:
 
   sql-parser-cst@0.38.2:
     resolution: {integrity: sha512-4SR3cZYMxG4gsmvZQSQYYzzfk20OnbpsnwOVbU6Fw39ORLPpIHCMqoX5li0dz+ZWyF5HeR+mSgbgayKhN4JR9w==}
-
-  sqlstring@2.3.3:
-    resolution: {integrity: sha512-qC9iz2FlN7DQl3+wjwn3802RTyjCx7sDvfQEXchwa6CWOx07/WVfh91gBmQ9fahw8snwGEWU3xGzOt4tFyHLxg==}
-    engines: {node: '>= 0.6'}
 
   srvx@0.11.16:
     resolution: {integrity: sha512-bp07zRuycfTY43IjAvvTFnmnJi8ikW0VFiHwOhhYcVW/L4xQ1XY4PAd4Nuum1rsA17C39zL7x+CDhrn5AL32Rw==}
@@ -17470,7 +17358,7 @@ packages:
     resolution: {integrity: sha512-sYRywMmcylt+Nupl+11AvizD2am06ST8lkVbUXuaEmrtV6Tf+TD4rsEm6u9YGGowYue+Vfg1IJ97SUP2J+PVXg==}
     engines: {node: '>=12.0.0', npm: '>=6.0.0'}
     peerDependencies:
-      monaco-editor: '>=0.20.0'
+      monaco-editor: 0.52.2
       yjs: ^13.3.1
 
   y-protocols@1.0.7:
@@ -20304,26 +20192,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@monaco-editor/loader@1.4.0(monaco-editor@0.52.2)':
-    dependencies:
-      monaco-editor: 0.52.2
-      state-local: 1.0.7
-
   '@monaco-editor/loader@1.5.0':
     dependencies:
       state-local: 1.0.7
 
-  '@monaco-editor/react@4.6.0(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
-    dependencies:
-      '@monaco-editor/loader': 1.4.0(monaco-editor@0.52.2)
-      monaco-editor: 0.52.2
-      react: 19.2.6
-      react-dom: 19.2.6(react@19.2.6)
-
-  '@monaco-editor/react@4.7.0(monaco-editor@0.55.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+  '@monaco-editor/react@4.7.0(monaco-editor@0.52.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
     dependencies:
       '@monaco-editor/loader': 1.5.0
-      monaco-editor: 0.55.1
+      monaco-editor: 0.52.2
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
 
@@ -21411,8 +21287,6 @@ snapshots:
       playwright: 1.59.1
 
   '@polka/url@1.0.0-next.25': {}
-
-  '@popperjs/core@2.11.8': {}
 
   '@poppinss/colors@4.1.6':
     dependencies:
@@ -23550,10 +23424,6 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@tailwindcss/container-queries@0.1.1(tailwindcss@4.2.4)':
-    dependencies:
-      tailwindcss: 4.2.4
-
   '@tailwindcss/forms@0.5.11(tailwindcss@4.2.4)':
     dependencies:
       mini-svg-data-uri: 1.4.4
@@ -24051,7 +23921,7 @@ snapshots:
       srvx: 0.11.16
       tinyglobby: 0.2.17
       ufo: 1.6.4
-      vitefu: 1.1.1(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))
+      vitefu: 1.1.1(vite@8.0.16(@types/node@22.13.14)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))
       xmlbuilder2: 4.0.3
       zod: 4.4.3
     optionalDependencies:
@@ -24084,7 +23954,7 @@ snapshots:
       srvx: 0.11.16
       tinyglobby: 0.2.17
       ufo: 1.6.4
-      vitefu: 1.1.1(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))
+      vitefu: 1.1.1(vite@8.0.16(@types/node@22.13.14)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))
       xmlbuilder2: 4.0.3
       zod: 4.4.3
     optionalDependencies:
@@ -24302,10 +24172,6 @@ snapshots:
 
   '@types/d3-selection@3.0.10': {}
 
-  '@types/d3-shape@1.3.9':
-    dependencies:
-      '@types/d3-path': 1.0.9
-
   '@types/d3-shape@3.1.3':
     dependencies:
       '@types/d3-path': 1.0.9
@@ -24445,10 +24311,6 @@ snapshots:
     dependencies:
       lz-string: 1.5.0
 
-  '@types/markdown-table@3.0.0':
-    dependencies:
-      markdown-table: 3.0.3
-
   '@types/mdast@3.0.15':
     dependencies:
       '@types/unist': 2.0.8
@@ -24507,23 +24369,9 @@ snapshots:
     dependencies:
       '@types/node': 22.13.14
 
-  '@types/react-beautiful-dnd@13.1.5':
-    dependencies:
-      '@types/react': 19.2.14
-
   '@types/react-copy-to-clipboard@5.0.5':
     dependencies:
       '@types/react': 19.2.14
-
-  '@types/react-datepicker@4.15.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
-    dependencies:
-      '@popperjs/core': 2.11.8
-      '@types/react': 19.2.14
-      date-fns: 2.30.0
-      react-popper: 2.3.0(@popperjs/core@2.11.8)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-    transitivePeerDependencies:
-      - react
-      - react-dom
 
   '@types/react-dom@19.2.3(@types/react@19.2.14)':
     dependencies:
@@ -24548,16 +24396,9 @@ snapshots:
     dependencies:
       csstype: 3.2.3
 
-  '@types/recharts@1.8.25':
-    dependencies:
-      '@types/d3-shape': 1.3.9
-      '@types/react': 19.2.14
-
   '@types/resolve@1.20.2': {}
 
   '@types/resolve@1.20.6': {}
-
-  '@types/sqlstring@2.3.0': {}
 
   '@types/stats.js@0.17.3': {}
 
@@ -28666,8 +28507,6 @@ snapshots:
   immer@10.1.1:
     optional: true
 
-  immutability-helper@3.1.1: {}
-
   immutable@3.8.3: {}
 
   immutable@4.3.8:
@@ -29669,8 +29508,6 @@ snapshots:
 
   markdown-wasm@1.2.0: {}
 
-  marked@14.0.0: {}
-
   marked@16.3.0: {}
 
   math-intrinsics@1.1.0: {}
@@ -30059,8 +29896,6 @@ snapshots:
       '@jsonjoy.com/util': 1.5.0(tslib@2.8.1)
       tree-dump: 1.0.1(tslib@2.8.1)
       tslib: 2.8.1
-
-  memoize-one@5.2.1: {}
 
   memorystream@0.3.1: {}
 
@@ -30801,11 +30636,6 @@ snapshots:
   module-details-from-path@1.0.4: {}
 
   monaco-editor@0.52.2: {}
-
-  monaco-editor@0.55.1:
-    dependencies:
-      dompurify: 3.4.11
-      marked: 14.0.0
 
   monaco-graphql@1.7.3(graphql@16.11.0)(monaco-editor@0.52.2)(prettier@3.8.1):
     dependencies:
@@ -31919,8 +31749,6 @@ snapshots:
 
   pg-int8@1.0.1: {}
 
-  pg-minify@1.6.3: {}
-
   pg-numeric@1.0.2: {}
 
   pg-pool@3.10.1(pg@8.16.3):
@@ -32525,8 +32353,6 @@ snapshots:
       '@babel/runtime': 7.26.10
       react: 19.2.6
 
-  react-fast-compare@3.2.2: {}
-
   react-from-dom@0.6.2(react@19.2.6):
     dependencies:
       react: 19.2.6
@@ -32585,14 +32411,6 @@ snapshots:
     dependencies:
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
-
-  react-popper@2.3.0(@popperjs/core@2.11.8)(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
-    dependencies:
-      '@popperjs/core': 2.11.8
-      react: 19.2.6
-      react-dom: 19.2.6(react@19.2.6)
-      react-fast-compare: 3.2.2
-      warning: 4.0.3
 
   react-refresh@0.14.2: {}
 
@@ -33779,8 +33597,6 @@ snapshots:
       nearley: 2.20.1
 
   sql-parser-cst@0.38.2: {}
-
-  sqlstring@2.3.3: {}
 
   srvx@0.11.16: {}
 
@@ -35030,7 +34846,7 @@ snapshots:
       tsx: 4.22.4
       yaml: 2.9.0
 
-  vitefu@1.1.1(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0)):
+  vitefu@1.1.1(vite@8.0.16(@types/node@22.13.14)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0)):
     optionalDependencies:
       vite: 8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0)
 
@@ -35390,10 +35206,10 @@ snapshots:
 
   xtend@4.0.2: {}
 
-  y-monaco@0.1.6(monaco-editor@0.55.1)(yjs@13.6.29):
+  y-monaco@0.1.6(monaco-editor@0.52.2)(yjs@13.6.29):
     dependencies:
       lib0: 0.2.117
-      monaco-editor: 0.55.1
+      monaco-editor: 0.52.2
       yjs: 13.6.29
 
   y-protocols@1.0.7(yjs@13.6.29):

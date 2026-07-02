@@ -48,6 +48,7 @@ const TopNavBar: FC = () => {
             <div className="flex gap-2 items-center">
               <DevToolbarTrigger />
               <CommandMenuTriggerInput
+                className="[&>div>p]:text-foreground-lighter"
                 placeholder={
                   <>
                     Search

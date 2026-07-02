@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ArrowRight } from 'lucide-react'
+import { AlertTriangle, ArrowRight } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Alert,
@@ -84,6 +84,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
     anyDiskAttributeChange,
     showThroughputRow,
     hasAnyBreakdownRows,
+    hasExtendedDowntimeRisk,
     oldComputeLabel,
     newComputeLabel,
   } = useDiskManagementReviewChanges(form, numReplicas)
@@ -265,6 +266,20 @@ export const DiskManagementReviewAndSubmitDialog = ({
               </div>
             )}
           </div>
+        )}
+
+        {hasExtendedDowntimeRisk && (
+          <>
+            <DialogSectionSeparator />
+            <DialogSection>
+              <Alert variant="warning">
+                <AlertTriangle />
+                <AlertTitle>
+                  Resizes may require more downtime than normal on this project.
+                </AlertTitle>
+              </Alert>
+            </DialogSection>
+          </>
         )}
 
         <DialogFooter className="px-5 py-4">

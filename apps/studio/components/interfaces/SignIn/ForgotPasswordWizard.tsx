@@ -76,6 +76,7 @@ const ConfirmResetCodeForm = ({ email }: { email: string }) => {
     <Form {...codeForm}>
       <form
         id="code-input-form"
+        method="POST"
         className="flex flex-col pt-4 space-y-4"
         onSubmit={codeForm.handleSubmit(onCodeEntered)}
       >
@@ -148,6 +149,7 @@ const ForgotPasswordForm = ({ onSuccess }: { onSuccess: (email: string) => void 
     <Form {...forgotPasswordForm}>
       <form
         id="forgot-password-form"
+        method="POST"
         className="flex flex-col pt-4 space-y-4"
         onSubmit={forgotPasswordForm.handleSubmit(onForgotPassword)}
       >

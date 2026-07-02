@@ -1,5 +1,4 @@
 import '@/styles/code.css'
-import '@/styles/editor.css'
 import '@/styles/focus.css'
 import '@/styles/globals.css'
 import '@/styles/graphiql-base.css'
@@ -53,7 +52,7 @@ import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalEr
 import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { getCLIReleaseVersion } from '@/data/misc/cli-release-version-query'
 import { useRootQueryClient } from '@/data/query-client'
-import { customFont, sourceCodePro } from '@/fonts'
+import { inter, manrope, sourceCodePro } from '@/fonts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { AuthProvider } from '@/lib/auth'
@@ -119,18 +118,14 @@ const TimestampInfoTimezoneBridge = ({ children }: { children: React.ReactNode }
   return <TimestampInfoProvider timezone={timezone}>{children}</TimestampInfoProvider>
 }
 
-loader.config({
-  // [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
-  // locally. We're however, only storing the assets which we need (based on what the network tab loads
-  // while using monaco). If we end up facing more effort trying to maintain this, probably to either
-  // use cloudflare or find some way to pull all the files from a CDN via a CLI, rather than tracking individual files
-  // The alternative was to import * as monaco from 'monaco-editor' but i couldn't get it working
-  paths: {
-    vs: IS_PLATFORM
-      ? 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs'
-      : `${BASE_PATH}/monaco-editor`,
-  },
-})
+// [Ivan] Serve the Monaco assets locally from the public folder. The worker bootstrap
+// (vs/base/worker/workerMain.js) loads the language workers (e.g. tsWorker.js) via fetch()
+// from inside the web worker. A root-relative path fails to resolve there in some browsers
+// (Firefox throws "... is not a valid URL"), so we point `vs` at an absolute URL including
+// the origin. Guarded on `window` since this module is also evaluated during SSR.
+if (typeof window !== 'undefined') {
+  loader.config({ paths: { vs: `${window.location.origin}${BASE_PATH}/monaco-editor/vs` } })
+}
 
 // [Joshen TODO] Once we settle on the new nav layout - we'll need a lot of clean up in terms of our layout components
 // a lot of them are unnecessary and introduce way too many cluttered CSS especially with the height styles that make
@@ -191,7 +186,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                         {/* [Alaister]: This has to be an inline style tag here and not a separate component due to next/font */}
                         <style
                           dangerouslySetInnerHTML={{
-                            __html: `:root{--font-custom:${customFont.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
+                            __html: `:root{--font-sans:${inter.style.fontFamily};--font-heading:${manrope.style.fontFamily};--font-source-code-pro:${sourceCodePro.style.fontFamily};}`,
                           }}
                         />
                         {/* Speed up initial API loading times by pre-connecting to the API domain */}

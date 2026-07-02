@@ -345,7 +345,7 @@ const stateOfStartupsData = {
           eyebrow: 'Older is the new younger',
           title: 'Founders 40 and older grew from 18% to 25%.',
           description:
-            'Every age band above 40 grew by a statistically significant margin. The 22 to 29 cohort shrank by 5%. Seasoned operators are filling the gap, often with AI doing the typing.',
+            'Every age band above 40 grew by a statistically significant margin. The 22 to 29 cohort shrank by 4%. Seasoned operators are filling the gap, often with AI doing the typing.',
           pullQuote: {
             quote: 'It has allowed me to build the vision that has been in my head for decades',
             author: 'Mazz Ink',
@@ -362,7 +362,7 @@ const stateOfStartupsData = {
           eyebrow: 'From anywhere',
           title: 'You can build a great company from anywhere now.',
           description:
-            'The top metros are still the top metros. But AI has flattened the development gap everywhere else. Europe grew 4%; Africa grew 2%. Startups are setting up across Toronto, Chicago, Denver, and Austin, and throughout Europe, Asia, and Africa.',
+            'The top metros are still the top metros. But AI has flattened the development gap everywhere else. Europe and Africa grew 3%. Startups are setting up across Toronto, Chicago, Denver, and Austin, and throughout Europe, Asia, and Africa.',
           pullQuote: {
             quote:
               'Speed of iteration is mind blowing. Even non-technical people can now translate creativity and ideas into tangible assets.',
@@ -486,7 +486,7 @@ const stateOfStartupsData = {
           eyebrow: 'Model providers',
           title: 'Anthropic is the default model provider.',
           description:
-            'Anthropic/Claude climbed from 38% to 64%; OpenAI fell from 69% to 51%. Gemini entered at 44%. Hugging Face and custom models lost material share, a sign fewer teams run their own inference.',
+            'Anthropic/Claude climbed from 38% to 64%; OpenAI fell from 69% to 52%. Gemini entered at 44%. Hugging Face and custom models lost material share, a sign fewer teams run their own inference.',
           stats: [
             stat('use Anthropic models', 'ai_models_used', 'multi', 'Anthropic/Claude'),
             stat('use OpenAI models', 'ai_models_used', 'multi', 'OpenAI'),
@@ -507,7 +507,7 @@ const stateOfStartupsData = {
       shortTitle: 'AI-written code',
       title: 'AI-generated code is the median experience.',
       description:
-        '62% of startups have more than half their codebase written by AI. 40% are at 76 to 100%. Only 2% are at zero. Older founders use it more heavily than younger ones, and non-technical founders more than technical ones.',
+        '61% of startups have more than half their codebase written by AI. 40% are at 76 to 100%. Only 2% are at zero. Older founders use it more heavily than younger ones, and non-technical founders more than technical ones.',
       sections: [
         {
           id: 'ai-codebase',

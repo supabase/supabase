@@ -516,6 +516,7 @@ export const MARKDOWN_SLUGS: readonly string[] = [
   "storage/buckets/fundamentals",
   "storage/cdn/fundamentals",
   "storage/cdn/metrics",
+  "storage/cdn/purge-cdn-cache",
   "storage/cdn/smart-cdn",
   "storage/debugging/error-codes",
   "storage/debugging/logs",
