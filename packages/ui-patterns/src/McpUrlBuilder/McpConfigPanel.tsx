@@ -5,15 +5,15 @@ import { cn, Separator } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { InfoTooltip } from '../info-tooltip'
-import { ClientSelectDropdown } from './components/ClientSelectDropdown'
-import { McpConfigurationDisplay } from './components/McpConfigurationDisplay'
-import { McpConfigurationOptions } from './components/McpConfigurationOptions'
 import {
   FEATURE_GROUPS_NON_PLATFORM,
   FEATURE_GROUPS_PLATFORM,
   MCP_CLIENT_GROUPS,
-  MCP_CLIENTS,
-} from './constants'
+} from './clients.data'
+import { ClientSelectDropdown } from './components/ClientSelectDropdown'
+import { McpConfigurationDisplay } from './components/McpConfigurationDisplay'
+import { McpConfigurationOptions } from './components/McpConfigurationOptions'
+import { MCP_CLIENTS } from './mcpClients'
 import type { McpClient, McpOnCopyCallback } from './types'
 import { getMcpUrl } from './utils/getMcpUrl'
 

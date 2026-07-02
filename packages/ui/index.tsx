@@ -37,7 +37,6 @@ export * from './src/components/LoadingLine'
 export * from './src/layout/ai-icon-animation'
 
 // theme switcher
-export * from './src/components/ThemeProvider/themes'
 export * from './src/components/ThemeProvider/singleThemes'
 
 // shadcn

@@ -54,7 +54,7 @@ import { useAiAssistantState, useAiAssistantStateSnapshot } from '@/state/ai-ass
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 interface AIAssistantProps {
   initialMessages?: MessageType[] | undefined

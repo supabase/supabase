@@ -10,8 +10,8 @@ import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
 import { useTrack } from '@/lib/telemetry/track'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export type UtilityPanelProps = {
   id: string
@@ -153,7 +153,7 @@ export const UtilityPanel = ({
             <DownloadResultsButton
               variant="text"
               results={result.rows as any[]}
-              fileName={`Supabase Snippet ${snippet.name}`}
+              fileName={`Supabase Snippet ${snippet?.name ?? 'Results'}`}
               onDownloadAsCSV={() => track('sql_editor_result_download_csv_clicked')}
               onCopyAsMarkdown={() => track('sql_editor_result_copy_markdown_clicked')}
               onCopyAsJSON={() => track('sql_editor_result_copy_json_clicked')}

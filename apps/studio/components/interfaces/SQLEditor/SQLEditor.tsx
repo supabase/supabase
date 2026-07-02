@@ -92,9 +92,12 @@ import {
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
-import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { useSqlEditorDiffRequestSnapshot } from '@/state/sql-editor/sql-editor-diff-request'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
+import {
+  getSqlEditorV2StateSnapshot,
+  useSqlEditorV2StateSnapshot,
+} from '@/state/sql-editor/sql-editor-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 // Load the monaco editor client-side only (does not behave well server-side)

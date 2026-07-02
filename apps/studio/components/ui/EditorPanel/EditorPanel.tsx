@@ -66,7 +66,7 @@ import { editorPanelState, useEditorPanelStateSnapshot } from '@/state/editor-pa
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export const EditorPanel = () => {
   const {

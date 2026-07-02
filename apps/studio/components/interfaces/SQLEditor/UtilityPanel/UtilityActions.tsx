@@ -24,8 +24,8 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export type UtilityActionsProps = {
   id: string

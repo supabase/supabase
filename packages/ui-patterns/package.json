@@ -86,6 +86,10 @@
       "import": "./src/CommandMenu/api/CommandHeader.tsx",
       "types": "./src/CommandMenu/api/CommandHeader.tsx"
     },
+    "./CommandMenu/api/CommandMenu": {
+      "import": "./src/CommandMenu/api/CommandMenu.tsx",
+      "types": "./src/CommandMenu/api/CommandMenu.tsx"
+    },
     "./CommandMenu/api/CommandMenuInput": {
       "import": "./src/CommandMenu/api/CommandMenuInput.tsx",
       "types": "./src/CommandMenu/api/CommandMenuInput.tsx"
@@ -93,10 +97,6 @@
     "./CommandMenu/api/CommandMenuList": {
       "import": "./src/CommandMenu/api/CommandMenuList.tsx",
       "types": "./src/CommandMenu/api/CommandMenuList.tsx"
-    },
-    "./CommandMenu/api/CommandMenu": {
-      "import": "./src/CommandMenu/api/CommandMenu.tsx",
-      "types": "./src/CommandMenu/api/CommandMenu.tsx"
     },
     "./CommandMenu/api/CommandProvider": {
       "import": "./src/CommandMenu/api/CommandProvider.tsx",
@@ -106,17 +106,9 @@
       "import": "./src/CommandMenu/api/TextHighlighter.tsx",
       "types": "./src/CommandMenu/api/TextHighlighter.tsx"
     },
-    "./CommandMenu/api/hooks/commandsHooks.test": {
-      "import": "./src/CommandMenu/api/hooks/commandsHooks.test.tsx",
-      "types": "./src/CommandMenu/api/hooks/commandsHooks.test.tsx"
-    },
     "./CommandMenu/api/hooks/commandsHooks": {
       "import": "./src/CommandMenu/api/hooks/commandsHooks.ts",
       "types": "./src/CommandMenu/api/hooks/commandsHooks.ts"
-    },
-    "./CommandMenu/api/hooks/pagesHooks.test": {
-      "import": "./src/CommandMenu/api/hooks/pagesHooks.test.tsx",
-      "types": "./src/CommandMenu/api/hooks/pagesHooks.test.tsx"
     },
     "./CommandMenu/api/hooks/pagesHooks": {
       "import": "./src/CommandMenu/api/hooks/pagesHooks.ts",
@@ -162,10 +154,6 @@
       "import": "./src/CommandMenu/index.tsx",
       "types": "./src/CommandMenu/index.tsx"
     },
-    "./CommandMenu/internal/CommandMenuItem": {
-      "import": "./src/CommandMenu/internal/CommandMenuItem.tsx",
-      "types": "./src/CommandMenu/internal/CommandMenuItem.tsx"
-    },
     "./CommandMenu/internal/CommandMenuEmpty": {
       "import": "./src/CommandMenu/internal/CommandMenuEmpty.tsx",
       "types": "./src/CommandMenu/internal/CommandMenuEmpty.tsx"
@@ -173,6 +161,10 @@
     "./CommandMenu/internal/CommandMenuGroup": {
       "import": "./src/CommandMenu/internal/CommandMenuGroup.tsx",
       "types": "./src/CommandMenu/internal/CommandMenuGroup.tsx"
+    },
+    "./CommandMenu/internal/CommandMenuItem": {
+      "import": "./src/CommandMenu/internal/CommandMenuItem.tsx",
+      "types": "./src/CommandMenu/internal/CommandMenuItem.tsx"
     },
     "./CommandMenu/internal/CommandSection": {
       "import": "./src/CommandMenu/internal/CommandSection.tsx",
@@ -185,14 +177,6 @@
     "./CommandMenu/internal/state/commandsState": {
       "import": "./src/CommandMenu/internal/state/commandsState.ts",
       "types": "./src/CommandMenu/internal/state/commandsState.ts"
-    },
-    "./CommandMenu/internal/state/commandsStates.test": {
-      "import": "./src/CommandMenu/internal/state/commandsStates.test.ts",
-      "types": "./src/CommandMenu/internal/state/commandsStates.test.ts"
-    },
-    "./CommandMenu/internal/state/pagesState.test": {
-      "import": "./src/CommandMenu/internal/state/pagesState.test.ts",
-      "types": "./src/CommandMenu/internal/state/pagesState.test.ts"
     },
     "./CommandMenu/internal/state/pagesState": {
       "import": "./src/CommandMenu/internal/state/pagesState.ts",
@@ -238,10 +222,6 @@
       "import": "./src/CommandMenu/prepackaged/Support.tsx",
       "types": "./src/CommandMenu/prepackaged/Support.tsx"
     },
-    "./CommandMenu/prepackaged/ThemeSwitcher.test": {
-      "import": "./src/CommandMenu/prepackaged/ThemeSwitcher.test.tsx",
-      "types": "./src/CommandMenu/prepackaged/ThemeSwitcher.test.tsx"
-    },
     "./CommandMenu/prepackaged/ThemeSwitcher": {
       "import": "./src/CommandMenu/prepackaged/ThemeSwitcher.tsx",
       "types": "./src/CommandMenu/prepackaged/ThemeSwitcher.tsx"
@@ -257,10 +237,6 @@
     "./CommandMenu/prepackaged/ai/queryAi": {
       "import": "./src/CommandMenu/prepackaged/ai/queryAi.ts",
       "types": "./src/CommandMenu/prepackaged/ai/queryAi.ts"
-    },
-    "./CommandMenu/prepackaged/ai/useAiChat.test": {
-      "import": "./src/CommandMenu/prepackaged/ai/useAiChat.test.ts",
-      "types": "./src/CommandMenu/prepackaged/ai/useAiChat.test.ts"
     },
     "./CommandMenu/prepackaged/ai/useAiChat": {
       "import": "./src/CommandMenu/prepackaged/ai/useAiChat.ts",
@@ -310,6 +286,10 @@
       "import": "./src/DataInputs/Input.tsx",
       "types": "./src/DataInputs/Input.tsx"
     },
+    "./DatePicker/DatePicker": {
+      "import": "./src/DatePicker/DatePicker.tsx",
+      "types": "./src/DatePicker/DatePicker.tsx"
+    },
     "./DatePicker": {
       "import": "./src/DatePicker/index.ts",
       "types": "./src/DatePicker/index.ts"
@@ -350,10 +330,6 @@
       "import": "./src/FilterBar/DefaultCommandList.tsx",
       "types": "./src/FilterBar/DefaultCommandList.tsx"
     },
-    "./FilterBar/FilterBar.test": {
-      "import": "./src/FilterBar/FilterBar.test.tsx",
-      "types": "./src/FilterBar/FilterBar.test.tsx"
-    },
     "./FilterBar/FilterBar": {
       "import": "./src/FilterBar/FilterBar.tsx",
       "types": "./src/FilterBar/FilterBar.tsx"
@@ -374,10 +350,6 @@
       "import": "./src/FilterBar/OperatorSymbolBadge.tsx",
       "types": "./src/FilterBar/OperatorSymbolBadge.tsx"
     },
-    "./FilterBar/hooks.test": {
-      "import": "./src/FilterBar/hooks.test.ts",
-      "types": "./src/FilterBar/hooks.test.ts"
-    },
     "./FilterBar/hooks": {
       "import": "./src/FilterBar/hooks.ts",
       "types": "./src/FilterBar/hooks.ts"
@@ -385,10 +357,6 @@
     "./FilterBar": {
       "import": "./src/FilterBar/index.ts",
       "types": "./src/FilterBar/index.ts"
-    },
-    "./FilterBar/menuItems.test": {
-      "import": "./src/FilterBar/menuItems.test.ts",
-      "types": "./src/FilterBar/menuItems.test.ts"
     },
     "./FilterBar/menuItems": {
       "import": "./src/FilterBar/menuItems.ts",
@@ -413,10 +381,6 @@
     "./FilterBar/useKeyboardNavigation": {
       "import": "./src/FilterBar/useKeyboardNavigation.ts",
       "types": "./src/FilterBar/useKeyboardNavigation.ts"
-    },
-    "./FilterBar/utils.test": {
-      "import": "./src/FilterBar/utils.test.ts",
-      "types": "./src/FilterBar/utils.test.ts"
     },
     "./FilterBar/utils": {
       "import": "./src/FilterBar/utils.ts",
@@ -450,13 +414,29 @@
       "import": "./src/LogsBarChart/index.tsx",
       "types": "./src/LogsBarChart/index.tsx"
     },
+    "./Markdown/components": {
+      "import": "./src/Markdown/components.tsx",
+      "types": "./src/Markdown/components.tsx"
+    },
     "./Markdown": {
       "import": "./src/Markdown/index.tsx",
       "types": "./src/Markdown/index.tsx"
     },
+    "./McpUrlBuilder/McpConfigPanel.md": {
+      "import": "./src/McpUrlBuilder/McpConfigPanel.md.tsx",
+      "types": "./src/McpUrlBuilder/McpConfigPanel.md.tsx"
+    },
     "./McpUrlBuilder/McpConfigPanel": {
       "import": "./src/McpUrlBuilder/McpConfigPanel.tsx",
       "types": "./src/McpUrlBuilder/McpConfigPanel.tsx"
+    },
+    "./McpUrlBuilder/clients.data": {
+      "import": "./src/McpUrlBuilder/clients.data.ts",
+      "types": "./src/McpUrlBuilder/clients.data.ts"
+    },
+    "./McpUrlBuilder/clients.instructions.md": {
+      "import": "./src/McpUrlBuilder/clients.instructions.md.tsx",
+      "types": "./src/McpUrlBuilder/clients.instructions.md.tsx"
     },
     "./McpUrlBuilder/components/ClientSelectDropdown": {
       "import": "./src/McpUrlBuilder/components/ClientSelectDropdown.tsx",
@@ -466,6 +446,10 @@
       "import": "./src/McpUrlBuilder/components/ConnectionIcon.tsx",
       "types": "./src/McpUrlBuilder/components/ConnectionIcon.tsx"
     },
+    "./McpUrlBuilder/components/InstructionBlocks": {
+      "import": "./src/McpUrlBuilder/components/InstructionBlocks.tsx",
+      "types": "./src/McpUrlBuilder/components/InstructionBlocks.tsx"
+    },
     "./McpUrlBuilder/components/McpConfigurationDisplay": {
       "import": "./src/McpUrlBuilder/components/McpConfigurationDisplay.tsx",
       "types": "./src/McpUrlBuilder/components/McpConfigurationDisplay.tsx"
@@ -474,13 +458,13 @@
       "import": "./src/McpUrlBuilder/components/McpConfigurationOptions.tsx",
       "types": "./src/McpUrlBuilder/components/McpConfigurationOptions.tsx"
     },
-    "./McpUrlBuilder/constants": {
-      "import": "./src/McpUrlBuilder/constants.tsx",
-      "types": "./src/McpUrlBuilder/constants.tsx"
-    },
     "./McpUrlBuilder": {
       "import": "./src/McpUrlBuilder/index.ts",
       "types": "./src/McpUrlBuilder/index.ts"
+    },
+    "./McpUrlBuilder/mcpClients": {
+      "import": "./src/McpUrlBuilder/mcpClients.tsx",
+      "types": "./src/McpUrlBuilder/mcpClients.tsx"
     },
     "./McpUrlBuilder/types": {
       "import": "./src/McpUrlBuilder/types.ts",
@@ -494,10 +478,6 @@
       "import": "./src/McpUrlBuilder/utils/getMcpButtonData.ts",
       "types": "./src/McpUrlBuilder/utils/getMcpButtonData.ts"
     },
-    "./McpUrlBuilder/utils/getMcpIconSrc.test": {
-      "import": "./src/McpUrlBuilder/utils/getMcpIconSrc.test.ts",
-      "types": "./src/McpUrlBuilder/utils/getMcpIconSrc.test.ts"
-    },
     "./McpUrlBuilder/utils/getMcpIconSrc": {
       "import": "./src/McpUrlBuilder/utils/getMcpIconSrc.ts",
       "types": "./src/McpUrlBuilder/utils/getMcpIconSrc.ts"
@@ -509,6 +489,10 @@
     "./McpUrlBuilder/utils/mcpIconAssets": {
       "import": "./src/McpUrlBuilder/utils/mcpIconAssets.ts",
       "types": "./src/McpUrlBuilder/utils/mcpIconAssets.ts"
+    },
+    "./McpUrlBuilder/utils/serializeMcpConfig": {
+      "import": "./src/McpUrlBuilder/utils/serializeMcpConfig.ts",
+      "types": "./src/McpUrlBuilder/utils/serializeMcpConfig.ts"
     },
     "./Mermaid/Mermaid": {
       "import": "./src/Mermaid/Mermaid.tsx",
@@ -522,10 +506,6 @@
       "import": "./src/MetricCard/index.tsx",
       "types": "./src/MetricCard/index.tsx"
     },
-    "./MobileSheetNav/MobileSheetNav.test": {
-      "import": "./src/MobileSheetNav/MobileSheetNav.test.tsx",
-      "types": "./src/MobileSheetNav/MobileSheetNav.test.tsx"
-    },
     "./MobileSheetNav/MobileSheetNav": {
       "import": "./src/MobileSheetNav/MobileSheetNav.tsx",
       "types": "./src/MobileSheetNav/MobileSheetNav.tsx"
@@ -534,25 +514,13 @@
       "import": "./src/MobileSheetNav/index.ts",
       "types": "./src/MobileSheetNav/index.ts"
     },
-    "./MultiSelectDeprecated/Badges": {
-      "import": "./src/MultiSelectDeprecated/Badges.tsx",
-      "types": "./src/MultiSelectDeprecated/Badges.tsx"
-    },
-    "./MultiSelectDeprecated/MultiSelectV2": {
-      "import": "./src/MultiSelectDeprecated/MultiSelectV2.tsx",
-      "types": "./src/MultiSelectDeprecated/MultiSelectV2.tsx"
-    },
-    "./MultiSelectDeprecated": {
-      "import": "./src/MultiSelectDeprecated/index.tsx",
-      "types": "./src/MultiSelectDeprecated/index.tsx"
-    },
-    "./MultipleCodeBlock/index.test": {
-      "import": "./src/MultipleCodeBlock/index.test.tsx",
-      "types": "./src/MultipleCodeBlock/index.test.tsx"
-    },
     "./MultipleCodeBlock": {
       "import": "./src/MultipleCodeBlock/index.tsx",
       "types": "./src/MultipleCodeBlock/index.tsx"
+    },
+    "./PageBreadcrumbs": {
+      "import": "./src/PageBreadcrumbs/index.tsx",
+      "types": "./src/PageBreadcrumbs/index.tsx"
     },
     "./PageContainer": {
       "import": "./src/PageContainer/index.tsx",
@@ -561,10 +529,6 @@
     "./PageHeader": {
       "import": "./src/PageHeader/index.tsx",
       "types": "./src/PageHeader/index.tsx"
-    },
-    "./PageBreadcrumbs": {
-      "import": "./src/PageBreadcrumbs/index.tsx",
-      "types": "./src/PageBreadcrumbs/index.tsx"
     },
     "./PageNav": {
       "import": "./src/PageNav/index.tsx",
@@ -601,10 +565,6 @@
     "./Row/Row.utils": {
       "import": "./src/Row/Row.utils.ts",
       "types": "./src/Row/Row.utils.ts"
-    },
-    "./Row/index.test": {
-      "import": "./src/Row/index.test.ts",
-      "types": "./src/Row/index.test.ts"
     },
     "./Row": {
       "import": "./src/Row/index.tsx",
@@ -666,6 +626,14 @@
       "import": "./src/StatusCode/index.tsx",
       "types": "./src/StatusCode/index.tsx"
     },
+    "./Table/TanStackTableHeadSort": {
+      "import": "./src/Table/TanStackTableHeadSort.tsx",
+      "types": "./src/Table/TanStackTableHeadSort.tsx"
+    },
+    "./Table": {
+      "import": "./src/Table/index.ts",
+      "types": "./src/Table/index.ts"
+    },
     "./TextLink": {
       "import": "./src/TextLink/index.tsx",
       "types": "./src/TextLink/index.tsx"
@@ -674,13 +642,13 @@
       "import": "./src/ThemeToggle.tsx",
       "types": "./src/ThemeToggle.tsx"
     },
+    "./TimestampInfo/TimestampInfoProvider": {
+      "import": "./src/TimestampInfo/TimestampInfoProvider.tsx",
+      "types": "./src/TimestampInfo/TimestampInfoProvider.tsx"
+    },
     "./TimestampInfo": {
       "import": "./src/TimestampInfo/index.tsx",
       "types": "./src/TimestampInfo/index.tsx"
-    },
-    "./Table": {
-      "import": "./src/Table/index.ts",
-      "types": "./src/Table/index.ts"
     },
     "./Toc": {
       "import": "./src/Toc/index.ts",
@@ -722,13 +690,13 @@
       "import": "./src/admonition.tsx",
       "types": "./src/admonition.tsx"
     },
-    "./consent": {
-      "import": "./src/consent.tsx",
-      "types": "./src/consent.tsx"
-    },
     "./collapsible-alert": {
       "import": "./src/collapsible-alert.tsx",
       "types": "./src/collapsible-alert.tsx"
+    },
+    "./consent": {
+      "import": "./src/consent.tsx",
+      "types": "./src/consent.tsx"
     },
     "./form/FormItemLayout/FormItemLayout": {
       "import": "./src/form/FormItemLayout/FormItemLayout.tsx",
@@ -738,10 +706,6 @@
       "import": "./src/form/FormLayout2.tsx",
       "types": "./src/form/FormLayout2.tsx"
     },
-    "./form/KeyValueFieldArray/KeyValueFieldArray.test": {
-      "import": "./src/form/KeyValueFieldArray/KeyValueFieldArray.test.tsx",
-      "types": "./src/form/KeyValueFieldArray/KeyValueFieldArray.test.tsx"
-    },
     "./form/KeyValueFieldArray/KeyValueFieldArray": {
       "import": "./src/form/KeyValueFieldArray/KeyValueFieldArray.tsx",
       "types": "./src/form/KeyValueFieldArray/KeyValueFieldArray.tsx"
@@ -750,17 +714,13 @@
       "import": "./src/form/KeyValueFieldArray/validation.ts",
       "types": "./src/form/KeyValueFieldArray/validation.ts"
     },
-    "./form/SingleValueFieldArray/SingleValueFieldArray.test": {
-      "import": "./src/form/SingleValueFieldArray/SingleValueFieldArray.test.tsx",
-      "types": "./src/form/SingleValueFieldArray/SingleValueFieldArray.test.tsx"
+    "./form/Layout/FormLayout": {
+      "import": "./src/form/Layout/FormLayout.tsx",
+      "types": "./src/form/Layout/FormLayout.tsx"
     },
     "./form/SingleValueFieldArray/SingleValueFieldArray": {
       "import": "./src/form/SingleValueFieldArray/SingleValueFieldArray.tsx",
       "types": "./src/form/SingleValueFieldArray/SingleValueFieldArray.tsx"
-    },
-    "./form/Layout/FormLayout": {
-      "import": "./src/form/Layout/FormLayout.tsx",
-      "types": "./src/form/Layout/FormLayout.tsx"
     },
     "./form/utils": {
       "import": "./src/form/utils.tsx",
@@ -774,10 +734,6 @@
       "import": "./src/multi-select/index.tsx",
       "types": "./src/multi-select/index.tsx"
     },
-    "./multi-select/multi-select.test": {
-      "import": "./src/multi-select/multi-select.test.tsx",
-      "types": "./src/multi-select/multi-select.test.tsx"
-    },
     "./multi-select/multi-select": {
       "import": "./src/multi-select/multi-select.tsx",
       "types": "./src/multi-select/multi-select.tsx"
@@ -790,7 +746,6 @@
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
     "@monaco-editor/react": "catalog:",
-    "@std/toml": "jsr:^1.0.11",
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-table": "catalog:",
@@ -808,6 +763,7 @@
     "lodash": "catalog:",
     "lucide-react": "*",
     "mdast": "^3.0.0",
+    "mdast-jsx": "^0.1.1",
     "mermaid": "^11.12.1",
     "monaco-editor": "*",
     "next-themes": "catalog:",
@@ -828,6 +784,7 @@
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.0",
     "scroll-into-view-if-needed": "^3.1.0",
+    "smol-toml": "^1.6.1",
     "sonner": "^1.5.0",
     "sql-formatter": "^15.0.0",
     "sse.js": "^2.2.0",

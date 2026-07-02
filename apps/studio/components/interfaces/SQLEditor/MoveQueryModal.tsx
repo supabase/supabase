@@ -42,7 +42,7 @@ import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation
 import { useSQLSnippetFolderCreateMutation } from '@/data/content/sql-folder-create-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
 import type { SnippetWithContent } from '@/data/content/sql-folders-query'
-import { useSnippetFolders, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSnippetFolders, useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 interface MoveQueryModalProps {

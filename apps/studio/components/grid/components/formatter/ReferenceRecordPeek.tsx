@@ -122,39 +122,41 @@ export const ReferenceRecordPeek = ({ table, column, value }: ReferenceRecordPee
         </span>
         :
       </p>
-      <DataGrid
-        className="h-32 rounded-b border-0"
-        columns={columns}
-        rows={rows}
-        onSelectedCellChange={(args: {
-          column: CalculatedColumn<SupaRow, unknown>
-          rowIdx: number
-          row: SupaRow
-        }) => {
-          selectedCellRef.current = { idx: args.column.idx, rowIdx: args.rowIdx }
-        }}
-        onCellDoubleClick={(_, e) => {
-          e.preventDefault()
-          e.stopPropagation()
-        }}
-        renderers={{
-          noRowsFallback: (
-            <div className="w-96 px-2">
-              {isLoading && (
-                <div className="py-2">
-                  <ShimmeringLoader />
-                </div>
-              )}
-              {isError && (
-                <p className="text-foreground-light">
-                  Failed to find referencing row: {error.message}
-                </p>
-              )}
-              {isSuccess && <p className="text-foreground-light">No results were returned</p>}
-            </div>
-          ),
-        }}
-      />
+      <div className="h-32 overflow-hidden">
+        <DataGrid
+          className="h-full rounded-b border-0"
+          columns={columns}
+          rows={rows}
+          onSelectedCellChange={(args: {
+            column: CalculatedColumn<SupaRow, unknown>
+            rowIdx: number
+            row: SupaRow
+          }) => {
+            selectedCellRef.current = { idx: args.column.idx, rowIdx: args.rowIdx }
+          }}
+          onCellDoubleClick={(_, e) => {
+            e.preventDefault()
+            e.stopPropagation()
+          }}
+          renderers={{
+            noRowsFallback: (
+              <div className="w-96 px-2">
+                {isLoading && (
+                  <div className="py-2">
+                    <ShimmeringLoader />
+                  </div>
+                )}
+                {isError && (
+                  <p className="text-foreground-light">
+                    Failed to find referencing row: {error.message}
+                  </p>
+                )}
+                {isSuccess && <p className="text-foreground-light">No results were returned</p>}
+              </div>
+            ),
+          }}
+        />
+      </div>
       <div className="flex items-center justify-end px-2 py-1">
         <EditorTablePageLink
           href={`/project/${ref}/editor/${table.id}?schema=${table.schema}&filter=${column}%3Aeq%3A${value}`}
