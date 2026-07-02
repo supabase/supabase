@@ -1,21 +1,14 @@
+import { BLOG_VIEW_COOKIE, isBlogView, type BlogView } from 'app/blog/blog-view'
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { cookies } from 'next/headers'
+import { notFound } from 'next/navigation'
 
-import BlogGridItem from '@/components/Blog/BlogGridItem'
-import DefaultLayout from '@/components/Layouts/Default'
+import CategoryClient from './CategoryClient'
 import { capitalize } from '@/lib/helpers'
 import { getAllCategories, getSortedPosts } from '@/lib/posts'
 import type PostTypes from '@/types/post'
 
 type Params = { category: string }
-
-export async function generateStaticParams() {
-  const categories = getAllCategories('_blog')
-  return categories.map((category: string) => ({ category }))
-}
-
-export const revalidate = 30
-export const dynamic = 'force-static'
 
 export async function generateMetadata({
   params: paramsPromise,
@@ -38,37 +31,33 @@ export default async function CategoriesPage({
 }) {
   const params = await paramsPromise
 
+  if (!getAllCategories('_blog').includes(params.category)) {
+    notFound()
+  }
+
+  // Read the list/grid preference from a cookie so the correct view renders on
+  // first paint. Reading a cookie opts this route into dynamic rendering.
+  const cookieStore = await cookies()
+  const cookieView = cookieStore.get(BLOG_VIEW_COOKIE)?.value
+  const initialView: BlogView = isBlogView(cookieView) ? cookieView : 'list'
+
   const staticPosts = getSortedPosts({
     directory: '_blog',
     limit: 0,
     categories: [params.category],
   })
   const blogs = [...staticPosts] as PostTypes[]
-  const capitalizedCategory = capitalize(params?.category.replaceAll('-', ' '))
 
+  const capitalizedCategory = capitalize(params.category.replaceAll('-', ' '))
+
+  // Key by category so state (search term, view) resets when switching between
+  // category pages rather than persisting across the reused page component.
   return (
-    <>
-      <DefaultLayout>
-        <div className="container mx-auto px-8 py-16 sm:px-16 xl:px-20">
-          <div className="text-foreground-lighter flex space-x-1">
-            <h1 className="cursor-pointer">
-              <Link href="/blog">Blog</Link>
-              <span className="px-2">/</span>
-              <span>{capitalizedCategory}</span>
-            </h1>
-          </div>
-          <ol className="grid grid-cols-12 gap-8 py-16 lg:gap-16">
-            {blogs.map((blog: PostTypes) => (
-              <div
-                className="col-span-12 mb-16 md:col-span-12 lg:col-span-6 xl:col-span-4"
-                key={blog.slug}
-              >
-                <BlogGridItem post={blog} />
-              </div>
-            ))}
-          </ol>
-        </div>
-      </DefaultLayout>
-    </>
+    <CategoryClient
+      key={params.category}
+      posts={blogs}
+      initialView={initialView}
+      category={capitalizedCategory}
+    />
   )
 }

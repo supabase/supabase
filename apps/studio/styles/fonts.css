@@ -1,0 +1,28 @@
+/*
+ * Font setup for the Vite/TanStack Start build.
+ * The Next.js build uses next/font via fonts/index.ts; keep the
+ * CSS var names (--font-custom, --font-source-code-pro) in sync so
+ * styles that reference them work in both pipelines.
+ * Source Code Pro is loaded via a <link> in the root route's head().
+ */
+
+@font-face {
+  font-family: 'Inter';
+  src: url('../fonts/inter/InterVariable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('../fonts/inter/InterVariable-Italic.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  --font-custom: 'Inter', system-ui, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-source-code-pro: 'Source Code Pro', 'Office Code Pro', Menlo, monospace;
+}

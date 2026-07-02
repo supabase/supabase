@@ -80,7 +80,7 @@ const Step: FC<PropsWithChildren<IStep>> = ({ children, title, step }) => {
 const Details: FC<PropsWithChildren<IDetails>> = ({ children, title, fullWidth = false }) => {
   return (
     <div className={cn(fullWidth ? 'col-span-12' : 'col-span-5', 'ml-12', 'lg:ml-0')}>
-      <h3 className="mt-0 text-foreground text-base">{title}</h3>
+      <h3 className="not-prose mb-4 text-foreground text-base">{title}</h3>
       {children}
     </div>
   )

@@ -1,4 +1,4 @@
-import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
+import type { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 
 export const checkHasNonPositiveValues = (data: Record<string, unknown>[], key: string): boolean =>
   data.some((row) => (row[key] as number) <= 0)
@@ -47,16 +47,19 @@ export const formatLogTick = (value: number): string => {
   return value.toLocaleString()
 }
 
-export const getCumulativeResults = (results: { rows: any[] }, config: ChartConfig) => {
+export const getCumulativeResults = (results: { rows: readonly any[] }, config: ChartConfig) => {
   if (!results?.rows?.length) {
     return []
   }
 
   const cumulativeResults = results.rows.reduce((acc, row) => {
     const prev = acc[acc.length - 1] || {}
+    // Coerce to Number before adding: Postgres returns `bigint`, `numeric`,
+    // `money` and `count(*)` columns as strings, so a bare `+` would
+    // concatenate (e.g. "10" + "20" -> "1020") instead of summing.
     const next = {
       ...row,
-      [config.yKey]: (prev[config.yKey] || 0) + row[config.yKey],
+      [config.yKey]: (Number(prev[config.yKey]) || 0) + (Number(row[config.yKey]) || 0),
     }
     return [...acc, next]
   }, [])

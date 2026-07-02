@@ -1,8 +1,8 @@
 import { ArrowUpRight, BookOpen, Gauge, Settings } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
-import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { MarketplaceDetailBreadrumbs } from './MarketplaceDetailBreadcrumbs'
 import { MarketplaceDetailHero } from './MarketplaceDetailHero'
@@ -175,7 +175,9 @@ export const MarketplaceDetail = () => {
             <CustomPageComponent />
           </div>
         ) : (
-          <CustomPageComponent />
+          <div className="flex-1 min-h-0">
+            <CustomPageComponent />
+          </div>
         )
       ) : null}
     </>

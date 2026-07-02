@@ -12,8 +12,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { PauseDisabledState } from './PauseDisabledState'
 import { ResumeProjectButton } from '@/components/interfaces/Project/ResumeProjectButton'

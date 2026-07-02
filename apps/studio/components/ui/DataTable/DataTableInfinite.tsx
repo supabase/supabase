@@ -5,7 +5,7 @@ import { LoaderCircle } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 import { Fragment, UIEvent, useCallback, useRef } from 'react'
 import { Button, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AlertError } from '../AlertError'
 import { formatCompactNumber } from './DataTable.utils'

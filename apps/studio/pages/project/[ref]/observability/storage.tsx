@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Button } from 'ui'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import {
   NetworkTrafficRenderer,
   ResponseSpeedChartRenderer,
@@ -25,8 +26,9 @@ import {
   LogsDatePicker,
 } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useStorageReport } from '@/data/reports/storage-report-query'
@@ -35,6 +37,8 @@ import { DOCS_URL } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { NextPageWithLayout } from '@/types'
+
+const REPORT_TITLE = 'Storage'
 
 export const StorageReport: NextPageWithLayout = () => {
   const report = useStorageReport()
@@ -88,11 +92,12 @@ export const StorageReport: NextPageWithLayout = () => {
 
   return (
     <ReportPadding>
-      <ReportHeader title="Storage" showDatabaseSelector={false} />
+      <ReportHeader title={REPORT_TITLE} showDatabaseSelector={false} />
       <ReportStickyNav
         content={
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-2 w-full">
+            <div className="ml-auto flex items-center gap-2 flex-wrap">
+              <DocsButton href={OBSERVABILITY_DOCS_HREFS.storage} topic={REPORT_TITLE} />
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
                 label="Refresh report"

@@ -3,7 +3,7 @@ import { ArrowUpRight, BookOpen, LayoutGrid, PlusSquare } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { cn } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { DOCS_URL } from '@/lib/constants'

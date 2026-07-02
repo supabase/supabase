@@ -13,6 +13,7 @@ export {
 export type { McpClientData } from './clients.data'
 export { MCP_CLIENTS } from './mcpClients'
 export { getMcpUrl } from './utils/getMcpUrl'
+export { getMcpClientIconSrc } from './utils/getMcpIconSrc'
 export { createMcpCopyHandler, type McpCopyType } from './utils/createMcpCopyHandler'
 export { McpConfigPanel, type McpConfigPanelProps } from './McpConfigPanel'
 export type {
