@@ -86,6 +86,7 @@ export const ForeignKeyFormatter = (props: Props) => {
               </PopoverTrigger>
               <PopoverContent
                 align="end"
+                collisionPadding={8}
                 className="p-0 w-96"
                 onDoubleClick={(e) => {
                   e.preventDefault()
