@@ -11,7 +11,7 @@ const ArticleButton = (props: Article) => {
             border-default 
             flex items-start gap-3 rounded-md 
             border p-3 
-            px-6 drop-shadow-sm transition"
+            px-6 drop-shadow-xs transition"
       >
         <div className="w-6">
           <NewspaperIcon strokeWidth={1} />

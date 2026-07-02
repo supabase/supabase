@@ -19,7 +19,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
+const handleGet = async (_req: NextApiRequest, res: NextApiResponse) => {
   if (process.env.OPENAI_API_KEY) {
     return res.status(200).json({ hasKey: true })
   } else {

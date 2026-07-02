@@ -1,20 +1,24 @@
 'use client'
 
-import { Tabs } from 'ui'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Bar, BarChart, Legend, ResponsiveContainer, XAxis, YAxis } from 'recharts'
-import * as data from '~/data/blog/PostgresFTSComparison'
-
 import remarkGfm from 'remark-gfm'
+import {
+  Tabs_Shadcn_ as Tabs,
+  TabsList_Shadcn_ as TabsList,
+  TabsTrigger_Shadcn_ as TabsTrigger,
+} from 'ui'
+
+import * as data from '@/data/blog/PostgresFTSComparison'
 
 const barColors = {
   pg: 'hsl(var(--brand-600))',
-  meilisearch: 'var(--colors-blue11)',
-  typesense: 'var(--colors-violet11)',
-  'sqlite-disk': 'var(--colors-orange11)',
-  'sqlite-mem': 'var(--colors-yellow11)',
-  opensearch: 'var(--colors-tomato11)',
+  meilisearch: 'var(--color-blue-1100)',
+  typesense: 'var(--color-violet-1100)',
+  'sqlite-disk': 'var(--color-orange-1100)',
+  'sqlite-mem': 'var(--color-yellow-1100)',
+  opensearch: 'var(--color-tomato-1100)',
 }
 
 const dimensions = ['pg', 'meilisearch', 'typesense', 'sqlite-disk', 'sqlite-mem', 'opensearch']
@@ -53,17 +57,13 @@ const Chart = () => {
   const [selection, setSelection] = useState('latency')
   return (
     <div className={'my-16 flex flex-col'}>
-      <Tabs
-        defaultActiveId={'latency'}
-        type="underlined"
-        size="medium"
-        block
-        onChange={(value: string) => setSelection(value)}
-      >
-        <Tabs.Panel id="latency" label="Latency"></Tabs.Panel>
-        <Tabs.Panel id="results" label="Number of results"></Tabs.Panel>
-        <Tabs.Panel id="avg_latency" label="Average latency"></Tabs.Panel>
-        <Tabs.Panel id="raw_data" label="Raw data"></Tabs.Panel>
+      <Tabs defaultValue="latency" onValueChange={(value: string) => setSelection(value)}>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="latency">Latency</TabsTrigger>
+          <TabsTrigger value="results">Number of results</TabsTrigger>
+          <TabsTrigger value="avg_latency">Average latency</TabsTrigger>
+          <TabsTrigger value="raw_data">Raw data</TabsTrigger>
+        </TabsList>
       </Tabs>
 
       {selection !== 'raw_data' ? (

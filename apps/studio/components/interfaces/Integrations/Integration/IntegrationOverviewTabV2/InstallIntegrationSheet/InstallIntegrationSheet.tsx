@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import {
   Button,
   DialogSectionSeparator,
-  Form_Shadcn_,
+  Form,
   Sheet,
   SheetClose,
   SheetContent,
@@ -214,15 +214,15 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button type="primary">Install integration</Button>
+        <Button variant="primary">Install integration</Button>
       </SheetTrigger>
 
-      <Form_Shadcn_ {...form}>
+      <Form {...form}>
         <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
           <SheetContent
             size="default"
             aria-describedby={undefined}
-            className="flex flex-col gap-0 !w-[650px]"
+            className="flex flex-col gap-0 w-[650px]!"
           >
             <SheetHeader className="flex items-center gap-x-4">
               <div className="shrink-0 w-11 h-11 relative bg-white border rounded-md flex items-center justify-center">
@@ -234,7 +234,7 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
               </div>
             </SheetHeader>
 
-            <div className="flex-grow overflow-y-auto">
+            <div className="grow overflow-y-auto">
               <div className="py-5 flex flex-col gap-y-7">
                 {Object.keys(inputs).length > 0 && (
                   <InstallationSettings form={form} integration={integration} />
@@ -261,14 +261,14 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
 
             <SheetFooter>
               <SheetClose asChild>
-                <Button type="default" disabled={isInstalling}>
+                <Button variant="default" disabled={isInstalling}>
                   Cancel
                 </Button>
               </SheetClose>
               <Button
                 form={formId}
-                htmlType="submit"
-                type="primary"
+                type="submit"
+                variant="primary"
                 loading={isInstalling}
                 disabled={hasMissingExtensions}
               >
@@ -277,7 +277,7 @@ export const InstallIntegrationSheet = ({ integration }: InstallIntegrationSheet
             </SheetFooter>
           </SheetContent>
         </form>
-      </Form_Shadcn_>
+      </Form>
     </Sheet>
   )
 }

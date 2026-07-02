@@ -90,7 +90,7 @@ export default function TweetsSection({ section }: { section: GoTweetsSection })
                 <Button
                   key={i}
                   asChild
-                  type={cta.variant === 'secondary' ? 'default' : 'primary'}
+                  variant={cta.variant === 'secondary' ? 'default' : 'primary'}
                   size="small"
                 >
                   <Link href={cta.href}>{cta.label}</Link>

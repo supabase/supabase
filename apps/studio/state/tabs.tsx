@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { safeLocalStorage, useParams } from 'common'
 import { partition } from 'lodash'
 import { type NextRouter } from 'next/router'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
@@ -62,9 +62,9 @@ const RECENT_ITEMS_STORAGE_KEY = 'supabase_recent_items'
 const getRecentItemsStorageKey = (ref: string) => `${RECENT_ITEMS_STORAGE_KEY}_${ref}`
 
 function getSavedRecentItems(ref: string): RecentItem[] {
-  if (typeof window === 'undefined' || !ref) return []
+  if (!ref) return []
 
-  const stored = localStorage.getItem(getRecentItemsStorageKey(ref))
+  const stored = safeLocalStorage.getItem(getRecentItemsStorageKey(ref))
 
   try {
     return JSON.parse(stored ?? '{"items": []}').items
@@ -84,9 +84,9 @@ const TABS_STORAGE_KEY = 'supabase_studio_tabs'
 const getTabsStorageKey = (ref: string) => `${TABS_STORAGE_KEY}_${ref}`
 
 function getSavedTabs(ref: string) {
-  if (typeof window === 'undefined' || !ref) return DEFAULT_TABS_STATE
+  if (!ref) return DEFAULT_TABS_STATE
 
-  const stored = localStorage.getItem(getTabsStorageKey(ref))
+  const stored = safeLocalStorage.getItem(getTabsStorageKey(ref))
 
   if (!stored) return DEFAULT_TABS_STATE
 
@@ -451,7 +451,7 @@ export const TabsStateContextProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     if (typeof window !== 'undefined' && projectRef) {
       return subscribe(state, () => {
-        localStorage.setItem(
+        safeLocalStorage.setItem(
           getTabsStorageKey(projectRef),
           JSON.stringify({
             activeTab: state.activeTab,
@@ -460,7 +460,7 @@ export const TabsStateContextProvider = ({ children }: PropsWithChildren) => {
             previewTabId: state.previewTabId,
           })
         )
-        localStorage.setItem(
+        safeLocalStorage.setItem(
           getRecentItemsStorageKey(projectRef),
           JSON.stringify({
             items: state.recentItems,

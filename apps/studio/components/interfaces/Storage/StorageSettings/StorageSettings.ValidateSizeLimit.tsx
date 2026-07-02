@@ -125,7 +125,7 @@ export const ValidateSizeLimit = ({
               type="button"
               className={cn(
                 'mt-2 ml-auto text-foreground-lighter',
-                '!w-fit text-xs',
+                'w-fit! text-xs',
                 isValidating ? 'cursor-wait' : 'hover:text-foreground'
               )}
               onClick={() => setShowModal(true)}

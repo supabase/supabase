@@ -10,7 +10,7 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
+  Form,
 } from 'ui'
 
 import { AIOptInLevelSelector } from '@/components/interfaces/Organization/GeneralSettings/AIOptInLevelSelector'
@@ -44,7 +44,7 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
   return (
     <Dialog open={visible} onOpenChange={onOpenChange}>
       <DialogContent size="large" aria-describedby={undefined}>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id="ai-opt-in-form" onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader padding="small">
               <DialogTitle>Update Supabase Assistant Opt-in Level</DialogTitle>
@@ -61,7 +61,7 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
 
             <DialogFooter
               padding="small"
-              className={cn(!canUpdateOrganization && '!justify-between')}
+              className={cn(!canUpdateOrganization && 'justify-between!')}
             >
               {!canUpdateOrganization && (
                 <p className="text-sm text-foreground-lighter">
@@ -69,12 +69,12 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
                 </p>
               )}
               <div className="flex items-center gap-x-2">
-                <Button type="default" disabled={isUpdating} onClick={onCancel}>
+                <Button variant="default" disabled={isUpdating} onClick={onCancel}>
                   Cancel
                 </Button>
                 <Button
-                  type="primary"
-                  htmlType="submit"
+                  variant="primary"
+                  type="submit"
                   form="ai-opt-in-form"
                   loading={isUpdating}
                   disabled={isUpdating || !canUpdateOrganization || !form.formState.isDirty}
@@ -84,7 +84,7 @@ export const AIOptInModal = ({ visible, onCancel }: AIOptInModalProps) => {
               </div>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

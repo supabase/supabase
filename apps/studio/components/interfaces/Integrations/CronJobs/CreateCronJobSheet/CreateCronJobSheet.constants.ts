@@ -103,7 +103,7 @@ const sqlSnippetSchema = z.object({
 
 export const FormSchema = z
   .object({
-    name: z.string().trim().min(1, 'Please provide a name for your cron job'),
+    name: z.string().trim(),
     supportsSeconds: z.boolean(),
     schedule: z
       .string()

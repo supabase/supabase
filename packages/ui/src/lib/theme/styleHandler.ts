@@ -3,12 +3,12 @@ import { useContext } from 'react'
 import { ThemeContext } from './../../components/ThemeProvider/ThemeProvider'
 import defaultTheme from './../theme/defaultTheme'
 
-export default function styleHandler(target: string) {
+type Keys = keyof typeof defaultTheme
+
+export default function styleHandler(target: Keys) {
   let {
     theme: { [target]: __styles },
   }: any = useContext(ThemeContext)
-
-  if (!__styles) __styles = defaultTheme.accordion
 
   // console.log(__styles)
 

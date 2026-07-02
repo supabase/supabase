@@ -104,13 +104,9 @@ export const InstallationOverview = ({
                     {!ext ? (
                       <Badge variant="warning">Unavailable</Badge>
                     ) : ext.installed_version ? (
-                      <Badge variant="secondary" className="text-foreground-lighter">
-                        Installed
-                      </Badge>
+                      <Badge variant="secondary">Installed</Badge>
                     ) : (
-                      <Badge variant="default" className="text-foreground">
-                        Required
-                      </Badge>
+                      <Badge variant="warning">Required</Badge>
                     )}
                   </div>
                 )

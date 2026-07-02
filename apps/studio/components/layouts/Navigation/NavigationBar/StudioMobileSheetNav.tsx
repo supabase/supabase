@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
-import { CommandWrapper, MobileSheetNav } from 'ui-patterns'
+import { CommandWrapper } from 'ui-patterns/CommandMenu'
+import { MobileSheetNav } from 'ui-patterns/MobileSheetNav'
 
 import {
   SIDEBAR_KEYS,

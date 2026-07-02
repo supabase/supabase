@@ -1,19 +1,25 @@
-import Editor, { Monaco, OnMount } from '@monaco-editor/react'
+import { Monaco, OnMount } from '@monaco-editor/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { editor as monacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { KeyboardShortcut } from 'ui'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
+import { CodeEditor, type ValidLanguages } from '../CodeEditor/CodeEditor'
 import { DiffEditor } from '../DiffEditor'
 import ResizableAIWidget from './ResizableAIWidget'
+import { getEditorSelectionParts } from './utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { constructHeaders } from '@/data/fetchers'
+import { useLatest } from '@/hooks/misc/useLatest'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AIEditorProps {
   id?: string
-  language?: string
+  language: ValidLanguages
   value?: string
   defaultValue?: string
   aiEndpoint?: string
@@ -21,6 +27,7 @@ interface AIEditorProps {
     projectRef?: string
     connectionString?: string | null
     orgSlug?: string
+    language?: string
   }
   initialPrompt?: string
   readOnly?: boolean
@@ -63,8 +70,12 @@ export const AIEditor = ({
   const monacoRef = useRef<Monaco | null>(null)
   const closeActionDisposableRef = useRef<{ dispose: () => void } | null>(null)
 
-  const executeQueryRef = useRef(executeQuery)
-  executeQueryRef.current = executeQuery
+  const isCommandMenuHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
+  const setCommandMenuOpen = useSetCommandMenuOpen()
+
+  const executeQueryRef = useLatest(executeQuery)
+  const commandMenuHotkeyEnabledRef = useLatest(isCommandMenuHotkeyEnabled)
+  const setCommandMenuOpenRef = useLatest(setCommandMenuOpen)
 
   const [currentValue, setCurrentValue] = useState(value || defaultValue)
   const [isDiffMode, setIsDiffMode] = useState(false)
@@ -84,7 +95,7 @@ export const AIEditor = ({
 
   const complete = useCallback(
     async (
-      prompt: string,
+      _prompt: string,
       options?: {
         headers?: Record<string, string>
         body?: { completionMetadata?: any }
@@ -204,32 +215,23 @@ export const AIEditor = ({
 
     if (language === 'javascript' || language === 'typescript') {
       // The Deno libs are loaded as a raw text via raw-loader in next.config.ts. They're passed as raw text to the
-      // Monaco editor.
-      import('@/public/deno/edge-runtime.d.ts' as string)
+      // Monaco editor. The @vite-ignore stops Vite/Rolldown's dep scanner from following the dynamic import and
+      // trying to parse the .d.ts declarations as runtime modules — that crashes the scan in vite 8.0.13+ and
+      // cascades into SSR pre-bundling breakage.
+      import(/* @vite-ignore */ '@/public/deno/edge-runtime.d.ts' as string)
         .then((module) => {
           monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
         })
         .catch((error) => {
           console.error('Failed to load Deno edge-runtime typings:', error)
         })
-      import('@/public/deno/lib.deno.d.ts' as string)
+      import(/* @vite-ignore */ '@/public/deno/lib.deno.d.ts' as string)
         .then((module) => {
           monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
         })
         .catch((error) => {
           console.error('Failed to load Deno lib typings:', error)
         })
-    }
-
-    if (!!executeQueryRef.current) {
-      editor.addAction({
-        id: 'run-query',
-        label: 'Run Query',
-        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.Enter],
-        contextMenuGroupId: 'operation',
-        contextMenuOrder: 0,
-        run: () => executeQueryRef.current?.(),
-      })
     }
 
     refreshCloseAction()
@@ -249,35 +251,22 @@ export const AIEditor = ({
     editor.addAction({
       id: 'generate-ai',
       label: 'Generate with AI',
-      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyK],
       run: () => {
-        const selection = editor.getSelection()
-        const model = editor.getModel()
-        if (!model || !selection) return
-
-        const allLines = model.getLinesContent()
-        const startLineIndex = selection.startLineNumber - 1
-        const endLineIndex = selection.endLineNumber
-
-        const beforeSelection = allLines.slice(0, startLineIndex).join('\n') + '\n'
-        const selectedText = allLines.slice(startLineIndex, endLineIndex).join('\n')
-        const afterSelection = '\n' + allLines.slice(endLineIndex).join('\n')
-
-        setPromptState({
-          isOpen: true,
-          selection: selectedText,
-          beforeSelection,
-          afterSelection,
-          startLineNumber: selection?.startLineNumber ?? 0,
-          endLineNumber: selection?.endLineNumber ?? 0,
-        })
+        const selectionParts = getEditorSelectionParts(editor)
+        if (!selectionParts) return
+        setPromptState({ isOpen: true, ...selectionParts })
       },
     })
 
-    if (autoFocus) {
-      if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
-      editor.focus()
-    }
+    // Monaco claims Cmd+K as a chord prefix, which swallows the global command
+    // menu shortcut while the editor is focused. Intercept it here and open the
+    // command menu directly so it works the same inside and outside the editor.
+    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK, () => {
+      if (commandMenuHotkeyEnabledRef.current) {
+        setCommandMenuOpenRef.current(true)
+      }
+    })
   }
 
   const handlePrompt = async (
@@ -315,19 +304,6 @@ export const AIEditor = ({
     } catch (error) {
       setPromptState((prev) => ({ ...prev, isOpen: false }))
     }
-  }
-
-  const defaultOptions: monacoEditor.IStandaloneEditorConstructionOptions = {
-    tabSize: 2,
-    fontSize: 13,
-    readOnly,
-    minimap: { enabled: false },
-    wordWrap: 'on',
-    lineNumbers: 'on',
-    folding: false,
-    padding: { top: 4 },
-    lineNumbersMinChars: 3,
-    ...options,
   }
 
   useEffect(() => {
@@ -406,19 +382,20 @@ export const AIEditor = ({
         </div>
       ) : (
         <div className="w-full h-full relative">
-          {/* [Joshen] Refactor: Use CodeEditor.tsx instead, reduce duplicate declaration of Editor */}
-          <Editor
-            theme="supabase"
+          <CodeEditor
             language={language}
+            autofocus={autoFocus}
+            className={className}
+            isReadOnly={readOnly}
+            options={options}
             value={currentValue}
-            options={defaultOptions}
-            onChange={(value: string | undefined) => {
+            onInputChange={(value) => {
               const newValue = value || ''
               setCurrentValue(newValue)
               onChange?.(newValue)
             }}
             onMount={handleEditorOnMount}
-            className={className}
+            actions={{ runQuery: { enabled: true, callback: () => executeQueryRef.current?.() } }}
           />
           {promptState.isOpen && editorRef.current && (
             <ResizableAIWidget
@@ -450,7 +427,7 @@ export const AIEditor = ({
               >
                 Hit{' '}
                 <KeyboardShortcut
-                  keys={['Meta', 'k']}
+                  keys={['Meta', 'Shift', 'k']}
                   variant="inline"
                   className="text-xs text-foreground-lighter"
                 />{' '}

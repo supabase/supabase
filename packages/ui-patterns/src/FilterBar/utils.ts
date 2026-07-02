@@ -326,14 +326,9 @@ export function groupMenuItemsByOperator(items: MenuItem[]): MenuItemGroup[] {
   }))
 }
 
-export function truncateText(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text
-  return text.slice(0, maxLength) + '...'
-}
-
 export function getActionItemLabel(item: MenuItem): string {
   if (item.isAction && item.actionInputValue) {
-    return `Ask AI: "${truncateText(item.actionInputValue, 30)}"`
+    return `Ask AI: "${item.actionInputValue}"`
   }
   return item.label
 }

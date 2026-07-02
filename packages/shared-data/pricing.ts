@@ -37,6 +37,7 @@ export type FeatureKey =
   | 'database.pausing'
   | 'database.branching'
   | 'database.egress'
+  | 'database.replication'
   | 'auth.totalUsers'
   | 'auth.maus'
   | 'auth.userDataOwnership'
@@ -60,7 +61,6 @@ export type FeatureKey =
   | 'storage.cachedEgress'
   | 'storage.cdn'
   | 'storage.transformations'
-  | 'storage.byoc'
   | 'functions.invocations'
   | 'functions.scriptSize'
   | 'functions.numberOfFunctions'
@@ -75,6 +75,7 @@ export type FeatureKey =
   | 'security.logDrain'
   | 'security.metricsEndpoint'
   | 'security.soc2'
+  | 'security.iso27001'
   | 'security.hipaa'
   | 'security.privateLink'
   | 'security.sso'
@@ -190,6 +191,25 @@ export const pricing: Pricing = {
           free: '5 GB included',
           pro: ['250 GB included', 'then $0.09 per GB'],
           team: ['250 GB included', 'then $0.09 per GB'],
+          enterprise: 'Custom',
+        },
+        usage_based: true,
+      },
+      {
+        key: 'database.replication',
+        title: 'Pipelines',
+        plans: {
+          free: false,
+          pro: [
+            '$39 per pipeline per month',
+            '$3.00 per GB replicated data',
+            '$0.60 per GB backfill data',
+          ],
+          team: [
+            '$39 per pipeline per month',
+            '$3.00 per GB replicated data',
+            '$0.60 per GB backfill data',
+          ],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -401,8 +421,8 @@ export const pricing: Pricing = {
         title: 'Storage',
         plans: {
           free: '1 GB included',
-          pro: ['100 GB included', 'then $0.021 per GB'],
-          team: ['100 GB included', 'then $0.021 per GB'],
+          pro: ['100 GB included', 'then $0.0213 per GB'],
+          team: ['100 GB included', 'then $0.0213 per GB'],
           enterprise: 'Custom',
         },
         usage_based: true,
@@ -461,17 +481,6 @@ export const pricing: Pricing = {
           enterprise: 'Custom',
         },
         usage_based: true,
-      },
-      {
-        key: 'storage.byoc',
-        title: 'Bring your own storage provider',
-        plans: {
-          free: false,
-          pro: false,
-          team: false,
-          enterprise: true,
-        },
-        usage_based: false,
       },
     ],
   },
@@ -621,6 +630,17 @@ export const pricing: Pricing = {
       {
         key: 'security.soc2',
         title: 'SOC2',
+        plans: {
+          free: false,
+          pro: false,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
+        key: 'security.iso27001',
+        title: 'ISO 27001',
         plans: {
           free: false,
           pro: false,

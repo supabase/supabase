@@ -2,7 +2,7 @@ import { useBreakpoint } from 'common'
 import { Play } from 'lucide-react'
 import Image from 'next/image'
 import React, { ReactNode } from 'react'
-import { cn, Modal } from 'ui'
+import { Dialog, DialogContent, DialogTrigger } from 'ui'
 
 interface ExpandableVideoProps {
   videoId: string
@@ -29,27 +29,11 @@ export function ExpandableVideo({
   const isMobile = useBreakpoint(768)
 
   React.useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      switch (e.key) {
-        case 'Escape':
-          return setExpandVideo(false)
-        default:
-          return
-      }
-    }
-
-    window.addEventListener('keydown', onKeyDown)
-    return () => {
-      window.removeEventListener('keydown', onKeyDown)
-    }
-  }, [])
-
-  React.useEffect(() => {
     if (isMobile) setExpandVideo(false)
   }, [isMobile])
 
   const CliccablePreview = () => (
-    <div className="video-container overflow-hidden rounded hover:cursor-pointer">
+    <div className="video-container overflow-hidden rounded-sm hover:cursor-pointer">
       <div
         className="
           absolute inset-0 z-10
@@ -76,58 +60,45 @@ export function ExpandableVideo({
         fill
         sizes="100%"
         priority={priority}
-        className="absolute inset-0 object-cover blur-sm scale-105"
+        className="absolute inset-0 object-cover blur-xs scale-105"
       />
     </div>
   )
 
   return (
     <>
-      <Modal
-        visible={expandVideo}
-        hideFooter
-        className={cn(
-          '!bg-[#f8f9fa]/95 dark:!bg-[#1c1c1c]/80',
-          '!border-[#e6e8eb]/90 dark:!border-[#282828]/90',
-          'transition ease-out',
-          'mx-auto backdrop-blur-md w-[calc(100%-2rem)]'
-        )}
-        onInteractOutside={(e) => {
-          // Only hide menu when clicking outside, not focusing outside
-          // Prevents Firefox dropdown issue that immediately closes menu after opening
-          if (e.type === 'dismissableLayer.pointerDownOutside') {
-            setExpandVideo(!expandVideo)
-          }
-        }}
-        size="xxlarge"
-      >
-        <div className="!w-full flex items-center justify-center">
-          <div className="relative w-full">
-            <button
-              onClick={() => setExpandVideo(false)}
-              className="text-foreground-light hover:text-foreground absolute -top-8 right-0"
-            >
-              <p className="text-xs">Close</p>
-            </button>
-            <div className="video-container !rounded-lg !border-none !overflow-hidden">
-              <iframe
-                src={`https://www.youtube-nocookie.com/embed/${videoId}`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+      <Dialog open={expandVideo} onOpenChange={(open) => setExpandVideo(open)}>
+        <DialogTrigger asChild>
+          <button
+            onClick={() => {
+              if (onOpenCallback) onOpenCallback()
+              setExpandVideo(true)
+            }}
+            className={['w-full', triggerContainerClassName].join(' ').trim()}
+          >
+            {trigger ?? <CliccablePreview />}
+          </button>
+        </DialogTrigger>
+        <DialogContent size="xxlarge">
+          <div className="w-full! flex items-center justify-center">
+            <div className="relative w-full">
+              <button
+                onClick={() => setExpandVideo(false)}
+                className="text-foreground-light hover:text-foreground absolute -top-8 right-0"
+              >
+                <p className="text-xs">Close</p>
+              </button>
+              <div className="video-container rounded-lg! border-none! overflow-hidden!">
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
             </div>
           </div>
-        </div>
-      </Modal>
-      <button
-        onClick={() => {
-          if (onOpenCallback) onOpenCallback()
-          setExpandVideo(true)
-        }}
-        className={['w-full', triggerContainerClassName].join(' ').trim()}
-      >
-        {trigger ?? <CliccablePreview />}
-      </button>
+        </DialogContent>
+      </Dialog>
     </>
   )
 }

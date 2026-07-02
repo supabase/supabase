@@ -18,7 +18,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
+const handleGetAll = async (_req: NextApiRequest, res: NextApiResponse) => {
   // Platform specific endpoint
   return res.status(200).json({
     db_anon_role: 'anon',
@@ -31,7 +31,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   })
 }
 
-const handlePatch = async (req: NextApiRequest, res: NextApiResponse) => {
+const handlePatch = async (_req: NextApiRequest, res: NextApiResponse) => {
   // Platform specific endpoint
   return res.status(200).json({})
 }

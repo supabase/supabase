@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import type { ReactNode } from 'react'
 
 import { useIsFeatureEnabled } from './useIsFeatureEnabled'
@@ -69,7 +68,7 @@ export function useOrganizationRestrictions() {
       variant: 'warning',
       title: RESTRICTION_MESSAGES.GRACE_PERIOD.title,
       description: RESTRICTION_MESSAGES.GRACE_PERIOD.description(
-        dayjs(org?.restriction_data?.['grace_period_end']).format('DD MMM, YYYY'),
+        org?.restriction_data?.['grace_period_end'] ?? '',
         org.slug
       ),
     })

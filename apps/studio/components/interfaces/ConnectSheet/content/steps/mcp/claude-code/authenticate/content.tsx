@@ -12,7 +12,7 @@ function ClaudeAuthenticateContent(_props: StepContentProps) {
         language="bash"
       />
       <p className="text-sm text-foreground-light">
-        Select the <code className="text-xs bg-surface-300 px-1 py-0.5 rounded">supabase</code>{' '}
+        Select the <code className="text-xs bg-surface-300 px-1 py-0.5 rounded-sm">supabase</code>{' '}
         server, then <span className="font-medium">Authenticate</span> to begin the flow.
       </p>
     </div>

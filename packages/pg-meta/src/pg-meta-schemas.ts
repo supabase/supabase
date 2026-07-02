@@ -13,6 +13,8 @@ const pgSchemaZod = z.object({
 const pgSchemaArrayZod = z.array(pgSchemaZod)
 const pgSchemaOptionalZod = z.optional(pgSchemaZod)
 
+export type PGSchema = z.infer<typeof pgSchemaZod>
+
 function list({
   includeSystemSchemas = false,
   limit,

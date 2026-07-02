@@ -12,7 +12,7 @@ cli = [ "supabase-postgres-config-update" ]
 
 > WARNING: Manually configuring the connection count hard codes it. This means if you upgrade or downgrade your database, the connection count will not auto-resize. You will have to make sure to manually update it.
 
-# Changing max database connections:
+## Changing max database connections
 
 Each compute instance has a default direct connection and pooler connection settings. You can find the most recent settings in the [compute docs](/docs/guides/platform/compute-add-ons#disk-io):
 
@@ -30,7 +30,7 @@ Each compute instance has a default direct connection and pooler connection sett
 | 12XL         | 500                | 9,000              |
 | 16XL         | 500                | 12,000             |
 
-## Configuring direct connections limits
+### Configuring direct connections limits
 
 > Note: the Supavisor connection limits are hard-coded and cannot be changed without upgrading the compute size:
 
@@ -50,28 +50,28 @@ Then you could run the following SQL in the SQL Editor to see if the changes wen
 SHOW max_connections;
 ```
 
-# Dangers of increasing the direct connection limits
+## Dangers of increasing the direct connection limits
 
 **Three** factors must be taken into consideration when adjusting the direct connection limit:
 
-### Process schedulers and Postgres internals:
+#### Process schedulers and Postgres internals
 
 Allowing too many direct connections in your database can overburden Postgres schedulers and other internal modules. This will result in a noticeable decrease in query throughput, despite having more connections available. EnterpriseDB wrote a wonderful [article](https://www.enterprisedb.com/postgres-tutorials/why-you-should-use-connection-pooling-when-setting-maxconnections-postgres) that outlines some of the considerations.
 
 The default connection values are set based on a solid understanding of Postgres architecture, and straying too far from them is _likely_ to hinder performance. However, with some experimentation, you might discover a value better suited to your specific needs. Still, unless there's a compelling reason to adjust the setting, it's generally advisable to stick with the defaults or change the values judiciously.'
 
-### Memory
+#### Memory
 
 > If you do not know how to monitor memory and CPU with Supabase Grafana, [check here](https://github.com/orgs/supabase/discussions/27141).
 
-#### Each direct connection is a running process that will consume active memory
+##### Each direct connection is a running process that will consume active memory
 
 This is a Grafana Chart of unhealthy memory usage:
 
 ![image](/docs/img/troubleshooting/47685206-7914-440e-a010-da62f5c38186.png)
 
 - Yellow: represents active memory
-- Red: represents SWAP, which is disk storage that the system treats as if it were actually memory
+- Red: represents SWAP, which is disk storage that the system treats as if it were memory
 - Green: it is unclaimed (the system will always leave some memory unclaimed)
 - Blue: it is cached data and a buffer
 
@@ -92,7 +92,7 @@ select
   ) || ' * ' || current_setting('maintenance_work_mem') || ')) / ' || current_setting('work_mem');
 ```
 
-### CPU
+#### CPU
 
 The below chart is an example of what can occur to the CPU if 100s of connections are inappropriately opened/closed every second or many CPU intensive queries are run in parallel
 

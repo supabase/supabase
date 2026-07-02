@@ -66,7 +66,6 @@ export const updateStackedChartColors = (isDarkMode: boolean) => {
   STACKED_CHART_FILLS = isDarkMode ? DARK_STACKED_CHART_FILLS : LIGHT_STACKED_CHART_FILLS
 }
 
-// refer to packages/ui/radix-colors.js for full list of colors
 export type ValidStackColor =
   | 'brand'
   | 'blue'
@@ -81,17 +80,14 @@ export type ValidStackColor =
 
 export const genStackColorScales = (colors: ValidStackColor[]) =>
   colors.map((color) => {
-    // override default base scale for certain colors that do not have good contrast
-    const scale =
-      (
-        {
-          slate: 11,
-        } as any
-      )[color] ?? 9
+    let scale = 9
+    if (color === 'slate') {
+      scale = 11
+    }
     return {
-      lighter: `var(--colors-${color}${(scale as number) - 1})`,
-      base: `var(--colors-${color}${scale})`,
-      darker: `var(--colors-${color}${(scale as number) + 1})`,
+      lighter: `var(--color-${color}-${scale - 1}00)`,
+      base: `var(--color-${color}-${scale * 100})`,
+      darker: `var(--color-${color}-${scale + 1}00)`,
     }
   })
 

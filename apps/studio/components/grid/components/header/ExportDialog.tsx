@@ -15,7 +15,7 @@ import {
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { Filter, Sort, SupaTable } from '@/components/grid/types'
@@ -148,7 +148,7 @@ pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${table
           )}
         </DialogSection>
         <DialogFooter>
-          <Button type="default" onClick={() => onOpenChange(false)}>
+          <Button variant="default" onClick={() => onOpenChange(false)}>
             Close
           </Button>
         </DialogFooter>

@@ -24,6 +24,7 @@ enum MenuId {
   Security = 'security',
   SelfHosting = 'self_hosting',
   Integrations = 'integrations',
+  AiTools = 'ai_tools',
   LocalDevelopment = 'local_development',
   Contributing = 'contributing',
   RefJavaScriptV1 = 'reference_javascript_v1',
@@ -132,6 +133,10 @@ const menus: Menu[] = [
   },
   {
     id: MenuId.LocalDevelopment,
+    type: 'guide',
+  },
+  {
+    id: MenuId.AiTools,
     type: 'guide',
   },
   {

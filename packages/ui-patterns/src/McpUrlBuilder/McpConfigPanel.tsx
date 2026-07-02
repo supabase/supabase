@@ -5,12 +5,24 @@ import { cn, Separator } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { InfoTooltip } from '../info-tooltip'
+import {
+  FEATURE_GROUPS_NON_PLATFORM,
+  FEATURE_GROUPS_PLATFORM,
+  MCP_CLIENT_GROUPS,
+} from './clients.data'
 import { ClientSelectDropdown } from './components/ClientSelectDropdown'
 import { McpConfigurationDisplay } from './components/McpConfigurationDisplay'
 import { McpConfigurationOptions } from './components/McpConfigurationOptions'
-import { FEATURE_GROUPS_NON_PLATFORM, FEATURE_GROUPS_PLATFORM, MCP_CLIENTS } from './constants'
+import { MCP_CLIENTS } from './mcpClients'
 import type { McpClient, McpOnCopyCallback } from './types'
 import { getMcpUrl } from './utils/getMcpUrl'
+
+const CLIENT_GROUPS = MCP_CLIENT_GROUPS.map((group) => ({
+  heading: group.heading,
+  clients: group.keys
+    .map((key) => MCP_CLIENTS.find((c) => c.key === key))
+    .filter(Boolean) as (typeof MCP_CLIENTS)[number][],
+}))
 
 export interface McpConfigPanelProps {
   baseUrl?: string
@@ -75,7 +87,6 @@ export function McpConfigPanel({
         <Separator />
         <McpConfigurationOptions
           className={innerPanelSpacing}
-          isPlatform={isPlatform}
           readonly={readonly}
           onReadonlyChange={setReadonly}
           selectedFeatures={selectedFeaturesSupported}
@@ -106,6 +117,7 @@ export function McpConfigPanel({
         <ClientSelectDropdown
           label="Client"
           clients={MCP_CLIENTS}
+          groups={CLIENT_GROUPS}
           selectedClient={selectedClient}
           onClientChange={handleClientChange}
           theme={theme}

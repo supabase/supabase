@@ -106,7 +106,7 @@ export function PITRForm({
         footer={
           <div className="flex items-center justify-end gap-3 p-6">
             <ButtonTooltip
-              type="default"
+              variant="default"
               disabled={disabled || !selectedDate || !isWithinRange}
               onClick={handleSubmit}
               tooltip={{
@@ -140,10 +140,10 @@ export function PITRForm({
               ]}
               classNames={{
                 day: cn(
-                  '[&:not(:has(:disabled))]:border [&:not(:has(:disabled))]:border-stronger [&:not(:last-child)]:border-r-0 [&:not(:has(:disabled))]:bg-overlay-hover',
+                  '[&:not(:has(:disabled))]:border [&:not(:has(:disabled))]:border-stronger not-last:border-r-0 [&:not(:has(:disabled))]:bg-overlay-hover',
                   'rounded-none'
                 ),
-                selected: '!bg-brand-500',
+                selected: 'bg-brand-500!',
               }}
             />
             {availableDates.length > 1 && (
@@ -216,7 +216,7 @@ export function PITRForm({
                       closest backup within the 2-minute window
                     </p>
                   </div>
-                  <div className="!mt-4 space-y-1">
+                  <div className="mt-4! space-y-1">
                     <h3 className="text-sm text-foreground-light"></h3>
                     {isSelectedOnEarliestDay && (
                       <p className="text-sm text-foreground-light">

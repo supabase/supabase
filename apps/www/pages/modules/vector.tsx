@@ -1,13 +1,16 @@
 import 'swiper/css'
 
+import DefaultLayout from '~/components/Layouts/Default'
+import ModulesNav from '~/components/Modules/ModulesNav'
+import vectorPageData from '~/data/products/modules/vector'
+import { useBreakpoint } from 'common'
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
-import DefaultLayout from '~/components/Layouts/Default'
-
-import { useBreakpoint } from 'common'
-import vectorPageData from '~/data/products/modules/vector'
-import ModulesNav from '~/components/Modules/ModulesNav'
+import Head from 'next/head'
 import { PRODUCT_MODULES_NAMES, PRODUCT_MODULES_SHORTNAMES } from 'shared-data/products'
+
+import { breadcrumbs } from '@/lib/breadcrumbs'
+import { breadcrumbListSchema, serializeJsonLd, softwareApplicationSchema } from '@/lib/json-ld'
 
 const ProductModulesHeader = dynamic(() => import('~/components/Sections/ProductModulesHeader'))
 const HighlightCards = dynamic(() => import('~/components/Sections/HighlightCards'))
@@ -45,7 +48,28 @@ function VectorPage() {
           ],
         }}
       />
-      <DefaultLayout className="!bg-alternative" stickyNavbar={false}>
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(
+              softwareApplicationSchema({
+                name: 'Supabase Vector',
+                description: meta_description,
+                url: 'https://supabase.com/modules/vector',
+                image: meta_image,
+              })
+            ),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.vector)),
+          }}
+        />
+      </Head>
+      <DefaultLayout className="bg-alternative!" stickyNavbar={false}>
         <ModulesNav activePage={PRODUCT_MODULES_NAMES.VECTOR} docsUrl={pageData.docsUrl} />
         <ProductModulesHeader {...pageData.heroSection} />
         <HighlightCards {...(pageData.highlightsSection as any)} />
@@ -56,11 +80,11 @@ function VectorPage() {
           <FeaturesSection {...pageData.featuresSection} />
         </div>
         <CustomerQuotesSection {...pageData.quotesSection} />
-        <div className="bg-gradient-to-t from-alternative to-transparent">
+        <div className="bg-linear-to-t from-alternative to-transparent">
           <EnterpriseCta />
         </div>
         <div className="bg-background">
-          <div className="w-full h-[1px] bg-gradient-to-r from-background-alternative via-border to-background-alternative" />
+          <div className="w-full h-px bg-linear-to-r from-background-alternative via-border to-background-alternative" />
           <ProductsCta currentProduct={PRODUCT_MODULES_SHORTNAMES.VECTOR} />
         </div>
       </DefaultLayout>

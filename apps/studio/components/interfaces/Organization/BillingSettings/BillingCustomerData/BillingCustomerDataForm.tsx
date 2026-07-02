@@ -5,24 +5,24 @@ import type {
   StripeAddressElementOptions,
 } from '@stripe/stripe-js'
 import { Check, ChevronsUpDown, Info, X } from 'lucide-react'
-import { useId, useMemo, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Button,
   cn,
-  Command_Shadcn_ as Command,
-  CommandEmpty_Shadcn_ as CommandEmpty,
-  CommandGroup_Shadcn_ as CommandGroup,
-  CommandInput_Shadcn_ as CommandInput,
-  CommandItem_Shadcn_ as CommandItem,
-  CommandList_Shadcn_ as CommandList,
-  FormControl_Shadcn_ as FormControl,
-  FormField_Shadcn_ as FormField,
-  FormMessage_Shadcn_ as FormMessage,
-  Input_Shadcn_ as Input,
-  Popover_Shadcn_ as Popover,
-  PopoverContent_Shadcn_ as PopoverContent,
-  PopoverTrigger_Shadcn_ as PopoverTrigger,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  FormControl,
+  FormField,
+  FormMessage,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -87,6 +87,23 @@ export const BillingCustomerDataForm = ({
     )
   }, [addressCountry])
 
+  // Clear tax ID fields when the billing country changes so a stale tax ID
+  // from the previous country doesn't persist under the new one.
+  const prevCountryRef = useRef(addressCountry)
+  useEffect(() => {
+    if (!addressCountry) return
+
+    const isCountryChange =
+      prevCountryRef.current !== undefined && prevCountryRef.current !== addressCountry
+    prevCountryRef.current = addressCountry
+
+    if (isCountryChange) {
+      form.setValue('tax_id_type', '', { shouldDirty: true })
+      form.setValue('tax_id_value', '', { shouldDirty: true })
+      form.setValue('tax_id_name', '', { shouldDirty: true })
+    }
+  }, [addressCountry, form])
+
   return (
     <div className={cn('flex flex-col space-y-4', className)}>
       <div className={cn('relative', disabled && 'opacity-50')}>
@@ -126,7 +143,7 @@ export const BillingCustomerDataForm = ({
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button
-                      type="default"
+                      variant="default"
                       role="combobox"
                       size="medium"
                       disabled={disabled}
@@ -204,7 +221,7 @@ export const BillingCustomerDataForm = ({
             />
 
             <Button
-              type="text"
+              variant="text"
               className="px-1"
               icon={<X />}
               disabled={disabled}

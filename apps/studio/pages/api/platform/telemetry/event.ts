@@ -16,7 +16,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const handlePost = async (req: NextApiRequest, res: NextApiResponse) => {
+const handlePost = async (_req: NextApiRequest, res: NextApiResponse) => {
   // Platform specific endpoint
   const response = {}
   return res.status(200).json(response)

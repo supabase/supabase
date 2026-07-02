@@ -1,12 +1,14 @@
 /**
- * Types and additional comments for the JavaScript library are found in the
- * auto-generated TS typespec.
+ * Type definitions and TypeDoc normalisation helpers shared between the build
+ * script (`scripts/build-reference-content.ts`) and the renderer
+ * (`Reference.sections.tsx`, `Reference.ui.tsx`).
  *
- * The format of this typespec is difficult to walk, so we re-shape it for easy
- * access to a function's type definition, given its name and module.
+ * The build script walks each per-package TypeDoc dump and calls
+ * `parseSignature` / `parseType` / `normalizeComment` to produce the
+ * `MethodTypes` / `VariableTypes` entries the renderer consumes. This module
+ * is I/O-free so it can be imported from any environment (Node scripts, RSC,
+ * tests).
  */
-
-import _typeSpec from '~/spec/enrichments/tsdoc_v2/combined.json' with { type: 'json' }
 
 // [Charis] 2024-07-10
 // Types are more trouble than they're worth here: manually defining the types
@@ -14,7 +16,6 @@ import _typeSpec from '~/spec/enrichments/tsdoc_v2/combined.json' with { type: '
 // errors. As long as everything is typed on the way out, and we code
 // defensively, it should be fine. Keep any unsafe type shenanigans isolated
 // to this file.
-const typeSpec = _typeSpec as any
 
 export const TYPESPEC_NODE_ANONYMOUS = Symbol('anonymous')
 
@@ -54,7 +55,7 @@ export interface VariableTypes {
   isConst?: boolean
 }
 
-interface Comment {
+export interface Comment {
   shortText?: string
   text?: string
   tags?: Array<{ tag: string; text: string }>
@@ -177,14 +178,14 @@ export interface CustomTypePropertyType {
 
 // The meaning of kind flags from `typedoc`:
 // https://github.com/TypeStrong/typedoc/blob/2953b0148253589448176881a7acb46090f941bd/src/lib/output/themes/default/assets/typedoc/Application.ts#L36
-const KIND_MODULE = 2
-const KIND_VARIABLE = 32
-const KIND_CLASS = 128
-const KIND_INTERFACE = 256
-const KIND_CONSTRUCTOR = 512
-const KIND_PROPERTY = 1024
-const KIND_METHOD = 2048
-const KIND_TYPE_LITERAL = 65536
+export const KIND_MODULE = 2
+export const KIND_VARIABLE = 32
+export const KIND_CLASS = 128
+export const KIND_INTERFACE = 256
+export const KIND_CONSTRUCTOR = 512
+export const KIND_PROPERTY = 1024
+export const KIND_METHOD = 2048
+export const KIND_TYPE_LITERAL = 65536
 
 /**
  *
@@ -231,7 +232,9 @@ interface CommentBlockTag {
   content: CommentKind[]
 }
 
-function normalizeComment(original: TypedocComment | Comment | undefined): Comment | undefined {
+export function normalizeComment(
+  original: TypedocComment | Comment | undefined
+): Comment | undefined {
   if (!original) return
 
   if ('shortText' in original || 'text' in original) {
@@ -345,41 +348,11 @@ function normalizeComment(original: TypedocComment | Comment | undefined): Comme
   return comment
 }
 
-export function parseTypeSpec() {
-  const modules = (typeSpec.children ?? []).map(parseMod)
-  return modules as Array<ModuleTypes>
-}
-
-function normalizeRefPath(path: string) {
+export function normalizeRefPath(path: string) {
   return path.replace(/\.index(?=\.|$)/g, '').replace(/\.+/g, '.')
 }
 
-function buildRefPath(segments: Array<string>) {
-  return normalizeRefPath(segments.filter(Boolean).join('.'))
-}
-
-// Reading the type spec happens in several layers. The first layer is the
-// module: this corresponds roughly to the JS libraries for each product:
-// database, auth, storage, etc.
-
-function parseMod(mod: (typeof typeSpec)['children'][number]) {
-  const res: ModuleTypes = {
-    name: mod.name,
-    methods: new Map(),
-    variables: new Map(),
-  }
-
-  // Build a map of nodes by their IDs for easy cross-referencing.
-  const targetMap = new Map<number, any>()
-  buildMap(mod, targetMap)
-  const processingRefs = new Set<number>()
-
-  parseModInternal(mod, targetMap, [], res, processingRefs)
-
-  return res
-}
-
-function buildMap(node: any, map: Map<number, any>) {
+export function buildMap(node: any, map: Map<number, any>) {
   if ('id' in node) {
     map.set(node.id, node)
   }
@@ -388,127 +361,12 @@ function buildMap(node: any, map: Map<number, any>) {
   }
 }
 
-// This layer is the top level of a module. Paths are tracked in this layer,
-// because they are needed to construct the $ref that will be used to reference
-// a specific type definition.
-
-function parseModInternal(
-  node: any,
-  map: Map<number, any>,
-  currentPath: Array<string>,
-  res: ModuleTypes,
-  processingRefs: Set<number>
-) {
-  let updatedPath: Array<string>
-
-  switch ((node.kindString ?? node.variant)?.toLowerCase()) {
-    case 'module':
-      updatedPath = [...currentPath, node.name]
-      node.children?.forEach((child: any) =>
-        parseModInternal(child, map, updatedPath, res, processingRefs)
-      )
-      return
-    // Some libraries have undefined where others have Project or declaration // for the same type of top-level node.
-    case 'project':
-    case undefined:
-      updatedPath = [...currentPath, node.name]
-      node.children?.forEach((child: any) =>
-        parseModInternal(child, map, updatedPath, res, processingRefs)
-      )
-      return
-    case 'class':
-      updatedPath = [...currentPath, node.name]
-      node.children?.forEach((child: any) =>
-        parseModInternal(child, map, updatedPath, res, processingRefs)
-      )
-      return
-    case 'constructor':
-      return parseConstructor(node, map, currentPath, res)
-    case 'method':
-      return parseMethod(node, map, currentPath, res)
-    case 'interface':
-      updatedPath = [...currentPath, node.name]
-      node.children?.forEach((child: any) =>
-        parseModInternal(child, map, updatedPath, res, processingRefs)
-      )
-      return
-    case 'declaration':
-      if (node.kind === KIND_CLASS || node.kind === KIND_MODULE) {
-        updatedPath = [...currentPath, node.name]
-        node.children?.forEach((child: any) =>
-          parseModInternal(child, map, updatedPath, res, processingRefs)
-        )
-      } else if (node.kind === KIND_INTERFACE) {
-        updatedPath = [...currentPath, node.name]
-        node.children?.forEach((child: any) =>
-          parseModInternal(child, map, updatedPath, res, processingRefs)
-        )
-      } else if (node.kind === KIND_CONSTRUCTOR) {
-        parseConstructor(node, map, currentPath, res)
-      } else if (node.kind === KIND_METHOD) {
-        return parseMethod(node, map, currentPath, res)
-      } else if (node.kind === KIND_VARIABLE) {
-        return parseVariable(node, map, currentPath, res)
-      } else if (node.kind === KIND_PROPERTY) {
-        parsePropertyReference(node, map, currentPath, res, processingRefs)
-      }
-      return
-    case 'property':
-      parsePropertyReference(node, map, currentPath, res, processingRefs)
-      return
-    case 'reference':
-    default:
-      return
-  }
-}
-
-function parsePropertyReference(
-  node: any,
-  map: Map<number, any>,
-  currentPath: Array<string>,
-  res: ModuleTypes,
-  processingRefs: Set<number>
-) {
-  const refType = node.type
-  if (refType?.type !== 'reference') {
-    return
-  }
-
-  const referent = map.get(refType.target ?? refType.id)
-  if (!referent) {
-    return
-  }
-
-  if (processingRefs.has(referent.id)) {
-    return
-  }
-
-  const isForwardedNamespace =
-    referent?.variant === 'declaration' &&
-    (referent.kind === KIND_INTERFACE ||
-      referent.kind === KIND_CLASS ||
-      referent.kind === KIND_MODULE)
-
-  if (!isForwardedNamespace) {
-    return
-  }
-
-  const parentPath =
-    currentPath.length > 0 && currentPath[currentPath.length - 1]?.startsWith('@supabase/')
-      ? currentPath
-      : currentPath.slice(0, -1)
-
-  processingRefs.add(referent.id)
-  parseModInternal(referent, map, parentPath, res, processingRefs)
-  processingRefs.delete(referent.id)
-}
-
 /**
  * Get the name for a node, which may be delegated or missing (placeholders
  * are prefaced by two `__` in the type spec). If missing, use the anonymous
  * symbol.
  */
-function nameOrAnonymous(nodes: any) {
+export function nameOrAnonymous(nodes: any) {
   if (!Array.isArray(nodes)) {
     nodes = [nodes]
   }
@@ -522,91 +380,7 @@ function nameOrAnonymous(nodes: any) {
   return TYPESPEC_NODE_ANONYMOUS
 }
 
-function parseConstructor(
-  node: any,
-  map: Map<number, any>,
-  currentPath: Array<string>,
-  res: ModuleTypes
-) {
-  const $ref = buildRefPath([...currentPath, 'constructor'])
-
-  const signature = node.signatures[0]
-  if (!signature) return
-
-  const { params, ret, comment } = parseSignature(signature, map)
-
-  const types: MethodTypes = {
-    name: $ref,
-    params,
-    ret,
-    comment,
-  }
-
-  res.methods.set($ref, types)
-}
-
-function parseMethod(
-  node: any,
-  map: Map<number, any>,
-  currentPath: Array<string>,
-  res: ModuleTypes
-) {
-  const $ref = buildRefPath([...currentPath, node.name])
-
-  const signature = node.signatures[0]
-  if (!signature) return
-
-  let { params, ret, comment } = parseSignature(signature, map)
-
-  // When a method has multiple overload signatures, TypeDoc places the shared
-  // JSDoc on the method node rather than any individual signature. Always merge
-  // node.comment as the base so that block tags (@remarks, @example, etc.) are
-  // not lost when overload signatures already carry a minimal summary comment.
-  if (node.comment) {
-    const nodeComment = normalizeComment(node.comment)
-    if (nodeComment) {
-      comment = { ...nodeComment, ...comment }
-    }
-  }
-
-  const types: MethodTypes = {
-    name: $ref,
-    params,
-    ret,
-    comment,
-  }
-
-  if (node.signatures.length > 1) {
-    types.altSignatures = node.signatures
-      .slice(1)
-      .map((signature) => parseSignature(signature, map))
-  }
-
-  res.methods.set($ref, types)
-}
-
-function parseVariable(
-  node: any,
-  map: Map<number, any>,
-  currentPath: Array<string>,
-  res: ModuleTypes
-) {
-  const $ref = buildRefPath([...currentPath, node.name])
-
-  const type = parseType(node.type, map)
-  const comment = node.comment ? normalizeComment(node.comment) : undefined
-
-  const types: VariableTypes = {
-    name: $ref,
-    type,
-    comment,
-    isConst: node.flags?.isConst ?? false,
-  }
-
-  res.variables.set($ref, types)
-}
-
-function parseSignature(
+export function parseSignature(
   signature: any,
   map: Map<number, any>
 ): {
@@ -662,7 +436,7 @@ function parseSignature(
 //
 // with additional properties depending on the type.
 
-function parseType(type: any, map: Map<number, any>, typeArguments?: any, debug = false) {
+export function parseType(type: any, map: Map<number, any>, typeArguments?: any, debug = false) {
   switch (type.type) {
     case 'literal':
       return type

@@ -2,10 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { useForm } from 'react-hook-form'
+import { Button, Form } from 'ui'
 import { describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
-
-import { Button, Form_Shadcn_ } from 'ui'
 
 import { KeyValueFieldArray, type KeyValueFieldArrayAction } from './KeyValueFieldArray'
 
@@ -65,7 +64,7 @@ const KeyValueForm = ({
   })
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <KeyValueFieldArray
           control={form.control}
@@ -79,9 +78,9 @@ const KeyValueForm = ({
           addActions={addActions}
           removeLabel="Remove header"
         />
-        <Button htmlType="submit">Submit</Button>
+        <Button type="submit">Submit</Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }
 
@@ -98,7 +97,7 @@ const NameValueForm = ({
   })
 
   return (
-    <Form_Shadcn_ {...form}>
+    <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
         <KeyValueFieldArray
           control={form.control}
@@ -111,9 +110,9 @@ const NameValueForm = ({
           addLabel="Add header"
           removeLabel="Remove header"
         />
-        <Button htmlType="submit">Submit</Button>
+        <Button type="submit">Submit</Button>
       </form>
-    </Form_Shadcn_>
+    </Form>
   )
 }
 

@@ -8,7 +8,7 @@ interface StateOfStartupsHeaderProps {
 
 const DiagonalStripes = () => (
   <div
-    className="flex-grow"
+    className="grow"
     style={{
       backgroundImage: `repeating-linear-gradient(
         45deg,
@@ -30,7 +30,7 @@ const HeaderProgressBar = ({
   progressBgColor?: string
   progressFgColor?: string
 }) => (
-  <div className="flex-grow">
+  <div className="grow">
     <ProgressBar
       className="h-full"
       backgroundClassName={progressBgColor}
@@ -90,7 +90,7 @@ export function StateOfStartupsHeader({ showProgressBars = true }: StateOfStartu
 
   return (
     <header className="mt-16 md:mt-32">
-      <div className="max-w-[60rem] ml-8 md:mx-auto">
+      <div className="max-w-240 ml-8 md:mx-auto">
         <div className="flex flex-col">
           <h1 className="sr-only">State of Startups 2026</h1>
           <TextBlock

@@ -14,7 +14,7 @@ export function SurveyRankedAnswersPair({
   const accentRankText = 'text-brand'
 
   return (
-    <aside className="flex flex-col sm:flex-row flex-wrap divide-x divide-y divide-muted divide-opacity-50">
+    <aside className="flex flex-col sm:flex-row flex-wrap divide-x divide-y divide-muted/50">
       {rankedAnswersPair.map((item, index) => (
         <div
           key={index}

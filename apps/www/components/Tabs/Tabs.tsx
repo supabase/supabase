@@ -42,7 +42,7 @@ function Tabs({ children, className, defaultActiveId, listClassNames }: TabsProp
       <Tabs_Shadcn_
         value={currentActiveTab}
         onValueChange={setActiveTab}
-        className="w-full flex flex-col gap-4 [&_.ch-codeblock]:!mt-0"
+        className="w-full flex flex-col gap-4 [&_.ch-codeblock]:mt-0!"
       >
         <TabsList_Shadcn_ className={cn('shiki-wrapper flex', listClassNames)}>
           {validTabPanels.map((panel) => (

@@ -93,7 +93,7 @@ const RightClickBrandLogo = () => {
           onContextMenu={handleRightClick}
           onFocus={handleKeyboardOpen}
           onKeyDown={(e) => e.key === 'Enter' && router?.push('/')}
-          className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
+          className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-xs"
         >
           <SupabaseWordmark />
         </Link>
@@ -114,7 +114,7 @@ const RightClickBrandLogo = () => {
                   autoFocus
                   asChild
                   key={menuItem.label}
-                  className="w-full flex justify-between gap-2 items-center !p-2"
+                  className="w-full flex justify-between gap-2 items-center p-2!"
                 >
                   {menuItem.type === 'download' || menuItem.type === 'link' ? (
                     <Link

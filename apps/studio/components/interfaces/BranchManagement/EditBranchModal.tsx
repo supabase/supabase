@@ -17,11 +17,11 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  Label_Shadcn_ as Label,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Label,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -215,21 +215,21 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
           <DialogTitle>Edit branch "{branch?.name}"</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             <DialogSection padding="medium" className="space-y-4">
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="branchName"
                 render={({ field }) => (
                   <FormItemLayout label="Preview branch name">
-                    <FormControl_Shadcn_>
-                      <Input_Shadcn_
+                    <FormControl>
+                      <Input
                         {...field}
                         placeholder="e.g. staging, dev-feature-x"
                         autoComplete="off"
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -250,7 +250,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
 
               {isSuccessConnections &&
                 (githubConnection ? (
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="gitBranchName"
                     render={({ field }) => (
@@ -276,8 +276,8 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                         description="Automatically deploy changes on every commit"
                       >
                         <div className="relative">
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_
+                          <FormControl>
+                            <Input
                               {...field}
                               placeholder="e.g. main, feat/some-feature"
                               autoComplete="off"
@@ -286,7 +286,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                                 setIsGitBranchValid(false)
                               }}
                             />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                           <div className="absolute top-2.5 right-3 flex items-center gap-2">
                             {field.value ? (
                               isChecking ? (
@@ -311,7 +311,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                         for this branch.
                       </p>
                     </div>
-                    <Button type="default" icon={<Github />} onClick={openLinkerPanel}>
+                    <Button variant="default" icon={<Github />} onClick={openLinkerPanel}>
                       Connect to GitHub
                     </Button>
                   </div>
@@ -319,7 +319,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
             </DialogSection>
 
             <DialogFooter padding="medium">
-              <Button disabled={isUpdating} type="default" onClick={onClose}>
+              <Button disabled={isUpdating} variant="default" onClick={onClose}>
                 Cancel
               </Button>
               <Button
@@ -331,14 +331,14 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                   isChecking
                 }
                 loading={isUpdating}
-                type="primary"
-                htmlType="submit"
+                variant="primary"
+                type="submit"
               >
                 Update branch
               </Button>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

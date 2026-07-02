@@ -18,7 +18,7 @@ interface CourseHeroProps {
 
 export function CourseHero({ title, subtitle, description, instructors }: CourseHeroProps) {
   return (
-    <div className="relative w-full mx-auto py-16 sm:py-24 border-b bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.14),_transparent_55%),radial-gradient(circle_at_bottom,_rgba(34,197,94,0.10),_transparent_50%)]">
+    <div className="relative w-full mx-auto py-16 sm:py-24 border-b bg-[radial-gradient(circle_at_top,rgba(16,185,129,0.14),transparent_55%),radial-gradient(circle_at_bottom,rgba(34,197,94,0.10),transparent_50%)]">
       {/* Chapter label */}
       <div className="flex items-center justify-center mb-6">
         <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-muted border border-border text-xs font-medium text-muted-foreground uppercase tracking-wider">
@@ -27,7 +27,7 @@ export function CourseHero({ title, subtitle, description, instructors }: Course
         </span>
       </div>
 
-      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-balance text-center bg-gradient-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
+      <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-balance text-center bg-linear-to-br from-foreground to-foreground/70 bg-clip-text text-transparent">
         {title}
       </h1>
 
@@ -43,21 +43,21 @@ export function CourseHero({ title, subtitle, description, instructors }: Course
       {/* Course metadata */}
       <div className="flex flex-wrap items-center justify-center gap-6 mt-10 text-sm">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center shrink-0">
             <BookA className="w-5 h-5 text-brand-500" />
           </div>
           <span className="font-medium text-muted-foreground">5 Chapters</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center shrink-0">
             <Clock className="w-5 h-5 text-brand-500" />
           </div>
           <span className="font-medium text-muted-foreground">~1 hour</span>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-lg bg-brand-500/10 flex items-center justify-center shrink-0">
             <GraduationCap className="w-5 h-5 text-brand-500" />
           </div>
           <span className="font-medium text-muted-foreground">Beginner</span>

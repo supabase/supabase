@@ -75,7 +75,7 @@ const data = {
         link: 'https://supabase.com/dashboard/support/new',
         target: '_blank',
         icon: <ArrowUpRight />,
-        className: '!text-foreground-light hover:!text-foreground',
+        className: 'text-foreground-light! hover:text-foreground!',
         type: 'text',
       },
     ],

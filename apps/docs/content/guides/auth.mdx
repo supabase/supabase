@@ -1,7 +1,7 @@
 ---
 id: 'auth'
 title: 'Auth'
-description: 'Use Supabase to Authenticate and Authorize your users.'
+description: 'Use Supabase to authenticate and authorize your users.'
 subtitle: 'Use Supabase to authenticate and authorize your users.'
 tocVideo: '6ow_jW4epf8'
 ---
@@ -27,19 +27,15 @@ Auth uses your project's Postgres database under the hood, storing user data and
 
 Auth also enables access control to your database's automatically generated [REST API](/docs/guides/api). When using Supabase SDKs, your data requests are automatically sent with the user's Auth Token. The Auth Token scopes database access on a row-by-row level when used along with [RLS policies](/docs/guides/database/postgres/row-level-security).
 
+<ContentListings id="auth-get-started" />
+
 <$Show if="authentication:show_providers">
 <$Partial path="providers.mdx" />
 </$Show>
 
 <$Show if="billing:all">
 
-## Pricing
-
-Charges apply to Monthly Active Users (MAU), Monthly Active Third-Party Users (Third-Party MAU), and Monthly Active SSO Users (SSO MAU) and Advanced MFA Add-ons. For a detailed breakdown of how these charges are calculated, refer to the following pages:
-
-- [Pricing MAU](/docs/guides/platform/manage-your-usage/monthly-active-users)
-- [Pricing Third-Party MAU](/docs/guides/platform/manage-your-usage/monthly-active-users-third-party)
-- [Pricing SSO MAU](/docs/guides/platform/manage-your-usage/monthly-active-users-sso)
-- [Advanced MFA - Phone](/docs/guides/platform/manage-your-usage/advanced-mfa-phone)
-
+<ContentListings id="auth-pricing" />
 </$Show>
+
+<ContentListings id="auth-next-steps" />

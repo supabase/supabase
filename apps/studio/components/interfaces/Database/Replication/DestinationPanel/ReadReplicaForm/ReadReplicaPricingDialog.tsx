@@ -17,6 +17,7 @@ import {
 } from 'ui'
 
 import { useGetReplicaCost } from './useGetReplicaCost'
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -104,6 +105,7 @@ export const ReadReplicaPricingDialog = () => {
               .
             </p>
           )}
+          <TaxDisclaimer className="mt-3" />
         </DialogSection>
 
         <DialogFooter>

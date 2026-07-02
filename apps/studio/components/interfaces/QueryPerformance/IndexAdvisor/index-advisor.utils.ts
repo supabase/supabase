@@ -1,8 +1,9 @@
+import { joinSqlFragments, safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { toast } from 'sonner'
 
 import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
 import { GetIndexAdvisorResultResponse } from '@/data/database/retrieve-index-advisor-result-query'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 
 /**
@@ -44,7 +45,7 @@ export function calculateImprovement(
 interface CreateIndexParams {
   projectRef?: string
   connectionString?: string | null
-  indexStatements: string[]
+  indexStatements: SafeSqlFragment[]
   onSuccess?: () => void
   onError?: (error: any) => void
 }
@@ -78,7 +79,7 @@ export async function createIndexes({
     await executeSql({
       projectRef,
       connectionString,
-      sql: indexStatements.join(';\n') + ';',
+      sql: safeSql`${joinSqlFragments(indexStatements, ';\n')};`,
     })
 
     toast.success('Successfully created index')
@@ -112,7 +113,9 @@ export function hasIndexRecommendations(
  * @param indexStatements Array of index statement strings
  * @returns Filtered array excluding statements referencing protected schemas
  */
-export function filterProtectedSchemaIndexStatements(indexStatements: string[]): string[] {
+export function filterProtectedSchemaIndexStatements(
+  indexStatements: SafeSqlFragment[]
+): SafeSqlFragment[] {
   if (!indexStatements || indexStatements.length === 0) {
     return []
   }

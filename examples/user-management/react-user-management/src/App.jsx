@@ -1,30 +1,28 @@
-import { useState, useEffect } from 'react'
-import './App.css'
-import { supabase } from './supabaseClient'
-import Auth from './Auth'
-import Account from './Account'
-
 function App() {
-  const [user, setUser] = useState(null)
+  const [claims, setClaims] = useState(null)
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user)
+    const loadClaims = async () => {
+      const {
+        data: { claims },
+      } = await supabase.auth.getClaims()
+      setClaims(claims)
+    }
+
+    loadClaims()
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      loadClaims()
     })
 
-    supabase.auth.onAuthStateChange(async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      setUser(user)
-    })
+    return () => subscription.unsubscribe()
   }, [])
 
   return (
     <div className="container" style={{ padding: '50px 0 100px 0' }}>
-      {!user ? <Auth /> : <Account key={user.id} user={user} />}
+      {!claims ? <Auth /> : <Account key={claims.sub} claims={claims} />}
     </div>
   )
 }
-
-export default App

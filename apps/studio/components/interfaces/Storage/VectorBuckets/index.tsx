@@ -14,7 +14,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
 import { CreateVectorBucketDialog } from './CreateVectorBucketDialog'
-import AlertError from '@/components/ui/AlertError'
+import { VectorBucketsErrorState } from './VectorBucketsErrorState'
 import { AlphaNotice } from '@/components/ui/AlphaNotice'
 import { useVectorBucketsQuery } from '@/data/storage/vector-buckets-query'
 import { createNavigationHandler } from '@/lib/navigation'
@@ -62,9 +62,7 @@ export const VectorsBuckets = () => {
 
             {isLoadingBuckets && <GenericSkeletonLoader />}
 
-            {isErrorBuckets && (
-              <AlertError error={bucketsError} subject="Failed to retrieve vector buckets" />
-            )}
+            {isErrorBuckets && <VectorBucketsErrorState error={bucketsError} />}
 
             {isSuccessBuckets && (
               <>
@@ -75,10 +73,10 @@ export const VectorsBuckets = () => {
                     <div className="py-0">
                       <PageSectionTitle>Buckets</PageSectionTitle>
                     </div>
-                    <div className="flex flex-grow justify-between gap-x-2 items-center">
+                    <div className="flex grow justify-between gap-x-2 items-center">
                       <Input
                         size="tiny"
-                        className="flex-grow lg:flex-grow-0 w-52"
+                        className="grow lg:grow-0 w-52"
                         placeholder="Search for a bucket"
                         value={filterString}
                         onChange={(e) => setFilterString(e.target.value)}

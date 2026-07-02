@@ -6,14 +6,14 @@ import { useEffect } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Badge,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  FormControl,
+  FormField,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -50,13 +50,13 @@ export const OrganizationSelector = ({ form }: OrganizationSelectorProps) => {
 
   return (
     <Panel.Content className="space-y-4">
-      <FormField_Shadcn_
+      <FormField
         control={form.control}
         name="organization"
         render={({ field }) => (
           <FormItemLayout label="Organization" layout="horizontal">
             {(organizations?.length ?? 0) > 0 && (
-              <Select_Shadcn_
+              <Select
                 onValueChange={(slug) => {
                   field.onChange(slug)
                   router.push(`/new/${slug}`)
@@ -64,24 +64,24 @@ export const OrganizationSelector = ({ form }: OrganizationSelectorProps) => {
                 value={field.value}
                 defaultValue={field.value}
               >
-                <FormControl_Shadcn_>
-                  <SelectTrigger_Shadcn_>
-                    <SelectValue_Shadcn_ placeholder="Select an organization" />
-                  </SelectTrigger_Shadcn_>
-                </FormControl_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectGroup_Shadcn_>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select an organization" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectGroup>
                     {organizations?.map((x) => (
-                      <SelectItem_Shadcn_ key={x.id} value={x.slug}>
+                      <SelectItem key={x.id} value={x.slug}>
                         <div className="flex justify-between items-center gap-2 w-full">
                           <span>{x.name}</span>
-                          <Badge className="mt-[1px]">{x.plan.name}</Badge>
+                          <Badge className="mt-px">{x.plan.name}</Badge>
                         </div>
-                      </SelectItem_Shadcn_>
+                      </SelectItem>
                     ))}
-                  </SelectGroup_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             )}
           </FormItemLayout>
         )}

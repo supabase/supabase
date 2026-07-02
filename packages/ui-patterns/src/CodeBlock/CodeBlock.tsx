@@ -31,27 +31,34 @@ import { Button, cn, copyToClipboard } from 'ui'
 
 import { monokaiCustomTheme } from './CodeBlock.utils'
 
-export type CodeBlockLang =
-  | 'js'
-  | 'jsx'
-  | 'sql'
-  | 'py'
-  | 'bash'
-  | 'ts'
-  | 'dart'
-  | 'json'
-  | 'csharp'
-  | 'kotlin'
-  | 'curl'
-  | 'http'
-  | 'php'
-  | 'python'
-  | 'go'
-  | 'pgsql'
-  | 'swift'
-  | 'yaml'
-  | 'toml'
-  | 'html'
+const codeBlockLangs = [
+  'js',
+  'jsx',
+  'sql',
+  'py',
+  'bash',
+  'ts',
+  'dart',
+  'json',
+  'csharp',
+  'kotlin',
+  'curl',
+  'http',
+  'php',
+  'python',
+  'go',
+  'pgsql',
+  'swift',
+  'yaml',
+  'toml',
+  'html',
+] as const
+
+export type CodeBlockLang = (typeof codeBlockLangs)[number]
+
+export function isCodeBlockLang(lang: string): lang is CodeBlockLang {
+  return (codeBlockLangs as readonly string[]).includes(lang)
+}
 
 export interface CodeBlockProps {
   title?: ReactNode
@@ -195,7 +202,7 @@ export const CodeBlock = ({
             wrapLines={wrapLines}
             style={monokaiTheme}
             className={cn(
-              'code-block border border-surface p-4 w-full !my-0 !bg-surface-100 outline-none focus:border-foreground-lighter/50',
+              'code-block border border-surface p-4 w-full my-0! !bg-surface-100 outline-hidden focus:border-foreground-lighter/50',
               `${!title ? 'rounded-md' : 'rounded-t-none rounded-b-md'}`,
               `${!showLineNumbers ? 'pl-6' : ''}`,
               className
@@ -260,7 +267,7 @@ export const CodeBlock = ({
               ].join(' ')}
             >
               <Button
-                type="default"
+                variant="default"
                 className="px-1.5"
                 icon={copied ? <Check /> : <Copy />}
                 onClick={() => onSelectCopy(value || children)}

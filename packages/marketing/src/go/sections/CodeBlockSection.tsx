@@ -51,7 +51,7 @@ export default async function CodeBlockSection({ section }: { section: GoCodeBlo
     highlightedFiles.length > 1 || (highlightedFiles.length === 1 && isSingleFileWithName)
 
   return (
-    <div className="max-w-[80rem] w-full min-w-0 mx-auto px-8">
+    <div className="max-w-7xl w-full min-w-0 mx-auto px-8">
       {(section.title || section.description) && (
         <div className="mb-12">
           {section.title && (
@@ -69,11 +69,11 @@ export default async function CodeBlockSection({ section }: { section: GoCodeBlo
         ) : highlightedFiles.length === 1 ? (
           <>
             <div
-              className="hidden dark:block px-5 py-4 sm:px-6 sm:py-5 overflow-x-auto text-[13px] leading-[1.6] [&_pre]:!bg-transparent [&_pre]:!m-0 [&_code]:font-mono"
+              className="hidden dark:block px-5 py-4 sm:px-6 sm:py-5 overflow-x-auto text-[13px] leading-[1.6] [&_pre]:bg-transparent! [&_pre]:m-0! [&_code]:font-mono"
               dangerouslySetInnerHTML={{ __html: highlightedFiles[0].darkHtml }}
             />
             <div
-              className="block dark:hidden px-5 py-4 sm:px-6 sm:py-5 overflow-x-auto text-[13px] leading-[1.6] [&_pre]:!bg-transparent [&_pre]:!m-0 [&_code]:font-mono"
+              className="block dark:hidden px-5 py-4 sm:px-6 sm:py-5 overflow-x-auto text-[13px] leading-[1.6] [&_pre]:bg-transparent! [&_pre]:m-0! [&_code]:font-mono"
               dangerouslySetInnerHTML={{ __html: highlightedFiles[0].lightHtml }}
             />
           </>

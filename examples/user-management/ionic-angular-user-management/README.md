@@ -39,13 +39,13 @@ Once your database has started, run the "User Management Starter" quickstart. In
 
 ### 3. Get the URL and Key
 
-Go to the Project Settings (the cog icon), open the API tab, and find your API URL and `anon` key, you'll need these in the next step.
+Go to the Project Settings (the cog icon), open the API tab, and find your API URL and `publishable` key, you'll need these in the next step.
 
-The `anon` key is your client-side API key. It allows "anonymous access" to your database, until the user has logged in. Once they have logged in, the keys will switch to the user's own login token. This enables row level security for your data. Read more about this [below](#postgres-row-level-security).
+The `publishable` key is your client-side API key. It allows "anonymous access" to your database, until the user has logged in. Once they have logged in, the keys will switch to the user's own login token. This enables row level security for your data. Read more about this [below](#postgres-row-level-security).
 
 ![image](https://user-images.githubusercontent.com/10214025/88916245-528c2680-d298-11ea-8a71-708f93e1ce4f.png)
 
-**_NOTE_**: The `service_role` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
+**_NOTE_**: The `secret` key has full access to your data, bypassing any security policies. These keys have to be kept secret and are meant to be used in server environments and never on a client or browser.
 
 ### 4. Env vars
 
@@ -55,7 +55,7 @@ Update your environment file `environment.ts`
 export const environment = {
   // ...
   supabaseUrl: "YOUR_SUPBASE_URL",
-  supbaseKey: "YOUR_SUPABASE_KEY"
+  supabasePublishableKey: "YOUR_SUPABASE_PUBLISHABLE_KEY"
 };
 ```
 

@@ -128,7 +128,7 @@ function dangerouslyRunEsLint(eslintCmd: string, eslintArgs: string): ESLintExec
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
     env: process.env,
-    maxBuffer: 32 * 1024 * 1024, // allow large ESLint JSON payloads
+    maxBuffer: 128 * 1024 * 1024, // allow large ESLint JSON payloads (the studio repo regularly emits ~35MB+)
   })
 
   const stdout = typeof proc.stdout === 'string' ? proc.stdout : ''

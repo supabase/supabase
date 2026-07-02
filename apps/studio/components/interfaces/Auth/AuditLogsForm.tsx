@@ -4,17 +4,8 @@ import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  Card,
-  CardContent,
-  CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Switch,
-} from 'ui'
-import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -23,6 +14,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { AlertError } from '@/components/ui/AlertError'
@@ -123,11 +115,11 @@ export const AuditLogsForm = () => {
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmitAuditLogs)} className="space-y-4">
             <Card>
               <CardContent>
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="AUDIT_LOG_DISABLE_POSTGRES"
                   render={({ field }) => (
@@ -157,13 +149,13 @@ export const AuditLogsForm = () => {
                         </p>
                       }
                     >
-                      <FormControl_Shadcn_>
+                      <FormControl>
                         <Switch
                           checked={!field.value}
                           onCheckedChange={(value) => field.onChange(!value)}
                           disabled={!canUpdateConfig}
                         />
-                      </FormControl_Shadcn_>
+                      </FormControl>
                     </FormItemLayout>
                   )}
                 />
@@ -182,7 +174,7 @@ export const AuditLogsForm = () => {
                         </InlineLink>
                         . You are responsible for backing up, copying, or migrating existing data
                         from the{' '}
-                        <code className="text-code-inline !break-keep">
+                        <code className="text-code-inline break-keep!">
                           {AUDIT_LOG_ENTRIES_TABLE}
                         </code>{' '}
                         table if needed.
@@ -194,13 +186,13 @@ export const AuditLogsForm = () => {
 
               <CardFooter className="justify-end space-x-2">
                 {isDirty && (
-                  <Button type="default" onClick={() => form.reset()}>
+                  <Button variant="default" onClick={() => form.reset()}>
                     Cancel
                   </Button>
                 )}
                 <Button
-                  type="primary"
-                  htmlType="submit"
+                  variant="primary"
+                  type="submit"
                   disabled={!canUpdateConfig || isUpdatingConfig || !isDirty}
                   loading={isUpdatingConfig}
                 >
@@ -209,7 +201,7 @@ export const AuditLogsForm = () => {
               </CardFooter>
             </Card>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </PageSectionContent>
     </PageSection>
   )

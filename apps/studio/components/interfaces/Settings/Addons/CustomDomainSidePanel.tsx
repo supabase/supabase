@@ -1,19 +1,21 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import { AlertCircle } from 'lucide-react'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   cn,
-  Radio,
+  RadioGroupCard,
+  RadioGroupCardItem,
   SidePanel,
 } from 'ui'
 
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useProjectAddonRemoveMutation } from '@/data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addon-update-mutation'
@@ -128,86 +130,82 @@ const CustomDomainSidePanel = () => {
           {subscriptionCDOption === undefined &&
             selectedCustomDomain !== undefined &&
             customDomainsDisabledDueToQuota && (
-              <Alert_Shadcn_ variant="default" className="mb-2">
+              <Alert variant="default" className="mb-2">
                 <AlertCircle className="h-4 w-4" />
-                <AlertTitle_Shadcn_>
-                  Adding new custom domains temporarily disabled
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                <AlertTitle>Adding new custom domains temporarily disabled</AlertTitle>
+                <AlertDescription className="flex flex-col gap-3">
                   We are working with our upstream DNS provider before we are able to sign up new
                   custom domains. Please check back in a few hours.
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             )}
           <p className="text-sm">
             Custom domains allow you to present a branded experience to your users. You may set up
             your custom domain in the{' '}
-            <Link href={`/project/${projectRef}/settings/general`} className="text-brand">
+            <InlineLink href={`/project/${projectRef}/settings/general#custom-domains`}>
               General Settings
-            </Link>{' '}
+            </InlineLink>{' '}
             page after enabling the add-on.
           </p>
 
-          <div className={cn('!mt-8 pb-4', !hasAccessToCustomDomain && 'opacity-75')}>
-            <Radio.Group
-              type="large-cards"
-              size="tiny"
+          <div className={cn('mt-8! pb-4', !hasAccessToCustomDomain && 'opacity-75')}>
+            <RadioGroupCard
               id="custom-domain"
-              onChange={(event: any) => setSelectedOption(event.target.value)}
+              className="flex flex-wrap gap-3"
+              value={selectedOption}
+              onValueChange={(value) => setSelectedOption(value)}
             >
-              <Radio
-                name="custom-domain"
-                checked={selectedOption === 'cd_none'}
-                className="col-span-4 !p-0"
-                label="No custom domain"
+              <RadioGroupCardItem
                 value="cd_none"
-              >
-                <div className="w-full group">
-                  <div className="border-b border-default px-4 py-2 group-hover:border-control">
-                    <p className="text-sm">No custom domain</p>
-                  </div>
-                  <div className="px-4 py-2">
-                    <p className="text-foreground-light">
-                      Use the default supabase domain for your API
-                    </p>
-                    <div className="flex items-center space-x-1 mt-2">
-                      <p className="text-foreground text-sm" translate="no">
-                        $0
-                      </p>
-                      <p className="text-foreground-light translate-y-[1px]"> / month</p>
-                    </div>
-                  </div>
-                </div>
-              </Radio>
-              {availableOptions.map((option) => (
-                <Radio
-                  className="col-span-4 !p-0"
-                  name="custom-domain"
-                  key={option.identifier}
-                  disabled={!hasAccessToCustomDomain}
-                  checked={selectedOption === option.identifier}
-                  label={option.name}
-                  value={option.identifier}
-                >
-                  <div className="w-full group">
+                id="cd_none"
+                label={
+                  <div className="w-full group text-left">
                     <div className="border-b border-default px-4 py-2 group-hover:border-control">
-                      <p className="text-sm">{option.name}</p>
+                      <p className="text-sm">No custom domain</p>
                     </div>
                     <div className="px-4 py-2">
                       <p className="text-foreground-light">
-                        Present a branded experience to your users
+                        Use the default supabase domain for your API
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
                         <p className="text-foreground text-sm" translate="no">
-                          {formatCurrency(option.price)}
+                          $0
                         </p>
-                        <p className="text-foreground-light translate-y-[1px]"> / month</p>
+                        <p className="text-foreground-light translate-y-px"> / month</p>
                       </div>
                     </div>
                   </div>
-                </Radio>
+                }
+                showIndicator={false}
+              />
+              {availableOptions.map((option) => (
+                <RadioGroupCardItem
+                  key={option.identifier}
+                  value={option.identifier}
+                  id={option.identifier}
+                  label={
+                    <div className="w-full group text-left">
+                      <div className="border-b border-default px-4 py-2 group-hover:border-control">
+                        <p className="text-sm">{option.name}</p>
+                      </div>
+                      <div className="px-4 py-2">
+                        <p className="text-foreground-light">
+                          Present a branded experience to your users
+                        </p>
+                        <div className="flex items-center space-x-1 mt-2">
+                          <p className="text-foreground text-sm" translate="no">
+                            {formatCurrency(option.price)}
+                          </p>
+                          <p className="text-foreground-light translate-y-px"> / month</p>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                  showIndicator={false}
+                />
               ))}
-            </Radio.Group>
+            </RadioGroupCard>
+            <TaxDisclaimer className="mt-3" />
           </div>
 
           {hasChanges && selectedOption !== 'cd_none' && (

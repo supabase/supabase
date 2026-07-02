@@ -1,4 +1,4 @@
-import type { PostgresRelationship } from '@supabase/postgres-meta'
+import type { PGTableRelationship, SafeSqlFragment } from '@supabase/pg-meta'
 
 import { CreateColumnBody } from '@/data/database-columns/database-column-create-mutation'
 import { UpdateColumnBody } from '@/data/database-columns/database-column-update-mutation'
@@ -36,7 +36,7 @@ export interface Field {
   foreignKey?: { table: string; column: string }
 }
 
-export interface ExtendedPostgresRelationship extends PostgresRelationship {
+export interface ExtendedPostgresRelationship extends PGTableRelationship {
   deletion_action: string
   update_action: string
 }
@@ -46,9 +46,10 @@ export interface ColumnField {
   name: string
   table: string
   schema: string
-  check: string | null
+  check: SafeSqlFragment | null
   comment?: string | null
   format: string
+  formatSchema?: string
   defaultValue: string | null
   foreignKey?: ExtendedPostgresRelationship
   isNullable: boolean

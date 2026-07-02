@@ -1,22 +1,20 @@
 ---
 title: 'Build an API route in less than 2 minutes.'
-subtitle: 'Create your first API route by creating a table called `todos` to store tasks.'
+subtitle: 'Create your first API route by creating a public `leaderboard` table.'
 breadcrumb: 'API Quickstart'
 hideToc: true
 ---
 
-Let's create our first REST route which we can query using `cURL` or the browser.
-
-We'll create a database table called `todos` for storing tasks. This creates a corresponding API route `/rest/v1/todos` which can accept `GET`, `POST`, `PATCH`, & `DELETE` requests.
+This guide covers creating a REST route you can query using `cURL` or the browser by creating a database table called `leaderboard` to hold player scores. This creates a corresponding API route `/rest/v1/leaderboard` which can accept `GET`, `POST`, `PATCH`, and `DELETE` requests.
 
 <StepHikeCompact>
 
   <StepHikeCompact.Step step={1}>
-    <StepHikeCompact.Details title="Set up a Supabase project with a 'todos' table">
+    <StepHikeCompact.Details title="Set up a Supabase project with a 'leaderboard' table">
 
-    [Create a new project](/dashboard) in the Supabase Dashboard.
+    [Create a new project](/dashboard/_) in the Supabase Dashboard.
 
-    After your project is ready, create a table in your Supabase database. You can do this with either the Table interface or the [SQL Editor](/dashboard/project/_/sql).
+After your project is ready, create a table in your Supabase database. You can do this with either the [Table Editor](/dashboard/project/_/editor) or the [SQL Editor](/dashboard/project/_/sql).
 
     </StepHikeCompact.Details>
 
@@ -32,23 +30,23 @@ We'll create a database table called `todos` for storing tasks. This creates a c
       <TabPanel id="sql" label="SQL">
 
       ```sql
-      -- Create a table called "todos"
-      -- with a column to store tasks.
-      create table todos (
+      -- Create a "leaderboard" table to store
+      -- player names and their scores.
+      create table leaderboard (
         id serial primary key,
-        task text
+        player text not null,
+        score integer not null default 0,
+        created_at timestamptz default now()
       );
       ```
 
       </TabPanel>
       <TabPanel id="dashboard" label="Dashboard">
 
-      <video width="99%" muted playsInline controls={true}>
-        <source
-          src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/api/api-create-table-sm.mp4"
-          type="video/mp4"
-        />
-      </video>
+      1. Go to the [**Table editor**](/dashboard/project/_/editor) section in the Dashboard.
+      2. Click **New Table** and create a table with the name `leaderboard`.
+      3. Add a `player` column of type `text` and a `score` column of type `int4`.
+      4. Click **Save**.
 
       </TabPanel>
       </Tabs>
@@ -58,48 +56,77 @@ We'll create a database table called `todos` for storing tasks. This creates a c
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Enable Data API access to Anon Role">
 
-    <StepHikeCompact.Details title="Allow public access">
+    Expose the `leaderboard` table through the Data API so it can be queried over HTTP. A leaderboard is meant to be public, so anonymous clients only need read access.
 
-    Let's turn on Row Level Security for this table and allow public access.
+    For more control over which tables and functions are exposed, read the [Grant access explicitly guide](/docs/guides/api/securing-your-api#grant-access-explicitly).
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
-      ```sql
-      -- Turn on security
-      alter table "todos"
-      enable row level security;
+      <Tabs
+        scrollable
+        size="small"
+        type="underlined"
+        defaultActiveId="sql"
+        queryGroup="database-method"
+      >
+      <TabPanel id="sql" label="SQL">
 
-      -- Allow anonymous access
-      create policy "Allow public access"
-        on todos
-        for select
-        to anon
-        using (true);
+      ```sql
+      -- Allow read-only access for anonymous clients
+      grant select on public.leaderboard to anon;
       ```
+
+      </TabPanel>
+      <TabPanel id="dashboard" label="Dashboard">
+
+      In the [**Integrations > Data API > Settings**](/dashboard/project/_/integrations/data_api/settings) section of the Dashboard. Under **Exposed schemas**, make sure `public` is included, then under **Exposed tables**, toggle on access for the `leaderboard` table.
+
+      </TabPanel>
+      </Tabs>
 
     </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Insert some dummy data">
 
-    Now we can add some data to our table which we can access through our API.
+    <StepHikeCompact.Details title="Configure RLS">
+
+    Enable Row Level Security (RLS) for this table and create the policies that control who can read and write rows. For a leaderboard, anyone should be able to read scores. Only authenticated users should be able to submit or update them.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
       ```sql
-      insert into todos (task)
-      values
-        ('Create tables'),
-        ('Enable security'),
-        ('Add data'),
-        ('Fetch data from the API');
+      -- Turn on RLS
+      alter table "leaderboard"
+      enable row level security;
+
+      -- Anyone can read the leaderboard
+      create policy "Leaderboard is public"
+        on leaderboard
+        for select
+        to anon, authenticated
+        using (true);
+
+      -- Authenticated users can submit and update scores
+      create policy "Authenticated users can submit scores"
+        on leaderboard
+        for insert
+        to authenticated
+        with check (true);
+
+      create policy "Authenticated users can update scores"
+        on leaderboard
+        for update
+        to authenticated
+        using (true)
+        with check (true);
       ```
 
     </StepHikeCompact.Code>
@@ -107,19 +134,59 @@ We'll create a database table called `todos` for storing tasks. This creates a c
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Enable Data API access for authenticated and service roles">
+
+    With RLS setup, grant write access to the `authenticated` and `service_role` roles.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sql
+      -- Grant write access only after RLS and policies are in place
+      grant select, insert, update, delete on public.leaderboard to authenticated;
+      grant select, insert, update, delete on public.leaderboard to service_role;
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Insert some dummy data">
+
+    Now add some scores to the table so the API has something to query.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```sql
+      insert into leaderboard (player, score)
+      values
+        ('alice', 4200),
+        ('bob', 3700),
+        ('carol', 5100),
+        ('dave', 2900);
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
     <StepHikeCompact.Details title="Fetch the data">
 
-    Find your API URL and Keys in your Dashboard [API Settings](/dashboard/project/_/settings/api). You can now query your "todos" table by appending `/rest/v1/todos` to the API URL.
+    You can find your API URL and Keys in the [**Settings > API Settings**](/dashboard/project/_/settings/api) section of the Dashboard. Query the `leaderboard` table by appending `/rest/v1/leaderboard` to the API URL.
 
-    Copy this block of code, substitute `<PROJECT_REF>` and `<ANON_KEY>`, then run it from a terminal.
+    Copy this block of code, substitute `<PROJECT_REF>` and `<PUBLISHABLE_KEY>`, then run it from a terminal.
 
     </StepHikeCompact.Details>
     <StepHikeCompact.Code>
 
       ```bash Terminal
-      curl 'https://<PROJECT_REF>.supabase.co/rest/v1/todos' \
-      -H "apikey: <ANON_KEY>" \
-      -H "Authorization: Bearer <ANON_KEY>"
+      curl 'https://<PROJECT_REF>.supabase.co/rest/v1/leaderboard?select=*&order=score.desc' \
+      -H "apikey: <PUBLISHABLE_KEY>"
       ```
 
     </StepHikeCompact.Code>
@@ -134,9 +201,16 @@ There are several options for accessing your data:
 
 ### Browser
 
-You can query the route in your browser, by appending the `anon` key as a query parameter:
+You can query the route in your browser, by appending the `publishable` key as a query parameter:
 
-`https://<PROJECT_REF>.supabase.co/rest/v1/todos?apikey=<ANON_KEY>`
+`https://<PROJECT_REF>.supabase.co/rest/v1/leaderboard?apikey=<PUBLISHABLE_KEY>`
+
+### Curl
+
+```sh
+curl 'https://<PROJECT_REF>.supabase.co/rest/v1/leaderboard?select=*&order=score.desc' \
+  -H "apikey: <PUBLISHABLE_KEY>" \
+```
 
 ### Client libraries
 
@@ -152,7 +226,10 @@ We provide a number of [Client Libraries](https://github.com/supabase/supabase#c
 <TabPanel id="js" label="JavaScript">
 
 ```js
-const { data, error } = await supabase.from('todos').select()
+const { data, error } = await supabase
+  .from('leaderboard')
+  .select()
+  .order('score', { ascending: false })
 ```
 
 </TabPanel>
@@ -160,7 +237,10 @@ const { data, error } = await supabase.from('todos').select()
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final data = await supabase.from('todos').select('*');
+final data = await supabase
+  .from('leaderboard')
+  .select('*')
+  .order('score', ascending: false);
 ```
 
 </TabPanel>
@@ -169,7 +249,12 @@ final data = await supabase.from('todos').select('*');
 <TabPanel id="python" label="Python">
 
 ```python
-response = supabase.table('todos').select("*").execute()
+response = (
+    supabase.table('leaderboard')
+    .select("*")
+    .order('score', desc=True)
+    .execute()
+)
 ```
 
 </TabPanel>
@@ -178,7 +263,10 @@ response = supabase.table('todos').select("*").execute()
 <TabPanel id="swift" label="Swift">
 
 ```swift
-let response = try await supabase.from("todos").select()
+let response = try await supabase
+  .from("leaderboard")
+  .select()
+  .order("score", ascending: false)
 ```
 
 </TabPanel>

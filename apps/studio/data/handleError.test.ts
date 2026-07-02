@@ -95,5 +95,39 @@ describe('handleError — error classification', () => {
       const err = throwAndCatch({ msg: 'from msg field', message: 'from message field' })
       expect(err.message).toBe('from msg field')
     })
+
+    it('preserves formattedError on classified errors', () => {
+      const err = throwAndCatch({
+        message: 'CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT',
+        formattedError: 'ERROR: 08000: CONNECTION TERMINATED\nHINT: retry later',
+      })
+      expect(err).toBeInstanceOf(ConnectionTimeoutError)
+      expect(err.formattedError).toBe('ERROR: 08000: CONNECTION TERMINATED\nHINT: retry later')
+    })
+
+    it('preserves formattedError on unclassified errors (permission denied with HINT)', () => {
+      const err = throwAndCatch({
+        message: 'permission denied for table users',
+        code: 400,
+        formattedError:
+          'ERROR:  42501: permission denied for table users\n' +
+          'HINT:  To grant access to anon on a specific table:\n' +
+          '  GRANT SELECT ON TABLE public.users TO anon;',
+      })
+      expect(err).toBeInstanceOf(UnknownAPIResponseError)
+      expect(err.formattedError).toContain('ERROR:')
+      expect(err.formattedError).toContain('HINT:')
+      expect(err.formattedError?.split('\n').length).toBeGreaterThan(1)
+    })
+
+    it('leaves formattedError undefined when raw error omits it', () => {
+      const err = throwAndCatch({ message: 'some error' })
+      expect(err.formattedError).toBeUndefined()
+    })
+
+    it('ignores non-string formattedError values', () => {
+      const err = throwAndCatch({ message: 'some error', formattedError: 42 })
+      expect(err.formattedError).toBeUndefined()
+    })
   })
 })

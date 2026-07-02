@@ -78,20 +78,24 @@ const Metrics = ({ isActive }: { isActive?: boolean }) => {
   return (
     <div
       className={cn(
-        'absolute inset-0 bottom-4 px-4 opacity-50 transition-opacity overflow-hidden',
+        'absolute inset-0  opacity-50 transition-opacity overflow-hidden',
         isActive && 'opacity-100'
       )}
     >
-      <div className="relative rounded-md w-full h-full border border-overlay shadow p-4 !min-w-[300px]">
-        <p className="text-foreground text-sm mb-2">Execution time</p>
-        <p className="text-foreground text-base mb-4">
-          {displayValue ? data[displayValue]?.pv : highlightedValue}ms {displayValue ? '' : '(Avg)'}
-        </p>
-        <ResponsiveContainer minWidth={200} minHeight={200} width="100%" height="90%">
+      <div className="relative w-full h-full py-4 !min-w-[300px]">
+        <div className="px-6  mb-4">
+          <p className="text-foreground text-sm mb-2">Execution time</p>
+          <p className="text-foreground text-base">
+            {displayValue ? data[displayValue]?.pv : highlightedValue}ms{' '}
+            {displayValue ? '' : '(Avg)'}
+          </p>
+        </div>
+
+        <ResponsiveContainer minWidth={200} width="100%" height="70%">
           <AreaChart
             className="relative z-20 text-xs"
             data={data}
-            margin={{ top: 10, right: 0, left: 0, bottom: 40 }}
+            margin={{ top: 10, right: 0, left: 0, bottom: 0 }}
             onMouseMove={(e: any) => {
               if (e.activeTooltipIndex !== displayValue) {
                 setDisplayValue(e.activeTooltipIndex)
@@ -125,8 +129,9 @@ const Metrics = ({ isActive }: { isActive?: boolean }) => {
             />
           </AreaChart>
         </ResponsiveContainer>
+
         {data && (
-          <div className="absolute inset-4 top-auto text-foreground-lighter flex items-center justify-between text-xs">
+          <div className="absolute bottom-4 inset-x-0 px-6 text-foreground-lighter flex items-center justify-between text-xs">
             <span>{dayjs(data[0].timestamp).subtract(7, 'days').format(dateFormat)}</span>
             <span>{dayjs(data[data?.length - 1]?.timestamp).format(dateFormat)}</span>
           </div>

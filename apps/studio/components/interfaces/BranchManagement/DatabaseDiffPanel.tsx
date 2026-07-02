@@ -33,7 +33,7 @@ export const DatabaseDiffPanel = ({
             <span className="text-sm text-foreground-light">Loading database diff…</span>
           </div>
           <div className="min-h-0 flex-1 p-4">
-            <Skeleton className="h-full w-full rounded" />
+            <Skeleton className="h-full w-full rounded-sm" />
           </div>
         </div>
       </div>
@@ -76,7 +76,7 @@ export const DatabaseDiffPanel = ({
           </Link>
         </CardTitle>
         <Button
-          type="default"
+          variant="default"
           size="tiny"
           icon={<Download strokeWidth={1.5} size={14} className="text-foreground-light" />}
           className="mt-0"

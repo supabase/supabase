@@ -3,7 +3,9 @@ title: 'Platform Audit Logs'
 description: 'Monitor and track organization member activities via platform API or dashboard.'
 ---
 
-Any [Platform API](/docs/reference/api/introduction) or [dashboard](/dashboard) actions performed by organization members are logged automatically for auditing and security purposes. This includes actions such as creating a new project, inviting members, modifying an edge function or changing project settings.
+This topic covers how to view and stream Platform Audit Logs for your organization.
+
+Any [Platform API](/docs/reference/api/introduction) or [dashboard](/dashboard) actions performed by organization members are logged automatically for auditing and security purposes. This includes actions such as creating a new project, inviting members, modifying an edge function or changing project settings. You can view these logs in the dashboard or stream them to an external destination using [Audit Log Drains](#accessing-audit-log-drains).
 
 Besides Platform Audit Logs, Supabase Auth also provides [Auth Audit Logs](/docs/guides/auth/audit-logs) to monitor authentication-related activities within your projects.
 
@@ -40,8 +42,13 @@ For each audit log, you can see additional details by clicking on the log entry:
   - Metadata such as route and response status
 - Action Target (Project, organization, Edge Function, ...)
 
+Each Supabase user account also has access to [Account Audit logs](/dashboard/account/audit) which displays these logs for only the associated user account.
+
+## Accessing Audit Log Drains
+
+Audit Log Drains can be configured under your [organization's audit log drains](/dashboard/org/_/audit-log-drains). For setup instructions and supported destinations, see the [Log Drains guide](/docs/guides/telemetry/log-drains).
+
 ## Limitations
 
 - There is currently no way to export the logs via dashboard
-- There is currently no way to set up a log drain of platform audit logs
 - Retention periods depend on your plan

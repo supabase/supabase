@@ -39,7 +39,7 @@ For better performance with large files, use the direct storage hostname: `https
 
 ## Step 2: Create buckets on self-hosted
 
-Buckets must exist on the destination before you can copy objects into them. You can create them through dashboard UI, or with **SQL Editor**.
+Buckets must exist on the destination before you can copy objects into them. You can create them through the dashboard UI, or with the **SQL Editor**.
 
 <Admonition type="tip">
 
@@ -93,7 +93,7 @@ Replace the credentials with your actual values. For self-hosted, use the `REGIO
 
 Verify both remotes connect:
 
-```bash
+```sh
 rclone lsd platform:
 rclone lsd self-hosted:
 ```
@@ -104,13 +104,13 @@ Both commands should list your buckets.
 
 Copy a single bucket:
 
-```bash
+```sh
 rclone copy platform:your-storage-bucket self-hosted:your-storage-bucket --progress
 ```
 
 To copy all buckets:
 
-```bash
+```sh
 for bucket in $(rclone lsf platform: | tr -d '/'); do
   echo "Copying bucket: $bucket"
   rclone copy "platform:$bucket" "self-hosted:$bucket" --progress
@@ -127,7 +127,7 @@ For large migrations, consider adding `--transfers 4` to increase parallelism, o
 
 Compare object counts between source and destination:
 
-```bash
+```sh
 rclone size platform:your-storage-bucket && \
 rclone size self-hosted:your-storage-bucket
 ```
@@ -154,7 +154,7 @@ If rclone reports that a bucket doesn't exist on the self-hosted side, create it
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 For very large files, increase rclone's timeout:
 
-```bash
+```sh
 rclone copy platform:your-storage-bucket self-hosted:your-storage-bucket --timeout 30m
 ```
 

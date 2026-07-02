@@ -1,17 +1,16 @@
-import { notFound } from 'next/navigation'
 import { isAbsolute, relative } from 'path'
-import rehypeSlug from 'rehype-slug'
-
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
-import { getGitHubFileContents } from '~/lib/octokit'
-import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
+import { getEmptyArray } from '~/features/helpers.fn'
+import { IS_DEV } from '~/lib/constants'
+import { linkTransform, UrlTransformFunction } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
+import { getGitHubFileContents } from '~/lib/octokit'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
-import { IS_PROD } from 'common'
-import { getEmptyArray } from '~/features/helpers.fn'
+import { notFound } from 'next/navigation'
+import rehypeSlug from 'rehype-slug'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -190,7 +189,7 @@ const urlTransform: UrlTransformFunction = (url) => {
   }
 }
 
-const generateStaticParams = IS_PROD
+const generateStaticParams = !IS_DEV
   ? async () => pageMap.map(({ slug }) => ({ slug: slug ? [slug] : [] }))
   : getEmptyArray
 const generateMetadata = genGuideMeta(getContent)

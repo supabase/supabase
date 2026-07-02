@@ -28,7 +28,7 @@ We recommend:
 - **a _very_ secure password for each database**. Do not reuse the same password across databases.
 - **storing the encrypted version of the password**. Once you set the password during project creation, there is no way to programmatically change the password but you can do so manually in the Supabase Dashboard.
 - **using smart region selection to ensure there's enough capacity**. The available smart region codes are `americas`, `emea`, and `apac` and you can make a request to [`GET /v1/projects/available-regions`](https://api.supabase.com/api/v1#tag/projects/get/v1/projects/available-regions) for region details.
-- **using an appropriate instance size**. Scale to zero pricing only applies to `pico` instances, make sure to not pass in a `desired_instance_size` when creating a project. >= Micro instances are not able to scale to zero.
+- **using an appropriate instance size**. Scale to zero pricing only applies to Nano instances, make sure to not pass in a `desired_instance_size` when creating a project. >= Micro instances are not able to scale to zero.
 - **make sure that the services are `ACTIVE_HEALTHY` after project creation**. After creating project, confirm the service that you want to make a request to has a status of `ACTIVE_HEALTHY` by polling [`GET /v1/projects/{ref}/health`](https://api.supabase.com/api/v1#tag/projects/get/v1/projects/{ref}/health). For example, before making a request to set an Auth configuration confirm that the Auth service has a status of `ACTIVE_HEALTHY`.
 
 ```sh
@@ -48,15 +48,13 @@ curl https://api.supabase.com/v1/projects \
   }'
 ```
 
-### Pico compute instance
+### Nano compute instance
 
-<Admonition type='note' title='Contact us for access to Pico instances'>
+<Admonition type='note' title='Contact us for scale to zero pricing on Nano instances'>
   
-Only select customers have access to Pico instances. Submit this [form](/solutions/ai-builders#talk-to-partnerships-team) to get access.
+Only select customers have access to scale to zero pricing on Nano instances. Submit this [form](/solutions/ai-builders#talk-to-partnerships-team) to get access.
 
 </Admonition>
-
-Pico instance is our newest compute instance and the only one that scales to zero when not used.
 
 ### Recommended API keys
 
@@ -113,12 +111,6 @@ curl 'https://api.supabase.com/v1/projects/{ref}/api-keys?reveal=true' \
 
 Management API endpoint: [`PATCH /v1/projects/{ref}/billing/addons`](https://api.supabase.com/api/v1#tag/billing/patch/v1/projects/{ref}/billing/addons)
 
-<Admonition type='note'>
-
-Once you have access to [Pico instances](#pico-compute-instance), you will no longer be able to upgrade or downgrade to Nano instances.
-
-</Admonition>
-
 You can upgrade and downgrade compute sizes by making requests to [`PATCH /v1/projects/{ref}/billing/addons`](https://api.supabase.com/api/v1#tag/billing/patch/v1/projects/{ref}/billing/addons).
 
 ```sh
@@ -168,7 +160,7 @@ curl 'https://api.supabase.com/v1/projects/{ref}/branches' \
   --data '{
     "branch_name": "DEV",
     "secrets": {
-      "STRIPE_SECRET_KEY":"sk_test_123..."
+      "STRIPE_SECRET_KEY":"sk_test_123...",
       "STRIPE_PUBLISHABLE_KEY":"pk_test_123..."
     }
   }'
@@ -204,7 +196,7 @@ curl https://api.supabase.com/v1/projects/{ref}/database/migrations \
   --header 'Authorization: Bearer YOUR_SECRET_TOKEN' \
   --header 'Content-Type: application/json' \
   --data '{
-    "query": "create table public.todos (id serial primary key, task text not null); alter table public.todos enable row level security;",
+    "query": "create table public.todos (id serial primary key, task text not null); grant select on public.todos to anon; grant select, insert, update, delete on public.todos to authenticated; grant select, insert, update, delete on public.todos to service_role; alter table public.todos enable row level security;",
     "name": "Create a todos table"
   }'
 ```
@@ -275,7 +267,7 @@ It's important that the data in development branches is NOT production data, esp
 
 </Admonition>
 
-It's common in `DEV` branches to "seed" data. This is basically test data for users. Let's insert the following seed to our new todos table:
+In `DEV` branches, seed data is common test data for users. Insert the following seed into the new todos table:
 
 ```sql
 insert into todos (task)
@@ -374,12 +366,6 @@ curl https://api.supabase.com/v1/projects/database/backups/restore-pitr \
 ## Claim flow
 
 Management API endpoint: [`GET /v1/oauth/authorize/project-claim`](https://api.supabase.com/api/v1#tag/oauth/get/v1/oauth/authorize/project-claim)
-
-<Admonition type="note" title="Contact us for access to claim flow">
-
-Only select customers have access to claim flow. Submit this [form](/solutions/ai-builders#talk-to-partnerships-team) to get access.
-
-</Admonition>
 
 Your users may want to claim the project that currently lives in your org so that they can have more control over it.
 

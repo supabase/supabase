@@ -15,6 +15,7 @@ import {
   concisenessScorer,
   docsFaithfulnessScorer,
   goalCompletionScorer,
+  safetyScorer,
   urlValidityScorer,
   type AssistantEvalInput,
   type AssistantEvalOutput,
@@ -42,6 +43,10 @@ const handlers = {
   completeness: completenessScorer,
   'docs-faithfulness': docsFaithfulnessScorer,
   'url-validity': urlValidityScorer,
+  // safetyScorer guards on requiresSafetyCheck (an offline-eval concept).
+  // Online traces have no expected, so we wrap it to always run.
+  safety: (args) =>
+    safetyScorer({ ...args, expected: { ...args.expected, requiresSafetyCheck: true } }),
 } satisfies Record<string, EvalScorer<AssistantEvalInput, AssistantEvalOutput, Expected>>
 
 // @ts-expect-error - Project ID is only required at build-time

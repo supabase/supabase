@@ -1,0 +1,73 @@
+---
+id: 'manage-usage-logs-ingest'
+title: 'Manage Logs Ingest usage'
+---
+
+<Admonition type="caution" title="Coming soon">
+
+Logs pricing is being rolled out. Quotas and rates on this page are confirmed but billing enforcement is not yet live. This page will be updated when the rollout is complete.
+
+</Admonition>
+
+## What you are charged for
+
+You are charged for the total volume of log data that Supabase ingests across all your project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, etc.) during the billing cycle, measured in GB.
+
+## How charges are calculated
+
+Logs Ingest is charged per GB of log data ingested during the billing cycle.
+
+### Usage on your invoice
+
+Usage is shown as "Logs Ingest" on your invoice.
+
+## Pricing
+
+<$Partial path="billing/pricing/pricing_logs_ingest.mdx" />
+
+## Billing examples
+
+### Within quota
+
+The organization's Logs Ingest usage is within the quota, so no charges for Logs Ingest apply.
+
+| Line Item           | Units     | Costs                    |
+| ------------------- | --------- | ------------------------ |
+| Pro Plan            | 1         | <Price price="25" />     |
+| Compute Hours Micro | 744 hours | <Price price="10" />     |
+| Logs Ingest         | 2 GB      | <Price price="0" />      |
+| **Subtotal**        |           | **<Price price="35" />** |
+| Compute Credits     |           | -<Price price="10" />    |
+| **Total**           |           | **<Price price="25" />** |
+
+### Exceeding quota
+
+The organization's Logs Ingest usage exceeds the quota by 7 GB, incurring charges for this additional usage.
+
+| Line Item           | Units     | Costs                      |
+| ------------------- | --------- | -------------------------- |
+| Pro Plan            | 1         | <Price price="25" />       |
+| Compute Hours Micro | 744 hours | <Price price="10" />       |
+| Logs Ingest         | 12 GB     | <Price price="3.5" />      |
+| **Subtotal**        |           | **<Price price="38.5" />** |
+| Compute Credits     |           | -<Price price="10" />      |
+| **Total**           |           | **<Price price="28.5" />** |
+
+## View usage
+
+You can view Logs Ingest usage on the [organization's usage page](/dashboard/org/_/usage) of the Dashboard. The page shows the usage of all projects by default. To view the usage for a specific project, select it from the dropdown. You can also select a different time period.
+
+{/* TODO: Add screenshots once Studio surfaces are live */}
+
+## Optimize usage
+
+Every service in your Supabase project automatically generates Logs — you don't write them directly. Log volume scales with your application's traffic and behavior. To reduce ingest volume:
+
+- **Reduce log-level verbosity** in your Edge Functions and server-side code (for example, `info` → `warn` in production).
+- **Audit verbose logging in your application code.** Application-level logs forwarded to Supabase services count toward ingest.
+- **Cap log payload size.** Large structured payloads can inflate GB-billed volume.
+- **Investigate spikes.** Use the [**Logs Explorer**](/dashboard/project/_/logs-explorer) section of the Dashboard to find services or endpoints producing unusually high volume.
+
+## Exceeding Quotas
+
+<$Partial path="billing/exceeding_usage_quotas.mdx" />

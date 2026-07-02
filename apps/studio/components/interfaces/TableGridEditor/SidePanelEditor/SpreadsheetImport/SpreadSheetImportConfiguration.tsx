@@ -1,6 +1,6 @@
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
-import { Button, cn, Collapsible, SidePanel } from 'ui'
+import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, SidePanel } from 'ui'
 import { MultiSelector } from 'ui-patterns/multi-select'
 
 import type { SpreadsheetData } from './SpreadsheetImport.types'
@@ -27,12 +27,12 @@ const SpreadsheetImportConfiguration = ({
 
   return (
     <Collapsible open={expandConfiguration} onOpenChange={setExpandConfiguration} className={''}>
-      <Collapsible.Trigger asChild>
+      <CollapsibleTrigger asChild>
         <SidePanel.Content>
           <div className="py-1 flex items-center justify-between">
             <p className="text-sm">Configure import data</p>
             <Button
-              type="text"
+              variant="text"
               aria-label="Toggle import configuration"
               icon={
                 <ChevronDown
@@ -46,8 +46,8 @@ const SpreadsheetImportConfiguration = ({
             />
           </div>
         </SidePanel.Content>
-      </Collapsible.Trigger>
-      <Collapsible.Content>
+      </CollapsibleTrigger>
+      <CollapsibleContent>
         <SidePanel.Content>
           <div className="py-2 space-y-3">
             <div>
@@ -62,7 +62,7 @@ const SpreadsheetImportConfiguration = ({
                 return (
                   <Button
                     key={header}
-                    type={isSelected ? 'primary' : 'default'}
+                    variant={isSelected ? 'primary' : 'default'}
                     aria-label={`Toggle column ${header}`}
                     aria-pressed={isSelected}
                     className={cn('transition', isSelected ? 'opacity-100' : 'opacity-75')}
@@ -107,7 +107,7 @@ const SpreadsheetImportConfiguration = ({
             </div>
           </div>
         </SidePanel.Content>
-      </Collapsible.Content>
+      </CollapsibleContent>
     </Collapsible>
   )
 }

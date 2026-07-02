@@ -4,13 +4,13 @@ import { useState } from 'react'
 import {
   Badge,
   Button,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -53,22 +53,22 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Button
-          type="default"
+          variant="default"
           className="text-foreground-light"
           iconRight={<ChevronsUpDown strokeWidth={1} size={12} />}
         >
           {selectedModel}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-44" align="start" side="top">
-        <Command_Shadcn_>
-          <CommandList_Shadcn_>
-            <CommandGroup_Shadcn_>
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-44" align="start" side="top">
+        <Command>
+          <CommandList>
+            <CommandGroup>
               {ASSISTANT_MODELS.map((m) => (
-                <CommandItem_Shadcn_
+                <CommandItem
                   key={m.id}
                   value={m.id}
                   disabled={isLoadingEntitlements && isAdvanceOnlyModelId(m.id)}
@@ -94,12 +94,12 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
                   ) : (
                     selectedModel === m.id && <Check className="h-3.5 w-3.5" />
                   )}
-                </CommandItem_Shadcn_>
+                </CommandItem>
               ))}
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

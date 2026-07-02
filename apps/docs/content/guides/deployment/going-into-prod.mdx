@@ -22,7 +22,7 @@ Check and review issues in your database using [Security Advisor](/dashboard/pro
   - Tables that do not have RLS enabled with reasonable policies allow any client to access and modify their data. This is usually not what you want.
   - [Learn more about RLS](/docs/guides/database/postgres/row-level-security).
 - Enable replication on tables containing sensitive data by enabling RLS and setting row security policies:
-  - Go to the [**Authentication > Policies**](/dashboard/project/_/auth/policies) section of the Supabase Dashboard to enable RLS and create security policies.
+  - Go to the [**Database > Policies**](/dashboard/project/_/database/policies) section of the Supabase Dashboard to enable RLS and create security policies.
   - Go to the [**Database > Publications**](/dashboard/project/_/database/publications) section of the Supabase Dashboard to manage replication tables.
 - Turn on [SSL Enforcement](/docs/guides/platform/ssl-enforcement) from the [**Database > Settings > SSL Configuration**](/dashboard/project/_/database/settings#ssl-configuration) section of the dashboard.
 - Enable [Network Restrictions](/docs/guides/platform/network-restrictions) for the database from the [**Database > Settings > Network Restrictions**](/dashboard/project/_/database/settings#network-restrictions) section of the dashboard.
@@ -74,9 +74,15 @@ Check and review issues in your database using [Performance Advisor](/dashboard/
   - Use PITR if you require durability resilience to a disk failure event
 - Upgrading to the Supabase Pro Plan gives you [access to our support team](/dashboard/support/new).
 
+## Deployment
+
+- Connect your GitHub repository and enable **Deploy to production** in the integration settings to automate deployments from your `main` branch ([set up the integration](/dashboard/project/_/settings/integrations))
+  - This ensures schema changes are deployed consistently and avoids manual `supabase db push` from a local machine
+- If you're on the Pro Plan, consider enabling [branching](/docs/guides/deployment/branching) to test migrations in a preview environment before they reach production
+
 ## Rate limiting, resource allocation, & abuse prevention
 
-<Admonition type="caution" label="Shared Responsibility Model">
+<Admonition type="caution" title="Shared Responsibility Model">
 
 Running databases is a shared responsibility between you and Supabase. There are some things that we can take care of for you, and some things that you are responsible for.
 

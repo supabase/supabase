@@ -1,3 +1,4 @@
+import { literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
 import { Filter, Query } from '../../../query'
 import { COUNT_ESTIMATE_SQL, THRESHOLD_COUNT } from './get-count-estimate'
 
@@ -17,8 +18,8 @@ export const getTableRowsCountSql = ({
   filters?: Filter[]
   enforceExactCount?: boolean
   isUsingReadReplica?: boolean
-}) => {
-  if (!table) return ``
+}): SafeSqlFragment => {
+  if (!table) return safeSql``
 
   if (enforceExactCount) {
     const query = new Query()
@@ -28,16 +29,23 @@ export const getTableRowsCountSql = ({
       .forEach((x) => {
         queryChains = queryChains.filter(x.column, x.operator, x.value)
       })
-    return `select (${queryChains.toSql().slice(0, -1)}), false as is_estimate;`
+    const queryChainsSql = queryChains.toSql()
+    const queryChainsSqlWithoutSemicolon = queryChainsSql.endsWith(';')
+      ? (queryChainsSql.slice(0, -1) as SafeSqlFragment)
+      : queryChainsSql
+    return safeSql`select (${queryChainsSqlWithoutSemicolon}), false as is_estimate;`
   } else {
     const selectQuery = new Query()
-    let selectQueryChains = selectQuery.from(table.name, table.schema ?? undefined).select('*')
+    let selectQueryChains = selectQuery.from(table.name, table.schema ?? undefined).select()
     filters
       .filter((x) => x.value && x.value != '')
       .forEach((x) => {
         selectQueryChains = selectQueryChains.filter(x.column, x.operator, x.value)
       })
     const selectBaseSql = selectQueryChains.toSql()
+    const selectBaseSqlWithoutSemicolon = selectBaseSql.endsWith(';')
+      ? (selectBaseSql.slice(0, -1) as SafeSqlFragment)
+      : selectBaseSql
 
     const countQuery = new Query()
     let countQueryChains = countQuery.from(table.name, table.schema ?? undefined).count()
@@ -46,42 +54,45 @@ export const getTableRowsCountSql = ({
       .forEach((x) => {
         countQueryChains = countQueryChains.filter(x.column, x.operator, x.value)
       })
-    const countBaseSql = countQueryChains.toSql().slice(0, -1)
+    const countBaseSql = countQueryChains.toSql()
+    const countBaseSqlWithoutSemicolon = countBaseSql.endsWith(';')
+      ? (countBaseSql.slice(0, -1) as SafeSqlFragment)
+      : countBaseSql
 
     if (isUsingReadReplica) {
-      const sql = `
+      const sql = safeSql`
 with approximation as (
     select reltuples as estimate
     from pg_class
-    where oid = ${table.id}
+    where oid = ${literal(table.id)}
 )
 select 
   case 
-    when estimate > ${THRESHOLD_COUNT} then (select -1)
-    else (${countBaseSql})
+    when estimate > ${literal(THRESHOLD_COUNT)} then (select -1)
+    else (${countBaseSqlWithoutSemicolon})
   end as count,
-  estimate > ${THRESHOLD_COUNT} as is_estimate
+  estimate > ${literal(THRESHOLD_COUNT)} as is_estimate
 from approximation;
-`.trim()
+`
 
       return sql
     } else {
-      const sql = `
+      const sql = safeSql`
 ${COUNT_ESTIMATE_SQL}
 
 with approximation as (
     select reltuples as estimate
     from pg_class
-    where oid = ${table.id}
+    where oid = ${literal(table.id)}
 )
 select 
   case 
-    when estimate > ${THRESHOLD_COUNT} then ${filters.length > 0 ? `pg_temp.count_estimate('${selectBaseSql.replaceAll("'", "''")}')` : 'estimate'}
-    else (${countBaseSql})
+    when estimate > ${literal(THRESHOLD_COUNT)} then ${filters.length > 0 ? safeSql`pg_temp.count_estimate('${selectBaseSqlWithoutSemicolon.replaceAll("'", "''") as SafeSqlFragment}')` : safeSql`estimate`}
+    else (${countBaseSqlWithoutSemicolon})
   end as count,
-  estimate > ${THRESHOLD_COUNT} as is_estimate
+  estimate > ${literal(THRESHOLD_COUNT)} as is_estimate
 from approximation;
-`.trim()
+`
 
       return sql
     }

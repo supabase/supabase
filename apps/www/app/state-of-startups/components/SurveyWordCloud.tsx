@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+
 import { useAccent } from './accent-context'
 
 const TIMER_DURATION = 3000

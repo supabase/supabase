@@ -27,7 +27,7 @@ export const DevelopersDropdown = () => {
                 <li key={link.text}>
                   <Link
                     href={link.url!}
-                    className="flex group items-center gap-2 text-foreground-light text-sm hover:text-foreground focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-none focus-visible:rounded focus-visible:ring-foreground-lighter"
+                    className="flex group items-center gap-2 text-foreground-light text-sm hover:text-foreground focus-visible:text-foreground focus-visible:ring-2 focus-visible:outline-hidden focus-visible:rounded-sm focus-visible:ring-foreground-lighter"
                   >
                     {Icon && <Icon size={16} strokeWidth={1.3} />}
                     <span>{link.text}</span>
@@ -51,7 +51,7 @@ export const DevelopersDropdown = () => {
         <div className="flex-col gap-2 py-8 px-10">
           <Link
             href="/blog"
-            className="group flex items-center gap-1 text-foreground-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-5 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm focus-visible:text-foreground"
+            className="group flex items-center gap-1 text-foreground-lighter hover:text-foreground text-xs uppercase tracking-widest font-mono mb-5 focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-xs focus-visible:text-foreground"
           >
             <span>Blog</span>
             <ChevronRight className="h-3 w-3 transition-transform will-change-transform -translate-x-1 group-hover:translate-x-0" />
@@ -61,12 +61,12 @@ export const DevelopersDropdown = () => {
               <li key={post.title}>
                 <Link
                   href={post.url}
-                  className="group flex flex-col focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded"
+                  className="group flex flex-col focus-visible:ring-2 focus-visible:outline-hidden focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
                 >
                   <p className="text-foreground-light mb-0 line-clamp-2 group-hover:text-foreground group-focus-visible:text-foreground">
                     {post.title}
                   </p>
-                  <p className="text-sm line-clamp-2 text-foreground-lighter leading-relaxed !mb-0 group-hover:text-foreground-light group-focus-visible:text-foreground-light">
+                  <p className="text-sm line-clamp-2 text-foreground-lighter leading-relaxed mb-0! group-hover:text-foreground-light group-focus-visible:text-foreground-light">
                     {post.description}
                   </p>
                 </Link>

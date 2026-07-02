@@ -1,6 +1,6 @@
 import { components } from 'api-types'
 import { Axiom, Datadog, Grafana, Last9, Otlp, Sentry } from 'icons'
-import { BracesIcon, Cloud } from 'lucide-react'
+import { BracesIcon, Cloud, Server } from 'lucide-react'
 
 const iconProps = {
   height: 24,
@@ -61,6 +61,12 @@ export const LOG_DRAIN_TYPES = [
     name: 'Last9',
     description: 'Last9 is an observability platform for monitoring and telemetry data',
     icon: <Last9 {...iconProps} fill="currentColor" />,
+  },
+  {
+    value: 'syslog',
+    name: 'Syslog',
+    description: 'Forward logs to a remote Syslog receiver using TCP or TLS, adhering to RFC 5424',
+    icon: <Server {...iconProps} />,
   },
 ] as const
 

@@ -26,11 +26,13 @@ export function ErrorMatcher({ title, error, supportFormParams, className }: Err
       supportFormParams={supportFormParams}
       className={className}
       onRender={() => {
-        track('dashboard_error_created', {
-          source: 'error_display',
-          errorType: mapping?.id,
-          hasTroubleshooting: !!mapping,
-        })
+        if (Math.random() < 0.1) {
+          track('dashboard_error_created', {
+            source: 'error_display',
+            errorType: mapping?.id,
+            hasTroubleshooting: !!mapping,
+          })
+        }
         if (mapping) {
           track('inline_error_troubleshooter_exposed', { errorType: mapping.id })
         }

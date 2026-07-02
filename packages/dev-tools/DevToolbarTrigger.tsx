@@ -210,7 +210,7 @@ export function DevToolbarTrigger() {
   return (
     <div style={containerStyle}>
       <Button
-        type="text"
+        variant="text"
         className={cn(
           'relative rounded-full h-10 w-10 p-0',
           'bg-surface-100 border border-overlay shadow-md',

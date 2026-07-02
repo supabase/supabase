@@ -3,7 +3,7 @@
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import SVG from 'react-inlinesvg'
-import { RadioGroup_Shadcn_, RadioGroupLargeItem_Shadcn_, singleThemes, Theme } from 'ui'
+import { RadioGroup, RadioGroupLargeItem, singleThemes, Theme } from 'ui'
 
 const ThemeSettings = () => {
   const [mounted, setMounted] = useState(false)
@@ -25,7 +25,7 @@ const ThemeSettings = () => {
   function SingleThemeSelection() {
     return (
       <form className="py-8">
-        <RadioGroup_Shadcn_
+        <RadioGroup
           name="theme"
           onValueChange={setTheme}
           aria-label="Choose a theme"
@@ -34,11 +34,11 @@ const ThemeSettings = () => {
           className="flex flex-wrap gap-3"
         >
           {singleThemes.map((theme: Theme) => (
-            <RadioGroupLargeItem_Shadcn_ key={theme.value} value={theme.value} label={theme.name}>
+            <RadioGroupLargeItem key={theme.value} value={theme.value} label={theme.name}>
               <SVG src={`${process.env.NEXT_PUBLIC_BASE_PATH}/img/themes/${theme.value}.svg`} />
-            </RadioGroupLargeItem_Shadcn_>
+            </RadioGroupLargeItem>
           ))}
-        </RadioGroup_Shadcn_>
+        </RadioGroup>
       </form>
     )
   }

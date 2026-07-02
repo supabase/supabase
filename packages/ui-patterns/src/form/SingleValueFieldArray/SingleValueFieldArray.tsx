@@ -8,15 +8,7 @@ import {
   FieldValues,
   useFieldArray,
 } from 'react-hook-form'
-import {
-  Button,
-  cn,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormMessage_Shadcn_,
-  Input_Shadcn_,
-} from 'ui'
+import { Button, cn, FormControl, FormField, FormItem, FormMessage, Input } from 'ui'
 
 export interface SingleValueFieldArrayProps<
   TFieldValues extends FieldValues,
@@ -35,17 +27,17 @@ export interface SingleValueFieldArrayProps<
   removeLabel?: string
   disabled?: boolean
   minimumRows?: number
-  inputSize?: React.ComponentProps<typeof Input_Shadcn_>['size']
+  inputSize?: React.ComponentProps<typeof Input>['size']
   inputAutoComplete?: string
   className?: string
   rowsClassName?: string
   rowClassName?: string
   inputClassName?: string
   addButtonClassName?: string
-  addButtonType?: React.ComponentProps<typeof Button>['type']
+  addButtonType?: React.ComponentProps<typeof Button>['variant']
   addButtonSize?: React.ComponentProps<typeof Button>['size']
   removeButtonClassName?: string
-  removeButtonType?: React.ComponentProps<typeof Button>['type']
+  removeButtonType?: React.ComponentProps<typeof Button>['variant']
   removeButtonSize?: React.ComponentProps<typeof Button>['size']
 }
 
@@ -97,13 +89,13 @@ export const SingleValueFieldArray = <
       <div className={rowsClassName}>
         {typedFields.map((field, index) => (
           <div key={field.fieldId} className={cn('flex items-start space-x-2', rowClassName)}>
-            <FormField_Shadcn_
+            <FormField
               control={control}
               name={toFieldPath<TFieldValues>(`${name}.${index}.${valueFieldName}`)}
               render={({ field }) => (
-                <FormItem_Shadcn_ className="flex-1">
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_
+                <FormItem className="flex-1">
+                  <FormControl>
+                    <Input
                       {...field}
                       size={inputSize}
                       autoComplete={inputAutoComplete}
@@ -111,16 +103,16 @@ export const SingleValueFieldArray = <
                       placeholder={placeholder}
                       disabled={disabled}
                     />
-                  </FormControl_Shadcn_>
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
               )}
             />
 
             <Button
-              type={removeButtonType}
+              variant={removeButtonType}
               size={removeButtonSize}
-              htmlType="button"
+              type="button"
               icon={<Trash size={12} />}
               aria-label={removeLabel}
               disabled={disableRemove}
@@ -133,9 +125,9 @@ export const SingleValueFieldArray = <
 
       <div className="flex items-center">
         <Button
-          type={addButtonType}
+          variant={addButtonType}
           size={addButtonSize}
-          htmlType="button"
+          type="button"
           icon={<Plus strokeWidth={1.5} />}
           disabled={disabled}
           onClick={() => append(createEmptyRow())}

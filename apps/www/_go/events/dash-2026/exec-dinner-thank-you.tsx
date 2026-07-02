@@ -4,16 +4,16 @@ import { Button } from 'ui'
 
 const page: GoPageInput = {
   template: 'thank-you',
-  slug: 'dash-2026/exec-dinner/thank-you',
+  slug: 'nyc-2026/exec-dinner/thank-you',
   metadata: {
     title: "You're confirmed | Supabase Executive Dinner",
     description:
-      'Your RSVP for the Supabase executive dinner at DASH 2026 has been confirmed. Venue and date to be announced.',
+      'Your RSVP for the Supabase executive dinner on June 10, 2026 has been confirmed. Join us at Manhatta Restaurant with cocktails at 6:30 PM and dinner at 7:00 PM.',
   },
   hero: {
     title: "You're confirmed",
     description:
-      "We'll send details including venue, date, and directions closer to the event. We look forward to seeing you.",
+      "We'll see you at Manhatta Restaurant on June 10, 2026. Cocktails begin at 6:30 PM and dinner starts at 7:00 PM. We look forward to seeing you.",
   },
   sections: [
     {
@@ -22,7 +22,7 @@ const page: GoPageInput = {
       description: 'Learn more about what we are building at Supabase.',
       children: (
         <div className="flex items-center justify-center gap-4">
-          <Button asChild type="default" size="small">
+          <Button asChild variant="default" size="small">
             <Link href="https://supabase.com">Visit supabase.com</Link>
           </Button>
         </div>

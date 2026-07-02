@@ -18,7 +18,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 }
 
-const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
+const handleGet = async (_req: NextApiRequest, res: NextApiResponse) => {
   const response = await fetch(`${process.env.SUPABASE_URL}/rest/v1/`, {
     method: 'GET',
     headers: {
@@ -34,6 +34,6 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   return res.status(500).json({ error: { message: 'Internal Server Error' } })
 }
 
-const handleHead = async (req: NextApiRequest, res: NextApiResponse) => {
+const handleHead = async (_req: NextApiRequest, res: NextApiResponse) => {
   res.status(200).end()
 }

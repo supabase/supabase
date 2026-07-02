@@ -1,3 +1,5 @@
+import type { UntrustedSqlFragment } from '@supabase/pg-meta'
+
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
 
 export interface UserContent<
@@ -34,7 +36,9 @@ export namespace SqlSnippets {
     content_id: string
 
     // A full SQL query - this will be hashed on the /content endpoint
-    sql: string
+    // Named unchecked_sql to highlight that this SQL must never be run automatically
+    // without user confirmation — it may originate from untrusted sources like URL params.
+    unchecked_sql: UntrustedSqlFragment
 
     // we can add some versioning to this schema in case we need to change the format.
     schema_version: string

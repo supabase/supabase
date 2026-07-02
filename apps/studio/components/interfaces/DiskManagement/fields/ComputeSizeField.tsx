@@ -6,7 +6,7 @@ import { UseFormReturn } from 'react-hook-form'
 import {
   Button,
   cn,
-  FormField_Shadcn_,
+  FormField,
   RadioGroupCard,
   RadioGroupCardItem,
   Skeleton,
@@ -14,7 +14,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { ComputeBadge } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
@@ -26,7 +27,6 @@ import {
 } from '../DiskManagement.utils'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
-import { NoticeBar } from '../ui/NoticeBar'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -58,7 +58,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
 
   const showComputePrice = useIsFeatureEnabled('project_addons:show_compute_price')
 
-  const { computeSize, storageType } = form.watch()
+  const { computeSize } = form.watch()
 
   const {
     data: addons,
@@ -121,7 +121,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
   const hasHiddenOptions = availableOptions.length > INITIALLY_VISIBLE_COUNT
 
   return (
-    <FormField_Shadcn_
+    <FormField
       name="computeSize"
       control={control}
       render={({ field }) => (
@@ -167,14 +167,15 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                   />
                 </div>
 
-                <NoticeBar
-                  showIcon={false}
-                  type="default"
-                  className="mt-3 border-violet-900 bg-violet-200 [&_h5]:text-violet-1100"
-                  visible={showUpgradeBadge && form.watch('computeSize') === 'ci_nano'}
-                  title={'Upgrade to Micro Compute'}
-                  description="This Project is already paying for Micro Compute. You can upgrade to Micro Compute at any time when convenient."
-                />
+                {showUpgradeBadge && form.watch('computeSize') === 'ci_nano' && (
+                  <Admonition
+                    showIcon={false}
+                    type="default"
+                    className="mt-3 border-violet-900 bg-violet-200 [&_h5]:text-violet-1100"
+                    title="Upgrade to Micro Compute"
+                    description="This Project is already paying for Micro Compute. You can upgrade to Micro Compute at any time when convenient."
+                  />
+                )}
               </>
             }
           >
@@ -248,7 +249,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                   </div>
                                 )}
                                 <div className="w-full flex flex-col gap-3 justify-between">
-                                  <div className="relative px-3 opacity-50 group-data-[state=checked]:opacity-100 flex justify-between">
+                                  <div className="relative px-3 opacity-50 group-data-checked:opacity-100 flex justify-between">
                                     <ComputeBadge
                                       className="inline-flex font-semibold"
                                       infraComputeSize={compute.name as InfraInstanceSize}
@@ -267,7 +268,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                             >
                                               ${price}
                                             </span>
-                                            <span className="text-foreground-light translate-y-[1px]">
+                                            <span className="text-foreground-light translate-y-px">
                                               {' '}
                                               /{' '}
                                               {compute.price_interval === 'monthly'
@@ -379,7 +380,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
 
             {!isLoading && !addonsError && hasHiddenOptions && (
               <Button
-                type="default"
+                variant="default"
                 size="tiny"
                 className="mt-4"
                 aria-expanded={showAllSizes}

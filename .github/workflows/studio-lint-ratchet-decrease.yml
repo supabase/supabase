@@ -16,6 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
+          persist-credentials: false
           sparse-checkout: |
             .github
             apps/studio
@@ -38,10 +39,12 @@ jobs:
 
       - name: Generate token
         id: app-token
-        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
-          app-id: ${{ secrets.GH_AUTOFIX_APP_ID }}
+          client-id: ${{ vars.GH_AUTOFIX_APP_CLIENT_ID }}
           private-key: ${{ secrets.GH_AUTOFIX_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
 
       - name: Decrease ESLint ratchet baselines and open PR
         env:
@@ -74,7 +77,7 @@ jobs:
 
           git add apps/studio/.github/eslint-rule-baselines.json
           git commit --message "chore: decrease ESLint ratchet baselines"
-          git push --force origin "$BRANCH"
+          git -c credential.helper= push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${BRANCH}"
 
           pr_url=$(gh pr list --state open --head "$BRANCH" --json url --jq '.[0].url // ""' 2>/dev/null || echo "")
           if [ -z "$pr_url" ]; then

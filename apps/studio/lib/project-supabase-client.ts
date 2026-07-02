@@ -15,11 +15,11 @@ export async function createProjectSupabaseClient(projectRef: string, clientEndp
         autoRefreshToken: false,
         detectSessionInUrl: false,
         storage: {
-          getItem: (key) => {
+          getItem: (_key) => {
             return null
           },
-          setItem: (key, value) => {},
-          removeItem: (key) => {},
+          setItem: (_key, _value) => {},
+          removeItem: (_key) => {},
         },
       },
     })

@@ -2,32 +2,22 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { compact } from 'lodash'
 import { Edit, Trash } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Card,
-  CardContent,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Separator,
   SheetFooter,
   SheetHeader,
-  SheetSection,
   SheetTitle,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import {
-  PageSection,
-  PageSectionContent,
-  PageSectionDescription,
-  PageSectionMeta,
-  PageSectionSummary,
-  PageSectionTitle,
-} from 'ui-patterns/PageSection'
 import * as z from 'zod'
 
 import InputField from './InputField'
@@ -41,6 +31,11 @@ import {
 } from './Wrappers.utils'
 import WrapperTableEditor from './WrapperTableEditor'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import {
+  FormSection,
+  FormSectionContent,
+  FormSectionLabel,
+} from '@/components/ui/Forms/FormSection'
 import { invalidateSchemasQuery } from '@/data/database/schemas-query'
 import { useFDWUpdateMutation } from '@/data/fdw/fdw-update-mutation'
 import { FDW } from '@/data/fdw/fdws-query'
@@ -96,7 +91,7 @@ export const EditWrapperSheet = ({
     resolver: zodResolver(formSchema),
   })
 
-  const { getValues, reset, resetField, setError } = form
+  const { getValues, resetField, setError } = form
   const { errors, isDirty, isSubmitting } = form.formState
 
   const {
@@ -194,7 +189,7 @@ export const EditWrapperSheet = ({
   return (
     <>
       <div className="flex flex-col h-full" tabIndex={-1}>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form
             id={FORM_ID}
             onSubmit={form.handleSubmit(onSubmit)}
@@ -205,79 +200,68 @@ export const EditWrapperSheet = ({
                 Edit {wrapperMeta.label} wrapper: {wrapper.name}
               </SheetTitle>
             </SheetHeader>
-            <SheetSection className="flex-grow overflow-y-auto">
-              <PageSection>
-                <PageSectionMeta>
-                  <PageSectionSummary>
-                    <PageSectionTitle>Wrapper Configuration</PageSectionTitle>
-                  </PageSectionSummary>
-                </PageSectionMeta>
-                <PageSectionContent>
-                  <Card>
-                    <CardContent>
-                      <FormField_Shadcn_
+            <div className="grow overflow-y-auto">
+              <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
+                <FormSectionContent className="flex flex-col space-y-2" loading={false}>
+                  <FormField
+                    control={form.control}
+                    name="wrapper_name"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="vertical"
+                        label="Wrapper Name"
+                        description={
+                          wrapper_name !== initialValues.wrapper_name ? (
+                            <>
+                              Your wrapper's server name will be updated to{' '}
+                              <code className="text-code-inline">{wrapper_name}_server</code>
+                            </>
+                          ) : (
+                            <>
+                              Your wrapper's server name is{' '}
+                              <code className="text-code-inline">{wrapper_name}_server</code>
+                            </>
+                          )
+                        }
+                      >
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </FormSectionContent>
+              </FormSection>
+              <Separator />
+
+              <FormSection
+                header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
+              >
+                <FormSectionContent className="flex flex-col space-y-2" loading={false}>
+                  {wrapperMeta.server.options
+                    .filter((option) => !option.hidden)
+                    .map((option) => (
+                      <InputField
+                        key={option.name}
+                        option={option}
                         control={form.control}
-                        name="wrapper_name"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            layout="vertical"
-                            label="Wrapper Name"
-                            description={
-                              wrapper_name !== initialValues.wrapper_name ? (
-                                <>
-                                  Your wrapper's server name will be updated to{' '}
-                                  <code className="text-code-inline">{wrapper_name}_server</code>
-                                </>
-                              ) : (
-                                <>
-                                  Your wrapper's server name is{' '}
-                                  <code className="text-code-inline">{wrapper_name}_server</code>
-                                </>
-                              )
-                            }
-                          >
-                            <FormControl_Shadcn_>
-                              <Input_Shadcn_ {...field} />
-                            </FormControl_Shadcn_>
-                          </FormItemLayout>
-                        )}
+                        loading={option.secureEntry ? isLoadingSecrets : undefined}
                       />
-                    </CardContent>
-                  </Card>
-                </PageSectionContent>
-              </PageSection>
-              <PageSection>
-                <PageSectionMeta>
-                  <PageSectionSummary>
-                    <PageSectionTitle>{wrapperMeta.label} Configuration</PageSectionTitle>
-                  </PageSectionSummary>
-                </PageSectionMeta>
-                <PageSectionContent>
-                  <Card>
-                    {wrapperMeta.server.options
-                      .filter((option) => !option.hidden)
-                      .map((option) => (
-                        <CardContent key={option.name}>
-                          <InputField
-                            option={option}
-                            control={form.control}
-                            loading={option.secureEntry ? isLoadingSecrets : undefined}
-                          />
-                        </CardContent>
-                      ))}
-                  </Card>
-                </PageSectionContent>
-              </PageSection>
-              <PageSection>
-                <PageSectionMeta>
-                  <PageSectionSummary>
-                    <PageSectionTitle>Foreign Tables</PageSectionTitle>
-                    <PageSectionDescription>
+                    ))}
+                </FormSectionContent>
+              </FormSection>
+              <Separator />
+              <FormSection
+                header={
+                  <FormSectionLabel>
+                    <p>Foreign Tables</p>
+                    <p className="text-foreground-light mt-2 w-[90%]">
                       You can query your data from these foreign tables after the wrapper is created
-                    </PageSectionDescription>
-                  </PageSectionSummary>
-                </PageSectionMeta>
-                <PageSectionContent className="flex flex-col space-y-2">
+                    </p>
+                  </FormSectionLabel>
+                }
+              >
+                <FormSectionContent className="flex flex-col space-y-2" loading={false}>
                   {tablesField.map((t, tableIndex) => {
                     // FIXME: make inference work
                     const table = t as unknown as FormattedWrapperTable
@@ -297,7 +281,7 @@ export const EditWrapperSheet = ({
                         </div>
                         <div className="flex items-center space-x-2">
                           <Button
-                            type="default"
+                            variant="default"
                             className="px-1"
                             icon={<Edit />}
                             onClick={() => {
@@ -305,7 +289,7 @@ export const EditWrapperSheet = ({
                             }}
                           />
                           <Button
-                            type="default"
+                            variant="default"
                             className="px-1"
                             icon={<Trash />}
                             onClick={() => {
@@ -318,7 +302,7 @@ export const EditWrapperSheet = ({
                   })}
 
                   <div className="flex justify-end">
-                    <Button type="default" onClick={() => setSelectedTableToEdit(NewTable)}>
+                    <Button variant="default" onClick={() => setSelectedTableToEdit(NewTable)}>
                       Add foreign table
                     </Button>
                   </div>
@@ -327,14 +311,14 @@ export const EditWrapperSheet = ({
                       {errors.tables.message?.toString()}
                     </p>
                   )}
-                </PageSectionContent>
-              </PageSection>
-            </SheetSection>
+                </FormSectionContent>
+              </FormSection>
+            </div>
             <SheetFooter>
               <Button
                 size="tiny"
-                type="default"
-                htmlType="button"
+                variant="default"
+                type="button"
                 onClick={confirmOnClose}
                 disabled={isSubmitting}
               >
@@ -342,9 +326,9 @@ export const EditWrapperSheet = ({
               </Button>
               <Button
                 size="tiny"
-                type="primary"
+                variant="primary"
                 form={FORM_ID}
-                htmlType="submit"
+                type="submit"
                 disabled={isSubmitting || !isDirty}
                 loading={isSubmitting}
               >
@@ -352,7 +336,7 @@ export const EditWrapperSheet = ({
               </Button>
             </SheetFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </div>
 
       <ConfirmationModal

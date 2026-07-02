@@ -27,7 +27,7 @@ Push notifications are an important part of any mobile app. They allow you to se
 
     ## Expo setup
 
-    To utilize Expo's push notification service, you must configure your app by installing a set of libraries, implementing functions to handle notifications, and setting up credentials for Android and iOS. Follow the official [Expo Push Notifications Setup Guide](https://docs.expo.dev/push-notifications/push-notifications-setup/) to get the credentials for Android and iOS. This project uses [Expo's EAS build](https://docs.expo.dev/build/introduction/) service to simplify this part.
+    To use Expo's push notification service, you must configure your app by installing a set of libraries, implementing functions to handle notifications, and setting up credentials for Android and iOS. Follow the official [Expo Push Notifications Setup Guide](https://docs.expo.dev/push-notifications/push-notifications-setup/) to get the credentials for Android and iOS. This project uses [Expo's EAS build](https://docs.expo.dev/build/introduction/) service to simplify this part.
 
     1. Install the dependencies: `npm i`
     1. Create a [new Expo project](https://expo.dev/accounts/_/projects)
@@ -53,7 +53,7 @@ Push notifications are an important part of any mobile app. They allow you to se
     1. `supabase secrets set --env-file .env.local`
 
     ```ts supabase/functions/push/index.ts
-    import { createClient } from 'npm:@supabase/supabase-js@2'
+    import { withSupabase } from 'npm:@supabase/server@^1'
 
     console.log('Hello from Functions!')
 
@@ -71,36 +71,33 @@ Push notifications are an important part of any mobile app. They allow you to se
       old_record: null | Notification
     }
 
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    )
+    // Triggered by a Database Webhook, which authenticates with a secret key.
+    // Deploy with `verify_jwt = false`.
+    export default {
+      fetch: withSupabase({ auth: 'secret' }, async (req, ctx) => {
+        const payload: WebhookPayload = await req.json()
+        const { data } = await ctx.supabaseAdmin
+          .from('profiles')
+          .select('expo_push_token')
+          .eq('id', payload.record.user_id)
+          .single()
 
-    Deno.serve(async (req) => {
-      const payload: WebhookPayload = await req.json()
-      const { data } = await supabase
-        .from('profiles')
-        .select('expo_push_token')
-        .eq('id', payload.record.user_id)
-        .single()
+        const res = await fetch('https://exp.host/--/api/v2/push/send', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${Deno.env.get('EXPO_ACCESS_TOKEN')}`,
+          },
+          body: JSON.stringify({
+            to: data?.expo_push_token,
+            sound: 'default',
+            body: payload.record.body,
+          }),
+        }).then((res) => res.json())
 
-      const res = await fetch('https://exp.host/--/api/v2/push/send', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${Deno.env.get('EXPO_ACCESS_TOKEN')}`,
-        },
-        body: JSON.stringify({
-          to: data?.expo_push_token,
-          sound: 'default',
-          body: payload.record.body,
-        }),
-      }).then((res) => res.json())
-
-      return new Response(JSON.stringify(res), {
-        headers: { 'Content-Type': 'application/json' },
-      })
-    })
+        return Response.json(res)
+      }),
+    }
     ```
 
     ## Create the database webhook
@@ -166,8 +163,8 @@ Push notifications are an important part of any mobile app. They allow you to se
     Add the following code to `supabase/functions/push/index.ts`:
 
     ```ts supabase/functions/push/index.ts
-    import { createClient } from 'npm:@supabase/supabase-js@2'
-    import { JWT } from 'npm:google-auth-library@9'
+    import { withSupabase } from 'npm:@supabase/server@^1'
+    import { JWT } from 'npm:google-auth-library@^10'
     import serviceAccount from '../service-account.json' with { type: 'json' }
 
     interface Notification {
@@ -183,56 +180,53 @@ Push notifications are an important part of any mobile app. They allow you to se
       schema: 'public'
     }
 
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
-    )
+    // Triggered by a Database Webhook, which authenticates with a secret key.
+    // Deploy with `verify_jwt = false`.
+    export default {
+      fetch: withSupabase({ auth: 'secret' }, async (req, ctx) => {
+        const payload: WebhookPayload = await req.json()
 
-    Deno.serve(async (req) => {
-      const payload: WebhookPayload = await req.json()
+        const { data } = await ctx.supabaseAdmin
+          .from('profiles')
+          .select('fcm_token')
+          .eq('id', payload.record.user_id)
+          .single()
 
-      const { data } = await supabase
-        .from('profiles')
-        .select('fcm_token')
-        .eq('id', payload.record.user_id)
-        .single()
+        const fcmToken = data!.fcm_token as string
 
-      const fcmToken = data!.fcm_token as string
+        const accessToken = await getAccessToken({
+          clientEmail: serviceAccount.client_email,
+          privateKey: serviceAccount.private_key,
+        })
 
-      const accessToken = await getAccessToken({
-        clientEmail: serviceAccount.client_email,
-        privateKey: serviceAccount.private_key,
-      })
-
-      const res = await fetch(
-        `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${accessToken}`,
-          },
-          body: JSON.stringify({
-            message: {
-              token: fcmToken,
-              notification: {
-                title: `Notification from Supabase`,
-                body: payload.record.body,
-              },
+        const res = await fetch(
+          `https://fcm.googleapis.com/v1/projects/${serviceAccount.project_id}/messages:send`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
             },
-          }),
+            body: JSON.stringify({
+              message: {
+                token: fcmToken,
+                notification: {
+                  title: `Notification from Supabase`,
+                  body: payload.record.body,
+                },
+              },
+            }),
+          }
+        )
+
+        const resData = await res.json()
+        if (res.status < 200 || 299 < res.status) {
+          throw resData
         }
-      )
 
-      const resData = await res.json()
-      if (res.status < 200 || 299 < res.status) {
-        throw resData
-      }
-
-      return new Response(JSON.stringify(resData), {
-        headers: { 'Content-Type': 'application/json' },
-      })
-    })
+        return Response.json(resData)
+      }),
+    }
 
     const getAccessToken = ({
       clientEmail,

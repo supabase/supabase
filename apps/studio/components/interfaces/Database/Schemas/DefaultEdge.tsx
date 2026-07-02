@@ -8,14 +8,14 @@ import {
   useReactFlow,
 } from '@xyflow/react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { useEffect, useRef, useState } from 'react'
+import { memo, useCallback, useState } from 'react'
 import { Badge, cn } from 'ui'
 
+import { useSchemaGraphContext } from './SchemaGraphContext'
 import { EdgeData } from './Schemas.constants'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 
-export const DefaultEdge = ({
+const DefaultEdgeComponent = ({
   id,
   animated,
   data,
@@ -35,6 +35,7 @@ export const DefaultEdge = ({
   pathOptions,
   ...props
 }: EdgeProps<Edge<EdgeData>>) => {
+  const { isDownloading } = useSchemaGraphContext()
   const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX,
     sourceY,
@@ -46,13 +47,13 @@ export const DefaultEdge = ({
     offset: pathOptions?.offset,
     stepPosition: pathOptions?.stepPosition,
   })
-
   return (
     <>
       <BaseEdge
         id={id}
         path={edgePath}
-        className={cn(selected ? '!stroke-brand' : undefined)}
+        className={cn(selected ? 'stroke-brand!' : isDownloading ? 'stroke-black!' : undefined)}
+        stroke="#000000"
         {...props}
       />
       {data && selected ? (
@@ -71,9 +72,10 @@ export const DefaultEdge = ({
   )
 }
 
+export const DefaultEdge = memo(DefaultEdgeComponent)
+
 const EdgeRelationInfo = ({
   data,
-  edgePath,
   source,
   target,
   labelX,
@@ -93,7 +95,7 @@ const EdgeRelationInfo = ({
   const [show, setShow] = useState(false)
   const reactFlowInstance = useReactFlow()
 
-  const checkIfShouldBeDisplayed = useStaticEffectEvent(
+  const checkIfShouldBeDisplayed = useCallback(
     (relationInfoElement: HTMLDivElement | null) => {
       if (!relationInfoElement) return
       const sourceNode = reactFlowInstance.getNode(source)
@@ -130,7 +132,8 @@ const EdgeRelationInfo = ({
 
       // If it is, hide it as they are too close
       setShow(!isNodeIntersectingWithSource && !isNodeIntersectingWithTarget)
-    }
+    },
+    [reactFlowInstance, source, target]
   )
 
   return (

@@ -6,7 +6,7 @@ import { ChevronLeft } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
 import { Button, cn, Separator, SidebarGroup, SidebarMenu } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { resolveSectionDisplay } from './MobileMenuContent.utils'
 import { getProductMenuComponent } from './mobileProductMenuRegistry'
@@ -138,12 +138,12 @@ export function MobileMenuContent({
       {viewLevel === 'section' && sectionLabel && (
         <div
           className={cn(
-            'flex-shrink-0 flex items-center gap-2 border-b border-default px-3 min-h-[var(--header-height)]'
+            'shrink-0 flex items-center gap-2 border-b border-default px-3 min-h-(--header-height)'
           )}
         >
           <Button
-            type="text"
-            className="!p-1 justify-start"
+            variant="text"
+            className="p-1! justify-start"
             icon={<ChevronLeft size={20} />}
             onClick={handleBackToTop}
             aria-label="Back to menu"

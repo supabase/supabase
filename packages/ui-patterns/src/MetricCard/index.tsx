@@ -82,7 +82,7 @@ const MetricCardHeader = React.forwardRef<HTMLDivElement, MetricCardHeaderProps>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                type="text"
+                variant="text"
                 size="tiny"
                 className="px-1 text-foreground-lighter group-hover:text-foreground absolute right-3 transition-colors"
                 asChild
@@ -217,7 +217,7 @@ const SparklineTooltip = ({ active, payload, label }: RechartsTooltipProps<any, 
   }
 
   return (
-    <div className="bg-black/90 text-white p-2 rounded text-xs">
+    <div className="bg-black/90 text-white p-2 rounded-sm text-xs">
       {label && (
         <div className="dark:text-foreground-light text-white/60">
           {formatTimestamp(payload[0].payload.timestamp)}

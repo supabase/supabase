@@ -148,6 +148,12 @@ Let us develop a Hook locally and then deploy it to the cloud. As a recap, hereâ
 
 Edit `config.toml` to set up the Auth Hook locally.
 
+<Admonition type="note">
+  
+  The hook name used in the `config.toml` must correspond to one of the available Hooks listed above. For example, the Send SMS hook would be configured as: `[auth.hook.send_sms]`
+
+</Admonition>
+
 <Tabs
   scrollable
   size="small"
@@ -366,37 +372,39 @@ Outside of runtime errors, both HTTP Hooks and Postgres Hooks return timeout err
 Each Hook description contains an example JSON Schema which you can use in conjunction with [JSON Schema Faker](https://json-schema-faker.js.org/) in order to generate a mock payload. For HTTP Hooks, you can also use [the Standard Webhooks Testing Tool](https://www.standardwebhooks.com/simulate) to simulate a request.
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
-  {[
-    {
-      name: 'Custom Access Token',
-      description: 'Customize the access token issued by Supabase Auth',
-      href: '/guides/auth/auth-hooks/custom-access-token-hook',
-    },
-    {
-      name: 'Send SMS',
-      description: 'Use a custom SMS provider to send authentication messages',
-      href: '/guides/auth/auth-hooks/send-sms-hook',
-    },
-    {
-      name: 'Send Email',
-      description: 'Use a custom email provider to send authentication messages',
-      href: '/guides/auth/auth-hooks/send-email-hook',
-    },
-    {
-      name: 'MFA Verification',
-      description: 'Add additional checks to the MFA verification flow',
-      href: '/guides/auth/auth-hooks/mfa-verification-hook',
-    },
-    {
-      name: 'Password verification',
-      description: 'Add additional checks to the password verification flow',
-      href: '/guides/auth/auth-hooks/password-verification-hook',
-    },
-  ].map((x) => (
-    <div className="col-span-4" key={x.href}>
-      <Link href={x.href} passHref>
-        <GlassPanel title={x.name}>{x.description}</GlassPanel>
-      </Link>
-    </div>
-  ))}
+  <div className="col-span-4">
+    <Link href="/guides/auth/auth-hooks/custom-access-token-hook" passHref>
+      <GlassPanel title="Custom Access Token">
+        Customize the access token issued by Supabase Auth
+      </GlassPanel>
+    </Link>
+  </div>
+  <div className="col-span-4">
+    <Link href="/guides/auth/auth-hooks/send-sms-hook" passHref>
+      <GlassPanel title="Send SMS">
+        Use a custom SMS provider to send authentication messages
+      </GlassPanel>
+    </Link>
+  </div>
+  <div className="col-span-4">
+    <Link href="/guides/auth/auth-hooks/send-email-hook" passHref>
+      <GlassPanel title="Send Email">
+        Use a custom email provider to send authentication messages
+      </GlassPanel>
+    </Link>
+  </div>
+  <div className="col-span-4">
+    <Link href="/guides/auth/auth-hooks/mfa-verification-hook" passHref>
+      <GlassPanel title="MFA Verification">
+        Add additional checks to the MFA verification flow
+      </GlassPanel>
+    </Link>
+  </div>
+  <div className="col-span-4">
+    <Link href="/guides/auth/auth-hooks/password-verification-hook" passHref>
+      <GlassPanel title="Password verification">
+        Add additional checks to the password verification flow
+      </GlassPanel>
+    </Link>
+  </div>
 </div>

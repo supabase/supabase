@@ -141,14 +141,14 @@ export function PolicySearchResults({ query }: PolicySearchResultsProps) {
           getRoute={(result) => {
             const policy = policies?.find((p) => String(p.id) === result.id)
             if (!policy || !projectRef)
-              return `/project/${projectRef}/auth/policies` as `/${string}`
+              return `/project/${projectRef}/database/policies` as `/${string}`
 
             const params = new URLSearchParams()
             params.set('edit', String(policy.id))
             if (policy.schema) {
               params.set('schema', policy.schema)
             }
-            return `/project/${projectRef}/auth/policies?${params.toString()}` as `/${string}`
+            return `/project/${projectRef}/database/policies?${params.toString()}` as `/${string}`
           }}
           className="pb-9"
         />

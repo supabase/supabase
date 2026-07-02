@@ -13,7 +13,7 @@ execute function "supabase_functions"."http_request"(
 
 const TriggerViaWebhookPanel = () => (
   <CodeWindow
-    className="[&_.synthax-highlighter]:md:!min-h-[300px]"
+    className="[&_.synthax-highlighter]:md:min-h-[300px]!"
     code={code}
     lang="sql"
     showLineNumbers

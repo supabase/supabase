@@ -4,7 +4,6 @@ import React from 'react'
 
 import styleHandler from '../../lib/theme/styleHandler'
 import { cn } from '../../lib/utils/cn'
-import Typography from '../Typography'
 import { MenuContextProvider, useMenuContext } from './MenuContext'
 
 interface MenuProps {
@@ -43,16 +42,7 @@ interface ItemProps {
   style?: React.CSSProperties
 }
 
-export function Item({
-  children,
-  icon,
-  active,
-  rounded,
-  onClick,
-  doNotCloseOverlay = false,
-  showActiveBar = false,
-  style,
-}: ItemProps) {
+export function Item({ children, icon, active, onClick, style }: ItemProps) {
   const __styles = styleHandler('menu')
 
   const { type } = useMenuContext()
@@ -84,7 +74,7 @@ export function Item({
   return (
     <li
       role="menuitem"
-      className={cn('outline-none', classes)}
+      className={cn('outline-hidden', classes)}
       style={style}
       onClick={onClick}
       aria-current={active ? 'page' : undefined}
@@ -113,27 +103,6 @@ export function Group({ children, icon, title }: GroupProps) {
   )
 }
 
-interface MiscProps {
-  children: React.ReactNode
-}
-
-export function Misc({ children }: MiscProps) {
-  return (
-    <div
-    // className={MenuStyles['sbui-menu__misc']}
-    >
-      <Typography.Text>
-        <span
-        // className={MenuStyles['sbui-menu__content']}
-        >
-          {children}
-        </span>
-      </Typography.Text>
-    </div>
-  )
-}
-
 Menu.Item = Item
 Menu.Group = Group
-Menu.Misc = Misc
 export default Menu

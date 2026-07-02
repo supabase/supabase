@@ -1,4 +1,3 @@
-import { PostgresTrigger } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { includes, sortBy } from 'lodash'
@@ -15,9 +14,16 @@ import {
   DropdownMenuTrigger,
   TableCell,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
-import { generateTriggerCreateSQL } from './TriggerList.utils'
+import {
+  generateTriggerCreateSQL,
+  getDatabaseFunctionsHref,
+  type PostgresTrigger,
+} from './TriggerList.utils'
 import { selectFilterSchema } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -104,7 +110,7 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
         <TableRow key={x.id}>
           <TableCell className="space-x-2">
             <Button
-              type="text"
+              variant="text"
               disabled={isLocked || !canUpdateTriggers}
               onClick={() => editTrigger(x)}
               title={x.name}
@@ -132,7 +138,7 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
           <TableCell className="space-x-2">
             {x.function_name ? (
               <Link
-                href={`/project/${projectRef}/database/functions?search=${x.function_name}&schema=${x.function_schema}`}
+                href={getDatabaseFunctionsHref(projectRef, x.function_schema, x.function_name)}
                 className="text-link-table-cell block max-w-40 text-foreground-light"
               >
                 {x.function_name}
@@ -171,19 +177,23 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
               <div className="flex items-center justify-end">
                 {canUpdateTriggers ? (
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        aria-label="More options"
-                        type="default"
-                        className="px-1"
-                        icon={<MoreVertical />}
-                      />
-                    </DropdownMenuTrigger>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            aria-label={`${x.function_name} actions`}
+                            variant="default"
+                            className="px-1"
+                            icon={<MoreVertical />}
+                          />
+                        </DropdownMenuTrigger>
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">More options</TooltipContent>
+                    </Tooltip>
                     <DropdownMenuContent side="bottom" align="end" className="w-52">
                       <DropdownMenuItem
                         className="space-x-2"
                         onClick={() => {
-                          const sql = generateTriggerCreateSQL(x)
                           editTrigger(x)
                         }}
                       >
@@ -238,7 +248,7 @@ export const TriggerList = ({ editTrigger, duplicateTrigger, deleteTrigger }: Tr
                 ) : (
                   <ButtonTooltip
                     disabled
-                    type="default"
+                    variant="default"
                     className="px-1"
                     icon={<MoreVertical />}
                     tooltip={{

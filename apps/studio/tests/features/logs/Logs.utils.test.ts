@@ -7,7 +7,6 @@ import {
   checkForWildcard,
   checkForWithClause,
   fillTimeseries,
-  unixMicroToIsoTimestamp,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
 
 dayjs.extend(utc)

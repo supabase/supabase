@@ -139,7 +139,7 @@ describe('propsAreEqual', () => {
   })
 
   it('should return false if the props are not equal', () => {
-    const result = propsAreEqual({ a: 1, b: 2 }, { a: 1, b: 3 })
+    propsAreEqual({ a: 1, b: 2 }, { a: 1, b: 3 })
   })
 })
 

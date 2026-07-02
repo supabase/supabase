@@ -1,4 +1,4 @@
-import { literal } from '../../pg-format'
+import { literal, safeSql, type SafeSqlFragment } from '../../pg-format'
 
 function getPostgrestRoleImpersonationSql({
   role,
@@ -6,25 +6,25 @@ function getPostgrestRoleImpersonationSql({
 }: {
   role: string
   unexpiredClaims: Object
-}) {
-  return `
+}): SafeSqlFragment {
+  return safeSql`
 select set_config('role', ${literal(role)}, true),
 set_config('request.jwt.claims', ${literal(JSON.stringify(unexpiredClaims))}, true),
 set_config('request.method', 'POST', true),
 set_config('request.path', '/impersonation-example-request-path', true),
 set_config('request.headers', '{"accept": "*/*"}', true);
-  `.trim()
+  `
 }
 
-function getCustomRoleImpersonationSql(roleName: string) {
-  return /* SQL */ `
+function getCustomRoleImpersonationSql(roleName: string): SafeSqlFragment {
+  return safeSql`
     set local role ${literal(roleName)};
-  `.trim()
+  `
 }
 
 // Includes getPostgrestRoleImpersonationSql() and wrapWithRoleImpersonation()
 export const ROLE_IMPERSONATION_SQL_LINE_COUNT = 11
-export const ROLE_IMPERSONATION_NO_RESULTS = 'ROLE_IMPERSONATION_NO_RESULTS'
+export const ROLE_IMPERSONATION_NO_RESULTS = safeSql`ROLE_IMPERSONATION_NO_RESULTS`
 
 export const getImpersonationSQL = ({
   role,
@@ -36,16 +36,16 @@ export const getImpersonationSQL = ({
     role: string
   }
   unexpiredClaims?: Object
-  sql: string
-}) => {
+  sql: SafeSqlFragment
+}): SafeSqlFragment => {
   const impersonationSql =
     role.type === 'postgrest'
       ? unexpiredClaims !== undefined
         ? getPostgrestRoleImpersonationSql({ role: role.role, unexpiredClaims })
-        : ''
+        : safeSql``
       : getCustomRoleImpersonationSql(role.role)
 
-  return /* SQL */ `
+  return safeSql`
     ${impersonationSql}
 
     -- If the users sql returns no rows, pg-meta will
@@ -53,5 +53,5 @@ export const getImpersonationSQL = ({
     select 1 as "${ROLE_IMPERSONATION_NO_RESULTS}";
 
     ${sql}
-  `.trim()
+  `
 }

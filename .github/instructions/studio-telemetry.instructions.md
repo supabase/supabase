@@ -1,5 +1,5 @@
 ---
-applyTo: "apps/studio/**,packages/common/telemetry*"
+applyTo: 'apps/studio/**,packages/common/telemetry*'
 ---
 
 # Studio Telemetry Review Rules
@@ -11,8 +11,8 @@ All comments are **advisory** — suggest, do not request changes.
 Use judgment — not every PR needs telemetry. But **always flag** when:
 
 1. **Changes to `packages/common/telemetry-constants.ts`** — validate event naming, property conventions, and JSDoc accuracy.
-2. **PostHog feature flags without measurement.** If a PR uses `usePHFlag` or PostHog-backed hooks like `useDataApiGrantTogglesEnabled` to gate behavior, the flag state should be captured in a telemetry event so the rollout can be measured. Flag if the flag value isn't included in a relevant `track()` call. (Note: `useFlag` from `common` reads ConfigCat flags, not PostHog — different system, different guidance.)
-3. **Feature-flagged rollouts without outcome tracking.** If a flag gates new behavior, there should be telemetry on both the flag state *and* how users respond to the new behavior (e.g., toggle clicks, opt-in actions).
+2. **PostHog feature flags without measurement.** If a PR uses `usePHFlag` or PostHog-backed hooks like `useDataApiRevokeOnCreateDefaultEnabled` to gate behavior, the flag state should be captured in a telemetry event so the rollout can be measured. Flag if the flag value isn't included in a relevant `track()` call. (Note: `useFlag` from `common` reads ConfigCat flags, not PostHog — different system, different guidance.)
+3. **Feature-flagged rollouts without outcome tracking.** If a flag gates new behavior, there should be telemetry on both the flag state _and_ how users respond to the new behavior (e.g., toggle clicks, opt-in actions).
 4. **Growth-oriented components adding user interactions without tracking** — onboarding flows, setup wizards, upgrade CTAs, A/B experiment variants.
 
 When tracking is missing, comment: _"This adds a user interaction (or feature flag) that may benefit from tracking."_ Then propose an event name and `useTrack()` call.
@@ -52,6 +52,7 @@ Flag: unapproved verbs (`saved`, `viewed`, `pressed`), wrong order (`click_produ
 
 ```typescript
 import { useTrack } from 'lib/telemetry/track'
+
 const track = useTrack()
 track('product_card_clicked', { productType: 'database', planTier: 'pro' })
 ```

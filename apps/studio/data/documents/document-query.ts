@@ -4,7 +4,10 @@ import { documentKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-export type DocType = 'standard-security-questionnaire' | 'soc2-type-2-report'
+export type DocType =
+  | 'standard-security-questionnaire'
+  | 'soc2-type-2-report'
+  | 'iso27001-certificate'
 
 export type DocumentVariables = {
   orgSlug?: string
@@ -30,6 +33,19 @@ export async function getDocument({ orgSlug, docType }: DocumentVariables, signa
   if (docType === 'soc2-type-2-report') {
     const { data, error } = await get(
       `/platform/organizations/{slug}/documents/soc2-type-2-report`,
+      {
+        params: { path: { slug: orgSlug } },
+        signal,
+      }
+    )
+    if (error) throw error
+
+    return data as { fileUrl: string }
+  }
+
+  if (docType === 'iso27001-certificate') {
+    const { data, error } = await get(
+      `/platform/organizations/{slug}/documents/iso27001-certificate`,
       {
         params: { path: { slug: orgSlug } },
         signal,

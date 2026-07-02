@@ -145,10 +145,10 @@ const data: () => {
         'Supabase includes everything you need to create the perfect app for your brand, business, or just for fun.',
       className: cn(
         '[&_div.grid]:sm:divide-x [&_div.grid]:divide-y',
-        '[&_div.grid>div:nth-child(2n+2)]:sm:!border-l-0',
-        '[&_div.grid>div:nth-child(2n+2)]:lg:!border-l',
-        '[&_div.grid>div:nth-child(3n+3)]:lg:!border-l-0',
-        '[&_div.grid>div:nth-child(2)]:lg:!border-t-0'
+        '[&_div.grid>div:nth-child(2n+2)]:sm:border-l-0!',
+        '[&_div.grid>div:nth-child(2n+2)]:lg:border-l!',
+        '[&_div.grid>div:nth-child(3n+3)]:lg:border-l-0!',
+        '[&_div.grid>div:nth-child(2)]:lg:border-t-0!'
       ),
       features: [
         {
@@ -277,7 +277,7 @@ const data: () => {
               more. Secure and trusted.
             </>
           ),
-          image: <AuthVisual className="2xl:!-bottom-20" />,
+          image: <AuthVisual className="2xl:-bottom-20!" />,
         },
         {
           id: 'storage',
@@ -479,7 +479,7 @@ const data: () => {
       heading: 'Fun projects built with Supabase',
       subheading: 'Discover what our community has to say about their Supabase experience.',
       ctas: (
-        <Button asChild type="default" size="small" icon={<IconDiscord />}>
+        <Button asChild variant="default" size="small" icon={<IconDiscord />}>
           <Link
             href={'https://discord.supabase.com/'}
             target="_blank"

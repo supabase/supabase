@@ -30,10 +30,6 @@ vi.mock('@/data/entitlements/entitlements-query', () => ({
   checkEntitlement: vi.fn(),
 }))
 
-vi.mock('@/data/fetchers', () => ({
-  get: vi.fn(),
-}))
-
 const AUTH = 'Bearer token'
 const HEADERS = { 'Content-Type': 'application/json', Authorization: AUTH }
 
@@ -43,7 +39,6 @@ describe('getOrgAIDetails', () => {
   let mockGetAiOptInLevel: ReturnType<typeof vi.fn>
   let mockSubscriptionHasHipaaAddon: ReturnType<typeof vi.fn>
   let mockCheckEntitlement: ReturnType<typeof vi.fn>
-  let mockGet: ReturnType<typeof vi.fn>
 
   beforeEach(async () => {
     vi.clearAllMocks()
@@ -54,19 +49,16 @@ describe('getOrgAIDetails', () => {
     const subscriptionUtils =
       await import('@/components/interfaces/Billing/Subscription/Subscription.utils')
     const entitlementsQuery = await import('@/data/entitlements/entitlements-query')
-    const fetchers = await import('@/data/fetchers')
 
     mockGetOrganizations = vi.mocked(orgsQuery.getOrganizations)
     mockGetOrgSubscription = vi.mocked(subscriptionQuery.getOrgSubscription)
     mockGetAiOptInLevel = vi.mocked(aiHook.getAiOptInLevel)
     mockSubscriptionHasHipaaAddon = vi.mocked(subscriptionUtils.subscriptionHasHipaaAddon)
     mockCheckEntitlement = vi.mocked(entitlementsQuery.checkEntitlement)
-    mockGet = vi.mocked(fetchers.get)
 
     mockGetOrgSubscription.mockResolvedValue({ addons: [] })
     mockSubscriptionHasHipaaAddon.mockReturnValue(false)
     mockCheckEntitlement.mockResolvedValue({ hasAccess: false })
-    mockGet.mockResolvedValue({ data: { signed: false } })
   })
 
   it('returns org-level fields', async () => {
@@ -81,7 +73,6 @@ describe('getOrgAIDetails', () => {
       aiOptInLevel: 'schema',
       hasAccessToAdvanceModel: false,
       hasHipaaAddon: false,
-      isDpaSigned: false,
       orgId: 1,
       planId: 'pro',
     })
@@ -109,30 +100,6 @@ describe('getOrgAIDetails', () => {
     const result = await getOrgAIDetails({ orgSlug: 'test-org', authorization: AUTH })
 
     expect(result.hasHipaaAddon).toBe(true)
-  })
-
-  it('returns isDpaSigned true when endpoint returns signed: true', async () => {
-    mockGetOrganizations.mockResolvedValue([
-      { id: 1, slug: 'test-org', plan: { id: 'pro' }, opt_in_tags: [] },
-    ])
-    mockGetAiOptInLevel.mockReturnValue('schema')
-    mockGet.mockResolvedValue({ data: { signed: true } })
-
-    const result = await getOrgAIDetails({ orgSlug: 'test-org', authorization: AUTH })
-
-    expect(result.isDpaSigned).toBe(true)
-  })
-
-  it('returns isDpaSigned undefined when endpoint fails', async () => {
-    mockGetOrganizations.mockResolvedValue([
-      { id: 1, slug: 'test-org', plan: { id: 'pro' }, opt_in_tags: [] },
-    ])
-    mockGetAiOptInLevel.mockReturnValue('schema')
-    mockGet.mockResolvedValue({ data: null, error: { message: 'Unauthorized' } })
-
-    const result = await getOrgAIDetails({ orgSlug: 'test-org', authorization: AUTH })
-
-    expect(result.isDpaSigned).toBeUndefined()
   })
 
   it('calls getAiOptInLevel with the matched org opt_in_tags', async () => {

@@ -26,6 +26,7 @@ export const test = base.extend<TestOptions>({
         `table-editor-queue-operations-banner-dismissed-${ref}`,
         JSON.stringify(true)
       )
+      localStorage.setItem(`terms-of-service-update-2026-06-06`, JSON.stringify(true))
     }, ref)
     await use(page)
   },

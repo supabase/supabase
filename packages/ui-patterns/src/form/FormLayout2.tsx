@@ -4,17 +4,17 @@ import { useForm } from 'react-hook-form'
 import {
   Badge,
   Button,
-  Checkbox_Shadcn_,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  RadioGroup_Shadcn_,
-  RadioGroupItem_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Checkbox,
+  Form,
+  FormControl,
+  FormField,
+  RadioGroup,
+  RadioGroupItem,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
   Sheet,
   SheetContent,
@@ -111,10 +111,10 @@ export const Page = () => {
           <SheetTitle>Create a function</SheetTitle>
           <SheetDescription>Create a function</SheetDescription>
         </SheetHeader>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <SheetSection>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="username"
                 render={({ field }) => (
@@ -127,9 +127,9 @@ export const Page = () => {
                       <InfoTooltip side="right">You can also rename this later.</InfoTooltip>
                     }
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input placeholder="Name of function" {...field} />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -194,7 +194,7 @@ export const Page = () => {
               )}
             /> */}
             <SheetSection>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="switch_option"
                 render={({ field }) => (
@@ -204,16 +204,16 @@ export const Page = () => {
                     description="This is an explanation."
                     layout="flex"
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Switch checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </SheetSection>
             <Separator />
             <SheetSection>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
@@ -222,36 +222,36 @@ export const Page = () => {
                     description="This is your public display name."
                     layout="horizontal"
                   >
-                    <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl_Shadcn_ className="w-full">
-                        <SelectTrigger_Shadcn_ className="w-full">
-                          <SelectValue_Shadcn_
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl className="w-full">
+                        <SelectTrigger className="w-full">
+                          <SelectValue
                             placeholder="Select a verified email"
                             className="flex gap-2"
                           />
-                        </SelectTrigger_Shadcn_>
-                      </FormControl_Shadcn_>
-                      <SelectContent_Shadcn_>
-                        <SelectItem_Shadcn_ value="m@example.com">
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="m@example.com">
                           <div className="flex gap-2 items-center">
                             <UserIcon />
                             <span>m@example.com</span>
                           </div>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="m@google.com" className="flex gap-2">
+                        </SelectItem>
+                        <SelectItem value="m@google.com" className="flex gap-2">
                           <div className="flex gap-2 items-center">
                             <UserIcon />
                             UserIconm@google.com
                           </div>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="m@support.com" className="flex gap-2">
+                        </SelectItem>
+                        <SelectItem value="m@support.com" className="flex gap-2">
                           <div className="flex gap-2 items-center">
                             <UserIcon />
                             m@support.com
                           </div>
-                        </SelectItem_Shadcn_>
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                   </FormItemLayout>
                 )}
               />
@@ -260,7 +260,7 @@ export const Page = () => {
             <Separator />
 
             <SheetSection>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="kevins_input"
                 render={({ field }) => (
@@ -271,13 +271,13 @@ export const Page = () => {
                     layout="vertical"
                     labelOptional="Optional"
                   >
-                    <FormControl_Shadcn_>
+                    <FormControl>
                       <Input
                         icon={<Box strokeWidth={1.5} size={16} />}
                         placeholder="Needs to be 6 long"
                         {...field}
                       />
-                    </FormControl_Shadcn_>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -286,7 +286,7 @@ export const Page = () => {
             <Separator />
 
             <SheetSection>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="consistent_settings"
                 render={({ field }) => (
@@ -301,9 +301,9 @@ export const Page = () => {
                     description="This is your public display name."
                     layout="flex"
                   >
-                    <FormControl_Shadcn_>
-                      <Checkbox_Shadcn_ checked={field.value} onCheckedChange={field.onChange} />
-                    </FormControl_Shadcn_>
+                    <FormControl>
+                      <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
@@ -312,7 +312,7 @@ export const Page = () => {
             <Separator />
 
             <SheetSection>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="items"
                 render={() => (
@@ -329,7 +329,7 @@ export const Page = () => {
                 </FormDescription>
               </div> */}
                     {items.map((item) => (
-                      <FormField_Shadcn_
+                      <FormField
                         key={item.id}
                         control={form.control}
                         name="items"
@@ -342,8 +342,8 @@ export const Page = () => {
                               layout="flex"
                               hideMessage
                             >
-                              <FormControl_Shadcn_>
-                                <Checkbox_Shadcn_
+                              <FormControl>
+                                <Checkbox
                                   checked={field.value?.includes(item.id)}
                                   onCheckedChange={(checked) => {
                                     return checked
@@ -353,7 +353,7 @@ export const Page = () => {
                                         )
                                   }}
                                 />
-                              </FormControl_Shadcn_>
+                              </FormControl>
                             </FormItemLayout>
                           )
                         }}
@@ -366,7 +366,7 @@ export const Page = () => {
             </SheetSection>
 
             <SheetSection>
-              <FormField_Shadcn_
+              <FormField
                 control={form.control}
                 name="type"
                 render={({ field }) => (
@@ -376,8 +376,8 @@ export const Page = () => {
                     description="I am descript"
                     layout="horizontal"
                   >
-                    <FormControl_Shadcn_>
-                      <RadioGroup_Shadcn_
+                    <FormControl>
+                      <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                         className="flex flex-col space-y-1"
@@ -388,9 +388,9 @@ export const Page = () => {
                           layout="flex"
                           hideMessage
                         >
-                          <FormControl_Shadcn_>
-                            <RadioGroupItem_Shadcn_ value="all" />
-                          </FormControl_Shadcn_>
+                          <FormControl>
+                            <RadioGroupItem value="all" />
+                          </FormControl>
                         </FormItemLayout>
                         <FormItemLayout
                           className="flex items-center space-x-3 space-y-0"
@@ -398,9 +398,9 @@ export const Page = () => {
                           layout="flex"
                           hideMessage
                         >
-                          <FormControl_Shadcn_>
-                            <RadioGroupItem_Shadcn_ value="mentions" />
-                          </FormControl_Shadcn_>
+                          <FormControl>
+                            <RadioGroupItem value="mentions" />
+                          </FormControl>
                         </FormItemLayout>
                         <FormItemLayout
                           className="flex items-center space-x-3 space-y-0"
@@ -408,22 +408,22 @@ export const Page = () => {
                           layout="flex"
                           hideMessage
                         >
-                          <FormControl_Shadcn_>
-                            <RadioGroupItem_Shadcn_ value="none" />
-                          </FormControl_Shadcn_>
+                          <FormControl>
+                            <RadioGroupItem value="none" />
+                          </FormControl>
                         </FormItemLayout>
-                      </RadioGroup_Shadcn_>
-                    </FormControl_Shadcn_>
+                      </RadioGroup>
+                    </FormControl>
                   </FormItemLayout>
                 )}
               />
             </SheetSection>
             <SheetFooter>
-              <Button type="default">Cancel</Button>
-              <Button htmlType="submit">Submit</Button>
+              <Button variant="default">Cancel</Button>
+              <Button type="submit">Submit</Button>
             </SheetFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </SheetContent>
     </Sheet>
   )

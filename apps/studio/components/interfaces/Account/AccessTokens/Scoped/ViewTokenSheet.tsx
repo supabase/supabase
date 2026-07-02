@@ -102,7 +102,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
         <SheetContent
           showClose={false}
           size="default"
-          className="!min-w-[600px] flex flex-col h-full gap-0"
+          className="min-w-[600px]! flex flex-col h-full gap-0"
         >
           <SheetHeader
             className={cn('flex flex-row justify-between gap-x-4 items-center border-b')}
@@ -231,11 +231,16 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
                               <TableRow>
                                 <TableCell colSpan={2}>
                                   <p className="text-foreground-light text-center py-4">
-                                    {(token?.organization_slugs &&
-                                      token.organization_slugs.length > 0) ||
-                                    (token?.project_refs && token.project_refs.length > 0)
-                                      ? 'This token has access to specific organizations and projects.'
-                                      : 'This token has access to all resources.'}
+                                    {token?.scope === 'organization'
+                                      ? token.organization_slugs &&
+                                        token.organization_slugs.length > 0
+                                        ? 'This token has access to specific organizations.'
+                                        : 'This token has no accessible organizations.'
+                                      : token?.scope === 'project'
+                                        ? token.project_refs && token.project_refs.length > 0
+                                          ? 'This token has access to specific projects.'
+                                          : 'This token has no accessible projects.'
+                                        : 'This token has access to all resources.'}
                                   </p>
                                 </TableCell>
                               </TableRow>

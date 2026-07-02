@@ -26,7 +26,7 @@ const BodyContentTypeDropdown = ({ types, onSelect }: IParamProps) => {
           border
           hover:border-control
           hover:bg-overlay-hover
-          border-control px-2 h-[32px] rounded
+          border-control px-2 h-[32px] rounded-sm
           font-mono
           flex items-center gap-1
           text-foreground text-sm group-hover:text-foreground transition

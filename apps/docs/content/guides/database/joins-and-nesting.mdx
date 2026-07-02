@@ -8,7 +8,7 @@ The data APIs automatically detect relationships between Postgres tables. Since 
 
 ## One-to-many joins
 
-Let's use an example database that stores `orchestral_sections` and `instruments`:
+Use an example database that stores `orchestral_sections` and `instruments`:
 
 <Tabs
   scrollable
@@ -111,7 +111,7 @@ create table instruments (
 We can get the nested `SectionsWithInstruments` type like this:
 
 ```ts
-import { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
+import { QueryData, QueryError, QueryResult } from '@supabase/supabase-js'
 
 const sectionsWithInstrumentsQuery = supabase.from('orchestral_sections').select(`
   id,

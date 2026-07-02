@@ -112,7 +112,7 @@ const NavigationMenuCliList = ({ currentLevel, setLevel, id }) => {
         <div className="flex items-center gap-3 my-3">
           <img
             src={`${BASE_PATH}` + (menu.icon ?? `/img/icons/menu/${id}.svg`)}
-            className="w-5 rounded"
+            className="w-5 rounded-sm"
           />
 
           <h2 className={['text-foreground ', !menu.title && 'capitalize'].join(' ')}>

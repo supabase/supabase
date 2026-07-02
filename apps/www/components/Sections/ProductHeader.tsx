@@ -1,8 +1,9 @@
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { BookOpen } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
+
 import ProductIcon from '../ProductIcon'
-import { BookOpen } from 'lucide-react'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
 
 type subheader = string
 interface Types {
@@ -19,7 +20,7 @@ interface Types {
 const ProductHeader = (props: Types) => {
   const sendTelemetryEvent = useSendTelemetryEvent()
   return (
-    <div className="container relative mx-auto px-6 pt-16 pb-0 sm:px-16 lg:pt-28 xl:px-20">
+    <div className="section-container relative pt-16 pb-0 lg:pt-28">
       <div className="grid grid-cols-12">
         <div className="col-span-12 space-y-8 lg:col-span-5">
           {props.callout && props.callout}
@@ -64,7 +65,7 @@ const ProductHeader = (props: Types) => {
               </Link>
             </Button>
             {props.documentation_url && (
-              <Button asChild type="default" size="medium" icon={<BookOpen />}>
+              <Button asChild variant="default" size="medium" icon={<BookOpen />}>
                 <Link
                   href={props.documentation_url}
                   as={props.documentation_url}

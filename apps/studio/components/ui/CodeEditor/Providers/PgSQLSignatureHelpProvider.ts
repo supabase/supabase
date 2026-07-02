@@ -5,7 +5,7 @@ import type { DatabaseFunction } from '@/data/database-functions/database-functi
 
 // [Joshen] Needs to be fixed
 
-export default function getPgsqlSignatureHelpProvider(monaco: any, pgInfoRef: RefObject<any>) {
+export default function getPgsqlSignatureHelpProvider(_monaco: any, pgInfoRef: RefObject<any>) {
   return {
     signatureHelpTriggerCharacters: ['(', ','],
     provideSignatureHelp: function (model: any, position: any) {

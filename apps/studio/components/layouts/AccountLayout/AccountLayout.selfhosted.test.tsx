@@ -34,7 +34,7 @@ vi.mock('next/head', async () => {
         (child) => React.isValidElement(child) && child.type === 'title'
       )
 
-      if (!React.isValidElement(titleElement)) return
+      if (!React.isValidElement<{ children: ReactNode }>(titleElement)) return
 
       const titleText = React.Children.toArray(titleElement.props.children).join('')
       document.title = titleText
@@ -55,7 +55,7 @@ vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
 }))
 
 vi.mock('@/hooks/misc/useLocalStorage', () => ({
-  useLocalStorageQuery: () => [''],
+  useLocalStorageQuery: () => ['', vi.fn(), { isLoading: false, isSuccess: true }],
 }))
 
 vi.mock('@/hooks/misc/withAuth', () => ({

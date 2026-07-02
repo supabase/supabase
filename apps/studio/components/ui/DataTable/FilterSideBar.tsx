@@ -1,20 +1,19 @@
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import React, { useEffect } from 'react'
-import { Button, cn, ResizablePanel, usePanelRef } from 'ui'
+import { cloneElement, Dispatch, SetStateAction, useEffect } from 'react'
+import { Badge, Button, cn, ResizablePanel, usePanelRef } from 'ui'
 
 import { FeaturePreviewSidebarPanel } from '../FeaturePreviewSidebarPanel'
 import { DateRangeDisabled } from './DataTable.types'
 import { DataTableFilterControls } from './DataTableFilters/DataTableFilterControls'
 import { DataTableResetButton } from './DataTableResetButton'
 import { useDataTable } from './providers/DataTableProvider'
-import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
+import { UnifiedLogsBanner } from '@/components/interfaces/UnifiedLogs/UnifiedLogsBanner'
 
 interface FilterSideBarProps {
   isFilterBarOpen: boolean
-  setIsFilterBarOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setIsFilterBarOpen: Dispatch<SetStateAction<boolean>>
   dateRangeDisabled?: DateRangeDisabled
 }
 
@@ -23,17 +22,8 @@ export function FilterSideBar({
   setIsFilterBarOpen,
   dateRangeDisabled,
 }: FilterSideBarProps) {
-  const router = useRouter()
   const { ref } = useParams()
   const { table } = useDataTable()
-
-  const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
-  const { disable: disableUnifiedLogs } = useUnifiedLogsPreview()
-
-  const handleGoBackToOldLogs = () => {
-    disableUnifiedLogs()
-    router.push(`/project/${ref}/logs/explorer`)
-  }
 
   const panelRef = usePanelRef()
 
@@ -48,8 +38,9 @@ export function FilterSideBar({
   return (
     <ResizablePanel
       panelRef={panelRef}
-      maxSize={512}
       minSize={256}
+      defaultSize={265}
+      maxSize={512}
       id="panel-left"
       collapsible
       onResize={(size) => {
@@ -63,24 +54,17 @@ export function FilterSideBar({
     >
       <div className="border-b border-border px-4 md:top-0">
         <div className="flex h-[48px] items-center justify-between gap-3">
-          <p className="text-foreground text-lg">Logs</p>
+          <div className="flex items-center gap-2">
+            <p className="text-foreground text-lg">Logs</p>
+            <Badge variant="default">Beta</Badge>
+          </div>
           {table.getState().columnFilters.length ? <DataTableResetButton /> : null}
         </div>
       </div>
 
+      <UnifiedLogsBanner />
+
       <div className="flex-1 p-2 sm:overflow-y-scroll">
-        {isUnifiedLogsPreviewAvailable && (
-          <FeaturePreviewSidebarPanel
-            className="mx-2 mt-2 mb-3"
-            title="Go back to old logs"
-            description="Use the traditional interface"
-            actions={
-              <Button type="default" size="tiny" onClick={handleGoBackToOldLogs}>
-                Switch back
-              </Button>
-            }
-          />
-        )}
         <DataTableFilterControls dateRangeDisabled={dateRangeDisabled} />
         <FeaturePreviewSidebarPanel
           className="mx-2 my-4"
@@ -90,13 +74,11 @@ export function FilterSideBar({
             <div className="flex items-center gap-4">
               {LOG_DRAIN_TYPES.filter((t) =>
                 ['datadog', 'sentry', 'webhook', 'loki'].includes(t.value)
-              ).map((type) =>
-                React.cloneElement(type.icon, { height: 20, width: 20, key: type.value })
-              )}
+              ).map((type) => cloneElement(type.icon, { height: 20, width: 20, key: type.value }))}
             </div>
           }
           actions={
-            <Button asChild type="default">
+            <Button asChild variant="default">
               <Link href={`/project/${ref}/settings/log-drains`}>Go to Log Drains</Link>
             </Button>
           }

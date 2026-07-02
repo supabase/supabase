@@ -4,13 +4,16 @@ import { RegisterContent } from './register/RegisterContent'
 import StateOfStartups2026Content from './StateOfStartups2026Content'
 
 // TODO (alan): set this to true once results are available.
-const SHOW_RESULTS = false
+const SHOW_RESULTS = true
 
 export const metadata: Metadata = SHOW_RESULTS
   ? {
       title: 'State of Startups 2026 | Supabase',
       description:
         'The latest trends among builders in tech stacks, AI usage, problem domains, and more.',
+      alternates: {
+        canonical: 'https://supabase.com/state-of-startups',
+      },
       openGraph: {
         title: 'State of Startups 2026 | Supabase',
         description:
@@ -26,8 +29,19 @@ export const metadata: Metadata = SHOW_RESULTS
   : {
       title: 'State of Startups 2026 — Survey | Supabase',
       description: 'Be the first to access the State of Startups 2026 report.',
+      alternates: {
+        canonical: 'https://supabase.com/state-of-startups',
+      },
+      openGraph: {
+        title: 'State of Startups 2026 — Survey | Supabase',
+        description: 'Be the first to access the State of Startups 2026 report.',
+        url: 'https://supabase.com/state-of-startups',
+      },
     }
 
 export default function StateOfStartupsPage() {
-  return SHOW_RESULTS ? <StateOfStartups2026Content /> : <RegisterContent />
+  if (!SHOW_RESULTS) return <RegisterContent />
+  // All survey numbers are embedded statically (data/surveys/
+  // state-of-startups-data.json). No live database, no build-time fetch.
+  return <StateOfStartups2026Content />
 }

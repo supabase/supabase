@@ -1,6 +1,6 @@
 'use client'
 
-import * as Dialog from '@radix-ui/react-dialog'
+import { Dialog } from 'radix-ui'
 import React from 'react'
 
 import { Button } from '../../components/Button/Button'
@@ -70,7 +70,7 @@ const SidePanel = ({
   ) : (
     <div className={__styles.footer}>
       <div>
-        <Button disabled={loading} type="default" onClick={() => (onCancel ? onCancel() : null)}>
+        <Button disabled={loading} variant="default" onClick={() => (onCancel ? onCancel() : null)}>
           {cancelText}
         </Button>
       </div>
@@ -79,7 +79,7 @@ const SidePanel = ({
           <TooltipTrigger asChild>
             <span className="inline-block">
               <Button
-                htmlType="submit"
+                type="submit"
                 disabled={disabled || loading}
                 loading={loading}
                 onClick={onConfirm}

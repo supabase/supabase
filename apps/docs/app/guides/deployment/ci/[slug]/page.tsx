@@ -87,7 +87,7 @@ const getContent = async ({ slug }: Params) => {
   )
 
   return {
-    pathname: `/guides/cli/github-action/${slug}` satisfies `/${string}`,
+    pathname: `/guides/deployment/ci/${slug}` satisfies `/${string}`,
     meta,
     content,
     editLink,

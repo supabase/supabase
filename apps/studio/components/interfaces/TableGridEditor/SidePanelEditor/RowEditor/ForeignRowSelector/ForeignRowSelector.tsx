@@ -27,8 +27,6 @@ import {
 } from '@/state/role-impersonation-state'
 import { TableEditorTableStateContextProvider } from '@/state/table-editor-table'
 
-const FOREIGN_ROW_SELECTOR_TABLE_NAME_SUFFIX = '__frselector'
-
 export interface ForeignRowSelectorProps {
   visible: boolean
   foreignKey?: ForeignKey
@@ -125,12 +123,13 @@ export const ForeignRowSelector = ({
 
   // Load sorts from local storage
   useEffect(() => {
-    if (!project?.ref || !table?.name || !table?.schema) return
+    if (!project?.ref || !table) return
 
     try {
       const savedState = loadTableEditorStateFromLocalStorage(project.ref, table.id)
       const urlSorts = savedState?.sorts ?? []
-      const parsedSorts = formatSortURLParams(table.name, urlSorts)
+      const parsedSorts = formatSortURLParams(table, urlSorts)
+
       if (parsedSorts.length > 0) {
         setFiltersAndSorts((prev) => ({ ...prev, sort: parsedSorts }))
       }
@@ -139,7 +138,7 @@ export const ForeignRowSelector = ({
     } finally {
       setShouldSaveSorts(true)
     }
-  }, [project?.ref, table?.schema, table?.name, table?.id])
+  }, [project?.ref, table])
 
   // Persist sorts to local storage
   useEffect(() => {
@@ -165,7 +164,7 @@ export const ForeignRowSelector = ({
         <div className="flex items-center justify-between">
           <p>
             Select a record to reference from{' '}
-            <code className="text-code-inline !text-sm">
+            <code className="text-code-inline text-sm!">
               {schemaName}.{tableName}
             </code>
           </p>
@@ -176,13 +175,13 @@ export const ForeignRowSelector = ({
                 <p className="text-xs text-foreground-light">Saving</p>
               </div>
             )}
-            <Button type="text" icon={<X />} className="w-7" onClick={closePanel} />
+            <Button variant="text" icon={<X />} className="w-7" onClick={closePanel} />
           </div>
         </div>
       }
       onCancel={closePanel}
     >
-      <SidePanel.Content className="h-full !px-0">
+      <SidePanel.Content className="h-full px-0!">
         <div className="h-full">
           {isLoading && (
             <div className="flex h-full py-6 flex-col items-center justify-center space-y-2">
@@ -211,13 +210,13 @@ export const ForeignRowSelector = ({
             >
               <div className="h-full flex flex-col">
                 <div className="flex items-center justify-between my-2 mx-3">
-                  <div className="flex items-center">
+                  <div className="flex items-center gap-x-1">
                     <RefreshButton tableId={table?.id} isRefetching={isRefetching} />
                     <FilterPopoverPrimitive filters={filters} onApplyFilters={onApplyFilters} />
                     <SortPopoverPrimitive sorts={sorts} onApplySorts={onApplySorts} />
                   </div>
 
-                  <div className="flex items-center gap-x-3 divide-x">
+                  <div className="flex items-center gap-x-3">
                     <Pagination
                       page={page}
                       setPage={setPage}
@@ -228,7 +227,7 @@ export const ForeignRowSelector = ({
                     {isNullable && (
                       <div className="pl-3">
                         <Button
-                          type="default"
+                          variant="default"
                           onClick={() => {
                             if (columns?.length === 1) onSelect({ [columns[0].source]: null })
                           }}

@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import type { NextPageWithLayout } from '@/types'

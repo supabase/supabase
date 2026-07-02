@@ -175,7 +175,7 @@ function FloatingStatBubbles() {
         <motion.div
           key={bubble.id}
           className={cn(
-            'absolute pointer-events-none px-3 py-2 bg-surface-100 border rounded-lg shadow-sm'
+            'absolute pointer-events-none px-3 py-2 bg-surface-100 border rounded-lg shadow-xs'
           )}
           style={{
             top: `${bubble.top}%`,
@@ -205,7 +205,7 @@ function FloatingStatBubbles() {
 
 export function Home() {
   return (
-    <div className="h-[calc(100dvh-64px)] flex flex-col max-w-[60rem] mx-auto w-[95%] md:w-full">
+    <div className="h-[calc(100dvh-64px)] flex flex-col max-w-240 mx-auto w-[95%] md:w-full">
       <section className="relative border-x border-b h-full">
         {/* Grid background */}
         <AnimatedGridBackground

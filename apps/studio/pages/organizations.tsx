@@ -1,11 +1,9 @@
-import { useParams } from 'common'
 import { Plus, Search } from 'lucide-react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { Button, Skeleton } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { NoOrganizationsState } from '@/components/interfaces/Home/ProjectList/EmptyStates'
@@ -27,8 +25,6 @@ const OrganizationsPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { appTitle } = useCustomContent(['app:title'])
   const [search, setSearch] = useState('')
-  const { error: orgNotFoundError, org: orgSlug } = useParams()
-  const orgNotFound = orgNotFoundError === 'org_not_found'
   const pageTitle = buildStudioPageTitle({
     section: 'Organizations',
     brand: appTitle || 'Supabase',
@@ -52,8 +48,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
 
   useEffect(() => {
     // If there are no organizations, force the user to create one
-    // unless the user is on the not found page
-    if (isSuccess && organizations.length <= 0 && !orgNotFound) {
+    if (isSuccess && organizations.length <= 0) {
       router.push('/new')
     }
   }, [isSuccess, organizations])
@@ -66,20 +61,6 @@ const OrganizationsPage: NextPageWithLayout = () => {
       </Head>
       <ScaffoldContainer>
         <ScaffoldSection isFullWidth className="flex flex-col gap-y-4">
-          {orgNotFound && (
-            <Admonition
-              type="destructive"
-              title="Organization not found"
-              description={
-                <>
-                  The organization <code className="text-code-inline">{orgSlug}</code> does not
-                  exist or you do not have permission to access to it. Contact the the owner if you
-                  believe this is a mistake.
-                </>
-              }
-            />
-          )}
-
           {organizations.length > 0 && (
             <div className="flex items-center justify-between gap-x-2 md:gap-x-3">
               <Input
@@ -92,7 +73,7 @@ const OrganizationsPage: NextPageWithLayout = () => {
               />
 
               {organizationCreationEnabled && (
-                <Button asChild icon={<Plus />} type="primary" className="w-min">
+                <Button asChild icon={<Plus />} variant="primary" className="w-min">
                   <Link href={`/new`}>New organization</Link>
                 </Button>
               )}
