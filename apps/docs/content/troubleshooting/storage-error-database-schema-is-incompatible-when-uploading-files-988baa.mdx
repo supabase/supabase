@@ -22,4 +22,4 @@ Postgres detects the recursive policy evaluation and terminates the query to pre
 
 Option 1: Update the table's RLS policies to ensure they do not directly or indirectly create a circular dependency.
 
-Option 2: Wrap the permission check in a SECURITY DEFINER function. This executes with the privileges of the user who created the function — if created with a role like postgres, it bypasses RLS on the target table and breaks the recursion. See [Use Security Definer Functions](https://supabase.com/docs/guides/database/postgres/row-level-security#use-security-definer-functions) for details.
+Option 2: Wrap the permission check in a SECURITY DEFINER function. This executes with the privileges of the user who created the function — if created with a role like postgres, it bypasses RLS on the target table and breaks the recursion. See [Use Security Definer Functions](/docs/guides/database/postgres/row-level-security#use-security-definer-functions) for details.
