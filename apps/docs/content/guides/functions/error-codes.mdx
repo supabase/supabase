@@ -159,7 +159,7 @@ export default {
         body: req.body,
       })
 
-      // Creating a 'new Response()' ensures contructor checks
+      // Creating a 'new Response()' ensures constructor checks
       return new Response(await res.body, {
         headers: res.headers,
         status: res.status,
