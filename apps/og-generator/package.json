@@ -1,0 +1,34 @@
+{
+  "name": "og-generator",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Internal tool to generate on-brand OG & thumbnail images for supabase.com/blog posts",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "dev": "next dev --port 3030",
+    "build": "next build",
+    "start": "next start --port 3030",
+    "pretypecheck": "next typegen",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf node_modules .next .turbo tsconfig.tsbuildinfo"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.106.0",
+    "@supabase/supabase-js": "catalog:",
+    "fontkit": "^2.0.4",
+    "next": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@types/fontkit": "^2.0.7",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "config": "workspace:*",
+    "lucide-static": "1.21.0",
+    "tailwindcss": "catalog:",
+    "tsconfig": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

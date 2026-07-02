@@ -1,0 +1,25 @@
+# dependencies
+/node_modules
+
+# next.js
+/.next/
+/out/
+
+# turbo
+.turbo
+
+# production
+/build
+
+# misc
+.DS_Store
+*.tsbuildinfo
+next-env.d.ts
+
+# local env files
+.env*.local
+
+# Internal reference material / mood board (brief §11.6 — internal-only, never
+# shipped or exported). Keep the README; don't commit the actual source files.
+/reference-examples/*
+!/reference-examples/README.md

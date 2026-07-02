@@ -1,0 +1,8 @@
+/* Pulls in Tailwind v4 + the full Supabase design system (semantic tokens like
+ * bg-background / text-foreground, plus the dark theme). This styles the APP
+ * CHROME only. The generated OG/Thumb image is drawn from our own independent
+ * design-tokens module (lib/design/tokens.ts), NOT from these Tailwind tokens. */
+@import 'config/tailwind.config.css';
+
+/* Tell Tailwind v4 where to scan for utility classes in this app. */
+@source './**/*.{ts,tsx}';
