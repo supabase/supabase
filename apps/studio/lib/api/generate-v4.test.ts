@@ -42,6 +42,7 @@ test('generateV4 calls the tool sanitizer', async () => {
     status: vi.fn(() => mockRes),
     json: vi.fn(() => mockRes),
     setHeader: vi.fn(() => mockRes),
+    on: vi.fn(),
   }
 
   vi.mock('@/lib/ai/ai-details', () => ({
@@ -83,4 +84,7 @@ test('generateV4 calls the tool sanitizer', async () => {
   await generateV4(mockReq as any, mockRes as any)
 
   expect(sanitizeMessagePart).toHaveBeenCalled()
+  // The response 'close' event must be wired up so the remote MCP connection
+  // opened in getTools is torn down when the stream finishes or the client drops
+  expect(mockRes.on).toHaveBeenCalledWith('close', expect.any(Function))
 })
