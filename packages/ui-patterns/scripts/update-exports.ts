@@ -20,7 +20,7 @@ function getAllSourceFiles(dir: string): ExportMap {
 
     if (entry.isDirectory()) {
       Object.assign(exportsMap, getAllSourceFiles(fullPath))
-    } else if (entry.isFile() && /\.(ts|tsx|css)$/.test(entry.name)) {
+    } else if (entry.isFile() && /\.(ts|tsx|css)$/.test(entry.name) && !/\.test/.test(entry.name)) {
       const relativePath = path.relative(SRC_DIR, fullPath)
       const noExtension = relativePath.replace(/\.(ts|tsx)$/, '')
       const segments = noExtension.split(path.sep)

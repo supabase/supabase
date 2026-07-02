@@ -106,17 +106,9 @@
       "import": "./src/CommandMenu/api/TextHighlighter.tsx",
       "types": "./src/CommandMenu/api/TextHighlighter.tsx"
     },
-    "./CommandMenu/api/hooks/commandsHooks.test": {
-      "import": "./src/CommandMenu/api/hooks/commandsHooks.test.tsx",
-      "types": "./src/CommandMenu/api/hooks/commandsHooks.test.tsx"
-    },
     "./CommandMenu/api/hooks/commandsHooks": {
       "import": "./src/CommandMenu/api/hooks/commandsHooks.ts",
       "types": "./src/CommandMenu/api/hooks/commandsHooks.ts"
-    },
-    "./CommandMenu/api/hooks/pagesHooks.test": {
-      "import": "./src/CommandMenu/api/hooks/pagesHooks.test.tsx",
-      "types": "./src/CommandMenu/api/hooks/pagesHooks.test.tsx"
     },
     "./CommandMenu/api/hooks/pagesHooks": {
       "import": "./src/CommandMenu/api/hooks/pagesHooks.ts",
@@ -186,14 +178,6 @@
       "import": "./src/CommandMenu/internal/state/commandsState.ts",
       "types": "./src/CommandMenu/internal/state/commandsState.ts"
     },
-    "./CommandMenu/internal/state/commandsStates.test": {
-      "import": "./src/CommandMenu/internal/state/commandsStates.test.ts",
-      "types": "./src/CommandMenu/internal/state/commandsStates.test.ts"
-    },
-    "./CommandMenu/internal/state/pagesState.test": {
-      "import": "./src/CommandMenu/internal/state/pagesState.test.ts",
-      "types": "./src/CommandMenu/internal/state/pagesState.test.ts"
-    },
     "./CommandMenu/internal/state/pagesState": {
       "import": "./src/CommandMenu/internal/state/pagesState.ts",
       "types": "./src/CommandMenu/internal/state/pagesState.ts"
@@ -238,10 +222,6 @@
       "import": "./src/CommandMenu/prepackaged/Support.tsx",
       "types": "./src/CommandMenu/prepackaged/Support.tsx"
     },
-    "./CommandMenu/prepackaged/ThemeSwitcher.test": {
-      "import": "./src/CommandMenu/prepackaged/ThemeSwitcher.test.tsx",
-      "types": "./src/CommandMenu/prepackaged/ThemeSwitcher.test.tsx"
-    },
     "./CommandMenu/prepackaged/ThemeSwitcher": {
       "import": "./src/CommandMenu/prepackaged/ThemeSwitcher.tsx",
       "types": "./src/CommandMenu/prepackaged/ThemeSwitcher.tsx"
@@ -257,10 +237,6 @@
     "./CommandMenu/prepackaged/ai/queryAi": {
       "import": "./src/CommandMenu/prepackaged/ai/queryAi.ts",
       "types": "./src/CommandMenu/prepackaged/ai/queryAi.ts"
-    },
-    "./CommandMenu/prepackaged/ai/useAiChat.test": {
-      "import": "./src/CommandMenu/prepackaged/ai/useAiChat.test.ts",
-      "types": "./src/CommandMenu/prepackaged/ai/useAiChat.test.ts"
     },
     "./CommandMenu/prepackaged/ai/useAiChat": {
       "import": "./src/CommandMenu/prepackaged/ai/useAiChat.ts",
@@ -354,10 +330,6 @@
       "import": "./src/FilterBar/DefaultCommandList.tsx",
       "types": "./src/FilterBar/DefaultCommandList.tsx"
     },
-    "./FilterBar/FilterBar.test": {
-      "import": "./src/FilterBar/FilterBar.test.tsx",
-      "types": "./src/FilterBar/FilterBar.test.tsx"
-    },
     "./FilterBar/FilterBar": {
       "import": "./src/FilterBar/FilterBar.tsx",
       "types": "./src/FilterBar/FilterBar.tsx"
@@ -378,10 +350,6 @@
       "import": "./src/FilterBar/OperatorSymbolBadge.tsx",
       "types": "./src/FilterBar/OperatorSymbolBadge.tsx"
     },
-    "./FilterBar/hooks.test": {
-      "import": "./src/FilterBar/hooks.test.ts",
-      "types": "./src/FilterBar/hooks.test.ts"
-    },
     "./FilterBar/hooks": {
       "import": "./src/FilterBar/hooks.ts",
       "types": "./src/FilterBar/hooks.ts"
@@ -389,10 +357,6 @@
     "./FilterBar": {
       "import": "./src/FilterBar/index.ts",
       "types": "./src/FilterBar/index.ts"
-    },
-    "./FilterBar/menuItems.test": {
-      "import": "./src/FilterBar/menuItems.test.ts",
-      "types": "./src/FilterBar/menuItems.test.ts"
     },
     "./FilterBar/menuItems": {
       "import": "./src/FilterBar/menuItems.ts",
@@ -417,10 +381,6 @@
     "./FilterBar/useKeyboardNavigation": {
       "import": "./src/FilterBar/useKeyboardNavigation.ts",
       "types": "./src/FilterBar/useKeyboardNavigation.ts"
-    },
-    "./FilterBar/utils.test": {
-      "import": "./src/FilterBar/utils.test.ts",
-      "types": "./src/FilterBar/utils.test.ts"
     },
     "./FilterBar/utils": {
       "import": "./src/FilterBar/utils.ts",
@@ -502,10 +462,6 @@
       "import": "./src/McpUrlBuilder/utils/getMcpButtonData.ts",
       "types": "./src/McpUrlBuilder/utils/getMcpButtonData.ts"
     },
-    "./McpUrlBuilder/utils/getMcpIconSrc.test": {
-      "import": "./src/McpUrlBuilder/utils/getMcpIconSrc.test.ts",
-      "types": "./src/McpUrlBuilder/utils/getMcpIconSrc.test.ts"
-    },
     "./McpUrlBuilder/utils/getMcpIconSrc": {
       "import": "./src/McpUrlBuilder/utils/getMcpIconSrc.ts",
       "types": "./src/McpUrlBuilder/utils/getMcpIconSrc.ts"
@@ -530,10 +486,6 @@
       "import": "./src/MetricCard/index.tsx",
       "types": "./src/MetricCard/index.tsx"
     },
-    "./MobileSheetNav/MobileSheetNav.test": {
-      "import": "./src/MobileSheetNav/MobileSheetNav.test.tsx",
-      "types": "./src/MobileSheetNav/MobileSheetNav.test.tsx"
-    },
     "./MobileSheetNav/MobileSheetNav": {
       "import": "./src/MobileSheetNav/MobileSheetNav.tsx",
       "types": "./src/MobileSheetNav/MobileSheetNav.tsx"
@@ -541,10 +493,6 @@
     "./MobileSheetNav": {
       "import": "./src/MobileSheetNav/index.ts",
       "types": "./src/MobileSheetNav/index.ts"
-    },
-    "./MultipleCodeBlock/index.test": {
-      "import": "./src/MultipleCodeBlock/index.test.tsx",
-      "types": "./src/MultipleCodeBlock/index.test.tsx"
     },
     "./MultipleCodeBlock": {
       "import": "./src/MultipleCodeBlock/index.tsx",
@@ -597,10 +545,6 @@
     "./Row/Row.utils": {
       "import": "./src/Row/Row.utils.ts",
       "types": "./src/Row/Row.utils.ts"
-    },
-    "./Row/index.test": {
-      "import": "./src/Row/index.test.ts",
-      "types": "./src/Row/index.test.ts"
     },
     "./Row": {
       "import": "./src/Row/index.tsx",
@@ -662,10 +606,6 @@
       "import": "./src/StatusCode/index.tsx",
       "types": "./src/StatusCode/index.tsx"
     },
-    "./Table/TanStackTableHeadSort.test": {
-      "import": "./src/Table/TanStackTableHeadSort.test.tsx",
-      "types": "./src/Table/TanStackTableHeadSort.test.tsx"
-    },
     "./Table/TanStackTableHeadSort": {
       "import": "./src/Table/TanStackTableHeadSort.tsx",
       "types": "./src/Table/TanStackTableHeadSort.tsx"
@@ -726,10 +666,6 @@
       "import": "./src/TweetCard/index.tsx",
       "types": "./src/TweetCard/index.tsx"
     },
-    "./admonition.test": {
-      "import": "./src/admonition.test.tsx",
-      "types": "./src/admonition.test.tsx"
-    },
     "./admonition": {
       "import": "./src/admonition.tsx",
       "types": "./src/admonition.tsx"
@@ -750,17 +686,9 @@
       "import": "./src/form/FormLayout2.tsx",
       "types": "./src/form/FormLayout2.tsx"
     },
-    "./form/KeyValueFieldArray/KeyValueFieldArray.test": {
-      "import": "./src/form/KeyValueFieldArray/KeyValueFieldArray.test.tsx",
-      "types": "./src/form/KeyValueFieldArray/KeyValueFieldArray.test.tsx"
-    },
     "./form/KeyValueFieldArray/KeyValueFieldArray": {
       "import": "./src/form/KeyValueFieldArray/KeyValueFieldArray.tsx",
       "types": "./src/form/KeyValueFieldArray/KeyValueFieldArray.tsx"
-    },
-    "./form/KeyValueFieldArray/validation.test": {
-      "import": "./src/form/KeyValueFieldArray/validation.test.ts",
-      "types": "./src/form/KeyValueFieldArray/validation.test.ts"
     },
     "./form/KeyValueFieldArray/validation": {
       "import": "./src/form/KeyValueFieldArray/validation.ts",
@@ -769,10 +697,6 @@
     "./form/Layout/FormLayout": {
       "import": "./src/form/Layout/FormLayout.tsx",
       "types": "./src/form/Layout/FormLayout.tsx"
-    },
-    "./form/SingleValueFieldArray/SingleValueFieldArray.test": {
-      "import": "./src/form/SingleValueFieldArray/SingleValueFieldArray.test.tsx",
-      "types": "./src/form/SingleValueFieldArray/SingleValueFieldArray.test.tsx"
     },
     "./form/SingleValueFieldArray/SingleValueFieldArray": {
       "import": "./src/form/SingleValueFieldArray/SingleValueFieldArray.tsx",
@@ -789,10 +713,6 @@
     "./multi-select": {
       "import": "./src/multi-select/index.tsx",
       "types": "./src/multi-select/index.tsx"
-    },
-    "./multi-select/multi-select.test": {
-      "import": "./src/multi-select/multi-select.test.tsx",
-      "types": "./src/multi-select/multi-select.test.tsx"
     },
     "./multi-select/multi-select": {
       "import": "./src/multi-select/multi-select.tsx",
