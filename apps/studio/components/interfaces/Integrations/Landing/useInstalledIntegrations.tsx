@@ -69,7 +69,7 @@ export const useInstalledIntegrations = () => {
     connectionString: project?.connectionString,
   })
 
-  const isHooksEnabled = schemas?.some((schema) => schema.name === 'supabase_functions')
+  const isHooksEnabled = schemas.some((schema) => schema.name === 'supabase_functions')
 
   const installedIntegrations = useMemo(() => {
     return allIntegrations

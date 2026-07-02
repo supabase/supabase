@@ -3,6 +3,7 @@ import type { components } from 'api-types'
 
 import { get, handleError } from '@/data/fetchers'
 import { organizationKeys } from '@/data/organizations/keys'
+import { EMPTY_ARR } from '@/lib/void'
 import { UseCustomQueryOptions } from '@/types'
 import { ResponseError } from '@/types/base'
 
@@ -32,7 +33,10 @@ export async function getEntitlements(
   })
   if (error) handleError(error)
 
-  return data
+  return {
+    ...data,
+    entitlements: Array.isArray(data?.entitlements) ? data.entitlements : EMPTY_ARR,
+  }
 }
 
 export type EntitlementsData = Awaited<ReturnType<typeof getEntitlements>>

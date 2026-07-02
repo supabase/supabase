@@ -336,7 +336,7 @@ For transaction-mode connections:
 psql 'postgres://postgres.[POOLER_TENANT_ID]:[POSTGRES_PASSWORD]@[your-domain]:6543/postgres'
 ```
 
-When using `psql` with command-line parameters instead of a connection string to connect to Supavisor, the `-U` parameter should also be `postgres.[POOLER_TENANT_ID]`, and not just `postgres`.
+When using `psql` with command-line parameters instead of a connection string to connect to Supavisor, the `-U` parameter should also be `postgres.[POOLER_TENANT_ID]`.
 
 If you need to configure Postgres to be directly accessible from the Internet, read [Exposing your Postgres database](#exposing-your-postgres-database).
 
@@ -514,9 +514,10 @@ sh run.sh recreate
 The `generate-keys.sh` script sets the following secrets automatically. You can also configure them manually in the `.env` file if needed:
 
 - `SECRET_KEY_BASE`: encryption key for securing Realtime and Supavisor communications. (Must be at least 64 characters; generate with `openssl rand -base64 48`)
+- `REALTIME_DB_ENC_KEY`: encryption key used by Realtime for sensitive fields in the `_realtime` schema. (Must be exactly 16 characters; generate with `openssl rand -hex 8`)
 - `VAULT_ENC_KEY`: encryption key used by Supavisor for storing encrypted configuration. (Must be exactly 32 characters; generate with `openssl rand -hex 16`)
 - `PG_META_CRYPTO_KEY`: encryption key for securing connection strings used by Studio against postgres-meta. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
-- `LOGFLARE_PUBLIC_ACCESS_TOKEN`: API token for log ingestion and querying. Used by Vector and Studio to send and query logs. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
+- `LOGFLARE_PUBLIC_ACCESS_TOKEN`: API token for log ingestion used by Logflare and Vector. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
 - `LOGFLARE_PRIVATE_ACCESS_TOKEN`: API token for Logflare management operations. Used by Studio for administrative tasks. Never expose client-side. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
 - `S3_PROTOCOL_ACCESS_KEY_ID`: Access key ID (username-like) for [accessing](/docs/guides/self-hosting/self-hosted-s3) the S3 protocol endpoint in Storage. (Generate with `openssl rand -hex 16`)
 - `S3_PROTOCOL_ACCESS_KEY_SECRET`: Secret key (password-like) used with S3_PROTOCOL_ACCESS_KEY_ID. (Generate with `openssl rand -hex 32`)

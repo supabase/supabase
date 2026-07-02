@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, mergeRefs, useParams } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import { XIcon } from 'lucide-react'
 import Head from 'next/head'
@@ -41,7 +41,6 @@ import { RestoreFailedState } from './RestoreFailedState'
 import { RestoringState } from './RestoringState'
 import { UnhealthyState } from './UnhealthyState'
 import { UpgradingState } from './UpgradingState'
-import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { CreateBranchModal } from '@/components/interfaces/BranchManagement/CreateBranchModal'
 import { ProjectAPIDocs } from '@/components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import { BannerFreeMicroUpgrade } from '@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade'
@@ -143,7 +142,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const { data: resourceWarnings } = useResourceWarningsQuery({
       slug: selectedOrganization?.slug,
     })
-    const projectResourceWarnings = resourceWarnings?.find(
+    const projectResourceWarnings = (Array.isArray(resourceWarnings) ? resourceWarnings : []).find(
       (w) => w.project === selectedProject?.ref
     )
     const isComputeNearExhaustion =
@@ -161,7 +160,6 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       LOCAL_STORAGE_KEYS.UNIFIED_LOGS_BANNER_DISMISSED,
       false
     )
-    const { isEligible: showUnifiedLogsBanner } = useUnifiedLogsPreview()
     const [isProjectIntegrationBannerDismissed, setIsProjectIntegrationBannerDismissed] =
       useLocalStorageQuery(
         getProjectIntegrationBannerDismissKey({
@@ -241,7 +239,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
 
     useEffect(() => {
       if (!selectedProject?.ref) return
-      if (showUnifiedLogsBanner && !isUnifiedLogsBannerDismissed) {
+      if (IS_PLATFORM && !isUnifiedLogsBannerDismissed) {
         addBanner({
           id: BANNER_ID.UNIFIED_LOGS,
           isDismissed: false,
@@ -251,13 +249,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       } else {
         dismissBanner(BANNER_ID.UNIFIED_LOGS)
       }
-    }, [
-      selectedProject?.ref,
-      showUnifiedLogsBanner,
-      isUnifiedLogsBannerDismissed,
-      addBanner,
-      dismissBanner,
-    ])
+    }, [selectedProject?.ref, isUnifiedLogsBannerDismissed, addBanner, dismissBanner])
 
     useLayoutEffect(() => {
       const unregister = registerOpenMenu(() => {

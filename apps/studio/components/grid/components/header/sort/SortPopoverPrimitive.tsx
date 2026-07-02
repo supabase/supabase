@@ -290,7 +290,7 @@ export const SortPopoverPrimitive = ({
                     asChild
                     variant="dashed"
                     iconRight={<ChevronDown size="14" className="text-foreground-light" />}
-                    className="sb-grid-dropdown__item-trigger"
+                    className="my-1"
                     data-testid="table-editor-pick-column-to-sort-button"
                   >
                     <span>Pick {localSorts.length > 1 ? 'another' : 'a'} column to sort by</span>

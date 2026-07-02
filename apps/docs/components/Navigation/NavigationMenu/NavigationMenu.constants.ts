@@ -2096,6 +2096,7 @@ export const storage: NavMenuConstant = {
           items: [
             { name: 'Fundamentals', url: '/guides/storage/cdn/fundamentals' },
             { name: 'Smart CDN', url: '/guides/storage/cdn/smart-cdn' },
+            { name: 'Purging Cache', url: '/guides/storage/cdn/purge-cdn-cache' },
             { name: 'Metrics', url: '/guides/storage/cdn/metrics' },
           ],
         },
@@ -2714,6 +2715,10 @@ export const platform: NavMenuConstant = {
         {
           name: 'Restore to a new project',
           url: '/guides/platform/clone-project',
+        },
+        {
+          name: 'Project Pausing',
+          url: '/guides/platform/free-project-pausing' as `/${string}`,
         },
         {
           name: 'Single Sign-On',

@@ -70,7 +70,7 @@ To get started:
 You can use the `get` subcommand of the CLI to check whether SSL is currently being enforced:
 
 ```bash
-supabase ssl-enforcement --project-ref {ref} get --experimental
+supabase ssl-enforcement get --project-ref {ref} --experimental
 ```
 
 Response if SSL is being enforced:
@@ -90,13 +90,13 @@ SSL is *NOT* being enforced.
 The `update` subcommand is used to change the SSL enforcement status for your project:
 
 ```bash
-supabase ssl-enforcement --project-ref {ref} update --enable-db-ssl-enforcement --experimental
+supabase ssl-enforcement update --project-ref {ref} --enable-db-ssl-enforcement --experimental
 ```
 
 Similarly, to disable SSL enforcement:
 
 ```bash
-supabase ssl-enforcement --project-ref {ref} update --disable-db-ssl-enforcement --experimental
+supabase ssl-enforcement update --project-ref {ref} --disable-db-ssl-enforcement --experimental
 ```
 
 ### A note about Postgres SSL modes

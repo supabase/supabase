@@ -7,7 +7,7 @@ import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.typ
 import type { TableField } from '../TableEditor.types'
 import { ForeignKeyRow } from './ForeignKeyRow'
 import { checkIfRelationChanged } from './ForeignKeysManagement.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'

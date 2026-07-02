@@ -45,9 +45,17 @@ export const useBucketDeleteMutation = ({
   return useMutation<BucketDeleteData, ResponseError, BucketDeleteVariables>({
     mutationFn: (vars) => deleteBucket(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef } = variables
-      await queryClient.invalidateQueries({ queryKey: storageKeys.buckets(projectRef) })
+      const { projectRef, id } = variables
+
+      const deletedBucketQueryKey = storageKeys.bucket(projectRef, id)
+      await queryClient.cancelQueries({ queryKey: deletedBucketQueryKey })
+      queryClient.removeQueries({ queryKey: deletedBucketQueryKey })
+
       await onSuccess?.(data, variables, context)
+
+      // Fire-and-forget: only the bucket list needs refreshing, and it shouldn't block
+      // onSuccess (modal close/navigation) above.
+      void queryClient.invalidateQueries({ queryKey: storageKeys.bucketsList(projectRef) })
     },
     async onError(data, variables, context) {
       if (onError === undefined) {

@@ -7,7 +7,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { SectionContent } from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import Panel from '@/components/ui/Panel'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'

@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { ButtonTooltip } from '../ButtonTooltip'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'

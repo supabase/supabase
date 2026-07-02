@@ -4,6 +4,7 @@ import { IS_PLATFORM } from 'common'
 import { usageKeys } from './keys'
 import type { components } from '@/data/api'
 import { get, handleError } from '@/data/fetchers'
+import { EMPTY_ARR } from '@/lib/void'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ResourceWarningsVariables = {
@@ -26,7 +27,7 @@ export async function getResourceWarnings(
   })
   if (error) handleError(error)
 
-  return data
+  return Array.isArray(data) ? data : EMPTY_ARR
 }
 
 export type ResourceWarning = components['schemas']['ProjectResourceWarningsResponse']
