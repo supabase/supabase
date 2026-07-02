@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { UseFormReturn } from 'react-hook-form'
 import { FormControl, FormField } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -15,32 +16,42 @@ interface DatabasePasswordInputProps {
   form: UseFormReturn<CreateProjectForm>
 }
 
-const updatePasswordStrength = async (form: UseFormReturn<CreateProjectForm>, value: string) => {
-  try {
-    const { warning, message, strength } = await passwordStrength(value)
-    form.setValue('dbPassStrength', strength, { shouldValidate: false, shouldDirty: false })
-    form.setValue('dbPassStrengthMessage', message ?? '', {
-      shouldValidate: false,
-      shouldDirty: false,
-    })
-    form.setValue('dbPassStrengthWarning', warning ?? '', {
-      shouldValidate: false,
-      shouldDirty: false,
-    })
-
-    form.trigger('dbPass')
-  } catch (error) {
-    console.error(error)
-  }
-}
-
 export const DatabasePasswordInput = ({ form }: DatabasePasswordInputProps) => {
+  const passwordStrengthRequestIdRef = useRef(0)
+
   // [Refactor] DB Password could be a common component used in multiple pages with repeated logic
+  const updatePasswordStrength = async (value: string) => {
+    const requestId = passwordStrengthRequestIdRef.current + 1
+    passwordStrengthRequestIdRef.current = requestId
+
+    try {
+      const { warning, message, strength } = await passwordStrength(value)
+
+      if (requestId !== passwordStrengthRequestIdRef.current) return
+
+      form.setValue('dbPassStrength', strength, { shouldValidate: false, shouldDirty: false })
+      form.setValue('dbPassStrengthMessage', message ?? '', {
+        shouldValidate: false,
+        shouldDirty: false,
+      })
+      form.setValue('dbPassStrengthWarning', warning ?? '', {
+        shouldValidate: false,
+        shouldDirty: false,
+      })
+
+      form.trigger('dbPass')
+    } catch (error) {
+      if (requestId === passwordStrengthRequestIdRef.current) {
+        console.error(error)
+      }
+    }
+  }
+
   async function generatePassword() {
     const password = generateStrongPassword()
     form.setValue('dbPass', password)
 
-    updatePasswordStrength(form, password)
+    updatePasswordStrength(password)
   }
 
   return (
@@ -79,7 +90,7 @@ export const DatabasePasswordInput = ({ form }: DatabasePasswordInputProps) => {
                     const newValue = event.target.value
                     field.onChange(event)
 
-                    updatePasswordStrength(form, newValue)
+                    updatePasswordStrength(newValue)
                   }}
                 />
               </FormControl>
