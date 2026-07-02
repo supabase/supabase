@@ -20,7 +20,6 @@ npm create refine-app@latest -- --preset refine-supabase my-app
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "refine", "tab": "frameworks" }} />
 
-
 ## 4. Update `supabaseClient` with environment variables
 
 Update the `supabaseClient` with the `SUPABASE_URL` and `SUPABASE_KEY` of your Supabase API, which you can get from the helper above, or [from the project **Connect** panel](https://supabase.com/dashboard/project/_?showConnect=true&framework=refine&tab=frameworks). The `supabaseClient` is used in auth provider and data provider methods that allow the Refine app to connect to your Supabase backend.
@@ -28,8 +27,8 @@ Update the `supabaseClient` with the `SUPABASE_URL` and `SUPABASE_KEY` of your S
 ```ts name=src/utility/supabaseClient.ts
 import { createClient } from '@refinedev/supabase'
 
-const SUPABASE_URL = YOUR_SUPABASE_URL
-const SUPABASE_KEY = YOUR_SUPABASE_KEY
+const SUPABASE_URL = '<your-supabase-url>'
+const SUPABASE_KEY = '<your-supabase-publishable-key>'
 
 export const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
   db: {

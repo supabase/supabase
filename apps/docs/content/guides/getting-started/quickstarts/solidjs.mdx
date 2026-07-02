@@ -49,7 +49,10 @@ Add a `getInstruments` function to fetch the data and display the query result t
 import { createClient } from '@supabase/supabase-js'
 import { createResource, For } from 'solid-js'
 
-const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_key>')
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY
+)
 
 async function getInstruments() {
   const { data } = await supabase.from('instruments').select()

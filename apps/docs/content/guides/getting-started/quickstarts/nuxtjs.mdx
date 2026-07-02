@@ -32,12 +32,12 @@ Create a `.env` file and populate with your Supabase connection variables that y
 
 <$CodeTabs>
 
-```text name=.env.local
+```text name=.env
 SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
 
-```ts name=nuxt.config.tsx
+```ts name=nuxt.config.ts
 export default defineNuxtConfig({
   runtimeConfig: {
     public: {
@@ -81,7 +81,7 @@ onMounted(() => {
 
 ## 7. Start the app
 
-Start the app, navigate to http://localhost:3000 in the browser, open the browser console, and you should see the list of instruments.
+Start the app, navigate to http://localhost:3000 in the browser, and you should see the list of instruments.
 
 ```bash
 npm run dev
