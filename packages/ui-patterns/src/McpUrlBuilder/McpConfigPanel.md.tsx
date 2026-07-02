@@ -1,6 +1,8 @@
 /** @jsxRuntime automatic */
 /** @jsxImportSource mdast-jsx */
 import type { Blockquote, Content, Paragraph } from 'mdast'
+import { remark } from 'remark'
+import remarkGfm from 'remark-gfm'
 
 import {
   HOSTED_MCP_URL as HOSTED_URL,
@@ -154,4 +156,11 @@ export function McpConfigPanel() {
       </paragraph>
     </>
   )
+}
+
+export function mcpConfigPanelMarkdown(): string {
+  const processor = remark().use(remarkGfm)
+  return processor
+    .stringify(McpConfigPanel() as unknown as Parameters<typeof processor.stringify>[0])
+    .trim()
 }
