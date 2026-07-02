@@ -12,7 +12,7 @@ describe('buildEdgeFunctionHeaderAddActions', () => {
       createRow: (name, value) => ({ name, value }),
     })
 
-    expect(authAction.label).toBe('Add apikey header with secret key')
+    expect(authAction.label).toBe('Add secret key')
     expect(authAction.createRows()).toEqual([{ name: 'apikey', value: 'sb_secret_123' }])
   })
 
@@ -22,7 +22,7 @@ describe('buildEdgeFunctionHeaderAddActions', () => {
       createRow: (name, value) => ({ name, value }),
     })
 
-    expect(authAction.label).toBe('Add auth header with secret key')
+    expect(authAction.label).toBe('Add secret key')
     expect(authAction.createRows()).toEqual([
       { name: 'Authorization', value: 'Bearer legacy-service-role-jwt' },
     ])
