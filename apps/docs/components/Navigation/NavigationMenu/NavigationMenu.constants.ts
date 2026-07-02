@@ -978,6 +978,10 @@ const guiQuickstarts: NavMenuSection = {
   url: undefined,
   items: [
     {
+      name: 'Paul',
+      url: '/guides/database/paul',
+    },
+    {
       name: 'pgAdmin',
       url: '/guides/database/pgadmin',
     },
