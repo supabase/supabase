@@ -130,7 +130,7 @@ export const PolicyRow = ({
                     icon={<MoreVertical />}
                     data-testid={`policy-${policy.name}-actions-button`}
                     aria-label={`${policy.name} actions`}
-                    />
+                  />
                 </DropdownMenuTrigger>
               </TooltipTrigger>
               <TooltipContent side="bottom">More options</TooltipContent>
