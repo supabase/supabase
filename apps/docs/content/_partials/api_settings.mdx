@@ -1,10 +1,12 @@
 ### Get API details
 
-Now that you've created some database tables, you are ready to insert data using the auto-generated API.
+To interact with data in database tables, you use the client libraries that wrap [the auto-generated Data API endpoints](/docs/guides/api), authenticating using the Project URL and key from [the project **Connect** dialog](/dashboard/project/\_?showConnect=true&connectTab={{ .tab }}&framework={{ .framework }}).
 
-To do this, you need to get the Project URL and key from [the project **Connect** dialog](/dashboard/project/\_?showConnect=true&connectTab={{ .tab }}&framework={{ .framework }}).
+<ProjectConfigVariables variable="url" />
+<ProjectConfigVariables variable="publishable" />
 
-[Read the API keys docs](/docs/guides/getting-started/api-keys) for a full explanation of all key types and their uses.
+<Admonition type="tip">
 
-<$Partial path="api_keys_deprecation.mdx" variables={{ "framework": "{{ .framework }}", "tab": "{{ .tab }}" }}
-/>
+[Read the API keys docs](/docs/guides/getting-started/api-keys) for a full explanation of all key types, their uses, and where to find them.
+
+</Admonition>
