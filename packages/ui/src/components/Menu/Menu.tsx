@@ -85,6 +85,9 @@ export const menuItemVariants = cva(
         className: 'hover:bg-sidebar-accent/50',
       },
     ],
+    defaultVariants: {
+      active: false,
+    },
   }
 )
 
