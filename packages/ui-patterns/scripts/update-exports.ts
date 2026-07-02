@@ -54,7 +54,6 @@ function updatePackageJson(exportsMap: ExportMap): void {
 
   fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2))
   fs.appendFileSync(packageJsonPath, EOL, 'utf8')
-  fs.appendFileSync(packageJsonPath, EOL, 'utf8')
   console.log('✅ package.json exports updated (with clean index paths).')
 }
 
