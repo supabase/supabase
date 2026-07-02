@@ -3,6 +3,7 @@ import { snakeCase } from 'lodash'
 import z from 'zod'
 
 import { DestinationType } from '../DestinationPanel.types'
+import { type ClickHouseApiConfig } from './ClickHouse/ClickHouse.utils'
 import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import {
   DestinationPanelFormSchema,
@@ -17,6 +18,7 @@ import { type DucklakeApiConfig } from './DuckLake/DuckLake.utils'
 import { type SnowflakeApiConfig } from './Snowflake/Snowflake.utils'
 import {
   BigQueryDestinationConfig,
+  ClickHouseDestinationConfig,
   DestinationConfig,
   DucklakeDestinationConfig,
   DucklakeManualDestinationConfig,
@@ -80,6 +82,14 @@ export const generateDefaultValues = ({
     snowflakeConfigValue && typeof snowflakeConfigValue === 'object'
       ? (snowflakeConfigValue as SnowflakeApiConfig)
       : undefined
+  const clickhouseConfigValue =
+    config && 'clickhouse' in (config as Record<string, unknown>)
+      ? (config as Record<string, unknown>).clickhouse
+      : undefined
+  const clickhouseConfig =
+    clickhouseConfigValue && typeof clickhouseConfigValue === 'object'
+      ? (clickhouseConfigValue as ClickHouseApiConfig)
+      : undefined
 
   return {
     // Common fields
@@ -133,6 +143,12 @@ export const generateDefaultValues = ({
     snowflakeDatabase: snowflakeConfig?.database ?? '',
     snowflakeSchema: snowflakeConfig?.schema ?? '',
     snowflakeRole: snowflakeConfig?.role ?? '',
+    // ClickHouse fields
+    clickhouseUrl: clickhouseConfig?.url ?? '',
+    clickhouseUser: clickhouseConfig?.user ?? '',
+    clickhousePassword: clickhouseConfig?.password ?? '',
+    clickhouseDatabase: clickhouseConfig?.database ?? '',
+    clickhouseEngine: clickhouseConfig?.engine ?? 'replacing_merge_tree',
   }
 }
 
@@ -156,6 +172,16 @@ const buildSnowflakeConfig = (
   database: normalizeRequiredString(data.snowflakeDatabase),
   schema: normalizeRequiredString(data.snowflakeSchema),
   role: normalizeOptionalString(data.snowflakeRole),
+})
+
+const buildClickHouseConfig = (
+  data: z.infer<typeof DestinationPanelFormSchema>
+): ClickHouseDestinationConfig => ({
+  url: normalizeRequiredString(data.clickhouseUrl),
+  user: normalizeRequiredString(data.clickhouseUser),
+  password: normalizeOptionalString(data.clickhousePassword),
+  database: normalizeRequiredString(data.clickhouseDatabase),
+  engine: data.clickhouseEngine,
 })
 
 // Builds the studio-side DuckLake config from form data, picking the right shape for the
@@ -232,6 +258,8 @@ export const buildDestinationConfigForValidation = ({
     return { ducklake: buildDucklakeConfig(data) }
   } else if (selectedType === 'Snowflake') {
     return { snowflake: buildSnowflakeConfig(data) }
+  } else if (selectedType === 'ClickHouse') {
+    return { clickHouse: buildClickHouseConfig(data) }
   } else {
     throw new Error('Invalid destination type')
   }
@@ -291,6 +319,8 @@ export const buildDestinationConfig = async ({
     destinationConfig = { ducklake: buildDucklakeConfig(data) }
   } else if (selectedType === 'Snowflake') {
     destinationConfig = { snowflake: buildSnowflakeConfig(data) }
+  } else if (selectedType === 'ClickHouse') {
+    destinationConfig = { clickHouse: buildClickHouseConfig(data) }
   }
 
   return destinationConfig

@@ -10,6 +10,7 @@ import * as z from 'zod'
 
 import {
   useIsETLBigQueryPrivateAlpha,
+  useIsETLClickHousePrivateAlpha,
   useIsETLDucklakePrivateAlpha,
   useIsETLIcebergPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
@@ -20,6 +21,8 @@ import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsB
 import { AnalyticsBucketFields } from './AnalyticsBucket/Fields'
 import { getBigQueryValidationIssues } from './BigQuery/BigQuery.utils'
 import { BigQueryFields } from './BigQuery/Fields'
+import { getClickHouseValidationIssues } from './ClickHouse/ClickHouse.utils'
+import { ClickHouseFields } from './ClickHouse/Fields'
 import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.schema'
 import { areValidationFailuresEqual, generateDefaultValues } from './DestinationForm.utils'
 import { DestinationNameInput } from './DestinationNameInput'
@@ -63,6 +66,7 @@ export const DestinationForm = ({
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
+  const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
   const [isFormInteracting, setIsFormInteracting] = useState(false)
@@ -85,8 +89,15 @@ export const DestinationForm = ({
       destinations.push({ value: 'Analytics Bucket', label: 'Analytics Bucket' })
     if (etlEnableDucklake) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
     if (etlEnableSnowflake) destinations.push({ value: 'Snowflake', label: 'Snowflake' })
+    if (etlEnableClickHouse) destinations.push({ value: 'ClickHouse', label: 'ClickHouse' })
     return destinations
-  }, [etlEnableBigQuery, etlEnableDucklake, etlEnableIceberg, etlEnableSnowflake])
+  }, [
+    etlEnableBigQuery,
+    etlEnableDucklake,
+    etlEnableIceberg,
+    etlEnableSnowflake,
+    etlEnableClickHouse,
+  ])
   const hasNoAvailableDestinations = availableDestinations.length === 0
 
   const { data: sourcesData } = useReplicationSourcesQuery({ projectRef })
@@ -170,6 +181,10 @@ export const DestinationForm = ({
           })
         } else if (selectedType === 'Snowflake') {
           getSnowflakeValidationIssues(data).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
+        } else if (selectedType === 'ClickHouse') {
+          getClickHouseValidationIssues(data).forEach(({ path, message }) => {
             addRequiredFieldError(path, message)
           })
         }
@@ -330,6 +345,8 @@ export const DestinationForm = ({
                 <DuckLakeFields form={form} editMode={editMode} />
               ) : selectedType === 'Snowflake' && etlEnableSnowflake ? (
                 <SnowflakeFields form={form} />
+              ) : selectedType === 'ClickHouse' && etlEnableClickHouse ? (
+                <ClickHouseFields form={form} />
               ) : null}
 
               <DialogSectionSeparator />

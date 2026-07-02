@@ -11,6 +11,7 @@ export type DestinationConfig =
   | { iceberg: IcebergDestinationConfig }
   | { ducklake: DucklakeDestinationConfig }
   | { snowflake: SnowflakeDestinationConfig }
+  | { clickHouse: ClickHouseDestinationConfig }
 
 export type BigQueryDestinationConfig = {
   projectId: string
@@ -116,6 +117,14 @@ export type SnowflakeDestinationConfig = {
   role?: string
 }
 
+export type ClickHouseDestinationConfig = {
+  url: string
+  user: string
+  password?: string
+  database: string
+  engine?: 'merge_tree' | 'replacing_merge_tree'
+}
+
 export type BatchConfig = {
   maxFillMs?: number
 }
@@ -211,9 +220,21 @@ async function createDestinationPipeline(
         role,
       },
     } as unknown as components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
+  } else if ('clickHouse' in destinationConfig) {
+    const { url, user, password, database, engine } = destinationConfig.clickHouse
+
+    destination_config = {
+      clickhouse: {
+        url,
+        user,
+        password,
+        database,
+        engine,
+      },
+    } as unknown as components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
   } else {
     throw new Error(
-      'Invalid destination config: must specify bigQuery, iceberg, ducklake, or snowflake'
+      'Invalid destination config: must specify bigQuery, iceberg, ducklake, snowflake, or clickHouse'
     )
   }
 

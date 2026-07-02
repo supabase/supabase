@@ -103,9 +103,20 @@ async function updateDestinationPipeline(
         role,
       },
     } as unknown as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
+  } else if ('clickHouse' in destinationConfig) {
+    const { url, user, password, database, engine } = destinationConfig.clickHouse
+    destination_config = {
+      clickhouse: {
+        url,
+        user,
+        password,
+        database,
+        engine,
+      },
+    } as unknown as components['schemas']['UpdateReplicationDestinationPipelineBody']['destination_config']
   } else {
     throw new Error(
-      'Invalid destination config: must specify bigQuery, iceberg, ducklake, or snowflake'
+      'Invalid destination config: must specify bigQuery, iceberg, ducklake, snowflake, or clickHouse'
     )
   }
 

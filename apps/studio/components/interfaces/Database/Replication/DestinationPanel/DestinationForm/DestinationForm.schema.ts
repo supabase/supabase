@@ -59,6 +59,12 @@ export const DestinationPanelFormSchema = z.object({
   snowflakeDatabase: z.string().optional(),
   snowflakeSchema: z.string().optional(),
   snowflakeRole: z.string().optional(),
+  // ClickHouse fields
+  clickhouseUrl: z.string().optional(),
+  clickhouseUser: z.string().optional(),
+  clickhousePassword: z.string().optional(),
+  clickhouseDatabase: z.string().optional(),
+  clickhouseEngine: z.enum(['merge_tree', 'replacing_merge_tree']).optional(),
 })
 
 export type DestinationPanelSchemaType = z.infer<typeof DestinationPanelFormSchema>
