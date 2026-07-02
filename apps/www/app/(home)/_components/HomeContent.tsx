@@ -4,15 +4,23 @@ import getContent from '~/data/home/content'
 import dynamic from 'next/dynamic'
 
 import { BuiltWithSupabaseSection } from './BuiltWithSupabaseSection'
-import { CommunitySectionV2 as CommunitySection } from './CommunitySectionV2'
-import { CTASection } from './CTASection'
-import { CustomerStoriesSection } from './CustomerStoriesSection'
-import { DashboardFeaturesSection } from './DashboardFeaturesSection'
 import { Hero } from './Hero'
-import { LogosGrid } from './LogosGrid'
-import { OpenSourceSection } from './OpenSourceSection'
 
-const Products = dynamic(() => import('~/components/Products/index'))
+const Products = dynamic(() => import('@/components/Products/index'))
+const CommunitySection = dynamic(() =>
+  import('./CommunitySectionV2').then((mod) => mod.CommunitySectionV2)
+)
+const CTASection = dynamic(() => import('./CTASection').then((mod) => mod.CTASection))
+const CustomerStoriesSection = dynamic(() =>
+  import('./CustomerStoriesSection').then((mod) => mod.CustomerStoriesSection)
+)
+const DashboardFeaturesSection = dynamic(() =>
+  import('./DashboardFeaturesSection').then((mod) => mod.DashboardFeaturesSection)
+)
+const LogosGrid = dynamic(() => import('./LogosGrid').then((mod) => mod.LogosGrid))
+const OpenSourceSection = dynamic(() =>
+  import('./OpenSourceSection').then((mod) => mod.OpenSourceSection)
+)
 
 export function HomeContent({ frameworksSlot }: { frameworksSlot: React.ReactNode }) {
   const content = getContent()
@@ -23,9 +31,7 @@ export function HomeContent({ frameworksSlot }: { frameworksSlot: React.ReactNod
         <Hero />
       </header>
       <section id="products" className="relative">
-        <div className="-translate-y-16">
-          <Products {...content.productsSection} />
-        </div>
+        <Products {...content.productsSection} />
       </section>
       <section id="social-proof">
         <LogosGrid />

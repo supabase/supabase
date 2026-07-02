@@ -44,7 +44,7 @@ export function CommunitySectionV2() {
       <div className="mx-auto">
         <div className="flex flex-col items-center gap-3 px-6 py-20">
           <h3 className="text-2xl md:text-4xl text-center">Join the community</h3>
-          <p className="text-foreground-lighter text-center text-sm">
+          <p className="text-foreground-lighter text-center">
             Discover what our community has to say about their Supabase experience.
           </p>
           <Button asChild variant="default" size="small" className="mt-2">
