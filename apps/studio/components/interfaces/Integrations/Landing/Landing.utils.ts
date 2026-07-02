@@ -1,4 +1,5 @@
 import { parseSchemaComment } from '@stripe/sync-engine/supabase'
+import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 
 import { type WrapperMeta } from '../Wrappers/Wrappers.types'
@@ -8,17 +9,19 @@ import {
   isInstalled as checkIsInstalled,
   findStripeSchema,
 } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/stripe-sync-status'
-import { useAPIKeysQuery, type APIKey } from '@/data/api-keys/api-keys-query'
-import { ProjectAuthConfigData, useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { getAPIKeys, type APIKey } from '@/data/api-keys/api-keys-query'
+import { apiKeysKeys } from '@/data/api-keys/keys'
+import { getProjectAuthConfig, ProjectAuthConfigData } from '@/data/auth/auth-config-query'
+import { authKeys } from '@/data/auth/keys'
 import { type DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
 import { type Schema } from '@/data/database/schemas-query'
 import { type FDW } from '@/data/fdw/fdws-query'
-import { AuthorizedApp, useAuthorizedAppsQuery } from '@/data/oauth/authorized-apps-query'
-import {
-  IntegrationStatus,
-  usePartnerIntegrationsQuery,
-} from '@/data/partners/integration-status-query'
-import { useSecretsQuery, type ProjectSecret } from '@/data/secrets/secrets-query'
+import { AuthorizedApp, getAuthorizedApps } from '@/data/oauth/authorized-apps-query'
+import { oauthAppKeys } from '@/data/oauth/keys'
+import { getIntegrations, IntegrationStatus } from '@/data/partners/integration-status-query'
+import { partnersKeys } from '@/data/partners/keys'
+import { secretsKeys } from '@/data/secrets/keys'
+import { getSecrets, type ProjectSecret } from '@/data/secrets/secrets-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { ResponseError } from '@/types'
 
@@ -31,9 +34,45 @@ export const isStripeSyncEngineInstalled = (schemas: Schema[]) => {
 type ProjectOAuthIntegrationData = {
   apiKeys: APIKey[]
   edgeFunctionSecrets: ProjectSecret[]
-  authConfig: ProjectAuthConfigData | undefined
+  authConfig: ProjectAuthConfigData | null
   partnerIntegrations: IntegrationStatus[]
   oauthApps: AuthorizedApp[]
+}
+
+/**
+ * Wraps a query in error-handling code that suppresses 403 errors, for graceful degradation of the marketplace UI
+ * for users in roles that don't have access to certain resources.
+ * TODO: Consider surfacing permission errors in query results so the Settings tab can differentiate between
+ *       missing resources and ones the user doesn't have permission to see.
+ */
+function usePermissionSafeQuery<T>({
+  queryKey,
+  queryFn,
+  defaultVal,
+  enabled = true,
+}: {
+  queryKey: readonly (string | boolean | undefined)[]
+  queryFn: (opts: { signal?: AbortSignal }) => Promise<T>
+  defaultVal: T
+  enabled: boolean
+}) {
+  return useQuery({
+    // Callers should pass in the queryKey used by the standard data hook, as the shared prefix
+    // will let this new query also be invalidated in response to user actions.
+    queryKey: [...queryKey, 'permission-safe'],
+    queryFn: async (opts) => {
+      try {
+        return await queryFn(opts)
+      } catch (error) {
+        if (error instanceof ResponseError && error.code === 403) {
+          return defaultVal
+        } else {
+          throw error
+        }
+      }
+    },
+    enabled,
+  })
 }
 
 /**
@@ -52,11 +91,36 @@ export const useProjectOAuthIntegrationData = (
 } => {
   const { data: org } = useSelectedOrganizationQuery({ enabled })
   const queries = {
-    apiKeys: useAPIKeysQuery({ projectRef, reveal: false }, { enabled }),
-    edgeFunctionSecrets: useSecretsQuery({ projectRef }, { enabled }),
-    authConfig: useAuthConfigQuery({ projectRef }, { enabled }),
-    partnerIntegrations: usePartnerIntegrationsQuery({ projectRef }, { enabled }),
-    oauthApps: useAuthorizedAppsQuery({ slug: org?.slug }, { enabled: !!org }),
+    apiKeys: usePermissionSafeQuery({
+      queryKey: apiKeysKeys.list(projectRef, false),
+      queryFn: ({ signal }) => getAPIKeys({ projectRef, reveal: false }, signal),
+      defaultVal: [],
+      enabled: enabled && !!projectRef,
+    }),
+    edgeFunctionSecrets: usePermissionSafeQuery({
+      queryKey: secretsKeys.list(projectRef),
+      queryFn: ({ signal }) => getSecrets({ projectRef }, signal),
+      defaultVal: [],
+      enabled: enabled && !!projectRef,
+    }),
+    authConfig: usePermissionSafeQuery({
+      queryKey: authKeys.authConfig(projectRef),
+      queryFn: ({ signal }) => getProjectAuthConfig({ projectRef }, signal),
+      defaultVal: null,
+      enabled: enabled && !!projectRef,
+    }),
+    partnerIntegrations: usePermissionSafeQuery({
+      queryKey: partnersKeys.getIntegrations(projectRef),
+      queryFn: ({ signal }) => getIntegrations({ projectRef }, signal),
+      defaultVal: [],
+      enabled: enabled && !!projectRef,
+    }),
+    oauthApps: usePermissionSafeQuery({
+      queryKey: oauthAppKeys.authorizedApps(org?.slug),
+      queryFn: ({ signal }) => getAuthorizedApps({ slug: org?.slug }, signal),
+      defaultVal: [],
+      enabled: enabled && !!org,
+    }),
   }
 
   // memoize to prevent object creation from triggering a re-render when the result data is used
@@ -65,7 +129,7 @@ export const useProjectOAuthIntegrationData = (
     return {
       apiKeys: queries.apiKeys.data ?? [],
       edgeFunctionSecrets: queries.edgeFunctionSecrets.data ?? [],
-      authConfig: queries.authConfig.data,
+      authConfig: queries.authConfig.data ?? null,
       partnerIntegrations: queries.partnerIntegrations.data ?? [],
       oauthApps: queries.oauthApps.data ?? [],
     }
