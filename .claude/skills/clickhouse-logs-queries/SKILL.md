@@ -49,9 +49,11 @@ in `log_attributes`.
 precision, no trailing `Z`). In the Logs Explorer the selected time range is
 applied for you, so you rarely need to write a `timestamp` filter by hand.
 
-A minimal, well-formed query:
+A minimal, well-formed query. Lead with a comment naming the query, filter by
+`source`, and always `limit`:
 
 ```sql
+-- recent edge requests
 select timestamp, event_message
 from logs
 where source = 'edge_logs'
@@ -155,8 +157,9 @@ rejects `count(*)` and `select *` — use `count()` and list the columns you nee
 These keep queries correct and cheap. Log tables are large; an unbounded scan
 reads far more data than you need.
 
+- **Start every query with an identifying comment** (e.g. `-- errors since last deploy`). It labels the query in logs and review, and makes each of several queries in a file easy to tell apart.
 - **Always include a `LIMIT`.** Even for aggregates while you iterate.
-- **Always filter by `source`.** It scopes the query to one service.
+- **Always query `from logs where source = '...'`.** There is no per-service table (no `edge_logs`, `postgres_logs`, etc. table) — there is one `logs` table, and `source` scopes it to a service. Filtering by `source` is required, not just an optimization.
 - **Keep the time range tight.** A smaller window returns results faster.
 - **Filter on the real columns** (`source`, `timestamp`) before reaching into
   `log_attributes`.
