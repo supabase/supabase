@@ -19,16 +19,13 @@ export const buildEdgeFunctionHeaderAddActions = <TRow>({
   return [
     {
       key: 'add-auth-header',
-      label:
-        authHeader.name === 'apikey'
-          ? 'Add apikey header with secret key'
-          : 'Add auth header with secret key',
+      label: 'Add secret key',
       description: 'Required for edge functions invoked with a secret key',
       createRows: () => [createRow(authHeader.name, authHeader.value)],
     },
     {
       key: 'add-source-header',
-      label: 'Add custom source header',
+      label: 'Add custom source',
       description: 'Useful to verify that the edge function was triggered from this webhook',
       createRows: () => createRow('x-supabase-webhook-source', '[Use a secret value]'),
       separatorAbove: true,

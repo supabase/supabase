@@ -55,7 +55,7 @@ export const HTTPHeaders = ({ form }: HTTPHeadersProps) => {
           createEmptyRow={() => ({ id: uuidv4(), name: '', value: '' })}
           keyPlaceholder="Header name"
           valuePlaceholder="Header value"
-          addLabel="Add a new header"
+          addLabel="Add header"
           addActions={addActions}
         />
       </FormSectionContent>

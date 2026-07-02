@@ -44,7 +44,7 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
         createEmptyRow={() => ({ name: '', value: '' })}
         keyPlaceholder="Header name"
         valuePlaceholder="Header value"
-        addLabel="Add a new header"
+        addLabel="Add header"
         addActions={addActions}
       />
     </SheetSection>
