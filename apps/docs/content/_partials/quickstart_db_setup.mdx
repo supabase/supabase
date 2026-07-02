@@ -79,7 +79,11 @@ Then set a secure baseline by setting only the privileges each Postgres role nee
 You can click this button to prefill all the SQL needed in [the SQL editor of your project](/dashboard/project/_/sql) in the Dashboard.
 
 <Button variant="primary" asChild>
-  <a href={`https://supabase.com/dashboard/project/_/sql/new?content=${encodeURIComponent(sqlSetup)}`}>Prefill SQL</a>
+  <a
+    href={`https://supabase.com/dashboard/project/_/sql/new?content=${encodeURIComponent(sqlSetup)}`}
+  >
+    Prefill SQL
+  </a>
 </Button>
 
 <Accordion
@@ -125,6 +129,7 @@ You can click this button to prefill all the SQL needed in [the SQL editor of yo
     ```
 
     </AccordionItem>
+
 </Accordion>
 
 <Admonition type="note" label="Disabled the Data API during project setup?">
