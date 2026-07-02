@@ -29,7 +29,7 @@ export function DashboardFeaturesSection({
   const Panel = tabs[activeTabIdx].panel
 
   return (
-    <SectionContainer ref={sectionRef} className="pt-10! pb-4! overflow-hidden">
+    <SectionContainer ref={sectionRef} className="pt-10! pb-4! space-y-8 overflow-hidden">
       <div className="pt-12 flex flex-col gap-8">
         <h3 className="text-2xl md:text-4xl text-foreground-lighter">{title}</h3>
         <div className="flex gap-2" role="tablist">
@@ -52,7 +52,7 @@ export function DashboardFeaturesSection({
       </div>
 
       <BrowserFrame
-        className="overflow-hidden bg-default w-full mx-auto translate-y-16"
+        className="overflow-hidden bg-default w-full mx-auto -mb-16"
         contentClassName="aspect-video overflow-hidden rounded-lg"
       >
         {isInView && (

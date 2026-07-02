@@ -193,8 +193,6 @@ const data: {
           <>
             <>
               <svg
-                width="auto"
-                height="auto"
                 className="w-5 h-5 xl:h-10 xl:w-10 shrink-0"
                 viewBox="0 0 18 18"
                 fill="none"
