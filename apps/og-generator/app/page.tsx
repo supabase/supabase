@@ -553,24 +553,130 @@ export default function Page() {
     'flex h-6 w-6 items-center justify-center rounded border border-default bg-surface-100 text-foreground-light hover:border-strong'
 
   return (
-    <div className="flex h-screen flex-col bg-background text-foreground">
-      {/* Top bar */}
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-default px-5">
-        <span className="text-sm font-medium text-foreground">OG Image Generator</span>
-        <label className="flex items-center gap-1.5 text-xs text-foreground-light">
-          <input
-            type="checkbox"
-            id="toggle-scale"
-            checked={scale === 2}
-            onChange={(e) => setScale(e.target.checked ? 2 : 1)}
-          />
-          Export @2x
-        </label>
-      </header>
+    <div className="flex h-screen bg-background text-foreground">
+      {/* Canvas — light workspace with a dot grid */}
+      <main
+        className="@container flex min-w-0 flex-1 flex-col items-center overflow-auto p-8"
+        style={{
+          backgroundColor: '#f4f4f5',
+          backgroundImage: 'radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1px)',
+          backgroundSize: '16px 16px',
+        }}
+      >
+        {/* view toggle (center) + zoom (right) */}
+          <div className="mb-5 flex w-full items-center justify-between">
+            <span className="w-24" />
+            <Segmented value={view} onChange={setView} options={VIEW_OPTS} />
+            <div className="flex w-24 items-center justify-end gap-1 text-xs text-foreground-lighter">
+              <button onClick={() => nudgeZoom(-0.1)} className={zoomBtn} title="Zoom out">
+                −
+              </button>
+              <button
+                onClick={() => setZoom(1)}
+                className="w-10 tabular-nums hover:text-foreground"
+                title="Reset zoom"
+              >
+                {Math.round(zoom * 100)}%
+              </button>
+              <button onClick={() => nudgeZoom(0.1)} className={zoomBtn} title="Zoom in">
+                +
+              </button>
+            </div>
+          </div>
 
-      <div className="flex min-h-0 flex-1">
-        {/* Sidebar */}
-        <aside className="flex w-[340px] shrink-0 flex-col overflow-y-auto overflow-x-hidden border-r border-default p-5">
+          <div className="flex w-full flex-col gap-6 @4xl:flex-row @4xl:items-center" style={{ zoom }}>
+            {showOg && (
+              <div className="min-w-0 @4xl:flex-1">
+                <PreviewCard
+                  label="OG"
+                  imgUrl={og.url}
+                  loading={og.loading}
+                  error={og.error}
+                  alt={headline}
+                  showSafeArea={showSafeArea}
+                  showHeadlineInset
+                  showCrops={showCrops}
+                  copied={copied === 'og'}
+                  onCopy={() => copyUrl(ogEndpoint, 'og')}
+                  onDownload={() => download(og.url, `og${suffix}.png`)}
+                >
+                  <div className="flex flex-col gap-2">
+                    {og.fit && (
+                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 self-start rounded-full bg-surface-200 px-3 py-1 text-xs text-foreground-light">
+                        <span className="text-foreground">{og.fit.fontSize}px</span>
+                        <span className="text-foreground-lighter">·</span>
+                        <span>
+                          {og.fit.lineCount} {og.fit.lineCount === 1 ? 'line' : 'lines'}
+                        </span>
+                        <span className="text-foreground-lighter">·</span>
+                        <span>{og.fit.mode}</span>
+                        <span className="text-foreground-lighter">·</span>
+                        <span className={headlineRating === 'Fail' ? 'text-destructive-600' : 'text-brand'}>
+                          {headlineContrast.toFixed(1)}:1 {headlineRating}
+                        </span>
+                      </div>
+                    )}
+                    {og.fit?.overflow && (
+                      <p className="text-xs text-destructive-600">
+                        ⚠ Won’t fit in 2 lines even at the minimum size — shorten it before export.
+                      </p>
+                    )}
+                    {og.fit && !og.fit.overflow && og.fit.mode === 'manual' && og.fit.lineCount > 2 && (
+                      <p className="text-xs text-warning-600">
+                        ⚠ More than 2 lines — allowed in manual mode, but off-brand.
+                      </p>
+                    )}
+                  </div>
+                </PreviewCard>
+              </div>
+            )}
+
+            {showThumb && (
+              <div className="min-w-0 @4xl:flex-1">
+                <PreviewCard
+                  label="Thumb"
+                  imgUrl={thumb.url}
+                  loading={thumb.loading}
+                  error={thumb.error}
+                  alt="Thumbnail preview"
+                  showSafeArea={showSafeArea}
+                  showHeadlineInset={false}
+                  showCrops={showCrops}
+                  copied={copied === 'thumb'}
+                  onCopy={() => copyUrl(thumbEndpoint, 'thumb')}
+                  onDownload={() => download(thumb.url, `thumb${suffix}.png`)}
+                >
+                  <div className="flex flex-col gap-2">
+                    <p className="text-xs text-foreground-light">
+                      No headline — the Thumb is icon-only and shares the OG’s icon (§3).
+                    </p>
+                    {!icon && (
+                      <p className="text-xs text-warning-600">
+                        ⚠ Pick an icon in Assets — the Thumb has no text to fall back on.
+                      </p>
+                    )}
+                  </div>
+                </PreviewCard>
+              </div>
+            )}
+          </div>
+      </main>
+
+      {/* Floating tool panel — packaged top bar + all controls, docked right */}
+      <aside className="my-4 mr-4 flex w-[340px] shrink-0 flex-col overflow-hidden rounded-xl border border-default bg-background shadow-lg">
+        <div className="flex h-14 shrink-0 items-center justify-between border-b border-default px-5">
+          <span className="text-sm font-medium text-foreground">OG Image Generator</span>
+          <label className="flex items-center gap-1.5 text-xs text-foreground-light">
+            <input
+              type="checkbox"
+              id="toggle-scale"
+              checked={scale === 2}
+              onChange={(e) => setScale(e.target.checked ? 2 : 1)}
+            />
+            Export @2x
+          </label>
+        </div>
+        <div className="flex flex-col overflow-y-auto overflow-x-hidden p-5">
           {showOg && (
             <Group title="AI art direction">
               <div className="flex flex-col gap-2">
@@ -979,116 +1085,8 @@ export default function Page() {
               <Hint text="Preview how X, LinkedIn, Facebook, Slack and chat apps crop & round the 1200×630 (§11.1)." />
             </label>
           </Group>
-        </aside>
-
-        {/* Canvas — light workspace with a dot grid */}
-        <main
-          className="@container flex min-w-0 flex-1 flex-col items-center overflow-auto p-8"
-          style={{
-            backgroundColor: '#f4f4f5',
-            backgroundImage: 'radial-gradient(rgba(0,0,0,0.06) 1px, transparent 1px)',
-            backgroundSize: '16px 16px',
-          }}
-        >
-          {/* view toggle (center) + zoom (right) */}
-          <div className="mb-5 flex w-full items-center justify-between">
-            <span className="w-24" />
-            <Segmented value={view} onChange={setView} options={VIEW_OPTS} />
-            <div className="flex w-24 items-center justify-end gap-1 text-xs text-foreground-lighter">
-              <button onClick={() => nudgeZoom(-0.1)} className={zoomBtn} title="Zoom out">
-                −
-              </button>
-              <button
-                onClick={() => setZoom(1)}
-                className="w-10 tabular-nums hover:text-foreground"
-                title="Reset zoom"
-              >
-                {Math.round(zoom * 100)}%
-              </button>
-              <button onClick={() => nudgeZoom(0.1)} className={zoomBtn} title="Zoom in">
-                +
-              </button>
-            </div>
-          </div>
-
-          <div className="flex w-full flex-col gap-6 @4xl:flex-row" style={{ zoom }}>
-            {showOg && (
-              <div className="min-w-0 @4xl:flex-1">
-                <PreviewCard
-                  label="OG"
-                  imgUrl={og.url}
-                  loading={og.loading}
-                  error={og.error}
-                  alt={headline}
-                  showSafeArea={showSafeArea}
-                  showHeadlineInset
-                  showCrops={showCrops}
-                  copied={copied === 'og'}
-                  onCopy={() => copyUrl(ogEndpoint, 'og')}
-                  onDownload={() => download(og.url, `og${suffix}.png`)}
-                >
-                  <div className="flex flex-col gap-2">
-                    {og.fit && (
-                      <div className="flex flex-wrap items-center gap-x-2 gap-y-1 self-start rounded-full bg-surface-200 px-3 py-1 text-xs text-foreground-light">
-                        <span className="text-foreground">{og.fit.fontSize}px</span>
-                        <span className="text-foreground-lighter">·</span>
-                        <span>
-                          {og.fit.lineCount} {og.fit.lineCount === 1 ? 'line' : 'lines'}
-                        </span>
-                        <span className="text-foreground-lighter">·</span>
-                        <span>{og.fit.mode}</span>
-                        <span className="text-foreground-lighter">·</span>
-                        <span className={headlineRating === 'Fail' ? 'text-destructive-600' : 'text-brand'}>
-                          {headlineContrast.toFixed(1)}:1 {headlineRating}
-                        </span>
-                      </div>
-                    )}
-                    {og.fit?.overflow && (
-                      <p className="text-xs text-destructive-600">
-                        ⚠ Won’t fit in 2 lines even at the minimum size — shorten it before export.
-                      </p>
-                    )}
-                    {og.fit && !og.fit.overflow && og.fit.mode === 'manual' && og.fit.lineCount > 2 && (
-                      <p className="text-xs text-warning-600">
-                        ⚠ More than 2 lines — allowed in manual mode, but off-brand.
-                      </p>
-                    )}
-                  </div>
-                </PreviewCard>
-              </div>
-            )}
-
-            {showThumb && (
-              <div className="min-w-0 @4xl:flex-1">
-                <PreviewCard
-                  label="Thumb"
-                  imgUrl={thumb.url}
-                  loading={thumb.loading}
-                  error={thumb.error}
-                  alt="Thumbnail preview"
-                  showSafeArea={showSafeArea}
-                  showHeadlineInset={false}
-                  showCrops={showCrops}
-                  copied={copied === 'thumb'}
-                  onCopy={() => copyUrl(thumbEndpoint, 'thumb')}
-                  onDownload={() => download(thumb.url, `thumb${suffix}.png`)}
-                >
-                  <div className="flex flex-col gap-2">
-                    <p className="text-xs text-foreground-light">
-                      No headline — the Thumb is icon-only and shares the OG’s icon (§3).
-                    </p>
-                    {!icon && (
-                      <p className="text-xs text-warning-600">
-                        ⚠ Pick an icon in Assets — the Thumb has no text to fall back on.
-                      </p>
-                    )}
-                  </div>
-                </PreviewCard>
-              </div>
-            )}
-          </div>
-        </main>
-      </div>
+        </div>
+      </aside>
     </div>
   )
 }
