@@ -10,6 +10,7 @@ import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { parse as parseToml } from 'smol-toml'
+import { mcpConfigPanelMarkdown as McpConfigPanel } from 'ui-patterns/McpUrlBuilder/McpConfigPanel.md'
 
 import { addBaseUrlPrefix } from './internal-links'
 import { Admonition } from './markdown-schema/Admonition'
@@ -144,6 +145,7 @@ const SCHEMA: ComponentSchema = {
   ComputeDiskLimitsTable,
   ErrorCodes,
   Link,
+  McpConfigPanel,
   Price,
   GlassPanel: Panel,
   IconPanel: Panel,

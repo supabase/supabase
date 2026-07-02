@@ -60,6 +60,9 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
+  # First-party, published from supabase-community/mdast-jsx.
+  - mdast-jsx
+  # The following are excluded to fix vulnerablities.
   - react-use
 
 onlyBuiltDependencies:

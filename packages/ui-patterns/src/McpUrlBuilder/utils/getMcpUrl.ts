@@ -1,5 +1,18 @@
-import { DEFAULT_MCP_URL_NON_PLATFORM, DEFAULT_MCP_URL_PLATFORM } from '../constants'
-import type { McpClient, McpClientConfig } from '../types'
+import { DEFAULT_MCP_URL_NON_PLATFORM, DEFAULT_MCP_URL_PLATFORM } from '../clients.data'
+import type { McpClient, McpClientBaseConfig, McpClientConfig } from '../types'
+
+/**
+ * Builds the client config object for a given MCP server URL, applying the
+ * client's format transform when it has one. Shared by `getMcpUrl` (dashboard)
+ * and the generated markdown docs, so the config shape lives in one place.
+ */
+export function buildClientConfig(
+  url: string,
+  client?: Pick<McpClient, 'transformConfig'>
+): McpClientConfig {
+  const base: McpClientBaseConfig = { mcpServers: { supabase: { url } } }
+  return client?.transformConfig ? client.transformConfig(base) : base
+}
 
 interface GetMcpUrlOptions {
   projectRef?: string
@@ -36,21 +49,9 @@ export function getMcpUrl({
   }
   const mcpUrl = url.toString()
 
-  let clientConfig: McpClientConfig = {
-    mcpServers: {
-      supabase: {
-        url: mcpUrl,
-      },
-    },
-  }
-  // Apply client-specific transformation if available
-  if (selectedClient?.transformConfig) {
-    clientConfig = selectedClient.transformConfig(clientConfig)
-  }
-
   return {
     mcpUrl,
-    clientConfig,
+    clientConfig: buildClientConfig(mcpUrl, selectedClient),
   }
 }
 

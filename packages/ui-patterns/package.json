@@ -458,6 +458,10 @@
       "import": "./src/McpUrlBuilder/McpConfigPanel.tsx",
       "types": "./src/McpUrlBuilder/McpConfigPanel.tsx"
     },
+    "./McpUrlBuilder/McpConfigPanel.md": {
+      "import": "./src/McpUrlBuilder/McpConfigPanel.md.tsx",
+      "types": "./src/McpUrlBuilder/McpConfigPanel.md.tsx"
+    },
     "./McpUrlBuilder/components/ClientSelectDropdown": {
       "import": "./src/McpUrlBuilder/components/ClientSelectDropdown.tsx",
       "types": "./src/McpUrlBuilder/components/ClientSelectDropdown.tsx"
@@ -474,9 +478,17 @@
       "import": "./src/McpUrlBuilder/components/McpConfigurationOptions.tsx",
       "types": "./src/McpUrlBuilder/components/McpConfigurationOptions.tsx"
     },
-    "./McpUrlBuilder/constants": {
-      "import": "./src/McpUrlBuilder/constants.tsx",
-      "types": "./src/McpUrlBuilder/constants.tsx"
+    "./McpUrlBuilder/clients.data": {
+      "import": "./src/McpUrlBuilder/clients.data.ts",
+      "types": "./src/McpUrlBuilder/clients.data.ts"
+    },
+    "./McpUrlBuilder/utils/serializeMcpConfig": {
+      "import": "./src/McpUrlBuilder/utils/serializeMcpConfig.ts",
+      "types": "./src/McpUrlBuilder/utils/serializeMcpConfig.ts"
+    },
+    "./McpUrlBuilder/mcpClients": {
+      "import": "./src/McpUrlBuilder/mcpClients.tsx",
+      "types": "./src/McpUrlBuilder/mcpClients.tsx"
     },
     "./McpUrlBuilder": {
       "import": "./src/McpUrlBuilder/index.ts",
@@ -790,7 +802,6 @@
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",
     "@monaco-editor/react": "catalog:",
-    "@std/toml": "jsr:^1.0.11",
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-table": "catalog:",
@@ -808,6 +819,7 @@
     "lodash": "catalog:",
     "lucide-react": "*",
     "mdast": "^3.0.0",
+    "mdast-jsx": "^0.1.1",
     "mermaid": "^11.12.1",
     "monaco-editor": "*",
     "next-themes": "catalog:",
@@ -828,6 +840,7 @@
     "remark": "^15.0.1",
     "remark-gfm": "^4.0.0",
     "scroll-into-view-if-needed": "^3.1.0",
+    "smol-toml": "^1.6.1",
     "sonner": "^1.5.0",
     "sql-formatter": "^15.0.0",
     "sse.js": "^2.2.0",
