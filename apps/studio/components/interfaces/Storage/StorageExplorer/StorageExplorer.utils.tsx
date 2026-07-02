@@ -142,19 +142,20 @@ export const formatTime = (seconds: number) => {
 }
 
 export const calculateTotalRemainingTime = (progresses: UploadProgress[]) => {
-  let totalRemainingTime = 0
-  let totalRemainingBytes = 0
+  const totalRemainingBytes = progresses.reduce((sum, progress) => sum + progress.remainingBytes, 0)
+  if (totalRemainingBytes === 0) {
+    return 0
+  }
 
-  progresses.forEach((progress) => {
-    totalRemainingBytes += progress.remainingBytes
-    if (totalRemainingBytes === 0) {
-      return
-    }
-    const weight = progress.remainingBytes / totalRemainingBytes
-    totalRemainingTime += weight * progress.remainingTime
-  })
-
-  return totalRemainingTime
+  // Weight each upload's remaining time by its share of the total remaining
+  // bytes. The weights must divide by the final total, not a running prefix
+  // sum, or the result depends on iteration order (the first upload would get
+  // weight 1 and dominate the estimate).
+  return progresses.reduce(
+    (total, progress) =>
+      total + (progress.remainingBytes / totalRemainingBytes) * progress.remainingTime,
+    0
+  )
 }
 
 export const formatFolderItems = (items: StorageObject[] = [], prefix?: string): StorageItem[] => {
