@@ -76,12 +76,6 @@ export const useTabsWithQueryParams = ({ tabIds, queryGroup }: UseTabsWithQueryP
       }, 300)
 
       checkedLocalStorage.current = true
-
-      return () => {
-        if (timeout != undefined) {
-          clearTimeout(timeout)
-        }
-      }
     }
 
     if (queryGroupRef.current && queryTab) {
