@@ -9,6 +9,20 @@ const {
 } = isFeatureEnabled(['sdk:csharp', 'sdk:dart', 'sdk:kotlin', 'sdk:python', 'sdk:swift'])
 
 export const REFERENCES = {
+  server: {
+    type: 'sdk',
+    name: 'Server',
+    library: '@supabase/server',
+    libPath: 'server',
+    versions: ['v1'],
+    typeSpec: true,
+    icon: 'reference-javascript',
+    meta: {
+      v1: {
+        libId: 'reference_server_v1',
+      },
+    },
+  },
   javascript: {
     type: 'sdk',
     name: 'JavaScript',
