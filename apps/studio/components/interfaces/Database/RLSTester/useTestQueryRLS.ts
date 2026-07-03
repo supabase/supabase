@@ -141,12 +141,12 @@ export const useTestQueryRLS = () => {
   }): Promise<boolean> => {
     if (!project) {
       console.error('Project is required')
-      return false
+      return true
     }
 
     if (option === 'authenticated' && !user) {
       toast('Select which user to test as before running the query')
-      return false
+      return true
     }
 
     try {
@@ -227,8 +227,8 @@ export const useTestQueryRLS = () => {
         onExecuteSQL({ result, operation: data.operation, isAutoLimit: !!autoLimit })
         onParseQuery({ tables, operation: data.operation, role: role?.role, user })
       } catch (error) {
-        const isRLSInsertError = (error as ResponseError).message.includes(
-          'new row violates row-level security policy'
+        const isRLSInsertError = Boolean(
+          (error as ResponseError)?.message?.includes('new row violates row-level security policy')
         )
         onExecuteSQL({ result: null, operation: data.operation, isAutoLimit: false })
         if (isRLSInsertError) {

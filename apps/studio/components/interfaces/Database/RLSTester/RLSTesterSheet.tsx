@@ -366,7 +366,7 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
         {sandboxEnabled && (
           <>
             <p className="text-sm">
-              We highly recommend using the sandbox to set up an ephermeral database environment for
+              We highly recommend using the sandbox to set up an ephemeral database environment for
               testing insert, update, or delete queries.
             </p>
             <Button

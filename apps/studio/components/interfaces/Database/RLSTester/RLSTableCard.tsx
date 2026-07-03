@@ -45,7 +45,7 @@ export const RLSTableCard = ({
           <code className="text-code-inline">{role}</code> role on this table -{' '}
           {operation === 'SELECT'
             ? 'no data will be returned'
-            : `no data will be ${operation?.toLowerCase()}${operation?.endsWith('e') ? 'd' : 'ed'}`}
+            : `no data will be ${operation?.toLowerCase()}${operation?.toLowerCase().endsWith('e') ? 'd' : 'ed'}`}
           .
         </p>
       )
