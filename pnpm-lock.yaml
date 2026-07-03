@@ -130,6 +130,10 @@ patchedDependencies:
 importers:
 
   .:
+    dependencies:
+      '@supabase/server':
+        specifier: ^1.2.0
+        version: 1.2.0(@supabase/supabase-js@2.108.2)(hono@4.12.25)
     devDependencies:
       '@aws-sdk/client-secrets-manager':
         specifier: ^3.1041.0
@@ -7571,6 +7575,25 @@ packages:
     resolution: {integrity: sha512-aAGxCSUemZvQIibnCdvNvgaKib28I4rfrNjKbQ9cG1uBLwUsI7hVpGXgEbypCCDhLjQlDTAiJlu7rgljYUT73g==}
     engines: {node: '>=20.0.0'}
 
+  '@supabase/server@1.2.0':
+    resolution: {integrity: sha512-6ts8/aC5FEf03A9+WnEsrb79YYqlE1lf8KKtWKVHZIyaDq+RM5tzP4tHRzc8Bwg88pmoDImAkaj9D3lunnanvg==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@nestjs/common': ^10.0.0 || ^11.0.0
+      '@supabase/supabase-js': ^2.0.0
+      elysia: ^1.4.0
+      h3: ^2.0.0
+      hono: ^4.0.0
+    peerDependenciesMeta:
+      '@nestjs/common':
+        optional: true
+      elysia:
+        optional: true
+      h3:
+        optional: true
+      hono:
+        optional: true
+
   '@supabase/shared-types@0.1.88':
     resolution: {integrity: sha512-9LYy+pD6cD2o8ZSxeUeJ1nrHPigeoP1kzhd2+k6MmzrwBHwxwUhWjywQJVjpU6fLNQxdkoNqxPfI7UQgOjG7Lg==}
 
@@ -12455,6 +12478,9 @@ packages:
 
   jose@6.1.3:
     resolution: {integrity: sha512-0TpaTfihd4QMNwrz/ob2Bp7X04yuxJkjRGi4aKmOqwhov54i6u79oCv7T+C7lo70MKH6BesI3vscD1yb/yzKXQ==}
+
+  jose@6.2.3:
+    resolution: {integrity: sha512-YYVDInQKFJfR/xa3ojUTl8c2KoTwiL1R5Wg9YCydwH0x0B9grbzlg5HC7mMjCtUJjbQ/YnGEZIhI5tCgfTb4Hw==}
 
   jotai@2.8.1:
     resolution: {integrity: sha512-Gmk5Y3yJL/vN5S0rQ6AaWpXH5Q+HBGHThMHXfylVzXGVuO8YxPRtZf8Y9XYvl+h7ZMQXoHNdFi37vNsJFsiszQ==}
@@ -23289,6 +23315,13 @@ snapshots:
       '@supabase/phoenix': 0.4.2
       tslib: 2.8.1
 
+  '@supabase/server@1.2.0(@supabase/supabase-js@2.108.2)(hono@4.12.25)':
+    dependencies:
+      '@supabase/supabase-js': 2.108.2
+      jose: 6.2.3
+    optionalDependencies:
+      hono: 4.12.25
+
   '@supabase/shared-types@0.1.88': {}
 
   '@supabase/sql-to-rest@0.1.6(encoding@0.1.13)(supports-color@8.1.1)':
@@ -28951,6 +28984,8 @@ snapshots:
   jose@5.9.6: {}
 
   jose@6.1.3: {}
+
+  jose@6.2.3: {}
 
   jotai@2.8.1(@types/react@19.2.14)(react@19.2.6):
     optionalDependencies:
