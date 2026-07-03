@@ -311,7 +311,7 @@
   --background-color-dialog: var(--background-dialog-default);
   --background-color-dash-sidebar: var(--background-dash-sidebar);
   --background-color-dash-canvas: var(--background-dash-canvas);
-  --background-color-studio: var(--background-200);
+  --background-color-studio: var(--background);
 
   /*
    * This will generate colors for all utilities, they'll have border in the name i.e. bg-border-overlay, text-border-muted
