@@ -20,6 +20,7 @@ import {
   buildMap,
   KIND_INTERFACE,
   KIND_PROPERTY,
+  KIND_TYPE_ALIAS,
   KIND_VARIABLE,
   normalizeComment,
   parseSignature,
@@ -27,8 +28,6 @@ import {
   type MethodTypes,
   type VariableTypes,
 } from '../features/docs/Reference.typeSpec'
-
-const KIND_TYPE_ALIAS = 2097152
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const DOCS_DIR = join(__dirname, '..')

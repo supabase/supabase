@@ -186,6 +186,7 @@ export const KIND_CONSTRUCTOR = 512
 export const KIND_PROPERTY = 1024
 export const KIND_METHOD = 2048
 export const KIND_TYPE_LITERAL = 65536
+export const KIND_TYPE_ALIAS = 2097152
 
 /**
  *
