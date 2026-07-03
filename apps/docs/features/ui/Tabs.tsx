@@ -1,29 +1,27 @@
 'use client'
 
 import { useTocRerenderTrigger } from '~/features/docs/GuidesMdx.state'
-import { useCallback, type ComponentPropsWithoutRef, type PropsWithChildren } from 'react'
+import { useCallback } from 'react'
 
-import { Tabs as TabsPrimitive, type TabsProps } from './UITabs'
+import { Tabs as TabsPrimitive, type TabsProps as TabsPrimitiveProps } from './UITabs'
 import { withQueryParams, type QueryParamsProps } from './withQueryParams'
-import { withSticky } from './withSticky'
+import { useStickyTabs, UseStickyTabsOptions } from './withSticky'
 
-const TabsWithStickyAndQueryParams = withSticky<PropsWithChildren<TabsProps & QueryParamsProps>>(
-  withQueryParams(TabsPrimitive)
-)
+const TabsWithStickyAndQueryParams = withQueryParams(TabsPrimitive)
+
+type TabsProps = TabsPrimitiveProps & QueryParamsProps & { stickyTabList?: UseStickyTabsOptions }
 
 const TabPanel = TabsPrimitive.Panel
-const Tabs = ({
-  onChange,
-  stickyTabList,
-  ...props
-}: ComponentPropsWithoutRef<typeof TabsWithStickyAndQueryParams>) => {
+const Tabs = ({ onChange, stickyTabList, ...props }: TabsProps) => {
+  const { observedRef, stickyRef, onTabSelected } = useStickyTabs(stickyTabList)
   const rerenderToc = useTocRerenderTrigger()
   const onChangeInternal = useCallback(
-    (...args: Parameters<typeof onChange>) => {
+    (id: string) => {
+      onTabSelected(id)
       rerenderToc()
-      onChange?.(...args)
+      onChange?.(id)
     },
-    [rerenderToc, onChange]
+    [rerenderToc, onChange, onTabSelected]
   )
 
   if (stickyTabList && !stickyTabList.scrollMarginTop) {
@@ -36,7 +34,7 @@ const Tabs = ({
     <TabsWithStickyAndQueryParams
       wrappable
       onChange={onChangeInternal}
-      stickyTabList={stickyTabList}
+      refs={{ base: observedRef, list: stickyRef }}
       {...props}
     />
   )

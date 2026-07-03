@@ -5,6 +5,7 @@ import { Tabs as TabsPrimitive } from 'radix-ui'
 import {
   Children,
   isValidElement,
+  ReactNode,
   useMemo,
   useState,
   type KeyboardEvent,
@@ -14,6 +15,7 @@ import {
 import { cn } from 'ui'
 
 export interface TabsProps {
+  children: ReactNode
   type?: 'pills' | 'underlined' | 'cards' | 'rounded-pills'
   defaultActiveId?: string
   activeId?: string
@@ -21,7 +23,7 @@ export interface TabsProps {
   block?: boolean
   tabBarGutter?: number
   tabBarStyle?: React.CSSProperties
-  onChange?: any
+  onChange?: (id: string) => void
   onClick?: any
   scrollable?: boolean
   wrappable?: boolean
@@ -30,8 +32,8 @@ export interface TabsProps {
   listClassNames?: string
   baseClassNames?: string
   refs?: {
-    base: RefObject<HTMLDivElement> | ((elem: HTMLDivElement | null) => void)
-    list: RefObject<HTMLDivElement> | ((elem: HTMLDivElement | null) => void)
+    base: RefObject<HTMLDivElement | null> | ((elem: HTMLDivElement | null) => void)
+    list: RefObject<HTMLDivElement | null> | ((elem: HTMLDivElement | null) => void)
   }
 }
 
@@ -117,7 +119,7 @@ export const tabsTriggerListVariants = cva(
 /**
  * @deprecated Use `import { Tabs_shadcn_ } from "ui"` instead
  */
-export const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
+export const Tabs: React.FC<TabsProps> & TabsSubComponents = ({
   defaultActiveId,
   activeId,
   type = 'pills',
