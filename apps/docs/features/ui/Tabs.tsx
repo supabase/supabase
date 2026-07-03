@@ -168,7 +168,7 @@ export const Tabs = ({
   }
 
   const [activeTab, setActiveTab] = useState(
-    queryGroup ??
+    queryTab ??
       activeId ??
       defaultActiveId ??
       // if no defaultActiveId is set use the first panel
