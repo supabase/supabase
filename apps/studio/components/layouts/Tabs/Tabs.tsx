@@ -20,6 +20,9 @@ import {
   Tabs_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
@@ -220,23 +223,30 @@ export const EditorTabs = () => {
 
           <AnimatePresence initial={false}>
             {!hasNewTab && (
-              <motion.button
-                className="flex items-center justify-center w-10 min-h-(--header-height) hover:bg-surface-100 shrink-0 border-b"
-                onClick={() =>
-                  router.push(
-                    `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
-                  )
-                }
-                initial={{ opacity: 0, scale: 0.8, x: -10 }}
-                animate={{ opacity: 1, scale: 1, x: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Plus
-                  size={16}
-                  strokeWidth={1.5}
-                  className="text-foreground-lighter hover:text-foreground-light"
-                />
-              </motion.button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <motion.button
+                    className="flex items-center justify-center w-10 min-h-(--header-height) hover:bg-surface-100 shrink-0 border-b"
+                    onClick={() =>
+                      router.push(
+                        `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
+                      )
+                    }
+                    initial={{ opacity: 0, scale: 0.8, x: -10 }}
+                    animate={{ opacity: 1, scale: 1, x: 0 }}
+                    transition={{ duration: 0.2 }}
+                    aria-label="New table"
+                  >
+                    <Plus
+                      size={16}
+                      strokeWidth={1.5}
+                      className="text-foreground-lighter hover:text-foreground-light"
+                    />
+                    
+                  </motion.button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">New table</TooltipContent>
+              </Tooltip>
             )}
           </AnimatePresence>
           <div className="grow h-full border-b pr-6" />
