@@ -190,7 +190,7 @@ export const Tabs = ({
     (id: string) => {
       if (id !== activeTab) {
         setActiveTab(id)
-        onTabSelectedForSticky(id)
+        onTabSelectedForSticky()
         onTabSelectedForQuery(id)
         rerenderToc()
         onChange?.(id)
