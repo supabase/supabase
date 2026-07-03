@@ -189,12 +189,12 @@ export const Tabs = ({
   const onTabClick = useCallback(
     (id: string) => {
       if (id !== activeTab) {
+        setActiveTab(id)
         onTabSelectedForSticky(id)
         onTabSelectedForQuery(id)
         rerenderToc()
         onChange?.(id)
         onClick?.(id)
-        setActiveTab(id)
       }
     },
     [
