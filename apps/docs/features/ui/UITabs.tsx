@@ -11,8 +11,7 @@ import {
   type PropsWithChildren,
   type RefObject,
 } from 'react'
-
-import { cn } from '../../lib/utils'
+import { cn } from 'ui'
 
 export interface TabsProps {
   type?: 'pills' | 'underlined' | 'cards' | 'rounded-pills'
@@ -118,7 +117,7 @@ export const tabsTriggerListVariants = cva(
 /**
  * @deprecated Use `import { Tabs_shadcn_ } from "ui"` instead
  */
-const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
+export const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   defaultActiveId,
   activeId,
   type = 'pills',
@@ -232,4 +231,3 @@ export const Panel: React.FC<PropsWithChildren<PanelProps>> = ({ children, id, c
 }
 
 Tabs.Panel = Panel
-export default Tabs

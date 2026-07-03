@@ -1,8 +1,8 @@
 'use client'
 
 import { PropsWithChildren, useCallback, type FC } from 'react'
-import { type TabsProps } from 'ui/src/components/Tabs'
 
+import { type TabsProps } from './UITabs'
 import { useSticky } from './withSticky.utils'
 
 interface StickyProps {
@@ -16,11 +16,10 @@ interface StickyProps {
  * Wrapper around Tabs to make the tab list sticky while the tab content is in
  * view.
  */
-const withSticky =
-  <Props extends PropsWithChildren<TabsProps>>(
-    Component: FC<Omit<Props, 'stickyTabList' | 'onClick'>>
-  ) =>
-  ({ stickyTabList, onClick, ...props }: Props & StickyProps) => {
+const withSticky = <Props extends PropsWithChildren<TabsProps>>(
+  Component: FC<Omit<Props, 'stickyTabList' | 'onClick'>>
+) =>
+  function TabsWithSticky({ stickyTabList, onClick, ...props }: Props & StickyProps) {
     const { inView, observedRef, stickyRef } = useSticky<HTMLDivElement>({
       enabled: !!stickyTabList,
       style: stickyTabList?.style,

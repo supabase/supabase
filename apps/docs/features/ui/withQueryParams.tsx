@@ -1,9 +1,10 @@
 'use client'
 
 import { useSearchParamsShallow } from 'common'
-import { xor } from 'lodash'
+import { xor } from 'lodash-es'
 import { Children, isValidElement, useEffect, useRef, type FC, type PropsWithChildren } from 'react'
-import { type TabsProps } from 'ui'
+
+import { type TabsProps } from './UITabs'
 
 const isString = (maybeStr: unknown): maybeStr is string => typeof maybeStr === 'string'
 
@@ -17,16 +18,15 @@ interface QueryParamsProps {
  * Wraps the basic `Tabs` component from the `ui` library so it stores
  * selection state in query params.
  */
-const withQueryParams =
-  <Props extends PropsWithChildren<TabsProps>>(
-    Component: FC<Omit<Props, 'children' | 'queryGroup' | 'onClick'>>
-  ) =>
-  ({
+const withQueryParams = <Props extends PropsWithChildren<TabsProps>>(
+  Component: FC<Omit<Props, 'children' | 'queryGroup' | 'onClick'>>
+) =>
+  function TabsWithQueryParams({
     children: childrenUnvalidated,
     queryGroup: queryGroupTemp,
     onClick,
     ...props
-  }: Props & QueryParamsProps) => {
+  }: Props & QueryParamsProps) {
     // Avoid Children.toArray — it clones elements (accessing element.ref) which
     // triggers a React 19 warning. Children.forEach iterates without cloning.
     const tabIdsTemp: string[] = []
