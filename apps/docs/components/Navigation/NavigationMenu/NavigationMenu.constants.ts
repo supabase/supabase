@@ -236,6 +236,12 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
             label: 'Client Library Reference',
           },
           {
+            label: 'Server',
+            icon: 'reference-javascript',
+            href: '/reference/server' as `/${string}`,
+            level: 'reference_server',
+          },
+          {
             label: 'JavaScript',
             icon: 'reference-javascript',
             href: '/reference/javascript' as `/${string}`,
