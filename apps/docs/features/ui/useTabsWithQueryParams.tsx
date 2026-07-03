@@ -43,9 +43,10 @@ export const useTabsWithQueryParams = ({ tabIds, queryGroup }: UseTabsWithQueryP
 
   const checkedLocalStorage = useRef(false)
   useEffect(() => {
+    let timeout: number | undefined
     if (!checkedLocalStorage.current) {
       // Timeout to avoid something (I think the router) overwriting it
-      setTimeout(() => {
+      timeout = window.setTimeout(() => {
         if (
           queryGroupRef.current &&
           !new URLSearchParams(window.location.search).has(queryGroupRef.current)
@@ -75,6 +76,12 @@ export const useTabsWithQueryParams = ({ tabIds, queryGroup }: UseTabsWithQueryP
       }, 300)
 
       checkedLocalStorage.current = true
+
+      return () => {
+        if (timeout != undefined) {
+          clearTimeout(timeout)
+        }
+      }
     }
 
     if (queryGroupRef.current && queryTab) {
