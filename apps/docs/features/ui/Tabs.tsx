@@ -1,25 +1,153 @@
 'use client'
 
-import { useTocRerenderTrigger } from '~/features/docs/GuidesMdx.state'
-import { Children, isValidElement, useCallback } from 'react'
+import { cva } from 'class-variance-authority'
+import { Tabs as TabsPrimitive } from 'radix-ui'
+import {
+  Children,
+  isValidElement,
+  ReactElement,
+  ReactNode,
+  useCallback,
+  useMemo,
+  useState,
+  type KeyboardEvent,
+  type RefObject,
+} from 'react'
+import { cn } from 'ui'
 
-import { Tabs as TabsPrimitive, type TabsProps as TabsPrimitiveProps } from './UITabs'
-import { useTabsWithQueryParams, type UseTabsWithQueryParamsOptions } from './withQueryParams'
+import { useTocRerenderTrigger } from '../docs/GuidesMdx.state'
+import { useTabsWithQueryParams, UseTabsWithQueryParamsOptions } from './withQueryParams'
 import { useStickyTabs, UseStickyTabsOptions } from './withSticky'
+
+export interface TabsProps {
+  children: ReactNode
+  type?: 'pills' | 'underlined' | 'cards' | 'rounded-pills'
+  defaultActiveId?: string
+  activeId?: string
+  size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
+  block?: boolean
+  tabBarGutter?: number
+  tabBarStyle?: React.CSSProperties
+  onChange?: (id: string) => void
+  onClick?: any
+  scrollable?: boolean
+  wrappable?: boolean
+  addOnBefore?: React.ReactNode
+  addOnAfter?: React.ReactNode
+  listClassNames?: string
+  baseClassNames?: string
+  refs?: {
+    base: RefObject<HTMLDivElement | null> | ((elem: HTMLDivElement | null) => void)
+    list: RefObject<HTMLDivElement | null> | ((elem: HTMLDivElement | null) => void)
+  }
+}
+
+export const tabsListVariants = cva(cn('flex'), {
+  variants: {
+    type: {
+      pills: 'space-x-1',
+      underlined: 'items-center border-b border-secondary',
+      cards: '',
+      'rounded-pills': 'flex-wrap gap-2',
+    },
+    scrollable: {
+      true: 'overflow-auto whitespace-nowrap no-scrollbar mask-fadeout-right',
+    },
+    wrappable: {
+      true: 'flex-wrap',
+    },
+  },
+})
+
+export const tabsTriggerListVariants = cva(
+  cn(
+    'relative cursor-pointer flex items-center space-x-2 text-center transition focus:outline-hidden focus-visible:ring-3 focus-visible:ring-foreground-muted focus-visible:border-foreground-muted'
+  ),
+  {
+    variants: {
+      type: {
+        pills: 'shadow-xs rounded-sm border',
+        underlined: 'text-foreground-lighter',
+        cards: '',
+        'rounded-pills': 'shadow-xs rounded-full',
+      },
+      size: {
+        tiny: 'text-xs px-2.5 py-1',
+        small: 'text-base md:text-sm leading-4 px-3 py-2',
+        medium: 'text-base md:text-sm px-4 py-2',
+        large: 'text-base px-4 py-2',
+        xlarge: 'text-base px-6 py-3',
+      },
+      block: {
+        true: 'w-full flex items-center justify-center',
+      },
+      isActive: {
+        false: 'hover:text-foreground',
+      },
+    },
+    compoundVariants: [
+      {
+        type: 'pills',
+        isActive: true,
+        className: 'bg-selection text-foreground border-stronger',
+      },
+      {
+        type: 'pills',
+        isActive: false,
+        className:
+          'bg-background border-strong hover:border-foreground-muted text-foreground-muted',
+      },
+      {
+        type: 'underlined',
+        isActive: true,
+        className: '!text-foreground border-b-2 border-foreground',
+      },
+      {
+        type: 'rounded-pills',
+        isActive: true,
+        className: 'bg-foreground text-background border-foreground',
+      },
+      {
+        type: 'rounded-pills',
+        isActive: false,
+        className:
+          'bg-surface-200 hover:bg-surface-300 hover:border-foreground-lighter text-foreground-lighter',
+      },
+    ],
+  }
+)
 
 const isString = (maybeStr: unknown): maybeStr is string => typeof maybeStr === 'string'
 
-type TabsProps = TabsPrimitiveProps &
-  Pick<UseTabsWithQueryParamsOptions, 'queryGroup'> & { stickyTabList?: UseStickyTabsOptions }
-
-const TabPanel = TabsPrimitive.Panel
-const Tabs = ({ children, onChange, stickyTabList, queryGroup, ...props }: TabsProps) => {
-  // Avoid Children.toArray — it clones elements (accessing element.ref) which
-  // triggers a React 19 warning. Children.forEach iterates without cloning.
+export const Tabs = ({
+  defaultActiveId,
+  activeId,
+  type = 'pills',
+  size = 'tiny',
+  block,
+  onChange,
+  onClick,
+  scrollable,
+  wrappable,
+  addOnBefore,
+  addOnAfter,
+  listClassNames,
+  baseClassNames,
+  children,
+  queryGroup,
+  stickyTabList,
+}: TabsProps &
+  Pick<UseTabsWithQueryParamsOptions, 'queryGroup'> & {
+    stickyTabList?: UseStickyTabsOptions
+  }) => {
+  const childrenArr: ReactElement<TabPanelProps>[] = []
   const tabIds: string[] = []
   Children.forEach(children, (child) => {
-    if (isValidElement(child) && isString((child.props as any).id)) {
-      tabIds.push((child.props as any).id)
+    if (isValidElement<TabPanelProps>(child)) {
+      childrenArr.push(child)
+    }
+    if (isValidElement<TabPanelProps>(child) && isString(child.props.id)) {
+      tabIds.push(child.props.id)
     }
   })
   const { queryTab, onTabSelected: onTabSelectedForQuery } = useTabsWithQueryParams({
@@ -32,15 +160,6 @@ const Tabs = ({ children, onChange, stickyTabList, queryGroup, ...props }: TabsP
     onTabSelected: onTabSelectedForSticky,
   } = useStickyTabs(stickyTabList)
   const rerenderToc = useTocRerenderTrigger()
-  const onChangeInternal = useCallback(
-    (id: string) => {
-      onTabSelectedForSticky(id)
-      onTabSelectedForQuery(id)
-      rerenderToc()
-      onChange?.(id)
-    },
-    [rerenderToc, onChange, onTabSelectedForSticky, onTabSelectedForQuery]
-  )
 
   if (stickyTabList && !stickyTabList.scrollMarginTop) {
     // Magic number is the height of tab list + paragraph margin, worth getting
@@ -48,17 +167,102 @@ const Tabs = ({ children, onChange, stickyTabList, queryGroup, ...props }: TabsP
     stickyTabList.scrollMarginTop = 'calc(var(--header-height) + 43px + 20px)'
   }
 
+  const [activeTab, setActiveTab] = useState(
+    queryGroup ??
+      activeId ??
+      defaultActiveId ??
+      // if no defaultActiveId is set use the first panel
+      children?.[0]?.props?.id
+  )
+
+  useMemo(() => {
+    // If we have a queryTab, Tabs is controller by URL params
+    if (queryTab && queryTab !== activeTab) {
+      setActiveTab(queryTab)
+      return
+    }
+    if (activeId && activeId !== activeTab) {
+      setActiveTab(activeId)
+    }
+  }, [activeId, activeTab, queryTab])
+
+  const onTabClick = useCallback(
+    (id: string) => {
+      if (id !== activeTab) {
+        onTabSelectedForSticky(id)
+        onTabSelectedForQuery(id)
+        rerenderToc()
+        onChange?.(id)
+        onClick?.(id)
+        setActiveTab(id)
+      }
+    },
+    [
+      activeTab,
+      onTabSelectedForSticky,
+      onTabSelectedForQuery,
+      rerenderToc,
+      onChange,
+      onClick,
+      setActiveTab,
+    ]
+  )
   return (
-    <TabsPrimitive
-      wrappable
-      onChange={onChangeInternal}
-      refs={{ base: observedRef, list: stickyRef }}
-      activeId={queryTab}
-      {...props}
+    <TabsPrimitive.Root
+      value={activeTab}
+      className={cn('w-full justify-between space-y-4', baseClassNames)}
+      ref={observedRef}
     >
-      {children}
-    </TabsPrimitive>
+      <TabsPrimitive.List
+        className={tabsListVariants({ type, scrollable, wrappable, className: listClassNames })}
+        ref={stickyRef}
+      >
+        {addOnBefore}
+        {childrenArr.map((tab) => {
+          const isActive = activeTab === tab.props.id
+
+          return (
+            <TabsPrimitive.Trigger
+              onKeyDown={(e: KeyboardEvent<HTMLButtonElement>) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  onTabClick(tab.props.id)
+                }
+              }}
+              onClick={() => onTabClick(tab.props.id)}
+              key={`${tab.props.id}-tab-button`}
+              value={tab.props.id}
+              className={tabsTriggerListVariants({ type, isActive, size, block })}
+            >
+              {tab.props.icon}
+              <span>{tab.props.label}</span>
+              {tab.props.iconRight}
+            </TabsPrimitive.Trigger>
+          )
+        })}
+        {addOnAfter}
+      </TabsPrimitive.List>
+      {childrenArr}
+    </TabsPrimitive.Root>
   )
 }
 
-export { TabPanel, Tabs }
+interface TabPanelProps {
+  children: ReactNode
+  id: string
+  label?: string
+  icon?: React.ReactNode
+  iconRight?: React.ReactNode
+  className?: string
+}
+
+export const TabPanel = ({ children, id, className }: TabPanelProps) => {
+  return (
+    <TabsPrimitive.Content
+      value={id}
+      className={cn('focus:outline-hidden transition-height', className)}
+    >
+      {children}
+    </TabsPrimitive.Content>
+  )
+}
