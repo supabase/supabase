@@ -3348,6 +3348,17 @@ export const reference_javascript_v2 = {
   },
 }
 
+export const reference_server_v1 = {
+  icon: 'reference-javascript',
+  title: 'Server',
+  url: '/reference/server',
+  parent: '/reference',
+  pkg: {
+    name: '@supabase/server',
+    repo: 'https://github.com/supabase/supabase-js',
+  },
+}
+
 // TODO: How to?
 export const reference_dart_v1 = {
   icon: 'reference-dart',
