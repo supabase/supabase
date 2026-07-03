@@ -1421,6 +1421,10 @@ export const database: NavMenuConstant = {
               url: '/guides/database/extensions/wrappers/logflare' as `/${string}`,
             },
             {
+              name: 'MongoDB',
+              url: '/guides/database/extensions/wrappers/mongodb' as `/${string}`,
+            },
+            {
               name: 'MSSQL',
               url: '/guides/database/extensions/wrappers/mssql' as `/${string}`,
             },

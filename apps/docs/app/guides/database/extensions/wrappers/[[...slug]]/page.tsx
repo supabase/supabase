@@ -224,6 +224,14 @@ const pageMap = [
     remoteFile: 'logflare.md',
   },
   {
+    slug: 'mongodb',
+    meta: {
+      title: 'MongoDB',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'mongodb.md',
+  },
+  {
     slug: 'mssql',
     meta: {
       title: 'MSSQL',
