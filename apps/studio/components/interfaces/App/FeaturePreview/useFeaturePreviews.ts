@@ -37,7 +37,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           isNew: true,
           isPlatformOnly: false,
           isDefaultOptIn: false,
-          getRoute: (ref?: string) => `/project/${ref}/auth/policies`,
+          getRoute: (ref?: string) => `/project/${ref}/database/policies`,
         },
         {
           key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,

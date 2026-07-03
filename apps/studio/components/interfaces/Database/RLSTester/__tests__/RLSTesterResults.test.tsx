@@ -37,6 +37,7 @@ const makeTable = (
 const defaultProps = {
   results: [],
   autoLimit: false,
+  executeSqlError: undefined,
   handleSelectEditPolicy: vi.fn(),
 }
 

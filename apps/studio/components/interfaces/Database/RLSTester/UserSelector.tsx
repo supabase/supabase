@@ -12,6 +12,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  copyToClipboard,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -67,7 +68,27 @@ export const UserSelector = () => {
   }
 
   return (
-    <FormItemLayout isReactForm={false} label="Select which user to test as">
+    <FormItemLayout
+      isReactForm={false}
+      layout="horizontal"
+      label="Select which user to test as"
+      description={
+        impersonatingUser ? (
+          <p>
+            ID:{' '}
+            <code
+              className="text-code-inline cursor-pointer"
+              onClick={() => {
+                copyToClipboard(impersonatingUser?.id ?? '')
+                toast('Copied ID to clipboard')
+              }}
+            >
+              {impersonatingUser.id}
+            </code>
+          </p>
+        ) : undefined
+      }
+    >
       <Popover open={open} onOpenChange={setOpen} modal>
         <PopoverTrigger asChild>
           <Button

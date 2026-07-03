@@ -29,6 +29,7 @@ import {
   SheetTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { InferredSQLViewer } from './InferredSQLViewer'
 import { type ParseQueryResults } from './RLSTester.types'
@@ -43,9 +44,10 @@ import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTab
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
+import { useParseSQLQueryMutation } from '@/data/misc/parse-query-mutation'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
-import { PostgresSandboxProvider } from '@/state/postgres-sandbox/sandbox'
+import { PostgresSandboxProvider, usePostgresSandbox } from '@/state/postgres-sandbox/sandbox'
 import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -66,10 +68,15 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const { setRole } = useRoleImpersonationStateSnapshot()
+  const { sandbox, startSandbox, status, isSyncing } = usePostgresSandbox()
+
   const sandboxEnabled = useFlag('rlsTesterSandbox')
+  const sandboxIsStarting = status === 'loading'
 
   const [open, setOpen] = useState(false)
   const [selectedOption, setSelectedOption] = useState<'anon' | 'authenticated'>('anon')
+  const [showMutationWarning, setShowMutationWarning] = useState<'INSERT' | 'UPDATE' | 'DELETE'>()
+  const [showMultipleStatementsError, setShowMultipleStatementsError] = useState(false)
 
   const [format, setFormat] = useState<'sql' | 'lib'>('sql')
   const [inferredSQL, setInferredSQL] = useState<UntrustedSqlFragment>()
@@ -88,6 +95,10 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
     parseQueryError,
     parseClientCodeError,
   } = useTestQueryRLS()
+  const isErrorDueToRLS =
+    executeSqlError?.message.includes('violates row-level security policy') ?? false
+
+  const { mutateAsync: parseQuery } = useParseSQLQueryMutation({ onError: () => {} })
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -98,9 +109,7 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
     if (debounceRef.current !== null) clearTimeout(debounceRef.current)
     if (!sql) return
 
-    debounceRef.current = setTimeout(() => {
-      inferSQLFromLib(sql, setInferredSQL)
-    }, 1500)
+    debounceRef.current = setTimeout(() => inferSQLFromLib(sql, setInferredSQL), 1500)
   }
 
   const executionCallbacks = {
@@ -112,15 +121,42 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
     onParseQuery: setParseQueryResults,
   }
 
+  // Returns true if the query shouldn't be run yet (either blocked outright, or a warning was
+  // shown that the user needs to acknowledge by running the query again)
+  const validateQuery = async (sql: SafeSqlFragment) => {
+    try {
+      const data = await parseQuery({ sql })
+
+      if (data.statementCount > 1) {
+        setShowMultipleStatementsError(true)
+        return true
+      }
+      setShowMultipleStatementsError(false)
+
+      if (data.operation && data.operation !== 'SELECT' && !sandbox && !showMutationWarning) {
+        setShowMutationWarning(data.operation)
+        return true
+      }
+    } catch (e) {}
+    return false
+  }
+
   const onRunQuery = async () => {
     if (format === 'lib') {
       if (!inferredSQL) return
-      await testQuery({ value: acceptUntrustedSql(inferredSQL), ...executionCallbacks })
+      const sql = acceptUntrustedSql(inferredSQL)
+      if (await validateQuery(sql)) return
+
+      await testQuery({ value: sql, ...executionCallbacks })
       track('rls_tester_run_query_clicked', { type: 'inferred' })
     } else {
+      if (await validateQuery(value)) return
+
       await testQuery({ value, ...executionCallbacks })
       track('rls_tester_run_query_clicked', { type: 'raw' })
     }
+
+    if (showMutationWarning) setShowMutationWarning(undefined)
   }
 
   const assistantSql = format === 'lib' && inferredSQL ? acceptUntrustedSql(inferredSQL) : value
@@ -143,13 +179,13 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
   }
 
   useEffect(() => {
-    if (open) {
-      setRole({ type: 'postgrest', role: 'anon' })
-    } else {
-      // Flip back to service role
+    setRole({ type: 'postgrest', role: 'anon' })
+    return () => {
       setRole(undefined)
     }
-  }, [open, setRole])
+    // [Joshen] Intentional - to only reset back to service role when navigating away
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -162,11 +198,11 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
       <SheetContent className="w-[600px]! flex flex-col gap-y-0">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-x-4">
-            <span>What data can my users see?</span>
+            <span>What data can my users access?</span>
             <FeaturePreviewBadge featureKey={LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER} />
           </SheetTitle>
           <SheetDescription>
-            See what data a user is allowed to read based on your RLS policies
+            See what data a user is allowed to read or modify based on your RLS policies
           </SheetDescription>
         </SheetHeader>
 
@@ -240,7 +276,15 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
 
           <DialogSectionSeparator />
 
-          {parseQueryError ? (
+          {showMultipleStatementsError ? (
+            <div className="p-4">
+              <Admonition
+                type="warning"
+                title="Only a single SQL statement is supported"
+                description="Remove any additional statements and run the query again."
+              />
+            </div>
+          ) : parseQueryError ? (
             <div className="p-4">
               <Admonition
                 type="warning"
@@ -256,34 +300,60 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
                 description={parseClientCodeError.message}
               />
             </div>
-          ) : (
-            executeSqlError && (
-              <div className="p-4">
-                <Admonition
-                  type="warning"
-                  title="Error running SQL query"
-                  description={executeSqlError.message}
-                  actions={[
-                    <AiAssistantDropdown
-                      key="ai-assistant"
-                      label="Ask Assistant"
-                      telemetrySource="rls_tester"
-                      buildPrompt={() => getDebugPrompt({ includeSql: true })}
-                      onOpenAssistant={onDebugWithAssistant}
-                    />,
-                  ]}
-                />
-              </div>
-            )
-          )}
-
-          {results === null ? (
-            !parseQueryError && !parseClientCodeError && !executeSqlError && <RLSTesterEmptyState />
+          ) : executeSqlError && !isErrorDueToRLS ? (
+            <div className="p-4">
+              <Admonition
+                type="warning"
+                title="Error running SQL query"
+                description={executeSqlError.message}
+                actions={[
+                  <AiAssistantDropdown
+                    key="ai-assistant"
+                    label="Ask Assistant"
+                    telemetrySource="rls_tester"
+                    buildPrompt={() => getDebugPrompt({ includeSql: true })}
+                    onOpenAssistant={onDebugWithAssistant}
+                  />,
+                ]}
+              />
+            </div>
+          ) : showMutationWarning ? (
+            <div className="p-4">
+              <Admonition
+                variant="warning"
+                title={`This ${showMutationWarning} query will run against your actual database`}
+                description={`${sandboxEnabled ? 'We highly recommend using the sandbox to test insert, update, or delete queries. However, if' : 'If'} you'd like to proceed anyway, you may run the query again.`}
+                className="[&>div>div]:gap-x-2"
+                actions={
+                  sandboxEnabled
+                    ? [
+                        <Button
+                          key="set-up-sandbox"
+                          variant="default"
+                          onClick={() => {
+                            startSandbox()
+                            setShowMutationWarning(undefined)
+                          }}
+                        >
+                          Set up sandbox
+                        </Button>,
+                      ]
+                    : undefined
+                }
+              />
+            </div>
+          ) : isLoading ? (
+            <div className="p-4">
+              <GenericSkeletonLoader />
+            </div>
+          ) : results === null && !isErrorDueToRLS ? (
+            <RLSTesterEmptyState />
           ) : !!parseQueryResults ? (
             <RLSTesterResults
-              results={results}
+              results={results ?? []}
               parseQueryResults={parseQueryResults}
               autoLimit={autoLimit}
+              executeSqlError={executeSqlError}
               handleSelectEditPolicy={handleSelectEditPolicy}
             />
           ) : null}
@@ -306,7 +376,7 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
             <Button
               variant="primary"
               loading={isInferring || isLoading}
-              disabled={format === 'lib' && !inferredSQL}
+              disabled={(format === 'lib' && !inferredSQL) || sandboxIsStarting || isSyncing}
               onClick={onRunQuery}
             >
               Run query

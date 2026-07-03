@@ -1,4 +1,4 @@
-import { type SafeSqlFragment, type UntrustedSqlFragment } from '@supabase/pg-meta'
+import { safeSql, type SafeSqlFragment, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
@@ -8,7 +8,10 @@ import { filterTablePolicies } from './useTestQueryRLS.utils'
 import { useParseClientCodeMutation } from '@/data/ai/parse-client-code-mutation'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useCheckTableRLSStatusMutation } from '@/data/database/table-check-rls-mutation'
-import { useParseSQLQueryMutation } from '@/data/misc/parse-query-mutation'
+import {
+  useParseSQLQueryMutation,
+  type ParseSQLQueryOperations,
+} from '@/data/misc/parse-query-mutation'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
@@ -19,8 +22,26 @@ import {
   useImpersonatedUser,
   useRoleImpersonationStateSnapshot,
 } from '@/state/role-impersonation-state'
+import { type ResponseError } from '@/types'
 
 const limit = 100
+
+// [Joshen] This is pre-requisite work for identifying UPDATE / DELETE failures due to RLS
+const wrapReturnRowsAffected = (sql: SafeSqlFragment) => {
+  return safeSql`
+  DO $$
+DECLARE
+  row_count integer;
+BEGIN
+  ${sql}${(sql.endsWith(';') ? '' : ';') as SafeSqlFragment}
+  GET DIAGNOSTICS row_count = ROW_COUNT;
+  -- store it somewhere you can read back
+  PERFORM set_config('rls_tester.rows_affected', row_count::text, true);
+END $$;
+
+SELECT current_setting('rls_tester.rows_affected', true);
+`
+}
 
 /**
  * [Joshen] Testing a SQL query for its RLS access involves 3 async steps
@@ -93,9 +114,11 @@ export const useTestQueryRLS = () => {
     option: 'anon' | 'authenticated'
     onExecuteSQL: ({
       result,
+      operation,
       isAutoLimit,
     }: {
       result: Object[] | null
+      operation: ParseSQLQueryOperations
       isAutoLimit: boolean
     }) => void
     onParseQuery: (results?: ParseQueryResults) => void
@@ -114,8 +137,8 @@ export const useTestQueryRLS = () => {
       const formattedSql = suffixWithLimit(value, limit)
       const data = await parseQuery({ sql: formattedSql })
 
-      if (data.operation !== 'SELECT') {
-        return toast('Only SELECT statements are supported with the RLS Tester at the moment')
+      if (data.operation !== 'SELECT' && !sandbox) {
+        // return toast('Only SELECT statements are supported with the RLS Tester at the moment')
       }
 
       const formattedTables = data.tables.map((x) => {
@@ -151,35 +174,46 @@ export const useTestQueryRLS = () => {
         })
 
       const autoLimit = appendAutoLimit ? limit : undefined
-      const sql = wrapWithRoleImpersonation(formattedSql, impersonatedRoleState)
+      const sql = wrapWithRoleImpersonation(
+        data.operation === 'UPDATE' || data.operation === 'DELETE'
+          ? wrapReturnRowsAffected(formattedSql)
+          : formattedSql,
+        impersonatedRoleState
+      )
 
-      const { result } = sandbox
-        ? await sandbox.run({ sql }).catch((e) => {
-            setSandboxError(e instanceof Error ? e : new Error(String(e)))
-            throw e
-          })
-        : await executeSql({
-            sql,
-            autoLimit,
-            projectRef: project.ref,
-            connectionString: project.connectionString,
-            isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
-            isStatementTimeoutDisabled: true,
-            handleError: (e) => {
+      try {
+        const { result } = sandbox
+          ? await sandbox.run({ sql }).catch((e) => {
+              setSandboxError(e instanceof Error ? e : new Error(String(e)))
               throw e
-            },
-            queryKey: ['rls-tester'],
-          })
-      onExecuteSQL({ result, isAutoLimit: !!autoLimit })
+            })
+          : await executeSql({
+              sql,
+              autoLimit,
+              projectRef: project.ref,
+              connectionString: project.connectionString,
+              isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
+              isStatementTimeoutDisabled: true,
+              handleError: (e) => {
+                throw e
+              },
+              queryKey: ['rls-tester'],
+            })
 
-      onParseQuery({
-        tables,
-        operation: data.operation,
-        role: role?.role,
-        user,
-      })
+        onExecuteSQL({ result, operation: data.operation, isAutoLimit: !!autoLimit })
+        onParseQuery({ tables, operation: data.operation, role: role?.role, user })
+      } catch (error) {
+        const isRLSInsertError = (error as ResponseError).message.includes(
+          'new row violates row-level security policy'
+        )
+        if (isRLSInsertError) {
+          onParseQuery({ tables, operation: data.operation, role: role?.role, user })
+        } else {
+          onParseQuery(undefined)
+        }
+      }
     } catch (error) {
-      onExecuteSQL({ result: null, isAutoLimit: false })
+      onExecuteSQL({ result: null, operation: undefined, isAutoLimit: false })
       onParseQuery(undefined)
     } finally {
       setIsLoading(false)
