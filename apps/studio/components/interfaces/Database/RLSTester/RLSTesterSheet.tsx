@@ -360,21 +360,26 @@ const RLSTesterSheetContents = ({ handleSelectEditPolicy }: RLSTesterSheetProps)
         onCancel={() => setBlockedReason(undefined)}
         alert={{
           title: `This ${mutationOperation} query will run against your actual database`,
-          description: sandboxEnabled
-            ? 'We highly recommend using the sandbox to test insert, update, or delete queries.'
-            : 'Your database may be directly modified as a result. Are you sure?',
+          description: 'Your database may be directly modified as a result. Are you sure?',
         }}
       >
         {sandboxEnabled && (
-          <Button
-            variant="default"
-            onClick={() => {
-              startSandbox()
-              setBlockedReason(undefined)
-            }}
-          >
-            Set up sandbox
-          </Button>
+          <>
+            <p className="text-sm">
+              We highly recommend using the sandbox to set up an ephermeral database environment for
+              testing insert, update, or delete queries.
+            </p>
+            <Button
+              variant="default"
+              className="mt-2"
+              onClick={() => {
+                startSandbox()
+                setBlockedReason(undefined)
+              }}
+            >
+              Set up sandbox
+            </Button>
+          </>
         )}
       </ConfirmationModal>
     </>
