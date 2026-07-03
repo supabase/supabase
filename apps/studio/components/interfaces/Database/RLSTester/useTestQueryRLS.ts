@@ -4,7 +4,11 @@ import { toast } from 'sonner'
 
 import { checkIfAppendLimitRequired, suffixWithLimit } from '../../SQLEditor/SQLEditor.utils'
 import { type ParseQueryResults } from './RLSTester.types'
-import { filterTablePolicies } from './useTestQueryRLS.utils'
+import {
+  filterTablePolicies,
+  getTestQueryBlockedReason,
+  type TestQueryBlockedReason,
+} from './useTestQueryRLS.utils'
 import { useParseClientCodeMutation } from '@/data/ai/parse-client-code-mutation'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useCheckTableRLSStatusMutation } from '@/data/database/table-check-rls-mutation'
@@ -26,10 +30,7 @@ import { type ResponseError } from '@/types'
 
 const limit = 100
 
-export type TestQueryBlockedReason =
-  | { type: 'multiple-statements' }
-  | { type: 'unsupported-operation'; operation: 'UPDATE' | 'DELETE' }
-  | { type: 'mutation'; operation: 'INSERT' }
+export type { TestQueryBlockedReason }
 
 // [Joshen] Pre-requisite work for identifying UPDATE / DELETE failures due to RLS - not yet wired
 // in since those operations are currently blocked (see TestQueryBlockedReason's 'unsupported-
@@ -156,21 +157,14 @@ export const useTestQueryRLS = () => {
       const formattedSql = suffixWithLimit(value, limit)
       const data = await parseQuery({ sql: formattedSql })
 
-      if (data.statementCount > 1) {
-        onValidationBlocked({ type: 'multiple-statements' })
-        return true
-      }
-
-      // [Joshen] UPDATE and DELETE are not supported yet - RLS blocking them doesn't raise an
-      // error the way it does for INSERT (they just silently affect 0 rows), so we can't yet
-      // surface an accurate result. Handling this properly is tracked for a separate PR.
-      if (data.operation === 'UPDATE' || data.operation === 'DELETE') {
-        onValidationBlocked({ type: 'unsupported-operation', operation: data.operation })
-        return true
-      }
-
-      if (data.operation === 'INSERT' && !sandbox && !acknowledgeMutation) {
-        onValidationBlocked({ type: 'mutation', operation: data.operation })
+      const blockedReason = getTestQueryBlockedReason({
+        statementCount: data.statementCount,
+        operation: data.operation,
+        hasSandbox: !!sandbox,
+        acknowledgeMutation,
+      })
+      if (blockedReason) {
+        onValidationBlocked(blockedReason)
         return true
       }
 
