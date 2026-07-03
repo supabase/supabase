@@ -137,10 +137,8 @@ export const Tabs = ({
   const childrenArr: ReactElement<TabPanelProps>[] = []
   const tabIds: string[] = []
   Children.forEach(children, (child) => {
-    if (isValidElement<TabPanelProps>(child)) {
-      childrenArr.push(child)
-    }
     if (isValidElement<TabPanelProps>(child) && isString(child.props.id)) {
+      childrenArr.push(child)
       tabIds.push(child.props.id)
     }
   })
