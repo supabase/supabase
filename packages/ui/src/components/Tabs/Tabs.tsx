@@ -1,5 +1,6 @@
 'use client'
 
+import { cva } from 'class-variance-authority'
 import { Tabs as TabsPrimitive } from 'radix-ui'
 import {
   Children,
@@ -11,7 +12,7 @@ import {
   type RefObject,
 } from 'react'
 
-import styleHandler from '../../lib/theme/styleHandler'
+import { cn } from '../../lib/utils'
 
 export interface TabsProps {
   type?: 'pills' | 'underlined' | 'cards' | 'rounded-pills'
@@ -38,6 +39,81 @@ export interface TabsProps {
 interface TabsSubComponents {
   Panel: React.FC<PropsWithChildren<PanelProps>>
 }
+
+export const tabsListVariants = cva(cn('flex'), {
+  variants: {
+    type: {
+      pills: 'space-x-1',
+      underlined: 'items-center border-b border-secondary',
+      cards: '',
+      'rounded-pills': 'flex-wrap gap-2',
+    },
+    scrollable: {
+      true: 'overflow-auto whitespace-nowrap no-scrollbar mask-fadeout-right',
+    },
+    wrappable: {
+      true: 'flex-wrap',
+    },
+  },
+})
+
+export const tabsTriggerListVariants = cva(
+  cn(
+    'relative cursor-pointer flex items-center space-x-2 text-center transition focus:outline-hidden focus-visible:ring-3 focus-visible:ring-foreground-muted focus-visible:border-foreground-muted'
+  ),
+  {
+    variants: {
+      type: {
+        pills: 'shadow-xs rounded-sm border',
+        underlined: 'text-foreground-lighter',
+        cards: '',
+        'rounded-pills': 'shadow-xs rounded-full',
+      },
+      size: {
+        tiny: 'text-xs px-2.5 py-1',
+        small: 'text-base md:text-sm leading-4 px-3 py-2',
+        medium: 'text-base md:text-sm px-4 py-2',
+        large: 'text-base px-4 py-2',
+        xlarge: 'text-base px-6 py-3',
+      },
+      block: {
+        true: 'w-full flex items-center justify-center',
+      },
+      isActive: {
+        false: 'hover:text-foreground',
+      },
+    },
+    compoundVariants: [
+      {
+        type: 'pills',
+        isActive: true,
+        className: 'bg-selection text-foreground border-stronger',
+      },
+      {
+        type: 'pills',
+        isActive: false,
+        className:
+          'bg-background border-strong hover:border-foreground-muted text-foreground-muted',
+      },
+      {
+        type: 'underlined',
+        isActive: true,
+        className: '!text-foreground border-b-2 border-foreground',
+      },
+      {
+        type: 'rounded-pills',
+        isActive: true,
+        className: 'bg-foreground text-background border-foreground',
+      },
+      {
+        type: 'rounded-pills',
+        isActive: false,
+        className:
+          'bg-surface-200 hover:bg-surface-300 hover:border-foreground-lighter text-foreground-lighter',
+      },
+    ],
+  }
+)
 
 /**
  * @deprecated Use `import { Tabs_shadcn_ } from "ui"` instead
@@ -80,8 +156,6 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
     if (activeId && activeId !== activeTab) setActiveTab(activeId)
   }, [activeId])
 
-  let __styles = styleHandler('tabs')
-
   function onTabClick(id: string) {
     onClick?.(id)
     if (id !== activeTab) {
@@ -90,30 +164,19 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
     }
   }
 
-  const listClasses = [__styles[type].list]
-  if (scrollable) listClasses.push(__styles.scrollable)
-  if (wrappable) listClasses.push(__styles.wrappable)
-  if (listClassNames) listClasses.push(listClassNames)
-
   return (
     <TabsPrimitive.Root
       value={activeTab}
-      className={[__styles.base, baseClassNames].join(' ')}
+      className={cn('w-full justify-between space-y-4', baseClassNames)}
       ref={refs?.base}
     >
-      <TabsPrimitive.List className={listClasses.join(' ')} ref={refs?.list}>
+      <TabsPrimitive.List
+        className={tabsListVariants({ type, scrollable, wrappable, className: listClassNames })}
+        ref={refs?.list}
+      >
         {addOnBefore}
         {children.map((tab) => {
           const isActive = activeTab === tab.props.id
-          const triggerClasses = [__styles[type].base, __styles.size[size]]
-          if (isActive) {
-            triggerClasses.push(__styles[type].active)
-          } else {
-            triggerClasses.push(__styles[type].inactive)
-          }
-          if (block) {
-            triggerClasses.push(__styles.block)
-          }
 
           return (
             <TabsPrimitive.Trigger
@@ -126,7 +189,7 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
               onClick={() => onTabClick(tab.props.id)}
               key={`${tab.props.id}-tab-button`}
               value={tab.props.id}
-              className={triggerClasses.join(' ')}
+              className={tabsTriggerListVariants({ type, isActive, size, block })}
             >
               {tab.props.icon}
               <span>{tab.props.label}</span>
@@ -158,10 +221,11 @@ interface PanelProps {
  * @deprecated Use ./TabsContent_Shadcn_ instead
  */
 export const Panel: React.FC<PropsWithChildren<PanelProps>> = ({ children, id, className }) => {
-  let __styles = styleHandler('tabs')
-
   return (
-    <TabsPrimitive.Content value={id} className={[__styles.content, className].join(' ')}>
+    <TabsPrimitive.Content
+      value={id}
+      className={cn('focus:outline-hidden transition-height', className)}
+    >
       {children}
     </TabsPrimitive.Content>
   )

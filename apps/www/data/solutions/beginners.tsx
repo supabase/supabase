@@ -203,7 +203,7 @@ const data: () => {
                   absolute pointer-events-none
                   w-full h-full
                   inset-0 top-auto
-                  bg-[linear-gradient(to_bottom,transparent_0%,hsl(var(--background-default))_100%)]
+                  bg-[linear-gradient(to_bottom,transparent_0%,var(--background-default)_100%)]
                 "
               />
             </div>
@@ -319,7 +319,7 @@ const data: () => {
             </>
           ),
           image: (
-            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]" />
+            <RealtimeVisual className="[&_.visual-overlay]:bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]" />
           ),
         },
         {
@@ -409,7 +409,7 @@ const data: () => {
             absolute pointer-events-none
             w-full h-full
             inset-0 top-auto
-            bg-[linear-gradient(to_top,transparent_0%,transparent_50%,hsl(var(--background-default))_75%)]
+            bg-[linear-gradient(to_top,transparent_0%,transparent_50%,var(--background-default)_75%)]
           "
               />
               <Image

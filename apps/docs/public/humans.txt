@@ -8,6 +8,7 @@ Adam Mohammed
 Adam Mokan
 AJ Matias
 Akash Manimaran
+Akilesh Sethu
 Alaister Young
 Aleksi Immonen
 Alex Hall
@@ -159,6 +160,7 @@ Julian Domke
 Julien Goux
 Kai M
 Kalleby Santos
+Kanad Gupta
 Kanishk Dudeja
 Kamil Ogórek
 Kang Ming Tay
@@ -184,6 +186,7 @@ Liam Cloud Hogan
 Lindsay Moss
 Lukas Bernert
 Lukas Klingsbo
+Łukasz Korbasiewicz
 Łukasz Niemier
 Maksym Ionutsa
 Manuel Mendez
@@ -219,6 +222,7 @@ Oli R
 Pamela Chia
 Patricia Szasz
 Patrick Crane
+Paul Bauer
 Paul Caselton
 Paul Cioanca
 Paul Copplestone

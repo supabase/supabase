@@ -49,7 +49,7 @@ const SheetOverlay = React.forwardRef<
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName
 
 const classes = cn([
-  'fixed z-50 scale-100 gap-4 bg-studio opacity-100 shadow-lg',
+  'fixed z-50 scale-100 gap-4 bg-popover opacity-100 shadow-lg',
   'data-[state=open]:animate-in data-[state=open]:duration-300 data-[state=closed]:animate-out data-[state=closed]:duration-300',
 ])
 

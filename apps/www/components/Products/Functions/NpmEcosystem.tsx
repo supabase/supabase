@@ -199,7 +199,7 @@ const NpmEcosystem = ({ isHovered = false }: { isHovered?: boolean }) => {
       <div
         className="absolute inset-0 z-10"
         style={{
-          background: `radial-gradient(70% 50% at 50% 50%, transparent, hsl(var(--background-surface-75)))`,
+          background: `radial-gradient(70% 50% at 50% 50%, transparent, var(--background-surface-75))`,
         }}
       />
 

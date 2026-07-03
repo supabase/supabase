@@ -142,7 +142,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     const { data: resourceWarnings } = useResourceWarningsQuery({
       slug: selectedOrganization?.slug,
     })
-    const projectResourceWarnings = resourceWarnings?.find(
+    const projectResourceWarnings = (Array.isArray(resourceWarnings) ? resourceWarnings : []).find(
       (w) => w.project === selectedProject?.ref
     )
     const isComputeNearExhaustion =

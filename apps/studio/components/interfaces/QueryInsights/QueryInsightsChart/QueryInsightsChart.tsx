@@ -181,13 +181,13 @@ export const QueryInsightsChart = ({
                       dataKey="time"
                       tick={false}
                       tickLine={false}
-                      axisLine={{ stroke: 'hsl(var(--border-default))' }}
+                      axisLine={{ stroke: 'var(--border-default)' }}
                       height={1}
                     />
                     <YAxis
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fontSize: 10, fill: 'hsl(var(--foreground-muted))' }}
+                      tick={{ fontSize: 10, fill: 'var(--foreground-muted)' }}
                       tickCount={3}
                       width={40}
                       orientation="left"
@@ -208,7 +208,7 @@ export const QueryInsightsChart = ({
                     <CartesianGrid
                       horizontal={true}
                       vertical={false}
-                      stroke="hsl(var(--border-default))"
+                      stroke="var(--border-default)"
                       strokeOpacity={0.5}
                     />
                     {legendItems.map((item) => (

@@ -69,7 +69,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 export const CHART_CONFIG = {
   success: {
     label: <TooltipLabel level="success" />,
-    color: 'hsl(var(--foreground-muted))',
+    color: 'var(--foreground-muted)',
   },
   warning: {
     label: <TooltipLabel level="warning" />,
@@ -459,7 +459,7 @@ export const UnifiedLogs = () => {
                   className={cn(
                     'h-full [&>div]:h-full',
                     '[&_thead_th]:[border-top:none]! [&_thead_th]:[border-bottom:none]!',
-                    '[&_thead_th]:[box-shadow:inset_0_-1px_0_hsl(var(--border-default))]!',
+                    '[&_thead_th]:[box-shadow:inset_0_-1px_0_var(--border-default)]!',
                     '[&_thead_th]:text-foreground-lighter! [&_thead_tr:hover]:bg-surface-75',
                     '[&_thead_tr]:border-b-0! [&_tbody_tr]:border-b-0!'
                   )}
