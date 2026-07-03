@@ -140,8 +140,9 @@ export const RLSTesterResults = ({
                     {tableWithRLSEnabledWithPoliciesDontApply.schema}.
                     {tableWithRLSEnabledWithPoliciesDontApply.table}
                   </code>{' '}
-                  has RLS enabled with some policies set up, but none of the policies apply for the
-                  selected user.
+                  has a policy for the{' '}
+                  <code className="text-code-inline break-keep!">{parseQueryResults.role}</code>{' '}
+                  role, but its condition wasn't satisfied for this specific request.
                 </p>
               </Admonition>
             ) : null)}

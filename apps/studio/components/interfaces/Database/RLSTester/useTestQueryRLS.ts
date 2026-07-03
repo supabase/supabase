@@ -26,8 +26,15 @@ import { type ResponseError } from '@/types'
 
 const limit = 100
 
-// [Joshen] This is pre-requisite work for identifying UPDATE / DELETE failures due to RLS
-const wrapReturnRowsAffected = (sql: SafeSqlFragment) => {
+export type TestQueryBlockedReason =
+  | { type: 'multiple-statements' }
+  | { type: 'unsupported-operation'; operation: 'UPDATE' | 'DELETE' }
+  | { type: 'mutation'; operation: 'INSERT' }
+
+// [Joshen] Pre-requisite work for identifying UPDATE / DELETE failures due to RLS - not yet wired
+// in since those operations are currently blocked (see TestQueryBlockedReason's 'unsupported-
+// operation'). Exported so it isn't flagged as unused until the follow-up PR wires it back in.
+export const wrapReturnRowsAffected = (sql: SafeSqlFragment) => {
   return safeSql`
   DO $$
 DECLARE
@@ -104,14 +111,21 @@ export const useTestQueryRLS = () => {
       onError: () => {},
     })
 
+  /**
+   * Returns true if the query was blocked (multiple statements, or an unacknowledged mutation)
+   * and did not run, false if it ran (successfully or not)
+   */
   const testQuery = async ({
     value,
     option,
+    acknowledgeMutation = false,
     onExecuteSQL,
     onParseQuery,
+    onValidationBlocked,
   }: {
     value: SafeSqlFragment
     option: 'anon' | 'authenticated'
+    acknowledgeMutation?: boolean
     onExecuteSQL: ({
       result,
       operation,
@@ -122,11 +136,16 @@ export const useTestQueryRLS = () => {
       isAutoLimit: boolean
     }) => void
     onParseQuery: (results?: ParseQueryResults) => void
-  }) => {
-    if (!project) return console.error('Project is required')
+    onValidationBlocked: (reason: TestQueryBlockedReason) => void
+  }): Promise<boolean> => {
+    if (!project) {
+      console.error('Project is required')
+      return false
+    }
 
     if (option === 'authenticated' && !user) {
-      return toast('Select which user to test as before running the query')
+      toast('Select which user to test as before running the query')
+      return false
     }
 
     try {
@@ -137,8 +156,22 @@ export const useTestQueryRLS = () => {
       const formattedSql = suffixWithLimit(value, limit)
       const data = await parseQuery({ sql: formattedSql })
 
-      if (data.operation !== 'SELECT' && !sandbox) {
-        // return toast('Only SELECT statements are supported with the RLS Tester at the moment')
+      if (data.statementCount > 1) {
+        onValidationBlocked({ type: 'multiple-statements' })
+        return true
+      }
+
+      // [Joshen] UPDATE and DELETE are not supported yet - RLS blocking them doesn't raise an
+      // error the way it does for INSERT (they just silently affect 0 rows), so we can't yet
+      // surface an accurate result. Handling this properly is tracked for a separate PR.
+      if (data.operation === 'UPDATE' || data.operation === 'DELETE') {
+        onValidationBlocked({ type: 'unsupported-operation', operation: data.operation })
+        return true
+      }
+
+      if (data.operation === 'INSERT' && !sandbox && !acknowledgeMutation) {
+        onValidationBlocked({ type: 'mutation', operation: data.operation })
+        return true
       }
 
       const formattedTables = data.tables.map((x) => {
@@ -174,12 +207,9 @@ export const useTestQueryRLS = () => {
         })
 
       const autoLimit = appendAutoLimit ? limit : undefined
-      const sql = wrapWithRoleImpersonation(
-        data.operation === 'UPDATE' || data.operation === 'DELETE'
-          ? wrapReturnRowsAffected(formattedSql)
-          : formattedSql,
-        impersonatedRoleState
-      )
+      // UPDATE/DELETE are blocked above, so wrapReturnRowsAffected isn't wired in here yet -
+      // it's kept for the follow-up PR that adds proper UPDATE/DELETE support
+      const sql = wrapWithRoleImpersonation(formattedSql, impersonatedRoleState)
 
       try {
         const { result } = sandbox
@@ -206,6 +236,7 @@ export const useTestQueryRLS = () => {
         const isRLSInsertError = (error as ResponseError).message.includes(
           'new row violates row-level security policy'
         )
+        onExecuteSQL({ result: null, operation: data.operation, isAutoLimit: false })
         if (isRLSInsertError) {
           onParseQuery({ tables, operation: data.operation, role: role?.role, user })
         } else {
@@ -218,6 +249,8 @@ export const useTestQueryRLS = () => {
     } finally {
       setIsLoading(false)
     }
+
+    return false
   }
 
   return {

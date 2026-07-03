@@ -93,8 +93,7 @@ export const RLSTableCard = ({
           {policies.length} {policies.length > 1 ? 'policies apply' : 'policy applies'} for the{' '}
           <code className="text-code-inline">{role}</code> role on this table.{' '}
           {operation === 'SELECT'
-            ? `Only rows that match{' '}
-          {policies.length > 1 ? 'these conditions' : 'this condition'} are returned.`
+            ? `Only rows that match ${policies.length > 1 ? 'these conditions' : 'this condition'} are returned.`
             : `The ${operation} operation will only be successful if the conditions are matched.`}
         </p>
         <TableAccessPolicySummary
