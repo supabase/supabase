@@ -62,6 +62,26 @@ module.exports = defineConfig([
       'barrel-files/avoid-re-export-all': 'error',
       'jsx-a11y/alt-text': 'warn',
       'jsx-a11y/role-has-required-aria-props': 'error',
+      // Statically-checkable subset of the axe-core findings in FE-3781. Kept at
+      // 'warn' + ratcheted (see lint:ratchet in package.json) rather than 'error'
+      // since the codebase has pre-existing violations — see the a11y audit doc.
+      'jsx-a11y/aria-props': 'warn',
+      'jsx-a11y/aria-proptypes': 'warn',
+      'jsx-a11y/role-supports-aria-props': 'warn',
+      'jsx-a11y/anchor-has-content': 'warn',
+      'jsx-a11y/control-has-associated-label': ['warn', { controlComponents: ['Button', 'Switch'] }],
+      'jsx-a11y/label-has-associated-control': [
+        'warn',
+        { labelComponents: ['Label'], controlComponents: ['Input', 'Switch'] },
+      ],
+      // Low-noise, low-config jsx-a11y rules — cheap to check, near-zero false-positive risk.
+      'jsx-a11y/aria-role': 'warn',
+      'jsx-a11y/no-redundant-roles': 'warn',
+      'jsx-a11y/no-aria-hidden-on-focusable': 'warn',
+      'jsx-a11y/tabindex-no-positive': 'warn',
+      'jsx-a11y/anchor-is-valid': 'warn',
+      'jsx-a11y/heading-has-content': 'warn',
+      'jsx-a11y/no-distracting-elements': 'warn',
     },
   },
   // Analytics SQL wire boundary: every call to a SQL-bearing analytics

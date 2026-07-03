@@ -18,7 +18,7 @@
     "smoke:tanstack": "node scripts/smoke-server.mjs",
     "start:tanstack": "node scripts/serve.js",
     "lint": "eslint .",
-    "lint:ratchet": "tsx scripts/ratchet-eslint-rules.ts --rule react-hooks/exhaustive-deps --rule import/no-anonymous-default-export --rule @tanstack/query/exhaustive-deps --rule @typescript-eslint/no-explicit-any --rule no-restricted-imports --rule no-restricted-exports --rule react/no-unstable-nested-components",
+    "lint:ratchet": "tsx scripts/ratchet-eslint-rules.ts --rule react-hooks/exhaustive-deps --rule import/no-anonymous-default-export --rule @tanstack/query/exhaustive-deps --rule @typescript-eslint/no-explicit-any --rule no-restricted-imports --rule no-restricted-exports --rule react/no-unstable-nested-components --rule jsx-a11y/aria-props --rule jsx-a11y/aria-proptypes --rule jsx-a11y/role-supports-aria-props --rule jsx-a11y/anchor-has-content --rule jsx-a11y/control-has-associated-label --rule jsx-a11y/label-has-associated-control --rule jsx-a11y/aria-role --rule jsx-a11y/no-redundant-roles --rule jsx-a11y/no-aria-hidden-on-focusable --rule jsx-a11y/tabindex-no-positive --rule jsx-a11y/anchor-is-valid --rule jsx-a11y/heading-has-content --rule jsx-a11y/no-distracting-elements",
     "clean": "rimraf node_modules tsconfig.tsbuildinfo .next .turbo",
     "test": "vitest --run --coverage",
     "test:watch": "vitest watch",
