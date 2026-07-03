@@ -90,7 +90,8 @@ const getWhereClauseText = (sql: string, stmtType: string, stmt: Record<string, 
     else if (exprStart !== undefined && exprStart > start) candidateEnds.push(exprStart)
   }
 
-  const end = candidateEnds.length > 0 ? Math.min(...candidateEnds) : sql.replace(/;\s*$/, '').length
+  const end =
+    candidateEnds.length > 0 ? Math.min(...candidateEnds) : sql.replace(/;\s*$/, '').length
   return sql.slice(start, end).trim()
 }
 
