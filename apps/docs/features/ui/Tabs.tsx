@@ -8,16 +8,16 @@ import {
   ReactElement,
   ReactNode,
   useCallback,
+  useEffect,
   useMemo,
   useState,
   type KeyboardEvent,
-  type RefObject,
 } from 'react'
 import { cn } from 'ui'
 
 import { useTocRerenderTrigger } from '../docs/GuidesMdx.state'
-import { useTabsWithQueryParams, UseTabsWithQueryParamsOptions } from './useTabsWithQueryParams'
 import { useStickyTabs, UseStickyTabsOptions } from './useStickyTabs'
+import { useTabsWithQueryParams, UseTabsWithQueryParamsOptions } from './useTabsWithQueryParams'
 
 export interface TabsProps {
   children: ReactNode
@@ -26,8 +26,6 @@ export interface TabsProps {
   activeId?: string
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
   block?: boolean
-  tabBarGutter?: number
-  tabBarStyle?: React.CSSProperties
   onChange?: (id: string) => void
   onClick?: any
   scrollable?: boolean
@@ -36,10 +34,6 @@ export interface TabsProps {
   addOnAfter?: React.ReactNode
   listClassNames?: string
   baseClassNames?: string
-  refs?: {
-    base: RefObject<HTMLDivElement | null> | ((elem: HTMLDivElement | null) => void)
-    list: RefObject<HTMLDivElement | null> | ((elem: HTMLDivElement | null) => void)
-  }
 }
 
 export const tabsListVariants = cva(cn('flex'), {
@@ -154,28 +148,36 @@ export const Tabs = ({
     tabIds,
     queryGroup,
   })
+
+  const sanitizedStickyTabList = useMemo(
+    () =>
+      stickyTabList != undefined
+        ? {
+            ...stickyTabList,
+            // Magic number is the height of tab list + paragraph margin, worth getting
+            // rid of this?
+            scrollMarginTop:
+              stickyTabList.scrollMarginTop || 'calc(var(--header-height) + 43px + 20px)',
+          }
+        : undefined,
+    [stickyTabList]
+  )
   const {
     observedRef,
     stickyRef,
     onTabSelected: onTabSelectedForSticky,
-  } = useStickyTabs(stickyTabList)
+  } = useStickyTabs(sanitizedStickyTabList)
   const rerenderToc = useTocRerenderTrigger()
-
-  if (stickyTabList && !stickyTabList.scrollMarginTop) {
-    // Magic number is the height of tab list + paragraph margin, worth getting
-    // rid of this?
-    stickyTabList.scrollMarginTop = 'calc(var(--header-height) + 43px + 20px)'
-  }
 
   const [activeTab, setActiveTab] = useState(
     queryTab ??
       activeId ??
       defaultActiveId ??
       // if no defaultActiveId is set use the first panel
-      children?.[0]?.props?.id
+      childrenArr?.[0]?.props?.id
   )
 
-  useMemo(() => {
+  useEffect(() => {
     // If we have a queryTab, Tabs is controller by URL params
     if (queryTab && queryTab !== activeTab) {
       setActiveTab(queryTab)
