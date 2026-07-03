@@ -159,7 +159,7 @@
 
 [data-theme='dark'],
 .dark {
-  --chart-1: var(--brand-default);
+  --chart-1: hsl(var(--brand-default));
   --chart-2: 160 60% 45%;
   --chart-3: 30 80% 55%;
   --chart-4: 280 65% 60%;
