@@ -214,7 +214,12 @@ export const Tabs = ({
       ref={observedRef}
     >
       <TabsPrimitive.List
-        className={tabsListVariants({ type, scrollable, wrappable, className: listClassNames })}
+        className={tabsListVariants({
+          type,
+          scrollable,
+          wrappable,
+          className: cn({ 'bg-background': stickyTabList != null }, listClassNames),
+        })}
         ref={stickyRef}
       >
         {addOnBefore}
