@@ -1,6 +1,8 @@
-import { serve } from 'https://deno.land/std@0.170.0/http/server.ts'
+import { withSupabase } from 'npm:@supabase/server@^1'
 import { handler } from './handler.tsx'
 
-serve(handler)
+export default {
+  fetch: withSupabase({ auth: 'none' }, handler),
+}
 
 console.log('Serving og-images function')
