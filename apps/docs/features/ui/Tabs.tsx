@@ -16,8 +16,8 @@ import {
 import { cn } from 'ui'
 
 import { useTocRerenderTrigger } from '../docs/GuidesMdx.state'
-import { useTabsWithQueryParams, UseTabsWithQueryParamsOptions } from './withQueryParams'
-import { useStickyTabs, UseStickyTabsOptions } from './withSticky'
+import { useTabsWithQueryParams, UseTabsWithQueryParamsOptions } from './useTabsWithQueryParams'
+import { useStickyTabs, UseStickyTabsOptions } from './useStickyTabs'
 
 export interface TabsProps {
   children: ReactNode
