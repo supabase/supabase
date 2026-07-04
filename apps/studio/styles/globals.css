@@ -350,6 +350,38 @@ input[type='number'] {
   display: none;
 }
 
+/*
+  Opts an overflow container out of macOS overlay scrollbars so the thumb is
+  always visible and draggable with a mouse, regardless of the system
+  "Show scroll bars" setting (https://github.com/supabase/supabase/issues/44369).
+*/
+.persistent-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background: transparent;
+}
+.persistent-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+  background-color: var(--foreground-muted);
+}
+.persistent-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--foreground-lighter);
+}
+.persistent-scrollbar::-webkit-scrollbar-corner {
+  background: transparent;
+}
+/* Firefox — Chromium/WebKit ignore ::-webkit-scrollbar styling when
+   scrollbar-width/scrollbar-color are set, so scope these to browsers
+   without ::-webkit-scrollbar support */
+@supports not selector(::-webkit-scrollbar) {
+  .persistent-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--foreground-muted) transparent;
+  }
+}
+
 div[data-radix-portal]:not(.portal--toast) {
   z-index: 2147483646 !important;
 }
