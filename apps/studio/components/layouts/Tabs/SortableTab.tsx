@@ -60,7 +60,7 @@ export const SortableTab = ({
       layoutId={tab.id}
       transition={{ duration: 0.045 }}
       animate={{ opacity: isDragging ? 0 : 1 }}
-      className={cn('flex items-center h-(--header-height) first-of-type:border-l')}
+      className={cn('flex items-center h-(--header-height)', index === 0 && 'border-l')}
     >
       <TabsTrigger_Shadcn_
         value={tab.id}
@@ -78,6 +78,7 @@ export const SortableTab = ({
           'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
           'border-b border-default',
           'data-[state=active]:border-b-background-dash-sidebar dark:data-[state=active]:border-b-background-surface-100',
+          'transition-none',
           'relative group h-full',
           'hover:bg-surface-300 dark:hover:bg-surface-100',
           tab.isPreview && 'italic font-light' // Optional: style preview tabs differently
@@ -120,7 +121,7 @@ export const SortableTab = ({
         >
           <X size={12} className="text-foreground-light" />
         </span>
-        <div className="absolute w-full top-0 left-0 right-0 h-px bg-foreground opacity-0 group-data-[state=active]:opacity-100" />
+        <div className="absolute w-full top-0 left-0 right-0 h-0.5 bg-foreground opacity-0 group-data-[state=active]:opacity-100" />
       </TabsTrigger_Shadcn_>
       {index < openTabs.length && (
         <div role="separator" className="h-full w-px bg-border" key={`separator-${tab.id}`} />
