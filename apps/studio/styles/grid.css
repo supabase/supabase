@@ -104,38 +104,14 @@
 }
 
 /*
-  Always-grabbable scrollbars for the grid.
-  On macOS with overlay scrollbars ("Show scroll bars" not set to Always),
-  native scrollbars are hidden until a scroll happens and cannot be reached
-  with the mouse (https://github.com/supabase/supabase/issues/44369).
-  Styling ::-webkit-scrollbar opts the grid out of overlay scrollbars in
-  Chromium/WebKit so the thumb is always visible and draggable.
+  Reuse the .persistent-scrollbar rules (globals.css) so the grid keeps a
+  grabbable scrollbar on macOS instead of a hidden overlay one
+  (https://github.com/supabase/supabase/issues/44369), just with a slightly
+  larger thumb sized for the grid's own scroll area.
 */
-.rdg::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-  background: transparent;
-}
-.rdg::-webkit-scrollbar-thumb {
-  border-radius: 5px;
-  border: 2px solid transparent;
-  background-clip: content-box;
-  background-color: var(--foreground-muted);
-}
-.rdg::-webkit-scrollbar-thumb:hover {
-  background-color: var(--foreground-lighter);
-}
-.rdg::-webkit-scrollbar-corner {
-  background: transparent;
-}
-/* Firefox — Chromium/WebKit ignore ::-webkit-scrollbar styling when
-   scrollbar-width/scrollbar-color are set, so scope these to browsers
-   without ::-webkit-scrollbar support */
-@supports not selector(::-webkit-scrollbar) {
-  .rdg {
-    scrollbar-width: thin;
-    scrollbar-color: var(--foreground-muted) transparent;
-  }
+.rdg {
+  --persistent-scrollbar-size: 10px;
+  --persistent-scrollbar-radius: 5px;
 }
 
 @supports not (contain: strict) {

@@ -354,14 +354,20 @@ input[type='number'] {
   Opts an overflow container out of macOS overlay scrollbars so the thumb is
   always visible and draggable with a mouse, regardless of the system
   "Show scroll bars" setting (https://github.com/supabase/supabase/issues/44369).
+  Consumers can override --persistent-scrollbar-size/-radius before applying
+  this class instead of duplicating the rules below (e.g. .rdg in grid.css).
 */
+.persistent-scrollbar {
+  --persistent-scrollbar-size: 8px;
+  --persistent-scrollbar-radius: 4px;
+}
 .persistent-scrollbar::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: var(--persistent-scrollbar-size);
+  height: var(--persistent-scrollbar-size);
   background: transparent;
 }
 .persistent-scrollbar::-webkit-scrollbar-thumb {
-  border-radius: 4px;
+  border-radius: var(--persistent-scrollbar-radius);
   border: 2px solid transparent;
   background-clip: content-box;
   background-color: var(--foreground-muted);
