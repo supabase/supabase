@@ -104,10 +104,11 @@
 }
 
 /*
-  Reuse the .persistent-scrollbar rules (globals.css) so the grid keeps a
-  grabbable scrollbar on macOS instead of a hidden overlay one
-  (https://github.com/supabase/supabase/issues/44369), just with a slightly
-  larger thumb sized for the grid's own scroll area.
+  The persistent-scrollbar rules that keep .rdg's scrollbar grabbable on
+  macOS (https://github.com/supabase/supabase/issues/44369) live in
+  globals.css so every data grid in Studio shares one definition. Override
+  just the size here for a slightly larger thumb on the grid's own scroll
+  area.
 */
 .rdg {
   --persistent-scrollbar-size: 10px;

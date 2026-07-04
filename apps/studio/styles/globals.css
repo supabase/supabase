@@ -355,34 +355,40 @@ input[type='number'] {
   always visible and draggable with a mouse, regardless of the system
   "Show scroll bars" setting (https://github.com/supabase/supabase/issues/44369).
   Consumers can override --persistent-scrollbar-size/-radius before applying
-  this class instead of duplicating the rules below (e.g. .rdg in grid.css).
+  this class instead of duplicating the rules below.
+
+  .rdg is included directly (rather than requiring every react-data-grid
+  call site across Studio to add the persistent-scrollbar class) so every
+  data grid in the app — table editor, SQL results, logs, auth users, cron
+  jobs, queues, etc. — keeps a grabbable scrollbar, not just the table
+  editor grid. .rdg overrides the two size variables in grid.css.
 */
-.persistent-scrollbar {
+:is(.persistent-scrollbar, .rdg) {
   --persistent-scrollbar-size: 8px;
   --persistent-scrollbar-radius: 4px;
 }
-.persistent-scrollbar::-webkit-scrollbar {
+:is(.persistent-scrollbar, .rdg)::-webkit-scrollbar {
   width: var(--persistent-scrollbar-size);
   height: var(--persistent-scrollbar-size);
   background: transparent;
 }
-.persistent-scrollbar::-webkit-scrollbar-thumb {
+:is(.persistent-scrollbar, .rdg)::-webkit-scrollbar-thumb {
   border-radius: var(--persistent-scrollbar-radius);
   border: 2px solid transparent;
   background-clip: content-box;
   background-color: var(--foreground-muted);
 }
-.persistent-scrollbar::-webkit-scrollbar-thumb:hover {
+:is(.persistent-scrollbar, .rdg)::-webkit-scrollbar-thumb:hover {
   background-color: var(--foreground-lighter);
 }
-.persistent-scrollbar::-webkit-scrollbar-corner {
+:is(.persistent-scrollbar, .rdg)::-webkit-scrollbar-corner {
   background: transparent;
 }
 /* Firefox — Chromium/WebKit ignore ::-webkit-scrollbar styling when
    scrollbar-width/scrollbar-color are set, so scope these to browsers
    without ::-webkit-scrollbar support */
 @supports not selector(::-webkit-scrollbar) {
-  .persistent-scrollbar {
+  :is(.persistent-scrollbar, .rdg) {
     scrollbar-width: thin;
     scrollbar-color: var(--foreground-muted) transparent;
   }
