@@ -39,6 +39,12 @@ export interface AppLayoutDropdownWithPopoverProps {
   linkHref: string
   linkContent: ReactNode
   linkClassName?: string
+  /**
+   * Optional content rendered as a sibling of (i.e. outside) the navigation link. Use this
+   * for interactive elements that need their own link/handler, since nesting them inside
+   * `linkContent` would render an `<a>` within an `<a>` (invalid markup).
+   */
+  trailingContent?: ReactNode
   commandContent: ReactNode
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -49,6 +55,7 @@ export function AppLayoutDropdownWithPopover({
   linkHref,
   linkContent,
   linkClassName = 'flex items-center gap-2 shrink-0 text-sm',
+  trailingContent,
   commandContent,
   open,
   onOpenChange,
@@ -60,6 +67,7 @@ export function AppLayoutDropdownWithPopover({
         <Link href={linkHref} className={linkClassName}>
           {linkContent}
         </Link>
+        {trailingContent}
         <PopoverTrigger asChild>
           <AppLayoutDropdownTriggerButton className={triggerButtonClassName} />
         </PopoverTrigger>
