@@ -28,7 +28,17 @@ import {
 } from 'react'
 import Markdown from 'react-markdown'
 import { format } from 'sql-formatter'
-import { Alert, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, Tabs } from 'ui'
+import {
+  Alert,
+  cn,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  Tabs_Shadcn_ as Tabs,
+  TabsContent_Shadcn_ as TabsContent,
+  TabsList_Shadcn_ as TabsList,
+  TabsTrigger_Shadcn_ as TabsTrigger,
+} from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { assumptions } from './assumptions'
@@ -355,8 +365,13 @@ export default function SqlToRest({
         )}
       >
         <div className="font-medium">Choose language to translate to</div>
-        <Tabs activeId={currentLanguage} onChange={(id: string) => setCurrentLanguage(id)}>
-          <Tabs.Panel id="curl" label="cURL" className="flex flex-col gap-4">
+        <Tabs value={currentLanguage} onValueChange={(id: string) => setCurrentLanguage(id)}>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="curl">cURL</TabsTrigger>
+            <TabsTrigger value="http">HTTP</TabsTrigger>
+            <TabsTrigger value="js">JavaScript</TabsTrigger>
+          </TabsList>
+          <TabsContent value="curl" className="flex flex-col gap-4">
             {httpRenderError && <Alert className="text-red-900">{httpRenderError.message}</Alert>}
             <CodeBlock
               language="curl"
@@ -369,8 +384,8 @@ export default function SqlToRest({
             >
               {curlCommand}
             </CodeBlock>
-          </Tabs.Panel>
-          <Tabs.Panel id="http" label="HTTP" className="flex flex-col gap-4">
+          </TabsContent>
+          <TabsContent value="http" className="flex flex-col gap-4">
             {httpRenderError && <Alert className="text-red-900">{httpRenderError.message}</Alert>}
             <CodeBlock
               language="http"
@@ -383,8 +398,8 @@ export default function SqlToRest({
             >
               {rawHttp}
             </CodeBlock>
-          </Tabs.Panel>
-          <Tabs.Panel id="js" label="JavaScript" className="flex flex-col gap-4">
+          </TabsContent>
+          <TabsContent value="js" className="flex flex-col gap-4">
             {supabaseJsRenderError && (
               <Alert className="text-red-900">{supabaseJsRenderError.message}</Alert>
             )}
@@ -399,7 +414,7 @@ export default function SqlToRest({
             >
               {jsCommand}
             </CodeBlock>
-          </Tabs.Panel>
+          </TabsContent>
         </Tabs>
         <div
           className={cn(

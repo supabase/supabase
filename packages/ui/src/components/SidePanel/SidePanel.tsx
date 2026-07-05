@@ -43,7 +43,7 @@ interface CustomProps {
 }
 
 export const sidePanelContentVariants = cva(
-  cn('z-50 bg-dash-sidebar flex flex-col fixed inset-y-0 h-full lg:h-screen border-l shadow-xl'),
+  cn('z-50 bg-popover flex flex-col fixed inset-y-0 h-full lg:h-screen border-l shadow-xl'),
   {
     variants: {
       size: {
@@ -161,7 +161,7 @@ const SidePanel = ({
           {...props}
         >
           {header && (
-            <header className="flex items-center space-y-1 py-4 px-4 bg-dash-sidebar sm:px-6 border-b h-(--header-height)">
+            <header className="flex items-center space-y-1 py-4 px-4 bg-popover sm:px-6 border-b h-(--header-height)">
               {header}
             </header>
           )}

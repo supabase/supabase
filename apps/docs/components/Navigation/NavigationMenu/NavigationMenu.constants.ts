@@ -1421,6 +1421,10 @@ export const database: NavMenuConstant = {
               url: '/guides/database/extensions/wrappers/logflare' as `/${string}`,
             },
             {
+              name: 'MongoDB',
+              url: '/guides/database/extensions/wrappers/mongodb' as `/${string}`,
+            },
+            {
               name: 'MSSQL',
               url: '/guides/database/extensions/wrappers/mssql' as `/${string}`,
             },
@@ -2719,6 +2723,10 @@ export const platform: NavMenuConstant = {
         {
           name: 'Project Pausing',
           url: '/guides/platform/free-project-pausing' as `/${string}`,
+        },
+        {
+          name: 'Delete Project',
+          url: '/guides/platform/delete-project',
         },
         {
           name: 'Single Sign-On',

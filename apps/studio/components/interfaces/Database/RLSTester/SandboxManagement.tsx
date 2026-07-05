@@ -14,15 +14,15 @@ export const SandboxManagement = () => {
       <Admonition
         type="default"
         layout="horizontal"
-        className="min-h-min border-none [&>div>div>div>div>p]:!mb-0"
+        className="min-h-min border-none [&>div>div>div>div>p]:!mb-0 [&>div>div]:gap-x-2"
         actions={[
-          <Button key="set-up" variant="default" onClick={() => startSandbox()}>
+          <Button key="sandbox" variant="default" onClick={() => startSandbox()}>
             Set up sandbox
           </Button>,
         ]}
       >
         <div className="flex items-center gap-x-2">
-          <p className="text-foreground !m-0">Set up sandbox for testing</p>
+          <p className="text-foreground !m-0">Run queries in a sandbox</p>
           <Badge variant="success">Recommended</Badge>
         </div>
         <p className="text-foreground-light !m-0">

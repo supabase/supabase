@@ -126,7 +126,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
         {(hasComputeChanges || anyBillableDiskChange) && (
           <>
             <div className="relative flex border-b">
-              <div className="flex-1 flex flex-col items-center gap-2 py-6 px-4 border-r bg-linear-to-t from-[hsl(var(--background-surface-100))] to-transparent">
+              <div className="flex-1 flex flex-col items-center gap-2 py-6 px-4 border-r bg-linear-to-t from-[var(--background-surface-100)] to-transparent">
                 <span className="text-xs uppercase tracking-widest font-mono text-foreground-lighter">
                   Before
                 </span>
@@ -144,7 +144,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 <ArrowRight size={16} className="text-brand-600 relative z-10" strokeWidth={2.5} />
               </div>
 
-              <div className="flex-1 flex flex-col items-center gap-2 py-6 px-4 bg-linear-to-t from-[hsl(var(--background-surface-100))] to-transparent">
+              <div className="flex-1 flex flex-col items-center gap-2 py-6 px-4 bg-linear-to-t from-[var(--background-surface-100)] to-transparent">
                 <span className="text-xs uppercase tracking-widest font-mono text-foreground-lighter">
                   After
                 </span>

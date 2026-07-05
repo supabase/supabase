@@ -3,10 +3,6 @@
 export * from './src/components/Button'
 export * from './src/components/Icon/IconBackground'
 
-// DISPLAYS
-
-export * from './src/components/Tabs'
-
 // NAV
 
 export * from './src/components/Menu'
