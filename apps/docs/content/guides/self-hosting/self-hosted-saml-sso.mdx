@@ -23,7 +23,7 @@ You need:
 - Open SSL installed (for key generation)
 - Your IdP's SAML metadata URL or metadata XML
 - The `SERVICE_ROLE_KEY` from your `.env` file (needed for admin API calls)
-- `API_EXTERNAL_URL` set to the publicly-accessible URL of your Supabase Auth service (e.g., `https://<your-domain>`). This URL is used as the SAML Service Provider entity ID and for constructing the ACS endpoint URL
+- `API_EXTERNAL_URL` set to the publicly-accessible URL of your Supabase Auth service (e.g., `https://<your-domain>/auth/v1`). This URL is used as the SAML Service Provider entity ID and for constructing the ACS endpoint URL
 
 ## How SAML SSO works in Supabase
 
@@ -91,7 +91,7 @@ SAML_PRIVATE_KEY=<your-base64-encoded-private-key>
 
 # Optional: override the SAML entity ID / ACS base URL
 # Defaults to API_EXTERNAL_URL if not set
-# SAML_EXTERNAL_URL=https://supabase.example.com:8000
+# SAML_EXTERNAL_URL=https://supabase.example.com:8000/auth/v1
 
 # Optional: rate limit on the ACS endpoint (requests per second, default: 15)
 # SAML_RATE_LIMIT_ASSERTION=15
@@ -137,7 +137,7 @@ Once SAML is enabled, your Supabase instance exposes service provider (SP) metad
 Verify it using `curl`:
 
 ```sh
-curl http://<your-domain>/sso/saml/metadata
+curl http://<your-domain>/auth/v1/sso/saml/metadata
 ```
 
 This returns an XML document containing your SP entity ID, ACS endpoint URL, and signing certificate. You will need to provide this to your IdP.
@@ -560,8 +560,8 @@ base64 -w 0 -i pk_rsa1.der
 
 ### IdP cannot reach the ACS endpoint
 
-- Verify `API_EXTERNAL_URL` is set to a URL the IdP can reach (not `localhost` unless testing locally)
-- Check that the API gateway routes for `/sso/saml/acs` and `/sso/saml/metadata` are configured as open (no `key-auth` plugin).
+- Verify `API_EXTERNAL_URL` is set to a URL containing `/auth/v1` the IdP can reach (not set to `localhost` unless testing locally)
+- Check that the API gateway routes for `/auth/v1/sso/saml/acs` and `/auth/v1/sso/saml/metadata` are configured as open (no `key-auth` plugin).
 - Check the Auth container logs: `docker compose logs auth`
 
 ### "No SSO provider found for this domain"
