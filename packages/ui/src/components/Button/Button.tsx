@@ -50,11 +50,11 @@ const buttonVariants = cva(
           data-[state=open]:border-button-hover
           `,
         secondary: `
-          bg-foreground
-          text-background hover:text-border-stronger
-          focus-visible:text-border-control
+          bg-foreground hover:bg-foreground/90
+          text-background
           border-foreground-light hover:border-foreground-lighter
           focus-visible:outline-border-strong
+          data-[state=open]:bg-foreground/90
           data-[state=open]:border-foreground-lighter
           data-[state=open]:outline-border-strong
         `,
