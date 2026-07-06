@@ -92,12 +92,29 @@ function mdRawLoader(): Plugin {
 function umdAmdShortCircuit(): Plugin {
   // Matches both unminified (`typeof define === 'function' && define.amd`)
   // and minified (`"function" == typeof define && define.amd`) forms of
-  // the UMD AMD-detection check. Replaces the whole expression with
-  // `false` so dead-code elimination drops the AMD branch.
+  // the UMD AMD-detection check.
   const AMD_CHECK_PATTERNS = [
     /typeof\s+define\s*===?\s*['"]function['"]\s*&&\s*define\.amd/g,
     /['"]function['"]\s*===?\s*typeof\s+define\s*&&\s*define\.amd/g,
   ]
+
+  // Only short-circuit when `define` is the *global* AMD loader (Monaco's
+  // CDN loader) — that's the one we never want UMD wrappers to register
+  // against. Some vendored bundles install their own *local* `define` shim
+  // and rely on the AMD branch to capture their exports:
+  // `monaco-editor/esm/vs/base/common/marked/marked.js` (pulled in by
+  // @graphiql/react's bundled Monaco) wraps marked's UMD in
+  // `function define(deps, factory) { factory(__marked_exports) }` and its
+  // ESM tail reads `__marked_exports.X || exports.X`. Replacing the check
+  // with a bare `false` diverts the factory to the global-object branch,
+  // leaving `__marked_exports` empty, and the tail's `exports.X` fallback
+  // then throws `ReferenceError: exports is not defined` — the GraphiQL
+  // editor pane never mounts. The `define !== globalThis.define` guard
+  // keeps such local AMD shims working while still disarming the global
+  // one. (The operand order — guard *before* `define.amd` — also ensures
+  // the emitted expression can never re-match AMD_CHECK_PATTERNS.)
+  const AMD_CHECK_REPLACEMENT =
+    '(typeof define === "function" && define !== globalThis.define && define.amd)'
 
   return {
     name: 'studio-umd-amd-short-circuit',
@@ -109,7 +126,7 @@ function umdAmdShortCircuit(): Plugin {
       if (id.includes('monaco-editor/min/vs/loader')) return
       let next = code
       for (const pattern of AMD_CHECK_PATTERNS) {
-        next = next.replace(pattern, 'false')
+        next = next.replace(pattern, AMD_CHECK_REPLACEMENT)
       }
       if (next === code) return
       return { code: next, map: null }
@@ -328,19 +345,16 @@ export default defineConfig(({ command, mode }) => {
   //   - `global` → `globalThis`: makes Node-style libs (`randombytes` via
   //     `generate-password-browser`, etc.) work in the browser. Surfaces
   //     on /auth/hooks via `randombytes/browser.js:16`.
-  //   - `define.amd` → `false`: short-circuits the AMD branch in UMD
-  //     wrappers (papaparse, others). Monaco's CDN loader installs an
-  //     AMD-style `window.define` at runtime; without this substitution,
-  //     UMD libs evaluate after Monaco has loaded and call an anonymous
-  //     `define([], t)` that Monaco's queue rejects with "Can only have
-  //     one anonymous define call per script file". Surfaces concretely
-  //     on /functions/[slug] (papaparse pulled in by invocations).
-  //     Monaco's loader.js itself runs from a CDN script tag (not in our
-  //     bundle / not pre-bundled), so its own `define.amd = true` write
-  //     isn't affected by the substitution.
+  //
+  // NOTE: `define.amd` is deliberately NOT substituted here. The AMD
+  // short-circuit is handled exclusively by the `umdAmdShortCircuit()`
+  // transform above — a blanket `'define.amd': 'false'` define would also
+  // rewrite the *read* in vendored bundles that install their own local
+  // `define` shim (monaco-editor's `esm/vs/base/common/marked/marked.js`)
+  // and break them the same way an unguarded transform did — see the
+  // plugin's comment.
   const sharedDefines = {
     global: 'globalThis',
-    'define.amd': 'false',
   }
 
   return {
