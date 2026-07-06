@@ -18,6 +18,7 @@ import {
   SheetFooter,
   SheetSection,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -134,6 +135,8 @@ export const DestinationForm = ({
   const catalogToken = serviceKey?.api_key ?? ''
 
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
+  const sourceRegion = projectSettings?.region
+  const isCrossRegion = !!sourceRegion && sourceRegion !== PIPELINE_REGION.code
 
   const {
     isValidating,
@@ -339,10 +342,19 @@ export const DestinationForm = ({
                   label="Region"
                   labelOptional="This pipeline runs from a fixed region"
                   description={
-                    <span className="block text-sm text-foreground-light mb-1">
-                      For best replication performance, choose a destination located in or close to
-                      this region.
-                    </span>
+                    <div className="flex flex-col gap-y-2">
+                      <span className="block text-sm text-foreground-light">
+                        For best replication performance, choose a destination located in or close
+                        to this region.
+                      </span>
+                      {isCrossRegion && (
+                        <Admonition
+                          type="warning"
+                          className="mb-0"
+                          description={`Your database is in ${sourceRegion}, a different region than this pipeline (${PIPELINE_REGION.code}). Cross-region data transfer can add noticeable latency and may slow down replication.`}
+                        />
+                      )}
+                    </div>
                   }
                 >
                   <Select disabled value={PIPELINE_REGION.code}>
