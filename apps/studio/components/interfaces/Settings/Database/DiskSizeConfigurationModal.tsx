@@ -72,9 +72,9 @@ const DiskSizeConfigurationModal = ({
   // COOLDOWN_DURATION is in seconds; convert to minutes to match the diff unit below.
   const cooldownMinutes = COOLDOWN_DURATION / 60
   const timeTillNextAvailableDatabaseResize =
-    lastDatabaseResizeAt === null
+    lastDatabaseResizeAt == null
       ? 0
-      : cooldownMinutes - dayjs().diff(lastDatabaseResizeAt, 'minutes')
+      : Math.max(0, cooldownMinutes - dayjs().diff(lastDatabaseResizeAt, 'minutes'))
   const isAbleToResizeDatabase = timeTillNextAvailableDatabaseResize <= 0
   const formattedTimeTillNextAvailableResize =
     timeTillNextAvailableDatabaseResize < 60
