@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   buildUnifiedLogsUrl,
-  gateFilterFieldsByHighAvailability,
+  gateMultigresLogType,
   getEventMessageDisplay,
   parseMultigresEventMessage,
 } from './UnifiedLogs.utils'
@@ -94,7 +94,7 @@ describe('getEventMessageDisplay', () => {
   })
 })
 
-describe('gateFilterFieldsByHighAvailability', () => {
+describe('gateMultigresLogType', () => {
   const fields = [
     { value: 'date' },
     {
@@ -106,19 +106,19 @@ describe('gateFilterFieldsByHighAvailability', () => {
     },
   ]
 
-  it('drops the multigres log_type option for non-high-availability projects', () => {
-    const gated = gateFilterFieldsByHighAvailability(fields, false)
+  it('drops the multigres log_type option when the flag is disabled', () => {
+    const gated = gateMultigresLogType(fields, false)
     const logType = gated.find((field) => field.value === 'log_type')
     expect(logType?.options?.map((option) => option.value)).toEqual(['postgres'])
   })
 
-  it('keeps the multigres option for high availability projects', () => {
-    const gated = gateFilterFieldsByHighAvailability(fields, true)
+  it('keeps the multigres option when the flag is enabled', () => {
+    const gated = gateMultigresLogType(fields, true)
     expect(gated).toBe(fields)
   })
 
   it('leaves non log_type fields untouched', () => {
-    const gated = gateFilterFieldsByHighAvailability(fields, false)
+    const gated = gateMultigresLogType(fields, false)
     expect(gated.find((field) => field.value === 'date')).toEqual({ value: 'date' })
   })
 })

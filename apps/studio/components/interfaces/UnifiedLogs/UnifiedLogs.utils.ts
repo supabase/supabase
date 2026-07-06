@@ -202,14 +202,14 @@ export function getEventMessageDisplay(
 }
 
 /**
- * Multigres logs only exist on high availability projects, so the multigres
- * log_type option is removed from the filter fields for everyone else.
+ * Multigres logs are gated behind the `showMultigresLogs` flag, so the multigres
+ * log_type option is removed from the filter fields when the flag is disabled.
  */
-export function gateFilterFieldsByHighAvailability<T extends { value: string; options?: Option[] }>(
+export function gateMultigresLogType<T extends { value: string; options?: Option[] }>(
   fields: T[],
-  isHighAvailability: boolean
+  showMultigresLogs: boolean
 ): T[] {
-  if (isHighAvailability) return fields
+  if (showMultigresLogs) return fields
 
   return fields.map((field) =>
     field.value === 'log_type' && field.options
