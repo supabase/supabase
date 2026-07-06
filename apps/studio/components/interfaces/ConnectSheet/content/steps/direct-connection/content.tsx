@@ -26,6 +26,7 @@ import {
   PASSWORD_PLACEHOLDER,
   resolveConnectionString,
 } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
+import { PasswordEncodingNote } from '@/components/interfaces/ConnectSheet/PasswordEncodingNote'
 import { ResetDbPasswordDialog } from '@/components/interfaces/Settings/Database/DatabaseSettings/ResetDbPasswordDialog'
 import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
@@ -237,6 +238,7 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
           <Badge>{poolerBadge}</Badge>
         </div>
       )}
+      {connectionString.includes(PASSWORD_PLACEHOLDER) && <PasswordEncodingNote />}
       <div className="overflow-hidden rounded-lg border bg-surface-75">
         <div data-connect-copy-value={redactedConnectionString}>
           <CodeBlock

@@ -18,6 +18,8 @@ import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Row } from 'ui-patterns/Row'
 
+import { resolveSnippetSelection } from '@/components/interfaces/ProjectHome/CustomReportSection.utils'
+import { MakeReportSnippetPublicModal } from '@/components/interfaces/ProjectHome/MakeReportSnippetPublicModal'
 import { SnippetDropdown } from '@/components/interfaces/ProjectHome/SnippetDropdown'
 import { ReportBlock } from '@/components/interfaces/Reports/ReportBlock/ReportBlock'
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
@@ -52,6 +54,9 @@ export function CustomReportSection() {
   const { data: project } = useSelectedProjectQuery()
 
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false)
+  const [snippetToMakePublic, setSnippetToMakePublic] = useState<
+    { id: string; name: string } | undefined
+  >(undefined)
 
   const { data: reportsData } = useContentInfiniteQuery(
     { projectRef: ref, type: 'report', name: 'Home', limit: 1 },
@@ -161,14 +166,17 @@ export function CustomReportSection() {
     []
   )
 
+  const isSnippetInReport = useCallback(
+    (id: string) =>
+      !!editableReport?.layout?.some(
+        (x) => String(x.id) === String(id) || String(x.attribute) === `snippet_${id}`
+      ),
+    [editableReport]
+  )
+
   const addSnippetToReport = useCallback(
     (snippet: { id: string; name: string }) => {
-      if (
-        editableReport?.layout?.some(
-          (x) =>
-            String(x.id) === String(snippet.id) || String(x.attribute) === `snippet_${snippet.id}`
-        )
-      ) {
+      if (isSnippetInReport(snippet.id)) {
         toast('This block is already in your report')
         return
       }
@@ -226,7 +234,25 @@ export function CustomReportSection() {
       findNextPlacement,
       createSnippetChartBlock,
       persistReport,
+      isSnippetInReport,
     ]
+  )
+
+  const handleSelectSnippet = useCallback(
+    (snippet: { id: string; name: string; visibility: Content['visibility'] }) => {
+      const action = resolveSnippetSelection(snippet, isSnippetInReport(snippet.id))
+      switch (action) {
+        case 'already-added':
+          toast('This block is already in your report')
+          return
+        case 'confirm-share':
+          setSnippetToMakePublic({ id: snippet.id, name: snippet.name })
+          return
+        case 'add':
+          addSnippetToReport(snippet)
+      }
+    },
+    [isSnippetInReport, addSnippetToReport]
   )
 
   const handleRemoveChart = ({ metric }: { metric: { key: string } }) => {
@@ -280,12 +306,15 @@ export function CustomReportSection() {
 
       const toastId = toast.loading(`Creating new query: ${label}`)
 
-      const payload = createSqlSnippetSkeletonV2({
-        name: label,
-        sql,
-        owner_id: profile.id,
-        project_id: project.id,
-      }) as UpsertContentPayload
+      const payload = {
+        ...createSqlSnippetSkeletonV2({
+          name: label,
+          sql,
+          owner_id: profile.id,
+          project_id: project.id,
+        }),
+        visibility: 'project',
+      } as UpsertContentPayload
 
       upsertContent({ projectRef: ref, payload })
 
@@ -349,7 +378,7 @@ export function CustomReportSection() {
           {canUpdateReport || canCreateReport ? (
             <SnippetDropdown
               projectRef={ref}
-              onSelect={addSnippetToReport}
+              onSelect={handleSelectSnippet}
               trigger={
                 <Button variant="default" icon={<Plus />}>
                   Add block
@@ -380,7 +409,7 @@ export function CustomReportSection() {
             {canUpdateReport || canCreateReport ? (
               <SnippetDropdown
                 projectRef={ref}
-                onSelect={addSnippetToReport}
+                onSelect={handleSelectSnippet}
                 trigger={
                   <Button variant="default" iconRight={<Plus size={14} />}>
                     Add your first block
@@ -437,6 +466,16 @@ export function CustomReportSection() {
           </DndContext>
         )}
       </div>
+
+      <MakeReportSnippetPublicModal
+        projectRef={ref}
+        snippet={snippetToMakePublic}
+        onCancel={() => setSnippetToMakePublic(undefined)}
+        onConfirm={(snippet) => {
+          setSnippetToMakePublic(undefined)
+          addSnippetToReport(snippet)
+        }}
+      />
     </div>
   )
 }

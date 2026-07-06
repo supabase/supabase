@@ -1,6 +1,6 @@
 import { isBrowser, useReducedMotion } from 'common'
 import Image from 'next/image'
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 
 interface Props {
@@ -8,15 +8,29 @@ interface Props {
 }
 
 const RealtimeVisual: React.FC<Props> = ({ className }) => {
-  const cardRef = useRef<HTMLDivElement | null>(null)
+  const figureRef = useRef<HTMLElement | null>(null)
   const [svgTransformSelf, setSvgTransformSelf] = useState<string>('translate(0px, 0px)')
   const [svgTransform, setSvgTransform] = useState<string>('translate(0px, 0px)')
   const [svgTransform2, setSvgTransform2] = useState<string>('translate(0px, 0px)')
   const reduceMotion = isBrowser && useReducedMotion()
 
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (cardRef.current) {
-      const cardRect = cardRef.current.getBoundingClientRect()
+  useEffect(() => {
+    if (reduceMotion) return
+
+    const figure = figureRef.current
+    if (!figure) return
+
+    // Track the pointer across the whole card (the Link ancestor), not just the
+    // figure. The card's text content sits above the figure at a higher z-index,
+    // and it is a sibling of the figure rather than a descendant, so listening on
+    // the figure alone means the animation freezes whenever the pointer is over
+    // the text or other overlapping elements. Listening on the card lets the
+    // mousemove events bubble up from any child regardless of stacking order.
+    const card = figure.closest('a') ?? figure
+
+    const handleMouseMove = (event: MouseEvent) => {
+      // Coordinates stay relative to the figure so the animation math is unchanged.
+      const cardRect = figure.getBoundingClientRect()
       const mouseX = event.clientX - cardRect.left // Mouse X relative to card
       const mouseY = event.clientY - cardRect.top // Mouse Y relative to card
       const cardWidth = cardRect.width
@@ -34,24 +48,30 @@ const RealtimeVisual: React.FC<Props> = ({ className }) => {
       )
       setSvgTransformSelf(`translate(${mouseX + 12}px, ${mouseY + 4}px)`)
     }
-  }
 
-  const handleMouseLeave = () => {
-    setSvgTransform('translate(0px, 0px)')
-    setSvgTransform2('translate(0px, 0px)')
-  }
+    const handleMouseLeave = () => {
+      setSvgTransform('translate(0px, 0px)')
+      setSvgTransform2('translate(0px, 0px)')
+    }
+
+    card.addEventListener('mousemove', handleMouseMove)
+    card.addEventListener('mouseleave', handleMouseLeave)
+
+    return () => {
+      card.removeEventListener('mousemove', handleMouseMove)
+      card.removeEventListener('mouseleave', handleMouseLeave)
+    }
+  }, [reduceMotion])
 
   return (
     <figure
-      ref={cardRef}
+      ref={figureRef}
       className={cn(
-        'absolute inset-0 xl:-bottom-2 2xl:bottom-0 z-0 w-full overflow-hidden pointer-events-auto',
+        'absolute inset-0 xl:-bottom-2 2xl:bottom-0 z-0 w-full overflow-hidden pointer-events-none',
         className
       )}
       role="img"
       aria-label="Supabase Realtime multiplayer app demo"
-      onMouseMove={reduceMotion ? undefined : handleMouseMove}
-      onMouseLeave={handleMouseLeave} // Reset on mouse leave
     >
       <Image
         src="/images/index/products/realtime-dark.svg"
@@ -71,7 +91,7 @@ const RealtimeVisual: React.FC<Props> = ({ className }) => {
       />
       {/* User 1 */}
       <div
-        className="absolute will-change-transform"
+        className="absolute will-change-transform pointer-events-none"
         style={{
           position: 'absolute',
           top: '60%',
@@ -103,7 +123,7 @@ const RealtimeVisual: React.FC<Props> = ({ className }) => {
       </div>
       {/* User 2 */}
       <div
-        className="absolute will-change-transform scale-[80%]"
+        className="absolute will-change-transform scale-[80%] pointer-events-none"
         style={{
           position: 'absolute',
           top: '80%',
@@ -135,7 +155,7 @@ const RealtimeVisual: React.FC<Props> = ({ className }) => {
       </div>
       {/* Self */}
       <div
-        className="absolute will-change-transform w-1 h-1 opacity-0 motion-safe:group-hover:opacity-100 delay-0 duration-75 group-hover:duration-300 transition-opacity"
+        className="absolute will-change-transform w-1 h-1 opacity-0 motion-safe:group-hover:opacity-100 delay-0 duration-75 group-hover:duration-300 transition-opacity pointer-events-none"
         style={{
           position: 'absolute',
           top: '0',
