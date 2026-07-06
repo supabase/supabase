@@ -494,6 +494,31 @@ Keep this plugin even after migration — it's not a Next-related shim,
 it's general protection against this entire class of bug. Just clear
 the allowlist when the underlying cycle is gone.
 
+### `@sentry/nextjs` → `@sentry/react` alias
+
+`resolve.alias` in `vite.config.ts` rewrites the bare `@sentry/nextjs`
+import to `compat/sentry-nextjs.ts`, which re-exports `@sentry/react`
+(the same-version package `@sentry/nextjs` wraps on the client) plus
+explicit stand-ins for the Next-only APIs (`captureRouterTransitionStart`,
+`captureRequestError`, `withSentryConfig`).
+
+Why: `@sentry/nextjs`'s client entry imports
+`next/dist/shared/lib/constants`, whose module scope evaluates
+`...(process?.features?.typescript ? ['next.config.mts'] : [])`.
+Optional chaining does **not** guard an undeclared `process` identifier,
+so every built client chunk containing it (table editor was the canary)
+threw `ReferenceError: process is not defined` at module load. Dev was
+unaffected (dev pipeline shims `process`), so it only surfaced in the
+production/test build.
+
+The alias also made the previous `@sentry/nextjs` SSR workarounds
+(`ssr.noExternal` entry + `ssr.optimizeDeps.include`) obsolete — the id
+is rewritten before SSR resolution, and `@sentry/react` ships real ESM.
+App source keeps importing `@sentry/nextjs` so the Next build
+(`build:next`) is untouched; drop the alias + shim together with the
+Next build when the migration is done (switch imports to
+`@sentry/react` directly).
+
 ### Other build-side migration changes
 
 - `pnpm-workspace.yaml` catalog now includes `@tanstack/react-router`,
