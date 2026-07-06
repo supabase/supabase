@@ -71,7 +71,7 @@ const RealtimeVisual: React.FC<Props> = ({ className }) => {
       />
       {/* User 1 */}
       <div
-        className="absolute will-change-transform"
+        className="absolute will-change-transform pointer-events-none"
         style={{
           position: 'absolute',
           top: '60%',
@@ -103,7 +103,7 @@ const RealtimeVisual: React.FC<Props> = ({ className }) => {
       </div>
       {/* User 2 */}
       <div
-        className="absolute will-change-transform scale-[80%]"
+        className="absolute will-change-transform scale-[80%] pointer-events-none"
         style={{
           position: 'absolute',
           top: '80%',
@@ -135,7 +135,7 @@ const RealtimeVisual: React.FC<Props> = ({ className }) => {
       </div>
       {/* Self */}
       <div
-        className="absolute will-change-transform w-1 h-1 opacity-0 motion-safe:group-hover:opacity-100 delay-0 duration-75 group-hover:duration-300 transition-opacity"
+        className="absolute will-change-transform w-1 h-1 opacity-0 motion-safe:group-hover:opacity-100 delay-0 duration-75 group-hover:duration-300 transition-opacity pointer-events-none"
         style={{
           position: 'absolute',
           top: '0',
