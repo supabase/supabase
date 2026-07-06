@@ -242,7 +242,6 @@ export const EditorTabs = () => {
                       strokeWidth={1.5}
                       className="text-foreground-lighter hover:text-foreground-light"
                     />
-                    
                   </motion.button>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">New table</TooltipContent>
