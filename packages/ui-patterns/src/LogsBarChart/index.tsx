@@ -13,7 +13,7 @@ const CHART_COLORS = {
   GREEN_2: 'hsl(var(--brand-500))',
   RED_1: 'hsl(var(--destructive-default))',
   RED_2: 'hsl(var(--destructive-500))',
-  YELLOW_1: 'hsl(var(--warning-default))',
+  YELLOW_1: 'var(--warning)',
   YELLOW_2: 'hsl(var(--warning-500))',
 }
 
