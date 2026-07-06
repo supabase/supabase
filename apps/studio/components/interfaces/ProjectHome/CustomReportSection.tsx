@@ -18,6 +18,7 @@ import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Row } from 'ui-patterns/Row'
 
+import { resolveSnippetSelection } from '@/components/interfaces/ProjectHome/CustomReportSection.utils'
 import { MakeReportSnippetPublicModal } from '@/components/interfaces/ProjectHome/MakeReportSnippetPublicModal'
 import { SnippetDropdown } from '@/components/interfaces/ProjectHome/SnippetDropdown'
 import { ReportBlock } from '@/components/interfaces/Reports/ReportBlock/ReportBlock'
@@ -239,15 +240,17 @@ export function CustomReportSection() {
 
   const handleSelectSnippet = useCallback(
     (snippet: { id: string; name: string; visibility: Content['visibility'] }) => {
-      if (isSnippetInReport(snippet.id)) {
-        toast('This block is already in your report')
-        return
+      const action = resolveSnippetSelection(snippet, isSnippetInReport(snippet.id))
+      switch (action) {
+        case 'already-added':
+          toast('This block is already in your report')
+          return
+        case 'confirm-share':
+          setSnippetToMakePublic({ id: snippet.id, name: snippet.name })
+          return
+        case 'add':
+          addSnippetToReport(snippet)
       }
-      if (snippet.visibility === 'user') {
-        setSnippetToMakePublic({ id: snippet.id, name: snippet.name })
-        return
-      }
-      addSnippetToReport(snippet)
     },
     [isSnippetInReport, addSnippetToReport]
   )

@@ -64,7 +64,7 @@ export const MakeReportSnippetPublicModal = ({
       onCancel={onCancel}
       onConfirm={onMakePublic}
       alert={{
-        title: 'This snippet will become public to all team members',
+        title: 'This snippet will become visible to all project members',
         description: 'Snippets added to the report must be shared so the team can view them',
       }}
     >
@@ -75,7 +75,7 @@ export const MakeReportSnippetPublicModal = ({
         </li>
         <li className="flex gap-3 items-center">
           <Unlock size={16} />
-          <span>Anyone will be able to duplicate it to their personal snippets.</span>
+          <span>Project members can duplicate it to their personal snippets.</span>
         </li>
       </ul>
     </ConfirmationModal>
