@@ -200,12 +200,15 @@ function buildRootHead() {
   ]
 
   const links: Array<Record<string, string>> = [
-    // Google Fonts — Source Code Pro (the local CustomFont is declared in styles/fonts.css).
+    // Google Fonts — Manrope (headings) + Source Code Pro (mono). Inter (body) is
+    // vendored via @font-face in styles/fonts.css. next/font self-hosts Manrope on
+    // the Next build; the TanStack build has no equivalent build step, so it loads
+    // over the same <link> already used for Source Code Pro.
     { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
     { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: '' },
     {
       rel: 'stylesheet',
-      href: 'https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600;700&display=swap',
+      href: 'https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&family=Source+Code+Pro:wght@400;500;600;700&display=swap',
     },
     ...APPLE_TOUCH_ICON_SIZES.map((size) => ({
       rel: 'apple-touch-icon-precomposed',

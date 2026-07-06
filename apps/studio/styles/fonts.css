@@ -1,9 +1,17 @@
 /*
  * Font setup for the Vite/TanStack Start build.
- * The Next.js build uses next/font via fonts/index.ts; keep the
- * CSS var names (--font-custom, --font-source-code-pro) in sync so
- * styles that reference them work in both pipelines.
- * Source Code Pro is loaded via a <link> in the root route's head().
+ *
+ * The Next.js build uses next/font (fonts/index.ts + the inline :root style in
+ * pages/_app.tsx). This file is the TanStack equivalent, and the CSS var names
+ * MUST match what the theme/Tailwind consume:
+ *   --font-sans            -> body (Inter)          [theme.css: --font-sans]
+ *   --font-heading         -> headings (Manrope)    [globals.css @theme inline]
+ *   --font-source-code-pro -> mono (Source Code Pro)
+ * #47306 renamed the sans var from --font-custom to --font-sans and added
+ * --font-heading (Manrope); this file wasn't updated, so on TanStack the body
+ * fell through to the theme fallback chain (Circular/system) and headings had
+ * no Manrope. Inter is vendored (below); Manrope + Source Code Pro load via the
+ * Google Fonts <link> in the root route's head().
  */
 
 @font-face {
@@ -23,6 +31,7 @@
 }
 
 :root {
-  --font-custom: 'Inter', system-ui, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-sans: 'Inter', system-ui, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-heading: 'Manrope', system-ui, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   --font-source-code-pro: 'Source Code Pro', 'Office Code Pro', Menlo, monospace;
 }
