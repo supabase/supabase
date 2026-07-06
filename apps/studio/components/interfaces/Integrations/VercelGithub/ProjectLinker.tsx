@@ -375,9 +375,9 @@ const ProjectLinker = ({
   if (variant === 'interstitial') {
     return (
       <div className="flex flex-col gap-5">
-        {loadingForeignProjects ? (
+        {loadingForeignProjects || loadingSupabaseProjects ? (
           <div className="space-y-2">
-            <p className="text-sm text-foreground-light">Loading Vercel projects</p>
+            <p className="text-sm text-foreground-light">Loading projects</p>
             <ShimmerLine active />
           </div>
         ) : showNoEntitiesState && (noSupabaseProjects || noForeignProjects) ? (
