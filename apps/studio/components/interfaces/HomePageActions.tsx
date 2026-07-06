@@ -98,6 +98,7 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
                 icon={<X />}
                 onClick={() => setSearch('')}
                 className="p-0 h-5 w-5"
+                aria-label="Clear"
               />
             ),
           ]}
@@ -140,9 +141,11 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
           >
             <ToggleGroupItem value="grid" size="sm" className="h-[26px] w-[26px] p-0">
               <Grid size={14} strokeWidth={1.5} />
+              <span className="sr-only">Toggle grid view</span>
             </ToggleGroupItem>
             <ToggleGroupItem value="table" size="sm" className="h-[26px] w-[26px] p-0">
               <List size={14} strokeWidth={1.5} />
+              <span className="sr-only">Toggle list view</span>
             </ToggleGroupItem>
           </ToggleGroup>
         )}
