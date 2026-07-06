@@ -11,6 +11,8 @@ import {
   type Ref,
 } from 'react'
 
+import { searchParamsToRecord } from '@/lib/router-search-params'
+
 // Next's Link accepts either a string `href` or a `UrlObject`
 // ({pathname, query, hash}). Workspace source does both — flatten
 // `UrlObject` into `pathname?search#hash` first so the TanStack `to`
@@ -96,9 +98,10 @@ const NEXT_PUBLIC_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 // double-prefix it (`/dashboard/dashboard/project/...`). Strip the
 // basePath when we see it, so what we hand TanStack is always
 // basepath-relative.
-function splitInternalUrl(url: string): {
+// Exported for unit tests (see link.test.tsx) — not part of the Next surface.
+export function splitInternalUrl(url: string): {
   to: string
-  search?: Record<string, string>
+  search?: Record<string, string | string[]>
   hash?: string
 } {
   // Try to detect cross-origin absolute URLs cheaply before paying for a
@@ -140,8 +143,13 @@ function splitInternalUrl(url: string): {
     pathname = pathname.slice(NEXT_PUBLIC_BASE_PATH.length) || '/'
   }
 
-  const search = Object.fromEntries(parsed.searchParams)
-  const hash = parsed.hash || undefined
+  // Repeated keys must survive as arrays (Object.fromEntries would keep only
+  // the last occurrence) — matches the router's Next-style parseSearch shape.
+  const search = searchParamsToRecord(parsed.searchParams)
+  // URL.hash includes the leading `#`; TanStack's `hash` prop expects the
+  // bare fragment and prepends its own `#` (passing it through would
+  // navigate to `##section` and break hash-scroll).
+  const hash = parsed.hash ? parsed.hash.slice(1) : undefined
   return {
     to: pathname,
     search: Object.keys(search).length > 0 ? search : undefined,
