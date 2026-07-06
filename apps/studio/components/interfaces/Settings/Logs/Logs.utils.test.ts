@@ -5,6 +5,7 @@ import type { Filters, LogData } from './Logs.types'
 import {
   buildLogsPrompt,
   checkForLimitClause,
+  ensureNoTimestampConflict,
   extractEdgeFunctionName,
   formatLogsAsCsv,
   formatLogsAsJson,
@@ -340,6 +341,14 @@ describe('Logs.utils', () => {
       expect(genChartQuery(LogsTableName.AUTH, params as any, {})).toContain(
         'timestamp_trunc(t.timestamp, minute)'
       )
+    })
+  })
+
+  describe('ensureNoTimestampConflict', () => {
+    test('does not throw for unparseable initial timestamps', () => {
+      expect(() =>
+        ensureNoTimestampConflict(['not-a-date', 'also-bad'], ['', '2024-01-01T00:00:00.000Z'])
+      ).not.toThrow()
     })
   })
 })

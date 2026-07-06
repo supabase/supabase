@@ -454,14 +454,12 @@ export const ensureNoTimestampConflict = (
   [nextStart, nextEnd]: TsPair
 ): TsPair => {
   if (initialStart && initialEnd && nextEnd && !nextStart) {
-    const resolvedDiff = dayjs(nextEnd).diff(dayjs(initialStart))
-    let start = dayjs(initialStart)
+    const end = resolveLogTimestamp(nextEnd)
+    let start = resolveLogTimestamp(initialStart)
 
-    if (resolvedDiff <= 0) {
-      // start ts is definitely before end ts
-      const currDiff = Math.abs(dayjs(initialEnd).diff(start, 'minute'))
-      // shift start ts backwards by the current ts difference
-      start = dayjs(nextEnd).subtract(currDiff, 'minute')
+    if (end.diff(start) <= 0) {
+      const currDiff = Math.abs(resolveLogTimestamp(initialEnd).diff(start, 'minute'))
+      start = end.subtract(currDiff, 'minute')
     }
     return [start.toISOString(), nextEnd]
   } else if (!nextEnd && nextStart) {
