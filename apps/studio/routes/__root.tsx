@@ -47,7 +47,6 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
-import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
 import {
   lazy,
   Suspense,
@@ -73,6 +72,9 @@ import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { AuthProvider } from '@/lib/auth'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
+// Custom adapter instead of `nuqs/adapters/tanstack-router` — the stock one
+// injects a trailing slash before the query on every nuqs write (see module).
+import { NuqsAdapter } from '@/lib/nuqs-tanstack-adapter'
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
 import { Toaster } from '@/lib/toaster'

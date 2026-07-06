@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveUrl } from './router'
+import { resolveSearchOrHashOnlyTarget, resolveUrl } from './router'
 
 describe('resolveUrl (next/router compat shim)', () => {
   it('returns string URLs untouched', () => {
@@ -56,5 +56,35 @@ describe('resolveUrl (next/router compat shim)', () => {
     expect(
       resolveUrl({ pathname: '/project/[ref]', query: { ref: 'x', drop: 'me' }, search: '?a=1' })
     ).toBe('/project/x?a=1')
+  })
+})
+
+describe('resolveSearchOrHashOnlyTarget (next/router compat shim)', () => {
+  it('prefixes the current pathname on a ?-only target', () => {
+    // The regression we fixed: `push({ query })` with no pathname produced a
+    // relative `?...` that TanStack resolved by appending — landing on
+    // `/advisors/security/?preset=...` (trailing slash injected).
+    expect(resolveSearchOrHashOnlyTarget('?preset=x', '/advisors/security')).toBe(
+      '/advisors/security?preset=x'
+    )
+  })
+
+  it('prefixes the current pathname on a #-only target', () => {
+    expect(resolveSearchOrHashOnlyTarget('#invoices', '/org/slug/billing')).toBe(
+      '/org/slug/billing#invoices'
+    )
+  })
+
+  it('strips a trailing slash from the current pathname, but keeps the root "/"', () => {
+    expect(resolveSearchOrHashOnlyTarget('?a=1', '/auth/providers/')).toBe('/auth/providers?a=1')
+    expect(resolveSearchOrHashOnlyTarget('?a=1', '/')).toBe('/?a=1')
+    expect(resolveSearchOrHashOnlyTarget('?a=1', '')).toBe('/?a=1')
+  })
+
+  it('leaves targets with a pathname untouched', () => {
+    expect(resolveSearchOrHashOnlyTarget('/project/abc?x=1', '/elsewhere')).toBe(
+      '/project/abc?x=1'
+    )
+    expect(resolveSearchOrHashOnlyTarget('/project/abc', '/elsewhere')).toBe('/project/abc')
   })
 })

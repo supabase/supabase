@@ -107,6 +107,20 @@ function interpolatePathname(
   return { pathname: interpolated, query: rest }
 }
 
+// TanStack resolves a `?`- or `#`-only relative `to` by *appending* it to the
+// current path, injecting a trailing slash: navigating to `?preset=x` from
+// `/advisors/security` lands on `/advisors/security/?preset=x`. Next resolved
+// these against the current pathname. Prefix it explicitly (trailing slash
+// stripped; root stays `/`) so `push({ query })` with no pathname stays on
+// the exact current path.
+// Exported for unit tests (see router.test.ts) — not part of the Next surface.
+export function resolveSearchOrHashOnlyTarget(to: string, currentPathname: string): string {
+  if (!to.startsWith('?') && !to.startsWith('#')) return to
+  let base = currentPathname || '/'
+  if (base.length > 1 && base.endsWith('/')) base = base.slice(0, -1)
+  return `${base}${to}`
+}
+
 // Exported for unit tests (see router.test.ts) — not part of the Next surface.
 export function resolveUrl(url: string | UrlObject): string {
   if (typeof url === 'string') return url
@@ -231,7 +245,12 @@ export function useRouter() {
       // It's intentionally not part of Next's public TransitionOptions.
       options?: TransitionOptions & { _replace?: boolean }
     ): Promise<boolean> => {
-      const to = toRelativeSameOrigin(resolveUrl(url))
+      // `location.pathname` is already basepath-stripped by TanStack, so the
+      // prefixed target stays basepath-relative like every other `to`.
+      const to = resolveSearchOrHashOnlyTarget(
+        toRelativeSameOrigin(resolveUrl(url)),
+        location.pathname
+      )
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await router.navigate({ to: to as any, replace: options?._replace })
       return true
