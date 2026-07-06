@@ -17,9 +17,9 @@ import {
   ContextMenuContent,
   ContextMenuItem,
   ContextMenuTrigger,
-  Tabs_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
+  Tabs,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
@@ -137,13 +137,13 @@ export const EditorTabs = () => {
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <Tabs_Shadcn_
+      <Tabs
         className="w-full flex"
         value={hasNewTab ? 'new' : (tabs.activeTab ?? undefined)}
         onValueChange={handleTabChange}
       >
         <CollapseButton hideTabs={false} />
-        <TabsList_Shadcn_
+        <TabsList
           ref={tabsListRef}
           className={cn(
             'rounded-b-none gap-0 min-h-(--header-height) flex items-center w-full z-1',
@@ -181,7 +181,7 @@ export const EditorTabs = () => {
 
           {/* Non-draggable new tab */}
           {hasNewTab && (
-            <TabsTrigger_Shadcn_
+            <TabsTrigger
               value="new"
               className={cn(
                 'flex items-center gap-2 px-3 text-xs',
@@ -215,7 +215,7 @@ export const EditorTabs = () => {
                 <X size={12} className="text-foreground-light" />
               </span>{' '}
               <div className="absolute w-full -bottom-px left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
-            </TabsTrigger_Shadcn_>
+            </TabsTrigger>
           )}
 
           <AnimatePresence initial={false}>
@@ -240,8 +240,8 @@ export const EditorTabs = () => {
             )}
           </AnimatePresence>
           <div className="grow h-full border-b pr-6" />
-        </TabsList_Shadcn_>
-      </Tabs_Shadcn_>
+        </TabsList>
+      </Tabs>
 
       <DragOverlay dropAnimation={null}>
         {tabs.activeTab ? <TabPreview tab={tabs.activeTab} /> : null}
