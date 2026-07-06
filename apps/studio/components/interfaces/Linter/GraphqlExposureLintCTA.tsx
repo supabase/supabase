@@ -1,9 +1,10 @@
+import { ident, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQueryClient } from '@tanstack/react-query'
 import { EyeOff, Lock } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -25,8 +26,6 @@ export const asGraphqlExposureLint = (
   !!name && (GRAPHQL_EXPOSURE_LINT_NAMES as readonly string[]).includes(name)
     ? (name as GraphqlExposureLintName)
     : null
-
-const quoteIdent = (ident: string) => `"${ident.replace(/"/g, '""')}"`
 
 interface GraphqlExposureLintCTAProps {
   lintName: GraphqlExposureLintName
@@ -68,9 +67,10 @@ export const GraphqlExposureLintCTA = ({
   const audience = AUDIENCE[lintName]
   const canAct = !!schema && !!name
 
-  const revokeSql = canAct
-    ? `revoke all on ${quoteIdent(schema)}.${quoteIdent(name)} from ${role};`
-    : ''
+  const revokeSql =
+    schema && name
+      ? safeSql`revoke all on ${ident(schema)}.${ident(name)} from ${ident(role)};`
+      : undefined
 
   const { mutate: executeSql, isPending: isRevoking } = useExecuteSqlMutation({
     onSuccess: async () => {
@@ -87,7 +87,7 @@ export const GraphqlExposureLintCTA = ({
   })
 
   const handleRevoke = () => {
-    if (!canAct) return
+    if (!revokeSql) return
     executeSql({
       projectRef,
       connectionString: project?.connectionString,
@@ -97,7 +97,7 @@ export const GraphqlExposureLintCTA = ({
 
   return (
     <>
-      <Button type="primary" disabled={!canAct} onClick={() => setShowConfirmRevoke(true)}>
+      <Button variant="primary" disabled={!canAct} onClick={() => setShowConfirmRevoke(true)}>
         {TRIGGER_LABEL[lintName]}
       </Button>
       <ConfirmationModal

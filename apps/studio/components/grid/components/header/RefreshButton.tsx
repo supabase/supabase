@@ -32,11 +32,12 @@ export const RefreshButton = ({ tableId, isRefetching }: RefreshButtonProps) => 
       side="bottom"
     >
       <Button
-        type="outline"
+        variant="outline"
         loading={isRefetching}
         icon={<RefreshCw />}
         onClick={() => onClick()}
-        className="w-7 h-7 p-0"
+        className="w-7 p-0"
+        aria-label="Refresh table data"
       />
     </Shortcut>
   )

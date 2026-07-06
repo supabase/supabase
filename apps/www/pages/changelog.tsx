@@ -2,15 +2,15 @@ import { useBreakpoint } from 'common'
 import dayjs from 'dayjs'
 import { GitCommit, ListFilter, Rss, X } from 'lucide-react'
 import type { GetServerSideProps } from 'next'
-import type { MDXRemoteSerializeResult } from 'next-mdx-remote'
-import { MDXRemote } from 'next-mdx-remote'
+import { MDXClient } from 'next-mdx-remote-client/csr'
+import type { SerializeResult as MDXRemoteSerializeResult } from 'next-mdx-remote-client/serialize'
 import { NextSeo } from 'next-seo'
 import Head from 'next/head'
 import Link from 'next/link'
 import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs'
 import { NuqsAdapter } from 'nuqs/adapters/next/pages'
 import { useEffect, useMemo, useState } from 'react'
-import { Badge, Button, cn, IconYCombinator, Input_Shadcn_ } from 'ui'
+import { Badge, Button, cn, IconYCombinator, Input } from 'ui'
 
 import { ChangelogLlmMarkdownButton } from '@/components/Changelog/ChangelogLlmMarkdownButton'
 import { ChangelogTimelineList } from '@/components/Changelog/ChangelogTimelineList'
@@ -200,7 +200,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
         }}
       />
       <DefaultLayout>
-        <div className="container mx-auto max-w-5xl flex flex-col gap-8 px-4 py-10 sm:px-16 xl:px-20">
+        <div className="container mx-auto max-w-6xl flex flex-col gap-8 px-4 py-10 sm:px-16 xl:px-24">
           <div className="pb-4">
             <h1 className="h1">Changelog</h1>
             <div className="flex flex-wrap items-center justify-between gap-2">
@@ -210,7 +210,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
               <div className="w-full lg:w-auto flex flex-wrap items-center gap-1">
                 <div className="flex-1">
                   <Button
-                    type="default"
+                    variant="default"
                     size="tiny"
                     className={cn('shrink-0', !filterPanelOpen && 'px-1.5')}
                     aria-expanded={filterPanelOpen}
@@ -233,7 +233,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                 </div>
                 <Button
                   asChild
-                  type="default"
+                  variant="default"
                   className="shrink-0"
                   icon={<Rss className="h-4 w-4" strokeWidth={2} aria-hidden />}
                 >
@@ -262,7 +262,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                   <label htmlFor="changelog-filter-search" className="sr-only">
                     Search changelog
                   </label>
-                  <Input_Shadcn_
+                  <Input
                     id="changelog-filter-search"
                     size="small"
                     placeholder="Search changelog..."
@@ -274,7 +274,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                   />
                   {(filterSearch.trim().length > 0 || selectedTags.size > 0) && (
                     <Button
-                      type="outline"
+                      variant="outline"
                       size="tiny"
                       className="absolute inset-1 my-auto left-auto shrink-0"
                       onClick={clearFilters}
@@ -313,7 +313,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                   <p className="text-foreground-lighter text-sm">No entries match your filters.</p>
                   {!filterPanelOpen && (
                     <Button
-                      type="text"
+                      variant="text"
                       size="tiny"
                       className="shrink-0"
                       icon={<X className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
@@ -331,7 +331,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                     </p>
                     {!filterPanelOpen && (
                       <Button
-                        type="text"
+                        variant="text"
                         size="tiny"
                         className="shrink-0"
                         icon={<X className="h-4 w-4" strokeWidth={1.5} aria-hidden />}
@@ -393,7 +393,11 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
                     </div>
                     <div className="col-span-8 lg:max-w-[calc(100vw-80px)]">
                       <article className="prose prose-docs max-w-none wrap-break-word [&>*:first-child:not(style):not(script)]:mt-0 [&>style:first-child+*]:mt-0 [&>script:first-child+*]:mt-0 [&>*:last-child:not(style):not(script)]:mb-0">
-                        <MDXRemote {...entry.source} components={mdxComponents('blog')} />
+                        {'error' in entry.source ? (
+                          <p>Error rendering changelog: {entry.source.error.message}</p>
+                        ) : (
+                          <MDXClient {...entry.source} components={mdxComponents('blog')} />
+                        )}
                       </article>
                     </div>
                   </div>

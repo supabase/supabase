@@ -10,26 +10,26 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_ as Input,
-  Label_Shadcn_ as Label,
+  Input,
+  Label,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  Select_Shadcn_ as Select,
-  SelectContent_Shadcn_ as SelectContent,
-  SelectItem_Shadcn_ as SelectItem,
-  SelectTrigger_Shadcn_ as SelectTrigger,
-  SelectValue_Shadcn_ as SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Sheet,
   SheetContent,
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
-  TextArea_Shadcn_ as Textarea,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Textarea,
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -38,21 +38,23 @@ import * as z from 'zod'
 import { HTTP_METHODS } from './EdgeFunctionDetails.constants'
 import { ErrorWithStatus, ResponseData } from './EdgeFunctionDetails.types'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useSessionAccessTokenQuery } from '@/data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useEdgeFunctionTestMutation } from '@/data/edge-functions/edge-function-test-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 import { prettifyJSON } from '@/lib/helpers'
 import { getRoleImpersonationJWT } from '@/lib/role-impersonation'
+import { useTrack } from '@/lib/telemetry/track'
 import {
   RoleImpersonationStateContextProvider,
   useGetImpersonatedRoleState,
 } from '@/state/role-impersonation-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface EdgeFunctionTesterSheetProps {
   visible: boolean
@@ -81,8 +83,18 @@ const FormSchema = z.object({
 
 type FormValues = z.infer<typeof FormSchema>
 
-export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
-  const { data: org } = useSelectedOrganizationQuery()
+export const EdgeFunctionTesterSheet = (props: EdgeFunctionTesterSheetProps) => {
+  const { ref: projectRef } = useParams()
+
+  // [Alaister]: We're using a fresh context here as edge functions don't allow impersonating users.
+  return (
+    <RoleImpersonationStateContextProvider key={`role-impersonation-state-${projectRef}`}>
+      <EdgeFunctionTesterSheetContent {...props} />
+    </RoleImpersonationStateContextProvider>
+  )
+}
+
+const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
   const { ref: projectRef, functionSlug } = useParams()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
@@ -90,13 +102,13 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
   const [error, setError] = useState<string | null>(null)
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
+  const { data: apiKeysData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const { serviceKey } = apiKeysData ?? {}
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
-  const { serviceKey } = getKeys(apiKeys)
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { mutate: testEdgeFunction, isPending } = useEdgeFunctionTestMutation({
     onSuccess: (res) => setResponse(res),
     onError: (err) => {
@@ -160,6 +172,14 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
       removeQueryParam(index)
     }
   }
+
+  useShortcut(
+    SHORTCUT_IDS.FUNCTION_DETAIL_SUBMIT_TEST,
+    () => {
+      form.handleSubmit(onSubmit)()
+    },
+    { enabled: visible && !isPending }
+  )
 
   const onSubmit = async (values: FormValues) => {
     setError(null)
@@ -229,7 +249,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
       <div className="flex items-center justify-between">
         <Label className="text-foreground text-sm">{label}</Label>
         <Button
-          type="default"
+          variant="default"
           size="tiny"
           icon={<Plus size={14} />}
           onClick={() => addKeyValuePair(type)}
@@ -273,7 +293,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
             <div className="flex items-center justify-center">
               {(type === 'headers' ? headerFields : queryParamFields).length > 1 && (
                 <Button
-                  type="text"
+                  variant="text"
                   size="tiny"
                   icon={<X strokeWidth={1.5} size={14} />}
                   className="w-6 h-6"
@@ -446,35 +466,23 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
 
             <SheetFooter className="px-5 py-3 border-t">
               <div className="flex items-center gap-2">
-                {/* [Alaister]: We're using a fresh context here as edge functions don't allow impersonating users. */}
-                <RoleImpersonationStateContextProvider
-                  key={`role-impersonation-state-${projectRef}`}
-                >
-                  <RoleImpersonationPopover
-                    disallowAuthenticatedOption
-                    header="Run edge function as a role"
-                  />
-                </RoleImpersonationStateContextProvider>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={isPending}
-                  disabled={isPending}
-                  onClick={() =>
-                    sendEvent({
-                      action: 'edge_function_test_send_button_clicked',
-                      properties: {
-                        httpMethod: method,
-                      },
-                      groups: {
-                        project: projectRef ?? 'Unknown',
-                        organization: org?.slug ?? 'Unknown',
-                      },
-                    })
-                  }
-                >
-                  Send Request
-                </Button>
+                <RoleImpersonationPopover
+                  disallowAuthenticatedOption
+                  header="Run edge function as a role"
+                />
+                <ShortcutTooltip shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_SUBMIT_TEST} side="top">
+                  <Button
+                    variant="primary"
+                    type="submit"
+                    loading={isPending}
+                    disabled={isPending}
+                    onClick={() =>
+                      track('edge_function_test_send_button_clicked', { httpMethod: method })
+                    }
+                  >
+                    Send Request
+                  </Button>
+                </ShortcutTooltip>
               </div>
             </SheetFooter>
           </form>

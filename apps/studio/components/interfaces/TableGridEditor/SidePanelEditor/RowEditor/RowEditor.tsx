@@ -1,7 +1,7 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
+import type { PGTable } from '@supabase/pg-meta'
 import { isEmpty, noop, partition } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
-import { Label_Shadcn_, SidePanel, Switch } from 'ui'
+import { Label, SidePanel, Switch } from 'ui'
 
 import { ActionBar } from '../ActionBar'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
@@ -18,6 +18,7 @@ import {
   validateFields,
 } from './RowEditor.utils'
 import { TextEditor } from './TextEditor'
+import { getStableRowIdentifiers } from '@/components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -25,7 +26,7 @@ import type { Dictionary } from '@/types'
 
 export interface RowEditorProps {
   row?: Dictionary<any>
-  selectedTable: PostgresTable
+  selectedTable: PGTable
   visible: boolean
   editable?: boolean
   closePanel: () => void
@@ -133,7 +134,7 @@ export const RowEditor = ({
       updateEditorDirty()
 
       const payload = isNewRecord
-        ? generateRowObjectFromFields({ fields: rowFields })
+        ? generateRowObjectFromFields({ fields: rowFields, useDefaultForEmptyValues: true })
         : generateUpdateRowPayload(row, rowFields)
 
       const configuration = { identifiers: {}, rowIdx: -1 }
@@ -144,7 +145,7 @@ export const RowEditor = ({
           identifiers[column.name] =
             column.format === 'bytea' ? convertByteaToHex(row![column.name]) : row![column.name]
         })
-        configuration.identifiers = identifiers
+        configuration.identifiers = getStableRowIdentifiers(row!, identifiers)
         configuration.rowIdx = row!.idx
       }
 
@@ -199,7 +200,7 @@ export const RowEditor = ({
                 checked={createMore}
                 onCheckedChange={(checked) => setCreateMore(checked)}
               />
-              <Label_Shadcn_ htmlFor="create-more">Create more</Label_Shadcn_>
+              <Label htmlFor="create-more">Create more</Label>
             </div>
           )}
         </ActionBar>

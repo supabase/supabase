@@ -6,8 +6,7 @@ import * as z from 'zod'
 
 import { DashboardToggle } from './DashboardToggle'
 import { useIsInlineEditorSetting, useIsQueueOperationsSetting } from './useDashboardSettings'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 const DashboardSettingsSchema = z.object({
   inlineEditorEnabled: z.boolean(),
@@ -18,9 +17,7 @@ export const DashboardSettingsToggles = () => {
   const { inlineEditorEnabled, setInlineEditorEnabled } = useIsInlineEditorSetting()
   const { isQueueOperationsEnabled, setIsQueueOperationsEnabled } = useIsQueueOperationsSetting()
 
-  const { data: org } = useSelectedOrganizationQuery()
-
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const form = useForm<z.infer<typeof DashboardSettingsSchema>>({
     resolver: zodResolver(DashboardSettingsSchema),
@@ -34,11 +31,7 @@ export const DashboardSettingsToggles = () => {
     setInlineEditorEnabled(value)
     form.setValue('inlineEditorEnabled', value)
 
-    sendEvent({
-      action: 'inline_editor_setting_clicked',
-      properties: { enabled: value },
-      groups: { organization: org?.slug },
-    })
+    track('inline_editor_setting_clicked', { enabled: value })
 
     toast(
       `${value ? 'Editing entities will now be via the SQL Editor' : 'Editing entities will now be via a guided UI panel'}`
@@ -49,11 +42,7 @@ export const DashboardSettingsToggles = () => {
     setIsQueueOperationsEnabled(value)
     form.setValue('queueOperationsEnabled', value)
 
-    sendEvent({
-      action: 'queue_operations_setting_clicked',
-      properties: { enabled: value },
-      groups: { organization: org?.slug },
-    })
+    track('queue_operations_setting_clicked', { enabled: value })
 
     toast(
       `${value ? 'Table edits in the Table Editor will now be queued' : 'Table edits in the Table Editor will now be saved immediately'}`

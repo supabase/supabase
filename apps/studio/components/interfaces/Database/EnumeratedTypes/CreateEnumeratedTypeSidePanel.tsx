@@ -19,9 +19,9 @@ import { useEffect, useRef } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
   Form,
@@ -31,7 +31,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
+  Input,
   SidePanel,
 } from 'ui'
 import * as z from 'zod'
@@ -153,7 +153,7 @@ const CreateEnumeratedTypeSidePanel = ({
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input_Shadcn_ {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -166,7 +166,7 @@ const CreateEnumeratedTypeSidePanel = ({
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Input_Shadcn_ {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormDescription>Optional</FormDescription>
                 </FormItem>
@@ -183,19 +183,17 @@ const CreateEnumeratedTypeSidePanel = ({
               >
                 Values
               </span>
-              <Alert_Shadcn_>
+              <Alert>
                 <AlertCircle strokeWidth={1.5} />
-                <AlertTitle_Shadcn_>
-                  After creation, values cannot be deleted or sorted
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
+                <AlertTitle>After creation, values cannot be deleted or sorted</AlertTitle>
+                <AlertDescription>
                   <p className="leading-normal! track">
                     You will need to delete and recreate the enumerated type with the updated values
                     instead.
                   </p>
                   <Button
                     asChild
-                    type="default"
+                    variant="default"
                     icon={<ExternalLink strokeWidth={1.5} />}
                     className="mt-2"
                   >
@@ -207,8 +205,8 @@ const CreateEnumeratedTypeSidePanel = ({
                       Learn more
                     </Link>
                   </Button>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
               <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
@@ -231,14 +229,14 @@ const CreateEnumeratedTypeSidePanel = ({
             </div>
 
             <Button
-              type="default"
+              variant="default"
               icon={<Plus strokeWidth={1.5} />}
               onClick={() => append({ value: '' })}
             >
               Add value
             </Button>
 
-            <Button ref={submitRef} htmlType="submit" type="default" className="hidden">
+            <Button ref={submitRef} type="submit" variant="default" className="hidden">
               Update
             </Button>
           </form>

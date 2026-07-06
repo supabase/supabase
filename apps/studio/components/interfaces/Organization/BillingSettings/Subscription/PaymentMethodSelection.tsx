@@ -14,14 +14,7 @@ import {
   useState,
 } from 'react'
 import { toast } from 'sonner'
-import {
-  Checkbox,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
-} from 'ui'
+import { Checkbox, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -305,7 +298,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
             className="gap-[2px]"
             size="tiny"
           >
-            <Select_Shadcn_
+            <Select
               value={selectedPaymentMethod}
               onValueChange={(value) => {
                 if (value === 'new') {
@@ -315,14 +308,14 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
                 onSelectPaymentMethod(value)
               }}
             >
-              <SelectTrigger_Shadcn_ id="payment-method">
-                <SelectValue_Shadcn_ className="flex gap-2" />
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
+              <SelectTrigger id="payment-method">
+                <SelectValue className="flex gap-2" />
+              </SelectTrigger>
+              <SelectContent>
                 {paymentMethods?.data.map((method) => {
                   const label = `•••• •••• •••• ${method.card?.last4}`
                   return (
-                    <SelectItem_Shadcn_ key={method.id} value={method.id}>
+                    <SelectItem key={method.id} value={method.id}>
                       <div className="flex gap-2">
                         <img
                           alt="Credit Card Brand"
@@ -333,19 +326,19 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
                         />
                         {label}
                       </div>
-                    </SelectItem_Shadcn_>
+                    </SelectItem>
                   )
                 })}
-                <SelectItem_Shadcn_ value="new">
+                <SelectItem value="new">
                   <div className="flex gap-2">
                     <Plus size={16} />
                     <p className="transition text-foreground-light group-hover:text-foreground">
                       Add new payment method
                     </p>
                   </div>
-                </SelectItem_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </FormItemLayout>
         ) : null}
 

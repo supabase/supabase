@@ -3,7 +3,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useMemo } from 'react'
-import { cn, TabsTrigger_Shadcn_ } from 'ui'
+import { cn, TabsTrigger } from 'ui'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
@@ -50,7 +50,7 @@ export const SortableTab = ({
   }, [openTabs, currentSchema, editor])
 
   // Create a motion version of TabsTrigger while preserving all functionality
-  // const MotionTabsTrigger = motion(TabsTrigger_Shadcn_)
+  // const MotionTabsTrigger = motion(TabsTrigger)
 
   return (
     <motion.div
@@ -62,7 +62,7 @@ export const SortableTab = ({
       animate={{ opacity: isDragging ? 0 : 1 }}
       className={cn('flex items-center h-(--header-height) first-of-type:border-l')}
     >
-      <TabsTrigger_Shadcn_
+      <TabsTrigger
         value={tab.id}
         onAuxClick={(e) => {
           // Middle click closes tab
@@ -121,7 +121,7 @@ export const SortableTab = ({
           <X size={12} className="text-foreground-light" />
         </span>
         <div className="absolute w-full top-0 left-0 right-0 h-px bg-foreground opacity-0 group-data-[state=active]:opacity-100" />
-      </TabsTrigger_Shadcn_>
+      </TabsTrigger>
       {index < openTabs.length && (
         <div role="separator" className="h-full w-px bg-border" key={`separator-${tab.id}`} />
       )}

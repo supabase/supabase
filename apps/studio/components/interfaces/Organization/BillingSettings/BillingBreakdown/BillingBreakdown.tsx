@@ -9,10 +9,10 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
-import SparkBar from '@/components/ui/SparkBar'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { SparkBar } from '@/components/ui/SparkBar'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
@@ -84,9 +84,8 @@ const BillingBreakdown = () => {
               </>
             ) : (
               <>
-                Your upcoming invoice (excluding credits) will continue to update until the end of
-                your billing cycle on {billingCycleEnd.format('MMMM DD')}. For a more detailed
-                breakdown, visit the{' '}
+                Your upcoming invoice will continue to update until the end of your billing cycle on{' '}
+                {billingCycleEnd.format('MMMM DD')}. For a more detailed breakdown, visit the{' '}
                 <InlineLink href={`/org/${orgSlug}/usage`}>usage page.</InlineLink>
               </>
             )}

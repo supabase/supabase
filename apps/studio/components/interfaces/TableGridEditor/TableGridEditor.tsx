@@ -5,7 +5,8 @@ import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useCallback } from 'react'
 import { Button } from 'ui'
-import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
 import { SidePanelEditor } from './SidePanelEditor/SidePanelEditor'
@@ -129,7 +130,7 @@ export const TableGridEditor = ({
             >
               {!!tabId ? (
                 <Button
-                  type="default"
+                  variant="default"
                   className="mt-2"
                   onClick={() => {
                     tabs.handleTabClose({
@@ -145,7 +146,7 @@ export const TableGridEditor = ({
               ) : openTabs.length > 0 ? (
                 <Button
                   asChild
-                  type="default"
+                  variant="default"
                   className="mt-2"
                   onClick={() => setLastVisitedTable(undefined)}
                 >
@@ -156,7 +157,7 @@ export const TableGridEditor = ({
               ) : (
                 <Button
                   asChild
-                  type="default"
+                  variant="default"
                   className="mt-2"
                   onClick={() => setLastVisitedTable(undefined)}
                 >
@@ -178,7 +179,7 @@ export const TableGridEditor = ({
             gridProps={{ height: '100%' }}
             customHeader={
               (isViewSelected || isTableSelected) && selectedView === 'definition' ? (
-                <div className="flex items-center space-x-2">
+                <div className="px-2 flex items-center gap-x-2">
                   <p>
                     SQL Definition of <code className="text-sm">{selectedTable.name}</code>{' '}
                   </p>
@@ -193,7 +194,7 @@ export const TableGridEditor = ({
           </SupabaseGrid>
 
           <DeleteConfirmationDialogs
-            selectedTable={isTableSelected ? selectedTable : undefined}
+            selectedTable={selectedTable}
             onTableDeleted={onTableDeleted}
           />
         </TableEditorTableStateContextProvider>

@@ -5,17 +5,16 @@ import SVG from 'react-inlinesvg'
 import {
   Card,
   CardContent,
-  Label_Shadcn_,
+  Label,
   RadioGroup,
   RadioGroupLargeItem,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
   singleThemes,
-  Theme,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
@@ -58,7 +57,7 @@ export const ThemeSettings = () => {
         value={theme}
         className="grid grid-cols-2 gap-4"
       >
-        {singleThemes.map((theme: Theme) => (
+        {singleThemes.map((theme) => (
           <RadioGroupLargeItem
             className="p-3 w-full"
             key={theme.value}
@@ -86,9 +85,9 @@ export const ThemeSettings = () => {
         <Card>
           <CardContent className="grid grid-cols-12 gap-6">
             <div className="col-span-full md:col-span-4 flex flex-col gap-2">
-              <Label_Shadcn_ htmlFor="theme" className="text-foreground">
+              <Label htmlFor="theme" className="text-foreground">
                 Theme mode
-              </Label_Shadcn_>
+              </Label>
               <p className="text-sm text-foreground-light">
                 Choose how Supabase looks to you. Select a single theme, or sync with your system.
               </p>
@@ -106,20 +105,20 @@ export const ThemeSettings = () => {
               layout="flex-row-reverse"
               description="Choose your preferred sidebar behavior: open, closed, or expand on hover."
             >
-              <Select_Shadcn_
+              <Select
                 value={sidebarBehaviour}
                 onValueChange={setSidebarBehaviour}
                 aria-label="Select an option"
               >
-                <SelectTrigger_Shadcn_>
-                  <SelectValue_Shadcn_ placeholder="Choose an option" />
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  <SelectItem_Shadcn_ value="open">Expanded</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="closed">Collapsed</SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="expandable">Expand on hover</SelectItem_Shadcn_>
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose an option" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="open">Expanded</SelectItem>
+                  <SelectItem value="closed">Collapsed</SelectItem>
+                  <SelectItem value="expandable">Expand on hover</SelectItem>
+                </SelectContent>
+              </Select>
             </FormItemLayout>
           </CardContent>
         </Card>

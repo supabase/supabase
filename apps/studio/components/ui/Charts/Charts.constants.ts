@@ -3,14 +3,14 @@
 
 // For ChartHandler
 export const CHART_COLORS = {
-  TICK: 'hsl(var(--background-overlay-hover))',
-  AXIS: 'hsl(var(--background-overlay-hover))',
-  GREEN_1: 'hsl(var(--brand-default))', // #3ECF8E
+  TICK: 'var(--background-overlay-hover)',
+  AXIS: 'var(--background-overlay-hover)',
+  GREEN_1: 'hsl(var(--brand-default))',
   GREEN_2: 'hsl(var(--brand-500))',
   RED_1: 'hsl(var(--destructive-default))',
   RED_2: 'hsl(var(--destructive-500))',
-  REFERENCE_LINE: 'hsl(var(--foreground-muted))',
-  REFERENCE_LINE_TEXT: 'hsl(var(--foreground-muted))',
+  REFERENCE_LINE: 'var(--foreground-muted)',
+  REFERENCE_LINE_TEXT: 'var(--foreground-muted)',
 }
 
 const LIGHT_STACKED_CHART_COLORS = [
@@ -66,7 +66,6 @@ export const updateStackedChartColors = (isDarkMode: boolean) => {
   STACKED_CHART_FILLS = isDarkMode ? DARK_STACKED_CHART_FILLS : LIGHT_STACKED_CHART_FILLS
 }
 
-// refer to packages/ui/radix-colors.js for full list of colors
 export type ValidStackColor =
   | 'brand'
   | 'blue'
@@ -81,17 +80,14 @@ export type ValidStackColor =
 
 export const genStackColorScales = (colors: ValidStackColor[]) =>
   colors.map((color) => {
-    // override default base scale for certain colors that do not have good contrast
-    const scale =
-      (
-        {
-          slate: 11,
-        } as any
-      )[color] ?? 9
+    let scale = 9
+    if (color === 'slate') {
+      scale = 11
+    }
     return {
-      lighter: `var(--colors-${color}${(scale as number) - 1})`,
-      base: `var(--colors-${color}${scale})`,
-      darker: `var(--colors-${color}${(scale as number) + 1})`,
+      lighter: `var(--color-${color}-${scale - 1}00)`,
+      base: `var(--color-${color}-${scale * 100})`,
+      darker: `var(--color-${color}-${scale + 1}00)`,
     }
   })
 

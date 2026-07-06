@@ -103,6 +103,12 @@ async function findStalePRs(): Promise<StalePR[]> {
         continue
       }
 
+      // Skip closed PRs
+      if (pr.state === 'closed') {
+        console.error(`PR #${pr.number} is closed, skipping...`)
+        continue
+      }
+
       const createdAt = new Date(pr.created_at)
 
       if (createdAt > TWENTY_FOUR_HOURS_AGO) {

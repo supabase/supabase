@@ -1,16 +1,16 @@
 ---
 id: 'manual-replication-setup'
-title: 'Manual Replication Setup'
+title: 'Set up manual replication'
 description: 'Configure your own replication using external tools and Postgres logical replication.'
 subtitle: 'Set up replication with Airbyte, Estuary, Fivetran, and other tools.'
 sidebar_label: 'Setting up'
 ---
 
-This guide covers setting up **manual logical replication** using external tools. If you prefer a simpler, managed solution, read [the Replication setup docs](/docs/guides/database/replication/replication-setup) instead.
+This guide covers setting up **manual logical replication** using your own tools. If you prefer a managed solution, read [Set up Pipelines](/docs/guides/database/replication/pipelines) instead.
 
 <Admonition type="note">
 
-This guide is for replicating data to external systems using your own tools. For deploying read-only databases across multiple regions, see [Read Replicas](/docs/guides/platform/read-replicas) instead.
+This guide is for replicating data to destination systems using your own tools. For deploying read-only databases across multiple regions, see [read replicas](/docs/guides/platform/read-replicas) instead.
 
 </Admonition>
 
@@ -21,7 +21,7 @@ To set up replication, the following is recommended:
 - Instance size of XL or greater
 - [IPv4 add-on](/docs/guides/platform/ipv4-address) enabled
 
-To create a replication slot, you will need to use the `postgres` user and follow the instructions in the [external replication setup guide](/docs/guides/database/postgres/setup-replication-external).
+To create a replication slot, you will need to use the `postgres` user and follow the instructions in the [logical replication example](/docs/guides/database/postgres/setup-replication-external).
 
 <Admonition type="note">
 
@@ -29,7 +29,7 @@ If you are running Postgres 17 or higher, you can create a new user and grant th
 
 </Admonition>
 
-If you are replicating to an external system and using any of the tools below, check their documentation first. Additional information is provided where the setup with Supabase can vary.
+If you are replicating to a destination system and using any of the tools below, check their documentation first. Additional information is provided where the setup with Supabase can vary.
 
 <Tabs
   scrollable
@@ -77,7 +77,7 @@ Materialize has the following [documentation](https://materialize.com/docs/sql/c
 
 You can follow those steps with the following modifications:
 
-1. Follow the steps in the [external replication setup guide](/docs/guides/database/postgres/setup-replication-external) to create a publication slot
+1. Follow the steps in the [logical replication example](/docs/guides/database/postgres/setup-replication-external) to create a publication slot
 
 </TabPanel>
 

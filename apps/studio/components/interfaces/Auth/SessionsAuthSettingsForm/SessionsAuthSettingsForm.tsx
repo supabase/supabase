@@ -18,7 +18,6 @@ import {
   InputGroupText,
   Switch,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -27,10 +26,11 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
-import AlertError from '@/components/ui/AlertError'
-import NoPermission from '@/components/ui/NoPermission'
+import { AlertError } from '@/components/ui/AlertError'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
@@ -259,13 +259,13 @@ export const SessionsAuthSettingsForm = () => {
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
                   {refreshTokenForm.formState.isDirty && (
-                    <Button type="default" onClick={() => refreshTokenForm.reset()}>
+                    <Button variant="default" onClick={() => refreshTokenForm.reset()}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={
                       !canUpdateConfig ||
                       isUpdatingRefreshTokens ||
@@ -389,13 +389,13 @@ export const SessionsAuthSettingsForm = () => {
 
                 <CardFooter className="justify-end space-x-2">
                   {userSessionsForm.formState.isDirty && (
-                    <Button type="default" onClick={() => userSessionsForm.reset()}>
+                    <Button variant="default" onClick={() => userSessionsForm.reset()}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type={promptProPlanUpgrade ? 'default' : 'primary'}
-                    htmlType="submit"
+                    variant={promptProPlanUpgrade ? 'default' : 'primary'}
+                    type="submit"
                     disabled={
                       !canUpdateConfig ||
                       isUpdatingUserSessions ||

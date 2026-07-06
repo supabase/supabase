@@ -1,6 +1,7 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
 import { Content, ContentType } from './content-query'
+import { remapSqlContentFields } from './content-remap'
 import { contentKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { UseCustomInfiniteQueryOptions } from '@/types'
@@ -40,7 +41,7 @@ export async function getContent(
 
   return {
     cursor: data.cursor,
-    content: data.data as unknown as Content[],
+    content: remapSqlContentFields(data.data as unknown as Content[]),
   }
 }
 

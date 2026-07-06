@@ -112,9 +112,14 @@ export function useAttachmentUpload() {
 
     if (uploadedFiles.length === 0) return
 
-    const filenames = await uploadAttachments({ userId: profile.gotrue_id, files: uploadedFiles })
-    const urls = await generateAttachmentURLs({ bucket: 'support-attachments', filenames })
-    return urls
+    try {
+      const filenames = await uploadAttachments({ userId: profile.gotrue_id, files: uploadedFiles })
+      const urls = await generateAttachmentURLs({ bucket: 'support-attachments', filenames })
+      return urls
+    } catch {
+      // Ignore attachments upload errors, images are additional context and support can ask for more if needed
+      return
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profile, uploadedFiles])
 
@@ -133,7 +138,7 @@ export function useAttachmentUpload() {
 }
 
 interface AttachmentUploadDisplayProps {
-  uploadButtonRef: RefObject<HTMLInputElement>
+  uploadButtonRef: RefObject<HTMLInputElement | null>
   isFull: boolean
   uploadedDataUrls: string[]
   addFile: () => void

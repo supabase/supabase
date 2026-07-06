@@ -3,8 +3,7 @@ import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
 import { Markdown } from '../Markdown'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface ResourceContentProps {
   selectedLanguage: 'js' | 'bash'
@@ -19,21 +18,10 @@ interface ResourceContentProps {
 
 const ResourceContent = ({ selectedLanguage, snippet, codeSnippets }: ResourceContentProps) => {
   const { ref: projectRef } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const handleCopy = (title: string) => {
-    sendEvent({
-      action: 'api_docs_code_copy_button_clicked',
-      properties: {
-        title,
-        selectedLanguage,
-      },
-      groups: {
-        project: projectRef ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+    track('api_docs_code_copy_button_clicked', { title, selectedLanguage })
   }
 
   return (

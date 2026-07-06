@@ -8,7 +8,7 @@ import {
 } from '@/components/interfaces/Organization/AuditLogs/AuditLogs.utils'
 import {
   TIMESTAMP_MICROS_PER_MS,
-  type V2AuditLog,
+  type AuditLog,
 } from '@/data/organizations/organization-audit-logs-query'
 
 // Timestamps are in microseconds (e.g. 1777471903844000 = April 2026)
@@ -16,7 +16,7 @@ const TS_A = 1777471903844000
 const TS_B = 1777471903845000
 const TS_C = 1777471903846000
 
-function makeLog(overrides: Partial<V2AuditLog> = {}): V2AuditLog {
+function makeLog(overrides: Partial<AuditLog> = {}): AuditLog {
   return {
     timestamp: TS_A,
     request_id: 'req-1',

@@ -70,9 +70,22 @@ export function buildPropertyItems(params: {
   inputValue: string
   supportsOperators?: boolean
   actions?: FilterBarAction[]
+  freeformDefaultProperty?: FilterProperty
 }): MenuItem[] {
-  const { filterProperties, inputValue, supportsOperators, actions } = params
+  const { filterProperties, inputValue, supportsOperators, actions, freeformDefaultProperty } =
+    params
   const items: MenuItem[] = []
+
+  const trimmedInput = inputValue.trim()
+  if (freeformDefaultProperty && trimmedInput.length > 0) {
+    items.push({
+      value: '__freeform_search__',
+      label: `Search ${freeformDefaultProperty.label.toLowerCase()}: "${trimmedInput}"`,
+      isFreeformSearch: true,
+      freeformPropertyName: freeformDefaultProperty.name,
+      freeformValue: trimmedInput,
+    })
+  }
 
   items.push(
     ...filterProperties
@@ -81,10 +94,9 @@ export function buildPropertyItems(params: {
   )
 
   if (supportsOperators) {
-    items.push({ value: 'group', label: 'New Group' })
+    items.push({ value: '__new_group__', label: 'New Group' })
   }
 
-  const trimmedInput = inputValue.trim()
   if (actions && trimmedInput.length > 0) {
     actions.forEach((action) => {
       items.push({
@@ -144,7 +156,14 @@ export function buildValueItems(
   } else if (loadingOptions[property.name]) {
     items.push({ value: 'loading', label: 'Loading options...' })
   } else if (Array.isArray(property.options)) {
-    items.push(...getArrayOptionItems(property.options, inputValue, hasTypedSinceFocus))
+    items.push(
+      ...getArrayOptionItems({
+        options: property.options,
+        inputValue,
+        hasTypedSinceFocus,
+        showCount: activeCondition?.operator === '=',
+      })
+    )
   } else if (propertyOptionsCache[property.name]) {
     items.push(...getCachedOptionItems(propertyOptionsCache[property.name].options))
   }
@@ -152,11 +171,17 @@ export function buildValueItems(
   return items
 }
 
-function getArrayOptionItems(
-  options: any[],
-  inputValue: string,
+function getArrayOptionItems({
+  options,
+  inputValue,
+  hasTypedSinceFocus,
+  showCount,
+}: {
+  options: any[]
+  inputValue: string
   hasTypedSinceFocus: boolean
-): MenuItem[] {
+  showCount?: boolean
+}): MenuItem[] {
   const items: MenuItem[] = []
   const normalizedInput = inputValue.toLowerCase()
 
@@ -170,7 +195,11 @@ function getArrayOptionItems(
       }
     } else if (isFilterOptionObject(option)) {
       if (!shouldFilter || option.label.toLowerCase().includes(normalizedInput)) {
-        items.push({ value: option.value, label: option.label })
+        items.push({
+          value: option.value,
+          label: option.label,
+          count: showCount ? option.count : undefined,
+        })
       }
     } else if (isCustomOptionObject(option)) {
       if (!shouldFilter || (option.label?.toLowerCase().includes(normalizedInput) ?? true)) {

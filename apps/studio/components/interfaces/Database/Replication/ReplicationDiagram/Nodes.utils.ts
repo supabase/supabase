@@ -1,4 +1,4 @@
-export type ReplicationDestinationType = 'BigQuery' | 'Analytics Bucket' | 'DuckLake'
+export type ReplicationDestinationType = 'BigQuery' | 'Analytics Bucket' | 'DuckLake' | 'Snowflake'
 
 export const getReplicationDestinationType = (
   config?: Record<string, unknown>
@@ -7,5 +7,6 @@ export const getReplicationDestinationType = (
   if ('big_query' in config) return 'BigQuery'
   if ('iceberg' in config) return 'Analytics Bucket'
   if ('ducklake' in config) return 'DuckLake'
+  if ('snowflake' in config) return 'Snowflake'
   return undefined
 }

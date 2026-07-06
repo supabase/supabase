@@ -1,13 +1,7 @@
 import { useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Button,
-  WarningIcon,
-} from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, WarningIcon } from 'ui'
 import {
   PageSection,
   PageSectionContent,
@@ -20,7 +14,7 @@ import {
 import { getPhoneProviderValidationSchema, PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import type { Provider } from './AuthProvidersForm.types'
 import { ProviderForm } from './ProviderForm'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ResourceList } from '@/components/ui/Resource/ResourceList'
 import { HorizontalShimmerWithIcon } from '@/components/ui/Shimmers'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
@@ -54,27 +48,24 @@ export const AuthProvidersForm = () => {
         ) : (
           <div className="-space-y-px">
             {authConfig?.EXTERNAL_EMAIL_ENABLED && authConfig?.MAILER_OTP_EXP > 3600 && (
-              <Alert_Shadcn_
-                className="flex w-full items-center justify-between my-3"
-                variant="warning"
-              >
+              <Alert className="flex w-full items-center justify-between my-3" variant="warning">
                 <WarningIcon />
                 <div>
-                  <AlertTitle_Shadcn_>OTP expiry exceeds recommended threshold</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
+                  <AlertTitle>OTP expiry exceeds recommended threshold</AlertTitle>
+                  <AlertDescription className="flex flex-col gap-y-3">
                     <p>
                       We have detected that you have enabled the email provider with the OTP expiry
                       set to more than an hour. It is recommended to set this value to less than an
                       hour.
                     </p>
-                    <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
+                    <Button asChild variant="default" className="w-min" icon={<ExternalLink />}>
                       <Link href="https://supabase.com/docs/guides/platform/going-into-prod#security">
                         View security recommendations
                       </Link>
                     </Button>
-                  </AlertDescription_Shadcn_>
+                  </AlertDescription>
                 </div>
-              </Alert_Shadcn_>
+              </Alert>
             )}
 
             <ResourceList>

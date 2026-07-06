@@ -1,4 +1,4 @@
-import { http, HttpResponse, HttpResponseResolver } from 'msw'
+import { DefaultBodyType, http, HttpResponse, HttpResponseResolver, PathParams } from 'msw'
 import { setupServer } from 'msw/node'
 
 import type { paths } from '../../data/api'
@@ -39,6 +39,20 @@ type SuccessResponse<P extends Endpoints, M extends Methods> = RemapPaths[P][M] 
     ? R201
     : never
 
+// Studio's standard error envelope — what `handleError` and `ResponseError` consume.
+// OpenAPI doesn't document error bodies (4xx/5xx are `content?: never`), so we
+// hardcode this convention to keep error-state tests strongly typed.
+export type APIErrorBody = { message: string }
+
+// Resolver constrained to the OpenAPI success body (or the error envelope above).
+// Catches drift between mocks and the API contract. `Extract<..., DefaultBodyType>`
+// filters to the JSON-body subset to satisfy `HttpResponseResolver`'s body constraint.
+type TypedResolver<P extends Endpoints, M extends Methods> = HttpResponseResolver<
+  PathParams,
+  DefaultBodyType,
+  Extract<SuccessResponse<P, M>, DefaultBodyType> | APIErrorBody
+>
+
 const isResponseResolver = (val: unknown): val is HttpResponseResolver => typeof val === `function`
 
 export const addAPIMock = <P extends Endpoints | `${Endpoints}?${string}`, M extends Methods>({
@@ -46,12 +60,13 @@ export const addAPIMock = <P extends Endpoints | `${Endpoints}?${string}`, M ext
   path,
   response,
 }: SuccessResponse<TrimQueryParams<P>, M> extends never
-  ? // Don't require a mocked response when the API doesn't return one
-    { method: M; path: P; response?: never }
+  ? // Endpoints with no documented JSON response body — resolver is optional, used
+    // when the test needs to assert on the request or override the status.
+    { method: M; path: P; response?: HttpResponseResolver }
   : {
       method: M
       path: P
-      response: SuccessResponse<TrimQueryParams<P>, M> | HttpResponseResolver
+      response: SuccessResponse<TrimQueryParams<P>, M> | TypedResolver<TrimQueryParams<P>, M>
     }) => {
   const fullPath = `${API_URL}${path}`
   console.log('[MSW] Adding mock:', method.toUpperCase(), fullPath)

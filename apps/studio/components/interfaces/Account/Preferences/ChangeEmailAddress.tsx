@@ -3,15 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  DialogFooter,
-  DialogSection,
-  Form,
-  FormControl,
-  FormField,
-  Input_Shadcn_,
-} from 'ui'
+import { Button, DialogFooter, DialogSection, Form, FormControl, FormField, Input } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -113,7 +105,7 @@ export const ChangeEmailAddressForm = ({ onClose }: { onClose: () => void }) => 
                 description="A confirmation email will be sent to the provided email address"
               >
                 <FormControl>
-                  <Input_Shadcn_ {...field} placeholder="example@email.com" />
+                  <Input {...field} placeholder="example@email.com" />
                 </FormControl>
               </FormItemLayout>
             )}
@@ -121,10 +113,10 @@ export const ChangeEmailAddressForm = ({ onClose }: { onClose: () => void }) => 
         </DialogSection>
 
         <DialogFooter>
-          <Button type="default" disabled={isPending} onClick={onClose}>
+          <Button variant="default" disabled={isPending} onClick={onClose}>
             Cancel
           </Button>
-          <Button htmlType="submit" loading={isPending} disabled={isPending}>
+          <Button type="submit" loading={isPending} disabled={isPending}>
             Confirm
           </Button>
         </DialogFooter>

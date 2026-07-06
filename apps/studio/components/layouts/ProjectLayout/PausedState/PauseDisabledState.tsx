@@ -10,7 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { Admonition, TimestampInfo } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -173,7 +174,7 @@ export const PauseDisabledState = () => {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="default" icon={<Download />} iconRight={<ChevronDown />}>
+            <Button variant="default" icon={<Download />} iconRight={<ChevronDown />}>
               Download backups
             </Button>
           </DropdownMenuTrigger>

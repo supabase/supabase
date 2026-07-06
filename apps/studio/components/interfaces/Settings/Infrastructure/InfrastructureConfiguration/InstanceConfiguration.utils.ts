@@ -6,7 +6,7 @@ import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'shared-data'
 import {
   AVAILABLE_REPLICA_REGIONS,
   AWS_REGIONS_COORDINATES,
-  NODE_ROW_HEIGHT,
+  NODE_HEIGHT_FALLBACKS,
   NODE_SEP,
   NODE_WIDTH,
   ReplicaNodeData,
@@ -123,15 +123,20 @@ export const generateNodes = ({
   ]
 }
 
+const getDagreNodeHeight = (node: Node) => {
+  if (node.measured?.height) return node.measured.height
+  return NODE_HEIGHT_FALLBACKS[node.type ?? ''] ?? 100
+}
+
 export const getDagreGraphLayout = (nodes: Node[], edges: Edge[]) => {
   const dagreGraph = new dagre.graphlib.Graph()
   dagreGraph.setDefaultEdgeLabel(() => ({}))
-  dagreGraph.setGraph({ rankdir: 'TB', ranksep: 160, nodesep: NODE_SEP })
+  dagreGraph.setGraph({ rankdir: 'TB', ranksep: 60, nodesep: NODE_SEP })
 
   nodes.forEach((node) => {
     dagreGraph.setNode(node.id, {
       width: NODE_WIDTH / 2,
-      height: node.id === 'load-balancer' ? -70 : NODE_ROW_HEIGHT / 2,
+      height: getDagreNodeHeight(node),
     })
   })
 

@@ -1,13 +1,12 @@
 'use client'
 
-import dayjs from 'dayjs'
 import { useState } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
 import { formatPercentage, numberFormatter } from './Charts.utils'
-import { guessLocalTimezone } from '@/lib/dayjs'
-import { formatBytes } from '@/lib/helpers'
+import { useFormatDateTime, useTimezone } from '@/lib/datetime'
+import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
 export interface ReportAttributes {
   id?: string
@@ -154,6 +153,8 @@ export const CustomTooltip = ({
   showTotal,
   isActiveHoveredChart,
 }: TooltipProps) => {
+  const formatDateTime = useFormatDateTime()
+  const { timezone } = useTimezone()
   if (active && payload && payload.length) {
     /**
      * Depending on the data source, the timestamp key could be 'timestamp' or 'period_start'
@@ -173,12 +174,14 @@ export const CustomTooltip = ({
     const isRamChart =
       !payload?.some((p: any) => p.dataKey.toLowerCase() === 'ram_usage') &&
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
+    const isSwapChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('swap_'))
+    const isMemoryChart = isRamChart || isSwapChart
     const isDBSizeChart =
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_')) ||
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('pg_database_size'))
     const isNetworkChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('network_'))
     const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
-    const shouldFormatBytes = isBytesFormat || isRamChart || isDBSizeChart || isNetworkChart
+    const shouldFormatBytes = isBytesFormat || isMemoryChart || isDBSizeChart || isNetworkChart
     const byteUnitSuffix = format === 'bytes-per-second' ? '/s' : ''
 
     const attributesToIgnore =
@@ -194,7 +197,7 @@ export const CustomTooltip = ({
       ...(maxValueAttribute?.attribute ? [maxValueAttribute.attribute] : []),
     ]
 
-    const localTimeZone = guessLocalTimezone()
+    const localTimeZone = timezone
 
     const rawPayload = payload.map((entry: any) => ({
       ...entry,
@@ -211,9 +214,22 @@ export const CustomTooltip = ({
 
     const formatNumeric = (value: number) => {
       if (!shouldFormatBytes && valuePrecision === 0 && value > 0 && value < 1) return '<1'
-      return shouldFormatBytes
-        ? formatBytes(isNetworkChart ? Math.abs(value) : value, valuePrecision)
-        : numberFormatter(value, valuePrecision)
+      if (shouldFormatBytes) {
+        const val = isNetworkChart ? Math.abs(value) : value
+        if (isMemoryChart) return formatBytesMinMB(val, valuePrecision)
+        return formatBytes(val, valuePrecision)
+      }
+      const formatted = numberFormatter(value, valuePrecision)
+      if (
+        !isBytesFormat &&
+        format !== '%' &&
+        format !== 'ms' &&
+        typeof format === 'string' &&
+        format
+      ) {
+        return `${formatted}${format}`
+      }
+      return formatted
     }
 
     const LabelItem = ({ entry }: { entry: any }) => {
@@ -256,7 +272,7 @@ export const CustomTooltip = ({
         )}
       >
         <p className="text-foreground-light text-xs">{localTimeZone}</p>
-        <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)}</p>
+        <p className="font-medium">{formatDateTime(timestamp, DateTimeFormats.FULL_SECONDS)}</p>
         <div className="grid gap-0">
           {[...payload].reverse().map((entry: any, index: number) => (
             <LabelItem key={`${entry.name}-${index}`} entry={entry} />

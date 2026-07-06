@@ -3,18 +3,18 @@ import { ChevronDown } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
-  Accordion_Shadcn_ as Accordion,
-  AccordionContent_Shadcn_ as AccordionContent,
-  AccordionItem_Shadcn_ as AccordionItem,
-  AccordionTrigger_Shadcn_ as AccordionTrigger,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
   Button,
   Checkbox,
   cn,
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_ as InputField,
-  Label_Shadcn_ as Label,
+  Input,
+  Label,
   Separator,
   Sheet,
   SheetContent,
@@ -24,7 +24,7 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
-  TextArea_Shadcn_ as Textarea,
+  Textarea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
@@ -42,8 +42,10 @@ import type {
 import { generateWebhookEndpointName } from './PlatformWebhooks.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const endpointFormSchema = z
   .object({
@@ -286,7 +288,7 @@ export const PlatformWebhooksEndpointSheet = ({
                       className="gap-1"
                     >
                       <FormControl>
-                        <InputField {...field} placeholder="winged-envelope" maxLength={64} />
+                        <Input {...field} placeholder="winged-envelope" maxLength={64} />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -298,10 +300,7 @@ export const PlatformWebhooksEndpointSheet = ({
                   render={({ field }) => (
                     <FormItemLayout label="Endpoint URL" layout="vertical" className="gap-1">
                       <FormControl>
-                        <InputField
-                          {...field}
-                          placeholder="https://api.example.com/webhooks/supabase"
-                        />
+                        <Input {...field} placeholder="https://api.example.com/webhooks/supabase" />
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -583,12 +582,18 @@ export const PlatformWebhooksEndpointSheet = ({
           </Form>
         </SheetSection>
         <SheetFooter>
-          <Button type="default" onClick={confirmOnClose}>
+          <Button variant="default" onClick={confirmOnClose}>
             Cancel
           </Button>
-          <Button form="platform-webhook-endpoint-form" htmlType="submit">
-            {mode === 'create' ? 'Create endpoint' : 'Save changes'}
-          </Button>
+          <Shortcut
+            id={SHORTCUT_IDS.ACTION_BAR_SAVE}
+            label={mode === 'create' ? 'Create endpoint' : 'Save changes'}
+            onTrigger={() => form.handleSubmit(onSubmit)()}
+          >
+            <Button form="platform-webhook-endpoint-form" type="submit">
+              {mode === 'create' ? 'Create endpoint' : 'Save changes'}
+            </Button>
+          </Shortcut>
         </SheetFooter>
       </SheetContent>
       <DiscardChangesConfirmationDialog {...discardChangesModalProps} />

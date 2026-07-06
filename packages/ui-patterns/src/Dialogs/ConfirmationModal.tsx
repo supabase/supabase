@@ -5,7 +5,7 @@
 import { Dialog as _RadixDialog } from 'radix-ui'
 import { forwardRef, MouseEventHandler, useEffect, useState } from 'react'
 import {
-  Alert_Shadcn_,
+  Alert,
   Button,
   cn,
   Dialog,
@@ -30,9 +30,9 @@ export interface ConfirmationModalProps {
   onConfirm: () => void
   onCancel: () => void
   disabled?: boolean
-  variant?: React.ComponentProps<typeof Alert_Shadcn_>['variant']
+  variant?: React.ComponentProps<typeof Alert>['variant']
   alert?: {
-    base?: React.ComponentProps<typeof Alert_Shadcn_>
+    base?: React.ComponentProps<typeof Alert>
     title?: string
     description?: string | React.ReactNode
   }
@@ -85,6 +85,9 @@ export const ConfirmationModal = forwardRef<
       if (loading_ !== undefined) setLoading(loading_)
     }, [loading_])
 
+    const { title: _alertBaseTitle, children: _alertBaseChildren, ...alertBase } = alert?.base ?? {}
+    const alertTitleProps = alert?.title ? { title: alert.title } : {}
+
     return (
       <Dialog
         open={visible}
@@ -108,10 +111,10 @@ export const ConfirmationModal = forwardRef<
           {alert && (
             <Admonition
               type={variant as 'default' | 'destructive' | 'warning'}
-              label={alert.title}
               description={alert.description}
+              {...alertTitleProps}
               className="border-x-0 rounded-none -mt-px"
-              {...alert?.base}
+              {...alertBase}
             />
           )}
           {children && (
@@ -126,7 +129,7 @@ export const ConfirmationModal = forwardRef<
             <Button
               size="medium"
               block
-              type="default"
+              variant="default"
               disabled={loading}
               onClick={() => onCancel()}
             >
@@ -136,10 +139,10 @@ export const ConfirmationModal = forwardRef<
             <Button
               block
               size="medium"
-              type={
+              variant={
                 variant === 'destructive' ? 'danger' : variant === 'warning' ? 'warning' : 'primary'
               }
-              htmlType="submit"
+              type="submit"
               loading={loading}
               disabled={loading || disabled}
               onClick={onSubmit}

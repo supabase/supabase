@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import Link from 'next/link'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_ } from 'ui'
+import { Alert, AlertDescription, AlertTitle } from 'ui'
 
 interface Props {
   awsContractEndDate: string
@@ -13,11 +13,11 @@ const AwsMarketplaceAutoRenewalWarning = ({
 }: Props) => {
   return (
     <div className="mt-5 mb-10">
-      <Alert_Shadcn_ variant="warning">
-        <AlertTitle_Shadcn_ className="text-foreground font-bold text-orange-1000">
+      <Alert variant="warning">
+        <AlertTitle className="text-foreground font-bold text-orange-1000">
           “Auto Renewal” is turned OFF for your AWS Marketplace subscription
-        </AlertTitle_Shadcn_>
-        <AlertDescription_Shadcn_ className="flex flex-col gap-3 wrap-break-word">
+        </AlertTitle>
+        <AlertDescription className="flex flex-col gap-3 wrap-break-word">
           <div>
             As a result, your Supabase organization will be downgraded to the Free Plan on{' '}
             {dayjs(awsContractEndDate).format('MMMM DD')}. If you have more than 2 projects running,
@@ -28,8 +28,8 @@ const AwsMarketplaceAutoRenewalWarning = ({
             </Link>
             .
           </div>
-        </AlertDescription_Shadcn_>
-      </Alert_Shadcn_>
+        </AlertDescription>
+      </Alert>
     </div>
   )
 }

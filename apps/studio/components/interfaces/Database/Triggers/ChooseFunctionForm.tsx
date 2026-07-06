@@ -3,18 +3,11 @@ import { map as lodashMap, uniqBy } from 'lodash'
 import { HelpCircle, Terminal } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  AccordionTrigger_Shadcn_,
-  Button,
-  SidePanel,
-} from 'ui'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button, SidePanel } from 'ui'
 
 import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import InformationBox from '@/components/ui/InformationBox'
-import SqlEditor from '@/components/ui/SqlEditor'
 import {
   useDatabaseFunctionsQuery,
   type DatabaseFunction,
@@ -85,7 +78,7 @@ const NoticeBox = () => {
         title="Only functions that return a trigger will be displayed below"
         description={`You can make functions by using the Database Functions`}
         button={
-          <Button asChild type="default">
+          <Button asChild variant="default">
             <Link href={`/project/${ref}/database/functions`}>Go to Functions</Link>
           </Button>
         }
@@ -152,8 +145,8 @@ export interface FunctionProps {
 const Function = ({ id, completeStatement, name, onClick }: FunctionProps) => {
   return (
     <div className="cursor-pointer rounded-sm p-3 px-6 hover:bg-studio" onClick={() => onClick(id)}>
-      <Accordion_Shadcn_ type="single" collapsible>
-        <AccordionItem_Shadcn_ value="definition" className="border-none">
+      <Accordion type="single" collapsible>
+        <AccordionItem value="definition" className="border-none">
           <div className="flex items-center justify-between space-x-3">
             <div className="flex items-center space-x-3">
               <div className="flex items-center justify-center rounded-sm bg-foreground p-1 text-background">
@@ -161,20 +154,25 @@ const Function = ({ id, completeStatement, name, onClick }: FunctionProps) => {
               </div>
               <p className="mb-0 text-sm">{name}</p>
             </div>
-            <AccordionTrigger_Shadcn_
+            <AccordionTrigger
               onClick={(e) => e.stopPropagation()}
               className="py-0 text-xs font-normal text-foreground-light hover:no-underline"
             >
               View definition
-            </AccordionTrigger_Shadcn_>
+            </AccordionTrigger>
           </div>
-          <AccordionContent_Shadcn_ className="[&>div]:pb-0" onClick={(e) => e.stopPropagation()}>
+          <AccordionContent className="[&>div]:pb-0" onClick={(e) => e.stopPropagation()}>
             <div className="mt-4 h-64 border border-default">
-              <SqlEditor defaultValue={completeStatement} readOnly={true} contextmenu={false} />
+              <CodeEditor
+                isReadOnly
+                language="pgsql"
+                defaultValue={completeStatement}
+                options={{ contextmenu: false }}
+              />
             </div>
-          </AccordionContent_Shadcn_>
-        </AccordionItem_Shadcn_>
-      </Accordion_Shadcn_>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </div>
   )
 }

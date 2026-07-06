@@ -129,7 +129,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
                 </div>
 
                 <div
-                  className="relative overflow-hidden transition-all duration-500 ease-in-out bg-_secondary"
+                  className="relative overflow-hidden transition-all duration-500 ease-in-out bg-[hsl(var(--secondary-default))]"
                   style={{
                     width: `${showNewSize ? newUsedPercentageWAL : usedPercentageWAL}%`,
                   }}
@@ -189,12 +189,13 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
                   </TooltipTrigger>
                   <TooltipContent side="bottom" className="w-[310px] flex flex-col gap-y-1">
                     <p>
-                      Supabase expands your disk storage automatically when the database reached 90%
-                      of the disk size. However, any disk modifications, including auto-scaling, can
-                      only take place once every 4 hours.
+                      Supabase expands your disk storage automatically when the database reaches 90%
+                      of the disk size. However, disk modifications, including auto-scaling, are
+                      limited to 4 within a rolling 24-hour window.
                     </p>
                     <p>
-                      If within those 4 hours you reach 95% of the disk space, your project{' '}
+                      If you exhaust these modifications and reach 95% of the disk space, your
+                      project{' '}
                       <span className="text-destructive-600">will enter read-only mode.</span>
                     </p>
                   </TooltipContent>
@@ -216,7 +217,7 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
           <LegendItem
             name="WAL"
             size={diskBreakdownBytes.walSizeBytes}
-            color="bg-_secondary"
+            color="bg-[hsl(var(--secondary-default))]"
             description="Total space on disk used by the write-ahead log."
           />
 

@@ -10,11 +10,11 @@ import {
   DialogTitle,
   DialogTrigger,
   Progress,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -77,7 +77,7 @@ const CronJobRunDetailsOverflowDialog = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="default">Learn more</Button>
+        <Button variant="default">Learn more</Button>
       </DialogTrigger>
       <DialogContent
         aria-describedby={undefined}
@@ -139,25 +139,25 @@ const CronJobRunDetailsOverflowDialog = ({
             ) : (
               <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                 <div className="sm:w-64">
-                  <Select_Shadcn_
+                  <Select
                     disabled={isBusy}
                     value={cleanupInterval}
                     onValueChange={setCleanupInterval}
                   >
-                    <SelectTrigger_Shadcn_ className="w-full">
-                      <SelectValue_Shadcn_ placeholder="Select an interval" />
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
+                    <SelectTrigger className="w-full">
+                      <SelectValue placeholder="Select an interval" />
+                    </SelectTrigger>
+                    <SelectContent>
                       {CLEANUP_INTERVALS.map((option) => (
-                        <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                        <SelectItem key={option.value} value={option.value}>
                           {option.label}
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       ))}
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <Button
-                  type="default"
+                  variant="default"
                   disabled={isBusy}
                   onClick={() => runBatchedDeletion(cleanupInterval)}
                 >
@@ -188,7 +188,7 @@ const CronJobRunDetailsOverflowDialog = ({
                 <Button
                   block
                   size="small"
-                  type="default"
+                  variant="default"
                   className="mt-1"
                   loading={isScheduling}
                   disabled={isScheduling}
@@ -232,7 +232,7 @@ const DeletionProgress = ({ progress, onCancel }: DeletionProgressProps) => {
         <span className="text-xs text-foreground-light">
           Deleted {totalRowsDeleted.toLocaleString()} rows so far...
         </span>
-        <Button type="outline" size="tiny" onClick={onCancel}>
+        <Button variant="outline" size="tiny" onClick={onCancel}>
           Cancel
         </Button>
       </div>
@@ -262,7 +262,7 @@ const DeletionError = ({ error, onRetry }: DeletionErrorProps) => (
       <XCircle size={16} />
       <span className="text-sm">Deletion failed: {error}</span>
     </div>
-    <Button type="default" size="small" onClick={onRetry}>
+    <Button variant="default" size="small" onClick={onRetry}>
       Retry
     </Button>
   </div>

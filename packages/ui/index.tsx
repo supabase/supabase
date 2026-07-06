@@ -3,14 +3,6 @@
 export * from './src/components/Button'
 export * from './src/components/Icon/IconBackground'
 
-// DISPLAYS
-
-export { Card as Card_legacy_ } from './src/components/Card'
-export * from './src/components/Tabs'
-export * from './src/components/Alert'
-export * from './src/components/Accordion'
-export * from './src/components/Collapsible'
-
 // NAV
 
 export * from './src/components/Menu'
@@ -18,9 +10,7 @@ export * from './src/components/NavMenu'
 
 // OVERLAYS
 
-export * from './src/components/Modal'
 export * from './src/components/SidePanel'
-export * from './src/components/Popover'
 
 // HTML
 
@@ -28,15 +18,12 @@ export { Heading } from './src/components/CustomHTMLElements'
 
 // UTILITIES
 
-export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/LogoLoader'
 export * from './src/components/AnimatedCounter'
 export * from './src/lib/utils'
 
 // DATA ENTRY
-
-export * from './src/components/Input'
 export * from './src/components/ExpandingTextArea'
 
 // layout
@@ -46,7 +33,6 @@ export * from './src/components/LoadingLine'
 export * from './src/layout/ai-icon-animation'
 
 // theme switcher
-export * from './src/components/ThemeProvider/themes'
 export * from './src/components/ThemeProvider/singleThemes'
 
 // shadcn
@@ -67,118 +53,42 @@ export * from './src/components/shadcn/ui/skeleton'
 export * from './src/components/shadcn/ui/slider'
 export * from './src/components/shadcn/ui/textarea'
 export * from './src/components/shadcn/ui/toggle-group'
-
-export { Toggle as Toggle_Shadcn_ } from './src/components/shadcn/ui/toggle'
-
+export * from './src/components/shadcn/ui/toggle'
 export * from './src/components/shadcn/ui/card'
 
-export {
-  Command as Command_Shadcn_,
-  CommandDialog as CommandDialog,
-  CommandInput as CommandInput_Shadcn_,
-  CommandList as CommandList_Shadcn_,
-  CommandEmpty as CommandEmpty_Shadcn_,
-  CommandGroup as CommandGroup_Shadcn_,
-  CommandItem as CommandItem_Shadcn_,
-  CommandShortcut as CommandShortcut_Shadcn_,
-  CommandSeparator as CommandSeparator_Shadcn_,
-} from './src/components/shadcn/ui/command'
+export * from './src/components/shadcn/ui/command'
 
-export {
-  ContextMenu as ContextMenu_Shadcn_,
-  ContextMenuTrigger as ContextMenuTrigger_Shadcn_,
-  ContextMenuContent as ContextMenuContent_Shadcn_,
-  ContextMenuItem as ContextMenuItem_Shadcn_,
-  ContextMenuSeparator as ContextMenuSeparator_Shadcn_,
-  ContextMenuLabel as ContextMenuLabel_Shadcn_,
-  ContextMenuRadioGroup as ContextMenuRadioGroup_Shadcn_,
-  ContextMenuRadioItem as ContextMenuRadioItem_Shadcn_,
-  ContextMenuShortcut as ContextMenuShortcut_Shadcn_,
-  ContextMenuSub as ContextMenuSub_Shadcn_,
-  ContextMenuSubContent as ContextMenuSubContent_Shadcn_,
-  ContextMenuSubTrigger as ContextMenuSubTrigger_Shadcn_,
-  ContextMenuCheckboxItem as ContextMenuCheckboxItem_Shadcn_,
-  ContextMenuGroup as ContextMenuGroup_Shadcn_,
-  ContextMenuPortal as ContextMenuPortal_Shadcn_,
-} from './src/components/shadcn/ui/context-menu'
+export * from './src/components/shadcn/ui/context-menu'
 
 export * from './src/components/shadcn/ui/dialog'
 
-export {
-  Alert as Alert_Shadcn_,
-  AlertTitle as AlertTitle_Shadcn_,
-  AlertDescription as AlertDescription_Shadcn_,
-} from './src/components/shadcn/ui/alert'
+export * from './src/components/shadcn/ui/alert'
 
-export * from './src/components/AlertCollapsible'
-
-export {
-  Field as Field_Shadcn_,
-  FieldContent as FieldContent_Shadcn_,
-  FieldDescription as FieldDescription_Shadcn_,
-  FieldError as FieldError_Shadcn_,
-  FieldGroup as FieldGroup_Shadcn_,
-  FieldLabel as FieldLabel_Shadcn_,
-  FieldLegend as FieldLegend_Shadcn_,
-  FieldSeparator as FieldSeparator_Shadcn_,
-  FieldSet as FieldSet_Shadcn_,
-  FieldTitle as FieldTitle_Shadcn_,
-} from './src/components/shadcn/ui/field'
+export * from './src/components/shadcn/ui/field'
 
 export * from './src/components/shadcn/ui/form'
 
-export {
-  Popover as Popover_Shadcn_,
-  PopoverTrigger as PopoverTrigger_Shadcn_,
-  PopoverContent as PopoverContent_Shadcn_,
-  PopoverAnchor as PopoverAnchor_Shadcn_,
-  PopoverSeparator as PopoverSeparator_Shadcn_,
-  type PopoverContentProps as PopoverContentProps_Shadcn_,
-} from './src/components/shadcn/ui/popover'
+export * from './src/components/shadcn/ui/popover'
 
-export {
-  Accordion as Accordion_Shadcn_,
-  AccordionItem as AccordionItem_Shadcn_,
-  AccordionTrigger as AccordionTrigger_Shadcn_,
-  AccordionContent as AccordionContent_Shadcn_,
-} from './src/components/shadcn/ui/accordion'
+export * from './src/components/shadcn/ui/accordion'
 
-export {
-  Select as Select_Shadcn_,
-  SelectContent as SelectContent_Shadcn_,
-  SelectGroup as SelectGroup_Shadcn_,
-  SelectItem as SelectItem_Shadcn_,
-  SelectLabel as SelectLabel_Shadcn_,
-  SelectSeparator as SelectSeparator_Shadcn_,
-  SelectTrigger as SelectTrigger_Shadcn_,
-  SelectValue as SelectValue_Shadcn_,
-  SelectScrollUpButton as SelectScrollUpButton_Shadcn_,
-  SelectScrollDownButton as SelectScrollDownButton_Shadcn_,
-} from './src/components/shadcn/ui/select'
+export * from './src/components/shadcn/ui/select'
 
 export * from './src/components/shadcn/ui/radio-group'
 
-export { Slider as Slider_Shadcn_ } from './src/components/shadcn/ui/slider'
+export * from './src/components/shadcn/ui/slider'
 
-export { Input as Input_Shadcn_ } from './src/components/shadcn/ui/input'
+export * from './src/components/shadcn/ui/input'
 
 export { Button as Button_Shadcn_ } from './src/components/shadcn/ui/button'
 
-export { ButtonGroup, ButtonGroupItem } from './src/components/shadcn/ui/button-group'
+export * from './src/components/shadcn/ui/button-group'
 
-export {
-  Breadcrumb as Breadcrumb_Shadcn_,
-  BreadcrumbItem as BreadcrumbItem_Shadcn_,
-  BreadcrumbLink as BreadcrumbLink_Shadcn_,
-  BreadcrumbList as BreadcrumbList_Shadcn_,
-  BreadcrumbEllipsis as BreadcrumbEllipsis_Shadcn_,
-  BreadcrumbPage as BreadcrumbPage_Shadcn_,
-  BreadcrumbSeparator as BreadcrumbSeparator_Shadcn_,
-} from './src/components/shadcn/ui/breadcrumb'
+export * from './src/components/shadcn/ui/breadcrumb'
 
-export { TextArea as TextArea_Shadcn_ } from './src/components/shadcn/ui/text-area'
+export * from './src/components/shadcn/ui/text-area'
 
-export { Label as Label_Shadcn_ } from './src/components/shadcn/ui/label'
+export * from './src/components/shadcn/ui/label'
 
 export * from './src/components/shadcn/ui/input-group'
 
@@ -195,40 +105,19 @@ export * from './src/components/shadcn/ui/aspect-ratio'
 export * from './src/components/shadcn/ui/table'
 export * from './src/components/ShadowScrollArea'
 
-export {
-  Collapsible as Collapsible_Shadcn_,
-  CollapsibleTrigger as CollapsibleTrigger_Shadcn_,
-  CollapsibleContent as CollapsibleContent_Shadcn_,
-} from './src/components/shadcn/ui/collapsible'
+export * from './src/components/shadcn/ui/collapsible'
 
-export {
-  Tabs as Tabs_Shadcn_,
-  TabsContent as TabsContent_Shadcn_,
-  TabsList as TabsList_Shadcn_,
-  TabsTrigger as TabsTrigger_Shadcn_,
-} from './src/components/shadcn/ui/tabs'
+export * from './src/components/shadcn/ui/tabs'
 
-export {
-  TooltipProvider,
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-  TooltipPortal,
-} from './src/components/shadcn/ui/tooltip'
+export * from './src/components/shadcn/ui/tooltip'
 
-export {
-  HoverCard as HoverCard_Shadcn_,
-  HoverCardTrigger as HoverCardTrigger_Shadcn_,
-  HoverCardContent as HoverCardContent_Shadcn_,
-} from './src/components/shadcn/ui/hover-card'
+export * from './src/components/shadcn/ui/hover-card'
 
 export * from './src/components/shadcn/ui/calendar'
 
-export { Toggle as Toggle_Shadcn } from './src/components/shadcn/ui/toggle'
+export * from './src/components/shadcn/ui/scroll-area'
 
-export { ScrollArea, ScrollBar, ScrollViewport } from './src/components/shadcn/ui/scroll-area'
-
-export { Separator } from './src/components/shadcn/ui/separator'
+export * from './src/components/shadcn/ui/separator'
 
 export * from './src/components/shadcn/ui/resizable'
 

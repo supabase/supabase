@@ -1,4 +1,3 @@
-import { PostgresTable } from '@supabase/postgres-meta'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useState } from 'react'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -8,7 +7,7 @@ import { TableList } from '@/components/interfaces/Database/Tables/TableList'
 import DeleteConfirmationDialogs from '@/components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { AutoEnableRLSNotice } from '@/components/ui/AutoEnableRLSNotice'
 import { Entity, isTableLike, postgresTableToEntity } from '@/data/table-editor/table-editor-types'
@@ -71,7 +70,14 @@ const DatabaseTables: NextPageWithLayout = () => {
           </TableEditorTableStateContextProvider>
         )}
 
-      <SidePanelEditor includeColumns selectedTable={selectedTableToEdit as PostgresTable} />
+      <SidePanelEditor
+        includeColumns
+        selectedTable={
+          selectedTableToEdit !== undefined && isTableLike(selectedTableToEdit)
+            ? selectedTableToEdit
+            : undefined
+        }
+      />
     </>
   )
 }

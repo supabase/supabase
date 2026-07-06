@@ -54,6 +54,17 @@ vi.mock('./MarkdownContent', () => ({
   MarkdownContent: () => null,
 }))
 
+vi.mock('../Landing/useIntegrationDetail', () => ({
+  useIntegrationDetail: () => ({
+    integration: {
+      id: 'test-integration',
+      name: 'Test Integration',
+      requiredExtensions: ['pg_net'],
+      missingExtensionsAlert: null,
+    },
+  }),
+}))
+
 describe('IntegrationOverviewTab', () => {
   beforeEach(() => {
     routerMock.setCurrentUrl('/project/default/integrations/test-integration/overview')

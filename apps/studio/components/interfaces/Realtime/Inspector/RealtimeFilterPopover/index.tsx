@@ -10,9 +10,9 @@ import {
   IconDatabaseChanges,
   IconPresence,
   Input,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Switch,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -21,26 +21,45 @@ import { RealtimeConfig } from '../useRealtimeMessages'
 import { FilterSchema } from './FilterSchema'
 import { FilterTable } from './FilterTable'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
-interface RealtimeFilterPopoverProps {
+type ControlledOpenProps =
+  | { open: boolean; onOpenChange: (open: boolean) => void }
+  | { open?: undefined; onOpenChange?: undefined }
+
+type RealtimeFilterPopoverProps = {
   config: RealtimeConfig
   onChangeConfig: Dispatch<SetStateAction<RealtimeConfig>>
-}
+} & ControlledOpenProps
 
-export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilterPopoverProps) => {
-  const [open, setOpen] = useState(false)
+export const RealtimeFilterPopover = ({
+  config,
+  onChangeConfig,
+  open: controlledOpen,
+  onOpenChange,
+}: RealtimeFilterPopoverProps) => {
+  const [internalOpen, setInternalOpen] = useState(false)
+  const isControlled = controlledOpen !== undefined
+  const open = isControlled ? controlledOpen : internalOpen
+
+  const setOpen = (v: boolean) => {
+    if (isControlled) {
+      onOpenChange?.(v)
+    } else {
+      setInternalOpen(v)
+    }
+  }
   const [applyConfigOpen, setApplyConfigOpen] = useState(false)
   const [tempConfig, setTempConfig] = useState(config)
 
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const { data: publications } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
@@ -66,28 +85,37 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
   // [Joshen] Restricting the schemas to only public as any other schema won’t work out of the box due to missing permissions
   // Consequently, SchemaSelector here will also be disabled
   const isFiltered = config.table !== '*'
+  const filterPopoverTrigger = (
+    <PopoverTrigger asChild>
+      <Button
+        icon={<PlusCircle size="16" />}
+        variant={isFiltered ? 'primary' : 'dashed'}
+        className={cn('rounded-full px-1 text-xs h-[26px]')}
+        size="small"
+      >
+        {isFiltered ? (
+          <>
+            <span className="mr-1">Filtered by </span>
+            <Badge variant="success">table: {config.table}</Badge>
+          </>
+        ) : (
+          <span className="mr-1">Filter messages</span>
+        )}
+      </Button>
+    </PopoverTrigger>
+  )
 
   return (
     <>
-      <Popover_Shadcn_ open={open} onOpenChange={onOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
-          <Button
-            icon={<PlusCircle size="16" />}
-            type={isFiltered ? 'primary' : 'dashed'}
-            className={cn('rounded-full px-1 text-xs h-[26px]')}
-            size="small"
-          >
-            {isFiltered ? (
-              <>
-                <span className="mr-1">Filtered by </span>
-                <Badge variant="success">table: {config.table}</Badge>
-              </>
-            ) : (
-              <span className="mr-1">Filter messages</span>
-            )}
-          </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="p-0 w-[365px]" align="start">
+      <Popover open={open} onOpenChange={onOpen}>
+        {!open && config.channelName.length > 0 ? (
+          <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_TOGGLE_FILTERS} side="bottom">
+            {filterPopoverTrigger}
+          </ShortcutTooltip>
+        ) : (
+          filterPopoverTrigger
+        )}
+        <PopoverContent className="p-0 w-[365px]" align="start">
           <div className="border-b border-overlay text-xs px-4 py-3 text-foreground">
             Listen to event types
           </div>
@@ -203,8 +231,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
                 <div className="flex flex-row gap-4 items-center">
                   <p className="w-[60px] flex justify-end text-sm">AND</p>
                   <Input
-                    size="tiny"
-                    className="grow"
+                    className="w-64"
                     placeholder="body=eq.hey"
                     value={tempConfig.filter}
                     onChange={(v) => setTempConfig({ ...tempConfig, filter: v.target.value })}
@@ -225,13 +252,13 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
             </>
           )}
           <div className="px-4 py-2 gap-2 flex justify-end">
-            <Button type="default" onClick={() => setOpen(false)}>
+            <Button variant="default" onClick={() => setOpen(false)}>
               Cancel
             </Button>
             <Button onClick={() => setApplyConfigOpen(true)}>Apply</Button>
           </div>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
       <ConfirmationModal
         title="Previously found messages will be lost"
         variant="destructive"
@@ -240,10 +267,7 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
         visible={applyConfigOpen}
         onCancel={() => setApplyConfigOpen(false)}
         onConfirm={() => {
-          sendEvent({
-            action: 'realtime_inspector_filters_applied',
-            groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-          })
+          track('realtime_inspector_filters_applied')
           onChangeConfig(tempConfig)
           setApplyConfigOpen(false)
           setOpen(false)

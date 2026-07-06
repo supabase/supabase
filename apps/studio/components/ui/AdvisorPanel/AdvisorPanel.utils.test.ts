@@ -71,4 +71,44 @@ describe('AdvisorPanel.utils', () => {
     const bannedIpSignal = createBannedIPSignalItem('203.0.113.10')
     expect(getAdvisorItemSecondaryText(bannedIpSignal)).toBe('Database · 203.0.113.10')
   })
+
+  describe('notification secondary text', () => {
+    const [notificationWithProject] = createAdvisorNotificationItems([
+      createNotification({
+        id: 'notification-with-project',
+        data: {
+          title: 'CPU usage is high on my-project.',
+          message: 'Project my-project has high CPU usage.',
+          project_ref: 'abcd1234',
+          actions: [],
+        },
+      }),
+    ])
+
+    const [notificationWithoutProject] = createAdvisorNotificationItems([
+      createNotification({
+        id: 'notification-without-project',
+        data: { title: 'Generic notification', message: 'Body', actions: [] },
+      }),
+    ])
+
+    it('returns the resolved project name when available in the map', () => {
+      const projectNameByRef = new Map([['abcd1234', 'my-production-db']])
+      expect(getAdvisorItemSecondaryText(notificationWithProject, projectNameByRef)).toBe(
+        'my-production-db'
+      )
+    })
+
+    it('falls back to the project ref when the name is missing from the map', () => {
+      expect(getAdvisorItemSecondaryText(notificationWithProject, new Map())).toBe('abcd1234')
+    })
+
+    it('falls back to the project ref when no map is provided', () => {
+      expect(getAdvisorItemSecondaryText(notificationWithProject)).toBe('abcd1234')
+    })
+
+    it('returns undefined for notifications without a project_ref', () => {
+      expect(getAdvisorItemSecondaryText(notificationWithoutProject)).toBeUndefined()
+    })
+  })
 })

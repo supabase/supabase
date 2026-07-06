@@ -20,6 +20,7 @@ import type {
   ConnectMode,
   ConnectSchema,
   ConnectState,
+  DeploymentMode,
   FieldOption,
   ResolvedField,
   ResolvedStep,
@@ -28,6 +29,7 @@ import { resolveFrameworkLibraryKey } from './Connect.utils'
 import { Database, useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 
 // ============================================================================
@@ -42,10 +44,12 @@ function getFieldOptionsFromSource({
   source,
   state,
   databases,
+  deploymentMode,
 }: {
   source: string
   state: ConnectState
   databases: Database[]
+  deploymentMode: DeploymentMode
 }): FieldOption[] {
   switch (source) {
     case 'frameworks':
@@ -104,12 +108,27 @@ function getFieldOptionsFromSource({
       return []
     }
 
-    case 'connectionMethods':
-      return Object.values(connectionStringMethodOptions).map((m) => ({
+    case 'connectionMethods': {
+      const all = Object.values(connectionStringMethodOptions)
+      const allowed: string[] = deploymentMode.isCli
+        ? ['direct']
+        : deploymentMode.isSelfHosted
+          ? ['session', 'transaction', 'direct']
+          : ['direct', 'transaction', 'session']
+      const filtered = allowed
+        .map((value) => all.find((m) => m.value === value))
+        .filter((m): m is (typeof all)[number] => !!m)
+      return filtered.map((m) => ({
         value: m.value,
         label: m.label,
-        description: m.description,
+        description:
+          deploymentMode.isSelfHosted && m.value === 'direct'
+            ? 'Manually configurable for self-hosted Supabase.'
+            : deploymentMode.isSelfHosted && m.value === 'session'
+              ? 'Supavisor (default pooler for self-hosted Supabase).'
+              : m.description,
       }))
+    }
 
     case 'connectionSources':
       return databases.map((db) => {
@@ -160,10 +179,12 @@ function resolveFieldOptionsWithSource({
   field,
   state,
   databases,
+  deploymentMode,
 }: {
   field: ResolvedField
   state: ConnectState
   databases: Database[]
+  deploymentMode: DeploymentMode
 }): FieldOption[] {
   // If already resolved (from conditional resolution)
   if (field.resolvedOptions.length > 0) {
@@ -173,7 +194,12 @@ function resolveFieldOptionsWithSource({
   // Check if it's a source reference
   const options = connectSchema.fields[field.id]?.options
   if (options && typeof options === 'object' && 'source' in options) {
-    return getFieldOptionsFromSource({ source: options.source as string, state, databases })
+    return getFieldOptionsFromSource({
+      source: options.source as string,
+      state,
+      databases,
+      deploymentMode,
+    })
   }
 
   return []
@@ -198,6 +224,7 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
   const { data: databases = [] } = useReadReplicasQuery({ projectRef })
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
   const isHighAvailability = useIsHighAvailability()
+  const deploymentMode = useDeploymentMode()
 
   const [state, setState] = useState<ConnectState>(() => {
     const defaults = getDefaultState({ schema: connectSchema })
@@ -300,7 +327,8 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
         }
 
         if (mode === 'direct') {
-          next.connectionMethod = next.connectionMethod ?? 'direct'
+          const defaultMethod = deploymentMode.isSelfHosted ? 'session' : 'direct'
+          next.connectionMethod = next.connectionMethod ?? defaultMethod
           next.connectionType = next.connectionType ?? 'uri'
           next.connectionSource = projectRef ?? '_'
         }
@@ -316,12 +344,14 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
         return next
       })
     },
-    [projectRef]
+    [projectRef, deploymentMode.isSelfHosted]
   )
 
   const activeFields = useMemo(() => {
     let fields = getActiveFields(connectSchema, state)
-    if (!hasDedicatedPooler) {
+    if (!hasDedicatedPooler || !deploymentMode.isPlatform) {
+      // useSharedPooler is a platform-only toggle (CLI has no pooler; self-hosted
+      // already uses Supavisor shared)
       fields = fields.filter((f) => f.id !== 'useSharedPooler')
     }
     if (isHighAvailability) {
@@ -330,7 +360,7 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
         .map((f) => (f.id === 'connectionType' ? { ...f, label: 'Connection Type' } : f))
     }
     return fields
-  }, [state, hasDedicatedPooler, isHighAvailability])
+  }, [state, hasDedicatedPooler, isHighAvailability, deploymentMode.isPlatform])
 
   const resolvedSteps = useMemo(() => resolveSteps(connectSchema, state), [state])
 
@@ -338,9 +368,9 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
     (fieldId: string): FieldOption[] => {
       const field = activeFields.find((f) => f.id === fieldId)
       if (!field) return []
-      return resolveFieldOptionsWithSource({ field, state, databases })
+      return resolveFieldOptionsWithSource({ field, state, databases, deploymentMode })
     },
-    [activeFields, state, databases]
+    [activeFields, state, databases, deploymentMode]
   )
 
   return {

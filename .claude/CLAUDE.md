@@ -6,7 +6,7 @@ pnpm 10 + Turborepo monorepo. Requires Node >= 22.
 
 | Directory         | Purpose                                                      |
 | ----------------- | ------------------------------------------------------------ |
-| `apps/studio`     | Supabase Studio/Dashboard — Next.js (pages router), React 18 |
+| `apps/studio`     | Supabase Studio/Dashboard — Next.js (pages router), React 19 |
 | `apps/docs`       | Documentation site                                           |
 | `apps/www`        | Marketing website                                            |
 | `packages/ui`     | Shared UI components (shadcn/ui based)                       |
@@ -32,6 +32,8 @@ pnpm typecheck                        # typecheck all packages
 **Styling** — Tailwind only, semantic tokens (`bg-muted`, `text-foreground-light`), no hardcoded colors.
 
 **Language** — Use U.S. English everywhere.
+
+**Studio shortcuts** — when adding or changing repeated Studio UI actions, use the shared shortcut registry and primitives in `apps/studio/state/shortcuts/` and `apps/studio/components/ui/Shortcut*.tsx`. Prefer registered, discoverable shortcuts over one-off keyboard listeners; keep `G then ...` chords for navigation.
 
 ## Studio
 

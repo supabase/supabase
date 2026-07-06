@@ -1,11 +1,11 @@
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, WarningIcon } from 'ui'
+import { Alert, AlertDescription, AlertTitle, WarningIcon } from 'ui'
 
 export const DataApiDisabledAlert = () => {
   return (
-    <Alert_Shadcn_ variant="warning">
+    <Alert variant="warning">
       <WarningIcon />
-      <AlertTitle_Shadcn_>No schemas can be queried</AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_>
+      <AlertTitle>No schemas can be queried</AlertTitle>
+      <AlertDescription>
         <p>
           With this setting disabled, you will not be able to query any schemas via the Data API.
         </p>
@@ -13,7 +13,7 @@ export const DataApiDisabledAlert = () => {
           You will see errors from the Postgrest endpoint{' '}
           <code className="text-code-inline">/rest/v1/</code>.
         </p>
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+      </AlertDescription>
+    </Alert>
   )
 }

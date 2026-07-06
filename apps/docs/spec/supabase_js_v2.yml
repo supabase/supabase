@@ -33,7 +33,7 @@ functions:
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          const supabase = createClient(supabase_url, anon_key)
+          const supabase = createClient(supabase_url, publishable_key)
           ```
       - id: create-auth-client-server-side
         name: Create auth client (server-side)
@@ -42,7 +42,7 @@ functions:
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          const supabase = createClient(supabase_url, anon_key, {
+          const supabase = createClient(supabase_url, publishable_key, {
             auth: {
               autoRefreshToken: false,
               persistSession: false,
@@ -159,8 +159,8 @@ functions:
   - id: admin-api
     title: Overview
     notes: |
-      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
-      - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the browser.
+      - Any method under the `supabase.auth.admin` namespace requires a `secret` key.
+      - These methods are considered admin methods and should be called on a trusted server. Never expose your `secret` key in the browser.
     examples:
       - id: create-auth-admin-client
         name: Create server-side auth client
@@ -169,7 +169,7 @@ functions:
           ```js
           import { createClient } from '@supabase/supabase-js'
 
-          const supabase = createClient(supabase_url, service_role_key, {
+          const supabase = createClient(supabase_url, secret_key, {
             auth: {
               autoRefreshToken: false,
               persistSession: false
@@ -213,7 +213,7 @@ functions:
     title: Custom OIDC/OAuth Provider Admin API
     notes: |
       - These methods allow you to manage custom OIDC/OAuth providers programmatically.
-      - Requires `service_role` key.
+      - Requires `secret` key.
       - Custom providers use the `custom:` prefix when signing in (e.g., `custom:my-oidc-provider`).
   - id: admin-custom-providers-create
     $ref: '@supabase/auth-js.GoTrueAdminCustomProvidersApi.createProvider'
@@ -590,7 +590,7 @@ functions:
     notes: |
       The OAuth Admin API allows you to manage OAuth clients programmatically.
       Only relevant when the OAuth 2.1 server is enabled in Supabase Auth.
-      These functions should only be called on a server. Never expose your `service_role` key in the browser.
+      These functions should only be called on a server. Never expose your `secret` key in the browser.
   - id: auth-js-gotrueadminoauthapi-createclient
     $ref: '@supabase/auth-js.GoTrueAdminOAuthApi.createClient'
   - id: auth-js-gotrueadminoauthapi-deleteclient

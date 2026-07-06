@@ -37,33 +37,39 @@ create index on embeddings using hnsw (embedding vector_ip_ops);
 
 You can deploy the [following edge function](https://github.com/supabase/supabase/blob/master/examples/ai/edge-functions/supabase/functions/generate-embedding/index.ts) as a [database webhook](/docs/guides/database/webhooks) to generate the embeddings for any text content inserted into the table:
 
-```tsx
+```ts
+import { withSupabase } from 'npm:@supabase/server@^1'
+
 const model = new Supabase.ai.Session('gte-small')
 
-Deno.serve(async (req) => {
-  const payload: WebhookPayload = await req.json()
-  const { content, id } = payload.record
+// Triggered by a Database Webhook, which authenticates with a secret key.
+// Deploy with `verify_jwt = false`.
+export default {
+  fetch: withSupabase({ auth: 'secret' }, async (req, ctx) => {
+    const payload: WebhookPayload = await req.json()
+    const { content, id } = payload.record
 
-  // Generate embedding.
-  const embedding = await model.run(content, {
-    mean_pool: true,
-    normalize: true,
-  })
+    // Generate embedding.
+    const embedding = await model.run(content, {
+      mean_pool: true,
+      normalize: true,
+    })
 
-  // Store in database.
-  const { error } = await supabase
-    .from('embeddings')
-    .update({ embedding: JSON.stringify(embedding) })
-    .eq('id', id)
-  if (error) console.warn(error.message)
+    // Store in database.
+    const { error } = await ctx.supabaseAdmin
+      .from('embeddings')
+      .update({ embedding: JSON.stringify(embedding) })
+      .eq('id', id)
+    if (error) console.warn(error.message)
 
-  return new Response('ok')
-})
+    return Response.json({ ok: true })
+  }),
+}
 ```
 
 ## Create a Database Function and RPC
 
-With the embeddings now stored in your Postgres database table, you can query them from Supabase Edge Functions by utilizing [Remote Procedure Calls (RPC)](/docs/guides/database/functions?language=js).
+With the embeddings now stored in your Postgres database table, you can query them from Supabase Edge Functions by using [Remote Procedure Calls (RPC)](/docs/guides/database/functions?language=js).
 
 Given the [following Postgres Function](https://github.com/supabase/supabase/blob/master/examples/ai/edge-functions/supabase/migrations/20240410031515_vector-search.sql):
 
@@ -98,32 +104,36 @@ $$;
 
 You can use `supabase-js` to first generate the embedding for the search term and then invoke the Postgres function to find the relevant results from your stored embeddings, right from your [Supabase Edge Function](https://github.com/supabase/supabase/blob/master/examples/ai/edge-functions/supabase/functions/search/index.ts):
 
-```tsx
+```ts
+import { withSupabase } from 'npm:@supabase/server@^1'
+
 const model = new Supabase.ai.Session('gte-small')
 
-Deno.serve(async (req) => {
-  const { search } = await req.json()
-  if (!search) return new Response('Please provide a search param!')
-  // Generate embedding for search term.
-  const embedding = await model.run(search, {
-    mean_pool: true,
-    normalize: true,
-  })
-
-  // Query embeddings.
-  const { data: result, error } = await supabase
-    .rpc('query_embeddings', {
-      embedding,
-      match_threshold: 0.8,
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
+    const { search } = await req.json()
+    if (!search) return Response.json({ error: 'Please provide a search param!' }, { status: 400 })
+    // Generate embedding for search term.
+    const embedding = await model.run(search, {
+      mean_pool: true,
+      normalize: true,
     })
-    .select('content')
-    .limit(3)
-  if (error) {
-    return Response.json(error)
-  }
 
-  return Response.json({ search, result })
-})
+    // Query embeddings.
+    const { data: result, error } = await ctx.supabase
+      .rpc('query_embeddings', {
+        embedding,
+        match_threshold: 0.8,
+      })
+      .select('content')
+      .limit(3)
+    if (error) {
+      return Response.json({ error: error.message }, { status: 500 })
+    }
+
+    return Response.json({ search, result })
+  }),
+}
 ```
 
-You now have AI powered semantic search set up without any external dependencies! Just you, pgvector, and Supabase Edge Functions!
+You now have AI powered semantic search set up without any external dependencies! All you need: you, pgvector, and Supabase Edge Functions!

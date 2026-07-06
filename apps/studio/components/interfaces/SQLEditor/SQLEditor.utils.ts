@@ -1,3 +1,4 @@
+import { untrustedSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { TABLE_EVENT_ACTIONS } from 'common/telemetry-constants'
 
 import {
@@ -8,11 +9,11 @@ import {
   updateWithoutWhereRegex,
 } from './SQLEditor.constants'
 import { ContentDiff } from './SQLEditor.types'
+import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { removeCommentsFromSql } from '@/lib/helpers'
 import { sqlEventParser } from '@/lib/sql-event-parser'
-import type { SnippetWithContent } from '@/state/sql-editor-v2'
 
 export type CreateTableWithoutRLS = {
   schema?: string
@@ -80,9 +81,9 @@ export const createSqlSnippetSkeletonV2 = ({
     content: {
       ...NEW_SQL_SNIPPET_SKELETON.content,
       content_id: id ?? '',
-      sql: sql ?? '',
+      unchecked_sql: untrustedSql(sql ?? ''),
     } as any,
-    isNotSavedInDatabaseYet: true,
+    status: 'new',
   }
 }
 
@@ -253,12 +254,10 @@ export const checkIfAppendLimitRequired = (sql: string, limit: number = 0) => {
   return { cleanedSql, appendAutoLimit }
 }
 
-export const suffixWithLimit = (sql: string, limit: number = 0) => {
+export const suffixWithLimit = (sql: SafeSqlFragment, limit: number = 0): SafeSqlFragment => {
   const { cleanedSql, appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
-  const formattedSql = appendAutoLimit
-    ? cleanedSql.endsWith(';')
-      ? sql.replace(/[;]+$/, ` limit ${limit};`)
-      : `${sql} limit ${limit};`
-    : sql
-  return formattedSql
+  if (!appendAutoLimit) return sql
+  return (
+    cleanedSql.endsWith(';') ? sql.replace(/[;]+$/, ` limit ${limit};`) : `${sql} limit ${limit};`
+  ) as SafeSqlFragment
 }

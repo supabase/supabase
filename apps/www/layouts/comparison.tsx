@@ -1,13 +1,13 @@
-import authors from 'lib/authors.json'
-import { MDXRemote } from 'next-mdx-remote'
-import { NextSeo } from 'next-seo'
-import Image from 'next/image'
-import Link from 'next/link'
-import React from 'react'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import { getAbsoluteBlogSocialImage } from '~/lib/blog-images'
 import { generateReadingTime } from '~/lib/helpers'
+import authors from 'lib/authors.json'
+import { MDXClient } from 'next-mdx-remote-client/csr'
+import { NextSeo } from 'next-seo'
+import Image from 'next/image'
+import Link from 'next/link'
+import React from 'react'
 
 interface Props {
   components: React.ReactNode
@@ -125,7 +125,7 @@ const LayoutComparison = ({ components, props }: Props) => {
           <div>
             {/* Content */}
             <div className="prose prose-docs max-w-none">
-              <MDXRemote {...content} components={components} />
+              <MDXClient {...content} components={components} />
             </div>
             <div className="py-16">
               <div className="text-foreground-lighter text-sm">Share this article</div>

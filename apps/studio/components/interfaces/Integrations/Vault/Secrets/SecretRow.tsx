@@ -55,7 +55,7 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
       <div className="flex items-center justify-end w-full" onClick={(e) => e.stopPropagation()}>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button title="Manage Secret" type="text" className="px-1" icon={<MoreVertical />} />
+            <Button title="Manage Secret" variant="text" className="px-1" icon={<MoreVertical />} />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end" className="w-40">
             <DropdownMenuItemTooltip
@@ -96,7 +96,7 @@ export const SecretRow = ({ row, col }: SecretRowProps) => {
     return (
       <div className="flex items-center gap-2 w-full" onClick={(e) => e.stopPropagation()}>
         <Button
-          type="text"
+          variant="text"
           className="px-1.5"
           icon={
             isFetching && revealedValue === undefined ? (

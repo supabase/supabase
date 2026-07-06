@@ -1,4 +1,3 @@
-import { PostgresColumn } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { noop } from 'lodash'
@@ -48,7 +47,8 @@ import {
   getUniqueIndexColumnNames,
 } from './ColumnList.utils'
 import { ConstraintToken } from './ConstraintToken'
-import AlertError from '@/components/ui/AlertError'
+import { displayColumnType } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
@@ -57,8 +57,9 @@ import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import type { SafePostgresColumn } from '@/lib/postgres-types'
 
-const getColumnTypeAffordancePresentation = (column: PostgresColumn) => {
+const getColumnTypeAffordancePresentation = (column: SafePostgresColumn) => {
   const { kind, label } = getColumnTypeAffordance(column.format)
   const iconClassName = 'text-foreground-muted'
 
@@ -98,8 +99,8 @@ const getColumnTypeAffordancePresentation = (column: PostgresColumn) => {
 
 interface ColumnListProps {
   onAddColumn: () => void
-  onEditColumn: (column: PostgresColumn) => void
-  onDeleteColumn: (column: PostgresColumn) => void
+  onEditColumn: (column: SafePostgresColumn) => void
+  onDeleteColumn: (column: SafePostgresColumn) => void
 }
 
 export const ColumnList = ({
@@ -161,6 +162,7 @@ export const ColumnList = ({
         {!isSchemaLocked && isTableEntity && (
           <ButtonTooltip
             icon={<Plus />}
+            variant="default"
             disabled={!canUpdateColumns}
             onClick={() => onAddColumn()}
             tooltip={{
@@ -322,7 +324,11 @@ export const ColumnList = ({
                               <span>{column.data_type}</span>
                               {column.format !== column.data_type && (
                                 <span className="text-xs text-foreground-light">
-                                  {column.format}
+                                  {displayColumnType(
+                                    column.format,
+                                    column.format_schema,
+                                    column.data_type === 'ARRAY'
+                                  )}
                                 </span>
                               )}
                             </div>
@@ -343,7 +349,13 @@ export const ColumnList = ({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <p className="text-foreground-lighter">{column.format}</p>
+                        <p className="text-foreground-lighter">
+                          {displayColumnType(
+                            column.format,
+                            column.format_schema,
+                            column.data_type === 'ARRAY'
+                          )}
+                        </p>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1.5">{constraintTokens}</div>
@@ -352,7 +364,7 @@ export const ColumnList = ({
                         {!isSchemaLocked && isTableEntity && (
                           <div className="flex justify-end gap-2">
                             <ButtonTooltip
-                              type="default"
+                              variant="default"
                               disabled={!canUpdateColumns}
                               onClick={() => onEditColumn(column)}
                               tooltip={{
@@ -368,7 +380,11 @@ export const ColumnList = ({
                             </ButtonTooltip>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button type="default" className="px-1" icon={<MoreVertical />} />
+                                <Button
+                                  variant="default"
+                                  className="px-1"
+                                  icon={<MoreVertical />}
+                                />
                               </DropdownMenuTrigger>
                               <DropdownMenuContent side="bottom" align="end" className="w-32">
                                 <DropdownMenuItemTooltip

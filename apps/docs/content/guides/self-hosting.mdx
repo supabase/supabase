@@ -34,23 +34,20 @@ The fastest and recommended way to self-host Supabase is to use Docker.
 There are several other options to deploy Supabase. If you're interested in helping these projects, visit our [Community](/contribute) page.
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
-  {selfHostingCommunity.map((x) => (
-    <div className="md:col-span-6 xl:col-span-3" key={x.href}>
-      <Link href={x.href} passHref>
-        <GlassPanel
-          title={
-            <span className="flex items-center gap-2">
-              {x.name}
-            </span>
-          }
-        >
-          {x.description}
-        </GlassPanel>
-      </Link>
-    </div>
-
-))}
-
+  <div className="md:col-span-6 xl:col-span-3">
+    <Link href="https://github.com/supabase-community/supabase-kubernetes" passHref>
+      <GlassPanel title={<span className="flex items-center gap-2">Kubernetes</span>}>
+        Helm charts to deploy a Supabase on Kubernetes.
+      </GlassPanel>
+    </Link>
+  </div>
+  <div className="md:col-span-6 xl:col-span-3">
+    <Link href="https://github.com/supabase-community/supabase-traefik" passHref>
+      <GlassPanel title={<span className="flex items-center gap-2">Traefik</span>}>
+        A self-hosted Supabase setup with Traefik as a reverse proxy.
+      </GlassPanel>
+    </Link>
+  </div>
 </div>
 
 ## About self-hosting

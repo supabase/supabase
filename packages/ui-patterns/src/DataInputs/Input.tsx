@@ -7,17 +7,16 @@ import React, {
   useState,
 } from 'react'
 import {
+  Input as BaseInput,
   cn,
   copyToClipboard,
-  Input_Shadcn_,
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
   InputGroupInput,
 } from 'ui'
-import styleHandler from 'ui/src/lib/theme/styleHandler'
 
-export interface Props extends Omit<ComponentProps<typeof Input_Shadcn_>, 'onCopy'> {
+export interface Props extends Omit<ComponentProps<typeof BaseInput>, 'onCopy'> {
   copy?: boolean
   showCopyOnHover?: boolean
   onCopy?: () => void
@@ -29,8 +28,8 @@ export interface Props extends Omit<ComponentProps<typeof Input_Shadcn_>, 'onCop
 }
 
 const Input = forwardRef<
-  ElementRef<typeof Input_Shadcn_>,
-  ComponentPropsWithoutRef<typeof Input_Shadcn_> & Props
+  ElementRef<typeof BaseInput>,
+  ComponentPropsWithoutRef<typeof BaseInput> & Props
 >(
   (
     {
@@ -50,8 +49,6 @@ const Input = forwardRef<
     const [copyLabel, setCopyLabel] = useState('Copy')
     const [hidden, setHidden] = useState(true)
 
-    const __styles = styleHandler('input')
-
     function _onCopy(value: any) {
       copyToClipboard(value, () => {
         /* clipboard successfully set */
@@ -67,9 +64,6 @@ const Input = forwardRef<
       setHidden(false)
     }
 
-    let inputClasses: string[] = []
-    if (size) inputClasses.push(__styles.size[size])
-
     return (
       <InputGroup className={containerClassName}>
         <InputGroupInput
@@ -80,7 +74,7 @@ const Input = forwardRef<
           onCopy={onCopy}
           type={reveal && hidden ? 'password' : props.type}
           disabled={props.disabled}
-          className={cn(...inputClasses, props.className)}
+          className={props.className}
           data-1p-ignore // 1Password
           data-lpignore="true" // LastPass
           data-form-type="other" // Dashlane
@@ -96,7 +90,7 @@ const Input = forwardRef<
             {copy && !(reveal && hidden) ? (
               <InputGroupButton
                 size="tiny"
-                type="default"
+                variant="default"
                 className={cn(showCopyOnHover && 'opacity-0 group-hover:opacity-100 transition')}
                 icon={<Copy size={16} className="text-foreground-muted" />}
                 onClick={() => _onCopy(props.value)}
@@ -105,7 +99,7 @@ const Input = forwardRef<
               </InputGroupButton>
             ) : null}
             {reveal && hidden ? (
-              <InputGroupButton size="tiny" type="default" onClick={onReveal}>
+              <InputGroupButton size="tiny" variant="default" onClick={onReveal}>
                 Reveal
               </InputGroupButton>
             ) : null}

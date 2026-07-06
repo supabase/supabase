@@ -46,7 +46,7 @@ export const SelectionDetailedRow = ({
         iconOnly
         text={value}
         className="group-hover:opacity-100 opacity-0 p-0 h-6 w-6"
-        type="text"
+        variant="text"
         title="Copy to clipboard"
       />
     </div>
@@ -106,7 +106,7 @@ export const ResponseCodeFormatter = ({ value }: { value: string }) => {
     // 4XX || 3XX responses
     case '4':
     case '3':
-      return <ResponseCodeItem className="bg-amber-300 text-amber-1100">{value}</ResponseCodeItem>
+      return <ResponseCodeItem className="bg-warning/10 text-warning">{value}</ResponseCodeItem>
 
     // All other responses
     default:
@@ -185,6 +185,7 @@ export const SeverityFormatter = ({
       )
       break
 
+    case 'WARN':
     case 'WARNING':
       return (
         <Layout className="gap-1">

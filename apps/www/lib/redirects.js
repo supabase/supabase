@@ -1,6 +1,31 @@
 module.exports = [
   {
     permanent: true,
+    source: '/blog/pricing',
+    destination: '/pricing',
+  },
+  {
+    permanent: true,
+    source: '/blog/introducing-supabase-etl',
+    destination: '/blog/introducing-supabase-pipelines',
+  },
+  {
+    permanent: true,
+    source: '/blog/supabase-etl',
+    destination: '/blog/introducing-supabase-pipelines',
+  },
+  {
+    permanent: true,
+    source: '/blog/realtime-or-etl-how-to-choose-the-right-tool',
+    destination: '/blog/realtime-or-pipelines-how-to-choose-the-right-tool',
+  },
+  {
+    permanent: true,
+    source: '/features/supabase-etl',
+    destination: '/features/supabase-pipelines',
+  },
+  {
+    permanent: true,
     source: '/ui/docs/ai-editors-rules/prompts',
     destination: '/ui/docs/ai-editors-rules/skills',
   },
@@ -1579,6 +1604,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/functions/auth#understanding-authorization-headers',
+    destination: '/docs/guides/functions/auth-headers',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/functions/auth#the-verify_jwt-platform-check',
+    destination: '/docs/guides/functions/auth-headers',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/functions/examples',
     destination: '/docs/guides/functions',
   },
@@ -1826,7 +1861,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/features',
-    destination: '/docs/guides/getting-started/features',
+    destination: '/features',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/features',
+    destination: '/features',
   },
   {
     permanent: true,
@@ -2415,6 +2455,16 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/partners/integrations/refine_dev',
+    destination: '/partners/integrations/refine',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/supabase_wrapper_stripe',
+    destination: '/partners/integrations/stripe-wrapper',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/integrations/sequin',
     destination: '/partners/integrations/sequin',
   },
@@ -2674,12 +2724,42 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/database/replication/etl-destinations',
-    destination: '/docs/guides/database/replication/replication-setup',
+    destination: '/docs/guides/database/replication/pipelines',
   },
   {
     permanent: true,
     source: '/docs/guides/storage/analytics/replication',
-    destination: '/docs/guides/database/replication/replication-setup',
+    destination: '/docs/guides/database/replication/pipelines',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/external-replication-setup',
+    destination: '/docs/guides/database/replication/pipelines',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/external-replication-monitoring',
+    destination: '/docs/guides/database/replication/pipelines-monitoring',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/external-replication-faq',
+    destination: '/docs/guides/database/replication/pipelines-faq',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/replication-setup',
+    destination: '/docs/guides/database/replication/pipelines',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/replication-monitoring',
+    destination: '/docs/guides/database/replication/pipelines-monitoring',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/replication-faq',
+    destination: '/docs/guides/database/replication/pipelines-faq',
   },
   {
     permanent: true,
@@ -3099,6 +3179,42 @@ module.exports = [
     destination: '/docs/guides/database/overview',
   },
 
+  // AI tools move
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/plugins',
+    destination: '/docs/guides/ai-tools/plugins',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-prompts',
+    destination: '/docs/guides/ai-tools/ai-prompts',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-prompts',
+    destination: '/docs/guides/ai-tools/ai-prompts',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-prompts/:slug',
+    destination: '/docs/guides/ai-tools/ai-prompts/:slug',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/ai-skills',
+    destination: '/docs/guides/ai-tools/ai-skills',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/mcp',
+    destination: '/docs/guides/ai-tools/mcp',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/getting-started/byo-mcp',
+    destination: '/docs/guides/ai-tools/byo-mcp',
+  },
   // design
   {
     permanent: true,
@@ -3126,16 +3242,6 @@ module.exports = [
     ],
     destination: '/dashboard/redeem?code=:code',
     permanent: false,
-  },
-  {
-    permanent: true,
-    source: '/docs/llms.txt',
-    destination: '/llms.txt',
-  },
-  {
-    permanent: true,
-    source: '/docs/llms-full.txt',
-    destination: '/llms-full.txt',
   },
   // Legacy product .txt URLs → new .md routes
   { permanent: true, source: '/llms/homepage.txt', destination: '/homepage.md' },

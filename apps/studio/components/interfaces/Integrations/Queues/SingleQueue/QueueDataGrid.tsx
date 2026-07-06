@@ -7,7 +7,7 @@ import { Badge, Button, cn, ResizableHandle, ResizablePanel, ResizablePanelGroup
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DATE_FORMAT, MessageDetailsPanel } from './MessageDetailsPanel'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { PostgresQueueMessage } from '@/data/database-queues/database-queue-messages-infinite-query'
 import type { ResponseError } from '@/types'
 
@@ -154,7 +154,7 @@ export const QueueMessagesDataGrid = ({
     <div className="relative h-full">
       <DataGrid
         ref={gridRef}
-        className="h-full"
+        className="h-full border-t-0! border-b-0!"
         rowHeight={44}
         headerRowHeight={36}
         columns={columns}

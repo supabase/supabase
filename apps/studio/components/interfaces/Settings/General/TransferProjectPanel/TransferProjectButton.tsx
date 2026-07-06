@@ -6,17 +6,24 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  DialogTrigger,
   InfoIcon,
   Loading,
-  Modal,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -81,10 +88,6 @@ export const TransferProjectButton = () => {
     'organizations'
   )
 
-  const toggle = () => {
-    setIsOpen(!isOpen)
-  }
-
   async function handleTransferProject() {
     if (project === undefined) return
     if (selectedOrg === undefined) return
@@ -92,48 +95,31 @@ export const TransferProjectButton = () => {
   }
 
   return (
-    <>
-      <ButtonTooltip
-        type="default"
-        onClick={toggle}
-        disabled={!canTransferProject || disableProjectTransfer}
-        tooltip={{
-          content: {
-            side: 'bottom',
-            text: !canTransferProject
-              ? 'You need additional permissions to transfer this project'
-              : disableProjectTransfer
-                ? 'Project transfers are temporarily disabled, please try again later.'
-                : undefined,
-          },
-        }}
-      >
-        Transfer project
-      </ButtonTooltip>
-
-      <Modal
-        onCancel={() => toggle()}
-        visible={isOpen}
-        loading={isTransferring}
-        size={'xlarge'}
-        header={`Transfer project ${project?.name}`}
-        customFooter={
-          <div className="flex items-center space-x-2 justify-end">
-            <Button type="default" onClick={() => setIsOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={() => handleTransferProject()}
-              disabled={
-                !transferPreviewData || !transferPreviewData.valid || isTransferring || !selectedOrg
-              }
-            >
-              Transfer Project
-            </Button>
-          </div>
-        }
-      >
-        <Modal.Content className="text-foreground-light">
+    <Dialog onOpenChange={(open) => setIsOpen(open)} open={isOpen}>
+      <DialogTrigger asChild>
+        <ButtonTooltip
+          variant="default"
+          disabled={!canTransferProject || disableProjectTransfer}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !canTransferProject
+                ? 'You need additional permissions to transfer this project'
+                : disableProjectTransfer
+                  ? 'Project transfers are temporarily disabled, please try again later.'
+                  : undefined,
+            },
+          }}
+        >
+          Transfer project
+        </ButtonTooltip>
+      </DialogTrigger>
+      <DialogContent size="xlarge">
+        <DialogHeader>
+          <DialogTitle>{`Transfer project ${project?.name}`}</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection className="text-foreground-light">
           <p className="text-sm">
             To transfer projects, the owner must be a member of both the source and target
             organizations. Consider the following before transferring your project:
@@ -185,11 +171,11 @@ export const TransferProjectButton = () => {
             className="mt-6"
             href={`${DOCS_URL}/guides/platform/project-transfer`}
           />
-        </Modal.Content>
+        </DialogSection>
 
-        <Modal.Separator />
+        <DialogSectionSeparator />
 
-        <Modal.Content>
+        <DialogSection>
           {organizations && (
             <div className="space-y-2">
               {organizations.length === 0 ? (
@@ -205,30 +191,27 @@ export const TransferProjectButton = () => {
                   className="gap-[2px]"
                   size="tiny"
                 >
-                  <Select_Shadcn_
-                    onValueChange={(slug) => setSelectedOrg(slug)}
-                    value={selectedOrg}
-                  >
-                    <SelectTrigger_Shadcn_ id="organization">
-                      <SelectValue_Shadcn_ placeholder="Select Organization" />
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
+                  <Select onValueChange={(slug) => setSelectedOrg(slug)} value={selectedOrg}>
+                    <SelectTrigger id="organization">
+                      <SelectValue placeholder="Select Organization" />
+                    </SelectTrigger>
+                    <SelectContent>
                       {organizations.map((x) => (
-                        <SelectItem_Shadcn_ key={x.id} value={x.slug}>
+                        <SelectItem key={x.id} value={x.slug}>
                           {x.name}
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       ))}
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                    </SelectContent>
+                  </Select>
                 </FormItemLayout>
               )}
             </div>
           )}
-        </Modal.Content>
+        </DialogSection>
 
         {selectedOrg !== undefined && (
           <Loading active={selectedOrg !== undefined && transferPreviewIsLoading}>
-            <Modal.Content>
+            <DialogSection>
               <div className="space-y-2">
                 {transferPreviewData && transferPreviewData.errors.length > 0 && (
                   <Admonition type="danger" title="Project cannot be transferred">
@@ -296,10 +279,23 @@ export const TransferProjectButton = () => {
                   />
                 )}
               </div>
-            </Modal.Content>
+            </DialogSection>
           </Loading>
         )}
-      </Modal>
-    </>
+        <DialogFooter>
+          <Button variant="default" onClick={() => setIsOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={() => handleTransferProject()}
+            disabled={
+              !transferPreviewData || !transferPreviewData.valid || isTransferring || !selectedOrg
+            }
+          >
+            Transfer Project
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }

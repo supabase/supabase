@@ -5,15 +5,20 @@ import { useCallback, useEffect, useState } from 'react'
 import { AiIconAnimation, Button } from 'ui'
 
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from './SupportForm.utils'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface AIAssistantOptionProps {
   projectRef?: string | null
   organizationSlug?: string | null
+  onClick?: () => void
 }
 
-export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantOptionProps) => {
-  const { mutate: sendEvent } = useSendEventMutation()
+export const AIAssistantOption = ({
+  projectRef,
+  organizationSlug,
+  onClick,
+}: AIAssistantOptionProps) => {
+  const track = useTrack()
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
@@ -22,17 +27,16 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
   }, [])
 
   const onAiAssistantClicked = useCallback(() => {
-    sendEvent({
-      action: 'ai_assistant_in_support_form_clicked',
-      groups: {
-        project: projectRef === null || projectRef === NO_PROJECT_MARKER ? undefined : projectRef,
-        organization:
-          organizationSlug === null || organizationSlug === NO_ORG_MARKER
-            ? undefined
-            : organizationSlug,
-      },
+    track('ai_assistant_in_support_form_clicked', undefined, {
+      project: projectRef === null || projectRef === NO_PROJECT_MARKER ? undefined : projectRef,
+      organization:
+        organizationSlug === null || organizationSlug === NO_ORG_MARKER
+          ? undefined
+          : organizationSlug,
     })
-  }, [projectRef, organizationSlug, sendEvent])
+
+    onClick?.()
+  }, [onClick, projectRef, organizationSlug, track])
 
   // If no specific project selected, use the wildcard route
   const aiLink = `/project/${projectRef !== NO_PROJECT_MARKER ? projectRef : '_'}?sidebar=ai-assistant&slug=${organizationSlug}`
@@ -57,11 +61,22 @@ export const AIAssistantOption = ({ projectRef, organizationSlug }: AIAssistantO
                 </p>
               </div>
               <div>
-                <Link href={aiLink} onClick={onAiAssistantClicked}>
-                  <Button size="tiny" type="default" icon={<AiIconAnimation size={14} />}>
+                {onClick ? (
+                  <Button
+                    size="tiny"
+                    variant="default"
+                    icon={<AiIconAnimation size={14} />}
+                    onClick={onAiAssistantClicked}
+                  >
                     Ask the Assistant
                   </Button>
-                </Link>
+                ) : (
+                  <Link href={aiLink} onClick={onAiAssistantClicked}>
+                    <Button size="tiny" variant="default" icon={<AiIconAnimation size={14} />}>
+                      Ask the Assistant
+                    </Button>
+                  </Link>
+                )}
               </div>
             </div>
             {/* Decorative background */}

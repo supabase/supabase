@@ -5,7 +5,7 @@ description: 'Learn about IdP-initiated and SP-initiated SSO login flows and whe
 
 When configuring SSO for your organization, you can choose between two different login flows: **identity provider (IdP)-initiated** and **service provider (SP)-initiated**. Understanding the difference helps you provide the best experience for your users.
 
-<Admonition type="tip" label="Quick decision guide">
+<Admonition type="tip" title="Quick decision guide">
 
 Most enterprises use IdP-initiated flow for its simplicity and better user experience. Enable SP-initiated only if you need users to start their login journey at supabase.com.
 
@@ -107,7 +107,7 @@ IdP-initiated flow is automatically enabled when you configure SSO. No additiona
 
 Users can now access Supabase through your IdP's app catalog.
 
-<Admonition type="note" label="Domain configuration optional">
+<Admonition type="note" title="Domain configuration optional">
 
 With IdP-initiated flow, you don't need to configure email domains. Your identity provider handles all authentication routing.
 
@@ -131,7 +131,7 @@ To enable SP-initiated flow, you need to configure email domains:
 - Multiple domains supported (e.g., `company.com`, `subsidiary.com`)
 - Users with matching email domains will be routed to your IdP
 
-<Admonition type="caution" label="Domain restrictions apply">
+<Admonition type="caution" title="Domain restrictions apply">
 
 Only users with email addresses matching your configured domains can use SP-initiated login. Users with other domains cannot sign in via SSO at supabase.com (but can still use IdP-initiated flow if you configure it in your IdP).
 

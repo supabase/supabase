@@ -82,7 +82,7 @@ const MetricCardHeader = React.forwardRef<HTMLDivElement, MetricCardHeaderProps>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
-                type="text"
+                variant="text"
                 size="tiny"
                 className="px-1 text-foreground-lighter group-hover:text-foreground absolute right-3 transition-colors"
                 asChild

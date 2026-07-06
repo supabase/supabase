@@ -1,3 +1,4 @@
+import { untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
@@ -6,7 +7,10 @@ import { BASE_PATH } from '@/lib/constants'
 import { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type ParseClientCodeResponse = {
-  sql: string | undefined
+  // Named unchecked_sql to highlight that this SQL must never be run
+  // automatically without user confirmation — it is AI-generated and may not
+  // be correct.
+  unchecked_sql: UntrustedSqlFragment | undefined
   valid: boolean
 }
 
@@ -25,7 +29,10 @@ export async function generateSqlTitle({ code }: ParseClientCodeVariables) {
     }).then((res) => res.json())
 
     if (response.error) throw new Error(response.error)
-    return response as ParseClientCodeResponse
+    return {
+      valid: response.valid as boolean,
+      unchecked_sql: response.sql != null ? untrustedSql(response.sql as string) : undefined,
+    } satisfies ParseClientCodeResponse
   } catch (error) {
     throw error
   }

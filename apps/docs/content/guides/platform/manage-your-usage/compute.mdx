@@ -25,7 +25,7 @@ Each project you launch increases your monthly Compute costs.
 
 ### Example
 
-Your billing cycle runs from January 1 to January 31. On January 10 at 4:30 PM, you switch your project from the Micro Compute size to the Small Compute size. At the end of the billing cycle you are billed for 233 hours of Micro Compute size and 511 hours of Small Compute size.
+Your billing cycle runs from January 1 to January 31. On January 10 at 4:30 PM, you switch your project from the Micro Compute size to the Small Compute size. At the end of the billing cycle you are billed for 233 hours of Micro Compute size and 512 hours of Small Compute size.
 
 | Time Window                                 | Compute Size | Hours Billed | Description         |
 | ------------------------------------------- | ------------ | ------------ | ------------------- |
@@ -50,7 +50,7 @@ Paid plans include <Price price="10" /> in Compute Credits, which cover one proj
 | Micro        | <Price price="0.01344" /> | ~<Price price="10" />                                                                                   |
 | Small        | <Price price="0.0206" />  | ~<Price price="15" />                                                                                   |
 | Medium       | <Price price="0.0822" />  | ~<Price price="60" />                                                                                   |
-| Large        | <Price price="0.1517" />  | ~<Price price="110" />                                                                                  |
+| Large        | <Price price="0.1517" />  | ~<Price price="111" />                                                                                  |
 | XL           | <Price price="0.2877" />  | ~<Price price="210" />                                                                                  |
 | 2XL          | <Price price="0.562" />   | ~<Price price="410" />                                                                                  |
 | 4XL          | <Price price="1.32" />    | ~<Price price="960" />                                                                                  |
@@ -61,7 +61,7 @@ Paid plans include <Price price="10" /> in Compute Credits, which cover one proj
 
 [^1]: Compute resources on the Free Plan are subject to change.
 
-<Admonition type="note" label="Nano Compute size in paid plan organizations">
+<Admonition type="note" title="Nano Compute size in paid plan organizations">
 
 In paid organizations, Nano Compute are billed at the same price as Micro Compute. It is recommended to upgrade your Project from Nano Compute to Micro Compute when it's convenient for you. Compute sizes are not auto-upgraded because of the downtime incurred. See [Supabase Pricing](/pricing) for more information. You cannot launch Nano instances on paid plans, only Micro and above - but you might have Nano instances after upgrading from Free Plan.
 
@@ -76,10 +76,10 @@ The project runs on the same Compute size throughout the entire billing cycle.
 | Line Item                     | Hours | Costs                    |
 | ----------------------------- | ----- | ------------------------ |
 | Pro Plan                      | -     | <Price price="25"/>      |
-| Compute Hours Micro Project 1 | 744   | <Price price="10" />     |
-| **Subtotal**                  |       | **<Price price="35" />** |
+| Compute Hours Small Project 1 | 730   | <Price price="15" />     |
+| **Subtotal**                  |       | **<Price price="40" />** |
 | Compute Credits               |       | -<Price price="10" />    |
-| **Total**                     |       | **<Price price="25" />** |
+| **Total**                     |       | **<Price price="30" />** |
 
 ### Multiple projects
 
@@ -88,25 +88,25 @@ All projects run on the same Compute size throughout the entire billing cycle.
 | Line Item                     | Hours | Costs                    |
 | ----------------------------- | ----- | ------------------------ |
 | Pro Plan                      | -     | <Price price="25" />     |
-| Compute Hours Micro Project 1 | 744   | <Price price="10" />     |
-| Compute Hours Micro Project 2 | 744   | <Price price="10" />     |
-| Compute Hours Micro Project 3 | 744   | <Price price="10" />     |
-| **Subtotal**                  |       | **<Price price="55" />** |
+| Compute Hours Small Project 1 | 730   | <Price price="15" />     |
+| Compute Hours Small Project 2 | 730   | <Price price="15" />     |
+| Compute Hours Small Project 3 | 730   | <Price price="15" />     |
+| **Subtotal**                  |       | **<Price price="70" />** |
 | Compute Credits               |       | -<Price price="10" />    |
-| **Total**                     |       | **<Price price="45" />** |
+| **Total**                     |       | **<Price price="60" />** |
 
 ### One project on different Compute sizes
 
 The project's Compute size changes throughout the billing cycle.
 
-| Line Item                     | Hours | Costs                    |
-| ----------------------------- | ----- | ------------------------ |
-| Pro Plan                      | -     | <Price price="25" />     |
-| Compute Hours Micro Project 1 | 233   | <Price price="3" />      |
-| Compute Hours Small Project 1 | 511   | <Price price="11" />     |
-| **Subtotal**                  |       | **<Price price="39" />** |
-| Compute Credits               |       | -<Price price="10" />    |
-| **Total**                     |       | **<Price price="29" />** |
+| Line Item                     | Hours | Costs                       |
+| ----------------------------- | ----- | --------------------------- |
+| Pro Plan                      | -     | <Price price="25" />        |
+| Compute Hours Micro Project 1 | 230   | <Price price="3.09" />      |
+| Compute Hours Small Project 1 | 500   | <Price price="10.30" />     |
+| **Subtotal**                  |       | **<Price price="38.39" />** |
+| Compute Credits               |       | -<Price price="10" />       |
+| **Total**                     |       | **<Price price="28.39" />** |
 
 ### Projects not running for full month
 
@@ -117,12 +117,12 @@ Compute is always billed in arrears when your billing cycle resets.
 | Line Item                     | Hours | Costs                       |
 | ----------------------------- | ----- | --------------------------- |
 | Pro Plan                      | -     | <Price price="25" />        |
-| Compute Hours Micro Project 1 | 744   | <Price price="10" />        |
+| Compute Hours Small Project 1 | 730   | <Price price="15" />        |
 | Compute Hours Micro Project 2 | 20    | <Price price="0.27" />      |
 | Compute Hours Micro Project 3 | 70    | <Price price="0.94" />      |
-| **Subtotal**                  |       | **<Price price="36.21" />** |
+| **Subtotal**                  |       | **<Price price="41.21" />** |
 | Compute Credits               |       | -<Price price="10" />       |
-| **Total**                     |       | **<Price price="26.21" />** |
+| **Total**                     |       | **<Price price="31.21" />** |
 
 ## View usage
 

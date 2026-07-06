@@ -11,6 +11,7 @@ import {
 
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { StorageItem } from '../Storage.types'
+import { getPathAlongOpenedFolders } from './StorageExplorer.utils'
 import { useCopyUrl } from './useCopyUrl'
 import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -22,10 +23,12 @@ import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 const PREVIEW_SIZE_LIMIT = 10 * 1024 * 1024 // 10MB
 
 const PreviewFile = ({ item }: { item: StorageItem }) => {
-  const { projectRef, selectedBucket } = useStorageExplorerStateSnapshot()
+  const { projectRef, selectedBucket, openedFolders } = useStorageExplorerStateSnapshot()
+  const folderPath = getPathAlongOpenedFolders({ openedFolders, selectedBucket }, false)
+  const path = [folderPath, item.name].filter(Boolean).join('/')
 
   const { data: previewUrl, isPending: isLoading } = useFetchFileUrlQuery({
-    file: item,
+    path,
     projectRef: projectRef,
     bucket: selectedBucket,
   })
@@ -39,7 +42,7 @@ const PreviewFile = ({ item }: { item: StorageItem }) => {
   if (isLoading) {
     return (
       <div className="flex h-full w-full items-center justify-center text-foreground-lighter">
-        <LoaderCircle size={14} strokeWidth={2} className="animate-spin text-foreground-lighter" />
+        <LoaderCircle size={14} className="animate-spin text-foreground-lighter" />
       </div>
     )
   }
@@ -139,12 +142,7 @@ export const PreviewPane = () => {
     >
       {/* Preview Header */}
       <div className="flex w-full justify-end text-foreground-lighter transition-colors hover:text-foreground">
-        <X
-          className="cursor-pointer"
-          size={14}
-          strokeWidth={2}
-          onClick={() => setSelectedFilePreview(undefined)}
-        />
+        <X className="cursor-pointer" size={14} onClick={() => setSelectedFilePreview(undefined)} />
       </div>
 
       {/* Preview Thumbnail*/}
@@ -160,7 +158,7 @@ export const PreviewPane = () => {
           <h5 className="wrap-break-word text-base text-foreground">{file.name}</h5>
           {file.isCorrupted && (
             <div className="flex items-center space-x-2">
-              <AlertCircle size={14} strokeWidth={2} className="text-foreground-light" />
+              <AlertCircle size={14} className="text-foreground-light" />
               <p className="text-sm text-foreground-light">
                 File is corrupted, please delete and reupload this file again
               </p>
@@ -189,7 +187,7 @@ export const PreviewPane = () => {
         {/* Actions */}
         <div className="flex space-x-2 border-b border-overlay pb-4">
           <Button
-            type="default"
+            variant="default"
             icon={<Download />}
             disabled={file.isCorrupted}
             onClick={() => downloadFile(file)}
@@ -198,7 +196,7 @@ export const PreviewPane = () => {
           </Button>
           {selectedBucket.public ? (
             <Button
-              type="outline"
+              variant="outline"
               icon={<Copy />}
               onClick={() => onCopyUrl(file.path!)}
               disabled={file.isCorrupted}
@@ -209,7 +207,7 @@ export const PreviewPane = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="outline"
+                  variant="outline"
                   icon={<Copy />}
                   iconRight={<ChevronDown />}
                   disabled={file.isCorrupted}
@@ -247,10 +245,10 @@ export const PreviewPane = () => {
           )}
         </div>
         <ButtonTooltip
-          type="outline"
+          variant="outline"
           disabled={!canUpdateFiles}
           size="tiny"
-          icon={<Trash2 strokeWidth={2} />}
+          icon={<Trash2 />}
           onClick={() => setSelectedItemsToDelete([file])}
           tooltip={{
             content: {

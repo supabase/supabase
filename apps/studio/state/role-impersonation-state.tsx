@@ -1,10 +1,11 @@
+import { ident, literal, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useConstant } from 'common'
 import { createContext, PropsWithChildren, useCallback, useContext, useEffect } from 'react'
 import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import { CustomAccessTokenHookDetails } from '../hooks/misc/useCustomAccessTokenHookDetails'
-import { executeSql } from '@/data/sql/execute-sql-query'
-import useLatest from '@/hooks/misc/useLatest'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { getPostgrestClaims, ImpersonationRole } from '@/lib/role-impersonation'
 
@@ -73,7 +74,7 @@ export const RoleImpersonationStateContextProvider = ({ children }: PropsWithChi
     const result = await executeSql({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      sql: `select ${schema}.${functionName}('${JSON.stringify(event)}'::jsonb) as event;`,
+      sql: safeSql`select ${ident(schema)}.${ident(functionName)}(${literal(JSON.stringify(event))}::jsonb) as event;`,
       queryKey: ['customize-access-token', project?.ref],
     })
 

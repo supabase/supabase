@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from 'ui'
 
 import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
@@ -7,6 +7,7 @@ import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from '../SidePanelEditor.types'
 import { ForeignKeyRow } from '../TableEditor/ForeignKeysManagement/ForeignKeyRow'
 import { checkIfRelationChanged } from '../TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
+import { normalizeFormatSchema } from './ColumnEditor.utils'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -16,7 +17,12 @@ interface ColumnForeignKeyProps {
   column: ColumnField
   relations: ForeignKey[]
   closePanel: () => void
-  onUpdateColumnType: (type: string) => void
+  onOpenChange?: (open: boolean) => void
+  onUpdateColumnType: (selection: {
+    format: string
+    formatSchema?: string
+    isArray: boolean
+  }) => void
   onUpdateFkRelations: (fks: ForeignKey[]) => void
 }
 
@@ -25,6 +31,7 @@ const ColumnForeignKey = ({
   column,
   relations,
   closePanel,
+  onOpenChange,
   onUpdateColumnType,
   onUpdateFkRelations,
 }: ColumnForeignKeyProps) => {
@@ -44,11 +51,14 @@ const ColumnForeignKey = ({
     connectionString: project?.connectionString,
     id: tableId ?? id,
   })
+  useEffect(() => onOpenChange?.(open), [open, onOpenChange])
   const formattedColumnsForFkSelector = (table?.columns ?? []).map((c) => {
     return {
       id: c.id,
       name: c.name,
       format: c.format || column.format,
+      formatSchema: normalizeFormatSchema(c.format_schema),
+      isArray: c.data_type === 'ARRAY',
       isNewColumn: false,
     }
   })
@@ -109,7 +119,7 @@ const ColumnForeignKey = ({
           </div>
         )}
 
-        <Button type="default" className="w-min" onClick={() => setOpen(true)}>
+        <Button variant="default" className="w-min" onClick={() => setOpen(true)}>
           Add foreign key
         </Button>
       </div>
@@ -123,7 +133,14 @@ const ColumnForeignKey = ({
             name: table.name,
             columns:
               column.isNewColumn && column.name
-                ? formattedColumnsForFkSelector.concat(column)
+                ? formattedColumnsForFkSelector.concat({
+                    id: column.id,
+                    name: column.name,
+                    format: column.format,
+                    formatSchema: column.formatSchema,
+                    isArray: column.isArray,
+                    isNewColumn: column.isNewColumn,
+                  })
                 : formattedColumnsForFkSelector.map((c) => {
                     if (c.id === column.id) return { ...c, name: column.name }
                     else return c
@@ -146,8 +163,14 @@ const ColumnForeignKey = ({
             } else {
               onUpdateFkRelations(relations.concat([fk]))
             }
-            const targetType = fk.columns.find((col) => col.source === column.name)?.targetType
-            if (targetType) onUpdateColumnType(targetType)
+            const matched = fk.columns.find((col) => col.source === column.name)
+            if (matched?.targetType) {
+              onUpdateColumnType({
+                format: matched.targetType,
+                formatSchema: matched.targetTypeSchema,
+                isArray: matched.targetIsArray ?? false,
+              })
+            }
           }}
         />
       )}

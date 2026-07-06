@@ -30,6 +30,8 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetRespons
   const folderId = (req.query.id as string) ?? null
 
   const folders = await getFolders(folderId)
+  // Folder listings return metadata only (no SQL body) to match the Management API contract; the
+  // editor loads each snippet's content on demand via the item endpoint.
   const { cursor, snippets } = await getSnippets({
     searchTerm: params?.name,
     cursor: params?.cursor,
@@ -37,6 +39,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse<GetRespons
     limit: params?.limit ? Number(params.limit) : undefined,
     sort: params?.sort_by,
     sortOrder: params?.sort_order,
+    includeContent: false,
   })
 
   return res.status(200).json({ data: { folders: folders, contents: snippets }, cursor })

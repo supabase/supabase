@@ -11,8 +11,8 @@ export function StateOfStartupsAuroraHeader() {
 
   return (
     <header
-      className="relative w-full overflow-hidden min-h-[32svh] md:min-h-[50svh]"
-      style={{ background: 'hsl(var(--background-alternative-default))' }}
+      className="relative w-full overflow-hidden min-h-[26rem] md:min-h-[50vh]"
+      style={{ background: 'var(--background-alternative-default)' }}
     >
       {/* Aurora shader scene — hidden when user prefers reduced motion */}
       {!prefersReducedMotion && (
@@ -35,7 +35,7 @@ export function StateOfStartupsAuroraHeader() {
         className="absolute inset-0 pointer-events-none transition-opacity [transition-duration:1200ms]"
         style={{
           opacity: shaderLoaded ? 0 : 1,
-          background: 'hsl(var(--background-alternative-default))',
+          background: 'var(--background-alternative-default)',
         }}
       />
 
@@ -44,12 +44,12 @@ export function StateOfStartupsAuroraHeader() {
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'linear-gradient(to top, hsl(var(--background-alternative-default)) 0%, hsl(var(--background-alternative-default) / 0.9) 15%, transparent 90%)',
+            'linear-gradient(to top, var(--background-alternative-default) 0%, oklch(from var(--background-alternative-default) l c h / 0.9) 15%, transparent 90%)',
         }}
       />
 
       {/* Content — constrained to default container */}
-      <div className="relative z-10 max-w-240 mx-auto px-8 flex flex-col gap-4 justify-end pb-16 md:pb-18 min-h-[32svh] md:min-h-[50svh]">
+      <div className="relative z-10 max-w-240 mx-auto px-8 flex flex-col gap-4 justify-end pb-16 md:pb-18 min-h-[26rem] md:min-h-[50vh]">
         <p className="font-mono uppercase tracking-wide text-sm text-foreground-light">
           Supabase Presents
         </p>

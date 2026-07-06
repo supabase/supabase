@@ -7,16 +7,21 @@ import { toast } from 'sonner'
 import {
   Button,
   cn,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Modal,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  Separator,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -80,77 +85,77 @@ export const BanUserModal = ({ visible, user, onClose }: BanUserModalProps) => {
   }, [visible])
 
   return (
-    <Modal
-      hideFooter
-      visible={visible}
-      size="small"
-      header="Confirm to ban user"
-      onCancel={() => onClose()}
-    >
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <Modal.Content className="flex flex-col gap-y-3">
-            <p className="text-sm">
-              This will revoke the user's access to your project and prevent them from logging in
-              for a specified duration.
-            </p>
-            <div className="flex items-start gap-x-2 [&>div:first-child]:grow">
-              <FormField
-                control={form.control}
-                name="value"
-                render={({ field }) => (
-                  <FormItemLayout className="[&>div>div]:mt-0" label="Set a ban duration">
-                    <FormControl>
-                      <Input_Shadcn_ {...field} />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="unit"
-                render={({ field }) => (
-                  <FormItemLayout className="[&>div>div]:mt-0 mt-[33px]">
-                    <FormControl>
-                      <Select_Shadcn_
-                        {...field}
-                        value={field.value}
-                        onValueChange={(value) => form.setValue('unit', value as 'hours' | 'days')}
-                      >
-                        <SelectTrigger_Shadcn_ className="capitalize w-24">
-                          {field.value}
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
-                          <SelectItem_Shadcn_ value="hours">Hours</SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="days">Days</SelectItem_Shadcn_>
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-            </div>
+    <Dialog open={visible} onOpenChange={() => onClose()}>
+      <DialogContent size="small">
+        <DialogHeader>
+          <DialogTitle>Confirm to ban user</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <DialogSection className="flex flex-col gap-y-3">
+              <p className="text-sm">
+                This will revoke the user's access to your project and prevent them from logging in
+                for a specified duration.
+              </p>
+              <div className="flex items-start gap-x-2 [&>div:first-child]:grow">
+                <FormField
+                  control={form.control}
+                  name="value"
+                  render={({ field }) => (
+                    <FormItemLayout label="Set a ban duration">
+                      <FormControl>
+                        <Input {...field} />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="unit"
+                  render={({ field }) => (
+                    <FormItemLayout className="[&>div>div]:mt-0 mt-[29px]">
+                      <FormControl>
+                        <Select
+                          {...field}
+                          aria-label="Duration unit"
+                          value={field.value}
+                          onValueChange={(value) =>
+                            form.setValue('unit', value as 'hours' | 'days')
+                          }
+                        >
+                          <SelectTrigger className="capitalize w-24">{field.value}</SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="hours">Hours</SelectItem>
+                            <SelectItem value="days">Days</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              </div>
 
-            <div>
-              <p className="text-sm text-foreground-lighter">
-                This user will not be able to log in until:
-              </p>
-              <p className={cn('text-sm', !value && 'text-foreground-light')}>
-                {!!value ? bannedUntil : 'Invalid duration set'}
-              </p>
-            </div>
-          </Modal.Content>
-          <Separator />
-          <Modal.Content className="flex justify-end gap-2">
-            <Button type="default" disabled={isBanningUser} onClick={() => onClose()}>
-              Cancel
-            </Button>
-            <Button type="warning" htmlType="submit" loading={isBanningUser}>
-              Confirm ban
-            </Button>
-          </Modal.Content>
-        </form>
-      </Form>
-    </Modal>
+              <div>
+                <p className="text-sm text-foreground-lighter">
+                  This user will not be able to log in until:
+                </p>
+                <p className={cn('text-sm', !value && 'text-foreground-light')}>
+                  {!!value ? bannedUntil : 'Invalid duration set'}
+                </p>
+              </div>
+            </DialogSection>
+            <DialogFooter>
+              <Button variant="default" disabled={isBanningUser} onClick={() => onClose()}>
+                Cancel
+              </Button>
+              <Button variant="warning" type="submit" loading={isBanningUser}>
+                Confirm ban
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }

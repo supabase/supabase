@@ -5,11 +5,12 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Form, FormControl, FormField, FormItem, Switch } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
+import { ConstrainedIntegrationTabScaffold } from '@/components/interfaces/Integrations/ConstrainedIntegrationTabScaffold'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import {
@@ -21,6 +22,7 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
 import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/database-queues-expose-postgrest-status-query'
+import { useQueuesQuery } from '@/data/database-queues/database-queues-query'
 import { useDatabaseQueueToggleExposeMutation } from '@/data/database-queues/database-queues-toggle-postgrest-mutation'
 import { useDatabaseQueuesVersionQuery } from '@/data/database-queues/database-queues-version-query'
 import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
@@ -55,6 +57,18 @@ export const QueuesSettings = () => {
   })
   const tablesWithoutRLS =
     queueTables?.filter((x) => x.name.startsWith('q_') && !x.rls_enabled) ?? []
+
+  // pgmq lowercases queue names when building q_/a_ relations, but pgmq.meta keeps
+  // the original casing. Look up each relname in list_queues() so we render the
+  // user-provided name rather than the lowercased relname slice.
+  const { data: queues } = useQueuesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const queueDisplayName = (relname: string) => {
+    const stripped = relname.slice(2)
+    return queues?.find((q) => q.queue_name.toLowerCase() === stripped)?.queue_name ?? stripped
+  }
 
   const { data: config, error: configError } = useProjectPostgrestConfigQuery({
     projectRef: project?.ref,
@@ -180,7 +194,7 @@ export const QueuesSettings = () => {
 
   return (
     <>
-      <div className="w-full flex flex-col gap-y-4 p-10">
+      <ConstrainedIntegrationTabScaffold className="flex flex-col gap-y-4">
         <FormHeader
           className="mb-0"
           title="Settings"
@@ -259,20 +273,22 @@ export const QueuesSettings = () => {
                             {tablesWithoutRLS.map((x) => {
                               return (
                                 <li key={x.name}>
-                                  <code className="text-code-inline">{x.name.slice(2)}</code>
+                                  <code className="text-code-inline">
+                                    {queueDisplayName(x.name)}
+                                  </code>
                                 </li>
                               )
                             })}
                           </ul>
 
                           <Button
-                            type="default"
+                            variant="default"
                             className="mt-3"
                             onClick={() => setRlsConfirmModalOpen(true)}
                           >
                             Enable RLS on{' '}
                             {tablesWithoutRLS.length === 1
-                              ? tablesWithoutRLS[0].name.slice(2)
+                              ? queueDisplayName(tablesWithoutRLS[0].name)
                               : `${tablesWithoutRLS.length} queues`}
                           </Button>
                         </Admonition>
@@ -317,15 +333,15 @@ export const QueuesSettings = () => {
                 />
                 <div className="flex items-center gap-x-2">
                   <Button
-                    type="default"
+                    variant="default"
                     disabled={Object.keys(formState.dirtyFields).length === 0 || isToggling}
                     onClick={() => form.reset({ enable: false })}
                   >
                     Cancel
                   </Button>
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={Object.keys(formState.dirtyFields).length === 0}
                     loading={isToggling}
                   >
@@ -336,7 +352,7 @@ export const QueuesSettings = () => {
             </FormPanelContainer>
           </form>
         </Form>
-      </div>
+      </ConstrainedIntegrationTabScaffold>
 
       <ConfirmationModal
         visible={rlsConfirmModalOpen}
@@ -354,7 +370,7 @@ export const QueuesSettings = () => {
           {tablesWithoutRLS.map((x) => {
             return (
               <li key={x.id}>
-                <code className="text-code-inline">{x.name.slice(2)}</code>
+                <code className="text-code-inline">{queueDisplayName(x.name)}</code>
               </li>
             )
           })}

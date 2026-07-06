@@ -1,44 +1,43 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { buildDefaultPrivilegesSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
+import { useFeatureFlags, useFlag, useParams } from 'common'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { AWS_REGIONS, type CloudProvider } from 'shared-data'
+import { PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
+import { useForm, useFormState } from 'react-hook-form'
+import { type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
-import { Button, Form, FormField, useWatch } from 'ui'
+import { Button, Form, useWatch } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
 
 import { AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggers.constants'
 import { AdvancedConfiguration } from '@/components/interfaces/ProjectCreation/AdvancedConfiguration'
-import { CloudProviderSelector } from '@/components/interfaces/ProjectCreation/CloudProviderSelector'
 import { ComputeSizeSelector } from '@/components/interfaces/ProjectCreation/ComputeSizeSelector'
-import { CustomPostgresVersionInput } from '@/components/interfaces/ProjectCreation/CustomPostgresVersionInput'
 import { DatabasePasswordInput } from '@/components/interfaces/ProjectCreation/DatabasePasswordInput'
 import { DisabledWarningDueToIncident } from '@/components/interfaces/ProjectCreation/DisabledWarningDueToIncident'
 import { FreeProjectLimitWarning } from '@/components/interfaces/ProjectCreation/FreeProjectLimitWarning'
-import { HighAvailabilityInput } from '@/components/interfaces/ProjectCreation/HighAvailabilityInput'
+import { InternalOnlyConfiguration } from '@/components/interfaces/ProjectCreation/InternalOnlyConfiguration'
 import { OrganizationSelector } from '@/components/interfaces/ProjectCreation/OrganizationSelector'
-import {
-  extractPostgresVersionDetails,
-  PostgresVersionSelector,
-} from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
+import { extractPostgresVersionDetails } from '@/components/interfaces/ProjectCreation/PostgresVersionSelector'
 import { sizes } from '@/components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { FormSchema } from '@/components/interfaces/ProjectCreation/ProjectCreation.schema'
 import {
   instanceLabel,
+  monthlyInstancePrice,
   smartRegionToExactRegion,
 } from '@/components/interfaces/ProjectCreation/ProjectCreation.utils'
 import { ProjectCreationFooter } from '@/components/interfaces/ProjectCreation/ProjectCreationFooter'
 import { ProjectNameInput } from '@/components/interfaces/ProjectCreation/ProjectNameInput'
 import { RegionSelector } from '@/components/interfaces/ProjectCreation/RegionSelector'
 import { SecurityOptions } from '@/components/interfaces/ProjectCreation/SecurityOptions'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import {
+  GitHubRepositoryField,
+  useGitHubRepositoryOptions,
+} from '@/components/interfaces/Settings/Integrations/GithubIntegration/GitHubRepositoryField'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { WizardLayoutWithoutAuth } from '@/components/layouts/WizardLayout'
 import Panel from '@/components/ui/Panel'
 import { useAvailableOrioleImageVersion } from '@/data/config/project-creation-postgres-versions-query'
@@ -48,7 +47,7 @@ import { useAuthorizedAppsQuery } from '@/data/oauth/authorized-apps-query'
 import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
 import { useOrganizationAvailableRegionsQuery } from '@/data/organizations/organization-available-regions-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { DesiredInstanceSize, instanceSizeSpecs } from '@/data/projects/new-project.constants'
+import { DesiredInstanceSize } from '@/data/projects/new-project.constants'
 import {
   OrgProject,
   useOrgProjectsInfiniteQuery,
@@ -58,23 +57,30 @@ import {
   useProjectCreateMutation,
 } from '@/data/projects/project-create-mutation'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useDataApiRevokeOnCreateDefaultEnabled } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
+import {
+  isInDataApiRevokeTreatment,
+  useDataApiRevokeOnCreateDefaultEnabled,
+} from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { usePHFlag } from '@/hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from '@/lib/constants'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { useProfile } from '@/lib/profile'
+import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 import type { NextPageWithLayout } from '@/types'
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
 const Wizard: NextPageWithLayout = () => {
   const track = useTrack()
+  const trackFunnelError = useTrackFunnelError()
   const router = useRouter()
   const { slug, projectName } = useParams()
   const { appTitle } = useCustomContent(['app:title'])
@@ -89,25 +95,30 @@ const Wizard: NextPageWithLayout = () => {
   const isFreePlan = currentOrg?.plan?.id === 'free'
   const canChooseInstanceSize = !isFreePlan
 
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
   const { can: isAdmin } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
+  const { can: canCreateGitHubConnection } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'integrations.github_connections'
+  )
   const showAdvancedConfig = useIsFeatureEnabled('project_creation:show_advanced_config')
+  const { hasAccess: hasAccessToGitHubIntegration } = useCheckEntitlements(
+    'integrations.github_connections'
+  )
 
-  const smartRegionEnabled = useFlag('enableSmartRegion')
+  const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
-  const showPostgresVersionSelector = useFlag('showPostgresVersionSelector')
-  const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
+  const showInternalOnlyConfiguration = useFlag('newProjectInternalOnlyConfiguration')
 
   // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
   // users whose flags haven't loaded yet. The raw value preserves undefined (omitted from
-  // PostHog) so we only record true/false when the flag is resolved.
-  const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean>('dataApiRevokeOnCreateDefault')
+  // PostHog) so we only record an actual value (boolean true/false, or a variant string
+  // like 'test'/'control' post-multivariate migration) once the flag has resolved.
+  const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean | string>(
+    'dataApiRevokeOnCreateDefault'
+  )
   const isDataApiRevokeOnCreateDefault = useDataApiRevokeOnCreateDefaultEnabled()
 
-  const showNonProdFields = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
 
   // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
@@ -131,11 +142,15 @@ const Wizard: NextPageWithLayout = () => {
       projectName: projectName || '',
       highAvailability: false,
       postgresVersion: '',
+      instanceType: '',
       cloudProvider: PROVIDERS[defaultProvider].id,
       dbPass: '',
       dbPassStrength: 0,
       dbPassStrengthMessage: '',
       dbRegion: undefined,
+      githubRepositoryId: '',
+      githubInstallationId: undefined,
+      githubRepositoryName: '',
       instanceSize: canChooseInstanceSize ? sizes[0] : undefined,
       dataApi: true,
       dataApiDefaultPrivileges: !isDataApiRevokeOnCreateDefault,
@@ -149,9 +164,22 @@ const Wizard: NextPageWithLayout = () => {
     instanceSize: watchedInstanceSize,
     cloudProvider,
     dbRegion,
+    githubRepositoryName,
     organization,
+    projectName: watchedProjectName,
     highAvailability,
   } = useWatch({ control: form.control })
+  const { dirtyFields } = useFormState(form)
+  const isDbRegionDirty = dirtyFields.dbRegion
+  const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
+
+  // Read dirty state during render rather than depending on form.formState in the
+  // effect — form.formState is a Proxy that gets a new reference every render, which
+  // would re-fire this effect after each setValue and trigger an infinite loop.
+  const isDataApiDefaultPrivilegesDirty = getFieldState(
+    'dataApiDefaultPrivileges',
+    form.formState
+  ).isDirty
 
   // [Charis] Since the form is updated in a useEffect, there is an edge case
   // when switching from free to paid, where canChooseInstanceSize is true for
@@ -191,14 +219,15 @@ const Wizard: NextPageWithLayout = () => {
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
   const additionalMonthlySpend = isFreePlan
     ? 0
-    : instanceSizeSpecs[instanceSize as DesiredInstanceSize]!.priceMonthly - availableComputeCredits
+    : monthlyInstancePrice(instanceSize) - availableComputeCredits
 
-  const { data: _defaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
+  const selectedCloudProvider = cloudProvider as CloudProvider
+  const { data: autoDefaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {
-      cloudProvider: PROVIDERS[defaultProvider].id,
+      cloudProvider: selectedCloudProvider,
     },
     {
-      enabled: !smartRegionEnabled,
+      enabled: flagsLoaded && !smartRegionEnabled,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       refetchInterval: false,
@@ -215,29 +244,30 @@ const Wizard: NextPageWithLayout = () => {
         desiredInstanceSize: instanceSize as DesiredInstanceSize,
       },
       {
-        enabled: smartRegionEnabled,
+        enabled: flagsLoaded && smartRegionEnabled,
         refetchOnMount: false,
         refetchOnWindowFocus: false,
         refetchInterval: false,
         refetchOnReconnect: false,
       }
     )
+
   const recommendedSmartRegion = smartRegionEnabled
     ? availableRegionsData?.recommendations.smartGroup.name
     : ''
 
+  const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError =
     smartRegionEnabled && defaultProvider !== 'AWS_NIMBUS'
       ? availableRegionsError
       : defaultRegionError
-  const defaultRegion =
-    defaultProvider === 'AWS_NIMBUS'
-      ? AWS_REGIONS.EAST_US.displayName
-      : smartRegionEnabled
-        ? availableRegionsData?.recommendations.smartGroup.name
-        : _defaultRegion
+  const defaultRegion = smartRegionEnabled
+    ? availableRegionsData?.recommendations.smartGroup.name
+    : (autoDefaultRegion ?? fixedDefaultRegion)
 
   const canCreateProject = isAdmin && !freePlanWithExceedingLimits && !hasOutstandingInvoices
+  const canConfigureGitHubOnCreate =
+    canCreateProject && hasAccessToGitHubIntegration && canCreateGitHubConnection
 
   const dbRegionExact = smartRegionToExactRegion(dbRegion ?? '')
 
@@ -257,6 +287,13 @@ const Wizard: NextPageWithLayout = () => {
       )
     : false
   const shouldShowFreeProjectInfo = !!currentOrg && !isFreePlan && !isUserAtFreeProjectLimit
+  const {
+    gitHubAuthorization,
+    githubRepos,
+    hasPartialResponseDueToSSO,
+    isLoading: isLoadingRepositoryOptions,
+    refetch: refetchRepositoryOptions,
+  } = useGitHubRepositoryOptions()
 
   const {
     mutate: createProject,
@@ -283,6 +320,10 @@ const Wizard: NextPageWithLayout = () => {
         }
       )
       router.push(`/project/${res.ref}`)
+    },
+    onError: (error) => {
+      toast.error(`Failed to create new project: ${error.message}`)
+      trackFunnelError('project_creation', classifyApiError('project_creation', error), 'toast')
     },
   })
 
@@ -311,15 +352,23 @@ const Wizard: NextPageWithLayout = () => {
       dbPass,
       dbRegion,
       postgresVersion,
+      instanceType,
       instanceSize,
       dataApi,
       dataApiDefaultPrivileges,
       enableRlsEventTrigger,
       postgresVersionSelection,
       useOrioleDb,
+      githubInstallationId,
+      githubRepositoryId,
     } = values
 
     if (useOrioleDb && !availableOrioleVersion) {
+      trackFunnelError(
+        'project_creation',
+        { errorCategory: 'validation', errorReason: 'oriole_unavailable' },
+        'toast'
+      )
       return toast.error('No available OrioleDB image found, only Postgres is available')
     }
 
@@ -330,6 +379,10 @@ const Wizard: NextPageWithLayout = () => {
     const selectedRegion = smartRegionEnabled
       ? (smartGroup.find((x) => x.name === dbRegion) ?? specific.find((x) => x.name === dbRegion))
       : undefined
+    const parsedGitHubRepositoryId =
+      githubRepositoryId.length > 0 ? Number(githubRepositoryId) : undefined
+    const shouldIncludeGitHubFields =
+      githubInstallationId !== undefined && Number.isFinite(parsedGitHubRepositoryId)
 
     const data: ProjectCreateVariables = {
       dbPass,
@@ -343,32 +396,46 @@ const Wizard: NextPageWithLayout = () => {
       dbInstanceSize: isFreePlan ? undefined : (instanceSize as DesiredInstanceSize),
       dataApiExposedSchemas: !dataApi ? [] : undefined,
       dataApiUseApiSchema: false,
+      dataApiRevokeDefaultPrivileges: dataApi && !dataApiDefaultPrivileges,
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
       releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
       ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
-      dbSql:
-        [
-          enableRlsEventTrigger && AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL,
-          dataApi && !dataApiDefaultPrivileges && buildDefaultPrivilegesSql('revoke'),
-        ]
-          .filter(Boolean)
-          .join('\n') || undefined,
+      dbSql: enableRlsEventTrigger ? AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL : undefined,
+      ...(shouldIncludeGitHubFields
+        ? {
+            githubInstallationId,
+            githubRepositoryId: parsedGitHubRepositoryId,
+          }
+        : {}),
     }
 
-    if (postgresVersion) {
-      if (!postgresVersion.match(/1[2-9]\..*/)) {
-        toast.error(
-          `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
-        )
-      }
+    if (postgresVersion && !postgresVersion.match(/1[2-9]\..*/)) {
+      toast.error(
+        `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
+      )
+    }
 
+    if (postgresVersion || instanceType) {
       data['customSupabaseRequest'] = {
-        ami: { search_tags: { 'tag:postgresVersion': postgresVersion } },
+        ami: {
+          ...(postgresVersion && {
+            search_tags: { 'tag:postgresVersion': postgresVersion },
+          }),
+          ...(instanceType && { instance_type: instanceType }),
+        },
       }
     }
 
     createProject(data)
   }
+
+  const hasTrackedFormExposed = useRef(false)
+  useEffect(() => {
+    if (hasTrackedFormExposed.current) return
+    if (!isOrganizationsSuccess || !canCreateProject || !currentOrg) return
+    hasTrackedFormExposed.current = true
+    track('project_creation_form_exposed', { surface: 'main' })
+  }, [isOrganizationsSuccess, canCreateProject, currentOrg, track])
 
   useEffect(() => {
     // Only set once to ensure compute credits dont change while project is being created
@@ -391,7 +458,6 @@ const Wizard: NextPageWithLayout = () => {
     if (projectName) setValue('projectName', projectName || '')
   }, [slug, setValue, projectName])
 
-  const isDbRegionDirty = getFieldState('dbRegion', form.formState).isDirty
   useEffect(() => {
     if (!isDbRegionDirty && defaultRegion) {
       setValue('dbRegion', defaultRegion)
@@ -399,18 +465,16 @@ const Wizard: NextPageWithLayout = () => {
   }, [defaultRegion, isDbRegionDirty, setValue])
 
   useEffect(() => {
-    if (regionError) {
-      resetField('dbRegion', {
-        defaultValue: PROVIDERS[defaultProvider].default_region.displayName,
-      })
-    }
-  }, [regionError, resetField, defaultProvider])
-
-  useEffect(() => {
     if (!isDbRegionDirty && recommendedSmartRegion) {
       setValue('dbRegion', recommendedSmartRegion)
     }
   }, [recommendedSmartRegion, isDbRegionDirty, setValue])
+
+  useEffect(() => {
+    if (regionError && fixedDefaultRegion) {
+      resetField('dbRegion', { defaultValue: fixedDefaultRegion })
+    }
+  }, [regionError, resetField, fixedDefaultRegion])
 
   useEffect(() => {
     if (highAvailability && cloudProvider !== 'AWS_K8S') {
@@ -428,6 +492,28 @@ const Wizard: NextPageWithLayout = () => {
     }
   }, [instanceSize, watchedInstanceSize, setValue])
 
+  useEffect(() => {
+    if (!githubRepositoryName) return
+    if ((watchedProjectName ?? '').trim().length > 0) return
+
+    const repoName = githubRepositoryName.split('/').at(-1) ?? githubRepositoryName
+    setValue('projectName', repoName.trim(), {
+      shouldValidate: true,
+    })
+  }, [githubRepositoryName, watchedProjectName, setValue])
+
+  useEffect(() => {
+    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
+    if (isDataApiDefaultPrivilegesDirty) return
+    setValue(
+      'dataApiDefaultPrivileges',
+      !isInDataApiRevokeTreatment(dataApiRevokeOnCreateDefaultFlag),
+      {
+        shouldDirty: false,
+      }
+    )
+  }, [dataApiRevokeOnCreateDefaultFlag, isDataApiDefaultPrivilegesDirty, setValue])
+
   return (
     <>
       {/* Wizard layouts set the visual header but not the browser tab title. */}
@@ -436,7 +522,15 @@ const Wizard: NextPageWithLayout = () => {
         <meta name="description" content="Supabase Studio" />
       </Head>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation)}>
+        <form
+          onSubmit={form.handleSubmit(onSubmitWithComputeCostsConfirmation, (errors) =>
+            trackFunnelError(
+              'project_creation',
+              classifyValidationError('project_creation', errors),
+              'form'
+            )
+          )}
+        >
           <Panel
             loading={!isOrganizationsSuccess}
             title={
@@ -463,17 +557,44 @@ const Wizard: NextPageWithLayout = () => {
               {projectCreationDisabled ? (
                 <DisabledWarningDueToIncident title="Project creation is currently disabled" />
               ) : (
-                <div className="divide-y divide-border-muted">
+                <div className="divide-y divide-border-border">
                   <OrganizationSelector form={form} />
 
                   {canCreateProject && (
                     <>
-                      <ProjectNameInput form={form} />
-                      <HighAvailabilityInput form={form} />
-
-                      {cloudProviderEnabled && showNonProdFields && (
-                        <CloudProviderSelector form={form} />
+                      {canConfigureGitHubOnCreate && (
+                        <Panel.Content>
+                          <GitHubRepositoryField
+                            form={form}
+                            name="githubRepositoryId"
+                            installationIdField="githubInstallationId"
+                            repositoryNameField="githubRepositoryName"
+                            label="GitHub (optional)"
+                            description={
+                              <>
+                                Ideal for agent-first workflows: update your schema in code, push it
+                                to GitHub, and Supabase deploys the changes automatically.{' '}
+                                <a
+                                  href="https://supabase.com/docs/guides/deployment/branching/github-integration"
+                                  target="_blank"
+                                  rel="noreferrer noopener"
+                                  className="text-link"
+                                >
+                                  Learn more
+                                </a>
+                              </>
+                            }
+                            disabled={isCreatingNewProject}
+                            repositories={githubRepos}
+                            gitHubAuthorization={gitHubAuthorization}
+                            hasPartialResponseDueToSSO={hasPartialResponseDueToSSO}
+                            isLoading={isLoadingRepositoryOptions}
+                            refetch={refetchRepositoryOptions}
+                            onConnectClick={() => track('project_creation_github_connect_clicked')}
+                          />
+                        </Panel.Content>
                       )}
+                      <ProjectNameInput form={form} />
 
                       {canChooseInstanceSize && <ComputeSizeSelector form={form} />}
 
@@ -484,34 +605,17 @@ const Wizard: NextPageWithLayout = () => {
                         instanceSize={instanceSize as DesiredInstanceSize}
                       />
 
-                      {showPostgresVersionSelector && (
-                        <Panel.Content>
-                          <FormField
-                            control={form.control}
-                            name="postgresVersionSelection"
-                            render={({ field }) => (
-                              <PostgresVersionSelector
-                                field={field}
-                                form={form}
-                                cloudProvider={form.getValues('cloudProvider') as CloudProvider}
-                                organizationSlug={slug}
-                                dbRegion={form.getValues('dbRegion')}
-                              />
-                            )}
-                          />
-                        </Panel.Content>
-                      )}
-
-                      {showNonProdFields && <CustomPostgresVersionInput form={form} />}
-
                       <SecurityOptions form={form} />
+
+                      {showInternalOnlyConfiguration && <InternalOnlyConfiguration form={form} />}
+
                       {showAdvancedConfig && !!availableOrioleVersion && (
                         <AdvancedConfiguration form={form} />
                       )}
 
                       {shouldShowFreeProjectInfo ? (
                         <Admonition
-                          className="rounded-none border-0 border-t"
+                          className="rounded-none border-0"
                           type="note"
                           title="Need a free project?"
                           description={
@@ -546,7 +650,7 @@ const Wizard: NextPageWithLayout = () => {
                             </p>
 
                             <div>
-                              <Button asChild type="default">
+                              <Button asChild variant="default">
                                 <Link href={`/org/${slug}/billing#invoices`}>View invoices</Link>
                               </Button>
                             </div>

@@ -158,5 +158,3 @@ ${ENV_VAR_RAW_KEYS.map((x) => {
     </SidePanel>
   )
 }
-
-export default SidePanelVercelProjectLinker

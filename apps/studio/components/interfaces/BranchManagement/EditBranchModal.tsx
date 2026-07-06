@@ -20,8 +20,8 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Label_Shadcn_ as Label,
+  Input,
+  Label,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -224,7 +224,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                 render={({ field }) => (
                   <FormItemLayout label="Preview branch name">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         {...field}
                         placeholder="e.g. staging, dev-feature-x"
                         autoComplete="off"
@@ -277,7 +277,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                       >
                         <div className="relative">
                           <FormControl>
-                            <Input_Shadcn_
+                            <Input
                               {...field}
                               placeholder="e.g. main, feat/some-feature"
                               autoComplete="off"
@@ -311,7 +311,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                         for this branch.
                       </p>
                     </div>
-                    <Button type="default" icon={<Github />} onClick={openLinkerPanel}>
+                    <Button variant="default" icon={<Github />} onClick={openLinkerPanel}>
                       Connect to GitHub
                     </Button>
                   </div>
@@ -319,7 +319,7 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
             </DialogSection>
 
             <DialogFooter padding="medium">
-              <Button disabled={isUpdating} type="default" onClick={onClose}>
+              <Button disabled={isUpdating} variant="default" onClick={onClose}>
                 Cancel
               </Button>
               <Button
@@ -331,8 +331,8 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
                   isChecking
                 }
                 loading={isUpdating}
-                type="primary"
-                htmlType="submit"
+                variant="primary"
+                type="submit"
               >
                 Update branch
               </Button>

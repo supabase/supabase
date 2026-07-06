@@ -2,7 +2,7 @@ import { getCreatePublicationSQL } from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from '../sql/execute-sql-query'
+import { executeSql } from '../sql/execute-sql-mutation'
 import { replicationKeys } from './keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 

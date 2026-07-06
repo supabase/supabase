@@ -419,32 +419,33 @@ By enabling SSL Enforcement, you implement a fundamental best practice in data p
   },
   {
     title: 'Branching',
-    subtitle: 'Test and preview changes using Supabase Branches.',
+    subtitle: 'Test schema changes without touching production.',
     description: `
-Supabase Branching allows you to create and test changes in separate, temporary environments without affecting your production setup. Branching 2.0 (currently in public alpha) removes the Git requirement—spin up branches directly from the dashboard, CLI, or Management API, with or without GitHub integration.
+Branching without Git is now the default for all Supabase projects. Create a branch directly from the Supabase Dashboard, make schema changes, review the diff, and merge. No Git configuration required. Git-based branching remains fully supported for teams that manage migrations in version control. You can start with dashboard branching and add a Git integration later.
+
+## Two ways to branch
+
+**Dashboard branching (default)**
+Create branches directly from the Supabase Dashboard. Each branch gets its own Postgres instance with your current production schema. Make changes using the SQL Editor or Table Editor, preview the diff, and merge. The whole workflow stays inside Supabase.
+
+**Git-based branching**
+Connect a GitHub repo to your Supabase project. Migrations live in version control, and branches are created automatically when you open a pull request and cleaned up when it closes.
 
 ## Key features
-1. No-Git workflows: Create branches directly from dashboard or CLI without requiring GitHub connection.
-2. Git-based workflow: Optionally integrate with GitHub, creating preview branches for each pull request.
+1. No-Git workflow: Create and merge branches entirely from the dashboard. No GitHub connection needed.
+2. Git-based workflow: Optionally integrate with GitHub for pull request-driven schema reviews.
 3. Isolated environments: Each branch has its own Supabase instance with separate API credentials.
 4. Automatic migrations: Runs new migrations when changes are pushed to the ./supabase/migrations directory.
-5. Data seeding: Preview branches can be seeded with sample data using ./supabase/seed.sql.
+5. Data seeding: Seed branches with sample data using ./supabase/seed.sql.
 6. CI/CD integration: Supports preview deployments with hosting providers like Vercel.
 7. Merge requests: Review schema diffs and merge changes directly in the dashboard.
 
-## Benefits:
-- Risk-free experimentation: Test changes without affecting the production environment.
-- Improved collaboration: Multiple team members can work on different features simultaneously.
-- Streamlined reviews: Facilitate thorough checks of database changes before merging.
-- Rapid iteration: Quickly prototype and validate database-driven features.
-- Flexible workflows: Use Git integration, dashboard creation, or combine both approaches.
-
-## Supabase Branching is valuable for:
-- Agile teams working on multiple features concurrently
-- Projects with complex database schemas requiring careful management
-- Applications undergoing significant refactoring or upgrades
-- CI/CD pipelines integrating database changes
-- Teams preferring no-code or database-first development workflows
+## When to use branching
+- Developers prototyping schema changes who want fast iteration without upfront configuration
+- AI agents that need to create and manage database branches programmatically
+- Teams managing database migrations in Git who want PR-driven schema reviews
+- Projects with complex schemas requiring careful diff review before merging
+- CI/CD pipelines integrating database changes alongside application code
 `,
     icon: GitBranch,
     products: [PRODUCT_SHORTNAMES.DATABASE],
@@ -641,22 +642,22 @@ Foreign Data Wrappers simplify data integration by bringing external data into y
     },
   },
   {
-    title: 'Supabase ETL',
+    title: 'Supabase Pipelines',
     subtitle: 'Real-time data replication to analytical destinations.',
-    description: `Supabase ETL is a change-data-capture pipeline built in Rust that replicates your Postgres tables to analytical destinations in near real-time. Reading directly from the Postgres Write Ahead Log, ETL ensures your analytics data stays synchronized with your production database.
+    description: `Supabase Pipelines creates managed change-data-capture pipelines that replicate your Postgres tables to analytical destinations in near real time. Reading directly from the Postgres Write Ahead Log, each pipeline keeps your analytics data synchronized with your production database.
 
 ## Key benefits
 1. Real-time replication: Near real-time data synchronization using Postgres logical replication.
-2. Analytics Buckets support: Replicate to Iceberg format for large-scale analytics.
-3. BigQuery integration: Direct replication to Google's data warehouse.
+2. BigQuery integration: Direct replication to Google's data warehouse.
+3. Managed destinations: Start with BigQuery while more destinations are evaluated.
 4. Complete change history: Captures INSERT, UPDATE, DELETE, and TRUNCATE operations.
 5. Optimized for analytics: Faster queries and lower storage costs through compression.
 6. Production isolation: Complete separation of analytics and production workloads.
 
 ## How it works
-ETL uses Postgres logical replication to capture changes. Each replicated table includes a \`cdc_operation\` column tracking the type of change. For Analytics Buckets, data is stored in append-only changelog format using Parquet files. For BigQuery, a view is created for each table backed by versioned tables.
+Pipelines uses Postgres logical replication to capture changes. For BigQuery, a view is created for each table backed by versioned tables.
 
-## Supabase ETL is valuable for:
+## Pipelines is valuable for:
 - Data warehousing and business intelligence
 - Historical analysis and audit trails
 - Large-scale analytics requiring separation from production
@@ -665,14 +666,14 @@ ETL uses Postgres logical replication to capture changes. Each replicated table 
 ## Limitations
 Tables require primary keys. DDL support (schema changes) is currently in development.
 
-Supabase ETL provides a powerful alternative to Read Replicas for analytics workloads, optimizing performance while reducing costs.`,
+Pipelines provides a powerful alternative to Read Replicas for analytics workloads, optimizing performance while reducing costs.`,
     icon: CloudCog,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
-    docsUrl: 'https://supabase.github.io/etl/',
-    slug: 'supabase-etl',
+    docsUrl: 'https://supabase.com/docs/guides/database/replication/pipelines',
+    slug: 'supabase-pipelines',
     status: {
-      stage: PRODUCT_STAGES.PRIVATE_ALPHA,
+      stage: PRODUCT_STAGES.PUBLIC_ALPHA,
       availableOnSelfHosted: false,
     },
   },
@@ -1608,7 +1609,7 @@ Supabase Storage simplifies adding robust file management to your applications, 
 2. Automatic compaction: S3 Tables merges small files automatically for optimal performance.
 3. Built-in time travel: Query historical data using snapshots.
 4. Schema evolution: Evolve schema over time without breaking queries.
-5. Integrated with ETL: Real-time replication from Postgres via Supabase ETL.
+5. Open ingestion: Populate buckets with your own Iceberg-compatible ingestion pipeline.
 6. Query from Postgres: Use Iceberg Foreign Data Wrapper to join with operational data.
 
 ## Query tools supported
@@ -2834,17 +2835,17 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
   {
     title: 'Replication',
     subtitle: 'Replicate database changes to external destinations.',
-    description: `Replication uses Postgres logical replication to replicate database changes to external destinations like Analytics Buckets and BigQuery. Changes are captured from the Write Ahead Log and delivered in near real-time to analytical systems.
+    description: `Supabase Pipelines uses Postgres logical replication to replicate database changes to external destinations like BigQuery. Changes are captured from the Write Ahead Log and delivered in near real time to analytical systems.
 
 ## Key benefits
 1. Near real-time sync: Changes replicated as they occur using WAL reading.
-2. Analytics Buckets support: Append-only changelog format in Iceberg.
-3. BigQuery integration: Direct replication to Google's data warehouse.
+2. BigQuery integration: Direct replication to Google's data warehouse.
+3. Managed pipeline: Monitor status, lag, and errors in dashboard.
 4. Complete change capture: INSERT, UPDATE, DELETE, and TRUNCATE operations.
-5. Managed pipeline: Monitor status, lag, and errors in dashboard.
+5. Production isolation: Keep analytical workloads away from your primary database.
 
 ## Destinations
-Analytics Buckets create append-only changelog with \`cdc_operation\` column, preserving complete change history in Iceberg format. BigQuery creates views backed by versioned tables for efficient querying.
+BigQuery creates views backed by versioned tables for efficient querying. Additional managed destinations are being evaluated as Pipelines develops.
 
 ## Setup
 Create Postgres publication for tables to replicate. Add destination in Replication section of dashboard. Configure destination-specific settings. Monitor pipeline in dashboard.
@@ -2862,11 +2863,11 @@ Tables must have primary keys. Logical replication must be enabled.
 ## Limitations
 No DDL support yet (ALTER TABLE, ADD COLUMN). Destination-specific constraints may apply.
 
-Replication provides the real-time data pipeline required for modern analytics architectures.`,
+Pipelines provides the real-time data pipeline required for modern analytics architectures.`,
     icon: DatabaseZap,
     products: [PRODUCT_SHORTNAMES.DATABASE],
     heroImage: '',
-    docsUrl: 'https://supabase.com/docs/guides/database/replication/replication-setup',
+    docsUrl: 'https://supabase.com/docs/guides/database/replication/pipelines',
     slug: 'replication',
     status: {
       stage: PRODUCT_STAGES.PRIVATE_ALPHA,

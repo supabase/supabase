@@ -10,13 +10,13 @@ To ensure that queries return the expected data, RLS policies are correctly appl
 
 - Secondly, you can test through the Supabase CLI, which is a more low-level approach where you write tests in SQL.
 
-# Testing using the Supabase CLI
+## Testing using the Supabase CLI
 
 You can use the Supabase CLI to test your database. The minimum required version of the CLI is [v1.11.4](https://github.com/supabase/cli/releases). To get started:
 
 - [Install the Supabase CLI](/docs/guides/cli) on your local machine
 
-## Creating a test
+### Creating a test
 
 Create a tests folder inside the `supabase` folder:
 
@@ -30,11 +30,11 @@ Create a new file with the `.sql` extension which will contain the test.
 touch ./supabase/tests/database/hello_world.test.sql
 ```
 
-## Writing tests
+### Writing tests
 
 All `sql` files use [pgTAP](/docs/guides/database/extensions/pgtap) as the test runner.
 
-Let's write a simple test to check that our `auth.users` table has an ID column. Open `hello_world.test.sql` and add the following code:
+Write a test to check that our `auth.users` table has an ID column. Open `hello_world.test.sql` and add the following code:
 
 ```sql
 begin;
@@ -51,7 +51,7 @@ select * from finish();
 rollback;
 ```
 
-## Running tests
+### Running tests
 
 To run the test, you can use:
 
@@ -69,7 +69,7 @@ Files=1, Tests=1,  1 wallclock secs ( 0.01 usr  0.00 sys +  0.04 cusr  0.02 csys
 Result: PASS
 ```
 
-## More resources
+### More resources
 
 - [Testing RLS policies](/docs/guides/database/extensions/pgtap#testing-rls-policies)
 - [pgTAP extension](/docs/guides/database/extensions/pgtap)

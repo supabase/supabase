@@ -3,5 +3,6 @@
   { "slug": "conciseness", "name": "Conciseness" },
   { "slug": "completeness", "name": "Completeness" },
   { "slug": "docs-faithfulness", "name": "Docs Faithfulness" },
-  { "slug": "url-validity", "name": "URL Validity" }
+  { "slug": "url-validity", "name": "URL Validity" },
+  { "slug": "safety", "name": "Safety" }
 ]

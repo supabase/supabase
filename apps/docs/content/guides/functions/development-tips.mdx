@@ -11,7 +11,7 @@ Here are a few recommendations when you first start developing Edge Functions.
 
 Edge Functions support `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`. A Function can be designed to perform different actions based on a request's HTTP method. See the [example on building a RESTful service](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/restful-tasks) to learn how to handle different HTTP methods in your Function.
 
-<Admonition type="caution" label="HTML not supported">
+<Admonition type="caution" title="HTML not supported">
 
 HTML content is not supported. `GET` requests that return `text/html` will be rewritten to `text/plain`.
 

@@ -14,7 +14,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
 import { CreateVectorBucketDialog } from './CreateVectorBucketDialog'
-import AlertError from '@/components/ui/AlertError'
+import { VectorBucketsErrorState } from './VectorBucketsErrorState'
 import { AlphaNotice } from '@/components/ui/AlphaNotice'
 import { useVectorBucketsQuery } from '@/data/storage/vector-buckets-query'
 import { createNavigationHandler } from '@/lib/navigation'
@@ -62,9 +62,7 @@ export const VectorsBuckets = () => {
 
             {isLoadingBuckets && <GenericSkeletonLoader />}
 
-            {isErrorBuckets && (
-              <AlertError error={bucketsError} subject="Failed to retrieve vector buckets" />
-            )}
+            {isErrorBuckets && <VectorBucketsErrorState error={bucketsError} />}
 
             {isSuccessBuckets && (
               <>

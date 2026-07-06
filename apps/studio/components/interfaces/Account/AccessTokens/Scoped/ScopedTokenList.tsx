@@ -22,7 +22,7 @@ import { RowLoading } from '../AccessTokenTable/RowLoading'
 import { TableContainer } from '../AccessTokenTable/TableContainer'
 import { ExpiresCell, LastUsedCell, TokenNameCell } from '../AccessTokenTable/TokenCells'
 import { ViewTokenSheet } from './ViewTokenSheet'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import {
   ScopedAccessToken,
   useScopedAccessTokensQuery,
@@ -126,7 +126,7 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      type="default"
+                      variant="default"
                       title="More options"
                       className="w-7"
                       icon={<MoreVertical />}

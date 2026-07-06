@@ -30,7 +30,7 @@ Otherwise, it is necessary to fast reboot your instance in the [Dashboard's Sett
 
 Using `pg_net` in triggers on most tables is fine; however, do not add triggers to the `net._http_response` or `net.http_request_queue` tables.
 
-The `net` tables are special and if triggers on them fail or call a pg_net function (`http_get`, `http_post`, `http_delete`), it can lead to an infinite loop. This warning is irrelevant to most projects, but it's worth specifying just in case.
+The `net` tables are special and if triggers on them fail or call a pg_net function (`http_get`, `http_post`, `http_delete`), it can lead to an infinite loop. This warning is irrelevant to most projects, but it's worth specifying in case.
 
 **3. Check for timeout errors**
 
@@ -56,7 +56,7 @@ body := '{"key1": "value", "key2": 5}'::jsonb
 ) as request_id;
 ```
 
-Postman will then respond with the same payload. This is just a test to confirm that requests are being properly formatted and going through.
+Postman will then respond with the same payload. This is a test to confirm that requests are being properly formatted and going through.
 
 You can then view the request in the `net._http_response table` in the [Table Editor](/dashboard/project/_/editor) or with the following SQL:
 

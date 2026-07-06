@@ -60,6 +60,8 @@ export const TroubleshootingSchema = z
     topics: z.array(
       z.enum([
         'ai',
+        'ai-tools',
+        'api',
         'auth',
         'branching',
         'cli',
@@ -128,12 +130,10 @@ export async function getAllTroubleshootingEntriesInternal() {
 
     const parseResult = validateTroubleshootingMetadata(frontmatter)
     if ('error' in parseResult) {
-      console.error(
-        `Error validating troubleshooting metadata\nEntry:%O\nError:%O`,
-        frontmatter,
-        parseResult.error
+      throw Error(
+        `Error validating troubleshooting metadata for ${filePath}`,
+        { cause: parseResult.error }
       )
-      return null
     }
 
     const mdxTree = fromMarkdown(content, {

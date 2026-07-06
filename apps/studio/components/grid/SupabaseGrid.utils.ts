@@ -1,4 +1,5 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
+import { safeLocalStorage, safeSessionStorage } from 'common'
 import { compact } from 'lodash'
 import { useSearchParams } from 'next/navigation'
 import { parseAsNativeArrayOf, parseAsString, useQueryStates } from 'nuqs'
@@ -9,6 +10,7 @@ import {
   CellKeyDownArgs,
   RowsChangeData,
 } from 'react-data-grid'
+import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
 
 import { FilterOperatorOptions } from './components/header/filter/Filter.constants'
@@ -22,14 +24,20 @@ import { BASE_PATH } from '@/lib/constants'
 import { eventMatchesAnyShortcut } from '@/state/shortcuts/matchEvent'
 import { tableEditorRegistry } from '@/state/shortcuts/registry/table-editor'
 
-export function formatSortURLParams(tableName: string, sort?: string[]): Sort[] {
+export function formatSortURLParams(
+  // Should match the Entity type.
+  table: { name: string; columns: { name: string }[] },
+  sort?: string[]
+): Sort[] {
   if (Array.isArray(sort)) {
     return compact(
       sort.map((s) => {
         const [column, order] = s.split(':')
         // Reject any possible malformed sort param
         if (!column || !order) return undefined
-        else return { table: tableName, column, ascending: order === 'asc' }
+        // if the sort column name doesn't exist in the table, reject it as well to avoid confusion
+        if (table.columns.find((c) => c.name === column) === undefined) return undefined
+        else return { table: table.name, column, ascending: order === 'asc' }
       })
     )
   }
@@ -147,7 +155,7 @@ export function loadTableEditorStateFromLocalStorage(
 ): SavedState | undefined {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
   // Prefer sessionStorage (scoped to current tab) over localStorage
-  const jsonStr = sessionStorage.getItem(storageKey) ?? localStorage.getItem(storageKey)
+  const jsonStr = safeSessionStorage.getItem(storageKey) ?? safeLocalStorage.getItem(storageKey)
   if (!jsonStr) return
   const json = JSON.parse(jsonStr)
   return json[tableId]
@@ -197,7 +205,7 @@ export function saveTableEditorStateToLocalStorage({
   filters?: string[]
 }) {
   const storageKey = getStorageKey(STORAGE_KEY_PREFIX, projectRef)
-  const savedStr = sessionStorage.getItem(storageKey) ?? localStorage.getItem(storageKey)
+  const savedStr = safeSessionStorage.getItem(storageKey) ?? safeLocalStorage.getItem(storageKey)
 
   const config = {
     ...(gridColumns !== undefined && { gridColumns }),
@@ -214,8 +222,8 @@ export function saveTableEditorStateToLocalStorage({
     savedJson = { [tableId]: config }
   }
   // Save to both localStorage and sessionStorage so it's consistent to current tab
-  localStorage.setItem(storageKey, JSON.stringify(savedJson))
-  sessionStorage.setItem(storageKey, JSON.stringify(savedJson))
+  safeLocalStorage.setItem(storageKey, JSON.stringify(savedJson))
+  safeSessionStorage.setItem(storageKey, JSON.stringify(savedJson))
 }
 
 export const saveTableEditorStateToLocalStorageDebounced = AwesomeDebouncePromise(
@@ -283,22 +291,42 @@ export const handleCellKeyDown = <TRow extends SupaRow = SupaRow>(
 ) => {
   const { mode, column, row, rowIdx } = args
   if (mode !== 'SELECT') return
+  const key = event.key.toLowerCase()
 
-  if (event.code === 'KeyC' && (event.metaKey || event.ctrlKey)) {
-    const cellValue = row[column.key] ?? ''
-    const value = formatClipboardValue(cellValue)
-    copyToClipboard(value)
-  }
-  // Let registered shortcuts win over rdg's "type a key to enter edit mode" default.
-  if (eventMatchesAnyShortcut(event.nativeEvent, tableEditorRegistry)) {
+  if (key === 'c' && (event.metaKey || event.ctrlKey)) {
+    if (window.getSelection()?.isCollapsed === false) return
+
+    const value = formatClipboardValue(row[column.key] ?? '')
+    event.preventDefault()
     event.preventGridDefault()
+    void copyToClipboard(value, () => {
+      toast.success('Copied cell value to clipboard')
+    })
     return
+  }
+
+  // Let registered shortcuts win over rdg's "type a key to enter edit mode" default,
+  // unless a printable key enters edit mode.
+  if (eventMatchesAnyShortcut(event.nativeEvent, tableEditorRegistry)) {
+    if (
+      event.key.length === 1 &&
+      event.key !== ' ' &&
+      !event.altKey &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.shiftKey &&
+      column.renderEditCell != null
+    ) {
+      event.stopPropagation()
+    } else {
+      event.preventGridDefault()
+      return
+    }
   }
 
   // Toggle boolean cells with T/F when no modifier keys are pressed.
   if (context === undefined) return
 
-  const key = event.key.toLowerCase()
   if (event.altKey || event.ctrlKey || event.metaKey || (key !== 't' && key !== 'f')) return
 
   const supaColumn = context.columns.find((c) => c.name === column.key)

@@ -15,19 +15,19 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
-import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { ScaffoldSection, ScaffoldSectionTitle } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
-import NoPermission from '@/components/ui/NoPermission'
+import { AlertError } from '@/components/ui/AlertError'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
@@ -266,13 +266,13 @@ export const PerformanceSettingsForm = () => {
 
               <CardFooter className="justify-end space-x-2">
                 {requestDurationForm.formState.isDirty && (
-                  <Button type="default" onClick={() => requestDurationForm.reset()}>
+                  <Button variant="default" onClick={() => requestDurationForm.reset()}>
                     Cancel
                   </Button>
                 )}
                 <Button
-                  type={promptUpgrade ? 'default' : 'primary'}
-                  htmlType="submit"
+                  variant={promptUpgrade ? 'default' : 'primary'}
+                  type="submit"
                   disabled={
                     !canUpdateConfig ||
                     isUpdatingRequestDurationForm ||
@@ -312,7 +312,7 @@ export const PerformanceSettingsForm = () => {
                       }
                     >
                       <FormControl>
-                        <Select_Shadcn_
+                        <Select
                           value={field.value}
                           onValueChange={(value) => {
                             const values = databaseForm.getValues()
@@ -340,23 +340,20 @@ export const PerformanceSettingsForm = () => {
                             }
                           }}
                         >
-                          <SelectTrigger_Shadcn_
-                            size="small"
-                            disabled={!canUpdateConfig || promptUpgrade}
-                          >
-                            <SelectValue_Shadcn_>
+                          <SelectTrigger size="small" disabled={!canUpdateConfig || promptUpgrade}>
+                            <SelectValue>
                               {field.value === 'percent' ? 'Percentage' : 'Absolute'}
-                            </SelectValue_Shadcn_>
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_ align="end">
-                            <SelectItem_Shadcn_ value="connections" className="text-xs">
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent align="end">
+                            <SelectItem value="connections" className="text-xs">
                               Absolute number of connections
-                            </SelectItem_Shadcn_>
-                            <SelectItem_Shadcn_ value="percent" className="text-xs">
+                            </SelectItem>
+                            <SelectItem value="percent" className="text-xs">
                               Percent of max connections
-                            </SelectItem_Shadcn_>
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -419,13 +416,13 @@ export const PerformanceSettingsForm = () => {
 
               <CardFooter className="justify-end space-x-2">
                 {databaseForm.formState.isDirty && (
-                  <Button type="default" onClick={() => databaseForm.reset()}>
+                  <Button variant="default" onClick={() => databaseForm.reset()}>
                     Cancel
                   </Button>
                 )}
                 <Button
-                  type={promptUpgrade ? 'default' : 'primary'}
-                  htmlType="submit"
+                  variant={promptUpgrade ? 'default' : 'primary'}
+                  type="submit"
                   disabled={
                     !canUpdateConfig || isUpdatingDatabaseForm || !databaseForm.formState.isDirty
                   }

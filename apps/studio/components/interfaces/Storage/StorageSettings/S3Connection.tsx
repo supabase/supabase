@@ -7,8 +7,8 @@ import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
+  Alert,
+  AlertDescription,
   Button,
   Card,
   CardContent,
@@ -44,9 +44,9 @@ import { CreateCredentialModal } from './CreateCredentialModal'
 import { RevokeCredentialModal } from './RevokeCredentialModal'
 import { StorageCredItem } from './StorageCredItem'
 import { getConnectionURL } from './StorageSettings.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from '@/data/config/project-storage-config-update-mutation'
@@ -220,8 +220,8 @@ export const S3Connection = () => {
                     <CardFooter className="justify-end space-x-2">
                       {form.formState.isDirty && (
                         <Button
-                          type="default"
-                          htmlType="reset"
+                          variant="default"
+                          type="reset"
                           onClick={() => form.reset()}
                           disabled={
                             !form.formState.isDirty || !canUpdateStorageSettings || isUpdating
@@ -231,8 +231,8 @@ export const S3Connection = () => {
                         </Button>
                       )}
                       <Button
-                        type="primary"
-                        htmlType="submit"
+                        variant="primary"
+                        type="submit"
                         loading={isUpdating}
                         disabled={
                           !form.formState.isDirty || !canUpdateStorageSettings || isUpdating
@@ -243,18 +243,18 @@ export const S3Connection = () => {
                     </CardFooter>
                   </Card>
                 ) : (
-                  <Alert_Shadcn_ variant="warning">
+                  <Alert variant="warning">
                     <WarningIcon />
                     <AlertTitle>Project is paused</AlertTitle>
-                    <AlertDescription_Shadcn_>
+                    <AlertDescription>
                       To connect to your S3 bucket, you need to restore your project.
-                    </AlertDescription_Shadcn_>
+                    </AlertDescription>
                     <div className="mt-3 flex items-center space-x-2">
-                      <Button asChild type="default">
+                      <Button asChild variant="default">
                         <Link href={`/project/${projectRef}`}>Restore project</Link>
                       </Button>
                     </div>
-                  </Alert_Shadcn_>
+                  </Alert>
                 )}
               </form>
             </Form>
@@ -280,18 +280,18 @@ export const S3Connection = () => {
             ) : !canReadS3Credentials ? (
               <NoPermission resourceText="view this project's S3 access keys" />
             ) : !isProjectActive ? (
-              <Alert_Shadcn_ variant="warning">
+              <Alert variant="warning">
                 <WarningIcon />
                 <AlertTitle>Can't fetch S3 access keys</AlertTitle>
-                <AlertDescription_Shadcn_>
+                <AlertDescription>
                   To fetch your S3 access keys, you need to restore your project.
-                </AlertDescription_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  <Button asChild type="default" className="mt-3">
+                </AlertDescription>
+                <AlertDescription>
+                  <Button asChild variant="default" className="mt-3">
                     <Link href={`/project/${projectRef}`}>Restore project</Link>
                   </Button>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             ) : (
               <>
                 {isLoadingStorageCreds ? (

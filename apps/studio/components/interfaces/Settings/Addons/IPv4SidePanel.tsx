@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { cn, RadioGroup, RadioGroupLargeItem, SidePanel } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -161,7 +161,7 @@ const IPv4SidePanel = () => {
           {!isAws && (
             <Admonition
               type="default"
-              title="Dedicated IPv4 address is only available for AWS projects"
+              description="Dedicated IPv4 address is only available for AWS projects."
             />
           )}
 

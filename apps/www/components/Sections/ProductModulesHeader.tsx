@@ -109,14 +109,14 @@ const ProductModulesHeader = (props: Types) => (
             </Button>
           )}
           {props.video && (
-            <Button type="default" size="small" icon={<PlayCircle />} asChild>
+            <Button variant="default" size="small" icon={<PlayCircle />} asChild>
               <Link href={props.video} as={props.video}>
                 Watch video
               </Link>
             </Button>
           )}
           {props.secondaryCta && (
-            <Button type="default" size="small" asChild>
+            <Button variant="default" size="small" asChild>
               <Link href={props.secondaryCta.link} as={props.secondaryCta.link}>
                 {props.secondaryCta.label}
               </Link>

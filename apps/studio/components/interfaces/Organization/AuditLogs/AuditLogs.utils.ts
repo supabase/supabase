@@ -1,20 +1,20 @@
 import dayjs from 'dayjs'
 
 import { DatePickerToFrom } from '@/components/interfaces/Settings/Logs/Logs.types'
-import type { V2AuditLog } from '@/data/organizations/organization-audit-logs-query'
+import type { AuditLog } from '@/data/organizations/organization-audit-logs-query'
 
-export function sortAuditLogs(logs: V2AuditLog[], descending: boolean): V2AuditLog[] {
+export function sortAuditLogs(logs: AuditLog[], descending: boolean): AuditLog[] {
   return [...logs].sort((a, b) =>
     descending ? b.timestamp - a.timestamp : a.timestamp - b.timestamp
   )
 }
 
-export function filterByUsers(logs: V2AuditLog[], userIds: string[]): V2AuditLog[] {
+export function filterByUsers(logs: AuditLog[], userIds: string[]): AuditLog[] {
   if (userIds.length === 0) return logs
   return logs.filter((log) => userIds.includes(log.actor.user_id ?? ''))
 }
 
-export function filterByProjects(logs: V2AuditLog[], projectRefs: string[]): V2AuditLog[] {
+export function filterByProjects(logs: AuditLog[], projectRefs: string[]): AuditLog[] {
   if (projectRefs.length === 0) return logs
   return logs.filter((log) => projectRefs.includes(log.project_ref ?? ''))
 }

@@ -10,9 +10,9 @@ import apiWrapper from '@/lib/api/apiWrapper'
 const codeSchema = z.object({
   sql: z
     .string()
-    .optional()
+    .nullable()
     .describe(
-      'The converted SQL query from the provided client library code. Return undefined if the code is invalid'
+      'The converted SQL query from the provided client library code. Return null if the code is invalid'
     ),
   valid: z.boolean().describe('Whether the provided client library code is valid.'),
 })
@@ -51,7 +51,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       output: Output.object({ schema: codeSchema }),
       prompt: source`
         Convert the follow Supabase client library code into SQL. The response should only be in JSON with the structure: { sql: string, valid: boolean }
-        If the client library code does not look valid, return { sql: undefined, valid: false }. Otherwise return valid as true and sql as the converted SQL query
+        If the client library code does not look valid, return { sql: null, valid: false }. Otherwise return valid as true and sql as the converted SQL query
 
         ${code}
       `,

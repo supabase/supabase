@@ -1,4 +1,4 @@
-import { ROLE_IMPERSONATION_NO_RESULTS } from '@supabase/pg-meta'
+import { ident, joinSqlFragments, ROLE_IMPERSONATION_NO_RESULTS, safeSql } from '@supabase/pg-meta'
 import { Query, type QueryFilter } from '@supabase/pg-meta/src/query'
 import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
 import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
@@ -11,7 +11,7 @@ import { Filter, Sort, SupaRow, SupaTable } from '@/components/grid/types'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { handleError } from '@/data/fetchers'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
-import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
 import { isMsSqlForeignTable } from '@/data/table-editor/table-editor-types'
 import { timeout } from '@/lib/helpers'
@@ -130,11 +130,15 @@ export const getAllTableRowsSql = ({
     .filter(
       (column) => (column?.enum ?? []).length > 0 && column.dataType.toLowerCase() === 'array'
     )
-    .map((column) => `"${column.name}"::text[]`)
+    .map((column) => safeSql`${ident(column.name)}::text[]`)
 
   let queryChains = query
     .from(table.name, table.schema ?? undefined)
-    .select(arrayBasedColumns.length > 0 ? `*,${arrayBasedColumns.join(',')}` : '*')
+    .select(
+      arrayBasedColumns.length > 0
+        ? joinSqlFragments([safeSql`*`, ...arrayBasedColumns], ',')
+        : safeSql`*`
+    )
 
   filters
     .filter((filter) => filter.value && filter.value !== '')
@@ -312,7 +316,7 @@ type TableRowsVariables = Omit<GetTableRowsArgs, 'table'> & {
 }
 
 export type TableRowsData = TableRows
-type TableRowsError = ExecuteSqlError
+type TableRowsError = ResponseError
 
 async function getTableRows(
   {

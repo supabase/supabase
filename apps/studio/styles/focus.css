@@ -1,4 +1,4 @@
-@reference "./main.css";
+@reference "./globals.css";
 
 /* Focus styles for keyboard navigation on interactive table rows */
 .inset-focus {

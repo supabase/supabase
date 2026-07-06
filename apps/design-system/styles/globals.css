@@ -1,13 +1,18 @@
-@import 'tailwindcss';
-
-@import './../../../packages/ui/build/css/source/global.css';
-@import './../../../packages/ui/build/css/themes/dark.css';
+@import 'config/tailwind.config.css';
 @import './../../../packages/ui/build/css/themes/classic-dark.css';
-@import './../../../packages/ui/build/css/themes/light.css';
-
-@config '../tailwind.config.js';
-
 @import 'config/typography.css';
+
+@source '../app/**/*.{js,ts,jsx,tsx}';
+@source '../components/**/*.{js,ts,jsx,tsx}';
+@source '../registry/**/*.{js,ts,jsx,tsx}';
+@source '../content/**/*.mdx';
+@source './../../../packages/ui/src/**/*.{tsx,ts,js}';
+@source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+
+@theme {
+  /* added to get max-w-site */
+  --container-site: 128rem;
+}
 
 @layer base {
   :root {

@@ -34,7 +34,7 @@ export const DocsMobileNav = ({
   return (
     <>
       <div className="sticky top-0 z-10 flex lg:hidden items-center border-b bg-surface-100 px-4 py-3">
-        <Button type="default" icon={<Menu size={16} />} onClick={() => setOpen(true)}>
+        <Button variant="default" icon={<Menu size={16} />} onClick={() => setOpen(true)}>
           Menu
         </Button>
       </div>

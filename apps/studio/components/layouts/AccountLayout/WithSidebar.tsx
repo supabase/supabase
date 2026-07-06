@@ -1,18 +1,16 @@
 import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren, ReactNode } from 'react'
-import { cn, Menu } from 'ui'
+import { cn } from 'ui'
 
 import type { SidebarSection } from './AccountLayout.types'
+import { getActiveKey, toSubMenuSections } from './AccountLayout.utils'
+import { SubMenu } from '@/components/ui/ProductMenu/SubMenu'
 
 interface WithSidebarProps {
   title?: string
   sections: SidebarSection[]
   header?: ReactNode
-  subitems?: any[]
-  subitemsParentKey?: number
-  hideSidebar?: boolean
-  customSidebarContent?: ReactNode
   backToDashboardURL?: string
 }
 
@@ -21,24 +19,17 @@ export const WithSidebar = ({
   header,
   children,
   sections,
-  subitems,
-  subitemsParentKey,
-  hideSidebar = false,
-  customSidebarContent,
   backToDashboardURL,
 }: PropsWithChildren<WithSidebarProps>) => {
-  const noContent = !sections && !customSidebarContent
+  const noContent = !sections
 
   return (
     <div className="flex flex-col md:flex-row h-full">
-      {!hideSidebar && !noContent && (
+      {!noContent && (
         <SidebarContent
           title={title}
           header={header}
           sections={sections}
-          subitems={subitems}
-          subitemsParentKey={subitemsParentKey}
-          customSidebarContent={customSidebarContent}
           backToDashboardURL={backToDashboardURL}
           className="hidden md:flex"
         />
@@ -53,12 +44,12 @@ export const WithSidebar = ({
 export const SidebarContent = ({
   header,
   sections,
-  subitems,
-  subitemsParentKey,
-  customSidebarContent,
   backToDashboardURL,
   className,
 }: PropsWithChildren<Omit<WithSidebarProps, 'breadcrumbs'>> & { className?: string }) => {
+  const page = getActiveKey(sections)
+  const subMenuSections = toSubMenuSections(sections)
+
   return (
     <>
       <div
@@ -85,49 +76,8 @@ export const SidebarContent = ({
           )}
           {header && header}
           <div className="flex-1 overflow-auto">
-            <div className="flex flex-col space-y-8">
-              <Menu type="pills">
-                {customSidebarContent}
-                {sections.map((section, idx) => (
-                  <div key={section.key || section.heading}>
-                    {Boolean(section.heading) ? (
-                      <SectionWithHeaders
-                        key={section.key}
-                        section={section}
-                        subitems={subitems}
-                        subitemsParentKey={subitemsParentKey}
-                      />
-                    ) : (
-                      <div className="my-6 space-y-8">
-                        <div className="mx-3">
-                          {section.links.map((link, i: number) => {
-                            const isActive = link.isActive && !subitems
-                            return (
-                              <Menu.Item
-                                key={`${link.key}-${i}`}
-                                rounded
-                                active={isActive}
-                                icon={link.icon}
-                              >
-                                <Link href={link.href || ''} className="block">
-                                  <div className="flex w-full items-center justify-between gap-1">
-                                    <div className="flex items-center gap-2 truncate w-full">
-                                      <span className="truncate">{link.label}</span>
-                                    </div>
-                                  </div>
-                                </Link>
-                              </Menu.Item>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    )}
-                    {idx !== sections.length - 1 && (
-                      <div className="h-px w-full bg-border-overlay" />
-                    )}
-                  </div>
-                ))}
-              </Menu>
+            <div className="flex flex-col">
+              <SubMenu sections={subMenuSections} page={page} />
             </div>
           </div>
         </div>
@@ -135,41 +85,3 @@ export const SidebarContent = ({
     </>
   )
 }
-
-interface SectionWithHeadersProps {
-  section: SidebarSection
-  subitems?: any[]
-  subitemsParentKey?: number
-}
-
-const SectionWithHeaders = ({ section, subitems }: SectionWithHeadersProps) => (
-  <div key={section.heading} className="my-6 space-y-8">
-    <div className="mx-3">
-      {section.heading && (
-        <Menu.Group
-          title={
-            <div className="flex flex-col space-y-2 uppercase font-mono">
-              <span>{section.heading}</span>
-            </div>
-          }
-        />
-      )}
-      <div>
-        {section.links.map((link, i: number) => {
-          const isActive = link.isActive && !subitems
-          return (
-            <Menu.Item key={`${link.key}-${i}`} rounded active={isActive} icon={link.icon}>
-              <Link href={link.href || ''} className="block">
-                <div className="flex w-full items-center justify-between gap-1">
-                  <div className="flex items-center gap-2 truncate w-full">
-                    <span className="truncate">{link.label}</span>
-                  </div>
-                </div>
-              </Link>
-            </Menu.Item>
-          )
-        })}
-      </div>
-    </div>
-  </div>
-)

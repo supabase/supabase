@@ -2,7 +2,7 @@ import { getCronJobsSql } from '@supabase/pg-meta'
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
 import { databaseCronJobsKeys } from './keys'
-import { COST_THRESHOLD_ERROR, executeSql } from '@/data/sql/execute-sql-query'
+import { COST_THRESHOLD_ERROR, executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 // The value is intentionally high because the data grid needs to overflow so that `onScroll` event work and trigger

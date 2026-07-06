@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority'
 import React from 'react'
-import { cn, FormDescription, FormLabel, FormMessage, Label_Shadcn_ } from 'ui'
+import { cn, FormDescription, FormLabel, FormMessage, Label } from 'ui'
 import { SIZE } from 'ui/src/lib/constants'
 
 type Props = {
@@ -286,6 +286,7 @@ export const FormLayout = React.forwardRef<
       nonBoxInput = !label,
       hideMessage = false,
       isReactForm,
+      error,
       ...props
     },
     ref
@@ -301,6 +302,10 @@ export const FormLayout = React.forwardRef<
           )}
           data-formlayout-id="message"
         />
+      ) : error && !hideMessage ? (
+        <p className={cn('mt-2 text-sm text-destructive', layout === 'flex-row-reverse' && 'mt-0')}>
+          {error}
+        </p>
       ) : null
 
     const renderDescription =
@@ -372,13 +377,13 @@ export const FormLayout = React.forwardRef<
                   <LabelContents />
                 </FormLabel>
               ) : (
-                <Label_Shadcn_
+                <Label
                   className="text-foreground flex gap-2 items-center wrap-break-word leading-normal"
                   data-formlayout-id="label"
                   htmlFor={props.name || id}
                 >
                   <LabelContents />
-                </Label_Shadcn_>
+                </Label>
               )}
               {labelOptional && (
                 <span

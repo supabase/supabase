@@ -15,6 +15,10 @@ describe('getReplicationDestinationType', () => {
     expect(getReplicationDestinationType({ ducklake: {} })).toBe('DuckLake')
   })
 
+  it('returns Snowflake for snowflake configs', () => {
+    expect(getReplicationDestinationType({ snowflake: {} })).toBe('Snowflake')
+  })
+
   it('returns undefined for unknown or missing configs', () => {
     expect(getReplicationDestinationType({})).toBeUndefined()
     expect(getReplicationDestinationType(undefined)).toBeUndefined()

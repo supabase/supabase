@@ -2,8 +2,8 @@ import { getOngoingQueriesSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { sqlKeys } from './keys'
-import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from '@/types'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type OngoingQuery = {
   pid: number
@@ -31,7 +31,7 @@ export async function getOngoingQueries(
 }
 
 export type OngoingQueriesData = Awaited<ReturnType<typeof getOngoingQueries>>
-export type OngoingQueriesError = ExecuteSqlError
+export type OngoingQueriesError = ResponseError
 
 export const useOngoingQueriesQuery = <TData = OngoingQueriesData>(
   { projectRef, connectionString }: OngoingQueriesVariables,

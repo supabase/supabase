@@ -1,7 +1,7 @@
 import { ChevronsUpDown, Lightbulb } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button, cn } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, cn } from 'ui'
 
 import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
 import { buildQueryExplanationPrompt } from './QueryPerformance.ai'
@@ -88,7 +88,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
             onOpenAssistant={handleExplainQuery}
             telemetrySource="query_performance"
             size="tiny"
-            type="default"
+            variant="default"
           />
         </div>
         <div
@@ -99,26 +99,24 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
         >
           <SqlMonacoBlock
             value={query}
-            height={322}
-            lineNumbers="off"
-            wrapperClassName={cn('pl-3 bg-surface-100', !isExpanded && 'pointer-events-none')}
+            wrapperClassName={cn('bg-surface-100', !isExpanded && 'pointer-events-none')}
           />
           {isLinterWarning && (
-            <Alert_Shadcn_
+            <Alert
               variant="default"
               className="mt-2 border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand"
             >
               <Lightbulb />
-              <AlertTitle_Shadcn_>Suggested optimization: Add an index</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              <AlertTitle>Suggested optimization: Add an index</AlertTitle>
+              <AlertDescription>
                 Adding an index will help this query execute faster
-              </AlertDescription_Shadcn_>
-              <AlertDescription_Shadcn_>
+              </AlertDescription>
+              <AlertDescription>
                 <Button className="mt-3" onClick={() => onClickViewSuggestion()}>
                   View suggestion
                 </Button>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           )}
         </div>
         <div
@@ -129,7 +127,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
         />
         <div className="absolute bottom-[-13px] left-0 right-0 w-full flex items-center justify-center z-10">
           <Button
-            type="default"
+            variant="default"
             className="rounded-full"
             icon={<ChevronsUpDown />}
             onClick={() => setIsExpanded(!isExpanded)}
@@ -139,7 +137,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
         </div>
       </QueryPanelSection>
       <QueryPanelSection className="pb-3 pt-6">
-        <h4 className="mb-2">Metadata</h4>
+        <h4 className="mb-4">Metadata</h4>
         <ul className="flex flex-col gap-y-3 divide-y divide-dashed">
           {report
             .filter((x) => x.id !== 'query')
@@ -160,7 +158,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
                 const totalTime = selectedRow?.total_time || 0
 
                 return (
-                  <li key={x.id} className="flex justify-between pt-3 text-sm">
+                  <li key={x.id} className="flex justify-between pb-3 text-sm">
                     <p className="text-foreground-light">{x.name}</p>
                     {percentage && totalTime ? (
                       <p className="flex items-center gap-x-1.5">
@@ -191,7 +189,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
 
               if (x.id == 'rows_read') {
                 return (
-                  <li key={x.id} className="flex justify-between pt-3 text-sm">
+                  <li key={x.id} className="flex justify-between pb-3 text-sm">
                     <p className="text-foreground-light">{x.name}</p>
                     {typeof rawValue === 'number' && !isNaN(rawValue) && isFinite(rawValue) ? (
                       <p
@@ -213,7 +211,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
 
               if (x.id === 'cache_hit_rate') {
                 return (
-                  <li key={x.id} className="flex justify-between pt-3 text-sm">
+                  <li key={x.id} className="flex justify-between pb-3 text-sm">
                     <p className="text-foreground-light">{x.name}</p>
                     {typeof rawValue === 'string' || typeof rawValue === 'number' ? (
                       <p
@@ -236,7 +234,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
               }
 
               return (
-                <li key={x.id} className="flex justify-between pt-3 text-sm">
+                <li key={x.id} className="flex justify-between pb-3 text-sm">
                   <p className="text-foreground-light">{x.name}</p>
                   <p className={cn('tabular-nums', x.id === 'rolname' && 'font-mono')}>
                     {formattedValue}

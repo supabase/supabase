@@ -3,7 +3,6 @@ import { Elements } from '@stripe/react-stripe-js'
 import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import { useDebounce } from '@uidotdev/usehooks'
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { groupBy } from 'lodash'
 import { HelpCircle } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -17,18 +16,25 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
+import {
+  ORG_KIND_DEFAULT,
+  ORG_SIZE_DEFAULT,
+  OrganizationDetailsFields,
+  organizationDetailsSchema,
+  type OrgKind,
+  type OrgSize,
+} from './OrganizationDetailsFields'
 import { UpgradeExistingOrganizationCallout } from './UpgradeExistingOrganizationCallout'
 import { ChargeBreakdown } from '@/components/interfaces/Billing/ChargeBreakdown'
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
@@ -48,28 +54,17 @@ import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-quer
 import { SetupIntentResponse } from '@/data/stripe/setup-intent-mutation'
 import { useConfirmPendingSubscriptionCreateMutation } from '@/data/subscriptions/org-subscription-confirm-pending-create'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { validateReturnTo } from '@/lib/gotrue'
 import { useProfile } from '@/lib/profile'
-
-const ORG_KIND_TYPES = {
-  PERSONAL: 'Personal',
-  EDUCATIONAL: 'Educational',
-  STARTUP: 'Startup',
-  AGENCY: 'Agency',
-  COMPANY: 'Company',
-  UNDISCLOSED: 'N/A',
-}
-const ORG_KIND_DEFAULT = 'PERSONAL'
-
-const ORG_SIZE_TYPES = {
-  '1': '1 - 10',
-  '10': '10 - 49',
-  '50': '50 - 99',
-  '100': '100 - 299',
-  '300': 'More than 300',
-}
-const ORG_SIZE_DEFAULT = '1'
+import {
+  classifyApiError,
+  classifyStripeError,
+  classifyValidationError,
+} from '@/lib/telemetry/funnel-errors'
+import { useTrack } from '@/lib/telemetry/track'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
 interface NewOrgFormProps {
   onPaymentMethodReset: () => void
@@ -79,19 +74,11 @@ interface NewOrgFormProps {
 
 const plans = ['FREE', 'PRO', 'TEAM'] as const
 
-const formSchema = z.object({
+const formSchema = organizationDetailsSchema.extend({
   plan: z
     .string()
     .transform((val) => val.toUpperCase())
     .pipe(z.enum(plans)),
-  name: z.string().min(1, 'Organization name is required'),
-  kind: z
-    .string()
-    .transform((val) => val.toUpperCase())
-    .pipe(
-      z.enum(['PERSONAL', 'EDUCATIONAL', 'STARTUP', 'AGENCY', 'COMPANY', 'UNDISCLOSED'] as const)
-    ),
-  size: z.enum(['1', '10', '50', '100', '300'] as const),
   spend_cap: z.boolean(),
 })
 
@@ -112,18 +99,15 @@ export const NewOrgForm = ({
 }: NewOrgFormProps) => {
   const router = useRouter()
   const user = useProfile()
+  const track = useTrack()
   const { resolvedTheme } = useTheme()
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const isBillingEnabled = useIsFeatureEnabled('billing:all')
 
   const { data: organizations, isSuccess } = useOrganizationsQuery()
   const { data } = useProjectsInfiniteQuery({})
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects) ?? [], [data?.pages])
-
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
 
   const freeOrgs = (organizations || []).filter((it) => it.plan.id === 'free')
 
@@ -164,8 +148,8 @@ export const NewOrgForm = ({
     defaultValues: {
       plan: defaultValues.plan.toUpperCase() as (typeof plans)[number],
       name: defaultValues.name,
-      kind: defaultValues.kind as typeof ORG_KIND_DEFAULT,
-      size: defaultValues.size as keyof typeof ORG_SIZE_TYPES,
+      kind: defaultValues.kind as OrgKind,
+      size: defaultValues.size as OrgSize,
       spend_cap: defaultValues.spend_cap,
     },
   })
@@ -174,8 +158,8 @@ export const NewOrgForm = ({
     form.reset({
       plan: defaultValues.plan.toUpperCase() as (typeof plans)[number],
       name: defaultValues.name,
-      kind: defaultValues.kind as typeof ORG_KIND_DEFAULT,
-      size: defaultValues.size as keyof typeof ORG_SIZE_TYPES,
+      kind: defaultValues.kind as OrgKind,
+      size: defaultValues.size as OrgSize,
       spend_cap: defaultValues.spend_cap,
     })
   }, [defaultValues, form])
@@ -187,6 +171,14 @@ export const NewOrgForm = ({
       form.setValue('name', prefilledOrgName)
     }
   }, [isSuccess, form, organizations?.length, user.profile?.username, user.isSuccess])
+
+  const hasTrackedFormExposed = useRef(false)
+  useEffect(() => {
+    if (hasTrackedFormExposed.current) return
+    if (!user.isSuccess) return
+    hasTrackedFormExposed.current = true
+    track('organization_creation_form_exposed')
+  }, [user.isSuccess, track])
 
   const [latestAddress, setLatestAddress] = useState<CustomerAddress>()
   const [latestTaxId, setLatestTaxId] = useState<CustomerTaxId | null>()
@@ -250,6 +242,8 @@ export const NewOrgForm = ({
     [freeOrgs, projectsByOrg]
   )
 
+  const trackFunnelError = useTrackFunnelError()
+
   const { mutate: createOrganization } = useOrganizationCreateMutation({
     onSuccess: async (org) => {
       if ('pending_payment_intent_secret' in org && org.pending_payment_intent_secret) {
@@ -260,6 +254,7 @@ export const NewOrgForm = ({
     },
     onError: (data) => {
       toast.error(data.message, { duration: 10_000 })
+      trackFunnelError('org_creation', classifyApiError('org_creation', data), 'toast')
       setNewOrgLoading(false)
     },
   })
@@ -269,6 +264,10 @@ export const NewOrgForm = ({
       if (data && 'slug' in data) {
         onOrganizationCreated({ slug: data.slug })
       }
+    },
+    onError: (error) => {
+      toast.error(error.message, { dismissible: true, duration: 10_000 })
+      trackFunnelError('org_creation', classifyApiError('org_creation', error), 'toast')
     },
   })
 
@@ -284,6 +283,11 @@ export const NewOrgForm = ({
         size: form.getValues('size'),
       })
     } else {
+      trackFunnelError(
+        'org_creation',
+        classifyStripeError(paymentIntentConfirmation.error),
+        'toast'
+      )
       // If the payment intent is not successful, we reset the payment method and show an error
       toast.error(`Could not confirm payment. Please try again or use a different card.`, {
         duration: 10_000,
@@ -294,12 +298,20 @@ export const NewOrgForm = ({
   }
 
   const onOrganizationCreated = (org: { slug: string }) => {
+    if (submittedTier.current) {
+      track(
+        'organization_creation_completed',
+        { tier: submittedTier.current },
+        { organization: org.slug }
+      )
+    }
+
     const prefilledProjectName = user.profile?.username
       ? user.profile.username + `'s Project`
       : 'My Project'
 
     if (searchParams.returnTo) {
-      const url = new URL(searchParams.returnTo, window.location.origin)
+      const url = new URL(validateReturnTo(searchParams.returnTo, '/'), window.location.origin)
       if (searchParams.auth_id) {
         url.searchParams.set('auth_id', searchParams.auth_id)
       }
@@ -320,6 +332,8 @@ export const NewOrgForm = ({
     } as StripeElementsOptions
   }, [paymentIntentSecret, resolvedTheme])
 
+  const submittedTier = useRef<'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | null>(null)
+
   async function createOrg(
     formValues: z.infer<typeof formSchema>,
     paymentMethodId?: string,
@@ -330,15 +344,17 @@ export const NewOrgForm = ({
     }
   ) {
     const dbTier = formValues.plan === 'PRO' && !formValues.spend_cap ? 'PAYG' : formValues.plan
+    const tier = ('tier_' + dbTier.toLowerCase()) as
+      | 'tier_payg'
+      | 'tier_pro'
+      | 'tier_free'
+      | 'tier_team'
+    submittedTier.current = tier
 
     createOrganization({
       name: formValues.name,
       kind: formValues.kind,
-      tier: ('tier_' + dbTier.toLowerCase()) as
-        | 'tier_payg'
-        | 'tier_pro'
-        | 'tier_free'
-        | 'tier_team',
+      tier,
       ...(formValues.kind == 'COMPANY' ? { size: formValues.size } : {}),
       payment_method: paymentMethodId,
       billing_name: dbTier === 'FREE' ? undefined : customerData?.billing_name,
@@ -378,7 +394,12 @@ export const NewOrgForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} id={FORM_ID}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit, (errors) =>
+          trackFunnelError('org_creation', classifyValidationError('org_creation', errors), 'form')
+        )}
+        id={FORM_ID}
+      >
         <Panel
           title={
             <div key="panel-title">
@@ -392,7 +413,7 @@ export const NewOrgForm = ({
           footer={
             <div key="panel-footer" className="flex w-full items-center justify-between">
               <Button
-                type="default"
+                variant="default"
                 disabled={newOrgLoading || paymentConfirmationLoading}
                 onClick={() => {
                   if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
@@ -404,8 +425,8 @@ export const NewOrgForm = ({
 
               <Button
                 form={FORM_ID}
-                htmlType="submit"
-                type="primary"
+                type="submit"
+                variant="primary"
                 loading={newOrgLoading}
                 disabled={newOrgLoading || creationPreviewIsFetching}
               >
@@ -420,93 +441,13 @@ export const NewOrgForm = ({
           footerClasses="rounded-b-md"
         >
           <div className="divide-y divide-border-muted">
-            <Panel.Content>
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Name"
-                    layout="horizontal"
-                    description="What's the name of your company or team? You can change this later."
-                  >
-                    <FormControl>
-                      <Input_Shadcn_
-                        autoFocus
-                        type="text"
-                        placeholder="Organization name"
-                        data-1p-ignore
-                        data-lpignore="true"
-                        data-form-type="other"
-                        data-bwignore
-                        {...field}
-                      />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-            </Panel.Content>
-            <Panel.Content>
-              <FormField
-                control={form.control}
-                name="kind"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Type"
-                    layout="horizontal"
-                    description="What best describes your organization?"
-                  >
-                    <FormControl>
-                      <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger_Shadcn_ className="w-full">
-                          <SelectValue_Shadcn_ />
-                        </SelectTrigger_Shadcn_>
-
-                        <SelectContent_Shadcn_>
-                          {Object.entries(ORG_KIND_TYPES).map(([k, v]) => (
-                            <SelectItem_Shadcn_ key={k} value={k}>
-                              {v}
-                            </SelectItem_Shadcn_>
-                          ))}
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-            </Panel.Content>
-
-            {form.watch('kind') == 'COMPANY' && (
-              <Panel.Content>
-                <FormField
-                  control={form.control}
-                  name="size"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Company size"
-                      layout="horizontal"
-                      description="How many people are in your company?"
-                    >
-                      <FormControl>
-                        <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger_Shadcn_ className="w-full">
-                            <SelectValue_Shadcn_ />
-                          </SelectTrigger_Shadcn_>
-
-                          <SelectContent_Shadcn_>
-                            {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
-                              <SelectItem_Shadcn_ key={k} value={k}>
-                                {v}
-                              </SelectItem_Shadcn_>
-                            ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-              </Panel.Content>
-            )}
+            <OrganizationDetailsFields
+              control={form.control}
+              kind={form.watch('kind')}
+              renderFieldWrapper={(children, field) => (
+                <Panel.Content key={field}>{children}</Panel.Content>
+              )}
+            />
 
             {isBillingEnabled && (
               <Panel.Content>
@@ -525,25 +466,25 @@ export const NewOrgForm = ({
                       }
                     >
                       <FormControl>
-                        <Select_Shadcn_
+                        <Select
                           value={field.value}
                           onValueChange={(value) => {
                             field.onChange(value)
                             onPlanSelected(value)
                           }}
                         >
-                          <SelectTrigger_Shadcn_ className="w-full">
-                            <SelectValue_Shadcn_ />
-                          </SelectTrigger_Shadcn_>
+                          <SelectTrigger className="w-full">
+                            <SelectValue />
+                          </SelectTrigger>
 
-                          <SelectContent_Shadcn_>
+                          <SelectContent>
                             {Object.entries(PRICING_TIER_LABELS_ORG).map(([k, v]) => (
-                              <SelectItem_Shadcn_ key={k} value={k} translate="no">
+                              <SelectItem key={k} value={k} translate="no">
                                 {v}
-                              </SelectItem_Shadcn_>
+                              </SelectItem>
                             ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                     </FormItemLayout>
                   )}
@@ -651,6 +592,11 @@ export const NewOrgForm = ({
               onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
               onError={(err) => {
                 toast.error(err.message, { duration: 10_000 })
+                trackFunnelError(
+                  'org_creation',
+                  { errorCategory: 'payment', errorReason: 'payment_error' },
+                  'toast'
+                )
                 setNewOrgLoading(false)
                 resetPaymentMethod()
               }}

@@ -16,6 +16,7 @@ interface PricingPlansProps {
 
 const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansProps) => {
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const orgSlug = organizations?.[0]?.slug
 
   return (
     <div className="mx-auto lg:container lg:px-16 xl:px-12 flex flex-col">
@@ -36,6 +37,7 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                   showUpgradeText: isUpgradablePlan && hasExistingOrganizations ? true : false,
                   section: 'main',
                 },
+                ...(orgSlug && { groups: { organization: orgSlug } }),
               })
             }
 
@@ -81,7 +83,7 @@ const PricingPlans = ({ organizations, hasExistingOrganizations }: PricingPlansP
                     <Button
                       block
                       size="large"
-                      type={plan.name === 'Enterprise' ? 'default' : 'primary'}
+                      variant={plan.name === 'Enterprise' ? 'default' : 'primary'}
                       asChild
                     >
                       <Link href={plan.href} onClick={sendPricingEvent}>

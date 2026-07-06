@@ -3,10 +3,13 @@ import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import career from '~/data/career.json'
+import { breadcrumbs } from '~/lib/breadcrumbs'
 import { filterGenericJob, groupJobsByTeam, JobItemProps, PLACEHOLDER_JOB_ID } from '~/lib/careers'
+import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import Styles from '~/styles/career.module.css'
 import { GetServerSideProps } from 'next'
 import { NextSeo } from 'next-seo'
+import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -109,20 +112,30 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
           ],
         }}
       />
+      <Head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: serializeJsonLd(breadcrumbListSchema(breadcrumbs.careers)),
+          }}
+        />
+      </Head>
       <DefaultLayout>
-        <header className="container relative mx-auto px-6 pt-12 pb-8 lg:pt-24 lg:px-16 xl:px-20 text-center space-y-4">
-          <h1 className="text-sm text-brand md:text-base">
-            <span className="sr-only">Supabase </span>Careers
-          </h1>
-          <h2 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1px]">
-            We're on a mission to build the best developer platform
-          </h2>
-          <p className="text-sm md:text-base text-foreground-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
-            Explore remote opportunities and join our team to help us achieve it.
-          </p>
-          <Button asChild type="primary" className="mt-4">
-            <Link href="#positions">Open positions</Link>
-          </Button>
+        <header>
+          <SectionContainer className="pt-12 pb-8! lg:pt-24 py-0 text-center space-y-4">
+            <h1 className="text-sm text-brand md:text-base">
+              <span className="sr-only">Supabase </span>Careers
+            </h1>
+            <h2 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1px]">
+              We're on a mission to build the best developer platform
+            </h2>
+            <p className="text-sm md:text-base text-foreground-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
+              Explore remote opportunities and join our team to help us achieve it.
+            </p>
+            <Button asChild variant="primary" className="mt-4">
+              <Link href="#positions">Open positions</Link>
+            </Button>
+          </SectionContainer>
         </header>
 
         <SectionContainer className="pt-8!">
@@ -146,7 +159,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
         </SectionContainer>
 
         <div className="py-[1.25px] bg-linear-to-r from-background via-border to-background">
-          <div className="bg-alternative text-clip">
+          <div className="bg-alternative text-clip overflow-hidden">
             <SectionContainer className="md:pt-16! md:grid md:max-h-[500px] grid-cols-1 md:grid-cols-5 md:gap-8">
               <div
                 className="
@@ -432,7 +445,7 @@ const CareerPage = ({ jobs, placeholderJob, contributors }: CareersPageProps) =>
                   Join our talent community to stay updated on future opportunities.
                 </p>
               </div>
-              <Button asChild type="primary">
+              <Button asChild variant="primary">
                 <Link
                   href="https://jobs.ashbyhq.com/supabase/form/talent-community-form"
                   target="_blank"
@@ -475,7 +488,7 @@ const JobItem = ({ job }: { job: JobItemProps }) => {
           </Badge>
           <span className="hidden md:block">{job.employment}</span>
         </div>
-        <div className={cn(buttonVariants({ type: 'default', size: 'tiny' }), 'rounded-full')}>
+        <div className={cn(buttonVariants({ variant: 'default', size: 'tiny' }), 'rounded-full')}>
           {isPlaceholderJob ? 'Submit resume' : 'Apply for position'}
         </div>
       </div>

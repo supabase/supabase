@@ -2,29 +2,42 @@ import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 
 import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
-const ContentFile = ({ connectionStringPooler }: StepContentProps) => {
+const ContentFile = ({ connectionStringPooler, deploymentMode }: StepContentProps) => {
+  const envCode = deploymentMode.isCli
+    ? `
+# Connect to Postgres via the direct connection
+DATABASE_URL="${connectionStringPooler.direct}"
+`
+    : deploymentMode.isSelfHosted
+      ? `
+# Connect to Postgres via the self-hosted transaction-mode pooler
+DATABASE_URL="${connectionStringPooler.transactionShared}"
+`
+      : connectionStringPooler.transactionDedicated &&
+          connectionStringPooler.ipv4SupportedForDedicatedPooler
+        ? `
+# Connect to Postgres via the dedicated transaction-mode pooler (IPv4-only)
+DATABASE_URL="${connectionStringPooler.transactionDedicated}"
+        `
+        : connectionStringPooler.transactionDedicated &&
+            !connectionStringPooler.ipv4SupportedForDedicatedPooler
+          ? `
+# Connect to Postgres via the shared transaction-mode pooler (IPv4-only)
+DATABASE_URL="${connectionStringPooler.transactionShared}"
+
+# For paid projects, if your network supports IPv6, or you purchased the IPv4 add-on, use the dedicated transaction-mode pooler as an alternative
+# DATABASE_URL="${connectionStringPooler.transactionDedicated}"
+        `
+          : `
+# Connect to Postgres via the shared transaction-mode pooler (IPv4-only)
+DATABASE_URL="${connectionStringPooler.transactionShared}"
+`
+
   const files = [
     {
       name: '.env',
       language: 'bash',
-      code:
-        connectionStringPooler.ipv4SupportedForDedicatedPooler &&
-        connectionStringPooler.transactionDedicated
-          ? `
-DATABASE_URL="${connectionStringPooler.transactionDedicated}"
-        `
-          : connectionStringPooler.transactionDedicated &&
-              !connectionStringPooler.ipv4SupportedForDedicatedPooler
-            ? `
-# Use Shared connection pooler (supports both IPv4/IPv6)
-DATABASE_URL="${connectionStringPooler.transactionShared}"
-
-# If your network supports IPv6 or you purchased IPv4 addon, use dedicated pooler
-# DATABASE_URL="${connectionStringPooler.transactionDedicated}"
-        `
-            : `
-DATABASE_URL="${connectionStringPooler.transactionShared}"
-`,
+      code: envCode,
     },
     {
       name: 'drizzle/schema.ts',

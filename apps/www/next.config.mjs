@@ -71,6 +71,17 @@ const nextConfig = {
       'public/**/*',
     ],
   },
+  /**
+   * /llms.txt enumerates top-level guide directories at runtime via fs.readdir
+   * on apps/docs/content/guides and reads each <dir>.mdx for its frontmatter
+   * title. /llms-full.txt recursively reads the generated .md files under
+   * apps/docs/public/markdown/. Both directories live in a sibling app, so
+   * they have to be explicitly traced into this lambda's bundle.
+   */
+  outputFileTracingIncludes: {
+    '/llms.txt': ['../docs/content/guides/*'],
+    '/llms-full.txt': ['../docs/public/markdown/guides/**/*.md' ],
+  },
   reactStrictMode: true,
   images: {
     dangerouslyAllowSVG: false,

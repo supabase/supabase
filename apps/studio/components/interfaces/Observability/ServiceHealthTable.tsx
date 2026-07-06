@@ -1,17 +1,29 @@
 import { ChevronRight, HelpCircle } from 'lucide-react'
 import Link from 'next/link'
-import { Card, CardContent, Loading, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Button,
+  Card,
+  CardContent,
+  cn,
+  Skeleton,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+  type ChartConfig,
+} from 'ui'
+import { ChartEmptyState, ChartLoadingState } from 'ui-patterns/Chart'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
-import { ButtonTooltip } from '../../ui/ButtonTooltip'
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
-import type { ServiceKey } from './ObservabilityOverview.utils'
+import type { UnifiedLogType } from '../UnifiedLogs/UnifiedLogs.utils'
+import { getHealthStatus, type ServiceKey } from './ObservabilityOverview.utils'
 
 type ServiceConfig = {
   key: ServiceKey
   name: string
   description: string
   reportUrl?: string
+  logType: UnifiedLogType
   logsUrl: string
 }
 
@@ -27,8 +39,21 @@ type ServiceData = {
 export type ServiceHealthTableProps = {
   services: ServiceConfig[]
   serviceData: Record<string, ServiceData>
-  onBarClick: (logsUrl: string) => (datum: LogsBarChartDatum) => void
+  onBarClick: (service: ServiceConfig) => (datum: LogsBarChartDatum) => void
   datetimeFormat: string
+}
+
+const colorClassMap: Record<string, string> = {
+  muted: 'bg-gray-500',
+  destructive: 'bg-destructive',
+  warning: 'bg-warning',
+  brand: 'bg-brand',
+}
+
+const LEVEL_CHART_CONFIG: ChartConfig = {
+  error_count: { label: 'Errors' },
+  warning_count: { label: 'Warnings' },
+  ok_count: { label: 'Infos' },
 }
 
 const SERVICE_DESCRIPTIONS: Record<ServiceKey, string> = {
@@ -37,101 +62,132 @@ const SERVICE_DESCRIPTIONS: Record<ServiceKey, string> = {
   functions: 'Serverless Edge Functions execution',
   storage: 'Object storage for files and assets',
   realtime: 'WebSocket connections and broadcasts',
+  data_api: 'Incoming API requests routed through the edge network',
   postgrest: 'Auto-generated REST API for your database',
 }
 
-type ServiceRowProps = {
+const formatPercent = (value: number) =>
+  value >= 1 ? `${value.toFixed(1)}%` : `${value.toFixed(2)}%`
+
+const getSubtitle = (data: ServiceData) => {
+  if (data.total === 0) return ''
+
+  const errorRate = data.errorRate
+  const warningRate = data.total > 0 ? (data.warningCount / data.total) * 100 : 0
+
+  if (errorRate > 0) return `${formatPercent(errorRate)} errors`
+  if (warningRate > 0) return `${formatPercent(warningRate)} warnings`
+  return `${data.total.toLocaleString()} requests`
+}
+
+type ServiceCellProps = {
   service: ServiceConfig
   data: ServiceData
   onBarClick: (datum: LogsBarChartDatum) => void
   datetimeFormat: string
+  className?: string
 }
 
-const ServiceRow = ({ service, data, onBarClick, datetimeFormat }: ServiceRowProps) => {
-  const errorRate = data.total > 0 ? data.errorRate : 0
-  const warningRate = data.total > 0 ? (data.warningCount / data.total) * 100 : 0
-
+const ServiceCell = ({
+  service,
+  data,
+  onBarClick,
+  datetimeFormat,
+  className,
+}: ServiceCellProps) => {
   const reportUrl = service.reportUrl || service.logsUrl
+  const { color } = getHealthStatus(data.errorRate, data.total)
+  const description = SERVICE_DESCRIPTIONS[service.key] || service.description
 
   return (
-    <Link
-      href={reportUrl}
-      className="block group py-4 px-card border-b border-default last:border-b-0 hover:bg-surface-200 transition-colors cursor-pointer"
+    <div
+      className={cn(
+        'group relative px-card pt-2 pb-4 hover:bg-surface-200 transition-colors',
+        className
+      )}
     >
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-foreground font-medium">{service.name}</span>
+      <div className="flex items-center justify-between mb-3 gap-2">
+        <div className="flex items-center gap-1.5 min-w-0">
+          <div
+            className={cn(
+              'w-1.5 h-1.5 rounded-full shrink-0',
+              colorClassMap[color] || 'bg-gray-500'
+            )}
+          />
+          <h3 className="text-foreground-light font-mono uppercase text-xs truncate m-0">
+            <Link
+              href={reportUrl}
+              className="after:absolute after:inset-0 after:content-[''] focus-visible:outline-none focus-visible:after:ring-2 focus-visible:after:ring-foreground-light focus-visible:after:ring-offset-2 focus-visible:after:rounded-sm"
+            >
+              {service.name}
+            </Link>
+          </h3>
+          {description && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  className="relative z-10 text-foreground-lighter hover:text-foreground-light transition-colors shrink-0"
+                  aria-label={`About ${service.name}`}
+                >
+                  <HelpCircle size={12} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-xs">
+                <p>{description}</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </div>
+        <div className="flex items-center gap-1.5">
+          {data.isLoading ? (
+            <Skeleton className="h-3 w-20 mt-0.5" />
+          ) : (
+            <span
+              className={cn(
+                'text-xs truncate',
+                data.total === 0 ? 'text-foreground-lighter' : 'text-foreground'
+              )}
+            >
+              {getSubtitle(data)}
+            </span>
+          )}
           <Tooltip>
             <TooltipTrigger asChild>
-              <button
-                onClick={(e) => e.preventDefault()}
-                className="text-foreground-lighter hover:text-foreground-light transition-colors"
+              <Button
+                variant="text"
+                size="tiny"
+                className="relative z-10 px-1 text-foreground-lighter group-hover:text-foreground transition-colors shrink-0"
+                aria-label={`Go to ${service.name} report`}
+                asChild
               >
-                <HelpCircle size={14} />
-              </button>
+                <Link href={reportUrl}>
+                  <ChevronRight size={14} strokeWidth={1.5} />
+                </Link>
+              </Button>
             </TooltipTrigger>
-            <TooltipContent side="right" className="max-w-xs">
-              <p>{SERVICE_DESCRIPTIONS[service.key as ServiceKey] || service.description}</p>
-            </TooltipContent>
+            <TooltipContent side="top">Go to {service.name} report</TooltipContent>
           </Tooltip>
         </div>
-        <div className="flex items-center gap-2">
-          <ButtonTooltip
-            type="text"
-            size="tiny"
-            className="p-1.5"
-            tooltip={{ content: { text: `Go to ${service.name} report` } }}
-          >
-            <ChevronRight
-              size={14}
-              className="text-foreground-lighter group-hover:text-foreground"
-            />
-          </ButtonTooltip>
-        </div>
       </div>
 
-      <div className="h-16" onClick={(e) => e.preventDefault()}>
-        <Loading active={data.isLoading}>
-          {data.isLoading ? (
-            <div />
-          ) : (
-            <LogsBarChart
-              data={data.eventChartData}
-              DateTimeFormat={datetimeFormat}
-              onBarClick={onBarClick}
-              EmptyState={
-                <div className="flex items-center justify-center h-full text-xs text-foreground-lighter">
-                  No data
-                </div>
-              }
-            />
-          )}
-        </Loading>
+      <div className="relative z-10 h-16">
+        {data.isLoading ? (
+          <ChartLoadingState className="h-full" />
+        ) : (
+          <LogsBarChart
+            isFullHeight
+            hideDateRange
+            hideXAxis
+            data={data.eventChartData}
+            chartConfig={LEVEL_CHART_CONFIG}
+            DateTimeFormat={datetimeFormat}
+            onBarClick={onBarClick}
+            EmptyState={<ChartEmptyState className="h-full" description="No traffic" />}
+          />
+        )}
       </div>
-
-      {data.total > 0 && (
-        <div className="flex items-center justify-center mt-2 text-xs text-foreground-lighter gap-4 font-mono tabular-nums tracking-tight">
-          {errorRate > 0 && (
-            <span className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
-              {errorRate.toFixed(2)}% errors
-            </span>
-          )}
-          {warningRate > 0 && (
-            <span className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-warning" />
-              {warningRate.toFixed(2)}% warnings
-            </span>
-          )}
-          {errorRate === 0 && warningRate === 0 && (
-            <span className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-brand" />
-              0% errors
-            </span>
-          )}
-        </div>
-      )}
-    </Link>
+    </div>
   )
 }
 
@@ -144,22 +200,37 @@ export const ServiceHealthTable = ({
   return (
     <div>
       <h2 className="heading-section mb-4">Service Health</h2>
-      <Card>
+      <Card className="overflow-auto">
         <CardContent className="p-0">
-          {services.map((service) => {
-            const data = serviceData[service.key]
-            if (!data) return null
+          <div className="grid grid-cols-1 md:grid-cols-2">
+            {services.map((service, index) => {
+              const data = serviceData[service.key]
+              if (!data) return null
 
-            return (
-              <ServiceRow
-                key={service.key}
-                service={service}
-                data={data}
-                onBarClick={onBarClick(service.logsUrl)}
-                datetimeFormat={datetimeFormat}
-              />
-            )
-          })}
+              const isFirst = index === 0
+              const isLeftColumn = !isFirst && (index - 1) % 2 === 0
+              const restCount = services.length - 1
+              const lastRowCount = restCount % 2 === 0 ? 2 : 1
+              const isInLastRow = !isFirst && index >= services.length - lastRowCount
+
+              return (
+                <ServiceCell
+                  key={service.key}
+                  service={service}
+                  data={data}
+                  onBarClick={onBarClick(service)}
+                  datetimeFormat={datetimeFormat}
+                  className={cn(
+                    'border-default border-b',
+                    isFirst && 'md:col-span-2',
+                    isInLastRow && 'md:border-b-0',
+                    isLeftColumn && 'md:border-r'
+                  )}
+                />
+              )
+            })}
+            <div className="bg-background/20" aria-hidden="true" />
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -1,8 +1,9 @@
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseCronJobsKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseCronJobDeleteVariables = {
@@ -20,7 +21,7 @@ export async function deleteDatabaseCronJob({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `SELECT cron.unschedule(${jobId});`,
+    sql: safeSql`SELECT cron.unschedule(${literal(jobId)});`,
     queryKey: databaseCronJobsKeys.delete(),
   })
 

@@ -8,6 +8,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ButtonTooltip } from '../ButtonTooltip'
 import { CHART_COLORS } from '../Charts/Charts.constants'
+import { PortalChartTooltip } from '../Charts/PortalChartTooltip'
 import { SqlWarningAdmonition } from '../SqlWarningAdmonition'
 import { BlockViewConfiguration } from './BlockViewConfiguration'
 import { EditQueryButton } from './EditQueryButton'
@@ -20,7 +21,7 @@ import {
 } from './QueryBlock.utils'
 import { ReportBlockContainer } from '@/components/interfaces/Reports/ReportBlock/ReportBlockContainer'
 import { ChartConfig } from '@/components/interfaces/SQLEditor/UtilityPanel/ChartConfig'
-import Results from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
+import { Results } from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
 
 export const DEFAULT_CHART_CONFIG: ChartConfig = {
   type: 'bar',
@@ -47,6 +48,9 @@ export interface QueryBlockProps {
   draggable?: boolean
   disabled?: boolean
   blockWriteQueries?: boolean
+  /** Render the chart tooltip in a portal so it isn't clipped by overflow-hidden ancestors (e.g. report cards). */
+  portalTooltip?: boolean
+  autoLimit?: boolean
   onExecute?: (queryType: 'select' | 'mutation') => void
   onRemoveChart?: () => void
   onUpdateChartConfig?: ({ chartConfig }: { chartConfig: Partial<ChartConfig> }) => void
@@ -69,11 +73,14 @@ export const QueryBlock = ({
   draggable = false,
   disabled = false,
   blockWriteQueries = false,
+  portalTooltip = false,
+  autoLimit = false,
   onExecute,
   onRemoveChart,
   onUpdateChartConfig,
   onDragStart,
 }: QueryBlockProps) => {
+  const chartContainerRef = useRef<HTMLDivElement>(null)
   const [chartSettings, setChartSettings] = useState<ChartConfig>(chartConfig)
   const { xKey, yKey, view = 'table', logScale = false } = chartSettings
 
@@ -161,7 +168,7 @@ export const QueryBlock = ({
           {!disabled && (
             <>
               <ButtonTooltip
-                type="text"
+                variant="text"
                 size="tiny"
                 className="w-7 h-7"
                 icon={<Code size={14} strokeWidth={1.5} />}
@@ -191,7 +198,7 @@ export const QueryBlock = ({
 
               <EditQueryButton id={id} title={label} sql={sql} />
               <ButtonTooltip
-                type="text"
+                variant="text"
                 size="tiny"
                 className="w-7 h-7"
                 icon={<Play size={14} strokeWidth={1.5} />}
@@ -280,6 +287,7 @@ export const QueryBlock = ({
                 </p>
               )}
               <ChartContainer
+                ref={chartContainerRef}
                 className="aspect-auto px-3 py-2"
                 style={{ height: '230px', minHeight: '230px' }}
               >
@@ -318,22 +326,34 @@ export const QueryBlock = ({
                   />
                   <Tooltip
                     content={
-                      <ChartTooltipContent
-                        className="min-w-[200px]"
-                        labelFormatter={(value) =>
-                          xKeyDateFormat === 'date'
-                            ? dayjs(value).format('MMM D YYYY HH:mm')
-                            : String(value)
-                        }
-                      />
+                      portalTooltip ? (
+                        <PortalChartTooltip
+                          chartRef={chartContainerRef}
+                          className="min-w-[200px]"
+                          labelFormatter={(value) =>
+                            xKeyDateFormat === 'date'
+                              ? dayjs(value).format('MMM D YYYY HH:mm')
+                              : String(value)
+                          }
+                        />
+                      ) : (
+                        <ChartTooltipContent
+                          className="min-w-[200px]"
+                          labelFormatter={(value) =>
+                            xKeyDateFormat === 'date'
+                              ? dayjs(value).format('MMM D YYYY HH:mm')
+                              : String(value)
+                          }
+                        />
+                      )
                     }
                   />
-                  <Bar radius={1} dataKey={yKey} fill="hsl(var(--chart-1))">
+                  <Bar radius={1} dataKey={yKey} fill="var(--chart-1)">
                     {chartData?.map((_: any, index: number) => (
                       <Cell
                         key={`cell-${index}`}
                         className="transition-all duration-100"
-                        fill="hsl(var(--chart-1))"
+                        fill="var(--chart-1)"
                         opacity={focusDataIndex === undefined || focusDataIndex === index ? 1 : 0.4}
                         enableBackground={12}
                       />
@@ -355,7 +375,7 @@ export const QueryBlock = ({
                 Queries that involve any mutation will not be run in reports
               </p>
               {!!onRemoveChart && (
-                <Button type="default" className="mt-2" onClick={() => onRemoveChart()}>
+                <Button variant="default" className="mt-2" onClick={() => onRemoveChart()}>
                   Remove chart
                 </Button>
               )}
@@ -372,6 +392,11 @@ export const QueryBlock = ({
                 )}
               >
                 <Results rows={results} />
+                {autoLimit && (
+                  <p className="text-xs font-mono px-2 py-1 border-t text-foreground-light">
+                    Limited to only 100 rows
+                  </p>
+                )}
               </div>
             )
           )}

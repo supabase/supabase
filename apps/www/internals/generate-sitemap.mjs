@@ -10,13 +10,11 @@ async function generate() {
     'pages/*.tsx',
     'pages/*.mdx',
     'pages/**/*.tsx',
-    'data/**/*.mdx',
     '_blog/*.mdx',
     '_case-studies/*.mdx',
     '_customers/*.mdx',
     '_events/*.mdx',
     '_alternatives/*.mdx',
-    '!data/*.mdx',
     '!pages/_*.js',
     '!pages/_*.tsx',
     '!pages/api',
@@ -38,7 +36,7 @@ async function generate() {
     .map((page) => {
       const path = page
         .replace('.next/server/pages', '')
-        .replace('pages', '')
+        .replace(/^pages/, '')
         .replace('.html', '')
         // add a `/` for blog posts
         .replace('_blog', `/${blogUrl}`)
@@ -120,7 +118,9 @@ async function generate() {
   const changelogDetailUrls = (() => {
     try {
       const rss = readFileSync('public/changelog-rss.xml', 'utf-8')
-      const matches = [...rss.matchAll(/<link>(https:\/\/supabase\.com\/changelog\/\d+[^<]*)<\/link>/g)]
+      const matches = [
+        ...rss.matchAll(/<link>(https:\/\/supabase\.com\/changelog\/\d+[^<]*)<\/link>/g),
+      ]
       const uniqueUrls = [...new Set(matches.map((match) => match[1]))]
 
       return uniqueUrls.map(

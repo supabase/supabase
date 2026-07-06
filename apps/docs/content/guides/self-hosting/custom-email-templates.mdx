@@ -159,7 +159,7 @@ services:
     environment:
       GOTRUE_MAILER_NOTIFICATIONS_PASSWORD_CHANGED_ENABLED: 'true' # 👈 enabling the notification is required
       GOTRUE_MAILER_TEMPLATES_PASSWORD_CHANGED_NOTIFICATION: 'http://templates-server/password_changed_notification.html'
-      GOTRUE_MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION: 'Your password has been changed'
+      GOTRUE_MAILER_SUBJECTS_PASSWORD_CHANGED_NOTIFICATION: 'Your password was changed'
 
   templates-server:
     image: caddy:2-alpine

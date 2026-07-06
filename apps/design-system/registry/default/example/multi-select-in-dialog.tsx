@@ -10,7 +10,7 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Label_Shadcn_,
+  Label,
 } from 'ui'
 import {
   MultiSelector,
@@ -47,7 +47,7 @@ export default function MultiSelectDemo() {
         <DialogSectionSeparator />
         <DialogSection className="space-y-4">
           <div>
-            <Label_Shadcn_ htmlFor="fruits">Fruits</Label_Shadcn_>
+            <Label htmlFor="fruits">Fruits</Label>
             <MultiSelector id="fruits" values={selectedValues} onValuesChange={setSelectedValues}>
               <MultiSelectorTrigger label="Select fruits" badgeLimit="wrap" showIcon={false} />
               <MultiSelectorContent>

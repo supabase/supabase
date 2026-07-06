@@ -1,18 +1,17 @@
-import { capitalize } from 'lodash-es'
-import rehypeSlug from 'rehype-slug'
-import { Heading } from 'ui'
-import { Admonition } from 'ui-patterns'
-
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
-import { OCTOKIT_RETRY_OPTIONS, getGitHubFileContents, octokit } from '~/lib/octokit'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
-import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
+import { linkTransform, UrlTransformFunction } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
+import { getGitHubFileContents, octokit, OCTOKIT_RETRY_OPTIONS } from '~/lib/octokit'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
+import { capitalize } from 'lodash-es'
+import rehypeSlug from 'rehype-slug'
+import { Heading } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -26,7 +25,7 @@ const meta = {
 }
 
 const generateMetadata = genGuideMeta(() => ({
-  pathname: '/guides/database/database-linter',
+  pathname: '/guides/database/database-advisors',
   meta,
 }))
 
@@ -64,7 +63,7 @@ const DatabaseAdvisorDocs = async () => {
   } as SerializeOptions
 
   return (
-    <GuideTemplate meta={meta} editLink={editLink}>
+    <GuideTemplate meta={meta} editLink={editLink} pathname="/guides/database/database-advisors">
       <MDXRemoteBase source={markdownIntro} />
       <Heading tag="h2">Available checks</Heading>
 

@@ -1,3 +1,4 @@
+import { ident, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { ScrollArea } from 'ui'
@@ -51,9 +52,7 @@ export const ViewEntityAutofixSecurityModal = ({
   })
 
   function handleConfirm() {
-    const sql = `
-	ALTER VIEW "${table.schema}"."${table.name}" SET (security_invoker = on);
-	`
+    const sql = safeSql`ALTER VIEW ${ident(table.schema)}.${ident(table.name)} SET (security_invoker = on);`
     execute({
       projectRef: project?.ref,
       connectionString: project?.connectionString,

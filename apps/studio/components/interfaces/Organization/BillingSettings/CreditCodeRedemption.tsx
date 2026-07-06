@@ -19,19 +19,20 @@ import {
   DialogTrigger,
   Form,
   FormField,
-  Input_Shadcn_,
+  Input,
   Separator,
 } from 'ui'
-import { Admonition, ShimmeringLoader, TimestampInfo } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { z } from 'zod'
 
-import { getTotalCreditBalanceCents } from './helpers'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
-import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
+import { useOrgBalanceQuery } from '@/data/subscriptions/org-balance-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLatest } from '@/hooks/misc/useLatest'
 
@@ -58,14 +59,11 @@ export const CreditCodeRedemption = ({
   )
 
   const { data: org, isLoading: isOrgLoading } = useOrganizationQuery({ slug })
-  const { data: customerProfile, isLoading: isCustomerProfileLoading } =
-    useOrganizationCustomerProfileQuery({ slug })
-  const combinedCreditBalanceCents = customerProfile
-    ? getTotalCreditBalanceCents({
-        customerBalance: customerProfile.balance,
-        prepaidCreditsBalance: customerProfile.prepaid_credits_balance,
-      })
-    : undefined
+  const { data: orgBalance, isLoading: isOrgBalanceLoading } = useOrgBalanceQuery(
+    { orgSlug: slug },
+    { enabled: codeRedemptionModalVisible }
+  )
+  const combinedCreditBalanceCents = orgBalance?.total_balance_cents
 
   const { can: canRedeemCode, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
     PermissionAction.BILLING_WRITE,
@@ -77,7 +75,7 @@ export const CreditCodeRedemption = ({
   const captchaRef = useRef<HCaptcha>(null)
   const captchaTokenRef = useRef<string | null>(null)
   const codeRedemptionDisabled =
-    !canRedeemCode || !isPermissionsLoaded || isOrgLoading || isCustomerProfileLoading
+    !canRedeemCode || !isPermissionsLoaded || isOrgLoading || isOrgBalanceLoading
 
   const form = useForm<CreditCodeRedemptionForm>({
     resolver: zodResolver(FormSchema),
@@ -157,7 +155,7 @@ export const CreditCodeRedemption = ({
       {!modalVisible && (
         <DialogTrigger asChild>
           <ButtonTooltip
-            type="default"
+            variant="default"
             className="pointer-events-auto"
             disabled={codeRedemptionDisabled}
             tooltip={{
@@ -239,7 +237,7 @@ export const CreditCodeRedemption = ({
                   )}
 
                   {!router.pathname.includes('/org/') && (
-                    <Button asChild type="default">
+                    <Button asChild variant="default">
                       <Link href={`/org/${org?.slug}`}>Go to organization</Link>
                     </Button>
                   )}
@@ -259,7 +257,7 @@ export const CreditCodeRedemption = ({
             <DialogSectionSeparator />
 
             <Form {...form}>
-              {isOrgLoading || isCustomerProfileLoading || !isPermissionsLoaded ? (
+              {isOrgLoading || isOrgBalanceLoading || !isPermissionsLoaded ? (
                 <div className="p-6 space-y-4">
                   <ShimmeringLoader />
                   <div className="flex space-x-4">
@@ -280,7 +278,7 @@ export const CreditCodeRedemption = ({
                           className="gap-1"
                           layout="horizontal"
                         >
-                          <Input_Shadcn_
+                          <Input
                             {...field}
                             className="uppercase w-56 ml-auto"
                             placeholder="ABCD-1234-EFGH-5678"
@@ -323,11 +321,11 @@ export const CreditCodeRedemption = ({
 
                   <DialogFooter>
                     <ButtonTooltip
-                      type="primary"
+                      variant="primary"
                       className="pointer-events-auto"
                       loading={redeemingCode}
                       disabled={codeRedemptionDisabled || !isValid}
-                      htmlType="submit"
+                      type="submit"
                       tooltip={{
                         content: {
                           side: 'bottom',

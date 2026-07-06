@@ -9,10 +9,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: write
-  pull-requests: write
-
 jobs:
   test:
     name: 'E2E tests'
@@ -26,11 +22,16 @@ jobs:
     outputs:
       tests_ran: ${{ steps.filter.outputs.studio == 'true' }}
 
+    permissions:
+      contents: read
+      id-token: write
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
 
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          persist-credentials: false
       - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
         id: filter
         with:
@@ -79,22 +80,42 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
 
-      - name: Reset supabase
-        if: steps.filter.outputs.studio == 'true'
-        run: rm -rf supabase && pnpm exec supabase init && mkdir supabase/functions
+      # Authenticate with AWS ECR to avoid rate limiting
+      - name: configure aws credentials
+        if: steps.filter.outputs.studio == 'true' && !github.event.pull_request.head.repo.fork
+        uses: aws-actions/configure-aws-credentials@5fd3084fc36e372ff1fff382a39b10d03659f355 # v2.2.0
+        with:
+          role-to-assume: ${{ secrets.PROD_AWS_ROLE }}
+          aws-region: us-east-1
+      - uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+        if: steps.filter.outputs.studio == 'true' && !github.event.pull_request.head.repo.fork
+        with:
+          registry: public.ecr.aws
+
+      - name: Pre-start diagnostics
+        run: |
+          docker ps -a
+          sudo ss -tlnp | grep 54322 || echo "54322 free"
 
       - name: Start supabase
         if: steps.filter.outputs.studio == 'true'
         run: SKIP_ASSET_UPLOAD=1 pnpm run e2e:setup:cli
 
+      - name: Failure diagnostics
+        if: failure()
+        run: |
+          docker ps -a
+          sudo ss -tlnp | grep 54322 || echo "54322 not listening"
+          docker logs $(docker ps -aq) 2>&1 || true
+
       - name: Build studio
         if: steps.filter.outputs.studio == 'true'
         run: SKIP_ASSET_UPLOAD=1 NODE_ENV=test NODE_OPTIONS="--max-old-space-size=4096" pnpm run build:studio
 
-      - name: 🚀 Run Playwright tests against Vercel Preview
+      - name: 🚀 Run Playwright tests against local studio build
         if: steps.filter.outputs.studio == 'true'
         id: playwright
-        run: pnpm e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+        run: PWTEST_SHARD_WEIGHTS=62:38 pnpm e2e --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
 
       - name: Upload blob report to GitHub Actions Artifacts
         if: always() && steps.filter.outputs.studio == 'true'
@@ -116,9 +137,13 @@ jobs:
     if: ${{ !cancelled() && needs.test.outputs.tests_ran == 'true' }}
     needs: [test]
     runs-on: blacksmith-4vcpu-ubuntu-2404
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
-
+        with:
+          persist-credentials: false
       - name: Use Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
@@ -152,6 +177,7 @@ jobs:
   merge-results:
     name: 'E2E results'
     runs-on: ubuntu-latest
+    permissions: {}
     needs: [test]
     if: ${{ !cancelled() && needs.test.outputs.tests_ran == 'true' }}
     steps:

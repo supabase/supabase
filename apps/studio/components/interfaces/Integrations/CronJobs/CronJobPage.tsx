@@ -5,11 +5,11 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
-  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
-  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
-  BreadcrumbList_Shadcn_ as BreadcrumbList,
-  BreadcrumbPage_Shadcn_ as BreadcrumbPage,
-  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
   Button,
   cn,
   Tooltip,
@@ -114,13 +114,13 @@ export const CronJobPage = () => {
   const secondaryActions = [
     <Button
       key="edit"
-      type="outline"
+      variant="outline"
       icon={<Edit3 strokeWidth={1.5} size="14" />}
       onClick={() => setIsEditSheetOpen(true)}
     >
       Edit
     </Button>,
-    <Button key="view-logs" asChild type="outline" icon={<List strokeWidth={1.5} size="14" />}>
+    <Button key="view-logs" asChild variant="outline" icon={<List strokeWidth={1.5} size="14" />}>
       <Link
         target="_blank"
         rel="noopener noreferrer"
@@ -131,7 +131,7 @@ export const CronJobPage = () => {
     </Button>,
     ...(isValidEdgeFunction
       ? [
-          <Button key="view-edge-logs" asChild type="outline">
+          <Button key="view-edge-logs" asChild variant="outline">
             <Link
               target="_blank"
               rel="noopener noreferrer"

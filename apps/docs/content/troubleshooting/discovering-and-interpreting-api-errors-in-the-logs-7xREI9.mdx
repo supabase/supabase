@@ -9,7 +9,7 @@ database_id = "188986c9-019d-4f26-baaf-6f58cec8fa7a"
 
 > A complimentary [guide](https://github.com/orgs/supabase/discussions/26224) was made for the Postgres logs
 
-# Navigating the API logs:
+## Navigating the API logs:
 
 The Database API is powered by a [ PostgREST web-server](https://postgrest.org/en/v12/), recording every request to the API Edge Network logs. To precisely navigate them, use the [Log Explorer](/dashboard/project/_/logs/explorer). These logs are managed through [Logflare](/blog/supabase-logs-self-hosted) and can be queried with a subset of BigQuery SQL syntax.
 
@@ -45,9 +45,9 @@ The most useful fields for debugging are:
 
 > NOTE: not every field is included below. For a full list, check the API Edge field reference in the [Log Explorer](/dashboard/project/_/logs/explorer)
 
-## Request object
+### Request object
 
-### Cloudflare geographic data:
+#### Cloudflare geographic data:
 
 **Suggested use cases:**
 
@@ -79,7 +79,7 @@ cross join unnest(request) AS request;
 cross join unnest(cf) AS cf;
 ```
 
-### IP and browser/environment data:
+#### IP and browser/environment data:
 
 **Suggested use cases:**
 
@@ -107,7 +107,7 @@ cross join unnest(request) AS request;
 cross join unnest(headers) AS headers;
 ```
 
-### Query type and formatting data:
+#### Query type and formatting data:
 
 **Suggested use cases:**
 
@@ -137,9 +137,9 @@ cross join unnest(request) AS request;
 cross join unnest(sb) AS sb;
 ```
 
-## Response object
+### Response object
 
-### Status code:
+#### Status code:
 
 **Suggested use cases:**
 
@@ -162,9 +162,9 @@ from
   cross join unnest(response) as response;
 ```
 
-# Finding errors
+## Finding errors
 
-### API level errors
+#### API level errors
 
 The `metadata.request.url` contains PostgREST formatted queries.
 
@@ -213,7 +213,7 @@ where
 
 PostgREST has an [error reference table](https://postgrest.org/en/v12/references/errors.html) that you can use to interpret status codes.
 
-### Database-level errors
+#### Database-level errors
 
 However, some errors that are reported through the Database API occur at the Postgres level. If it is not clear which error occurred you should reference the timestamp of the error and try to see if you can find it in the Postgres logs.
 
@@ -248,11 +248,11 @@ limit 100;
 
 Like PostgREST, Postgres has a [reference table](https://www.postgresql.org/docs/current/errcodes-appendix.html) for interpreting error codes.
 
-## PostgREST server and Cloudflare errors
+### PostgREST server and Cloudflare errors
 
 In some cases, errors may emerge because of Cloudflare or PostgREST server errors. For 500 and above errors, you may want to check your [PostgREST](/dashboard/project/_/logs/postgrest-logs) logs and the [Cloudflare docs.](https://developers.cloudflare.com/support/troubleshooting/cloudflare-errors/troubleshooting-cloudflare-5xx-errors/#error-502-bad-gateway-or-error-504-gateway-timeout))
 
-# Practical examples:
+## Practical examples:
 
 **Find All Errors:**
 

@@ -30,10 +30,6 @@ interface OtherFeatures {
   showLogs?: boolean
 }
 
-interface SettingsFeatures {
-  isPlatform?: boolean
-}
-
 function getRouteContext(ref?: string, project?: Project): RouteContext {
   return {
     ref,
@@ -210,17 +206,13 @@ export const generateOtherRoutes = (
   ]
 }
 
-export const generateSettingsRoutes = (ref?: string, features?: SettingsFeatures): Route[] => {
-  const isPlatform = features?.isPlatform ?? IS_PLATFORM
-
+export const generateSettingsRoutes = (ref?: string): Route[] => {
   return [
     {
       key: 'settings',
       label: 'Project Settings',
       icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link:
-        ref &&
-        (isPlatform ? `/project/${ref}/settings/general` : `/project/${ref}/settings/log-drains`),
+      link: ref && `/project/${ref}/settings/general`,
       disabled: false,
       shortcutId: SHORTCUT_IDS.NAV_SETTINGS,
     },

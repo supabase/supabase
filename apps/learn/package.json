@@ -23,7 +23,7 @@
     "lucide-react": "*",
     "next": "catalog:",
     "next-contentlayer2": "0.4.6",
-    "next-themes": "^0.3.0",
+    "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
     "react-wrap-balancer": "^1.1.0",

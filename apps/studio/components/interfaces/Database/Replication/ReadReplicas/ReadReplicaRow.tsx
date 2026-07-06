@@ -18,7 +18,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getIsInTransition, getStatusLabel } from './ReadReplicas.utils'
 import { DropReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/DropReplicaConfirmationModal'
@@ -111,14 +111,19 @@ export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => 
 
         <TableCell>
           <div className="flex items-center justify-end gap-x-2">
-            <Button asChild type="default" className="relative" disabled={status === 'GOING_DOWN'}>
+            <Button
+              asChild
+              variant="default"
+              className="relative"
+              disabled={status === 'GOING_DOWN'}
+            >
               <Link href={`/project/${ref}/database/replication/replica/${replica.identifier}`}>
-                View replication
+                View replica
               </Link>
             </Button>
             <DropdownMenu>
-              <DropdownMenuTrigger>
-                <Button type="default" icon={<MoreVertical />} className="w-7" />
+              <DropdownMenuTrigger asChild>
+                <Button variant="default" icon={<MoreVertical />} className="w-7" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
                 <DropdownMenuItem

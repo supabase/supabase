@@ -23,7 +23,7 @@ const ShadowScrollArea = React.forwardRef<HTMLDivElement, ShadowScrollAreaProps>
     { className, containerClassName, children, stickyLastColumn, outerContainerRef, ...props },
     _ref
   ) => {
-    const containerRef = React.useRef<HTMLDivElement>(null)
+    const containerRef = React.useRef<HTMLDivElement | null>(null)
     const { hasHorizontalScroll, canScrollLeft, canScrollRight } = useHorizontalScroll(containerRef)
 
     const stickyColumnShadow = cn(
@@ -60,8 +60,8 @@ const ShadowScrollArea = React.forwardRef<HTMLDivElement, ShadowScrollAreaProps>
               '[&_tr:hover>*:last-child]:bg-transparent',
               '[&_th>*:last-child]:bg-surface-100',
               stickyColumnShadow,
+              hasHorizontalScroll && '[&_tr:hover>td:last-child]:!bg-surface-200',
             ],
-            hasHorizontalScroll && '[&_tr:hover>td:last-child]:!bg-surface-200',
             canScrollRight &&
               '[&_td]:before:opacity-100 [&_tr>*:last-child]:before:opacity-100 [&_th:last-child]:before:opacity-100',
             className

@@ -70,7 +70,7 @@ const page: GoPageInput = {
             native products for their teams and customers.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Button asChild type="primary" size="medium">
+            <Button asChild variant="primary" size="medium">
               <Link
                 href="https://supabase.com/docs/guides/getting-started/ai-skills"
                 target="_blank"
@@ -79,7 +79,7 @@ const page: GoPageInput = {
                 Learn about Supabase AI Tools
               </Link>
             </Button>
-            <Button asChild type="default" size="medium">
+            <Button asChild variant="default" size="medium">
               <Link
                 href="https://supabase.link/accenture-reinvention-2026-slides"
                 target="_blank"
@@ -103,7 +103,7 @@ const page: GoPageInput = {
             <li>Load data into a Supabase database</li>
             <li>Complete these steps by Monday, May 4, 2026 at 12:00 PM PST</li>
           </ol>
-          <Button asChild type="default" size="medium">
+          <Button asChild variant="default" size="medium">
             <Link href="https://supabase.com/dashboard">Create your account</Link>
           </Button>
           <p className="text-xs text-foreground-lighter mt-4">

@@ -3,8 +3,7 @@ import { formatRelative } from 'date-fns'
 import { BadgeCheck, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
-import { Admonition, ShimmeringLoader, TimestampInfo } from 'ui-patterns'
-import { PageContainer } from 'ui-patterns/PageContainer'
+import { Admonition } from 'ui-patterns/admonition'
 import {
   PageSection,
   PageSectionContent,
@@ -13,8 +12,11 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { isInstalled, isSyncRunning, isUninstalling } from './stripe-sync-status'
+import { ConstrainedIntegrationTabScaffold } from '@/components/interfaces/Integrations/ConstrainedIntegrationTabScaffold'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 
 export const StripeSyncSettingsPage = () => {
@@ -30,17 +32,17 @@ export const StripeSyncSettingsPage = () => {
 
   if (!installed || uninstalling) {
     return (
-      <PageContainer className="mx-0">
+      <ConstrainedIntegrationTabScaffold>
         <PageSection>
-          <Admonition type="default" title="Stripe Sync Engine is not installed" />
+          <Admonition type="default" description="Stripe Sync Engine is not installed." />
         </PageSection>
-      </PageContainer>
+      </ConstrainedIntegrationTabScaffold>
     )
   }
 
   return (
-    <PageContainer className="mx-0">
-      <PageSection>
+    <ConstrainedIntegrationTabScaffold>
+      <PageSection className="py-0!">
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>Manage Stripe data</PageSectionTitle>
@@ -50,7 +52,7 @@ export const StripeSyncSettingsPage = () => {
           </PageSectionSummary>
         </PageSectionMeta>
         <PageSectionContent>
-          <Card className="max-w-4xl">
+          <Card>
             <CardHeader>
               <CardTitle className="text-foreground-lighter">
                 {!syncState ? (
@@ -113,7 +115,7 @@ export const StripeSyncSettingsPage = () => {
                   </p>
                 </div>
 
-                <Button asChild type="default" className="ml-8 @md:ml-0">
+                <Button asChild variant="default" className="ml-8 @md:ml-0">
                   <Link href={`/project/${ref}/editor?schema=stripe`}>Open Table Editor</Link>
                 </Button>
               </div>
@@ -121,6 +123,6 @@ export const StripeSyncSettingsPage = () => {
           </Card>
         </PageSectionContent>
       </PageSection>
-    </PageContainer>
+    </ConstrainedIntegrationTabScaffold>
   )
 }

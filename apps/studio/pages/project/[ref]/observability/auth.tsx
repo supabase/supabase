@@ -4,7 +4,9 @@ import { ArrowRight, LogsIcon, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsJson, useQueryState } from 'nuqs'
 import { useState } from 'react'
+import { Button } from 'ui'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
@@ -24,18 +26,21 @@ import {
 } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { ChartHighlightAction } from '@/components/ui/Charts/ChartHighlightActions'
 import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import {
   createErrorsReportConfig,
   createLatencyReportConfig,
   createUsageReportConfig,
 } from '@/data/reports/v2/auth.config'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { NextPageWithLayout } from '@/types'
 
 const AuthReport: NextPageWithLayout = () => {
@@ -54,6 +59,8 @@ AuthReport.getLayout = (page) => (
 
 export type UpdateDateRange = (from: string, to: string) => void
 export default AuthReport
+
+const REPORT_TITLE = 'Auth'
 
 const AuthUsage = () => {
   const { ref } = useParams()
@@ -87,6 +94,7 @@ const AuthUsage = () => {
   })
 
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [showDatePicker, setShowDatePicker] = useState(false)
 
   const [monitoringStatusCodeFilter, setMonitoringStatusCodeFilter] = useQueryState(
     'monitoring_status_code',
@@ -112,7 +120,7 @@ const AuthUsage = () => {
     { label: 'SAML', value: 'saml' },
     { label: 'Recovery', value: 'recovery' },
     { label: 'SSO/SAML', value: 'sso/saml' },
-    { label: 'Magic Link', value: 'magiclink' },
+    { label: 'Magic link', value: 'magiclink' },
     { label: 'Keycloak', value: 'keycloak' },
     { label: 'Facebook', value: 'facebook' },
     { label: 'Twitch', value: 'twitch' },
@@ -166,6 +174,13 @@ const AuthUsage = () => {
     }
   )
 
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_REFRESH, onRefreshReport, {
+    enabled: !isRefreshing,
+  })
+  useShortcut(SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER, () => {
+    setShowDatePicker((open) => !open)
+  })
+
   const router = useRouter()
 
   const highlightActions: ChartHighlightAction[] = [
@@ -198,24 +213,33 @@ const AuthUsage = () => {
 
   return (
     <>
-      <ReportHeader title="Auth" showDatabaseSelector={false} />
+      <ReportHeader title={REPORT_TITLE} showDatabaseSelector={false} />
       <ReportStickyNav
         content={
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <ButtonTooltip
-                type="default"
-                disabled={isRefreshing}
-                icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-                className="w-7"
-                tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-                onClick={onRefreshReport}
-              />
+          <div className="flex flex-col gap-2 w-full">
+            <div className="ml-auto flex items-center gap-2 flex-wrap">
+              <DocsButton href={OBSERVABILITY_DOCS_HREFS.auth} topic={REPORT_TITLE} />
+              <ShortcutTooltip
+                shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
+                label="Refresh report"
+                side="bottom"
+              >
+                <Button
+                  variant="default"
+                  disabled={isRefreshing}
+                  icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                  className="w-7"
+                  onClick={onRefreshReport}
+                />
+              </ShortcutTooltip>
               <ReportSettings chartId={chartSyncId} />
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
                 helpers={datePickerHelpers}
+                open={showDatePicker}
+                onOpenChange={setShowDatePicker}
+                shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
               />
               <UpgradePrompt
                 show={showUpgradePrompt}

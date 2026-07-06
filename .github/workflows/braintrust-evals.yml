@@ -30,6 +30,7 @@ jobs:
         uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
         with:
           fetch-depth: 0
+          persist-credentials: false
           # For PR events, checkout the actual branch so Braintrust can report the correct branch name instead of detached HEAD.
           # github.head_ref is the PR source branch, github.ref_name is the fallback for push events (e.g., master).
           ref: ${{ github.head_ref || github.ref_name }}

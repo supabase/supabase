@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
-// import { useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -10,12 +9,11 @@ import {
   Form,
   FormControl,
   FormField,
-  Input,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Separator,
   Sheet,
   SheetContent,
@@ -24,11 +22,12 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
+  TextArea,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -173,25 +172,25 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
                 control={form.control}
                 render={({ field }) => (
                   <FormItemLayout label="Assign rule to" layout="vertical" className="px-5">
-                    <Select_Shadcn_
+                    <Select
                       onValueChange={(val) => {
                         field.onChange(val)
                         if (val === 'all') form.setValue('is_disabled', true)
                       }}
                       defaultValue={field.value}
                     >
-                      <SelectTrigger_Shadcn_ className="col-span-8">
-                        <SelectValue_Shadcn_ />
-                      </SelectTrigger_Shadcn_>
-                      <SelectContent_Shadcn_>
-                        <SelectItem_Shadcn_ value="all">All project members</SelectItem_Shadcn_>
+                      <SelectTrigger className="col-span-8">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All project members</SelectItem>
                         {members.map((m) => (
-                          <SelectItem_Shadcn_ key={m.gotrue_id} value={m.gotrue_id}>
+                          <SelectItem key={m.gotrue_id} value={m.gotrue_id}>
                             {m.username || m.primary_email}
-                          </SelectItem_Shadcn_>
+                          </SelectItem>
                         ))}
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
+                      </SelectContent>
+                    </Select>
                   </FormItemLayout>
                 )}
               />
@@ -221,9 +220,10 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
                     labelOptional="Optional"
                   >
                     <FormControl>
-                      <Input.TextArea
+                      <TextArea
                         {...field}
-                        className="[&>div>div>div>textarea]:text-sm"
+                        rows={4}
+                        className="text-sm"
                         placeholder="e.g Describe why this rule is being set"
                       />
                     </FormControl>
@@ -234,10 +234,10 @@ export const CreateRuleSheet = ({ lint, open, onOpenChange }: CreateRuleSheetPro
           </Form>
         </SheetSection>
         <SheetFooter>
-          <Button disabled={isCreating} type="default" onClick={() => onOpenChange(false)}>
+          <Button disabled={isCreating} variant="default" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" loading={isCreating}>
+          <Button form={formId} type="submit" loading={isCreating}>
             Create rule
           </Button>
         </SheetFooter>

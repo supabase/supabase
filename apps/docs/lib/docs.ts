@@ -1,12 +1,12 @@
-import matter from 'gray-matter'
-import { serialize } from 'next-mdx-remote/serialize'
 import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
 import { basename, extname, join, sep } from 'node:path'
+import { type SerializeOptions } from '~/types/next-mdx-remote-serialize'
+import matter from 'gray-matter'
+import { serialize } from 'next-mdx-remote-client/serialize'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
-import { type SerializeOptions } from '~/types/next-mdx-remote-serialize'
 
 // MUST be process.cwd() here, not import.meta.url, or files that are added
 // with outputFileTracingIncludes (not auto-traced) will not be found at
@@ -125,14 +125,13 @@ export async function getGuidesStaticProps(
     return
   }
 
-  const mdxOptions: SerializeOptions = {
-    blockJS: false,
+  const options: SerializeOptions = {
     mdxOptions: {
       remarkPlugins: [[remarkMath, { singleDollarTextMath: false }], remarkGfm],
       rehypePlugins: [rehypeKatex as any],
     },
   }
-  const mdxSource = await serialize(content, mdxOptions)
+  const mdxSource = await serialize({ source: content, options: options })
 
   return {
     props: {

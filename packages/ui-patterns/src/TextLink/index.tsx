@@ -12,6 +12,7 @@ interface Props {
   hasChevron?: boolean
   chevronAnimation?: 'translate' | 'fadeIn'
   target?: '_blank' | '_self'
+  onClick?: () => void
 }
 
 export function TextLink({

@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { IS_PLATFORM } from 'common'
 import Link from 'next/link'
-import { ReactNode, useEffect } from 'react'
+import { ReactNode, useEffect, useMemo, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -12,16 +12,16 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  Input_Shadcn_,
+  Input,
   RadioGroupCard,
   RadioGroupCardItem,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectLabel_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
   Sheet,
   SheetContent,
   SheetFooter,
@@ -29,6 +29,7 @@ import {
   SheetSection,
   SheetTitle,
   Switch,
+  TextArea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
@@ -50,11 +51,13 @@ import {
   logDrainHeaderEntriesSchema,
   type LogDrainHeaderRow,
 } from './LogDrains.utils'
+import { useEnabledLogDrainTypes } from './useEnabledLogDrainTypes'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
-import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { LogDrainData } from '@/data/log-drains/log-drains-query'
 import { DOCS_URL } from '@/lib/constants'
-import { useTrack } from '@/lib/telemetry/track'
 import { httpEndpointUrlSchema } from '@/lib/validation/http-url'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const FORM_ID = 'log-drain-destination-form'
 
@@ -106,10 +109,6 @@ const lokiFormSchema = z.object({
 const lokiSubmitSchema = z.object({
   ...lokiFields,
   headers: headerRecordSchema,
-})
-
-const elasticSchema = z.object({
-  type: z.literal('elastic'),
 })
 
 const postgresSchema = z.object({
@@ -180,14 +179,24 @@ const otlpSubmitSchema = z.object({
 
 const syslogSchema = z.object({
   type: z.literal('syslog'),
+  host: z.string().min(1, { message: 'Host is required' }),
+  port: z.coerce
+    .number()
+    .int({ message: 'Port must be an integer' })
+    .min(0, { message: 'Port must be between 0 and 65535' })
+    .max(65535, { message: 'Port must be between 0 and 65535' }),
+  tls: z.boolean().optional().default(false),
+  structured_data: z.string().optional(),
+  cipher_key: z.string().optional(),
+  ca_cert: z.string().optional(),
+  client_cert: z.string().optional(),
+  client_key: z.string().optional(),
 })
 
 const formUnion = z.discriminatedUnion('type', [
   webhookFormSchema,
   datadogSchema,
   lokiFormSchema,
-  // [Joshen] To fix API types, not supported in the UI
-  elasticSchema,
   postgresSchema,
   bigquerySchema,
   clickhouseSchema,
@@ -203,7 +212,6 @@ const submitUnion = z.discriminatedUnion('type', [
   webhookSubmitSchema,
   datadogSchema,
   lokiSubmitSchema,
-  elasticSchema,
   postgresSchema,
   bigquerySchema,
   clickhouseSchema,
@@ -223,6 +231,23 @@ const formSchema = z
     description: z.string().optional(),
   })
   .and(formUnion)
+  .superRefine((data, ctx) => {
+    if (data.type !== 'syslog') return
+    if (data.client_cert && !data.client_key) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Client key is required when a client certificate is provided',
+        path: ['client_key'],
+      })
+    }
+    if (data.client_key && !data.client_cert) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Client certificate is required when a client key is provided',
+        path: ['client_cert'],
+      })
+    }
+  })
 
 const submitSchema = z
   .object({
@@ -238,7 +263,9 @@ type LogDrainDestinationSubmitValues = z.infer<typeof submitSchema>
 
 const HEADER_ENABLED_TYPES = ['webhook', 'loki', 'otlp'] as const
 
-function toSubmitValues(values: LogDrainDestinationFormValues): LogDrainDestinationSubmitValues {
+export function toSubmitValues(
+  values: LogDrainDestinationFormValues
+): LogDrainDestinationSubmitValues {
   if (!HEADER_ENABLED_TYPES.includes(values.type as (typeof HEADER_ENABLED_TYPES)[number])) {
     return submitSchema.parse(values)
   }
@@ -279,7 +306,7 @@ function LogDrainFormItem({
       render={({ field }) => (
         <FormItemLayout layout="horizontal" label={label} description={description || ''}>
           <FormControl>
-            <Input_Shadcn_ type={type || 'text'} placeholder={placeholder} {...field} />
+            <Input type={type || 'text'} placeholder={placeholder} {...field} />
           </FormControl>
         </FormItemLayout>
       )}
@@ -296,6 +323,8 @@ export function LogDrainDestinationSheetForm({
   onSubmit,
   isLoading,
   mode,
+  existingDrainNames = [],
+  onSaveClick,
 }: {
   open: boolean
   onOpenChange: (v: boolean) => void
@@ -303,58 +332,69 @@ export function LogDrainDestinationSheetForm({
   isLoading?: boolean
   onSubmit: (values: LogDrainDestinationSubmitValues) => void
   mode: 'create' | 'update'
+  existingDrainNames?: string[]
+  onSaveClick?: (type: LogDrainType) => void
 }) {
   // NOTE(kamil): This used to be `any` for a long long time, but after moving to Zod,
   // it produces a correct union type of all possible configs. Unfortunately, this type was not designed correctly
   // and it does not include `type` inside the config itself, so it's not trivial to create `discriminatedUnion`
   // out of it, therefore for an ease of use now, we bail to `any` until the better time come.
-  const defaultConfig = (defaultValues?.config || {}) as any
   const defaultType = defaultValues?.type || 'webhook'
-  const defaultHeaderEntries = headerRecordToRows(
-    mode === 'create' ? getDefaultHeadersByType(defaultType) : defaultConfig?.headers || {}
-  )
+  const defaultHeaderEntries = useMemo(() => {
+    const config = (defaultValues?.config || {}) as any
+    const type = defaultValues?.type || 'webhook'
+    return headerRecordToRows(
+      mode === 'create' ? getDefaultHeadersByType(type) : config?.headers || {}
+    )
+  }, [defaultValues, mode])
 
-  const sentryEnabled = useFlag('SentryLogDrain')
-  const s3Enabled = useFlag('S3logdrain')
-  const axiomEnabled = useFlag('axiomLogDrain')
-  const otlpEnabled = useFlag('otlpLogDrain')
-  const last9Enabled = useFlag('Last9LogDrain')
+  const enabledLogDrainTypes = useEnabledLogDrainTypes()
 
-  const { ref } = useParams()
-  const { data: logDrains } = useLogDrainsQuery({
-    ref,
-  })
+  const formRef = useRef<HTMLFormElement>(null)
 
-  const track = useTrack()
+  const formValues = useMemo(() => {
+    const config = (defaultValues?.config || {}) as any
+    const type = defaultValues?.type || 'webhook'
+    return {
+      name: defaultValues?.name || '',
+      description: defaultValues?.description || '',
+      type,
+      http: config?.http || 'http2',
+      gzip: mode === 'create' ? true : config?.gzip || false,
+      headerEntries: defaultHeaderEntries,
+      url: config?.url || '',
+      api_key: config?.api_key || '',
+      region: config?.region || '',
+      username: config?.username || '',
+      password: config?.password || '',
+      dsn: config?.dsn || '',
+      s3_bucket: config?.s3_bucket || '',
+      storage_region: config?.storage_region || '',
+      access_key_id: config?.access_key_id || '',
+      secret_access_key: config?.secret_access_key || '',
+      batch_timeout: config?.batch_timeout ?? 3000,
+      dataset_name: config?.dataset_name || '',
+      api_token: config?.api_token || '',
+      endpoint: config?.endpoint || '',
+      protocol: config?.protocol || 'http/protobuf',
+      host: config?.host || '',
+      port: (config?.port ?? '') as number,
+      tls: config?.tls ?? false,
+      structured_data: config?.structured_data || '',
+      cipher_key: config?.cipher_key || '',
+      ca_cert: config?.ca_cert || '',
+      client_cert: config?.client_cert || '',
+      client_key: config?.client_key || '',
+    }
+  }, [defaultValues, mode, defaultHeaderEntries])
 
   const form = useForm<LogDrainDestinationFormValues>({
     resolver: zodResolver(formSchema),
-    values: {
-      name: defaultValues?.name || '',
-      description: defaultValues?.description || '',
-      type: defaultType,
-      http: defaultConfig?.http || 'http2',
-      gzip: mode === 'create' ? true : defaultConfig?.gzip || false,
-      headerEntries: defaultHeaderEntries,
-      url: defaultConfig?.url || '',
-      api_key: defaultConfig?.api_key || '',
-      region: defaultConfig?.region || '',
-      username: defaultConfig?.username || '',
-      password: defaultConfig?.password || '',
-      dsn: defaultConfig?.dsn || '',
-      s3_bucket: defaultConfig?.s3_bucket || '',
-      storage_region: defaultConfig?.storage_region || '',
-      access_key_id: defaultConfig?.access_key_id || '',
-      secret_access_key: defaultConfig?.secret_access_key || '',
-      batch_timeout: defaultConfig?.batch_timeout ?? 3000,
-      dataset_name: defaultConfig?.dataset_name || '',
-      api_token: defaultConfig?.api_token || '',
-      endpoint: defaultConfig?.endpoint || '',
-      protocol: defaultConfig?.protocol || 'http/protobuf',
-    },
+    values: formValues,
   })
 
   const type = form.watch('type')
+  const tls = form.watch('tls')
 
   useEffect(() => {
     if (mode === 'create' && !open) {
@@ -365,9 +405,8 @@ export function LogDrainDestinationSheetForm({
   useEffect(() => {
     if (!open || mode !== 'create') return
 
-    form.setValue('headerEntries', headerRecordToRows(getDefaultHeadersByType(type)), {
-      shouldValidate: true,
-    })
+    form.setValue('headerEntries', headerRecordToRows(getDefaultHeadersByType(type)))
+    form.clearErrors('headerEntries')
   }, [form, mode, open, type])
 
   return (
@@ -384,23 +423,23 @@ export function LogDrainDestinationSheetForm({
         <SheetSection className="px-0! pb-0!">
           <Form {...form}>
             <form
+              ref={formRef}
               id={FORM_ID}
               onSubmit={(e) => {
                 e.preventDefault()
 
                 // Temp check to make sure the name is unique
                 const logDrainName = form.getValues('name')
-                const logDrainExists =
-                  !!logDrains?.length && logDrains?.find((drain) => drain.name === logDrainName)
+                const logDrainExists = existingDrainNames.includes(logDrainName)
                 if (logDrainExists && mode === 'create') {
                   toast.error('Log drain name already exists')
                   return
                 }
 
-                form.handleSubmit((values) => onSubmit(toSubmitValues(values)))(e)
-                track('log_drain_save_button_clicked', {
-                  destination: form.getValues('type'),
-                })
+                form.handleSubmit((values) => {
+                  onSubmit(toSubmitValues(values))
+                  onSaveClick?.(values.type)
+                })(e)
               }}
             >
               <div className="space-y-8 px-content">
@@ -422,34 +461,27 @@ export function LogDrainDestinationSheetForm({
                     label="Type"
                     description={LOG_DRAIN_TYPES.find((t) => t.value === type)?.description || ''}
                   >
-                    <Select_Shadcn_
+                    <Select
                       defaultValue={defaultType}
                       value={form.getValues('type')}
                       onValueChange={(v: LogDrainType) => form.setValue('type', v)}
                     >
-                      <SelectTrigger_Shadcn_>
+                      <SelectTrigger>
                         {LOG_DRAIN_TYPES.find((t) => t.value === type)?.name}
-                      </SelectTrigger_Shadcn_>
-                      <SelectContent_Shadcn_>
-                        {LOG_DRAIN_TYPES.filter((t) => {
-                          if (t.value === 'sentry') return sentryEnabled
-                          if (t.value === 's3') return s3Enabled
-                          if (t.value === 'axiom') return axiomEnabled
-                          if (t.value === 'otlp') return otlpEnabled
-                          if (t.value === 'last9') return last9Enabled
-                          return true
-                        }).map((type) => (
-                          <SelectItem_Shadcn_
+                      </SelectTrigger>
+                      <SelectContent>
+                        {enabledLogDrainTypes.map((type) => (
+                          <SelectItem
                             value={type.value}
                             key={type.value}
                             id={type.value}
                             className="text-left"
                           >
                             {type.name}
-                          </SelectItem_Shadcn_>
+                          </SelectItem>
                         ))}
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
+                      </SelectContent>
+                    </Select>
                   </FormItemLayout>
                 )}
               </div>
@@ -555,21 +587,21 @@ export function LogDrainDestinationSheetForm({
                           }
                         >
                           <FormControl>
-                            <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                              <SelectTrigger_Shadcn_ className="col-span-3">
-                                <SelectValue_Shadcn_ placeholder="Select a region" />
-                              </SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
-                                <SelectGroup_Shadcn_>
-                                  <SelectLabel_Shadcn_>Region</SelectLabel_Shadcn_>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger className="col-span-3">
+                                <SelectValue placeholder="Select a region" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>Region</SelectLabel>
                                   {DATADOG_REGIONS.map((reg) => (
-                                    <SelectItem_Shadcn_ key={reg.value} value={reg.value}>
+                                    <SelectItem key={reg.value} value={reg.value}>
                                       {reg.label}
-                                    </SelectItem_Shadcn_>
+                                    </SelectItem>
                                   ))}
-                                </SelectGroup_Shadcn_>
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
                           </FormControl>
                         </FormItemLayout>
                       )}
@@ -710,21 +742,21 @@ export function LogDrainDestinationSheetForm({
                             description="Only HTTP with Protocol Buffers is currently supported"
                           >
                             <FormControl>
-                              <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                                <SelectTrigger_Shadcn_ className="col-span-3">
-                                  <SelectValue_Shadcn_ placeholder="Select protocol" />
-                                </SelectTrigger_Shadcn_>
-                                <SelectContent_Shadcn_>
-                                  <SelectGroup_Shadcn_>
-                                    <SelectLabel_Shadcn_>Protocol</SelectLabel_Shadcn_>
+                              <Select value={field.value} onValueChange={field.onChange}>
+                                <SelectTrigger className="col-span-3">
+                                  <SelectValue placeholder="Select protocol" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectGroup>
+                                    <SelectLabel>Protocol</SelectLabel>
                                     {OTLP_PROTOCOLS.map((proto) => (
-                                      <SelectItem_Shadcn_ key={proto.value} value={proto.value}>
+                                      <SelectItem key={proto.value} value={proto.value}>
                                         {proto.label}
-                                      </SelectItem_Shadcn_>
+                                      </SelectItem>
                                     ))}
-                                  </SelectGroup_Shadcn_>
-                                </SelectContent_Shadcn_>
-                              </Select_Shadcn_>
+                                  </SelectGroup>
+                                </SelectContent>
+                              </Select>
                             </FormControl>
                           </FormItemLayout>
                         )}
@@ -767,21 +799,21 @@ export function LogDrainDestinationSheetForm({
                           }
                         >
                           <FormControl>
-                            <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                              <SelectTrigger_Shadcn_ className="col-span-3">
-                                <SelectValue_Shadcn_ placeholder="Select a region" />
-                              </SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
-                                <SelectGroup_Shadcn_>
-                                  <SelectLabel_Shadcn_>Region</SelectLabel_Shadcn_>
+                            <Select value={field.value} onValueChange={field.onChange}>
+                              <SelectTrigger className="col-span-3">
+                                <SelectValue placeholder="Select a region" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectGroup>
+                                  <SelectLabel>Region</SelectLabel>
                                   {LAST9_REGIONS.map((reg) => (
-                                    <SelectItem_Shadcn_ key={reg.value} value={reg.value}>
+                                    <SelectItem key={reg.value} value={reg.value}>
                                       {reg.label}
-                                    </SelectItem_Shadcn_>
+                                    </SelectItem>
                                   ))}
-                                </SelectGroup_Shadcn_>
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
+                                </SelectGroup>
+                              </SelectContent>
+                            </Select>
                           </FormControl>
                         </FormItemLayout>
                       )}
@@ -803,6 +835,125 @@ export function LogDrainDestinationSheetForm({
                       description="Password for authentication from Last9 OTEL integration."
                     />
                   </div>
+                )}
+                {type === 'syslog' && (
+                  <>
+                    <div className="grid gap-4 px-content">
+                      <LogDrainFormItem
+                        value="host"
+                        label="Host"
+                        placeholder="logs.example.com"
+                        formControl={form.control}
+                        description="Hostname or IP address of the syslog receiver."
+                      />
+                      <LogDrainFormItem
+                        type="number"
+                        value="port"
+                        label="Port"
+                        placeholder="514"
+                        formControl={form.control}
+                        description="Port of the syslog receiver (0–65535)."
+                      />
+                      <LogDrainFormItem
+                        value="structured_data"
+                        label="Structured Data"
+                        placeholder='[exampleSDID@32473 iut="3" eventSource="Application"]'
+                        formControl={form.control}
+                        description="Static RFC 5424 Structured Data included in every log frame."
+                      />
+                      <LogDrainFormItem
+                        type="password"
+                        value="cipher_key"
+                        label="Cipher Key"
+                        placeholder="••••••••••••••••"
+                        formControl={form.control}
+                        description="Base64-encoded 32-byte key for AES-256-GCM encryption of the log body."
+                      />
+                    </div>
+
+                    <FormField
+                      control={form.control}
+                      name="tls"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2 px-4">
+                          <div className="flex gap-2 items-center">
+                            <FormControl>
+                              <Switch checked={field.value} onCheckedChange={field.onChange} />
+                            </FormControl>
+                            <FormLabel className="text-base">TLS</FormLabel>
+                            <InfoTooltip align="start">
+                              Connect via SSL/TLS instead of plain TCP.
+                            </InfoTooltip>
+                          </div>
+                        </FormItem>
+                      )}
+                    />
+
+                    {tls && (
+                      <div className="grid gap-4 px-content">
+                        <FormField
+                          name="ca_cert"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="horizontal"
+                              label="CA Certificate"
+                              description="PEM encoded CA certificate for verifying the server. Falls back to the system CA bundle if omitted."
+                            >
+                              <FormControl>
+                                <TextArea
+                                  className="font-mono text-xs"
+                                  placeholder="-----BEGIN CERTIFICATE-----"
+                                  rows={4}
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItemLayout>
+                          )}
+                        />
+                        <FormField
+                          name="client_cert"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="horizontal"
+                              label="Client Certificate"
+                              description="PEM encoded client certificate for mTLS."
+                            >
+                              <FormControl>
+                                <TextArea
+                                  className="font-mono text-xs"
+                                  placeholder="-----BEGIN CERTIFICATE-----"
+                                  rows={4}
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItemLayout>
+                          )}
+                        />
+                        <FormField
+                          name="client_key"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="horizontal"
+                              label="Client Key"
+                              description="PEM encoded client private key for mTLS. Required when a client certificate is provided."
+                            >
+                              <FormControl>
+                                <TextArea
+                                  className="font-mono text-xs"
+                                  placeholder="-----BEGIN PRIVATE KEY-----"
+                                  rows={4}
+                                  {...field}
+                                />
+                              </FormControl>
+                            </FormItemLayout>
+                          )}
+                        />
+                      </div>
+                    )}
+                  </>
                 )}
                 {HEADER_ENABLED_TYPES.includes(type as (typeof HEADER_ENABLED_TYPES)[number]) && (
                   <div className="px-content">
@@ -873,9 +1024,16 @@ export function LogDrainDestinationSheetForm({
               </span>
               <TaxDisclaimer />
             </div>
-            <Button form={FORM_ID} loading={isLoading} htmlType="submit" type="primary">
-              Save destination
-            </Button>
+            <Shortcut
+              id={SHORTCUT_IDS.LOG_DRAINS_SAVE_DESTINATION}
+              onTrigger={() => formRef.current?.requestSubmit()}
+              options={{ enabled: open && !isLoading }}
+              side="top"
+            >
+              <Button form={FORM_ID} loading={isLoading} type="submit" variant="primary">
+                Save destination
+              </Button>
+            </Shortcut>
           </SheetFooter>
         </div>
       </SheetContent>

@@ -7,19 +7,19 @@ import * as React from 'react'
 // import { NpmCommands } from 'types/unist'
 // import { Event } from '@/lib/events'
 import {
-  Accordion_Shadcn_ as Accordion,
-  AccordionContent_Shadcn_ as AccordionContent,
-  AccordionItem_Shadcn_ as AccordionItem,
-  AccordionTrigger_Shadcn_ as AccordionTrigger,
-  Alert_Shadcn_ as Alert,
-  AlertDescription_Shadcn_ as AlertDescription,
-  AlertTitle_Shadcn_ as AlertTitle,
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   AspectRatio,
   cn,
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
@@ -31,6 +31,7 @@ import { StyleWrapper } from './style-wrapper'
 import { Callout } from '@/components/callout'
 import { CodeBlockWrapper } from '@/components/code-block-wrapper'
 import { CodeFragment } from '@/components/code-fragment'
+import { ColorPalette } from '@/components/color-palette'
 import { Colors } from '@/components/colors'
 import { ComponentExample } from '@/components/component-example'
 import { ComponentPreview } from '@/components/component-preview'
@@ -265,6 +266,7 @@ const components = {
     />
   ),
   Colors,
+  ColorPalette,
   Icons,
   ThemeSettings,
   CodeFragment,

@@ -3,16 +3,22 @@ import dayjs from 'dayjs'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import {
   Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Modal,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -72,93 +78,90 @@ export const CustomExpiryModal = () => {
   })
 
   return (
-    <Modal
-      hideFooter
-      size="small"
-      header="Custom expiry for signed URL"
-      visible={visible}
-      alignFooter="right"
-      confirmText="Get URL"
-      onCancel={handleClose}
-    >
-      <Form {...form}>
-        <Modal.Content>
-          <p className="text-sm text-foreground-light mb-4">
-            Enter the duration for which the URL will be valid for:
-          </p>
-          <form
-            id={formId}
-            onSubmit={form.handleSubmit(handleSubmit)}
-            noValidate
-            className="flex items-start space-x-2"
-          >
-            <div className="grow">
-              <FormField
-                control={form.control}
-                name="expiresIn"
-                render={({ field }) => (
-                  <FormItemLayout layout="vertical" label="Duration">
-                    <FormControl>
-                      <Input_Shadcn_
-                        {...field}
-                        type="number"
-                        onChange={(e) => {
-                          field.onChange(
-                            isNaN(e.target.valueAsNumber) ? '' : e.target.valueAsNumber
-                          )
-                        }}
-                      />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-            </div>
-            <div>
-              <FormField
-                control={form.control}
-                name="units"
-                render={({ field }) => (
-                  <FormItemLayout layout="vertical" label="Units">
-                    <FormControl>
-                      <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger_Shadcn_>
-                          <SelectValue_Shadcn_ aria-label="Units" placeholder="Select an option" />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
-                          <SelectItem_Shadcn_ value="days">days</SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="weeks">weeks</SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="months">months</SelectItem_Shadcn_>
-                          <SelectItem_Shadcn_ value="years">years</SelectItem_Shadcn_>
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
-            </div>
-          </form>
-          {isDirty && isValid && (
-            <p className="text-sm text-foreground-light mt-2">
-              URL will expire on {dayjs().add(expiresIn, units).format(DATETIME_FORMAT)}
+    <Dialog open={visible} onOpenChange={handleClose}>
+      <DialogContent size="small">
+        <DialogHeader>
+          <DialogTitle>Custom expiry for signed URL</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form {...form}>
+          <DialogSection>
+            <p className="text-sm text-foreground-light mb-4">
+              Enter the duration for which the URL will be valid for:
             </p>
-          )}
-        </Modal.Content>
-        <Modal.Separator />
-        <Modal.Content className="flex items-center justify-end space-x-2">
-          <Button type="default" onClick={handleClose}>
-            Cancel
-          </Button>
-          <Button
-            form={formId}
-            disabled={!isDirty || isSubmitting}
-            loading={isSubmitting}
-            htmlType="submit"
-            type="primary"
-          >
-            Get signed URL
-          </Button>
-        </Modal.Content>
-      </Form>
-    </Modal>
+            <form
+              id={formId}
+              onSubmit={form.handleSubmit(handleSubmit)}
+              noValidate
+              className="flex items-start space-x-2"
+            >
+              <div className="grow">
+                <FormField
+                  control={form.control}
+                  name="expiresIn"
+                  render={({ field }) => (
+                    <FormItemLayout layout="vertical" label="Duration">
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="number"
+                          onChange={(e) => {
+                            field.onChange(
+                              isNaN(e.target.valueAsNumber) ? '' : e.target.valueAsNumber
+                            )
+                          }}
+                        />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              </div>
+              <div>
+                <FormField
+                  control={form.control}
+                  name="units"
+                  render={({ field }) => (
+                    <FormItemLayout layout="vertical" label="Units">
+                      <FormControl>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger>
+                            <SelectValue aria-label="Units" placeholder="Select an option" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="days">days</SelectItem>
+                            <SelectItem value="weeks">weeks</SelectItem>
+                            <SelectItem value="months">months</SelectItem>
+                            <SelectItem value="years">years</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              </div>
+            </form>
+            {isDirty && isValid && (
+              <p className="text-sm text-foreground-light mt-2">
+                URL will expire on {dayjs().add(expiresIn, units).format(DATETIME_FORMAT)}
+              </p>
+            )}
+          </DialogSection>
+          <DialogFooter>
+            <Button variant="default" onClick={handleClose}>
+              Cancel
+            </Button>
+            <Button
+              form={formId}
+              disabled={!isDirty || isSubmitting}
+              loading={isSubmitting}
+              type="submit"
+              variant="primary"
+            >
+              Get signed URL
+            </Button>
+          </DialogFooter>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -1,9 +1,10 @@
 import { useFlag, useParams } from 'common'
-import { ExternalLink, Search, X } from 'lucide-react'
+import { ExternalLink, RefreshCw, Search, X } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef, type PropsWithChildren } from 'react'
 import { Button, Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -26,22 +27,28 @@ import {
   EdgeFunctionsSortOrder,
 } from '@/components/interfaces/EdgeFunctions/EdgeFunctionsSortDropdown'
 import { EdgeFunctionsListItem } from '@/components/interfaces/Functions/EdgeFunctionsListItem'
-import {
-  FunctionsEmptyState,
-  FunctionsInstructionsLocal,
-} from '@/components/interfaces/Functions/FunctionsEmptyState'
+import { FunctionsEmptyState } from '@/components/interfaces/Functions/FunctionsEmptyState'
 import { TerminalInstructionsDialog } from '@/components/interfaces/Functions/TerminalInstructionsDialog'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { useFunctionsListShortcuts } from '@/components/interfaces/Functions/useFunctionsListShortcuts'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import EdgeFunctionsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionsLayout'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import type { NextPageWithLayout } from '@/types'
 
 const EdgeFunctionsPage: NextPageWithLayout = () => {
+  const router = useRouter()
   const { ref } = useParams()
   const showLastHourStats = useFlag('edgeFunctionsRequestMetrics')
+  const isProjectActive = useIsProjectActive()
+
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const [search, setSearch] = useQueryState('search', parseAsString.withDefault(''))
   const [sort, setSortQueryParam] = useQueryState(
@@ -55,7 +62,21 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
     isPending: isLoading,
     isError,
     isSuccess,
+    isFetching,
+    refetch,
   } = useEdgeFunctionsQuery({ projectRef: ref })
+
+  useFunctionsListShortcuts({
+    searchInputRef,
+    setSearch,
+    sort,
+    setSort: setSortQueryParam,
+    canCreateNew: isProjectActive,
+    onCreateNew: () => router.push(`/project/${ref}/functions/new`),
+    onRefresh: () => {
+      refetch()
+    },
+  })
 
   const filteredFunctions = useMemo(() => {
     const temp = (functions ?? []).filter((x) =>
@@ -95,7 +116,8 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
               ) : (
                 <Admonition type="warning" title="Failed to retrieve edge functions">
                   <p className="prose [&>code]:text-xs text-sm">
-                    Local functions can be found at <code>supabase/functions</code> folder.
+                    Edge functions could not be read from disk. The functions directory may be
+                    missing, not mounted into Studio, or unreadable.
                   </p>
                 </Admonition>
               ))}
@@ -106,31 +128,52 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                     <div className="flex items-center gap-2">
                       <div className="flex items-center gap-2">
                         <div className="relative">
-                          <Input
-                            placeholder="Search function names"
-                            icon={<Search />}
-                            size="tiny"
-                            className="w-32 md:w-64"
-                            value={search}
-                            onChange={(event) => setSearch(event.target.value)}
-                            actions={[
-                              search && (
-                                <Button
-                                  key="clear"
-                                  size="tiny"
-                                  type="text"
-                                  icon={<X />}
-                                  onClick={() => setSearch('')}
-                                  className="p-0 h-5 w-5"
-                                />
-                              ),
-                            ]}
-                          />
+                          <ShortcutTooltip
+                            shortcutId={SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH}
+                            label="Search functions"
+                            side="bottom"
+                          >
+                            <Input
+                              ref={searchInputRef}
+                              placeholder="Search function names"
+                              icon={<Search />}
+                              size="tiny"
+                              className="w-32 md:w-64"
+                              value={search}
+                              onChange={(event) => setSearch(event.target.value)}
+                              onKeyDown={onSearchInputEscape(search, setSearch)}
+                              actions={[
+                                search && (
+                                  <Button
+                                    key="clear"
+                                    size="tiny"
+                                    variant="text"
+                                    icon={<X />}
+                                    onClick={() => setSearch('')}
+                                    className="p-0 h-5 w-5"
+                                  />
+                                ),
+                              ]}
+                            />
+                          </ShortcutTooltip>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <EdgeFunctionsSortDropdown value={sort} onChange={setSortQueryParam} />
                       </div>
+                      <ShortcutTooltip
+                        shortcutId={SHORTCUT_IDS.FUNCTIONS_LIST_REFRESH}
+                        side="bottom"
+                      >
+                        <Button
+                          variant="default"
+                          icon={<RefreshCw />}
+                          loading={isFetching}
+                          onClick={() => refetch()}
+                        >
+                          Refresh
+                        </Button>
+                      </ShortcutTooltip>
                       <span className="border-l border-default pl-2 text-xs text-foreground-light">
                         {search && filteredFunctions.length !== functions.length
                           ? `Viewing ${filteredFunctions.length} of ${functions.length} functions in total`
@@ -181,7 +224,6 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                 )}
               </>
             )}
-            {!IS_PLATFORM && <FunctionsInstructionsLocal />}
           </div>
         </PageSectionContent>
       </PageSection>
@@ -189,41 +231,45 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
   )
 }
 
-EdgeFunctionsPage.getLayout = (page: React.ReactElement) => {
-  return (
-    <DefaultLayout>
-      <EdgeFunctionsLayout title="Edge Functions">
-        <div className="w-full min-h-full flex flex-col items-stretch">
-          <PageHeader size="large">
-            <PageHeaderMeta>
-              <PageHeaderSummary>
-                <PageHeaderTitle>Edge Functions</PageHeaderTitle>
-                <PageHeaderDescription>
-                  Run server-side logic close to your users
-                </PageHeaderDescription>
-              </PageHeaderSummary>
-              <PageHeaderAside>
-                <DocsButton href={`${DOCS_URL}/guides/functions`} />
-                <Button asChild type="default" icon={<ExternalLink />}>
-                  <a
-                    target="_blank"
-                    rel="noreferrer"
-                    href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
-                  >
-                    Examples
-                  </a>
-                </Button>
-                {IS_PLATFORM && <DeployEdgeFunctionButton />}
-              </PageHeaderAside>
-            </PageHeaderMeta>
-          </PageHeader>
+// Hoisted out of `getLayout` so the TanStack route can import it
+// directly. Same body — accepts the page content as `children`.
+export const EdgeFunctionsIndexPageWrapper = ({ children }: PropsWithChildren) => (
+  <>
+    <div className="w-full min-h-full flex flex-col items-stretch">
+      <PageHeader size="large">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Edge Functions</PageHeaderTitle>
+            <PageHeaderDescription>Run server-side logic close to your users</PageHeaderDescription>
+          </PageHeaderSummary>
+          <PageHeaderAside>
+            <DocsButton href={`${DOCS_URL}/guides/functions`} />
+            <Button asChild variant="default" icon={<ExternalLink />}>
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href="https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions"
+              >
+                Examples
+              </a>
+            </Button>
+            {IS_PLATFORM && <DeployEdgeFunctionButton />}
+          </PageHeaderAside>
+        </PageHeaderMeta>
+      </PageHeader>
 
-          {page}
-        </div>
-      </EdgeFunctionsLayout>
-      <TerminalInstructionsDialog />
-    </DefaultLayout>
-  )
-}
+      {children}
+    </div>
+    <TerminalInstructionsDialog />
+  </>
+)
+
+EdgeFunctionsPage.getLayout = (page: React.ReactElement) => (
+  <DefaultLayout>
+    <EdgeFunctionsLayout title="Edge Functions">
+      <EdgeFunctionsIndexPageWrapper>{page}</EdgeFunctionsIndexPageWrapper>
+    </EdgeFunctionsLayout>
+  </DefaultLayout>
+)
 
 export default EdgeFunctionsPage

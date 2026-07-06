@@ -17,7 +17,12 @@ export default function ThankYouTemplate({
         <Confetti />
       </div>
       {page.sections?.map((section, i) => (
-        <SectionRenderer key={i} section={section} customRenderers={customRenderers} />
+        <SectionRenderer
+          key={i}
+          section={section}
+          slug={page.slug}
+          customRenderers={customRenderers}
+        />
       ))}
     </div>
   )

@@ -158,8 +158,8 @@ test.describe('SQL Editor', () => {
     await page.getByTestId('sql-run-button').click()
 
     // verify warning modal is visible
-    expect(page.getByRole('heading', { name: 'Potential issue detected with' })).toBeVisible()
-    expect(page.getByText('Query has destructive')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Potential issue detected' })).toBeVisible()
+    await expect(page.getByText('This query includes destructive operations')).toBeVisible()
     await page.getByRole('button', { name: 'Cancel' }).click()
 
     // clear SQL snippet
@@ -192,8 +192,8 @@ test.describe('SQL Editor', () => {
     await page.getByTestId('sql-run-button').click()
 
     // verify warning modal blocks execution
-    await expect(page.getByRole('heading', { name: 'Potential issue detected with' })).toBeVisible()
-    await expect(page.getByText('Query will prevent connections to your database')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Potential issue detected' })).toBeVisible()
+    await expect(page.getByText('This query may prevent new database connections')).toBeVisible()
     expect(queryDispatched).toBe(false)
 
     // cancel should dismiss without executing
@@ -232,8 +232,8 @@ test.describe('SQL Editor', () => {
     await page.getByTestId('sql-run-button').click()
 
     // verify warning modal blocks execution
-    await expect(page.getByRole('heading', { name: 'Potential issue detected with' })).toBeVisible()
-    await expect(page.getByText('Query will prevent connections to your database')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Potential issue detected' })).toBeVisible()
+    await expect(page.getByText('This query may prevent new database connections')).toBeVisible()
     expect(queryDispatched).toBe(false)
 
     // cancel should dismiss without executing
@@ -272,8 +272,8 @@ test.describe('SQL Editor', () => {
     await page.getByTestId('sql-run-button').click()
 
     // verify warning modal blocks execution
-    await expect(page.getByRole('heading', { name: 'Potential issue detected with' })).toBeVisible()
-    await expect(page.getByText('Query uses update without a where clause')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Potential issue detected' })).toBeVisible()
+    await expect(page.getByText(/This query runs an UPDATE without a WHERE clause/)).toBeVisible()
     expect(queryDispatched).toBe(false)
 
     // cancel should dismiss without executing
@@ -291,7 +291,11 @@ test.describe('SQL Editor', () => {
   })
 
   test('warns on CREATE TABLE without RLS and "Run and enable RLS" enables it', async ({ ref }) => {
-    const tableName = 'pw_rls_smoke_test'
+    // Suffix with parallel worker index so parallel workers don't collide
+    // on the same table name — when they do, one worker's `dropTable`
+    // races another's "Run and enable RLS" and the post-action query
+    // sometimes finds the table missing.
+    const tableName = `pw_rls_smoke_test_${test.info().parallelIndex}`
 
     // Drop any leftover table from a previous failed run, and ensure cleanup
     // after the test regardless of pass/fail.
@@ -307,11 +311,11 @@ test.describe('SQL Editor', () => {
 
       // Modal appears with the RLS warning
       await expect(
-        page.getByRole('heading', { name: 'Potential issue detected with' }),
+        page.getByRole('heading', { name: 'Potential issue detected' }),
         'Warning modal should appear when CREATE TABLE has no RLS'
       ).toBeVisible()
       await expect(
-        page.getByText('Row Level Security'),
+        page.getByText('This query creates a table without enabling Row Level Security'),
         'Modal should mention Row Level Security'
       ).toBeVisible()
 
@@ -372,7 +376,7 @@ test.describe('SQL Editor', () => {
       // the waiter above would have timed out. Belt-and-braces check that the
       // modal is not visible.
       await expect(
-        page.getByRole('heading', { name: 'Potential issue detected with' }),
+        page.getByRole('heading', { name: /Potential issues? detected/ }),
         'RLS warning should not fire on CREATE FUNCTION with plpgsql SELECT..INTO'
       ).not.toBeVisible()
 
@@ -412,7 +416,7 @@ test.describe('SQL Editor', () => {
 
     // verify warning modal is NOT visible - query should execute directly
     await expect(
-      page.getByRole('heading', { name: 'Potential issue detected with' })
+      page.getByRole('heading', { name: /Potential issues? detected/ })
     ).not.toBeVisible()
 
     // clear SQL snippet
@@ -782,11 +786,11 @@ hello world`)
     await expect(page.getByText('result found')).toBeVisible()
     await searchBar.fill('') // clear search bar
 
-    // download as migration file
+    // export query as migration file
     await privateSnippetSection
       .getByTitle(sqlSnippetName, { exact: true })
       .click({ button: 'right' })
-    await page.getByRole('menuitem', { name: 'Download as migration file' }).click()
+    await page.getByRole('menuitem', { name: 'Export query' }).click()
     await expect(page.getByText('supabase migration new')).toBeVisible()
     await page.getByRole('button', { name: 'Close' }).click()
 

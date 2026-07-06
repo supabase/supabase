@@ -28,7 +28,7 @@ then the runtime will return a 404 error.
 
 <Admonition type="note">
 
-If the tests return a 404 but don't match the criteria below, the error is coming from your app logic, not the JWT check.
+If the tests return a 404 but do not match the criteria below, the error is coming from your app's logic.
 
 </Admonition>
 
@@ -61,18 +61,22 @@ Always configure an appropriate time frame when using the log explorer
 
 </Admonition>
 
-One cannot inspect the function dashboard to find platform 404 errors, instead, you must run the below query in the [log explorer](/dashboard/project/_/logs/explorer?q=SELECT+DISTINCT%0A++++req.pathname+AS+function_name%2C%0A++++res.status_code%0AFROM+function_edge_logs%0ACROSS+JOIN+UNNEST%28metadata%29+AS+metadata+%0ACROSS+JOIN+UNNEST%28metadata.request%29+AS+req+%0ACROSS+JOIN+UNNEST%28metadata.response%29+AS+res+%0AWHERE+%0A++++status_code+%3D+404+%0A++++++++AND+%0A++++metadata.execution_id+IS+NULL%0ALIMIT+10%3B). Results will show all requests that reached Supabase but were rejected as unrecognizable.
+You cannot inspect the function dashboard to find platform 404 errors, instead, run the below query in the [log explorer](</dashboard/project/_/logs/explorer?its=&ite=&s=select+distinct%0A++req.pathname+as+function_name,%0A++res.status_code,%0A++CASE+%0A++++WHEN+metadata.execution_id+is+null+THEN+%27FUNCTION_NOT_FOUND%27%0A++++ELSE+%27FUNCTION+RECOGNIZED:+custom+404+message+in+app+logic%27%0A++END+AS+type_of_404%0Afrom%0A++function_edge_logs%0A++cross+join+UNNEST(metadata)+as+metadata%0A++cross+join+UNNEST(metadata.request)+as+req%0A++cross+join+UNNEST(metadata.response)+as+res%0Awhere+status_code+=+404%0Alimit+10;>). The results show all requests that reached Supabase but were rejected as unrecognizable.
 
 ```sql
 select distinct
   req.pathname as function_name,
-  res.status_code
+  res.status_code,
+  case
+    when metadata.execution_id is null then 'FUNCTION_NOT_FOUND'
+    else 'FUNCTION RECOGNIZED: custom 404 message in app logic'
+  end as type_of_404
 from
   function_edge_logs
   cross join UNNEST(metadata) as metadata
   cross join UNNEST(metadata.request) as req
   cross join UNNEST(metadata.response) as res
-where status_code = 404 and metadata.execution_id is null
+where status_code = 404
 limit 10;
 ```
 

@@ -1,4 +1,4 @@
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, CriticalIcon } from 'ui'
+import { Alert, AlertDescription, AlertTitle, CriticalIcon } from 'ui'
 import {
   PageSection,
   PageSectionContent,
@@ -39,14 +39,14 @@ export const DeleteProjectPanel = () => {
       </PageSectionMeta>
 
       <PageSectionContent>
-        <Alert_Shadcn_ variant="destructive">
+        <Alert variant="destructive">
           <CriticalIcon />
-          <AlertTitle_Shadcn_>{title}</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
+          <AlertTitle>{title}</AlertTitle>
+          <AlertDescription>{description}</AlertDescription>
           <div className="mt-2">
             <DeleteProjectButton />
           </div>
-        </Alert_Shadcn_>
+        </Alert>
       </PageSectionContent>
     </PageSection>
   )

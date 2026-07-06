@@ -5,13 +5,13 @@ import { ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandInput,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Tooltip,
   TooltipContent,
@@ -217,7 +217,7 @@ export const OrganizationProjectSelector = ({
   }
 
   const commandContent = (
-    <Command_Shadcn_
+    <Command
       shouldFilter={false}
       className={cn(className, embedded && 'flex flex-col flex-1 min-h-0 overflow-hidden')}
     >
@@ -226,7 +226,7 @@ export const OrganizationProjectSelector = ({
           {renderActions(setOpen, { embedded: true })}
         </div>
       )}
-      <CommandInput_Shadcn_
+      <CommandInput
         showResetIcon
         value={search}
         onValueChange={setSearch}
@@ -235,24 +235,24 @@ export const OrganizationProjectSelector = ({
         wrapperClassName={embedded ? 'shrink-0 border-b' : undefined}
         className="text-base sm:text-sm"
       />
-      <CommandList_Shadcn_
+      <CommandList
         className={
           embedded
             ? 'flex-1 min-h-0 overflow-y-auto overflow-x-hidden max-h-none!'
             : 'max-h-none md:max-h-[300px] overflow-y-auto overflow-x-hidden'
         }
       >
-        <CommandGroup_Shadcn_ className={embedded ? 'flex-1 min-h-0 overflow-hidden' : ''}>
+        <CommandGroup className={embedded ? 'flex-1 min-h-0 overflow-hidden' : ''}>
           {renderListContent()}
-        </CommandGroup_Shadcn_>
+        </CommandGroup>
         {!!renderActions && !embedded && (
           <>
             <div className="h-px bg-border-overlay -mx-1 shrink-0" />
             {renderActions(setOpen)}
           </>
         )}
-      </CommandList_Shadcn_>
-    </Command_Shadcn_>
+      </CommandList>
+    </Command>
   )
 
   if (embedded) {
@@ -260,8 +260,8 @@ export const OrganizationProjectSelector = ({
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={modal}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen} modal={modal}>
+      <PopoverTrigger asChild>
         {renderTrigger ? (
           renderTrigger({
             isLoading: isLoadingProjects || isFetching,
@@ -272,7 +272,7 @@ export const OrganizationProjectSelector = ({
         ) : (
           <Button
             block
-            type="default"
+            variant="default"
             role="combobox"
             size="small"
             aria-expanded={open}
@@ -287,8 +287,8 @@ export const OrganizationProjectSelector = ({
             )}
           </Button>
         )}
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent
         id={listboxId}
         sameWidthAsTrigger={sameWidthAsTrigger}
         className="p-0"
@@ -296,7 +296,7 @@ export const OrganizationProjectSelector = ({
         align="start"
       >
         {commandContent}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

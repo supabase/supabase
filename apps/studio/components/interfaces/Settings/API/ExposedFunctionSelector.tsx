@@ -5,14 +5,14 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Tooltip,
   TooltipContent,
@@ -96,12 +96,12 @@ export const ExposedFunctionSelector = ({
   }, [entry?.isIntersecting, hasNextPage, isFetching, isFetchingNextPage, isPending, fetchNextPage])
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger asChild>
         <Button
           size="small"
           disabled={disabled}
-          type="default"
+          variant="default"
           className="w-full [&>span]:w-full pr-1! space-x-1"
           iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
         >
@@ -119,22 +119,22 @@ export const ExposedFunctionSelector = ({
             </p>
           </div>
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent
         className="p-0 min-w-[200px] pointer-events-auto"
         side="bottom"
         align="start"
         sameWidthAsTrigger
       >
-        <Command_Shadcn_ shouldFilter={false}>
-          <CommandInput_Shadcn_
+        <Command shouldFilter={false}>
+          <CommandInput
             className="text-xs"
             placeholder="Find function..."
             value={search}
             onValueChange={setSearch}
           />
-          <CommandList_Shadcn_>
-            <CommandGroup_Shadcn_>
+          <CommandList>
+            <CommandGroup>
               {isPending ? (
                 <>
                   <div className="px-2 py-1">
@@ -179,7 +179,7 @@ export const ExposedFunctionSelector = ({
                       })
 
                       return (
-                        <CommandItem_Shadcn_
+                        <CommandItem
                           key={key}
                           value={key}
                           className={cn(
@@ -266,7 +266,7 @@ export const ExposedFunctionSelector = ({
                               )}
                             </div>
                           </div>
-                        </CommandItem_Shadcn_>
+                        </CommandItem>
                       )
                     })}
                     <div ref={sentinelRef} className="h-1 -mt-1" />
@@ -278,11 +278,11 @@ export const ExposedFunctionSelector = ({
                   </ScrollArea>
                 </>
               )}
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }
 

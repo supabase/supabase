@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -19,7 +19,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  Input_Shadcn_,
+  Input,
   Separator,
 } from 'ui'
 import * as z from 'zod'
@@ -32,18 +32,18 @@ import { useProfile } from '@/lib/profile'
 const setDeletionRequestFlag = () => {
   const expiryDate = new Date()
   expiryDate.setDate(expiryDate.getDate() + 30)
-  localStorage.setItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST, expiryDate.toString())
+  safeLocalStorage.setItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST, expiryDate.toString())
 }
 
 const hasActiveDeletionRequest = () => {
-  const expiryDateStr = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
+  const expiryDateStr = safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
   if (!expiryDateStr) return false
 
   const expiryDate = new Date(expiryDateStr)
   const now = new Date()
 
   if (now > expiryDate) {
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
+    safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
     return false
   }
 
@@ -106,7 +106,7 @@ export const DeleteAccountButton = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button type="danger" loading={!accountEmail}>
+        <Button variant="danger" loading={!accountEmail}>
           Request to delete account
         </Button>
       </DialogTrigger>
@@ -144,7 +144,7 @@ export const DeleteAccountButton = () => {
                   </span>
                 </DialogSection>
                 <DialogFooter>
-                  <Button block type="primary" size="medium" onClick={() => setIsOpen(false)}>
+                  <Button block variant="primary" size="medium" onClick={() => setIsOpen(false)}>
                     Understood
                   </Button>
                 </DialogFooter>
@@ -167,7 +167,7 @@ export const DeleteAccountButton = () => {
                             confirm
                           </FormLabel>
                           <FormControl>
-                            <Input_Shadcn_
+                            <Input
                               autoFocus
                               {...field}
                               autoComplete="off"
@@ -184,8 +184,8 @@ export const DeleteAccountButton = () => {
                     <Button
                       block
                       size="small"
-                      type="danger"
-                      htmlType="submit"
+                      variant="danger"
+                      type="submit"
                       loading={isPending}
                       disabled={account !== accountEmail || isPending}
                     >

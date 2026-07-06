@@ -4,7 +4,8 @@ import { ExternalLink } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Alert, Alert_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { Alert, AlertTitle, Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
@@ -14,9 +15,9 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { PARTNER_TO_NAME } from '@/components/ui/PartnerManagedResource'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
@@ -101,40 +102,45 @@ const CostControl = ({}: CostControlProps) => {
               {isError && <AlertError subject="Failed to retrieve subscription" error={error} />}
 
               {isSuccess && costControlDisabled && (
-                <Alert_Shadcn_ className="flex flex-col items-center gap-y-2 border-0 rounded-none">
+                <Alert className="flex flex-col items-center gap-y-2 border-0 rounded-none">
                   <PartnerIcon
                     organization={{ managed_by: selectedOrganization?.managed_by }}
                     showTooltip={false}
                     size="large"
                   />
 
-                  <AlertTitle_Shadcn_ className="text-sm">
+                  <AlertTitle className="text-sm">
                     The Spend Cap is not available for organizations managed by{' '}
                     {PARTNER_TO_NAME[selectedOrganization?.managed_by]}.
-                  </AlertTitle_Shadcn_>
-                </Alert_Shadcn_>
+                  </AlertTitle>
+                </Alert>
               )}
 
               {isSuccess && !costControlDisabled && (
                 <div className="space-y-6">
                   {['team', 'enterprise', 'platform'].includes(currentPlan?.id || '') ? (
-                    <Alert
-                      withIcon
-                      variant="info"
-                      title={`You will be charged for any additional usage on the ${
-                        currentPlan?.name || ''
-                      } plan`}
-                    >
-                      {currentPlan?.name || ''} plan requires you to have spend cap off at all
-                      times. Your projects will never become unresponsive. Only when your{' '}
-                      <Link
-                        href={`/org/${slug}/usage`}
-                        className="text-green-900 transition hover:text-green-1000"
-                      >
-                        included usage
-                      </Link>{' '}
-                      is exceeded will you be charged for any additional usage.
-                    </Alert>
+                    <>
+                      <Admonition
+                        type="default"
+                        layout="horizontal"
+                        title={`You will be charged for any additional usage on the ${
+                          currentPlan?.name || ''
+                        } plan`}
+                        description={
+                          <>
+                            {currentPlan?.name || ''} plan requires you to have spend cap off at all
+                            times. Your projects will never become unresponsive. Only when your{' '}
+                            <Link
+                              href={`/org/${slug}/usage`}
+                              className="text-green-900 transition hover:text-green-1000"
+                            >
+                              included usage
+                            </Link>{' '}
+                            is exceeded will you be charged for any additional usage.
+                          </>
+                        }
+                      />
+                    </>
                   ) : (
                     <p className="text-sm text-foreground-light">
                       If you need to go beyond the included quota, simply switch off your spend cap
@@ -178,7 +184,7 @@ const CostControl = ({}: CostControlProps) => {
                       </p>
                       <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
                         <Button
-                          type="default"
+                          variant="default"
                           className="mt-4 pointer-events-auto"
                           disabled={!canChangeTier}
                           onClick={() => snap.setPanelKey('costControl')}

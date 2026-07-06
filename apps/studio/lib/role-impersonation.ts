@@ -1,4 +1,4 @@
-import { getImpersonationSQL } from '@supabase/pg-meta'
+import { getImpersonationSQL, type SafeSqlFragment } from '@supabase/pg-meta'
 
 import { uuidv4 } from './helpers'
 import type { User } from '@/data/auth/users-infinite-query'
@@ -96,7 +96,10 @@ export function getPostgrestClaims(projectRef: string, role: PostgrestImpersonat
 
 export type RoleImpersonationState = Pick<ValtioRoleImpersonationState, 'role' | 'claims'>
 
-export function wrapWithRoleImpersonation(sql: string, state?: RoleImpersonationState) {
+export function wrapWithRoleImpersonation(
+  sql: SafeSqlFragment,
+  state?: RoleImpersonationState
+): SafeSqlFragment {
   const { role, claims } = state ?? { role: undefined, claims: undefined }
 
   if (role === undefined) return sql
@@ -123,7 +126,7 @@ function encodeBase64Url(data: ArrayBuffer | Uint8Array | string): string {
 function genKey(rawKey: string) {
   return window.crypto.subtle.importKey(
     'raw',
-    encodeText(rawKey),
+    encodeText(rawKey) as BufferSource,
     { name: 'HMAC', hash: 'SHA-256' },
     false,
     ['sign', 'verify']
@@ -141,7 +144,7 @@ async function createToken(jwtPayload: object, key: string) {
       await window.crypto.subtle.sign(
         { name: 'HMAC' },
         await genKey(key),
-        encodeText(headerAndPayload)
+        encodeText(headerAndPayload) as BufferSource
       )
     )
   )

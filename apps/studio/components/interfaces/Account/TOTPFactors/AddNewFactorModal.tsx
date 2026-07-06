@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Form, FormControl, FormField, Input, Input_Shadcn_ } from 'ui'
+import { Form, FormControl, FormField, Input } from 'ui'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -15,7 +15,7 @@ import { organizationKeys } from '@/data/organizations/keys'
 import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaEnrollMutation } from '@/data/profile/mfa-enroll-mutation'
 import { useMfaUnenrollMutation } from '@/data/profile/mfa-unenroll-mutation'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 
 type TOTP = { qr_code: string; secret: string; uri: string }
 
@@ -108,7 +108,7 @@ const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) =>
                 description="A string will be randomly generated if a name is not provided"
               >
                 <FormControl>
-                  <Input_Shadcn_ id="name" {...field} />
+                  <Input id="name" {...field} />
                 </FormControl>
               </FormItemLayout>
             )}
@@ -139,10 +139,7 @@ const SecondStep = ({
   onClose,
 }: SecondStepProps) => {
   const queryClient = useQueryClient()
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const FormSchema = z.object({
     code: z.string().min(1, 'Please provide a code from your authenticator app'),
@@ -225,14 +222,12 @@ const SecondStep = ({
           <InformationBox
             title="Unable to scan?"
             description={
-              <Input
-                copy
-                disabled
-                id="ref"
-                size="small"
+              <FormItemLayout
+                isReactForm={false}
                 label="You can also enter this secret key into your authenticator app"
-                value={factor.totp.secret}
-              />
+              >
+                <PasswordInput copy disabled id="ref" size="small" value={factor.totp.secret} />
+              </FormItemLayout>
             }
           />
 
@@ -249,7 +244,7 @@ const SecondStep = ({
                 render={({ field }) => (
                   <FormItemLayout name="code" label="Authentication code">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         id="code"
                         autoFocus
                         {...field}
