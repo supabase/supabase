@@ -262,7 +262,9 @@ export function normalizeComment(
 
   // Surface @deprecated so deprecated-only symbols (e.g. type aliases whose
   // only doc content is a @deprecated tag) still render a description instead
-  // of an empty card. Inline {@link X} parts fall back to their text.
+  // of an empty card. Inline {@link X} parts fall back to their text. Angle
+  // brackets are HTML-escaped because the note is rendered via MDX, which would
+  // otherwise parse a generic like `overrideTypes<T, U>` as a JSX tag and throw.
   if ('blockTags' in original && Array.isArray(original.blockTags)) {
     const deprecatedTag = original.blockTags.find((t) => t.tag === '@deprecated')
     if (deprecatedTag) {
@@ -270,6 +272,8 @@ export function normalizeComment(
         .map((p) => p.text)
         .join('')
         .trim()
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
       const note = detail ? `**Deprecated.** ${detail}` : '**Deprecated.**'
       comment.text = comment.text ? `${note}\n\n${comment.text}` : note
     }

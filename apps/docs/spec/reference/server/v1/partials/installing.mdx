@@ -58,9 +58,27 @@ slug: installing
 
   <RefSubLayout.Examples>
 
-    ```sh Terminal
-    deno add jsr:@supabase/server
-    ```
+    <Tabs
+      size="small"
+      type="underlined"
+      defaultActiveId="deno"
+      queryGroup="platform"
+    >
+      <TabPanel id="deno" label="Deno">
+
+        ```sh Terminal
+        deno add jsr:@supabase/server
+        ```
+
+      </TabPanel>
+      <TabPanel id="bun" label="Bun">
+
+        ```sh Terminal
+        bunx jsr add @supabase/server
+        ```
+
+      </TabPanel>
+    </Tabs>
 
   </RefSubLayout.Examples>
 </RefSubLayout.EducationRow>
