@@ -220,12 +220,14 @@ services:
       # GOTRUE_MFA_MAX_ENROLLED_FACTORS: ${MFA_MAX_ENROLLED_FACTORS}
 
       # SAML SSO
+      # See: https://supabase.com/docs/guides/self-hosting/self-hosted-saml-sso
       # GOTRUE_SAML_ENABLED: ${SAML_ENABLED}
       # GOTRUE_SAML_PRIVATE_KEY: ${SAML_PRIVATE_KEY}
       # GOTRUE_SAML_ALLOW_ENCRYPTED_ASSERTIONS: ${SAML_ALLOW_ENCRYPTED_ASSERTIONS}
       # GOTRUE_SAML_RELAY_STATE_VALIDITY_PERIOD: ${SAML_RELAY_STATE_VALIDITY_PERIOD}
-      # GOTRUE_SAML_EXTERNAL_URL: ${SAML_EXTERNAL_URL}
       # GOTRUE_SAML_RATE_LIMIT_ASSERTION: ${SAML_RATE_LIMIT_ASSERTION}
+      # Optional, defaults to API_EXTERNAL_URL if not set
+      # GOTRUE_SAML_EXTERNAL_URL: ${SAML_EXTERNAL_URL}
 
       # Uncomment to enable custom access token hook.
       # See: https://supabase.com/docs/guides/auth/auth-hooks for
