@@ -87,7 +87,7 @@ export const INVOCATION_CHART_CONFIG = {
   },
   warning_count: {
     label: 'Warnings',
-    color: 'var(--warning)',
+    color: 'var(--chart-warning)',
   },
   error_count: {
     label: 'Errors',

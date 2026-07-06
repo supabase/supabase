@@ -73,7 +73,7 @@ export const CHART_CONFIG = {
   },
   warning: {
     label: <TooltipLabel level="warning" />,
-    color: 'var(--warning)',
+    color: 'var(--chart-warning)',
   },
   error: {
     label: <TooltipLabel level="error" />,
