@@ -46,8 +46,10 @@ export const MakeReportSnippetPublicModal = ({
           },
         }
       )
-    } catch (error) {
-      toast.error(`Failed to share snippet: ${(error as Error).message}`)
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        toast.error(`Failed to share snippet: ${error.message}`)
+      }
     } finally {
       setIsPreparing(false)
     }
