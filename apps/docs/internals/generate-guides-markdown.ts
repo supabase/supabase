@@ -19,6 +19,7 @@ import { AuthProviders } from './markdown-schema/AuthProviders'
 import { ComputeDiskLimitsTable } from './markdown-schema/ComputeDiskLimitsTable'
 import { ErrorCodes } from './markdown-schema/ErrorCodes'
 import { IconCheck, IconX } from './markdown-schema/Icons'
+import { Image } from './markdown-schema/Image'
 import { Link } from './markdown-schema/Link'
 import { ContentListings } from './markdown-schema/ContentListings'
 import { MetricsStackCards } from './markdown-schema/MetricsStackCards'
@@ -155,6 +156,7 @@ const SCHEMA: ComponentSchema = {
   Admonition,
   IconCheck,
   IconX,
+  Image,
   AuthProviders,
   ComputeDiskLimitsTable,
   ErrorCodes,
