@@ -4,6 +4,7 @@ import { LogsTableName } from './Logs.constants'
 import type { Filters, LogData } from './Logs.types'
 import {
   buildLogsPrompt,
+  checkForLimitClause,
   extractEdgeFunctionName,
   formatLogsAsCsv,
   formatLogsAsJson,
@@ -293,6 +294,39 @@ describe('Logs.utils', () => {
     test('info severity filter excludes error and warning rows', () => {
       const sql = queryFor({ info: true })
       expect(sql).toContain('NOT (')
+    })
+  })
+
+  describe('checkForLimitClause', () => {
+    test('detects a limit clause regardless of casing', () => {
+      expect(checkForLimitClause('select event_message from edge_logs limit 100')).toBe(true)
+      expect(checkForLimitClause('SELECT event_message FROM edge_logs LIMIT 5')).toBe(true)
+    })
+
+    test('detects a limit clause across newlines', () => {
+      expect(checkForLimitClause('select event_message\nfrom edge_logs\nlimit 50')).toBe(true)
+    })
+
+    test('returns false when no limit clause is present', () => {
+      expect(checkForLimitClause('select event_message from edge_logs')).toBe(false)
+    })
+
+    test('returns false for a bare limit keyword without a row count', () => {
+      expect(checkForLimitClause('select event_message from edge_logs limit')).toBe(false)
+    })
+
+    test('ignores a column named like limit', () => {
+      expect(checkForLimitClause('select limit_reached from edge_logs')).toBe(false)
+    })
+
+    test('ignores the word limit inside a string literal', () => {
+      expect(checkForLimitClause("select event_message from edge_logs where s = 'limit 10'")).toBe(
+        false
+      )
+    })
+
+    test('ignores a limit clause that is commented out', () => {
+      expect(checkForLimitClause('select event_message from edge_logs -- limit 10')).toBe(false)
     })
   })
 })

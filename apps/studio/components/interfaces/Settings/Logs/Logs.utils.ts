@@ -708,6 +708,13 @@ export function checkForILIKEClause(query: string) {
   return ilikeClauseRegex.test(queryWithoutComments)
 }
 
+export function checkForLimitClause(query: string) {
+  const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
+
+  const limitClauseRegex = /\b(LIMIT)\b\s+\d+(?=(?:[^']*'[^']*')*[^']*$)/i
+  return limitClauseRegex.test(queryWithoutComments)
+}
+
 export function checkForWildcard(query: string) {
   const queryWithoutComments = query.replace(/--.*$/gm, '').replace(/\/\*[\s\S]*?\*\//gm, '')
 
