@@ -7,6 +7,27 @@ import Link from 'next/link'
 
 const sections = [
   {
+    id: 'customer-legal-resources',
+    title: 'Customer Legal Resources',
+    links: [
+      {
+        label: 'Terms of Service',
+        href: '/terms',
+        type: 'document' as const,
+      },
+      {
+        label: 'Support Policy',
+        href: '/support-policy',
+        type: 'document' as const,
+      },
+      {
+        label: 'Service Level Agreement',
+        href: '/sla',
+        type: 'document' as const,
+      },
+    ],
+  },
+  {
     id: 'partner-legal-resources',
     title: 'Partner Legal Resources',
     links: [

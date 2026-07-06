@@ -184,10 +184,6 @@ const footerData = [
         url: '/legal',
       },
       {
-        text: 'Terms of Service',
-        url: '/terms',
-      },
-      {
         text: 'Privacy Policy',
         url: '/privacy',
       },
@@ -198,14 +194,6 @@ const footerData = [
       {
         text: 'Acceptable Use Policy',
         url: '/aup',
-      },
-      {
-        text: 'Support Policy',
-        url: '/support-policy',
-      },
-      {
-        text: 'Service Level Agreement',
-        url: '/sla',
       },
       {
         text: 'Humans.txt',
