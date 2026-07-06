@@ -4,7 +4,7 @@
  * bundle) and the build-time markdown-schema handler without pulling in
  * `CodeBlock`'s heavier dependencies (Shiki, Twoslash) into the build script.
  */
-export function buildMcpCiConfig(remoteUrl?: string) {
+export function buildMcpCiConfig(remoteUrl = 'https://mcp.supabase.com/mcp') {
   return {
     mcpServers: {
       supabase: {
