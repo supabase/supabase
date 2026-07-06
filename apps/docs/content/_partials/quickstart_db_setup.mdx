@@ -74,7 +74,13 @@ curl -X POST https://api.supabase.com/v1/projects \
 
 When your Supabase project is up and running, create an `instruments` table with some sample data. Then set only the privileges each Postgres role needs, add [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default, and create an RLS policy to make the data in the table publicly readable.
 
-For this, copy and run the snippet below in your project's [SQL Editor](/dashboard/project/_/sql/new) or <a href={`/dashboard/project/_/sql/new?content=${encodeURIComponent(sqlSetup)}`}>click here to prefill the SQL</a> and then execute it.
+<Admonition type="tip">
+
+Save some steps by <a href={`/dashboard/project/_/sql/new?content=${encodeURIComponent(sqlSetup)}`}>clicking here to prefill the SQL</a> and execute it.
+
+</Admonition>
+
+Or do this manually by going into your project's [SQL Editor](/dashboard/project/_/sql/new) and click **Run**.
 
 ```sql SQL_EDITOR
 -- Create the table
