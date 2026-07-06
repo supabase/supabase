@@ -332,7 +332,7 @@ resources:
                             '@type': >-
                               type.googleapis.com/envoy.config.route.v3.FilterConfig
                             disabled: true
-                            
+
                       - name: rest-v1-openapi-protected
                         match:
                           path: /rest/v1/
@@ -700,6 +700,7 @@ resources:
 
                       local PROTECTED_ROUTES = {
                         ["auth-v1-protected"] = true,
+                        ["rest-v1-openapi-protected"] = true,
                         ["rest-v1-protected"] = true,
                         ["graphql-v1-protected"] = true,
                         ["realtime-v1-api-protected"] = true,
