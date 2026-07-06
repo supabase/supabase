@@ -6,6 +6,7 @@ import { Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Button, DialogSectionSeparator, Form, SheetFooter, SheetSection } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import * as z from 'zod'
 
 import {
@@ -41,6 +42,7 @@ import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-
 import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
 const formId = 'destination-editor'
 
@@ -313,6 +315,12 @@ export const DestinationForm = ({
             <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
               <div className="p-5 flex flex-col gap-y-6">
                 <p className="text-sm font-medium text-foreground">Destination details</p>
+
+                <Admonition
+                  type="default"
+                  title="Pipeline region"
+                  description={`This pipeline runs from ${IS_STAGING_OR_LOCAL ? 'ap-southeast-1' : 'eu-central-1'}. We recommend choosing a destination located in or close to this region to minimize replication latency.`}
+                />
 
                 <div className="space-y-4">
                   <DestinationNameInput form={form} />
