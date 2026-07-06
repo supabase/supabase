@@ -18,19 +18,18 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { getHasInstalledObject } from '@/components/layouts/IntegrationsLayout/Integrations.utils'
 import {
-  InterstitialAccountRow,
-  InterstitialLayout,
-  LogoPair,
-  PartnerLogo,
-  SupabaseLogo,
-} from '@/components/layouts/InterstitialLayout'
+  VercelIntegrationFooter,
+  VercelIntegrationInterstitialErrorState,
+  VercelIntegrationLogo,
+} from '@/components/interfaces/Integrations/Vercel/VercelIntegrationInterstitial'
+import { getHasInstalledObject } from '@/components/layouts/IntegrationsLayout/Integrations.utils'
+import { InterstitialAccountRow, InterstitialLayout } from '@/components/layouts/InterstitialLayout'
 import { useIntegrationsQuery } from '@/data/integrations/integrations-query'
 import { useVercelIntegrationCreateMutation } from '@/data/integrations/vercel-integration-create-mutation'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { withAuth } from '@/hooks/misc/withAuth'
-import { BASE_PATH } from '@/lib/constants'
+import { getErrorMessage } from '@/lib/get-error-message'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { useProfileNameAndPicture } from '@/lib/profile'
 import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
@@ -40,19 +39,6 @@ const PAGE_TITLE = buildStudioPageTitle({
   section: 'Install Vercel Integration',
   brand: 'Supabase',
 })
-
-function getErrorMessage(error: unknown): string | undefined {
-  if (error instanceof Error) return error.message
-  if (
-    typeof error === 'object' &&
-    error !== null &&
-    'message' in error &&
-    typeof (error as { message: unknown }).message === 'string'
-  ) {
-    return (error as { message: string }).message
-  }
-  return undefined
-}
 
 /**
  * Variations of the Vercel integration flow.
@@ -262,32 +248,19 @@ const VercelIntegration: NextPageWithLayout = () => {
       </Head>
 
       <InterstitialLayout
-        logo={
-          <LogoPair
-            left={
-              <PartnerLogo
-                src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
-                alt="Vercel"
-                className="bg-surface-75"
-                imageClassName="size-7 object-contain dark:invert"
-              />
-            }
-            right={<SupabaseLogo />}
-          />
-        }
+        logo={<VercelIntegrationLogo />}
         title="Install Vercel Integration"
         description="Choose the Supabase organization Vercel can connect to"
-        footer={
-          <p className="text-xs text-foreground-lighter">
-            You can remove this integration at any time from Vercel or the Supabase dashboard.
-          </p>
-        }
+        footer={<VercelIntegrationFooter />}
       >
         <div className="px-6 pb-6">
           {showLoadingState ? (
             <InstallationLoadingState />
           ) : isError ? (
-            <InstallationErrorState errorMessage={errorMessage} />
+            <VercelIntegrationInterstitialErrorState
+              title="Unable to load installation"
+              errorMessage={errorMessage}
+            />
           ) : (
             <div className="flex flex-col gap-5">
               <InterstitialAccountRow avatarUrl={avatarUrl} displayName={displayName} />
@@ -370,26 +343,6 @@ const InstallationLoadingState = () => (
       <ShimmeringLoader className="h-[34px] w-full rounded-md py-0" />
     </section>
     <ShimmeringLoader className="h-10 w-full rounded-md py-0" />
-  </div>
-)
-
-const InstallationErrorState = ({ errorMessage }: { errorMessage?: string }) => (
-  <div className="flex flex-col gap-3">
-    <Admonition
-      type="warning"
-      title="Unable to load installation"
-      description={
-        <>
-          Retry the installation request from Vercel.
-          {errorMessage && (
-            <span className="mt-1 block text-foreground-lighter">Error: {errorMessage}</span>
-          )}
-        </>
-      }
-    />
-    <Button variant="default" block asChild>
-      <Link href="/">Back to dashboard</Link>
-    </Button>
   </div>
 )
 
