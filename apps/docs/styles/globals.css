@@ -150,10 +150,8 @@ h6:not(.font-mono),
   font-weight: inherit;
 }
 
-/* Prose body text inherits the page base weight (500 light / 450 dark) from the
- * rule above, which collides with the shared typography config's `strong: 500`
- * and makes bold text indistinguishable from body copy. Keep bold clearly
- * heavier than the inherited body weight. */
+/* Body text inherits a heavier base weight, so override the shared `strong: 500`
+ * to keep bold text visually distinct. */
 .prose :where(strong, b):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   font-weight: 700;
 }
