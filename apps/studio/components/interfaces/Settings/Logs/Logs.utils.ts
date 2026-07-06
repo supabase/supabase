@@ -365,6 +365,8 @@ export const genCountQuery = (table: LogsTableName, filters: Filters): SafeLogSq
   return safeSql`SELECT count(*) as count FROM ${LOG_TABLE_SQL[table]} ${joins} ${where}`
 }
 
+// Falls back to now for missing or unparseable params so an Invalid Date can't
+// reach .toISOString() downstream and throw RangeError (Sentry 7580074952).
 export const resolveLogTimestamp = (value?: string): Dayjs => {
   const parsed = dayjs(value)
   return value && parsed.isValid() ? parsed : dayjs()
