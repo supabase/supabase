@@ -260,6 +260,21 @@ export function normalizeComment(
     }
   }
 
+  // Surface @deprecated so deprecated-only symbols (e.g. type aliases whose
+  // only doc content is a @deprecated tag) still render a description instead
+  // of an empty card. Inline {@link X} parts fall back to their text.
+  if ('blockTags' in original && Array.isArray(original.blockTags)) {
+    const deprecatedTag = original.blockTags.find((t) => t.tag === '@deprecated')
+    if (deprecatedTag) {
+      const detail = deprecatedTag.content
+        .map((p) => p.text)
+        .join('')
+        .trim()
+      const note = detail ? `**Deprecated.** ${detail}` : '**Deprecated.**'
+      comment.text = comment.text ? `${note}\n\n${comment.text}` : note
+    }
+  }
+
   // Extract @example tags from blockTags
   if ('blockTags' in original && Array.isArray(original.blockTags)) {
     const exampleTags = original.blockTags.filter((t) => t.tag === '@example')
