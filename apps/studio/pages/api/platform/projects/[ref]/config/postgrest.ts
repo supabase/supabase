@@ -2,6 +2,7 @@ import { components } from 'api-types'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import apiWrapper from '@/lib/api/apiWrapper'
+import { DEFAULT_EXPOSED_SCHEMAS } from '@/lib/api/self-hosted/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
@@ -21,7 +22,7 @@ const handleGet = async (_req: NextApiRequest, res: NextApiResponse) => {
   const responseObj: components['schemas']['GetPostgrestConfigResponse'] = {
     db_anon_role: 'anon',
     db_extra_search_path: process.env.PGRST_DB_EXTRA_SEARCH_PATH ?? 'public',
-    db_schema: process.env.PGRST_DB_SCHEMAS ?? 'public,storage,graphql_public',
+    db_schema: DEFAULT_EXPOSED_SCHEMAS,
     jwt_secret:
       process.env.AUTH_JWT_SECRET ?? 'super-secret-jwt-token-with-at-least-32-characters-long',
     max_rows: Number(process.env.PGRST_DB_MAX_ROWS) || 1000,

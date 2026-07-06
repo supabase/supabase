@@ -2725,6 +2725,10 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/free-project-pausing' as `/${string}`,
         },
         {
+          name: 'Delete Project',
+          url: '/guides/platform/delete-project',
+        },
+        {
           name: 'Single Sign-On',
           url: '/guides/platform/sso',
           enabled: fullPlatformEnabled,
