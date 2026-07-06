@@ -49,6 +49,10 @@ function CustomContent<T extends CustomContentKey>({
     return resolveSharedDataPath(value, children) as ReactNode
   }
 
+  if (value != null && typeof value === 'object') {
+    return JSON.stringify(value) as unknown as ReactNode
+  }
+
   return (value ?? null) as ReactNode
 }
 
