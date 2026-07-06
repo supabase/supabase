@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { AWS_REGIONS } from 'shared-data'
 import { Button, DialogSectionSeparator, Form, SheetFooter, SheetSection } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import * as z from 'zod'
@@ -42,9 +43,13 @@ import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-
 import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
+import { BASE_PATH, IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
 const formId = 'destination-editor'
+
+// Pipelines always run out of a single fixed region per environment, regardless of the source
+// project's region.
+const PIPELINE_REGION = IS_STAGING_OR_LOCAL ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.CENTRAL_EU
 
 interface DestinationFormProps {
   selectedType: DestinationType
@@ -319,7 +324,25 @@ export const DestinationForm = ({
                 <Admonition
                   type="default"
                   title="Pipeline region"
-                  description={`This pipeline runs from ${IS_STAGING_OR_LOCAL ? 'ap-southeast-1' : 'eu-central-1'}. We recommend choosing a destination located in or close to this region to minimize replication latency.`}
+                  description={
+                    <div className="flex flex-col gap-y-2">
+                      <div className="flex items-center gap-x-2">
+                        <img
+                          alt="region icon"
+                          className="w-5 rounded-xs"
+                          src={`${BASE_PATH}/img/regions/${PIPELINE_REGION.code}.svg`}
+                        />
+                        <span>
+                          This pipeline runs from {PIPELINE_REGION.displayName} (
+                          {PIPELINE_REGION.code})
+                        </span>
+                      </div>
+                      <span>
+                        We recommend choosing a destination located in or close to this region to
+                        minimize replication latency.
+                      </span>
+                    </div>
+                  }
                 />
 
                 <div className="space-y-4">
