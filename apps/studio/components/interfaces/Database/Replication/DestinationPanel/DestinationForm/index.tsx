@@ -6,8 +6,19 @@ import { Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { AWS_REGIONS } from 'shared-data'
-import { Button, DialogSectionSeparator, Form, SheetFooter, SheetSection } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import {
+  Button,
+  DialogSectionSeparator,
+  Form,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SheetFooter,
+  SheetSection,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import {
@@ -321,29 +332,42 @@ export const DestinationForm = ({
               <div className="p-5 flex flex-col gap-y-6">
                 <p className="text-sm font-medium text-foreground">Destination details</p>
 
-                <Admonition
-                  type="default"
-                  title="Pipeline region"
+                <FormItemLayout
+                  isReactForm={false}
+                  layout="horizontal"
+                  className="[&>div]:gap-y-1 [&>div>span]:text-foreground-lighter"
+                  label="Region"
+                  labelOptional="This pipeline runs from a fixed region"
                   description={
-                    <div className="flex flex-col gap-y-2">
-                      <div className="flex items-center gap-x-2">
-                        <img
-                          alt="region icon"
-                          className="w-5 rounded-xs"
-                          src={`${BASE_PATH}/img/regions/${PIPELINE_REGION.code}.svg`}
-                        />
-                        <span>
-                          This pipeline runs from {PIPELINE_REGION.displayName} (
-                          {PIPELINE_REGION.code})
-                        </span>
-                      </div>
-                      <span>
-                        We recommend choosing a destination located in or close to this region to
-                        minimize replication latency.
-                      </span>
-                    </div>
+                    <span className="block text-sm text-foreground-light mb-1">
+                      For best replication performance, choose a destination located in or close to
+                      this region.
+                    </span>
                   }
-                />
+                >
+                  <Select disabled value={PIPELINE_REGION.code}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a region" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={PIPELINE_REGION.code}>
+                        <div className="flex gap-x-3 items-center">
+                          <img
+                            alt="region icon"
+                            className="w-5 rounded-xs"
+                            src={`${BASE_PATH}/img/regions/${PIPELINE_REGION.code}.svg`}
+                          />
+                          <p className="flex items-center gap-x-2">
+                            <span>{PIPELINE_REGION.displayName}</span>
+                            <span className="text-xs text-foreground-lighter font-mono">
+                              {PIPELINE_REGION.code}
+                            </span>
+                          </p>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormItemLayout>
 
                 <div className="space-y-4">
                   <DestinationNameInput form={form} />
