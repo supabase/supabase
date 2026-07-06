@@ -170,16 +170,11 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
             />
           ) : (
             <div className="flex flex-col gap-5">
-              <InterstitialAccountRow avatarUrl={avatarUrl} displayName={displayName} />
-
-              {organization && (
-                <section className="space-y-2" aria-label="Organization">
-                  <p className="text-xs font-medium uppercase tracking-wider text-foreground-light">
-                    Organization
-                  </p>
-                  <p className="truncate text-sm text-foreground">{organization.name}</p>
-                </section>
-              )}
+              <InterstitialAccountRow
+                avatarUrl={avatarUrl}
+                displayName={displayName}
+                detail={organization?.name}
+              />
 
               <ProjectLinker
                 variant="interstitial"
@@ -216,13 +211,10 @@ const ChooseProjectLoadingState = () => (
         <div className="min-w-0 flex-1 space-y-2">
           <ShimmeringLoader className="h-3 w-20 py-0" />
           <ShimmeringLoader className="h-4 w-40 max-w-full py-0" />
+          <ShimmeringLoader className="h-3 w-32 py-0" />
         </div>
       </CardContent>
     </Card>
-    <section className="space-y-2" aria-label="Organization loading">
-      <ShimmeringLoader className="h-3 w-24 py-0" />
-      <ShimmeringLoader className="h-4 w-32 py-0" />
-    </section>
     <section className="space-y-2" aria-label="Project loading">
       <ShimmeringLoader className="h-3 w-24 py-0" />
       <ShimmeringLoader className="h-[34px] w-full rounded-md py-0" />

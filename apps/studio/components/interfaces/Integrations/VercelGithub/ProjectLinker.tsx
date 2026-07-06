@@ -348,8 +348,8 @@ const ProjectLinker = ({
     >
       {onSkip !== undefined && (
         <Button
-          size="medium"
-          variant="default"
+          size={variant === 'interstitial' ? undefined : 'medium'}
+          variant={variant === 'interstitial' ? 'text' : 'default'}
           block={variant === 'interstitial'}
           onClick={() => {
             onSkip()
@@ -359,7 +359,7 @@ const ProjectLinker = ({
         </Button>
       )}
       <Button
-        size="medium"
+        size={variant === 'interstitial' ? undefined : 'medium'}
         variant={variant === 'interstitial' ? 'primary' : 'default'}
         block={variant === 'interstitial'}
         className={variant === 'default' ? 'self-end' : undefined}
