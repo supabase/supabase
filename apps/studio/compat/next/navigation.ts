@@ -6,6 +6,8 @@ import {
 } from '@tanstack/react-router'
 import { useMemo } from 'react'
 
+import { splitInternalUrl } from '@/lib/internal-url'
+
 // `next/navigation` is the App Router hook surface (Next 13+). Studio is
 // still pages-based, so most of these are entry-points that arrive via
 // stray imports or shared packages — we keep the surface comprehensive
@@ -29,13 +31,26 @@ export function useRouter() {
 
   return useMemo(
     () => ({
+      // Split query/hash out of the href — embedding them in TanStack's
+      // `to` runs the whole string through path interpolation, which
+      // percent-decodes it and strips control characters from query values
+      // (see @/lib/internal-url). `search: {}` / `hash: ''` clear stale
+      // state, matching Next's full-href navigation semantics.
       push: (href: string, _options?: NavigateOptions) => {
+        const { to, search, hash } = splitInternalUrl(href)
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        router.navigate({ to: href as any })
+        router.navigate({ to: to as any, search: (search ?? {}) as any, hash: hash ?? '' })
       },
       replace: (href: string, _options?: NavigateOptions) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        router.navigate({ to: href as any, replace: true })
+        const { to, search, hash } = splitInternalUrl(href)
+        router.navigate({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          to: to as any,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          search: (search ?? {}) as any,
+          hash: hash ?? '',
+          replace: true,
+        })
       },
       // App Router's refresh() refetches the current route's data without
       // re-mounting the React tree. Closest TanStack equivalent is
@@ -50,10 +65,18 @@ export function useRouter() {
         if (typeof window !== 'undefined') window.history.forward()
       },
       prefetch: (href: string, _options?: PrefetchOptions) => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        router.preloadRoute({ to: href as any }).catch(() => {
-          // Match Next's fire-and-forget contract.
-        })
+        const { to, search, hash } = splitInternalUrl(href)
+        router
+          .preloadRoute({
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            to: to as any,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            search: (search ?? {}) as any,
+            hash: hash ?? '',
+          })
+          .catch(() => {
+            // Match Next's fire-and-forget contract.
+          })
       },
     }),
     [router]

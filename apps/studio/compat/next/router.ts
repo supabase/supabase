@@ -7,6 +7,8 @@ import {
 } from '@tanstack/react-router'
 import { useMemo } from 'react'
 
+import { splitInternalUrl } from '@/lib/internal-url'
+
 import { getRouterEventsProxy } from './_router-events'
 
 // Next's pages-router exposes `router.pathname` as the route *pattern*
@@ -174,8 +176,8 @@ export function resolveUrl(url: string | UrlObject): string {
 // `basepath: '/dashboard'` and `to: '/foo'`, it produces `/dashboard/foo`.
 // So we strip the origin AND the basePath when present; otherwise
 // `router.push('/dashboard/...')` would double-prefix to
-// `/dashboard/dashboard/...`. Mirrors the equivalent logic in the
-// next/link shim's `splitInternalUrl`. Cross-origin URLs pass through
+// `/dashboard/dashboard/...`. Mirrors the equivalent logic in
+// `splitInternalUrl` (@/lib/internal-url). Cross-origin URLs pass through
 // untouched so TanStack hands them to the browser as external.
 const NEXT_PUBLIC_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
@@ -272,12 +274,29 @@ export function useRouter() {
     ): Promise<boolean> => {
       // `location.pathname` is already basepath-stripped by TanStack, so the
       // prefixed target stays basepath-relative like every other `to`.
-      const to = resolveSearchOrHashOnlyTarget(
-        toRelativeSameOrigin(resolveUrl(withDefaultPathname(url, pathPattern, params))),
+      const target = resolveSearchOrHashOnlyTarget(
+        // `useParams({ strict: false })` types as possibly-undefined; treat
+        // "no params" as an empty record for backfilling.
+        toRelativeSameOrigin(resolveUrl(withDefaultPathname(url, pathPattern, params ?? {}))),
         location.pathname
       )
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await router.navigate({ to: to as any, replace: options?._replace })
+      // Never embed `?query`/`#hash` inside TanStack's `to` — router-core
+      // runs the whole string through path interpolation, which percent-
+      // decodes it and strips control characters (dropping `%0A` newlines
+      // from values like the Logs Explorer's `s` SQL param). Split into
+      // { to, search, hash } instead; the target is already relative and
+      // basepath-stripped, so splitInternalUrl's own origin/basePath
+      // normalisation is a no-op here. `search: {}` clears the query,
+      // matching Next's push-without-query semantics; same for `hash: ''`.
+      const { to, search, hash } = splitInternalUrl(target)
+      await router.navigate({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        to: to as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        search: (search ?? {}) as any,
+        hash: hash ?? '',
+        replace: options?._replace,
+      })
       return true
     }
 
@@ -352,8 +371,16 @@ export function useRouter() {
         _options?: PrefetchOptions
       ): Promise<void> => {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          await router.preloadRoute({ to: url as any })
+          // Split like navigate() above so a query string in the href
+          // preloads the real target instead of a path-mangled one.
+          const { to, search, hash } = splitInternalUrl(toRelativeSameOrigin(url))
+          await router.preloadRoute({
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            to: to as any,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            search: (search ?? {}) as any,
+            hash: hash ?? '',
+          })
         } catch {
           // Next's prefetch is fire-and-forget; swallow resolution errors
           // (e.g. unknown route) so callers don't have to guard.

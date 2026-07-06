@@ -1,29 +1,42 @@
 import { useLocation, useNavigate } from '@tanstack/react-router'
-import { renderQueryString, unstable_createAdapterProvider } from 'nuqs/adapters/custom'
+import { unstable_createAdapterProvider } from 'nuqs/adapters/custom'
 import { startTransition, useCallback, useMemo } from 'react'
+
+import { searchParamsToRecord, type SearchRecord } from './router-search-params'
 
 // Custom nuqs adapter for TanStack Router.
 //
 // The stock `nuqs/adapters/tanstack-router` adapter navigates with
-// `navigate({ to: renderQueryString(search) || '.', from })`. TanStack
-// resolves a `?`-only relative `to` by *appending* it to the current path,
-// injecting a trailing slash — every nuqs write turned
-// `/auth/providers?provider=x` into `/auth/providers/?provider=x`. We build
-// an absolute target from the current pathname instead. Everything else
-// (searchParams derivation, replace/push, scroll, hash preservation)
-// mirrors the stock adapter's contract.
+// `navigate({ to: renderQueryString(search) || '.', from })`. That shape is
+// doubly broken for us:
+//   - TanStack resolves a `?`-only relative `to` by *appending* it to the
+//     current path, injecting a trailing slash — every nuqs write turned
+//     `/auth/providers?provider=x` into `/auth/providers/?provider=x`.
+//   - Embedding the query string in `to` at all sends it through TanStack's
+//     path interpolation, which percent-decodes and then strips control
+//     characters — `%0A` newlines in values (e.g. Logs Explorer SQL in `s`)
+//     were silently deleted.
+// So we navigate with `to` = the current pathname and the query as a
+// TanStack `search` *object*, which the router serialises through the app's
+// Next-style codec (lib/router-search-params) without touching the path
+// pipeline. Everything else (searchParams derivation, replace/push, scroll,
+// hash preservation) mirrors the stock adapter's contract.
 
 type AdapterOptions = { history: 'push' | 'replace'; scroll: boolean; shallow: boolean }
 
-// Compose the current pathname and a nuqs-rendered query string (`?...` or
-// '' when every param is cleared) into an absolute navigation target.
-// `pathname` comes from TanStack's parsed location, which is already
-// basepath-stripped; guard against a trailing slash anyway (root stays `/`).
-// Exported for unit tests — not part of the adapter surface.
-export function buildSearchUpdateTarget(pathname: string, queryString: string): string {
-  let base = pathname || '/'
-  if (base.length > 1 && base.endsWith('/')) base = base.slice(0, -1)
-  return `${base}${queryString}`
+// Compose the nuqs-updated URLSearchParams into TanStack navigate args:
+// `to` is the current pathname (from TanStack's parsed location, already
+// basepath-stripped; guard against a trailing slash anyway — root stays `/`)
+// and `search` is the FULL desired search state as a record ({} correctly
+// clears every param). Exported for unit tests — not part of the adapter
+// surface.
+export function buildSearchUpdateArgs(
+  pathname: string,
+  search: URLSearchParams
+): { to: string; search: SearchRecord } {
+  let to = pathname || '/'
+  if (to.length > 1 && to.endsWith('/')) to = to.slice(0, -1)
+  return { to, search: searchParamsToRecord(search) }
 }
 
 function useNuqsTanStackRouterAdapter(watchKeys: string[]) {
@@ -49,10 +62,13 @@ function useNuqsTanStackRouterAdapter(watchKeys: string[]) {
 
   const updateUrl = useCallback(
     (search: URLSearchParams, options: AdapterOptions) => {
+      const args = buildSearchUpdateArgs(pathname, search)
       startTransition(() => {
         navigate({
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          to: buildSearchUpdateTarget(pathname, renderQueryString(search)) as any,
+          to: args.to as any,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          search: args.search as any,
           replace: options.history === 'replace',
           resetScroll: options.scroll,
           // Keep the current hash — nuqs updates must not clear `#section`.
