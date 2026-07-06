@@ -12,10 +12,10 @@ import {
   PopoverContent,
   PopoverSeparator,
   PopoverTrigger,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
@@ -67,42 +67,42 @@ export const LocalVersionPopover = () => {
           !isBeta && hasUpdate ? (
             <div className="px-4 mb-3">
               <p className="text-sm mb-2">A new version of Supabase CLI is available:</p>
-              <Tabs_Shadcn_ defaultValue="macos">
-                <TabsList_Shadcn_ className="mt-2">
-                  <TabsTrigger_Shadcn_ className="px-2 text-xs" value="macos">
+              <Tabs defaultValue="macos">
+                <TabsList className="mt-2">
+                  <TabsTrigger className="px-2 text-xs" value="macos">
                     macOS
-                  </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_ className="px-2 text-xs" value="windows">
+                  </TabsTrigger>
+                  <TabsTrigger className="px-2 text-xs" value="windows">
                     Windows
-                  </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_ className="px-2 text-xs" value="linux">
+                  </TabsTrigger>
+                  <TabsTrigger className="px-2 text-xs" value="linux">
                     Linux
-                  </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_ className="px-2 text-xs" value="npm">
+                  </TabsTrigger>
+                  <TabsTrigger className="px-2 text-xs" value="npm">
                     npm / Bun
-                  </TabsTrigger_Shadcn_>
-                </TabsList_Shadcn_>
-                <TabsContent_Shadcn_ className="mt-2 text-xs" value="macos">
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent className="mt-2 text-xs" value="macos">
                   <SimpleCodeBlock parentClassName="bg-selection rounded-sm px-2!">
                     brew upgrade supabase
                   </SimpleCodeBlock>
-                </TabsContent_Shadcn_>
-                <TabsContent_Shadcn_ className="mt-2 text-xs" value="windows">
+                </TabsContent>
+                <TabsContent className="mt-2 text-xs" value="windows">
                   <SimpleCodeBlock parentClassName="bg-selection rounded-sm px-2!">
                     scoop update supabase
                   </SimpleCodeBlock>
-                </TabsContent_Shadcn_>
-                <TabsContent_Shadcn_ className="mt-2 text-xs" value="linux">
+                </TabsContent>
+                <TabsContent className="mt-2 text-xs" value="linux">
                   <SimpleCodeBlock parentClassName="bg-selection rounded-sm px-2!">
                     brew upgrade supabase
                   </SimpleCodeBlock>
-                </TabsContent_Shadcn_>
-                <TabsContent_Shadcn_ className="mt-2 text-xs" value="npm">
+                </TabsContent>
+                <TabsContent className="mt-2 text-xs" value="npm">
                   <SimpleCodeBlock parentClassName="bg-selection rounded-sm px-2!">
                     npm update supabase --save-dev
                   </SimpleCodeBlock>
-                </TabsContent_Shadcn_>
-              </Tabs_Shadcn_>
+                </TabsContent>
+              </Tabs>
             </div>
           ) : (
             <div className="px-4 mb-3">
