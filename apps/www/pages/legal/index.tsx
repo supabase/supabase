@@ -59,11 +59,11 @@ export default function LegalHubPage() {
         subheader="Legal documents and resources for Supabase customers and partners."
       />
       <SectionContainer className="prose">
-        <div className="divide-y divide-border">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
           {sections.map((section) => (
             <section key={section.title} id={section.id} className="scroll-mt-24">
               <h2 className="mt-0">{section.title}</h2>
-              <div className="divide-y divide-border lg:max-w-1/2">
+              <div className="divide-y divide-border">
                 {section.links.map((link) => {
                   const Icon = linkIcons[link.type]
                   return (
