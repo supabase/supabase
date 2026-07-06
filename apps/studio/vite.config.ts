@@ -52,6 +52,23 @@ function nextCompat(): Plugin {
   }
 }
 
+// Mirror the `*.md` raw-loader rule from next.config.ts: serve markdown
+// files as JS modules whose default export is the file's text (used by
+// `static-data/integrations/*/overview.md` via
+// `static-data/integrations/overviews.ts`). Vite has `?raw` for this, but
+// the query suffix would have to live in shared app source where it breaks
+// the webpack/turbopack raw-loader rule, so the import specifiers stay
+// query-free and this plugin does the conversion for the Vite pipeline.
+function mdRawLoader(): Plugin {
+  return {
+    name: 'studio-md-raw-loader',
+    transform(code, id) {
+      if (!id.endsWith('.md')) return
+      return { code: `export default ${JSON.stringify(code)}`, map: null }
+    },
+  }
+}
+
 // Short-circuit UMD wrappers' AMD branch by string-replacing the
 // `define.amd` check. Vite's `config.define` doesn't reach pre-bundled
 // deps (Vite 8's Rolldown-based optimizer doesn't honour member-
@@ -454,6 +471,7 @@ export default defineConfig(({ command, mode }) => {
     },
     plugins: [
       nextCompat(),
+      mdRawLoader(),
       ssrStubGraphiql(),
       umdAmdShortCircuit(),
       assertNoChunkCycles(),
