@@ -290,6 +290,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       pathname: location.pathname,
       search: location.search as Record<string, string | string[] | undefined>,
       isPlatform: IS_PLATFORM,
+      hash: location.hash,
     })
     if (!match) return
     const href = BASE_PATH ? `${BASE_PATH}${match.destination}` : match.destination

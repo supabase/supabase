@@ -82,9 +82,7 @@ describe('resolveSearchOrHashOnlyTarget (next/router compat shim)', () => {
   })
 
   it('leaves targets with a pathname untouched', () => {
-    expect(resolveSearchOrHashOnlyTarget('/project/abc?x=1', '/elsewhere')).toBe(
-      '/project/abc?x=1'
-    )
+    expect(resolveSearchOrHashOnlyTarget('/project/abc?x=1', '/elsewhere')).toBe('/project/abc?x=1')
     expect(resolveSearchOrHashOnlyTarget('/project/abc', '/elsewhere')).toBe('/project/abc')
   })
 })
