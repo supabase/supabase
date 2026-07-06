@@ -8,20 +8,20 @@ import {
   CardTitle,
   Input,
   Label,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 
 export default function TabsDemo() {
   return (
-    <Tabs_Shadcn_ defaultValue="account" className="w-[400px]">
-      <TabsList_Shadcn_ className="grid w-full grid-cols-2">
-        <TabsTrigger_Shadcn_ value="account">Account</TabsTrigger_Shadcn_>
-        <TabsTrigger_Shadcn_ value="password">Password</TabsTrigger_Shadcn_>
-      </TabsList_Shadcn_>
-      <TabsContent_Shadcn_ value="account">
+    <Tabs defaultValue="account" className="w-[400px]">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="account">Account</TabsTrigger>
+        <TabsTrigger value="password">Password</TabsTrigger>
+      </TabsList>
+      <TabsContent value="account">
         <Card>
           <CardHeader>
             <CardTitle>Account</CardTitle>
@@ -43,8 +43,8 @@ export default function TabsDemo() {
             <Button>Save changes</Button>
           </CardFooter>
         </Card>
-      </TabsContent_Shadcn_>
-      <TabsContent_Shadcn_ value="password">
+      </TabsContent>
+      <TabsContent value="password">
         <Card>
           <CardHeader>
             <CardTitle>Password</CardTitle>
@@ -66,7 +66,7 @@ export default function TabsDemo() {
             <Button>Save password</Button>
           </CardFooter>
         </Card>
-      </TabsContent_Shadcn_>
-    </Tabs_Shadcn_>
+      </TabsContent>
+    </Tabs>
   )
 }
