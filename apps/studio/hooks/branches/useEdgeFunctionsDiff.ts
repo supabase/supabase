@@ -1,4 +1,3 @@
-import { basename } from 'path'
 import { useQueries, useQueryClient } from '@tanstack/react-query'
 import { useCallback, useMemo } from 'react'
 
@@ -46,8 +45,9 @@ export interface EdgeFunctionsDiffResult {
   clearDiffsOptimistically: () => void
 }
 
-// Small helper around path.basename but avoids importing the full Node path lib for the browser bundle
-const fileKey = (fullPath: string) => basename(fullPath)
+// Equivalent of path.basename without importing Node's path lib — `path` isn't
+// polyfilled in the browser bundle under Vite, so importing it crashes the route.
+const fileKey = (fullPath: string) => fullPath.slice(fullPath.lastIndexOf('/') + 1)
 
 export const useEdgeFunctionsDiff = ({
   currentBranchRef,

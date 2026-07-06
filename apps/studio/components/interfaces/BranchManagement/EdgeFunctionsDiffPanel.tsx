@@ -1,4 +1,3 @@
-import { basename } from 'path'
 import { IS_PLATFORM } from 'common'
 import { Circle, Code, Minus, Plus, Wind } from 'lucide-react'
 import Link from 'next/link'
@@ -31,8 +30,10 @@ interface FunctionDiffProps {
   fileInfos: FileInfo[]
 }
 
-// Helper to canonicalize file identifiers to prevent mismatch due to differing root paths
-const fileKey = (fullPath: string) => basename(fullPath)
+// Helper to canonicalize file identifiers to prevent mismatch due to differing root paths.
+// Equivalent of path.basename without importing Node's path lib — `path` isn't
+// polyfilled in the browser bundle under Vite, so importing it crashes the route.
+const fileKey = (fullPath: string) => fullPath.slice(fullPath.lastIndexOf('/') + 1)
 
 // Helper to get the status color for file indicators
 const getStatusColor = (status: FileStatus): string => {
