@@ -35,11 +35,8 @@ import {
 import { TableEditor } from './TableEditor/TableEditor'
 import type { ImportContent } from './TableEditor/TableEditor.types'
 import { useTableRowOperations } from '@/components/grid/hooks/useTableRowOperations'
+import { getStableRowIdentifiers } from '@/components/grid/utils/queueOperationUtils'
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
-import {
-  acceptGeneratedPolicy,
-  type GeneratedPolicy,
-} from '@/components/interfaces/Auth/Policies/Policies.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { databasePoliciesKeys } from '@/data/database-policies/keys'
 import { useDatabasePublicationCreateMutation } from '@/data/database-publications/database-publications-create-mutation'
@@ -82,7 +79,6 @@ type SaveTableParamsBase = {
   columns: ColumnField[]
   foreignKeyRelations: ForeignKey[]
   resolve: () => void
-  generatedPolicies?: GeneratedPolicy[]
 }
 
 type SaveTableParamsNew = SaveTableParamsBase & {
@@ -318,7 +314,7 @@ export const SidePanelEditor = ({
       const { row, column } = selectedValueForJsonEdit
       payload = { [column]: value === null ? null : JSON.parse(value as any) }
       selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
-      configuration = { identifiers, rowIdx: row.idx }
+      configuration = { identifiers: getStableRowIdentifiers(row!, identifiers), rowIdx: row.idx }
     } else if (snap.sidePanel?.type === 'cell') {
       const column = snap.sidePanel.value?.column
       const row = snap.sidePanel.value?.row
@@ -326,7 +322,7 @@ export const SidePanelEditor = ({
       if (!column || !row) return
       payload = { [column]: value === null ? null : value }
       selectedTable.primary_keys.forEach((column) => (identifiers[column.name] = row![column.name]))
-      configuration = { identifiers, rowIdx: row.idx }
+      configuration = { identifiers: getStableRowIdentifiers(row!, identifiers), rowIdx: row.idx }
     }
 
     if (payload !== undefined && configuration !== undefined) {
@@ -354,7 +350,10 @@ export const SidePanelEditor = ({
       })
 
       const isNewRecord = false
-      const configuration = { identifiers, rowIdx: row.idx }
+      const configuration = {
+        identifiers: getStableRowIdentifiers(row, identifiers),
+        rowIdx: row.idx,
+      }
 
       await saveRow(value, isNewRecord, configuration, (error) => {
         if (error) {
@@ -594,7 +593,6 @@ export const SidePanelEditor = ({
     configuration,
     columns,
     foreignKeyRelations,
-    generatedPolicies = [],
     resolve,
   }: SaveTableParams) => {
     let toastId
@@ -659,7 +657,6 @@ export const SidePanelEditor = ({
               'table.has_rls': isRLSEnabled ? 1 : 0,
               'table.has_foreign_keys': foreignKeyRelations.length > 0 ? 1 : 0,
               'table.has_import': importContent !== undefined ? 1 : 0,
-              'table.generated_policies_count': generatedPolicies.length,
               'project.region': project?.region ?? 'local',
               ...(project?.cloud_provider && {
                 'project.cloud_provider': project.cloud_provider,
@@ -670,13 +667,7 @@ export const SidePanelEditor = ({
             })
 
             try {
-              // The Save click is the explicit user gesture that promotes generated policy
-              // SQL (programmatic or AI) to executable. Programmatic fragments are already
-              // SafeSqlFragment; AI fragments are UntrustedSqlFragment — both are accepted
-              // here before being passed into createTable.
-              const acceptedPolicies = generatedPolicies.map(acceptGeneratedPolicy)
-
-              const { table, failedPolicies } = await createTable({
+              const { table } = await createTable({
                 projectRef: project?.ref!,
                 connectionString: project?.connectionString,
                 toastId,
@@ -685,13 +676,10 @@ export const SidePanelEditor = ({
                 foreignKeyRelations,
                 isRLSEnabled,
                 importContent,
-                generatedPolicies: acceptedPolicies,
-                onCreatePoliciesSuccess: () => track('rls_generated_policies_created'),
                 track,
               })
 
               createTableSpan.setAttribute('table.created', 1)
-              createTableSpan.setAttribute('table.failed_policies', failedPolicies.length)
 
               await Sentry.startSpan(
                 { name: 'create_table.post_creation', op: 'db.table.post_creation' },
@@ -732,24 +720,7 @@ export const SidePanelEditor = ({
                 }
               )
 
-              // Show success toast after everything is complete
-              if (failedPolicies.length > 0) {
-                toast.success(
-                  `Table ${table.name} is created successfully, but we ran into issues creating ${failedPolicies.length} policie${failedPolicies.length > 1 ? 's' : ''}`,
-                  {
-                    id: toastId,
-                    description: (
-                      <ul className="list-disc pl-6">
-                        {failedPolicies.map((x) => (
-                          <li key={x.name}>{x.name}</li>
-                        ))}
-                      </ul>
-                    ),
-                  }
-                )
-              } else {
-                toast.success(`Table ${table.name} is good to go!`, { id: toastId })
-              }
+              toast.success(`Table ${table.name} is good to go!`, { id: toastId })
 
               onTableCreated(table)
             } catch (error) {

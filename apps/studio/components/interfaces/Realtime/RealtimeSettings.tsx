@@ -20,12 +20,12 @@ import {
   InputGroupText,
   Switch,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ToggleSpendCapButton } from '@/components/ui/ToggleSpendCapButton'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'

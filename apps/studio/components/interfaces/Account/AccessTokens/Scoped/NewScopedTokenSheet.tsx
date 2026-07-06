@@ -17,7 +17,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import {
   CUSTOM_EXPIRY_VALUE,

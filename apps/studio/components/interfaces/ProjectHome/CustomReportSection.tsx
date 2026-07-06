@@ -16,7 +16,7 @@ import type { CSSProperties, DragEvent, ReactNode } from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { Row } from 'ui-patterns'
+import { Row } from 'ui-patterns/Row'
 
 import { SnippetDropdown } from '@/components/interfaces/ProjectHome/SnippetDropdown'
 import { ReportBlock } from '@/components/interfaces/Reports/ReportBlock/ReportBlock'

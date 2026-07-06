@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Card, CardContent } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteAnalyticsBucketModal } from '../DeleteAnalyticsBucketModal'
@@ -29,7 +29,7 @@ import {
   ScaffoldSection,
   ScaffoldSectionTitle,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useIcebergNamespacesQuery } from '@/data/storage/iceberg-namespaces-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'

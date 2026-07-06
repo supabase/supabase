@@ -17,7 +17,7 @@ import {
   Form,
   Separator,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { FormFooterChangeBadge } from '../DataWarehouse/FormFooterChangeBadge'
 import { CreateDiskStorageSchema, DiskStorageSchemaType } from './DiskManagement.schema'

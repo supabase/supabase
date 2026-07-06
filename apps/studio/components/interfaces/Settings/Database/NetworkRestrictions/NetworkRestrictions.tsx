@@ -21,7 +21,7 @@ import {
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-} from 'ui-patterns'
+} from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import AddRestrictionModal from './AddRestrictionModal'

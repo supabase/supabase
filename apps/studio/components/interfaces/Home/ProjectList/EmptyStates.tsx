@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { ShimmeringCard } from './ShimmeringCard'
 import { HomeIcon } from '@/components/layouts/Navigation/LayoutHeader/HomeIcon'

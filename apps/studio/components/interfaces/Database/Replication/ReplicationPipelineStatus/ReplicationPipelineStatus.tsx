@@ -30,8 +30,8 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { BatchRestartDialog } from '../BatchRestartDialog'
 import { ErrorDetailsDialog } from '../ErrorDetailsDialog'

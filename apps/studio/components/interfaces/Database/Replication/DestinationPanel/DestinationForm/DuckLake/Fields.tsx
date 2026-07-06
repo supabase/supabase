@@ -22,10 +22,11 @@ import {
   SelectTrigger,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 import {
   DUCKLAKE_MODE_CUSTOM,
@@ -358,7 +359,13 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
   )
 }
 
-const DuckLakeCustomFields = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
+const DuckLakeCustomFields = ({
+  form,
+  editMode,
+}: {
+  form: UseFormReturn<DestinationPanelSchemaType>
+  editMode: boolean
+}) => {
   const [showCatalogUrl, setShowCatalogUrl] = useState(false)
   const [showSecretAccessKey, setShowSecretAccessKey] = useState(false)
 
@@ -379,13 +386,21 @@ const DuckLakeCustomFields = ({ form }: { form: UseFormReturn<DestinationPanelSc
             <FormItemLayout
               layout="horizontal"
               label="Catalog URL"
-              description="A PostgreSQL connection string for the DuckLake catalog"
+              description={
+                editMode
+                  ? 'Stored catalog URL is hidden. Enter a new URL to replace it.'
+                  : 'A PostgreSQL connection string for the DuckLake catalog'
+              }
             >
               <FormControl>
                 <PasswordInput
                   value={field.value ?? ''}
                   type={showCatalogUrl ? 'text' : 'password'}
-                  placeholder="postgres://user:pass@host:5432/ducklake_catalog"
+                  placeholder={
+                    editMode
+                      ? STORED_SECRET_PLACEHOLDER
+                      : 'postgres://user:pass@host:5432/ducklake_catalog'
+                  }
                   onChange={(event) => field.onChange(event.target.value)}
                   actions={
                     <div className="flex items-center justify-center">
@@ -462,10 +477,18 @@ const DuckLakeCustomFields = ({ form }: { form: UseFormReturn<DestinationPanelSc
             <FormItemLayout
               layout="horizontal"
               label="S3 Access Key ID"
-              description="Required access key ID for the object storage provider"
+              description={
+                editMode
+                  ? 'Stored access key ID is hidden. Enter a new key ID to replace it.'
+                  : 'Required access key ID for the object storage provider'
+              }
             >
               <FormControl>
-                <Input {...field} placeholder="my-access-key" value={field.value ?? ''} />
+                <Input
+                  {...field}
+                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : 'my-access-key'}
+                  value={field.value ?? ''}
+                />
               </FormControl>
             </FormItemLayout>
           )}
@@ -478,14 +501,18 @@ const DuckLakeCustomFields = ({ form }: { form: UseFormReturn<DestinationPanelSc
             <FormItemLayout
               layout="horizontal"
               label="S3 Secret Access Key"
-              description="Required secret access key for the object storage provider"
+              description={
+                editMode
+                  ? 'Stored secret access key is hidden. Enter a new secret to replace it.'
+                  : 'Required secret access key for the object storage provider'
+              }
               className="relative"
             >
               <FormControl>
                 <Input
                   {...field}
                   type={showSecretAccessKey ? 'text' : 'password'}
-                  placeholder="my-secret-key"
+                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : 'my-secret-key'}
                   value={field.value ?? ''}
                 />
               </FormControl>
@@ -641,7 +668,7 @@ export const DuckLakeFields = ({
       {effectiveMode === DUCKLAKE_MODE_SUPABASE ? (
         <DuckLakeSupabaseFields form={form} />
       ) : (
-        <DuckLakeCustomFields form={form} />
+        <DuckLakeCustomFields form={form} editMode={editMode} />
       )}
     </div>
   )

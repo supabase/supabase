@@ -4,7 +4,11 @@ import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Bar, BarChart, Legend, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 import remarkGfm from 'remark-gfm'
-import { Tabs } from 'ui'
+import {
+  Tabs_Shadcn_ as Tabs,
+  TabsList_Shadcn_ as TabsList,
+  TabsTrigger_Shadcn_ as TabsTrigger,
+} from 'ui'
 
 import * as data from '@/data/blog/PostgresFTSComparison'
 
@@ -39,7 +43,7 @@ const CustomizedAxisTick = (props: any) => {
         y={-12}
         dy={16}
         textAnchor="end"
-        fill="hsl(var(--foreground-lighter))"
+        fill="var(--foreground-lighter)"
         transform="rotate(-35)"
         className="text-xs"
       >
@@ -53,17 +57,13 @@ const Chart = () => {
   const [selection, setSelection] = useState('latency')
   return (
     <div className={'my-16 flex flex-col'}>
-      <Tabs
-        defaultActiveId={'latency'}
-        type="underlined"
-        size="medium"
-        block
-        onChange={(value: string) => setSelection(value)}
-      >
-        <Tabs.Panel id="latency" label="Latency"></Tabs.Panel>
-        <Tabs.Panel id="results" label="Number of results"></Tabs.Panel>
-        <Tabs.Panel id="avg_latency" label="Average latency"></Tabs.Panel>
-        <Tabs.Panel id="raw_data" label="Raw data"></Tabs.Panel>
+      <Tabs defaultValue="latency" onValueChange={(value: string) => setSelection(value)}>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="latency">Latency</TabsTrigger>
+          <TabsTrigger value="results">Number of results</TabsTrigger>
+          <TabsTrigger value="avg_latency">Average latency</TabsTrigger>
+          <TabsTrigger value="raw_data">Raw data</TabsTrigger>
+        </TabsList>
       </Tabs>
 
       {selection !== 'raw_data' ? (
@@ -72,14 +72,14 @@ const Chart = () => {
         @ts-ignore */}
           <BarChart data={data[selection]} layout="vertical">
             <XAxis
-              axisLine={{ stroke: 'hsl(var(--border-default))' }}
-              tickLine={{ stroke: 'hsl(var(--border-default))' }}
+              axisLine={{ stroke: 'var(--border-default)' }}
+              tickLine={{ stroke: 'var(--border-default)' }}
               type="number"
               tickMargin={8}
               style={{
                 fontSize: '14px',
                 marginBottom: '32px',
-                color: 'hsl(var(--foreground-default))',
+                color: 'var(--foreground-default)',
               }}
               tick={<CustomizedAxisTick />}
               label={{
@@ -91,7 +91,7 @@ const Chart = () => {
                       : 'Number of results',
                 position: 'insideBottom',
                 offset: -32,
-                fill: 'hsl(var(--foreground-default))',
+                fill: 'var(--foreground-default)',
               }}
             />
             <YAxis
@@ -100,12 +100,12 @@ const Chart = () => {
               style={{
                 fontSize: '14px',
                 marginBottom: '32px',
-                color: 'hsl(var(--foreground-lighter))',
+                color: 'var(--foreground-lighter)',
               }}
               minTickGap={16}
               tickMargin={8}
-              axisLine={{ stroke: 'hsl(var(--border-default))' }}
-              tickLine={{ stroke: 'hsl(var(--border-default))' }}
+              axisLine={{ stroke: 'var(--border-default)' }}
+              tickLine={{ stroke: 'var(--border-default)' }}
               tick={<CustomizedAxisTick />}
             />
             {dimensions.map((dimension: string, index: number) => {

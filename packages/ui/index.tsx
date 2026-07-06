@@ -3,10 +3,6 @@
 export * from './src/components/Button'
 export * from './src/components/Icon/IconBackground'
 
-// DISPLAYS
-
-export * from './src/components/Tabs'
-
 // NAV
 
 export * from './src/components/Menu'
@@ -37,7 +33,6 @@ export * from './src/components/LoadingLine'
 export * from './src/layout/ai-icon-animation'
 
 // theme switcher
-export * from './src/components/ThemeProvider/themes'
 export * from './src/components/ThemeProvider/singleThemes'
 
 // shadcn

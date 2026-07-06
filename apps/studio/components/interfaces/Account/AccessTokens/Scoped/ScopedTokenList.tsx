@@ -22,7 +22,7 @@ import { RowLoading } from '../AccessTokenTable/RowLoading'
 import { TableContainer } from '../AccessTokenTable/TableContainer'
 import { ExpiresCell, LastUsedCell, TokenNameCell } from '../AccessTokenTable/TokenCells'
 import { ViewTokenSheet } from './ViewTokenSheet'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import {
   ScopedAccessToken,
   useScopedAccessTokensQuery,

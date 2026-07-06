@@ -299,6 +299,33 @@ describe('genChartQueryOtel', () => {
     `)
   })
 
+  it('filters the function logs chart by the metadata.function_id override key', () => {
+    expect(
+      fmt(genChartQueryOtel(LogsTableName.FUNCTIONS, params, { 'metadata.function_id': 'abc-123' }))
+    ).toMatchInlineSnapshot(`
+      "-- Logs Chart Query (otel) ['function_logs']
+      select
+        toStartOfMinute (timestamp) as timestamp,
+        countIf (
+          not (
+            (log_attributes['level'] in ('error', 'fatal'))
+            or (log_attributes['level'] = 'warning')
+          )
+        ) as ok_count,
+        countIf (log_attributes['level'] in ('error', 'fatal')) as error_count,
+        countIf (log_attributes['level'] = 'warning') as warning_count
+      from
+        logs
+      where
+        source = 'function_logs'
+        and (log_attributes['function_id'] = 'abc-123')
+      group by
+        timestamp
+      order by
+        timestamp asc"
+    `)
+  })
+
   it('buckets by hour for ranges longer than 12 hours', () => {
     expect(
       fmt(
@@ -570,9 +597,55 @@ describe('OTEL filter translation', () => {
     `)
   })
 
+  it('drops the metadata root from an override key for function logs', () => {
+    expect(fmt(genDefaultQueryOtel(LogsTableName.FUNCTIONS, { 'metadata.function_id': 'abc-123' })))
+      .toMatchInlineSnapshot(`
+      "-- Logs Preview Query (otel) ['function_logs']
+      select
+        id,
+        timestamp,
+        event_message,
+        log_attributes['event_type'] as event_type,
+        log_attributes['function_id'] as function_id,
+        log_attributes['execution_id'] as execution_id,
+        log_attributes['level'] as level
+      from
+        logs
+      where
+        source = 'function_logs'
+        and (log_attributes['function_id'] = 'abc-123')
+      order by
+        timestamp desc
+      limit
+        100"
+    `)
+  })
+
   it('translates the etl pipeline_id filter', () => {
     expect(fmt(genDefaultQueryOtel(LogsTableName.ETL, { pipeline_id: '42' })))
       .toMatchInlineSnapshot(`
+      "-- Logs Preview Query (otel) ['etl_replication_logs']
+      select
+        id,
+        timestamp,
+        event_message
+      from
+        logs
+      where
+        source = 'etl_replication_logs'
+        and (log_attributes['pipeline_id'] = '42')
+      order by
+        timestamp desc
+      limit
+        100"
+    `)
+  })
+
+  it('quotes a numeric etl pipeline_id so it compares as a string', () => {
+    // The replication "View logs" link puts pipeline_id in the `f` param as a
+    // number; JSON.parse keeps it numeric, so model that path here.
+    const filters = JSON.parse('{ "pipeline_id": 42 }')
+    expect(fmt(genDefaultQueryOtel(LogsTableName.ETL, filters))).toMatchInlineSnapshot(`
       "-- Logs Preview Query (otel) ['etl_replication_logs']
       select
         id,

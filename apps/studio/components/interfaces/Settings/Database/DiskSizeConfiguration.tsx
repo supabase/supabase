@@ -11,7 +11,7 @@ import {
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-} from 'ui-patterns'
+} from 'ui-patterns/PageSection'
 
 import { Markdown } from '@/components/interfaces/Markdown'
 import DiskSizeConfigurationModal from '@/components/interfaces/Settings/Database/DiskSizeConfigurationModal'

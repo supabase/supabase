@@ -78,7 +78,7 @@ export function CommandMenu({ ...props }: DialogProps) {
       <CommandDialog open={open} onOpenChange={setOpen}>
         <DialogTitle className="sr-only">Search Design System...</DialogTitle>
         <CommandInput placeholder="Type a command or search..." />
-        <CommandList>
+        <CommandList className="max-h-[300px]">
           <CommandEmpty>No results found.</CommandEmpty>
           {docsConfig.sidebarNav.map((group) => (
             <CommandGroup key={group.title} heading={group.title}>

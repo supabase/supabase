@@ -13,7 +13,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import CopyButton from '@/components/ui/CopyButton'
 import type { OAuthApp } from '@/data/oauth/oauth-apps-query'

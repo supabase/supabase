@@ -31,7 +31,3 @@ export function useYear() {
   }
   return ctx
 }
-
-export function rpcNameForYear(baseName: string, year: SurveyYear) {
-  return year === 2026 ? `${baseName}_2026` : baseName
-}

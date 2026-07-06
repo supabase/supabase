@@ -138,4 +138,3 @@ export const useLogsQuery = (
     setParams,
   }
 }
-export default useLogsQuery

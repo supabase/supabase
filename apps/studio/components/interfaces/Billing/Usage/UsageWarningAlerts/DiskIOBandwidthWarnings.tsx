@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 // [Joshen] In the future, conditionals should be from resource exhaustion endpoint as single source of truth
 interface DiskIOBandwidthWarningsProps {

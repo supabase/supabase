@@ -4,6 +4,7 @@ import { Globe } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Card, CardContent, Skeleton } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   PageSection,
   PageSectionContent,
@@ -11,10 +12,9 @@ import {
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-} from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+} from 'ui-patterns/PageSection'
 
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { HighAvailabilityDisabledSectionNotice } from '@/components/ui/HighAvailability/HighAvailabilityDisabledSectionNotice'

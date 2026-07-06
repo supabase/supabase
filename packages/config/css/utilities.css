@@ -10,7 +10,7 @@
  * Should be deprecated in favor of `bg-default`.
  */
 @utility bg {
-  background-color: hsl(var(--background-default));
+  background-color: var(--background);
 }
 
 /*

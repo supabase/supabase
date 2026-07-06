@@ -21,9 +21,9 @@ import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringL
 
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { CreateIndexSidePanel } from './CreateIndexSidePanel'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useDatabaseIndexDeleteMutation } from '@/data/database-indexes/index-delete-mutation'
 import { useIndexesQuery, type DatabaseIndex } from '@/data/database-indexes/indexes-query'

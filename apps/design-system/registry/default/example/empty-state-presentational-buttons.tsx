@@ -1,6 +1,6 @@
 import { Plus } from 'lucide-react'
 import { Button } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import {
   PageSection,
   PageSectionAside,

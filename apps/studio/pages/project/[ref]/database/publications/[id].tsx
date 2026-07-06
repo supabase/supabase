@@ -1,6 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { PageContainer, PageSection, PageSectionContent, ShimmeringLoader } from 'ui-patterns'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { PublicationsTables } from '@/components/interfaces/Database/Publications/PublicationsTables'
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'

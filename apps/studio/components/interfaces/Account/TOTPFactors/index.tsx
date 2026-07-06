@@ -5,7 +5,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AddNewFactorModal } from './AddNewFactorModal'
 import DeleteFactorModal from './DeleteFactorModal'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
 import { DATETIME_FORMAT } from '@/lib/constants'
 

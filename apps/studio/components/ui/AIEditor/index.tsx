@@ -4,7 +4,7 @@ import type { editor as monacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { KeyboardShortcut } from 'ui'
-import { useSetCommandMenuOpen } from 'ui-patterns'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 import { CodeEditor, type ValidLanguages } from '../CodeEditor/CodeEditor'
 import { DiffEditor } from '../DiffEditor'

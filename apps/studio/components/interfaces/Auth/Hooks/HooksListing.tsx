@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { EmptyStatePresentational, GenericSkeletonLoader } from 'ui-patterns'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import {
   PageSection,
   PageSectionAside,
@@ -11,6 +11,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AddHookDropdown } from './AddHookDropdown'
 import { CreateHookSheet } from './CreateHookSheet'

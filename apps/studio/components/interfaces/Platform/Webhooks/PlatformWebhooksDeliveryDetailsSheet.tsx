@@ -16,7 +16,7 @@ import {
   TabsList_Shadcn_ as TabsList,
   TabsTrigger_Shadcn_ as TabsTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import type { WebhookDelivery } from './PlatformWebhooks.types'
 import { formatDeliveryStatus, statusBadgeVariant } from './PlatformWebhooksView.utils'

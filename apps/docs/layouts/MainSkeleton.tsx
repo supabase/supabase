@@ -283,8 +283,9 @@ const Container = memo(function Container({
     <main
       // used by layout to scroll to top
       id={DOCS_CONTENT_CONTAINER_ID}
+      tabIndex={-1}
       className={cn(
-        'w-full transition-all ease-out relative',
+        'w-full transition-all ease-out relative scroll-mt-(--header-height)',
         // desktop override any margin styles
         'lg:ml-0',
         className

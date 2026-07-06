@@ -19,7 +19,7 @@ import { POOLING_OPTIMIZATIONS } from '@/components/interfaces/Settings/Database
 import DiskSizeConfigurationModal from '@/components/interfaces/Settings/Database/DiskSizeConfigurationModal'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
 import Table from '@/components/to-be-cleaned/Table'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'

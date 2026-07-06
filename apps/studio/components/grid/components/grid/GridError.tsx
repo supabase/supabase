@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { ChevronDown } from 'lucide-react'
 import { useCallback } from 'react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { isFilterRelatedError } from './GridError.utils'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'

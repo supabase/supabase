@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getConnectionStrings } from '@/components/interfaces/Connect/DatabaseSettings.utils'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
