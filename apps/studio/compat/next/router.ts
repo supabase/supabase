@@ -121,6 +121,31 @@ export function resolveSearchOrHashOnlyTarget(to: string, currentPathname: strin
   return `${base}${to}`
 }
 
+// Next resolves a pathname-less UrlObject against the *current route
+// pattern*, re-consuming dynamic params from `query` into the path — e.g.
+// `push({ query: { ...router.query, preset } })` on `/project/[ref]/advisors`
+// stays on `/project/<ref>/advisors?preset=…`. Because the shim's
+// `router.query` merges path params in (Next shape), skipping this would leak
+// `ref`/`id` into the query string. Params the caller didn't include are
+// backfilled from the current route's params (minus TanStack's `_splat`,
+// which no bracket segment can consume) so partial `{ query }` pushes stay
+// on-page instead of producing empty path segments.
+// Exported for unit tests (see router.test.ts) — not part of the Next surface.
+export function withDefaultPathname(
+  url: string | UrlObject,
+  currentPathPattern: string,
+  currentParams: Record<string, QueryValue>
+): string | UrlObject {
+  if (typeof url === 'string' || url.pathname != null) return url
+  if (!url.query || typeof url.query !== 'object') return url
+  const { _splat, ...paramsWithoutSplat } = currentParams
+  return {
+    ...url,
+    pathname: currentPathPattern,
+    query: { ...paramsWithoutSplat, ...url.query },
+  }
+}
+
 // Exported for unit tests (see router.test.ts) — not part of the Next surface.
 export function resolveUrl(url: string | UrlObject): string {
   if (typeof url === 'string') return url
@@ -248,7 +273,7 @@ export function useRouter() {
       // `location.pathname` is already basepath-stripped by TanStack, so the
       // prefixed target stays basepath-relative like every other `to`.
       const to = resolveSearchOrHashOnlyTarget(
-        toRelativeSameOrigin(resolveUrl(url)),
+        toRelativeSameOrigin(resolveUrl(withDefaultPathname(url, pathPattern, params))),
         location.pathname
       )
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

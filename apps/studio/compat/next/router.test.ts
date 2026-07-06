@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { resolveSearchOrHashOnlyTarget, resolveUrl } from './router'
+import { resolveSearchOrHashOnlyTarget, resolveUrl, withDefaultPathname } from './router'
 
 describe('resolveUrl (next/router compat shim)', () => {
   it('returns string URLs untouched', () => {
@@ -84,5 +84,55 @@ describe('resolveSearchOrHashOnlyTarget (next/router compat shim)', () => {
   it('leaves targets with a pathname untouched', () => {
     expect(resolveSearchOrHashOnlyTarget('/project/abc?x=1', '/elsewhere')).toBe('/project/abc?x=1')
     expect(resolveSearchOrHashOnlyTarget('/project/abc', '/elsewhere')).toBe('/project/abc')
+  })
+})
+
+describe('withDefaultPathname (next/router compat shim)', () => {
+  it('fills a missing pathname from the current route pattern so path params are consumed', () => {
+    // The regression we fixed: `push({ query: { ...router.query, filter } })`
+    // with no pathname leaked `ref`/`id` into the query string
+    // (`/editor/17597/?ref=...&id=17597&filter=...`) because nothing
+    // interpolated them back into the path.
+    const target = withDefaultPathname(
+      { query: { ref: 'abc', id: '17597', filter: 'note:eq:hi' } },
+      '/project/[ref]/editor/[id]',
+      { ref: 'abc', id: '17597' }
+    )
+    expect(resolveUrl(target)).toBe('/project/abc/editor/17597?filter=note%3Aeq%3Ahi')
+  })
+
+  it('backfills params the caller omitted from the current route params', () => {
+    const target = withDefaultPathname(
+      { query: { preset: 'WARN' } },
+      '/project/[ref]/advisors/security',
+      { ref: 'abc' }
+    )
+    expect(resolveUrl(target)).toBe('/project/abc/advisors/security?preset=WARN')
+  })
+
+  it('caller-provided query values win over backfilled params', () => {
+    const target = withDefaultPathname(
+      { query: { ref: 'other', page: '2' } },
+      '/project/[ref]',
+      { ref: 'abc' }
+    )
+    expect(resolveUrl(target)).toBe('/project/other?page=2')
+  })
+
+  it('never backfills the TanStack _splat param', () => {
+    const target = withDefaultPathname({ query: { a: '1' } }, '/org/_/[[...routeSlug]]', {
+      _splat: 'x/y',
+    })
+    expect(resolveUrl(target)).toBe('/org/_/?a=1')
+  })
+
+  it('leaves string URLs, explicit pathnames, and raw-string queries untouched', () => {
+    expect(withDefaultPathname('/x?a=1', '/p/[ref]', { ref: 'r' })).toBe('/x?a=1')
+    expect(
+      withDefaultPathname({ pathname: '/y', query: { a: '1' } }, '/p/[ref]', { ref: 'r' })
+    ).toEqual({ pathname: '/y', query: { a: '1' } })
+    expect(withDefaultPathname({ query: 'a=1' }, '/p/[ref]', { ref: 'r' })).toEqual({
+      query: 'a=1',
+    })
   })
 })
