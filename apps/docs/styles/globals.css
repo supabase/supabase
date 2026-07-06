@@ -155,7 +155,7 @@ h6:not(.font-mono),
  * and makes bold text indistinguishable from body copy. Keep bold clearly
  * heavier than the inherited body weight. */
 .prose :where(strong, b):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .prose :where(h1, h2, h3, h4, h5, h6):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
