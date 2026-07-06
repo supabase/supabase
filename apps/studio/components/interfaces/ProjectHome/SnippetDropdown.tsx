@@ -29,7 +29,7 @@ type SnippetDropdownProps = {
   align?: 'start' | 'center' | 'end'
   className?: string
   autoFocus?: boolean
-  onSelect: (snippet: { id: string; name: string }) => void
+  onSelect: (snippet: { id: string; name: string; visibility: Content['visibility'] }) => void
 }
 
 type SqlContentItem = Extract<Content, { type: 'sql' }>
@@ -112,7 +112,13 @@ export const SnippetDropdown = ({
                     <CommandItem
                       key={snippet.id}
                       value={snippet.id}
-                      onSelect={() => onSelect({ id: snippet.id, name: snippet.name })}
+                      onSelect={() =>
+                        onSelect({
+                          id: snippet.id,
+                          name: snippet.name,
+                          visibility: snippet.visibility,
+                        })
+                      }
                     >
                       {snippet.name}
                     </CommandItem>
