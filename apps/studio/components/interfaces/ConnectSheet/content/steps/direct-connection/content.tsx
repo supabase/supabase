@@ -238,6 +238,7 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
           <Badge>{poolerBadge}</Badge>
         </div>
       )}
+      {connectionString.includes(PASSWORD_PLACEHOLDER) && <PasswordEncodingNote />}
       <div className="overflow-hidden rounded-lg border bg-surface-75">
         <div data-connect-copy-value={redactedConnectionString}>
           <CodeBlock
@@ -271,7 +272,6 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
           </div>
         )}
       </div>
-      {connectionString.includes(PASSWORD_PLACEHOLDER) && <PasswordEncodingNote />}
       {showSelfHostedDirectNotice && (
         <p className="text-sm text-foreground-light">
           Manually{' '}
