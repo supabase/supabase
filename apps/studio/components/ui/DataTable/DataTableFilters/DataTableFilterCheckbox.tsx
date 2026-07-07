@@ -158,7 +158,7 @@ export function DataTableFilterCheckbox<TData>({
                 </div>
 
                 {hasNested && isExpanded && (
-                  <div className="pb-2">
+                  <div className="pb-1">
                     {option.options?.map((optionNested, nestedIndex) => {
                       const nestedChecked = getBooleanParam(optionNested.value)
                       const isLastNested = nestedIndex === (option.options?.length ?? 0) - 1
@@ -166,22 +166,31 @@ export function DataTableFilterCheckbox<TData>({
                       return (
                         <div
                           key={optionNested.value}
-                          className={cn(
-                            'group/nested relative flex items-stretch',
-                            nestedIndex === 0 && '[&>div:last-child]:pt-2'
-                          )}
+                          className="group/nested relative flex items-stretch"
                         >
                           <div aria-hidden className="relative w-7 shrink-0">
                             {isLastNested ? (
                               <span
                                 className={cn(
-                                  'absolute left-4 top-0 w-3 rounded-bl-sm border-b border-l border-border',
-                                  option.options?.length === 1 ? 'h-[60%]' : 'h-1/2'
+                                  'absolute left-[0.95rem] w-3 rounded-bl-sm border-b border-l border-border',
+                                  nestedIndex === 0
+                                    ? 'top-[-8px] h-[calc(60%+8px)]'
+                                    : cn(
+                                        'top-0',
+                                        option.options?.length === 1 ? 'h-[60%]' : 'h-1/2'
+                                      )
                                 )}
                               />
                             ) : (
                               <>
-                                <span className="absolute left-4 top-0 h-full w-px bg-border" />
+                                <span
+                                  className={cn(
+                                    'absolute left-[0.95rem] w-px bg-border',
+                                    nestedIndex === 0
+                                      ? 'top-[-8px] h-[calc(100%+8px)]'
+                                      : 'top-0 h-full'
+                                  )}
+                                />
                                 <span className="absolute left-4 top-[55%] h-px w-3 bg-border" />
                               </>
                             )}
