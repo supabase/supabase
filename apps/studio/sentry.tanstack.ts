@@ -10,7 +10,7 @@
 // convention file that nothing loads under TanStack Start. Without this init
 // every `Sentry.captureException` in the TanStack runtime (including the
 // globalErrorBoundary / routerErrorComponent captures in routes/__root.tsx)
-// was a silent no-op.
+// would be a silent no-op.
 //
 // Called from `getRouter()` (router.tsx) — the earliest point in the TanStack
 // client bootstrap with access to the router instance, which
