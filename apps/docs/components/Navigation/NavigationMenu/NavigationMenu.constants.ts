@@ -1179,12 +1179,12 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/database/replication' },
         {
-          name: 'External replication',
-          url: '/guides/database/replication/external-replication-setup' as `/${string}`,
+          name: 'Pipelines',
+          url: '/guides/database/replication/pipelines' as `/${string}`,
           items: [
             {
               name: 'Setting up',
-              url: '/guides/database/replication/external-replication-setup' as `/${string}`,
+              url: '/guides/database/replication/pipelines' as `/${string}`,
               items: [
                 {
                   name: 'BigQuery',
@@ -1194,9 +1194,9 @@ export const database: NavMenuConstant = {
             },
             {
               name: 'Monitoring',
-              url: '/guides/database/replication/external-replication-monitoring' as `/${string}`,
+              url: '/guides/database/replication/pipelines-monitoring' as `/${string}`,
             },
-            { name: 'FAQ', url: '/guides/database/replication/external-replication-faq' },
+            { name: 'FAQ', url: '/guides/database/replication/pipelines-faq' },
           ],
         },
         {
@@ -2773,6 +2773,10 @@ export const platform: NavMenuConstant = {
         },
         { name: 'Performance Tuning', url: '/guides/platform/performance' as `/${string}` },
         { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' as `/${string}` },
+        {
+          name: 'Postgres Connection Logging',
+          url: '/guides/platform/postgres-connection-logging' as `/${string}`,
+        },
         {
           name: 'Default Platform Permissions',
           url: '/guides/platform/permissions' as `/${string}`,

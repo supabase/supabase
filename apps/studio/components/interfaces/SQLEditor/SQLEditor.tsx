@@ -96,7 +96,10 @@ import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from '@/stat
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 // Load the monaco editor client-side only (does not behave well server-side)
-const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
+const MonacoEditor = dynamic(
+  () => import('./MonacoEditor').then(({ MonacoEditor }) => MonacoEditor),
+  { ssr: false }
+)
 const DiffEditor = dynamic(
   () => import('../../ui/DiffEditor').then(({ DiffEditor }) => DiffEditor),
   { ssr: false }

@@ -20,11 +20,12 @@ export type FeaturePreview = {
 }
 
 export const useFeaturePreviews = (): FeaturePreview[] => {
-  const isUnifiedLogsPreviewAvailable = useFlag('unifiedLogs')
   const pgDeltaDiffEnabled = useFlag('pgdeltaDiff')
   const platformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+
+  const unifiedLogsDefaultOptIn = useFlag('unifiedLogsDefaultOptIn')
 
   return useMemo(
     () =>
@@ -43,10 +44,10 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
           name: 'Updated Logs interface',
           discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
-          enabled: isUnifiedLogsPreviewAvailable,
+          enabled: true,
           isNew: true,
           isPlatformOnly: true,
-          isDefaultOptIn: false,
+          isDefaultOptIn: unifiedLogsDefaultOptIn,
           getRoute: (ref?: string) => `/project/${ref}/logs`,
         },
         {
@@ -57,7 +58,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           isNew: false,
           isPlatformOnly: true,
           isDefaultOptIn: false,
-          getRoute: (ref?: string) => `/project/${ref}/advisors/rules`,
+          getRoute: (ref?: string) => `/project/${ref}/advisors/rules/security`,
         },
 
         {
@@ -111,7 +112,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         },
       ].sort((a, b) => Number(b.isNew) - Number(a.isNew)),
     [
-      isUnifiedLogsPreviewAvailable,
+      unifiedLogsDefaultOptIn,
       pgDeltaDiffEnabled,
       platformWebhooksEnabled,
       jitDbAccessEnabled,

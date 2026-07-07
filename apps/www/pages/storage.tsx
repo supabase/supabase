@@ -260,7 +260,7 @@ function StoragePage() {
                   <Link href="/docs/guides/storage/analytics/introduction">Read the docs</Link>
                 </Button>
                 <Button asChild size="small" variant="default" icon={<ArrowUpRight />}>
-                  <Link href="/blog/analytics-buckets">Read the blog post</Link>
+                  <Link href="/blog/introducing-analytics-buckets">Read the blog post</Link>
                 </Button>
               </div>
             </div>
@@ -339,7 +339,7 @@ function StoragePage() {
             <div className="section--bg-masked">
               <div className="section--bg border-t border-control"></div>
             </div>
-            <div className="section-container pt-12 pb-0">
+            <div className="relative pt-12 pb-0">
               <div className="overflow-x-hidden">
                 <SectionContainer>
                   <div className="grid grid-cols-12 lg:gap-16">

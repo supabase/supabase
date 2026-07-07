@@ -76,6 +76,7 @@ export const ProjectUsageSectionDeltas = () => {
       {
         key: 'functions',
         title: 'Edge Functions',
+        href: `/project/${projectRef}/functions`,
         route: '/logs/edge-functions-logs',
         enabled: true,
       },
@@ -96,12 +97,14 @@ export const ProjectUsageSectionDeltas = () => {
       {
         key: 'realtime',
         title: 'Realtime',
+        href: `/project/${projectRef}/realtime/inspector`,
         route: '/logs/realtime-logs',
         enabled: true,
       },
       {
         key: 'data_api',
         title: 'API Gateway',
+        href: `/project/${projectRef}/integrations/data_api/overview`,
         route: '/logs/edge-logs',
         enabled: dataApiEnabled,
       },

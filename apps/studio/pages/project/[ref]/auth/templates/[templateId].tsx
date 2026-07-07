@@ -44,7 +44,7 @@ import * as z from 'zod'
 
 import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/EmailTemplates/AuthTemplatesValidation'
 import { CustomEmailTemplateRestrictionAdmonition } from '@/components/interfaces/Auth/EmailTemplates/CustomEmailTemplateRestrictionAdmonition'
-import { EMAIL_TEMPLATE_DOCS_ANCHORS } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.constants'
+import { AUTH_EMAIL_TEMPLATES_DOCS_PATH } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.constants'
 import {
   isCustomEmailTemplateEditingRestricted,
   isCustomEmailTemplateRestrictionStatusKnown,
@@ -208,9 +208,7 @@ const RedirectToTemplates = () => {
             </PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
-            <DocsButton
-              href={`${DOCS_URL}/guides/local-development/customizing-email-templates#${EMAIL_TEMPLATE_DOCS_ANCHORS[template.id]}`}
-            />
+            <DocsButton href={`${DOCS_URL}${AUTH_EMAIL_TEMPLATES_DOCS_PATH}`} />
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>

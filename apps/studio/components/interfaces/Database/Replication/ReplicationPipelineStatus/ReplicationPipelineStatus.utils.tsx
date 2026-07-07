@@ -12,8 +12,8 @@ export const getStatusConfig = (state: TableState['state']) => {
     case 'queued':
       return {
         badge: <Badge variant="warning">Queued</Badge>,
-        description: 'Table is waiting for ETL to pick it up for replication.',
-        tooltip: 'Table is waiting for ETL to pick it up for replication.',
+        description: 'Table is waiting for the pipeline to pick it up for replication.',
+        tooltip: 'Table is waiting for the pipeline to pick it up for replication.',
         color: 'text-warning',
       }
     case 'copying_table':

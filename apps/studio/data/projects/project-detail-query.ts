@@ -9,7 +9,7 @@ import type { components } from '@/data/api'
 import { get, handleError, isValidConnString, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-type ProjectDetailVariables = { ref?: string }
+type ProjectDetailVariables = { ref?: string; skipWake?: boolean }
 export type ProjectDetail = components['schemas']['ProjectDetailResponse']
 export interface Project extends Omit<ProjectDetail, 'status'> {
   /**
@@ -22,7 +22,7 @@ export interface Project extends Omit<ProjectDetail, 'status'> {
 }
 
 export async function getProjectDetail(
-  { ref }: ProjectDetailVariables,
+  { ref, skipWake = false }: ProjectDetailVariables,
   signal?: AbortSignal,
   headers?: Record<string, string>,
   queryClient?: QueryClient
@@ -42,7 +42,7 @@ export async function getProjectDetail(
    * To prevent odd side effects like pg-meta queries failing or the likes, we wake up the project proactively and wait for it
    * to be back online before returning the project details.
    */
-  if (data?.is_hibernating) {
+  if (data?.is_hibernating && !skipWake) {
     // In case project was scaled down, explicitly wake it up before continuing to return the project details
     const { error: errorWaking, data: wakeResponse } = await post('/platform/projects/{ref}/wake', {
       params: { path: { ref } },
@@ -118,7 +118,8 @@ export function prefetchProjectDetail(client: QueryClient, { ref }: ProjectDetai
   return client.fetchQuery({
     // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: projectKeys.detail(ref),
-    queryFn: ({ client, signal }) => getProjectDetail({ ref }, signal, undefined, client),
+    queryFn: ({ client, signal }) =>
+      getProjectDetail({ ref, skipWake: true }, signal, undefined, client),
   })
 }
 

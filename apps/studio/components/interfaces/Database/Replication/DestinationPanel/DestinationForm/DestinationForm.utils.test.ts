@@ -71,12 +71,12 @@ const baseSnowflakeFormData = {
   ducklakeS3UseSsl: undefined,
   ducklakeMetadataSchema: undefined,
   snowflakeAccountId: ' MYORG-MYACCOUNT ',
-  snowflakeUser: ' ETL_USER ',
+  snowflakeUser: ' PIPELINES_USER ',
   snowflakePrivateKey: '-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----',
   snowflakePrivateKeyPassphrase: ' secret passphrase ',
   snowflakeDatabase: ' ANALYTICS ',
   snowflakeSchema: ' PUBLIC ',
-  snowflakeRole: ' ETL_ROLE ',
+  snowflakeRole: ' PIPELINES_ROLE ',
 }
 
 describe('DestinationForm.utils DuckLake', () => {
@@ -333,7 +333,7 @@ describe('DestinationForm.utils Snowflake', () => {
     expect(config).toEqual({
       snowflake: {
         accountId: 'MYORG-MYACCOUNT',
-        user: 'ETL_USER',
+        user: 'PIPELINES_USER',
         privateKey: '-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----',
         privateKeyPassphrase: undefined,
         database: 'ANALYTICS',
@@ -358,12 +358,12 @@ describe('DestinationForm.utils Snowflake', () => {
     expect(config).toEqual({
       snowflake: {
         accountId: 'MYORG-MYACCOUNT',
-        user: 'ETL_USER',
+        user: 'PIPELINES_USER',
         privateKey: '-----BEGIN PRIVATE KEY-----\nabc\n-----END PRIVATE KEY-----',
         privateKeyPassphrase: ' secret passphrase ',
         database: 'ANALYTICS',
         schema: 'PUBLIC',
-        role: 'ETL_ROLE',
+        role: 'PIPELINES_ROLE',
       },
     })
     expect(createS3AccessKey).not.toHaveBeenCalled()

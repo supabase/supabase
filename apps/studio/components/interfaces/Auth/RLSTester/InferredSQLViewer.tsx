@@ -2,7 +2,7 @@ import { UntrustedSqlFragment } from '@supabase/pg-meta'
 import { Loader2 } from 'lucide-react'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 
 export const InferredSQLViewer = ({
   sql,

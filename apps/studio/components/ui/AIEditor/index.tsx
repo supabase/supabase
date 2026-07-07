@@ -218,15 +218,17 @@ export const AIEditor = ({
 
     if (language === 'javascript' || language === 'typescript') {
       // The Deno libs are loaded as a raw text via raw-loader in next.config.ts. They're passed as raw text to the
-      // Monaco editor.
-      import('@/public/deno/edge-runtime.d.ts' as string)
+      // Monaco editor. The @vite-ignore stops Vite/Rolldown's dep scanner from following the dynamic import and
+      // trying to parse the .d.ts declarations as runtime modules — that crashes the scan in vite 8.0.13+ and
+      // cascades into SSR pre-bundling breakage.
+      import(/* @vite-ignore */ '@/public/deno/edge-runtime.d.ts' as string)
         .then((module) => {
           monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
         })
         .catch((error) => {
           console.error('Failed to load Deno edge-runtime typings:', error)
         })
-      import('@/public/deno/lib.deno.d.ts' as string)
+      import(/* @vite-ignore */ '@/public/deno/lib.deno.d.ts' as string)
         .then((module) => {
           monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
         })

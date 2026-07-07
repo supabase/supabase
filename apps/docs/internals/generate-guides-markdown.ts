@@ -10,10 +10,12 @@ import type { MdxJsxFlowElement, MdxJsxTextElement } from 'mdast-util-mdx-jsx'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { gfm } from 'micromark-extension-gfm'
 import { mdxjs } from 'micromark-extension-mdxjs'
+
+import { addBaseUrlPrefix } from './internal-links'
 import { Admonition } from './markdown-schema/Admonition'
 import { AuthProviders } from './markdown-schema/AuthProviders'
 import { ComputeDiskLimitsTable } from './markdown-schema/ComputeDiskLimitsTable'
-import { addBaseUrlPrefix } from './internal-links'
+import { ErrorCodes } from './markdown-schema/ErrorCodes'
 import { Link } from './markdown-schema/Link'
 import { MetricsStackCards } from './markdown-schema/MetricsStackCards'
 import { NavData } from './markdown-schema/NavData'
@@ -138,6 +140,7 @@ const SCHEMA: ComponentSchema = {
   Admonition,
   AuthProviders,
   ComputeDiskLimitsTable,
+  ErrorCodes,
   Link,
   Price,
   GlassPanel: Panel,

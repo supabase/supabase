@@ -32,6 +32,7 @@ export interface ConnectServerEnvSecret {
 
 export interface UseConnectServerEnvResult {
   isLoading: boolean
+  canReadAPIKeys: boolean
   apiUrl: string
   publishableKey: string
 
@@ -125,6 +126,7 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
 
   return {
     isLoading: isLoadingUrl || isLoadingKeys || isLoadingPermission,
+    canReadAPIKeys,
     apiUrl: resolvedUrl,
     publishableKey: publishableKey || 'your-publishable-key',
     jwksUrl,

@@ -126,7 +126,7 @@ function encodeBase64Url(data: ArrayBuffer | Uint8Array | string): string {
 function genKey(rawKey: string) {
   return window.crypto.subtle.importKey(
     'raw',
-    encodeText(rawKey),
+    encodeText(rawKey) as BufferSource,
     { name: 'HMAC', hash: 'SHA-256' },
     false,
     ['sign', 'verify']
@@ -144,7 +144,7 @@ async function createToken(jwtPayload: object, key: string) {
       await window.crypto.subtle.sign(
         { name: 'HMAC' },
         await genKey(key),
-        encodeText(headerAndPayload)
+        encodeText(headerAndPayload) as BufferSource
       )
     )
   )

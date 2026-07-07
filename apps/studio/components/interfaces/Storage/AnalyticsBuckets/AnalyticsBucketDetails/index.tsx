@@ -248,7 +248,7 @@ export const AnalyticBucketDetails = () => {
                               <Link
                                 href={`/project/${projectRef}/database/replication/${pipeline.replicator_id}`}
                               >
-                                View replication
+                                View pipeline
                               </Link>
                             </Button>
                             {isPipelineStopped && (

@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import type { Content } from './content-query'
 import { unmapSqlContentField } from './content-remap'
 import { contentKeys } from './keys'
-import type { Snippet } from './sql-folders-query'
+import type { Snippet, SnippetWithContent } from './sql-folders-query'
 import type { components } from '@/data/api'
 import { handleError, put } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -23,7 +23,7 @@ export type UpsertContentVariables = {
 export async function upsertContent(
   { projectRef, payload }: UpsertContentVariables,
   signal?: AbortSignal
-) {
+): Promise<SnippetWithContent | null> {
   const { data, error } = await put('/platform/projects/{ref}/content', {
     params: { path: { ref: projectRef } },
     body: unmapSqlContentField(payload),
@@ -32,7 +32,10 @@ export async function upsertContent(
   })
   if (error) handleError(error)
 
-  return data as Snippet | null
+  const snippet = data as Snippet | null
+  // The upsert response is a snippet freshly persisted to the database, so it
+  // carries status 'saved' as it crosses into the app — same as the queries.
+  return snippet === null ? null : { ...snippet, status: 'saved' }
 }
 
 export type UpsertContentData = Awaited<ReturnType<typeof upsertContent>>

@@ -6,7 +6,6 @@ keywords = [ "postgrest", "column does not exist" ]
 [[errors]]
 http_status_code = 400
 message = "column example_table.example_column does not exist"
-
 ---
 
 If you receive a `400` error with the message `column example_table.example_column does not exist` only on mutation requests (`PATCH`, `POST`, `DELETE`) — while `SELECT` queries on the same column work fine — this is a known bug in PostgREST versions before 14.4 ([issue #3707](https://github.com/PostgREST/postgrest/issues/3707)).

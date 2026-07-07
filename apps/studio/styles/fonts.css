@@ -1,0 +1,68 @@
+/*
+ * Font setup for the Vite/TanStack Start build.
+ * The Next.js build uses next/font via fonts/index.ts; keep the
+ * CSS var names (--font-custom, --font-source-code-pro) in sync so
+ * styles that reference them work in both pipelines.
+ * Source Code Pro is loaded via a <link> in the root route's head().
+ */
+
+@font-face {
+  font-family: 'CustomFont';
+  src: url('../fonts/CustomFont-Book.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CustomFont';
+  src: url('../fonts/CustomFont-BookItalic.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CustomFont';
+  src: url('../fonts/CustomFont-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CustomFont';
+  src: url('../fonts/CustomFont-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CustomFont';
+  src: url('../fonts/CustomFont-BoldItalic.woff2') format('woff2');
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CustomFont';
+  src: url('../fonts/CustomFont-Black.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CustomFont';
+  src: url('../fonts/CustomFont-BlackItalic.woff2') format('woff2');
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  --font-custom: 'CustomFont', Circular, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-source-code-pro: 'Source Code Pro', 'Office Code Pro', Menlo, monospace;
+}

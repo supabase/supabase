@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { cn } from 'ui'
+
 import { AnimatedGridBackground } from '../AnimatedGridBackground'
 
 type Announcement = {
@@ -290,8 +291,8 @@ const months: Month[] = [
     isLaunchWeek: true,
     announcements: [
       {
-        title: 'Supabase ETL',
-        url: 'https://supabase.com/blog/introducing-supabase-etl',
+        title: 'Supabase Pipelines',
+        url: 'https://supabase.com/blog/introducing-supabase-pipelines',
       },
       {
         title: 'Analytics Buckets',

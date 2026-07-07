@@ -44,24 +44,18 @@ export default function ProgramAddendaPage({ addenda }: { addenda: AddendumSumma
         <h2>Current addenda</h2>
         <p>Additional partner-type addenda will be added as the program expands.</p>
         <div className="divide-y divide-border">
-          {addenda.flatMap((item) =>
-            item.versions.map((v) => (
-              <div key={`${item.slug}-${v.id}`} className="flex items-center gap-3 py-4">
-                <FileText size={15} className="shrink-0 text-foreground-muted" />
-                <Link
-                  href={v.href}
-                  className="text-foreground-light transition-colors hover:text-foreground hover:underline"
-                >
-                  {item.title}
-                </Link>
-                {v.isLatest ? (
-                  <Badge variant="success">Effective {v.effectiveDate}</Badge>
-                ) : (
-                  <Badge>{v.effectiveDate}</Badge>
-                )}
-              </div>
-            ))
-          )}
+          {addenda.map((item) => (
+            <div key={item.slug} className="flex items-center gap-3 py-4">
+              <FileText size={15} className="shrink-0 text-foreground-muted" />
+              <Link
+                href={item.href}
+                className="text-foreground-light transition-colors hover:text-foreground hover:underline"
+              >
+                {item.title}
+              </Link>
+              <Badge>Effective {item.versions[0].effectiveDate}</Badge>
+            </div>
+          ))}
         </div>
       </SectionContainer>
     </DefaultLayout>

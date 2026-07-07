@@ -8,8 +8,8 @@ import { Button, cn, SidePanel } from 'ui'
 import { ActionBar } from '../../ActionBar'
 import { isValueTruncated } from '../RowEditor.utils'
 import { DrilldownViewer } from './DrilldownViewer/DrilldownViewer'
-import { JsonCodeEditor } from './JsonCodeEditor'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
@@ -173,11 +173,12 @@ export const JsonEditor = ({
       <div className="flex flex-auto h-full flex-col gap-y-4 relative">
         {view === 'edit' ? (
           <div className="w-full h-full grow">
-            <JsonCodeEditor
+            <CodeEditor
               key={jsonString}
-              readOnly={readOnly}
-              onInputChange={(val) => setJsonStr(val ?? '')}
+              isReadOnly={readOnly}
+              language="json"
               value={(jsonStr ?? '').toString()}
+              onInputChange={(val) => setJsonStr(val ?? '')}
             />
           </div>
         ) : (

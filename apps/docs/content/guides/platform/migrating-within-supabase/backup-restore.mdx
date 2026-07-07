@@ -84,11 +84,9 @@ breadcrumb: 'Migrations'
   size="medium"
   className="text-foreground-light mt-8 mb-6"
 >
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem header="Install Postgres and psql" id="install-postgres">
-      <$Partial path="postgres_installation.mdx" />
-    </AccordionItem>
-  </div>
+  <AccordionItem header="Install Postgres and psql" id="install-postgres">
+    <$Partial path="postgres_installation.mdx" />
+  </AccordionItem>
 </Accordion>
 
 ### Restore backup using CLI

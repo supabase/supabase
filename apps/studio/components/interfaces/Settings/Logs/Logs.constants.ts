@@ -287,7 +287,7 @@ limit 100;
 ]
 
 type SqlFilterFn = (value: any) => SafeLogSqlFragment
-type SqlFilterEntry = SafeLogSqlFragment | SqlFilterFn
+export type SqlFilterEntry = SafeLogSqlFragment | SqlFilterFn
 
 const _SQL_FILTER_COMMON: Record<string, SqlFilterEntry> = {
   search_query: (value: string) =>

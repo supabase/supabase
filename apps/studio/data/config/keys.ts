@@ -27,4 +27,6 @@ export const configKeys = {
   diskAutoscaleConfig: (projectRef: string | undefined) =>
     ['projects', projectRef, 'disk-autoscale-config'] as const,
   deploymentMode: () => ['deployment-mode'] as const,
+  postgresConfig: (projectRef: string | undefined) =>
+    ['projects', projectRef, 'postgres-config'] as const,
 }

@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 import BlogGridItem from '@/components/Blog/BlogGridItem'
 import DefaultLayout from '@/components/Layouts/Default'
+import SectionContainer from '@/components/Layouts/SectionContainer'
 import { capitalize } from '@/lib/helpers'
 import { getAllTags, getSortedPosts } from '@/lib/posts'
 import type PostTypes from '@/types/post'
@@ -41,7 +42,7 @@ export default async function TagPage({ params: paramsPromise }: { params: Promi
   return (
     <>
       <DefaultLayout>
-        <div className="container mx-auto px-8 py-16 sm:px-16 xl:px-20">
+        <SectionContainer>
           <div className="text-foreground-lighter flex space-x-1">
             <h1 className="cursor-pointer">
               <Link href="/blog">Blog</Link>
@@ -59,7 +60,7 @@ export default async function TagPage({ params: paramsPromise }: { params: Promi
               </div>
             ))}
           </ol>
-        </div>
+        </SectionContainer>
       </DefaultLayout>
     </>
   )
