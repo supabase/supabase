@@ -138,18 +138,19 @@
 }
 
 :root {
-  --chart-1: var(--brand-default);
+  --chart-1: hsl(var(--brand-default));
   --chart-2: 173 58% 39%;
   --chart-3: 197 37% 24%;
   --chart-4: 43 74% 66%;
   --chart-5: 27 87% 67%;
   --chart-blue: 217 91% 60%;
-  --chart-warning: hsl(var(--warning-default));
+  --chart-warning: hsl(var(--warning-500));
+  --chart-warning-muted: hsl(var(--warning-400));
   --chart-destructive: hsl(var(--destructive-default));
   --sidebar-background: var(--background-dash-sidebar);
   --sidebar-foreground: var(--foreground-default);
   --sidebar-primary: var(--foreground-default);
-  --sidebar-primary-foreground: hsl(var(--warning-default));
+  --sidebar-primary-foreground: var(--warning);
   --sidebar-accent: var(--background-selection);
   --sidebar-accent-foreground: var(--foreground-default);
   --sidebar-border: var(--border-default);
@@ -159,18 +160,19 @@
 
 [data-theme='dark'],
 .dark {
-  --chart-1: var(--brand-default);
+  --chart-1: hsl(var(--brand-default));
   --chart-2: 160 60% 45%;
   --chart-3: 30 80% 55%;
   --chart-4: 280 65% 60%;
   --chart-5: 340 75% 55%;
   --chart-blue: 217 91% 65%;
   --chart-warning: hsl(var(--warning-default));
+  --chart-warning-muted: hsl(var(--warning-500));
   --chart-destructive: hsl(var(--destructive-default));
   --sidebar-background: var(--background-dash-sidebar);
   --sidebar-foreground: var(--foreground-default);
   --sidebar-primary: var(--foreground-default);
-  --sidebar-primary-foreground: hsl(var(--warning-default));
+  --sidebar-primary-foreground: var(--warning);
   --sidebar-accent: var(--background-selection);
   --sidebar-accent-foreground: var(--foreground-default);
   --sidebar-border: var(--border-default);

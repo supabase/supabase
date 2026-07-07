@@ -1,4 +1,4 @@
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 
 import CopyButton from '@/components/ui/CopyButton'
 
@@ -11,20 +11,20 @@ const INSTALL_OPTIONS = [
 
 function ServerInstallContent() {
   return (
-    <Tabs_Shadcn_ defaultValue="npm" className="overflow-hidden rounded-lg border">
-      <TabsList_Shadcn_ className="gap-5 border-0 border-b bg-surface-75 px-4">
+    <Tabs defaultValue="npm" className="overflow-hidden rounded-lg border">
+      <TabsList className="gap-5 border-0 border-b bg-surface-75 px-4">
         {INSTALL_OPTIONS.map((option) => (
-          <TabsTrigger_Shadcn_
+          <TabsTrigger
             key={option.name}
             value={option.name}
             className="px-0 py-2.5 text-xs data-[state=active]:bg-transparent"
           >
             {option.name}
-          </TabsTrigger_Shadcn_>
+          </TabsTrigger>
         ))}
-      </TabsList_Shadcn_>
+      </TabsList>
       {INSTALL_OPTIONS.map((option) => (
-        <TabsContent_Shadcn_
+        <TabsContent
           key={option.name}
           value={option.name}
           className="m-0 data-[state=inactive]:hidden"
@@ -41,9 +41,9 @@ function ServerInstallContent() {
               aria-label={`Copy ${option.name} command`}
             />
           </div>
-        </TabsContent_Shadcn_>
+        </TabsContent>
       ))}
-    </Tabs_Shadcn_>
+    </Tabs>
   )
 }
 

@@ -1,11 +1,4 @@
-import {
-  Badge,
-  cn,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-} from 'ui'
+import { Badge, cn, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { Results } from '../../SQLEditor/UtilityPanel/Results'
@@ -14,11 +7,13 @@ import { ParseQueryResults } from './RLSTester.types'
 import { deriveRLSTestState } from './RLSTesterResults.utils'
 import { useTestQueryRLS } from './useTestQueryRLS'
 import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { type QueryResponseError } from '@/data/sql/execute-sql-mutation'
 
 interface RLSTesterResultsProps {
   results: Object[]
   autoLimit: boolean
   parseQueryResults: ParseQueryResults
+  executeSqlError: Error | QueryResponseError | null | undefined
   handleSelectEditPolicy: (policy: Policy) => void
 }
 
@@ -26,6 +21,7 @@ export const RLSTesterResults = ({
   results,
   autoLimit,
   parseQueryResults,
+  executeSqlError,
   handleSelectEditPolicy,
 }: RLSTesterResultsProps) => {
   const { limit } = useTestQueryRLS()
@@ -34,29 +30,34 @@ export const RLSTesterResults = ({
     isServiceRole,
     tableWithRLSEnabledButNoPolicies,
     tableWithRLSEnabledWithPolicyFalse,
+    tableWithRLSEnabledWithPoliciesDontApply,
     noAccessToData,
   } = deriveRLSTestState(parseQueryResults)
+
+  const { operation, role } = parseQueryResults
+  const rlsBlockInsert = executeSqlError && operation === 'INSERT'
+  const noAccess = noAccessToData || rlsBlockInsert
 
   return (
     <div className="p-5 pt-4">
       <div className="flex items-center gap-x-2 mb-2">
         <p className="text-sm">Summary</p>
-        {noAccessToData ? (
+        {noAccess ? (
           <Badge variant="destructive">No access</Badge>
         ) : (
           <Badge variant="success">{results.length > 0 ? 'Can access' : 'Has access'}</Badge>
         )}
       </div>
 
-      <Tabs_Shadcn_ defaultValue="policies">
-        <TabsList_Shadcn_ className="gap-x-3">
-          <TabsTrigger_Shadcn_ value="policies" className="px-2">
+      <Tabs defaultValue="policies">
+        <TabsList className="gap-x-3">
+          <TabsTrigger value="policies" className="px-2">
             Policies applied
-          </TabsTrigger_Shadcn_>
-          <TabsTrigger_Shadcn_ value="data" className="px-2">
+          </TabsTrigger>
+          <TabsTrigger value="data" className="px-2" disabled={operation !== 'SELECT'}>
             Data preview
-          </TabsTrigger_Shadcn_>
-        </TabsList_Shadcn_>
+          </TabsTrigger>
+        </TabsList>
 
         {!!parseQueryResults && (
           <div className="border rounded-sm flex items-center justify-between px-3 py-1.5 mt-3">
@@ -80,11 +81,17 @@ export const RLSTesterResults = ({
           </div>
         )}
 
-        <TabsContent_Shadcn_ value="policies" className="mt-0">
+        <TabsContent value="policies" className="mt-0">
           {!isServiceRole &&
             (!!tableWithRLSEnabledButNoPolicies ? (
               <Admonition showIcon={false} type="default" className="rounded-sm mt-2">
-                <p className="mb-0.5!">This user has no access to any rows from this query</p>
+                <p className="mb-0.5! text-foreground">
+                  This user{' '}
+                  {operation === 'SELECT'
+                    ? 'has no access to any rows'
+                    : `is unable to ${operation?.toLowerCase()} any rows`}{' '}
+                  from this query
+                </p>
                 <p className="text-foreground-light">
                   The table{' '}
                   <code className="text-code-inline">
@@ -98,7 +105,9 @@ export const RLSTesterResults = ({
               </Admonition>
             ) : tableWithRLSEnabledWithPolicyFalse ? (
               <Admonition showIcon={false} type="default" className="rounded-sm mt-2">
-                <p className="mb-0.5!">This user has no access to any rows from this query</p>
+                <p className="mb-0.5! text-foreground">
+                  This user has no access to any rows from this query
+                </p>
                 <p className="text-foreground-light">
                   The table{' '}
                   <code className="text-code-inline">
@@ -111,11 +120,29 @@ export const RLSTesterResults = ({
                   role.
                 </p>
               </Admonition>
+            ) : rlsBlockInsert &&
+              parseQueryResults.user &&
+              tableWithRLSEnabledWithPoliciesDontApply ? (
+              <Admonition showIcon={false} type="default" className="rounded-sm mt-2">
+                <p className="mb-0.5! text-foreground">
+                  This user is unable to {operation?.toLowerCase()} any rows from this query
+                </p>
+                <p className="text-foreground-light">
+                  The table{' '}
+                  <code className="text-code-inline">
+                    {tableWithRLSEnabledWithPoliciesDontApply.schema}.
+                    {tableWithRLSEnabledWithPoliciesDontApply.table}
+                  </code>{' '}
+                  has a policy for the{' '}
+                  <code className="text-code-inline break-keep!">{parseQueryResults.role}</code>{' '}
+                  role, but its condition wasn't satisfied for this specific request.
+                </p>
+              </Admonition>
             ) : null)}
 
           {isServiceRole && (
             <Admonition showIcon={false} type="default" className="rounded-sm mt-2">
-              <p className="mb-0.5!">
+              <p className="mb-0.5! text-foreground">
                 The <code className="text-code-inline">postgres</code> role has access to all rows
                 for this query
               </p>
@@ -136,8 +163,10 @@ export const RLSTesterResults = ({
                     <RLSTableCard
                       key={`${schema}.${table}`}
                       table={{ schema, name: table, isRLSEnabled }}
-                      role={parseQueryResults.role}
+                      role={role}
+                      operation={operation}
                       policies={tablePolicies}
+                      hasError={!!executeSqlError}
                       handleSelectEditPolicy={handleSelectEditPolicy}
                     />
                   )
@@ -145,8 +174,8 @@ export const RLSTesterResults = ({
               </div>
             )}
           </div>
-        </TabsContent_Shadcn_>
-        <TabsContent_Shadcn_ value="data" className="mt-2">
+        </TabsContent>
+        <TabsContent value="data" className="mt-2">
           <div
             className={cn(
               'grow flex flex-col border overflow-hidden',
@@ -161,8 +190,8 @@ export const RLSTesterResults = ({
               {autoLimit && results.length >= limit && ` (Limited to only ${limit} rows)`}
             </p>
           )}
-        </TabsContent_Shadcn_>
-      </Tabs_Shadcn_>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }

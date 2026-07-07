@@ -11,7 +11,7 @@ export const RoleSelector = ({ onSelectRole }: RoleSelectorProps) => {
   const { role, setRole } = useRoleImpersonationStateSnapshot()
 
   return (
-    <FormItemLayout isReactForm={false} label="Test as">
+    <FormItemLayout isReactForm={false} label="Test query as" layout="horizontal">
       <RadioGroupStacked defaultValue={role?.role ?? 'anon'}>
         <RadioGroupStackedItem
           value="anon"
@@ -27,7 +27,7 @@ export const RoleSelector = ({ onSelectRole }: RoleSelectorProps) => {
           value="authenticated"
           id="authenticated"
           label="Authenticated user"
-          description="A specific logged in user"
+          description="A logged in user"
           onClick={() => {
             onSelectRole('authenticated')
           }}

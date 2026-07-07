@@ -250,22 +250,6 @@
       "import": "./src/CommandMenu/prepackaged/shared/constants.ts",
       "types": "./src/CommandMenu/prepackaged/shared/constants.ts"
     },
-    "./ComplexTabs": {
-      "import": "./src/ComplexTabs/index.tsx",
-      "types": "./src/ComplexTabs/index.tsx"
-    },
-    "./ComplexTabs/withQueryParams": {
-      "import": "./src/ComplexTabs/withQueryParams.tsx",
-      "types": "./src/ComplexTabs/withQueryParams.tsx"
-    },
-    "./ComplexTabs/withSticky": {
-      "import": "./src/ComplexTabs/withSticky.tsx",
-      "types": "./src/ComplexTabs/withSticky.tsx"
-    },
-    "./ComplexTabs/withSticky.utils": {
-      "import": "./src/ComplexTabs/withSticky.utils.ts",
-      "types": "./src/ComplexTabs/withSticky.utils.ts"
-    },
     "./ComputeBadge": {
       "import": "./src/ComputeBadge/index.tsx",
       "types": "./src/ComputeBadge/index.tsx"

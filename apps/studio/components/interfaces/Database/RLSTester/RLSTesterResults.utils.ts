@@ -8,6 +8,10 @@ export function deriveRLSTestState(parseQueryResults: ParseQueryResults | undefi
   const tableWithRLSEnabledWithPolicyFalse = parseQueryResults?.tables.find(
     (x) => x.isRLSEnabled && x.tablePolicies.some((y) => y.definition === 'false')
   )
+  const tableWithRLSEnabledWithPoliciesDontApply = parseQueryResults?.tables.find(
+    (x) => x.isRLSEnabled && x.tablePolicies.length !== 0
+  )
+
   const noAccessToData =
     !isServiceRole && (!!tableWithRLSEnabledButNoPolicies || !!tableWithRLSEnabledWithPolicyFalse)
 
@@ -15,6 +19,7 @@ export function deriveRLSTestState(parseQueryResults: ParseQueryResults | undefi
     isServiceRole,
     tableWithRLSEnabledButNoPolicies,
     tableWithRLSEnabledWithPolicyFalse,
+    tableWithRLSEnabledWithPoliciesDontApply,
     noAccessToData,
   }
 }
