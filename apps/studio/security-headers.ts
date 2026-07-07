@@ -16,9 +16,7 @@ export function getSecurityHeaders(): Array<{ key: string; value: string }> {
 
   const headers = [
     { key: 'X-Frame-Options', value: 'DENY' },
-    // Mirrors next.config.ts (note: the effective value browsers honour is
-    // `nosniff`; kept identical to the Next build to avoid a behaviour split).
-    { key: 'X-Content-Type-Options', value: 'no-sniff' },
+    { key: 'X-Content-Type-Options', value: 'nosniff' },
     {
       key: 'Content-Security-Policy',
       value: isPlatform ? getCSP() : "frame-ancestors 'none';",
