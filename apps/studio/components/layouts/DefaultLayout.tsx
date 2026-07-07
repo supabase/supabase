@@ -79,7 +79,7 @@ export const DefaultLayout = ({
         <ProjectContextProvider projectRef={ref}>
           <MobileSheetProvider>
             <div className="flex flex-col h-screen w-screen">
-              <a class="sr-only" href="#main" tabIndex={0}>
+              <a className="sr-only" href="#main" tabIndex={0}>
                 Skip to content
               </a>
               {/* Top Banner */}
