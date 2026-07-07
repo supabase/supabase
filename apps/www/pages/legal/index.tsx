@@ -53,9 +53,9 @@ const linkIcons = {
 export default function LegalHubPage() {
   return (
     <DefaultLayout>
-      <NextSeo title="Legal" description="Supabase legal documents and resources." />
+      <NextSeo title="Legal Hub" description="Supabase legal documents and resources." />
       <PageHeader
-        h1="Legal"
+        h1="Legal Hub"
         subheader="Legal documents and resources for Supabase customers and partners."
       />
       <SectionContainer className="prose">

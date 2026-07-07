@@ -180,7 +180,7 @@ const footerData = [
         url: '/ga',
       },
       {
-        text: 'Legal',
+        text: 'Legal Hub',
         url: '/legal',
       },
       {
