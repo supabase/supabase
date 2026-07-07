@@ -306,15 +306,16 @@ export type MockToolOverrides = {
  *
  * Note: search_docs uses the real implementation
  */
-export async function getMockTools(overrides?: MockToolOverrides) {
+export async function getMockTools(overrides: MockToolOverrides | undefined, signal: AbortSignal) {
   const mockedStudioTools = createMockedStudioTools()
 
   const { search_docs } = await getMcpTools({
     accessToken: 'mock-access-token',
     projectRef: 'mock-project-ref',
     aiOptInLevel: 'schema_and_log_and_data',
-    // Evals are short-lived and don't manage connection lifecycle
-    signal: new AbortController().signal,
+    // The caller owns this signal and aborts it once generation is done, which
+    // closes the remote MCP client opened here.
+    signal,
   })
 
   assert(search_docs, 'search_docs tool not available from MCP server')

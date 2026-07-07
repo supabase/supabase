@@ -100,10 +100,15 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       return res.status(500).json({ error: modelError.message })
     }
 
-    // Closes the remote MCP connection opened in getTools once generation is done
-    // (or if anything below throws). This is a non-streaming request, so cleanup
-    // happens after generateText resolves rather than on client disconnect.
+    // Closes the remote MCP connection opened in getTools when generation is done,
+    // if anything below throws, or if the client disconnects mid-generation so the
+    // connection isn't held until generateText resolves on its own (mirrors the
+    // request-scoped cleanup in generate-v4.ts).
     const toolsAbortController = new AbortController()
+    req.on('close', () => toolsAbortController.abort())
+    req.on('aborted', () => toolsAbortController.abort())
+    // Fires when the response finishes or the connection drops.
+    res.on('close', () => toolsAbortController.abort())
     try {
       const tools = await getTools({
         projectRef,
