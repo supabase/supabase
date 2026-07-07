@@ -9,7 +9,7 @@ import type { ShortcutHotkeyMeta, ShortcutOptions } from './types'
 import { useIsShortcutEnabled } from './useIsShortcutEnabled'
 import { orderShortcutCommands } from './utils'
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
-import useLatest from '@/hooks/misc/useLatest'
+import { useLatest } from '@/hooks/misc/useLatest'
 
 /**
  * Subscribe to a registered keyboard shortcut.

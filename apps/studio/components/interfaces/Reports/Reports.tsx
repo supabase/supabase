@@ -12,11 +12,13 @@ import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { GridResize } from './GridResize'
 import { MetricOptions } from './MetricOptions'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { DateRangePicker } from '@/components/ui/DateRangePicker'
-import NoPermission from '@/components/ui/NoPermission'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { DEFAULT_CHART_CONFIG } from '@/components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from '@/data/analytics/constants'
 import { analyticsKeys } from '@/data/analytics/keys'
@@ -366,12 +368,14 @@ const Reports = () => {
     return <NoPermission isFullPage resourceText="access this custom report" />
   }
 
+  const reportTitle = currentReport?.name || 'Reports'
+
   return (
     <>
       <div className="flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
         <div className="flex items-center justify-between">
           <div>
-            <h1>{currentReport?.name || 'Reports'}</h1>
+            <h1>{reportTitle}</h1>
             <p className="text-foreground-light">{currentReport?.description}</p>
           </div>
           {hasEdits && (
@@ -396,14 +400,6 @@ const Reports = () => {
         </div>
         <div className={cn('mb-4 flex items-center gap-x-3 justify-between')}>
           <div className="flex items-center gap-x-2">
-            <ButtonTooltip
-              variant="default"
-              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-              className="w-7"
-              disabled={isRefreshing}
-              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-              onClick={onRefreshReport}
-            />
             <div className="flex items-center gap-x-3">
               <DateRangePicker
                 value="7d"
@@ -423,6 +419,15 @@ const Reports = () => {
           </div>
 
           <div className="flex items-center gap-x-2">
+            <DocsButton href={OBSERVABILITY_DOCS_HREFS.customReport} topic={reportTitle} />
+            <ButtonTooltip
+              variant="default"
+              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+              className="w-7"
+              disabled={isRefreshing}
+              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+              onClick={onRefreshReport}
+            />
             {canUpdateReport ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

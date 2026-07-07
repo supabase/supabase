@@ -3,7 +3,7 @@ import { formatRelative } from 'date-fns'
 import { BadgeCheck, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
-import { Admonition, ShimmeringLoader, TimestampInfo } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import {
   PageSection,
   PageSectionContent,
@@ -12,6 +12,8 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { isInstalled, isSyncRunning, isUninstalling } from './stripe-sync-status'
 import { ConstrainedIntegrationTabScaffold } from '@/components/interfaces/Integrations/ConstrainedIntegrationTabScaffold'

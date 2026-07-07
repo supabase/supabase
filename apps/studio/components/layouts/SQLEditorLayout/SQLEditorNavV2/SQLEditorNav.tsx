@@ -5,14 +5,14 @@ import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { TreeView } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   InnerSideBarEmptyPanel,
   InnerSideMenuCollapsible,
   InnerSideMenuCollapsibleContent,
   InnerSideMenuCollapsibleTrigger,
   InnerSideMenuSeparator,
-} from 'ui-patterns'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+} from 'ui-patterns/InnerSideMenu'
 
 import { DeleteSnippetsModal } from './DeleteSnippetsModal'
 import { ReferenceSnippetsSection } from './ReferenceSnippetsSection'
@@ -38,8 +38,8 @@ import { useSqlSnippetsQuery } from '@/data/content/sql-snippets-query'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
-import { useSnippetFolders, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { isNewFolder } from '@/state/sql-editor/sql-editor-lifecycle'
+import { useSnippetFolders, useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 interface SQLEditorNavProps {

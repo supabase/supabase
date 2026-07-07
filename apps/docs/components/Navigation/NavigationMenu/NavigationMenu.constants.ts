@@ -281,6 +281,13 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
         ],
         [
           {
+            label: 'Server SDK',
+            icon: 'reference-javascript',
+            href: '/reference/server' as `/${string}`,
+            level: 'reference_server',
+            new: true,
+          },
+          {
             label: 'CLI Commands',
             icon: 'reference-cli',
             href: '/reference/cli/introduction' as `/${string}`,
@@ -1421,6 +1428,10 @@ export const database: NavMenuConstant = {
               url: '/guides/database/extensions/wrappers/logflare' as `/${string}`,
             },
             {
+              name: 'MongoDB',
+              url: '/guides/database/extensions/wrappers/mongodb' as `/${string}`,
+            },
+            {
               name: 'MSSQL',
               url: '/guides/database/extensions/wrappers/mssql' as `/${string}`,
             },
@@ -2096,6 +2107,7 @@ export const storage: NavMenuConstant = {
           items: [
             { name: 'Fundamentals', url: '/guides/storage/cdn/fundamentals' },
             { name: 'Smart CDN', url: '/guides/storage/cdn/smart-cdn' },
+            { name: 'Purging Cache', url: '/guides/storage/cdn/purge-cdn-cache' },
             { name: 'Metrics', url: '/guides/storage/cdn/metrics' },
           ],
         },
@@ -2716,6 +2728,14 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/clone-project',
         },
         {
+          name: 'Project Pausing',
+          url: '/guides/platform/free-project-pausing' as `/${string}`,
+        },
+        {
+          name: 'Delete Project',
+          url: '/guides/platform/delete-project',
+        },
+        {
           name: 'Single Sign-On',
           url: '/guides/platform/sso',
           enabled: fullPlatformEnabled,
@@ -3332,6 +3352,17 @@ export const reference_javascript_v2 = {
   pkg: {
     name: '@supabase/supabase-js',
     repo: 'https://github.com/supabase/supabase-js',
+  },
+}
+
+export const reference_server_v1 = {
+  icon: 'reference-javascript',
+  title: 'Server',
+  url: '/reference/server',
+  parent: '/reference',
+  pkg: {
+    name: '@supabase/server',
+    repo: 'https://github.com/supabase/server',
   },
 }
 

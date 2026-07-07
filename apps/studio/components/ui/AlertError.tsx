@@ -112,5 +112,3 @@ export const AlertError = ({
     />
   )
 }
-
-export default AlertError

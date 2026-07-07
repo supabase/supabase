@@ -18,7 +18,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getIsInTransition, getStatusLabel } from './ReadReplicas.utils'
 import { DropReplicaConfirmationModal } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/DropReplicaConfirmationModal'

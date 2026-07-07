@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'ui'
-import { ComputeBadge } from 'ui-patterns'
+import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { sizes } from './ProjectCreation.constants'

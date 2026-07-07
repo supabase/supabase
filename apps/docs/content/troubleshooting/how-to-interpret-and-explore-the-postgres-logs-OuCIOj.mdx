@@ -263,7 +263,7 @@ limit 100;
 
 When recording what is accessed and by whom, logging based on database roles and objects is the most reliable way to ensure a proper trail of activity.
 
-You can use the [pg_audit](/docs/guides/database/extensions/pgaudit) extension to selectively log relevant queries (not just errors) by certain roles, against specific database objects.
+You can use the [pg_audit](/docs/guides/database/extensions/pgaudit) extension to selectively log relevant queries, not only errors, by certain roles, against specific database objects.
 
 You should take care when using the extension to not log all database events, but only what is absolutely necessary. Over-logging can strain the database and create log noise that makes it difficult to filter for relevant events.
 

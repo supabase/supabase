@@ -55,9 +55,9 @@ const HTTP_STATUS_EXPR: SafeLogSqlFragment = safeSql`if(source = 'auth_logs', lo
  * logs; the UI surfaces gateway HTTP traffic for those buckets.
  */
 const LOG_TYPE_CONDITION: Record<string, SafeLogSqlFragment> = {
-  edge: safeSql`source = 'edge_logs' AND ${ATTR.path} NOT LIKE '%/rest/%' AND ${ATTR.path} NOT LIKE '%/storage/%'`,
-  postgrest: safeSql`source = 'postgrest_logs' OR (source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%')`,
-  storage: safeSql`source = 'storage_logs' OR (source = 'edge_logs' AND ${ATTR.path} LIKE '%/storage/%')`,
+  edge: safeSql`source = 'edge_logs'`,
+  postgrest: safeSql`source = 'postgrest_logs'`,
+  storage: safeSql`source = 'storage_logs'`,
   postgres: safeSql`source = 'postgres_logs'`,
   'edge function': safeSql`source = 'function_edge_logs'`,
   auth: safeSql`source = 'auth_logs'`,
@@ -67,11 +67,11 @@ const LOG_TYPE_CONDITION: Record<string, SafeLogSqlFragment> = {
 }
 
 // Derived `log_type` column for SELECT / GROUP BY / countIf use.
+// WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%' THEN 'postgrest'
+// WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/storage/%' THEN 'storage'
 const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN source = 'postgrest_logs' THEN 'postgrest'
-      WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%' THEN 'postgrest'
       WHEN source = 'storage_logs' THEN 'storage'
-      WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/storage/%' THEN 'storage'
       WHEN source = 'edge_logs' THEN 'edge'
       WHEN source = 'postgres_logs' THEN 'postgres'
       WHEN source = 'function_edge_logs' THEN 'edge function'
@@ -294,26 +294,54 @@ const buildBaseWhere = (
     }
   }
 
-  const connFilter = connectionLogsFilter(search)
-  if (connFilter) parts.push(connFilter)
+  const searchParamsFilter = applySearchParamsFilter(search)
+  if (searchParamsFilter) parts.push(searchParamsFilter)
 
   return parts
 }
 
+// Path substrings that identify which downstream service an `edge_logs`
+// (API Gateway) row was routed to. Mirrors the convention already used by
+// the sibling Logs Explorer (Logs.constants.ts / Logs.utils.otel.ts) and by
+// ServiceFlow.sql.ts within this same feature.
+const EDGE_SERVICE_PATH_FILTER: Record<'edge_auth' | 'edge_storage' | 'edge_postgrest', string> = {
+  edge_auth: '%/auth/%',
+  edge_storage: '%/storage/%',
+  edge_postgrest: '%/rest/%',
+}
+
 /**
- * Returns a WHERE condition that excludes Postgres connection lifecycle messages.
- * Shared by every query via `buildBaseWhere`, so the row list, chart and sidebar
- * facet counts all hide connection logs together (otherwise the badges over-count
- * by the connection rows the list hides).
+ * Returns view-option WHERE conditions — toggles from the filter sidebar that
+ * hide a subset of rows without being a `filter` URL param (Postgres
+ * connection lifecycle messages, and per-service traffic nested inside the
+ * API Gateway `edge_logs` source). Shared by every query via `buildBaseWhere`,
+ * so the row list, chart and sidebar facet counts stay in sync (otherwise the
+ * badges over-count by the rows the list hides).
  */
-const connectionLogsFilter = (search: QuerySearchParamsType): SafeLogSqlFragment | null => {
+const applySearchParamsFilter = (search: QuerySearchParamsType): SafeLogSqlFragment | null => {
+  const conditions: SafeLogSqlFragment[] = []
+
   // Visible by default — only an explicit `false` hides connection logs.
-  if (search.show_connection_logs !== false) return null
-  return safeSql`(source != 'postgres_logs' OR (
-    event_message NOT LIKE 'connection received%' AND
-    event_message NOT LIKE 'connection authenticated%' AND
-    event_message NOT LIKE 'connection authorized%'
-  ))`
+  if (search.show_connection_logs === false) {
+    conditions.push(safeSql`(source != 'postgres_logs' OR (
+      event_message NOT LIKE 'connection received%' AND
+      event_message NOT LIKE 'connection authenticated%' AND
+      event_message NOT LIKE 'connection authorized%'
+    ))`)
+  }
+
+  // Visible by default — only an explicit `false` hides that service's
+  // requests within the API Gateway log type.
+  for (const key of ['edge_auth', 'edge_storage', 'edge_postgrest'] as const) {
+    if (search[key] === false) {
+      conditions.push(
+        safeSql`(source != 'edge_logs' OR ${ATTR.path} NOT LIKE ${lit(EDGE_SERVICE_PATH_FILTER[key])})`
+      )
+    }
+  }
+
+  if (conditions.length === 0) return null
+  return safeSql`(${joinSqlFragments(conditions, ' AND ')})`
 }
 
 /**

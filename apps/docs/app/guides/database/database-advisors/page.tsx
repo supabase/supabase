@@ -11,7 +11,7 @@ import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 import { capitalize } from 'lodash-es'
 import rehypeSlug from 'rehype-slug'
 import { Heading } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'

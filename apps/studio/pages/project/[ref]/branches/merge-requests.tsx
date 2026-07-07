@@ -22,12 +22,12 @@ import {
 import { BranchSelector } from '@/components/interfaces/BranchManagement/BranchSelector'
 import { PullRequestsEmptyState } from '@/components/interfaces/BranchManagement/EmptyStates'
 import BranchLayout from '@/components/layouts/BranchLayout/BranchLayout'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
 import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
@@ -300,7 +300,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
   )
 }
 
-const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
+export const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()

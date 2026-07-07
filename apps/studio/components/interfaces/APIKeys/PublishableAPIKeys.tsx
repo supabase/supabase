@@ -13,7 +13,8 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { APIKeyRow } from './APIKeyRow'
 import { CreatePublishableAPIKeyDialog } from './CreatePublishableAPIKeyDialog'

@@ -1,5 +1,5 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Card } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { Markdown } from '@/components/interfaces/Markdown'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'

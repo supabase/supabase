@@ -88,7 +88,7 @@ test.describe.configure({ mode: 'serial' })
 3. **`getByText` with exact match** - Good for unique text
 
    ```typescript
-   page.getByText('Data API Access', { exact: true })
+   page.getByText('Data API access', { exact: true })
    ```
 
 4. **`locator` with CSS** - Use sparingly, more fragile

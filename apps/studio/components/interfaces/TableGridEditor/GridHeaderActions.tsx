@@ -182,7 +182,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   }
 
   return (
-    <div className="sb-grid-header__inner">
+    <div className="flex items-center space-x-2">
       {showHeaderActions && (
         <div className="flex items-center gap-x-2">
           {isReadOnly && (

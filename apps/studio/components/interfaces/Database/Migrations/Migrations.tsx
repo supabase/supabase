@@ -16,9 +16,10 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition, TimestampInfo } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { MigrationsEmptyState } from './MigrationsEmptyState'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'

@@ -48,7 +48,7 @@ import {
 } from './ColumnList.utils'
 import { ConstraintToken } from './ConstraintToken'
 import { displayColumnType } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
@@ -162,6 +162,7 @@ export const ColumnList = ({
         {!isSchemaLocked && isTableEntity && (
           <ButtonTooltip
             icon={<Plus />}
+            variant="default"
             disabled={!canUpdateColumns}
             onClick={() => onAddColumn()}
             tooltip={{

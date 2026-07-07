@@ -39,13 +39,15 @@ const IconBackground = ({
 const LogoComponent = ({
   logoImage,
   className,
+  wrapperClassName,
   title,
 }: {
   title: string
   logoImage: string
   className?: string
+  wrapperClassName?: string
 }) => (
-  <div className="relative box-content p-8 pb-0">
+  <div className={cn('relative box-content p-8 pb-0', wrapperClassName)}>
     <div className="relative h-[33px] w-auto max-w-[145px]">
       <Image
         src={logoImage}
@@ -72,8 +74,6 @@ export const GlassPanel = ({
   className,
 }: Props) => {
   const { resolvedTheme } = useTheme()
-  const showLogoInverse = logoInverse && resolvedTheme?.includes('dark')
-  const showLogo = !showLogoInverse && logo
 
   return (
     <div
@@ -92,10 +92,22 @@ export const GlassPanel = ({
         className
       )}
     >
-      {showLogoInverse && (
-        <LogoComponent title={title} logoImage={logoInverse} className="opacity-50" />
+      {logoInverse && (
+        <LogoComponent
+          title={title}
+          logoImage={logoInverse}
+          className="opacity-50"
+          wrapperClassName="hidden dark:block"
+        />
       )}
-      {showLogo && <LogoComponent title={title} logoImage={logo} className="opacity-75" />}
+      {logo && (
+        <LogoComponent
+          title={title}
+          logoImage={logo}
+          className="opacity-75"
+          wrapperClassName={logoInverse ? 'block dark:hidden' : undefined}
+        />
+      )}
 
       {header && (
         <img

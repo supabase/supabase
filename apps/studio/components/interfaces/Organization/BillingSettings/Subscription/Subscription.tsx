@@ -14,8 +14,8 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
-import NoPermission from '@/components/ui/NoPermission'
+import { AlertError } from '@/components/ui/AlertError'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'

@@ -3,7 +3,7 @@ import { safeLocalStorage, safeSessionStorage } from 'common'
 import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import CopyButton from '../CopyButton'
 import { InlineLinkClassName } from '../InlineLink'
