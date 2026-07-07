@@ -167,13 +167,13 @@ The catch-all `/` route requires HTTP basic auth with credentials from `DASHBOAR
 
 ### API key enforcement on protected routes
 
-The protected routes (`/auth/v1/`, `/rest/v1/`, `/graphql/v1`, `/realtime/v1/api`, `/realtime/v1/`, `/pg/`) require the `apikey` header to contain a valid configured key. Acceptable keys are the new opaque `sb_publishable_*` and `sb_secret_*` keys (translated to internal JWTs) or the legacy `ANON_KEY` and `SERVICE_ROLE_KEY` HS256 JWT API keys. The `/rest/v1/` Open API root is stricter and only allows admin-level keys (`sb_secret_*` or legacy `SERVICE_ROLE_KEY`).
+The protected routes (`/auth/v1/`, `/rest/v1/`, `/graphql/v1`, `/realtime/v1/api`, `/realtime/v1/`, `/pg/`) require the `apikey` header to contain a valid configured key. Acceptable keys are the new opaque `sb_publishable_*` and `sb_secret_*` keys (translated to internal JWTs) or the legacy `ANON_KEY` and `SERVICE_ROLE_KEY` HS256 JWT API keys.
 
 A Lua filter rejects missing or invalid keys with HTTP `401 Unauthorized`. An RBAC filter then applies finer-grained rules:
 
-- `/pg/` - only `service_role` keys (`sb_secret_*` or legacy `SERVICE_ROLE_KEY`) are allowed (HTTP `403` otherwise).
-- `/rest/v1/` (exact path, OpenAPI schema root) - only `service_role` keys are allowed (HTTP `403` otherwise). `/rest/v1/<table>` and other Data API paths remain accessible to all valid keys.
-- All other protected routes - any valid configured key is allowed.
+- `/pg/` - only `service_role` keys (`sb_secret_*` or legacy `SERVICE_ROLE_KEY`) are allowed
+- `/rest/v1/` (exact path, OpenAPI schema root) - only `service_role` keys are allowed
+- `/rest/v1/<table>` and other Data API paths remain accessible to all valid keys
 
 ### Opaque key translation
 
