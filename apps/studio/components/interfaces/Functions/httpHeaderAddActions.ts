@@ -20,7 +20,7 @@ export const buildEdgeFunctionHeaderAddActions = <TRow>({
     {
       key: 'add-auth-header',
       label: 'Add secret key',
-      description: 'Required for edge functions invoked with a secret key',
+      description: 'Required for edge functions that enforce JWT verification',
       createRows: () => [createRow(authHeader.name, authHeader.value)],
     },
     {
