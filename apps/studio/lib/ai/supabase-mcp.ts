@@ -79,3 +79,54 @@ export async function createSupabaseMCPClient({
 
   return client
 }
+
+/**
+ * Legacy in-process MCP client — the pre-migration behavior, kept as a fallback
+ * behind the `USE_REMOTE_MCP` gate (see `tools/mcp-tools.ts`).
+ *
+ * Instantiates `@supabase/mcp-server-supabase` in-process and connects to it over
+ * an in-memory transport. The heavy server package is imported dynamically so it
+ * is code-split into its own chunk and stays out of the (default, post-migration)
+ * remote path's bundle.
+ *
+ * TODO(AI-897): remove in process mcp — delete this once every environment has
+ * been flipped to the remote MCP server and has been stable. Tracked alongside
+ * the `USE_REMOTE_MCP` rollout.
+ */
+export async function createInProcessSupabaseMCPClient({
+  accessToken,
+  projectRef,
+}: {
+  accessToken: string
+  projectRef: string
+}) {
+  // Dynamic imports keep the in-process server + its transport out of the remote
+  // path's bundle (loaded only when this fallback is actually taken).
+  // `.js` is required for esbuild ESM resolution.
+  const { InMemoryTransport } = await import('@modelcontextprotocol/sdk/inMemory.js')
+  const { createSupabaseMcpServer } = await import('@supabase/mcp-server-supabase')
+  const { createSupabaseApiPlatform } = await import('@supabase/mcp-server-supabase/platform/api')
+  const { API_URL } = await import('@/lib/constants')
+
+  const [clientTransport, serverTransport] = InMemoryTransport.createLinkedPair()
+
+  // Instantiate the MCP server and connect to its transport
+  const apiUrl = API_URL?.replace('/platform', '')
+  const server = createSupabaseMcpServer({
+    platform: createSupabaseApiPlatform({
+      accessToken,
+      apiUrl,
+    }),
+    contentApiUrl: process.env.NEXT_PUBLIC_CONTENT_API_URL,
+    projectId: projectRef,
+    readOnly: true,
+  })
+  await server.connect(serverTransport)
+
+  const client = await createMCPClient({
+    name: SOURCE_NAME,
+    transport: clientTransport,
+  })
+
+  return client
+}

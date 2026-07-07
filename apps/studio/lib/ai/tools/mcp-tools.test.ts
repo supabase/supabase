@@ -1,9 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createSupabaseMCPClient } from '../supabase-mcp'
+import { createInProcessSupabaseMCPClient, createSupabaseMCPClient } from '../supabase-mcp'
 import { getMcpTools } from './mcp-tools'
 
-vi.mock('../supabase-mcp', () => ({ createSupabaseMCPClient: vi.fn() }))
+vi.mock('../supabase-mcp', () => ({
+  createSupabaseMCPClient: vi.fn(),
+  createInProcessSupabaseMCPClient: vi.fn(),
+}))
 
 const BASE_PARAMS = {
   accessToken: 'token',
@@ -33,6 +36,8 @@ describe('ai/tools/mcp-tools getMcpTools', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    // These tests exercise the remote transport; pin the migration gate to it.
+    process.env.USE_REMOTE_MCP = 'true'
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     close = vi.fn().mockResolvedValue(undefined)
     tools = vi.fn().mockResolvedValue({ ...FULL_REMOTE_TOOLS })
@@ -40,6 +45,7 @@ describe('ai/tools/mcp-tools getMcpTools', () => {
   })
 
   afterEach(() => {
+    delete process.env.USE_REMOTE_MCP
     consoleErrorSpy.mockRestore()
   })
 
@@ -115,5 +121,52 @@ describe('ai/tools/mcp-tools getMcpTools', () => {
 
     await expect(getMcpTools(BASE_PARAMS)).rejects.toThrow('MCP tools validation failed')
     expect(close).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('ai/tools/mcp-tools getMcpTools transport selection', () => {
+  let close: ReturnType<typeof vi.fn>
+  let tools: ReturnType<typeof vi.fn>
+  let consoleErrorSpy: ReturnType<typeof vi.spyOn>
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+    close = vi.fn().mockResolvedValue(undefined)
+    tools = vi.fn().mockResolvedValue({ ...FULL_REMOTE_TOOLS })
+    vi.mocked(createSupabaseMCPClient).mockResolvedValue({ tools, close } as any)
+    vi.mocked(createInProcessSupabaseMCPClient).mockResolvedValue({ tools, close } as any)
+  })
+
+  afterEach(() => {
+    delete process.env.USE_REMOTE_MCP
+    consoleErrorSpy.mockRestore()
+  })
+
+  it('uses the remote client when USE_REMOTE_MCP is "true"', async () => {
+    process.env.USE_REMOTE_MCP = 'true'
+
+    await getMcpTools(BASE_PARAMS)
+
+    expect(createSupabaseMCPClient).toHaveBeenCalledTimes(1)
+    expect(createInProcessSupabaseMCPClient).not.toHaveBeenCalled()
+  })
+
+  it('falls back to the in-process client when USE_REMOTE_MCP is unset (default)', async () => {
+    delete process.env.USE_REMOTE_MCP
+
+    await getMcpTools(BASE_PARAMS)
+
+    expect(createInProcessSupabaseMCPClient).toHaveBeenCalledTimes(1)
+    expect(createSupabaseMCPClient).not.toHaveBeenCalled()
+  })
+
+  it('uses the in-process client for any non-"true" value', async () => {
+    process.env.USE_REMOTE_MCP = 'false'
+
+    await getMcpTools(BASE_PARAMS)
+
+    expect(createInProcessSupabaseMCPClient).toHaveBeenCalledTimes(1)
+    expect(createSupabaseMCPClient).not.toHaveBeenCalled()
   })
 })
