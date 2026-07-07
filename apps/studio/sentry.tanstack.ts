@@ -52,6 +52,14 @@ export function initSentryTanStackClient(router: AnyRouter) {
       // annotates frames (@sentry/vite-plugin moduleMetadata).
       includeThirdPartyErrorFilter: false,
       extraIntegrations: [Sentry.tanstackRouterBrowserTracingIntegration(router)],
+      // Without a release the SDK silently drops session envelopes
+      // (`Client.sendSession` early-returns), so Release Health sends nothing
+      // on this build. The Next build gets its release injected at build time
+      // by withSentryConfig, which resolves to the Vercel commit SHA; inline
+      // the same SHA here (vite.config.ts re-exposes VERCEL_GIT_COMMIT_SHA
+      // under the NEXT_PUBLIC_ name) so both builds report the same release.
+      // Unset outside Vercel (local/self-hosted), where sessions don't matter.
+      release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
     })
   )
 }

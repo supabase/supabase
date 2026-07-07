@@ -420,13 +420,43 @@ describe('Sentry beforeSend filtering functions', () => {
 })
 
 describe('buildSentryClientOptions', () => {
+  // Representative subset of Sentry's default integrations. `integrations`
+  // is the function form: Sentry.init calls it with the defaults and installs
+  // whatever it returns, so dropping these here would disable session
+  // envelopes (BrowserSession) and window.onerror capture (GlobalHandlers).
+  const fakeDefaultIntegrations = [{ name: 'BrowserSession' }, { name: 'GlobalHandlers' }]
+
   const getIntegrationNames = (options: ReturnType<typeof buildSentryClientOptions>) => {
     const integrations = options.integrations
-    if (typeof integrations === 'function' || integrations === undefined) {
-      throw new Error('expected a static integrations array')
+    if (typeof integrations !== 'function') {
+      throw new Error('expected the function form of integrations')
     }
-    return integrations.map((integration) => integration.name)
+    return integrations(fakeDefaultIntegrations).map((integration) => integration.name)
   }
+
+  it('preserves the default integrations passed in by Sentry.init', () => {
+    for (const includeThirdPartyErrorFilter of [true, false]) {
+      const names = getIntegrationNames(buildSentryClientOptions({ includeThirdPartyErrorFilter }))
+      // browserSessionIntegration is what sends the session envelope on every
+      // page load; globalHandlers is window.onerror / unhandledrejection.
+      expect(names).toContain('BrowserSession')
+      expect(names).toContain('GlobalHandlers')
+    }
+  })
+
+  it('sets the release only when one is provided', () => {
+    const withRelease = buildSentryClientOptions({
+      includeThirdPartyErrorFilter: false,
+      release: 'abc123',
+    })
+    expect(withRelease.release).toBe('abc123')
+
+    // The key must be ABSENT when no release is passed: on the Next build a
+    // `release: undefined` entry would override the release injected into
+    // @sentry/nextjs's init by withSentryConfig (options are spread last).
+    const withoutRelease = buildSentryClientOptions({ includeThirdPartyErrorFilter: true })
+    expect('release' in withoutRelease).toBe(false)
+  })
 
   it('includes the third-party error filter only when the build annotates frames', () => {
     // Next build: withSentryConfig injects the applicationKey metadata.

@@ -101,11 +101,36 @@ describe('initSentryTanStackClient', () => {
     expect(sentryMocks.tanstackRouterBrowserTracingIntegration).toHaveBeenCalledWith(fakeRouter)
 
     const [options] = sentryMocks.init.mock.calls[0]
-    expect(options.integrations).toContainEqual({ name: 'TanStackRouterBrowserTracing' })
+    // `integrations` is the function form: Sentry.init calls it with the
+    // default integrations (browserSession, globalHandlers, …) and installs
+    // whatever it returns, so the defaults must survive the merge.
+    expect(options.integrations).toBeTypeOf('function')
+    const defaultIntegrations = [{ name: 'BrowserSession' }, { name: 'GlobalHandlers' }]
+    const integrations = options.integrations(defaultIntegrations)
+
+    // Defaults passed in by Sentry.init survive the merge.
+    expect(integrations).toContainEqual({ name: 'BrowserSession' })
+    expect(integrations).toContainEqual({ name: 'GlobalHandlers' })
+    expect(integrations).toContainEqual({ name: 'TanStackRouterBrowserTracing' })
     // The Vite build runs no Sentry bundler plugin, so frames carry no
     // applicationKey metadata — the third-party filter must stay off or every
     // event would be tagged third_party_code=true and dropped by beforeSend.
     expect(sentryMocks.thirdPartyErrorFilterIntegration).not.toHaveBeenCalled()
-    expect(options.integrations).not.toContainEqual({ name: 'ThirdPartyErrorsFilter' })
+    expect(integrations).not.toContainEqual({ name: 'ThirdPartyErrorsFilter' })
+  })
+
+  it('passes the Vercel commit SHA as the release so session envelopes are sent', async () => {
+    // The SDK silently drops session envelopes when the client has no release
+    // (`Client.sendSession` early-returns) — without this, Release Health
+    // sends no /envelope traffic at all on the TanStack build. The Next build
+    // instead gets its release injected at build time by withSentryConfig.
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA', 'abc123commit')
+    const initSentryTanStackClient = await loadInitializer()
+
+    initSentryTanStackClient(fakeRouter)
+
+    expect(sentryMocks.init).toHaveBeenCalledWith(
+      expect.objectContaining({ release: 'abc123commit' })
+    )
   })
 })

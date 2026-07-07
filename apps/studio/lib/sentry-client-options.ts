@@ -127,24 +127,47 @@ export interface SentryClientOptionsParams {
   includeThirdPartyErrorFilter: boolean
   /** Build-specific integrations (e.g. TanStack Router browser tracing). */
   extraIntegrations?: Integration[]
+  /**
+   * Release identifier for the client.
+   *
+   * The SDK SILENTLY DROPS session envelopes when the client has no release
+   * (`Client.sendSession` early-returns), so a build without a release sends
+   * no Release Health traffic at all — errors and traces still flow.
+   *
+   * The Next build must NOT pass this: `withSentryConfig` injects the release
+   * (`SENTRY_RELEASE` ?? the Vercel commit SHA) into the bundle at build time,
+   * and an explicit `release` key — even `undefined` — would override it.
+   * The TanStack/Vite build runs no Sentry bundler plugin, so it passes the
+   * commit SHA here instead (see sentry.tanstack.ts).
+   */
+  release?: string
 }
 
 export function buildSentryClientOptions({
   includeThirdPartyErrorFilter,
   extraIntegrations = [],
+  release,
 }: SentryClientOptionsParams): Sentry.BrowserOptions {
   return {
     dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
     ...(process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT && {
       environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT,
     }),
+    // Conditional spread: see the `release` doc comment above — the key must
+    // be ABSENT (not `undefined`) so the Next build's injected release wins.
+    ...(release && { release }),
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,
 
     // Enable performance monitoring
     tracesSampleRate: 0.02,
 
-    integrations: [
+    // Function form so Sentry's default integrations (browserSession,
+    // globalHandlers, breadcrumbs, dedupe, …) are explicitly preserved — this
+    // is the documented way to extend the defaults, and it can never be
+    // misread as replacing them.
+    integrations: (defaultIntegrations) => [
+      ...defaultIntegrations,
       ...(includeThirdPartyErrorFilter ? [buildThirdPartyErrorFilterIntegration()] : []),
       ...extraIntegrations,
     ],
