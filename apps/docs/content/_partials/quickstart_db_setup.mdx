@@ -1,27 +1,27 @@
-export const sqlSetup = `    -- Create the table
-    create table instruments (
-      id bigint primary key generated always as identity,
-      name text not null
-    );
+export const sqlSetup = `-- Create the table
+create table instruments (
+  id bigint primary key generated always as identity,
+  name text not null
+);
 
-    -- Insert sample data into the table
-    insert into instruments (name)
-    values
-      ('violin'),
-      ('viola'),
-      ('cello');
+-- Insert sample data into the table
+insert into instruments (name)
+values
+('violin'),
+('viola'),
+('cello');
 
-    -- Grant the privileges the role needs, which is read access
-    grant select on public.instruments to anon;
+-- Grant the privileges the role needs, which is read access
+grant select on public.instruments to anon;
 
-    -- Enable row level security for the table
-    alter table instruments enable row level security;
+-- Enable row level security for the table
+alter table instruments enable row level security;
 
-    -- Create a policy to allow the anon role to read from the instruments table
-    create policy "public can read instruments"
-    on public.instruments
-    for select to anon
-    using (true);`
+-- Create a policy to allow the anon role to read from the instruments table
+create policy "public can read instruments"
+on public.instruments
+for select to anon
+using (true);`
 
 ## 1. Create a Supabase project
 
@@ -41,19 +41,17 @@ The Supabase MCP server connects AI assistants to Supabase, allowing you to inte
 
 ## 3. Set up your database
 
-When your Supabase project is up and running, create an `instruments` table with some sample data.
-
-Set a secure baseline by setting only the privileges each Postgres role needs, add [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default, and create an RLS policy to make the data in your table publicly readable.
+When your Supabase project is up and running, create an `instruments` table with some sample data. Then set only the privileges each Postgres role needs, add [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default, and create an RLS policy to make the data in the table publicly readable.
 
 You can do this visually with the dashboard or by using [the MCP server](/docs/guides/ai-tools/mcp) to ask your AI assistant to run the SQL snippet in your project.
 
-Copy and run the snippet in your project's [SQL Editor](/dashboard/project/_/sql/new) or <a href={`/dashboard/project/_/sql/new?content=${encodeURIComponent(sqlSetup)}`}>click here to prefill the SQL</a> and then execute it.
+Copy and run the snippet in your project's [SQL Editor](/dashboard/project/_/sql/new).
 
-You can also choose the SQL and prefill it from the **Reference > Samples** menu at the side of the SQL Editor.
+<Admonition type="tip">
 
-<Button variant="primary" asChild>
-  <a href={`/dashboard/project/_/sql/new?content=${encodeURIComponent(sqlSetup)}`}>Prefill SQL</a>
-</Button>
+Save some steps by <a href={`/dashboard/project/_/sql/new?content=${encodeURIComponent(sqlSetup)}`}>clicking here to prefill the SQL</a> in the SQL Editor, and then clicking **Run**.
+
+</Admonition>
 
 ```sql SQL_EDITOR
 -- Create the table
