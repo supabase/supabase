@@ -47,10 +47,12 @@ const PauseProjectButton = () => {
     organization?.slug
   )
 
+  const entity = isBranch ? 'branch' : 'project'
+
   const { mutate: pauseProject, isPending: isPausing } = useProjectPauseMutation({
     onSuccess: (_, variables) => {
       setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.PAUSING })
-      toast.success('Pausing project...')
+      toast.success(`Pausing ${entity}...`)
       router.push(`/project/${projectRef}`)
     },
   })
@@ -95,22 +97,23 @@ const PauseProjectButton = () => {
           },
         }}
       >
-        Pause project
+        {isBranch ? 'Pause branch' : 'Pause project'}
       </ButtonTooltip>
 
       <AlertDialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Pause project?</AlertDialogTitle>
+            <AlertDialogTitle>{isBranch ? 'Pause branch?' : 'Pause project?'}</AlertDialogTitle>
             <AlertDialogDescription>
-              This project will be unavailable while paused. Paused projects can be resumed for 90
-              days. After that, backups remain available to download.
+              {isBranch
+                ? 'This branch will be unavailable while paused. You can resume it at any time.'
+                : 'This project will be unavailable while paused. Paused projects can be resumed for 90 days. After that, backups remain available to download.'}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isPausing}>Cancel</AlertDialogCancel>
             <AlertDialogAction disabled={isPausing} onClick={requestPauseProject} variant="danger">
-              {isPausing ? 'Pausing project...' : 'Pause project'}
+              {isPausing ? `Pausing ${entity}...` : `Pause ${entity}`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

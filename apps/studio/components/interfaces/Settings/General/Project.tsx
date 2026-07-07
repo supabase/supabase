@@ -19,6 +19,7 @@ import { PROJECT_STATUS } from '@/lib/constants'
 
 export const Project = () => {
   const { data: project } = useSelectedProjectQuery()
+  const isBranch = Boolean(project?.parent_project_ref)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
   const { projectSettingsRestartProject } = useIsFeatureEnabled([
     'project_settings:restart_project',
@@ -91,10 +92,12 @@ export const Project = () => {
                   id="pause-project"
                 >
                   <div>
-                    <p className="text-sm">Pause project</p>
+                    <p className="text-sm">{isBranch ? 'Pause branch' : 'Pause project'}</p>
                     <div className="max-w-[420px]">
                       <p className="text-sm text-foreground-light">
-                        Your project will not be accessible while it is paused.
+                        {isBranch
+                          ? 'Your branch will not be accessible while it is paused.'
+                          : 'Your project will not be accessible while it is paused.'}
                       </p>
                     </div>
                   </div>
