@@ -203,13 +203,16 @@ export const CronJobTableCell = ({
   if (col.id === 'active') {
     return (
       <Dialog open={showToggleModal} onOpenChange={setShowToggleModal}>
-        <DialogTrigger className="flex items-center" onClick={(e) => e.stopPropagation()}>
-          <Switch
-            id={`cron-job-active-${jobid}`}
-            size="medium"
-            disabled={isToggling}
-            checked={active}
-          />
+        <DialogTrigger asChild onClick={(e) => e.stopPropagation()}>
+          {/* Wrapped in a div as the Switch is a button itself and cannot be nested within the trigger button */}
+          <div className="flex items-center">
+            <Switch
+              id={`cron-job-active-${jobid}`}
+              size="medium"
+              disabled={isToggling}
+              checked={active}
+            />
+          </div>
         </DialogTrigger>
         <DialogContent
           onClick={(e) => e.stopPropagation()}
