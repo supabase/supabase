@@ -1,0 +1,22 @@
+[
+  "react-hooks/exhaustive-deps",
+  "import/no-anonymous-default-export",
+  "@tanstack/query/exhaustive-deps",
+  "@typescript-eslint/no-explicit-any",
+  "no-restricted-imports",
+  "no-restricted-exports",
+  "react/no-unstable-nested-components",
+  "jsx-a11y/aria-props",
+  "jsx-a11y/aria-proptypes",
+  "jsx-a11y/role-supports-aria-props",
+  "jsx-a11y/anchor-has-content",
+  "jsx-a11y/control-has-associated-label",
+  "jsx-a11y/label-has-associated-control",
+  "jsx-a11y/aria-role",
+  "jsx-a11y/no-redundant-roles",
+  "jsx-a11y/no-aria-hidden-on-focusable",
+  "jsx-a11y/tabindex-no-positive",
+  "jsx-a11y/anchor-is-valid",
+  "jsx-a11y/heading-has-content",
+  "jsx-a11y/no-distracting-elements"
+]

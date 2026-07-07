@@ -6,7 +6,7 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 3. Create an Astro app
+## 4. Create an Astro app
 
 Create an Astro app using the `npm create` command.
 
@@ -15,7 +15,7 @@ npm create astro@latest my-app
 cd my-app
 ```
 
-## 4. Install Supabase client library and Node adapter
+## 5. Install Supabase client library and Node adapter
 
 Install the `supabase-js` client library and the `@astrojs/node` adapter to enable server-side rendering.
 
@@ -23,7 +23,7 @@ Install the `supabase-js` client library and the `@astrojs/node` adapter to enab
 npm install @supabase/supabase-js @astrojs/node
 ```
 
-## 5. Configure Astro for SSR
+## 6. Configure Astro for SSR
 
 Update your `astro.config.mjs`.
 
@@ -41,20 +41,22 @@ export default defineConfig({
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "astro", "tab": "frameworks" }} />
 
-## 6. Declare Supabase environment variables
+## 7. Declare Supabase environment variables
 
 Create a `.env.local` file and populate with your Supabase connection variables that you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=astro&tab=frameworks):
 
-<$CodeTabs>
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=astro">
+    Open Connect panel
+  </a>
+</Button>
 
 ```text name=.env.local
 PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
 
-</$CodeTabs>
-
-## 7. Create a Supabase client helper
+## 8. Create a Supabase client helper
 
 Create a utility file to initialize the Supabase client:
 
@@ -69,9 +71,7 @@ export function createServerClient() {
 }
 ```
 
-## 8. Query Supabase data from Astro
-
-<$Partial path="uiLibCta.mdx" />
+## 9. Query Supabase data from Astro
 
 Create a new file at `src/pages/instruments.astro` and populate with the following.
 
@@ -99,7 +99,7 @@ const { data: instruments } = await supabase.from("instruments").select();
 </html>
 ```
 
-## 9. Start the app
+## 10. Start the app
 
 Run the development server, go to http://localhost:4321/instruments in your browser of choice to check the list of instruments.
 
@@ -109,6 +109,7 @@ npm run dev
 
 ## Next steps
 
+- Explore [drop-in UI components](/ui) for your Supabase app
 - Set up [Auth](/docs/guides/auth) for your app
 - [Insert more data](/docs/guides/database/import-data) into your database
 - Upload and serve static files using [Storage](/docs/guides/storage)

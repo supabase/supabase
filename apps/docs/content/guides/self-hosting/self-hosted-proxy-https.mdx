@@ -45,9 +45,15 @@ Update the URL configuration in your `.env` file to use your HTTPS domain:
 
 ```sh name=.env
 SUPABASE_PUBLIC_URL=https://<your-domain>
-API_EXTERNAL_URL=https://<your-domain>
-SITE_URL=https://<your-domain>
+API_EXTERNAL_URL=https://<your-domain>/auth/v1
+SITE_URL=https://<your-app-domain>
 ```
+
+<Admonition type="note" title="What your-app-domain means">
+
+`<your-app-domain>` is the URL of your own frontend application (where users land after signing in) - not your Supabase instance. It's often a different domain, and possibly a different service entirely, from `<your-domain>` used above.
+
+</Admonition>
 
 For Nginx, change the following to your domain name and a **valid** email address:
 
@@ -167,8 +173,8 @@ Edit your `.env` file to use HTTPS with the Kong HTTPS port:
 
 ```sh name=.env
 SUPABASE_PUBLIC_URL=https://<your-domain>:8443
-API_EXTERNAL_URL=https://<your-domain>:8443
-SITE_URL=https://<your-domain>:8443
+API_EXTERNAL_URL=https://<your-domain>:8443/auth/v1
+SITE_URL=https://<your-app-domain>
 ```
 
 ### Step 4: Restart and verify
@@ -205,8 +211,8 @@ If Realtime subscriptions fail to connect:
 
 If OAuth redirects fail with a callback URL error:
 
-- Verify `API_EXTERNAL_URL` in `.env` is set to your HTTPS URL
-- Verify the callback URL registered with your OAuth provider matches `API_EXTERNAL_URL` followed by `/auth/v1/callback`
+- Verify `API_EXTERNAL_URL` in `.env` is set to your HTTPS URL + `/auth/v1`
+- Verify the callback URL registered with your OAuth provider matches `API_EXTERNAL_URL` followed by `/callback`
 - After changing `API_EXTERNAL_URL`, restart all services with `docker compose down && docker compose up -d`
 
 ### Mixed content warnings

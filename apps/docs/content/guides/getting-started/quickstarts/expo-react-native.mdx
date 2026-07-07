@@ -6,7 +6,7 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 3. Create an Expo app
+## 4. Create an Expo app
 
 Create a minimal Expo app using the `create-expo-app` command with the blank TypeScript template.
 
@@ -14,7 +14,7 @@ Create a minimal Expo app using the `create-expo-app` command with the blank Typ
 npx create-expo-app my-app --template blank-typescript
 ```
 
-## 4. Install the Supabase client library
+## 5. Install the Supabase client library
 
 The fastest way to get started is to use the `@supabase/supabase-js` client library which provides a convenient interface for working with Supabase from a React Native app.
 
@@ -26,9 +26,13 @@ cd my-app && npx expo install @supabase/supabase-js react-native-url-polyfill ex
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
 
-## 5. Declare Supabase environment variables
+## 6. Declare Supabase environment variables
 
 Create a `.env` file in the root of your project and populate it with your Supabase connection variables that you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true).
+
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true">Open Connect panel</a>
+</Button>
 
 Expo requires environment variables to be prefixed with `EXPO_PUBLIC_` to be accessible in your app code.
 
@@ -37,7 +41,7 @@ EXPO_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
 
-## 6. Initialize the Supabase client
+## 7. Initialize the Supabase client
 
 Create a helper file at `lib/supabase.ts` to initialize the Supabase client using the environment variables.
 
@@ -63,7 +67,7 @@ export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
 })
 ```
 
-## 7. Query data from the app
+## 8. Query data from the app
 
 Replace the contents of `App.tsx` with the following code to fetch and display the instruments from your database.
 
@@ -113,7 +117,7 @@ const styles = StyleSheet.create({
 })
 ```
 
-## 8. Start the app
+## 9. Start the app
 
 Run the development server and scan the QR code with the Expo Go app on your phone, or press `i` for iOS simulator or `a` for Android emulator.
 
