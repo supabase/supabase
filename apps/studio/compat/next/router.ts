@@ -4,6 +4,7 @@ import {
   useParams,
   useSearch,
   useRouter as useTanStackRouter,
+  type AnyRouter,
 } from '@tanstack/react-router'
 import { useMemo } from 'react'
 
@@ -287,12 +288,14 @@ export function useRouter() {
       // basepath-stripped, so splitInternalUrl's own origin/basePath
       // normalisation is a no-op here. `search: {}` clears the query,
       // matching Next's push-without-query semantics; same for `hash: ''`.
+      //
+      // The `<AnyRouter, string>` type arguments opt out of the registered
+      // route tree's strict typing: Next-style hrefs are free-form strings
+      // that can't satisfy the route-path union at compile time.
       const { to, search, hash } = splitInternalUrl(target)
-      await router.navigate({
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        to: to as any,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        search: (search ?? {}) as any,
+      await router.navigate<AnyRouter, string>({
+        to,
+        search: search ?? {},
         hash: hash ?? '',
         replace: options?._replace,
       })
@@ -372,12 +375,12 @@ export function useRouter() {
         try {
           // Split like navigate() above so a query string in the href
           // preloads the real target instead of a path-mangled one.
+          // `<string, string>` (TFrom, TTo) loosens `to` to a plain string
+          // for the same free-form-href reason as `navigate` above.
           const { to, search, hash } = splitInternalUrl(toRelativeSameOrigin(url))
-          await router.preloadRoute({
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            to: to as any,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            search: (search ?? {}) as any,
+          await router.preloadRoute<string, string>({
+            to,
+            search: search ?? {},
             hash: hash ?? '',
           })
         } catch {

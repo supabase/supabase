@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from '@tanstack/react-router'
+import { useLocation, useNavigate, type AnyRouter } from '@tanstack/react-router'
 import { unstable_createAdapterProvider } from 'nuqs/adapters/custom'
 import { startTransition, useCallback, useMemo } from 'react'
 
@@ -64,11 +64,13 @@ function useNuqsTanStackRouterAdapter(watchKeys: string[]) {
     (search: URLSearchParams, options: AdapterOptions) => {
       const args = buildSearchUpdateArgs(pathname, search)
       startTransition(() => {
-        navigate({
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          to: args.to as any,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          search: args.search as any,
+        // The `<AnyRouter, string>` type arguments opt out of the registered
+        // route tree's strict typing: the current pathname is a free-form
+        // runtime string that can't satisfy the route-path union at compile
+        // time.
+        navigate<AnyRouter, string>({
+          to: args.to,
+          search: args.search,
           replace: options.history === 'replace',
           resetScroll: options.scroll,
           // Keep the current hash — nuqs updates must not clear `#section`.

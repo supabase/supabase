@@ -16,9 +16,9 @@ export const Route = createFileRoute('/')({
     // destination — deep links like `/?next=new-project&projectName=x` must
     // keep `projectName`. Only the consumed `next` param is dropped (and only
     // when it matched); everything else passes through.
-    const suffix = (consumeNext: boolean) => {
+    const suffix = (shouldConsumeNext: boolean) => {
       const carried = { ...location.search } as Record<string, unknown>
-      if (consumeNext) delete carried.next
+      if (shouldConsumeNext) delete carried.next
       return `${stringifySearch(carried)}${location.hash ? `#${location.hash}` : ''}`
     }
     // `href` instead of `to` because these targets aren't in the TanStack

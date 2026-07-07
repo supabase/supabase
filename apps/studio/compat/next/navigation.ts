@@ -3,6 +3,7 @@ import {
   useMatches,
   useParams as useTanStackParams,
   useRouter as useTanStackRouter,
+  type AnyRouter,
 } from '@tanstack/react-router'
 import { useMemo } from 'react'
 
@@ -36,18 +37,19 @@ export function useRouter() {
       // percent-decodes it and strips control characters from query values
       // (see @/lib/internal-url). `search: {}` / `hash: ''` clear stale
       // state, matching Next's full-href navigation semantics.
+      //
+      // The `<AnyRouter, string>` type arguments opt out of the registered
+      // route tree's strict typing: Next-style hrefs are free-form strings
+      // that can't satisfy the route-path union at compile time.
       push: (href: string, _options?: NavigateOptions) => {
         const { to, search, hash } = splitInternalUrl(href)
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        router.navigate({ to: to as any, search: (search ?? {}) as any, hash: hash ?? '' })
+        router.navigate<AnyRouter, string>({ to, search: search ?? {}, hash: hash ?? '' })
       },
       replace: (href: string, _options?: NavigateOptions) => {
         const { to, search, hash } = splitInternalUrl(href)
-        router.navigate({
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          to: to as any,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          search: (search ?? {}) as any,
+        router.navigate<AnyRouter, string>({
+          to,
+          search: search ?? {},
           hash: hash ?? '',
           replace: true,
         })
@@ -66,14 +68,10 @@ export function useRouter() {
       },
       prefetch: (href: string, _options?: PrefetchOptions) => {
         const { to, search, hash } = splitInternalUrl(href)
+        // `<string, string>` (TFrom, TTo) loosens `to` to a plain string for
+        // the same free-form-href reason as `navigate` above.
         router
-          .preloadRoute({
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            to: to as any,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            search: (search ?? {}) as any,
-            hash: hash ?? '',
-          })
+          .preloadRoute<string, string>({ to, search: search ?? {}, hash: hash ?? '' })
           .catch(() => {
             // Match Next's fire-and-forget contract.
           })
