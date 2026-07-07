@@ -17,6 +17,9 @@ import {
   SelectValue,
   SheetFooter,
   SheetSection,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -48,6 +51,7 @@ import { useDestinationForm } from './useDestinationForm'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
@@ -135,8 +139,6 @@ export const DestinationForm = ({
   const catalogToken = serviceKey?.api_key ?? ''
 
   const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
-  const sourceRegion = projectSettings?.region
-  const isCrossRegion = !!sourceRegion && sourceRegion !== PIPELINE_REGION.code
 
   const {
     isValidating,
@@ -335,53 +337,7 @@ export const DestinationForm = ({
               <div className="p-5 flex flex-col gap-y-6">
                 <p className="text-sm font-medium text-foreground">Destination details</p>
 
-                <FormItemLayout
-                  isReactForm={false}
-                  layout="horizontal"
-                  className="[&>div]:gap-y-1 [&>div>span]:text-foreground-lighter"
-                  label="Region"
-                  labelOptional="This pipeline runs from a fixed region"
-                  description={
-                    <div className="flex flex-col gap-y-2">
-                      <span className="block text-sm text-foreground-light">
-                        For best replication performance, choose a destination located in or close
-                        to this region.
-                      </span>
-                      {isCrossRegion && (
-                        <Admonition
-                          type="warning"
-                          className="mb-0"
-                          description={`Your database is in ${sourceRegion}, a different region than this pipeline (${PIPELINE_REGION.code}). Cross-region data transfer can add noticeable latency and may slow down replication.`}
-                        />
-                      )}
-                    </div>
-                  }
-                >
-                  <Select disabled value={PIPELINE_REGION.code}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a region" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value={PIPELINE_REGION.code}>
-                        <div className="flex gap-x-3 items-center">
-                          <img
-                            alt="region icon"
-                            className="w-5 rounded-xs"
-                            src={`${BASE_PATH}/img/regions/${PIPELINE_REGION.code}.svg`}
-                          />
-                          <p className="flex items-center gap-x-2">
-                            <span>{PIPELINE_REGION.displayName}</span>
-                            <span className="text-xs text-foreground-lighter font-mono">
-                              {PIPELINE_REGION.code}
-                            </span>
-                          </p>
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </FormItemLayout>
-
-                <div className="space-y-4">
+                <div className="flex flex-col gap-y-4">
                   <DestinationNameInput form={form} />
                   <PublicationSelection
                     form={form}
@@ -389,6 +345,36 @@ export const DestinationForm = ({
                     visible={visible}
                     onSelectNewPublication={() => setPublicationPanelVisible(true)}
                   />
+                  <FormItemLayout
+                    isReactForm={false}
+                    layout="horizontal"
+                    className="[&>div>p]:text-foreground-lighter"
+                    label="Region"
+                    description="Pipelines run in a fixed region and cannot be changed."
+                  >
+                    <Select disabled value={PIPELINE_REGION.code}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a region" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={PIPELINE_REGION.code}>
+                          <div className="flex gap-x-3 items-center">
+                            <img
+                              alt="region icon"
+                              className="w-5 rounded-xs"
+                              src={`${BASE_PATH}/img/regions/${PIPELINE_REGION.code}.svg`}
+                            />
+                            <p className="flex items-center gap-x-2">
+                              <span>{PIPELINE_REGION.displayName}</span>
+                              <span className="text-xs text-foreground-lighter font-mono">
+                                {PIPELINE_REGION.code}
+                              </span>
+                            </p>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItemLayout>
                 </div>
               </div>
 
