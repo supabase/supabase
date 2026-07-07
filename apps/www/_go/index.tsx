@@ -22,6 +22,8 @@ import stripeExecDinner from './events/stripe-sessions-2026/exec-dinner'
 import stripeExecDinnerThankYou from './events/stripe-sessions-2026/exec-dinner-thank-you'
 import stripeMeetingScheduler from './events/stripe-sessions-2026/meeting-scheduler'
 import stripeParty from './events/stripe-sessions-2026/party'
+import vercelShipSydneyContest from './events/vercel-ship-sydney-2026/contest'
+import vercelShipSydneyContestThankYou from './events/vercel-ship-sydney-2026/contest-thank-you'
 import awsActivateOffer from './lead-gen/aws-activate-offer'
 import exampleLeadGen from './lead-gen/example-lead-gen'
 import amoe from './legal/amoe'
@@ -59,6 +61,8 @@ const pages: GoPageInput[] = [
   selectPartnerDay, // remove after Select 2026
   selectPartnerDayThankYou, // remove after Select 2026
   startupGrindContest, // remove after May 31, 2026
+  vercelShipSydneyContest, // remove after July 31, 2026
+  vercelShipSydneyContestThankYou, // remove after July 31, 2026
   supabaseStripeProjects,
 ]
 
