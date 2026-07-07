@@ -205,9 +205,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
                 <Icon size={14} className="mt-0.5 shrink-0 text-foreground-light" />
                 <div className="min-w-0 flex-1">
                   <div className="text-sm text-foreground">
-                    {copiedItem !== item.label ? (
-                      <span className="sr-only">Press Enter to copy</span>
-                    ) : null}
+                    {copiedItem !== item.label ? <span className="sr-only">Copy</span> : null}
                     {item.label}
                     {copiedItem === item.label ? (
                       <span className="sr-only">copied to your clipboard</span>
