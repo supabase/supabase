@@ -3,9 +3,7 @@ import { literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
 export const getMigrationsSql = (): SafeSqlFragment => {
   // The migrations table only exists once a migration has been applied (e.g. via
   // the CLI or the dashboard). Guard with to_regclass + query_to_xml so this query
-  // returns zero rows instead of erroring with 42P01 (undefined_table) — that error
-  // surfaced as a 400 on every dashboard load for projects without migrations.
-  // Same guard pattern as the storage.buckets check in ../advisor/lints.ts.
+  // returns zero rows instead of erroring with 42P01 (undefined_table).
   // Rows are serialized with to_jsonb so the query also tolerates older tables
   // that only have a `version` column (no `name`/`statements`).
   const sql = safeSql`

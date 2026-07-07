@@ -152,7 +152,6 @@ export const DatabaseInfrastructureSection = ({
           className="block group"
         >
           <MetricCard isLoading={slowQueriesLoading}>
-            {/* No href on the header as the whole card is wrapped in a link — a nested anchor is invalid HTML */}
             <MetricCardHeader linkTooltip="Go to query performance">
               <MetricCardLabel tooltip="Queries with total execution time (execution time + planning time) greater than 1000ms. High values may indicate query optimization opportunities">
                 Slow Queries
