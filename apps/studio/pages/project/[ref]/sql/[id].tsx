@@ -3,6 +3,7 @@ import { useParams } from 'common/hooks/useParams'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+import { toast } from 'sonner'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
@@ -109,7 +110,29 @@ const SqlEditor: NextPageWithLayout = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.isReady, id])
 
-  if ((snippetMissing || invalidId) && !snippetMissingImmediatelyAfterCreating) {
+  // The snippet no longer exists (e.g. deleted from another tab or session): clean up
+  // any stale tab and dashboard history references so navigation doesn't resurrect it,
+  // then fall back to a new snippet instead of rendering a dead state
+  useEffect(() => {
+    if (!ref || !id || id === 'new') return
+    if (!snippetMissing || snippetMissingImmediatelyAfterCreating) return
+
+    const staleTabId = createTabId('sql', { id })
+    if (tabs.hasTab(staleTabId)) tabs.removeTab(staleTabId)
+    if (snippet !== undefined) snapV2.removeSnippet(id)
+    setLastVisitedSnippet(undefined)
+
+    toast(`The SQL snippet you were trying to open no longer exists. Opened a new query instead.`)
+    router.replace(`/project/${ref}/sql/new`)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [snippetMissing, snippetMissingImmediatelyAfterCreating, id, ref])
+
+  // Render nothing while the effect above redirects away from the deleted snippet
+  if (snippetMissing && !snippetMissingImmediatelyAfterCreating) {
+    return null
+  }
+
+  if (invalidId) {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="w-[400px]">
