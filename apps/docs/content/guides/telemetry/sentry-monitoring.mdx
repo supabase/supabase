@@ -43,7 +43,7 @@ Sentry.init({
 
 <TabPanel id="instrument" label="Via instrumentSupabaseClient">
 
-Call `Sentry.instrumentSupabaseClient` where you create the client. This is the better fit for frameworks (like Next.js) where `Sentry.init` runs in a separate config file. A single call patches the client prototype, so it covers every environment (browser, server, and edge).
+Call `Sentry.instrumentSupabaseClient` where you create the client. This is the better fit for frameworks (like Next.js) where `Sentry.init` runs in a separate config file. Instrument each client you create: it patches database calls per runtime (browser, server, edge) and auth calls per client instance, so setups that create a client per request (like `@supabase/ssr`) must instrument each one. See the Next.js example below.
 
 ```ts
 import * as Sentry from '@sentry/browser'
@@ -60,7 +60,7 @@ Sentry.instrumentSupabaseClient(supabaseClient)
 
 <Admonition type='note'>
 
-By default, query filters and mutation bodies are redacted from spans and breadcrumbs. To capture them, set `sendOperationData: true` on the integration (`Sentry.supabaseIntegration({ supabaseClient, sendOperationData: true })`), or enable `dataCollection: { userInfo: true }` in your `Sentry.init` options.
+By default, query filters and mutation bodies are redacted from spans and breadcrumbs. To capture them, pass `sendOperationData: true` where you set up instrumentation (`Sentry.supabaseIntegration({ supabaseClient, sendOperationData: true })` or `Sentry.instrumentSupabaseClient(client, { sendOperationData: true })`), or enable `dataCollection: { userInfo: true }` in your `Sentry.init` options, which applies to every client in that runtime.
 
 </Admonition>
 
@@ -107,24 +107,24 @@ Sentry.init({
 
 ## Example Next.js configuration
 
-Because Next.js runs Sentry across browser, server, and edge runtimes from separate config files, the simplest approach is to instrument the Supabase client once where you create it. That single call covers all three runtimes.
+Next.js runs Sentry across browser, server, and edge runtimes, and auth-aware setups (like `@supabase/ssr`) create a Supabase client per request. Since `instrumentSupabaseClient` patches database calls per runtime and auth calls per client instance, call it inside each of your client factories rather than on a single shared instance.
 
 First, run through the [Sentry Next.js wizard](https://docs.sentry.io/platforms/javascript/guides/nextjs/#install) to set up the base Sentry configuration.
 
-Then create a shared Supabase client module and instrument it:
+Then add `Sentry.instrumentSupabaseClient` to each factory. For example, the server client with `@supabase/ssr`:
 
-```ts utils/supabase.ts
+```ts utils/supabase/server.ts
 import * as Sentry from '@sentry/nextjs'
-import { createClient } from '@supabase/supabase-js'
+import { createServerClient } from '@supabase/ssr'
 
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-)
+export async function createClient() {
+  const client = createServerClient(/* your usual URL, key, and cookie config */)
 
-Sentry.instrumentSupabaseClient(supabase)
+  Sentry.instrumentSupabaseClient(client)
+  return client
+}
 ```
 
-Import `supabase` from this module everywhere you query Supabase. To include query filters and mutation bodies in your telemetry, enable `dataCollection: { userInfo: true }` in your `sentry.server.config.ts` and `sentry.edge.config.ts`.
+Do the same in your browser client (`createBrowserClient`) and middleware client so every runtime is covered. To include query filters and mutation bodies, enable `dataCollection: { userInfo: true }` in each runtime's Sentry config, or pass `Sentry.instrumentSupabaseClient(client, { sendOperationData: true })` at the call site.
 
 Afterwards, build and run your application (`npm run build && npm run start`). Supabase queries now appear as `db` spans in your Sentry traces.
