@@ -47,7 +47,7 @@
 /* Cell with unsaved changes - warning (amber) background/text color */
 .rdg-cell.rdg-cell--dirty {
   background-color: hsl(var(--warning-300) / 0.75);
-  color: hsl(var(--warning-default));
+  color: hsl(var(--warning-600));
 }
 
 /* Row pending addition - green background, green text */
