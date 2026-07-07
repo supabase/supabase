@@ -58,8 +58,6 @@ describe('getMigrations', () => {
       response: () => HttpResponse.json({ message: 'permission denied' }, { status: 400 }),
     })
 
-    await expect(getMigrations({ projectRef: 'default' })).rejects.toThrowError(
-      'permission denied'
-    )
+    await expect(getMigrations({ projectRef: 'default' })).rejects.toThrowError('permission denied')
   })
 })

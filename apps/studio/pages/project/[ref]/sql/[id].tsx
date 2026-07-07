@@ -32,7 +32,7 @@ const SqlEditor: NextPageWithLayout = () => {
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
-  const { history, setLastVisitedSnippet } = useDashboardHistory()
+  const { history, setLastVisitedSnippet, clearSnippetsFromHistory } = useDashboardHistory()
 
   const allSnippets = useSnippets(ref!)
   const snippet = allSnippets.find((x) => x.id === id)
@@ -63,6 +63,8 @@ const SqlEditor: NextPageWithLayout = () => {
   // More details: https://github.com/supabase/supabase/pull/39389
   const snippetMissingImmediatelyAfterCreating =
     !!snippet && snippetMissing && previousRoute === 'new' && wasNeverPersisted(snippet.status)
+
+  const isSnippetDeleted = snippetMissing && !snippetMissingImmediatelyAfterCreating
 
   useEffect(() => {
     if (ref && data && project) {
@@ -115,20 +117,20 @@ const SqlEditor: NextPageWithLayout = () => {
   // then fall back to a new snippet instead of rendering a dead state
   useEffect(() => {
     if (!ref || !id || id === 'new') return
-    if (!snippetMissing || snippetMissingImmediatelyAfterCreating) return
+    if (!isSnippetDeleted) return
 
     const staleTabId = createTabId('sql', { id })
     if (tabs.hasTab(staleTabId)) tabs.removeTab(staleTabId)
     if (snippet !== undefined) snapV2.removeSnippet(id)
-    setLastVisitedSnippet(undefined)
+    clearSnippetsFromHistory([id])
 
     toast(`The SQL snippet you were trying to open no longer exists. Opened a new query instead.`)
     router.replace(`/project/${ref}/sql/new`)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [snippetMissing, snippetMissingImmediatelyAfterCreating, id, ref])
+  }, [isSnippetDeleted, id, ref])
 
   // Render nothing while the effect above redirects away from the deleted snippet
-  if (snippetMissing && !snippetMissingImmediatelyAfterCreating) {
+  if (isSnippetDeleted) {
     return null
   }
 
