@@ -40,8 +40,9 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 - ⚠️ Updated Kong and Envoy configuration to match the new `/auth/v1/sso` routing for SAML SSO (requires `docker-compose.yml`, `volumes/api/kong.yml` and `volumes/api/envoy` update) - PR [#47640](https://github.com/supabase/supabase/pull/47640)
 
 ### Studio
-- Updated to `2026.07.06-sha-66cf431`
+- Updated to `2026.07.07-sha-a6a04f2`
 - Fixed the local SQL snippets not being shown in the SQL Editor - PR [#47403](https://github.com/supabase/supabase/pull/47403), PR [#47409](https://github.com/supabase/supabase/pull/47409)
+- Fixed the exposed schemas and tables UI to properly reflect non-platform configuration (Data API > Settings) - PR [#47511](https://github.com/supabase/supabase/pull/47511)
 - Fixed the behavior of the type generator (Data API > Docs) - PR [#47577](https://github.com/supabase/supabase/pull/47577)
 
 ### Auth
