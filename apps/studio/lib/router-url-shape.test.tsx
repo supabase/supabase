@@ -3,6 +3,7 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
+  type AnyRouter,
 } from '@tanstack/react-router'
 import { describe, expect, it } from 'vitest'
 
@@ -13,7 +14,17 @@ import {
 } from '../compat/next/router'
 import { splitInternalUrl } from './internal-url'
 import { buildSearchUpdateArgs } from './nuqs-tanstack-adapter'
-import { parseSearch, stringifySearch } from './router-search-params'
+import { parseSearch, stringifySearch, type SearchRecord } from './router-search-params'
+
+// The `<AnyRouter, string>` type arguments mirror the compat shims: the
+// producers under test emit free-form runtime strings that can't satisfy
+// the route-path union at compile time.
+interface LooseNavigateArgs {
+  to: string
+  search?: SearchRecord
+  hash?: string | ((prevHash: string | undefined) => string)
+  replace?: boolean
+}
 
 // Integration guard for the family of URL-shape regressions from the
 // TanStack migration: drives a real router (with the app's custom search
@@ -44,8 +55,7 @@ describe('URL shape end-to-end against a real router', () => {
       '/project/abc/advisors/security?preset=security&filter=a:eq:1&filter=b:eq:2'
     )
     await router.load()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const build = (opts: any) => router.buildLocation(opts).href
+    const build = (opts: LooseNavigateArgs) => router.buildLocation<AnyRouter, string>(opts).href
 
     // Custom codec: strings and repeated-key arrays, no JSON coercion.
     expect(router.state.location.search).toEqual({
@@ -113,12 +123,10 @@ describe('URL shape end-to-end against a real router', () => {
     params.set('s', sql)
     params.set('its', 'PREVIOUS')
     const args = buildSearchUpdateArgs(router.state.location.pathname, params)
-    await router.navigate({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      to: args.to as any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      search: args.search as any,
-      hash: (h: string | undefined) => h ?? '',
+    await router.navigate<AnyRouter, string>({
+      to: args.to,
+      search: args.search,
+      hash: (h) => h ?? '',
       replace: true,
     })
 
@@ -148,11 +156,9 @@ describe('URL shape end-to-end against a real router', () => {
       router.state.location.pathname
     )
     const { to, search, hash } = splitInternalUrl(target)
-    await router.navigate({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      to: to as any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      search: (search ?? {}) as any,
+    await router.navigate<AnyRouter, string>({
+      to,
+      search: search ?? {},
       hash: hash ?? '',
     })
 
@@ -168,11 +174,9 @@ describe('URL shape end-to-end against a real router', () => {
     // Next's push('/path') drops the current query entirely — `search: {}`
     // (not undefined) is what encodes that under TanStack.
     const { to, search, hash } = splitInternalUrl('/project/abc/auth/providers')
-    await router.navigate({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      to: to as any,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      search: (search ?? {}) as any,
+    await router.navigate<AnyRouter, string>({
+      to,
+      search: search ?? {},
       hash: hash ?? '',
     })
 

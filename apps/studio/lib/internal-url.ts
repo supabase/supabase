@@ -36,18 +36,20 @@
 // the router shim's pre-stripped targets — pass through unchanged, since
 // no studio route pathname itself starts with the basePath segment.)
 
-import { searchParamsToRecord } from './router-search-params'
+import { searchParamsToRecord, type SearchRecord } from './router-search-params'
 
 // Inlined at build time via Vite's `define`. Must agree with Vite `base`
 // and `tanstackStart({ router: { basepath } })`. Empty string when no
 // basePath is configured.
 const NEXT_PUBLIC_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
-export function splitInternalUrl(url: string): {
+export interface SplitInternalUrlResult {
   to: string
-  search?: Record<string, string | string[]>
+  search?: SearchRecord
   hash?: string
-} {
+}
+
+export function splitInternalUrl(url: string): SplitInternalUrlResult {
   // Try to detect cross-origin absolute URLs cheaply before paying for a
   // full parse. Protocol-relative URLs (`//host/...`) are always external.
   if (url.startsWith('//')) {
