@@ -58,7 +58,8 @@ export function initSentryTanStackClient(router: AnyRouter) {
       // by withSentryConfig, which resolves to the Vercel commit SHA; inline
       // the same SHA here (vite.config.ts re-exposes VERCEL_GIT_COMMIT_SHA
       // under the NEXT_PUBLIC_ name) so both builds report the same release.
-      // Unset outside Vercel (local/self-hosted), where sessions don't matter.
+      // Unset outside Vercel (local/self-hosted), where sessions don't matter —
+      // so session envelopes only fire on deploys, not on a local dev build.
       release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA,
     })
   )
