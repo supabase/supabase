@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-exports */
 
+import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
@@ -52,16 +53,54 @@ function nextCompat(): Plugin {
   }
 }
 
-// Mirror the `*.md` raw-loader rule from next.config.ts: serve markdown
-// files as JS modules whose default export is the file's text (used by
-// `static-data/integrations/*/overview.md` via
-// `static-data/integrations/overviews.ts`). Vite has `?raw` for this, but
-// the query suffix would have to live in shared app source where it breaks
-// the webpack/turbopack raw-loader rule, so the import specifiers stay
-// query-free and this plugin does the conversion for the Vite pipeline.
-function mdRawLoader(): Plugin {
+// Import specifiers (as they appear in app source) for files that import as
+// raw text but whose extension the bundler would otherwise treat as code —
+// the Deno typings that `components/ui/AIEditor` feeds to Monaco as extra
+// libs. Deliberately an exact-specifier allowlist — do NOT widen to
+// `*.d.ts`: hijacking declaration-file resolution globally would corrupt
+// every package that ships `.d.ts` next to its JS.
+const RAW_TEXT_SPECIFIERS: Record<string, string> = {
+  '@/public/deno/edge-runtime.d.ts': path.join(rootDir, 'public/deno/edge-runtime.d.ts'),
+  '@/public/deno/lib.deno.d.ts': path.join(rootDir, 'public/deno/lib.deno.d.ts'),
+}
+
+// `\0`-prefixed so the Rolldown dep scanner externalizes the module instead
+// of descending into it (see `shouldExternalizeDep` in vite); `.js`-suffixed
+// so no TS transform ever sees a `.d.ts`-looking id.
+const RAW_TEXT_PREFIX = '\0studio-raw-text:'
+const RAW_TEXT_SUFFIX = '.js'
+
+// Mirror the raw-loader rules from next.config.ts: serve `*.md` files (used
+// by `static-data/integrations/*/overview.md` via
+// `static-data/integrations/overviews.ts`) and the Deno typings in
+// `public/deno/*.d.ts` as JS modules whose default export is the file's
+// text. Vite has `?raw` for this, but the query suffix would have to live
+// in shared app source where it breaks the webpack/turbopack raw-loader
+// rule, so the import specifiers stay query-free and this plugin does the
+// conversion for the Vite pipeline.
+//
+// The `.d.ts` files can't go through a plain `transform` like the `.md`
+// files do: the dep scanner's native scan pipeline skips JS transform/load
+// hooks entirely and parses whatever the id resolves to, and raw TS
+// *declaration* syntax (`get stdin(): WritableStream;`) is a parse error in
+// its runtime-TS grammar — the whole dependency scan fails and Vite skips
+// pre-bundling outright. Resolving the specifier to a `\0`-virtual id keeps
+// the scanner out (it externalizes `\0` ids) and the `load` hook then
+// serves the file's text for the real pipelines (dev, build, SSR).
+function rawTextLoader(): Plugin {
   return {
-    name: 'studio-md-raw-loader',
+    name: 'studio-raw-text-loader',
+    enforce: 'pre',
+    resolveId(id) {
+      const file = RAW_TEXT_SPECIFIERS[id]
+      if (file) return RAW_TEXT_PREFIX + file + RAW_TEXT_SUFFIX
+    },
+    load(id) {
+      if (!id.startsWith(RAW_TEXT_PREFIX)) return
+      const file = id.slice(RAW_TEXT_PREFIX.length, -RAW_TEXT_SUFFIX.length)
+      const content = fs.readFileSync(file, 'utf-8')
+      return { code: `export default ${JSON.stringify(content)}`, map: null }
+    },
     transform(code, id) {
       if (!id.endsWith('.md')) return
       return { code: `export default ${JSON.stringify(code)}`, map: null }
@@ -484,7 +523,7 @@ export default defineConfig(({ command, mode }) => {
     },
     plugins: [
       nextCompat(),
-      mdRawLoader(),
+      rawTextLoader(),
       ssrStubGraphiql(),
       umdAmdShortCircuit(),
       assertNoChunkCycles(),
