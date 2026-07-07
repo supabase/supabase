@@ -18,9 +18,6 @@ See per-service updates below for details. Only the most important changes relev
 
 Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted) for updates.
 
-### API gateway
-⚠️ Restricted access to the PostgREST OpenAPI schema root (`/rest/v1/`) to admin keys (`service_role` / `sb_secret_*`). Non-admin callers now receive `403 Forbidden`. The Data API itself (`/rest/v1/<table>`, `/rest/v1/rpc/...`) is unchanged. See [discussion #42949](https://github.com/orgs/supabase/discussions/42949).
-
 ---
 
 ## [0.6.0](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.6.0) - 2026-06-17
