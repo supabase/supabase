@@ -80,10 +80,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
 
-      - name: Reset supabase
-        if: steps.filter.outputs.studio == 'true'
-        run: rm -rf supabase && pnpm exec supabase init && mkdir supabase/functions
-
       # Authenticate with AWS ECR to avoid rate limiting
       - name: configure aws credentials
         if: steps.filter.outputs.studio == 'true' && !github.event.pull_request.head.repo.fork

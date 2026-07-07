@@ -63,8 +63,7 @@ const PauseProjectButton = () => {
   }
 
   const buttonDisabled =
-    isBranch ||
-    !projectPausingAllowedInOrg ||
+    (!isBranch && !projectPausingAllowedInOrg) ||
     project === undefined ||
     isPaused ||
     !canPauseProject ||
@@ -76,8 +75,7 @@ const PauseProjectButton = () => {
     if (isProjectUnhealthy)
       return 'Your project is unhealthy — restart it instead to restore normal operation'
     if (!isProjectActive) return 'Unable to pause project as project is not active'
-    if (isBranch) return 'Branch projects cannot be paused'
-    if (!projectPausingAllowedInOrg && !isFreePlan)
+    if (!isBranch && !projectPausingAllowedInOrg && !isFreePlan)
       return 'Projects on a paid plan will always be running'
     return undefined
   }

@@ -26,14 +26,7 @@ import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import { isFeatureEnabled } from 'common'
 import { Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
-import {
-  Badge,
-  cn,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-} from 'ui'
+import { Badge, cn, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 
 import { type IApiEndPoint } from './Reference.api.utils'
 import { RefInternalLink } from './Reference.navigation.client'
@@ -234,10 +227,10 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
         {'examples' in command &&
           Array.isArray(command.examples) &&
           command.examples.length > 0 && (
-            <Tabs_Shadcn_ defaultValue={command.examples[0].id}>
-              <TabsList_Shadcn_ className="flex-wrap gap-2 border-0">
+            <Tabs defaultValue={command.examples[0].id}>
+              <TabsList className="flex-wrap gap-2 border-0">
                 {command.examples.map((example) => (
-                  <TabsTrigger_Shadcn_
+                  <TabsTrigger
                     key={example.id}
                     value={example.id}
                     className={cn(
@@ -251,19 +244,19 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
                     )}
                   >
                     {example.name}
-                  </TabsTrigger_Shadcn_>
+                  </TabsTrigger>
                 ))}
-              </TabsList_Shadcn_>
+              </TabsList>
               {command.examples.map((example) => (
-                <TabsContent_Shadcn_ key={example.id} value={example.id}>
+                <TabsContent key={example.id} value={example.id}>
                   <CodeBlock lang="bash" className="mb-6">
                     {example.code}
                   </CodeBlock>
                   <h3 className="text-foreground-lighter text-sm mb-2">Response</h3>
                   <CodeBlock lang="txt">{example.response}</CodeBlock>
-                </TabsContent_Shadcn_>
+                </TabsContent>
               ))}
-            </Tabs_Shadcn_>
+            </Tabs>
           )}
       </div>
     </RefSubLayout.Section>
@@ -536,10 +529,10 @@ async function FunctionSection({
           if (examples.length === 0) return null
 
           return (
-            <Tabs_Shadcn_ defaultValue={examples[0].id}>
-              <TabsList_Shadcn_ className="flex-wrap gap-2 border-0">
+            <Tabs defaultValue={examples[0].id}>
+              <TabsList className="flex-wrap gap-2 border-0">
                 {examples.map((example) => (
-                  <TabsTrigger_Shadcn_
+                  <TabsTrigger
                     key={example.id}
                     value={example.id}
                     className={cn(
@@ -553,11 +546,11 @@ async function FunctionSection({
                     )}
                   >
                     {example.name}
-                  </TabsTrigger_Shadcn_>
+                  </TabsTrigger>
                 ))}
-              </TabsList_Shadcn_>
+              </TabsList>
               {examples.map((example) => (
-                <TabsContent_Shadcn_ key={example.id} value={example.id}>
+                <TabsContent key={example.id} value={example.id}>
                   <MDXRemoteRefs source={example.code} />
                   <div className="flex flex-col gap-2 mt-2">
                     {'data' in example && !!example.data?.sql && (
@@ -573,9 +566,9 @@ async function FunctionSection({
                       />
                     )}
                   </div>
-                </TabsContent_Shadcn_>
+                </TabsContent>
               ))}
-            </Tabs_Shadcn_>
+            </Tabs>
           )
         })()}
       </div>

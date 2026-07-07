@@ -92,9 +92,12 @@ import {
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
-import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { useSqlEditorDiffRequestSnapshot } from '@/state/sql-editor/sql-editor-diff-request'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
+import {
+  getSqlEditorV2StateSnapshot,
+  useSqlEditorV2StateSnapshot,
+} from '@/state/sql-editor/sql-editor-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 // Load the monaco editor client-side only (does not behave well server-side)
@@ -126,7 +129,6 @@ export const SQLEditor = () => {
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const { aiOptInLevel } = useOrgAiOptInLevel()
-  const showPrettyExplain = useFlag('ShowPrettyExplain')
 
   // [Ali] Kill switch to hide the SQL Editor Explain tab and its entry points
   const disablePrettyExplain = useFlag('DisablePrettyExplainOnSqlEditor')
@@ -236,7 +238,7 @@ export const SQLEditor = () => {
       if (id) {
         sessionSnap.addResult(id, data.result, vars.autoLimit)
 
-        if (!disablePrettyExplain && showPrettyExplain && isExplainQuery(data.result)) {
+        if (!disablePrettyExplain && isExplainQuery(data.result)) {
           sessionSnap.addExplainResult(id, data.result)
           setActiveUtilityTab('explain')
         } else if (activeUtilityTab === 'explain') {

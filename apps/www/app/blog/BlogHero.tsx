@@ -29,10 +29,10 @@ function SecondarySpotlight({ post }: { post: PostTypes }) {
     <Link
       href={post.path}
       prefetch={false}
-      className="group flex gap-4 items-start hover:bg-surface-200 dark:hover:bg-surface-75 p-2 sm:p-4 rounded-xl"
+      className="group flex gap-4 items-center hover:bg-surface-200 dark:hover:bg-surface-75 p-2 sm:p-4 rounded-xl"
     >
       <div
-        className="relative shrink-0 w-36 aspect-[1.91/1] overflow-hidden rounded-md border border-foreground/10"
+        className="relative hidden md:block shrink-0 w-36 aspect-[1.91/1] overflow-hidden rounded-md border border-foreground/10"
         aria-hidden="true"
       >
         <Image

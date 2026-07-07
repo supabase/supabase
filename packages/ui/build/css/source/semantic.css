@@ -1,0 +1,223 @@
+/*
+ * Core semantic color system.
+ *
+ * Themes override the small set of inputs below; every semantic color is then
+ * derived from them in OKLCH. The stepped numeric scales (brand / warning /
+ * destructive / secondary) are NOT derived here — they live as per-theme values
+ * in the theme files and are mapped to utilities in packages/config/css/theme.css.
+ */
+
+:root {
+  /*
+   * Hue inputs. A single --hue used to drive both the neutral surface/text ramp
+   * and the brand, so the two could never drift apart. They are now split so a
+   * theme can run, say, a cool-gray surface against the green brand:
+   *   --surface-hue  tints backgrounds, text and borders (the neutral ramp)
+   *   --primary-hue  is the brand hue that --primary is built from
+   * Both default to --hue (Supabase green ≈159° in OKLCH), so a theme that only
+   * sets --hue keeps surfaces and brand locked together as before; override
+   * either one to let them diverge. */
+  --hue: 159;
+  --surface-hue: var(--hue);
+  --primary-hue: var(--hue);
+  /* Root defaults mirror the dark theme (the app's default appearance). */
+  --chroma: 0.016;
+  --surface: 0.17;
+
+  --foreground-lightness: 0.95;
+  /* How far muted/tertiary text sits from --surface toward --foreground-lightness
+     (0 = surface, 1 = full foreground) at --contrast 0.5; themes override. */
+  --muted-foreground-level: 0.8;
+  --tertiary-foreground-level: 0.65;
+
+  /*
+   * Global contrast knob, 0 to 1. Default 0.5 is the comfortable baseline; 0 keeps
+   * borders and accent barely visible over muted surfaces; 1 pushes them to full
+   * strength. Foreground hits --foreground-lightness at 0.5; below that it eases
+   * toward the surface down to --contrast-text-floor at 0. Muted and tertiary
+   * foreground lightness sits at the theme base level (a surface→foreground mix) at
+   * 0.5 and eases up toward foreground or down toward half that base as contrast moves.
+   *
+   * --contrast-delta is -1 at 0, 0 at 0.5, +1 at 1 — shared offset from baseline;
+   * --contrast-up / --contrast-down are its positive / negative halves.
+   * --contrast-border ramps [floor, 1] over --contrast and squares it so most of
+   * the range lives toward full strength. ((delta + 1) / 2 simplifies to contrast.)
+   */
+  --contrast: 0.5;
+  --contrast-delta: calc((var(--contrast) - 0.5) / 0.5);
+  /* positive and negative halves of the delta, reused below */
+  --contrast-up: max(0, var(--contrast-delta));
+  --contrast-down: max(0, calc(var(--contrast-delta) * -1));
+  --contrast-text-floor: 0.9;
+  --contrast-border-floor: 0.05;
+  --contrast-text: calc(1 - (1 - var(--contrast-text-floor)) * var(--contrast-down));
+  --contrast-border-linear: calc(
+    var(--contrast-border-floor) + (1 - var(--contrast-border-floor)) * var(--contrast)
+  );
+  --contrast-border: calc(var(--contrast-border-linear) * var(--contrast-border-linear));
+
+  /*
+   * Surface elevation. Each surface steps its lightness away from --background
+   * by `--elevation-step * ratio`, where the ratios are shared across themes and
+   * the step is signed: positive brightens as surfaces rise, negative darkens.
+   *
+   * The default step reproduces the historical behavior (≈3% per level mixed
+   * toward the foreground): dark themes brighten and the light baseline darkens.
+   * The light theme overrides --elevation-step (and lowers --surface for
+   * headroom) so its higher surfaces brighten toward white instead — giving a
+   * single "higher = lighter" model in both modes. 0 = flat (no elevation).
+   */
+  --elevation-1: 1;
+  --elevation-2: 1.5;
+  --elevation-3: 2;
+  --elevation-4: 3;
+  /* Signed span surface→foreground (+ in dark, − in light). */
+  --tone-span: calc(var(--foreground-lightness) - var(--surface));
+  --elevation-step: calc(var(--tone-span) * 0.04);
+  /*
+   * Foreground overlays for muted / accent / tertiary. Alpha is tuned so each level
+   * matches the lightness delta of the same elevation ratio on --background; a
+   * translucent --foreground layer then composites with whatever surface sits
+   * beneath (lightens in dark, darkens in light). Steps: muted (e1) → accent
+   * (e2) → tertiary (e3).
+   */
+  --surface-overlay-unit: calc(var(--elevation-step) / abs(var(--tone-span)));
+  --muted-alpha: calc(var(--surface-overlay-unit) * var(--elevation-1));
+  --accent-alpha: calc(var(--surface-overlay-unit) * var(--elevation-2));
+  --tertiary-alpha: calc(var(--surface-overlay-unit) * var(--elevation-3));
+
+  /*
+   * Status hues stay anchored to amber / red but pull a fraction of the way
+   * toward the brand --primary-hue for harmony, then clamp to their perceptual
+   * category so "warning" always reads amber and "destructive" always reads red
+   * no matter what --primary-hue is. --status-hue-pull: 0 = fixed amber/red,
+   * 1 = fully brand-relative. At the default --primary-hue the pull term is 0, so
+   * these resolve to their bases (warning 75 / destructive 25 / info 288).
+   * --brand-hue-reference is the --primary-hue at which pull is zero; keep it
+   * equal to the default brand hue.
+   * Warning sits at 75 (amber), not higher toward yellow — yellow can't darken
+   * without going olive, so it loses contrast on light surfaces. Info is a violet
+   * (matching the "no additional charge" badge); like the others it pulls a touch
+   * with the brand --primary-hue but clamps so it always reads violet.
+   */
+  --brand-hue-reference: 159;
+  --status-hue-pull: 0.15;
+  --warning-hue: clamp(
+    65,
+    calc(75 + (var(--primary-hue) - var(--brand-hue-reference)) * var(--status-hue-pull)),
+    95
+  );
+  --destructive-hue: clamp(
+    12,
+    calc(25 + (var(--primary-hue) - var(--brand-hue-reference)) * var(--status-hue-pull)),
+    42
+  );
+  --info-hue: clamp(
+    272,
+    calc(288 + (var(--primary-hue) - var(--brand-hue-reference)) * var(--status-hue-pull)),
+    302
+  );
+  /*
+   * Expressive (status) colors are deliberately NOT derived from the neutral
+   * surface→foreground span the way text and surfaces are. An expressive color
+   * has its own identity; tying its lightness to the theme's text ramp is what
+   * left warning under-saturated in light mode and too dark in dark mode.
+   *
+   * Instead each is anchored to a fixed target lightness near its hue's chroma
+   * peak and a single shared --expressive-chroma. That chroma is a flat constant,
+   * deliberately NOT derived from the neutral --chroma knob: status colors must
+   * stay legible even when the brand is dialed toward grayscale. It sits inside
+   * sRGB at these lightnesses, so no gamut mapping is required.
+   *
+   * The dark-mode lightness anchors live here; light mode runs darker (set in
+   * light.css) so the fills hold contrast against the near-white surface.
+   */
+  --expressive-chroma: 0.14;
+  --warning-lightness: 0.8;
+  --destructive-lightness: 0.75;
+  --info-lightness: 0.7;
+
+  /* shadcn semantic pairs */
+  --background: oklch(var(--surface) calc(var(--chroma) * 0.5) var(--surface-hue));
+  --foreground: oklch(
+    calc(var(--surface) + var(--tone-span) * var(--contrast-text)) calc(var(--chroma) * 0.55)
+      var(--surface-hue)
+  );
+
+  --card: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-1)) c h);
+  --card-foreground: var(--foreground);
+  --popover: oklch(from var(--background) calc(l + var(--elevation-step) * var(--elevation-2)) c h);
+  --popover-foreground: var(--foreground);
+
+  /* Primary is the brand-derived accent: a fixed, vivid Supabase green on
+     --primary-hue, mode-invariant and decoupled from the --chroma knob so it
+     holds its identity even as neutrals desaturate. NOTE: the `brand` utility
+     (--color-brand in theme.css) is deliberately NOT this — it maps to the
+     per-theme --brand-default scale (master behavior) while we resolve how
+     `brand` is used across the interface. */
+  --primary: oklch(0.76 0.15 var(--primary-hue));
+  --primary-foreground: oklch(
+    min(var(--surface), var(--foreground-lightness)) calc(var(--chroma) * 0.45) var(--primary-hue)
+  );
+
+  --secondary: oklch(
+    from var(--background) calc(l + var(--elevation-step) * var(--elevation-3)) c h
+  );
+  --secondary-foreground: var(--foreground);
+  --tertiary: oklch(from var(--foreground) l c h / var(--tertiary-alpha));
+  --tertiary-foreground-mix: calc(
+    var(--tertiary-foreground-level) + (1 - var(--tertiary-foreground-level)) * var(--contrast-up) -
+      var(--tertiary-foreground-level) * 0.5 * var(--contrast-down)
+  );
+  --tertiary-foreground: oklch(
+    from var(--foreground) calc(var(--surface) + var(--tone-span) * var(--tertiary-foreground-mix))
+      c h
+  );
+  --muted: oklch(from var(--foreground) l c h / var(--muted-alpha));
+  --muted-foreground-mix: calc(
+    var(--muted-foreground-level) + (1 - var(--muted-foreground-level)) * var(--contrast-up) -
+      var(--muted-foreground-level) * 0.5 * var(--contrast-down)
+  );
+  --muted-foreground: oklch(
+    from var(--foreground) calc(var(--surface) + var(--tone-span) * var(--muted-foreground-mix)) c h
+  );
+  --accent: oklch(from var(--foreground) l c h / var(--accent-alpha));
+  --accent-foreground: var(--foreground);
+
+  --warning: oklch(var(--warning-lightness) var(--expressive-chroma) var(--warning-hue));
+  --destructive: oklch(
+    var(--destructive-lightness) var(--expressive-chroma) var(--destructive-hue)
+  );
+  /*
+   * Text that sits on the solid fill: dark ink on light fills (amber), white on
+   * dark fills (red). The clamp turns the fill's own lightness into a hard flip
+   * around L≈0.62 — (0.62 − l) is negative for light fills (→ floor 0.12) and
+   * positive for dark fills (→ ceil 0.99) — so on-colors stay legible and keep
+   * flipping correctly if the anchors are retuned. A trace of hue chroma keeps
+   * the ink from reading as flat gray.
+   */
+  --warning-foreground: oklch(
+    from var(--warning) clamp(0.12, calc((0.62 - l) * 100), 0.99) calc(c * 0.08) h
+  );
+  --destructive-foreground: oklch(
+    from var(--destructive) clamp(0.12, calc((0.62 - l) * 100), 0.99) calc(c * 0.08) h
+  );
+  --info: oklch(var(--info-lightness) var(--expressive-chroma) var(--info-hue));
+  --info-foreground: oklch(
+    from var(--info) clamp(0.12, calc((0.62 - l) * 100), 0.99) calc(c * 0.08) h
+  );
+
+  /* Status border tokens for subtle / tinted surfaces */
+  --border-destructive: oklch(from var(--destructive) l c h / 30%);
+  --border-warning: oklch(from var(--warning) l c h / 30%);
+  --border-info: oklch(from var(--info) l c h / 30%);
+  --border-brand: oklch(from var(--primary) l c h / 30%);
+
+  --border: oklch(
+    from var(--foreground) l calc(c * 0.54) h / calc(2% + 20% * var(--contrast-border))
+  );
+  --input: oklch(
+    from var(--foreground) l calc(c * 0.5) h / calc(3% + 38% * var(--contrast-border))
+  );
+  --ring: oklch(from var(--primary) l c h / 55%);
+}

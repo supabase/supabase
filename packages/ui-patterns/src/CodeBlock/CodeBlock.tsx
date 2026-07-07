@@ -31,27 +31,34 @@ import { Button, cn, copyToClipboard } from 'ui'
 
 import { monokaiCustomTheme } from './CodeBlock.utils'
 
-export type CodeBlockLang =
-  | 'js'
-  | 'jsx'
-  | 'sql'
-  | 'py'
-  | 'bash'
-  | 'ts'
-  | 'dart'
-  | 'json'
-  | 'csharp'
-  | 'kotlin'
-  | 'curl'
-  | 'http'
-  | 'php'
-  | 'python'
-  | 'go'
-  | 'pgsql'
-  | 'swift'
-  | 'yaml'
-  | 'toml'
-  | 'html'
+const codeBlockLangs = [
+  'js',
+  'jsx',
+  'sql',
+  'py',
+  'bash',
+  'ts',
+  'dart',
+  'json',
+  'csharp',
+  'kotlin',
+  'curl',
+  'http',
+  'php',
+  'python',
+  'go',
+  'pgsql',
+  'swift',
+  'yaml',
+  'toml',
+  'html',
+] as const
+
+export type CodeBlockLang = (typeof codeBlockLangs)[number]
+
+export function isCodeBlockLang(lang: string): lang is CodeBlockLang {
+  return (codeBlockLangs as readonly string[]).includes(lang)
+}
 
 export interface CodeBlockProps {
   title?: ReactNode
@@ -212,9 +219,9 @@ export const CodeBlock = ({
                     display: 'block',
                     backgroundColor: styleConfig?.highlightBackgroundColor
                       ? styleConfig?.highlightBackgroundColor
-                      : 'hsl(var(--background-selection))',
+                      : 'var(--background-selection)',
                     borderLeft: highlightBorder
-                      ? `1px solid ${styleConfig?.highlightBorderColor ? styleConfig?.highlightBorderColor : 'hsl(var(--foreground-default)'})`
+                      ? `1px solid ${styleConfig?.highlightBorderColor ? styleConfig?.highlightBorderColor : 'var(--foreground-default)'}`
                       : null,
                   },
                   class: 'hljs-line-highlight',

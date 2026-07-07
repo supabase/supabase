@@ -5,7 +5,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export const DeleteSnippetsModal = ({

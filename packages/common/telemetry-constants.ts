@@ -935,6 +935,19 @@ export interface Docs404RecommendationClickedEvent {
 }
 
 /**
+ * User clicked the copy button on a project config variable in the docs.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsProjectConfigVariablesCopyButtonClickedEvent {
+  action: 'docs_project_config_variables_copy_button_clicked'
+  properties: {
+    variable: 'url' | 'publishable' | 'anon' | 'sessionPooler'
+  }
+}
+
+/**
  * User clicked the framework quickstart card on the homepage, leading to the specific framework documentation.
  *
  * @group Events
@@ -3335,6 +3348,7 @@ export interface UnifiedLogsRowClickedEvent {
      * reaching the table; anything else is rejected upstream so the union here is exhaustive.
      */
     logType:
+      | 'edge'
       | 'postgres'
       | 'postgrest'
       | 'auth'
@@ -3584,6 +3598,7 @@ export type TelemetryEvent =
   | AskAiClickedEvent
   | DocsContentListingClickedEvent
   | Docs404RecommendationClickedEvent
+  | DocsProjectConfigVariablesCopyButtonClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent

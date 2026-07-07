@@ -56,24 +56,26 @@ export const PolicyTableRowHeader = ({
         >
           <Table strokeWidth={1.5} size={16} className="text-foreground-muted" />
           <CardTitle className="m-0 normal-case">{table.name}</CardTitle>
+        </EditorTablePageLink>
+        <div className="flex items-center gap-x-1">
           {!table.rls_enabled && (
-            <Badge variant="warning" className="shrink-0">
+            <Badge variant="warning" className="h-5">
               RLS Disabled
             </Badge>
           )}
           {!isLoadingApiAccess && !hasApiAccess && (
-            <Badge variant="default" className="shrink-0">
+            <Badge variant="default" className="h-5">
               API Disabled
             </Badge>
           )}
-        </EditorTablePageLink>
-        {isTableLocked && (
-          <Badge>
-            <span className="flex gap-2 items-center text-xs uppercase text-foreground-lighter">
-              <Lock size={12} /> Locked
-            </span>
-          </Badge>
-        )}
+          {isTableLocked && (
+            <Badge className="h-5">
+              <span className="flex gap-x-1 items-center text-foreground-lighter">
+                <Lock size={10} /> Locked
+              </span>
+            </Badge>
+          )}
+        </div>
       </div>
       {!isTableLocked && (
         <div className="flex-1">
