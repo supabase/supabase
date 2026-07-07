@@ -135,7 +135,16 @@ const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
 
 configureMonacoLoader()
 
-const FAVICON_ROUTE = '/favicon'
+// Non-prod (local + hosted staging) uses the white favicon, matching the Next
+// build (pages/_app.tsx passes `/favicon/staging` to MetaFaviconsPagesRouter for
+// non-prod). Uses the same synchronous NEXT_PUBLIC_ENVIRONMENT signal as
+// IS_DEV_TOOLBAR_ENABLED above, so it works at module scope (the `head()` route
+// option isn't a React component and can't run the async CLI check _app does).
+const FAVICON_ROUTE =
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+    ? '/favicon/staging'
+    : '/favicon'
 const THEME_COLOR = '1E1E1E'
 const APPLICATION_NAME = 'Supabase Studio'
 
