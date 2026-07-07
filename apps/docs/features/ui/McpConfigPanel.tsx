@@ -2,6 +2,7 @@
 
 import { useDebounce } from '~/hooks/useDebounce'
 import { useIntersectionObserver } from '~/hooks/useIntersectionObserver'
+import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { useProjectsInfiniteQuery } from '~/lib/fetch/projects-infinite'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
@@ -268,6 +269,7 @@ export function McpConfigPanel() {
   const [selectedClient, setSelectedClient] = useState<McpClient | null>(null)
   const { resolvedTheme } = useTheme()
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const { mcpServers } = getCustomContent(['mcp:servers'])
 
   const isPlatform = selectedPlatform === 'hosted'
   const project = isPlatform ? selectedProject : null
@@ -326,6 +328,8 @@ export function McpConfigPanel() {
           projectRef={project?.ref}
           theme={resolvedTheme as 'light' | 'dark'}
           isPlatform={isPlatform}
+          platformUrl={mcpServers?.remote}
+          nonPlatformUrl={mcpServers?.local}
           onCopyCallback={handleCopy}
           onInstallCallback={handleInstall}
           onClientSelect={setSelectedClient}

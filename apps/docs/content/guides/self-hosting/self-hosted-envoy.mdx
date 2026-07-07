@@ -134,8 +134,8 @@ Routes are matched in the order declared. The first matching prefix wins. Protec
 | `/auth/v1/authorize`                      | auth      | `/authorize`             | Open              | OAuth authorize                                                        |
 | `/auth/v1/.well-known/jwks.json`          | auth      | `/.well-known/jwks.json` | Open              | JWKS for third-party verification                                      |
 | `/.well-known/oauth-authorization-server` | auth      | -                        | Open              | OAuth 2.0 Authorization Server Metadata (RFC 8414)                     |
-| `/sso/saml/acs`                           | auth      | -                        | Open              | SAML assertion consumer                                                |
-| `/sso/saml/metadata`                      | auth      | -                        | Open              | SAML metadata                                                          |
+| `/auth/v1/sso/saml/acs`                   | auth      | `/sso/saml/acs`          | Open              | SAML assertion consumer                                                |
+| `/auth/v1/sso/saml/metadata`              | auth      | `/sso/saml/metadata`     | Open              | SAML metadata                                                          |
 | `/functions/v1/`                          | functions | `/`                      | Bypass            | Edge Functions runtime performs its own JWT verification; 150s timeout |
 | `/storage/v1/`                            | storage   | `/`                      | Bypass            | Storage performs its own authorization                                 |
 | `/auth/v1/`                               | auth      | `/`                      | API key           | Protected Auth endpoints                                               |
