@@ -6,7 +6,7 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 3. Create a Flutter app
+## 4. Create a Flutter app
 
 Create a Flutter app using the `flutter create` command.
 
@@ -14,7 +14,7 @@ Create a Flutter app using the `flutter create` command.
 flutter create my_app
 ```
 
-## 4. Install the Supabase client library
+## 5. Install the Supabase client library
 
 The fastest way to get started is to use the [`supabase_flutter`](https://pub.dev/packages/supabase_flutter) client library which provides a convenient interface for working with Supabase from a Flutter app.
 
@@ -26,9 +26,15 @@ supabase_flutter: ^2.0.0
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "flutter", "tab": "mobiles" }} />
 
-## 5. Initialize the Supabase client
+## 6. Initialize the Supabase client
 
 Open `lib/main.dart` and edit the main function to initialize Supabase using your project URL and publishable key, which you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=flutter&tab=mobiles):
+
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=mobiles&framework=flutter">
+    Open Connect panel
+  </a>
+</Button>
 
 ```dart name=lib/main.dart
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -44,7 +50,7 @@ Future<void> main() async {
 }
 ```
 
-## 6. Query data from the app
+## 7. Query data from the app
 
 Use a `FutureBuilder` to fetch the data when the home page loads and display the query result in a `ListView`.
 
@@ -101,7 +107,7 @@ class _HomePageState extends State<HomePage> {
 }
 ```
 
-## 7. Start the app
+## 8. Start the app
 
 Run your app on a platform of your choosing! By default an app should launch in your web browser.
 
@@ -112,7 +118,7 @@ Running the app on macOS requires additional configuration to [set the entitleme
 flutter run
 ```
 
-## Setup deep links
+## 9. Setup deep links (optional)
 
 Many sign in methods require deep links to redirect the user back to your app after authentication. Read more about setting deep links up for all platforms (including web) in the [Flutter Mobile Guide](/docs/guides/getting-started/tutorials/with-flutter#setup-deep-links).
 
