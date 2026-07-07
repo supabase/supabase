@@ -40,6 +40,8 @@ export const DeleteBranchPanel = () => {
 
   const { data: branches } = useBranchesQuery({ projectRef })
   const branch = branches?.find((b) => b.project_ref === branchRef)
+  const isBranchMetadataReady =
+    branchRef !== undefined && projectRef !== undefined && branch !== undefined
   const isPersistentBranch = Boolean(branch?.persistent)
 
   const { mutate: updateBranch, isPending: isUpdatingBranch } = useBranchUpdateMutation({
@@ -66,6 +68,8 @@ export const DeleteBranchPanel = () => {
   })
 
   const onClickDelete = () => {
+    if (!isBranchMetadataReady) return
+
     if (isPersistentBranch) {
       setShowSwitchToPreviewModal(true)
     } else {
@@ -74,12 +78,16 @@ export const DeleteBranchPanel = () => {
   }
 
   const onConfirmDelete = () => {
-    if (!branchRef || !projectRef) return console.error('Branch ref and project ref are required')
+    if (branchRef === undefined || projectRef === undefined || branch === undefined) {
+      return console.error('Branch metadata is required')
+    }
     deleteBranch({ branchRef, projectRef })
   }
 
   const onConfirmSwitchToPreview = () => {
-    if (!branchRef || !projectRef) return console.error('Branch ref and project ref are required')
+    if (branchRef === undefined || projectRef === undefined || branch === undefined) {
+      return console.error('Branch metadata is required')
+    }
     updateBranch({ branchRef, projectRef, persistent: false })
   }
 
@@ -91,7 +99,7 @@ export const DeleteBranchPanel = () => {
         <PageSectionSummary>
           <PageSectionTitle>Delete branch</PageSectionTitle>
           <PageSectionDescription>
-            Permanently remove this preview branch and its database
+            Permanently remove this branch and its database
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
@@ -107,14 +115,16 @@ export const DeleteBranchPanel = () => {
           <div className="mt-2">
             <ButtonTooltip
               variant="danger"
-              disabled={!canDeleteBranches}
+              disabled={!canDeleteBranches || !isBranchMetadataReady}
               onClick={onClickDelete}
               tooltip={{
                 content: {
                   side: 'bottom',
                   text: !canDeleteBranches
                     ? 'You need additional permissions to delete this branch'
-                    : undefined,
+                    : !isBranchMetadataReady
+                      ? 'Branch details are still loading'
+                      : undefined,
                 },
               }}
             >
@@ -139,7 +149,7 @@ export const DeleteBranchPanel = () => {
         }}
         text={
           <>
-            This will delete your database preview branch{' '}
+            This will delete your database branch{' '}
             <span className="text-bold text-foreground">{branch?.name}</span>.
           </>
         }

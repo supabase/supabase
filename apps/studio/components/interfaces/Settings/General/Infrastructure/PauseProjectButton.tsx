@@ -59,7 +59,7 @@ const PauseProjectButton = () => {
 
   const requestPauseProject = () => {
     if (!canPauseProject) {
-      return toast.error('You do not have the required permissions to pause this project')
+      return toast.error(`You do not have the required permissions to pause this ${entity}`)
     }
     pauseProject({ ref: projectRef })
   }
@@ -72,11 +72,11 @@ const PauseProjectButton = () => {
     !isProjectActive
 
   function getTooltipText() {
-    if (isPaused) return 'Your project is already paused'
-    if (!canPauseProject) return 'You need additional permissions to pause this project'
+    if (isPaused) return `Your ${entity} is already paused`
+    if (!canPauseProject) return `You need additional permissions to pause this ${entity}`
     if (isProjectUnhealthy)
-      return 'Your project is unhealthy — restart it instead to restore normal operation'
-    if (!isProjectActive) return 'Unable to pause project as project is not active'
+      return `Your ${entity} is unhealthy — restart it instead to restore normal operation`
+    if (!isProjectActive) return `Unable to pause ${entity} as ${entity} is not active`
     if (!isBranch && !projectPausingAllowedInOrg && !isFreePlan)
       return 'Projects on a paid plan will always be running'
     return undefined

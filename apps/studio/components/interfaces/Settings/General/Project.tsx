@@ -20,6 +20,7 @@ import { PROJECT_STATUS } from '@/lib/constants'
 export const Project = () => {
   const { data: project } = useSelectedProjectQuery()
   const isBranch = Boolean(project?.parent_project_ref)
+  const entity = isBranch ? 'branch' : 'project'
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
   const { projectSettingsRestartProject } = useIsFeatureEnabled([
     'project_settings:restart_project',
@@ -35,19 +36,19 @@ export const Project = () => {
 
   const primaryActionLabel = isPaused
     ? shouldShowDashboardLink
-      ? 'View project dashboard'
-      : 'Resume project'
+      ? `View ${entity} dashboard`
+      : `Resume ${entity}`
     : projectSettingsRestartProject
-      ? 'Restart project'
+      ? `Restart ${entity}`
       : 'Restart database'
 
   const primaryActionDescription = isPaused
     ? isPauseStatusSuccess && !pauseStatus.can_restore
-      ? 'This project can no longer be resumed here. Open the dashboard to download backups and view recovery options.'
+      ? `This ${entity} can no longer be resumed here. Open the dashboard to download backups and view recovery options.`
       : isPauseStatusError
-        ? 'Open the dashboard to manage this paused project.'
-        : 'Bring your paused project back online.'
-    : 'Your project will not be available for a few minutes.'
+        ? `Open the dashboard to manage this paused ${entity}.`
+        : `Bring your paused ${entity} back online.`
+    : `Your ${entity} will not be available for a few minutes.`
 
   return (
     <>
@@ -57,8 +58,8 @@ export const Project = () => {
             <PageSectionTitle>Project availability</PageSectionTitle>
             <PageSectionDescription>
               {isPaused
-                ? 'Resume your paused project or review recovery options'
-                : 'Restart or pause your project when performing maintenance'}
+                ? `Resume your paused ${entity} or review recovery options`
+                : `Restart or pause your ${entity} when performing maintenance`}
             </PageSectionDescription>
           </PageSectionSummary>
         </PageSectionMeta>
@@ -75,7 +76,7 @@ export const Project = () => {
                 {isPaused ? (
                   shouldShowDashboardLink ? (
                     <Button asChild variant="default">
-                      <Link href={`/project/${project?.ref}`}>View project dashboard</Link>
+                      <Link href={`/project/${project?.ref}`}>View {entity} dashboard</Link>
                     </Button>
                   ) : (
                     <ResumeProjectButton />
