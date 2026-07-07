@@ -197,9 +197,15 @@ fi
 
 echo ""
 echo "--- PostgREST ---"
-check "REST API query" "200" \
+check "REST API route with anon key" "403" \
     "$(http_status "$BASE_URL/rest/v1/" \
         -H "apikey: $ANON_KEY")"
+
+echo ""
+echo "--- PostgREST ---"
+check "REST API route with service role key" "200" \
+    "$(http_status "$BASE_URL/rest/v1/" \
+        -H "apikey: $SERVICE_ROLE_KEY")"
 
 # ---------------------------------------------
 # 5. GraphQL

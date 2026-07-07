@@ -6,7 +6,7 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 3. Create a Python app with Flask
+## 4. Create a Python app with Flask
 
 Create a new directory for your Python app and set up a virtual environment.
 
@@ -16,7 +16,7 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-## 4. Install Flask and the Supabase client library
+## 5. Install Flask and the Supabase client library
 
 The fastest way to get started is to use Flask for the web framework and the `supabase-py` client library which provides a convenient interface for working with Supabase from a Python app.
 
@@ -28,20 +28,20 @@ pip install flask supabase
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
 
-## 5. Create environment variables file
+## 6. Create environment variables file
 
 Create a `.env` file in your project root and populate it with your Supabase connection variables that you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true):
 
-<$CodeTabs>
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true">Open Connect panel</a>
+</Button>
 
 ```text name=.env
 SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
 
-</$CodeTabs>
-
-## 6. Query data from the app
+## 7. Query data from the app
 
 Install the `python-dotenv` package to load environment variables:
 
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     app.run(debug=True)
 ```
 
-## 7. Start the app
+## 8. Start the app
 
 Run the Flask development server, and go to http://localhost:5000 in your browser, you should see the list of instruments.
 
