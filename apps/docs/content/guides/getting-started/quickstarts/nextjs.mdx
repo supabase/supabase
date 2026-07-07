@@ -14,9 +14,19 @@ Use the `create-next-app` command and the `with-supabase` template, to create a 
 npx create-next-app -e with-supabase
 ```
 
+## 5. Install Agent Skills (optional)
+
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+Install them in your project with:
+
+```bash
+npx skills add supabase/agent-skills
+```
+
 <$Partial path="api_settings.mdx" variables={{ "framework": "nextjs", "tab": "frameworks" }} />
 
-## 5. Declare Supabase environment variables
+## 6. Declare Supabase environment variables
 
 Rename `.env.example` to `.env.local` and populate with your Supabase connection variables that you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=nextjs&tab=frameworks).
 
@@ -31,7 +41,7 @@ NEXT_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
 
-## 6. Query Supabase data from Next.js
+## 7. Query Supabase data from Next.js
 
 Create a new file at `app/instruments/page.tsx` and populate with the following.
 
@@ -61,7 +71,7 @@ export default function Instruments() {
 
 </$CodeTabs>
 
-## 7. Start the app
+## 8. Start the app
 
 Run the development server, go to http://localhost:3000/instruments in a browser and you should see the list of instruments.
 

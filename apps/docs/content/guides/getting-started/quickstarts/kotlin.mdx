@@ -10,7 +10,17 @@ breadcrumb: 'Framework Quickstarts'
 
 Select the **Android Studio > New > New Android Project** menu item.
 
-## 5. Install dependencies
+## 5. Install Agent Skills (optional)
+
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+Install them in your project with:
+
+```bash
+npx skills add supabase/agent-skills
+```
+
+## 6. Install dependencies
 
 Open `build.gradle.kts` (app) file and add the serialization plugin, Ktor client, and Supabase client.
 
@@ -36,7 +46,7 @@ dependencies {
 }
 ```
 
-## 6. Add internet access permission
+## 7. Add internet access permission
 
 Add the following line to the `AndroidManifest.xml` file under the `manifest` tag and outside the `application` tag.
 
@@ -48,7 +58,7 @@ Add the following line to the `AndroidManifest.xml` file under the `manifest` ta
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "androidkotlin", "tab": "mobiles" }} />
 
-## 7. Initialize the Supabase client
+## 8. Initialize the Supabase client
 
 You can create a Supabase client whenever you need to perform an API call.
 
@@ -74,7 +84,7 @@ val supabase = createSupabaseClient(
 ...
 ```
 
-## 8. Create a data model for instruments
+## 9. Create a data model for instruments
 
 Create a serializable data class to represent the data from the database.
 
@@ -88,7 +98,7 @@ data class Instrument(
 )
 ```
 
-## 9. Query data from the app
+## 10. Query data from the app
 
 Use `LaunchedEffect` to fetch data from the database and display it in a `LazyColumn`.
 
@@ -141,6 +151,6 @@ fun InstrumentsList() {
 }
 ```
 
-## 10. Start the app
+## 11. Start the app
 
 Run the app on an emulator or a physical device by clicking the `Run app` button in Android Studio.

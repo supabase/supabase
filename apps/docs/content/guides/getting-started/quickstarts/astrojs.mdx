@@ -15,7 +15,18 @@ npm create astro@latest my-app
 cd my-app
 ```
 
-## 5. Install Supabase client library and Node adapter
+## 5. Install Agent Skills (optional)
+
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+Install them in your project with:
+
+```bash
+npx skills add supabase/agent-skills
+```
+
+
+## 6. Install Supabase client library and Node adapter
 
 Install the `supabase-js` client library and the `@astrojs/node` adapter to enable server-side rendering.
 
@@ -23,7 +34,7 @@ Install the `supabase-js` client library and the `@astrojs/node` adapter to enab
 npm install @supabase/supabase-js @astrojs/node
 ```
 
-## 6. Configure Astro for SSR
+## 7. Configure Astro for SSR
 
 Update your `astro.config.mjs`.
 
@@ -41,7 +52,7 @@ export default defineConfig({
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "astro", "tab": "frameworks" }} />
 
-## 7. Declare Supabase environment variables
+## 8. Declare Supabase environment variables
 
 Create a `.env.local` file and populate with your Supabase connection variables that you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=astro&tab=frameworks):
 
@@ -56,7 +67,7 @@ PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
 
-## 8. Create a Supabase client helper
+## 9. Create a Supabase client helper
 
 Create a utility file to initialize the Supabase client:
 
@@ -71,7 +82,7 @@ export function createServerClient() {
 }
 ```
 
-## 9. Query Supabase data from Astro
+## 10. Query Supabase data from Astro
 
 Create a new file at `src/pages/instruments.astro` and populate with the following.
 
@@ -99,7 +110,7 @@ const { data: instruments } = await supabase.from("instruments").select();
 </html>
 ```
 
-## 10. Start the app
+## 11. Start the app
 
 Run the development server, go to http://localhost:4321/instruments in your browser of choice to check the list of instruments.
 

@@ -16,7 +16,18 @@ See the [Laravel docs](https://laravel.com/docs/10.x/installation#creating-a-lar
 composer create-project laravel/laravel example-app
 ```
 
-## 5. Install the authentication template
+## 5. Install Agent Skills (optional)
+
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+Install them in your project with:
+
+```bash
+npx skills add supabase/agent-skills
+```
+
+
+## 6. Install the authentication template
 
 Install [Laravel Breeze](https://laravel.com/docs/10.x/starter-kits#laravel-breeze), a basic implementation of all of Laravel's [authentication features](https://laravel.com/docs/10.x/authentication).
 
@@ -25,7 +36,7 @@ composer require laravel/breeze --dev
 php artisan breeze:install
 ```
 
-## 6. Set up the Postgres connection details
+## 7. Set up the Postgres connection details
 
 Go to [database.new](https://database.new) and create a new Supabase project. Save your database password securely.
 
@@ -44,7 +55,7 @@ DB_CONNECTION=pgsql
 DB_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
 ```
 
-## 7. Change the default schema
+## 8. Change the default schema
 
 By default Laravel uses the `public` schema. We recommend changing this as Supabase exposes the `public` schema as a [data API](/docs/guides/api).
 
@@ -69,7 +80,7 @@ The schema you specify in `search_path` has to exist on Supabase. You can create
 ],
 ```
 
-## 8. Run the database migrations
+## 9. Run the database migrations
 
 Laravel ships with database migration files that set up the required tables for Laravel Authentication and User Management.
 
@@ -79,7 +90,7 @@ Note: Laravel does not use Supabase Auth but rather implements its own authentic
 php artisan migrate
 ```
 
-## 9. Start the app
+## 10. Start the app
 
 Run the development server. Go to http://127.0.0.1:8000 in a browser to see your application. You can also navigate to http://127.0.0.1:8000/register and http://127.0.0.1:8000/login to register and log in users.
 

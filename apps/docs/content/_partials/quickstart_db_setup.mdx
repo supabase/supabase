@@ -35,37 +35,19 @@ You can also use [database.new](https://database.new) and [the Management API](/
 
 </Admonition>
 
-## 2. Install agent skills (optional)
+## 2. Install MCP server (optional)
 
-[Agent Skills](/docs/guides/ai-tools/ai-skills) are curated instruction sets that give your AI agent procedural knowledge about working with Supabase.
-
-Install them in your project with:
-
-```bash
-npx skills add supabase/agent-skills
-```
-
-
-
+The Supabase MCP server connects AI assistants to Supabase, allowing you to interact with your projects on your behalf. Find out more on how to add it to your client in [the MCP docs](/docs/guides/ai-tools/mcp).
 
 ## 3. Set up your database
 
 When your Supabase project is up and running, create an `instruments` table with some sample data.
 
+Set a secure baseline by setting only the privileges each Postgres role needs, add [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default, and create an RLS policy to make the data in your table publicly readable.
 
-Then set a secure baseline by setting only the privileges each Postgres role needs, add [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default, and create an RLS policy to make the data in your table publicly readable.
+You can do this visually with the dashboard or by using [the MCP server](/docs/guides/ai-tools/mcp) to ask your AI assistant to run the SQL snippet in your project.
 
-
-
-
-
-You can do this visually with the dashboard or by using the MCP server.
-
-<Tabs scrollable size="small" type="underlined" defaultActiveId="dashboard" queryGroup="create-database">
-
-<TabPanel id="dashboard" label="Dashboard">
-
-Copy and run the snippet below in your project's [SQL Editor](/dashboard/project/_/sql/new) or <a href={`/dashboard/project/_/sql/new?content=${encodeURIComponent(sqlSetup)}`}>click here to prefill the SQL</a> and then execute it.
+Copy and run the snippet in your project's [SQL Editor](/dashboard/project/_/sql/new) or <a href={`/dashboard/project/_/sql/new?content=${encodeURIComponent(sqlSetup)}`}>click here to prefill the SQL</a> and then execute it.
 
 You can also choose the SQL and prefill it from the **Reference > Samples** menu at the side of the SQL Editor.
 
@@ -99,16 +81,6 @@ on public.instruments
 for select to anon
 using (true);
 ```
-
-</TabPanel>
-
-<TabPanel id="mcp-server" label="MCP server">
-
-If you install and configure the MCP server, you can use it to ask your AI assistant to run SQL snippets in your project.
-
-</TabPanel>
-
-</Tabs>
 
 <Admonition type="note" label="Disabled the Data API during project setup?">
 
