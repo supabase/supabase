@@ -6,8 +6,8 @@
  * at module scope. Optional chaining does NOT guard an undeclared `process`
  * identifier in the browser, so any built chunk containing it throws
  * `ReferenceError: process is not defined` at load time (observed on the
- * table editor route). The Vite dev server shims `process`, which is why
- * this only surfaced in the production/test build.
+ * table editor route). The Vite dev server shims `process`, so the crash
+ * only surfaces in the production/test build.
  *
  * vite.config.ts aliases `@sentry/nextjs` to this module for the TanStack
  * build only — app source keeps importing `@sentry/nextjs`, and the Next

@@ -10,12 +10,12 @@ import { searchParamsToRecord, type SearchRecord } from './router-search-params'
 // `navigate({ to: renderQueryString(search) || '.', from })`. That shape is
 // doubly broken for us:
 //   - TanStack resolves a `?`-only relative `to` by *appending* it to the
-//     current path, injecting a trailing slash — every nuqs write turned
+//     current path, injecting a trailing slash — every nuqs write turns
 //     `/auth/providers?provider=x` into `/auth/providers/?provider=x`.
 //   - Embedding the query string in `to` at all sends it through TanStack's
 //     path interpolation, which percent-decodes and then strips control
 //     characters — `%0A` newlines in values (e.g. Logs Explorer SQL in `s`)
-//     were silently deleted.
+//     are silently deleted.
 // So we navigate with `to` = the current pathname and the query as a
 // TanStack `search` *object*, which the router serialises through the app's
 // Next-style codec (lib/router-search-params) without touching the path
