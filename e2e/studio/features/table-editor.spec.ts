@@ -877,6 +877,52 @@ testRunner('table editor', () => {
     })
   })
 
+  test('copying cell values preserves false and zero', async ({ page, ref }) => {
+    const tableName = 'pw_table_copy_falsy_values'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await query(`
+          create table if not exists public.${tableName} (
+            bool_false boolean,
+            bool_true boolean,
+            zero_int integer
+          );
+        `)
+        await query(`
+          insert into public.${tableName} (bool_false, bool_true, zero_int)
+          values (false, true, 0);
+        `)
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+    await expect(page.getByRole('grid')).toBeVisible()
+
+    const falseCell = page.getByRole('gridcell', { name: 'FALSE' }).first()
+    await expect(falseCell).toBeVisible()
+    await falseCell.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Copy cell' }).click()
+    await expectClipboardValue({ page, value: 'false', exact: true })
+
+    const zeroCell = page.getByRole('gridcell', { name: '0' }).first()
+    await expect(zeroCell).toBeVisible()
+    await zeroCell.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Copy cell' }).click()
+    await expectClipboardValue({ page, value: '0', exact: true })
+
+    const trueCell = page.getByRole('gridcell', { name: 'TRUE' }).first()
+    await expect(trueCell).toBeVisible()
+    await trueCell.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Copy cell' }).click()
+    await expectClipboardValue({ page, value: 'true', exact: true })
+  })
+
   test('boolean fields can be edited correctly', async ({ page, ref }) => {
     const tableName = 'pw_table_boolean_edits'
     const boolColName = 'is_active'

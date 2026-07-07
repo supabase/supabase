@@ -5,10 +5,12 @@ import type { Filters, LogData } from './Logs.types'
 import {
   buildLogsPrompt,
   checkForLimitClause,
+  ensureNoTimestampConflict,
   extractEdgeFunctionName,
   formatLogsAsCsv,
   formatLogsAsJson,
   formatLogsAsMarkdown,
+  genChartQuery,
   genDefaultQuery,
   getAuthLogSeverity,
   parseMultigresEventMessage,
@@ -327,6 +329,26 @@ describe('Logs.utils', () => {
 
     test('ignores a limit clause that is commented out', () => {
       expect(checkForLimitClause('select event_message from edge_logs -- limit 10')).toBe(false)
+    })
+  })
+
+  describe('genChartQuery', () => {
+    // Regression: an unparseable iso_timestamp_start used to reach
+    // startOffset.toISOString() as an Invalid Date and throw RangeError.
+    test('falls back to minute buckets for an unparseable time range without throwing', () => {
+      const params = { iso_timestamp_start: 'not-a-date', iso_timestamp_end: 'also-bad' }
+      expect(() => genChartQuery(LogsTableName.AUTH, params as any, {})).not.toThrow()
+      expect(genChartQuery(LogsTableName.AUTH, params as any, {})).toContain(
+        'timestamp_trunc(t.timestamp, minute)'
+      )
+    })
+  })
+
+  describe('ensureNoTimestampConflict', () => {
+    test('does not throw for unparseable initial timestamps', () => {
+      expect(() =>
+        ensureNoTimestampConflict(['not-a-date', 'also-bad'], ['', '2024-01-01T00:00:00.000Z'])
+      ).not.toThrow()
     })
   })
 })

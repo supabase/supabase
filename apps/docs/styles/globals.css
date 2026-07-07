@@ -150,6 +150,12 @@ h6:not(.font-mono),
   font-weight: inherit;
 }
 
+/* Body text inherits a heavier base weight, so override the shared `strong: 500`
+ * to keep bold text visually distinct. */
+.prose :where(strong, b):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  font-weight: 700;
+}
+
 .prose :where(h1, h2, h3, h4, h5, h6):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   @apply font-heading font-semibold;
 }
