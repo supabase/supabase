@@ -434,6 +434,7 @@ export const ColumnEditor = ({
               >
                 <Switch
                   id="isPrimaryKey"
+                  aria-label="Toggle primary key"
                   checked={columnFields?.isPrimaryKey ?? false}
                   onCheckedChange={() =>
                     onUpdateField({
@@ -458,6 +459,7 @@ export const ColumnEditor = ({
                     >
                       <Switch
                         id="isNullable"
+                        aria-label="Toggle is nullable"
                         disabled={columnFields.isPrimaryKey}
                         checked={columnFields.isNullable}
                         onCheckedChange={() =>
@@ -487,6 +489,7 @@ export const ColumnEditor = ({
                     >
                       <Switch
                         id="isUnique"
+                        aria-label="Toggle is unique"
                         disabled={columnFields.isPrimaryKey}
                         checked={columnFields.isUnique}
                         onCheckedChange={() => onUpdateField({ isUnique: !columnFields.isUnique })}
@@ -524,8 +527,14 @@ export const ColumnEditor = ({
           >
             {isNewRecord && (
               <div className="flex items-center gap-x-2">
-                <Switch checked={createMore} onCheckedChange={() => setCreateMore(!createMore)} />
+                <Switch
+                  id="toggle-create-more"
+                  aria-label="Toggle create more"
+                  checked={createMore}
+                  onCheckedChange={() => setCreateMore(!createMore)}
+                />
                 <label
+                  htmlFor="toggle-create-more"
                   className="text-foreground-light text-sm cursor-pointer select-none"
                   onClick={() => setCreateMore(!createMore)}
                 >

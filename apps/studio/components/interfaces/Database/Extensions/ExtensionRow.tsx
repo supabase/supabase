@@ -159,9 +159,9 @@ export const ExtensionRow = ({ extension }: ExtensionRowProps) => {
             ) : (
               <Tooltip>
                 <TooltipTrigger asChild>
-                  {/* Wrapped in a div as the Switch is a button itself and cannot be nested within the trigger button */}
                   <div>
                     <Switch
+                      aria-label="Toggle extension"
                       disabled={disabled}
                       checked={isOn}
                       onCheckedChange={() =>
