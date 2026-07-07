@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, ChevronDown, Copy, Database, KeyRound, Link2, Terminal } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Button,
   cn,
