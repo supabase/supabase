@@ -23,6 +23,19 @@ Throughout this migration both runtimes coexist in the same workspace:
   they stay until the cleanup pass, regardless of how many routes have
   moved.
 
+**PR guardrail — mirror page edits into their route**
+
+Because both runtimes ship at once, any change to a `pages/...` file can
+leave its `routes/...` mirror stale. A CodeRabbit `path_instructions`
+rule (`.coderabbit.yaml`, scoped to `apps/studio/pages/**`) posts a
+review reminder on every PR that touches a page, prompting the author to
+check whether the corresponding route needs the same change. It's a
+verify-not-block reminder: pure body edits on re-export (Path A) pages
+propagate automatically, but layout/`getLayout`, `staticData` props,
+`withAuth`, redirect-path, or brand-new-page changes must be mirrored by
+hand. This guardrail is temporary scaffolding — remove it in the cleanup
+pass when `pages/**` is deleted (tracked by FE-3106).
+
 **Strategy — minimum-diff re-export**
 
 The goal is to flip URL ownership to TanStack without rewriting page internals yet. For each page we pick one of two paths:
@@ -511,4 +524,5 @@ the allowlist when the underlying cycle is gone.
 - Lift `manualChunks` pins (`class-variance-authority`, `lucide-react`, `react-vendor`) once the structural fix in `packages/ui` lands — see CIRCULAR_IMPORTS.md. Keep `assertNoChunkCycles`; just clear `KNOWN_CHUNK_CYCLES`.
 - Delete `pages/_app.tsx`, `pages/_document.tsx`, `pages/_error.jsx`, `pages/500.tsx`, `pages/404.tsx` (Next-only catch-alls; TanStack equivalents on `__root.tsx`).
 - Drop the `dev:next` / `build:next` / `start:next` scripts from `apps/studio/package.json` once we're committed to TanStack.
+- Remove the `apps/studio/pages/**` `path_instructions` guardrail entry from `.coderabbit.yaml` (added in FE-3423; remove it as part of this FE-3106 cleanup) — it's only useful while both runtimes coexist.
 - Delete this file.

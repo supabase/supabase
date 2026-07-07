@@ -63,6 +63,7 @@ const AccordionMenuItem = ({ section }: { section: DropdownMenuItem[] }) => {
                     href={item.href}
                     title={item.label}
                     community={item.community}
+                    new={item.new}
                     icon={item.icon}
                   />
                 )

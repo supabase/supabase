@@ -18,7 +18,7 @@
     "smoke:tanstack": "node scripts/smoke-server.mjs",
     "start:tanstack": "node scripts/serve.js",
     "lint": "eslint .",
-    "lint:ratchet": "tsx scripts/ratchet-eslint-rules.ts --rule react-hooks/exhaustive-deps --rule import/no-anonymous-default-export --rule @tanstack/query/exhaustive-deps --rule @typescript-eslint/no-explicit-any --rule no-restricted-imports --rule no-restricted-exports --rule react/no-unstable-nested-components",
+    "lint:ratchet": "tsx scripts/ratchet-eslint-rules.ts --rules-file scripts/ratchet-rules.json",
     "clean": "rimraf node_modules tsconfig.tsbuildinfo .next .turbo",
     "test": "vitest --run --coverage",
     "test:watch": "vitest watch",

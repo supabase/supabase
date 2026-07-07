@@ -6,7 +6,6 @@ import throughputTable from '../../data/realtime/throughput.json'
 
 type Row = {
   computeAddOn: string
-  filters: boolean
   rls: boolean
   concurrency: number
   maxDBChanges: number
@@ -27,7 +26,7 @@ ${dividerRow}
 ${rows
   .map(
     (l) =>
-      `| ${l.filters ? 'Yes' : 'No'} | ${l.rls ? 'Yes' : 'No'} | ${l.concurrency.toLocaleString()} | ${l.maxDBChanges} | ${l.maxMessagesPerClient} | ${l.totalMessagesPerSecond.toLocaleString()} | ${l.p95Latency}ms |`
+      `| ${l.rls ? 'Yes' : 'No'} | ${l.concurrency.toLocaleString()} | ${l.maxDBChanges} | ${l.maxMessagesPerClient} | ${l.totalMessagesPerSecond.toLocaleString()} | ${l.p95Latency}ms |`
   )
   .join('\n')}`
 }
