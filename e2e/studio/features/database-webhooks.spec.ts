@@ -56,7 +56,7 @@ const openWebhookEditor = async (page: Page, hookName: string) => {
 }
 
 const addCustomHeader = async (page: Page, name: string, value: string) => {
-  await page.getByRole('button', { name: 'Add a new header' }).click()
+  await page.getByRole('button', { name: 'Add header' }).click()
   await page.getByPlaceholder('Header name').last().fill(name)
   await page.getByPlaceholder('Header value').last().fill(value)
 }
