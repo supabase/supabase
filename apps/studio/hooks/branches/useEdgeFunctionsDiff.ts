@@ -47,7 +47,8 @@ export interface EdgeFunctionsDiffResult {
 
 // Equivalent of path.basename without importing Node's path lib — `path` isn't
 // polyfilled in the browser bundle under Vite, so importing it crashes the route.
-const fileKey = (fullPath: string) => fullPath.slice(fullPath.lastIndexOf('/') + 1)
+// Exported so EdgeFunctionsDiffPanel matches files with identical semantics.
+export const fileKey = (fullPath: string) => fullPath.slice(fullPath.lastIndexOf('/') + 1)
 
 export const useEdgeFunctionsDiff = ({
   currentBranchRef,

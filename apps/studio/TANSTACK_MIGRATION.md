@@ -557,7 +557,7 @@ for the Vite pipeline:
   extra libs for edge-function editors) — an exact-specifier allowlist
   resolved to `\0`-virtual ids and served from a `load` hook. They can't go
   through `transform`: Rolldown's native dep scanner skips JS plugin hooks
-  and hard-fails parsing TS *declaration* syntax (`get stdin(): ...;`) as
+  and hard-fails parsing TS _declaration_ syntax (`get stdin(): ...;`) as
   runtime TS, which killed dependency pre-bundling wholesale. The previous
   `/* @vite-ignore */` hack kept the scanner away but also meant the
   imports failed at runtime, silently dropping Deno type hints in the

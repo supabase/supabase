@@ -6,10 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
 
 import { DiffEditor } from '@/components/ui/DiffEditor'
 import type { EdgeFunctionBodyData } from '@/data/edge-functions/edge-function-body-query'
-import type {
-  EdgeFunctionsDiffResult,
-  FileInfo,
-  FileStatus,
+import {
+  fileKey,
+  type EdgeFunctionsDiffResult,
+  type FileInfo,
+  type FileStatus,
 } from '@/hooks/branches/useEdgeFunctionsDiff'
 import { EMPTY_ARR } from '@/lib/void'
 
@@ -29,11 +30,6 @@ interface FunctionDiffProps {
   currentBranchRef?: string
   fileInfos: FileInfo[]
 }
-
-// Helper to canonicalize file identifiers to prevent mismatch due to differing root paths.
-// Equivalent of path.basename without importing Node's path lib — `path` isn't
-// polyfilled in the browser bundle under Vite, so importing it crashes the route.
-const fileKey = (fullPath: string) => fullPath.slice(fullPath.lastIndexOf('/') + 1)
 
 // Helper to get the status color for file indicators
 const getStatusColor = (status: FileStatus): string => {

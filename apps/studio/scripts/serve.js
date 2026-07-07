@@ -171,7 +171,7 @@ async function pipeWebResponse(response, res) {
 // any response is written so both the static and handler paths inherit them.
 const SECURITY_HEADERS = [
   ['X-Frame-Options', 'DENY'],
-  ['X-Content-Type-Options', 'no-sniff'],
+  ['X-Content-Type-Options', 'nosniff'],
   ['Content-Security-Policy', "frame-ancestors 'none';"],
   ['Referrer-Policy', 'strict-origin-when-cross-origin'],
 ]

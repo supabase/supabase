@@ -7,9 +7,8 @@ import {
 } from '@tanstack/react-router'
 import { useMemo } from 'react'
 
-import { splitInternalUrl } from '@/lib/internal-url'
-
 import { getRouterEventsProxy } from './_router-events'
+import { splitInternalUrl } from '@/lib/internal-url'
 
 // Next's pages-router exposes `router.pathname` as the route *pattern*
 // (e.g. `/project/[ref]/sql/[id]`), not the resolved URL. TanStack's

@@ -20,7 +20,6 @@ import '@/styles/stripe.css'
 import '@/styles/ui.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
 
-import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/react'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import type { QueryClient } from '@tanstack/react-query'
@@ -71,6 +70,7 @@ import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalEr
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { AuthProvider } from '@/lib/auth'
+import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
 // Custom adapter instead of `nuqs/adapters/tanstack-router` — the stock one
 // injects a trailing slash before the query on every nuqs write (see module).
@@ -133,16 +133,7 @@ const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
     ]
   : []
 
-// [Ivan] Serve the Monaco assets locally from the public folder (see #47182, which
-// dropped CDN loading in every environment and re-nested the assets under `vs/`). The
-// worker bootstrap (vs/base/worker/workerMain.js) loads the language workers (e.g.
-// tsWorker.js) via fetch() from inside the web worker. A root-relative path fails to
-// resolve there in some browsers (Firefox throws "... is not a valid URL"), so we point
-// `vs` at an absolute URL including the origin. Guarded on `window` since this module is
-// also evaluated during SSR (where `window` is undefined and there's no editor to mount).
-if (typeof window !== 'undefined') {
-  loader.config({ paths: { vs: `${window.location.origin}${BASE_PATH}/monaco-editor/vs` } })
-}
+configureMonacoLoader()
 
 const FAVICON_ROUTE = '/favicon'
 const THEME_COLOR = '1E1E1E'

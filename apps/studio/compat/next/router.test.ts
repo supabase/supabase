@@ -111,11 +111,9 @@ describe('withDefaultPathname (next/router compat shim)', () => {
   })
 
   it('caller-provided query values win over backfilled params', () => {
-    const target = withDefaultPathname(
-      { query: { ref: 'other', page: '2' } },
-      '/project/[ref]',
-      { ref: 'abc' }
-    )
+    const target = withDefaultPathname({ query: { ref: 'other', page: '2' } }, '/project/[ref]', {
+      ref: 'abc',
+    })
     expect(resolveUrl(target)).toBe('/project/other?page=2')
   })
 
