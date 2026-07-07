@@ -163,7 +163,7 @@ const Investors = () => {
           title="Our investors"
           paragraph={
             <>
-              We've raised $1 Billion in funding, backed by some of the world's leading investors.
+              We've raised $1 billion in funding, backed by some of the world's leading investors.
             </>
           }
         />
