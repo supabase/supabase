@@ -418,8 +418,7 @@ export default defineConfig(({ command, mode }) => {
   // transform above — a blanket `'define.amd': 'false'` define would also
   // rewrite the *read* in vendored bundles that install their own local
   // `define` shim (monaco-editor's `esm/vs/base/common/marked/marked.js`)
-  // and break them the same way an unguarded transform did — see the
-  // plugin's comment.
+  // and break them — see the plugin's comment for the failure mode.
   const sharedDefines = {
     global: 'globalThis',
   }
@@ -444,7 +443,7 @@ export default defineConfig(({ command, mode }) => {
         // (`next/dist/shared/lib/constants`), whose module scope evaluates
         // `process?.features?.typescript` — optional chaining doesn't guard
         // an undeclared `process` in the browser, so every built chunk
-        // containing it (e.g. table-editor) crashed at load with
+        // containing it (e.g. table-editor) crashes at load with
         // "ReferenceError: process is not defined". Dev is unaffected
         // because the dev pipeline shims `process`. Point the bare import
         // at a shim that re-exports `@sentry/react` (same 10.x version —
@@ -557,10 +556,9 @@ export default defineConfig(({ command, mode }) => {
       // entire exports object `{ default: fn }`, and call sites like
       // `AwesomeDebouncePromise(fn, 500)` crash with "is not a function" at
       // SSR module evaluation. Surfaces on routes that load the table grid.
-      // `@sentry/nextjs` itself needed CJS workarounds here (noExternal +
-      // ssr.optimizeDeps.include) — both dropped now that the resolve.alias
+      // `@sentry/nextjs` deliberately has no entry here: the resolve.alias
       // above rewrites it to the `@sentry/react`-backed shim before SSR
-      // resolution ever sees the id. `@sentry/react` ships real ESM
+      // resolution ever sees the id, and `@sentry/react` ships real ESM
       // ("import" condition → build/esm), so plain externalization works.
       noExternal: ['lodash', /^next(\/|$)/, 'tslib', 'react-use', 'awesome-debounce-promise'],
     },

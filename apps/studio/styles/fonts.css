@@ -7,10 +7,9 @@
  *   --font-sans            -> body (Inter)          [theme.css: --font-sans]
  *   --font-heading         -> headings (Manrope)    [globals.css @theme inline]
  *   --font-source-code-pro -> mono (Source Code Pro)
- * #47306 renamed the sans var from --font-custom to --font-sans and added
- * --font-heading (Manrope); this file wasn't updated, so on TanStack the body
- * fell through to the theme fallback chain (Circular/system) and headings had
- * no Manrope.
+ * If a var is renamed on the Next side (fonts/index.ts / theme.css), rename it
+ * here too — otherwise the TanStack build silently falls through to the theme
+ * fallback chain.
  *
  * All three families are vendored below (matching next/font, which self-hosts
  * them on the Next build) so nothing depends on the Google Fonts CDN at runtime
