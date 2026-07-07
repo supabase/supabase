@@ -25,6 +25,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 ### Configuration
 - ⚠️ Added `KONG_ROUTER_FLAVOR` to the compose configuration for Kong (requires `docker-compose.yml` update) - PR [#45462](https://github.com/supabase/supabase/pull/45462)
 - ⚠️ Changed the default `API_EXTERNAL_URL` in `.env.example` to contain `/auth/v1` - PR [#47640](https://github.com/supabase/supabase/pull/47640)
+- ⚠️ Changed the default `PGRST_DB_SCHEMAS` to `public,graphql_public` in `.env.example` to avoid exposing `storage` (a protected schema)
 
 ### Documentation
 - Minor updates to the how-to guides following the configuration changes
