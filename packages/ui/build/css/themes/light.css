@@ -14,9 +14,9 @@
   --surface: 0.98;
   --elevation-step: 0.024;
   --contrast: 0.53;
-  --foreground-lightness: 0.16;
-  --muted-foreground-level: 0.68;
-  --tertiary-foreground-level: 0.48;
+  --foreground-lightness: 0.1;
+  --muted-foreground-level: 0.65;
+  --tertiary-foreground-level: 0.5;
   /*
    * Expressive fills run darker than the dark-theme anchors so they hold contrast
    * against the near-white surface (a light amber on white disappears). Lightness
