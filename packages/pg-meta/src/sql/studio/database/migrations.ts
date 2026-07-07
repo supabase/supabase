@@ -1,11 +1,43 @@
 import { literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
 
 export const getMigrationsSql = (): SafeSqlFragment => {
+  // The migrations table only exists once a migration has been applied (e.g. via
+  // the CLI or the dashboard). Guard with to_regclass + query_to_xml so this query
+  // returns zero rows instead of erroring with 42P01 (undefined_table) — that error
+  // surfaced as a 400 on every dashboard load for projects without migrations.
+  // Same guard pattern as the storage.buckets check in ../advisor/lints.ts.
+  // Rows are serialized with to_jsonb so the query also tolerates older tables
+  // that only have a `version` column (no `name`/`statements`).
   const sql = safeSql`
+    with rows as (
+      select xt.row_json::jsonb as row_data
+      from xmltable(
+        '/table/row'
+        passing (
+          case
+            when pg_catalog.to_regclass('supabase_migrations.schema_migrations') is not null
+            then pg_catalog.query_to_xml(
+              'select to_jsonb(sm)::text as row_json from supabase_migrations.schema_migrations sm',
+              false,
+              false,
+              ''
+            )
+            else '<table/>'::xml
+          end
+        )
+        columns row_json text path 'row_json'
+      ) xt
+    )
     select
-      *
-    from supabase_migrations.schema_migrations sm
-    order by sm.version desc
+      rows.row_data->>'version' as version,
+      rows.row_data->>'name' as name,
+      case
+        when jsonb_typeof(rows.row_data->'statements') = 'array'
+        then array(select jsonb_array_elements_text(rows.row_data->'statements'))
+        else null
+      end as statements
+    from rows
+    order by rows.row_data->>'version' desc
   `
 
   return sql
