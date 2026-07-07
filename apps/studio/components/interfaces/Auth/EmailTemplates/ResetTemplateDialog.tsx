@@ -59,8 +59,12 @@ export const ResetTemplateDialog = ({
 
     try {
       await resetAuthTemplate({ projectRef, template: templateType })
-    } catch (error: any) {
-      setError(error.message ?? 'An unknown error occurred while resetting the template')
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : 'An unknown error occurred while resetting the template'
+      )
       throw error
     }
   }
