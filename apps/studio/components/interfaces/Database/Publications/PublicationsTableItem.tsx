@@ -87,13 +87,16 @@ export const PublicationsTableItem = ({
             </Badge>
           ) : (
             <Tooltip>
-              <TooltipTrigger>
-                <Switch
-                  size="small"
-                  disabled={!canUpdatePublications || isPending || isProtected}
-                  checked={checked}
-                  onClick={() => toggleReplicationForTable(table, selectedPublication)}
-                />
+              <TooltipTrigger asChild>
+                {/* Wrapped in a div as the Switch is a button itself and cannot be nested within the trigger button */}
+                <div>
+                  <Switch
+                    size="small"
+                    disabled={!canUpdatePublications || isPending || isProtected}
+                    checked={checked}
+                    onClick={() => toggleReplicationForTable(table, selectedPublication)}
+                  />
+                </div>
               </TooltipTrigger>
               {isProtected && (
                 <TooltipContent side="bottom" className="w-64 text-center">
