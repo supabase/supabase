@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev": "run-p dev:*",
+    "dev": "run-p --race dev:*",
     "dev:next": "next dev --turbopack --port 3003",
     "dev:content": "contentlayer2 dev",
     "build": "pnpm run content:build && pnpm run build:registry && next build --turbopack",
