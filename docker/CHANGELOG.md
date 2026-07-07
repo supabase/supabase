@@ -40,7 +40,7 @@ Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions
 
 ### Studio
 - Updated to `2026.07.06-sha-66cf431`
-- Fixed the local SQL snippets not being shown in the SQL Editor - PR [#47403](https://github.com/supabase/supabase/pull/47403)
+- Fixed the local SQL snippets not being shown in the SQL Editor - PR [#47403](https://github.com/supabase/supabase/pull/47403), PR [#47409](https://github.com/supabase/supabase/pull/47409)
 - Fixed the behavior of the type generator (Data API > Docs) - PR [#47577](https://github.com/supabase/supabase/pull/47577)
 
 ### Auth
