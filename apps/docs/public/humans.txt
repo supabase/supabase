@@ -32,6 +32,7 @@ Artur Zakirov
 Artyom Borissov
 Aziz Quadri
 Barco Fourie
+Barry Roodt
 Beng Eu
 Benjamin Coenen
 Bo Lu
