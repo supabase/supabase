@@ -380,6 +380,16 @@ export default defineConfig(({ command, mode }) => {
     }
   }
 
+  // Sentry init (lib/sentry-client-options.ts, reached via router.tsx) reads
+  // these at runtime in the browser. When a var is unset it gets no define
+  // entry above, which would leave a literal `process.env.*` in the built
+  // bundle — and an undeclared `process` throws in the browser. Inline
+  // `undefined` as the fallback, mirroring how Next inlines unset
+  // NEXT_PUBLIC_* vars.
+  for (const key of ['NEXT_PUBLIC_SENTRY_DSN', 'NEXT_PUBLIC_SENTRY_ENVIRONMENT']) {
+    publicEnvDefines[`process.env.${key}`] ??= 'undefined'
+  }
+
   // Mirror Next's `basePath` via NEXT_PUBLIC_BASE_PATH. Unlike Next, TanStack
   // Start has no single knob — the prefix has to be declared in three places
   // (see BASE_PATH_REDIRECT_GUIDE.md):

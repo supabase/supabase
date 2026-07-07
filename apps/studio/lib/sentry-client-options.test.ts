@@ -1,12 +1,13 @@
-import type { Event as SentryEvent, StackFrame } from '@sentry/nextjs'
+import type { Event as SentryEvent, StackFrame } from '@sentry/react'
 import { describe, expect, it } from 'vitest'
 
 import {
+  buildSentryClientOptions,
   isBrowserWalletExtensionError,
   isCancellationRejection,
   isChallengeExpiredError,
   isUserAbortedOperation,
-} from './instrumentation-client'
+} from './sentry-client-options'
 
 describe('Sentry beforeSend filtering functions', () => {
   describe('isBrowserWalletExtensionError', () => {
@@ -415,5 +416,52 @@ describe('Sentry beforeSend filtering functions', () => {
       expect(isCancellationRejection(event)).toBe(false)
       expect(isChallengeExpiredError(error, event)).toBe(false)
     })
+  })
+})
+
+describe('buildSentryClientOptions', () => {
+  const getIntegrationNames = (options: ReturnType<typeof buildSentryClientOptions>) => {
+    const integrations = options.integrations
+    if (typeof integrations === 'function' || integrations === undefined) {
+      throw new Error('expected a static integrations array')
+    }
+    return integrations.map((integration) => integration.name)
+  }
+
+  it('includes the third-party error filter only when the build annotates frames', () => {
+    // Next build: withSentryConfig injects the applicationKey metadata.
+    expect(
+      getIntegrationNames(buildSentryClientOptions({ thirdPartyErrorFilter: true }))
+    ).toContain('ThirdPartyErrorsFilter')
+
+    // TanStack/Vite build: no bundler metadata — including the integration
+    // would tag every event third_party_code=true and beforeSend would drop
+    // them all.
+    expect(
+      getIntegrationNames(buildSentryClientOptions({ thirdPartyErrorFilter: false }))
+    ).not.toContain('ThirdPartyErrorsFilter')
+  })
+
+  it('appends build-specific extra integrations', () => {
+    const options = buildSentryClientOptions({
+      thirdPartyErrorFilter: false,
+      extraIntegrations: [{ name: 'FakeRouterTracing' }],
+    })
+
+    expect(getIntegrationNames(options)).toContain('FakeRouterTracing')
+  })
+
+  it('builds the same shared options for both builds (parity)', () => {
+    const nextOptions = buildSentryClientOptions({ thirdPartyErrorFilter: true })
+    const tanstackOptions = buildSentryClientOptions({ thirdPartyErrorFilter: false })
+
+    // Everything except the integrations array must be identical between the
+    // two runtimes.
+    const { integrations: _next, ...nextRest } = nextOptions
+    const { integrations: _tanstack, ...tanstackRest } = tanstackOptions
+    expect(Object.keys(nextRest)).toEqual(Object.keys(tanstackRest))
+    expect(nextRest.tracesSampleRate).toBe(tanstackRest.tracesSampleRate)
+    expect(nextRest.allowUrls).toEqual(tanstackRest.allowUrls)
+    expect(nextRest.ignoreErrors).toEqual(tanstackRest.ignoreErrors)
   })
 })

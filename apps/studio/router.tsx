@@ -3,6 +3,7 @@ import { createRouter } from '@tanstack/react-router'
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query'
 
 import { routeTree } from './routeTree.gen'
+import { initSentryTanStackClient } from './sentry.tanstack'
 import { getQueryClient } from '@/data/query-client'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
@@ -86,6 +87,12 @@ export function getRouter() {
     // unless NEXT_PUBLIC_BASE_PATH is set. Must agree with Vite `base`
     basepath: process.env.NEXT_PUBLIC_BASE_PATH || undefined,
   })
+
+  // Sentry: nothing loads Next's convention files (instrumentation-client.ts)
+  // under TanStack Start, so init happens here — the earliest point with
+  // access to the router instance, which the tracing integration needs.
+  // No-op on the server and when no DSN is configured (see module).
+  initSentryTanStackClient(router)
 
   // @tanstack/react-router-ssr-query@1.166.12 pulls in @tanstack/query-core@5.100
   // as a peer, but our app pins react-query to 5.83. The QueryClient class is
