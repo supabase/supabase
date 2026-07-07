@@ -37,3 +37,13 @@ FOR EACH ${keyword(trigger.orientation)}
 
   return sql
 }
+
+export const getDatabaseFunctionsHref = (
+  projectRef: string | null | undefined,
+  schema: string | null | undefined,
+  name: string | null | undefined
+): string => {
+  return `/project/${projectRef ?? ''}/database/functions?search=${encodeURIComponent(
+    name ?? ''
+  )}&schema=${encodeURIComponent(schema ?? '')}`
+}

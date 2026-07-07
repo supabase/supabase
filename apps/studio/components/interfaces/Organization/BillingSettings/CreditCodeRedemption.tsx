@@ -19,11 +19,13 @@ import {
   DialogTrigger,
   Form,
   FormField,
-  Input_Shadcn_,
+  Input,
   Separator,
 } from 'ui'
-import { Admonition, ShimmeringLoader, TimestampInfo } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { z } from 'zod'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -153,7 +155,7 @@ export const CreditCodeRedemption = ({
       {!modalVisible && (
         <DialogTrigger asChild>
           <ButtonTooltip
-            type="default"
+            variant="default"
             className="pointer-events-auto"
             disabled={codeRedemptionDisabled}
             tooltip={{
@@ -235,7 +237,7 @@ export const CreditCodeRedemption = ({
                   )}
 
                   {!router.pathname.includes('/org/') && (
-                    <Button asChild type="default">
+                    <Button asChild variant="default">
                       <Link href={`/org/${org?.slug}`}>Go to organization</Link>
                     </Button>
                   )}
@@ -276,7 +278,7 @@ export const CreditCodeRedemption = ({
                           className="gap-1"
                           layout="horizontal"
                         >
-                          <Input_Shadcn_
+                          <Input
                             {...field}
                             className="uppercase w-56 ml-auto"
                             placeholder="ABCD-1234-EFGH-5678"
@@ -319,11 +321,11 @@ export const CreditCodeRedemption = ({
 
                   <DialogFooter>
                     <ButtonTooltip
-                      type="primary"
+                      variant="primary"
                       className="pointer-events-auto"
                       loading={redeemingCode}
                       disabled={codeRedemptionDisabled || !isValid}
-                      htmlType="submit"
+                      type="submit"
                       tooltip={{
                         content: {
                           side: 'bottom',

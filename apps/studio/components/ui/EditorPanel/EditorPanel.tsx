@@ -19,19 +19,19 @@ import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  HoverCard_Shadcn_,
-  HoverCardContent_Shadcn_,
-  HoverCardTrigger_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
   KeyboardShortcut,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   SQL_ICON,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
@@ -50,7 +50,7 @@ import {
   suffixWithLimit,
 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefinitions'
-import Results from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
+import { Results } from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
 import { SqlRunButton } from '@/components/interfaces/SQLEditor/UtilityPanel/RunButton'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useContentIdQuery } from '@/data/content/content-id-query'
@@ -66,7 +66,7 @@ import { editorPanelState, useEditorPanelStateSnapshot } from '@/state/editor-pa
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export const EditorPanel = () => {
   const {
@@ -123,7 +123,7 @@ export const EditorPanel = () => {
   const [showResults, setShowResults] = useState(true)
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false)
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle')
-  const saveStatusTimerRef = useRef<ReturnType<typeof setTimeout>>()
+  const saveStatusTimerRef = useRef<ReturnType<typeof setTimeout>>(null)
   const originalSnippetRef = useRef<{ sql: string; name: string } | null>(null)
 
   const refocusEditor = () => {
@@ -145,7 +145,9 @@ export const EditorPanel = () => {
 
   const showSaveSuccess = () => {
     setSaveStatus('success')
-    clearTimeout(saveStatusTimerRef.current)
+    if (saveStatusTimerRef.current) {
+      clearTimeout(saveStatusTimerRef.current)
+    }
     saveStatusTimerRef.current = setTimeout(() => setSaveStatus('idle'), 2000)
   }
   const [isTemplatesOpen, setIsTemplatesOpen] = useState(false)
@@ -272,7 +274,7 @@ export const EditorPanel = () => {
   }
 
   return (
-    <div className="flex h-full flex-col bg-background">
+    <div className="flex h-full flex-col bg-card">
       <div className="border-b border-b-muted flex items-center justify-between gap-x-4 pl-4 pr-3 h-(--header-height)">
         {isEditingTitle ? (
           <input
@@ -303,18 +305,18 @@ export const EditorPanel = () => {
           {activeSnippet && (
             <ButtonTooltip
               size="tiny"
-              type="text"
+              variant="text"
               className="w-7 h-7 p-0"
               icon={<PlusIcon size={14} />}
               tooltip={{ content: { side: 'bottom', text: 'New snippet' } }}
               onClick={() => editorPanelState.openAsNew()}
             />
           )}
-          <Popover_Shadcn_ open={isSnippetsOpen} onOpenChange={setIsSnippetsOpen}>
-            <PopoverTrigger_Shadcn_ asChild>
+          <Popover open={isSnippetsOpen} onOpenChange={setIsSnippetsOpen}>
+            <PopoverTrigger asChild>
               <ButtonTooltip
                 size="tiny"
-                type="text"
+                variant="text"
                 role="combobox"
                 aria-expanded={isSnippetsOpen}
                 className="w-7 h-7 p-0"
@@ -326,25 +328,25 @@ export const EditorPanel = () => {
                   },
                 }}
               ></ButtonTooltip>
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_ align="end" className="w-[300px] p-0">
-              <Command_Shadcn_ shouldFilter={false}>
-                <CommandInput_Shadcn_
+            </PopoverTrigger>
+            <PopoverContent align="end" className="w-[300px] p-0">
+              <Command shouldFilter={false}>
+                <CommandInput
                   placeholder="Search snippets..."
                   value={snippetSearch}
                   onValueChange={setSnippetSearch}
                 />
-                <CommandList_Shadcn_>
+                <CommandList>
                   {isLoadingSnippets ? (
                     <div className="py-6 text-center text-sm text-foreground-light">
                       Loading snippets...
                     </div>
                   ) : (
-                    <CommandEmpty_Shadcn_>No snippets found.</CommandEmpty_Shadcn_>
+                    <CommandEmpty>No snippets found.</CommandEmpty>
                   )}
-                  <CommandGroup_Shadcn_>
+                  <CommandGroup>
                     {(snippetsData?.content ?? []).map((snippet) => (
-                      <CommandItem_Shadcn_
+                      <CommandItem
                         key={snippet.id}
                         value={snippet.id}
                         className="cursor-pointer"
@@ -355,19 +357,19 @@ export const EditorPanel = () => {
                         }}
                       >
                         {snippet.name}
-                      </CommandItem_Shadcn_>
+                      </CommandItem>
                     ))}
-                  </CommandGroup_Shadcn_>
-                </CommandList_Shadcn_>
-              </Command_Shadcn_>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
           {templates.length > 0 && (
-            <Popover_Shadcn_ open={isTemplatesOpen} onOpenChange={setIsTemplatesOpen}>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover open={isTemplatesOpen} onOpenChange={setIsTemplatesOpen}>
+              <PopoverTrigger asChild>
                 <Button
                   size="tiny"
-                  type="default"
+                  variant="default"
                   role="combobox"
                   className="mr-2"
                   aria-expanded={isTemplatesOpen}
@@ -375,17 +377,17 @@ export const EditorPanel = () => {
                 >
                   Templates
                 </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ align="end" className="w-[300px] p-0">
-                <Command_Shadcn_>
-                  <CommandInput_Shadcn_ placeholder="Search templates..." />
-                  <CommandList_Shadcn_>
-                    <CommandEmpty_Shadcn_>No templates found.</CommandEmpty_Shadcn_>
-                    <CommandGroup_Shadcn_>
+              </PopoverTrigger>
+              <PopoverContent align="end" className="w-[300px] p-0">
+                <Command>
+                  <CommandInput placeholder="Search templates..." />
+                  <CommandList>
+                    <CommandEmpty>No templates found.</CommandEmpty>
+                    <CommandGroup>
                       {templates.map((template) => (
-                        <HoverCard_Shadcn_ key={template.name}>
-                          <HoverCardTrigger_Shadcn_ asChild>
-                            <CommandItem_Shadcn_
+                        <HoverCard key={template.name}>
+                          <HoverCardTrigger asChild>
+                            <CommandItem
                               value={template.name}
                               onSelect={() => onSelectTemplate(template.content)}
                               className="cursor-pointer"
@@ -404,26 +406,26 @@ export const EditorPanel = () => {
                                   </p>
                                 </div>
                               </div>
-                            </CommandItem_Shadcn_>
-                          </HoverCardTrigger_Shadcn_>
-                          <HoverCardContent_Shadcn_ side="left" className="w-[500px] p-0">
+                            </CommandItem>
+                          </HoverCardTrigger>
+                          <HoverCardContent side="left" className="w-[500px] p-0">
                             <CodeBlock
                               language="sql"
                               className="language-sql border-none"
                               hideLineNumbers
                               value={template.content}
                             />
-                          </HoverCardContent_Shadcn_>
-                        </HoverCard_Shadcn_>
+                          </HoverCardContent>
+                        </HoverCard>
                       ))}
-                    </CommandGroup_Shadcn_>
-                  </CommandList_Shadcn_>
-                </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           )}
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="w-7 h-7 p-0"
             icon={<Maximize2 strokeWidth={1.5} />}
             tooltip={{
@@ -460,7 +462,7 @@ export const EditorPanel = () => {
           />
 
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="w-7 h-7 p-0"
             onClick={handleClosePanel}
             icon={<X strokeWidth={1.5} />}
@@ -480,7 +482,7 @@ export const EditorPanel = () => {
       </div>
 
       <div className="flex-1 overflow-hidden flex flex-col h-full">
-        <div className="flex-1 min-h-0 relative [&_.monaco-editor]:!bg [&_.monaco-editor_.margin]:!bg [&_.monaco-editor_.monaco-editor-background]:!bg">
+        <div className="flex-1 min-h-0 relative [&_.monaco-editor]:!bg-card [&_.monaco-editor_.margin]:!bg-card [&_.monaco-editor_.monaco-editor-background]:!bg-card">
           <AIEditor
             autoFocus
             language="pgsql"
@@ -505,7 +507,7 @@ export const EditorPanel = () => {
               wordWrap: 'on',
               lineNumbers: 'on',
               folding: false,
-              padding: { top: 16 },
+              padding: { top: 12 },
               lineNumbersMinChars: 3,
             }}
             executeQuery={onExecuteSql}
@@ -514,7 +516,6 @@ export const EditorPanel = () => {
             openAIAssistantShortcutEnabled={isAIAssistantHotkeyEnabled}
           />
         </div>
-
         {error !== undefined && (
           <div className="shrink-0">
             <Admonition
@@ -537,7 +538,6 @@ export const EditorPanel = () => {
             />
           </div>
         )}
-
         {showWarning && (
           <SqlWarningAdmonition
             className="border-t"
@@ -555,7 +555,6 @@ export const EditorPanel = () => {
             }}
           />
         )}
-
         {results !== undefined && results.length > 0 && (
           <div
             className={cn(
@@ -575,7 +574,7 @@ export const EditorPanel = () => {
               </span>
               <Button
                 size="tiny"
-                type="default"
+                variant="default"
                 className="ml-2"
                 onClick={() => setShowResults((prev) => !prev)}
               >
@@ -591,7 +590,6 @@ export const EditorPanel = () => {
             </p>
           </div>
         )}
-
         <div className="relative shrink-0 flex items-center gap-2 justify-end px-5 py-4 w-full border-t">
           {(isUpserting || saveStatus !== 'idle') && (
             <div
@@ -615,7 +613,7 @@ export const EditorPanel = () => {
             </div>
           )}
           <Button
-            type="default"
+            variant="default"
             size="tiny"
             disabled={
               !currentValue ||
@@ -682,5 +680,3 @@ export const EditorPanel = () => {
     </div>
   )
 }
-
-export default EditorPanel

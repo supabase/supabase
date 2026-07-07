@@ -30,31 +30,91 @@ export type Database = {
       listings: {
         Row: {
           aud: string | null
+          built_by: string | null
           categories: Json | null
           content: string | null
           description: string | null
           documentation_url: string | null
+          edge_function_secret_name: string | null
           featured: boolean | null
           id: string | null
           images: string[] | null
-          installation_identification_method: 'secret_key_prefix' | null
+          installation_identification_method:
+            | 'secret_key_prefix'
+            | 'edge_function_secret_name'
+            | 'integration_status'
+            | 'oauth_authorization'
+            | null
           installation_url: string | null
           installation_url_type: 'get' | 'post' | null
           listing_logo: string | null
+          listing_tsv: unknown
           marketplace_url: string | null
+          oauth_app_id: string | null
+          partner_id: string | null
           partner_logo: string | null
           partner_name: string | null
           partner_slug: string | null
-          publish_dashboard: boolean | null
-          publish_location: 'marketplace' | 'dashboard' | 'both' | null
-          publish_marketplace: boolean | null
+          published_in_catalog_at: string | null
+          published_in_marketplace_at: string | null
           secret_key_prefix: string | null
           slug: string | null
           title: string | null
           website_url: string | null
           youtube_id: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: 'listings_partner_id_fkey'
+            columns: ['partner_id']
+            isOneToOne: false
+            referencedRelation: 'partners'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      marketplace_listings: {
+        Row: {
+          built_by: string | null
+          categories: Json | null
+          content: string | null
+          description: string | null
+          documentation_url: string | null
+          edge_function_secret_name: string | null
+          featured: boolean | null
+          id: string | null
+          images: string[] | null
+          installation_identification_method:
+            | 'secret_key_prefix'
+            | 'edge_function_secret_name'
+            | 'integration_status'
+            | 'oauth_authorization'
+            | null
+          installation_url: string | null
+          installation_url_type: 'get' | 'post' | null
+          listing_logo: string | null
+          oauth_app_id: string | null
+          partner_id: string | null
+          partner_logo: string | null
+          partner_name: string | null
+          partner_slug: string | null
+          published_in_marketplace_at: string | null
+          review_status: 'draft' | 'pending' | 'approved' | 'rejected' | 'preview' | null
+          secret_key_prefix: string | null
+          slug: string | null
+          title: string | null
+          website_url: string | null
+          youtube_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'listings_partner_id_fkey'
+            columns: ['partner_id']
+            isOneToOne: false
+            referencedRelation: 'partners'
+            referencedColumns: ['id']
+          },
+        ]
       }
       partners: {
         Row: {
@@ -92,16 +152,23 @@ export type Database = {
         }
         Relationships: []
       }
+      project_integration_status: {
+        Row: {
+          created_at: string | null
+          integration_id: string | null
+          listing_slug: string | null
+          partner_links: Json | null
+          project_ref: string | null
+          status: 'installing' | 'ready' | 'error' | null
+          updated_at: string | null
+          user_alert: Json | null
+          version: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      get_redirect_url: {
-        Args: {
-          p_listing_id: string
-          p_organization_slug: string
-          p_project_id: string
-        }
-        Returns: Json
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never

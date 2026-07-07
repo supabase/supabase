@@ -25,7 +25,7 @@ export function NumberEditor<TRow, TSummaryRow = unknown>({
 
   return (
     <input
-      className="sb-grid-number-editor"
+      className="h-full w-full px-2"
       ref={autoFocusAndSelect}
       value={value ?? ''}
       onChange={onChange}

@@ -8,10 +8,10 @@ import {
   Form,
   FormControl,
   FormField,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  TextArea_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  TextArea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -34,7 +34,7 @@ export function MessageActions({
 function MessageActionsEdit({ onClick, tooltip }: { onClick: () => void; tooltip: string }) {
   return (
     <ButtonTooltip
-      type="text"
+      variant="text"
       icon={<Pencil size={14} strokeWidth={1.5} />}
       onClick={onClick}
       className="text-foreground-light hover:text-foreground p-1 rounded-sm"
@@ -53,7 +53,7 @@ MessageActions.Edit = MessageActionsEdit
 function MessageActionsDelete({ onClick }: { onClick: () => void }) {
   return (
     <ButtonTooltip
-      type="text"
+      variant="text"
       icon={<Trash2 size={14} strokeWidth={1.5} />}
       tooltip={{ content: { side: 'bottom', text: 'Delete message' } }}
       onClick={onClick}
@@ -76,7 +76,7 @@ function MessageActionsThumbsUp({
 }) {
   return (
     <Button
-      type="text"
+      variant="text"
       disabled={disabled}
       icon={
         <ThumbsUp
@@ -151,10 +151,10 @@ function MessageActionsThumbsDown({
   }, [form.formState.isSubmitSuccessful])
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={handleOpenChange}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={handleOpenChange}>
+      <PopoverTrigger asChild>
         <Button
-          type="text"
+          variant="text"
           disabled={disabled}
           onClick={() => !disabled && setOpen(true)}
           className={cn(
@@ -174,8 +174,8 @@ function MessageActionsThumbsDown({
             )}
           />
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-80" align="start">
+      </PopoverTrigger>
+      <PopoverContent className="w-80" align="start">
         {form.formState.isSubmitSuccessful ? (
           <p className="text-sm">We appreciate your feedback!</p>
         ) : (
@@ -187,7 +187,7 @@ function MessageActionsThumbsDown({
                 render={({ field }) => (
                   <FormItemLayout label="What went wrong?" labelOptional="optional">
                     <FormControl>
-                      <TextArea_Shadcn_
+                      <TextArea
                         placeholder="Describe why the response was not helpful..."
                         autoComplete="off"
                         rows={4}
@@ -199,15 +199,15 @@ function MessageActionsThumbsDown({
                 )}
               />
               <div className="flex justify-end">
-                <Button type="primary" htmlType="submit" size="tiny">
+                <Button variant="primary" type="submit" size="tiny">
                   Submit feedback
                 </Button>
               </div>
             </form>
           </Form>
         )}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }
 MessageActions.ThumbsDown = MessageActionsThumbsDown

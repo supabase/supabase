@@ -1,15 +1,19 @@
 ---
-title = "546 - WORKER_LIMIT Exceeded"
+title = "546 - WORKER_RESOURCE_LIMIT Exceeded / WORKER_LIMIT Exceeded"
 topics = [ "functions" ]
 keywords = [ "546", "error", "resource", "memory", "cpu", "event loop", "edge function" ]
 database_id = "4e6ff2e4-2abb-4fba-8233-5883b3d56fb0"
 
 [[errors]]
 http_status_code = 546
+message = "WORKER_RESOURCE_LIMIT"
+
+[[errors]]
+http_status_code = 546
 message = "WORKER_LIMIT"
 ---
 
-A 546 error indicates that an edge function used more resources (CPU or Memory) than it was allocated.
+A 546 error indicates that an edge function used more resources (CPU or Memory) than it was allocated. Previously it was `WORKER_LIMIT`.
 
 ## Context for the error
 
@@ -37,7 +41,7 @@ When an edge function fails due to internal CPU or memory limits, it will return
 
 ```json
 {
-  "code": "WORKER_LIMIT",
+  "code": "WORKER_RESOURCE_LIMIT",
   "message": "Function failed due to not having enough compute resources (please check logs)"
 }
 ```
@@ -131,13 +135,11 @@ There are a few other queries that may be useful for identifying patterns around
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
   chevronAlign="right"
   justified
   size="medium"
   className="text-foreground-light mt-8 mb-6"
 >
-  <div className="border-b mt-3 pb-3">
     <AccordionItem
       header="Checking if a specific version is an offender"
       id="item-1"
@@ -165,8 +167,6 @@ order by pct_546;
 
     </AccordionItem>
 
-  </div>
-  <div className="border-b mt-3 pb-3">
     <AccordionItem
       header="Check error frequency by time"
       id="item-2"
@@ -204,9 +204,6 @@ LIMIT 24;
 
     </AccordionItem>
 
-  </div>
-
-      <div className="border-b mt-3 pb-3">
     <AccordionItem
       header="Check requests per isolate"
       id="item-3"
@@ -242,7 +239,6 @@ GROUP BY metadata.execution_id
 
     </AccordionItem>
 
-  </div>
 </Accordion>
 
 ## Step 3: Correcting the error
@@ -255,7 +251,7 @@ If you believe a portion of your function is overly aggressive, try testing loca
 
 Common culprits:
 
-**CPU intensive recursions**: intensive loops or recursion can quickly exhaust CPU
+**CPU intensive recursions**: intensive loops or recursion can exhaust CPU
 
 ```js
 // This will exhaust CPU allocation when called repeatedly
@@ -291,7 +287,7 @@ If you are performing logic to process data from Supabase Postgres, you may be a
 
 ### 4. Offload operations to an external API:
 
-Instead of managing all operations within the function itself, there may be an external API that can execute CPU or memory intensive jobs on its behalf. One [example](/docs/guides/functions/examples/screenshots) would be using an external API for orchestrating a headless browser and then just using the edge function to manage the output of the activity instead of everything all in place.
+Instead of managing all operations within the function itself, there may be an external API that can execute CPU or memory intensive jobs on its behalf. One [example](/docs/guides/functions/examples/screenshots) would be using an external API for orchestrating a headless browser and then using the edge function to manage the output of the activity instead of everything all in place.
 
 ### 5. Split operations into individual functions:
 
@@ -315,7 +311,7 @@ Performing edits against images or other large files can be both CPU and Memory 
 
 ### AI embedding generation and inference
 
-AI models process data into embeddings (large arrays), that they can more understand. Edge Functions are capable of managing [some small models directly](/blog/ai-inference-now-available-in-supabase-edge-functions); however, some require more processing power than what the edge function can support directly. In these cases, the solution is to manage the embeddings via an external source, such as OpenAI, Anthropic, etc. and to just use the edge function for light processing and coordination.
+AI models process data into embeddings (large arrays), that they can more understand. Edge Functions are capable of managing [some small models directly](/blog/ai-inference-now-available-in-supabase-edge-functions); however, some require more processing power than what the edge function can support directly. In these cases, the solution is to manage the embeddings via an external source, such as OpenAI, Anthropic, etc. and to use the edge function for light processing and coordination.
 
 ### Web scraping
 

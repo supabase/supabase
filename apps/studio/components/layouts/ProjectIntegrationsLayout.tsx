@@ -1,15 +1,16 @@
-import { useQuery } from '@tanstack/react-query'
-import { IS_PLATFORM, useFeatureFlags, useFlag, useParams } from 'common'
+import { IS_PLATFORM, useFeatureFlags, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 import { Menu, Separator } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { ProjectLayout } from '@/components/layouts/ProjectLayout'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ProductMenu } from '@/components/ui/ProductMenu'
-import { marketplaceCategoriesQueryOptions } from '@/data/marketplace/integration-categories-query'
+import { useMarketplaceCategoriesQuery } from '@/data/marketplace/integration-categories-query'
+import { useMarketplaceIntegrationsQuery } from '@/data/marketplace/integrations-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { withAuth } from '@/hooks/misc/withAuth'
 
@@ -45,19 +46,29 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
   const router = useRouter()
   const { ref } = useParams()
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const urlParams = new URLSearchParams(router.asPath.split('?')[1] || '')
   const categoryParam = urlParams.get('category')
   const pageKey = categoryParam || page
 
   const { integrationsWrappers: showWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
-  const { data: categories = [], isPending: isPendingCategories } = useQuery(
-    marketplaceCategoriesQueryOptions({ enabled: isMarketplaceEnabled })
+  const { data: categories = [], isPending: isPendingCategories } = useMarketplaceCategoriesQuery({
+    enabled: isMarketplaceEnabled,
+  })
+  const { data: listings = [], isPending: isPendingListings } = useMarketplaceIntegrationsQuery({
+    enabled: isMarketplaceEnabled,
+  })
+
+  const populatedCategoryIds = new Set(
+    listings.flatMap((listing) => listing.categories.map((c) => c.id))
+  )
+  const nonEmptyCategories = categories.filter(
+    (category) => category.id && populatedCategoryIds.has(category.id)
   )
 
   const isLoading = IS_PLATFORM
-    ? !flagsLoaded || (isMarketplaceEnabled && isPendingCategories)
+    ? !flagsLoaded || (isMarketplaceEnabled && (isPendingCategories || isPendingListings))
     : false
 
   const allCategories = [
@@ -84,7 +95,7 @@ const IntegrationCategoriesMenu = ({ page }: { page: string }) => {
       url: `/project/${ref}/integrations?category=postgres_extension`,
       items: [],
     },
-    ...categories.map((category) => ({
+    ...nonEmptyCategories.map((category) => ({
       name: category.name ?? '',
       key: category.slug ?? '',
       url: `/project/${ref}/integrations?category=${category.slug}`,

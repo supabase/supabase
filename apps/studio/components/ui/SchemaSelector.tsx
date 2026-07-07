@@ -2,20 +2,20 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import { ComponentPropsWithoutRef, forwardRef, useState } from 'react'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
   Skeleton,
 } from 'ui'
@@ -94,7 +94,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
       <div ref={ref} className={className} {...rest}>
         {isSchemasLoading && (
           <Button
-            type="default"
+            variant="default"
             key="schema-selector-skeleton"
             className="w-full [&>span]:w-full"
             size={size}
@@ -105,26 +105,24 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
         )}
 
         {showError && isSchemasError && (
-          <Alert_Shadcn_ variant="warning" className="px-3! py-3!">
-            <AlertTitle_Shadcn_ className="text-xs text-amber-900">
-              Failed to load schemas
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_ className="text-xs mb-2 wrap-break-word">
+          <Alert variant="warning" className="px-3! py-3!">
+            <AlertTitle className="text-xs text-amber-900">Failed to load schemas</AlertTitle>
+            <AlertDescription className="text-xs mb-2 wrap-break-word">
               Error: {(schemasError as any)?.message}
-            </AlertDescription_Shadcn_>
-            <Button type="default" size="tiny" onClick={() => refetchSchemas()}>
+            </AlertDescription>
+            <Button variant="default" size="tiny" onClick={() => refetchSchemas()}>
               Reload schemas
             </Button>
-          </Alert_Shadcn_>
+          </Alert>
         )}
 
         {isSchemasSuccess && (
-          <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-            <PopoverTrigger_Shadcn_ asChild>
+          <Popover open={open} onOpenChange={setOpen} modal={false}>
+            <PopoverTrigger asChild>
               <Button
                 size={size}
                 disabled={disabled}
-                type="default"
+                variant="default"
                 data-testid="schema-selector"
                 className={`w-full [&>span]:w-full pr-1! space-x-1`}
                 iconRight={
@@ -144,23 +142,23 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
                   </div>
                 )}
               </Button>
-            </PopoverTrigger_Shadcn_>
-            <PopoverContent_Shadcn_
+            </PopoverTrigger>
+            <PopoverContent
               className="p-0 min-w-[200px] pointer-events-auto"
               side="bottom"
               align={align}
               sameWidthAsTrigger
             >
-              <Command_Shadcn_>
-                <CommandInput_Shadcn_ className="text-xs" placeholder="Find schema..." />
-                <CommandList_Shadcn_
+              <Command>
+                <CommandInput className="text-xs" placeholder="Find schema..." />
+                <CommandList
                   onWheel={stopScrollPropagation ? (event) => event.stopPropagation() : undefined}
                 >
-                  <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
-                  <CommandGroup_Shadcn_>
+                  <CommandEmpty>No schemas found</CommandEmpty>
+                  <CommandGroup>
                     <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>
                       {supportSelectAll && (
-                        <CommandItem_Shadcn_
+                        <CommandItem
                           key="select-all"
                           className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                           onSelect={() => {
@@ -176,10 +174,10 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
                           {selectedSchemaName === '*' && (
                             <Check className="text-brand" strokeWidth={2} size={16} />
                           )}
-                        </CommandItem_Shadcn_>
+                        </CommandItem>
                       )}
                       {schemas.map((schema) => (
-                        <CommandItem_Shadcn_
+                        <CommandItem
                           key={schema.id}
                           className="cursor-pointer flex items-center justify-between space-x-2 w-full"
                           onSelect={() => {
@@ -195,15 +193,15 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
                           {selectedSchemaName === schema.name && (
                             <Check className="text-brand" strokeWidth={2} size={16} />
                           )}
-                        </CommandItem_Shadcn_>
+                        </CommandItem>
                       ))}
                     </ScrollArea>
-                  </CommandGroup_Shadcn_>
+                  </CommandGroup>
                   {onSelectCreateSchema !== undefined && canCreateSchemas && (
                     <>
-                      <CommandSeparator_Shadcn_ />
-                      <CommandGroup_Shadcn_>
-                        <CommandItem_Shadcn_
+                      <CommandSeparator />
+                      <CommandGroup>
+                        <CommandItem
                           className="cursor-pointer flex items-center gap-x-2 w-full"
                           onSelect={() => {
                             onSelectCreateSchema()
@@ -216,14 +214,14 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
                         >
                           <Plus size={12} />
                           Create a new schema
-                        </CommandItem_Shadcn_>
-                      </CommandGroup_Shadcn_>
+                        </CommandItem>
+                      </CommandGroup>
                     </>
                   )}
-                </CommandList_Shadcn_>
-              </Command_Shadcn_>
-            </PopoverContent_Shadcn_>
-          </Popover_Shadcn_>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
         )}
       </div>
     )
@@ -231,5 +229,3 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
 )
 
 SchemaSelector.displayName = 'SchemaSelector'
-
-export default SchemaSelector

@@ -2,8 +2,9 @@ import { useQuery } from '@tanstack/react-query'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import {
+  useCallback,
   useEffect,
-  useMemo,
+  useEffectEvent,
   useRef,
   useState,
   type Dispatch,
@@ -12,9 +13,10 @@ import {
 } from 'react'
 import { usePreviousDistinct } from 'react-use'
 import { Button, Switch } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
+import { getApiEndpoint } from '@/components/interfaces/Integrations/DataApi/DataApi.utils'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { defaultPrivilegesQueryOptions } from '@/data/privileges/default-privileges-query'
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
@@ -23,7 +25,6 @@ import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useIsSchemaExposed } from '@/hooks/misc/useIsSchemaExposed'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { useStaticEffectEvent } from '@/hooks/useStaticEffectEvent'
 import {
   checkDataApiPrivilegesNonEmpty,
   DEFAULT_DATA_API_PRIVILEGES,
@@ -157,24 +158,26 @@ const useTableApiAccessHandler = (
 
   const hasLoadedInitialData = useRef(false)
 
-  const resetState = useStaticEffectEvent(() => {
+  const resetState = useEffectEvent(() => {
     hasLoadedInitialData.current = !shouldReadExistingGrants
     setPrivileges(defaultPrivilegesForNewTable)
   })
   useEffect(() => {
     resetState()
-  }, [params.type, selectedSchema, permissionsTemplateSchema, permissionsTemplateTable, resetState])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [params.type, selectedSchema, permissionsTemplateSchema, permissionsTemplateTable])
 
-  const syncDefaultPrivileges = useStaticEffectEvent(() => {
+  const syncDefaultPrivileges = useEffectEvent(() => {
     if (!isNewTable) return
     if (!defaultPrivilegesQuery.isSuccess) return
     setPrivileges(defaultPrivilegesForNewTable)
   })
   useEffect(() => {
     syncDefaultPrivileges()
-  }, [defaultPrivilegesQuery.status, syncDefaultPrivileges])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [defaultPrivilegesQuery.status])
 
-  const syncApiPrivileges = useStaticEffectEvent(() => {
+  const syncApiPrivileges = useEffectEvent(() => {
     if (hasLoadedInitialData.current) return
     if (!apiAccessStatus.isSuccess) return
     if (!privilegesForTable) return
@@ -192,7 +195,8 @@ const useTableApiAccessHandler = (
   })
   useEffect(() => {
     syncApiPrivileges()
-  }, [apiAccessStatus.status, syncApiPrivileges])
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [apiAccessStatus.status])
 
   const isPending =
     !enabled ||
@@ -246,17 +250,17 @@ export const useTableApiAccessHandlerWithHistory = (
   const privileges = innerResult.data?.schemaExposed ? innerResult.data.privileges : undefined
   const previous = usePreviousDistinct(privileges)
 
-  const clearAllPrivileges = useStaticEffectEvent(() => {
+  const clearAllPrivileges = useCallback(() => {
     if (!innerResult.isSuccess) return
     if (!innerResult.data.schemaExposed) return
     innerResult.data?.setPrivileges(EMPTY_DATA_API_PRIVILEGES)
-  })
+  }, [innerResult])
 
-  const restorePreviousPrivileges = useStaticEffectEvent(() => {
+  const restorePreviousPrivileges = useCallback(() => {
     if (!innerResult.isSuccess) return
     if (!innerResult.data.schemaExposed) return
     innerResult.data?.setPrivileges(previous ?? DEFAULT_DATA_API_PRIVILEGES)
-  })
+  }, [innerResult, previous])
 
   if (!innerResult.isSuccess) {
     return innerResult
@@ -316,7 +320,7 @@ export const ApiAccessToggle = ({
       <div className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h5>Data API Access</h5>
+            <h5>Data API access</h5>
             <p className="text-sm text-foreground-lighter">
               Allow this table to be queried via Supabase client libraries or the API directly
             </p>
@@ -328,7 +332,7 @@ export const ApiAccessToggle = ({
               disabled={isDisabled}
             />
           ) : (
-            <Button asChild type="default" icon={<ExternalLink />}>
+            <Button asChild variant="default" icon={<ExternalLink />}>
               <Link
                 target="_blank"
                 rel="noopener noreferrer"
@@ -370,40 +374,33 @@ const SchemaExposureOptions = ({
 }): ReactNode => {
   const { selectedDatabaseId } = useDatabaseSelectorStateSnapshot()
 
-  const { data: endpoint } = useProjectApiUrl({ projectRef })
+  const { data: resolvedEndpoint } = useProjectApiUrl({ projectRef })
   const { data: loadBalancers } = useLoadBalancersQuery({ projectRef })
   const { data: databases } = useReadReplicasQuery({ projectRef })
 
-  const apiEndpoint = useMemo(() => {
-    if (selectedDatabaseId === projectRef) {
-      return endpoint
-    }
-
-    const loadBalancerSelected = selectedDatabaseId === 'load-balancer'
-    if (loadBalancerSelected) {
-      return loadBalancers?.[0]?.endpoint
-    }
-
-    const selectedDatabase = databases?.find((db) => db.identifier === selectedDatabaseId)
-    return selectedDatabase?.restUrl
-  }, [selectedDatabaseId, projectRef, databases, endpoint, loadBalancers])
-
-  const apiBaseUrl = useMemo(() => {
-    if (!apiEndpoint) return undefined
-    return apiEndpoint.endsWith('/') ? apiEndpoint.slice(0, -1) : apiEndpoint
-  }, [apiEndpoint])
+  const selectedDatabase = databases?.find((db) => db.identifier === selectedDatabaseId)
+  const apiBaseUrl = getApiEndpoint({
+    selectedDatabaseId,
+    projectRef,
+    resolvedEndpoint,
+    loadBalancers,
+    selectedDatabase,
+  })
 
   const tablePath = !(schemaName && tableName)
     ? undefined
     : schemaName === 'public'
       ? tableName
       : `${schemaName}.${tableName}`
-  const apiUrl = apiBaseUrl && tablePath ? `${apiBaseUrl}/${tablePath}` : undefined
+  const apiUrl = apiBaseUrl && tablePath ? `${apiBaseUrl}${tablePath}` : undefined
 
   return (
     <>
       {isError && (
-        <Admonition type="warning" title="An error occurred while fetching Data API settings." />
+        <Admonition
+          type="warning"
+          description="An error occurred while fetching Data API settings."
+        />
       )}
 
       {isSchemaExposed && apiUrl && (

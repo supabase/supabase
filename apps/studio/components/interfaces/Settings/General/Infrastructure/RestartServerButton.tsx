@@ -103,7 +103,7 @@ const RestartServerButton = () => {
       {projectSettingsRestartProject ? (
         <div className="flex w-full @lg:w-auto">
           <ButtonTooltip
-            type="default"
+            variant="default"
             className={cn(
               'flex-1 px-3 hover:z-10 @lg:flex-none',
               canRestartProject && canRestart ? 'rounded-r-none' : ''
@@ -137,7 +137,7 @@ const RestartServerButton = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="default"
+                  variant="default"
                   className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px"
                   icon={<ChevronDown />}
                   disabled={!canRestartProject}
@@ -165,7 +165,7 @@ const RestartServerButton = () => {
         </div>
       ) : (
         <Button
-          type="default"
+          variant="default"
           icon={<RefreshCw />}
           className="w-full @lg:w-auto"
           disabled={isLoading}

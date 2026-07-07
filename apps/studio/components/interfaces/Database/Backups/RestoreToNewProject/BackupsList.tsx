@@ -1,5 +1,5 @@
 import { Badge, Button } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { BackupsEmpty } from '../BackupsEmpty'
 import Panel from '@/components/ui/Panel'
@@ -46,7 +46,7 @@ export const BackupsList = ({ onSelectRestore, disabled, hasAccess }: BackupsLis
                     {(backup.status as any) === 'COMPLETED' && (
                       <Button
                         className="ml-auto"
-                        type="outline"
+                        variant="outline"
                         onClick={() => onSelectRestore(backup.id)}
                         disabled={disabled}
                       >

@@ -127,7 +127,7 @@ Unenrolling a factor will downgrade the assurance level from `aal2` to `aal1` on
 
 ```tsx
 /**
- * UnenrollMFA shows a simple table with the list of factors together with a button to unenroll.
+ * UnenrollMFA shows a table with the list of factors together with a button to unenroll.
  * When a user types in the factorId of the factor that they wish to unenroll and clicks unenroll
  * the corresponding factor will be unenrolled.
  */
@@ -271,7 +271,7 @@ It is possible to enforce MFA on the Server-Side Rendering level. However, this 
 
 You can use the `supabase.auth.mfa.getAuthenticatorAssuranceLevel()` and `supabase.auth.mfa.listFactors()` APIs to identify the AAL level of the session and any factors that are enabled for a user, similar to how you would use these on the browser.
 
-However, encountering a different AAL level on the server may not actually be a security problem. Consider these likely scenarios:
+However, encountering a different AAL level on the server may not be a security problem. Consider these likely scenarios:
 
 1. User signed-in with a conventional method but closed their tab on the MFA
    flow.
@@ -284,7 +284,7 @@ We thus recommend you redirect users to a page where they can authenticate using
 
 ### APIs
 
-If your application uses the Supabase Database, Storage or Edge Functions, just using Row Level Security policies will give you sufficient protection. In the event that you have other APIs that you wish to protect, follow these general guidelines:
+If your application uses the Supabase Database, Storage or Edge Functions, Row Level Security policies provide sufficient protection. In the event that you have other APIs that you wish to protect, follow these general guidelines:
 
 1. **Use a good JWT verification and parsing library for your language.**
    This will let you securely parse JWTs and extract their claims.
@@ -300,7 +300,6 @@ If your application uses the Supabase Database, Storage or Edge Functions, just 
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
   chevronAlign="right"
   justified
   size="medium"

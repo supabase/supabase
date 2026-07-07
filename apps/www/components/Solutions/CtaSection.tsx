@@ -4,7 +4,7 @@ import { Button, cn } from 'ui'
 
 import SectionContainer from '@/components/Layouts/SectionContainer'
 
-interface Props {
+export interface CtaSectionProps {
   id: string
   title: string | React.ReactNode
   subtitle?: string
@@ -25,7 +25,14 @@ interface Props {
   className?: string
 }
 
-const CtaSection = ({ id, title, subtitle, primaryCta, secondaryCta, className }: Props) => {
+const CtaSection = ({
+  id,
+  title,
+  subtitle,
+  primaryCta,
+  secondaryCta,
+  className,
+}: CtaSectionProps) => {
   return (
     <SectionContainer
       id={id}
@@ -42,7 +49,7 @@ const CtaSection = ({ id, title, subtitle, primaryCta, secondaryCta, className }
               </Link>
             </Button>
             {secondaryCta && (
-              <Button asChild size="medium" type="default">
+              <Button asChild size="medium" variant="default">
                 <Link href={secondaryCta.url}>{secondaryCta.label}</Link>
               </Button>
             )}

@@ -59,7 +59,7 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
         <AnimatePresence initial={false}>
           <ButtonTooltip
             key="search"
-            type={isSearchOpen ? 'secondary' : 'outline'}
+            variant={isSearchOpen ? 'secondary' : 'outline'}
             size="tiny"
             id="search-trigger"
             className={cn(
@@ -101,7 +101,7 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
             <Button
               key="menu"
               title="Menu dropdown button"
-              type={sheet.isMenuOpen ? 'secondary' : 'default'}
+              variant={sheet.isMenuOpen ? 'secondary' : 'default'}
               className={cn(
                 'flex lg:hidden mr-1 rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30',
                 !sheet.isMenuOpen && 'bg-surface-300!'
@@ -115,7 +115,7 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
       <AnimatePresence initial={false}>
         <Button
           title="close"
-          type="text"
+          variant="text"
           className={cn(
             'flex flex-row items-center justify-center rounded-full',
             'bg-overlay/50 backdrop-blur-md my-auto p-1! gap-2',

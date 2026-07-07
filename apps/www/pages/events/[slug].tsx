@@ -293,7 +293,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                   <h1 className="text-foreground text-3xl md:text-4xl xl:pr-9">{event.title}</h1>
                   <p>{event.subtitle}</p>
                   <Button
-                    type="primary"
+                    variant="primary"
                     size="medium"
                     className="mt-2"
                     disabled={
@@ -306,7 +306,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
                       target={event.main_cta?.target ? event.main_cta?.target : undefined}
                       onClick={() =>
                         sendTelemetryEvent({
-                          action: 'www_pricing_plan_cta_clicked',
+                          action: 'www_event_page_cta_clicked',
                           properties: { eventTitle: event.title },
                         })
                       }
@@ -392,7 +392,7 @@ const EventPage = ({ event }: InferGetStaticPropsType<typeof getStaticProps>) =>
               </div>
               <aside className="mt-8">
                 <Button
-                  type="primary"
+                  variant="primary"
                   size="medium"
                   className="mt-2"
                   disabled={!IS_REGISTRATION_OPEN || event.main_cta?.disabled}

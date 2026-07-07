@@ -26,7 +26,7 @@ export const InlineEditorButton = () => {
 
   return (
     <ButtonTooltip
-      type="outline"
+      variant="outline"
       size="tiny"
       id="editor-trigger"
       className={cn(
@@ -47,6 +47,7 @@ export const InlineEditorButton = () => {
       }}
     >
       <SqlEditor size={16} strokeWidth={1.5} />
+      <span className="sr-only">SQL Editor</span>
     </ButtonTooltip>
   )
 }

@@ -132,11 +132,12 @@ test('can click load older', async () => {
     { timeout: 10000 }
   )
 
-  loadOlder.onclick = vi.fn()
+  const handleClick = vi.fn()
+  loadOlder.addEventListener('click', handleClick)
 
   await userEvent.click(loadOlder)
 
-  expect(loadOlder.onclick).toHaveBeenCalled()
+  expect(handleClick).toHaveBeenCalled()
 })
 
 describe('calculateBarClickTimeRange', () => {

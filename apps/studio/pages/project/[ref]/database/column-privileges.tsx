@@ -3,7 +3,7 @@ import { AlertCircle, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -20,9 +20,9 @@ import PrivilegesHead from '@/components/interfaces/Database/Privileges/Privileg
 import PrivilegesTable from '@/components/interfaces/Database/Privileges/PrivilegesTable'
 import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { PgRole, useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
@@ -84,12 +84,12 @@ const PrivilegesPage: NextPageWithLayout = () => {
   } = useTablePrivilegesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    includedSchemas: [selectedSchema],
   })
 
   const tablePrivilege = useMemo(() => {
     const tablePrivilege = allTablePrivileges?.find(
-      (tablePrivilege) =>
-        tablePrivilege.schema === selectedSchema && tablePrivilege.name === selectedTable
+      (tablePrivilege) => tablePrivilege.name === selectedTable
     )
 
     if (tablePrivilege) {
@@ -100,7 +100,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
         ),
       }
     }
-  }, [allTablePrivileges, selectedRole, selectedSchema, selectedTable])
+  }, [allTablePrivileges, selectedRole, selectedTable])
 
   const {
     data: allColumnPrivileges,
@@ -110,6 +110,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
   } = useColumnPrivilegesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    schema: selectedSchema,
   })
 
   const columnPrivileges = useMemo(
@@ -241,19 +242,19 @@ const PrivilegesPage: NextPageWithLayout = () => {
           {isEnabled ? (
             <>
               {!diffWarningDismissed && (
-                <Alert_Shadcn_ variant="warning">
+                <Alert variant="warning">
                   <AlertCircle strokeWidth={2} />
-                  <AlertTitle_Shadcn_>
+                  <AlertTitle>
                     Changes to column privileges will not be reflected in migrations when running{' '}
                     <code className="text-code-inline">supabase db diff</code>.
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
+                  </AlertTitle>
+                  <AlertDescription>
                     Column privileges are not supported in the current version of the Supabase CLI.
                     <br />
                     You will need to manually apply these changes to your database.
-                  </AlertDescription_Shadcn_>
+                  </AlertDescription>
                   <Button
-                    type="outline"
+                    variant="outline"
                     aria-label="Dismiss"
                     className="absolute top-2 right-2 p-1 pl-1!"
                     onClick={() => {
@@ -262,16 +263,14 @@ const PrivilegesPage: NextPageWithLayout = () => {
                   >
                     <XIcon width={14} height={14} />
                   </Button>
-                </Alert_Shadcn_>
+                </Alert>
               )}
 
               {!selectStarWarningDismissed && (
-                <Alert_Shadcn_ variant="warning">
+                <Alert variant="warning">
                   <AlertCircle strokeWidth={2} />
-                  <AlertTitle_Shadcn_>
-                    Changing column privileges can break existing queries.
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
+                  <AlertTitle>Changing column privileges can break existing queries.</AlertTitle>
+                  <AlertDescription>
                     If you remove a column privilege for a role, that role will lose all access to
                     that column.
                     <br />
@@ -281,9 +280,9 @@ const PrivilegesPage: NextPageWithLayout = () => {
                     <code className="text-code-inline">insert</code>,{' '}
                     <code className="text-code-inline">update</code>, and{' '}
                     <code className="text-code-inline">delete</code>) will fail.
-                  </AlertDescription_Shadcn_>
+                  </AlertDescription>
                   <Button
-                    type="outline"
+                    variant="outline"
                     aria-label="Dismiss"
                     className="absolute top-2 right-2 p-1 pl-1!"
                     onClick={() => {
@@ -292,7 +291,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
                   >
                     <XIcon width={14} height={14} />
                   </Button>
-                </Alert_Shadcn_>
+                </Alert>
               )}
 
               <PrivilegesHead
@@ -349,19 +348,17 @@ const PrivilegesPage: NextPageWithLayout = () => {
               )}
             </>
           ) : (
-            <Alert_Shadcn_>
-              <AlertTitle_Shadcn_>
-                Column-level privileges is a dashboard feature preview
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+            <Alert>
+              <AlertTitle>Column-level privileges is a dashboard feature preview</AlertTitle>
+              <AlertDescription>
                 You may access this feature by enabling it under dashboard feature previews.
-              </AlertDescription_Shadcn_>
+              </AlertDescription>
               <div className="mt-4">
-                <Button type="default" onClick={() => toggleFeaturePreviewModal(true)}>
+                <Button variant="default" onClick={() => toggleFeaturePreviewModal(true)}>
                   View feature previews
                 </Button>
               </div>
-            </Alert_Shadcn_>
+            </Alert>
           )}
         </div>
       </ScaffoldSection>

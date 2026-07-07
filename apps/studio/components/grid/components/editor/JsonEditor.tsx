@@ -3,14 +3,21 @@ import { Maximize } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
-import { Popover, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 import { BlockKeys } from '../common/BlockKeys'
-import { MonacoEditor } from '../common/MonacoEditor'
 import { NullValue } from '../common/NullValue'
 import { TruncatedWarningOverlay } from './TruncatedWarningOverlay'
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
@@ -153,35 +160,38 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   }
 
   return (
-    <Popover
-      open={isPopoverOpen}
-      side="bottom"
-      align="start"
-      sideOffset={-35}
-      className="rounded-none"
-      overlay={
-        isTruncated && !isSuccess ? (
-          <div
-            style={{ width: `${column.width}px` }}
-            className="flex items-center justify-center flex-col relative"
-          >
-            <MonacoEditor
-              readOnly
-              onChange={() => {}}
-              width={`${column.width}px`}
+    <Popover open={isPopoverOpen}>
+      <PopoverTrigger asChild>
+        <div
+          className={`${
+            !!value && jsonString.trim().length == 0 ? 'sb-grid-fill-container' : ''
+          } text-grid overflow-hidden text-ellipsis px-2`}
+          onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+        >
+          {value === null || value === '' ? <NullValue /> : jsonString}
+        </div>
+      </PopoverTrigger>
+      <PopoverContent side="bottom" align="start" sideOffset={-35} className="rounded-none p-0">
+        {isTruncated && !isSuccess ? (
+          <div className="flex items-center justify-center flex-col relative">
+            <CodeEditor
+              isReadOnly
+              hideLineNumbers
+              language="plaintext"
               value={value ?? ''}
-              language="markdown"
+              className="h-[200px]"
             />
             <TruncatedWarningOverlay isLoading={isPending} loadFullValue={loadFullValue} />
           </div>
         ) : (
           <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>
-            <MonacoEditor
-              width={`${column.width}px`}
-              value={value ?? ''}
+            <CodeEditor
+              hideLineNumbers
+              isReadOnly={!isEditable}
               language="json"
-              readOnly={!isEditable}
-              onChange={onChange}
+              value={value ?? ''}
+              onInputChange={onChange}
+              className="h-[200px] border-b"
             />
             <div className="flex items-start justify-between p-2 bg-surface-200 gap-x-2">
               {isEditable && (
@@ -218,17 +228,8 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
               </Tooltip>
             </div>
           </BlockKeys>
-        )
-      }
-    >
-      <div
-        className={`${
-          !!value && jsonString.trim().length == 0 ? 'sb-grid-fill-container' : ''
-        } sb-grid-json-editor__trigger`}
-        onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-      >
-        {value === null || value === '' ? <NullValue /> : jsonString}
-      </div>
+        )}
+      </PopoverContent>
     </Popover>
   )
 }

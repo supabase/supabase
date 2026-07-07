@@ -3,7 +3,21 @@ import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Form, FormControl, FormField, Input_Shadcn_, Modal, Textarea } from 'ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Textarea,
+} from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
@@ -99,58 +113,57 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
   const { isDirty } = form.formState
 
   return (
-    <Modal
-      visible={visible}
-      onCancel={handleCancel}
-      hideFooter
-      header="Create a custom report"
-      size="small"
-    >
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(createCustomReport)} noValidate>
-          <Modal.Content>
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItemLayout name="name" layout="vertical" label="Name">
-                  <FormControl>
-                    <Input_Shadcn_ {...field} id="name" />
-                  </FormControl>
-                </FormItemLayout>
-              )}
-            />
-          </Modal.Content>
-          <Modal.Content>
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItemLayout name="description" layout="vertical" label="Description">
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      id="description"
-                      rows={4}
-                      placeholder="Describe your custom report"
-                      className="resize-none"
-                    />
-                  </FormControl>
-                </FormItemLayout>
-              )}
-            />
-          </Modal.Content>
-          <Modal.Separator />
-          <Modal.Content className="flex items-center justify-end gap-2">
-            <Button htmlType="reset" type="default" onClick={handleCancel} disabled={isCreating}>
-              Cancel
-            </Button>
-            <Button htmlType="submit" loading={isCreating} disabled={isCreating || !isDirty}>
-              Create report
-            </Button>
-          </Modal.Content>
-        </form>
-      </Form>
-    </Modal>
+    <Dialog open={visible} onOpenChange={handleCancel}>
+      <DialogContent size="small">
+        <DialogHeader>
+          <DialogTitle>Create a custom report</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(createCustomReport)} noValidate>
+            <DialogSection>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItemLayout name="name" layout="vertical" label="Name">
+                    <FormControl>
+                      <Input {...field} id="name" />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </DialogSection>
+            <DialogSection>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItemLayout name="description" layout="vertical" label="Description">
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        id="description"
+                        rows={4}
+                        placeholder="Describe your custom report"
+                        className="resize-none"
+                      />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </DialogSection>
+            <DialogFooter>
+              <Button type="reset" variant="default" onClick={handleCancel} disabled={isCreating}>
+                Cancel
+              </Button>
+              <Button type="submit" loading={isCreating} disabled={isCreating || !isDirty}>
+                Create report
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { Unlock } from 'lucide-react'
 import Link from 'next/link'
-import { Button, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import { Button, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
 import { type Lint } from '@/data/lint/lint-query'
 
@@ -15,13 +15,13 @@ export const SecurityDefinerViewPopover = ({
   const { ref } = useParams()
 
   return (
-    <Popover_Shadcn_ modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
-        <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
+    <Popover modal={false}>
+      <PopoverTrigger asChild>
+        <Button variant="warning" icon={<Unlock strokeWidth={1.5} />}>
           Security Definer view
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
+      </PopoverTrigger>
+      <PopoverContent className="min-w-[395px] text-sm" align="end">
         <h4 className="flex items-center gap-2">
           <Unlock size={14} /> Secure your view
         </h4>
@@ -35,11 +35,11 @@ export const SecurityDefinerViewPopover = ({
 
           <div className="mt-2 flex items-center gap-2">
             {!!onAutofix && (
-              <Button type="secondary" onClick={onAutofix}>
+              <Button variant="secondary" onClick={onAutofix}>
                 Autofix
               </Button>
             )}
-            <Button type="default" asChild>
+            <Button variant="default" asChild>
               <Link
                 target="_blank"
                 rel="noopener noreferrer"
@@ -50,7 +50,7 @@ export const SecurityDefinerViewPopover = ({
             </Button>
           </div>
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

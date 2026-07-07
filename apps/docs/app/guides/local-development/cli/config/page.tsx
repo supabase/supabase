@@ -12,7 +12,7 @@ const meta = {
 }
 
 const generateMetadata = genGuideMeta(() => ({
-  pathname: '/guides/cli/config',
+  pathname: '/guides/local-development/cli/config',
   meta,
 }))
 

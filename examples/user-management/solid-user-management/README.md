@@ -116,9 +116,11 @@ insert into
 values
 	('avatars', 'avatars');
 
+-- Set up access controls for storage. Allows downloading object with public key
+-- See https://supabase.com/docs/guides/storage/security/access-control#policy-examples for more details.
 create policy "Avatar images are publicly accessible." on storage.objects for
 select
-	using (bucket_id = 'avatars');
+	using (bucket_id = 'avatars' and storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated']));
 
 create policy "Anyone can upload an avatar." on storage.objects for insert
 with

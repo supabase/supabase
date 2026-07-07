@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, Button } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -14,9 +14,9 @@ import { CreateNewProjectDialog } from '@/components/interfaces/Database/Backups
 import { projectSpecToMonthlyPrice } from '@/components/interfaces/Database/Backups/RestoreToNewProject/RestoreToNewProject.utils'
 import { DiskType } from '@/components/interfaces/DiskManagement/ui/DiskManagement.constants'
 import { Markdown } from '@/components/interfaces/Markdown'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import Panel from '@/components/ui/Panel'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
@@ -136,7 +136,7 @@ export const RestoreToNewProject = () => {
     return (
       <Admonition
         type="default"
-        title="Restoring to new projects is temporarily not available for AWS (Revamped) projects"
+        description="Restoring to new projects is temporarily not available for AWS (Revamped) projects."
       />
     )
   }
@@ -157,7 +157,7 @@ export const RestoreToNewProject = () => {
       >
         <Markdown
           className="max-w-full"
-          content={`Restore to new project is only available for Postgres 15 and above.  
+          content={`Restore to new project is only available for Postgres 15 and above.
             Go to [infrastructure settings](/project/${project?.ref}/settings/infrastructure)
             to upgrade your database version.
           `}
@@ -257,21 +257,21 @@ export const RestoreToNewProject = () => {
         }}
       />
       {isRestoring ? (
-        <Alert_Shadcn_ className="[&>svg]:bg-none! [&>svg]:text-foreground-light mb-6">
+        <Alert className="[&>svg]:bg-none! [&>svg]:text-foreground-light mb-6">
           <Loader2 className="animate-spin" />
-          <AlertTitle_Shadcn_>Restoration in progress</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          <AlertTitle>Restoration in progress</AlertTitle>
+          <AlertDescription>
             <p>
               The new project {(restoringClone?.target_project as any)?.name || ''} is currently
               being created. You'll be able to restore again once the project is ready.
             </p>
-            <Button asChild type="default" className="mt-2">
+            <Button asChild variant="default" className="mt-2">
               <Link href={`/project/${restoringClone?.target_project?.ref ?? '_'}`}>
                 Go to new project
               </Link>
             </Button>
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       ) : null}
       {previousClones?.length ? (
         <div className="flex flex-col gap-2">

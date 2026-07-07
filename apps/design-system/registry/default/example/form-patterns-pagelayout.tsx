@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { format } from 'date-fns'
-import { CalendarIcon, ExternalLink, Trash, Upload } from 'lucide-react'
+import { ExternalLink, Trash, Upload } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -15,24 +15,27 @@ import {
   FormField,
   FormInputGroupInput,
   FormInputGroupTextArea,
-  Input_Shadcn_,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
   RadioGroupStacked,
   RadioGroupStackedItem,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Switch,
   Textarea,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
+import {
+  DatePicker,
+  DatePickerButton,
+  DatePickerContent,
+  DatePickerTrigger,
+} from 'ui-patterns/DatePicker'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValueFieldArray'
 import { getKeyValueFieldArrayValidationIssues } from 'ui-patterns/form/KeyValueFieldArray/validation'
@@ -57,7 +60,15 @@ const formSchema = z
   .object({
     name: z.string().min(1, 'Name is required'),
     description: z.string().optional(),
-    maxConnections: z.number().min(1).max(1000),
+    maxConnections: z
+      .union([
+        z.literal(''),
+        z.coerce
+          .number()
+          .gte(1000, 'Max connections should be at least 1000')
+          .lte(10000, 'Max connections should not exceed 10000'),
+      ])
+      .refine((value) => value !== '', 'Max connections is required'),
     enableFeature: z.boolean(),
     enableRls: z.boolean(),
     enableNotifications: z.boolean(),
@@ -65,9 +76,17 @@ const formSchema = z
     region: z.string().min(1, 'Region is required'),
     schemas: z.array(z.string()).min(1, 'At least one schema is required'),
     queueType: z.enum(['basic', 'partitioned']),
-    expiryDate: z.date().optional(),
+    expiryDate: z.date(),
     password: z.string().min(8, 'Password must be at least 8 characters'),
-    duration: z.number().min(5).max(30),
+    duration: z
+      .union([
+        z.literal(''),
+        z.coerce
+          .number()
+          .gte(1000, 'Duration should be at least 5ms')
+          .lte(10000, 'Duration should not exceed 30ms'),
+      ])
+      .refine((value) => value !== '', 'Duration is required'),
     redirectUris: z.array(z.object({ value: z.string().url('Must be a valid URL') })),
     httpHeaders: z.array(z.object({ key: z.string().trim(), value: z.string().trim() })),
     apiKey: z.string().optional(),
@@ -148,7 +167,7 @@ export default function FormPatternsPageLayout() {
                         description="Single-line text entry for short values"
                       >
                         <FormControl>
-                          <Input_Shadcn_ {...field} placeholder="Enter text" />
+                          <Input {...field} placeholder="Enter text" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -167,7 +186,7 @@ export default function FormPatternsPageLayout() {
                         description="Masked input for secure text entry"
                       >
                         <FormControl>
-                          <Input_Shadcn_ {...field} type="password" placeholder="Enter password" />
+                          <Input {...field} type="password" placeholder="Enter password" />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -186,7 +205,7 @@ export default function FormPatternsPageLayout() {
                         description="Read-only input with copy-to-clipboard functionality"
                       >
                         <FormControl>
-                          <Input
+                          <PasswordInput
                             copy
                             readOnly
                             value={form.getValues('apiKey') || ''}
@@ -211,13 +230,7 @@ export default function FormPatternsPageLayout() {
                         description="Numeric input with min/max validation"
                       >
                         <FormControl>
-                          <Input_Shadcn_
-                            {...field}
-                            type="number"
-                            min={1}
-                            max={1000}
-                            onChange={(e) => field.onChange(Number(e.target.value))}
-                          />
+                          <Input {...field} type="number" min={1} max={1000} />
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -237,15 +250,9 @@ export default function FormPatternsPageLayout() {
                       >
                         <FormControl>
                           <InputGroup>
-                            <FormInputGroupInput
-                              {...field}
-                              onChange={(e) => field.onChange(Number(e.target.value))}
-                              type="number"
-                              min={5}
-                              max={30}
-                            />
+                            <FormInputGroupInput {...field} type="number" min={5} max={30} />
                             <InputGroupAddon align="inline-end">
-                              <InputGroupText className="font-mono">MB</InputGroupText>
+                              <InputGroupText className="font-mono">ms</InputGroupText>
                             </InputGroupAddon>
                           </InputGroup>
                         </FormControl>
@@ -320,19 +327,20 @@ export default function FormPatternsPageLayout() {
                       >
                         <FormControl>
                           <div className="flex gap-4 items-center">
-                            <button
+                            <Button
                               type="button"
+                              variant="outline"
                               onClick={() => uploadButtonRef.current?.click()}
-                              className="flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong"
+                              className="flex items-center justify-center h-10 w-10 shrink-0 overflow-hidden rounded-full"
                               style={{
                                 backgroundImage: logoUrl ? `url("${logoUrl}")` : 'none',
                               }}
                             >
                               {!logoUrl && <Upload size={14} />}
-                            </button>
+                            </Button>
                             <div className="flex gap-2 items-center">
                               <Button
-                                type="default"
+                                variant="default"
                                 size="tiny"
                                 icon={<Upload size={14} />}
                                 onClick={() => uploadButtonRef.current?.click()}
@@ -341,7 +349,7 @@ export default function FormPatternsPageLayout() {
                               </Button>
                               {logoUrl && (
                                 <Button
-                                  type="default"
+                                  variant="default"
                                   size="tiny"
                                   icon={<Trash size={12} />}
                                   onClick={() => {
@@ -445,7 +453,7 @@ export default function FormPatternsPageLayout() {
                                         {file.name}
                                       </span>
                                       <Button
-                                        type="default"
+                                        variant="default"
                                         size="tiny"
                                         icon={<Trash size={12} />}
                                         onClick={() => {
@@ -572,22 +580,16 @@ export default function FormPatternsPageLayout() {
                         description="Single selection from a list of options"
                       >
                         <FormControl>
-                          <Select_Shadcn_ value={field.value} onValueChange={field.onChange}>
-                            <SelectTrigger_Shadcn_>
-                              <SelectValue_Shadcn_ placeholder="Select an option" />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
-                              <SelectItem_Shadcn_ value="us-east-1">
-                                US East (N. Virginia)
-                              </SelectItem_Shadcn_>
-                              <SelectItem_Shadcn_ value="us-west-2">
-                                US West (Oregon)
-                              </SelectItem_Shadcn_>
-                              <SelectItem_Shadcn_ value="eu-west-1">
-                                EU West (Ireland)
-                              </SelectItem_Shadcn_>
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
+                          <Select value={field.value} onValueChange={field.onChange}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select an option" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
+                              <SelectItem value="us-west-2">US West (Oregon)</SelectItem>
+                              <SelectItem value="eu-west-1">EU West (Ireland)</SelectItem>
+                            </SelectContent>
+                          </Select>
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -666,32 +668,28 @@ export default function FormPatternsPageLayout() {
                   <FormField
                     control={form.control}
                     name="expiryDate"
-                    render={({ field }) => (
+                    render={({ field, fieldState }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
                         label="Date Picker"
                         description="Date selection with calendar popover"
                       >
                         <FormControl>
-                          <Popover_Shadcn_>
-                            <PopoverTrigger_Shadcn_ asChild>
-                              <Button
-                                type="outline"
-                                className="bg-control w-full justify-start text-left font-normal px-3 py-4"
-                                icon={<CalendarIcon className="h-4 w-4" />}
-                              >
+                          <DatePicker>
+                            <DatePickerTrigger asChild>
+                              <DatePickerButton block isInvalid={fieldState.invalid}>
                                 {field.value ? format(field.value, 'PPP') : 'Pick a date'}
-                              </Button>
-                            </PopoverTrigger_Shadcn_>
-                            <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
+                              </DatePickerButton>
+                            </DatePickerTrigger>
+                            <DatePickerContent>
                               <Calendar
                                 mode="single"
                                 selected={field.value}
                                 onSelect={field.onChange}
                                 initialFocus
                               />
-                            </PopoverContent_Shadcn_>
-                          </Popover_Shadcn_>
+                            </DatePickerContent>
+                          </DatePicker>
                         </FormControl>
                       </FormItemLayout>
                     )}
@@ -759,13 +757,13 @@ export default function FormPatternsPageLayout() {
                   >
                     <div className="flex gap-2 items-center justify-end">
                       <Button
-                        type="default"
+                        variant="default"
                         icon={<ExternalLink size={14} />}
                         onClick={() => console.log('Action performed')}
                       >
                         View documentation
                       </Button>
-                      <Button type="default" onClick={() => console.log('Reset action')}>
+                      <Button variant="default" onClick={() => console.log('Reset action')}>
                         Reset API key
                       </Button>
                     </div>
@@ -773,11 +771,11 @@ export default function FormPatternsPageLayout() {
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
                   {form.formState.isDirty && (
-                    <Button type="default" onClick={() => form.reset()}>
+                    <Button variant="default" onClick={() => form.reset()}>
                       Cancel
                     </Button>
                   )}
-                  <Button type="primary" htmlType="submit" disabled={!form.formState.isDirty}>
+                  <Button variant="primary" type="submit" disabled={!form.formState.isDirty}>
                     Save changes
                   </Button>
                 </CardFooter>

@@ -6,10 +6,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Button,
   Checkbox,
-  Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import {
   InnerSideBarEmptyPanel,
@@ -27,10 +30,11 @@ import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import { SupaTable } from '@/components/grid/types'
 import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
 import { ErrorMatcher } from '@/components/interfaces/ErrorHandling/ErrorMatcher'
-import EditorMenuListSkeleton from '@/components/layouts/TableEditorLayout/EditorMenuListSkeleton'
+import { EditorMenuListSkeleton } from '@/components/layouts/TableEditorLayout/EditorMenuListSkeleton'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InfiniteListDefault, LoaderForIconMenuItems } from '@/components/ui/InfiniteList'
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { useEntityTypesQuery } from '@/data/entity-types/entity-types-infinite-query'
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
@@ -40,6 +44,8 @@ import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 export const TableEditorMenu = () => {
@@ -49,6 +55,7 @@ export const TableEditorMenu = () => {
   const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
 
   const [searchText, setSearchText] = useState<string>('')
+  const [isSchemaDropdownOpen, setIsSchemaDropdownOpen] = useState(false)
   const [tableToExport, setTableToExport] = useState<SupaTable>()
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
   const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
@@ -113,6 +120,10 @@ export const TableEditorMenu = () => {
     setSelectedSchema(selectedTable.schema)
   }
 
+  useShortcut(SHORTCUT_IDS.TABLE_EDITOR_FOCUS_SCHEMA, () => setIsSchemaDropdownOpen(true), {
+    registerInCommandMenu: true,
+  })
+
   const tableEditorTabsCleanUp = useTableEditorTabsCleanUp()
 
   const onSelectExportCLI = useCallback(
@@ -158,15 +169,28 @@ export const TableEditorMenu = () => {
     <>
       <div className="flex flex-col grow gap-5 pt-5 h-full">
         <div className="flex flex-col gap-y-1.5">
-          <SchemaSelector
-            className="mx-4"
-            selectedSchemaName={selectedSchema}
-            onSelectSchema={(name: string) => {
-              setSearchText('')
-              setSelectedSchema(name)
-            }}
-            onSelectCreateSchema={() => snap.onAddSchema()}
-          />
+          <ShortcutTooltip
+            shortcutId={SHORTCUT_IDS.TABLE_EDITOR_FOCUS_SCHEMA}
+            label="Switch schema"
+            side="bottom"
+            open={isSchemaDropdownOpen ? false : undefined}
+          >
+            <SchemaSelector
+              className="mx-4"
+              selectedSchemaName={selectedSchema}
+              onSelectSchema={(name: string) => {
+                setSearchText('')
+                setSelectedSchema(name)
+                setIsSchemaDropdownOpen(false)
+              }}
+              onSelectCreateSchema={() => {
+                snap.onAddSchema()
+                setIsSchemaDropdownOpen(false)
+              }}
+              open={isSchemaDropdownOpen}
+              onOpenChange={setIsSchemaDropdownOpen}
+            />
+          </ShortcutTooltip>
 
           <div className="grid gap-3 mx-4">
             {!isSchemaLocked ? (
@@ -177,7 +201,7 @@ export const TableEditorMenu = () => {
                 disabled={!canCreateTables}
                 size="tiny"
                 icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
-                type="default"
+                variant="default"
                 className="justify-start"
                 onClick={() => snap.onAddTable()}
                 tooltip={{
@@ -224,15 +248,21 @@ export const TableEditorMenu = () => {
                 </InnerSideBarFilterSortDropdownItem>
               </InnerSideBarFilterSortDropdown>
             </InnerSideBarFilterSearchInput>
-            <Popover_Shadcn_>
-              <PopoverTrigger_Shadcn_ asChild>
-                <Button
-                  type={visibleTypes.length !== 5 ? 'default' : 'dashed'}
-                  className="h-[32px] md:h-[28px] px-1.5"
-                  icon={<Filter />}
-                />
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_ className="p-0 w-56" side="bottom" align="center">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant={visibleTypes.length !== 5 ? 'default' : 'dashed'}
+                      className="h-[32px] md:h-[28px] px-1.5"
+                      icon={<Filter />}
+                      aria-label="Filter"
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Filter</TooltipContent>
+                </Tooltip>
+              </PopoverTrigger>
+              <PopoverContent className="p-0 w-56" side="bottom" align="center">
                 <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
                   <p className="text-xs">Show entity types</p>
                   <div className="flex flex-col">
@@ -251,13 +281,13 @@ export const TableEditorMenu = () => {
                               }
                             }}
                           />
-                          <Label_Shadcn_ htmlFor={key} className="capitalize text-xs">
+                          <Label htmlFor={key} className="capitalize text-xs">
                             {key.toLowerCase().replace('_', ' ')}
-                          </Label_Shadcn_>
+                          </Label>
                         </div>
                         <Button
                           size="tiny"
-                          type="default"
+                          variant="default"
                           onClick={() => setVisibleTypes([value])}
                           className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
                         >
@@ -267,8 +297,8 @@ export const TableEditorMenu = () => {
                     ))}
                   </div>
                 </div>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           </InnerSideBarFilters>
 
           {isLoading && <EditorMenuListSkeleton />}

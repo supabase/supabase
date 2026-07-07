@@ -2,13 +2,14 @@ import { type GuideModel } from '../../../resources/guide/guideModel.js'
 import { GuideModelLoader } from '../../../resources/guide/guideModelLoader.js'
 import { LintWarningsGuideLoader, type LintWarningsGuideSource } from './lint-warnings-guide.js'
 import { MarkdownLoader, type MarkdownSource } from './markdown.js'
-import { IntegrationLoader, type IntegrationSource, fetchPartners } from './partner-integrations.js'
+import { fetchPartners, IntegrationLoader, type IntegrationSource } from './partner-integrations.js'
 import {
-  CliReferenceLoader,
-  type CliReferenceSource,
   ClientLibReferenceLoader,
-  type ClientLibReferenceSource,
+  CliReferenceLoader,
+  loadClientLibReferenceFromNewPipeline,
   OpenApiReferenceLoader,
+  type ClientLibReferenceSource,
+  type CliReferenceSource,
   type OpenApiReferenceSource,
 } from './reference-doc.js'
 import { fetchTroubleshootingSources, type TroubleshootingSource } from './troubleshooting.js'
@@ -39,23 +40,27 @@ export async function fetchOpenApiReferenceSource() {
 }
 
 export async function fetchJsLibReferenceSource() {
-  return new ClientLibReferenceLoader(
-    'js-lib',
-    '/reference/javascript',
-    { title: 'JavaScript Reference', language: 'JavaScript' },
-    'spec/supabase_js_v2.yml',
-    'spec/common-client-libs-sections.json'
-  ).load()
+  // JS v2 is driven by the new reference pipeline. Ingest search sources from
+  // the generated `content/reference/javascript/v2/` outputs so embeddings
+  // never drift from what the renderer shows.
+  return loadClientLibReferenceFromNewPipeline({
+    source: 'js-lib',
+    path: '/reference/javascript',
+    meta: { title: 'JavaScript Reference', language: 'JavaScript' },
+    contentDir: 'content/reference/javascript/v2',
+  })
 }
 
 export async function fetchDartLibReferenceSource() {
-  return new ClientLibReferenceLoader(
-    'dart-lib',
-    '/reference/dart',
-    { title: 'Dart Reference', language: 'Dart' },
-    'spec/supabase_dart_v2.yml',
-    'spec/common-client-libs-sections.json'
-  ).load()
+  // Dart v2 is driven by the new reference pipeline. Ingest search sources from
+  // the generated `content/reference/dart/v2/` outputs so embeddings never
+  // drift from what the renderer shows.
+  return loadClientLibReferenceFromNewPipeline({
+    source: 'dart-lib',
+    path: '/reference/dart',
+    meta: { title: 'Dart Reference', language: 'Dart' },
+    contentDir: 'content/reference/dart/v2',
+  })
 }
 
 export async function fetchPythonLibReferenceSource() {

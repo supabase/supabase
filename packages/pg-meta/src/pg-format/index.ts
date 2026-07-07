@@ -212,18 +212,28 @@ export function literal(value?: unknown): SafeSqlFragment {
   return quoted as SafeSqlFragment
 }
 
+// Multi-word SQL keyword phrases callers are allowed to pass to `keyword()`.
+// Compared case-insensitively. Any phrase not listed here must be expressed as
+// separate single-word `keyword()` calls composed via `safeSql`, so that
+// arbitrary control phrases (e.g. "DROP TABLE") can't slip through.
+const ALLOWED_MULTI_WORD_KEYWORDS = new Set(['INSTEAD OF', 'BY DEFAULT'])
+
 /**
- * Marks SQL keywords (e.g., 'BEFORE', 'instead of') as safe for interpolation.
- * Only letters, numbers, underscores, and spaces are allowed, to prevent
- * injection.
+ * Marks SQL keywords (e.g., 'BEFORE', 'INSTEAD OF') as safe for interpolation.
+ * Accepts either a single word matching [A-Za-z][A-Za-z0-9_]*, or a
+ * multi-word phrase from `ALLOWED_MULTI_WORD_KEYWORDS`. Any other input —
+ * including arbitrary space-separated tokens like "DROP TABLE" — is rejected.
  */
 export function keyword(value: string): SafeSqlFragment {
-  if (!/^[A-Za-z][A-Za-z0-9_ ]*$/.test(value)) {
-    throw new Error(
-      `Not a valid keyword: "${value}". Only letters, numbers, underscores, and spaces are permitted.`
-    )
+  if (/^[A-Za-z][A-Za-z0-9_]*$/.test(value)) {
+    return value as SafeSqlFragment
   }
-  return value as SafeSqlFragment
+  if (ALLOWED_MULTI_WORD_KEYWORDS.has(value.toUpperCase())) {
+    return value as SafeSqlFragment
+  }
+  throw new Error(
+    `Not a valid keyword: "${value}". Must be a single word matching [A-Za-z][A-Za-z0-9_]*, or one of: ${[...ALLOWED_MULTI_WORD_KEYWORDS].join(', ')}.`
+  )
 }
 
 type Stringifyable =

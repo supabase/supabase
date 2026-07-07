@@ -141,7 +141,7 @@ These variables are safe to expose in your Expo app since Supabase has
     const supabaseUrl = YOUR_REACT_NATIVE_SUPABASE_URL
     const supabasePublishableKey = YOUR_REACT_NATIVE_SUPABASE_PUBLISHABLE_KEY
 
-    const supabase = createClient(supabaseUrl, supabasePublishableKey, {
+    export const supabase = createClient(supabaseUrl, supabasePublishableKey, {
       auth: {
         storage: new LargeSecureStore(),
         autoRefreshToken: true,

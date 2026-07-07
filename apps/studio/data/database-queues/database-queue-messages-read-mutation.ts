@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 
 import { databaseQueuesKeys } from './keys'
 import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueueMessageReadVariables = {

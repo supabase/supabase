@@ -1,8 +1,8 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
+import type { PGTable } from '@supabase/pg-meta'
 import { ArrowRight } from 'lucide-react'
 import type { PropsWithChildren } from 'react'
 import type { RenderCellProps } from 'react-data-grid'
-import { Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import { Popover, PopoverContent, PopoverTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { SupaRow } from '../../types'
@@ -38,7 +38,7 @@ export const ForeignKeyFormatter = (props: Props) => {
       r.source_column_name === column.name
   )
 
-  const { data: targetTable, isPending: isLoadingTargetTable } = useTableQuery<PostgresTable>(
+  const { data: targetTable, isPending: isLoadingTargetTable } = useTableQuery<PGTable>(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -56,8 +56,8 @@ export const ForeignKeyFormatter = (props: Props) => {
     foreignKeyColumn?.format === 'bytea' && !!value ? convertByteaToHex(value) : value
 
   return (
-    <div className="sb-grid-foreign-key-formatter flex justify-between">
-      <span className="sb-grid-foreign-key-formatter__text">
+    <div className="flex w-full items-center justify-between flex justify-between">
+      <span className="m-0 grow overflow-hidden text-ellipsis">
         {formattedValue === null ? <NullValue /> : formattedValue}
       </span>
       {isLoading && formattedValue !== null && (
@@ -73,19 +73,20 @@ export const ForeignKeyFormatter = (props: Props) => {
             </div>
           )}
           {!isLoadingTargetTable && targetTable !== undefined && (
-            <Popover_Shadcn_>
-              <PopoverTrigger_Shadcn_ asChild>
+            <Popover>
+              <PopoverTrigger asChild>
                 <ButtonTooltip
-                  type="default"
+                  variant="default"
                   className="w-6 h-6"
                   aria-label="View referencing record"
                   icon={<ArrowRight />}
                   onClick={(e) => e.stopPropagation()}
                   tooltip={{ content: { side: 'bottom', text: 'View referencing record' } }}
                 />
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
+              </PopoverTrigger>
+              <PopoverContent
                 align="end"
+                collisionPadding={8}
                 className="p-0 w-96"
                 onDoubleClick={(e) => {
                   e.preventDefault()
@@ -100,8 +101,8 @@ export const ForeignKeyFormatter = (props: Props) => {
                   column={relationship.target_column_name}
                   value={formattedValue}
                 />
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+              </PopoverContent>
+            </Popover>
           )}
         </>
       )}

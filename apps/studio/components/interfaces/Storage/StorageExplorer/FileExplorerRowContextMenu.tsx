@@ -1,14 +1,14 @@
 import { createContext, useCallback, useContext, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import {
-  ContextMenu_Shadcn_,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuSeparator_Shadcn_,
-  ContextMenuSub_Shadcn_,
-  ContextMenuSubContent_Shadcn_,
-  ContextMenuSubTrigger_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuSeparator,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
 } from 'ui'
 
 export type RowOptionChild = { name: string; onClick: () => void }
@@ -58,11 +58,11 @@ export function FileExplorerRowContextMenuProvider({ children }: { children: Rea
 
   return (
     <FileExplorerContextMenuContext.Provider value={{ onRowContextMenu }}>
-      <ContextMenu_Shadcn_ modal={false}>
-        <ContextMenuTrigger_Shadcn_ asChild>
+      <ContextMenu modal={false}>
+        <ContextMenuTrigger asChild>
           <div ref={triggerRef} className="fixed pointer-events-none w-0 h-0" />
-        </ContextMenuTrigger_Shadcn_>
-        <ContextMenuContent_Shadcn_
+        </ContextMenuTrigger>
+        <ContextMenuContent
           key={contextMenuKey}
           onCloseAutoFocus={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}
@@ -70,37 +70,33 @@ export function FileExplorerRowContextMenuProvider({ children }: { children: Rea
           {activeOptions.map((option) => {
             if ((option.children ?? []).length > 0) {
               return (
-                <ContextMenuSub_Shadcn_ key={option.name}>
-                  <ContextMenuSubTrigger_Shadcn_ className="gap-x-2">
+                <ContextMenuSub key={option.name}>
+                  <ContextMenuSubTrigger className="gap-x-2">
                     {option.icon || <></>}
                     <span className="text-xs">{option.name}</span>
-                  </ContextMenuSubTrigger_Shadcn_>
-                  <ContextMenuSubContent_Shadcn_>
+                  </ContextMenuSubTrigger>
+                  <ContextMenuSubContent>
                     {(option.children ?? []).map((child) => (
-                      <ContextMenuItem_Shadcn_ key={child.name} onSelect={child.onClick}>
+                      <ContextMenuItem key={child.name} onSelect={child.onClick}>
                         <span className="text-xs">{child.name}</span>
-                      </ContextMenuItem_Shadcn_>
+                      </ContextMenuItem>
                     ))}
-                  </ContextMenuSubContent_Shadcn_>
-                </ContextMenuSub_Shadcn_>
+                  </ContextMenuSubContent>
+                </ContextMenuSub>
               )
             } else if (option.name === 'Separator') {
-              return <ContextMenuSeparator_Shadcn_ key={option.name} />
+              return <ContextMenuSeparator key={option.name} />
             } else {
               return (
-                <ContextMenuItem_Shadcn_
-                  className="gap-x-2"
-                  key={option.name}
-                  onSelect={option.onClick}
-                >
+                <ContextMenuItem className="gap-x-2" key={option.name} onSelect={option.onClick}>
                   {option.icon || <></>}
                   <span className="text-xs">{option.name}</span>
-                </ContextMenuItem_Shadcn_>
+                </ContextMenuItem>
               )
             }
           })}
-        </ContextMenuContent_Shadcn_>
-      </ContextMenu_Shadcn_>
+        </ContextMenuContent>
+      </ContextMenu>
       {children}
     </FileExplorerContextMenuContext.Provider>
   )

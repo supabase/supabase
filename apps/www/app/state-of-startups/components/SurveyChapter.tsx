@@ -1,6 +1,7 @@
 'use client'
 
 import { SurveyPullQuote } from './SurveyPullQuote'
+import { SurveyPullQuoteCarousel, type CarouselPullQuote } from './SurveyPullQuoteCarousel'
 
 import './surveyResults.css'
 
@@ -15,9 +16,10 @@ interface SurveyChapterProps {
   pullQuote?: {
     quote: string
     author: string
-    authorPosition: string
-    authorAvatar: string
+    authorPosition?: string
+    authorAvatar?: string
   }
+  pullQuoteCarousel?: CarouselPullQuote[]
   children: React.ReactNode
 }
 
@@ -27,6 +29,7 @@ export function SurveyChapter({
   shortTitle,
   description,
   pullQuote,
+  pullQuoteCarousel,
   children,
 }: SurveyChapterProps) {
   const accent = 'green'
@@ -71,13 +74,17 @@ export function SurveyChapter({
           <div className="flex flex-col">{children}</div>
         </div>
 
-        {pullQuote && (
-          <SurveyPullQuote
-            quote={pullQuote.quote}
-            author={pullQuote.author}
-            authorPosition={pullQuote.authorPosition}
-            authorAvatar={pullQuote.authorAvatar}
-          />
+        {pullQuoteCarousel && pullQuoteCarousel.length > 0 ? (
+          <SurveyPullQuoteCarousel quotes={pullQuoteCarousel} />
+        ) : (
+          pullQuote && (
+            <SurveyPullQuote
+              quote={pullQuote.quote}
+              author={pullQuote.author}
+              authorPosition={pullQuote.authorPosition}
+              authorAvatar={pullQuote.authorAvatar}
+            />
+          )
         )}
       </section>
     </AccentContext.Provider>

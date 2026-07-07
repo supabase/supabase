@@ -1,11 +1,11 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { CodeIcon } from 'lucide-react'
 import { useState } from 'react'
-import { Button, cn, Popover } from 'ui'
+import { Button, cn, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
-import { TEMPLATES } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import { getLogsTemplates } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import type { LogTemplate } from '@/components/interfaces/Settings/Logs/Logs.types'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
 import CardButton from '@/components/ui/CardButton'
 import LogsExplorerHeader from '@/components/ui/Logs/LogsExplorerHeader'
@@ -17,14 +17,16 @@ export const LogsTemplatesPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const { logsTemplates: isTemplatesEnabled, logsShowMetadataIpTemplate: showMetadataIpTemplate } =
     useIsFeatureEnabled(['logs:templates', 'logs:show_metadata_ip_template'])
+  const useOtelEndpoint = useFlag('otelLegacyLogs')
 
   if (!isTemplatesEnabled) {
     return <UnknownInterface urlBack={`/project/${projectRef}/logs/explorer`} />
   }
 
+  const templates = getLogsTemplates(useOtelEndpoint)
   const allTemplates = showMetadataIpTemplate
-    ? TEMPLATES
-    : TEMPLATES.filter((template) => template.label !== 'Metadata IP')
+    ? templates
+    : templates.filter((template) => template.label !== 'Metadata IP')
 
   return (
     <div className="mx-auto h-full w-full px-5 py-6">
@@ -75,27 +77,24 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
       description={template.description}
       footer={
         <div className="flex flex-row justify-end">
-          <Popover
-            onOpenChange={setShowPreview}
-            open={showPreview}
-            className="rounded-lg bg-alternative"
-            size="content"
-            overlay={
+          <Popover onOpenChange={setShowPreview} open={showPreview}>
+            <PopoverTrigger asChild>
+              <Button
+                asChild
+                variant="default"
+                onClick={(e) => {
+                  e.preventDefault()
+                  setShowPreview(!showPreview)
+                }}
+              >
+                <span>Preview</span>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="rounded-lg bg-alternative p-0">
               <pre className="whitespace-pre-line wrap-break-word rounded-lg bg-alternative p-4 text-sm">
                 {template.searchString}
               </pre>
-            }
-          >
-            <Button
-              asChild
-              type="default"
-              onClick={(e) => {
-                e.preventDefault()
-                setShowPreview(!showPreview)
-              }}
-            >
-              <span>Preview</span>
-            </Button>
+            </PopoverContent>
           </Popover>
         </div>
       }

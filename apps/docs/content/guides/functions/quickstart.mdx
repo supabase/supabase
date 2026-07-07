@@ -53,7 +53,7 @@ supabase functions new hello-world
 
 {/* TODO: Link to parameter documentation */}
 
-<Admonition type="tip" label="Secure your function with Supabase Auth">
+<Admonition type="tip" title="Secure your function with Supabase Auth">
 
 When an HTTP request is sent to Edge Functions, you can use Supabase Auth to secure endpoints. By default, the `supabase functions new` command adds handling a valid publishable or secret key to the basic template. However, you can change this behavior with the `--auth` flag when creating a new function.
 
@@ -132,7 +132,7 @@ After this step, you should have successfully tested your Edge Function locally 
 
 To deploy your function globally, you need to connect your local project to a Supabase project.
 
-<Admonition type="tip" label="Need to create a new Supabase project?">
+<Admonition type="tip" title="Need to create a new Supabase project?">
 
 Create one at [database.new](https://database.new/).
 
@@ -176,7 +176,7 @@ If you want to deploy all functions, run the `deploy` command without specifying
 supabase functions deploy
 ```
 
-<Admonition type="note" label="Docker not required">
+<Admonition type="note" title="Docker not required">
 
 The CLI automatically falls back to API-based deployment if Docker isn't available. You can also explicitly use API deployment with the `--use-api` flag:
 
@@ -214,6 +214,12 @@ curl --request POST 'https://[YOUR_PROJECT_ID].supabase.co/functions/v1/hello-wo
 ## Usage
 
 Now that your function is deployed, you can invoke it from within an app:
+
+<Admonition type="note" label="Calling from the browser?">
+
+Make sure your function can handle [CORS](/docs/guides/functions/cors) (Cross-Origin Resource Sharing) requests by configuring its headers correctly.
+
+</Admonition>
 
 <Tabs
   scrollable

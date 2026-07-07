@@ -4,9 +4,11 @@ import type { Context, MiddlewareHandler } from 'hono'
 import { env } from 'hono/adapter'
 import { setCookie } from 'hono/cookie'
 
+import type { Database } from '../database.types'
+
 declare module 'hono' {
   interface ContextVariableMap {
-    supabase: SupabaseClient
+    supabase: SupabaseClient<Database>
   }
 }
 
@@ -38,9 +40,8 @@ export const supabaseMiddleware = (): MiddlewareHandler => {
         getAll() {
           return parseCookieHeader(c.req.header('Cookie') ?? '')
         },
-        setAll(cookiesToSet, cacheHeaders) {
+        setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => setCookie(c, name, value, options))
-          Object.entries(cacheHeaders).forEach(([key, value]) => c.header(key, value))
         },
       },
     })

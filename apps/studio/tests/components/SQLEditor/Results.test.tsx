@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import { expect, test, vi } from 'vitest'
 
-import Results from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
+import { Results } from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
 import { customRender as render } from '@/tests/lib/custom-render'
 
 let contextMenuMountCount = 0
@@ -10,9 +10,9 @@ vi.mock('ui', async () => {
   const actual = await vi.importActual<typeof import('ui')>('ui')
   return {
     ...actual,
-    ContextMenu_Shadcn_: (props: any) => {
+    ContextMenu: (props: any) => {
       contextMenuMountCount++
-      return <actual.ContextMenu_Shadcn_ {...props} />
+      return <actual.ContextMenu {...props} />
     },
   }
 })

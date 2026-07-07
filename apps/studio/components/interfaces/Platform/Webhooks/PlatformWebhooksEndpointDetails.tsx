@@ -8,8 +8,8 @@ import {
   type PaginationState,
   type SortingState,
 } from '@tanstack/react-table'
-import { ChevronLeft, ChevronRight, RotateCcw, Search } from 'lucide-react'
-import { useEffect, useState, type ReactNode } from 'react'
+import { ChevronLeft, ChevronRight, Copy, RotateCcw, Search } from 'lucide-react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import {
   Badge,
   Button,
@@ -23,15 +23,19 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { TanStackTableHeadSort } from 'ui-patterns/Table'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 import { statusBadgeVariant } from './PlatformWebhooksView.utils'
 import { getStatusLevel } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface DetailItemProps {
   label: string
@@ -50,6 +54,7 @@ interface PlatformWebhooksEndpointDetailsProps {
   deliverySearch: string
   filteredDeliveries: WebhookDelivery[]
   selectedEndpoint: WebhookEndpoint
+  onCopyUrl: () => void
   onDeliverySearchChange: (value: string) => void
   onOpenDelivery: (deliveryId: string) => void
   onRetryDelivery: (deliveryId: string) => void
@@ -118,7 +123,7 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
         <div className="flex h-full items-center justify-end">
           {row.original.status !== 'success' ? (
             <ButtonTooltip
-              type="default"
+              variant="default"
               size="tiny"
               className="w-7 shrink-0 hit-area-2"
               icon={<RotateCcw />}
@@ -132,7 +137,7 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
             />
           ) : (
             <Button
-              type="default"
+              variant="default"
               size="tiny"
               className="w-7 shrink-0 hit-area-2 invisible pointer-events-none"
               icon={<RotateCcw />}
@@ -150,6 +155,7 @@ export const PlatformWebhooksEndpointDetails = ({
   deliverySearch,
   filteredDeliveries,
   selectedEndpoint,
+  onCopyUrl,
   onDeliverySearchChange,
   onOpenDelivery,
   onRetryDelivery,
@@ -157,7 +163,12 @@ export const PlatformWebhooksEndpointDetails = ({
   const hasCustomHeaders = selectedEndpoint.customHeaders.length > 0
   const hasName = selectedEndpoint.name.trim().length > 0
   const hasDescription = selectedEndpoint.description.trim().length > 0
+  const deliverySearchRef = useRef<HTMLInputElement>(null)
   const [sorting, setSorting] = useState<SortingState>(DEFAULT_DELIVERY_SORTING)
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH, () => deliverySearchRef.current?.focus(), {
+    label: 'Search deliveries',
+  })
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: DELIVERIES_PAGE_SIZE,
@@ -198,8 +209,21 @@ export const PlatformWebhooksEndpointDetails = ({
             <dl className="grid grid-cols-1 gap-x-10 gap-y-6 md:grid-cols-2">
               {hasName && <DetailItem label="Name">{selectedEndpoint.name}</DetailItem>}
 
-              <DetailItem label="URL" ddClassName="text-sm break-all">
-                {selectedEndpoint.url}
+              <DetailItem label="URL" ddClassName="flex items-start gap-2 text-sm">
+                <span className="break-all">{selectedEndpoint.url}</span>
+                <ShortcutTooltip
+                  shortcutId={SHORTCUT_IDS.PLATFORM_WEBHOOKS_COPY_ENDPOINT_URL}
+                  label="Copy endpoint URL"
+                >
+                  <Button
+                    variant="text"
+                    size="tiny"
+                    className="mt-0.5 shrink-0 h-5 w-5 p-0"
+                    icon={<Copy size={12} />}
+                    aria-label="Copy endpoint URL"
+                    onClick={onCopyUrl}
+                  />
+                </ShortcutTooltip>
               </DetailItem>
 
               {hasDescription && (
@@ -250,12 +274,14 @@ export const PlatformWebhooksEndpointDetails = ({
         <h2 className="text-foreground text-xl">Deliveries</h2>
         <div className="flex items-center justify-between gap-2">
           <Input
+            ref={deliverySearchRef}
             placeholder="Search deliveries"
             size="tiny"
             icon={<Search />}
             value={deliverySearch}
             className="w-full lg:w-52"
             onChange={(event) => onDeliverySearchChange(event.target.value)}
+            onKeyDown={onSearchInputEscape(deliverySearch, onDeliverySearchChange)}
           />
         </div>
         <Card className="overflow-hidden">
@@ -340,7 +366,7 @@ export const PlatformWebhooksEndpointDetails = ({
                   icon={<ChevronLeft />}
                   className="w-7 hit-area-2"
                   aria-label="Previous page"
-                  type="default"
+                  variant="default"
                   size="tiny"
                   disabled={!table.getCanPreviousPage()}
                   onClick={() => table.previousPage()}
@@ -349,7 +375,7 @@ export const PlatformWebhooksEndpointDetails = ({
                   icon={<ChevronRight />}
                   className="w-7 hit-area-2"
                   aria-label="Next page"
-                  type="default"
+                  variant="default"
                   size="tiny"
                   disabled={!table.getCanNextPage()}
                   onClick={() => table.nextPage()}

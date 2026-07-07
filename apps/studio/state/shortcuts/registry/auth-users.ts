@@ -50,14 +50,14 @@ export const authUsersRegistry: RegistryDefinations<AuthUsersShortcutId> = {
     label: 'Clear user selection',
     sequence: ['Escape'],
     showInSettings: false,
-    options: { ignoreInputs: true },
+    options: { ignoreInputs: true, conflictBehavior: 'allow' },
   },
   [AUTH_USERS_SHORTCUT_IDS.AUTH_USERS_CLOSE_PANEL]: {
     id: AUTH_USERS_SHORTCUT_IDS.AUTH_USERS_CLOSE_PANEL,
     label: 'Close user details panel',
     sequence: ['Escape'],
     showInSettings: false,
-    options: { ignoreInputs: true },
+    options: { ignoreInputs: true, conflictBehavior: 'allow' },
   },
   [AUTH_USERS_SHORTCUT_IDS.AUTH_USERS_START_NAV_DOWN]: {
     id: AUTH_USERS_SHORTCUT_IDS.AUTH_USERS_START_NAV_DOWN,

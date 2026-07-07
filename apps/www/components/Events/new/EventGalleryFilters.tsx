@@ -2,7 +2,7 @@
 
 import { useEvents } from '~/app/events/context'
 import { SearchIcon } from 'lucide-react'
-import { Badge, Input_Shadcn_ as Input } from 'ui'
+import { Badge, Input } from 'ui'
 
 const CATEGORIES_FILTERS = [
   { name: 'All', value: 'all' },
@@ -46,6 +46,15 @@ export function EventGalleryFilters() {
             </Badge>
           )
         })}
+        {(categories['on-demand'] ?? 0) > 0 && (
+          <Badge
+            variant={selectedCategories.includes('on-demand') ? 'success' : 'default'}
+            className="cursor-pointer"
+            onClick={() => toggleCategory('on-demand')}
+          >
+            On-demand ({categories['on-demand']})
+          </Badge>
+        )}
       </div>
     </div>
   )

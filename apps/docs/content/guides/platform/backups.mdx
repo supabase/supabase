@@ -3,7 +3,7 @@ title: 'Database Backups'
 description: 'Learn about backups for your Supabase project.'
 ---
 
-We automatically back up all Free, Pro, Team, and Enterprise Plan projects on a daily basis. You can find backups in the [**Database** > **Backups**](/dashboard/project/_/database/backups/scheduled) section of the Dashboard.
+We automatically back up all Pro, Team, and Enterprise Plan projects on a daily basis. You can find backups in the [**Database** > **Backups**](/dashboard/project/_/database/backups/scheduled) section of the Dashboard.
 
 Pro Plan projects can access the last 7 days of daily backups. Team Plan projects can access the last 14 days of daily backups, while Enterprise Plan projects can access up to 30 days of daily backups. If you need more frequent backups, consider enabling [Point-in-Time Recovery](#point-in-time-recovery). We recommend that free tier plan projects regularly export their data using the [Supabase CLI `db dump` command](/docs/reference/cli/supabase-db-dump) and maintain off-site backups.
 
@@ -17,7 +17,7 @@ When you delete a project, we permanently remove all associated data, including 
 
 Database backups can be categorized into two types: **logical** and **physical**. You can learn more about them [in this blog post](/blog/postgresql-physical-logical-backups).
 
-<Admonition type="note" label="Physical backups are now enabled by default">
+<Admonition type="note" title="Physical backups are now enabled by default">
 
 All projects on Postgres `15.8.1.079` and newer use the newer physical backup process.
 
@@ -91,13 +91,11 @@ Projects that want to use PITR must also use at least a Small compute add-on to 
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
   chevronAlign="right"
   justified
   size="medium"
   className="text-foreground-light mt-8 mb-6"
 >
-  <div className="border-b mt-3 pb-3">
     <AccordionItem
       header="How PITR works"
       id="item-1"
@@ -111,7 +109,6 @@ Projects that want to use PITR must also use at least a Small compute add-on to 
 
     </AccordionItem>
 
-  </div>
 </Accordion>
 
 <Admonition type="note">

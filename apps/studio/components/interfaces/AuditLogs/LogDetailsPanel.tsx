@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Input_Shadcn_ as Input, SidePanel, TextArea_Shadcn_ as TextArea } from 'ui'
+import { Input, SidePanel, TextArea } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import {

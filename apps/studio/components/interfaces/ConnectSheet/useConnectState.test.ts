@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react'
-import { describe, expect, test, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { useConnectState } from './useConnectState'
 
@@ -17,6 +17,11 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
 
 vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useIsHighAvailability: vi.fn().mockImplementation(() => false),
+}))
+
+const deploymentModeMock = { isPlatform: true, isCli: false, isSelfHosted: false }
+vi.mock('@/hooks/misc/useDeploymentMode', () => ({
+  useDeploymentMode: () => deploymentModeMock,
 }))
 
 describe('useConnectState', () => {
@@ -562,6 +567,132 @@ describe('useConnectState', () => {
       expect(modeIds).toContain('direct')
       expect(modeIds).toContain('orm')
       expect(modeIds).toContain('mcp')
+    })
+  })
+
+  // ============================================================================
+  // Deployment-Mode-Aware Tests
+  // ============================================================================
+
+  describe('deployment mode', () => {
+    beforeEach(() => {
+      Object.assign(deploymentModeMock, {
+        isPlatform: true,
+        isCli: false,
+        isSelfHosted: false,
+      })
+    })
+
+    afterEach(() => {
+      Object.assign(deploymentModeMock, {
+        isPlatform: true,
+        isCli: false,
+        isSelfHosted: false,
+      })
+    })
+
+    describe('connectionMethod options filtering', () => {
+      test('platform exposes direct, transaction and session', () => {
+        Object.assign(deploymentModeMock, {
+          isPlatform: true,
+          isCli: false,
+          isSelfHosted: false,
+        })
+        const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
+        const values = result.current.getFieldOptions('connectionMethod').map((o) => o.value)
+        expect(values).toEqual(['direct', 'transaction', 'session'])
+      })
+
+      test('CLI exposes only direct', () => {
+        Object.assign(deploymentModeMock, {
+          isPlatform: false,
+          isCli: true,
+          isSelfHosted: false,
+        })
+        const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
+        const values = result.current.getFieldOptions('connectionMethod').map((o) => o.value)
+        expect(values).toEqual(['direct'])
+      })
+
+      test('self-hosted exposes session, transaction, direct (session first)', () => {
+        Object.assign(deploymentModeMock, {
+          isPlatform: false,
+          isCli: false,
+          isSelfHosted: true,
+        })
+        const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
+        const values = result.current.getFieldOptions('connectionMethod').map((o) => o.value)
+        expect(values).toEqual(['session', 'transaction', 'direct'])
+      })
+
+      test('self-hosted overrides direct method description', () => {
+        Object.assign(deploymentModeMock, {
+          isPlatform: false,
+          isCli: false,
+          isSelfHosted: true,
+        })
+        const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
+        const directOption = result.current
+          .getFieldOptions('connectionMethod')
+          .find((o) => o.value === 'direct')
+        expect(directOption?.description).toBe('Manually configurable for self-hosted Supabase.')
+      })
+
+      test('self-hosted overrides session method description', () => {
+        Object.assign(deploymentModeMock, {
+          isPlatform: false,
+          isCli: false,
+          isSelfHosted: true,
+        })
+        const { result } = renderHook(() => useConnectState({ mode: 'direct' }))
+        const sessionOption = result.current
+          .getFieldOptions('connectionMethod')
+          .find((o) => o.value === 'session')
+        expect(sessionOption?.description).toBe(
+          'Supavisor (default pooler for self-hosted Supabase).'
+        )
+      })
+    })
+
+    describe('setMode default for connectionMethod', () => {
+      test('platform defaults to direct', () => {
+        Object.assign(deploymentModeMock, {
+          isPlatform: true,
+          isCli: false,
+          isSelfHosted: false,
+        })
+        const { result } = renderHook(() => useConnectState({ mode: 'framework' }))
+        act(() => {
+          result.current.setMode('direct')
+        })
+        expect(result.current.state.connectionMethod).toBe('direct')
+      })
+
+      test('CLI defaults to direct', () => {
+        Object.assign(deploymentModeMock, {
+          isPlatform: false,
+          isCli: true,
+          isSelfHosted: false,
+        })
+        const { result } = renderHook(() => useConnectState({ mode: 'framework' }))
+        act(() => {
+          result.current.setMode('direct')
+        })
+        expect(result.current.state.connectionMethod).toBe('direct')
+      })
+
+      test('self-hosted defaults to session', () => {
+        Object.assign(deploymentModeMock, {
+          isPlatform: false,
+          isCli: false,
+          isSelfHosted: true,
+        })
+        const { result } = renderHook(() => useConnectState({ mode: 'framework' }))
+        act(() => {
+          result.current.setMode('direct')
+        })
+        expect(result.current.state.connectionMethod).toBe('session')
+      })
     })
   })
 })

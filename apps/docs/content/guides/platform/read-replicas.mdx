@@ -32,28 +32,37 @@ You can only read data from a Read Replica. This is in contrast to a Primary dat
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
   chevronAlign="right"
   justified
   size="large"
   className="text-foreground-light mt-8 mb-6"
 >
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
+  <AccordionItem
       header="Do you need Read Replicas?"
       id="rr-flow"
     >
 
-    When your database starts slowing down, you face a choice: make your existing database bigger (scale vertically), or spread the load across multiple databases (scale horizontally). Both approaches work. Neither is universally correct. The right answer depends on your workload, your budget, and where the bottleneck actually is.
+    When your database starts slowing down, you face a choice: make your existing database bigger (scale vertically), or spread the load across multiple databases (scale horizontally). Both approaches work. Neither is universally correct. The right answer depends on your workload, your budget, and where the bottleneck is.
 
-    <Image
-      src="/docs/img/guides/platform/read-replicas/read-replicas-flow.svg"
-      alt="Read Replicas decision flowchart"
-    />
+    ```mermaid
+    flowchart TD
+      A[Database slowing down] --> B{CPU above 70% sustained?}
+      B -->|No| C[Monitor, do not scale yet]
+      B -->|Yes| D{Queries optimized? Indexes in place?}
+      D -->|No| E[Run EXPLAIN ANALYZE<br/>Add missing indexes<br/>Optimize first]
+      E --> D
+      D -->|Yes| F{Workload 80%+ reads?}
+      F -->|No| G[Upgrade compute<br/>Replicas will not help writes]
+      F -->|Yes| H{Already at 16XL?}
+      H -->|Yes| I[Read Replicas<br/>Only horizontal option left]
+      H -->|No| J{Need workload isolation<br/>or geo-distribution?}
+      J -->|Yes| K[Read Replicas]
+      J -->|No| L[Either works<br/>Compute is simpler<br/>Replicas scale further]
+    ```
+
+    Supabase recommends not scaling until CPU is sustained above 70%. After it is, confirm your queries are already optimized and properly indexed with `EXPLAIN ANALYZE` before adding hardware. If your workload is less than roughly 80% reads, upgrade compute. Read Replicas only serve reads and won't help writes. If it's read-heavy, Read Replicas become the right choice after you reach the largest compute size of 16XL or earlier if you need workload isolation or geographic distribution. Below 16XL with no isolation need, either option works. While compute is simpler, Read Replicas scale further.
 
     </AccordionItem>
-
-  </div>
 
 </Accordion>
 
@@ -143,7 +152,7 @@ When a Read Replica is deployed, it emits logs from the following services:
 - [PostgREST](/dashboard/project/_/logs/postgrest-logs)
 - [Supavisor](/dashboard/project/_/logs/pooler-logs)
 
-Views on [Log Explorer](/docs/guides/platform/logs) are automatically filtered by databases, with the logs of the Primary database displayed by default. Viewing logs from other databases can be toggled with the `Source` button found on the upper-right part section of the Logs Explorer page.
+Views on [Log Explorer](/docs/guides/telemetry/logs) are automatically filtered by databases, with the logs of the Primary database displayed by default. Viewing logs from other databases can be toggled with the `Source` button found on the upper-right part section of the Logs Explorer page.
 
 For API logs, logs can originate from the API Load Balancer as well. The upstream database or the one that eventually handles the request can be found under the `Redirect Identifier` field. This is equivalent to `metadata.load_balancer_redirect_identifier` when querying the underlying logs.
 
@@ -151,7 +160,7 @@ For API logs, logs can originate from the API Load Balancer as well. The upstrea
 
 Observability and metrics for Read Replicas are available on the Supabase Dashboard. Resource utilization for a specific Read Replica can be viewed on the [Database Reports page](/dashboard/project/_/observability/database) by toggling for `Source`. Likewise, metrics on API requests going through either a Read Replica or Load Balancer API endpoint are also available on the dashboard through the [API Reports page](/dashboard/project/_/observability/api-overview)
 
-We recommend ingesting your [project's metrics](/docs/guides/platform/metrics#accessing-the-metrics-endpoint) into your own environment. If you have an existing ingestion pipeline set up for your project, you can [update it](https://github.com/supabase/supabase-grafana?tab=readme-ov-file#read-replica-support) to additionally ingest metrics from your Read Replicas.
+We recommend ingesting your [project's metrics](/docs/guides/telemetry/metrics) into your own environment. If you have an existing ingestion pipeline set up for your project, you can [update it](https://github.com/supabase/supabase-grafana?tab=readme-ov-file#read-replica-support) to additionally ingest metrics from your Read Replicas.
 
 ### Centralized configuration management
 

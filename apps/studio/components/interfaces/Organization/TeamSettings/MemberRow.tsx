@@ -5,9 +5,9 @@ import { useMemo } from 'react'
 import {
   Badge,
   cn,
-  HoverCard_Shadcn_,
-  HoverCardContent_Shadcn_,
-  HoverCardTrigger_Shadcn_,
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
   ScrollArea,
   TableCell,
   TableRow,
@@ -141,15 +141,15 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                         {projectsApplied[0]}
                       </span>
                     ) : (
-                      <HoverCard_Shadcn_ openDelay={200}>
-                        <HoverCardTrigger_Shadcn_ asChild>
+                      <HoverCard openDelay={200}>
+                        <HoverCardTrigger asChild>
                           <span className="text-foreground-light">
                             {role?.projects.length === 0
                               ? 'Organization'
                               : `${projectsApplied.length} project${projectsApplied.length > 1 ? 's' : ''}`}
                           </span>
-                        </HoverCardTrigger_Shadcn_>
-                        <HoverCardContent_Shadcn_ className="p-0">
+                        </HoverCardTrigger>
+                        <HoverCardContent className="p-0">
                           <p className="p-2 text-xs">
                             {roleName} role applies to {projectsApplied.length} project
                             {projectsApplied.length > 1 ? 's' : ''}
@@ -176,8 +176,8 @@ export const MemberRow = ({ member }: MemberRowProps) => {
                               })}
                             </ScrollArea>
                           </div>
-                        </HoverCardContent_Shadcn_>
-                      </HoverCard_Shadcn_>
+                        </HoverCardContent>
+                      </HoverCard>
                     )}
                   </>
                 )}

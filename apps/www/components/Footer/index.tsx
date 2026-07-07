@@ -18,7 +18,7 @@ import {
   IconTikTok,
   IconTwitterX,
   IconYoutubeSolid,
-  Input_Shadcn_,
+  Input,
 } from 'ui'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
@@ -178,7 +178,7 @@ const Footer = (props: Props) => {
                   <p className="text-foreground-lighter text-sm">
                     Get product updates and news from Supabase.
                   </p>
-                  <Input_Shadcn_
+                  <Input
                     type="email"
                     placeholder="Your email"
                     aria-label="Email for newsletter"
@@ -188,9 +188,9 @@ const Footer = (props: Props) => {
                     className="flex-1 md:max-w-72 xl:max-w-[80%] h-6! text-xs px-2"
                   />
                   <Button
-                    type="primary"
+                    variant="primary"
                     size="tiny"
-                    htmlType="submit"
+                    type="submit"
                     loading={newsletterStatus === 'loading'}
                     className="w-fit"
                   >

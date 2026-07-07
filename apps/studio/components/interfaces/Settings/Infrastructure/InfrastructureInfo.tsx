@@ -1,9 +1,7 @@
 import { useParams } from 'common'
-import Link from 'next/link'
 import {
   Badge,
-  Button,
-  Input_Shadcn_ as Input,
+  Input,
   InputGroup,
   InputGroupAddon,
   InputGroupInput,
@@ -16,8 +14,11 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
-import { ReadReplicasWarning, ValidationErrorsWarning } from './UpgradeWarnings'
-import { NoticeBar } from '@/components/interfaces/DiskManagement/ui/NoticeBar'
+import {
+  ReadReplicasWarning,
+  ValidationErrorsWarning,
+  ValidationWarningsAdmonition,
+} from './UpgradeWarnings'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -25,7 +26,7 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useProjectUpgradeEligibilityQuery } from '@/data/config/project-upgrade-eligibility-query'
 import { useProjectServiceVersionsQuery } from '@/data/projects/project-service-versions'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
@@ -36,15 +37,12 @@ export const InfrastructureInfo = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const {
-    projectAuthAll: authEnabled,
-    projectSettingsDatabaseUpgrades: showDatabaseUpgrades,
-    databaseReplication: showReplication,
-  } = useIsFeatureEnabled([
-    'project_auth:all',
-    'project_settings:database_upgrades',
-    'database:replication',
-  ])
+  const { projectAuthAll: authEnabled, projectSettingsDatabaseUpgrades: showDatabaseUpgrades } =
+    useIsFeatureEnabled([
+      'project_auth:all',
+      'project_settings:database_upgrades',
+      'database:replication',
+    ])
 
   const {
     data,
@@ -83,31 +81,9 @@ export const InfrastructureInfo = () => {
   const isInactive = project?.status === 'INACTIVE'
   const hasReadReplicas = (databases ?? []).length > 1
 
-  const hasValidationErrors = (data?.validation_errors ?? []).length > 0
-
   return (
     <>
       <ScaffoldDivider />
-
-      {project?.cloud_provider !== 'FLY' && showReplication && (
-        <ScaffoldContainer>
-          <ScaffoldSection isFullWidth>
-            <NoticeBar
-              visible={true}
-              type="default"
-              title="Management of read replicas has moved"
-              description="Read replicas is now managed under Replication in the Database section."
-              actions={
-                <Button type="default" asChild>
-                  <Link href={`/project/${ref}/database/replication`} className="no-underline!">
-                    Go to Replication
-                  </Link>
-                </Button>
-              }
-            />
-          </ScaffoldSection>
-        </ScaffoldContainer>
-      )}
 
       <ScaffoldContainer>
         <ScaffoldSection>
@@ -227,9 +203,13 @@ export const InfrastructureInfo = () => {
                       )
                     ) : null}
 
-                    {showDatabaseUpgrades && data && !data.eligible && hasValidationErrors ? (
-                      <ValidationErrorsWarning validationErrors={data.validation_errors ?? []} />
-                    ) : null}
+                    {showDatabaseUpgrades && data && !data.eligible && (
+                      <ValidationErrorsWarning validationErrors={data.validation_errors} />
+                    )}
+
+                    {showDatabaseUpgrades && data && data.warnings && (
+                      <ValidationWarningsAdmonition warnings={data.warnings} />
+                    )}
                   </>
                 )}
               </>

@@ -22,7 +22,7 @@ import {
 } from './EdgeFunctionOverview.utils'
 import type { InvocationChartDatum, InvocationUpdateAnnotation } from './EdgeFunctionOverview.utils'
 import { toAlertError } from './EdgeFunctionRecentErrors.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import type { ChartIntervals } from '@/types'
 
 interface EdgeFunctionInvocationsSectionProps {
@@ -102,7 +102,7 @@ export const EdgeFunctionInvocationsSection = ({
                     return (
                       <Button
                         key={`function-filter-${item.key}`}
-                        type={interval === item.key ? 'secondary' : 'default'}
+                        variant={interval === item.key ? 'secondary' : 'default'}
                         onClick={() => onIntervalChange(item.key)}
                         className={getSegmentedButtonClassName(
                           index,

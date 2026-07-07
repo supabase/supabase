@@ -65,6 +65,12 @@ export class NotionClient {
    * the database schema, so values can be passed as plain strings/numbers and
    * will be wrapped in the correct Notion property shape.
    * Unknown columns (not present in the database) are silently skipped.
+   *
+   * If the database has an `email`-typed column and `values` includes a value
+   * for it, the database is first queried for an existing row with that email.
+   * If one exists, the call is a no-op (skip-on-duplicate). Notion has no
+   * native dedupe, so this is the only thing standing between us and a row
+   * for every refresh of the form.
    */
   async createDatabasePage(databaseId: string, values: Record<string, unknown>): Promise<void> {
     const schema = await this.getSchema(databaseId)
@@ -78,10 +84,48 @@ export class NotionClient {
       if (encoded !== undefined) properties[name] = encoded
     }
 
+    const emailColumn = Object.values(schema.properties).find((p) => p.type === 'email')
+    if (emailColumn) {
+      const incomingEmail = values[emailColumn.name]
+      if (typeof incomingEmail === 'string' && incomingEmail.trim() !== '') {
+        const exists = await this.pageExistsByEmail(
+          databaseId,
+          emailColumn.name,
+          incomingEmail.trim()
+        )
+        if (exists) {
+          console.warn('[crm/notion] Skipping duplicate submission', {
+            databaseId,
+            emailColumn: emailColumn.name,
+          })
+          return
+        }
+      }
+    }
+
     await this.request('/pages', 'POST', {
       parent: { database_id: databaseId },
       properties,
     })
+  }
+
+  private async pageExistsByEmail(
+    databaseId: string,
+    propertyName: string,
+    email: string
+  ): Promise<boolean> {
+    const result = await this.request<{ results: unknown[] }>(
+      `/databases/${encodeURIComponent(databaseId)}/query`,
+      'POST',
+      {
+        filter: {
+          property: propertyName,
+          email: { equals: email },
+        },
+        page_size: 1,
+      }
+    )
+    return result.results.length > 0
   }
 }
 

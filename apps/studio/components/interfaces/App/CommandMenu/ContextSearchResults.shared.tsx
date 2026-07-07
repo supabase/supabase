@@ -1,11 +1,9 @@
-'use client'
-
-import { cn, CommandList_Shadcn_ } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { cn, CommandList } from 'ui'
 import { TextHighlighter } from 'ui-patterns/CommandMenu'
-import { CommandItem } from 'ui-patterns/CommandMenu/internal/Command'
-import { CommandGroup } from 'ui-patterns/CommandMenu/internal/CommandGroup'
+import { CommandMenuGroup } from 'ui-patterns/CommandMenu/internal/CommandMenuGroup'
+import { CommandMenuItem } from 'ui-patterns/CommandMenu/internal/CommandMenuItem'
 import type { IActionCommand, IRouteCommand } from 'ui-patterns/CommandMenu/internal/types'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 export interface SearchResult {
   id: string
@@ -53,6 +51,7 @@ interface ResultsListProps {
   onResultClick?: (result: SearchResult) => void
   getRoute?: (result: SearchResult) => `/${string}` | `http${string}`
   className?: string
+  infiniteLoadingObserverRef?: (node: Element | null) => void
 }
 
 export function ResultsList({
@@ -62,6 +61,7 @@ export function ResultsList({
   onResultClick,
   getRoute,
   className,
+  infiniteLoadingObserverRef,
 }: ResultsListProps) {
   const commands = results.map((result): IRouteCommand | IActionCommand => {
     const ResultIcon = getIcon ? getIcon(result) : Icon
@@ -86,15 +86,15 @@ export function ResultsList({
   })
 
   return (
-    <CommandList_Shadcn_
+    <CommandList
       className={cn(
         'max-h-full! flex-1 min-h-0 overflow-y-auto overflow-x-hidden bg-transparent',
         className
       )}
     >
-      <CommandGroup>
+      <CommandMenuGroup className="py-2">
         {commands.map((command) => (
-          <CommandItem key={command.id} command={command}>
+          <CommandMenuItem key={command.id} command={command}>
             <div className="flex flex-col min-w-0 text-foreground-light">
               <TextHighlighter>{command.name}</TextHighlighter>
               {command.value && command.value !== command.name && (
@@ -103,9 +103,10 @@ export function ResultsList({
                 </p>
               )}
             </div>
-          </CommandItem>
+          </CommandMenuItem>
         ))}
-      </CommandGroup>
-    </CommandList_Shadcn_>
+      </CommandMenuGroup>
+      {infiniteLoadingObserverRef && <div ref={infiniteLoadingObserverRef} />}
+    </CommandList>
   )
 }

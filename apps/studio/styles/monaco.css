@@ -7,8 +7,8 @@
 
 .monaco-editor-alt.monaco-editor-alt,
 .monaco-editor-alt > .monaco-editor {
-  --vscode-editor-background: hsl(var(--background-surface-300)) !important;
-  --vscode-editorGutter-background: hsl(var(--background-surface-300)) !important;
+  --vscode-editor-background: var(--background-surface-300) !important;
+  --vscode-editorGutter-background: var(--background-surface-300) !important;
 }
 
 .monaco-editor-alt .current-line {
@@ -17,14 +17,15 @@
 
 [data-theme='dark'] .monaco-editor,
 [data-theme='dark'] .monaco-diff-editor {
-  --vscode-editor-background: hsl(var(--background-surface-100)) !important;
-  --vscode-editorGutter-background: hsl(var(--background-surface-100)) !important;
+  --vscode-editor-background: var(--background-surface-100) !important;
+  --vscode-editorGutter-background: var(--background-surface-100) !important;
   color-scheme: dark;
 }
 .monaco-editor,
 .monaco-diff-editor {
-  --vscode-editor-background: hsl(var(--background-dash-sidebar)) !important;
-  --vscode-editorGutter-background: hsl(var(--background-dash-sidebar)) !important;
+  --vscode-editor-background: var(--background-dash-sidebar) !important;
+  --vscode-editorGutter-background: var(--background-dash-sidebar) !important;
+  outline: none !important;
 }
 
 .gutter {

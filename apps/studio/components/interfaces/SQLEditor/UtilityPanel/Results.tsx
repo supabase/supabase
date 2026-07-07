@@ -2,10 +2,10 @@ import { Copy, Expand } from 'lucide-react'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import DataGrid, { CalculatedColumn } from 'react-data-grid'
 import {
-  ContextMenu_Shadcn_,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
   copyToClipboard,
 } from 'ui'
 
@@ -95,12 +95,12 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
         </div>
       ) : (
         <>
-          <ContextMenu_Shadcn_ modal={false}>
-            <ContextMenuTrigger_Shadcn_ asChild>
+          <ContextMenu modal={false}>
+            <ContextMenuTrigger asChild>
               <div ref={triggerRef} className="fixed pointer-events-none w-0 h-0" />
-            </ContextMenuTrigger_Shadcn_>
-            <ContextMenuContent_Shadcn_ onCloseAutoFocus={(e) => e.stopPropagation()}>
-              <ContextMenuItem_Shadcn_
+            </ContextMenuTrigger>
+            <ContextMenuContent onCloseAutoFocus={(e) => e.stopPropagation()}>
+              <ContextMenuItem
                 className="gap-x-2"
                 onSelect={() => {
                   const value = formatClipboardValue(contextMenuCellRef.current?.value ?? '')
@@ -110,8 +110,8 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
               >
                 <Copy size={12} />
                 Copy cell content
-              </ContextMenuItem_Shadcn_>
-              <ContextMenuItem_Shadcn_
+              </ContextMenuItem>
+              <ContextMenuItem
                 className="gap-x-2"
                 onSelect={() => {
                   const cell = contextMenuCellRef.current
@@ -121,13 +121,13 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
               >
                 <Expand size={12} />
                 View cell content
-              </ContextMenuItem_Shadcn_>
-            </ContextMenuContent_Shadcn_>
-          </ContextMenu_Shadcn_>
+              </ContextMenuItem>
+            </ContextMenuContent>
+          </ContextMenu>
           <DataGrid
             columns={columns}
             rows={rows}
-            className="grow min-h-0 border-t-0"
+            className="grow min-h-0 border-t-0! border-b-0!"
             rowClass={() => '[&>.rdg-cell]:items-center'}
             onCellKeyDown={handleCellKeyDown}
           />
@@ -142,5 +142,3 @@ export const Results = ({ rows }: { rows: readonly any[] }) => {
     </>
   )
 }
-
-export default Results

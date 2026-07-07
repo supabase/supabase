@@ -63,16 +63,14 @@ export const RowIcon = ({
   mimeType: string | undefined
 }) => {
   if (view === STORAGE_VIEWS.LIST && status === STORAGE_ROW_STATUS.LOADING) {
-    return (
-      <LoaderCircle size={14} strokeWidth={2} className="animate-spin text-foreground-lighter" />
-    )
+    return <LoaderCircle size={14} className="animate-spin text-foreground-lighter" />
   }
 
   if (fileType === STORAGE_ROW_TYPES.FOLDER) {
     return isOpened ? (
-      <FolderOpen size={16} strokeWidth={2} className="text-foreground-lighter" />
+      <FolderOpen size={16} className="text-foreground-lighter" />
     ) : (
-      <FilesBucketIcon size={16} strokeWidth={2} className="text-foreground-lighter" />
+      <FilesBucketIcon size={16} className="text-foreground-lighter" />
     )
   }
 
@@ -81,14 +79,14 @@ export const RowIcon = ({
   }
 
   if (mimeType?.includes('audio')) {
-    return <Music size={16} strokeWidth={2} className="text-foreground-lighter" />
+    return <Music size={16} className="text-foreground-lighter" />
   }
 
   if (mimeType?.includes('video')) {
-    return <Film size={16} strokeWidth={2} className="text-foreground-lighter" />
+    return <Film size={16} className="text-foreground-lighter" />
   }
 
-  return <File size={16} strokeWidth={2} className="text-foreground-lighter" />
+  return <File size={16} className="text-foreground-lighter" />
 }
 
 interface FileExplorerRowProps {
@@ -350,7 +348,7 @@ export const FileExplorerRow = ({
           {item.isCorrupted && (
             <Tooltip>
               <TooltipTrigger>
-                <AlertCircle size={18} strokeWidth={2} className="text-foreground-light" />
+                <AlertCircle size={18} className="text-foreground-light" />
               </TooltipTrigger>
               <TooltipContent side="bottom">
                 File is corrupted, please delete and reupload again.
@@ -381,13 +379,12 @@ export const FileExplorerRow = ({
             <LoaderCircle
               className={`animate-spin text-foreground-lighter ${view === STORAGE_VIEWS.LIST ? 'invisible' : ''}`}
               size={14}
-              strokeWidth={2}
             />
           ) : (
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <div className="storage-row-menu opacity-0">
-                  <MoreVertical size={16} strokeWidth={2} />
+                  <MoreVertical size={16} />
                   <span className="sr-only">{item.name} actions</span>
                 </div>
               </DropdownMenuTrigger>

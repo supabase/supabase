@@ -12,7 +12,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_ as Input,
+  Input,
 } from 'ui'
 import { z } from 'zod'
 
@@ -57,7 +57,7 @@ export default function InputForm() {
             </FormItem>
           )}
         />
-        <Button htmlType="submit" type="secondary">
+        <Button type="submit" variant="secondary">
           Submit
         </Button>
       </form>

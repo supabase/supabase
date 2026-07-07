@@ -5,13 +5,15 @@ subtitle: "Learn how to configure and deploy Supabase with Docker."
 tocVideo: "FqiQKRKsfZE"
 ---
 
-Docker is the easiest way to get started with self-hosted Supabase. It should take you less than 30 minutes to get up and running.
+Docker is the easiest way to get started with self-hosted Supabase. It should take you less than 15 minutes to get up and running.
 
 ## Contents
 
 1. [Before you begin](#before-you-begin)
 2. [System requirements](#system-requirements)
 3. [Installing Supabase](#installing-supabase)
+   - [Quick start (Linux)](#quick-start-linux)
+   - [Manual installation](#manual-installation)
 4. [Configuring and securing Supabase](#configuring-and-securing-supabase)
 5. [Starting and stopping](#starting-and-stopping)
 6. [Accessing Supabase services](#accessing-supabase-studio-dashboard)
@@ -24,6 +26,7 @@ Docker is the easiest way to get started with self-hosted Supabase. It should ta
 This guide assumes you're comfortable with:
 
 - Linux server administration basics
+- Basic `git` usage
 - Docker and Docker Compose
 - Networking fundamentals (ports, DNS, firewalls)
 
@@ -38,8 +41,6 @@ You need the following installed on your system:
   - **macOS**: Install [Docker Desktop](https://docs.docker.com/desktop/install/mac-install/)
   - **Windows**: Install [Docker Desktop](https://docs.docker.com/desktop/install/windows-install/)
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-- OpenSSL and Node.js 16+ (when switching to the [new API keys](/docs/guides/self-hosting/self-hosted-auth-keys) and new auth)
-
 
 ## System requirements
 
@@ -49,21 +50,74 @@ Minimum requirements for running all Supabase components, suitable for developme
 |----------|---------|-------------|
 | RAM | 4 GB | 8 GB+ |
 | CPU | 2 cores | 4 cores+ |
-| Disk | 50 GB SSD | 80 GB+ SSD |
+| Disk | 40 GB SSD | 80 GB+ SSD |
 
-If you don't need specific services, such as Logflare (Analytics), Realtime, Storage, imgproxy, or Edge Runtime (Functions), you can remove the corresponding sections and dependencies from `docker-compose.yml` to reduce resource requirements.
+If you don't need specific services, such as Realtime, Storage, imgproxy, or Edge Runtime (`functions`), you can remove the corresponding sections and dependencies from `docker-compose.yml` to reduce resource requirements.
+
+<Admonition type="tip">
+
+The default configuration does not include [Logs & Analytics](/features/logs-analytics). You can [enable](#enabling-analytics) Logflare (Analytics), Vector (log collection), and the Log Explorer in Studio by using an optional docker-compose override file. Note that enabling these services will increase resource requirements.
+
+</Admonition>
 
 ## Installing Supabase
 
-Follow these steps to start Supabase on your machine:
+The Docker configuration is distributed as part of the [Supabase repository](https://github.com/supabase/supabase/tree/master/docker). There are two paths to get it onto your machine:
+
+- **[Quick start (Linux)](#quick-start-linux)** - one command installs Docker, fetches the configuration, generates all secrets and keys, and prompts for your URLs. Fastest path if you're on a supported Linux distribution.
+- **[Manual installation](#manual-installation)** - clone the repository yourself on any OS, then configure secrets and URLs as described below.
+
+### Quick start (Linux)
+
+Run the automated install script to set up a new project in the current directory:
+
+```sh
+curl -fsSL https://supabase.link/setup.sh | sh
+```
+
+The script supports Linux only (Debian/Ubuntu and RHEL/CentOS/Fedora) and will:
+
+- Install prerequisites (`git`, `openssl`, `jq`) and Docker Engine if not already present
+- Sparse-clone the `docker/` directory from the main Supabase [repository](https://github.com/supabase/supabase/)
+- Create a project directory (`supabase-project` by default) and copy the configuration files into it
+- Prompt for the main URLs (`SUPABASE_PUBLIC_URL`, `API_EXTERNAL_URL`, `SITE_URL`, `PROXY_DOMAIN`) and write them to `.env`
+- Generate all secrets, including a random `DASHBOARD_PASSWORD`, and the asymmetric JWT signing key pair (runs `generate-keys.sh` and `add-new-auth-keys.sh`, and enables the matching entries in `docker-compose.yml`)
+- Pull the Docker images
+
+The shortened link points to [setup.sh](https://raw.githubusercontent.com/supabase/supabase/refs/heads/master/docker/setup.sh) - you can inspect it before running. Use `-y` to run non-interactively with default values.
+
+After the script finishes, start the stack:
+
+```sh
+cd supabase-project && \
+sh run.sh start
+```
+
+View the generated credentials any time via:
+
+```sh
+sh run.sh secrets
+```
+
+Next, see [Starting and stopping](#starting-and-stopping) for how to check service health and follow logs, then [Accessing Supabase Studio (Dashboard)](#accessing-supabase-studio-dashboard) and the other related sections. To customize the install further, browse [Configuring and securing Supabase](#configuring-and-securing-supabase) and [Advanced topics](#advanced-topics).
+
+Not on Linux, or want to do it manually? See [Manual installation](#manual-installation) below.
+
+### Manual installation
+
+This path gets the Docker Compose configuration onto your server; you'll configure secrets, keys, and URLs in the [next section](#configuring-and-securing-supabase).
 
 <Tabs
 scrollable
 size="small"
 type="underlined"
-defaultActiveId="general"
+defaultActiveId="gitclone"
 
-> <TabPanel id="general" label="General">
+>
+
+<TabPanel id="gitclone" label="GitHub clone">
+
+A shallow clone of the full Supabase repository. Works on any OS with `git` installed and is the simplest manual option.
 
 ```sh
 # Get the code
@@ -80,7 +134,7 @@ mkdir supabase-project
 # Copy the compose files over to your project
 cp -rf supabase/docker/* supabase-project
 
-# Copy the fake env vars
+# Copy the example environment file
 cp supabase/docker/.env.example supabase-project/.env
 
 # Switch to your project directory
@@ -91,13 +145,18 @@ docker compose pull
 ```
 
 </TabPanel>
-<TabPanel id="advanced" label="Advanced">
+
+<TabPanel id="sparseclone" label="Sparse clone">
+
+Only downloads the `docker/` directory from the repository, saving bandwidth and disk space. Requires a few more steps than the shallow GitHub clone.
 
 ```sh
 # Get the code using git sparse checkout
-git clone --filter=blob:none --no-checkout https://github.com/supabase/supabase
+git clone --filter=blob:none --no-checkout --depth=1 --quiet https://github.com/supabase/supabase
 cd supabase
-git sparse-checkout set --cone docker && git checkout master
+git sparse-checkout init --cone
+git sparse-checkout set docker
+git checkout --quiet
 cd ..
 
 # Make your new supabase project directory
@@ -111,7 +170,7 @@ mkdir supabase-project
 # Copy the compose files over to your project
 cp -rf supabase/docker/* supabase-project
 
-# Copy the fake env vars
+# Copy the example environment file
 cp supabase/docker/.env.example supabase-project/.env
 
 # Switch to your project directory
@@ -122,6 +181,7 @@ docker compose pull
 ```
 
 </TabPanel>
+
 </Tabs>
 
 <Admonition type="tip">
@@ -132,7 +192,7 @@ docker compose pull
 
 ## Configuring and securing Supabase
 
-While we provided example placeholder passwords and keys in the `.env.example` file, you should NEVER start your self-hosted Supabase using these defaults.
+While we provided example placeholder passwords and keys in the `.env.example` file, you should **never** start your self-hosted Supabase using these defaults.
 
 <Admonition type="danger">
 
@@ -140,7 +200,13 @@ While we provided example placeholder passwords and keys in the `.env.example` f
 
 </Admonition>
 
-### Quick setup
+<Admonition type="note">
+
+  If you used [Quick start (Linux)](#quick-start-linux), these tasks were already done - `setup.sh` configured secrets, keys, URLs, and a random `DASHBOARD_PASSWORD`. You can skip ahead to [Starting and stopping](#starting-and-stopping), or read on to review what was set and how to change it.
+
+</Admonition>
+
+### Generate keys and secrets
 
 To generate secure passwords and secrets, run:
 
@@ -163,10 +229,10 @@ For a description of all secrets refer to the [related section](#configuring-sec
 Review and change URL configuration variables:
 
 - `SUPABASE_PUBLIC_URL`: base URL for accessing Supabase from the Internet (Dashboard, API, Storage, etc.), e.g., `http://example.com:8000`
-- `API_EXTERNAL_URL`: used by the Auth service to configure callback URLs, e.g., `http://example.com:8000`
+- `API_EXTERNAL_URL`: used by the Auth service to configure callback URLs, e.g., `http://example.com:8000/auth/v1`
 - `SITE_URL`: default [redirect URL](/docs/guides/auth/redirect-urls) for Auth, e.g., `http://example.com:3000`
 
-<Admonition type="note" label="What your-domain means in the docs">
+<Admonition type="note" title="What your-domain means in the docs">
 
   Throughout the self-hosting guides, `<your-domain>` stands for the host where your Supabase instance is reachable: your domain name, your server's IP, or `localhost`, depending on your setup.
 
@@ -184,7 +250,11 @@ The generated secrets and password are written to the `.env` file. The ones you 
 - `SUPABASE_SECRET_KEY`: secret API key for server-side use. Never expose this in client code
 - `SUPABASE_PUBLIC_URL`: base URL you pass as `supabaseUrl` to the client libraries
 
-If you are still using the [legacy API keys](#configuring-legacy-api-keys), look for `ANON_KEY` and `SERVICE_ROLE_KEY` instead of the new publishable and secret API keys above.
+You can view them at any time by opening `.env` directly, or by running:
+
+```sh
+sh run.sh secrets
+```
 
 ### Studio authentication
 
@@ -192,7 +262,7 @@ Access to Studio (Dashboard) is protected with **HTTP basic authentication**.
 
 <Admonition type="danger">
 
-    A secure password MUST be set before starting Supabase. The password must include at least one letter - do not use numbers only or any special characters.
+  A secure password MUST be set before starting Supabase. The password must include at least one letter - do not use numbers only or any special characters.
 
 </Admonition>
 
@@ -200,11 +270,13 @@ In the `.env` file, edit `DASHBOARD_PASSWORD` to change the password, and option
 
 ## Starting and stopping
 
-You can start Supabase by using the following command in the same directory as your `docker-compose.yml` file:
+Start Supabase from the same directory as your `docker-compose.yml` file:
 
 ```sh
-docker compose up -d
+sh run.sh start
 ```
+
+This is equivalent to `docker compose up -d --wait`, which starts all services and waits until they are healthy.
 
 Check the status of the services:
 
@@ -221,14 +293,20 @@ sh tests/test-container-logs.sh
 Then try inspecting the Docker logs for a specific container, e.g.,
 
 ```sh
-docker compose logs analytics
+sh run.sh logs storage
 ```
 
 To stop Supabase, use:
 
 ```sh
-docker compose down
+sh run.sh stop
 ```
+
+<Admonition type="caution" title="Windows: CRLF line endings">
+
+  If the API gateway (Kong) fails to start with an entrypoint error, your local files may have been checked out with CRLF line endings instead of LF. Re-clone the repository, or normalize everything in the `docker/` directory to LF, then restart Supabase. Fresh clones should already use LF because of `.gitattributes`.
+
+</Admonition>
 
 ## Accessing Supabase Studio (Dashboard)
 
@@ -244,21 +322,21 @@ The self-hosted Supabase stack provides the [Supavisor](https://supabase.github.
 
 You can connect to the Postgres database via Supavisor using the methods described below. Use your domain name, your server IP, or `localhost` depending on whether you are running self-hosted Supabase on a VPS, or locally.
 
-The default POOLER_TENANT_ID is `your-tenant-id` (can be changed in `.env`), and the password is the one you set previously in [Configure database password](#configure-database-password).
+The default `POOLER_TENANT_ID` is `your-tenant-id` (can be later changed in `.env`), and the password is the value of `POSTGRES_PASSWORD` from the `.env` file.
 
-For session-based connections (equivalent to a direct Postgres connection):
+For session-mode connections (equivalent to a direct Postgres connection):
 
 ```sh
 psql 'postgres://postgres.[POOLER_TENANT_ID]:[POSTGRES_PASSWORD]@[your-domain]:5432/postgres'
 ```
 
-For pooled transactional connections:
+For transaction-mode connections:
 
 ```sh
 psql 'postgres://postgres.[POOLER_TENANT_ID]:[POSTGRES_PASSWORD]@[your-domain]:6543/postgres'
 ```
 
-When using `psql` with command-line parameters instead of a connection string to connect to Supavisor, the `-U` parameter should also be `postgres.[POOLER_TENANT_ID]`, and not just `postgres`.
+When using `psql` with command-line parameters instead of a connection string to connect to Supavisor, the `-U` parameter should also be `postgres.[POOLER_TENANT_ID]`.
 
 If you need to configure Postgres to be directly accessible from the Internet, read [Exposing your Postgres database](#exposing-your-postgres-database).
 
@@ -275,10 +353,12 @@ curl http://<your-domain>:8000/functions/v1/hello
 Add new functions at `volumes/functions/<FUNCTION_NAME>/index.ts`, then restart the service to pick them up:
 
 ```sh
-docker compose restart functions --no-deps
+sh run.sh recreate functions
 ```
 
-See the [self-hosted Edge Functions guide](/docs/guides/self-hosting/self-hosted-functions) for more details.
+This force-recreates the container (equivalent to `docker compose up -d --wait --force-recreate --no-deps functions`). A plain `docker compose restart` is not sufficient as it does not pick up configuration changes.
+
+See the [Self-hosted Edge Functions](/docs/guides/self-hosting/self-hosted-functions) guide for more details.
 
 ## Accessing APIs
 
@@ -289,55 +369,84 @@ Each of the APIs is available through the same API gateway:
 - Storage: `http://<your-domain>:8000/storage/v1/`
 - Realtime: `http://<your-domain>:8000/realtime/v1/`
 
+## Enabling analytics
+
+Logs & Analytics are not included in the default configuration to reduce the memory footprint. To enable them:
+
+```sh
+sh run.sh config add logs && \
+sh run.sh start
+```
+
+This layers `docker-compose.logs.yml` on top of the base configuration and starts two additional services:
+
+- **Logflare** (Analytics) - log management and event analytics
+- **Vector** - collects logs from all running containers and forwards them to Logflare
+
+The Log Explorer in Studio is also enabled automatically. Note that these services increase resource requirements.
+
 ## Configuring HTTPS
 
 By default, Supabase is accessible over HTTP. For production deployments, especially when using OAuth providers, you need HTTPS with a valid TLS certificate. The recommended approach is to place a reverse proxy (such as Caddy or Nginx) in front of the API gateway.
 
 See the [Configure HTTPS](/docs/guides/self-hosting/self-hosted-proxy-https) guide for detailed setup instructions.
 
+## Managing the stack
+
+Two helper scripts - `run.sh` and `reset.sh` are available in your project directory and wrap common operations.
+
+**`run.sh`** manages the Docker Compose stack. Key commands:
+
+| Command | Description |
+|---|---|
+| `sh run.sh start` / `stop` | Start or stop the stack |
+| `sh run.sh restart [service]` | Restart the stack or a named service |
+| `sh run.sh recreate [service]` | Force-recreate containers, picking up config changes |
+| `sh run.sh secrets` | Print key credentials from `.env` |
+| `sh run.sh config add <name>` | Enable an optional override file |
+| `sh run.sh config remove <name>` | Disable an optional override file |
+| `sh run.sh printenv <service>` | Show environment variables inside the container |
+| `sh run.sh logs [service]` | Follow logs for all or a specific service |
+
+The `config add` / `config remove` commands manage the `COMPOSE_FILE` [variable](https://docs.docker.com/compose/how-tos/environment-variables/envvars/#compose_file) in your `.env`, which controls which override files are layered on top of `docker-compose.yml`. For example, `sh run.sh config add logs` appends `docker-compose.logs.yml` to `COMPOSE_FILE`, and `sh run.sh config remove logs` removes it. Run `sh run.sh help` for the full list of commands.
+
+**`reset.sh`** tears down the stack completely, removes all data, and resets `.env` to defaults. See [Uninstalling](#uninstalling) for details.
+
 ## Updating
 
 We publish stable releases of the Docker Compose setup approximately once a month. The versions in each release are tested together, so they may lag behind the latest images on Docker Hub. To update, apply the latest changes from the repository and restart the services. If you want to run different versions of individual services, you can change the image tags in the Docker Compose file, but compatibility is **not guaranteed**. All Supabase images are available on [Docker Hub](https://hub.docker.com/u/supabase).
 
-To follow the changes and updates, refer to the self-hosted Supabase [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md).
+To follow the changes and updates, refer to the self-hosted Supabase [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md). Make sure to also check the [GitHub Discussions](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted).
 
-You need to restart services to pick up the changes, which may result in downtime for your applications and users.
+After updating the configuration, you need to restart services to pick up the changes, which may result in downtime for your applications and users.
 
-**Example:**
-You'd like to update or rollback the Studio image. Follow the steps below:
+For example, you'd like to update or rollback the Studio image. Follow the steps below:
 
 1. Check the [supabase/studio](https://hub.docker.com/r/supabase/studio/tags) images on [Supabase Docker Hub](https://hub.docker.com/u/supabase)
-2. Find the latest version (tag) number. It looks something like `2025.11.26-sha-8f096b5`
-3. Update the `image` field in the `docker-compose.yml` file. It should look like this: `image: supabase/studio:2025.11.26-sha-8f096b5`
-4. Run `docker compose pull`, followed by `docker compose down && docker compose up -d` to restart Supabase.
+2. Find the latest version (tag) number. It looks something like `2026.04.27-sha-5f60601`
+3. Update the Studio `image` configuration in the `docker-compose.yml` file. It should look like this: `image: supabase/studio:2026.04.27-sha-5f60601`
+4. Run `sh run.sh pull` to pull the new image, then `sh run.sh recreate studio` to restart Studio from it without taking down the rest of the stack.
 
 ## Uninstalling
 
 <Admonition type="danger">
 
-    Be careful — the following destroys all data, including the database and storage volumes!
+    Be careful - the following destroys all data, including the database and storage volumes!
 
 </Admonition>
 
-To uninstall, stop Supabase (while in the same directory as your `docker-compose.yml` file).
-
-Stop the containers and remove volumes:
+To uninstall, run the following from the same directory as your `docker-compose.yml` file:
 
 ```sh
-docker compose down -v
+sh reset.sh
 ```
 
-Optionally, ensure removal of all Postgres data:
+This will:
+- Stop all containers and remove Docker-managed volumes (`docker compose down -v --remove-orphans`)
+- Delete the Postgres data directory (`volumes/db/data`) and Storage data (`volumes/storage`)
+- Back up your `.env` to `.env.old` and restore `.env.example` as the new `.env`
 
-```sh
-rm -rf volumes/db/data
-```
-
-and all Storage data:
-
-```sh
-rm -rf volumes/storage
-```
+Run with `-y` to skip the confirmation prompts: `sh reset.sh -y`
 
 ## Advanced topics
 
@@ -382,7 +491,7 @@ You can find all the default extensions inside the [schema migration scripts rep
 
 ### Setting database password
 
-The `generate-keys.sh` script creates a secure random database password. If you want to use your own, you can change `POSTGRES_PASSWORD` in the `.env` file **before** starting Supabase for the first time.
+The `generate-keys.sh` script creates a secure random database password. If you want to use your own, you can change `POSTGRES_PASSWORD` in the `.env` file **before starting Supabase for the first time**.
 
 Follow the [password guidelines](/docs/guides/database/postgres/roles#passwords) for choosing a secure password. For easier configuration, **use only letters and numbers** to avoid URL encoding issues in connection strings.
 
@@ -394,37 +503,26 @@ To change the database password after the initial setup, run:
 sh utils/db-passwd.sh
 ```
 
-The script generates a new password, updates all database roles, and modifies your `.env` file. After running it, restart the services with `docker compose up -d --force-recreate`.
+The script generates a new password, updates all database roles, and modifies your `.env` file. After running it, restart the services with:
 
-### Configuring legacy API keys
-
-Use the key generator below to obtain and configure the following secure keys in `.env`:
-
-- `JWT_SECRET`: Used by Auth, PostgREST, and other services to sign and verify JWTs.
-- `ANON_KEY`: Client-side API key with limited permissions (`anon` role). Use this in your frontend applications.
-- `SERVICE_ROLE_KEY`: Server-side API key with full database access (`service_role` role). **Never expose this in client code.**
-
-<JwtGeneratorSimple />
-
-1. Copy the generated value and update `JWT_SECRET` in the `.env` file. Do not share this secret publicly or commit it to version control.
-2. Copy the generated value and update `ANON_KEY` in the `.env` file.
-3. Copy the generated value and update `SERVICE_ROLE_KEY` in the `.env` file.
-
-The generated keys expire in 5 years. You can verify them at [jwt.io](https://jwt.io) using the saved value of `JWT_SECRET`.
+```sh
+sh run.sh recreate
+```
 
 ### Configuring secrets
 
 The `generate-keys.sh` script sets the following secrets automatically. You can also configure them manually in the `.env` file if needed:
 
 - `SECRET_KEY_BASE`: encryption key for securing Realtime and Supavisor communications. (Must be at least 64 characters; generate with `openssl rand -base64 48`)
+- `REALTIME_DB_ENC_KEY`: encryption key used by Realtime for sensitive fields in the `_realtime` schema. (Must be exactly 16 characters; generate with `openssl rand -hex 8`)
 - `VAULT_ENC_KEY`: encryption key used by Supavisor for storing encrypted configuration. (Must be exactly 32 characters; generate with `openssl rand -hex 16`)
 - `PG_META_CRYPTO_KEY`: encryption key for securing connection strings used by Studio against postgres-meta. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
-- `LOGFLARE_PUBLIC_ACCESS_TOKEN`: API token for log ingestion and querying. Used by Vector and Studio to send and query logs. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
+- `LOGFLARE_PUBLIC_ACCESS_TOKEN`: API token for log ingestion used by Logflare and Vector. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
 - `LOGFLARE_PRIVATE_ACCESS_TOKEN`: API token for Logflare management operations. Used by Studio for administrative tasks. Never expose client-side. (Must be at least 32 characters; generate with `openssl rand -base64 24`)
 - `S3_PROTOCOL_ACCESS_KEY_ID`: Access key ID (username-like) for [accessing](/docs/guides/self-hosting/self-hosted-s3) the S3 protocol endpoint in Storage. (Generate with `openssl rand -hex 16`)
 - `S3_PROTOCOL_ACCESS_KEY_SECRET`: Secret key (password-like) used with S3_PROTOCOL_ACCESS_KEY_ID. (Generate with `openssl rand -hex 32`)
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-- `MINIO_ROOT_PASSWORD`: Root administrator password for the [MinIO server](/docs/guides/self-hosting/self-hosted-s3#using-minio). (Must be 8+ characters; generate with `openssl rand -hex 16`)
+- `MINIO_ROOT_PASSWORD`: Root administrator password for the [RustFS or MinIO server](/docs/guides/self-hosting/self-hosted-s3). (Must be 8+ characters; generate with `openssl rand -hex 16`)
 
 ### Configuring Supabase services
 
@@ -439,7 +537,9 @@ services:
   rest:
     image: postgrest/postgrest
     environment:
-      PGRST_JWT_SECRET: ${JWT_SECRET}
+      PGRST_DB_SCHEMAS: ${PGRST_DB_SCHEMAS}
+      PGRST_DB_MAX_ROWS: ${PGRST_DB_MAX_ROWS:-1000}
+      PGRST_DB_EXTRA_SEARCH_PATH: ${PGRST_DB_EXTRA_SEARCH_PATH:-public}
 ```
 
 ```sh name=.env
@@ -462,21 +562,26 @@ See the [Configure Phone Login & MFA](/docs/guides/self-hosting/self-hosted-phon
 You will need to use a production-ready SMTP server for sending emails. You can configure the SMTP server by updating the following environment variables in the `.env` file:
 
 ```sh name=.env
-SMTP_ADMIN_EMAIL=
-SMTP_HOST=
-SMTP_PORT=
-SMTP_USER=
-SMTP_PASS=
-SMTP_SENDER_NAME=
+SMTP_ADMIN_EMAIL=admin@example.com
+SMTP_HOST=smtp.example.com
+SMTP_PORT=465
+SMTP_USER=your-smtp-user
+SMTP_PASS=your-smtp-password
+SMTP_SENDER_NAME=your-sender-name
 ```
 
 We recommend using [AWS SES](https://aws.amazon.com/ses/). It's affordable and reliable. Restart all services to pick up the new configuration.
 
 ### Configuring S3 Storage
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-By default, all files are stored locally on the server. You can connect Storage to an S3-compatible backend (AWS S3, RustFS, MinIO, Cloudflare R2), enable the S3 protocol endpoint for tools like `rclone`, or both. These are independent features.
+By default, when using self-hosted Storage service, all files are stored locally on your server filesystem (via a bind mount in `docker-compose.yml`). You can connect Storage to an S3-compatible backend (AWS S3, RustFS, MinIO, Cloudflare R2), enable the S3 protocol endpoint for tools like `rclone`, or both. These are independent features.
 
 See the [Configure S3 Storage](/docs/guides/self-hosting/self-hosted-s3) guide for detailed setup instructions.
+
+### Using file backend in Storage on macOS
+
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+By default, the Storage backend uses local files via a bind mount. On macOS, Docker Desktop bind mounts have known limitations (missing xattr support, permission issues) that can prevent Storage from working correctly. Change the [bind mount](https://github.com/supabase/supabase/blob/a5f4a59e0e262394b345600e8d8a2241d6ac3b64/docker/docker-compose.yml#L391) to a named Docker volume instead.
 
 ### Configuring Supabase AI Assistant
 
@@ -522,11 +627,6 @@ postgres://postgres:[POSTGRES_PASSWORD]@[your-server-ip]:5432/[POSTGRES_DB]
 ### Setting log_min_messages in Postgres
 
 By default, the database's `log_min_messages` configuration is set to `fatal` in [docker-compose.yml](https://github.com/supabase/supabase/blob/df8729a82b1847e2989c14ede27965612761d503/docker/docker-compose.yml#L466) to prevent redundant logs generated by Realtime. You can configure `log_min_messages` using any of the Postgres [Severity Levels](https://www.postgresql.org/docs/current/runtime-config-logging.html#RUNTIME-CONFIG-SEVERITY-LEVELS).
-
-### Using file backend in Storage on macOS
-
-{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-By default, the Storage backend uses local files via a bind mount. On macOS, Docker Desktop bind mounts have known limitations (missing xattr support, permission issues) that can prevent Storage from working correctly. Change the [bind mount](https://github.com/supabase/supabase/blob/a5f4a59e0e262394b345600e8d8a2241d6ac3b64/docker/docker-compose.yml#L391) to a named Docker volume instead.
 
 ## Managing your secrets
 

@@ -13,7 +13,7 @@ export interface ExpandingTextAreaProps extends React.TextareaHTMLAttributes<HTM
 /**
  * This is a custom TextArea component that expands based on the content.
  */
-const ExpandingTextArea = forwardRef<HTMLTextAreaElement, ExpandingTextAreaProps>(
+const ExpandingTextArea = forwardRef<HTMLTextAreaElement | null, ExpandingTextAreaProps>(
   ({ className, value, ...props }, ref) => {
     const internalRef = useRef<HTMLTextAreaElement | null>(null)
 

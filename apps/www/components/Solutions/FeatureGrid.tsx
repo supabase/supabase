@@ -1,12 +1,13 @@
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import type { IconType } from '~/data/solutions/solutions.utils'
 import React from 'react'
 import { cn } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
 
 interface Feature {
   id: string
   title: string
   description: string | React.ReactNode
-  icon: string
+  icon: string | IconType
   iconNoStroke?: boolean
   className?: string
 }
@@ -14,12 +15,20 @@ interface Feature {
 export interface FeatureGridProps {
   id: string
   features: Feature[]
+  heading?: React.ReactNode
+  subheading?: React.ReactNode
   className?: string
 }
 
-const FeatureGrid = ({ id, features, className }: FeatureGridProps) => {
+const FeatureGrid = ({ id, features, heading, subheading, className }: FeatureGridProps) => {
   return (
     <SectionContainer id={id} className={cn('flex flex-col gap-12 py-16 md:py-24', className)}>
+      {(heading || subheading) && (
+        <div className="flex flex-col gap-2 max-w-xl">
+          {heading && <h2 className="h2 text-foreground-lighter m-0!">{heading}</h2>}
+          {subheading && <p className="text-foreground-lighter">{subheading}</p>}
+        </div>
+      )}
       <div
         className="
           grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3
@@ -41,26 +50,29 @@ const FeatureGrid = ({ id, features, className }: FeatureGridProps) => {
             )}
           >
             <div className="flex items-center gap-2">
-              {feature.icon && (
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 25 25"
-                  fill={feature.iconNoStroke ? 'currentColor' : 'none'}
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d={feature.icon}
-                    stroke={feature.iconNoStroke ? 'none' : 'currentColor'}
-                    strokeMiterlimit="10"
-                    strokeLinejoin="round"
-                    strokeLinecap="round"
-                    strokeWidth="1.5"
-                  />
-                </svg>
-              )}
+              {feature.icon &&
+                (typeof feature.icon === 'string' ? (
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 25 25"
+                    fill={feature.iconNoStroke ? 'currentColor' : 'none'}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      clipRule="evenodd"
+                      d={feature.icon}
+                      stroke={feature.iconNoStroke ? 'none' : 'currentColor'}
+                      strokeMiterlimit="10"
+                      strokeLinejoin="round"
+                      strokeLinecap="round"
+                      strokeWidth="1.5"
+                    />
+                  </svg>
+                ) : (
+                  <feature.icon className="w-[18px] h-[18px]" strokeWidth={1.5} />
+                ))}
               <h3 className="">{feature.title}</h3>
             </div>
             <p className="text-base">{feature.description}</p>

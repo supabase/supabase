@@ -1,15 +1,53 @@
-<StepHikeCompact.Details title="Create a Supabase project">
+export const sqlSetup = `    -- Create the table
+    create table instruments (
+      id bigint primary key generated always as identity,
+      name text not null
+    );
 
-Go to [database.new](https://database.new) and create a new Supabase project.
+    -- Insert sample data into the table
+    insert into instruments (name)
+    values
+      ('violin'),
+      ('viola'),
+      ('cello');
 
-Alternatively, you can create a project using the Management API:
+    -- Grant the privileges the role needs, which is read access
+    grant select on public.instruments to anon;
 
-</StepHikeCompact.Details>
+    -- Enable row level security for the table
+    alter table instruments enable row level security;
 
-<StepHikeCompact.Code>
+    -- Create a policy to allow the anon role to read from the instruments table
+    create policy "public can read instruments"
+    on public.instruments
+    for select to anon
+    using (true);`
+
+## 1. Create a Supabase project
+
+Before you can use Supabase, you need a Supabase project. You can create a project visually in the Dashboard or programmatically using [the Management API](/docs/reference/api/introduction).
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="dashboard" queryGroup="create-project">
+
+<TabPanel id="dashboard" label="Dashboard">
+
+Create a new Supabase project from [the Dashboard of any organization](/dashboard/new/_) you belong to.
+
+<Admonition type="tip">
+
+You can also use [database.new](https://database.new) to create a new Supabase project.
+
+</Admonition>
+
+</TabPanel>
+
+<TabPanel id="management-api" label="Management API">
+
+First, get your access token from the [**Account Settings > Access Tokens**](/dashboard/account/tokens) section of the Dashboard.
+
+Then create a project using [the Management API](/docs/reference/api/introduction):
 
 ```bash
-# First, get your access token from https://supabase.com/dashboard/account/tokens
 export SUPABASE_ACCESS_TOKEN="your-access-token"
 
 # List your organizations to get the organization ID
@@ -28,19 +66,45 @@ curl -X POST https://api.supabase.com/v1/projects \
   }'
 ```
 
-</StepHikeCompact.Code>
+</TabPanel>
 
-<StepHikeCompact.Details>
+</Tabs>
 
-When your project is up and running, go to the [**Table Editor**](/dashboard/project/_/editor) section of the Dashboard, create a new table and insert some data. Then in the [**Integrations > Data API**](/dashboard/project/_/integrations/data_api/settings) section of the Dashboard, expose the specific tables or functions you want to access. To automatically grant access for new tables and functions in `public`, enable **Default privileges for new entities**.
+## 2. Install agent skills (optional)
 
-Alternatively, you can run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new).
+[Agent Skills](/docs/guides/ai-tools/ai-skills) are curated instruction sets that give your AI agent procedural knowledge about working with Supabase.
 
-This creates an `instruments` table with some sample data, sets a secure baseline by setting only the privileges each Postgres role needs, and adds [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default.
+Install them in your project with:
 
-</StepHikeCompact.Details>
+```bash
+npx skills add supabase/agent-skills
+```
 
-<StepHikeCompact.Code>
+## 3. Set up your database
+
+When your Supabase project is up and running, create an `instruments` table with some sample data.
+
+Then set a secure baseline by setting only the privileges each Postgres role needs, add [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default, and create an RLS policy to make the data in your table publicly readable.
+
+You can click this button to prefill all the SQL needed in [the SQL editor of your project](/dashboard/project/_/sql) in the Dashboard.
+
+<Button variant="primary" asChild>
+  <a href={`/dashboard/project/_/sql/new?content=${encodeURIComponent(sqlSetup)}`}>Prefill SQL</a>
+</Button>
+
+<Accordion
+  type="default"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light mt-8 mb-6"
+>
+    <AccordionItem
+      header="Want to learn more about the SQL and add it manually?"
+      id="manual-sql"
+    >
+
+    Run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new). You can also choose the SQL and prefill it from the **Reference > Samples** menu at the side of the SQL Editor.
 
     ```sql SQL_EDITOR
     -- Create the table
@@ -61,19 +125,7 @@ This creates an `instruments` table with some sample data, sets a secure baselin
 
     -- Enable row level security for the table
     alter table instruments enable row level security;
-    ```
 
-</StepHikeCompact.Code>
-
-<StepHikeCompact.Details>
-
-Create an RLS policy to make the data in your table publicly readable:
-
-</StepHikeCompact.Details>
-
-<StepHikeCompact.Code>
-
-    ```sql SQL_EDITOR
     -- Create a policy to allow the anon role to read from the instruments table
     create policy "public can read instruments"
     on public.instruments
@@ -81,4 +133,12 @@ Create an RLS policy to make the data in your table publicly readable:
     using (true);
     ```
 
-</StepHikeCompact.Code>
+    </AccordionItem>
+
+</Accordion>
+
+<Admonition type="note" label="Disabled the Data API during project setup?">
+
+If you disabled the Data API during project setup, enable it in the [**Integrations > Data API**](/dashboard/project/_/integrations/data_api/settings) section of the Dashboard and expose the specific tables or functions you want to access. To automatically grant access for new tables and functions in `public`, enable **Automatically expose new tables**.
+
+</Admonition>

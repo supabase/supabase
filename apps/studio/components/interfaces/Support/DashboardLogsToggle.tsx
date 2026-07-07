@@ -1,13 +1,7 @@
 import { ChevronRight } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-import {
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  FormField,
-  Switch,
-} from 'ui'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger, FormField, Switch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DASHBOARD_LOG_CATEGORIES } from './dashboard-logs'
@@ -53,12 +47,8 @@ export function DashboardLogsToggle({
               <span className="text-foreground-light">
                 Share sanitized logs of recent dashboard actions to help reproduce the issue.
               </span>
-              <Collapsible_Shadcn_
-                className="mt-2"
-                open={isPreviewOpen}
-                onOpenChange={setIsPreviewOpen}
-              >
-                <CollapsibleTrigger_Shadcn_
+              <Collapsible className="mt-2" open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
+                <CollapsibleTrigger
                   className={
                     'group flex items-center gap-x-1 group-data-open:text-foreground hover:text-foreground transition'
                   }
@@ -68,13 +58,13 @@ export function DashboardLogsToggle({
                     className="transition-all group-data-open:rotate-90 text-foreground-muted -ml-1"
                   />
                   <span className="text-sm">Preview log</span>
-                </CollapsibleTrigger_Shadcn_>
-                <CollapsibleContent_Shadcn_ className="mt-2">
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-2">
                   <pre className="bg-background-surface-200 border border-strong rounded-lg p-3 max-h-60 overflow-y-auto overflow-x-auto text-xs text-foreground-light whitespace-pre-wrap">
                     {sanitizedLogJson}
                   </pre>
-                </CollapsibleContent_Shadcn_>
-              </Collapsible_Shadcn_>
+                </CollapsibleContent>
+              </Collapsible>
             </div>
           }
         >

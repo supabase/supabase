@@ -2,12 +2,7 @@
 
 import { ExternalLink } from 'lucide-react'
 import { useState } from 'react'
-import {
-  AccordionContent_Shadcn_ as AccordionContent,
-  AccordionItem_Shadcn_ as AccordionItem,
-  AccordionTrigger_Shadcn_ as AccordionTrigger,
-  Button,
-} from 'ui'
+import { AccordionContent, AccordionItem, AccordionTrigger, Button } from 'ui'
 
 import { RestartProjectDialog } from './RestartProjectDialog'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
@@ -70,7 +65,7 @@ export function RestartDatabaseTroubleshootingSection({
             <p className="text-sm text-foreground-light mb-3">
               Restarting your project can help resolve timeout errors or stale connections.
             </p>
-            <Button type="default" size="tiny" onClick={handleClick}>
+            <Button variant="default" size="tiny" onClick={handleClick}>
               Restart project
             </Button>
           </div>
@@ -114,7 +109,7 @@ export function TroubleshootingGuideSection({
           {description && <p className="text-sm text-foreground-light mb-3">{description}</p>}
           <Button
             asChild
-            type="default"
+            variant="default"
             size="tiny"
             onClick={() =>
               track('inline_error_troubleshooter_action_clicked', {

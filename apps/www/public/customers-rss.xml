@@ -5,9 +5,16 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 04 May 2026 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Mon, 18 May 2026 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/customers/chatbase</guid>
+  <title>Chatbase goes upmarket on Supabase</title>
+  <link>https://supabase.com/customers/chatbase</link>
+  <description>The consolidation play that took a single founder from zero to 10 million in ARR, and the bet that takes him to 100.</description>
+  <pubDate>Mon, 18 May 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/customers/cofounder</guid>
   <title>Cofounder builds autonomous companies on Supabase</title>
   <link>https://supabase.com/customers/cofounder</link>
@@ -202,13 +209,6 @@
   <link>https://supabase.com/customers/pebblely</link>
   <description>Learn how Pebblely, an AI image generation company, used Supabase Auth to handle Single Sign On for their rapidly growing user base.</description>
   <pubDate>Fri, 29 Sep 2023 00:00:00 -0700</pubDate>
-</item>
-<item>
-  <guid>https://supabase.com/customers/chatbase</guid>
-  <title>Bootstrapped founder builds an AI app with Supabase and scales to $1M in 5 months</title>
-  <link>https://supabase.com/customers/chatbase</link>
-  <description>How Yasser leveraged Supabase to build Chatbase and became one of the most successful single-founder AI products.</description>
-  <pubDate>Wed, 06 Sep 2023 00:00:00 -0700</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/customers/quivr</guid>

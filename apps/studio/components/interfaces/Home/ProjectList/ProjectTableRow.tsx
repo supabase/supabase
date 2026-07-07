@@ -13,7 +13,7 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
@@ -173,7 +173,7 @@ export const ProjectTableRow = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
-                  type="default"
+                  variant="default"
                   icon={<MoreVertical />}
                   aria-label="More actions"
                   className="w-7"

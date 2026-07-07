@@ -24,7 +24,7 @@ import { notFound } from 'next/navigation'
 import rehypeSlug from 'rehype-slug'
 import emoji from 'remark-emoji'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -32,48 +32,36 @@ const repo = 'wrappers'
 const docsDir = 'docs/catalog'
 const externalSite = 'https://supabase.github.io/wrappers'
 
-type TagQueryResponse = {
+type DocsTagsQueryResponse = {
   repository: {
     refs: {
-      nodes:
-        | {
-            name: string
-          }[]
-        | null
-      pageInfo: {
-        hasNextPage: boolean
-        endCursor: string | null
-      }
+      nodes: { name: string }[] | null
+      pageInfo: { hasNextPage: boolean; endCursor: string | null }
     }
   }
 }
 
-const tagQuery = `
-    query TagQuery($owner: String!, $name: String!, $after: String) {
-      repository(owner: $owner, name: $name) {
-        refs(
-          refPrefix: "refs/tags/",
-          orderBy: {
-            field: TAG_COMMIT_DATE,
-            direction: DESC
-          },
-          first: 5,
-          after: $after
-        ) {
-          nodes {
-            name
-          }
-          pageInfo {
-            hasNextPage
-            endCursor
-          }
-        }
+const docsTagsQuery = `
+  query DocsTagsQuery($owner: String!, $name: String!, $after: String) {
+    repository(owner: $owner, name: $name) {
+      refs(
+        refPrefix: "refs/tags/",
+        orderBy: { field: TAG_COMMIT_DATE, direction: DESC },
+        first: 5,
+        after: $after
+      ) {
+        nodes { name }
+        pageInfo { hasNextPage endCursor }
       }
     }
-  `
+  }
+`
 
-async function getLatestRelease(after: string | null = null) {
+async function getLatestDocsTag(after: string | null = null): Promise<string | null> {
   try {
+    /**
+     * We use GraphQL as it's the only way to use `orderBy` on Github API.
+     */
     const {
       repository: {
         refs: {
@@ -81,18 +69,18 @@ async function getLatestRelease(after: string | null = null) {
           pageInfo: { hasNextPage, endCursor },
         },
       },
-    } = await octokit().graphql<TagQueryResponse>(tagQuery, {
+    } = await octokit().graphql<DocsTagsQueryResponse>(docsTagsQuery, {
       owner: org,
       name: repo,
       after,
     })
 
     return (
-      nodes?.find((node) => node?.name?.match(/^docs_v\d+\.\d+\.\d+/))?.name ??
-      (hasNextPage && endCursor ? await getLatestRelease(endCursor) : null)
+      nodes?.find(({ name }) => /^docs_v\d+\.\d+\.\d+/.test(name))?.name ??
+      (hasNextPage && endCursor ? await getLatestDocsTag(endCursor) : null)
     )
   } catch (error) {
-    console.error(`Error fetching release tags for wrappers federated pages: ${error}`)
+    console.error(`Error fetching docs tags for wrappers federated pages: ${error}`)
     return null
   }
 }
@@ -124,6 +112,22 @@ const pageMap = [
     remoteFile: 'bigquery.md',
   },
   {
+    slug: 'cal',
+    meta: {
+      title: 'Cal.com',
+      dashboardIntegrationPath: 'cal_wrapper',
+    },
+    remoteFile: 'cal.md',
+  },
+  {
+    slug: 'calendly',
+    meta: {
+      title: 'Calendly',
+      dashboardIntegrationPath: 'calendly_wrapper',
+    },
+    remoteFile: 'calendly.md',
+  },
+  {
     slug: 'clerk',
     meta: {
       title: 'Clerk',
@@ -140,6 +144,14 @@ const pageMap = [
     remoteFile: 'clickhouse.md',
   },
   {
+    slug: 'cloudflare-d1',
+    meta: {
+      title: 'Cloudflare D1',
+      dashboardIntegrationPath: 'cfd1_wrapper',
+    },
+    remoteFile: 'cfd1.md',
+  },
+  {
     slug: 'cognito',
     meta: {
       title: 'AWS Cognito',
@@ -151,8 +163,17 @@ const pageMap = [
     slug: 'duckdb',
     meta: {
       title: 'DuckDB',
+      dashboardIntegrationPath: undefined,
     },
     remoteFile: 'duckdb.md',
+  },
+  {
+    slug: 'dynamodb',
+    meta: {
+      title: 'AWS DynamoDB',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'dynamodb.md',
   },
   {
     slug: 'firebase',
@@ -163,12 +184,36 @@ const pageMap = [
     remoteFile: 'firebase.md',
   },
   {
+    slug: 'gravatar',
+    meta: {
+      title: 'Gravatar',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'gravatar.md',
+  },
+  {
+    slug: 'hubspot',
+    meta: {
+      title: 'HubSpot',
+      dashboardIntegrationPath: 'hubspot_wrapper',
+    },
+    remoteFile: 'hubspot.md',
+  },
+  {
     slug: 'iceberg',
     meta: {
       title: 'Iceberg',
       dashboardIntegrationPath: 'iceberg_wrapper',
     },
     remoteFile: 'iceberg.md',
+  },
+  {
+    slug: 'infura',
+    meta: {
+      title: 'Infura',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'infura.md',
   },
   {
     slug: 'logflare',
@@ -179,6 +224,14 @@ const pageMap = [
     remoteFile: 'logflare.md',
   },
   {
+    slug: 'mongodb',
+    meta: {
+      title: 'MongoDB',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'mongodb.md',
+  },
+  {
     slug: 'mssql',
     meta: {
       title: 'MSSQL',
@@ -187,12 +240,36 @@ const pageMap = [
     remoteFile: 'mssql.md',
   },
   {
+    slug: 'mysql',
+    meta: {
+      title: 'MySQL',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'mysql.md',
+  },
+  {
     slug: 'notion',
     meta: {
       title: 'Notion',
       dashboardIntegrationPath: 'notion_wrapper',
     },
     remoteFile: 'notion.md',
+  },
+  {
+    slug: 'openapi',
+    meta: {
+      title: 'OpenAPI',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'openapi.md',
+  },
+  {
+    slug: 'orb',
+    meta: {
+      title: 'Orb',
+      dashboardIntegrationPath: 'orb_wrapper',
+    },
+    remoteFile: 'orb.md',
   },
   {
     slug: 'paddle',
@@ -225,6 +302,22 @@ const pageMap = [
       dashboardIntegrationPath: 's3_vectors_wrapper',
     },
     remoteFile: 's3vectors.md',
+  },
+  {
+    slug: 'shopify',
+    meta: {
+      title: 'Shopify',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'shopify.md',
+  },
+  {
+    slug: 'slack',
+    meta: {
+      title: 'Slack',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'slack.md',
   },
   {
     slug: 'snowflake',
@@ -345,9 +438,10 @@ const getContent = async (params: Params) => {
     let remoteFile: string
     ;({ remoteFile, meta } = federatedPage)
 
-    const tag = await getLatestRelease()
+    const tag = await getLatestDocsTag()
+
     if (!tag) {
-      throw new Error('No latest release found for federated wrappers pages')
+      throw new Error('No latest docs tag found for federated wrappers pages')
     }
 
     editLink = `${org}/${repo}/blob/${tag}/${docsDir}/${remoteFile}`
@@ -425,7 +519,7 @@ const urlTransform: UrlTransformFunction = (url) => {
 }
 
 const generateStaticParams = async () => {
-  if (!IS_DEV) {
+  if (IS_DEV) {
     return []
   }
 

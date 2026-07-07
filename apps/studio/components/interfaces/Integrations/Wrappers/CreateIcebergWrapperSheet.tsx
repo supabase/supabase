@@ -4,12 +4,10 @@ import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Card,
-  CardContent,
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
+  Input,
   RadioGroupStacked,
   RadioGroupStackedItem,
   SheetFooter,
@@ -18,24 +16,20 @@ import {
   SheetTitle,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import {
-  PageSection,
-  PageSectionContent,
-  PageSectionDescription,
-  PageSectionMeta,
-  PageSectionSummary,
-  PageSectionTitle,
-} from 'ui-patterns/PageSection'
 import * as z from 'zod'
 
 import { CreateWrapperSheetProps } from './CreateWrapperSheet'
 import InputField from './InputField'
+import {
+  FormSection,
+  FormSectionContent,
+  FormSectionLabel,
+} from '@/components/ui/Forms/FormSection'
 import { useSchemaCreateMutation } from '@/data/database/schema-create-mutation'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useFDWCreateMutation } from '@/data/fdw/fdw-create-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 
 const FORM_ID = 'create-wrapper-form'
 
@@ -130,8 +124,7 @@ export const CreateIcebergWrapperSheet = ({
   onCloseWithConfirmation,
 }: CreateWrapperSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const { mutateAsync: createFDW, isPending: isCreatingWrapper } = useFDWCreateMutation({
     onSuccess: () => {
@@ -217,16 +210,7 @@ export const CreateIcebergWrapperSheet = ({
         targetSchema: values.target_schema,
       })
 
-      sendEvent({
-        action: 'foreign_data_wrapper_created',
-        properties: {
-          wrapperType: wrapperMeta.label,
-        },
-        groups: {
-          project: project?.ref ?? 'Unknown',
-          organization: org?.slug ?? 'Unknown',
-        },
-      })
+      track('foreign_data_wrapper_created', { wrapperType: wrapperMeta.label })
     } catch (error) {
       console.error(error)
       // The error will be handled by the mutation onError callback (toast.error)
@@ -258,180 +242,151 @@ export const CreateIcebergWrapperSheet = ({
               <SheetTitle>Create a {wrapperMeta.label} wrapper</SheetTitle>
             </SheetHeader>
             <SheetSection className="grow overflow-y-auto">
-              <PageSection>
-                <PageSectionMeta>
-                  <PageSectionSummary>
-                    <PageSectionTitle>Wrapper Configuration</PageSectionTitle>
-                  </PageSectionSummary>
-                </PageSectionMeta>
-                <PageSectionContent>
-                  <Card>
-                    <CardContent>
-                      <FormField
-                        control={form.control}
-                        name="wrapper_name"
-                        render={({ field }) => (
-                          <FormItemLayout
-                            layout="horizontal"
-                            label="Wrapper Name"
-                            description={
-                              wrapperName.length > 0 ? (
-                                <>
-                                  Your wrapper's server name will be{' '}
-                                  <code className="text-code-inline">{wrapperName}_server</code>
-                                </>
-                              ) : (
-                                ''
-                              )
-                            }
-                          >
-                            <FormControl>
-                              <Input_Shadcn_ {...field} />
-                            </FormControl>
-                          </FormItemLayout>
-                        )}
-                      />
-                    </CardContent>
-                  </Card>
-                </PageSectionContent>
-              </PageSection>
-              <PageSection>
-                <PageSectionMeta>
-                  <PageSectionSummary>
-                    <PageSectionTitle>Data target</PageSectionTitle>
-                  </PageSectionSummary>
-                </PageSectionMeta>
-                <PageSectionContent>
-                  <Card>
-                    <CardContent>
-                      <FormField
-                        control={form.control}
-                        name="target"
-                        render={({ field }) => (
-                          <FormItemLayout layout="vertical">
-                            <div>
-                              <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
-                                <RadioGroupStackedItem
-                                  key="S3Tables"
-                                  value="S3Tables"
-                                  label="AWS S3 Tables"
-                                  showIndicator={false}
-                                >
-                                  <div className="flex gap-x-5">
-                                    <div className="flex flex-col">
-                                      <p className="text-foreground-light text-left">
-                                        AWS S3 storage that's optimized for analytics workloads.
-                                      </p>
-                                    </div>
-                                  </div>
-                                </RadioGroupStackedItem>
-                                <RadioGroupStackedItem
-                                  key="R2Catalog"
-                                  value="R2Catalog"
-                                  label="Cloudflare R2 Catalog"
-                                  showIndicator={false}
-                                >
-                                  <div className="flex gap-x-5">
-                                    <div className="flex flex-col">
-                                      <p className="text-foreground-light text-left">
-                                        Managed Apache Iceberg built directly into your R2 bucket.
-                                      </p>
-                                    </div>
-                                  </div>
-                                </RadioGroupStackedItem>
-                                <RadioGroupStackedItem
-                                  key="IcebergRestCatalog"
-                                  value="IcebergRestCatalog"
-                                  label="Iceberg REST Catalog"
-                                  showIndicator={false}
-                                >
-                                  <div className="flex gap-x-5">
-                                    <div className="flex flex-col">
-                                      <p className="text-foreground-light text-left">
-                                        Can be used with any S3-compatible storage.
-                                      </p>
-                                    </div>
-                                  </div>
-                                </RadioGroupStackedItem>
-                              </RadioGroupStacked>
-                            </div>
-                          </FormItemLayout>
-                        )}
-                      />
-                    </CardContent>
-                  </Card>
-                </PageSectionContent>
-              </PageSection>
-
-              <PageSection>
-                <PageSectionMeta>
-                  <PageSectionSummary>
-                    <PageSectionTitle>{wrapperMeta.label} Configuration</PageSectionTitle>
-                  </PageSectionSummary>
-                </PageSectionMeta>
-                <PageSectionContent>
-                  <Card>
-                    {targetOptions.map((option) =>
-                      option.hidden ? (
-                        <input
-                          key={`${option.name}-${option.required}-${option.hidden}`}
-                          type="hidden"
-                          // @ts-expect-error Can't reconcile with form schema
-                          {...form.register(option.name)}
-                        />
-                      ) : (
-                        <CardContent key={`${option.name}-${option.required}-${option.hidden}`}>
-                          <InputField control={form.control} option={option} />
-                        </CardContent>
-                      )
+              <FormSection header={<FormSectionLabel>Wrapper Configuration</FormSectionLabel>}>
+                <FormSectionContent className="flex flex-col space-y-2" loading={false}>
+                  <FormField
+                    control={form.control}
+                    name="wrapper_name"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        layout="horizontal"
+                        label="Wrapper Name"
+                        description={
+                          wrapperName.length > 0 ? (
+                            <>
+                              Your wrapper's server name will be{' '}
+                              <code className="text-code-inline">{wrapperName}_server</code>
+                            </>
+                          ) : (
+                            ''
+                          )
+                        }
+                      >
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                      </FormItemLayout>
                     )}
-                  </Card>
-                </PageSectionContent>
-              </PageSection>
-              <PageSection>
-                <PageSectionMeta>
-                  <PageSectionSummary>
-                    <PageSectionTitle>Foreign Schema</PageSectionTitle>
-                    <PageSectionDescription>
+                  />
+                </FormSectionContent>
+              </FormSection>
+              <FormSection header={<FormSectionLabel>Data target</FormSectionLabel>}>
+                <FormSectionContent className="flex flex-col space-y-2" loading={false}>
+                  <FormField
+                    control={form.control}
+                    name="target"
+                    render={({ field }) => (
+                      <FormItemLayout layout="vertical">
+                        <div>
+                          <RadioGroupStacked value={field.value} onValueChange={field.onChange}>
+                            <RadioGroupStackedItem
+                              key="S3Tables"
+                              value="S3Tables"
+                              label="AWS S3 Tables"
+                              showIndicator={false}
+                            >
+                              <div className="flex gap-x-5">
+                                <div className="flex flex-col">
+                                  <p className="text-foreground-light text-left">
+                                    AWS S3 storage that's optimized for analytics workloads.
+                                  </p>
+                                </div>
+                              </div>
+                            </RadioGroupStackedItem>
+                            <RadioGroupStackedItem
+                              key="R2Catalog"
+                              value="R2Catalog"
+                              label="Cloudflare R2 Catalog"
+                              showIndicator={false}
+                            >
+                              <div className="flex gap-x-5">
+                                <div className="flex flex-col">
+                                  <p className="text-foreground-light text-left">
+                                    Managed Apache Iceberg built directly into your R2 bucket.
+                                  </p>
+                                </div>
+                              </div>
+                            </RadioGroupStackedItem>
+                            <RadioGroupStackedItem
+                              key="IcebergRestCatalog"
+                              value="IcebergRestCatalog"
+                              label="Iceberg REST Catalog"
+                              showIndicator={false}
+                            >
+                              <div className="flex gap-x-5">
+                                <div className="flex flex-col">
+                                  <p className="text-foreground-light text-left">
+                                    Can be used with any S3-compatible storage.
+                                  </p>
+                                </div>
+                              </div>
+                            </RadioGroupStackedItem>
+                          </RadioGroupStacked>
+                        </div>
+                      </FormItemLayout>
+                    )}
+                  />
+                </FormSectionContent>
+              </FormSection>
+
+              <FormSection
+                header={<FormSectionLabel>{wrapperMeta.label} Configuration</FormSectionLabel>}
+              >
+                <FormSectionContent className="flex flex-col space-y-2" loading={false}>
+                  {targetOptions.map((option) =>
+                    option.hidden ? (
+                      <input
+                        key={`${option.name}-${option.required}-${option.hidden}`}
+                        type="hidden"
+                        // @ts-expect-error Can't reconcile with form schema
+                        {...form.register(option.name)}
+                      />
+                    ) : (
+                      <InputField
+                        key={`${option.name}-${option.required}-${option.hidden}`}
+                        control={form.control}
+                        option={option}
+                      />
+                    )
+                  )}
+                </FormSectionContent>
+              </FormSection>
+              <FormSection
+                header={
+                  <FormSectionLabel>
+                    <p>Foreign Schema</p>
+                    <p className="text-foreground-light mt-2 w-[90%]">
                       You can query your data from the foreign tables in the specified schema after
                       the wrapper is created.
-                    </PageSectionDescription>
-                  </PageSectionSummary>
-                </PageSectionMeta>
-                <PageSectionContent>
-                  <Card>
-                    <CardContent>
-                      {wrapperMeta.sourceSchemaOption && (
-                        <InputField
-                          control={form.control}
-                          option={wrapperMeta.sourceSchemaOption}
-                        />
-                      )}
-                    </CardContent>
-                    <CardContent>
-                      <InputField
-                        control={form.control}
-                        option={{
-                          name: 'target_schema',
-                          label: 'Specify a new schema to create all wrapper tables in',
-                          description:
-                            'A new schema will be created. For security purposes, the wrapper tables from the foreign schema cannot be created within an existing schema.',
-                          required: true,
-                          encrypted: false,
-                          secureEntry: false,
-                        }}
-                      />
-                    </CardContent>
-                  </Card>
-                </PageSectionContent>
-              </PageSection>
+                    </p>
+                  </FormSectionLabel>
+                }
+              >
+                <FormSectionContent className="flex flex-col space-y-2" loading={false}>
+                  {wrapperMeta.sourceSchemaOption && (
+                    <InputField control={form.control} option={wrapperMeta.sourceSchemaOption} />
+                  )}
+                  <InputField
+                    control={form.control}
+                    option={{
+                      name: 'target_schema',
+                      label: 'Specify a new schema to create all wrapper tables in',
+                      description:
+                        'A new schema will be created. For security purposes, the wrapper tables from the foreign schema cannot be created within an existing schema.',
+                      required: true,
+                      encrypted: false,
+                      secureEntry: false,
+                    }}
+                  />
+                </FormSectionContent>
+              </FormSection>
             </SheetSection>
 
             <SheetFooter>
               <Button
                 size="tiny"
-                type="default"
-                htmlType="button"
+                variant="default"
+                type="button"
                 onClick={onCloseWithConfirmation}
                 disabled={isLoading}
               >
@@ -439,9 +394,9 @@ export const CreateIcebergWrapperSheet = ({
               </Button>
               <Button
                 size="tiny"
-                type="primary"
+                variant="primary"
                 form={FORM_ID}
-                htmlType="submit"
+                type="submit"
                 loading={isLoading}
                 disabled={isLoading || !isDirty}
               >

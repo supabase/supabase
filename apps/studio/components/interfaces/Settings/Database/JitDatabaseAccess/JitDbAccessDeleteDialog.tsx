@@ -1,27 +1,30 @@
 import {
   AlertDialog,
   AlertDialogAction,
+  AlertDialogBody,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-  Button,
 } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
 import type { JitUserRule } from './JitDbAccess.types'
 
 interface JitDbAccessDeleteDialogProps {
   user: JitUserRule | null
   isDeleting: boolean
+  error?: string | null
   onClose: () => void
-  onConfirm: () => void
+  onConfirm: () => unknown
 }
 
 export function JitDbAccessDeleteDialog({
   user,
   isDeleting = false,
+  error,
   onClose,
   onConfirm,
 }: JitDbAccessDeleteDialogProps) {
@@ -29,7 +32,7 @@ export function JitDbAccessDeleteDialog({
 
   return (
     <AlertDialog open={!!user} onOpenChange={(open) => !open && !isDeleting && onClose()}>
-      <AlertDialogContent size="medium">
+      <AlertDialogContent size="small">
         <AlertDialogHeader>
           <AlertDialogTitle>Delete temporary access rule</AlertDialogTitle>
           <AlertDialogDescription asChild>
@@ -45,19 +48,19 @@ export function JitDbAccessDeleteDialog({
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
+        {error && (
+          <AlertDialogBody>
+            <Admonition
+              type="destructive"
+              title="Unable to delete temporary access rule"
+              description={error}
+            />
+          </AlertDialogBody>
+        )}
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
-          <AlertDialogAction variant="danger" asChild>
-            <Button
-              loading={isDeleting}
-              disabled={isDeleting}
-              onClick={(e) => {
-                e.preventDefault()
-                onConfirm()
-              }}
-            >
-              Delete rule
-            </Button>
+          <AlertDialogAction variant="danger" loading={isDeleting} onClick={onConfirm}>
+            Delete rule
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

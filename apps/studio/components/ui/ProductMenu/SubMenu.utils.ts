@@ -8,6 +8,7 @@ export function convertSectionsToProductMenu(sections: SubMenuSection[]): Produc
       key: link.key,
       name: link.label,
       url: link.href ?? '#',
+      shortcutId: link.shortcutId,
     })),
   }))
 }

@@ -14,7 +14,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { DocsButton } from './DocsButton'
 import { InlineLinkClassName } from './InlineLink'
@@ -54,7 +54,7 @@ const HighQueryCostDialog = ({ error, suggestions = [] }: HighQueryCostErrorProp
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="outline">Learn more</Button>
+        <Button variant="outline">Learn more</Button>
       </DialogTrigger>
       <DialogContent onOpenAutoFocus={(event) => event.preventDefault()}>
         <DialogHeader>
@@ -112,7 +112,7 @@ const HighQueryCostDialog = ({ error, suggestions = [] }: HighQueryCostErrorProp
             href={`${DOCS_URL}/guides/troubleshooting/understanding-postgresql-explain-output-Un9dqX`}
           />
           <DialogClose asChild>
-            <Button type="default" className="opacity-100">
+            <Button variant="default" className="opacity-100">
               Understood
             </Button>
           </DialogClose>
@@ -134,7 +134,7 @@ const LoadDataWarningDialog = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="default">Load data</Button>
+        <Button variant="default">Load data</Button>
       </DialogTrigger>
       <DialogContent onOpenAutoFocus={(event) => event.preventDefault()}>
         <DialogHeader>
@@ -167,12 +167,12 @@ const LoadDataWarningDialog = ({
         </DialogSection>
         <DialogFooter>
           <DialogClose asChild>
-            <Button type="default" className="opacity-100">
+            <Button variant="default" className="opacity-100">
               Cancel
             </Button>
           </DialogClose>
           <DialogClose asChild>
-            <Button type="warning" onClick={() => onSelectLoadData()}>
+            <Button variant="warning" onClick={() => onSelectLoadData()}>
               I understand, proceed
             </Button>
           </DialogClose>

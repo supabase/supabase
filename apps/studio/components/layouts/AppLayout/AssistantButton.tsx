@@ -16,7 +16,7 @@ export const AssistantButton = () => {
 
   return (
     <ButtonTooltip
-      type="outline"
+      variant="outline"
       size="tiny"
       id="assistant-trigger"
       className={cn(
@@ -44,6 +44,7 @@ export const AssistantButton = () => {
         size={16}
         className={cn(isOpen && 'text-background')}
       />
+      <span className="sr-only">AI Assistant</span>
     </ButtonTooltip>
   )
 }

@@ -10,11 +10,11 @@ import {
   FormControl,
   FormField,
   ScrollArea,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Sheet,
   SheetContent,
   SheetDescription,
@@ -22,7 +22,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
@@ -54,6 +54,7 @@ import { DOCS_URL } from '@/lib/constants'
 const grantSchema = z.object({
   roleId: z.string(),
   enabled: z.boolean(),
+  branchesOnly: z.boolean(),
   expiryMode: z.custom<JitExpiryMode>(),
   hasExpiry: z.boolean(),
   expiry: z.string(),
@@ -243,19 +244,19 @@ export function JitDbAccessRuleSheet({
                   render={({ field }) => (
                     <FormItemLayout layout="vertical" label="Member">
                       <FormControl>
-                        <Select_Shadcn_
+                        <Select
                           value={field.value}
                           disabled={
                             mode === 'edit' || (mode === 'add' && availableMembersForAddCount === 0)
                           }
                           onValueChange={field.onChange}
                         >
-                          <SelectTrigger_Shadcn_>
-                            <SelectValue_Shadcn_ placeholder="Select a member" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a member" />
+                          </SelectTrigger>
+                          <SelectContent>
                             {memberOptions.map((member) => (
-                              <SelectItem_Shadcn_ key={member.id} value={member.id}>
+                              <SelectItem key={member.id} value={member.id}>
                                 {member.name ? (
                                   <>
                                     {member.name}{' '}
@@ -266,10 +267,10 @@ export function JitDbAccessRuleSheet({
                                 ) : (
                                   member.email
                                 )}
-                              </SelectItem_Shadcn_>
+                              </SelectItem>
                             ))}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
 
                       {mode === 'add' && availableMembersForAddCount === 0 && (
@@ -305,7 +306,7 @@ export function JitDbAccessRuleSheet({
                       {grants.length === 0 ? (
                         <Admonition
                           type="note"
-                          title="No assignable roles found"
+                          description="No assignable roles found."
                           className="bg-background"
                         />
                       ) : (
@@ -331,11 +332,11 @@ export function JitDbAccessRuleSheet({
           </Form>
 
           <SheetFooter className="mt-auto w-full border-t py-4">
-            <Button type="default" onClick={confirmOnClose} disabled={isSubmitting}>
+            <Button variant="default" onClick={confirmOnClose} disabled={isSubmitting}>
               Cancel
             </Button>
             <Button
-              type="primary"
+              variant="primary"
               onClick={form.handleSubmit(handleSaveRule)}
               loading={isSubmitting}
             >

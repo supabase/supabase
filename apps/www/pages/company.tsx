@@ -15,7 +15,7 @@ import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Button, Card, CardContent, CardHeader, CardTitle, Space } from 'ui'
+import { Button } from 'ui'
 
 type Props = {}
 
@@ -67,12 +67,7 @@ export default Index
 const Header = () => {
   return (
     <>
-      <div
-        className="
-          sm:py-18
-          container relative mx-auto px-6 py-16 text-center md:py-24 lg:px-16 lg:py-24
-          xl:px-20"
-      >
+      <div className="section-container text-center py-16 sm:py-18 md:py-24">
         <h1 className="text-foreground text-5xl">
           Join one of the world's fastest growing open source communities.
         </h1>

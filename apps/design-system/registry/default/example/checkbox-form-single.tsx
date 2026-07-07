@@ -59,7 +59,7 @@ export default function CheckboxReactHookFormSingle() {
             </FormItem>
           )}
         />
-        <Button htmlType="submit">Submit</Button>
+        <Button type="submit">Submit</Button>
       </form>
     </Form>
   )

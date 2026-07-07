@@ -79,6 +79,7 @@ describe('serializeDraftRolesForGrantMutation', () => {
         {
           ...createEmptyGrant('postgres'),
           enabled: true,
+          branchesOnly: true,
           hasExpiry: true,
           expiryMode: 'custom',
           expiry,
@@ -101,6 +102,7 @@ describe('serializeDraftRolesForGrantMutation', () => {
     expect(serializeDraftRolesForGrantMutation(draft)).toEqual([
       {
         role: 'postgres',
+        branches_only: true,
         expires_at: dayjs(expiry).unix(),
         allowed_networks: {
           allowed_cidrs: [{ cidr: '192.0.2.0/24' }],

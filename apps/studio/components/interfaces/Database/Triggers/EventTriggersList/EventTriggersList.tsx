@@ -3,8 +3,19 @@ import { DatabaseZap, Plus, Search } from 'lucide-react'
 import { parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, Card, Input, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns'
+import {
+  Button,
+  Card,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { EventTriggerList } from './EventTriggerList'
@@ -16,7 +27,7 @@ import {
   selectFilterSchema,
 } from '@/components/interfaces/Reports/v2/ReportsSelectFilter'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { Shortcut } from '@/components/ui/Shortcut'
@@ -181,16 +192,19 @@ export const EventTriggersList = () => {
     <div className="space-y-4">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-2 flex-wrap">
         <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
-          <Input
-            inputRef={searchInputRef}
-            placeholder="Search for an event trigger"
-            size="tiny"
-            icon={<Search />}
-            value={filterString}
-            className="w-full lg:w-64"
-            onChange={(e) => setFilterString(e.target.value)}
-            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
-          />
+          <InputGroup className="w-full lg:w-52">
+            <InputGroupInput
+              ref={searchInputRef}
+              size="tiny"
+              placeholder="Search for a trigger"
+              value={filterString}
+              onChange={(e) => setFilterString(e.target.value)}
+              onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+            />
+            <InputGroupAddon>
+              <Search />
+            </InputGroupAddon>
+          </InputGroup>
           <ReportsSelectFilter
             label="Owner"
             options={ownerOptions.map((owner) => ({
@@ -211,13 +225,13 @@ export const EventTriggersList = () => {
               onTrigger={createEventTrigger}
               side="bottom"
             >
-              <Button type="primary" icon={<Plus size={12} />} onClick={createEventTrigger}>
+              <Button variant="primary" icon={<Plus size={12} />} onClick={createEventTrigger}>
                 New trigger
               </Button>
             </Shortcut>
           ) : (
             <ButtonTooltip
-              type="primary"
+              variant="primary"
               icon={<Plus size={12} />}
               disabled
               tooltip={{
@@ -240,7 +254,7 @@ export const EventTriggersList = () => {
           description="Event triggers run on database-level events like DDL commands."
         >
           <ButtonTooltip
-            type="default"
+            variant="default"
             disabled={!canUpdateEventTriggers}
             onClick={createEventTrigger}
             tooltip={{

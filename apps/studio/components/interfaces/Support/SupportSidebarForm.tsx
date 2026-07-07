@@ -1,4 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
+import { useFlag } from 'common'
 import { Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useReducer } from 'react'
@@ -8,16 +9,17 @@ import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { IncidentAdmonition } from './IncidentAdmonition'
 import { Success } from './Success'
 import type { ExtendedSupportCategories } from './Support.constants'
+import { SupportAssistantSuccessCard } from './SupportAssistantSuccessCard'
 import { createInitialSupportFormState, supportFormReducer } from './SupportForm.state'
-import type { SupportFormUrlKeys } from './SupportForm.utils'
+import { NO_PROJECT_MARKER, type SupportFormUrlKeys } from './SupportForm.utils'
 import { SupportFormV3 } from './SupportFormV3'
 import { useSupportForm } from './useSupportForm'
 import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useStateTransition } from '@/hooks/misc/useStateTransition'
+import { useTrack } from '@/lib/telemetry/track'
 
 function useSupportFormTelemetry() {
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   return useCallback(
     ({
@@ -29,28 +31,23 @@ function useSupportFormTelemetry() {
       orgSlug: string | undefined
       category: ExtendedSupportCategories
     }) =>
-      sendEvent({
-        action: 'support_ticket_submitted',
-        properties: {
-          ticketCategory: category,
-        },
-        groups: {
-          project: projectRef,
-          organization: orgSlug,
-        },
-      }),
-    [sendEvent]
+      track(
+        'support_ticket_submitted',
+        { ticketCategory: category },
+        { project: projectRef, organization: orgSlug }
+      ),
+    [track]
   )
 }
 
 interface SupportFormProps {
   initialParams?: Partial<SupportFormUrlKeys>
-  onFinish?: () => void
 }
 
-export function SupportForm({ initialParams, onFinish }: SupportFormProps) {
+export function SupportForm({ initialParams }: SupportFormProps) {
   const [state, dispatch] = useReducer(supportFormReducer, undefined, createInitialSupportFormState)
   const { form, initialError, projectRef } = useSupportForm(dispatch, initialParams)
+  const showSupportAssistantFollowUp = useFlag('supportAssistantFollowUp') === true
 
   const {
     data: allStatusPageEvents,
@@ -73,11 +70,18 @@ export function SupportForm({ initialParams, onFinish }: SupportFormProps) {
 
   useStateTransition(state, 'submitting', 'error', (_, curr) => {
     toast.error(`Failed to submit support ticket: ${curr.message}`)
-    Sentry.captureMessage(`Failed to submit Support Form: ${curr.message}`)
+    if (curr.code !== 429) {
+      Sentry.captureMessage(`Failed to submit Support Form: ${curr.message}`)
+    }
     dispatch({ type: 'RETURN_TO_EDITING' })
   })
 
-  const isSuccess = state.type === 'success'
+  const successState = state.type === 'success' ? state : null
+  const showAssistantSuccessCard =
+    showSupportAssistantFollowUp &&
+    successState !== null &&
+    successState.submittedRequest.projectRef !== undefined &&
+    successState.submittedRequest.projectRef !== NO_PROJECT_MARKER
 
   return (
     <div className="relative h-full overflow-y-auto overflow-x-hidden">
@@ -87,14 +91,20 @@ export function SupportForm({ initialParams, onFinish }: SupportFormProps) {
       />
       <div className="min-h-full px-5 pt-5">
         <div className="flex flex-col gap-y-8">
-          {isSuccess ? (
-            <div className="pt-2">
+          {successState ? (
+            <div className="flex flex-col gap-y-8 pt-2">
               <Success
-                selectedProject={projectRef ?? undefined}
-                sentCategory={state.sentCategory}
-                onFinish={onFinish}
-                finishLabel={onFinish ? 'Done' : undefined}
+                selectedProject={
+                  successState.sentProjectRef === undefined
+                    ? (projectRef ?? undefined)
+                    : successState.sentProjectRef
+                }
+                sentCategory={successState.sentCategory}
+                showFinishAction={false}
               />
+              {showAssistantSuccessCard && (
+                <SupportAssistantSuccessCard request={successState.submittedRequest} />
+              )}
             </div>
           ) : (
             <SupportFormV3
@@ -122,7 +132,7 @@ export function SupportFormStatusButton() {
       <TooltipTrigger asChild>
         <Button
           asChild
-          type="default"
+          variant="default"
           size="tiny"
           icon={
             isLoading ? (

@@ -5,7 +5,9 @@ import { Button } from 'ui'
 import { LINT_TABS, LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { FilterPopover } from '@/components/ui/FilterPopover'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { Lint } from '@/data/lint/lint-query'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface LinterFiltersProps {
   filterOptions: {
@@ -60,17 +62,19 @@ const LinterFilters = ({
         </div>
       ))}
       <div className="flex items-center gap-x-2">
-        <Button
-          size="tiny"
-          type="default"
-          disabled={isLoading}
-          onClick={onClickRefresh}
-          icon={
-            <RefreshCw className={`text-foreground-light ${isLoading ? 'animate-spin' : ''}`} />
-          }
-        >
-          Refresh
-        </Button>
+        <ShortcutTooltip shortcutId={SHORTCUT_IDS.ADVISORS_REFRESH} side="bottom">
+          <Button
+            size="tiny"
+            variant="default"
+            disabled={isLoading}
+            onClick={onClickRefresh}
+            icon={
+              <RefreshCw className={`text-foreground-light ${isLoading ? 'animate-spin' : ''}`} />
+            }
+          >
+            Refresh
+          </Button>
+        </ShortcutTooltip>
         <DownloadResultsButton
           align="end"
           results={filteredLints}

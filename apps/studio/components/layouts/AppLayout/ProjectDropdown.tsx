@@ -2,10 +2,10 @@ import { useParams } from 'common'
 import { Box, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 import type { ComponentProps } from 'react'
-import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_ } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { useState } from 'react'
+import { Button, CommandGroup, CommandItem } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AppLayoutDropdownTriggerButton } from './AppLayoutDropdown'
 import { sanitizeRoute } from './ProjectDropdown.utils'
@@ -42,7 +42,13 @@ function ProjectDropdownNewProjectActions({
 
   if (embedded) {
     return (
-      <Button type="default" block size="small" asChild icon={<Plus size={14} strokeWidth={1.5} />}>
+      <Button
+        variant="default"
+        block
+        size="small"
+        asChild
+        icon={<Plus size={14} strokeWidth={1.5} />}
+      >
         <Link
           href={href}
           onClick={onClose}
@@ -55,8 +61,8 @@ function ProjectDropdownNewProjectActions({
   }
 
   return (
-    <CommandGroup_Shadcn_>
-      <CommandItem_Shadcn_
+    <CommandGroup>
+      <CommandItem
         className="cursor-pointer w-full"
         onSelect={() => {
           onClose()
@@ -68,17 +74,13 @@ function ProjectDropdownNewProjectActions({
           <Plus size={14} strokeWidth={1.5} />
           <p>New project</p>
         </Link>
-      </CommandItem_Shadcn_>
-    </CommandGroup_Shadcn_>
+      </CommandItem>
+    </CommandGroup>
   )
 }
 
-function ProjectDropdownNonPlatformView({ projectName }: { projectName: string }) {
-  return (
-    <Button type="text">
-      <span className="text-sm">{projectName}</span>
-    </Button>
-  )
+const ProjectDropdownNonPlatformView = ({ projectName }: { projectName: string }) => {
+  return <div className="text-sm px-3 py-1">{projectName}</div>
 }
 
 interface ProjectDropdownPlatformViewProps {
@@ -109,7 +111,12 @@ function ProjectDropdownPlatformView({
 
       <OrganizationProjectSelector
         {...selectorProps}
-        renderTrigger={() => <AppLayoutDropdownTriggerButton className="shrink-0" />}
+        renderTrigger={() => (
+          <AppLayoutDropdownTriggerButton
+            className="shrink-0"
+            aria-label="Show organization projects"
+          />
+        )}
       />
     </div>
   )

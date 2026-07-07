@@ -89,14 +89,14 @@ const ProductHeaderCentered = (props: Types) => (
             </Button>
           )}
           {props.video && (
-            <Button type="default" size="medium" icon={<PlayCircle />} asChild>
+            <Button variant="default" size="medium" icon={<PlayCircle />} asChild>
               <Link href={props.video} as={props.video}>
                 Watch video
               </Link>
             </Button>
           )}
           {props.secondaryCta && (
-            <Button type="default" size="medium" asChild>
+            <Button variant="default" size="medium" asChild>
               <Link href={props.secondaryCta.link} as={props.secondaryCta.link}>
                 {props.secondaryCta.label}
               </Link>

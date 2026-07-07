@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import Image from 'next/image'
-import { Alert_Shadcn_, AlertDescription_Shadcn_, AlertTitle_Shadcn_, WarningIcon } from 'ui'
+import { Alert, AlertDescription, AlertTitle, WarningIcon } from 'ui'
 
 import { Markdown } from '@/components/interfaces/Markdown'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -23,18 +23,18 @@ export const CLSPreview = () => {
           className="text-foreground-light max-w-full"
           content={`This is an advanced feature and should be used with caution. Unless you have a very specific use case, we recommend just using [Row-Level Security](${DOCS_URL}${docsRowLevelSecurityGuidePath}).`}
         />
-        <Alert_Shadcn_ variant="warning" className="mt-2">
+        <Alert variant="warning" className="mt-2">
           <WarningIcon />
-          <AlertTitle_Shadcn_>
+          <AlertTitle>
             Changes to column privileges will not be reflected in migrations when running{' '}
             <code className="text-code-inline">supabase db diff</code>.
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
+          </AlertTitle>
+          <AlertDescription>
             Column privileges are not supported in the current version of the Supabase CLI.
             <br />
             You will need to manually apply these changes to your database.
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          </AlertDescription>
+        </Alert>
       </div>
       <Image
         src={`${BASE_PATH}/img/previews/cls-preview.png`}

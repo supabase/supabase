@@ -137,14 +137,12 @@ Your project uses the [new asymmetric keys](/blog/jwt-signing-keys) for authenti
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
   chevronAlign="right"
   justified
   size="medium"
   className="text-foreground-light mt-8 mb-6"
 >
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
+  <AccordionItem
       header="Method A: Dashboard"
       id="item-1"
     >
@@ -154,10 +152,7 @@ In the [Functions Dashboard](/dashboard/project/_/functions/), open the affected
 ![image](/docs/img/troubleshooting/401_edge_functions_toggle_off_JWT_check.png)
 
   </AccordionItem>
-
-  </div>
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
+  <AccordionItem
       header="Method B: Supabase CLI"
       id="item-2"
     >
@@ -170,9 +165,7 @@ supabase functions deploy YOUR_FUNCTION_NAME --no-verify-jwt
 
     </AccordionItem>
 
-  </div>
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
+  <AccordionItem
       header="Method C: Management API"
       id="item-3"
     >
@@ -192,7 +185,6 @@ curl 'https://api.supabase.com/v1/projects/PROJECT_ID/functions/FUNCTION_NAME' \
 
     </AccordionItem>
 
-  </div>
 </Accordion>
 
 ### Invalid key

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Label_Shadcn_ as Label } from 'ui'
+import { Label } from 'ui'
 
 import type { DataTableSliderFilterField } from '../DataTable.types'
 import { isArrayOfNumbers } from '../DataTable.utils'

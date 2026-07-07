@@ -1,7 +1,7 @@
 import { AlertCircle, ChevronsUpDown } from 'lucide-react'
 import Link from 'next/link'
 import { forwardRef, type ReactNode } from 'react'
-import { Button, cn, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
+import { Button, cn, Popover, PopoverContent, PopoverTrigger } from 'ui'
 
 interface AppLayoutDropdownErrorProps {
   message: string
@@ -30,7 +30,7 @@ export const AppLayoutDropdownTriggerButton = forwardRef<
     className={cn('px-1.5 py-4 [&_svg]:w-5 [&_svg]:h-5 ml-1', className)}
     iconRight={<ChevronsUpDown strokeWidth={1.5} />}
     {...props}
-    type="text"
+    variant="text"
   />
 ))
 AppLayoutDropdownTriggerButton.displayName = 'AppLayoutDropdownTriggerButton'
@@ -42,7 +42,7 @@ export interface AppLayoutDropdownWithPopoverProps {
   commandContent: ReactNode
   open: boolean
   onOpenChange: (open: boolean) => void
-  triggerButtonClassName?: string
+  triggerButton?: ReactNode
 }
 
 export function AppLayoutDropdownWithPopover({
@@ -52,21 +52,19 @@ export function AppLayoutDropdownWithPopover({
   commandContent,
   open,
   onOpenChange,
-  triggerButtonClassName,
+  triggerButton,
 }: AppLayoutDropdownWithPopoverProps) {
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={onOpenChange} modal={false}>
+    <Popover open={open} onOpenChange={onOpenChange} modal={false}>
       <div className="flex items-center shrink-0">
         <Link href={linkHref} className={linkClassName}>
           {linkContent}
         </Link>
-        <PopoverTrigger_Shadcn_ asChild>
-          <AppLayoutDropdownTriggerButton className={triggerButtonClassName} />
-        </PopoverTrigger_Shadcn_>
+        <PopoverTrigger asChild>{triggerButton}</PopoverTrigger>
       </div>
-      <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+      <PopoverContent className="p-0" side="bottom" align="start">
         {commandContent}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

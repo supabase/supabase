@@ -1,5 +1,3 @@
-import { type Metadata } from 'next'
-
 import { TroubleshootingPreview } from '~/features/docs/Troubleshooting.ui'
 import {
   TroubleshootingFilter,
@@ -16,6 +14,7 @@ import { TROUBLESHOOTING_CONTAINER_ID } from '~/features/docs/Troubleshooting.ut
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
 import { PROD_URL } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+import { type Metadata } from 'next'
 
 const { metadataTitle } = getCustomContent(['metadata:title'])
 

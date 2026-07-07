@@ -2,13 +2,7 @@ import { IS_PLATFORM } from 'common'
 import { Lightbulb, TriangleAlert } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import {
-  Button,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverSeparator_Shadcn_,
-  PopoverTrigger_Shadcn_,
-} from 'ui'
+import { Button, Popover, PopoverContent, PopoverSeparator, PopoverTrigger } from 'ui'
 
 import { FeedbackWidget } from './FeedbackWidget'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
@@ -39,7 +33,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
   )
 
   return (
-    <Popover_Shadcn_
+    <Popover
       modal={false}
       open={isOpen}
       onOpenChange={(e) => {
@@ -48,20 +42,20 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
         if (!e) setStage('select')
       }}
     >
-      <PopoverTrigger_Shadcn_ asChild>
+      <PopoverTrigger asChild>
         <Button
           asChild
           onClick={() => {
             setIsOpen((isOpen) => !isOpen)
             setStage('select')
           }}
-          type="text"
+          variant="text"
           className="rounded-full h-[32px] text-foreground-light hover:text-foreground"
         >
           <span className={className}>Feedback</span>
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent
         side="bottom"
         align="end"
         className="p-0 flex flex-col w-96"
@@ -71,7 +65,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
           <div className="flex flex-col gap-4 p-4">
             <div className="font-medium text-sm">What would you like to share?</div>
             <div className="grid grid-cols-2 gap-3">
-              <Button type="default" className="h-32" onClick={() => setStage('issue-options')}>
+              <Button variant="default" className="h-32" onClick={() => setStage('issue-options')}>
                 <div className="grid gap-1.5 text-center">
                   <TriangleAlert size="28" className="mx-auto text-destructive-600" />
                   <div className="flex flex-col items-center">
@@ -80,7 +74,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
                   </div>
                 </div>
               </Button>
-              <Button type="default" className="h-32" onClick={() => setStage('widget')}>
+              <Button variant="default" className="h-32" onClick={() => setStage('widget')}>
                 <div className="grid gap-1.5 text-center">
                   <Lightbulb size="28" className="mx-auto text-warning" />
                   <div className="flex flex-col items-center">
@@ -108,9 +102,9 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
                 onSupportClick={() => setIsOpen(false)}
               />
             </div>
-            <PopoverSeparator_Shadcn_ />
+            <PopoverSeparator />
             <div className="px-4 pt-4 pb-4">
-              <Button type="default" size="tiny" onClick={() => setStage('widget')}>
+              <Button variant="default" size="tiny" onClick={() => setStage('widget')}>
                 Leave feedback instead
               </Button>
             </div>
@@ -122,7 +116,7 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
             onSwitchToIssueOptions={() => setStage('issue-options')}
           />
         )}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

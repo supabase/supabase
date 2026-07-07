@@ -6,22 +6,22 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-  Input_Shadcn_,
-  Label_Shadcn_,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
+  Input,
+  Label,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 
 export default function TabsDemo() {
   return (
-    <Tabs_Shadcn_ defaultValue="account" className="w-[400px]">
-      <TabsList_Shadcn_ className="grid w-full grid-cols-2">
-        <TabsTrigger_Shadcn_ value="account">Account</TabsTrigger_Shadcn_>
-        <TabsTrigger_Shadcn_ value="password">Password</TabsTrigger_Shadcn_>
-      </TabsList_Shadcn_>
-      <TabsContent_Shadcn_ value="account">
+    <Tabs defaultValue="account" className="w-[400px]">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="account">Account</TabsTrigger>
+        <TabsTrigger value="password">Password</TabsTrigger>
+      </TabsList>
+      <TabsContent value="account">
         <Card>
           <CardHeader>
             <CardTitle>Account</CardTitle>
@@ -31,20 +31,20 @@ export default function TabsDemo() {
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="space-y-1">
-              <Label_Shadcn_ htmlFor="name">Name</Label_Shadcn_>
-              <Input_Shadcn_ id="name" defaultValue="Pedro Duarte" />
+              <Label htmlFor="name">Name</Label>
+              <Input id="name" defaultValue="Pedro Duarte" />
             </div>
             <div className="space-y-1">
-              <Label_Shadcn_ htmlFor="username">Username</Label_Shadcn_>
-              <Input_Shadcn_ id="username" defaultValue="@peduarte" />
+              <Label htmlFor="username">Username</Label>
+              <Input id="username" defaultValue="@peduarte" />
             </div>
           </CardContent>
           <CardFooter>
             <Button>Save changes</Button>
           </CardFooter>
         </Card>
-      </TabsContent_Shadcn_>
-      <TabsContent_Shadcn_ value="password">
+      </TabsContent>
+      <TabsContent value="password">
         <Card>
           <CardHeader>
             <CardTitle>Password</CardTitle>
@@ -54,19 +54,19 @@ export default function TabsDemo() {
           </CardHeader>
           <CardContent className="space-y-2">
             <div className="space-y-1">
-              <Label_Shadcn_ htmlFor="current">Current password</Label_Shadcn_>
-              <Input_Shadcn_ id="current" type="password" />
+              <Label htmlFor="current">Current password</Label>
+              <Input id="current" type="password" />
             </div>
             <div className="space-y-1">
-              <Label_Shadcn_ htmlFor="new">New password</Label_Shadcn_>
-              <Input_Shadcn_ id="new" type="password" />
+              <Label htmlFor="new">New password</Label>
+              <Input id="new" type="password" />
             </div>
           </CardContent>
           <CardFooter>
             <Button>Save password</Button>
           </CardFooter>
         </Card>
-      </TabsContent_Shadcn_>
-    </Tabs_Shadcn_>
+      </TabsContent>
+    </Tabs>
   )
 }

@@ -29,7 +29,7 @@ Once configured, you can update your settings anytime from [the **SSO** section]
 
 ![SSO Example](/docs/img/sso-dashboard-enabled-idp.png)
 
-<Admonition type="tip" label="Testing your SSO configuration">
+<Admonition type="tip" title="Testing your SSO configuration">
 
 After configuring your SSO provider, thorough testing is essential. See our [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices) guide for:
 
@@ -74,7 +74,7 @@ Users start their login at supabase.com by entering their email address, then ar
 
 - **Login flows** - Choose between IdP-initiated (users start from identity provider), SP-initiated (users start at supabase.com), or both. IdP-initiated is recommended for most organizations and requires no domain configuration. See [Choosing the Right Login Flow](/docs/guides/platform/sso/choosing-login-flow) for guidance.
 - **Email domains** - Required only if you enable SP-initiated login. You can associate one or more email domains with your SSO provider. Users with matching email addresses can sign in via SSO at supabase.com. Not required for IdP-initiated flow.
-- **Auto-join** - Optionally allow users with a matching domain to be added to your organization automatically when they sign in via SSO. Auto-join applies on every login, not just first signup, making it easy to test before enabling.
+- **Auto-join** - Optionally allow users with a matching domain to join your organization automatically when they sign in via SSO. This applies on every login, not only on first signup.
 - **Default role for auto-joined users** - Choose the role (e.g., `Read-only`, `Developer`, `Administrator`, `Owner`) that automatically joined users receive. We recommend using `Developer` as the default (principle of least privilege) and promoting users individually as needed. Refer to [access control](/docs/guides/platform/access-control) for more information about roles.
 - **Invitation types** - When inviting users to your organization, you can explicitly choose whether the invitation requires SSO authentication or allows non-SSO login (password/social). This enables mixed authentication organizations with both SSO and non-SSO users.
 
@@ -100,17 +100,17 @@ When SSO is enabled for an organization:
 6. Thoroughly test using our [SSO Testing and Best Practices](/docs/guides/platform/sso/testing-best-practices) guide
 7. Invite users to the organization or let them auto-join on login
 
-<Admonition type="note" label="Account linking">
+<Admonition type="note" title="Non-SSO Accounts">
 
 If a user is already a member of the organization under a non-SSO account, they will need to be removed and invited again with an SSO-required invitation to join under their SSO account. SSO and non-SSO accounts with the same email are treated as separate accounts.
 
 </Admonition>
 
-<Admonition type="note" label="No automatic linking">
+<Admonition type="note" title="No identity linking">
 
-Each user account verified using a SSO identity provider will not be automatically linked to existing user accounts in the system. That is, if a user `valid.email@supabase.io` had signed up with a password, and then uses their company SSO login with your project, there will be two `valid.email@supabase.io` user accounts in the system.
+Each user account verified using an SSO identity provider will not be legible for [identity linking](/docs/guides/auth/auth-identity-linking) to existing user accounts in the system. That is, if a user `valid.email@supabase.io` had signed up with a password, and then uses their company SSO login with your project, there will be two `valid.email@supabase.io` user accounts in the system.
 
-Users will need to ensure they are logged in with the correct account when accepting invites or accessing organizations/projects.
+Users will need to ensure they are logged in with the correct account when accessing organizations/projects.
 
 </Admonition>
 
@@ -118,7 +118,7 @@ Users will need to ensure they are logged in with the correct account when accep
 
 If you disable or delete the SSO provider for an organization, **all SSO users will immediately be unable to sign in**.
 
-<Admonition type="caution" label="Safety requirement">
+<Admonition type="caution" title="Safety requirement">
 
 The system requires at least one non-SSO owner account before allowing SSO provider deletion. This prevents complete organization lockout. When you delete an SSO provider, all SSO members are automatically removed from the organization.
 

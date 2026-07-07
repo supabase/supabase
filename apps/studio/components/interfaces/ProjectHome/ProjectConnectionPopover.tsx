@@ -12,13 +12,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getConnectionStrings } from '@/components/interfaces/Connect/DatabaseSettings.utils'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { IS_PLATFORM } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 
 const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user'] as const
@@ -46,15 +47,15 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
 
   const { data: projectUrl, isPending: isLoadingApiUrl } = useProjectApiUrl({ projectRef })
 
-  const { data: apiKeys, isLoading: isLoadingKeys } = useAPIKeysQuery(
+  const { data, isLoading: isLoadingKeys } = useAPIKeys(
     { projectRef },
     { enabled: open && canReadAPIKeys }
   )
-  const { publishableKey } = canReadAPIKeys ? getKeys(apiKeys) : { publishableKey: null }
+  const { publishableKey } = data ?? {}
 
   const { data: databases, isLoading: isLoadingDatabases } = useReadReplicasQuery(
     { projectRef },
-    { enabled: open && !!projectRef }
+    { enabled: IS_PLATFORM && open && !!projectRef }
   )
   const primaryDatabase = databases?.find((db) => db.identifier === projectRef)
 
@@ -84,6 +85,12 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
     [projectRef]
   )
 
+  // Self-hosted projects may not have a publishable key configured. Rather
+  // than show a permanently-disabled "Publishable key unavailable" row, hide
+  // the entry entirely on !IS_PLATFORM when the key isn't available. Platform
+  // behavior is unchanged.
+  const showPublishableKey = IS_PLATFORM || !!publishableKey?.api_key
+
   const menuItems = useMemo(
     () => [
       {
@@ -95,35 +102,46 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
         disabled: isLoadingApiUrl || !projectUrl,
         icon: Link2,
       },
-      {
-        label: 'Publishable key',
-        value: publishableKey?.api_key ?? '',
-        displayValue:
-          isLoadingPermissions || isLoadingKeys
-            ? 'Loading publishable key...'
-            : canReadAPIKeys
-              ? (publishableKey?.api_key ?? 'Publishable key unavailable')
-              : "You don't have permission to view API keys.",
-        disabled:
-          isLoadingPermissions || isLoadingKeys || !canReadAPIKeys || !publishableKey?.api_key,
-        icon: KeyRound,
-      },
-      {
-        label: 'Direct connection string',
-        value: directConnectionString,
-        displayValue: isLoadingDatabases
-          ? 'Loading connection string...'
-          : directConnectionString || 'Connection string unavailable',
-        disabled: isLoadingDatabases || !directConnectionString,
-        icon: Database,
-      },
-      {
-        label: 'CLI setup commands',
-        value: cliCommands,
-        displayValue: cliCommands.replace(/\n/g, ' - '),
-        disabled: !projectRef,
-        icon: Terminal,
-      },
+      ...(showPublishableKey
+        ? [
+            {
+              label: 'Publishable key',
+              value: publishableKey?.api_key ?? '',
+              displayValue:
+                isLoadingPermissions || isLoadingKeys
+                  ? 'Loading publishable key...'
+                  : canReadAPIKeys
+                    ? (publishableKey?.api_key ?? 'Publishable key unavailable')
+                    : "You don't have permission to view API keys.",
+              disabled:
+                isLoadingPermissions ||
+                isLoadingKeys ||
+                !canReadAPIKeys ||
+                !publishableKey?.api_key,
+              icon: KeyRound,
+            },
+          ]
+        : []),
+      ...(IS_PLATFORM
+        ? [
+            {
+              label: 'Direct connection string',
+              value: directConnectionString,
+              displayValue: isLoadingDatabases
+                ? 'Loading connection string...'
+                : directConnectionString || 'Connection string unavailable',
+              disabled: isLoadingDatabases || !directConnectionString,
+              icon: Database,
+            },
+            {
+              label: 'CLI setup commands',
+              value: cliCommands,
+              displayValue: cliCommands.replace(/\n/g, ' - '),
+              disabled: !projectRef,
+              icon: Terminal,
+            },
+          ]
+        : []),
     ],
     [
       canReadAPIKeys,
@@ -136,6 +154,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
       projectRef,
       projectUrl,
       publishableKey?.api_key,
+      showPublishableKey,
     ]
   )
 
@@ -157,7 +176,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
       <DropdownMenu open={open} onOpenChange={setOpen}>
         <DropdownMenuTrigger asChild>
           <Button
-            type="default"
+            variant="default"
             size="tiny"
             className="shrink-0"
             iconRight={
@@ -208,7 +227,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
           <DropdownMenuSeparator />
           <div className="p-1">
             <Button
-              type="default"
+              variant="default"
               size="tiny"
               className="w-full"
               onClick={() => {

@@ -18,7 +18,7 @@ For a complete run-down on how all of our tools work together, see the main DEVE
 
 1. Follow the steps outlined in the Local Development section of the main [DEVELOPERS.md](https://github.com/supabase/supabase/blob/master/DEVELOPERS.md)
 2. If you work at Supabase, run `dev:secrets:pull` to pull down the internal environment variables. If you're a community member, create a `.env` file and add this line to it: `NEXT_PUBLIC_IS_PLATFORM=false`
-3. Start the local docs site by navigating to `/apps/docs` and running `npm run dev`
+3. Start the local docs site by navigating to `/apps/docs` and running `pnpm run dev`
 4. Visit http://localhost:3001/docs in your browser - don't forget to append the `/docs` to the end
 5. Your local site should look exactly like [https://supabase.com/docs](https://supabase.com/docs)
 
@@ -31,7 +31,7 @@ To test locally, within the `apps/docs` directory:
 1. Run `pnpm build:guides-markdown`
 2. Run `pnpm dev`
 
-This creates Markdown files for all routes under the `public/docs/guides` directory, ignored by Git.
+This creates Markdown files for all routes under the `public/markdown/guides` directory, ignored by Git.
 
 For production this setup runs as a `prebuild` task to allow Vercel to bundle these files with middleware and functions.
 

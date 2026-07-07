@@ -126,7 +126,7 @@ export const PageLayout = ({
                     </Link>
                   ) : (
                     <Button
-                      type="link"
+                      variant="link"
                       onClick={item.onClick}
                       className={cn(isActive && 'text-foreground font-medium')}
                     >

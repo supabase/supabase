@@ -58,7 +58,7 @@ export const plans: PricingInformation[] = [
       ['8 GB disk size per project', 'then $0.125 per GB'],
       ['250 GB egress', 'then $0.09 per GB'],
       ['250 GB cached egress', 'then $0.03 per GB'],
-      ['100 GB file storage', 'then $0.021 per GB'],
+      ['100 GB file storage', 'then $0.0213 per GB'],
       'Email support',
       'Daily backups stored for 7 days',
       '7-day log retention',

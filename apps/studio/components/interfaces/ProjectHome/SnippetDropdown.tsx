@@ -3,11 +3,11 @@ import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { Plus } from 'lucide-react'
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import {
-  Command_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
@@ -29,7 +29,7 @@ type SnippetDropdownProps = {
   align?: 'start' | 'center' | 'end'
   className?: string
   autoFocus?: boolean
-  onSelect: (snippet: { id: string; name: string }) => void
+  onSelect: (snippet: { id: string; name: string; visibility: Content['visibility'] }) => void
 }
 
 type SqlContentItem = Extract<Content, { type: 'sql' }>
@@ -91,8 +91,8 @@ export const SnippetDropdown = ({
         align={align}
         className={['w-80 p-0', className].filter(Boolean).join(' ')}
       >
-        <Command_Shadcn_ shouldFilter={false}>
-          <CommandInput_Shadcn_
+        <Command shouldFilter={false}>
+          <CommandInput
             showResetIcon
             autoFocus={autoFocus}
             placeholder="Search snippets..."
@@ -100,22 +100,28 @@ export const SnippetDropdown = ({
             onValueChange={setSearch}
             handleReset={() => setSearch('')}
           />
-          <CommandList_Shadcn_ ref={scrollRootRef}>
+          <CommandList ref={scrollRootRef}>
             {isLoading ? (
               <p className="text-xs text-center text-foreground-lighter py-3">Loading...</p>
             ) : search.length > 0 && snippets.length === 0 ? (
               <p className="text-xs text-center text-foreground-lighter py-3">No snippets found</p>
             ) : (
-              <CommandGroup_Shadcn_>
+              <CommandGroup>
                 <ScrollArea className={snippets.length > 7 ? 'h-[210px]' : ''}>
                   {snippets.map((snippet) => (
-                    <CommandItem_Shadcn_
+                    <CommandItem
                       key={snippet.id}
                       value={snippet.id}
-                      onSelect={() => onSelect({ id: snippet.id, name: snippet.name })}
+                      onSelect={() =>
+                        onSelect({
+                          id: snippet.id,
+                          name: snippet.name,
+                          visibility: snippet.visibility,
+                        })
+                      }
                     >
                       {snippet.name}
-                    </CommandItem_Shadcn_>
+                    </CommandItem>
                   ))}
                   <div ref={sentinelRef} className="h-1 -mt-1" />
                   {hasNextPage && (
@@ -124,13 +130,13 @@ export const SnippetDropdown = ({
                     </div>
                   )}
                 </ScrollArea>
-              </CommandGroup_Shadcn_>
+              </CommandGroup>
             )}
 
             <div className="h-px bg-border-overlay -mx-1" />
 
-            <CommandGroup_Shadcn_>
-              <CommandItem_Shadcn_
+            <CommandGroup>
+              <CommandItem
                 className="cursor-pointer w-full"
                 onSelect={() => {
                   setOpen(false)
@@ -142,10 +148,10 @@ export const SnippetDropdown = ({
                   <Plus size={14} strokeWidth={1.5} />
                   <p>Create snippet</p>
                 </div>
-              </CommandItem_Shadcn_>
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
+              </CommandItem>
+            </CommandGroup>
+          </CommandList>
+        </Command>
       </DropdownMenuContent>
     </DropdownMenu>
   )

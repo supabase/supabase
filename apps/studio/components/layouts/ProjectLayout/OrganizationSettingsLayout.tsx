@@ -1,11 +1,15 @@
 import { useFlag, useParams } from 'common'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, useMemo } from 'react'
 
 import { useIsPlatformWebhooksEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import type { SidebarSection } from '@/components/layouts/AccountLayout/AccountLayout.types'
+import { toSubMenuSections } from '@/components/layouts/AccountLayout/AccountLayout.utils'
 import { WithSidebar } from '@/components/layouts/AccountLayout/WithSidebar'
+import { ProductMenuShortcuts } from '@/components/ui/ProductMenu/ProductMenuShortcuts'
+import { convertSectionsToProductMenu } from '@/components/ui/ProductMenu/SubMenu.utils'
 import { useCurrentPath } from '@/hooks/misc/useCurrentPath'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface OrganizationSettingsMenuItemsProps {
   slug?: string
@@ -14,6 +18,7 @@ interface OrganizationSettingsMenuItemsProps {
   showLegalDocuments?: boolean
   showPlatformWebhooks?: boolean
   showPrivateApps?: boolean
+  showAuditLogDrains?: boolean
 }
 
 interface OrganizationSettingsSectionsProps extends OrganizationSettingsMenuItemsProps {
@@ -29,6 +34,7 @@ export const generateOrganizationSettingsMenuItems = ({
   showLegalDocuments = true,
   showPlatformWebhooks = true,
   showPrivateApps: _showPrivateApps = false,
+  showAuditLogDrains = false,
 }: OrganizationSettingsMenuItemsProps) => [
   {
     key: 'general',
@@ -72,6 +78,15 @@ export const generateOrganizationSettingsMenuItems = ({
     label: 'Audit Logs',
     href: `/org/${slug}/audit`,
   },
+  ...(showAuditLogDrains
+    ? [
+        {
+          key: 'audit-log-drains',
+          label: 'Audit Log Drains',
+          href: `/org/${slug}/audit-log-drains`,
+        },
+      ]
+    : []),
   ...(showLegalDocuments
     ? [
         {
@@ -91,6 +106,7 @@ export const generateOrganizationSettingsSections = ({
   showLegalDocuments = true,
   showPlatformWebhooks = true,
   showPrivateApps = false,
+  showAuditLogDrains = false,
 }: OrganizationSettingsSectionsProps): SidebarSection[] => {
   const isLinkActive = (key: string, href: string) =>
     key === 'webhooks'
@@ -102,6 +118,7 @@ export const generateOrganizationSettingsSections = ({
       key: 'general',
       label: 'General',
       href: `/org/${slug}/general`,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_GENERAL,
     },
     ...(showSecuritySettings
       ? [
@@ -109,6 +126,7 @@ export const generateOrganizationSettingsSections = ({
             key: 'security',
             label: 'Security',
             href: `/org/${slug}/security`,
+            shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_SECURITY,
           },
         ]
       : []),
@@ -118,6 +136,7 @@ export const generateOrganizationSettingsSections = ({
             key: 'sso',
             label: 'SSO',
             href: `/org/${slug}/sso`,
+            shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_SSO,
           },
         ]
       : []),
@@ -128,6 +147,7 @@ export const generateOrganizationSettingsSections = ({
       key: 'apps',
       label: 'OAuth Apps',
       href: `/org/${slug}/apps`,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_APPS,
     },
     ...(showPrivateApps
       ? [
@@ -135,6 +155,7 @@ export const generateOrganizationSettingsSections = ({
             key: 'private-apps',
             label: 'Private Apps',
             href: `/org/${slug}/private-apps`,
+            shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_PRIVATE_APPS,
           },
         ]
       : []),
@@ -144,6 +165,7 @@ export const generateOrganizationSettingsSections = ({
             key: 'webhooks',
             label: 'Webhooks',
             href: `/org/${slug}/webhooks`,
+            shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_WEBHOOKS,
           },
         ]
       : []),
@@ -154,13 +176,25 @@ export const generateOrganizationSettingsSections = ({
       key: 'audit',
       label: 'Audit Logs',
       href: `/org/${slug}/audit`,
+      shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_AUDIT,
     },
+    ...(showAuditLogDrains
+      ? [
+          {
+            key: 'audit-log-drains',
+            label: 'Audit Log Drains',
+            href: `/org/${slug}/audit-log-drains`,
+            shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_AUDIT_LOG_DRAINS,
+          },
+        ]
+      : []),
     ...(showLegalDocuments
       ? [
           {
             key: 'documents',
             label: 'Legal Documents',
             href: `/org/${slug}/documents`,
+            shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS_DOCUMENTS,
           },
         ]
       : []),
@@ -198,6 +232,7 @@ export function OrganizationSettingsLayout({ children }: PropsWithChildren) {
   const { slug } = useParams()
   const showPlatformWebhooks = useIsPlatformWebhooksEnabled()
   const showPrivateApps = useFlag('privateApps')
+  const showAuditLogDrains = useFlag('auditLogsLogDrain')
   const fullCurrentPath = useCurrentPath()
   const currentPath = normalizeOrganizationSettingsPath(fullCurrentPath)
 
@@ -219,20 +254,29 @@ export function OrganizationSettingsLayout({ children }: PropsWithChildren) {
     showLegalDocuments,
     showPlatformWebhooks,
     showPrivateApps,
+    showAuditLogDrains,
   })
+
+  const orgSettingsMenu = useMemo(
+    () => convertSectionsToProductMenu(toSubMenuSections(sections)),
+    [sections]
+  )
 
   // Browser titles for org settings routes are set by OrganizationLayout.
   return (
-    <WithSidebar
-      title="Organization Settings"
-      sections={sections}
-      header={
-        <div className="border-default flex min-h-(--header-height) items-center border-b px-6">
-          <h4 className="text-lg">Settings</h4>
-        </div>
-      }
-    >
-      {children}
-    </WithSidebar>
+    <>
+      <ProductMenuShortcuts menu={orgSettingsMenu} />
+      <WithSidebar
+        title="Organization Settings"
+        sections={sections}
+        header={
+          <div className="border-default flex min-h-(--header-height) items-center border-b px-6">
+            <h4 className="text-lg">Settings</h4>
+          </div>
+        }
+      >
+        {children}
+      </WithSidebar>
+    </>
   )
 }

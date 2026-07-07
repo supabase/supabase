@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { useIsPgDeltaDiffEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { ReviewWithAI } from '../BranchManagement/ReviewWithAI'
@@ -22,10 +22,9 @@ import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
 import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useProjectGitHubConnectionQuery } from '@/data/integrations/github-connections-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useBranchMergeDiff } from '@/hooks/branches/useBranchMergeDiff'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const MergeTitle = () => {
   const { ref } = useParams()
@@ -122,9 +121,8 @@ export const MergeActions = ({
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
-  const { mutate: sendEvent } = useSendEventMutation()
   const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to update branch: ${error.message}`)
@@ -132,8 +130,12 @@ export const MergeActions = ({
   })
 
   const parentProjectRef = project?.parent_project_ref
-  const { data: parentProject } = useProjectDetailQuery({ ref: parentProjectRef })
-  const { data: ghConnection } = useProjectGitHubConnectionQuery({ ref: parentProjectRef })
+  const { data: parentProject } = useProjectDetailQuery({
+    ref: parentProjectRef,
+  })
+  const { data: ghConnection } = useProjectGitHubConnectionQuery({
+    ref: parentProjectRef,
+  })
 
   const { data: branches } = useBranchesQuery(
     { projectRef: parentProjectRef },
@@ -189,7 +191,7 @@ export const MergeActions = ({
                     : 'Unable to merge at this time',
             },
           }}
-          type="primary"
+          variant="primary"
           loading={isSubmitting}
           disabled={isMergeDisabled}
           onClick={onSelectMerge}
@@ -199,7 +201,7 @@ export const MergeActions = ({
         </ButtonTooltip>
       ) : (
         <Button
-          type="primary"
+          variant="primary"
           loading={isSubmitting}
           onClick={onSelectMerge}
           icon={<GitMerge size={16} strokeWidth={1.5} className="text-brand" />}
@@ -210,7 +212,12 @@ export const MergeActions = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" loading={isUpdating} className="px-1.5" icon={<MoreVertical />} />
+          <Button
+            variant="default"
+            loading={isUpdating}
+            className="px-1.5"
+            icon={<MoreVertical />}
+          />
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="end" className="w-52">
           <DropdownMenuItem
@@ -227,12 +234,8 @@ export const MergeActions = ({
                   onSuccess: () => {
                     toast.success('Successfully closed merge request')
                     router.push(`/project/${project?.ref}/branches?tab=prs`)
-                    sendEvent({
-                      action: 'branch_close_merge_request_button_clicked',
-                      groups: {
-                        project: parentProjectRef ?? 'Unknown',
-                        organization: selectedOrg?.slug ?? 'Unknown',
-                      },
+                    track('branch_close_merge_request_button_clicked', undefined, {
+                      project: parentProjectRef,
                     })
                   },
                 }

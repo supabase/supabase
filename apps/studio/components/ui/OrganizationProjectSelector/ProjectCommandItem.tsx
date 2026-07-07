@@ -1,6 +1,6 @@
 import { Check } from 'lucide-react'
 import { ReactNode } from 'react'
-import { cn, CommandItem_Shadcn_ } from 'ui'
+import { cn, CommandItem } from 'ui'
 
 import type { OrgProject } from '@/data/projects/org-projects-infinite-query'
 
@@ -31,7 +31,7 @@ export function ProjectCommandItem({
   const disabled = isOptionDisabled?.(project) ?? false
 
   return (
-    <CommandItem_Shadcn_
+    <CommandItem
       key={project.ref}
       value={`${project.name.replaceAll('"', '')}-${project.ref}`}
       className="cursor-pointer w-full"
@@ -53,6 +53,6 @@ export function ProjectCommandItem({
           {checkPosition === 'right' && project.ref === selectedRef && <Check size={16} />}
         </div>
       )}
-    </CommandItem_Shadcn_>
+    </CommandItem>
   )
 }

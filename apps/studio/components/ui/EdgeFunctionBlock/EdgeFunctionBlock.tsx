@@ -90,7 +90,7 @@ export const EdgeFunctionBlock = ({
         ) : (
           <>
             <Button
-              type="outline"
+              variant="outline"
               size="tiny"
               loading={isDeploying}
               disabled={disabled || isDeploying}
@@ -115,7 +115,7 @@ export const EdgeFunctionBlock = ({
           </p>
           <div className="flex justify-stretch mt-2 gap-2">
             <Button
-              type="outline"
+              variant="outline"
               size="tiny"
               className="w-full flex-1"
               disabled={isDeploying}
@@ -124,7 +124,7 @@ export const EdgeFunctionBlock = ({
               Cancel
             </Button>
             <Button
-              type="danger"
+              variant="danger"
               size="tiny"
               className="w-full flex-1"
               loading={isDeploying}

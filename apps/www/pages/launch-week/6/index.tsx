@@ -1,21 +1,19 @@
 // @ts-nocheck
 
-import { ExternalLink } from 'lucide-react'
-import { NextSeo } from 'next-seo'
-import Image from 'next/image'
-
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import _days from '~/components/LaunchWeek/6/lw6_days.json'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
-import classNames from 'classnames'
-import { useTheme } from 'next-themes'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { Accordion, Badge } from 'ui'
 import { SITE_ORIGIN } from '~/lib/constants'
 import type { WeekDayProps } from '~/types/launch-week-6'
+import classNames from 'classnames'
+import { ExternalLink } from 'lucide-react'
+import { NextSeo } from 'next-seo'
+import { useTheme } from 'next-themes'
+import Image from 'next/image'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge } from 'ui'
 
 import styles from './styles/launchWeek6.module.css'
 import styleUtils from './styles/utils6.module.css'
@@ -269,13 +267,8 @@ export default function launchweek() {
         </SectionContainer>
         <SectionContainer className="pt-0!">
           <Accordion
-            type="default"
-            openBehaviour="multiple"
-            size="large"
+            type="multiple"
             className="text-white"
-            justified={false}
-            bordered={false}
-            chevronAlign="right"
             defaultValue={[
               day1.d.toString(),
               day2.d.toString(),
@@ -284,20 +277,16 @@ export default function launchweek() {
               day5.d?.toString(),
             ]}
           >
-            <div className="border-b border-[#2E2E2E] pb-3">
-              <Accordion.Item
-                header={
-                  <AccordionHeader
-                    date={day1.date}
-                    day={day1.dd}
-                    title={day1.title}
-                    shipped={day1.shipped}
-                  />
-                }
-                disabled={!day1.shipped}
-                className="h-[79px]"
-                id={day1.d.toString()}
-              >
+            <AccordionItem key={day1.dd} disabled={!day1.shipped} value={day1.d.toString()}>
+              <AccordionTrigger className="py-8 font-normal hover:no-underline">
+                <AccordionHeader
+                  date={day1.date}
+                  day={day1.dd}
+                  title={day1.title}
+                  shipped={day1.shipped}
+                />
+              </AccordionTrigger>
+              <AccordionContent>
                 {day1.steps.length > 0 && (
                   <div className="h-[400px] flex flex-col lg:flex-row group/day1 relative overflow-hidden">
                     <div
@@ -323,22 +312,18 @@ export default function launchweek() {
                     </div>
                   </div>
                 )}
-              </Accordion.Item>
-            </div>
-            <div className="border-b border-[#2E2E2E] pb-3">
-              <Accordion.Item
-                header={
-                  <AccordionHeader
-                    date={day2.date}
-                    day={day2.dd}
-                    title={day2.title}
-                    shipped={day2.shipped}
-                  />
-                }
-                disabled={!day2.shipped}
-                className="h-[79px]"
-                id={day2.d.toString()}
-              >
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem key={day2.dd} disabled={!day2.shipped} value={day2.d.toString()}>
+              <AccordionTrigger className="py-8 font-normal hover:no-underline">
+                <AccordionHeader
+                  date={day2.date}
+                  day={day2.dd}
+                  title={day2.title}
+                  shipped={day2.shipped}
+                />
+              </AccordionTrigger>
+              <AccordionContent>
                 {day2.steps.length > 0 && (
                   <div className="h-[800px] lg:h-[400px] flex flex-col gap-5 lg:flex-row">
                     <div
@@ -378,22 +363,18 @@ export default function launchweek() {
                     </div>
                   </div>
                 )}
-              </Accordion.Item>
-            </div>
-            <div className="border-b border-[#2E2E2E] pb-3">
-              <Accordion.Item
-                header={
-                  <AccordionHeader
-                    date={day3.date}
-                    day={day3.dd}
-                    title={day3.title}
-                    shipped={day3.shipped}
-                  />
-                }
-                disabled={!day3.shipped}
-                className="h-[79px]"
-                id={day3.d.toString()}
-              >
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem key={day3.dd} disabled={!day3.shipped} value={day3.d.toString()}>
+              <AccordionTrigger className="py-8 font-normal hover:no-underline">
+                <AccordionHeader
+                  date={day3.date}
+                  day={day3.dd}
+                  title={day3.title}
+                  shipped={day3.shipped}
+                />
+              </AccordionTrigger>
+              <AccordionContent>
                 {day3.steps.length > 0 && (
                   <div className="h-[400px] flex gap-5 group">
                     <div
@@ -427,22 +408,18 @@ export default function launchweek() {
                     </div>
                   </div>
                 )}
-              </Accordion.Item>
-            </div>
-            <div className="border-b border-[#2E2E2E] pb-3">
-              <Accordion.Item
-                header={
-                  <AccordionHeader
-                    date={day4.date}
-                    day={day4.dd}
-                    title={day4.title}
-                    shipped={day4.shipped}
-                  />
-                }
-                disabled={!day4.shipped}
-                className="h-[79px]"
-                id={day4.d.toString()}
-              >
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem key={day4.dd} disabled={!day4.shipped} value={day4.d.toString()}>
+              <AccordionTrigger className="py-8 font-normal hover:no-underline">
+                <AccordionHeader
+                  date={day4.date}
+                  day={day4.dd}
+                  title={day4.title}
+                  shipped={day4.shipped}
+                />
+              </AccordionTrigger>
+              <AccordionContent>
                 {day4.steps.length > 0 && (
                   <div className="h-[400px]  flex flex-col gap-5 lg:flex-row group/day4 relative overflow-hidden">
                     <div
@@ -483,22 +460,18 @@ export default function launchweek() {
                     </div>
                   </div>
                 )}
-              </Accordion.Item>
-            </div>
-            <div className="border-b border-[#2E2E2E] pb-3" id="currentDay">
-              <Accordion.Item
-                header={
-                  <AccordionHeader
-                    date={day5.date}
-                    day={day5.dd}
-                    title={day5.title}
-                    shipped={day5.shipped}
-                  />
-                }
-                disabled={!day5.shipped}
-                className="h-[79px]"
-                id={day5.d.toString()}
-              >
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem key={day5.dd} disabled={!day5.shipped} value={day5.d.toString()}>
+              <AccordionTrigger className="py-8 font-normal hover:no-underline">
+                <AccordionHeader
+                  date={day5.date}
+                  day={day5.dd}
+                  title={day5.title}
+                  shipped={day5.shipped}
+                />
+              </AccordionTrigger>
+              <AccordionContent>
                 {day5.steps.length > 0 && (
                   <>
                     <div className="h-[800px] lg:h-[400px]  flex flex-col gap-5 lg:flex-row">
@@ -865,8 +838,8 @@ export default function launchweek() {
                     </div>
                   </>
                 )}
-              </Accordion.Item>
-            </div>
+              </AccordionContent>
+            </AccordionItem>
           </Accordion>
         </SectionContainer>
 

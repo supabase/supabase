@@ -3,7 +3,7 @@ import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { Loader2, Search } from 'lucide-react'
 import { useState } from 'react'
-import { Checkbox, cn, Label_Shadcn_ as Label, Skeleton } from 'ui'
+import { Checkbox, cn, Label, Skeleton } from 'ui'
 
 import type { DataTableCheckboxFilterField } from '../DataTable.types'
 import { formatCompactNumber } from '../DataTable.utils'
@@ -66,7 +66,7 @@ export function DataTableFilterCheckboxAsync<TData>({
         onChange={(e) => setInputValue(e.target.value)}
       />
 
-      <div className="max-h-[200px] overflow-y-auto rounded-sm border border-border empty:border-none">
+      <div className="max-h-[215px] overflow-y-auto rounded-sm border border-border empty:border-none">
         {filterOptions.length === 0 ? (
           <div className="flex items-center justify-center px-2 py-3 text-center">
             <div className="space-y-0.5">

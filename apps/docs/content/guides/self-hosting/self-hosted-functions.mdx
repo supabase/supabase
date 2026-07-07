@@ -199,7 +199,7 @@ For more details, see:
 
 ### 400 "missing function name in request"
 
-The request URL must include the function name after `/functions/v1/`. For example, `/functions/v1/hello` — not just `/functions/v1/`.
+The request URL must include the function name after `/functions/v1/`. For example, `/functions/v1/hello`.
 
 ### 500 error on invocation
 
@@ -230,7 +230,7 @@ docker compose restart functions --no-deps
 - Recreate the functions container after changing configuration
 - Check that the variable name matches exactly (case-sensitive)
 
-Use the following command to recreate the container, not just `restart`:
+Use the following command to recreate the container:
 
 ```sh
 docker compose up -d --force-recreate --no-deps functions

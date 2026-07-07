@@ -13,13 +13,13 @@ import { Plus, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import {
   cn,
-  ContextMenu_Shadcn_,
-  ContextMenuContent_Shadcn_,
-  ContextMenuItem_Shadcn_,
-  ContextMenuTrigger_Shadcn_,
-  Tabs_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+  Tabs,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
@@ -137,13 +137,13 @@ export const EditorTabs = () => {
 
   return (
     <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-      <Tabs_Shadcn_
+      <Tabs
         className="w-full flex"
         value={hasNewTab ? 'new' : (tabs.activeTab ?? undefined)}
         onValueChange={handleTabChange}
       >
         <CollapseButton hideTabs={false} />
-        <TabsList_Shadcn_
+        <TabsList
           ref={tabsListRef}
           className={cn(
             'rounded-b-none gap-0 min-h-(--header-height) flex items-center w-full z-1',
@@ -155,8 +155,8 @@ export const EditorTabs = () => {
             strategy={horizontalListSortingStrategy}
           >
             {editorTabs.map((tab, index) => (
-              <ContextMenu_Shadcn_ key={tab.id}>
-                <ContextMenuTrigger_Shadcn_>
+              <ContextMenu key={tab.id}>
+                <ContextMenuTrigger>
                   <SortableTab
                     key={tab.id}
                     tab={tab}
@@ -164,28 +164,24 @@ export const EditorTabs = () => {
                     openTabs={openTabs}
                     onClose={() => handleClose(tab.id)}
                   />
-                </ContextMenuTrigger_Shadcn_>
-                <ContextMenuContent_Shadcn_>
-                  <ContextMenuItem_Shadcn_ onClick={() => handleClose(tab.id)}>
-                    Close
-                  </ContextMenuItem_Shadcn_>
-                  <ContextMenuItem_Shadcn_ onClick={() => handleCloseOthers(tab.id)}>
+                </ContextMenuTrigger>
+                <ContextMenuContent>
+                  <ContextMenuItem onClick={() => handleClose(tab.id)}>Close</ContextMenuItem>
+                  <ContextMenuItem onClick={() => handleCloseOthers(tab.id)}>
                     Close Others
-                  </ContextMenuItem_Shadcn_>
-                  <ContextMenuItem_Shadcn_ onClick={() => handleCloseRight(tab.id)}>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => handleCloseRight(tab.id)}>
                     Close to the Right
-                  </ContextMenuItem_Shadcn_>
-                  <ContextMenuItem_Shadcn_ onClick={handleCloseAll}>
-                    Close All
-                  </ContextMenuItem_Shadcn_>
-                </ContextMenuContent_Shadcn_>
-              </ContextMenu_Shadcn_>
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={handleCloseAll}>Close All</ContextMenuItem>
+                </ContextMenuContent>
+              </ContextMenu>
             ))}
           </SortableContext>
 
           {/* Non-draggable new tab */}
           {hasNewTab && (
-            <TabsTrigger_Shadcn_
+            <TabsTrigger
               value="new"
               className={cn(
                 'flex items-center gap-2 px-3 text-xs',
@@ -219,7 +215,7 @@ export const EditorTabs = () => {
                 <X size={12} className="text-foreground-light" />
               </span>{' '}
               <div className="absolute w-full -bottom-px left-0 right-0 h-px bg-dash-sidebar dark:bg-surface-100 opacity-0 group-data-[state=active]:opacity-100" />
-            </TabsTrigger_Shadcn_>
+            </TabsTrigger>
           )}
 
           <AnimatePresence initial={false}>
@@ -244,8 +240,8 @@ export const EditorTabs = () => {
             )}
           </AnimatePresence>
           <div className="grow h-full border-b pr-6" />
-        </TabsList_Shadcn_>
-      </Tabs_Shadcn_>
+        </TabsList>
+      </Tabs>
 
       <DragOverlay dropAnimation={null}>
         {tabs.activeTab ? <TabPreview tab={tabs.activeTab} /> : null}

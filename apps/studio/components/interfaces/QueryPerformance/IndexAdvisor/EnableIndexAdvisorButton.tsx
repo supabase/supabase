@@ -25,10 +25,10 @@ export const EnableIndexAdvisorButton = () => {
   return (
     <>
       <Button
-        type="primary"
+        variant="primary"
         onClick={() => {
           setIsDialogOpen(true)
-          track('index_advisor_banner_enable_button_clicked')
+          track('index_advisor_enable_button_clicked', { origin: 'banner' })
         }}
       >
         Enable
@@ -86,12 +86,13 @@ export const EnableIndexAdvisorDialog = ({
       setOpen(false)
     } catch (error: any) {
       toast.error(`Failed to enable Index Advisor: ${error.message}`)
+      throw error
     }
   }
 
   return (
     <AlertDialog open={open} onOpenChange={() => setOpen(!open)}>
-      <AlertDialogContent size="medium">
+      <AlertDialogContent size="small">
         <AlertDialogHeader>
           <AlertDialogTitle>Enable Index Advisor</AlertDialogTitle>
           <AlertDialogDescription className="flex flex-col gap-y-2">
@@ -100,21 +101,21 @@ export const EnableIndexAdvisorDialog = ({
               on your actual query patterns.
             </p>
             <p>
-              Enable this will install the <code className="text-code-inline">index_advisor</code>{' '}
-              and <code className="text-code-inline">hypopg</code> Postgres extensions so Index
-              Advisor can analyse queries and suggest performance-improving indexes.
+              This will install the{' '}
+              <code className="text-code-inline break-normal!">index_advisor</code> and{' '}
+              <code className="text-code-inline break-normal!">hypopg</code> Postgres extensions so
+              Index Advisor can analyse queries and suggest performance-improving indexes.
             </p>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction
-            onClick={(e) => {
-              e.preventDefault()
-              onEnableIndexAdvisor()
-              track('index_advisor_dialog_enable_button_clicked')
+            loading={isEnablingExtension}
+            onClick={() => {
+              track('index_advisor_enable_button_clicked', { origin: 'dialog' })
+              return onEnableIndexAdvisor()
             }}
-            disabled={isEnablingExtension}
           >
             {isEnablingExtension ? 'Enabling...' : 'Enable'}
           </AlertDialogAction>

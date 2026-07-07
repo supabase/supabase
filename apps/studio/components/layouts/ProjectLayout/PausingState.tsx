@@ -106,7 +106,7 @@ export const PausingState = ({ project }: PausingStateProps) => {
               </p>
               {isTakingLongerThanExpected && (
                 <div className="flex justify-center">
-                  <Button asChild type="default">
+                  <Button asChild variant="default">
                     <SupportLink
                       queryParams={{
                         category: SupportCategories.DATABASE_UNRESPONSIVE,

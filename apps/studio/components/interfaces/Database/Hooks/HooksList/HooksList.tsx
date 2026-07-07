@@ -2,13 +2,13 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { includes, map as lodashMap, uniqBy } from 'lodash'
 import { Search } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { HooksListEmpty } from './HooksListEmpty'
 import { SchemaTable } from './SchemaTable'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
@@ -16,6 +16,9 @@ import { useDatabaseHooksQuery } from '@/data/database-triggers/database-trigger
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { onSearchInputEscape } from '@/lib/keyboard'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const HooksList = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -44,15 +47,33 @@ export const HooksList = () => {
     'triggers'
   )
 
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search webhooks' }
+  )
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setFilterString(''))
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setShowCreateHookForm(true), {
+    label: 'Create webhook',
+    enabled: isPermissionsLoaded && canCreateWebhooks,
+  })
+
   return (
     <div className="w-full space-y-4">
       <div className="flex items-center justify-between">
         <InputGroup className="w-52">
           <InputGroupInput
+            ref={searchInputRef}
             size="tiny"
             placeholder="Search for a webhook"
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
+            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
           />
           <InputGroupAddon>
             <Search />

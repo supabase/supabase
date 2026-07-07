@@ -90,7 +90,17 @@ export const ChartHighlightActions = ({
           top: chartHighlight?.popoverPosition?.y + 'px' || 0,
         }}
       />
-      <DropdownMenuContent className="flex flex-col gap-1 p-1 w-fit text-left">
+      <DropdownMenuContent
+        className="flex flex-col gap-1 p-1 w-fit text-left"
+        onEscapeKeyDown={() => clearHighlight?.()}
+        onInteractOutside={(e) => {
+          const target = e.target as Element | null
+          // If the user clicked on a chart, handleMouseDown will manage the new selection.
+          // Calling clearHighlight here would race with it and clobber the new state.
+          if (target?.closest('.recharts-wrapper')) return
+          clearHighlight?.()
+        }}
+      >
         <DropdownMenuLabel className="flex items-center justify-center text-foreground-light font-mono gap-x-2 text-xs">
           <span>{formatChartDate(selectedRangeStart!, 'MMM D, H:mm')}</span>
           <ArrowRight size={10} />

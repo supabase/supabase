@@ -6,7 +6,7 @@ import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
 import { formatPercentage, numberFormatter } from './Charts.utils'
 import { useFormatDateTime, useTimezone } from '@/lib/datetime'
-import { formatBytes } from '@/lib/helpers'
+import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
 export interface ReportAttributes {
   id?: string
@@ -174,12 +174,14 @@ export const CustomTooltip = ({
     const isRamChart =
       !payload?.some((p: any) => p.dataKey.toLowerCase() === 'ram_usage') &&
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
+    const isSwapChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('swap_'))
+    const isMemoryChart = isRamChart || isSwapChart
     const isDBSizeChart =
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_')) ||
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('pg_database_size'))
     const isNetworkChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('network_'))
     const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
-    const shouldFormatBytes = isBytesFormat || isRamChart || isDBSizeChart || isNetworkChart
+    const shouldFormatBytes = isBytesFormat || isMemoryChart || isDBSizeChart || isNetworkChart
     const byteUnitSuffix = format === 'bytes-per-second' ? '/s' : ''
 
     const attributesToIgnore =
@@ -212,9 +214,22 @@ export const CustomTooltip = ({
 
     const formatNumeric = (value: number) => {
       if (!shouldFormatBytes && valuePrecision === 0 && value > 0 && value < 1) return '<1'
-      return shouldFormatBytes
-        ? formatBytes(isNetworkChart ? Math.abs(value) : value, valuePrecision)
-        : numberFormatter(value, valuePrecision)
+      if (shouldFormatBytes) {
+        const val = isNetworkChart ? Math.abs(value) : value
+        if (isMemoryChart) return formatBytesMinMB(val, valuePrecision)
+        return formatBytes(val, valuePrecision)
+      }
+      const formatted = numberFormatter(value, valuePrecision)
+      if (
+        !isBytesFormat &&
+        format !== '%' &&
+        format !== 'ms' &&
+        typeof format === 'string' &&
+        format
+      ) {
+        return `${formatted}${format}`
+      }
+      return formatted
     }
 
     const LabelItem = ({ entry }: { entry: any }) => {

@@ -97,7 +97,7 @@ Deno.serve(async (req) => {
     const response = await fetch(`${Deno.env.get('SUPABASE_URL')}/functions/v1/other-function`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${SUPABASE_DEFAULT_PUBLISHABLE_KEY}`,
+        apikey: SUPABASE_DEFAULT_PUBLISHABLE_KEY,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ foo: 'bar' }),
@@ -256,7 +256,7 @@ export async function save(data: any) {
 
 ```typescript
 // supabase/functions/process-data/index.ts
-import { validate, transform, save } from '../_shared/transform.ts'
+import { save, transform, validate } from '../_shared/transform.ts'
 
 Deno.serve(async (req) => {
   const data = await req.json()
@@ -284,7 +284,7 @@ async function processWithDelay(items: any[]) {
 
 | Pattern                         | Budget consumption | Recommendation    |
 | ------------------------------- | ------------------ | ----------------- |
-| Simple chain (A to B to C)      | Low                | Generally safe    |
+| Basic chain (A to B to C)       | Low                | Generally safe    |
 | Fan-out (A to B, C, D, E)       | Moderate           | Limit concurrency |
 | Deep recursion (A to A to A...) | High               | Set max depth     |
 | Unbounded loops                 | Very high          | Avoid, use queues |

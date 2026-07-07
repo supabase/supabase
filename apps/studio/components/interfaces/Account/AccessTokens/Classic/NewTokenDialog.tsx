@@ -16,15 +16,15 @@ import {
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
@@ -158,7 +158,7 @@ export const NewTokenDialog = ({
                   be very careful when using this API.
                 </p>
                 <div className="mt-4">
-                  <Button asChild type="default" icon={<ExternalLink />}>
+                  <Button asChild variant="default" icon={<ExternalLink />}>
                     <a href="https://api.supabase.com/api/v0" target="_blank" rel="noreferrer">
                       Experimental API documentation
                     </a>
@@ -189,7 +189,7 @@ export const NewTokenDialog = ({
                 render={({ field }) => (
                   <FormItemLayout name="tokenName" label="Name">
                     <FormControl>
-                      <Input_Shadcn_
+                      <Input
                         id="tokenName"
                         {...field}
                         placeholder="Provide a name for your token"
@@ -206,20 +206,20 @@ export const NewTokenDialog = ({
                   <FormItemLayout name="expiresAt" label="Expires in">
                     <div className="flex gap-2">
                       <FormControl className="grow">
-                        <Select_Shadcn_ value={field.value} onValueChange={handleExpiryChange}>
-                          <SelectTrigger_Shadcn_>
-                            <SelectValue_Shadcn_ placeholder="Expires at" />
-                          </SelectTrigger_Shadcn_>
-                          <SelectContent_Shadcn_>
+                        <Select value={field.value} onValueChange={handleExpiryChange}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Expires at" />
+                          </SelectTrigger>
+                          <SelectContent>
                             {Object.values(EXPIRES_AT_OPTIONS).map(
                               (option: { value: string; label: string }) => (
-                                <SelectItem_Shadcn_ key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value}>
                                   {option.label}
-                                </SelectItem_Shadcn_>
+                                </SelectItem>
                               )
                             )}
-                          </SelectContent_Shadcn_>
-                        </Select_Shadcn_>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       {isCustomExpiry && (
                         <DatePicker
@@ -251,7 +251,7 @@ export const NewTokenDialog = ({
         </DialogSection>
         <DialogFooter>
           <Button
-            type="default"
+            variant="default"
             disabled={isPending}
             onClick={() => {
               form.reset()
@@ -262,7 +262,7 @@ export const NewTokenDialog = ({
           >
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" loading={isPending}>
+          <Button form={formId} type="submit" loading={isPending}>
             Generate token
           </Button>
         </DialogFooter>

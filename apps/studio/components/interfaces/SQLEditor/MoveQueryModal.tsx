@@ -7,13 +7,13 @@ import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -28,11 +28,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
-  Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Input,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 import * as z from 'zod'
@@ -41,11 +41,8 @@ import { getContentById } from '@/data/content/content-id-query'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { useSQLSnippetFolderCreateMutation } from '@/data/content/sql-folder-create-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
-import {
-  SnippetWithContent,
-  useSnippetFolders,
-  useSqlEditorV2StateSnapshot,
-} from '@/state/sql-editor-v2'
+import type { SnippetWithContent } from '@/data/content/sql-folders-query'
+import { useSnippetFolders, useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 interface MoveQueryModalProps {
@@ -229,13 +226,13 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
 
             <DialogSection className="py-5 flex flex-col gap-y-4">
               <div className="flex flex-col gap-y-2">
-                <Label_Shadcn_ className="text-foreground-light">Select a folder</Label_Shadcn_>
-                <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-                  <PopoverTrigger_Shadcn_ asChild>
+                <Label className="text-foreground-light">Select a folder</Label>
+                <Popover open={open} onOpenChange={setOpen} modal={false}>
+                  <PopoverTrigger asChild>
                     <Button
                       block
                       size="small"
-                      type="default"
+                      variant="default"
                       className="pr-2 justify-between"
                       iconRight={
                         <Code
@@ -250,20 +247,15 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                         {isCurrentFolder && ` (Current)`}
                       </div>
                     </Button>
-                  </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_
-                    className="p-0"
-                    side="bottom"
-                    align="start"
-                    sameWidthAsTrigger
-                  >
-                    <Command_Shadcn_>
-                      <CommandInput_Shadcn_ placeholder="Find folder..." />
-                      <CommandList_Shadcn_>
-                        <CommandEmpty_Shadcn_>No folders found</CommandEmpty_Shadcn_>
-                        <CommandGroup_Shadcn_>
+                  </PopoverTrigger>
+                  <PopoverContent className="p-0" side="bottom" align="start" sameWidthAsTrigger>
+                    <Command>
+                      <CommandInput placeholder="Find folder..." />
+                      <CommandList>
+                        <CommandEmpty>No folders found</CommandEmpty>
+                        <CommandGroup>
                           <ScrollArea className={(folders || []).length > 6 ? 'h-[210px]' : ''}>
-                            <CommandItem_Shadcn_
+                            <CommandItem
                               key="root"
                               value="root"
                               className="cursor-pointer w-full justify-between"
@@ -283,9 +275,9 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                                   ` (Current)`}
                               </span>
                               {selectedId === 'root' && <Check size={14} />}
-                            </CommandItem_Shadcn_>
+                            </CommandItem>
                             {folders?.map((folder) => (
-                              <CommandItem_Shadcn_
+                              <CommandItem
                                 key={folder.id}
                                 value={folder.name}
                                 className="cursor-pointer w-full justify-between"
@@ -305,13 +297,13 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                                     ` (Current)`}
                                 </span>
                                 {folder.id === selectedId && <Check size={14} />}
-                              </CommandItem_Shadcn_>
+                              </CommandItem>
                             ))}
                           </ScrollArea>
-                        </CommandGroup_Shadcn_>
-                        <CommandSeparator_Shadcn_ />
-                        <CommandGroup_Shadcn_>
-                          <CommandItem_Shadcn_
+                        </CommandGroup>
+                        <CommandSeparator />
+                        <CommandGroup>
+                          <CommandItem
                             className="cursor-pointer w-full justify-start gap-x-2"
                             onSelect={(_e) => {
                               setOpen(false)
@@ -324,12 +316,12 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                           >
                             <Plus size={14} strokeWidth={1.5} />
                             <p>New folder</p>
-                          </CommandItem_Shadcn_>
-                        </CommandGroup_Shadcn_>
-                      </CommandList_Shadcn_>
-                    </Command_Shadcn_>
-                  </PopoverContent_Shadcn_>
-                </Popover_Shadcn_>
+                          </CommandItem>
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {selectedId === 'new-folder' && (
@@ -341,7 +333,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                       <FormItem className="flex flex-col gap-y-2">
                         <FormLabel>Provide a name for your new folder</FormLabel>
                         <FormControl>
-                          <Input_Shadcn_
+                          <Input
                             autoFocus
                             {...field}
                             autoComplete="off"
@@ -358,15 +350,15 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
 
             <DialogFooter>
               <Button
-                type="default"
+                variant="default"
                 disabled={isMovingSnippet || isCreatingFolder}
                 onClick={() => onClose()}
               >
                 Cancel
               </Button>
               <Button
-                type="primary"
-                htmlType="submit"
+                variant="primary"
+                type="submit"
                 disabled={isMovingToSameFolder}
                 loading={isMovingSnippet || isCreatingFolder}
               >

@@ -68,7 +68,7 @@ export const AskAIWidget = ({
       {isDiffVisible ? (
         <div className="flex justify-start p-0 border-t">
           <Button
-            type="text"
+            variant="text"
             onClick={onAccept}
             className="text-xs h-auto py-1 rounded-none px-3 border-r-border"
             disabled={isLoading}
@@ -77,7 +77,7 @@ export const AskAIWidget = ({
           </Button>
           <Button
             onClick={onReject}
-            type="text"
+            variant="text"
             className="text-xs h-auto py-1 rounded-none px-3 border-r-border"
             disabled={isLoading}
           >
@@ -87,7 +87,7 @@ export const AskAIWidget = ({
       ) : (
         <div className="flex justify-start p-0 border-t">
           <Button
-            type="text"
+            variant="text"
             onClick={handleSubmit}
             loading={isLoading}
             className="text-xs h-auto py-1 rounded-none px-3 border-r-border"
@@ -98,7 +98,7 @@ export const AskAIWidget = ({
           </Button>
           <Button
             onClick={onCancel}
-            type="text"
+            variant="text"
             className="text-xs h-auto py-1 rounded-none px-3 border-r-border"
             disabled={isLoading}
           >

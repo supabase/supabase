@@ -14,12 +14,12 @@ import {
   SheetContent,
   SheetDescription,
   SheetTitle,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -130,7 +130,7 @@ export const QueryPerformanceGrid = ({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
-                    type="text"
+                    variant="text"
                     size="tiny"
                     className="p-1 h-5 w-5 shrink-0"
                     icon={<ChevronDown size={14} className="text-foreground-muted" />}
@@ -187,11 +187,11 @@ export const QueryPerformanceGrid = ({
               </div>
               <CodeBlock
                 language="pgsql"
-                className="bg-transparent! p-0! m-0! border-none! whitespace-nowrap! [&>code]:whitespace-nowrap! [&>code]:wrap-break-word overflow-visible! truncate! w-full! pr-20! pointer-events-none"
-                wrapperClassName="max-w-full! flex-1"
+                className="bg-transparent! p-0! m-0! border-none! truncate! whitespace-nowrap! w-full! pr-20! pointer-events-none"
+                wrapperClassName="flex-1 min-w-0 max-w-full overflow-hidden!"
                 hideLineNumbers
                 hideCopy
-                value={value.replace(/\s+/g, ' ').trim() as string}
+                value={typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : ''}
                 wrapLines={false}
               />
               {onCurrentSelectQuery && (
@@ -199,7 +199,7 @@ export const QueryPerformanceGrid = ({
                   tooltip={{ content: { text: 'Query details' } }}
                   icon={<ArrowRight size={14} />}
                   size="tiny"
-                  type="default"
+                  variant="default"
                   onClick={(e) => {
                     e.stopPropagation()
                     setSelectedRow(props.rowIdx)
@@ -488,7 +488,7 @@ export const QueryPerformanceGrid = ({
           >
             {onRetry && (
               <div className="mt-4">
-                <Button type="default" onClick={onRetry}>
+                <Button variant="default" onClick={onRetry}>
                   Try again
                 </Button>
               </div>
@@ -509,7 +509,7 @@ export const QueryPerformanceGrid = ({
         <DataGrid
           ref={gridRef}
           style={{ height: '100%' }}
-          className={cn('flex-1 grow h-full')}
+          className={cn('flex-1 grow h-full border-t-0! border-b-0!')}
           rowHeight={44}
           headerRowHeight={36}
           columns={columns}
@@ -604,31 +604,31 @@ export const QueryPerformanceGrid = ({
             }
           }}
         >
-          <Tabs_Shadcn_
+          <Tabs
             value={view}
             className="flex flex-col h-full"
             onValueChange={(value: any) => setView(value)}
           >
             <div className="px-5 border-b">
-              <TabsList_Shadcn_ className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
-                <TabsTrigger_Shadcn_
+              <TabsList className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
+                <TabsTrigger
                   value="details"
                   className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
                 >
                   Query details
-                </TabsTrigger_Shadcn_>
+                </TabsTrigger>
                 {selectedRow !== undefined && canShowIndexesTab && (
-                  <TabsTrigger_Shadcn_
+                  <TabsTrigger
                     value="suggestion"
                     className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
                   >
                     Indexes
-                  </TabsTrigger_Shadcn_>
+                  </TabsTrigger>
                 )}
-              </TabsList_Shadcn_>
+              </TabsList>
             </div>
 
-            <TabsContent_Shadcn_ value="details" className="mt-0 grow min-h-0 overflow-y-auto">
+            <TabsContent value="details" className="mt-0 grow min-h-0 overflow-y-auto">
               {selectedRow !== undefined && (
                 <QueryDetail
                   selectedRow={reportData[selectedRow]}
@@ -636,13 +636,13 @@ export const QueryPerformanceGrid = ({
                   onClose={() => setSelectedRow(undefined)}
                 />
               )}
-            </TabsContent_Shadcn_>
+            </TabsContent>
             {selectedRow !== undefined && canShowIndexesTab && (
-              <TabsContent_Shadcn_ value="suggestion" className="mt-0 grow min-h-0 overflow-y-auto">
+              <TabsContent value="suggestion" className="mt-0 grow min-h-0 overflow-y-auto">
                 <QueryIndexes selectedRow={reportData[selectedRow]} />
-              </TabsContent_Shadcn_>
+              </TabsContent>
             )}
-          </Tabs_Shadcn_>
+          </Tabs>
         </SheetContent>
       </Sheet>
     </div>

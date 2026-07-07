@@ -9,22 +9,22 @@ import { useRouter } from 'next/router'
 import React, { useEffect, useState, type PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 import {
-  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
-  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
-  BreadcrumbList_Shadcn_ as BreadcrumbList,
-  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
   Button,
+  copyToClipboard,
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
   NavMenu,
   NavMenuItem,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Separator,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageHeader,
@@ -36,21 +36,24 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
 import { EdgeFunctionTesterSheet } from '@/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
+import { useFunctionsDetailShortcuts } from '@/components/interfaces/Functions/useFunctionsDetailShortcuts'
 import CopyButton from '@/components/ui/CopyButton'
 import { DocsButton } from '@/components/ui/DocsButton'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 dayjs.extend(relativeTime)
 
@@ -63,9 +66,8 @@ const EdgeFunctionDetailsLayout = ({
   children,
 }: PropsWithChildren<EdgeFunctionDetailsLayoutProps>) => {
   const router = useRouter()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
   const { functionSlug, ref } = useParams()
-  const { mutate: sendEvent } = useSendEventMutation()
 
   const { isLoading, can: canReadFunctions } = useAsyncCheckPermissions(
     PermissionAction.FUNCTIONS_READ,
@@ -73,6 +75,7 @@ const EdgeFunctionDetailsLayout = ({
   )
 
   const [isOpen, setIsOpen] = useState(false)
+  const [isDownloadOpen, setIsDownloadOpen] = useState(false)
   const [isTimestampHoverCardOpen, setIsTimestampHoverCardOpen] = useState(false)
 
   const {
@@ -235,6 +238,30 @@ const EdgeFunctionDetailsLayout = ({
     }
   }, [isError])
 
+  const openTestSheet = () => {
+    if (!functionSlug) return
+    setIsOpen(true)
+    if (IS_PLATFORM) {
+      track('edge_function_test_side_panel_opened')
+    }
+  }
+
+  const copyFunctionUrl = () => {
+    if (!functionUrl) return
+    copyToClipboard(functionUrl)
+    toast.success('Function URL copied to clipboard')
+  }
+
+  useFunctionsDetailShortcuts({
+    projectRef: ref,
+    functionSlug,
+    canReadFunctions,
+    isPlatform: IS_PLATFORM,
+    onOpenTest: openTestSheet,
+    onOpenDownload: () => setIsDownloadOpen((prev) => !prev),
+    onCopyUrl: copyFunctionUrl,
+  })
+
   if (!isLoading && !canReadFunctions) {
     return (
       <ProjectLayout product="Edge Functions" browserTitle={browserTitle}>
@@ -274,7 +301,9 @@ const EdgeFunctionDetailsLayout = ({
               <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 text-sm!">
                 <div className="flex items-center gap-x-2">
                   <span className="flex items-center gap-2">{functionUrl}</span>
-                  <CopyButton iconOnly type="text" text={functionUrl} />
+                  <ShortcutTooltip shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_COPY_URL} side="bottom">
+                    <CopyButton iconOnly variant="text" text={functionUrl} />
+                  </ShortcutTooltip>
                 </div>
 
                 <HoverCard
@@ -330,13 +359,19 @@ const EdgeFunctionDetailsLayout = ({
             <PageHeaderAside>
               <div className="flex items-center space-x-2">
                 <DocsButton href={`${DOCS_URL}/guides/functions`} />
-                <Popover_Shadcn_>
-                  <PopoverTrigger_Shadcn_ asChild>
-                    <Button type="default" icon={<Download />}>
-                      Download
-                    </Button>
-                  </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_ align="end" className="p-0">
+                <Popover open={isDownloadOpen} onOpenChange={setIsDownloadOpen}>
+                  <ShortcutTooltip
+                    shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_DOWNLOAD}
+                    side="bottom"
+                    open={isDownloadOpen ? false : undefined}
+                  >
+                    <PopoverTrigger asChild>
+                      <Button variant="default" icon={<Download />}>
+                        Download
+                      </Button>
+                    </PopoverTrigger>
+                  </ShortcutTooltip>
+                  <PopoverContent align="end" className="p-0">
                     {IS_PLATFORM && (
                       <>
                         <div className="p-3 flex flex-col gap-y-2">
@@ -355,7 +390,7 @@ const EdgeFunctionDetailsLayout = ({
                     )}
                     <div className="py-2 px-1">
                       <Button
-                        type="text"
+                        variant="text"
                         className="w-min hover:bg-transparent"
                         icon={<FileArchive />}
                         onClick={downloadFunction}
@@ -363,27 +398,17 @@ const EdgeFunctionDetailsLayout = ({
                         Download as ZIP
                       </Button>
                     </div>
-                  </PopoverContent_Shadcn_>
-                </Popover_Shadcn_>
+                  </PopoverContent>
+                </Popover>
                 {!!functionSlug && (
-                  <Button
-                    type="default"
-                    icon={<Send />}
-                    onClick={() => {
-                      setIsOpen(true)
-                      if (IS_PLATFORM) {
-                        sendEvent({
-                          action: 'edge_function_test_side_panel_opened',
-                          groups: {
-                            project: ref ?? 'Unknown',
-                            organization: org?.slug ?? 'Unknown',
-                          },
-                        })
-                      }
-                    }}
+                  <ShortcutTooltip
+                    shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_TEST}
+                    side="bottom"
                   >
-                    Test
-                  </Button>
+                    <Button variant="default" icon={<Send />} onClick={openTestSheet}>
+                      Test
+                    </Button>
+                  </ShortcutTooltip>
                 )}
               </div>
             </PageHeaderAside>

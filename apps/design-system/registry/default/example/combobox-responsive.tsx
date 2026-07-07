@@ -4,18 +4,18 @@ import { Plus } from 'lucide-react'
 import * as React from 'react'
 import {
   Button,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
   Drawer,
   DrawerContent,
   DrawerTrigger,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 import { useMediaQuery } from '@/hooks/use-media-query'
@@ -55,28 +55,28 @@ export default function ComboBoxResponsive() {
 
   if (isDesktop) {
     return (
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button
-            type="default"
+            variant="default"
             size="small"
             className="w-[150px] justify-start"
             icon={!selectedStatus && <Plus className="text-foreground-muted" />}
           >
             {selectedStatus ? <>{selectedStatus.label}</> : <>Set status</>}
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_ className="w-[200px] p-0" align="start">
+        </PopoverTrigger>
+        <PopoverContent className="w-[200px] p-0" align="start">
           <StatusList setOpen={setOpen} setSelectedStatus={setSelectedStatus} />
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+        </PopoverContent>
+      </Popover>
     )
   }
 
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button type="outline" className="w-[150px] justify-start">
+        <Button variant="outline" className="w-[150px] justify-start">
           {selectedStatus ? <>{selectedStatus.label}</> : <>+ Set status</>}
         </Button>
       </DrawerTrigger>
@@ -97,13 +97,13 @@ function StatusList({
   setSelectedStatus: (status: Status | null) => void
 }) {
   return (
-    <Command_Shadcn_>
-      <CommandInput_Shadcn_ placeholder="Filter status..." />
-      <CommandList_Shadcn_>
-        <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-        <CommandGroup_Shadcn_>
+    <Command>
+      <CommandInput placeholder="Filter status..." />
+      <CommandList>
+        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandGroup>
           {statuses.map((status) => (
-            <CommandItem_Shadcn_
+            <CommandItem
               key={status.value}
               value={status.value}
               onSelect={(value) => {
@@ -112,10 +112,10 @@ function StatusList({
               }}
             >
               {status.label}
-            </CommandItem_Shadcn_>
+            </CommandItem>
           ))}
-        </CommandGroup_Shadcn_>
-      </CommandList_Shadcn_>
-    </Command_Shadcn_>
+        </CommandGroup>
+      </CommandList>
+    </Command>
   )
 }

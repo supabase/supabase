@@ -6,10 +6,10 @@ import {
   Button,
   Checkbox,
   cn,
-  Label_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Label,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -92,7 +92,7 @@ export const FilterPopover = <T extends Record<string, any>>({
     const icon = iconKey ? option[iconKey] : undefined
 
     const defaultLabel = (
-      <Label_Shadcn_
+      <Label
         htmlFor={option[valueKey]}
         className={cn('flex items-center gap-x-2 text-xs cursor-pointer', labelClass)}
       >
@@ -100,7 +100,7 @@ export const FilterPopover = <T extends Record<string, any>>({
           <img src={icon} alt={option[labelKey]} className={cn('w-4 h-4', option.iconClass)} />
         )}
         <span>{option[labelKey]}</span>
-      </Label_Shadcn_>
+      </Label>
     )
 
     const label = renderLabel ? renderLabel(option, value) : defaultLabel
@@ -177,12 +177,12 @@ export const FilterPopover = <T extends Record<string, any>>({
   ])
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Button
           asChild
           disabled={disabled}
-          type={buttonType ?? (activeOptions.length > 0 ? 'default' : 'dashed')}
+          variant={buttonType ?? (activeOptions.length > 0 ? 'default' : 'dashed')}
           onClick={() => setOpen(false)}
           className={variant === 'rounded' ? 'rounded-full' : ''}
           iconRight={<ChevronDown />}
@@ -205,8 +205,8 @@ export const FilterPopover = <T extends Record<string, any>>({
             )}
           </div>
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_
+      </PopoverTrigger>
+      <PopoverContent
         className={cn('p-0', search !== undefined ? 'w-64' : 'w-44', className)}
         align="start"
       >
@@ -271,7 +271,7 @@ export const FilterPopover = <T extends Record<string, any>>({
         <div className="flex items-center justify-end gap-2 border-t border-overlay bg-surface-200 py-2 px-3">
           <Button
             size="tiny"
-            type="default"
+            variant="default"
             onClick={() => {
               onSaveFilters([])
               setSelectedOptions([])
@@ -281,7 +281,7 @@ export const FilterPopover = <T extends Record<string, any>>({
             {clearButtonText}
           </Button>
           <Button
-            type="primary"
+            variant="primary"
             onClick={() => {
               // Order the selection based on the options provided
               const sortingOrder = options.map((option) => option[valueKey]) as string[]
@@ -295,7 +295,7 @@ export const FilterPopover = <T extends Record<string, any>>({
             Save
           </Button>
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }

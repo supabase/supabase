@@ -1,10 +1,9 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, noop } from 'lodash'
-import { useContext, useEffect, useMemo, useState } from 'react'
+import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
-import { Admonition } from 'ui-patterns'
-import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+import { Admonition } from 'ui-patterns/admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ActionBar } from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
@@ -16,15 +15,16 @@ import { ApiAccessToggle, type TableApiAccessHandlerWithHistoryReturn } from './
 import { ColumnManagement } from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
 import { HeaderTitle } from './HeaderTitle'
-import { RLSDisableModalContent } from './RLSDisableModal'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
 import type { ImportContent, TableField } from './TableEditor.types'
 import {
   formatImportedContentToColumnFields,
   generateTableField,
-  generateTableFieldFromPostgresTable,
+  generateTableFieldFromPGTable,
+  mergeForeignKeyMeta,
   validateFields,
 } from './TableEditor.utils'
+import { RLSToggleDialog } from '@/components/interfaces/Database/RLSToggleDialog'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { CONSTRAINT_TYPE, useTableConstraintsQuery } from '@/data/database/constraints-query'
@@ -39,6 +39,7 @@ import { useUrlState } from '@/hooks/ui/useUrlState'
 import { useVisibleKey } from '@/hooks/ui/useVisibleKey'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
 import { DOCS_URL } from '@/lib/constants'
+import type { SafePostgresTable } from '@/lib/postgres-types'
 import { useTrack } from '@/lib/telemetry/track'
 import { type PlainObject } from '@/lib/type-helpers'
 import { TableEditorStateContext, useTableEditorStateSnapshot } from '@/state/table-editor'
@@ -52,7 +53,7 @@ type SaveTablePayloadFor<Action extends SaveTableParams['action']> =
   SaveTableParamsFor<Action>['payload']
 
 export interface TableEditorProps {
-  table?: PostgresTable
+  table?: SafePostgresTable
   isDuplicating: boolean
   templateData?: Partial<TableField>
   visible: boolean
@@ -88,6 +89,14 @@ export const TableEditor = ({
   const [errors, setErrors] = useState<PlainObject>({})
   const [tableFields, setTableFields] = useState<TableField>()
   const [fkRelations, setFkRelations] = useState<ForeignKey[]>([])
+  // Tracks whether tableFields has been initialized with fully-loaded server data
+  // for the current panel session. Prevents background refetches from resetting
+  // local edits (e.g. unsaved newly-added columns) while the panel is open.
+  const hasInitializedRef = useRef(false)
+  // Set true the moment the user makes any field change within the panel session.
+  // Used to switch the late FK-hydration paths from wholesale replace → merge so
+  // unsaved edits (e.g. a column added before foreignKeyMeta resolves) survive.
+  const hasUserEditsRef = useRef(false)
 
   const [isDuplicateRows, setIsDuplicateRows] = useState<boolean>(false)
   const [importContent, setImportContent] = useState<ImportContent>()
@@ -148,6 +157,7 @@ export const TableEditor = ({
     const updatedTableFields = { ...tableFields, ...changes } as TableField
     setTableFields(updatedTableFields)
     updateEditorDirty()
+    hasUserEditsRef.current = true
 
     const updatedErrors = { ...errors }
     for (const key of Object.keys(changes)) {
@@ -164,7 +174,17 @@ export const TableEditor = ({
       relation.columns.forEach((column) => {
         const sourceColumn = tableFields.columns.find((col) => col.name === column.source)
         if (sourceColumn?.isNewColumn && column.targetType) {
-          updatedColumns.push({ ...sourceColumn, format: column.targetType })
+          const isArray = column.targetIsArray ?? false
+          const bareFormat =
+            isArray && column.targetType.startsWith('_')
+              ? column.targetType.slice(1)
+              : column.targetType
+          updatedColumns.push({
+            ...sourceColumn,
+            format: bareFormat,
+            formatSchema: column.targetTypeSchema,
+            isArray,
+          })
         }
       })
     })
@@ -179,6 +199,7 @@ export const TableEditor = ({
         }),
       }
       setTableFields(updatedTableFields)
+      hasUserEditsRef.current = true
     }
     setFkRelations(relations)
   }
@@ -221,7 +242,6 @@ export const TableEditor = ({
             columns,
             foreignKeyRelations: fkRelations,
             resolve,
-            generatedPolicies: [],
           })
         } else if (isDuplicating) {
           const payload: SaveTablePayloadFor<'duplicate'> = {
@@ -235,7 +255,6 @@ export const TableEditor = ({
             columns,
             foreignKeyRelations: fkRelations,
             resolve,
-            generatedPolicies: [],
           })
         } else {
           const payload: SaveTablePayloadFor<'update'> = {
@@ -250,7 +269,6 @@ export const TableEditor = ({
             columns,
             foreignKeyRelations: fkRelations,
             resolve,
-            generatedPolicies: [],
           })
         }
       } else {
@@ -279,15 +297,29 @@ export const TableEditor = ({
           setTableFields(tableFields)
         }
         setFkRelations([])
+        hasInitializedRef.current = true
       } else {
-        const tableFields = generateTableFieldFromPostgresTable(
+        const serverTableFields = generateTableFieldFromPGTable(
           table,
           foreignKeyMeta ?? [],
           isDuplicating,
           isRealtimeEnabled
         )
-        setTableFields(tableFields)
+        // Defensive: if a prior session somehow left edits in place, merge
+        // FK metadata in instead of clobbering. In normal flow this branch is
+        // pristine because the close handler resets hasUserEditsRef.
+        setTableFields((current) =>
+          hasUserEditsRef.current && current !== undefined
+            ? mergeForeignKeyMeta(current, serverTableFields)
+            : serverTableFields
+        )
+        // Only mark fully initialized once FK meta has loaded — otherwise we'll
+        // re-init below when it arrives.
+        hasInitializedRef.current = isSuccessForeignKeyMeta
       }
+    } else if (visibleChanged && !visible) {
+      hasInitializedRef.current = false
+      hasUserEditsRef.current = false
     }
   }, [
     visible,
@@ -298,19 +330,39 @@ export const TableEditor = ({
     isDuplicating,
     table,
     visibleChanged,
+    isSuccessForeignKeyMeta,
   ])
 
   useEffect(() => {
-    if (!isNewRecord) {
-      const tableFields = generateTableFieldFromPostgresTable(
+    // Re-init tableFields once if foreignKeyMeta arrives after the panel opened.
+    // After this fires (or after the panel-open effect above sets it true),
+    // subsequent background refetches must not clobber the user's local edits.
+    if (!isNewRecord && visible && isSuccessForeignKeyMeta && !hasInitializedRef.current) {
+      const serverTableFields = generateTableFieldFromPGTable(
         table,
         foreignKeyMeta ?? [],
         isDuplicating,
         isRealtimeEnabled
       )
-      setTableFields(tableFields)
+      // If the user has already started editing before FK meta resolved, only
+      // merge FK metadata in — never replace, or we'd lose their work
+      // (e.g. a column added while the FK section was still loading).
+      setTableFields((current) =>
+        hasUserEditsRef.current && current !== undefined
+          ? mergeForeignKeyMeta(current, serverTableFields)
+          : serverTableFields
+      )
+      hasInitializedRef.current = true
     }
-  }, [isNewRecord, table, foreignKeyMeta, isDuplicating, isRealtimeEnabled])
+  }, [
+    isNewRecord,
+    visible,
+    isSuccessForeignKeyMeta,
+    table,
+    foreignKeyMeta,
+    isDuplicating,
+    isRealtimeEnabled,
+  ])
 
   useEffect(() => {
     if (isSuccessForeignKeyMeta) setFkRelations(formatForeignKeys(foreignKeys))
@@ -347,25 +399,35 @@ export const TableEditor = ({
       }
     >
       <SidePanel.Content className="space-y-10 py-6">
-        <Input
-          data-testid="table-name-input"
-          label="Name"
+        <FormItemLayout
           id="name"
+          isReactForm={false}
           layout="horizontal"
-          type="text"
+          label="Name"
           error={errors.name ? String(errors.name) : undefined}
-          value={tableFields?.name}
-          onChange={(event) => onUpdateField({ name: event.target.value })}
-        />
-        <Input
-          label="Description"
+        >
+          <Input
+            data-testid="table-name-input"
+            id="name"
+            type="text"
+            value={tableFields?.name}
+            onChange={(event) => onUpdateField({ name: event.target.value })}
+          />
+        </FormItemLayout>
+        <FormItemLayout
           id="description"
-          placeholder="Optional"
+          isReactForm={false}
           layout="horizontal"
-          type="text"
-          value={tableFields?.comment ?? ''}
-          onChange={(event) => onUpdateField({ comment: event.target.value })}
-        />
+          label="Description"
+        >
+          <Input
+            id="description"
+            placeholder="Optional"
+            type="text"
+            value={tableFields?.comment ?? ''}
+            onChange={(event) => onUpdateField({ comment: event.target.value })}
+          />
+        </FormItemLayout>
       </SidePanel.Content>
 
       <SidePanel.Separator />
@@ -413,7 +475,7 @@ export const TableEditor = ({
           >
             <DocsButton
               abbrev={false}
-              className="mt-2"
+              className="mt-2 w-min"
               href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
           </Admonition>
@@ -431,7 +493,7 @@ export const TableEditor = ({
           >
             <DocsButton
               abbrev={false}
-              className="mt-2"
+              className="mt-2 w-min"
               href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
           </Admonition>
@@ -520,19 +582,16 @@ export const TableEditor = ({
           closePanel={() => setIsImportingSpreadsheet(false)}
         />
 
-        <ConfirmationModal
-          visible={rlsConfirmVisible}
-          title="Turn off Row Level Security"
-          confirmLabel="Confirm"
-          size="medium"
-          onCancel={() => setRlsConfirmVisible(false)}
+        <RLSToggleDialog
+          open={rlsConfirmVisible}
+          tableName={tableFields.name}
+          isEnabled={tableFields.isRLSEnabled}
+          onOpenChange={setRlsConfirmVisible}
           onConfirm={() => {
-            onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
+            onUpdateField({ isRLSEnabled: false })
             setRlsConfirmVisible(false)
           }}
-        >
-          <RLSDisableModalContent />
-        </ConfirmationModal>
+        />
       </SidePanel.Content>
 
       {!isDuplicating && (

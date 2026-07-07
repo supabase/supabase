@@ -1,5 +1,5 @@
 import { createMCPClient } from '@ai-sdk/mcp'
-import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js'
+import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js' // .js required for esbuild ESM resolution
 import { createSupabaseMcpServer } from '@supabase/mcp-server-supabase'
 import { createSupabaseApiPlatform } from '@supabase/mcp-server-supabase/platform/api'
 

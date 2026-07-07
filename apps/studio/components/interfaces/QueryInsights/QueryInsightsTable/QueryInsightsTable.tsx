@@ -5,9 +5,8 @@ import { Search, TextSearch, X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-// eslint-disable-next-line no-restricted-imports
 import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
-import { Button, cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { Button, cn, Tabs, TabsList, TabsTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -365,34 +364,22 @@ export const QueryInsightsTable = ({
 
           <div className="flex items-center">
             {mode === 'triage' ? (
-              <Tabs_Shadcn_ value={filter} onValueChange={(v) => setFilter(v as IssueFilter)}>
-                <TabsList_Shadcn_ className="flex gap-x-4 rounded-none mt-0! pt-0 border-none!">
-                  <TabsTrigger_Shadcn_
-                    value="all"
-                    className="text-xs py-3 border-b font-mono uppercase"
-                  >
+              <Tabs value={filter} onValueChange={(v) => setFilter(v as IssueFilter)}>
+                <TabsList className="flex gap-x-4 rounded-none mt-0! pt-0 border-none!">
+                  <TabsTrigger value="all" className="text-xs py-3 border-b font-mono uppercase">
                     All{triageItems.length > 0 && ` (${triageItems.length})`}
-                  </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_
-                    value="error"
-                    className="text-xs py-3 border-b font-mono uppercase"
-                  >
+                  </TabsTrigger>
+                  <TabsTrigger value="error" className="text-xs py-3 border-b font-mono uppercase">
                     Errors{errorCount > 0 && ` (${errorCount})`}
-                  </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_
-                    value="index"
-                    className="text-xs py-3 border-b font-mono uppercase"
-                  >
+                  </TabsTrigger>
+                  <TabsTrigger value="index" className="text-xs py-3 border-b font-mono uppercase">
                     Index{indexCount > 0 && ` (${indexCount})`}
-                  </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_
-                    value="slow"
-                    className="text-xs py-3 border-b font-mono uppercase"
-                  >
+                  </TabsTrigger>
+                  <TabsTrigger value="slow" className="text-xs py-3 border-b font-mono uppercase">
                     Slow{slowCount > 0 && ` (${slowCount})`}
-                  </TabsTrigger_Shadcn_>
-                </TabsList_Shadcn_>
-              </Tabs_Shadcn_>
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
             ) : (
               <Input
                 size="tiny"
@@ -409,7 +396,7 @@ export const QueryInsightsTable = ({
                     <Button
                       key="clear"
                       size="tiny"
-                      type="text"
+                      variant="text"
                       icon={<X className="h-4 w-4" />}
                       onClick={() => setSearchQuery('')}
                       className="p-0 h-5 w-5"
@@ -436,7 +423,7 @@ export const QueryInsightsTable = ({
           ].join(' ')}
         >
           <Button
-            type="default"
+            variant="default"
             size="tiny"
             className="rounded-full shadow-md"
             onClick={() => onCurrentSelectQuery?.(null)}
@@ -453,7 +440,7 @@ export const QueryInsightsTable = ({
             <DataGrid
               ref={triageGridRef}
               style={{ height: '100%' }}
-              className="flex-1 grow h-full"
+              className="flex-1 grow h-full border-t-0! border-b-0!"
               rowHeight={60}
               headerRowHeight={36}
               columns={triageColumns}
@@ -509,7 +496,7 @@ export const QueryInsightsTable = ({
             <DataGrid
               ref={gridRef}
               style={{ height: '100%' }}
-              className={cn('flex-1 grow h-full')}
+              className={cn('flex-1 grow h-full border-t-0! border-b-0!')}
               rowHeight={44}
               headerRowHeight={36}
               columns={columns}

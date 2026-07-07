@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { partition } from 'lodash'
 import { MessageCircle } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useState, type PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 
@@ -20,11 +20,11 @@ import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useBranchDeleteMutation } from '@/data/branches/branch-delete-mutation'
 import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 import type { NextPageWithLayout } from '@/types'
 
@@ -37,7 +37,7 @@ const BranchesPage: NextPageWithLayout = () => {
 
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
 
   const isBranch = project?.parent_project_ref !== undefined
   const projectRef =
@@ -108,18 +108,14 @@ const BranchesPage: NextPageWithLayout = () => {
           if (branchRef === ref) {
             router.push(`/project/${projectRef}/branches`)
           }
-          // Track delete button click
-          sendEvent({
-            action: 'branch_delete_button_clicked',
-            properties: {
+          track(
+            'branch_delete_button_clicked',
+            {
               branchType: persistent ? 'persistent' : 'preview',
               origin: 'branches_page',
             },
-            groups: {
-              project: projectRef ?? 'Unknown',
-              organization: selectedOrg?.slug ?? 'Unknown',
-            },
-          })
+            { project: projectRef }
+          )
         },
       }
     )
@@ -193,69 +189,74 @@ const BranchesPage: NextPageWithLayout = () => {
   )
 }
 
-BranchesPage.getLayout = (page) => {
-  const BranchesPageWrapper = () => {
-    const snap = useAppStateSnapshot()
-    const { can: canCreateBranches } = useAsyncCheckPermissions(
-      PermissionAction.CREATE,
-      'preview_branches',
-      {
-        resource: { is_default: false },
-      }
-    )
+// Hoisted out of `getLayout` so the TanStack route can import it
+// directly. Same shape and identical body as before — accepts the page
+// content as `children` instead of capturing it from a closure.
+export const BranchesPageWrapper = ({ children }: PropsWithChildren) => {
+  const snap = useAppStateSnapshot()
+  const { can: canCreateBranches } = useAsyncCheckPermissions(
+    PermissionAction.CREATE,
+    'preview_branches',
+    {
+      resource: { is_default: false },
+    }
+  )
 
-    const primaryActions = (
-      <ButtonTooltip
-        type="primary"
-        disabled={!canCreateBranches}
-        onClick={() => snap.setShowCreateBranchModal(true)}
-        tooltip={{
-          content: {
-            side: 'bottom',
-            text: !canCreateBranches
-              ? 'You need additional permissions to create branches'
-              : undefined,
-          },
-        }}
+  const primaryActions = (
+    <ButtonTooltip
+      variant="primary"
+      disabled={!canCreateBranches}
+      onClick={() => snap.setShowCreateBranchModal(true)}
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text: !canCreateBranches
+            ? 'You need additional permissions to create branches'
+            : undefined,
+        },
+      }}
+    >
+      Create branch
+    </ButtonTooltip>
+  )
+
+  const secondaryActions = (
+    <div className="flex items-center gap-x-2">
+      <Button
+        asChild
+        variant="text"
+        icon={<MessageCircle className="text-muted" strokeWidth={1} />}
       >
-        Create branch
-      </ButtonTooltip>
-    )
-
-    const secondaryActions = (
-      <div className="flex items-center gap-x-2">
-        <Button asChild type="text" icon={<MessageCircle className="text-muted" strokeWidth={1} />}>
-          <a
-            target="_blank"
-            rel="noreferrer"
-            href="https://github.com/orgs/supabase/discussions/18937"
-          >
-            Branching feedback
-          </a>
-        </Button>
-        <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
-      </div>
-    )
-
-    return (
-      <PageLayout
-        title="Branches"
-        subtitle="Manage your database preview branches and deployments"
-        primaryActions={primaryActions}
-        secondaryActions={secondaryActions}
-      >
-        {page}
-      </PageLayout>
-    )
-  }
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href="https://github.com/orgs/supabase/discussions/18937"
+        >
+          Branching feedback
+        </a>
+      </Button>
+      <DocsButton href={`${DOCS_URL}/guides/platform/branching`} />
+    </div>
+  )
 
   return (
-    <DefaultLayout>
-      <BranchLayout>
-        <BranchesPageWrapper />
-      </BranchLayout>
-    </DefaultLayout>
+    <PageLayout
+      title="Branches"
+      subtitle="Manage your database preview branches and deployments"
+      primaryActions={primaryActions}
+      secondaryActions={secondaryActions}
+    >
+      {children}
+    </PageLayout>
   )
 }
+
+BranchesPage.getLayout = (page) => (
+  <DefaultLayout>
+    <BranchLayout>
+      <BranchesPageWrapper>{page}</BranchesPageWrapper>
+    </BranchLayout>
+  </DefaultLayout>
+)
 
 export default BranchesPage

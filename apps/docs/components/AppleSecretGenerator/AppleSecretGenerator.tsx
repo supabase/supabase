@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, Input_Shadcn_ as Input } from 'ui'
+import { Button, Input } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input as DataInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'

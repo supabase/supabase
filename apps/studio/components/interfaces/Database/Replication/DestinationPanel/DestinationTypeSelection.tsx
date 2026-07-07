@@ -1,29 +1,49 @@
 import { AnalyticsBucket, BigQuery, Database } from 'icons'
+import { Snowflake } from 'lucide-react'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
-import { Badge, cn, RadioGroupStacked, RadioGroupStackedItem } from 'ui'
+import {
+  Badge,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectSeparator,
+  SelectTrigger,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { useDestinationInformation } from '../useDestinationInformation'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLDucklakePrivateAlpha,
   useIsETLIcebergPrivateAlpha,
+  useIsETLSnowflakePrivateAlpha,
 } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
+interface DestinationTypeOption {
+  value: DestinationType
+  label: string
+  description: string
+  icon: typeof Database
+  isAlpha: boolean
+  enabled: boolean
+}
+
+interface DestinationTypeGroup {
+  label: string
+  options: DestinationTypeOption[]
+}
+
 export const DestinationTypeSelection = () => {
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
+  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
-
-  const numberOfTypes = [
-    infrastructureReadReplicas,
-    etlEnableBigQuery,
-    etlEnableIceberg,
-    etlEnableDucklake,
-  ].filter(Boolean).length
 
   const [urlDestinationType, setDestinationType] = useQueryState(
     'destinationType',
@@ -32,6 +52,7 @@ export const DestinationTypeSelection = () => {
       'BigQuery',
       'Analytics Bucket',
       'DuckLake',
+      'Snowflake',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,
@@ -47,118 +68,134 @@ export const DestinationTypeSelection = () => {
   const { type: existingDestinationType } = useDestinationInformation({ id: edit })
   const destinationType = existingDestinationType ?? urlDestinationType
 
+  // In edit mode the type is locked, so only surface the option that matches the
+  // destination being edited. Otherwise show every type the project has access to.
+  const isOptionVisible = (value: DestinationType, hasAccess: boolean) =>
+    editMode ? destinationType === value : hasAccess
+
+  const groups: DestinationTypeGroup[] = [
+    {
+      label: 'Other',
+      options: [
+        {
+          value: 'Read Replica',
+          label: 'Read Replica',
+          description:
+            'Deploy a read-only database in another region for lower latency and workload isolation',
+          icon: Database,
+          isAlpha: false,
+          enabled: isOptionVisible('Read Replica', infrastructureReadReplicas),
+        },
+      ],
+    },
+    {
+      label: 'Pipelines',
+      options: [
+        {
+          value: 'Analytics Bucket',
+          label: 'Analytics Bucket',
+          description: 'Write Apache Iceberg tables to Supabase Storage for analytics workflows',
+          icon: AnalyticsBucket,
+          isAlpha: true,
+          enabled: isOptionVisible('Analytics Bucket', etlEnableIceberg),
+        },
+        {
+          value: 'BigQuery',
+          label: 'BigQuery',
+          description: "Stream changes to Google Cloud's data warehouse for analytics and BI",
+          icon: BigQuery,
+          isAlpha: true,
+          enabled: isOptionVisible('BigQuery', etlEnableBigQuery),
+        },
+        {
+          value: 'DuckLake',
+          label: 'DuckLake',
+          description: 'Stream changes to a DuckLake catalog backed by S3-compatible storage',
+          icon: Database,
+          isAlpha: true,
+          enabled: isOptionVisible('DuckLake', etlEnableDucklake),
+        },
+        {
+          value: 'Snowflake',
+          label: 'Snowflake',
+          description:
+            'Stream changes to Snowflake for warehouse analytics and downstream data workflows',
+          icon: Snowflake,
+          isAlpha: true,
+          enabled: isOptionVisible('Snowflake', etlEnableSnowflake),
+        },
+      ],
+    },
+  ]
+
+  const visibleGroups = groups
+    .map((group) => ({ ...group, options: group.options.filter((option) => option.enabled) }))
+    .filter((group) => group.options.length > 0)
+
+  const selectedOption = visibleGroups
+    .flatMap((group) => group.options)
+    .find((option) => option.value === destinationType)
+
   return (
-    <div className="px-5 py-5">
-      <div className="flex flex-col gap-y-1 mb-4">
-        <p className="text-sm font-medium text-foreground">Type</p>
-        <p className="text-foreground-light text-sm">
-          The destination type cannot be changed after creation
-        </p>
-      </div>
-      <RadioGroupStacked
+    <FormItemLayout
+      isReactForm={false}
+      layout="horizontal"
+      className="p-5 [&>div]:gap-y-1 [&>div>span]:text-foreground-lighter"
+      label="Type"
+      labelOptional="Destination type cannot be changed after creation"
+      description={
+        selectedOption?.isAlpha && (
+          <span className="block text-sm text-foreground-light mb-1">
+            This destination type is in alpha and may be unstable or introduce breaking changes
+            while we iterate based on customer feedback.{' '}
+            <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
+              Leave feedback
+            </InlineLink>
+          </span>
+        )
+      }
+    >
+      <Select
         disabled={editMode}
-        value={destinationType}
+        value={destinationType ?? undefined}
         onValueChange={(value) => setDestinationType(value as DestinationType)}
-        className={cn(
-          'grid [&>button>div]:py-4',
-          !editMode && numberOfTypes >= 4
-            ? 'grid-cols-4'
-            : !editMode && numberOfTypes === 3
-              ? 'grid-cols-3'
-              : 'grid-cols-2',
-          '[&>button:first-of-type]:rounded-none [&>button:last-of-type]:rounded-none',
-          '[&>button:first-of-type]:rounded-l-lg! [&>button:last-of-type]:rounded-r-lg!'
-        )}
       >
-        {((!editMode && infrastructureReadReplicas) ||
-          (editMode && destinationType === 'Read Replica')) && (
-          <RadioGroupStackedItem
-            label=""
-            showIndicator={false}
-            id="Read Replica"
-            value="Read Replica"
-          >
-            <div className="flex flex-col gap-y-2">
-              <Database size={20} />
-              <div className="flex flex-col gap-y-0.5 text-sm text-left">
-                <p>Read Replica</p>
-                <p className="text-foreground-lighter">
-                  Deploy read-only databases across multiple regions for lower latency and better
-                  resource management
-                </p>
+        <SelectTrigger className="h-auto py-2">
+          {selectedOption ? (
+            <div className="flex items-center gap-x-3 text-left">
+              <selectedOption.icon size={20} className="shrink-0 text-foreground-light" />
+              <div className="flex items-center gap-x-2">
+                <span className="text-sm text-foreground">{selectedOption.label}</span>
+                {selectedOption.isAlpha && <Badge variant="warning">Alpha</Badge>}
               </div>
             </div>
-          </RadioGroupStackedItem>
-        )}
-
-        {((!editMode && etlEnableBigQuery) || (editMode && destinationType === 'BigQuery')) && (
-          <RadioGroupStackedItem label="" showIndicator={false} id="BigQuery" value="BigQuery">
-            <div className="flex flex-col gap-y-2">
-              <BigQuery size={20} />
-              <div className="flex flex-col gap-y-0.5 text-sm text-left">
-                <div className="flex items-center gap-x-2">
-                  <p>BigQuery</p>
-                  <Badge>Alpha</Badge>
-                </div>
-                <p className="text-foreground-lighter">
-                  Send data to Google Cloud's data warehouse for analytics and business intelligence
-                </p>
-              </div>
-            </div>
-          </RadioGroupStackedItem>
-        )}
-
-        {((!editMode && etlEnableIceberg) ||
-          (editMode && destinationType === 'Analytics Bucket')) && (
-          <RadioGroupStackedItem
-            label=""
-            showIndicator={false}
-            id="Analytics Bucket"
-            value="Analytics Bucket"
-          >
-            <div className="flex flex-col gap-y-2">
-              <AnalyticsBucket size={20} />
-              <div className="flex flex-col gap-y-0.5 text-sm text-left">
-                <div className="flex items-center gap-x-2">
-                  <p>Analytics Bucket</p>
-                  <Badge>Alpha</Badge>
-                </div>
-                <p className="text-foreground-lighter">
-                  Send data to Apache Iceberg tables in your Supabase Storage for flexible analytics
-                  workflows
-                </p>
-              </div>
-            </div>
-          </RadioGroupStackedItem>
-        )}
-
-        {((!editMode && etlEnableDucklake) || (editMode && destinationType === 'DuckLake')) && (
-          <RadioGroupStackedItem label="" showIndicator={false} id="DuckLake" value="DuckLake">
-            <div className="flex flex-col gap-y-2">
-              <Database size={20} />
-              <div className="flex flex-col gap-y-0.5 text-sm text-left">
-                <div className="flex items-center gap-x-2">
-                  <p>DuckLake</p>
-                  <Badge>Alpha</Badge>
-                </div>
-                <p className="text-foreground-lighter">
-                  Send data to a DuckLake catalog backed by S3-compatible object storage for
-                  flexible lakehouse workflows
-                </p>
-              </div>
-            </div>
-          </RadioGroupStackedItem>
-        )}
-      </RadioGroupStacked>
-
-      {destinationType !== 'Read Replica' && (
-        <p className="mt-3 text-sm text-foreground-light">
-          External replication is in alpha. Expect rapid changes and possible breaking updates.{' '}
-          <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
-            Leave feedback
-          </InlineLink>
-        </p>
-      )}
-    </div>
+          ) : (
+            <span className="text-foreground-lighter">Select a destination type</span>
+          )}
+        </SelectTrigger>
+        <SelectContent align="end">
+          {visibleGroups.map((group, index) => (
+            <SelectGroup key={group.label}>
+              {index > 0 && <SelectSeparator />}
+              <SelectLabel>{group.label}</SelectLabel>
+              {group.options.map((option) => (
+                <SelectItem key={option.value} value={option.value} className="py-2">
+                  <div className="flex items-center gap-x-3">
+                    <option.icon size={20} className="shrink-0 text-foreground-light" />
+                    <div className="flex flex-col gap-y-0.5">
+                      <div className="flex items-center gap-x-2">
+                        <span className="text-foreground">{option.label}</span>
+                        {option.isAlpha && <Badge variant="warning">Alpha</Badge>}
+                      </div>
+                      <span className="text-xs text-foreground-lighter">{option.description}</span>
+                    </div>
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          ))}
+        </SelectContent>
+      </Select>
+    </FormItemLayout>
   )
 }

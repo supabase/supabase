@@ -10,7 +10,7 @@ Authentication emails:
 
 - Confirm sign up
 - Invite user
-- Magic link
+- Magic link or OTP
 - Change email address
 - Reset password
 - Reauthentication
@@ -20,10 +20,10 @@ Security notification emails:
 - Password changed
 - Email address changed
 - Phone number changed
-- Identity linked
-- Identity unlinked
-- Multi-factor authentication (MFA) method added
-- Multi-factor authentication (MFA) method removed
+- Sign-in method linked
+- Sign-in method removed
+- Verification method added
+- Verification method removed
 
 Security emails are only sent to users if the respective security notifications have been enabled at a project-level.
 
@@ -44,12 +44,32 @@ The templating system provides the following variables for use:
 | `{{ .OldEmail }}`        | Contains the old email address of the user. This variable is only supported in the "Email address changed notification" template.                                                                                                                                                     |
 | `{{ .Phone }}`           | Contains the new phone number of the user. This variable is only supported in the "Phone number changed notification" template.                                                                                                                                                       |
 | `{{ .OldPhone }}`        | Contains the old phone address of the user. This variable is only supported in the "Phone number changed notification" template.                                                                                                                                                      |
-| `{{ .Provider }}`        | Contains the provider of the newly linked/unlinked identity. This variable is only supported in the "Identity linked notification" and "Identity unlinked notification" templates.                                                                                                    |
-| `{{ .FactorType }}`      | Contains the type of the newly enrolled/unenrolled MFA method. This variable is only supported in the "MFA method added notification" and "MFA method removed notification" templates.                                                                                                |
+| `{{ .Provider }}`        | Contains the provider of the linked or removed sign-in method. This variable is only supported in the "Sign-in method linked" and "Sign-in method removed" notification templates.                                                                                                    |
+| `{{ .FactorType }}`      | Contains the type of verification method that was added or removed. This variable is only supported in the "Verification method added" and "Verification method removed" notification templates.                                                                                      |
 
 ## Editing email templates
 
-On hosted Supabase projects, edit your email templates on the [Email Templates](/dashboard/project/_/auth/templates) page. On self-hosted projects or in local development, edit your [configuration files](/docs/guides/local-development/customizing-email-templates).
+Where you edit templates depends on how you run Supabase.
+
+### Hosted projects
+
+Edit templates on the [Email Templates](/dashboard/project/_/auth/templates) page in the dashboard. The template builder uses the same [terminology](#terminology) and variables documented on this page.
+
+### Local development and self-hosted
+
+The dashboard template builder does not apply when running Supabase locally or self-hosted. Customize templates in `supabase/config.toml` and HTML files instead.
+
+<Admonition type="note" title="Customizing templates locally">
+
+See [Customizing email templates](/docs/guides/local-development/customizing-email-templates) for:
+
+- [`config.toml` keys and HTML file paths](/docs/guides/local-development/customizing-email-templates#configuring-templates)
+- [Template variables](/docs/guides/local-development/customizing-email-templates#template-variables) — the same placeholders as the [terminology](#terminology) table above
+- Default subjects and behavior for each [authentication](/docs/guides/local-development/customizing-email-templates#available-authentication-email-templates) and [security notification](/docs/guides/local-development/customizing-email-templates#available-security-notification-email-templates) template
+
+For production self-hosted deployments, see [Custom email templates](/docs/guides/self-hosting/custom-email-templates).
+
+</Admonition>
 
 You can also manage email templates using the Management API:
 
@@ -68,39 +88,39 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
   -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-      "mailer_subjects_confirmation": "Confirm your signup",
-      "mailer_templates_confirmation_content": "<h2>Confirm your signup</h2><p>Follow this link to confirm your user:</p><p><a href=\"{{ .ConfirmationURL }}\">Confirm your email</a></p>",
-      "mailer_subjects_magic_link": "Your Magic Link",
-      "mailer_templates_magic_link_content": "<h2>Magic Link</h2><p>Follow this link to login:</p><p><a href=\"{{ .ConfirmationURL }}\">Log In</a></p>",
-      "mailer_subjects_recovery": "Rest Your Password",
-      "mailer_templates_recovery_content": "<h2>Reset Password</h2><p>Follow this link to reset the password for your user:</p><p><a href=\"{{ .ConfirmationURL }}\">Reset Password</a></p>",
-      "mailer_subjects_invite": "You have been invited",
-      "mailer_templates_invite_content": "<h2>You have been invited</h2><p>You have been invited to create a user on {{ .SiteURL }}. Follow this link to accept the invite:</p><p><a href=\"{{ .ConfirmationURL }}\">Accept the invite</a></p>",
-      "mailer_subjects_reauthentication": "Confirm reauthentication",
-      "mailer_templates_reauthentication_content": "<h2>Confirm reauthentication</h2><p>Enter the code: {{token}}</p>",
-      "mailer_subjects_email_change": "Confirm email change",
-      "mailer_templates_email_change_content": "<h2>Confirm email change</h2><p>Follow this link to confirm the update of your email:</p><p><a href=\"{{ .ConfirmationURL }}\">Change email</a></p>",
+      "mailer_subjects_confirmation": "Confirm your email address",
+      "mailer_templates_confirmation_content": "<h2>Confirm your email address</h2><p>Follow the link below to confirm this email address and finish signing up.</p><p><a href=\"{{ .ConfirmationURL }}\">Confirm email address</a></p>",
+      "mailer_subjects_magic_link": "Your sign-in link",
+      "mailer_templates_magic_link_content": "<h2>Your sign-in link</h2><p>Follow the link below to sign in. This link expires shortly and can only be used once.</p><p><a href=\"{{ .ConfirmationURL }}\">Sign in</a></p>",
+      "mailer_subjects_recovery": "Reset your password",
+      "mailer_templates_recovery_content": "<h2>Reset your password</h2><p>We received a request to reset your password. Follow the link below to choose a new one.</p><p><a href=\"{{ .ConfirmationURL }}\">Reset password</a></p><p>If you didn't request this, you can safely ignore this email.</p>",
+      "mailer_subjects_invite": "You've been invited",
+      "mailer_templates_invite_content": "<h2>You've been invited</h2><p>You've been invited to create an account. Follow the link below to accept.</p><p><a href=\"{{ .ConfirmationURL }}\">Accept invitation</a></p>",
+      "mailer_subjects_reauthentication": "{{ .Token }} is your verification code",
+      "mailer_templates_reauthentication_content": "<h2>Your verification code</h2><p>Use the code below to verify your identity. It expires shortly.</p><p>{{ .Token }}</p>",
+      "mailer_subjects_email_change": "Confirm your new email address",
+      "mailer_templates_email_change_content": "<h2>Confirm your new email address</h2><p>Follow the link below to confirm {{ .NewEmail }} as your new email address.</p><p><a href=\"{{ .ConfirmationURL }}\">Confirm new email address</a></p><p>If you didn't request this change, you can safely ignore this email.</p>",
       "mailer_notifications_password_changed_enabled": true,
-      "mailer_subjects_password_changed_notification": "Your password has been changed",
-      "mailer_templates_password_changed_notification_content": "<h2>Your password has been changed</h2>\n\n<p>This is a confirmation that the password for your account {{ .Email }} has just been changed.</p>\n<p>If you did not make this change, please contact support.</p>",
+      "mailer_subjects_password_changed_notification": "Your password was changed",
+      "mailer_templates_password_changed_notification_content": "<h2>Your password was changed</h2>\n\n<p>The password for your account was recently changed.</p>\n<p>If you didn't make this change, reset your password and contact support immediately.</p>",
       "mailer_notifications_email_changed_enabled": true,
-      "mailer_subjects_email_changed_notification": "Your email address has been changed",
-      "mailer_templates_email_changed_notification_content": "<h2>Your email address has been changed</h2>\n\n<p>The email address for your account has been changed from {{ .OldEmail }} to {{ .Email }}.</p>\n<p>If you did not make this change, please contact support.</p>",
+      "mailer_subjects_email_changed_notification": "Your email address was changed",
+      "mailer_templates_email_changed_notification_content": "<h2>Your email address was changed</h2>\n\n<p>The email address for your account was changed from {{ .OldEmail }} to {{ .Email }}.</p>\n<p>If you didn't make this change, contact support immediately.</p>",
       "mailer_notifications_phone_changed_enabled": true,
-      "mailer_subjects_phone_changed_notification": "Your phone number has been changed",
-      "mailer_templates_phone_changed_notification_content": "<h2>Your phone number has been changed</h2>\n\n<p>The phone number for your account {{ .Email }} has been changed from {{ .OldPhone }} to {{ .Phone }}.</p>\n<p>If you did not make this change, please contact support immediately.</p>",
+      "mailer_subjects_phone_changed_notification": "Your phone number was changed",
+      "mailer_templates_phone_changed_notification_content": "<h2>Your phone number was changed</h2>\n\n<p>The phone number for your account was changed from {{ .OldPhone }} to {{ .Phone }}.</p>\n<p>If you didn't make this change, contact support immediately.</p>",
       "mailer_notifications_mfa_factor_enrolled_enabled": true,
-      "mailer_subjects_mfa_factor_enrolled_notification": "A new MFA factor has been enrolled",
-      "mailer_templates_mfa_factor_enrolled_notification_content": "<h2>A new MFA factor has been enrolled</h2>\n\n<p>A new factor ({{ .FactorType }}) has been enrolled for your account {{ .Email }}.</p>\n<p>If you did not make this change, please contact support immediately.</p>",
+      "mailer_subjects_mfa_factor_enrolled_notification": "A new verification method was added to your account",
+      "mailer_templates_mfa_factor_enrolled_notification_content": "<h2>A new verification method was added</h2>\n\n<p>Sign-in verification method {{ .FactorType }} was added to your account.</p>\n<p>If you didn't make this change, contact support immediately.</p>",
       "mailer_notifications_mfa_factor_unenrolled_enabled": true,
-      "mailer_subjects_mfa_factor_unenrolled_notification": "An MFA factor has been unenrolled",
-      "mailer_templates_mfa_factor_unenrolled_notification_content": "<h2>An MFA factor has been unenrolled</h2>\n\n<p>A factor ({{ .FactorType }}) has been unenrolled for your account {{ .Email }}.</p>\n<p>If you did not make this change, please contact support immediately.</p>",
+      "mailer_subjects_mfa_factor_unenrolled_notification": "A verification method was removed from your account",
+      "mailer_templates_mfa_factor_unenrolled_notification_content": "<h2>A verification method was removed</h2>\n\n<p>Sign-in verification method {{ .FactorType }} was removed from your account.</p>\n<p>If you didn't make this change, contact support immediately.</p>",
       "mailer_notifications_identity_linked_enabled": true,
-      "mailer_subjects_identity_linked_notification": "A new identity has been linked",
-      "mailer_templates_identity_linked_notification_content": "<h2>A new identity has been linked</h2>\n\n<p>A new identity ({{ .Provider }}) has been linked to your account {{ .Email }}.</p>\n<p>If you did not make this change, please contact support immediately.</p>",
+      "mailer_subjects_identity_linked_notification": "A sign-in method was linked to your account",
+      "mailer_templates_identity_linked_notification_content": "<h2>A sign-in method was linked</h2>\n\n<p>Your {{ .Provider }} account was linked as a sign-in method for {{ .Email }}.</p>\n<p>If you didn't make this change, contact support immediately.</p>",
       "mailer_notifications_identity_unlinked_enabled": true,
-      "mailer_subjects_identity_unlinked_notification": "An identity has been unlinked",
-      "mailer_templates_identity_unlinked_notification_content": "<h2>An identity has been unlinked</h2>\n\n<p>An identity ({{ .Provider }}) has been unlinked from your account {{ .Email }}.</p>\n<p>If you did not make this change, please contact support immediately.</p>"
+      "mailer_subjects_identity_unlinked_notification": "A sign-in method was removed from your account",
+      "mailer_templates_identity_unlinked_notification_content": "<h2>A sign-in method was removed</h2>\n\n<p>Your {{ .Provider }} account was removed as a sign-in method for {{ .Email }}.</p>\n<p>If you didn't make this change, contact support immediately.</p>"
   }'
 ```
 
@@ -119,10 +139,10 @@ To guard against this there are the options below:
 **Option 1**
 
 - Use an email OTP instead by including `{{ .Token }}` in the email template
-- Create your own custom email link to redirect the user to a page where they can enter with their email and token to login
+- Create your own custom email link to redirect the user to a page where they can enter their email and token to sign in
 
 ```html
-<a href="{{ .SiteURL }}/confirm-signup">Confirm your signup</a>
+<a href="{{ .SiteURL }}/confirm-signup">Confirm email address</a>
 ```
 
 - Log them in by verifying the OTP token value with their email e.g. with [`supabase.auth.verifyOtp`](/docs/reference/javascript/auth-verifyotp) show below
@@ -137,7 +157,7 @@ const { data, error } = await supabase.auth.verifyOtp({ email, token, type: 'ema
 
 ```html
 <a href="{{ .SiteURL }}/confirm-signup?confirmation_url={{ .ConfirmationURL }}">
-  Confirm your signup
+  Confirm email address
 </a>
 ```
 
