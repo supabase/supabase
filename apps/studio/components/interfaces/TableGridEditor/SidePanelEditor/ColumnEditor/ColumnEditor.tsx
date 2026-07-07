@@ -446,23 +446,26 @@ export const ColumnEditor = ({
               </FormItemLayout>
 
               <Tooltip>
-                <TooltipTrigger>
-                  <FormItemLayout
-                    isReactForm={false}
-                    layout="flex"
-                    id="isNullable"
-                    label="Allow Nullable"
-                    description="Allow the column to assume a NULL value if no value is provided"
-                  >
-                    <Switch
+                <TooltipTrigger asChild>
+                  {/* Wrapped in a div as the Switch is a button itself and cannot be nested within the trigger button */}
+                  <div>
+                    <FormItemLayout
+                      isReactForm={false}
+                      layout="flex"
                       id="isNullable"
-                      disabled={columnFields.isPrimaryKey}
-                      checked={columnFields.isNullable}
-                      onCheckedChange={() =>
-                        onUpdateField({ isNullable: !columnFields.isNullable })
-                      }
-                    />
-                  </FormItemLayout>
+                      label="Allow Nullable"
+                      description="Allow the column to assume a NULL value if no value is provided"
+                    >
+                      <Switch
+                        id="isNullable"
+                        disabled={columnFields.isPrimaryKey}
+                        checked={columnFields.isNullable}
+                        onCheckedChange={() =>
+                          onUpdateField({ isNullable: !columnFields.isNullable })
+                        }
+                      />
+                    </FormItemLayout>
+                  </div>
                 </TooltipTrigger>
                 {columnFields.isPrimaryKey && (
                   <TooltipContent side="left" align="start">
@@ -472,21 +475,24 @@ export const ColumnEditor = ({
               </Tooltip>
 
               <Tooltip>
-                <TooltipTrigger>
-                  <FormItemLayout
-                    isReactForm={false}
-                    layout="flex"
-                    id="isUnique"
-                    label="Is Unique"
-                    description="Enforce values in the column to be unique across rows"
-                  >
-                    <Switch
+                <TooltipTrigger asChild>
+                  {/* Wrapped in a div as the Switch is a button itself and cannot be nested within the trigger button */}
+                  <div>
+                    <FormItemLayout
+                      isReactForm={false}
+                      layout="flex"
                       id="isUnique"
-                      disabled={columnFields.isPrimaryKey}
-                      checked={columnFields.isUnique}
-                      onCheckedChange={() => onUpdateField({ isUnique: !columnFields.isUnique })}
-                    />
-                  </FormItemLayout>
+                      label="Is Unique"
+                      description="Enforce values in the column to be unique across rows"
+                    >
+                      <Switch
+                        id="isUnique"
+                        disabled={columnFields.isPrimaryKey}
+                        checked={columnFields.isUnique}
+                        onCheckedChange={() => onUpdateField({ isUnique: !columnFields.isUnique })}
+                      />
+                    </FormItemLayout>
+                  </div>
                 </TooltipTrigger>
                 {columnFields.isPrimaryKey && (
                   <TooltipContent side="left" align="start">
