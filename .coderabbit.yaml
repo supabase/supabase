@@ -46,7 +46,7 @@ reviews:
         project/org creation, upgrade/billing actions, enabling or disabling a product
         feature, or any action that signals activation or retention. Do not suggest
         tracking for: passive views, page loads, UI-only state changes (e.g. expanding
-        a panel, switching tabs in a settings page), developer/internal tooling
+        a panel, switching tabs in a settings page), developr/internal tooling
         interactions, or interactions clearly unrelated to product adoption.
     - path: 'apps/studio/pages/**'
       instructions: |
