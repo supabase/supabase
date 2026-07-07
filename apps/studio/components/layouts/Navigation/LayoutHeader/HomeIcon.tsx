@@ -41,10 +41,10 @@ export const HomeIcon = ({ className }: { className?: string }) => {
             src={`${router.basePath}/img/supabase-logo.svg`}
             className={largeLogo ? 'h-[20px]' : 'h-[18px]'}
           />
-          <span className="sr-only">Back to organization dashboard</span>
+          <span className="sr-only">Navigate to the organization dashboard</span>
         </Link>
       </TooltipTrigger>
-      <TooltipContent>Back to organization dashboard</TooltipContent>
+      <TooltipContent aria-hidden>Back to the organization dashboard</TooltipContent>
     </Tooltip>
   )
 }
