@@ -29,6 +29,7 @@ import {
   useProjectsInfiniteQuery,
 } from '~/lib/fetch/projects-infinite'
 import { retrieve, storeOrRemoveNull } from '~/lib/storage'
+import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { useOnLogout } from '~/lib/userAuth'
 import { LOCAL_STORAGE_KEYS, useIsLoggedIn, useIsUserLoading } from 'common'
 import { Check, Copy } from 'lucide-react'
@@ -389,12 +390,13 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   }
 
   const { copied, handleCopy } = useCopy()
+  const sendTelemetryEvent = useSendTelemetryEvent()
 
   return (
     <>
       <div className={cn('flex items-center gap-2', className)}>
         <Input
-          disabled
+          readOnly
           type="text"
           className="font-mono"
           value={
@@ -413,10 +415,16 @@ function VariableView({ variable, className }: { variable: Variable; className?:
             disabled={!variableValue}
             variant="ghost"
             className="px-0"
-            onClick={handleCopy}
+            onClick={() => {
+              handleCopy()
+              sendTelemetryEvent({
+                action: 'docs_project_config_variables_copy_button_clicked',
+                properties: { variable },
+              })
+            }}
             aria-label="Copy"
           >
-            {copied ? <Check /> : <Copy />}
+            {copied ? <Check size="18" /> : <Copy size="18" />}
           </Button>
         </CopyToClipboard>
       </div>
@@ -445,7 +453,7 @@ function LoginHint({ variable }: { variable: Variable }) {
   if (isUserLoading || isLoggedIn) return null
 
   return (
-    <p className="text-foreground-muted text-sm mt-2 mb-0 ml-1">
+    <p className="not-prose text-foreground-muted text-sm mt-2 mb-0 ml-1">
       To get your {prettyFormatVariable[variable]},{' '}
       <Link
         className="text-foreground-muted"

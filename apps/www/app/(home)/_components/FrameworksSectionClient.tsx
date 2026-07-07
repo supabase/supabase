@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { cn } from 'ui'
 
+import SectionContainerWithCn from '../../../components/Layouts/SectionContainerWithCn'
+
 type Framework = {
   name: string
   icon: string
@@ -23,14 +25,14 @@ export function FrameworksSectionClient({ frameworks }: { frameworks: Framework[
   }
 
   return (
-    <div className="border-b border-border py-24">
-      <div className="mx-auto max-w-(--container-max-w,75rem) px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 md:gap-0">
+    <div className="border-b border-border">
+      <SectionContainerWithCn>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-0">
           {/* Left: title */}
-          <div className="flex flex-col justify-between py-4 gap-6 md:gap-10">
+          <div className="flex flex-col justify-between gap-6 md:gap-10">
             <h3 className="text-2xl md:text-4xl text-foreground-lighter">
               Use Supabase with{' '}
-              <span className="block">
+              <span className="md:block">
                 <AnimatePresence mode="popLayout" initial={false}>
                   <motion.span
                     key={active.name}
@@ -134,7 +136,7 @@ export function FrameworksSectionClient({ frameworks }: { frameworks: Framework[
             </div>
           </div>
         </div>
-      </div>
+      </SectionContainerWithCn>
     </div>
   )
 }
