@@ -28,7 +28,7 @@ import type { AnyRouter } from '@tanstack/react-router'
 
 import { buildSentryClientOptions } from '@/lib/sentry-client-options'
 
-let initialized = false
+let isInitialized = false
 
 export function initSentryTanStackClient(router: AnyRouter) {
   // Client-only: getRouter() also runs during SSR/prerender, and the TanStack
@@ -37,8 +37,8 @@ export function initSentryTanStackClient(router: AnyRouter) {
   if (typeof window === 'undefined') return
   // getRouter() is called once per pageload today; keep the guard so a future
   // second call can't double-init the client.
-  if (initialized) return
-  initialized = true
+  if (isInitialized) return
+  isInitialized = true
 
   // No-ops cleanly when NEXT_PUBLIC_SENTRY_DSN is unset (local/self-hosted):
   // `init` without a dsn creates a disabled client, and beforeSend drops
@@ -50,7 +50,7 @@ export function initSentryTanStackClient(router: AnyRouter) {
       // metadata the integration would tag EVERY event third_party_code=true
       // and beforeSend would drop them all. Leave it off until the Vite build
       // annotates frames (@sentry/vite-plugin moduleMetadata).
-      thirdPartyErrorFilter: false,
+      includeThirdPartyErrorFilter: false,
       extraIntegrations: [Sentry.tanstackRouterBrowserTracingIntegration(router)],
     })
   )

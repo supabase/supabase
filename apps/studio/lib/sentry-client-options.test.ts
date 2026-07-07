@@ -431,20 +431,20 @@ describe('buildSentryClientOptions', () => {
   it('includes the third-party error filter only when the build annotates frames', () => {
     // Next build: withSentryConfig injects the applicationKey metadata.
     expect(
-      getIntegrationNames(buildSentryClientOptions({ thirdPartyErrorFilter: true }))
+      getIntegrationNames(buildSentryClientOptions({ includeThirdPartyErrorFilter: true }))
     ).toContain('ThirdPartyErrorsFilter')
 
     // TanStack/Vite build: no bundler metadata — including the integration
     // would tag every event third_party_code=true and beforeSend would drop
     // them all.
     expect(
-      getIntegrationNames(buildSentryClientOptions({ thirdPartyErrorFilter: false }))
+      getIntegrationNames(buildSentryClientOptions({ includeThirdPartyErrorFilter: false }))
     ).not.toContain('ThirdPartyErrorsFilter')
   })
 
   it('appends build-specific extra integrations', () => {
     const options = buildSentryClientOptions({
-      thirdPartyErrorFilter: false,
+      includeThirdPartyErrorFilter: false,
       extraIntegrations: [{ name: 'FakeRouterTracing' }],
     })
 
@@ -452,8 +452,8 @@ describe('buildSentryClientOptions', () => {
   })
 
   it('builds the same shared options for both builds (parity)', () => {
-    const nextOptions = buildSentryClientOptions({ thirdPartyErrorFilter: true })
-    const tanstackOptions = buildSentryClientOptions({ thirdPartyErrorFilter: false })
+    const nextOptions = buildSentryClientOptions({ includeThirdPartyErrorFilter: true })
+    const tanstackOptions = buildSentryClientOptions({ includeThirdPartyErrorFilter: false })
 
     // Everything except the integrations array must be identical between the
     // two runtimes.

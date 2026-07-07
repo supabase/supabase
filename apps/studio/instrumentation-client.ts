@@ -14,7 +14,7 @@ Sentry.init(
     // next.config.ts (withSentryConfig) annotates the bundles with the
     // 'supabase-studio' applicationKey, so third-party frame tagging works
     // on this build.
-    thirdPartyErrorFilter: true,
+    includeThirdPartyErrorFilter: true,
   })
 )
 

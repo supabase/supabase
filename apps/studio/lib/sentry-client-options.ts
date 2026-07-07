@@ -13,6 +13,7 @@
 // version, same module instance under pnpm), so building the options against
 // it works for both `Sentry.init`s.
 import * as Sentry from '@sentry/react'
+import { thirdPartyErrorFilterIntegration } from '@sentry/react'
 import { hasConsented } from 'common'
 import { IS_PLATFORM } from 'common/constants/environment'
 
@@ -100,21 +101,16 @@ function isChunkLoadError(error: unknown, event: Sentry.Event): boolean {
   )
 }
 
-function buildThirdPartyErrorFilterIntegration(): Integration[] {
-  const thirdPartyErrorFilterIntegration = (Sentry as any).thirdPartyErrorFilterIntegration
-  if (!thirdPartyErrorFilterIntegration) return []
-
-  // Tag errors whose stack trace only contains third-party frames (browser extensions,
-  // injected scripts, etc.). This uses build-time code annotation via the applicationKey
-  // in next.config.ts to reliably distinguish our code from third-party code.
-  // We use 'apply-tag' instead of 'drop' so that beforeSend can exempt error boundary
-  // crashes — these may originate in third-party code but are caused by first-party bugs.
-  return [
-    thirdPartyErrorFilterIntegration({
-      filterKeys: ['supabase-studio'],
-      behaviour: 'apply-tag-if-exclusively-contains-third-party-frames',
-    }),
-  ]
+// Tag errors whose stack trace only contains third-party frames (browser extensions,
+// injected scripts, etc.). This uses build-time code annotation via the applicationKey
+// in next.config.ts to reliably distinguish our code from third-party code.
+// We use 'apply-tag' instead of 'drop' so that beforeSend can exempt error boundary
+// crashes — these may originate in third-party code but are caused by first-party bugs.
+function buildThirdPartyErrorFilterIntegration(): Integration {
+  return thirdPartyErrorFilterIntegration({
+    filterKeys: ['supabase-studio'],
+    behaviour: 'apply-tag-if-exclusively-contains-third-party-frames',
+  })
 }
 
 export interface SentryClientOptionsParams {
@@ -128,13 +124,13 @@ export interface SentryClientOptionsParams {
    * event `third_party_code: true` and `beforeSend` would then drop all
    * non-error-boundary events.
    */
-  thirdPartyErrorFilter: boolean
+  includeThirdPartyErrorFilter: boolean
   /** Build-specific integrations (e.g. TanStack Router browser tracing). */
   extraIntegrations?: Integration[]
 }
 
 export function buildSentryClientOptions({
-  thirdPartyErrorFilter,
+  includeThirdPartyErrorFilter,
   extraIntegrations = [],
 }: SentryClientOptionsParams): Sentry.BrowserOptions {
   return {
@@ -149,7 +145,7 @@ export function buildSentryClientOptions({
     tracesSampleRate: 0.02,
 
     integrations: [
-      ...(thirdPartyErrorFilter ? buildThirdPartyErrorFilterIntegration() : []),
+      ...(includeThirdPartyErrorFilter ? [buildThirdPartyErrorFilterIntegration()] : []),
       ...extraIntegrations,
     ],
 
