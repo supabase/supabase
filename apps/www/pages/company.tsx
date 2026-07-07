@@ -115,7 +115,6 @@ const Community = () => {
               className={`
               space-y-4 text-center lg:text-left
               ${i !== CommunityData.length - 1 ? 'border-default lg:border-r lg:pr-4' : ''}
-              ${i === 1 ? 'border-default md:border-0 lg:border-r lg:pr-4' : ''}
           `}
             >
               <div
