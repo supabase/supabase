@@ -519,6 +519,32 @@ App source keeps importing `@sentry/nextjs` so the Next build
 Next build when the migration is done (switch imports to
 `@sentry/react` directly).
 
+### Raw-text imports: `*.md` + `public/deno/*.d.ts` (`rawTextLoader`)
+
+Next's raw-loader rules (next.config.ts `turbopack.rules`) serve `*.md`
+files and the Deno typings `public/deno/edge-runtime.d.ts` /
+`public/deno/lib.deno.d.ts` as JS modules whose default export is the
+file's text. The `rawTextLoader` plugin in `vite.config.ts` mirrors that
+for the Vite pipeline:
+
+- `*.md` — plain `transform` (used by
+  `static-data/integrations/*/overview.md` via the literal-import registry
+  in `static-data/integrations/overviews.ts`).
+- The two Deno `.d.ts` files (used by `components/ui/AIEditor` as Monaco
+  extra libs for edge-function editors) — an exact-specifier allowlist
+  resolved to `\0`-virtual ids and served from a `load` hook. They can't go
+  through `transform`: Rolldown's native dep scanner skips JS plugin hooks
+  and hard-fails parsing TS *declaration* syntax (`get stdin(): ...;`) as
+  runtime TS, which killed dependency pre-bundling wholesale. The previous
+  `/* @vite-ignore */` hack kept the scanner away but also meant the
+  imports failed at runtime, silently dropping Deno type hints in the
+  TanStack build. Do NOT widen the allowlist to `*.d.ts` — hijacking
+  declaration-file resolution globally would corrupt packages that ship
+  `.d.ts` next to their JS. The `as string` casts on the import specifiers
+  in `AIEditor/index.tsx` keep tsc from resolving the `.d.ts` files as
+  declaration files (TS2846) while erasing to plain literals both bundlers
+  statically analyze.
+
 ### Other build-side migration changes
 
 - `pnpm-workspace.yaml` catalog now includes `@tanstack/react-router`,
