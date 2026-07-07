@@ -519,6 +519,29 @@ App source keeps importing `@sentry/nextjs` so the Next build
 Next build when the migration is done (switch imports to
 `@sentry/react` directly).
 
+### GraphiQL Monaco workers: `setup-workers/webpack` → `setup-workers/vite`
+
+App source (`GraphiQLTab.tsx`) imports `graphiql/setup-workers/webpack`,
+which registers `MonacoEnvironment.getWorker` using
+`new Worker(new URL('monaco-editor/...', import.meta.url))` — the URL form
+webpack/turbopack rewrites at build time. Vite doesn't rewrite bare module
+specifiers inside `new URL(..., import.meta.url)`, so under the TanStack
+build the worker URLs 404'd and Monaco fell back to running the `json`,
+`editorWorkerService` and `graphql` workers on the main thread ("Could not
+create web worker(s). Falling back to loading web worker code in main
+thread" in the console).
+
+The `graphiqlViteWorkers` plugin in `vite.config.ts` resolves that import
+to graphiql's own `setup-workers/vite` variant (same three workers via
+Vite `?worker` imports) in client builds; SSR resolution is untouched. The
+import specifier stays `.../webpack` in app source so the Next build keeps
+working. The whole setup-workers chain is also in `optimizeDeps.exclude` —
+the Rolldown dep optimizer can't load `?worker` ids
+(`UNLOADABLE_DEPENDENCY`), so the modules go through the normal transform
+pipeline where Vite's built-in worker plugin handles them. Drop the plugin
+and the exclude, and switch the import to `graphiql/setup-workers/vite`,
+when the Next build goes away.
+
 ### Raw-text imports: `*.md` + `public/deno/*.d.ts` (`rawTextLoader`)
 
 Next's raw-loader rules (next.config.ts `turbopack.rules`) serve `*.md`

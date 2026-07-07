@@ -108,6 +108,34 @@ function rawTextLoader(): Plugin {
   }
 }
 
+// Swap graphiql's webpack worker setup for its Vite one in client builds.
+//
+// App source imports `graphiql/setup-workers/webpack` (GraphiQLTab.tsx),
+// which registers `MonacoEnvironment.getWorker` using
+// `new Worker(new URL('monaco-editor/...', import.meta.url))` — the URL form
+// webpack/turbopack rewrites at build time. Vite doesn't rewrite bare module
+// specifiers inside `new URL(..., import.meta.url)`, so under the TanStack
+// build the worker URLs 404 and Monaco falls back to running the json /
+// editorWorkerService / graphql workers on the main thread ("Could not
+// create web worker(s)..." console warning). graphiql also ships
+// `setup-workers/vite`, which imports the same three workers via Vite's
+// `?worker` suffix; importing that unconditionally would break the Next
+// build, so the swap happens here instead of in app source.
+//
+// SSR resolution is left untouched: neither variant's `getWorker` ever runs
+// during SSR, and the webpack flavor is a plain global assignment while the
+// vite flavor's `?worker` imports don't belong in the server graph.
+function graphiqlViteWorkers(): Plugin {
+  return {
+    name: 'studio-graphiql-vite-workers',
+    enforce: 'pre',
+    resolveId(id, importer, options) {
+      if (id !== 'graphiql/setup-workers/webpack' || options.ssr) return
+      return this.resolve('graphiql/setup-workers/vite', importer, { skipSelf: true })
+    },
+  }
+}
+
 // Short-circuit UMD wrappers' AMD branch by string-replacing the
 // `define.amd` check. Vite's `config.define` doesn't reach pre-bundled
 // deps (Vite 8's Rolldown-based optimizer doesn't honour member-
@@ -430,6 +458,21 @@ export default defineConfig(({ command, mode }) => {
       ],
     },
     ...(basePath && { base: basePath }),
+    optimizeDeps: {
+      // graphiql's Vite worker setup (swapped in for the webpack one by the
+      // `graphiqlViteWorkers` plugin above) imports Monaco's workers with
+      // Vite's `?worker` suffix. The dep optimizer can't load `?worker` ids
+      // (UNLOADABLE_DEPENDENCY: "No such file or directory" for
+      // `json.worker.js?worker` etc.), so keep the whole chain out of
+      // pre-bundling; the modules then go through the normal transform
+      // pipeline where Vite's built-in worker plugin turns each `?worker`
+      // import into a spawnable Worker constructor.
+      exclude: [
+        'graphiql/setup-workers/webpack',
+        'graphiql/setup-workers/vite',
+        '@graphiql/react/setup-workers/vite',
+      ],
+    },
     define: {
       ...publicEnvDefines,
       ...sharedDefines,
@@ -524,6 +567,7 @@ export default defineConfig(({ command, mode }) => {
     plugins: [
       nextCompat(),
       rawTextLoader(),
+      graphiqlViteWorkers(),
       ssrStubGraphiql(),
       umdAmdShortCircuit(),
       assertNoChunkCycles(),
