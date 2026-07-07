@@ -5,9 +5,20 @@ import React from 'react'
 import { u } from 'unist-builder'
 import { visit } from 'unist-util-visit'
 
-import { Index } from '../__registry__'
+import { registry } from '../registry/registry'
 import { styles } from '../registry/styles'
 import { UnistNode, UnistTree } from '@/types/unist'
+
+// Resolves registry files from the plain registry data (name/type/files
+// metadata only) rather than `__registry__` — the generated index that also
+// wires up `React.lazy` component imports. This plugin only ever needs file
+// paths to read source off disk, and pulling in the generated index (with its
+// deep chain of real component + npm dependencies) breaks Velite's esbuild-based
+// config bundling under pnpm's strict module resolution.
+function getRegistryFiles(styleName: string, name: string) {
+  const item = registry.find((entry) => entry.name === name)
+  return item?.files.map((file) => `registry/${styleName}/${file}`)
+}
 
 export function rehypeComponent() {
   return async (tree: UnistTree) => {
@@ -39,16 +50,16 @@ export function rehypeComponent() {
             if (srcPath) {
               src = srcPath
             } else {
-              const component = Index[style.name][name]
+              const files = getRegistryFiles(style.name, name)
               // console.log('got to ELSE STATEMENT')
               // console.log('filename', fileName)
               // console.log('name', name)
 
               src = fileName
-                ? component.files.find((file: string) => {
+                ? files!.find((file: string) => {
                     return file.endsWith(`${fileName}.tsx`) || file.endsWith(`${fileName}.ts`)
-                  }) || component.files[0]
-                : component.files[0]
+                  }) || files![0]
+                : files![0]
               // console.log('got to END of ELSE STATEMENT')
             }
 
@@ -108,9 +119,9 @@ export function rehypeComponent() {
 
         try {
           for (const style of styles) {
-            const component = Index[style.name][name]
+            const files = getRegistryFiles(style.name, name)
             // console.log('GOT HERE')
-            const src = component.files[0]
+            const src = files![0]
 
             // Read the source file.
             const filePath = path.join(process.cwd(), src)
@@ -160,9 +171,9 @@ export function rehypeComponent() {
 
         try {
           for (const style of styles) {
-            const component = Index[style.name][name]
+            const files = getRegistryFiles(style.name, name)
             // console.log('GOT HERE')
-            const src = component.files[0]
+            const src = files![0]
 
             // Read the source file.
             const filePath = path.join(process.cwd(), src)
