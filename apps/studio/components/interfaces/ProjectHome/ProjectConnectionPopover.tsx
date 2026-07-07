@@ -182,7 +182,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
               <ChevronDown size={14} className={cn('transition-transform', open && 'rotate-180')} />
             }
           >
-            Copy <span className="sr-only">project's URL and API keys</span>
+            Copy <span className="sr-only">project URL and API keys</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="end" className="w-80 p-1">
