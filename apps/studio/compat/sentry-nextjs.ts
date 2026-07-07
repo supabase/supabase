@@ -21,6 +21,7 @@
  */
 import { captureException } from '@sentry/react'
 
+// eslint-disable-next-line barrel-files/avoid-re-export-all -- compat shim: its whole job is to mirror @sentry/react's surface
 export * from '@sentry/react'
 
 // ---------------------------------------------------------------------------
