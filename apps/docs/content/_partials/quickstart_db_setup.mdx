@@ -70,7 +70,17 @@ curl -X POST https://api.supabase.com/v1/projects \
 
 </Tabs>
 
-## 2. Set up your database
+## 2. Install agent skills (optional)
+
+[Agent Skills](/docs/guides/ai-tools/ai-skills) are curated instruction sets that give your AI agent procedural knowledge about working with Supabase.
+
+Install them in your project with:
+
+```bash
+npx skills add supabase/agent-skills
+```
+
+## 3. Set up your database
 
 When your Supabase project is up and running, create an `instruments` table with some sample data. Then set only the privileges each Postgres role needs, add [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default, and create an RLS policy to make the data in the table publicly readable.
 
@@ -80,7 +90,7 @@ Save some steps by <a href={`/dashboard/project/_/sql/new?content=${encodeURICom
 
 </Admonition>
 
-Or do this manually in our project's [SQL Editor](/dashboard/project/_/sql/new), by pasting the SQL below, and clicking **Run**.
+Or do this manually in your project's [SQL Editor](/dashboard/project/_/sql/new), by pasting the SQL below, and clicking **Run**.
 
 ```sql SQL_EDITOR
 -- Create the table

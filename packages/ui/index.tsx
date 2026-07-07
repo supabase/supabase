@@ -3,10 +3,6 @@
 export * from './src/components/Button'
 export * from './src/components/Icon/IconBackground'
 
-// DISPLAYS
-
-export * from './src/components/Tabs'
-
 // NAV
 
 export * from './src/components/Menu'
@@ -111,12 +107,7 @@ export * from './src/components/ShadowScrollArea'
 
 export * from './src/components/shadcn/ui/collapsible'
 
-export {
-  Tabs as Tabs_Shadcn_,
-  TabsContent as TabsContent_Shadcn_,
-  TabsList as TabsList_Shadcn_,
-  TabsTrigger as TabsTrigger_Shadcn_,
-} from './src/components/shadcn/ui/tabs'
+export * from './src/components/shadcn/ui/tabs'
 
 export * from './src/components/shadcn/ui/tooltip'
 

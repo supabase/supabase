@@ -5,9 +5,11 @@ import AuthProviders from '~/components/AuthProviders'
 import { AuthSmsProviderConfig } from '~/components/AuthSmsProviderConfig'
 import ButtonCard from '~/components/ButtonCard'
 import { ComputeDiskLimitsTable } from '~/components/ComputeDiskLimitsTable'
+import { CustomContent } from '~/components/CustomContent'
 import { ContentListings } from '~/components/ContentListings'
 import { Extensions } from '~/components/Extensions'
 import Image, { type ImageProps } from '~/components/Image'
+import { McpCiConfigBlock } from '~/components/McpCiConfigBlock'
 import { Mermaid } from '~/components/Mermaid'
 import { MetricsStackCards } from '~/components/MetricsStackCards'
 import { NavData } from '~/components/NavData'
@@ -76,6 +78,7 @@ const components = {
   CodeSampleDummy,
   CodeSampleWrapper,
   ComputeDiskLimitsTable,
+  CustomContent,
   ContentListings,
   ErrorCodes,
   Extensions,
@@ -86,6 +89,7 @@ const components = {
   IconX: X,
   Image: (props: ImageProps) => <Image className="rounded-md w-full" {...props} />,
   Link,
+  McpCiConfigBlock,
   McpConfigPanel,
   Mermaid,
   MetricsStackCards,
