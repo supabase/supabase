@@ -121,7 +121,7 @@ const GuideTemplate = ({
                 className={cn(
                   'w-fit',
                   'flex items-center gap-1',
-                  'text-sm text-scale-1000 hover:text-scale-1200',
+                  'text-sm text-tertiary-foreground hover:text-foreground',
                   'transition-colors'
                 )}
                 target="_blank"
