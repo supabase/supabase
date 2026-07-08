@@ -14,16 +14,15 @@ import { createSaveMechanism } from './sql-editor-save'
 import { createSaveScheduler, type SaveMode, type SaveScheduler } from './sql-editor-save-scheduler'
 import { sqlEditorState } from './sql-editor-state'
 import { useIsSqlEditorManualSaveEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  getSnippetIdFromTab,
+  SqlTabStatusIndicator,
+} from '@/components/interfaces/SQLEditor/SqlTabStatusIndicator'
 import { upsertContent } from '@/data/content/content-upsert-mutation'
 import { contentKeys } from '@/data/content/keys'
 import { createSQLSnippetFolder } from '@/data/content/sql-folder-create-mutation'
 import { updateSQLSnippetFolder } from '@/data/content/sql-folder-update-mutation'
 import { TabsStateContext, type Tab } from '@/state/tabs'
-
-/** The snippet id a SQL tab represents. Prefer the metadata; fall back to the id scheme. */
-function getSnippetIdFromTab(tab: Tab): string {
-  return tab.metadata?.sqlId ?? tab.id.replace(/^sql-/, '')
-}
 
 type SaveCoordinator = Pick<SaveScheduler, 'requestSave'>
 
@@ -74,8 +73,9 @@ export function SqlEditorSaveCoordinatorProvider({ children }: PropsWithChildren
 
   useEffect(() => scheduler.start(), [scheduler])
 
-  // Own what "closing a SQL tab" means, so the tabs layout doesn't have to know
-  // about snippets. Discarding is a manual-save concept: only manual mode leaves
+  // Own what a SQL tab means to the tabs layout — how it closes and the
+  // unsaved-changes dot it shows — so the layout doesn't have to know about
+  // snippets. Discarding is a manual-save concept: only manual mode leaves
   // unsaved local edits to throw away. In auto mode every edit is already
   // persisted (or a debounced save is in flight), so closing must NOT touch the
   // snippet's store content or cache — nulling a still-mounted editor's content
@@ -90,7 +90,9 @@ export function SqlEditorSaveCoordinatorProvider({ children }: PropsWithChildren
       saveModeRef.current === 'manual' &&
       hasUnsavedChanges(sqlEditorState.snippets[getSnippetIdFromTab(tab)]?.snippet.status)
 
-    return tabsStore.registerTabCloseHandler('sql', {
+    return tabsStore.registerTabTypeHandler('sql', {
+      // VS Code-style unsaved-changes dot, rendered by the tabs layout.
+      StatusIndicator: SqlTabStatusIndicator,
       onClose: (tab) => {
         if (!snippetHasUnsavedEdits(tab)) return
         const snippetId = getSnippetIdFromTab(tab)

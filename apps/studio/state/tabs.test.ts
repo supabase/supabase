@@ -149,7 +149,7 @@ describe('tabs close handlers', () => {
     store.addTab(sqlTab('a'))
 
     const onClose = vi.fn()
-    store.registerTabCloseHandler('sql', { onClose })
+    store.registerTabTypeHandler('sql', { onClose })
 
     store.handleTabClose({ id: 'sql-a', router: fakeRouter(), onClearDashboardHistory: () => {} })
 
@@ -163,7 +163,7 @@ describe('tabs close handlers', () => {
     store.addTab(sqlTab('b'))
 
     const onClose = vi.fn()
-    store.registerTabCloseHandler('sql', { onClose })
+    store.registerTabTypeHandler('sql', { onClose })
 
     store.closeTabs(['sql-a', 'sql-b'])
 
@@ -177,7 +177,7 @@ describe('tabs close handlers', () => {
     store.addTab(sqlTab('b'))
 
     const onClose = vi.fn()
-    store.registerTabCloseHandler('sql', { onClose })
+    store.registerTabTypeHandler('sql', { onClose })
 
     store.removeTab('sql-a')
     store.removeTabs(['sql-b'])
@@ -191,7 +191,7 @@ describe('tabs close handlers', () => {
     store.addTab({ id: 'r-1', type: ENTITY_TYPE.TABLE, label: 'tasks', isPreview: false })
 
     const onClose = vi.fn()
-    store.registerTabCloseHandler('sql', { onClose })
+    store.registerTabTypeHandler('sql', { onClose })
 
     store.closeTabs(['sql-a', 'r-1'])
 
@@ -204,7 +204,7 @@ describe('tabs close handlers', () => {
     store.addTab(sqlTab('clean'))
     store.addTab(sqlTab('dirty'))
 
-    store.registerTabCloseHandler('sql', {
+    store.registerTabTypeHandler('sql', {
       confirmClose: (tabs) =>
         tabs.some((tab) => tab.metadata?.sqlId === 'dirty')
           ? { title: 'Unsaved changes', description: 'Closing will discard them.' }
@@ -225,7 +225,7 @@ describe('tabs close handlers', () => {
     store.addTab(sqlTab('c'))
 
     // The handler — not the store — decides the wording, e.g. count-aware copy.
-    store.registerTabCloseHandler('sql', {
+    store.registerTabTypeHandler('sql', {
       confirmClose: (tabs) => ({ title: 'Unsaved changes', description: `${tabs.length} tabs` }),
     })
 
@@ -240,11 +240,30 @@ describe('tabs close handlers', () => {
     store.addTab(sqlTab('a'))
 
     const onClose = vi.fn()
-    const unregister = store.registerTabCloseHandler('sql', { onClose })
+    const unregister = store.registerTabTypeHandler('sql', { onClose })
     unregister()
 
     store.closeTabs(['sql-a'])
 
     expect(onClose).not.toHaveBeenCalled()
+  })
+
+  it('exposes a registered status indicator and bumps the registration version', () => {
+    const store = createTabsState('default')
+    const Indicator = () => null
+
+    expect(store.getTabStatusIndicator('sql')).toBeUndefined()
+    const before = store.handlerRegistrationVersion
+
+    const unregister = store.registerTabTypeHandler('sql', { StatusIndicator: Indicator })
+
+    expect(store.getTabStatusIndicator('sql')).toBe(Indicator)
+    expect(store.handlerRegistrationVersion).toBeGreaterThan(before)
+
+    const afterRegister = store.handlerRegistrationVersion
+    unregister()
+
+    expect(store.getTabStatusIndicator('sql')).toBeUndefined()
+    expect(store.handlerRegistrationVersion).toBeGreaterThan(afterRegister)
   })
 })
