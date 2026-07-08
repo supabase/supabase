@@ -158,7 +158,7 @@
   --header-height: 3rem;
 }
 
-[data-theme="light"],
+[data-theme='light'],
 .light {
   --surface: 0.99;
 }
