@@ -1,4 +1,4 @@
-import { useBreakpoint } from 'common'
+import { useIsMobile } from 'ui'
 import { useEffect } from 'react'
 import { cn, ResizableHandle, ResizablePanel } from 'ui'
 
@@ -25,7 +25,7 @@ export const LayoutSidebar = ({
   defaultSize = '30',
 }: LayoutSidebarProps) => {
   const { activeSidebar } = useSidebarManagerSnapshot()
-  const isMobile = useBreakpoint('md')
+  const isMobile = useIsMobile()
   const { content: sheetContent, setContent: setMobileSheetContent } = useMobileSheet()
 
   useEffect(() => {

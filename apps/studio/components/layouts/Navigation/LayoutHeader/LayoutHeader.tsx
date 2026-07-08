@@ -5,7 +5,7 @@ import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode, useMemo } from 'react'
-import { Badge, cn } from 'ui'
+import { Badge, cn, SidebarTrigger } from 'ui'
 import { CommandMenuTriggerInput } from 'ui-patterns/CommandMenu'
 
 import { BreadcrumbsView } from './BreadcrumbsView'
@@ -138,6 +138,7 @@ export const LayoutHeader = ({
           </div>
 
           <div className="hidden md:flex items-center text-sm">
+            <SidebarTrigger className="mr-2" />
             <HomeIcon />
             <div className="flex items-center md:pl-2">
               {showOrgSelection && IS_PLATFORM ? (
