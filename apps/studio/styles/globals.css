@@ -138,7 +138,6 @@
 }
 
 :root {
-  --surface: 0.99;
   --chart-1: hsl(var(--brand-default));
   --chart-2: 173 58% 39%;
   --chart-3: 197 37% 24%;
@@ -157,6 +156,11 @@
   --sidebar-border: var(--border-default);
   --sidebar-ring: var(--ring);
   --header-height: 3rem;
+}
+
+[data-theme="light"],
+.light {
+  --surface: 0.99;
 }
 
 [data-theme='dark'],
