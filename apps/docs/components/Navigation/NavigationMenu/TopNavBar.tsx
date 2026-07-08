@@ -10,7 +10,8 @@ import Link from 'next/link'
 import type { FC } from 'react'
 import { memo, useState } from 'react'
 import { Button, buttonVariants, cn } from 'ui'
-import { AuthenticatedDropdownMenu, CommandMenuTriggerInput } from 'ui-patterns'
+import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
+import { CommandMenuTriggerInput } from 'ui-patterns/CommandMenu'
 
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
@@ -47,6 +48,7 @@ const TopNavBar: FC = () => {
             <div className="flex gap-2 items-center">
               <DevToolbarTrigger />
               <CommandMenuTriggerInput
+                className="[&>div>p]:text-foreground-lighter"
                 placeholder={
                   <>
                     Search
@@ -57,7 +59,7 @@ const TopNavBar: FC = () => {
               <button
                 title="Menu dropdown button"
                 className={cn(
-                  buttonVariants({ type: 'default' }),
+                  buttonVariants({ variant: 'default' }),
                   'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30'
                 )}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -96,13 +98,7 @@ const HeaderLogo = memo(() => {
   const { navigationLogo } = getCustomContent(['navigation:logo'])
 
   return (
-    <Link
-      href="/"
-      className={cn(
-        buttonVariants({ type: 'default' }),
-        'flex shrink-0 items-center w-fit bg-transparent! border-none! shadow-none!'
-      )}
-    >
+    <Link href="/" className="flex shrink-0 items-center gap-1.5 w-fit">
       <Image
         className={cn('hidden dark:block m-0!', largeLogo && 'h-[36px]')}
         src={navigationLogo?.dark ?? '/docs/supabase-dark.svg'}

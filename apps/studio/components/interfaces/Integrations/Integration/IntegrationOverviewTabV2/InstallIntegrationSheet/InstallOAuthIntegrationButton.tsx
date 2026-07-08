@@ -3,18 +3,22 @@ import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 
-import { isOAuthInstalled, useProjectOAuthIntegrationData } from '../../../Landing/Landing.utils'
+import { isOAuthInstalled, type ProjectOAuthIntegrationData } from '../../../Landing/Landing.utils'
 import type { IntegrationDefinition } from '@/components/interfaces/Integrations/Landing/Integrations.constants'
 import { useInstallOAuthIntegrationMutation } from '@/data/marketplace/install-oauth-integration-mutation'
 
 interface InstallOAuthIntegrationButtonProps {
   integration: IntegrationDefinition
+  data: ProjectOAuthIntegrationData
+  isLoading: boolean
 }
 
-export function InstallOAuthIntegrationButton({ integration }: InstallOAuthIntegrationButtonProps) {
+export function InstallOAuthIntegrationButton({
+  integration,
+  data,
+  isLoading,
+}: InstallOAuthIntegrationButtonProps) {
   const { ref: projectRef } = useParams()
-
-  const { data, isLoading } = useProjectOAuthIntegrationData(projectRef)
 
   const { mutate: installOAuthIntegration, isPending: isInstalling } =
     useInstallOAuthIntegrationMutation({
@@ -47,12 +51,12 @@ export function InstallOAuthIntegrationButton({ integration }: InstallOAuthInteg
   return (
     <>
       {isIntegrationInstalled ? (
-        <Button disabled type="outline" className="shrink-0">
+        <Button disabled variant="outline" className="shrink-0">
           Installed
         </Button>
       ) : (
         <Button
-          type="primary"
+          variant="primary"
           className="shrink-0"
           loading={isInstalling || isLoading}
           disabled={isLoading}

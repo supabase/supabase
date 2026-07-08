@@ -3,7 +3,7 @@ import Link from 'next/link'
 import React, { Children, type ReactNode } from 'react'
 import { Button, cn } from 'ui'
 
-import SectionContainer from '../Layouts/SectionContainer'
+import SectionContainerWithCn from '../Layouts/SectionContainerWithCn'
 import ProductIcon from '../ProductIcon'
 
 // to do: move types to be global
@@ -29,12 +29,16 @@ const ProductHeader = ({ footerPosition = 'left', ...props }: Props) => (
       props.className
     )}
   >
-    <SectionContainer className={cn('py-0! grid grid-cols-12', props.sectionContainerClassName)}>
+    <SectionContainerWithCn
+      height="none"
+      className={cn('grid grid-cols-12', props.sectionContainerClassName)}
+    >
       <div
         className={cn(
           'relative z-10 col-span-12 lg:col-span-5',
           // if not image is present, center the content
-          !props.image && 'lg:col-start-4 lg:col-end-10 text-center flex flex-col items-center'
+          !props.image &&
+            'lg:col-span-12 lg:mx-auto lg:max-w-2xl text-center flex flex-col items-center'
         )}
       >
         {(props.icon || props.title) && (
@@ -50,14 +54,14 @@ const ProductHeader = ({ footerPosition = 'left', ...props }: Props) => (
             )}
           </div>
         )}
-        <h1 className="h1 text-3xl md:text-4xl! lg:text-4xl! 2xl:text-6xl! tracking-[-.15px]">
+        <h1 className="h1 text-3xl md:text-4xl! lg:text-4xl! 2xl:text-6xl! tracking-[-.15px] text-balance">
           {props.h1}
         </h1>
         {props.subheader && (
           <div className="">
             {Children.map(props.subheader, (subheader, i) => {
               return (
-                <p className="p lg:text-lg max-w-lg lg:max-w-none" key={i}>
+                <p className="p lg:text-lg max-w-lg lg:max-w-none text-pretty" key={i}>
                   {subheader}
                 </p>
               )
@@ -69,7 +73,7 @@ const ProductHeader = ({ footerPosition = 'left', ...props }: Props) => (
             <Button
               key={cta.href}
               size="medium"
-              type={cta.type ?? 'default'}
+              variant={cta.type ?? 'default'}
               onClick={cta.onClick}
               asChild
             >
@@ -93,7 +97,7 @@ const ProductHeader = ({ footerPosition = 'left', ...props }: Props) => (
           {props.footer}
         </div>
       )}
-    </SectionContainer>
+    </SectionContainerWithCn>
   </div>
 )
 

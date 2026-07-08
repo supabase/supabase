@@ -33,12 +33,31 @@ export type Database = MergeDeep<
             listing_logo: string
           }
         }
+        marketplace_listings: {
+          Row: {
+            // add a type for the JSON structure
+            categories: Category[]
+            // These all come from non-nullable columns but all view columns are inferred as nullable.
+            // See https://github.com/orgs/supabase/discussions/14151
+            featured: boolean
+            partner_name: string
+            built_by: string
+            slug: string
+            title: string
+            description: string
+            content: string
+            website_url: string
+            documentation_url: string
+            listing_logo: string
+          }
+        }
       }
     }
   }
 >
 
 export type Listing = Database['public']['Views']['listings']['Row']
+export type MarketplaceListing = Database['public']['Views']['marketplace_listings']['Row']
 
 export const createMarketplaceClient = () => {
   const API_URL = process.env.NEXT_PUBLIC_MARKETPLACE_API_URL || ''

@@ -9,7 +9,7 @@ import type { Commands } from './Functions.types'
 import CommandRender from '@/components/interfaces/Functions/CommandRender'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useAccessTokensQuery } from '@/data/access-tokens/access-tokens-query'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { DOCS_URL } from '@/lib/constants'
@@ -29,12 +29,12 @@ export const TerminalInstructions = forwardRef<
 
   const { data: tokens } = useAccessTokensQuery()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
+  const { data: apiKeyData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const { anonKey, publishableKey } = apiKeyData ?? {}
 
   const { data: endpoint } = useProjectApiUrl({ projectRef })
   const functionsEndpoint = `${endpoint}/functions/v1`
 
-  const { anonKey, publishableKey } = getKeys(apiKeys)
   const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
 
   // get the .co or .net TLD from the restUrl
@@ -119,7 +119,7 @@ export const TerminalInstructions = forwardRef<
                 You can create a secure access token in your account section
               </p>
             </div>
-            <Button type="default" onClick={() => router.push('/account/tokens')}>
+            <Button variant="default" onClick={() => router.push('/account/tokens')}>
               Access tokens
             </Button>
           </div>
@@ -133,7 +133,7 @@ export const TerminalInstructions = forwardRef<
             </div>
             <div className="flex gap-2">
               <DocsButton href={`${DOCS_URL}/guides/functions`} />
-              <Button asChild type="default" icon={<ExternalLink />}>
+              <Button asChild variant="default" icon={<ExternalLink />}>
                 <a
                   target="_blank"
                   rel="noreferrer"

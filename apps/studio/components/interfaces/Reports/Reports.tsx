@@ -12,11 +12,13 @@ import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { GridResize } from './GridResize'
 import { MetricOptions } from './MetricOptions'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
-import { PreventNavigationOnUnsavedChanges } from '@/components/ui-patterns/Dialogs/PreventNavigationOnUnsavedChanges'
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
+import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { DateRangePicker } from '@/components/ui/DateRangePicker'
-import NoPermission from '@/components/ui/NoPermission'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { DEFAULT_CHART_CONFIG } from '@/components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from '@/data/analytics/constants'
 import { analyticsKeys } from '@/data/analytics/keys'
@@ -27,6 +29,7 @@ import {
 } from '@/data/content/content-upsert-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { usePreventNavigationOnUnsavedChanges } from '@/hooks/ui/usePreventNavigationOnUnsavedChanges'
 import { Metric, TIME_PERIODS_REPORTS } from '@/lib/constants/metrics'
 import { uuidv4 } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
@@ -352,6 +355,11 @@ const Reports = () => {
     checkEditState()
   }, [config])
 
+  const { handleCancelNavigation, handleConfirmNavigation, shouldConfirmNavigation } =
+    usePreventNavigationOnUnsavedChanges({
+      hasChanges: hasEdits,
+    })
+
   if (isLoading || isLoadingPermissions) {
     return <LogoLoader />
   }
@@ -360,25 +368,27 @@ const Reports = () => {
     return <NoPermission isFullPage resourceText="access this custom report" />
   }
 
+  const reportTitle = currentReport?.name || 'Reports'
+
   return (
     <>
       <div className="flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
         <div className="flex items-center justify-between">
           <div>
-            <h1>{currentReport?.name || 'Reports'}</h1>
+            <h1>{reportTitle}</h1>
             <p className="text-foreground-light">{currentReport?.description}</p>
           </div>
           {hasEdits && (
             <div className="flex items-center gap-x-2">
               <Button
-                type="default"
+                variant="default"
                 disabled={isSaving}
                 onClick={() => setConfig(currentReportContent)}
               >
                 Cancel
               </Button>
               <Button
-                type="primary"
+                variant="primary"
                 icon={<Save />}
                 loading={isSaving}
                 onClick={() => onSaveReport()}
@@ -390,14 +400,6 @@ const Reports = () => {
         </div>
         <div className={cn('mb-4 flex items-center gap-x-3 justify-between')}>
           <div className="flex items-center gap-x-2">
-            <ButtonTooltip
-              type="default"
-              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
-              className="w-7"
-              disabled={isRefreshing}
-              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
-              onClick={onRefreshReport}
-            />
             <div className="flex items-center gap-x-3">
               <DateRangePicker
                 value="7d"
@@ -417,10 +419,19 @@ const Reports = () => {
           </div>
 
           <div className="flex items-center gap-x-2">
+            <DocsButton href={OBSERVABILITY_DOCS_HREFS.customReport} topic={reportTitle} />
+            <ButtonTooltip
+              variant="default"
+              icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+              className="w-7"
+              disabled={isRefreshing}
+              tooltip={{ content: { side: 'bottom', text: 'Refresh report' } }}
+              onClick={onRefreshReport}
+            />
             {canUpdateReport ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="default" icon={<Plus />}>
+                  <Button variant="default" icon={<Plus />}>
                     <span>Add block</span>
                   </Button>
                 </DropdownMenuTrigger>
@@ -431,7 +442,7 @@ const Reports = () => {
             ) : (
               <ButtonTooltip
                 disabled
-                type="default"
+                variant="default"
                 icon={<Plus />}
                 tooltip={{
                   content: {
@@ -461,7 +472,7 @@ const Reports = () => {
             {canUpdateReport ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button type="default" iconRight={<Plus size={14} />}>
+                  <Button variant="default" iconRight={<Plus size={14} />}>
                     Add your first chart
                   </Button>
                 </DropdownMenuTrigger>
@@ -491,7 +502,11 @@ const Reports = () => {
           </div>
         )}
       </div>
-      <PreventNavigationOnUnsavedChanges hasChanges={hasEdits} />
+      <DiscardChangesConfirmationDialog
+        visible={shouldConfirmNavigation}
+        onCancel={handleCancelNavigation}
+        onClose={handleConfirmNavigation}
+      />
     </>
   )
 }

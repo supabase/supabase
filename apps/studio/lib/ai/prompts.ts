@@ -733,7 +733,7 @@ export const CHAT_PROMPT = `
 - On execution error, explain succinctly and attempt to correct if possible, validating each outcome briefly (1–2 lines) after execution.
 - If a user skips execution, acknowledge and suggest alternatives.
 - Use markdown code blocks (\`\`\`sql\`\`\`) for illustrative SQL only if requested by the user or when providing non-executable examples.
-- Execute multiple queries separately via \`execute_sql\` and briefly validate outcomes.
+- Never call \`execute_sql\` or \`deploy_edge_function\` in parallel within the same step. Each requires user approval, so issue one per step and wait for its result before calling the next.
 - After execution, summarize outcomes concisely without duplicating results, as the client will present these.
 ## Edge Functions
 - Deploy Edge Functions by calling \`deploy_edge_function\` directly with \`name\` and \`code\`; the client handles confirmation and result presentation.
@@ -784,6 +784,15 @@ When no code context is provided: return a complete, valid implementation.
 export const SQL_COMPLETION_INSTRUCTIONS = `
 # SQL identifier quoting
 Do not quote identifiers unless they actually require it (uppercase letters, reserved words, or special characters). Plain lowercase identifiers should not be quoted.
+`
+
+export const CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS = `
+# Supabase logs SQL (ClickHouse)
+You are writing SQL for Supabase logs, which run on a ClickHouse-backed engine. This is NOT Postgres and NOT BigQuery. Output valid ClickHouse SQL only.
+- All logs are in a single table named \`logs\`, keyed by a \`source\` column. There are no per-service tables (no \`edge_logs\`, \`postgres_logs\`, and so on) and no \`unnest\` joins.
+- Per-source fields live in the \`log_attributes\` Map(String, String), read as \`log_attributes['key']\`. Map values are strings, so wrap numeric ones in \`toInt32OrZero(...)\`.
+- Use ClickHouse functions, not Postgres or BigQuery ones. Use \`match(col, 'regex')\` or \`col ILIKE '%text%'\` instead of \`regexp_contains\`, \`count()\` instead of \`count(*)\`, and select the \`timestamp\` column directly instead of \`cast(timestamp as datetime)\`.
+- Do not quote identifiers with double quotes and do not append a trailing semicolon.
 `
 
 export const LIMITATIONS_PROMPT = `

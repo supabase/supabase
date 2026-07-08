@@ -10,12 +10,12 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { Filter, Sort, SupaTable } from '@/components/grid/types'
@@ -100,12 +100,12 @@ pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${table
             done via the following command that you can run in your terminal:
           </p>
 
-          <Tabs_Shadcn_ value={selectedTab} onValueChange={setSelectedTab}>
-            <TabsList_Shadcn_ className="gap-x-3">
-              <TabsTrigger_Shadcn_ value="csv">As CSV</TabsTrigger_Shadcn_>
-              <TabsTrigger_Shadcn_ value="sql">As SQL</TabsTrigger_Shadcn_>
-            </TabsList_Shadcn_>
-            <TabsContent_Shadcn_ value="csv">
+          <Tabs value={selectedTab} onValueChange={setSelectedTab}>
+            <TabsList className="gap-x-3">
+              <TabsTrigger value="csv">As CSV</TabsTrigger>
+              <TabsTrigger value="sql">As SQL</TabsTrigger>
+            </TabsList>
+            <TabsContent value="csv">
               <CodeBlock
                 hideLineNumbers
                 wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-3')}
@@ -113,8 +113,8 @@ pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${table
                 value={csvExportCommand}
                 className="[&_code]:text-[12px] [&_code]:text-foreground"
               />
-            </TabsContent_Shadcn_>
-            <TabsContent_Shadcn_ value="sql">
+            </TabsContent>
+            <TabsContent value="sql">
               <CodeBlock
                 hideLineNumbers
                 wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-3')}
@@ -128,8 +128,8 @@ pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${table
                 title="Filters are not supported when exporting as SQL via pg_dump"
                 description="If you'd like to export as SQL, we recommend creating a view first then exporting the data from there via pg_dump instead"
               />
-            </TabsContent_Shadcn_>
-          </Tabs_Shadcn_>
+            </TabsContent>
+          </Tabs>
 
           <p className="text-sm">
             You will be prompted for your database password, and the output file{' '}
@@ -148,7 +148,7 @@ pg_dump -h ${db_host} -p ${db_port} -d ${db_name} -U ${db_user} --table="${table
           )}
         </DialogSection>
         <DialogFooter>
-          <Button type="default" onClick={() => onOpenChange(false)}>
+          <Button variant="default" onClick={() => onOpenChange(false)}>
             Close
           </Button>
         </DialogFooter>

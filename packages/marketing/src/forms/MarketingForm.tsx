@@ -409,8 +409,8 @@ export default function MarketingForm({
         <hr className="border-muted" />
 
         <Button
-          htmlType="submit"
-          type="primary"
+          type="submit"
+          variant="primary"
           size="large"
           block
           loading={submitState === 'loading'}

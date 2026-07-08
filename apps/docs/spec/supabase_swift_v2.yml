@@ -679,6 +679,50 @@ functions:
             // Open the URL using your preferred method to complete sign-in process.
             UIApplication.shared.open(url)
           ```
+  - id: sign-in-with-passkey
+    title: 'signInWithPasskey()'
+    notes: |
+      Signs the user in with a passkey (WebAuthn). Available on iOS 16+, macOS 13+, and visionOS 1+.
+
+      - Drives the full WebAuthn ceremony end to end: fetches assertion options from the server, presents the native passkey UI via `AuthenticationServices`, and verifies the assertion.
+      - Does not require an existing session. On success the session is persisted and a `signedIn` auth change event is emitted.
+      - For lower-level control (custom authenticator, tvOS, watchOS), use `getPasskeyAuthenticationOptions()` + `verifyPasskeyAuthentication()` instead.
+      - Passkey support is **experimental**. Opt in with `@_spi(Experimental) import Supabase`. The API may change in future releases.
+      - Passkeys must be enabled for your project in the Dashboard under Authentication → Passkeys.
+    examples:
+      - id: sign-in-with-passkey
+        name: Sign in with a passkey
+        isSpotlight: true
+        code: |
+          ```swift
+          // iOS 16+/macOS 13+ only. Must opt in: @_spi(Experimental) import Supabase
+          let response = try await supabase.auth.signInWithPasskey(
+            presentationAnchor: view.window!
+          )
+          let session = response.session
+          let user = response.user
+          ```
+  - id: register-passkey
+    title: 'registerPasskey()'
+    notes: |
+      Registers a new passkey (WebAuthn credential) for the signed-in user. Available on iOS 16+, macOS 13+, and visionOS 1+.
+
+      - Drives the full WebAuthn ceremony end to end: fetches creation options from the server, presents the native passkey registration UI, and stores the credential.
+      - Requires an authenticated, non-anonymous user.
+      - For lower-level control, use `getPasskeyRegistrationOptions()` + `verifyPasskeyRegistration()` instead.
+      - Passkey support is **experimental**. Opt in with `@_spi(Experimental) import Supabase`.
+    examples:
+      - id: register-passkey
+        name: Register a passkey for the current user
+        isSpotlight: true
+        code: |
+          ```swift
+          // iOS 16+/macOS 13+ only. Must opt in: @_spi(Experimental) import Supabase
+          let passkey = try await supabase.auth.registerPasskey(
+            presentationAnchor: view.window!
+          )
+          print("Registered passkey \(passkey.id)")
+          ```
   - id: sign-out
     title: 'signOut()'
     notes: |
@@ -1217,16 +1261,19 @@ functions:
     notes: |
       This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
 
-      Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
+      TOTP (time-based one-time password) is the stable 2nd factor. WebAuthn / passkey as a 2nd factor is **experimental** — opt in with `@_spi(Experimental) import Supabase`. The first-factor passkey API lives in the `auth` (not `auth.mfa`) namespace; see the [Auth Passkey](/docs/reference/swift/auth-passkey-api) section.
+
+      We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
 
       Having a 2nd TOTP factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup TOTP factor.
   - id: mfa-enroll
     title: 'mfa.enroll()'
     notes: |
-      - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
+      - Supported factor types: `totp` (stable) and `webauthn` (**experimental** — opt in with `@_spi(Experimental) import Supabase`). The returned `id` should be used to create a challenge.
       - To create a challenge, see [`mfa.challenge()`](/docs/reference/swift/auth-mfa-challenge).
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/swift/auth-mfa-verify).
       - To create and verify a challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/swift/auth-mfa-challengeandverify).
+      - For a one-call WebAuthn enrollment on iOS 16+/macOS 13+, use `mfa.enrollWebAuthnFactor(friendlyName:presentationAnchor:)` instead.
 
     examples:
       - id: enroll-totp-factor
@@ -1250,6 +1297,17 @@ functions:
           let secret = response.totp?.secret
           let uri = response.totp?.uri
           ```
+      - id: enroll-webauthn-factor
+        name: Enroll a WebAuthn (passkey) factor (iOS 16+/macOS 13+, experimental)
+        code: |
+          ```swift
+          // @_spi(Experimental) import Supabase
+          // enrollWebAuthnFactor drives the full ceremony: enroll → challenge → present native UI → verify.
+          let verifyResponse = try await supabase.auth.mfa.enrollWebAuthnFactor(
+            friendlyName: "My passkey",
+            presentationAnchor: view.window!
+          )
+          ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
     notes: |
@@ -1271,6 +1329,7 @@ functions:
     title: 'mfa.verify()'
     notes: |
       - To verify a challenge, please [create a challenge](/docs/reference/swift/auth-mfa-challenge) first.
+      - For WebAuthn factors on iOS 16+/macOS 13+, `mfa.verifyWebAuthnFactor(factorId:presentationAnchor:)` drives the full challenge + native UI + verify flow in one call (**experimental** — opt in with `@_spi(Experimental) import Supabase`).
     examples:
       - id: verify-challenge
         name: Verify a challenge for a factor
@@ -1283,6 +1342,17 @@ functions:
               challengeId: "4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15",
               code: "123456"
             )
+          )
+          ```
+      - id: verify-webauthn-factor
+        name: Verify a WebAuthn factor (iOS 16+/macOS 13+, experimental)
+        code: |
+          ```swift
+          // @_spi(Experimental) import Supabase
+          // verifyWebAuthnFactor drives the full ceremony: challenge → present native UI → verify.
+          let session = try await supabase.auth.mfa.verifyWebAuthnFactor(
+            factorId: "34e770dd-9ff9-416c-87fa-43b31d7ef225",
+            presentationAnchor: view.window!
           )
           ```
   - id: mfa-challenge-and-verify
@@ -1346,6 +1416,157 @@ functions:
         code: |
           ```swift
           let factors = try await supabase.auth.mfa.listFactors()
+          ```
+  - id: passkey-api
+    title: 'Overview'
+    notes: |
+      Lower-level passkey methods for custom authenticator flows and platforms where `AuthenticationServices` is unavailable (tvOS, watchOS).
+
+      These methods handle the network side of the WebAuthn ceremony only — the caller is responsible for driving the platform authenticator between fetching options and submitting the credential response. For an end-to-end flow on iOS 16+/macOS 13+, prefer `signInWithPasskey(presentationAnchor:)` and `registerPasskey(presentationAnchor:)`.
+
+      Passkey support is **experimental**. Opt in with `@_spi(Experimental) import Supabase`. The API may change in future releases.
+  - id: passkey-list
+    title: 'listPasskeys()'
+    notes: |
+      Returns the list of passkeys registered to the signed-in user.
+    examples:
+      - id: list-passkeys
+        name: List the current user's passkeys
+        isSpotlight: true
+        code: |
+          ```swift
+          // @_spi(Experimental) import Supabase
+          let passkeys: [PasskeyListItem] = try await supabase.auth.listPasskeys()
+          ```
+  - id: passkey-update
+    title: 'renamePasskey(id:friendlyName:)'
+    notes: |
+      Updates the friendly name of a passkey. Limited to 120 characters.
+    params:
+      - name: id
+        isOptional: false
+        type: String
+        description: ID of the passkey to rename.
+      - name: friendlyName
+        isOptional: false
+        type: String
+        description: New human readable name. Limited to 120 characters.
+    examples:
+      - id: rename-passkey
+        name: Rename a passkey
+        isSpotlight: true
+        code: |
+          ```swift
+          // @_spi(Experimental) import Supabase
+          let passkey = try await supabase.auth.renamePasskey(
+            id: "34e770dd-9ff9-416c-87fa-43b31d7ef225",
+            friendlyName: "Work laptop"
+          )
+          ```
+  - id: passkey-delete
+    title: 'deletePasskey(id:)'
+    notes: |
+      Removes a passkey from the signed-in user's account.
+    params:
+      - name: id
+        isOptional: false
+        type: String
+        description: ID of the passkey to delete.
+    examples:
+      - id: delete-passkey
+        name: Delete a passkey
+        isSpotlight: true
+        code: |
+          ```swift
+          // @_spi(Experimental) import Supabase
+          try await supabase.auth.deletePasskey(id: "34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          ```
+  - id: passkey-start-registration
+    title: 'getPasskeyRegistrationOptions()'
+    notes: |
+      Fetches credential creation options to register a new passkey for the signed-in user.
+
+      - Pass the returned `options` (W3C `PublicKeyCredentialCreationOptions`) to the platform authenticator.
+      - After running the authenticator, submit the result with `verifyPasskeyRegistration(challengeId:credentialResponse:)`.
+    examples:
+      - id: start-passkey-registration
+        name: Get passkey registration options
+        isSpotlight: true
+        code: |
+          ```swift
+          // @_spi(Experimental) import Supabase
+          let options: PasskeyRegistrationOptions = try await supabase.auth.getPasskeyRegistrationOptions()
+          // Hand options.options to the platform authenticator.
+          ```
+  - id: passkey-verify-registration
+    title: 'verifyPasskeyRegistration(challengeId:credentialResponse:)'
+    notes: |
+      Stores a newly created passkey for the signed-in user.
+    params:
+      - name: challengeId
+        isOptional: false
+        type: String
+        description: The `challengeId` returned by `getPasskeyRegistrationOptions()`.
+      - name: credentialResponse
+        isOptional: false
+        type: AnyJSON
+        description: The W3C `RegistrationResponseJSON` credential produced by the authenticator.
+    examples:
+      - id: verify-passkey-registration
+        name: Verify a passkey registration
+        isSpotlight: true
+        code: |
+          ```swift
+          // @_spi(Experimental) import Supabase
+          let passkey: PasskeyListItem = try await supabase.auth.verifyPasskeyRegistration(
+            challengeId: options.challengeId,
+            credentialResponse: credential
+          )
+          ```
+  - id: passkey-start-authentication
+    title: 'getPasskeyAuthenticationOptions()'
+    notes: |
+      Fetches assertion options to authenticate with a passkey.
+
+      - Does not require an existing session.
+      - Pass the returned `options` (W3C `PublicKeyCredentialRequestOptions`) to the platform authenticator.
+      - After running the authenticator, submit the result with `verifyPasskeyAuthentication(challengeId:credentialResponse:)`.
+    examples:
+      - id: start-passkey-authentication
+        name: Get passkey authentication options
+        isSpotlight: true
+        code: |
+          ```swift
+          // @_spi(Experimental) import Supabase
+          let options: PasskeyAuthenticationOptions = try await supabase.auth.getPasskeyAuthenticationOptions()
+          // Hand options.options to the platform authenticator.
+          ```
+  - id: passkey-verify-authentication
+    title: 'verifyPasskeyAuthentication(challengeId:credentialResponse:)'
+    notes: |
+      Verifies a passkey assertion and establishes a session. On success the session is persisted and a `signedIn` auth change event is emitted.
+    params:
+      - name: challengeId
+        isOptional: false
+        type: String
+        description: The `challengeId` returned by `getPasskeyAuthenticationOptions()`.
+      - name: credentialResponse
+        isOptional: false
+        type: AnyJSON
+        description: The W3C `AuthenticationResponseJSON` assertion produced by the authenticator.
+    examples:
+      - id: verify-passkey-authentication
+        name: Verify a passkey sign in
+        isSpotlight: true
+        code: |
+          ```swift
+          // @_spi(Experimental) import Supabase
+          let response: AuthResponse = try await supabase.auth.verifyPasskeyAuthentication(
+            challengeId: options.challengeId,
+            credentialResponse: credential
+          )
+          let session = response.session
+          let user = response.user
           ```
   - id: admin-api
     title: 'Overview'
@@ -4163,6 +4384,8 @@ functions:
       It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
 
       Follow the [Performance Debugging Guide](/docs/guides/database/debugging-performance) to enable the functionality on your project.
+    notes: |
+      The `format` parameter accepts an `ExplainFormat` value — either `.text` (default, human-readable) or `.json` (machine-readable JSON).
     examples:
       - id: get-execution-plan
         name: Get the execution plan
@@ -4241,6 +4464,21 @@ functions:
         description: |
           By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
         hideCodeBlock: true
+        isSpotlight: false
+
+      - id: get-execution-plan-json-format
+        name: Get the execution plan as JSON
+        code: |
+          ```swift
+          try await supabase
+            .from("instruments")
+            .select()
+            .explain(format: .json)
+            .execute()
+            .value
+          ```
+        description: |
+          Use `format: .json` to get a machine-readable JSON execution plan. The `ExplainFormat` type accepts `.text` (default) or `.json`.
         isSpotlight: false
   - id: invoke
     title: invoke()
@@ -4955,7 +5193,7 @@ functions:
             .createBucket(
               "avatars",
               options: BucketOptions(
-                public: false,
+                isPublic: false,
                 allowedMimeTypes: ["image/png"],
                 fileSizeLimit: 1024
               )
@@ -4995,7 +5233,7 @@ functions:
             .updateBucket(
               "avatars",
               options: BucketOptions(
-                public: false,
+                isPublic: false,
                 fileSizeLimit: 1024,
                 allowedMimeTypes: ["image/png"]
               )
@@ -5154,12 +5392,13 @@ functions:
           let signedURL = try await supabase.storage
             .from("avatars")
             .createSignedURL(
-              path: "folder/avatar1.png", expiresIn: 60,
-              download: true
+              path: "folder/avatar1.png",
+              expiresIn: 60,
+              download: .withOriginalName
             )
           ```
         note: |
-          You can also sepcify a `String` in the `download` parameter to define the file name for the downloaded asset.
+          Use `.withOriginalName` to download with the original file name, or `.named("custom.png")` to specify a custom file name. The `download: Bool` overload still compiles but is disfavored.
 
   - id: from-create-signed-urls
     title: from.createSignedUrls()
@@ -5298,11 +5537,11 @@ functions:
             .from("public-bucket")
             .getPublicURL(
               path: "folder/avatar1.png",
-              download: true
+              download: .withOriginalName
             )
           ```
         note: |
-          You can also sepcify a `String` in the `download` parameter to define the file name for the downloaded asset.
+          Use `.withOriginalName` to download with the original file name, or `.named("custom.png")` to specify a custom file name. The `download: Bool` overload still compiles but is disfavored.
 
   - id: from-download
     title: from.download()

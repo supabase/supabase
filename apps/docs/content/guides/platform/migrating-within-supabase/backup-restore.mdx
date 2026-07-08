@@ -4,9 +4,9 @@ subtitle: 'Learn how to backup and restore projects using the Supabase CLI'
 breadcrumb: 'Migrations'
 ---
 
-# Migrating the database
+## Migrating the database
 
-## Backup database using the CLI
+### Back up database using the CLI
 
 <StepHikeCompact>
   <StepHikeCompact.Step step={1}>
@@ -74,24 +74,21 @@ breadcrumb: 'Migrations'
 
 </StepHikeCompact>
 
-## Before you begin
+### Before you begin
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
   chevronAlign="right"
   justified
   size="medium"
   className="text-foreground-light mt-8 mb-6"
 >
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem header="Install Postgres and psql" id="install-postgres">
-      <$Partial path="postgres_installation.mdx" />
-    </AccordionItem>
-  </div>
+  <AccordionItem header="Install Postgres and psql" id="install-postgres">
+    <$Partial path="postgres_installation.mdx" />
+  </AccordionItem>
 </Accordion>
 
-## Restore backup using CLI
+### Restore backup using CLI
 
 <StepHikeCompact>
     <StepHikeCompact.Step step={1}>
@@ -197,9 +194,9 @@ breadcrumb: 'Migrations'
 
 </StepHikeCompact>
 
-## Special considerations
+### Special considerations
 
-#### Preserving migration history
+##### Preserving migration history
 
 If you were using Supabase CLI for managing migrations on your old database and would like to preserve the migration history in your newly restored project, you need to insert the migration records separately using the following commands.
 
@@ -214,7 +211,7 @@ psql \
   --dbname "$NEW_DB_URL"
 ```
 
-#### Schema changes to `auth` and `storage`
+##### Schema changes to `auth` and `storage`
 
 If you have modified the `auth` and `storage` schemas in your old project, such as adding triggers or Row Level Security(RLS) policies, you have to restore them separately. The Supabase CLI can help you diff the changes to these schemas using the following commands.
 
@@ -223,13 +220,13 @@ supabase link --project-ref "$OLD_PROJECT_REF"
 supabase db diff --linked --schema auth,storage > changes.sql
 ```
 
-## Troubleshooting notes
+### Troubleshooting notes
 
-#### Disabling triggers during restore:
+##### Disabling triggers during restore:
 
 Setting `session_replication_role` to `replica` disables triggers during the migration, preventing columns from being double encrypted.
 
-#### Custom roles require passwords
+##### Custom roles require passwords
 
 If you created any [custom roles](/dashboard/project/_/database/roles) with the `LOGIN` attribute, you must manually set their passwords in the new project. This can be done with the SQL command:
 
@@ -237,7 +234,7 @@ If you created any [custom roles](/dashboard/project/_/database/roles) with the 
 alter user "YOUR_USER" with password 'SOME_NEW_PASSWORD';
 ```
 
-#### `supabase_admin` permission errors
+##### `supabase_admin` permission errors
 
 If you encounter permission errors related to `supabase_admin` during restore:
 
@@ -248,7 +245,7 @@ If you encounter permission errors related to `supabase_admin` during restore:
   ALTER ... OWNER TO "supabase_admin"
 ```
 
-#### `cli_login_postgres` role grant error
+##### `cli_login_postgres` role grant error
 
 If you encounter the error:
 
@@ -264,7 +261,7 @@ DETAIL:  Only roles with the ADMIN option on role "postgres" may grant this role
 GRANT "postgres" TO "cli_login_postgres" WITH INHERIT FALSE GRANTED BY "supabase_admin";
 ```
 
-#### `cli_login_postgres` role issues after cloning
+##### `cli_login_postgres` role issues after cloning
 
 The `cli_login_role` must be created by the `supabase_admin` role. If the migration process cloned over the role before the CLI could generate its own version, it may encounter the error:
 
@@ -279,9 +276,9 @@ To resolve the issue, drop the custom `cli_login_postgres` role. Then the CLI ca
 DROP ROLE IF EXISTS cli_login_postgres;
 ```
 
-# Migrating edge functions
+## Migrating edge functions
 
-## Steps (using the Supabase CLI):
+### Steps (using the Supabase CLI):
 
 <StepHikeCompact>
   <StepHikeCompact.Step step={1}>
@@ -326,7 +323,7 @@ DROP ROLE IF EXISTS cli_login_postgres;
   </StepHikeCompact.Step>
 </StepHikeCompact>
 
-## Steps (using the Supabase Dashboard):
+### Steps (using the Supabase Dashboard):
 
 <Admonition type="note">
 
@@ -369,7 +366,7 @@ Dependencies defined through [import maps](/docs/guides/functions/dependencies#u
   </StepHikeCompact.Step>
 </StepHikeCompact>
 
-# Migrating storage objects
+## Migrating storage objects
 
 <StepHikeCompact>
   <StepHikeCompact.Step step={1}>
@@ -808,6 +805,6 @@ Dependencies defined through [import maps](/docs/guides/functions/dependencies#u
 
 </StepHikeCompact>
 
-## Resources
+### Resources
 
 - [Connecting with PSQL](/docs/guides/database/psql)

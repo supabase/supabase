@@ -111,7 +111,7 @@ const InfoTooltip = ({
                   <InfoIcon className="p-px min-w-4 min-h-4 text-foreground-lighter" />
                   <p className="italic text-foreground-light truncate">{children}</p>
                 </div>
-                <Button type="text" onClick={() => setMobileSheetOpen(false)} className="px-1">
+                <Button variant="text" onClick={() => setMobileSheetOpen(false)} className="px-1">
                   <XIcon className="w-4 h-4 text-foreground-lighter" />
                 </Button>
               </SheetHeader>

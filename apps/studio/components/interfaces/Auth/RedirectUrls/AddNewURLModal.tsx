@@ -22,7 +22,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
 import * as z from 'zod'
 
-import { urlRegex } from '../Auth.constants'
+import { normalizeRedirectUrl, parseRedirectUrls, urlRegex } from '../Auth.constants'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 
 const MAX_URLS_LENGTH = 2 * 1024
@@ -33,61 +33,88 @@ interface AddNewURLModalProps {
   onClose: () => void
 }
 
-const normaliseUrl = (value: string) => value.replace(/,\s*$/, '')
+const createRedirectUrlsSchema = (normalizedAllowList: string[]) => {
+  const redirectUrlRegex = urlRegex()
+
+  return z
+    .object({
+      urls: z
+        .object({
+          value: z.string().trim().min(1, 'Please provide a value').transform(normalizeRedirectUrl),
+        })
+        .array()
+        .default([]),
+    })
+    .superRefine((data, ctx) => {
+      const seenUrls = new Set<string>()
+
+      data.urls.forEach((url, index) => {
+        if (!redirectUrlRegex.test(url.value)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['urls', index, 'value'],
+            message: 'Please provide a valid URL',
+          })
+        }
+
+        if (normalizedAllowList.includes(url.value)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['urls', index, 'value'],
+            message: 'URL already exists in the allow list',
+          })
+        }
+
+        if (seenUrls.has(url.value)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['urls', index, 'value'],
+            message: 'URL already exists in this list',
+          })
+        }
+
+        seenUrls.add(url.value)
+      })
+    })
+}
 
 export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalProps) => {
   const { ref } = useParams()
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation()
-  const redirectUrlRegex = urlRegex()
-
-  const FormSchema = z.object({
-    urls: z
-      .object({
-        value: z
-          .string()
-          .min(1, 'Please provide a value')
-          .refine(
-            (value) => redirectUrlRegex.test(normaliseUrl(value)),
-            'Please provide a valid URL'
-          )
-          .refine((value) => !allowList.includes(normaliseUrl(value)), {
-            message: 'URL already exists in the allow list',
-          }),
-      })
-      .array()
-      .default([]),
-  })
+  const normalizedAllowList = parseRedirectUrls(allowList.join(','))
+  const formSchema = createRedirectUrlsSchema(normalizedAllowList)
 
   const initialValues = { urls: [{ value: '' }] }
-  const form = useForm<z.infer<typeof FormSchema>>({
-    resolver: zodResolver(FormSchema),
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: initialValues,
   })
   const urls = form.watch('urls')
 
-  const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    const dedupedUrls = [...new Set(data.urls.map((url) => normaliseUrl(url.value)))]
-    const payloadUrls = allowList.concat(dedupedUrls)
-    const addedCount = dedupedUrls.length
-    const payload = payloadUrls.toString()
+  const onSubmit = (data: z.infer<typeof formSchema>) => {
+    const payload = parseRedirectUrls(
+      normalizedAllowList.concat(data.urls.map((url) => url.value)).join(',')
+    )
+    const payloadString = payload.join(',')
+    const addedCount = payload.length - normalizedAllowList.length
 
-    if (payload.length > MAX_URLS_LENGTH) {
+    if (payloadString.length > MAX_URLS_LENGTH) {
       return toast.error('Too many redirect URLs, please remove some or try to use wildcards')
-    } else {
-      updateAuthConfig(
-        { projectRef: ref!, config: { URI_ALLOW_LIST: payload } },
-        {
-          onError: (error) => {
-            toast.error(`Failed to add URL(s): ${error?.message}`)
-          },
-          onSuccess: () => {
-            toast.success(`Successfully added ${addedCount} URL${addedCount > 1 ? 's' : ''}`)
-            form.reset(initialValues)
-            onClose()
-          },
-        }
-      )
     }
+
+    updateAuthConfig(
+      { projectRef: ref!, config: { URI_ALLOW_LIST: payloadString } },
+      {
+        onError: (error) => {
+          toast.error(`Failed to add URL(s): ${error?.message}`)
+        },
+        onSuccess: () => {
+          toast.success(`Successfully added ${addedCount} URL${addedCount > 1 ? 's' : ''}`)
+          form.reset(initialValues)
+          onClose()
+        },
+      }
+    )
   }
 
   useEffect(() => {
@@ -137,7 +164,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
             <DialogFooter>
               <Button
                 block
-                htmlType="submit"
+                type="submit"
                 size="small"
                 disabled={isUpdatingConfig}
                 loading={isUpdatingConfig}

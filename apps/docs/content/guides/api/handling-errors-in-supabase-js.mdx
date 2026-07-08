@@ -4,7 +4,7 @@ title: 'Handling errors in `supabase-js`'
 subtitle: 'Read `error.hint` first — Postgres often tells you the exact fix. Log the full error so you actually see it.'
 ---
 
-Every `supabase-js` call returns a `{ data, error }` pair instead of throwing. When something fails, the single most useful field on `error` is usually `hint` — Postgres returns the _fix_, not just a description of the problem. Logging only `error.message` hides it.
+Every `supabase-js` call returns a `{ data, error }` pair instead of throwing. When something fails, the single most useful field on `error` is usually `hint` — Postgres returns the _fix_, not only a description of the problem. Logging only `error.message` hides it.
 
 ## Usage of `message` and `hint` properties
 
@@ -19,7 +19,7 @@ The `message` exposes the error reason, and `hint` gives you the literal SQL sta
 
 The same pattern shows up across many Postgres errors — missing column? `hint` suggests the column name you probably meant. Type mismatch? `hint` shows the expected type. Whenever Postgres knows the fix, it puts it in `hint`.
 
-<Admonition type="tip">Log the full `error` object, not just `error.message`.</Admonition>
+<Admonition type="tip">Log the full `error` object, not only `error.message`.</Admonition>
 
 ## The recommended pattern
 

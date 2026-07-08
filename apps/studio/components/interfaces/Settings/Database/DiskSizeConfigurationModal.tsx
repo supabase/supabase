@@ -34,6 +34,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { COOLDOWN_DURATION } from '@/data/config/disk-attributes-update-mutation'
 import { useProjectDiskResizeMutation } from '@/data/config/project-disk-resize-mutation'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
@@ -68,8 +69,12 @@ const DiskSizeConfigurationModal = ({
 
   const isLoading = isLoadingProject || isLoadingSubscription || isLoadingDiskEntitlement
 
+  // COOLDOWN_DURATION is in seconds; convert to minutes to match the diff unit below.
+  const cooldownMinutes = COOLDOWN_DURATION / 60
   const timeTillNextAvailableDatabaseResize =
-    lastDatabaseResizeAt === null ? 0 : 6 * 60 - dayjs().diff(lastDatabaseResizeAt, 'minutes')
+    lastDatabaseResizeAt == null
+      ? 0
+      : Math.max(0, cooldownMinutes - dayjs().diff(lastDatabaseResizeAt, 'minutes'))
   const isAbleToResizeDatabase = timeTillNextAvailableDatabaseResize <= 0
   const formattedTimeTillNextAvailableResize =
     timeTillNextAvailableDatabaseResize < 60
@@ -157,7 +162,7 @@ const DiskSizeConfigurationModal = ({
                     You cannot manually expand the disk size any more than {maxDiskSize}GB. If you
                     need more than this, contact us via support for help.
                   </p>
-                  <Button asChild type="default" className="mt-3">
+                  <Button asChild variant="default" className="mt-3">
                     <SupportLink
                       queryParams={{
                         projectRef,
@@ -175,18 +180,18 @@ const DiskSizeConfigurationModal = ({
                 <DialogSection className="w-full space-y-4">
                   <Alert variant={isAbleToResizeDatabase ? 'default' : 'warning'}>
                     <Info size={16} />
-                    <AlertTitle>This operation is only possible every 4 hours</AlertTitle>
+                    <AlertTitle>
+                      Disk modifications are limited to 4 per rolling 24-hour window
+                    </AlertTitle>
                     <AlertDescription>
                       <div className="mb-4">
                         {isAbleToResizeDatabase
-                          ? `Upon updating your disk size, the next disk size update will only be available from ${dayjs().format(
-                              'DD MMM YYYY, HH:mm (ZZ)'
-                            )}`
+                          ? `You can modify disk attributes up to 4 times within a rolling 24-hour window. A new modification can be started as soon as the previous one completes.`
                           : `Your database was last resized at ${dayjs(lastDatabaseResizeAt).format(
                               'DD MMM YYYY, HH:mm (ZZ)'
-                            )}. You can resize your database again in approximately ${formattedTimeTillNextAvailableResize}`}
+                            )}. You've reached the disk modification limit for now — you can resize again in approximately ${formattedTimeTillNextAvailableResize}.`}
                       </div>
-                      <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
+                      <Button asChild variant="default" iconRight={<ExternalLink size={14} />}>
                         <Link href={`${DOCS_URL}/guides/platform/database-size#disk-management`}>
                           Read more about disk management
                         </Link>
@@ -220,13 +225,13 @@ const DiskSizeConfigurationModal = ({
                   </Form>
                 </DialogSection>
                 <DialogFooter>
-                  <Button type="default" onClick={() => hideModal(false)}>
+                  <Button variant="default" onClick={() => hideModal(false)}>
                     Cancel
                   </Button>
                   <Button
                     form={formId}
-                    htmlType="submit"
-                    type="primary"
+                    type="submit"
+                    variant="primary"
                     disabled={!isAbleToResizeDatabase || isUpdatingDiskSize || !isDirty || loading}
                     loading={isUpdatingDiskSize || loading}
                   >
@@ -256,7 +261,7 @@ const DiskSizeConfigurationModal = ({
                   disable your spend cap.
                 </p>
               )}
-              <Button asChild type="default" className="mt-3">
+              <Button asChild variant="default" className="mt-3">
                 <Link
                   href={`/org/${organization?.slug}/billing?panel=${
                     hasAccessToDiskModifications === false ? 'subscriptionPlan' : 'costControl'

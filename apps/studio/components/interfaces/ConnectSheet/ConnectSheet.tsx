@@ -12,7 +12,7 @@ import { useAvailableConnectModes } from './useAvailableConnectModes'
 import { useConnectSheetParams } from './useConnectSheetParams'
 import { useConnectSheetShortcut } from './useConnectSheetShortcut'
 import { useConnectState } from './useConnectState'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useTrack } from '@/lib/telemetry/track'
@@ -159,18 +159,16 @@ export const ConnectSheet = () => {
     PermissionAction.READ,
     'service_api_keys'
   )
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
-  const { anonKey, publishableKey } = canReadAPIKeys
-    ? getKeys(apiKeys)
-    : { anonKey: null, publishableKey: null }
+  const { data: apiKeysData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
 
   const projectKeys: ProjectKeys = useMemo(() => {
+    const { anonKey, publishableKey } = apiKeysData ?? {}
     return {
       apiUrl: endpoint,
       anonKey: anonKey?.api_key ?? null,
       publishableKey: publishableKey?.api_key ?? null,
     }
-  }, [endpoint, anonKey?.api_key, publishableKey?.api_key])
+  }, [endpoint, apiKeysData])
 
   const availableModes = useMemo(
     () => schema.modes.filter((m) => availableModeIds.includes(m.id)),
@@ -224,14 +222,16 @@ export const ConnectSheet = () => {
             />
           </div>
 
-          <div className="border-b p-8">
-            <ConnectConfigSection
-              state={state}
-              activeFields={activeFields}
-              onFieldChange={handleFieldChange}
-              getFieldOptions={getFieldOptions}
-            />
-          </div>
+          {activeFields.length > 0 && (
+            <div className="border-b p-8">
+              <ConnectConfigSection
+                state={state}
+                activeFields={activeFields}
+                onFieldChange={handleFieldChange}
+                getFieldOptions={getFieldOptions}
+              />
+            </div>
+          )}
 
           <ConnectStepsSection steps={resolvedSteps} state={state} projectKeys={projectKeys} />
         </div>

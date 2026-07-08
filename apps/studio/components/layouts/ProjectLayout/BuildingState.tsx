@@ -7,7 +7,7 @@ import { Badge, Button } from 'ui'
 import { ClientLibrary } from '@/components/interfaces/Home/ClientLibrary'
 import { ExampleProject } from '@/components/interfaces/Home/ExampleProject'
 import { EXAMPLE_PROJECTS } from '@/components/interfaces/Home/Home.constants'
-import { APIKeys } from '@/components/interfaces/Home/NewProjectPanel/APIKeys'
+import { APIKeys } from '@/components/interfaces/Project/APIKeys'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { useInvalidateProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
 import { useInvalidateProjectDetailsQuery } from '@/data/projects/project-detail-query'
@@ -124,7 +124,7 @@ const BuildingState = () => {
                           If your dashboard hasn't connected within 2 minutes, you can open a
                           support ticket.
                         </p>
-                        <Button asChild type="default">
+                        <Button asChild variant="default">
                           <SupportLink>Contact support team</SupportLink>
                         </Button>
                       </>

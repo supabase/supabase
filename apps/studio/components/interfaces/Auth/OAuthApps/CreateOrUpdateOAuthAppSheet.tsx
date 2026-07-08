@@ -330,7 +330,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                                     />
                                     {projectRef ? (
                                       <Button
-                                        type="default"
+                                        variant="default"
                                         size="tiny"
                                         icon={<Storage strokeWidth={1.5} />}
                                         className="absolute right-1 top-1/2 h-6 w-6 -translate-y-1/2 justify-center overflow-hidden px-1 transition-all duration-150 group-hover:w-36 group-focus-within:w-36 [&_span]:hidden group-hover:[&_span]:block group-focus-within:[&_span]:block"
@@ -344,7 +344,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                                   </div>
                                   {field.value ? (
                                     <Button
-                                      type="default"
+                                      variant="default"
                                       size="tiny"
                                       icon={<Trash2 size={12} />}
                                       onClick={handleRemoveLogo}
@@ -409,7 +409,7 @@ export const CreateOrUpdateOAuthAppSheet = ({
                               />
 
                               <Button
-                                type="default"
+                                variant="default"
                                 onClick={handleRegenerateSecret}
                                 className="w-min"
                                 disabled={isRegenerating}
@@ -516,10 +516,10 @@ export const CreateOrUpdateOAuthAppSheet = ({
             </Form>
           </SheetSection>
           <SheetFooter>
-            <Button type="default" disabled={isCreating || isUpdating} onClick={onClose}>
+            <Button variant="default" disabled={isCreating || isUpdating} onClick={onClose}>
               Cancel
             </Button>
-            <Button htmlType="submit" form={FORM_ID} loading={isCreating || isUpdating}>
+            <Button type="submit" form={FORM_ID} loading={isCreating || isUpdating}>
               {isEditMode ? 'Update app' : 'Create app'}
             </Button>
           </SheetFooter>

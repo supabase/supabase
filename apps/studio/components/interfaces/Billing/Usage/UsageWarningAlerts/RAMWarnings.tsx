@@ -27,10 +27,10 @@ export const RAMWarnings = ({
           larger compute add-on.
         </AlertDescription>
         <div className="mt-3 flex items-center space-x-2">
-          <Button asChild type="default">
+          <Button asChild variant="default">
             <Link href={`${DOCS_URL}/guides/troubleshooting/exhaust-ram`}>Learn more</Link>
           </Button>
-          <Button asChild type="warning">
+          <Button asChild variant="warning">
             <Link href={upgradeUrl}>
               {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
             </Link>
@@ -51,10 +51,10 @@ export const RAMWarnings = ({
           larger compute add-on.
         </AlertDescription>
         <div className="mt-3 flex items-center space-x-2">
-          <Button asChild type="default">
+          <Button asChild variant="default">
             <Link href={`${DOCS_URL}/guides/troubleshooting/high-cpu-usage`}>Learn more</Link>
           </Button>
-          <Button asChild type="danger">
+          <Button asChild variant="danger">
             <Link href={upgradeUrl}>
               {hasAccessToComputeSizes ? 'Change compute add-on' : 'Upgrade project'}
             </Link>

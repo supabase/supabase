@@ -192,7 +192,7 @@ export const PlanUpdateSidePanel = () => {
         header={
           <div className="flex items-center justify-between w-full">
             <h4>Change subscription plan for {selectedOrganization?.name}</h4>
-            <Button asChild type="default" icon={<ExternalLink />}>
+            <Button asChild variant="default" icon={<ExternalLink />}>
               <a href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
                 Pricing
               </a>
@@ -282,7 +282,7 @@ export const PlanUpdateSidePanel = () => {
                       <p className="text-foreground-light text-sm">{plan.costUnit}</p>
                     </div>
                     {isCurrentPlan ? (
-                      <Button block disabled type="default">
+                      <Button block disabled variant="default">
                         Current plan
                       </Button>
                     ) : !canUpdateSubscription && !isDowngradeOption ? (
@@ -290,7 +290,7 @@ export const PlanUpdateSidePanel = () => {
                     ) : (
                       <ButtonTooltip
                         block
-                        type={isDowngradeOption ? 'default' : 'primary'}
+                        variant={isDowngradeOption ? 'default' : 'primary'}
                         disabled={
                           (!canUpdateSubscription && isDowngradeOption) ||
                           subscription?.plan?.id === 'enterprise' ||

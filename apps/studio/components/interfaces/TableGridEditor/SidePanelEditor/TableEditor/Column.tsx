@@ -152,20 +152,22 @@ export const Column = ({
           {relations.filter((r) => !r.toRemove).length === 0 ? (
             <div className="flex items-center gap-x-1">
               <Button
-                type="dashed"
+                variant="dashed"
                 className="rounded-l-none h-[30px] py-0 px-2"
                 onClick={() => onEditForeignKey()}
               >
                 <Link size={12} />
               </Button>
-
               <div className="h-4 w-px bg-border" />
+
               <Tooltip>
                 <TooltipTrigger asChild>
                   <button
                     onClick={() => {
                       const SENSITIVE_DATA_MARKER = '[SENSITIVE]'
+
                       const isSensitive = !column.isSensitiveData
+
                       let updatedComment = column.comment || ''
 
                       if (isSensitive && !updatedComment.includes(SENSITIVE_DATA_MARKER)) {
@@ -180,6 +182,7 @@ export const Column = ({
                     }}
                     className={cn(
                       'transition cursor-pointer p-1 hover:bg-surface-100 rounded',
+
                       column.isSensitiveData
                         ? 'opacity-100 text-foreground'
                         : 'opacity-50 hover:opacity-100 text-foreground-light'
@@ -196,6 +199,7 @@ export const Column = ({
                     )}
                   </button>
                 </TooltipTrigger>
+
                 <TooltipContent side="bottom">
                   {column.isSensitiveData
                     ? 'Data is masked in grid display. Actual data unchanged in database.'
@@ -206,7 +210,7 @@ export const Column = ({
           ) : (
             <Popover open={open} onOpenChange={setOpen} modal={false}>
               <PopoverTrigger asChild>
-                <Button type="default" className="rounded-l-none h-[30px] py-0 px-2">
+                <Button variant="default" className="rounded-l-none h-[30px] py-0 px-2">
                   <Link size={12} />
                 </Button>
               </PopoverTrigger>
@@ -320,7 +324,7 @@ export const Column = ({
             size="small"
             value={column.defaultValue ?? ''}
             disabled={column.format.includes('int') && column.isIdentity}
-            className={`rounded-sm bg-surface-100 lg:gap-0 ${
+            className={`rounded-sm lg:gap-0 ${
               column.format.includes('int') && column.isIdentity ? 'opacity-50' : ''
             }`}
             suggestions={suggestions}

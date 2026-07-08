@@ -8,7 +8,7 @@ import {
   ReportQueryDb,
 } from '@/components/interfaces/Reports/Reports.types'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'

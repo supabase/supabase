@@ -3,8 +3,8 @@ import { QueryClient, queryOptions, useQuery } from '@tanstack/react-query'
 
 import { tableEditorKeys } from './keys'
 import { Entity } from './table-editor-types'
-import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from '@/types'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type TableEditorArgs = {
   id?: number
@@ -38,7 +38,7 @@ export async function getTableEditor(
 }
 
 export type TableEditorData = Awaited<ReturnType<typeof getTableEditor>>
-export type TableEditorError = ExecuteSqlError
+export type TableEditorError = ResponseError
 
 export const useTableEditorQuery = <TData = TableEditorData>(
   { projectRef, connectionString, id }: TableEditorVariables,

@@ -11,18 +11,25 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { useAuthorizedAppRevokeMutation } from '@/data/oauth/authorized-app-revoke-mutation'
 import type { AuthorizedApp } from '@/data/oauth/authorized-apps-query'
 
 export interface RevokeAppModalProps {
   selectedApp?: AuthorizedApp
+  /** Optional Organization slug override for routes without a `slug` param (e.g. project integrations). */
+  orgSlug?: string
   onClose: () => void
 }
 
-export const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
-  const { slug } = useParams()
+export const RevokeAppModal = ({
+  selectedApp,
+  orgSlug: slugOverride,
+  onClose,
+}: RevokeAppModalProps) => {
+  const { slug: slugParam } = useParams()
+  const orgSlug = slugOverride ?? slugParam
   const { mutateAsync: revokeAuthorizedApp } = useAuthorizedAppRevokeMutation({
     onSuccess: () => {
       toast.success(`Successfully revoked the app "${selectedApp?.name}"`)
@@ -31,9 +38,9 @@ export const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) =>
   })
 
   const onConfirmDelete = async () => {
-    if (!slug) return console.error('Slug is required')
+    if (!orgSlug) return console.error('Organization slug is required')
     if (!selectedApp?.id) return console.error('App ID is required')
-    await revokeAuthorizedApp({ slug, id: selectedApp?.id })
+    await revokeAuthorizedApp({ orgSlug, id: selectedApp?.id })
   }
 
   return (

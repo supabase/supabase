@@ -14,23 +14,18 @@ Dashboard backups are only available for older projects that still use logical b
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
   chevronAlign="right"
   justified
   size="medium"
   className="text-foreground-light mt-8 mb-6"
 >
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
+  <AccordionItem
       header="Install Postgres and psql"
       id="install-postgres"
     >
       <$Partial path="postgres_installation.mdx" />
     </AccordionItem>
-
-  </div>
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
+  <AccordionItem
       header="Create and configure a new project"
       id="create-project"
     >
@@ -52,7 +47,6 @@ Dashboard backups are only available for older projects that still use logical b
       </StepHikeCompact>
     </AccordionItem>
 
-  </div>
 </Accordion>
 
 ## Things to keep in mind

@@ -16,6 +16,7 @@ import {
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { getExposedSchemaCounts } from './ExposedSchemaSelector.utils'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
@@ -30,13 +31,17 @@ export const internalSchemasCannotExpose = new Set(
 )
 
 interface ExposedSchemaSelectorProps {
-  disabled?: boolean
+  /**
+   * When true the dropdown can still be opened to inspect which schemas are exposed (e.g.
+   * self-hosted, where schemas are managed via PGRST_DB_SCHEMAS), but schemas can't be toggled.
+   */
+  readOnly?: boolean
   selectedSchemas: string[]
   onToggleSchema: (schema: string) => void
 }
 
 export const ExposedSchemaSelector = ({
-  disabled = false,
+  readOnly = false,
   selectedSchemas,
   onToggleSchema,
 }: ExposedSchemaSelectorProps) => {
@@ -68,22 +73,25 @@ export const ExposedSchemaSelector = ({
   )
 
   const selectedSet = useMemo(() => new Set(selectedSchemas), [selectedSchemas])
-  const selectedCount = schemas.filter((s) => selectedSet.has(s.name)).length
+  const { selectedCount, totalCount } = getExposedSchemaCounts({
+    visibleSchemas: schemas.map((s) => s.name),
+    selectedSchemas,
+    protectedSchemas: internalSchemasCannotExpose,
+  })
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger asChild>
         <Button
           size="small"
-          disabled={disabled}
-          type="default"
+          variant="default"
           className="w-full [&>span]:w-full pr-1! space-x-1"
           iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
         >
           <div className="w-full flex gap-1">
             <p className="text-foreground-lighter">
               {isSuccess
-                ? `${selectedCount} of ${schemas.length} ${pluralize(schemas.length, 'schema')} exposed`
+                ? `${selectedCount} of ${totalCount} ${pluralize(totalCount, 'schema')} exposed`
                 : 'Loading schemas...'}
             </p>
           </div>
@@ -124,8 +132,9 @@ export const ExposedSchemaSelector = ({
                       <CommandItem
                         key={schema}
                         value={schema}
-                        className="cursor-pointer w-full"
+                        className={cn('w-full', readOnly ? 'cursor-default' : 'cursor-pointer')}
                         onSelect={() => {
+                          if (readOnly) return
                           onToggleSchema(schema)
                         }}
                       >
@@ -153,8 +162,9 @@ export const ExposedSchemaSelector = ({
                         <CommandItem
                           key={schema.id}
                           value={schema.name}
-                          className="cursor-pointer w-full"
+                          className={cn('w-full', readOnly ? 'cursor-default' : 'cursor-pointer')}
                           onSelect={() => {
+                            if (readOnly) return
                             onToggleSchema(schema.name)
                           }}
                         >

@@ -166,6 +166,22 @@ const ormConfigureStep: StepDefinition = {
   content: '{{orm}}',
 }
 
+const serverInstallStep: StepDefinition = {
+  id: 'server-install',
+  title: 'Install package',
+  description:
+    'Add @supabase/server to your backend or API framework of choice. On Supabase Edge Functions you can import it directly, no install needed.',
+  content: 'server/install',
+}
+
+const serverEnvStep: StepDefinition = {
+  id: 'server-env',
+  title: 'Set environment variables',
+  description:
+    'Copy these into your environment so you can verify users and use the client/admin supabase-js library from the context of your handler. On Supabase Edge Functions they are injected automatically.',
+  content: 'server/env',
+}
+
 const skillsInstallStep: StepDefinition = {
   id: 'install-skills',
   title: 'Install Agent Skills (Optional)',
@@ -173,6 +189,45 @@ const skillsInstallStep: StepDefinition = {
     'Agent Skills give AI coding tools ready-made instructions, scripts, and resources for working with Supabase more accurately and efficiently.',
   content: 'steps/skills-install',
 }
+
+const serverSkillsInstallStep: StepDefinition = {
+  id: 'install-skills',
+  title: 'Install the Supabase Server skill (Optional)',
+  description:
+    'Gives AI coding tools ready-made instructions for building APIs with @supabase/server.',
+  content: 'steps/skills-install',
+}
+
+// ============================================================================
+// Mode Prompts
+// ============================================================================
+
+// Agent-ready prompt for the Server mode. Intentionally omits the project's
+// actual keys — the secret should never be pasted into an LLM prompt; users
+// copy the real values from the env step.
+const serverConnectPrompt = `Set up the @supabase/server SDK in this project.
+
+Install it:
+npm install @supabase/server
+
+It reads these environment variables (copy the real values from the Supabase dashboard's Connect dialog — never commit the secret key):
+- SUPABASE_URL
+- SUPABASE_PUBLISHABLE_KEY
+- SUPABASE_SECRET_KEY
+- SUPABASE_JWKS_URL (used to verify user JWTs)
+
+Create request handlers with \`withSupabase\` from "@supabase/server". It validates auth and provides an RLS-scoped client (\`ctx.supabase\`) and an admin client that bypasses RLS (\`ctx.supabaseAdmin\`). Example:
+
+import { withSupabase } from "@supabase/server"
+
+export default {
+  fetch: withSupabase({ auth: "user" }, async (_req, ctx) => {
+    const { data } = await ctx.supabase.from("todos").select()
+    return Response.json(data)
+  }),
+}
+
+Auth modes: "user" (valid JWT), "publishable" (publishable key), "secret" (secret key), "none". On Supabase Edge Functions these env vars are injected automatically; for non-"user" auth modes, set \`verify_jwt = false\` for the function in supabase/config.toml.`
 
 // ============================================================================
 // Main Schema
@@ -188,6 +243,13 @@ export const connectSchema: ConnectSchema = {
       label: 'Framework',
       description: 'Use a client library',
       fields: ['framework', 'frameworkVariant', 'library', 'frameworkUi'],
+    },
+    {
+      id: 'server',
+      label: 'Server',
+      description: 'Build APIs',
+      fields: [],
+      prompt: serverConnectPrompt,
     },
     {
       id: 'direct',
@@ -386,6 +448,7 @@ export const connectSchema: ConnectSchema = {
           DEFAULT: [mcpConfigureStep, skillsInstallStep],
         },
       },
+      server: [serverInstallStep, serverEnvStep, serverSkillsInstallStep],
       DEFAULT: [skillsInstallStep],
     },
   },

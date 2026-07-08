@@ -2,7 +2,7 @@ import { FileText, Loader } from 'lucide-react'
 import { DragEvent, useCallback, useRef, useState, type ChangeEvent } from 'react'
 import { Button, cn } from 'ui'
 
-import SparkBar from '@/components/ui/SparkBar'
+import { SparkBar } from '@/components/ui/SparkBar'
 
 interface SpreadSheetFileUploadProps {
   parseProgress: number
@@ -122,7 +122,7 @@ function FileDetails({ file, parseProgress, removeFile }: FileDetailsProps) {
         <p className="text-sm text-foreground">{file.name}</p>
       </div>
       {parseProgress === 100 ? (
-        <Button type="outline" onClick={removeFile}>
+        <Button variant="outline" onClick={removeFile}>
           Remove File
         </Button>
       ) : (

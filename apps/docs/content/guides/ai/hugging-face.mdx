@@ -91,7 +91,7 @@ Create a file called `.env.local` to store your Hugging Face access token:
 HUGGING_FACE_ACCESS_TOKEN=<your-token-here>
 ```
 
-Let's modify the Edge Function to import Hugging Face's inference client and perform a `text-to-image` request:
+Modify the Edge Function to import Hugging Face's inference client and perform a `text-to-image` request:
 
 ```ts
 import { HfInference } from 'https://esm.sh/@huggingface/inference@2.3.2'
@@ -125,7 +125,7 @@ Deno.serve(async (req) => {
 
 1. The `image` result returned from the API will be a `Blob`. We can pass the `Blob` directly into a `new Response()` which will automatically set the content type and body of the response from the `image`.
 
-Finally let's serve the Edge Function locally to test it:
+Finally, serve the Edge Function locally to test it:
 
 ```shell
 supabase functions serve --env-file .env.local --no-verify-jwt

@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, NavMenu, NavMenuItem } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useIsPgDeltaDiffEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -390,7 +390,7 @@ const MergePage: NextPageWithLayout = () => {
                 overrideAction={
                   hasCurrentWorkflowFailed ? (
                     <Button
-                      type="default"
+                      variant="default"
                       asChild
                       icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
                       className="shrink-0"
@@ -399,7 +399,7 @@ const MergePage: NextPageWithLayout = () => {
                     </Button>
                   ) : hasCurrentWorkflowCompleted ? (
                     <Button
-                      type="default"
+                      variant="default"
                       onClick={handleCloseBranch}
                       loading={isDeleting}
                       icon={<X size={16} strokeWidth={1.5} />}

@@ -325,6 +325,226 @@ describe('SQLEditor.utils:updateWithoutWhere', () => {
       expect(checkDestructiveQuery(query), `Query ${query} should be destructive`).toBe(true)
     })
   })
+
+  it('should catch EXECUTE with DROP in string literal', () => {
+    expect(checkDestructiveQuery(`EXECUTE 'DROP TABLE users';`)).toBe(true)
+  })
+
+  it('should catch EXECUTE with DELETE in string literal', () => {
+    expect(checkDestructiveQuery(`EXECUTE 'DELETE FROM users';`)).toBe(true)
+  })
+
+  it('should catch EXECUTE with TRUNCATE in string literal', () => {
+    expect(checkDestructiveQuery(`EXECUTE 'TRUNCATE TABLE users';`)).toBe(true)
+  })
+
+  it('should catch EXECUTE format with DROP', () => {
+    expect(checkDestructiveQuery(`EXECUTE format('DROP TABLE %I', table_name);`)).toBe(true)
+  })
+
+  it('should catch EXECUTE format with DELETE', () => {
+    expect(checkDestructiveQuery(`EXECUTE format('DELETE FROM %I', table_name);`)).toBe(true)
+  })
+
+  it('should catch EXECUTE format with TRUNCATE', () => {
+    expect(checkDestructiveQuery(`EXECUTE format('TRUNCATE TABLE %I', table_name);`)).toBe(true)
+  })
+
+  it('should catch EXECUTE with string concatenation containing DROP', () => {
+    expect(checkDestructiveQuery(`EXECUTE 'DROP TABLE ' || table_name;`)).toBe(true)
+  })
+
+  it('should catch EXECUTE with string concatenation containing DELETE', () => {
+    expect(checkDestructiveQuery(`EXECUTE 'DELETE FROM ' || table_name;`)).toBe(true)
+  })
+
+  it('should catch DO block with EXECUTE DROP', () => {
+    expect(
+      checkDestructiveQuery(stripIndent`
+        DO $$
+        BEGIN
+          EXECUTE 'DROP TABLE users';
+        END
+        $$;
+      `)
+    ).toBe(true)
+  })
+
+  it('should catch DO block with EXECUTE format DROP', () => {
+    expect(
+      checkDestructiveQuery(stripIndent`
+        DO $$
+        BEGIN
+          FOR rec IN SELECT tablename FROM pg_tables WHERE schemaname = 'public' LOOP
+            EXECUTE format('DROP TABLE %I', rec.tablename);
+          END LOOP;
+        END
+        $$;
+      `)
+    ).toBe(true)
+  })
+
+  it('should catch DO block with multiple EXECUTE format DROPs', () => {
+    expect(
+      checkDestructiveQuery(stripIndent`
+        DO $$
+        DECLARE
+          func_name text;
+        BEGIN
+          FOR func_name IN
+            SELECT routine_name FROM information_schema.routines WHERE routine_schema = 'public'
+          LOOP
+            EXECUTE format('DROP FUNCTION %I', func_name);
+          END LOOP;
+        END
+        $$;
+      `)
+    ).toBe(true)
+  })
+
+  it('should catch lowercase execute with drop', () => {
+    expect(checkDestructiveQuery(`execute 'drop table users';`)).toBe(true)
+  })
+
+  it('should catch mixed case EXECUTE Format with DROP', () => {
+    expect(checkDestructiveQuery(`EXECUTE Format('DROP TABLE users');`)).toBe(true)
+  })
+
+  it('should not flag EXECUTE with safe SQL', () => {
+    expect(checkDestructiveQuery(`EXECUTE 'SELECT * FROM users';`)).toBe(false)
+  })
+
+  it('should not flag EXECUTE with INSERT', () => {
+    expect(checkDestructiveQuery(`EXECUTE 'INSERT INTO users (name) VALUES (''test'')';`)).toBe(
+      false
+    )
+  })
+
+  it('should not flag EXECUTE with UPDATE and WHERE', () => {
+    expect(checkDestructiveQuery(`EXECUTE 'UPDATE users SET name = ''test'' WHERE id = 1';`)).toBe(
+      false
+    )
+  })
+
+  it('should catch EXECUTE IMMEDIATE with DROP', () => {
+    expect(checkDestructiveQuery(`EXECUTE IMMEDIATE 'DROP TABLE users';`)).toBe(true)
+  })
+
+  it('should catch EXECUTE IMMEDIATE with DELETE', () => {
+    expect(checkDestructiveQuery(`EXECUTE IMMEDIATE 'DELETE FROM users';`)).toBe(true)
+  })
+
+  it('should catch EXECUTE IMMEDIATE with TRUNCATE', () => {
+    expect(checkDestructiveQuery(`EXECUTE IMMEDIATE 'TRUNCATE TABLE users';`)).toBe(true)
+  })
+
+  it('should catch OPEN cursor FOR EXECUTE with DROP', () => {
+    expect(checkDestructiveQuery(`OPEN ref FOR EXECUTE 'DROP TABLE users';`)).toBe(true)
+  })
+
+  it('should catch OPEN cursor FOR EXECUTE format with DELETE', () => {
+    expect(checkDestructiveQuery(`OPEN ref FOR EXECUTE format('DELETE FROM %I', tbl);`)).toBe(true)
+  })
+
+  it('should catch OPEN cursor FOR EXECUTE with string concat', () => {
+    expect(checkDestructiveQuery(`OPEN ref FOR EXECUTE 'TRUNCATE TABLE ' || tbl;`)).toBe(true)
+  })
+
+  it('should catch RETURN QUERY EXECUTE with DROP', () => {
+    expect(checkDestructiveQuery(`RETURN QUERY EXECUTE 'DROP TABLE users';`)).toBe(true)
+  })
+
+  it('should catch RETURN QUERY EXECUTE format with DELETE', () => {
+    expect(checkDestructiveQuery(`RETURN QUERY EXECUTE format('DELETE FROM %I', tbl);`)).toBe(true)
+  })
+
+  it('should catch EXECUTE with dollar-quoted string containing DROP', () => {
+    expect(checkDestructiveQuery(`EXECUTE $sql$DROP TABLE users$sql$;`)).toBe(true)
+  })
+
+  it('should catch EXECUTE with dollar-quoted string containing TRUNCATE', () => {
+    expect(checkDestructiveQuery(`EXECUTE $body$TRUNCATE TABLE logs$body$;`)).toBe(true)
+  })
+
+  it('should catch EXECUTE concat with DROP', () => {
+    expect(checkDestructiveQuery(`EXECUTE concat('DROP TABLE ', 'users');`)).toBe(true)
+  })
+
+  it('should catch EXECUTE concat_ws with DELETE', () => {
+    expect(checkDestructiveQuery(`EXECUTE concat_ws(' ', 'DELETE FROM', 'users');`)).toBe(true)
+  })
+
+  it('should catch EXECUTE with E-string escape containing DROP', () => {
+    expect(checkDestructiveQuery(`EXECUTE E'DROP TABLE users';`)).toBe(true)
+  })
+
+  it('should catch EXECUTE with ALTER TABLE DROP COLUMN', () => {
+    expect(checkDestructiveQuery(`EXECUTE 'ALTER TABLE users DROP COLUMN email';`)).toBe(true)
+  })
+
+  it('should catch EXECUTE format with ALTER TABLE DROP COLUMN', () => {
+    expect(
+      checkDestructiveQuery(`EXECUTE format('ALTER TABLE %I DROP COLUMN %I', 'users', 'email');`)
+    ).toBe(true)
+  })
+
+  it('should catch EXECUTE IMMEDIATE with ALTER TABLE DROP COLUMN', () => {
+    expect(checkDestructiveQuery(`EXECUTE IMMEDIATE 'ALTER TABLE users DROP COLUMN email';`)).toBe(
+      true
+    )
+  })
+
+  it('should catch OPEN cursor FOR EXECUTE with ALTER TABLE DROP COLUMN', () => {
+    expect(
+      checkDestructiveQuery(`OPEN ref FOR EXECUTE 'ALTER TABLE users DROP COLUMN email';`)
+    ).toBe(true)
+  })
+
+  it('should catch RETURN QUERY EXECUTE with ALTER TABLE DROP COLUMN', () => {
+    expect(
+      checkDestructiveQuery(`RETURN QUERY EXECUTE 'ALTER TABLE users DROP COLUMN email';`)
+    ).toBe(true)
+  })
+
+  it('should catch EXECUTE dollar-quoted with ALTER TABLE DROP COLUMN', () => {
+    expect(checkDestructiveQuery(`EXECUTE $sql$ALTER TABLE users DROP COLUMN email$sql$;`)).toBe(
+      true
+    )
+  })
+
+  it('should catch EXECUTE concat with ALTER TABLE DROP COLUMN', () => {
+    expect(
+      checkDestructiveQuery(`EXECUTE concat('ALTER TABLE ', 'users DROP COLUMN email');`)
+    ).toBe(true)
+  })
+
+  it('should catch DO block with EXECUTE ALTER TABLE DROP COLUMN', () => {
+    expect(
+      checkDestructiveQuery(stripIndent`
+        DO $$
+        BEGIN
+          EXECUTE 'ALTER TABLE users DROP COLUMN email';
+        END
+        $$;
+      `)
+    ).toBe(true)
+  })
+
+  it('should not flag ALTER TABLE without DROP COLUMN', () => {
+    expect(checkDestructiveQuery(`EXECUTE 'ALTER TABLE users ADD COLUMN email text';`)).toBe(false)
+  })
+
+  it('should not flag variable assignment with safe SQL', () => {
+    expect(checkDestructiveQuery(`sql := 'SELECT * FROM users';`)).toBe(false)
+  })
+
+  it('should not flag OPEN cursor FOR EXECUTE with safe SQL', () => {
+    expect(checkDestructiveQuery(`OPEN ref FOR EXECUTE 'SELECT * FROM users';`)).toBe(false)
+  })
+
+  it('should not flag RETURN QUERY EXECUTE with safe SQL', () => {
+    expect(checkDestructiveQuery(`RETURN QUERY EXECUTE 'SELECT * FROM users';`)).toBe(false)
+  })
 })
 
 describe('SQLEditor.utils:getCreateTablesMissingRLS', () => {

@@ -12,7 +12,7 @@ import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { ChevronUp, Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -92,11 +92,19 @@ import {
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
-import { getSqlEditorV2StateSnapshot, useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorDiffRequestSnapshot } from '@/state/sql-editor/sql-editor-diff-request'
+import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
+import {
+  getSqlEditorV2StateSnapshot,
+  useSqlEditorV2StateSnapshot,
+} from '@/state/sql-editor/sql-editor-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 // Load the monaco editor client-side only (does not behave well server-side)
-const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
+const MonacoEditor = dynamic(
+  () => import('./MonacoEditor').then(({ MonacoEditor }) => MonacoEditor),
+  { ssr: false }
+)
 const DiffEditor = dynamic(
   () => import('../../ui/DiffEditor').then(({ DiffEditor }) => DiffEditor),
   { ssr: false }
@@ -116,10 +124,14 @@ export const SQLEditor = () => {
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const sessionSnap = useSqlEditorSessionSnapshot()
+  const diffRequest = useSqlEditorDiffRequestSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
-  const { isHipaaProjectDisallowed } = useOrgAiOptInLevel()
-  const showPrettyExplain = useFlag('ShowPrettyExplain')
+  const { aiOptInLevel } = useOrgAiOptInLevel()
+
+  // [Ali] Kill switch to hide the SQL Editor Explain tab and its entry points
+  const disablePrettyExplain = useFlag('DisablePrettyExplainOnSqlEditor')
 
   const {
     sourceSqlDiff,
@@ -146,6 +158,9 @@ export const SQLEditor = () => {
   const [potentialIssues, setPotentialIssues] = useState<PotentialIssues>()
 
   const [showWidget, setShowWidget] = useState(false)
+  // Bumped on every editor mount (including the keyed remount on snippet switch)
+  // so a diff request that arrived before the editor was ready gets re-processed.
+  const [editorMountCount, setEditorMountCount] = useState(0)
   const [activeUtilityTab, setActiveUtilityTab] = useState<string>('results')
 
   const refocusEditor = useCallback(() => {
@@ -191,8 +206,8 @@ export const SQLEditor = () => {
   // the id is stable across renders - it depends either on the url or on the memoized generated id
   const id = !urlId || urlId === 'new' ? generatedId : urlId
 
-  const limit = snapV2.limit
-  const results = snapV2.results[id]?.[0]
+  const limit = sessionSnap.limit
+  const results = sessionSnap.results[id]?.[0]
   const snippetIsLoading = !(
     id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined
   )
@@ -221,10 +236,10 @@ export const SQLEditor = () => {
   const { mutate: execute, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
       if (id) {
-        snapV2.addResult(id, data.result, vars.autoLimit)
+        sessionSnap.addResult(id, data.result, vars.autoLimit)
 
-        if (showPrettyExplain && isExplainQuery(data.result)) {
-          snapV2.addExplainResult(id, data.result)
+        if (!disablePrettyExplain && isExplainQuery(data.result)) {
+          sessionSnap.addExplainResult(id, data.result)
           setActiveUtilityTab('explain')
         } else if (activeUtilityTab === 'explain') {
           // If on Explain tab but ran a non-EXPLAIN query, switch to Results tab
@@ -269,7 +284,7 @@ export const SQLEditor = () => {
           }
         }
 
-        snapV2.addResultError(id, error, vars.autoLimit)
+        sessionSnap.addResultError(id, error, vars.autoLimit)
       }
 
       refocusEditorAfterRunIfNeeded()
@@ -279,13 +294,13 @@ export const SQLEditor = () => {
   const { mutate: executeExplain, isPending: isExplainExecuting } = useExecuteSqlMutation({
     onSuccess(data) {
       if (id) {
-        snapV2.addExplainResult(id, data.result)
+        sessionSnap.addExplainResult(id, data.result)
         setActiveUtilityTab('explain')
       }
     },
     onError(error) {
       if (id) {
-        snapV2.addExplainResultError(id, error)
+        sessionSnap.addExplainResultError(id, error)
         setActiveUtilityTab('explain')
       }
     },
@@ -392,7 +407,9 @@ export const SQLEditor = () => {
       }
 
       if (
-        !isHipaaProjectDisallowed &&
+        // Don't auto-generate a title when the org has disabled AI or is a HIPAA project,
+        // as that would silently forward the query to the AI provider without consent
+        aiOptInLevel !== 'disabled' &&
         snippet?.snippet.name.startsWith(untitledSnippetTitle) &&
         IS_PLATFORM
       ) {
@@ -440,7 +457,7 @@ export const SQLEditor = () => {
       id,
       isExecuting,
       project,
-      isHipaaProjectDisallowed,
+      aiOptInLevel,
       execute,
       getImpersonatedRoleState,
       setAiTitle,
@@ -478,7 +495,7 @@ export const SQLEditor = () => {
       // Check for multiple statements - EXPLAIN only works on a single statement
       const statements = splitSqlStatements(sql)
       if (statements.length > 1) {
-        snapV2.addExplainResultError(id, {
+        sessionSnap.addExplainResultError(id, {
           message:
             'EXPLAIN only works on a single SQL statement. Please select just one query to analyze.',
         })
@@ -529,10 +546,11 @@ export const SQLEditor = () => {
     databaseSelectorState.selectedDatabaseId,
     databases,
     lineHighlights,
-    snapV2,
+    sessionSnap,
   ])
 
   useShortcut(SHORTCUT_IDS.SQL_EDITOR_EXPLAIN, executeExplainQuery, {
+    enabled: !disablePrettyExplain,
     registerInCommandMenu: true,
   })
 
@@ -561,6 +579,8 @@ export const SQLEditor = () => {
   )
 
   const onMount = (editor: IStandaloneCodeEditor) => {
+    setEditorMountCount((count) => count + 1)
+
     const tabId = createTabId('sql', { id })
     const tabData = tabs.tabsMap[tabId]
 
@@ -575,7 +595,7 @@ export const SQLEditor = () => {
 
   const buildDebugPrompt = useCallback(() => {
     const snippet = snapV2.snippets[id]
-    const result = snapV2.results[id]?.[0]
+    const result = sessionSnap.results[id]?.[0]
     const sql = (snippet?.snippet.content?.unchecked_sql ?? '')
       .replace(sqlAiDisclaimerComment, '')
       .trim()
@@ -583,12 +603,12 @@ export const SQLEditor = () => {
     const prompt = `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`
 
     return `${prompt}\n\nSQL Query:\n\`\`\`sql\n${sql}\n\`\`\``
-  }, [id, snapV2.results, snapV2.snippets])
+  }, [id, sessionSnap.results, snapV2.snippets])
 
   const onDebug = useCallback(async () => {
     try {
       const snippet = snapV2.snippets[id]
-      const result = snapV2.results[id]?.[0]
+      const result = sessionSnap.results[id]?.[0]
       openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
       aiSnap.newChat({
         name: 'Debug SQL snippet',
@@ -608,7 +628,7 @@ export const SQLEditor = () => {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, snapV2.results, snapV2.snippets])
+  }, [id, sessionSnap.results, snapV2.snippets])
 
   const acceptAiHandler = useCallback(async () => {
     try {
@@ -816,30 +836,40 @@ export const SQLEditor = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isSuccessReadReplicas, databases, ref])
 
-  useEffect(() => {
-    if (snapV2.diffContent !== undefined) {
-      const { diffType, sql }: { diffType: DiffType; sql: string } = snapV2.diffContent
-      const editorModel = editorRef.current?.getModel()
-      if (!editorModel) return
+  const drainDiffRequest = useEffectEvent(() => {
+    const request = diffRequest.pending
+    if (request === undefined) return
 
-      const existingValue = editorRef.current?.getValue() ?? ''
-      if (existingValue.length === 0) {
-        // if the editor is empty, just copy over the code
-        editorRef.current?.executeEdits('apply-ai-message', [
-          {
-            text: `${sql}`,
-            range: editorModel.getFullModelRange(),
-          },
-        ])
-      } else {
-        const currentSql = editorRef.current?.getValue()
-        const diff = { original: currentSql || '', modified: sql }
-        setSourceSqlDiff(diff)
-        setSelectedDiffType(diffType)
-      }
+    const editorModel = editorRef.current?.getModel()
+    // Editor isn't ready yet; leave the request pending. editorMountCount bumps
+    // on mount and re-runs this effect, so the request applies once mounted.
+    if (!editorModel) return
+
+    const { diffType, sql } = request
+    const existingValue = editorRef.current?.getValue() ?? ''
+    if (existingValue.length === 0) {
+      // if the editor is empty, just copy over the code
+      editorRef.current?.executeEdits('apply-ai-message', [
+        {
+          text: `${sql}`,
+          range: editorModel.getFullModelRange(),
+        },
+      ])
+    } else {
+      const currentSql = editorRef.current?.getValue()
+      const diff = { original: currentSql || '', modified: sql }
+      setSourceSqlDiff(diff)
+      setSelectedDiffType(diffType)
     }
+
+    // One-shot: drain the request so it can't re-apply to a later editor or session.
+    diffRequest.consumeDiffRequest()
+  })
+  useEffect(() => {
+    drainDiffRequest()
+    // until we can upgrade eslint to ignore useEffectEvent
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [snapV2.diffContent])
+  }, [diffRequest.pending, editorMountCount])
 
   // We want to check if the diff editor is mounted and if it is, we want to show the widget
   // We also want to cleanup the widget when the diff editor is closed
@@ -956,6 +986,7 @@ export const SQLEditor = () => {
                       monacoRef={monacoRef}
                       executeQuery={executeQuery}
                       executeExplainQuery={executeExplainQuery}
+                      showExplainAction={!disablePrettyExplain}
                       prettifyQuery={prettifyQuery}
                       onHasSelection={setHasSelection}
                       onMount={onMount}
@@ -1020,6 +1051,7 @@ export const SQLEditor = () => {
                 prettifyQuery={prettifyQuery}
                 executeQuery={executeQueryFromButton}
                 executeExplainQuery={executeExplainQuery}
+                showExplainTab={!disablePrettyExplain}
                 onDebug={onDebug}
                 buildDebugPrompt={buildDebugPrompt}
                 activeTab={activeUtilityTab}
@@ -1059,15 +1091,18 @@ export const SQLEditor = () => {
                 {results.autoLimit !== undefined && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button type="default" iconRight={<ChevronUp size={14} />}>
+                      <Button variant="default" iconRight={<ChevronUp size={14} />}>
                         Limit results to:{' '}
-                        {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === snapV2.limit)?.label}
+                        {
+                          ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === sessionSnap.limit)
+                            ?.label
+                        }
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-40" align="end">
                       <DropdownMenuRadioGroup
-                        value={snapV2.limit.toString()}
-                        onValueChange={(val) => snapV2.setLimit(Number(val))}
+                        value={sessionSnap.limit.toString()}
+                        onValueChange={(val) => sessionSnap.setLimit(Number(val))}
                       >
                         {ROWS_PER_PAGE_OPTIONS.map((option) => (
                           <DropdownMenuRadioItem key={option.label} value={option.value.toString()}>

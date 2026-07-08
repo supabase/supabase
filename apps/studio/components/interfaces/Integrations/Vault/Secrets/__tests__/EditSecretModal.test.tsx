@@ -86,9 +86,10 @@ describe(`EditSecretModal`, () => {
 
     expect(nameInput).toHaveValue(secret.name)
     expect(descriptionInput).toHaveValue(secret.description)
-    expect(valueInput).toHaveAttribute(`type`, `password`)
+    expect(valueInput.tagName).toBe('TEXTAREA')
+    expect((valueInput as any).style.WebkitTextSecurity).toBe('disc')
     await userEvent.click(togglePasswordButton)
-    expect(valueInput).toHaveAttribute(`type`, `text`)
+    expect((valueInput as any).style.WebkitTextSecurity).toBe('')
 
     await userEvent.type(nameInput, `updated-name`)
     await userEvent.clear(descriptionInput)

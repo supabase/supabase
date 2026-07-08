@@ -106,7 +106,7 @@ export const DeleteAccountButton = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button type="danger" loading={!accountEmail}>
+        <Button variant="danger" loading={!accountEmail}>
           Request to delete account
         </Button>
       </DialogTrigger>
@@ -144,7 +144,7 @@ export const DeleteAccountButton = () => {
                   </span>
                 </DialogSection>
                 <DialogFooter>
-                  <Button block type="primary" size="medium" onClick={() => setIsOpen(false)}>
+                  <Button block variant="primary" size="medium" onClick={() => setIsOpen(false)}>
                     Understood
                   </Button>
                 </DialogFooter>
@@ -184,8 +184,8 @@ export const DeleteAccountButton = () => {
                     <Button
                       block
                       size="small"
-                      type="danger"
-                      htmlType="submit"
+                      variant="danger"
+                      type="submit"
                       loading={isPending}
                       disabled={account !== accountEmail || isPending}
                     >

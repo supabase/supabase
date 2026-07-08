@@ -100,7 +100,7 @@ export const PITRSelection = () => {
               </AlertDescription>
               <div className="flex items-center gap-x-2 mt-2">
                 {/* [Joshen] Ideally we have some links to a docs to explain why so */}
-                <Button type="default">
+                <Button variant="default">
                   <Link href={`/project/${ref}/settings/infrastructure`}>
                     Infrastructure settings
                   </Link>

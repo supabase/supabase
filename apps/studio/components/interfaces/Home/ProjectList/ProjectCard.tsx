@@ -70,6 +70,7 @@ export const ProjectCard = ({
     <>
       <li className="list-none h-min">
         <CardButton
+          tabIndex={0}
           linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
           className="h-44 px-0! group pt-5 pb-0 overflow-hidden relative"
           hideChevron
@@ -82,7 +83,7 @@ export const ProjectCard = ({
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
-                          type="text"
+                          variant="text"
                           icon={<MoreVertical size={14} />}
                           className="w-6 h-6 px-0"
                           onClick={(e) => {

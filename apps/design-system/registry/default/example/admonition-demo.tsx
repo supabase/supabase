@@ -9,7 +9,7 @@ export default function AdmonitionDemo() {
       title="OAuth Server is disabled"
       description="Enable OAuth Server to make your project act as an identity provider for
             third-party applications."
-      actions={<Button type="default">OAuth Server Settings</Button>}
+      actions={<Button variant="default">OAuth Server Settings</Button>}
     />
   )
 }

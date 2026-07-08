@@ -51,7 +51,7 @@ import { getURL } from '@/lib/helpers'
 
 export const BillingCustomerDataSchema = z.object({
   tax_id_type: z.string(),
-  tax_id_value: z.string().min(2, {
+  tax_id_value: z.string().trim().min(2, {
     message: 'Tax ID needs to be set.',
   }),
   tax_id_name: z.string(),
@@ -140,7 +140,8 @@ export const NewPaymentMethodElement = forwardRef(
       form.setValue('tax_id_name', name)
     }
 
-    const { tax_id_name, tax_id_value } = form.watch()
+    const { tax_id_name, tax_id_value: rawTaxIdValue } = form.watch()
+    const taxIdValue = rawTaxIdValue?.trim() ?? ''
     const selectedTaxId = TAX_IDS.find((option) => option.name === tax_id_name)
 
     const [purchasingAsBusiness, setPurchasingAsBusiness] = useState(currentTaxId != null)
@@ -149,16 +150,16 @@ export const NewPaymentMethodElement = forwardRef(
     >(undefined)
     useEffect(() => {
       if (!onTaxIdChange) return
-      if (purchasingAsBusiness && selectedTaxId && tax_id_value) {
+      if (purchasingAsBusiness && selectedTaxId && taxIdValue) {
         onTaxIdChange({
           country: getEffectiveTaxCountry(selectedTaxId),
           type: selectedTaxId.type,
-          value: tax_id_value,
+          value: taxIdValue,
         })
       } else {
         onTaxIdChange(null)
       }
-    }, [purchasingAsBusiness, selectedTaxId, tax_id_value, onTaxIdChange])
+    }, [purchasingAsBusiness, selectedTaxId, taxIdValue, onTaxIdChange])
 
     const addressCountry = stripeAddress?.address.country
     const availableTaxIds = useMemo(() => {
@@ -212,7 +213,7 @@ export const NewPaymentMethodElement = forwardRef(
         ? {
             country: getEffectiveTaxCountry(selectedTaxId),
             type: selectedTaxId.type,
-            value: form.getValues('tax_id_value'),
+            value: form.getValues('tax_id_value').trim(),
           }
         : null
     }
@@ -356,9 +357,10 @@ export const NewPaymentMethodElement = forwardRef(
                 />
               </TooltipTrigger>
               <TooltipContent side="top" className="w-72">
-                Select this only if your business is tax-registered. You’ll be asked for a tax ID
-                (e.g. US EIN, VAT, GST), which is required to issue a compliant business invoice. If
-                you’re not tax-registered, leave this unchecked. You’ll still receive a receipt.
+                Check this only if you need a tax ID (e.g. US EIN, VAT, GST) on your invoice. You’ll
+                be asked to enter it, and it’ll appear on a compliant business invoice. If you don’t
+                have a tax ID, or don’t need one shown, leave this unchecked. You’ll still receive a
+                receipt.
               </TooltipContent>
             </Tooltip>
           </div>
@@ -394,7 +396,7 @@ export const NewPaymentMethodElement = forwardRef(
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
-                            type="default"
+                            variant="default"
                             role="combobox"
                             size="medium"
                             aria-expanded={showTaxIDsPopover}

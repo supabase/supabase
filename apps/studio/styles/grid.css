@@ -47,7 +47,7 @@
 /* Cell with unsaved changes - warning (amber) background/text color */
 .rdg-cell.rdg-cell--dirty {
   background-color: hsl(var(--warning-300) / 0.75);
-  color: hsl(var(--warning-default));
+  color: hsl(var(--warning-600));
 }
 
 /* Row pending addition - green background, green text */
@@ -124,7 +124,7 @@
 */
 
 .rdg-header-row {
-  @apply bg-surface-200 select-none border-none;
+  @apply select-none border-none;
 }
 
 .rdg-header-row {
@@ -134,7 +134,7 @@
 }
 
 .rdg-header-row .rdg-cell {
-  @apply bg-surface-200 border-default border-b;
+  @apply bg-dash-canvas border-default border-b;
 }
 
 .rdg-header-row .rdg-cell-frozen:nth-last-child(1 of .rdg-cell-frozen) {
@@ -299,106 +299,6 @@
 }
 
 /*
-  DropdownControl
-*/
-
-.dropdown-control {
-  @apply overflow-auto;
-}
-
-.dropdown-control .sbui-typography {
-  @apply block px-2 py-4;
-}
-
-/*
-  NullValue
-*/
-
-.null-value {
-  @apply block;
-}
-
-/*
-  CheckboxEditor
-*/
-
-.sb-grid-checkbox-editor {
-  @apply flex h-full w-full;
-}
-
-.sb-grid-checkbox-editor__input {
-  @apply h-4 w-4;
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-/*
-  JsonEditor
-*/
-
-.sb-grid-json-editor__trigger {
-  @apply text-grid overflow-hidden text-ellipsis px-2;
-}
-
-/*
-  NumberEditor
-*/
-
-.sb-grid-number-editor {
-  @apply h-full w-full px-2;
-}
-
-/*
-  SelectEditor
-*/
-
-.sb-grid-select-editor {
-  button {
-    @apply border-none rounded-none shadow-none;
-    box-shadow: none !important;
-  }
-}
-
-/*
-  TextEditor
-*/
-
-.sb-grid-text-editor__trigger {
-  @apply text-grid overflow-hidden text-ellipsis px-2;
-}
-
-/*
-  TimeEditor
-*/
-
-.sb-grid-time-editor {
-  @apply h-full w-full px-2;
-}
-
-/*
-  Footer
-*/
-
-.sb-grid-footer {
-  @apply bg-surface-100 flex h-10 items-center justify-between px-2;
-}
-
-.sb-grid-footer__inner {
-  @apply flex items-center;
-}
-
-/*
-  ForeignKeyFormatter
-*/
-
-.sb-grid-foreign-key-formatter {
-  @apply flex w-full items-center justify-between;
-}
-
-.sb-grid-foreign-key-formatter__text {
-  @apply m-0 grow overflow-hidden text-ellipsis;
-}
-
-/*
   ColumnHeader
 */
 
@@ -433,22 +333,6 @@
 }
 
 /*
-  Grid
-*/
-
-.sb-grid-grid--loading {
-  @apply flex justify-center bg-transparent;
-}
-
-.sb-grid-grid--loading__inner {
-  @apply flex items-center;
-}
-
-.sb-grid-grid--loading__inner__text {
-  @apply m-8;
-}
-
-/*
   SelectColumn
 */
 
@@ -463,96 +347,4 @@
 .sb-grid-select-cell__header__input {
   /* @apply focus:ring-brand-300; */
   @apply border-background-surface-100;
-}
-
-/*
-  Header
-*/
-
-.sb-grid-header {
-  @apply bg-surface-100 flex h-10 justify-between px-2;
-}
-
-.sb-grid-header__inner {
-  @apply flex items-center space-x-2;
-}
-
-.sb-grid-header__inner__divider {
-  @apply py-2;
-}
-
-.row_header__selected-rows {
-  @apply ml-2 mr-2;
-}
-
-/*
-  StatusLabel
-*/
-
-.sb-grid-status-label {
-  @apply text-grid text-white;
-}
-
-.sb-grid-status-label__no-msg {
-  @apply flex h-5 w-5;
-}
-
-.sb-grid-status-label__no-msg > div {
-  @apply m-auto h-2 w-2 rounded-full bg-green-900;
-}
-
-/*
-  Empty value
-*/
-
-.sb-grid-empty-value {
-  @apply block;
-}
-
-/*
-header/sort/SortDropdown
-*/
-
-.sb-grid-sort-popover {
-  @apply w-96;
-}
-
-.sb-grid-dropdown__empty {
-  @apply py-2;
-}
-
-.sb-grid-dropdown__empty__text {
-  @apply block;
-}
-
-.sb-grid-dropdown__item-trigger {
-  @apply my-1;
-}
-
-/*
-header/sort/SortRow
-*/
-
-.sb-grid-sort-row {
-  @apply flex justify-between space-x-3;
-}
-
-.sb-grid-sort-row__item {
-  @apply flex items-center space-x-3;
-}
-
-.sb-grid-sort-row__item__remove {
-  @apply bg-transparent p-0 hover:bg-transparent;
-}
-
-.sb-grid-sort-row__item__label {
-  @apply flex items-center space-x-2;
-}
-
-.sb-grid-sort-row__item_toogle {
-  @apply flex w-28 items-center gap-0 space-x-3;
-}
-
-.sb-grid-sort-row__item__move {
-  @apply flex cursor-move;
 }

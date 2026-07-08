@@ -12,6 +12,9 @@ import {
 } from './pg-format'
 import { FUNCTIONS_SQL } from './sql/functions'
 
+export const pgRoutineKindZod = z.enum(['function', 'procedure'])
+export type PGRoutineKind = z.infer<typeof pgRoutineKindZod>
+
 export const pgFunctionZod = z.object({
   id: z.number(),
   schema: z.string(),
@@ -33,6 +36,7 @@ export const pgFunctionZod = z.object({
       has_default: z.boolean(),
     })
   ),
+  type: pgRoutineKindZod,
   argument_types: z.string(),
   identity_argument_types: z.string(),
   return_type_id: z.number(),
@@ -174,6 +178,8 @@ export function retrieve({
 export const pgFunctionCreateZod = z.object({
   name: z.string(),
   definition: z.string(),
+  // 'procedure' omits RETURNS, behavior, and strictness — see _generateCreateFunctionSql
+  type: pgRoutineKindZod.optional(),
   args: z.array(z.string()).optional(),
   behavior: z.enum(['IMMUTABLE', 'STABLE', 'VOLATILE']).optional(),
   config_params: z.record(z.string(), z.string()).optional(),
@@ -242,9 +248,11 @@ function _generateCreateFunctionSql(
     behavior,
     security_definer,
     config_params,
+    type = 'function',
   }: PGFunctionCreate,
   { replace = false } = {}
 ): SafeSqlFragment {
+  const isProcedure = type === 'procedure'
   const argsFragment = args && args.length > 0 ? joinSqlFragments(args, ', ') : safeSql``
   const configParamsFragment =
     config_params && Object.keys(config_params).length > 0
@@ -258,13 +266,14 @@ function _generateCreateFunctionSql(
         )
       : safeSql``
 
+  // Procedures don't accept a RETURNS clause, a volatility category, or a
+  // strictness clause (CALLED ON NULL INPUT) — only functions do.
   return safeSql`
-    CREATE ${replace ? safeSql`OR REPLACE` : safeSql``} FUNCTION ${ident(schema!)}.${ident(name!)}(${argsFragment})
-    RETURNS ${return_type!}
+    CREATE ${replace ? safeSql`OR REPLACE` : safeSql``} ${isProcedure ? safeSql`PROCEDURE` : safeSql`FUNCTION`} ${ident(schema!)}.${ident(name!)}(${argsFragment})
+    ${isProcedure ? safeSql`` : safeSql`RETURNS ${return_type!}`}
     AS ${literal(definition)}
     LANGUAGE ${keyword(language!)}
-    ${keyword(behavior!)}
-    CALLED ON NULL INPUT
+    ${isProcedure ? safeSql`` : safeSql`${keyword(behavior!)} CALLED ON NULL INPUT`}
     ${security_definer ? safeSql`SECURITY DEFINER` : safeSql`SECURITY INVOKER`}
     ${configParamsFragment};
   `
@@ -280,6 +289,7 @@ export function create({
   behavior = 'VOLATILE',
   security_definer = false,
   config_params = {},
+  type = 'function',
 }: PGFunctionCreate) {
   const sql = _generateCreateFunctionSql({
     name,
@@ -291,6 +301,7 @@ export function create({
     behavior,
     security_definer,
     config_params,
+    type,
   })
 
   return {
@@ -317,6 +328,7 @@ export function update(
 ): { sql: SafeSqlFragment; zod: z.ZodType<void> } {
   const args = splitArgumentTypes(currentFunc.argument_types)
   const identityArgs = currentFunc.identity_argument_types
+  const routineKeyword = currentFunc.type === 'procedure' ? safeSql`PROCEDURE` : safeSql`FUNCTION`
 
   const updateDefinitionSql =
     typeof definition === 'string'
@@ -326,6 +338,7 @@ export function update(
             definition,
             args,
             config_params: currentFunc.config_params ?? {},
+            type: currentFunc.type,
           },
           { replace: true }
         )
@@ -333,12 +346,12 @@ export function update(
 
   const updateNameSql =
     name && name !== currentFunc.name
-      ? safeSql`ALTER FUNCTION ${ident(currentFunc.schema)}.${ident(currentFunc.name)}(${identityArgs}) RENAME TO ${ident(name)};`
+      ? safeSql`ALTER ${routineKeyword} ${ident(currentFunc.schema)}.${ident(currentFunc.name)}(${identityArgs}) RENAME TO ${ident(name)};`
       : safeSql``
 
   const updateSchemaSql =
     schema && schema !== currentFunc.schema
-      ? safeSql`ALTER FUNCTION ${ident(currentFunc.schema)}.${ident(name || currentFunc.name)}(${identityArgs}) SET SCHEMA ${ident(schema)};`
+      ? safeSql`ALTER ${routineKeyword} ${ident(currentFunc.schema)}.${ident(name || currentFunc.name)}(${identityArgs}) SET SCHEMA ${ident(schema)};`
       : safeSql``
 
   const sql = safeSql`
@@ -373,6 +386,7 @@ export function update(
 
 export const pgFunctionDeleteZod = z.object({
   cascade: z.boolean().default(false).optional(),
+  type: pgRoutineKindZod.optional(),
 })
 
 export type PGFunctionDelete = z.infer<typeof pgFunctionDeleteZod>
@@ -381,7 +395,8 @@ export function remove(
   func: PGSavedFunction,
   { cascade = false }: PGFunctionDelete = {}
 ): { sql: SafeSqlFragment; zod: z.ZodType<void> } {
-  const sql = safeSql`DROP FUNCTION ${ident(func.schema)}.${ident(func.name)}(${func.identity_argument_types}) ${cascade ? safeSql`CASCADE` : safeSql`RESTRICT`};`
+  const routineKeyword = func.type === 'procedure' ? safeSql`PROCEDURE` : safeSql`FUNCTION`
+  const sql = safeSql`DROP ${routineKeyword} ${ident(func.schema)}.${ident(func.name)}(${func.identity_argument_types}) ${cascade ? safeSql`CASCADE` : safeSql`RESTRICT`};`
 
   return {
     sql,

@@ -81,15 +81,51 @@ export const groupLogsFiltersByColumn = (
   return grouped
 }
 
+export const logsFiltersToColumnFilters = (
+  filters: LogsFilter[]
+): { id: string; value: string[] | LogsColumnFilterValue }[] => {
+  return Object.entries(groupLogsFiltersByColumn(filters)).map(([id, group]) =>
+    group.operator === '=' ? { id, value: group.values } : { id, value: group }
+  )
+}
+
 export const columnFiltersToLogsFilters = (
-  columnFilters: { id: string; value: unknown }[]
+  columnFilters: { id: string; value: unknown }[],
+  filterableNames?: Set<string>
 ): LogsFilter[] => {
   const filters: LogsFilter[] = []
   for (const { id, value } of columnFilters) {
-    if (!isLogsFilterColumnValue(value)) continue
-    for (const v of value.values) {
-      filters.push({ column: id, operator: value.operator, value: String(v) })
+    if (filterableNames && !filterableNames.has(id)) continue
+    if (value === null || value === undefined) continue
+    const fallback: LogsColumnFilterValue = {
+      operator: '=',
+      values: (Array.isArray(value) ? value : [value]).map(String),
+    }
+    const { operator, values } = isLogsFilterColumnValue(value) ? value : fallback
+    for (const v of values) {
+      filters.push({ column: id, operator, value: v })
     }
   }
   return filters
+}
+
+export const buildFilterSearchUpdate = (
+  columnFilters: { id: string; value: unknown }[],
+  filterFields: { value: string; type: string }[]
+): Record<string, unknown> => {
+  const filterableNames = new Set(
+    filterFields.filter((field) => field.type !== 'timerange').map((field) => field.value)
+  )
+  const filterEntries = logsFiltersToUrlParams(
+    columnFiltersToLogsFilters(columnFilters, filterableNames)
+  )
+  const update: Record<string, unknown> = {
+    filter: filterEntries.length > 0 ? filterEntries : null,
+  }
+  for (const field of filterFields) {
+    if (field.type !== 'timerange') continue
+    const current = columnFilters.find((c) => c.id === field.value)?.value
+    update[field.value] = current ?? null
+  }
+  return update
 }

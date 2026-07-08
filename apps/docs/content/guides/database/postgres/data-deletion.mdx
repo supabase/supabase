@@ -47,7 +47,7 @@ delete from logs
 where created_at < now() - interval '90 days';
 ```
 
-This acquires a `ROW EXCLUSIVE` lock on the table, which still allows other `SELECT`, `INSERT`, `UPDATE`, and `DELETE` statements to run concurrently. For small row counts, the operation completes quickly and has minimal impact.
+This acquires a `ROW EXCLUSIVE` lock on the table, which still allows other `SELECT`, `INSERT`, `UPDATE`, and `DELETE` statements to run concurrently. For small row counts, the operation completes with minimal impact.
 
 ### Large deletes
 
@@ -66,7 +66,7 @@ WHERE id IN (
 
 This approach has the benefit of controlling when it runs, locking for a shorter period of time and minimising impact on other transactions.
 
-If you know in advance that such large deletes will have to happen in the business cycle of your database, then you should seriously think about using (table parititioning)[/docs/guides/database/partitions] as a management tool.
+If you know in advance that such large deletes will have to happen in the business cycle of your database, then you should seriously think about using [table partitioning](/docs/guides/database/partitions) as a management tool.
 
 ### Soft deletes
 
@@ -188,7 +188,7 @@ If autovacuum is not keeping up, you can trigger a manual vacuum:
 vacuum (verbose) logs;
 ```
 
-For reclaiming disk space (not just marking tuples as reusable), use `VACUUM FULL` — but be aware this rewrites the entire table and takes an `ACCESS EXCLUSIVE` lock:
+To reclaim disk space rather than only marking tuples as reusable, use `VACUUM FULL`. Note that this rewrites the entire table and takes an `ACCESS EXCLUSIVE` lock:
 
 ```sql
 -- This locks the table for the duration — use during maintenance windows only

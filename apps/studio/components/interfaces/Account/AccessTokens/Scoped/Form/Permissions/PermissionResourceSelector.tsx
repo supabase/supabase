@@ -41,7 +41,7 @@ export const PermissionResourceSelector = <TFormValues extends PermissionsFormVa
   return (
     <Popover open={open} onOpenChange={onOpenChange} modal={true}>
       <PopoverTrigger asChild>
-        <Button type="default" size="tiny" icon={<Plus className="h-4 w-4" />}>
+        <Button variant="default" size="tiny" icon={<Plus className="h-4 w-4" />}>
           Add permission
         </Button>
       </PopoverTrigger>

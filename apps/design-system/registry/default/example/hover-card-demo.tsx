@@ -13,7 +13,7 @@ export default function HoverCardDemo() {
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        <Button type="link">@nextjs</Button>
+        <Button variant="link">@nextjs</Button>
       </HoverCardTrigger>
       <HoverCardContent className="w-80">
         <div className="flex justify-between space-x-4">

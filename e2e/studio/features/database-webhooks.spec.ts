@@ -6,7 +6,11 @@ import { toUrl } from '../utils/to-url.js'
 
 const ensureWebhooksEnabled = async (page: Page, ref: string) => {
   await page.goto(toUrl(`/project/${ref}/integrations/webhooks/overview`))
-  await expect(page.getByText('Database Webhooks allow you to send real-time data')).toBeVisible({
+  // The original "allow you to send real-time data" copy was removed when the
+  // webhooks page was migrated to the new integrations UI (PR #44277). Wait
+  // on the page-header heading instead — it's rendered whether or not the
+  // supabase_functions extension is enabled.
+  await expect(page.getByRole('heading', { name: 'Database Webhooks' })).toBeVisible({
     timeout: 30000,
   })
 

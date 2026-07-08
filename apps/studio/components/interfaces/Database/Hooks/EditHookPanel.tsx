@@ -318,8 +318,8 @@ export const EditHookPanel = () => {
           <div className="flex w-full justify-end space-x-3 border-t border-default px-3 py-4">
             <Button
               size="tiny"
-              type="default"
-              htmlType="button"
+              variant="default"
+              type="button"
               onClick={confirmOnClose}
               disabled={isSubmitting}
             >
@@ -327,8 +327,8 @@ export const EditHookPanel = () => {
             </Button>
             <Button
               size="tiny"
-              type="primary"
-              htmlType="submit"
+              variant="primary"
+              type="submit"
               form={FORM_ID}
               disabled={isSubmitting}
               loading={isSubmitting}

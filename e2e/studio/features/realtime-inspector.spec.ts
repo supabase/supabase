@@ -14,8 +14,13 @@ import { test } from '../utils/test.js'
 
 test.describe('Realtime Inspector', () => {
   test.beforeEach(async ({ page, ref }) => {
+    // `navigateToRealtimeInspector` already waits for "Join a channel" to be
+    // visible, which only renders once the project settings have loaded. A
+    // separate `waitForResponse(/settings/)` registered here is both redundant
+    // and racy: settings is a one-shot, non-refetching request, so under the
+    // faster TanStack render it resolves before this listener attaches and the
+    // wait hangs until the test timeout. The UI assertion is the real gate.
     await navigateToRealtimeInspector(page, ref)
-    await page.waitForResponse(new RegExp(`/platform/projects/${ref}/settings`))
   })
 
   test.describe('Basic Inspector UI', () => {
@@ -106,7 +111,16 @@ test.describe('Realtime Inspector', () => {
 
       const messageRow = page.getByRole('row').filter({ hasText: 'broadcast' }).first()
       await expect(messageRow).toBeVisible()
-      await messageRow.click()
+      // The message cell renders the full (untruncated) JSON, so the data-grid
+      // row is far wider than its column and its geometric center sits under the
+      // always-present detail panel — a default center-click is intercepted by
+      // that panel. Click the timestamp text instead: it's at the row's left,
+      // always inside the visible grid viewport, and still triggers the row's
+      // onClick that opens the detail panel.
+      await messageRow
+        .getByText(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)
+        .first()
+        .click()
 
       await expect(page.getByText('Timestamp')).toBeVisible()
 

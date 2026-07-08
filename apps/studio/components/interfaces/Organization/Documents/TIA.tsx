@@ -24,7 +24,7 @@ export const TIA = () => {
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
         <div className="@lg:flex items-center justify-center h-full">
-          <Button asChild type="default" iconRight={<Download />}>
+          <Button asChild variant="default" iconRight={<Download />}>
             <a
               href="https://supabase.com/downloads/docs/Supabase+TIA+250314.pdf"
               target="_blank"

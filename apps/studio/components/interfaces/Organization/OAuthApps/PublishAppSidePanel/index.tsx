@@ -274,7 +274,7 @@ export const PublishAppSidePanel = ({
                         <div className="absolute bottom-1 right-1">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <Button type="default" className="px-1">
+                              <Button variant="default" className="px-1">
                                 <Edit />
                               </Button>
                             </DropdownMenuTrigger>
@@ -338,7 +338,7 @@ export const PublishAppSidePanel = ({
                     </p>
                   </div>
                   <Button
-                    type="default"
+                    variant="default"
                     onClick={() => appendCallbackUrl({ id: uuidv4(), value: '' })}
                   >
                     Add URL
@@ -364,7 +364,7 @@ export const PublishAppSidePanel = ({
                               {callbackUrlsFields.length > 1 ? (
                                 <InputGroupAddon align="inline-end">
                                   <InputGroupButton
-                                    type="default"
+                                    variant="default"
                                     onClick={() => removeCallbackUrl(index)}
                                   >
                                     Remove
@@ -414,14 +414,14 @@ export const PublishAppSidePanel = ({
             <SidePanel.Content>
               <div className="pt-2 pb-3 flex items-center justify-between">
                 <Button
-                  type="default"
+                  variant="default"
                   onClick={() => setShowPreview(true)}
                   disabled={name.length === 0 || website.length === 0}
                 >
                   Preview consent for users
                 </Button>
                 <div className="flex items-center space-x-2">
-                  <Button type="default" disabled={isSubmitting} onClick={() => onClose()}>
+                  <Button variant="default" disabled={isSubmitting} onClick={() => onClose()}>
                     Cancel
                   </Button>
                   <Shortcut
@@ -430,7 +430,7 @@ export const PublishAppSidePanel = ({
                     options={{ enabled: visible && !isSubmitting }}
                     side="top"
                   >
-                    <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
+                    <Button type="submit" loading={isSubmitting} disabled={isSubmitting}>
                       Confirm
                     </Button>
                   </Shortcut>

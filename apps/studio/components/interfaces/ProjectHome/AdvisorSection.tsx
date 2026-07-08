@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { BarChart, Shield } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
 import { AiIconAnimation, Badge, Button, Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
-import { Row } from 'ui-patterns'
+import { Row } from 'ui-patterns/Row'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Markdown } from '../Markdown'
@@ -123,7 +123,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
       ) : (
         <div className="flex justify-between items-center mb-6">
           {titleContent}
-          <Button type="default" icon={<AiIconAnimation />} onClick={handleAskAssistant}>
+          <Button variant="default" icon={<AiIconAnimation />} onClick={handleAskAssistant}>
             Ask Assistant
           </Button>
         </div>
@@ -209,7 +209,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
                               })
                             }}
                             telemetrySource="advisor_section"
-                            type="text"
+                            variant="text"
                             className="w-7 h-7"
                           />
                         </div>
@@ -228,7 +228,7 @@ export const AdvisorSection = ({ showEmptyState = false }: { showEmptyState?: bo
           </Row>
           {hiddenIssuesCount > 0 && (
             <div className="mt-4 flex justify-end">
-              <Button type="text" onClick={() => openSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)}>
+              <Button variant="text" onClick={() => openSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)}>
                 View {hiddenIssuesCount} more issue{hiddenIssuesCount !== 1 ? 's' : ''} in Advisor
               </Button>
             </div>

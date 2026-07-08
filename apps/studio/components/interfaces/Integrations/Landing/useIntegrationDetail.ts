@@ -2,8 +2,16 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo } from 'react'
 
+import { useProjectOAuthIntegrationData } from './Landing.utils'
 import { useAvailableIntegrations } from './useAvailableIntegrations'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
+import {
+  areRequiredExtensionsInstalledFor,
+  getFilteredNavItems,
+  getInstallActionType,
+  type InstallActionType,
+} from './useIntegrationDetail.utils'
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -19,6 +27,7 @@ export const useIntegrationDetail = () => {
   const { ref, id, pageId, childId } = useParams()
 
   const { integrationsWrappers } = useIsFeatureEnabled(['integrations:wrappers'])
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const { data: project } = useSelectedProjectQuery()
   const { data: extensions } = useDatabaseExtensionsQuery({
@@ -36,21 +45,31 @@ export const useIntegrationDetail = () => {
     [installedIntegrations, id]
   )
 
-  const installableExtensions = (extensions ?? []).filter((ext) =>
-    (integration?.requiredExtensions ?? []).includes(ext.name)
+  // There does exist a mgmt-api endpoint to get a single status by integration-id, but the bulk results are likely already cached so go ahead and use them.
+  const { data: projectData, isLoading: isIntegrationStatusLoading } =
+    useProjectOAuthIntegrationData(project?.ref, { enabled: integration?.type === 'oauth' })
+  const integrationStatus = useMemo(
+    () => projectData.partnerIntegrations.find((i) => i.listing_slug === id),
+    [projectData, id]
   )
-  const extensionsInstalled = installableExtensions.every((x) => x.installed_version)
 
-  // installedIntegrations doesn't return wrappers unless there's a wrapper created
-  const isInstalled =
-    !!integration && (!!installation || (integration.type === 'wrapper' && extensionsInstalled))
+  const isInstalled = !!integration && !!installation
 
-  const navItems = useMemo(() => {
-    if (!integration?.navigation) return []
-    return isInstalled
-      ? integration.navigation
-      : integration.navigation.filter((nav) => nav.route === 'overview')
-  }, [integration, isInstalled])
+  const areRequiredExtensionsInstalled = useMemo(
+    () => areRequiredExtensionsInstalledFor(integration, extensions),
+    [integration, extensions]
+  )
+
+  const navItems = useMemo(
+    () =>
+      getFilteredNavItems({
+        integration,
+        isInstalled,
+        isMarketplaceEnabled,
+        areRequiredExtensionsInstalled,
+      }),
+    [integration, isInstalled, isMarketplaceEnabled, areRequiredExtensionsInstalled]
+  )
 
   const activeRoute = pageId ?? 'overview'
 
@@ -75,6 +94,22 @@ export const useIntegrationDetail = () => {
   const Component = useMemo(
     () => integration?.navigate({ id, pageId, childId }),
     [integration, id, pageId, childId]
+  )
+
+  const wrappersTabHref = useMemo(
+    () => tabs.find((tab) => tab.href.endsWith('/wrappers'))?.href,
+    [tabs]
+  )
+
+  const installActionType: InstallActionType = useMemo(
+    () =>
+      getInstallActionType({
+        integration,
+        isMarketplaceEnabled,
+        areRequiredExtensionsInstalled,
+        isInstalled,
+      }),
+    [integration, isMarketplaceEnabled, areRequiredExtensionsInstalled, isInstalled]
   )
 
   const isReady = !!router?.isReady
@@ -114,9 +149,15 @@ export const useIntegrationDetail = () => {
     integrationsWrappers,
     integration,
     installation,
+    integrationStatus,
     isInstalled,
+    areRequiredExtensionsInstalled,
+    installActionType,
+    wrappersTabHref,
     isAvailableLoading,
     isInstalledLoading,
+    isIntegrationStatusLoading,
+    oauthIntegrationData: projectData,
     Component,
   }
 }

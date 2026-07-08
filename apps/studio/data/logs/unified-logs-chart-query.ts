@@ -8,8 +8,7 @@ import { UNIFIED_LOGS_QUERY_OPTIONS, UnifiedLogsVariables } from './unified-logs
 import { parseLogsFilterUrlParams } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
 import { getLogsChartQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getLogsChartQuery as getLogsChartQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
-import { ExecuteSqlError } from '@/data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from '@/types'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export async function getUnifiedLogsChart(
   { projectRef, search, useOtel = false }: UnifiedLogsVariables & { useOtel?: boolean },
@@ -155,7 +154,7 @@ export async function getUnifiedLogsChart(
 }
 
 export type UnifiedLogsChartData = Awaited<ReturnType<typeof getUnifiedLogsChart>>
-export type UnifiedLogsChartError = ExecuteSqlError
+export type UnifiedLogsChartError = ResponseError
 
 export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
   { projectRef, search }: UnifiedLogsVariables,

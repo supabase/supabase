@@ -2,128 +2,76 @@
 title: 'Use Supabase with Next.js'
 subtitle: 'Learn how to create a Supabase project, add some sample data, and query from a Next.js app.'
 breadcrumb: 'Framework Quickstarts'
-hideToc: true
 ---
 
-<StepHikeCompact>
+<$Partial path="quickstart_db_setup.mdx" />
 
-  <StepHikeCompact.Step step={1}>
+## 4. Create a Next.js app
 
-    <$Partial path="quickstart_db_setup.mdx" />
+Use the `create-next-app` command and the `with-supabase` template, to create a Next.js app pre-configured with [Cookie-based Auth](/docs/guides/auth/server-side/creating-a-client?queryGroups=package-manager&package-manager=npm&queryGroups=framework&framework=nextjs&queryGroups=environment&environment=server), [TypeScript](https://www.typescriptlang.org/), and [Tailwind CSS](https://tailwindcss.com/).
 
-  </StepHikeCompact.Step>
+```bash
+npx create-next-app -e with-supabase
+```
 
-  <StepHikeCompact.Step step={2}>
+<$Partial path="api_settings.mdx" variables={{ "framework": "nextjs", "tab": "frameworks" }} />
 
-    <StepHikeCompact.Details title="Create a Next.js app">
+## 5. Declare Supabase environment variables
 
-    Use the `create-next-app` command and the `with-supabase` template, to create a Next.js app pre-configured with:
-    - [Cookie-based Auth](/docs/guides/auth/server-side/creating-a-client?queryGroups=package-manager&package-manager=npm&queryGroups=framework&framework=nextjs&queryGroups=environment&environment=server)
-    - [TypeScript](https://www.typescriptlang.org/)
-    - [Tailwind CSS](https://tailwindcss.com/)
+Rename `.env.example` to `.env.local` and populate with your Supabase connection variables that you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=nextjs&tab=frameworks).
 
-    <$Partial path="uiLibCta.mdx" />
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=nextjs">
+    Open Connect panel
+  </a>
+</Button>
 
-</StepHikeCompact.Details>
+```text name=.env.local
+NEXT_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+```
 
-    <StepHikeCompact.Code>
+## 6. Query Supabase data from Next.js
 
-      ```bash
-      npx create-next-app -e with-supabase
-      ```
+Create a new file at `app/instruments/page.tsx` and populate with the following.
 
-    </StepHikeCompact.Code>
+This selects all the rows from the `instruments` table you created earlier and renders them on the page.
 
-  </StepHikeCompact.Step>
+<$CodeTabs>
 
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Declare Supabase Environment Variables">
+```ts name=app/instruments/page.tsx
+import { createClient } from "@/lib/supabase/server";
+import { Suspense } from "react";
 
-    Rename `.env.example` to `.env.local` and populate with your Supabase connection variables:
+async function InstrumentsData() {
+  const supabase = await createClient();
+  const { data: instruments } = await supabase.from("instruments").select();
 
-    <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="publishable" />
+  return <pre>{JSON.stringify(instruments, null, 2)}</pre>;
+}
 
+export default function Instruments() {
+  return (
+    <Suspense fallback={<div>Loading instruments...</div>}>
+      <InstrumentsData />
+    </Suspense>
+  );
+}
+```
 
-    </StepHikeCompact.Details>
+</$CodeTabs>
 
-    <StepHikeCompact.Code>
+## 7. Start the app
 
-      <$CodeTabs>
+Run the development server, go to http://localhost:3000/instruments in a browser and you should see the list of instruments.
 
-        ```text name=.env.local
-        NEXT_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
-        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
-        ```
-
-      </$CodeTabs>
-
-      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "nextjs", "tab": "frameworks" }} />
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Query Supabase data from Next.js">
-
-    Create a new file at `app/instruments/page.tsx` and populate with the following.
-
-    This selects all the rows from the `instruments` table in Supabase and render them on the page.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-    <$CodeTabs>
-
-      ```ts name=app/instruments/page.tsx
-      import { createClient } from "@/lib/supabase/server";
-      import { Suspense } from "react";
-
-      async function InstrumentsData() {
-        const supabase = await createClient();
-        const { data: instruments } = await supabase.from("instruments").select();
-
-        return <pre>{JSON.stringify(instruments, null, 2)}</pre>;
-      }
-
-      export default function Instruments() {
-        return (
-          <Suspense fallback={<div>Loading instruments...</div>}>
-            <InstrumentsData />
-          </Suspense>
-        );
-      }
-      ```
-
-    </$CodeTabs>
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={5}>
-    <StepHikeCompact.Details title="Start the app">
-
-    Run the development server, go to http://localhost:3000/instruments in a browser and you should see the list of instruments.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```bash Terminal
-      npm run dev
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-</StepHikeCompact>
+```bash
+npm run dev
+```
 
 ## Next steps
 
+- Explore [drop-in UI components](/ui) for your Supabase app
 - Set up [Auth](/docs/guides/auth) for your app
 - [Insert more data](/docs/guides/database/import-data) into your database
 - Upload and serve static files using [Storage](/docs/guides/storage)

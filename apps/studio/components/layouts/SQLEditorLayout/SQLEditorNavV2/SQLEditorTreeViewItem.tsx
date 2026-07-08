@@ -29,14 +29,19 @@ import {
 } from 'ui'
 
 import { createSqlSnippetSkeletonV2 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
-import { getContentById } from '@/data/content/content-id-query'
+import { getContentById, getSqlSnippetById } from '@/data/content/content-id-query'
 import { useSQLSnippetFolderContentsQuery } from '@/data/content/sql-folder-contents-query'
 import { Snippet } from '@/data/content/sql-folders-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import useLatest from '@/hooks/misc/useLatest'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import {
+  isFolderEditing,
+  isFolderSaving,
+  type FolderStatus,
+} from '@/state/sql-editor/sql-editor-lifecycle'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 interface SQLEditorTreeViewItemProps extends Omit<
   ComponentProps<typeof TreeViewItem>,
@@ -44,7 +49,7 @@ interface SQLEditorTreeViewItemProps extends Omit<
 > {
   element: any
   isMultiSelected?: boolean
-  status?: 'editing' | 'saving' | 'idle'
+  status?: FolderStatus
   getNodeProps: () => any
   onSelectCreate?: () => void
   onSelectDelete?: () => void
@@ -105,8 +110,8 @@ export const SQLEditorTreeViewItem = ({
   const isSharedSnippet = element.metadata.visibility === 'project'
   const isFavorite = element.metadata.favorite
 
-  const isEditing = status === 'editing'
-  const isSaving = status === 'saving'
+  const isEditing = isFolderEditing(status)
+  const isSaving = isFolderSaving(status)
 
   const { can: canCreateSQLSnippet } = useAsyncCheckPermissions(
     PermissionAction.CREATE,
@@ -177,12 +182,23 @@ export const SQLEditorTreeViewItem = ({
     }
   }
 
-  const onToggleFavorite = () => {
+  const onToggleFavorite = async () => {
     const snippetId = element.metadata.id
-    if (snippetId) {
-      if (isFavorite) snapV2.removeFavorite(snippetId)
-      else snapV2.addFavorite(snippetId)
+    if (!snippetId) return
+    if (!projectRef) return console.error('Project ref is required')
+
+    // Persisting a favorite goes through the full content upsert, so the
+    // snippet's content must be loaded first — otherwise the PUT endpoint
+    // rejects the update. Snippets listed in the nav that have never been
+    // opened have no content loaded yet, so fetch it before toggling.
+    const storeSnippet = snapV2.snippets[snippetId]
+    if (!storeSnippet?.snippet.content) {
+      const snippet = await getSqlSnippetById({ projectRef, id: snippetId })
+      snapV2.setSnippet(projectRef, snippet)
     }
+
+    if (isFavorite) snapV2.removeFavorite(snippetId)
+    else snapV2.addFavorite(snippetId)
   }
 
   const onSelectDuplicate = async () => {
@@ -437,7 +453,7 @@ export const SQLEditorTreeViewItem = ({
           }}
         >
           <Button
-            type="outline"
+            variant="outline"
             size="tiny"
             block
             loading={isInFolder ? isFetchingNextPageInFolder : _isFetchingNextPage}

@@ -107,23 +107,22 @@ Since Supabase Edge Function uses the [Deno runtime](https://deno.land/), you do
 In your newly created `scribe-bot/index.ts` file, add the following code:
 
 ```ts supabase/functions/scribe-bot/index.ts
-import { Bot, webhookCallback } from 'https://deno.land/x/grammy@v1.34.0/mod.ts'
+import { Bot, webhookCallback } from 'npm:grammy@^1'
+
 import 'jsr:@supabase/functions-js/edge-runtime.d.ts'
-import { createClient } from 'npm:@supabase/supabase-js@2'
-import { ElevenLabsClient } from 'npm:elevenlabs@1.50.5'
+
+import { withSupabase } from 'npm:@supabase/server@^1'
+import type { SupabaseClient } from 'npm:@supabase/supabase-js@^2'
+import { ElevenLabsClient } from 'npm:elevenlabs@^1'
 
 console.log(`Function "elevenlabs-scribe-bot" up and running!`)
 
 const elevenLabsClient = new ElevenLabsClient({
   apiKey: Deno.env.get('ELEVENLABS_API_KEY') || '',
 })
-const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
-const supabase = createClient(
-  Deno.env.get('SUPABASE_URL') || '',
-  SUPABASE_SECRET_KEYS['default'] || ''
-)
 
 async function scribe({
+  supabaseAdmin,
   fileURL,
   fileType,
   duration,
@@ -131,6 +130,7 @@ async function scribe({
   messageId,
   username,
 }: {
+  supabaseAdmin: SupabaseClient
   fileURL: string
   fileType: string
   duration: number
@@ -178,8 +178,12 @@ async function scribe({
     error: errorMsg,
   }
   console.log({ logLine })
-  await supabase.from('transcription_logs').insert({ ...logLine, transcript })
+  await supabaseAdmin.from('transcription_logs').insert({ ...logLine, transcript })
 }
+
+// Set by the request handler before delegating to grammY, so bot handlers
+// can write transcription logs with the admin client.
+let supabaseAdmin: SupabaseClient
 
 const telegramBotToken = Deno.env.get('TELEGRAM_BOT_TOKEN')
 const bot = new Bot(telegramBotToken || '')
@@ -202,6 +206,7 @@ bot.on([':voice', ':audio', ':video'], async (ctx) => {
     // Run the transcription in the background.
     EdgeRuntime.waitUntil(
       scribe({
+        supabaseAdmin,
         fileURL,
         fileType: fileMeta.mime_type!,
         duration: fileMeta.duration,
@@ -223,18 +228,24 @@ bot.on([':voice', ':audio', ':video'], async (ctx) => {
 
 const handleUpdate = webhookCallback(bot, 'std/http')
 
-Deno.serve(async (req) => {
-  try {
-    const url = new URL(req.url)
-    if (url.searchParams.get('secret') !== Deno.env.get('FUNCTION_SECRET')) {
-      return new Response('not allowed', { status: 405 })
-    }
+// Deploy with verify_jwt = false
+// The bot is called by Telegram, so we verify the request with FUNCTION_SECRET in code.
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
+    try {
+      const url = new URL(req.url)
+      if (url.searchParams.get('secret') !== Deno.env.get('FUNCTION_SECRET')) {
+        return Response.json({ error: 'not allowed' }, { status: 405 })
+      }
 
-    return await handleUpdate(req)
-  } catch (err) {
-    console.error(err)
-  }
-})
+      supabaseAdmin = ctx.supabaseAdmin
+
+      return await handleUpdate(req)
+    } catch (err) {
+      console.error(err)
+    }
+  }),
+}
 ```
 
 ## Deploy to Supabase

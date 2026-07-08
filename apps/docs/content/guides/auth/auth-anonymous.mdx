@@ -8,7 +8,7 @@ subtitle: 'Create and use anonymous users to authenticate with Supabase'
 
 <Admonition type="note" title="Anonymous user vs the anon key">
 
-Calling `signInAnonymously()` creates an anonymous user. It's just like a permanent user, except the user can't access their account if they sign out, clear browsing data, or use another device.
+Calling `signInAnonymously()` creates an anonymous user. It behaves like a permanent user, except the user can't access their account if they sign out, clear browsing data, or use another device.
 
 Like permanent users, the `authenticated` Postgres role will be used when using the Data APIs to access your project. JWTs for these users will have an `is_anonymous` claim which you can use to distinguish in RLS policies.
 
@@ -32,7 +32,7 @@ See the [Access control section](#access-control) for more details.
 
 <Admonition type="caution" title="Use Dynamic Rendering with Next.js">
 
-The Supabase team has received reports of user metadata being cached across unique anonymous users as a result of Next.js static page rendering. For the best user experience, utilize dynamic page rendering.
+The Supabase team has received reports of user metadata being cached across unique anonymous users as a result of Next.js static page rendering. For the best user experience, use dynamic page rendering.
 
 </Admonition>
 
@@ -279,7 +279,7 @@ response = supabase.auth.link_identity({'provider': 'google'})
 
 ## Access control
 
-An anonymous user assumes the `authenticated` role just like a permanent user. You can use row-level security (RLS) policies to differentiate between an anonymous user and a permanent user by checking for the `is_anonymous` claim in the JWT returned by `auth.jwt()`:
+An anonymous user assumes the `authenticated` role like a permanent user. You can use row-level security (RLS) policies to differentiate between an anonymous user and a permanent user by checking for the `is_anonymous` claim in the JWT returned by `auth.jwt()`:
 
 ```sql
 create policy "Only permanent users can post to the news feed"

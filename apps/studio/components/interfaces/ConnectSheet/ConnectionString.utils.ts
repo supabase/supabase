@@ -92,6 +92,23 @@ export const buildSafeConnectionString = (
   return `postgresql://${params.user}:${PASSWORD_PLACEHOLDER}@${params.host}:${params.port}/${params.database}${search}`
 }
 
+export const buildConnectionStringWithPassword = (
+  connectionString: string,
+  password: string
+): string => {
+  if (!connectionString || !password) return connectionString
+
+  const encodedPassword = (() => {
+    try {
+      return encodeURIComponent(password)
+    } catch {
+      return password
+    }
+  })()
+
+  return connectionString.split(PASSWORD_PLACEHOLDER).join(encodedPassword)
+}
+
 export const buildConnectionParameters = (params: ConnectionParams) => [
   { key: 'host', value: params.host },
   { key: 'port', value: params.port },

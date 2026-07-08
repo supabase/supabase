@@ -8,7 +8,7 @@ Log drains send all logs of the Supabase stack to one or more desired destinatio
 
 You can read about the initial announcement [here](/blog/log-drains) and vote for your preferred drains in [this discussion](https://github.com/orgs/supabase/discussions/28324?sort=top).
 
-# Supported destinations
+## Supported destinations
 
 The following table lists the supported destinations and the required setup configuration:
 
@@ -23,7 +23,7 @@ The following table lists the supported destinations and the required setup conf
 
 HTTP requests are batched with a max of 250 logs or 1 second intervals, whichever happens first. Logs are compressed via Gzip if the destination supports it.
 
-## Generic HTTP endpoint
+### Generic HTTP endpoint
 
 Logs are sent as a POST request with a JSON body. Both HTTP/1 and HTTP/2 protocols are supported.
 Custom headers can optionally be configured for all requests.
@@ -38,7 +38,6 @@ Unsigned requests to HTTP endpoints are temporary and all requests will signed i
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
 >
     <AccordionItem
       header="Edge Function Walkthrough (Uncompressed)"
@@ -88,7 +87,7 @@ Create an HTTP drain under the [Project Settings > Log Drains](/dashboard/projec
 - Under URL, set it to your edge function URL `https://[PROJECT REF].supabase.co/functions/v1/hello-world`
 - Under Headers, set the `Authorization: Bearer [PUBLISHABLE KEY]`
 
-<ProjectConfigVariables variable="publishableKey" />
+<ProjectConfigVariables variable="publishable" />
 
     </AccordionItem>
 
@@ -138,7 +137,7 @@ Deno.serve(async (req) => {
 
 </Accordion>
 
-## Datadog logs
+### Datadog logs
 
 Logs sent to Datadog have the name of the log source set on the `service` field of the event and the source set to `Supabase`. Logs are gzipped before they are sent to Datadog.
 
@@ -148,7 +147,6 @@ To setup Datadog log drain, generate a Datadog API key [here](https://app.datado
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
 >
     <AccordionItem
       header="Walkthrough"
@@ -187,7 +185,7 @@ To setup Datadog log drain, generate a Datadog API key [here](https://app.datado
 
 If you are interested in other log drains, upvote them [here](https://github.com/orgs/supabase/discussions/28324)
 
-## Loki
+### Loki
 
 Logs sent to the Loki HTTP API are specifically formatted according to the HTTP API requirements. See the official Loki HTTP API documentation for [more details](https://grafana.com/docs/loki/latest/reference/loki-http-api/#ingest-logs).
 
@@ -199,7 +197,7 @@ The `event_message` and `timestamp` fields will be dropped from the events to av
 
 Loki must be configured to accept **structured metadata**, and it is advised to increase the default maximum number of structured metadata fields to at least 500 to accommodate large log event payloads of different products.
 
-## Sentry
+### Sentry
 
 Logs are sent to Sentry as part of [Sentry's Logging Product](https://docs.sentry.io/product/explore/logs/). Ingesting Supabase logs as Sentry errors is currently not supported.
 
@@ -213,7 +211,7 @@ All fields from the log event are attached as attributes to the Sentry log, whic
 
 If you are self-hosting Sentry, Sentry Logs are only supported in self-hosted version [25.9.0](https://github.com/getsentry/self-hosted/releases/tag/25.9.0) and later.
 
-## Axiom
+### Axiom
 
 Logs sent to a specified Axiom's dataset as JSON of a raw log event,
 with timestamp modified to be parsed by ingestion endpoint.
@@ -227,7 +225,7 @@ To set up the Axiom log drain, you have to:
    - API token
 4. Watch for events in the Stream panel of Axiom Console
 
-## Amazon S3
+### Amazon S3
 
 Logs are written to an existing S3 bucket that you own.
 
@@ -245,7 +243,7 @@ Ensure the AWS account tied to the Access Key ID has permissions to write to the
 
 </Admonition>
 
-## OpenTelemetry protocol (OTLP)
+### OpenTelemetry protocol (OTLP)
 
 Logs are sent to any OTLP-compatible endpoint using the OpenTelemetry Protocol over HTTP with Protocol Buffers encoding.
 
@@ -280,7 +278,6 @@ Ensure your OTLP endpoint is configured to accept logs at the `/v1/logs` path wi
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
 >
     <AccordionItem
       header="OpenTelemetry Collector Example"
@@ -352,6 +349,6 @@ Refer to your observability platform's documentation for specific authentication
 
 </Accordion>
 
-## Pricing
+### Pricing
 
 For a detailed breakdown of how charges are calculated, refer to [Manage Log Drain usage](/docs/guides/platform/manage-your-usage/log-drains).

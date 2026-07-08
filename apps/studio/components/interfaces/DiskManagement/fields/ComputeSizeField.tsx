@@ -14,7 +14,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { ComputeBadge } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
@@ -26,7 +27,6 @@ import {
 } from '../DiskManagement.utils'
 import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
-import { NoticeBar } from '../ui/NoticeBar'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -167,14 +167,15 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                   />
                 </div>
 
-                <NoticeBar
-                  showIcon={false}
-                  type="default"
-                  className="mt-3 border-violet-900 bg-violet-200 [&_h5]:text-violet-1100"
-                  visible={showUpgradeBadge && form.watch('computeSize') === 'ci_nano'}
-                  title={'Upgrade to Micro Compute'}
-                  description="This Project is already paying for Micro Compute. You can upgrade to Micro Compute at any time when convenient."
-                />
+                {showUpgradeBadge && form.watch('computeSize') === 'ci_nano' && (
+                  <Admonition
+                    showIcon={false}
+                    type="default"
+                    className="mt-3 border-violet-900 bg-violet-200 [&_h5]:text-violet-1100"
+                    title="Upgrade to Micro Compute"
+                    description="This Project is already paying for Micro Compute. You can upgrade to Micro Compute at any time when convenient."
+                  />
+                )}
               </>
             }
           >
@@ -379,7 +380,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
 
             {!isLoading && !addonsError && hasHiddenOptions && (
               <Button
-                type="default"
+                variant="default"
                 size="tiny"
                 className="mt-4"
                 aria-expanded={showAllSizes}

@@ -46,6 +46,7 @@ export enum PricingMetric {
   LOG_INGESTION = 'LOG_INGESTION',
   LOG_QUERYING = 'LOG_QUERYING',
   LOG_STORAGE = 'LOG_STORAGE',
+  ETL_PIPELINE = 'ETL_PIPELINE',
 }
 
 export enum ComputeUsageMetric {

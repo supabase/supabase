@@ -6,14 +6,14 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
 import { Button, cn, IconBroadcast, IconDatabaseChanges, IconPresence } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { LogData } from './Messages.types'
 import MessageSelection from './MessageSelection'
 import NoChannelEmptyState from './NoChannelEmptyState'
 import { ColumnRenderer } from './RealtimeMessageColumnRenderer'
 import { DocsButton } from '@/components/ui/DocsButton'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import ShimmerLine from '@/components/ui/ShimmerLine'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -42,7 +42,7 @@ const NoResultAlert = ({
   )
 
   const broadcastButton = (
-    <Button type="default" onClick={showSendMessage}>
+    <Button variant="default" onClick={showSendMessage}>
       Broadcast a message
     </Button>
   )
@@ -90,7 +90,7 @@ const NoResultAlert = ({
                 </p>
               </div>
               <Link href={`/project/${ref}/realtime/inspector`} target="_blank" rel="noreferrer">
-                <Button type="default" iconRight={<ExternalLink />}>
+                <Button variant="default" iconRight={<ExternalLink />}>
                   Open inspector
                 </Button>
               </Link>
@@ -106,7 +106,7 @@ const NoResultAlert = ({
                 <p className="text-foreground-lighter text-xs">Tables must have realtime enabled</p>
               </div>
               <Link href={`/project/${ref}/database/publications`} target="_blank" rel="noreferrer">
-                <Button type="default" iconRight={<ExternalLink />}>
+                <Button variant="default" iconRight={<ExternalLink />}>
                   Publications settings
                 </Button>
               </Link>
@@ -180,7 +180,7 @@ const MessagesTable = ({
                 </div>
                 <ShortcutTooltip shortcutId={SHORTCUT_IDS.INSPECTOR_BROADCAST} side="bottom">
                   <Button
-                    type="default"
+                    variant="default"
                     onClick={showSendMessage}
                     icon={<Megaphone strokeWidth={1.5} />}
                   >

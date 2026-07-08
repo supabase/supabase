@@ -1,25 +1,84 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { ChevronRight, Loader2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, ChevronRight, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { cn, HoverCard, HoverCardContent, HoverCardTrigger, InfoIcon } from 'ui'
 
-import {
-  extractDbSchema,
-  ProjectServiceStatus,
-  StatusIcon,
-  StatusMessage,
-} from '../Home/ServiceStatus'
+import { useUnifiedLogsPreview } from '../App/FeaturePreview/FeaturePreviewContext'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { SingleStat } from '@/components/ui/SingleStat'
 import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useEdgeFunctionServiceStatusQuery } from '@/data/service-status/edge-functions-status-query'
-import { useProjectServiceStatusQuery } from '@/data/service-status/service-status-query'
+import {
+  useProjectServiceStatusQuery,
+  type ProjectServiceStatus as APIProjectServiceStatus,
+  type ServiceHealthResponse,
+} from '@/data/service-status/service-status-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
+
+type ProjectServiceStatus = APIProjectServiceStatus | 'DISABLED'
+
+const iconProps = {
+  size: 18,
+  strokeWidth: 1.5,
+}
+const LoaderIcon = () => <Loader2 {...iconProps} className="animate-spin" />
+const AlertIcon = () => <AlertTriangle {...iconProps} />
+const CheckIcon = () => <CheckCircle2 {...iconProps} className="text-brand" />
+
+export const StatusIcon = ({
+  isLoading,
+  isProjectNew,
+  projectStatus,
+}: {
+  isLoading: boolean
+  isProjectNew: boolean
+  projectStatus?: ProjectServiceStatus
+}) => {
+  //
+  if (projectStatus === 'ACTIVE_HEALTHY') return <CheckIcon />
+  if (projectStatus === 'DISABLED') return <AlertIcon />
+  if (projectStatus === 'COMING_UP') return <LoaderIcon />
+  if (isLoading) return <LoaderIcon />
+  // isProjectNew has to be above UNHEALTHY because in the first few minutes, some services might be starting up and show as UNHEALTHY
+  if (isProjectNew) return <LoaderIcon />
+  if (projectStatus === 'UNHEALTHY') return <AlertIcon />
+  return <AlertIcon />
+}
+
+const StatusMessage = ({
+  status,
+  isLoading,
+  isProjectNew,
+}: {
+  isLoading: boolean
+  isProjectNew: boolean
+  status?: ProjectServiceStatus
+}) => {
+  if (isLoading) return 'Checking status'
+  if (status === 'DISABLED') return 'Disabled'
+  if (status === 'UNHEALTHY') return 'Unhealthy'
+  if (status === 'COMING_UP') return 'Coming up...'
+  if (status === 'ACTIVE_HEALTHY') return 'Healthy'
+  // isProjectNew has to be after all other statuses
+  if (isProjectNew) return 'Coming up...'
+  if (status) return status
+  return 'Unable to connect'
+}
+
+/*
+ * Extract the db_schema from the response.info object
+ */
+const extractDbSchema = (response: ServiceHealthResponse | undefined) => {
+  if (response?.info && 'db_schema' in response.info) {
+    return response.info.db_schema
+  }
+  return undefined
+}
 
 /**
  * [Joshen] JFYI before we go live with this, we need to revisit the migrations section
@@ -42,6 +101,7 @@ const SERVICE_STATUS_THRESHOLD = 5 // minutes
 export const ServiceStatus = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const {
     projectAuthAll: authEnabled,
@@ -123,7 +183,7 @@ export const ServiceStatus = () => {
       docsUrl: undefined,
       isLoading: isLoading,
       status: dbStatus?.status ?? 'UNHEALTHY',
-      logsUrl: '/logs/postgres-logs',
+      logsUrl: isUnifiedLogsEnabled ? '/logs?filter=log_type:eq:postgres' : '/logs/postgres-logs',
     },
     {
       name: 'PostgREST',
@@ -132,7 +192,7 @@ export const ServiceStatus = () => {
       isLoading,
       // If PostgREST has an empty schema, it means it's been disabled
       status: extractDbSchema(restStatus) === '' ? 'DISABLED' : (restStatus?.status ?? 'UNHEALTHY'),
-      logsUrl: '/logs/postgrest-logs',
+      logsUrl: isUnifiedLogsEnabled ? '/logs?filter=log_type:eq:postgrest' : '/logs/postgrest-logs',
     },
     ...(authEnabled
       ? [
@@ -142,7 +202,7 @@ export const ServiceStatus = () => {
             docsUrl: undefined,
             isLoading,
             status: authStatus?.status ?? 'UNHEALTHY',
-            logsUrl: '/logs/auth-logs',
+            logsUrl: isUnifiedLogsEnabled ? '/logs?filter=log_type:eq:auth' : '/logs/auth-logs',
           },
         ]
       : []),
@@ -154,7 +214,9 @@ export const ServiceStatus = () => {
             docsUrl: undefined,
             isLoading,
             status: realtimeStatus?.status ?? 'UNHEALTHY',
-            logsUrl: '/logs/realtime-logs',
+            logsUrl: isUnifiedLogsEnabled
+              ? '/logs?filter=log_type:eq:realtime'
+              : '/logs/realtime-logs',
           },
         ]
       : []),
@@ -166,7 +228,9 @@ export const ServiceStatus = () => {
             docsUrl: undefined,
             isLoading,
             status: storageStatus?.status ?? 'UNHEALTHY',
-            logsUrl: '/logs/storage-logs',
+            logsUrl: isUnifiedLogsEnabled
+              ? '/logs?filter=log_type:eq:storage'
+              : '/logs/storage-logs',
           },
         ]
       : []),
@@ -182,7 +246,9 @@ export const ServiceStatus = () => {
               : isLoading
                 ? ('COMING_UP' as const)
                 : ('UNHEALTHY' as const),
-            logsUrl: '/logs/edge-functions-logs',
+            logsUrl: isUnifiedLogsEnabled
+              ? '/logs?filter=log_type:eq:edge+function'
+              : '/logs/edge-functions-logs',
           },
         ]
       : []),

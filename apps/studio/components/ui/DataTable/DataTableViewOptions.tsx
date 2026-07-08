@@ -38,7 +38,7 @@ export function DataTableViewOptions() {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <ButtonTooltip
-          type="default"
+          variant="default"
           size="tiny"
           role="combobox"
           aria-expanded={open}
@@ -83,7 +83,7 @@ export function DataTableViewOptions() {
                         <span>{(column.columnDef.meta as any)?.label || column.id}</span>
                         {enableColumnOrdering && !search ? (
                           <SortableDragHandle
-                            type="text"
+                            variant="text"
                             size="tiny"
                             className="ml-auto size-5 text-muted-foreground hover:text-foreground focus:bg-muted focus:text-foreground"
                           >

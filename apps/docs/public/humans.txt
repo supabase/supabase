@@ -8,10 +8,12 @@ Adam Mohammed
 Adam Mokan
 AJ Matias
 Akash Manimaran
+Akilesh Sethu
 Alaister Young
 Aleksi Immonen
 Alex Hall
 Alex Hsu
+Alexander Alexandrov
 Alexander Korotkov
 Ali Waseem
 Allan S
@@ -22,7 +24,6 @@ Ana Mogul
 Andrew Valleteau
 Andrey A
 Angelico de los Reyes
-Anna Weihl
 Ant Evans
 Ant Wilson
 Ariuna K
@@ -31,6 +32,7 @@ Artur Zakirov
 Artyom Borissov
 Aziz Quadri
 Barco Fourie
+Barry Roodt
 Beng Eu
 Benjamin Coenen
 Bo Lu
@@ -40,6 +42,8 @@ Brendan Stephens
 Brent Newson
 Brian Cullen
 Brent Schroeter
+Bruno Kilian
+Burhan A
 Carel de Waal
 Cameron Blackwood
 Cameron Michie
@@ -89,6 +93,7 @@ Eduardo Gurgel
 Eleftheria Trivyzaki
 Eliot Whalan
 Emmett Folger
+Erfi Anugrah
 Eric Kharitonashvili
 Etienne Stalmans
 Eyal Ehrlich
@@ -109,7 +114,9 @@ Greg Marzouka
 Greg P
 Greg Richardson
 Gregor Vand
+Guillaume Faas
 Guilherme Souza
+Hanefi Önaldı
 Hannah Bowers
 Hardik Maheshwari
 Haritabh Gupta
@@ -126,6 +133,7 @@ Jared Patterson
 Jason Farber
 Jean-Paul Argudo
 Jeff Smick
+Jefferson Venerando
 Jenny Kibiri
 Jeremias Menichelli
 Jess Fink
@@ -153,6 +161,7 @@ Julian Domke
 Julien Goux
 Kai M
 Kalleby Santos
+Kanad Gupta
 Kanishk Dudeja
 Kamil Ogórek
 Kang Ming Tay
@@ -178,6 +187,7 @@ Liam Cloud Hogan
 Lindsay Moss
 Lukas Bernert
 Lukas Klingsbo
+Łukasz Korbasiewicz
 Łukasz Niemier
 Maksym Ionutsa
 Manuel Mendez
@@ -185,6 +195,7 @@ Manan Gupta
 Marcus Weiner
 Marija Milicevic
 Mark Burggraf
+Márton Boros
 Matthew Hambright
 Matt Hudson
 Matt Johnston
@@ -195,19 +206,24 @@ Mert Yerekapan
 Michal Kleczek
 Michelle Jubrey
 Miranda Limonczenko
+Mo Khan
 Monica Khoury
+Mrinal Paliwal
 Mykhailo Mischa Lieibenson
 Natalie Roberge
 Nick B
 Nick Littman
 Nick Nowlan
+Nicola Ferraro
 Nicolas Nosenzo
+Nik Richers
 Noah Moss
 Nyannyacha
 Oli R
 Pamela Chia
 Patricia Szasz
 Patrick Crane
+Paul Bauer
 Paul Caselton
 Paul Cioanca
 Paul Copplestone
@@ -235,6 +251,7 @@ Ryan Goulet
 Ryan Senior
 Ruan Maia
 Saba Pochkhua
+Sagar Shedge
 Sam Meech-Ward
 Sam Rome
 Sam Rose
@@ -247,6 +264,7 @@ Sean Romberg
 Sean Thompson
 Sergio Cioban Filho
 Shaii O
+Shane Adams
 Shane E
 Shreekar Shetty
 Sreyas Udayavarman
@@ -262,6 +280,7 @@ Taha Le Bras
 Tanun Chalermsinsuwan
 Taryn King
 Terry Sutton
+Terry Wilcox
 Thomas E
 Tim Frietas
 Tim Palmer

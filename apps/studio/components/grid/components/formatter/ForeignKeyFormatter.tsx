@@ -64,8 +64,8 @@ export const ForeignKeyFormatter = (props: Props) => {
     foreignKeyColumn?.format === 'bytea' && !!value ? convertByteaToHex(value) : value
 
   return (
-    <div className="sb-grid-foreign-key-formatter flex justify-between">
-      <span className="sb-grid-foreign-key-formatter__text">
+    <div className="flex w-full items-center justify-between flex justify-between">
+      <span className="m-0 grow overflow-hidden text-ellipsis">
         {formattedValue === null ? <NullValue /> : isMasked ? '••••••••' : formattedValue}
       </span>
       {isLoading && formattedValue !== null && (
@@ -84,7 +84,7 @@ export const ForeignKeyFormatter = (props: Props) => {
             <Popover>
               <PopoverTrigger asChild>
                 <ButtonTooltip
-                  type="default"
+                  variant="default"
                   className="w-6 h-6"
                   aria-label="View referencing record"
                   icon={<ArrowRight />}
@@ -94,6 +94,7 @@ export const ForeignKeyFormatter = (props: Props) => {
               </PopoverTrigger>
               <PopoverContent
                 align="end"
+                collisionPadding={8}
                 className="p-0 w-96"
                 onDoubleClick={(e) => {
                   e.preventDefault()

@@ -41,11 +41,8 @@ import { getContentById } from '@/data/content/content-id-query'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { useSQLSnippetFolderCreateMutation } from '@/data/content/sql-folder-create-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
-import {
-  SnippetWithContent,
-  useSnippetFolders,
-  useSqlEditorV2StateSnapshot,
-} from '@/state/sql-editor-v2'
+import type { SnippetWithContent } from '@/data/content/sql-folders-query'
+import { useSnippetFolders, useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 interface MoveQueryModalProps {
@@ -235,7 +232,7 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
                     <Button
                       block
                       size="small"
-                      type="default"
+                      variant="default"
                       className="pr-2 justify-between"
                       iconRight={
                         <Code
@@ -353,15 +350,15 @@ export const MoveQueryModal = ({ visible, snippets = [], onClose }: MoveQueryMod
 
             <DialogFooter>
               <Button
-                type="default"
+                variant="default"
                 disabled={isMovingSnippet || isCreatingFolder}
                 onClick={() => onClose()}
               >
                 Cancel
               </Button>
               <Button
-                type="primary"
-                htmlType="submit"
+                variant="primary"
+                type="submit"
                 disabled={isMovingToSameFolder}
                 loading={isMovingSnippet || isCreatingFolder}
               >

@@ -76,7 +76,7 @@ export default function RadioGroupForm() {
             </FormItem>
           )}
         />
-        <Button htmlType="submit">Submit</Button>
+        <Button type="submit">Submit</Button>
       </form>
     </Form>
   )

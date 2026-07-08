@@ -18,16 +18,16 @@ import {
   InputGroupInput,
   ScrollArea,
   Switch,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { getAvatarUrl, getDisplayName } from '../Auth/Users/Users.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
 import { useCustomAccessTokenHookDetails } from '@/hooks/misc/useCustomAccessTokenHookDetails'
@@ -218,24 +218,24 @@ export const UserImpersonationSelector = () => {
         )}
 
         {!impersonatingUser && !isExternalAuthImpersonating && (
-          <Tabs_Shadcn_ value={selectedTab} onValueChange={(value: any) => setSelectedTab(value)}>
-            <TabsList_Shadcn_ className="gap-x-3">
-              <TabsTrigger_Shadcn_ value="user">Project user</TabsTrigger_Shadcn_>
-              <TabsTrigger_Shadcn_ value="external" className="gap-x-1.5">
+          <Tabs value={selectedTab} onValueChange={(value: any) => setSelectedTab(value)}>
+            <TabsList className="gap-x-3">
+              <TabsTrigger value="user">Project user</TabsTrigger>
+              <TabsTrigger value="external" className="gap-x-1.5">
                 External user
                 <InfoTooltip side="bottom" className="flex flex-col gap-1 max-w-96">
                   Test RLS policies with external auth providers like Clerk or Auth0 by providing a
                   user ID and optional claims.
                 </InfoTooltip>
-              </TabsTrigger_Shadcn_>
-            </TabsList_Shadcn_>
+              </TabsTrigger>
+            </TabsList>
 
-            <TabsContent_Shadcn_ value="user">
+            <TabsContent value="user">
               <div className="flex flex-col gap-y-2">
                 <InputGroup>
                   <InputGroupInput
                     size="tiny"
-                    className="table-editor-search border-none"
+                    className="pr-10 border-none"
                     placeholder="Search by id, email, phone, or name..."
                     onChange={(e) => setSearchText(e.target.value)}
                     value={searchText}
@@ -253,7 +253,11 @@ export const UserImpersonationSelector = () => {
                   </InputGroupAddon>
                   <InputGroupAddon align="inline-end">
                     {searchText && (
-                      <InputGroupButton size="tiny" type="text" onClick={() => setSearchText('')}>
+                      <InputGroupButton
+                        size="tiny"
+                        variant="text"
+                        onClick={() => setSearchText('')}
+                      >
                         <span className="sr-only">Clear search</span>
                         <X size={12} />
                       </InputGroupButton>
@@ -314,7 +318,7 @@ export const UserImpersonationSelector = () => {
                             <CollapsibleContent className="mt-1 flex flex-col gap-y-4">
                               <Button
                                 size="tiny"
-                                type="text"
+                                variant="text"
                                 className="absolute right-0 top-0 py-2 hover:bg-muted flex items-center text"
                                 onClick={clearSearchHistory}
                               >
@@ -343,9 +347,9 @@ export const UserImpersonationSelector = () => {
                   )}
                 </>
               </div>
-            </TabsContent_Shadcn_>
+            </TabsContent>
 
-            <TabsContent_Shadcn_ value="external">
+            <TabsContent value="external">
               <div className="flex flex-col gap-y-4">
                 <FormItemLayout
                   layout="horizontal"
@@ -375,7 +379,7 @@ export const UserImpersonationSelector = () => {
                 </FormItemLayout>
                 <div className="flex items-center justify-end">
                   <Button
-                    type="default"
+                    variant="default"
                     disabled={!externalUserId}
                     onClick={impersonateExternalUser}
                   >
@@ -383,8 +387,8 @@ export const UserImpersonationSelector = () => {
                   </Button>
                 </div>
               </div>
-            </TabsContent_Shadcn_>
-          </Tabs_Shadcn_>
+            </TabsContent>
+          </Tabs>
         )}
       </div>
 
@@ -471,7 +475,7 @@ const BaseImpersonatingRow = ({
         </span>
       </div>
 
-      <Button type="default" onClick={onClick} disabled={isLoading} loading={isLoading}>
+      <Button variant="default" onClick={onClick} disabled={isLoading} loading={isLoading}>
         {isImpersonating ? 'Stop' : 'Impersonate'}
       </Button>
     </div>
@@ -567,7 +571,12 @@ const UserRow = ({ user, onClick, isImpersonating = false, isLoading = false }: 
         </span>
       </div>
 
-      <Button type="default" onClick={() => onClick(user)} disabled={isLoading} loading={isLoading}>
+      <Button
+        variant="default"
+        onClick={() => onClick(user)}
+        disabled={isLoading}
+        loading={isLoading}
+      >
         {isImpersonating ? 'Stop' : 'Impersonate'}
       </Button>
     </div>

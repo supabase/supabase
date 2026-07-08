@@ -77,7 +77,7 @@ const CronJobRunDetailsOverflowDialog = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="default">Learn more</Button>
+        <Button variant="default">Learn more</Button>
       </DialogTrigger>
       <DialogContent
         aria-describedby={undefined}
@@ -157,7 +157,7 @@ const CronJobRunDetailsOverflowDialog = ({
                   </Select>
                 </div>
                 <Button
-                  type="default"
+                  variant="default"
                   disabled={isBusy}
                   onClick={() => runBatchedDeletion(cleanupInterval)}
                 >
@@ -188,7 +188,7 @@ const CronJobRunDetailsOverflowDialog = ({
                 <Button
                   block
                   size="small"
-                  type="default"
+                  variant="default"
                   className="mt-1"
                   loading={isScheduling}
                   disabled={isScheduling}
@@ -232,7 +232,7 @@ const DeletionProgress = ({ progress, onCancel }: DeletionProgressProps) => {
         <span className="text-xs text-foreground-light">
           Deleted {totalRowsDeleted.toLocaleString()} rows so far...
         </span>
-        <Button type="outline" size="tiny" onClick={onCancel}>
+        <Button variant="outline" size="tiny" onClick={onCancel}>
           Cancel
         </Button>
       </div>
@@ -262,7 +262,7 @@ const DeletionError = ({ error, onRetry }: DeletionErrorProps) => (
       <XCircle size={16} />
       <span className="text-sm">Deletion failed: {error}</span>
     </div>
-    <Button type="default" size="small" onClick={onRetry}>
+    <Button variant="default" size="small" onClick={onRetry}>
       Retry
     </Button>
   </div>

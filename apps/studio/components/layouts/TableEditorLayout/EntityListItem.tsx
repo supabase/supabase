@@ -238,7 +238,7 @@ export const EntityListItem = ({
               className="text-foreground-lighter transition-all text-transparent group-hover:text-foreground data-open:text-foreground"
             >
               <Button
-                type="text"
+                variant="text"
                 className="w-6 h-6"
                 icon={<MoreVertical size={14} strokeWidth={2} />}
                 onClick={(e) => e.preventDefault()}
@@ -365,7 +365,7 @@ export const EntityListItem = ({
                   <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
                     <Link
                       key="view-policies"
-                      href={`/project/${projectRef}/auth/policies?schema=${encodeURIComponent(selectedSchema ?? '')}&search=${encodeURIComponent(String(entity.id))}`}
+                      href={`/project/${projectRef}/database/policies?schema=${encodeURIComponent(selectedSchema ?? '')}&search=${encodeURIComponent(String(entity.id))}`}
                     >
                       <Lock size={12} className="shrink-0" />
                       <span>View policies</span>

@@ -10,8 +10,14 @@
       "inputs": ["spec/**"],
       "outputs": ["features/docs/generated/**"],
     },
+    // Generates the guide/reference .md files and manifest.json under public/markdown/.
+    // Declaring outputs lets Turbo restore these artifacts on a cache hit; without it a
+    // cached run would skip the script and leave the generated markdown missing for `next build`.
+    "build:markdown": {
+      "outputs": ["public/markdown/**", "public/markdown/manifest.json"],
+    },
     "build": {
-      "dependsOn": ["^build", "codegen:examples", "codegen:references"],
+      "dependsOn": ["^build", "codegen:examples", "codegen:references", "build:markdown"],
       "env": [
         "ANALYZE",
         "NEXT_PUBLIC_SUPABASE_URL",

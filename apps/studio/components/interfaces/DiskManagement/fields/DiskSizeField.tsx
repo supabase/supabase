@@ -120,8 +120,8 @@ export function DiskSizeField({
                     <InputGroupText>GB</InputGroupText>
                     {isDirty ? (
                       <InputGroupButton
-                        htmlType="button"
-                        type="default"
+                        type="button"
+                        variant="default"
                         size="tiny"
                         className="px-2 text-foreground-light"
                         onClick={() => {
@@ -159,7 +159,7 @@ export function DiskSizeField({
             form={form}
             actions={
               <Button
-                type="default"
+                variant="default"
                 onClick={() => {
                   setValue('storageType', 'io2')
                   trigger('provisionedIOPS')

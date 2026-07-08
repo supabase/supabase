@@ -281,7 +281,7 @@ export const EditWrapperSheet = ({
                         </div>
                         <div className="flex items-center space-x-2">
                           <Button
-                            type="default"
+                            variant="default"
                             className="px-1"
                             icon={<Edit />}
                             onClick={() => {
@@ -289,7 +289,7 @@ export const EditWrapperSheet = ({
                             }}
                           />
                           <Button
-                            type="default"
+                            variant="default"
                             className="px-1"
                             icon={<Trash />}
                             onClick={() => {
@@ -302,7 +302,7 @@ export const EditWrapperSheet = ({
                   })}
 
                   <div className="flex justify-end">
-                    <Button type="default" onClick={() => setSelectedTableToEdit(NewTable)}>
+                    <Button variant="default" onClick={() => setSelectedTableToEdit(NewTable)}>
                       Add foreign table
                     </Button>
                   </div>
@@ -317,8 +317,8 @@ export const EditWrapperSheet = ({
             <SheetFooter>
               <Button
                 size="tiny"
-                type="default"
-                htmlType="button"
+                variant="default"
+                type="button"
                 onClick={confirmOnClose}
                 disabled={isSubmitting}
               >
@@ -326,9 +326,9 @@ export const EditWrapperSheet = ({
               </Button>
               <Button
                 size="tiny"
-                type="primary"
+                variant="primary"
                 form={FORM_ID}
-                htmlType="submit"
+                type="submit"
                 disabled={isSubmitting || !isDirty}
                 loading={isSubmitting}
               >

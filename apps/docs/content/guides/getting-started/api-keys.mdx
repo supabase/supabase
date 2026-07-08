@@ -32,6 +32,12 @@ There are 4 types of API keys that you can use with Supabase:
 | <span className="whitespace-nowrap!">`anon`</span>         | JWT (long lived)                                                 | Low        | <span className="whitespace-nowrap!">Platform, CLI</span> | Legacy version of publishable keys.                                                                                                                                                                                                                                                               |
 | <span className="whitespace-nowrap!">`service_role`</span> | JWT (long lived)                                                 | Elevated   | <span className="whitespace-nowrap!">Platform, CLI</span> | Legacy version of secret keys.                                                                                                                                                                                                                                                                    |
 
+<Admonition type="note" title="Creating new keys does not revoke your legacy keys">
+
+Both key types work simultaneously. Creating publishable and secret keys adds them _alongside_ your existing `anon` and `service_role` keys without affecting them — your legacy keys keep working. They remain valid until you explicitly disable them in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard which is a separate step. See [Migrating to new API keys](/docs/guides/getting-started/migrating-to-new-api-keys) for the full process.
+
+</Admonition>
+
 <$Partial path="api_keys_deprecation.mdx" />
 
 ## Publishable keys
@@ -89,7 +95,7 @@ Never expose your secret keys publicly. Your data is at risk. **Do not:**
 - Never use in a browser, even on `localhost`.
 - Do not pass in URLs or query params, as these are often logged.
 - Be careful passing them in request headers without prior log sanitization.
-- Take extra care logging even potentially **invalid API keys**. Simple typos might reveal the real key in the future.
+- Take extra care logging even potentially **invalid API keys**. Typos might reveal the real key in the future.
 - Reveal, copy, use or manipulate on hardware devices without full disk encryption and which you do not directly own or control (such as public computers, friend's laptop, etc.)
 
 Ensure you handle them with care and using [secure coding practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/stable-en/).

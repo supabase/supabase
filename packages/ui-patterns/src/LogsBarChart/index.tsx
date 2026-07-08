@@ -7,14 +7,14 @@ import type { CategoricalChartState } from 'recharts/types/chart/types'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 
 const CHART_COLORS = {
-  TICK: 'hsl(var(--background-overlay-hover))',
-  AXIS: 'hsl(var(--background-overlay-hover))',
+  TICK: 'var(--background-overlay-hover)',
+  AXIS: 'var(--background-overlay-hover)',
   GREEN_1: 'hsl(var(--brand-default))',
   GREEN_2: 'hsl(var(--brand-500))',
   RED_1: 'hsl(var(--destructive-default))',
   RED_2: 'hsl(var(--destructive-500))',
-  YELLOW_1: 'hsl(var(--warning-default))',
-  YELLOW_2: 'hsl(var(--warning-500))',
+  YELLOW_1: 'var(--chart-warning)',
+  YELLOW_2: 'var(--chart-warning-muted)',
 }
 
 type LogsBarChartDatum = {
@@ -26,8 +26,10 @@ type LogsBarChartDatum = {
 
 export const LogsBarChart = ({
   data,
+  error,
   onBarClick,
   EmptyState,
+  ErrorState,
   DateTimeFormat = 'MMM D, YYYY, hh:mma',
   isFullHeight = false,
   chartConfig,
@@ -36,8 +38,10 @@ export const LogsBarChart = ({
   hideXAxis = false,
 }: {
   data: LogsBarChartDatum[]
+  error?: unknown | null
   onBarClick?: (datum: LogsBarChartDatum, tooltipData?: CategoricalChartState) => void
   EmptyState?: ReactNode
+  ErrorState?: ReactNode
   DateTimeFormat?: string
   isFullHeight?: boolean
   chartConfig?: ChartConfig
@@ -46,6 +50,11 @@ export const LogsBarChart = ({
   hideXAxis?: boolean
 }) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
+
+  if (error) {
+    if (ErrorState) return ErrorState
+    return null
+  }
 
   if (data.length === 0) {
     if (EmptyState) return EmptyState

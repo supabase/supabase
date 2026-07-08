@@ -20,13 +20,11 @@ For content that requires progressive disclosure:
 ```mdx
 <Accordion
   type="default"
-  openBehaviour="multiple"
   chevronAlign="right"
   justified
   size="medium"
   className="text-foreground-light mt-8 mb-6"
 >
-  <div className="border-b mt-3 pb-3">
     <AccordionItem
       header="Accordion item 1"
       id="item-1"
@@ -36,8 +34,6 @@ For content that requires progressive disclosure:
 
     </AccordionItem>
 
-  </div>
-  <div className="border-b mt-3 pb-3">
     <AccordionItem
       header="Accordion item 2"
       id="item-2"
@@ -47,20 +43,17 @@ For content that requires progressive disclosure:
 
     </AccordionItem>
 
-  </div>
 </Accordion>
 ```
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
   chevronAlign="right"
   justified
   size="medium"
   className="text-foreground-light mt-8 mb-6"
 >
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
+  <AccordionItem
       header="Accordion item 1"
       id="item-1"
     >
@@ -69,9 +62,7 @@ For content that requires progressive disclosure:
 
     </AccordionItem>
 
-  </div>
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
+  <AccordionItem
       header="Accordion item 2"
       id="item-2"
     >
@@ -80,7 +71,6 @@ For content that requires progressive disclosure:
 
     </AccordionItem>
 
-  </div>
 </Accordion>
 
 ### Admonition
@@ -277,6 +267,7 @@ You can also import the `supabase-js` library here:
 ````mdx
 ```js
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('dummy', 'client')
 
 // ---cut---
@@ -291,6 +282,7 @@ Note the hidden statements above the cut. Hover over `signInWithPassword` to see
 
 ```js
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('dummy', 'client')
 
 // ---cut---
@@ -354,7 +346,7 @@ If your image has alternate light and dark versions, or you want to make it zoom
 
 ### Project Variables
 
-Some guides and tutorials will require that users copy their Supabase project URL and anon key. You can provide those inline if the user is signed in:
+Some guides and tutorials will require that users copy their Supabase project URL and publishable or secret key. You can provide those inline if the user is signed in:
 
 ```mdx
 <ProjectConfigVariables variable="url" />
@@ -507,14 +499,12 @@ We incorporate content reuse in the docs to avoid duplication. If you find yours
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
   chevronAlign="right"
   justified
   size="medium"
   className="text-foreground-light mt-8 mb-6"
 >
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
+  <AccordionItem
       header="Database setup"
       id="database-setup"
     >
@@ -527,9 +517,7 @@ We incorporate content reuse in the docs to avoid duplication. If you find yours
 
     </AccordionItem>
 
-  </div>
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
+  <AccordionItem
       header="Create client for Auth"
       id="create-client-auth"
     >
@@ -542,7 +530,6 @@ We incorporate content reuse in the docs to avoid duplication. If you find yours
 
     </AccordionItem>
 
-  </div>
 </Accordion>
 
 To make a new partial:

@@ -4,7 +4,7 @@ description: 'Share state between users with Realtime Presence.'
 subtitle: 'Share state between users with Realtime Presence.'
 ---
 
-Let's explore how to implement Realtime Presence to track state between multiple users.
+Use Realtime Presence to track state between multiple users.
 
 ## Usage
 
@@ -30,7 +30,7 @@ For high-frequency or fire-and-forget updates, use [Broadcast](/docs/guides/real
 
 <Admonition type="note" title="Sync event behavior">
 
-During a `sync` event, you may receive `join` and `leave` events simultaneously, even though no users are actually joining or leaving. This is expected behavior—Presence reconciles its local state with the server state, which can trigger these events as part of the synchronization process. This reflects state reconciliation, not real user movement.
+During a `sync` event, you may receive `join` and `leave` events simultaneously, even though no users are joining or leaving. This is expected behavior—Presence reconciles its local state with the server state, which can trigger these events as part of the synchronization process. This reflects state reconciliation, not real user movement.
 
 </Admonition>
 

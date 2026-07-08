@@ -11,7 +11,7 @@ import {
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-} from 'ui-patterns'
+} from 'ui-patterns/PageSection'
 
 import { Markdown } from '@/components/interfaces/Markdown'
 import DiskSizeConfigurationModal from '@/components/interfaces/Settings/Database/DiskSizeConfigurationModal'
@@ -108,7 +108,7 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
                         </p>
                         {!isAwsNimbus && (
                           <ButtonTooltip
-                            type="default"
+                            variant="default"
                             className="w-min ml-auto"
                             disabled={!canUpdateDiskSizeConfig || disabled}
                             onClick={() => setShowIncreaseDiskSizeModal(true)}
@@ -141,7 +141,11 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
 
                           {reportsAll && (
                             <div className="col-span-2 mt-4">
-                              <Button asChild type="default" iconRight={<ExternalLink size={14} />}>
+                              <Button
+                                asChild
+                                variant="default"
+                                iconRight={<ExternalLink size={14} />}
+                              >
                                 <Link
                                   href={`/project/${projectRef}/reports/database#database-size-report`}
                                 >
@@ -160,7 +164,7 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
                               <Markdown
                                 className="max-w-full"
                                 content={`
-We auto-scale your disk as you need more storage, but can only do this once every 4 hours.
+We auto-scale your disk as you need more storage, up to 4 modifications within a rolling 24-hour window.
 If you upload more than 1.5x the current size of your storage, your database will go
 into read-only mode. If you know how big your database is going to be, you can
 manually increase the size here.
@@ -197,7 +201,7 @@ Read more about [disk management](${DOCS_URL}/guides/platform/database-size#disk
                     disable your spend cap.
                   </p>
                 )}
-                <Button asChild type="default" className="mt-3">
+                <Button asChild variant="default" className="mt-3">
                   <Link
                     href={`/org/${organization?.slug}/billing?panel=${
                       hasAccessToDiskSizeConfig === false ? 'subscriptionPlan' : 'costControl'

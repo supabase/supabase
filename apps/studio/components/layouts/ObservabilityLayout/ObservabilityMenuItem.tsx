@@ -63,7 +63,7 @@ export const ObservabilityMenuItem = ({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="text"
+                variant="text"
                 className="px-1 opacity-50 hover:opacity-100"
                 icon={<MoreVertical size={12} strokeWidth={2} />}
                 onClick={(e) => {

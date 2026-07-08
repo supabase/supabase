@@ -64,7 +64,7 @@ const UpdatedTermsOfServiceDialog = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button type="default" className="w-min">
+        <Button variant="default" className="w-min">
           Learn more
         </Button>
       </DialogTrigger>
@@ -109,7 +109,7 @@ const UpdatedTermsOfServiceDialog = () => {
         <DialogFooter>
           <DialogClose asChild>
             <Button
-              type="default"
+              variant="default"
               className="opacity-100"
               onClick={() => setTOSUpdateAcknowledged(true)}
             >

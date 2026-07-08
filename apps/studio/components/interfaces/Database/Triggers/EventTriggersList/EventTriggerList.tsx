@@ -106,7 +106,7 @@ export const EventTriggerList = ({
             <TableCell className="space-x-2">
               {canEditTrigger ? (
                 <Button
-                  type="text"
+                  variant="text"
                   onClick={() => onEditTrigger(trigger)}
                   title={trigger.name}
                   className="text-link-table-cell text-left text-sm disabled:opacity-90 disabled:no-underline min-w-0 p-0 hover:bg-transparent font-medium max-w-48 title"
@@ -168,7 +168,7 @@ export const EventTriggerList = ({
                   <DropdownMenuTrigger asChild>
                     <Button
                       aria-label="More options"
-                      type="default"
+                      variant="default"
                       className="px-1"
                       icon={<MoreVertical />}
                     />
@@ -205,7 +205,7 @@ export const EventTriggerList = ({
               ) : (
                 <ButtonTooltip
                   disabled
-                  type="default"
+                  variant="default"
                   className="px-1"
                   icon={<MoreVertical />}
                   tooltip={{

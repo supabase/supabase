@@ -22,7 +22,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
@@ -332,11 +332,11 @@ export function JitDbAccessRuleSheet({
           </Form>
 
           <SheetFooter className="mt-auto w-full border-t py-4">
-            <Button type="default" onClick={confirmOnClose} disabled={isSubmitting}>
+            <Button variant="default" onClick={confirmOnClose} disabled={isSubmitting}>
               Cancel
             </Button>
             <Button
-              type="primary"
+              variant="primary"
               onClick={form.handleSubmit(handleSaveRule)}
               loading={isSubmitting}
             >

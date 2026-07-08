@@ -32,7 +32,7 @@ const Pagination = ({
 
       <Button
         icon={<ArrowLeft />}
-        type="outline"
+        variant="outline"
         disabled={page <= 1 || isLoading}
         onClick={onPreviousPage}
         title="Previous Page"
@@ -41,7 +41,7 @@ const Pagination = ({
 
       <Button
         icon={<ArrowRight />}
-        type="outline"
+        variant="outline"
         disabled={hasRunOutOfRows || isLoading}
         onClick={onNextPage}
         title="Next Page"

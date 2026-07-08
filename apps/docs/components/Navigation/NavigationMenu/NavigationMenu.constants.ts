@@ -31,6 +31,9 @@ const {
   sdkKotlin: sdkKotlinEnabled,
   sdkPython: sdkPythonEnabled,
   sdkSwift: sdkSwiftEnabled,
+  docsAgentPlugin: agentPluginEnabled,
+  docsAgentSkills: agentSkillsEnabled,
+  docsPrompts: promptsEnabled,
 } = isFeatureEnabled([
   'authentication:show_providers',
   'billing:all',
@@ -56,6 +59,9 @@ const {
   'sdk:kotlin',
   'sdk:python',
   'sdk:swift',
+  'docs:agent_plugin',
+  'docs:agent_skills',
+  'docs:prompts',
 ])
 
 const aiToolsEnabled = true
@@ -274,6 +280,13 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
           },
         ],
         [
+          {
+            label: 'Server SDK',
+            icon: 'reference-javascript',
+            href: '/reference/server' as `/${string}`,
+            level: 'reference_server',
+            new: true,
+          },
           {
             label: 'CLI Commands',
             icon: 'reference-cli',
@@ -1173,12 +1186,12 @@ export const database: NavMenuConstant = {
       items: [
         { name: 'Overview', url: '/guides/database/replication' },
         {
-          name: 'External replication',
-          url: '/guides/database/replication/external-replication-setup' as `/${string}`,
+          name: 'Pipelines',
+          url: '/guides/database/replication/pipelines' as `/${string}`,
           items: [
             {
               name: 'Setting up',
-              url: '/guides/database/replication/external-replication-setup' as `/${string}`,
+              url: '/guides/database/replication/pipelines' as `/${string}`,
               items: [
                 {
                   name: 'BigQuery',
@@ -1188,9 +1201,9 @@ export const database: NavMenuConstant = {
             },
             {
               name: 'Monitoring',
-              url: '/guides/database/replication/external-replication-monitoring' as `/${string}`,
+              url: '/guides/database/replication/pipelines-monitoring' as `/${string}`,
             },
-            { name: 'FAQ', url: '/guides/database/replication/external-replication-faq' },
+            { name: 'FAQ', url: '/guides/database/replication/pipelines-faq' },
           ],
         },
         {
@@ -1415,6 +1428,10 @@ export const database: NavMenuConstant = {
               url: '/guides/database/extensions/wrappers/logflare' as `/${string}`,
             },
             {
+              name: 'MongoDB',
+              url: '/guides/database/extensions/wrappers/mongodb' as `/${string}`,
+            },
+            {
               name: 'MSSQL',
               url: '/guides/database/extensions/wrappers/mssql' as `/${string}`,
             },
@@ -1575,10 +1592,6 @@ export const api: NavMenuConstant = {
         { name: 'Generating TypeScript Types', url: '/guides/api/rest/generating-types' },
         { name: 'Generating Python Types', url: '/guides/api/rest/generating-python-types' },
         { name: 'Error Codes', url: '/guides/api/rest/postgrest-error-codes' },
-        {
-          name: 'Handling Errors in supabase-js',
-          url: '/guides/api/handling-errors-in-supabase-js',
-        },
       ],
     },
     {
@@ -1616,6 +1629,16 @@ export const api: NavMenuConstant = {
         {
           name: 'Converting from SQL to JavaScript API',
           url: '/guides/api/sql-to-api' as `/${string}`,
+        },
+      ],
+    },
+    {
+      name: 'Debugging',
+      url: undefined,
+      items: [
+        {
+          name: 'Handling Errors in supabase-js',
+          url: '/guides/api/handling-errors-in-supabase-js',
         },
       ],
     },
@@ -1719,6 +1742,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Logging',
           url: '/guides/functions/logging' as `/${string}`,
+        },
+        {
+          name: 'Error codes',
+          url: '/guides/functions/error-codes' as `/${string}`,
         },
         {
           name: 'Troubleshooting',
@@ -2080,6 +2107,7 @@ export const storage: NavMenuConstant = {
           items: [
             { name: 'Fundamentals', url: '/guides/storage/cdn/fundamentals' },
             { name: 'Smart CDN', url: '/guides/storage/cdn/smart-cdn' },
+            { name: 'Purging Cache', url: '/guides/storage/cdn/purge-cdn-cache' },
             { name: 'Metrics', url: '/guides/storage/cdn/metrics' },
           ],
         },
@@ -2182,6 +2210,11 @@ export const storage: NavMenuConstant = {
         {
           name: 'Querying Vectors',
           url: '/guides/storage/vector/querying-vectors' as `/${string}`,
+        },
+        {
+          name: 'Local Development',
+          url: '/guides/storage/vector/local-development' as `/${string}`,
+          enabled: billingEnabled,
         },
         {
           name: 'Limits',
@@ -2380,6 +2413,7 @@ export const ai_tools: NavMenuConstant = {
     {
       name: 'Agent Plugin',
       url: '/guides/ai-tools/plugins' as `/${string}`,
+      enabled: agentPluginEnabled,
     },
     {
       name: 'MCP server',
@@ -2388,10 +2422,12 @@ export const ai_tools: NavMenuConstant = {
     {
       name: 'Agent Skills',
       url: '/guides/ai-tools/ai-skills' as `/${string}`,
+      enabled: agentSkillsEnabled,
     },
     {
       name: 'Prompts',
       url: '/guides/ai-tools/ai-prompts' as `/${string}`,
+      enabled: promptsEnabled,
     },
 
     {
@@ -2692,6 +2728,14 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/clone-project',
         },
         {
+          name: 'Project Pausing',
+          url: '/guides/platform/free-project-pausing' as `/${string}`,
+        },
+        {
+          name: 'Delete Project',
+          url: '/guides/platform/delete-project',
+        },
+        {
           name: 'Single Sign-On',
           url: '/guides/platform/sso',
           enabled: fullPlatformEnabled,
@@ -2749,6 +2793,10 @@ export const platform: NavMenuConstant = {
         },
         { name: 'Performance Tuning', url: '/guides/platform/performance' as `/${string}` },
         { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' as `/${string}` },
+        {
+          name: 'Postgres Connection Logging',
+          url: '/guides/platform/postgres-connection-logging' as `/${string}`,
+        },
         {
           name: 'Default Platform Permissions',
           url: '/guides/platform/permissions' as `/${string}`,
@@ -3304,6 +3352,17 @@ export const reference_javascript_v2 = {
   pkg: {
     name: '@supabase/supabase-js',
     repo: 'https://github.com/supabase/supabase-js',
+  },
+}
+
+export const reference_server_v1 = {
+  icon: 'reference-javascript',
+  title: 'Server',
+  url: '/reference/server',
+  parent: '/reference',
+  pkg: {
+    name: '@supabase/server',
+    repo: 'https://github.com/supabase/server',
   },
 }
 

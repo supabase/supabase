@@ -92,7 +92,7 @@ export const CreateSecretAPIKeyDialog = () => {
         side="bottom"
         tooltipOpen={visible === 'secret' ? false : undefined}
       >
-        <Button type="default" className="mt-2" icon={<Plus />} onClick={openDialog}>
+        <Button variant="default" className="mt-2" icon={<Plus />} onClick={openDialog}>
           New secret key
         </Button>
       </Shortcut>
@@ -176,7 +176,7 @@ export const CreateSecretAPIKeyDialog = () => {
             options={{ enabled: visible === 'secret' && !isCreatingAPIKey }}
             side="top"
           >
-            <Button form={FORM_ID} htmlType="submit" loading={isCreatingAPIKey}>
+            <Button form={FORM_ID} type="submit" loading={isCreatingAPIKey}>
               Create API key
             </Button>
           </Shortcut>

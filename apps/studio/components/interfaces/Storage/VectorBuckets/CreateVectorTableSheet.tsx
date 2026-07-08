@@ -23,7 +23,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -200,7 +200,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
         <ButtonTooltip
           block
           size="tiny"
-          type="primary"
+          variant="primary"
           className="w-fit"
           icon={<Plus size={14} />}
           disabled={!canCreateBuckets}
@@ -373,7 +373,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                       />
                     </div>
                     <Button
-                      type="text"
+                      variant="text"
                       className="w-[34px] h-[34px]" // Match the height of the input
                       size="tiny"
                       icon={<Trash2 size={12} />}
@@ -383,7 +383,7 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
                 ))}
               </div>
               <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-3">
-                <Button type="default" size="tiny" onClick={() => append({ value: '' })}>
+                <Button variant="default" size="tiny" onClick={() => append({ value: '' })}>
                   Add metadata key
                 </Button>
               </div>
@@ -392,12 +392,12 @@ export const CreateVectorTableSheet = ({ bucketName }: CreateVectorTableSheetPro
         </Form>
 
         <SheetFooter>
-          <Button type="default" disabled={isCreating} onClick={() => setVisible(false)}>
+          <Button variant="default" disabled={isCreating} onClick={() => setVisible(false)}>
             Cancel
           </Button>
           <Button
             form={formId}
-            htmlType="submit"
+            type="submit"
             loading={isCreating}
             disabled={isCreating || !bucketName}
           >

@@ -122,7 +122,7 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
         </div>
 
         <div className="flex items-center gap-x-2">
-          <Button disabled={isSettingUp} type="default" onClick={onClose}>
+          <Button disabled={isSettingUp} variant="default" onClick={onClose}>
             Cancel
           </Button>
           <Button disabled={!canDeployReplica} loading={isSettingUp} onClick={onSubmit}>

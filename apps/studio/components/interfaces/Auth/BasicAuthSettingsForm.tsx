@@ -32,9 +32,9 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { NO_REQUIRED_CHARACTERS } from './Auth.constants'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
@@ -269,14 +269,19 @@ export const BasicAuthSettingsForm = () => {
                             <code className="text-code-inline">authenticated</code> roles. We
                             strongly advise{' '}
                             <Link
-                              href={`/project/${projectRef}/auth/policies`}
+                              href={`/project/${projectRef}/database/policies`}
                               className="text-foreground underline"
                             >
                               reviewing your RLS policies
                             </Link>{' '}
                             to ensure that access to your data is restricted where required.
                           </p>
-                          <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
+                          <Button
+                            asChild
+                            variant="default"
+                            className="w-min"
+                            icon={<ExternalLink />}
+                          >
                             <Link href={`${DOCS_URL}/guides/auth/auth-anonymous#access-control`}>
                               View access control docs
                             </Link>
@@ -327,13 +332,13 @@ export const BasicAuthSettingsForm = () => {
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
                   {isDirty && (
-                    <Button type="default" onClick={() => form.reset()}>
+                    <Button variant="default" onClick={() => form.reset()}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     disabled={!canUpdateConfig || isUpdatingConfig || !isDirty}
                     loading={isUpdatingConfig}
                   >

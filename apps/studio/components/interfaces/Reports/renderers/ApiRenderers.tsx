@@ -16,7 +16,7 @@ import {
 } from 'ui'
 import * as z from 'zod'
 
-import { queryParamsToObject } from '../Reports.utils'
+import { queryParamsToObject, safeDecodeURIComponent } from '../Reports.utils'
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
 import { COUNTRY_LAT_LON } from '@/components/interfaces/ProjectCreation/ProjectCreation.constants'
 import {
@@ -35,7 +35,7 @@ import {
   TextFormatter,
 } from '@/components/interfaces/Settings/Logs/LogsFormatters'
 import Table from '@/components/to-be-cleaned/Table'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import BarChart from '@/components/ui/Charts/BarChart'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
@@ -225,7 +225,7 @@ export const TopApiRoutesRenderer = (
       />
       <div className="flex flex-row justify-end w-full gap-2 p-1">
         <Button
-          type="text"
+          variant="text"
           onClick={() => setShowMore(!showMore)}
           className={[
             'transition',
@@ -350,7 +350,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
   <Collapsible>
     <CollapsibleTrigger asChild>
       <div className="flex gap-2 items-center">
-        <Button asChild type="text" className=" py-0! p-1!" title="Show more route details">
+        <Button asChild variant="text" className=" py-0! p-1!" title="Show more route details">
           <span>
             <ChevronRight
               size={14}
@@ -372,7 +372,7 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
           <TextFormatter className="text-foreground-light" value={datum.path} />
           <TextFormatter
             className="max-w-sm text-foreground-lighter truncate "
-            value={decodeURIComponent(datum.search || '')}
+            value={safeDecodeURIComponent(datum.search || '')}
           />
         </div>
       </div>

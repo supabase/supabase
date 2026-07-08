@@ -9,7 +9,8 @@ import {
   TableCell,
   TableRow,
 } from 'ui'
-import { ShimmeringLoader, TimestampInfo } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { APIKeyDeleteDialog } from './APIKeyDeleteDialog'
 import { ApiKeyPill } from './ApiKeyPill'
@@ -91,7 +92,7 @@ export const APIKeyRow = ({
               <DropdownMenu>
                 <DropdownMenuTrigger className="px-1 focus-visible:outline-hidden" asChild>
                   <Button
-                    type="text"
+                    variant="text"
                     size="tiny"
                     icon={
                       <MoreVertical

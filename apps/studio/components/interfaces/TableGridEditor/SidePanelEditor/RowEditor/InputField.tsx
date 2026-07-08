@@ -1,5 +1,5 @@
 import { includes, noop } from 'lodash'
-import { Edit, Eye } from 'lucide-react'
+import { Edit, Expand, Eye } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -154,7 +154,7 @@ export const InputField = ({
             {isEditable && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <InputGroupButton type="default" icon={<Edit />} className="px-1.5" />
+                  <InputGroupButton variant="default" icon={<Edit />} className="px-1.5" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-28">
                   {field.isNullable && (
@@ -173,7 +173,7 @@ export const InputField = ({
   }
 
   if (includes(TEXT_TYPES, field.format)) {
-    const isTruncated = isValueTruncated(field.value)
+    const isTruncated = isValueTruncated(field.value, field.format)
 
     /**
      * Handle `undefined` as the default value of the input field
@@ -216,7 +216,7 @@ export const InputField = ({
               <DropdownMenuTrigger asChild>
                 <InputGroupButton
                   data-testid={`${field.name}-field-actions`}
-                  type="default"
+                  variant="default"
                   icon={<Edit />}
                   className="ml-auto px-1.5"
                 />
@@ -250,7 +250,7 @@ export const InputField = ({
   }
 
   if (includes(JSON_TYPES, field.format)) {
-    const isTruncated = isValueTruncated(field.value)
+    const isTruncated = isValueTruncated(field.value, field.format)
 
     return (
       <FormItemLayout
@@ -276,13 +276,12 @@ export const InputField = ({
           />
           <InputGroupAddon align="inline-end">
             <InputGroupButton
-              type="default"
-              htmlType="button"
+              variant="default"
+              type="button"
+              icon={isEditable ? <Edit /> : <Expand />}
+              className="px-1.5"
               onClick={() => onEditJson({ column: field.name, value: field.value })}
-              icon={isEditable ? <Edit /> : <Eye />}
-            >
-              {isEditable ? 'Edit' : 'View JSON'}
-            </InputGroupButton>
+            />
           </InputGroupAddon>
         </InputGroup>
       </FormItemLayout>
@@ -373,7 +372,7 @@ export const InputField = ({
     )
   }
 
-  const isTruncated = isValueTruncated(field.value)
+  const isTruncated = isValueTruncated(field.value, field.format)
 
   return (
     <FormItemLayout
@@ -406,8 +405,8 @@ export const InputField = ({
         <InputGroupAddon align="inline-end">
           {isTruncated ? (
             <InputGroupButton
-              type="default"
-              htmlType="button"
+              variant="default"
+              type="button"
               onClick={() => onEditJson({ column: field.name, value: field.value })}
               icon={isEditable ? <Edit /> : <Eye />}
             >

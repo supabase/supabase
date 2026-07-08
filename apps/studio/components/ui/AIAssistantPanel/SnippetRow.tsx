@@ -45,7 +45,7 @@ export const SnippetRow: React.FC<SnippetRowProps> = ({
               {onRemoveSnippet && (
                 <Button
                   size="tiny"
-                  type="text"
+                  variant="text"
                   className="h-4! w-4! rounded-full p-0"
                   onClick={(e) => {
                     e.stopPropagation()

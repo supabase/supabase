@@ -21,7 +21,7 @@ import { filterAndSortTokens, handleSortChange } from './AccessToken.utils'
 import { RowLoading } from './AccessTokenTable/RowLoading'
 import { TableContainer } from './AccessTokenTable/TableContainer'
 import { ExpiresCell, LastUsedCell, TokenNameCell } from './AccessTokenTable/TokenCells'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useAccessTokenDeleteMutation } from '@/data/access-tokens/access-tokens-delete-mutation'
 import { AccessToken, useAccessTokensQuery } from '@/data/access-tokens/access-tokens-query'
 import { useTrack } from '@/lib/telemetry/track'
@@ -118,7 +118,7 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      type="default"
+                      variant="default"
                       title="More options"
                       className="w-7"
                       icon={<MoreVertical />}

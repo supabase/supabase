@@ -108,7 +108,7 @@ export const UpgradingState = () => {
                   </p>
                 </div>
                 <div className="flex items-center mx-auto space-x-2">
-                  <Button asChild type="default">
+                  <Button asChild variant="default">
                     <SupportLink
                       queryParams={{
                         category: SupportCategories.DATABASE_UNRESPONSIVE,

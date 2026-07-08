@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest'
 
 import {
   buildConnectionParameters,
+  buildConnectionStringWithPassword,
   buildSafeConnectionString,
   DEFAULT_PORT,
   parseConnectionParams,
@@ -67,6 +68,23 @@ describe('buildSafeConnectionString', () => {
     const uri = 'postgresql://postgres.proj:[YOUR-PASSWORD]@host:5432/postgres?sslmode=require'
     const params = parseConnectionParams(uri)
     expect(buildSafeConnectionString(uri, params)).toContain('?sslmode=require')
+  })
+})
+
+describe('buildConnectionStringWithPassword', () => {
+  test('returns the original string when input or password is empty', () => {
+    const uri = `postgresql://postgres:${PASSWORD_PLACEHOLDER}@localhost:5432/postgres`
+
+    expect(buildConnectionStringWithPassword('', 'password')).toBe('')
+    expect(buildConnectionStringWithPassword(uri, '')).toBe(uri)
+  })
+
+  test('replaces every password placeholder with the encoded password', () => {
+    const uri = `postgresql://postgres:${PASSWORD_PLACEHOLDER}@localhost:5432/postgres?password=${PASSWORD_PLACEHOLDER}`
+
+    expect(buildConnectionStringWithPassword(uri, 'p@ss/word#1')).toBe(
+      'postgresql://postgres:p%40ss%2Fword%231@localhost:5432/postgres?password=p%40ss%2Fword%231'
+    )
   })
 })
 

@@ -64,7 +64,7 @@ export const DPA = () => {
                 setIsOpen(true)
                 track('dpa_request_button_clicked')
               }}
-              type="default"
+              variant="default"
             >
               Request DPA
             </Button>

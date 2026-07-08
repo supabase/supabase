@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS, useBreakpoint, useParams } from 'common'
+import { useBreakpoint, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { ResizablePanel, ResizablePanelGroup, SidebarProvider } from 'ui'
@@ -13,7 +13,7 @@ import { LayoutSidebarProvider } from './ProjectLayout/LayoutSidebar/LayoutSideb
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
 import { Sidebar } from '@/components/interfaces/Sidebar'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useCheckLatestDeploy } from '@/hooks/use-check-latest-deploy'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useAppStateSnapshot } from '@/state/app-state'
@@ -42,10 +42,7 @@ export const DefaultLayout = ({
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
 
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const backToDashboardURL = router.pathname.startsWith('/account')
     ? appSnap.lastRouteBeforeVisitingAccountPage.length > 0
@@ -82,6 +79,9 @@ export const DefaultLayout = ({
         <ProjectContextProvider projectRef={ref}>
           <MobileSheetProvider>
             <div className="flex flex-col h-screen w-screen">
+              <a className="sr-only" href="#main" tabIndex={0}>
+                Skip to content
+              </a>
               {/* Top Banner */}
               <AppBannerWrapper />
               <div className="shrink-0">
@@ -110,7 +110,9 @@ export const DefaultLayout = ({
                     maxSize={`${contentMaxSizePercentage}`}
                     defaultSize={`${contentMaxSizePercentage}`}
                   >
-                    <div className="h-full overflow-y-auto">{children}</div>
+                    <main id="main" className="h-full overflow-y-auto">
+                      {children}
+                    </main>
                   </ResizablePanel>
                   <LayoutSidebar
                     minSize={`${100 - contentMaxSizePercentage}`}
@@ -129,5 +131,3 @@ export const DefaultLayout = ({
     </SidebarProvider>
   )
 }
-
-export default DefaultLayout

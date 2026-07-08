@@ -1,8 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, DatabaseBackup } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -18,14 +18,16 @@ import DatabaseBackupsNav from '@/components/interfaces/Database/Backups/Databas
 import { PITRNotice } from '@/components/interfaces/Database/Backups/PITR/PITRNotice'
 import { PITRSelection } from '@/components/interfaces/Database/Backups/PITR/PITRSelection'
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
-import AlertError from '@/components/ui/AlertError'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
-import NoPermission from '@/components/ui/NoPermission'
+import { HighAvailabilityDisabledEmptyState } from '@/components/ui/HighAvailability/HighAvailabilityDisabledEmptyState'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useBackupsQuery } from '@/data/database/backups-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsOrioleDbInAws, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, PROJECT_STATUS } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
@@ -64,7 +66,8 @@ DatabasePhysicalBackups.getLayout = (page) => (
 
 const PITR = () => {
   const { ref: projectRef } = useParams()
-  const { data: project } = useSelectedProjectQuery()
+  const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
+  const { isHighAvailability } = useHighAvailability()
   const { hasAccess: hasAccessToPitr, isLoading: isLoadingEntitlements } =
     useCheckEntitlements('pitr.available_variants')
   const isOrioleDbInAws = useIsOrioleDbInAws()
@@ -76,7 +79,7 @@ const PITR = () => {
     isSuccess,
   } = useBackupsQuery({ projectRef })
 
-  const isLoading = isLoadingBackups || isLoadingEntitlements
+  const isLoading = isLoadingBackups || isLoadingEntitlements || isProjectPending
   const isEnabled = backups?.pitr_enabled
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
@@ -101,9 +104,23 @@ const PITR = () => {
     )
   }
 
+  if (isLoading) {
+    return <GenericSkeletonLoader />
+  }
+
+  if (isHighAvailability) {
+    return (
+      <HighAvailabilityDisabledEmptyState
+        icon={DatabaseBackup}
+        title="Point-in-Time Recovery unavailable on High Availability projects"
+        description="We're working to bring point-in-time recovery to High Availability projects. Contact support if this is blocking your work."
+        className="max-w-none mx-0"
+      />
+    )
+  }
+
   return (
     <>
-      {isLoading && <GenericSkeletonLoader />}
       {isError && <AlertError error={error} subject="Failed to retrieve PITR backups" />}
       {isSuccess && (
         <>
@@ -112,7 +129,11 @@ const PITR = () => {
               addon={hasAccessToPitr ? 'pitr' : undefined}
               source="pitr"
               featureProposition="enable Point-in-Time Recovery"
-              primaryText="Point in Time Recovery is a Pro Plan add-on"
+              primaryText={
+                hasAccessToPitr
+                  ? 'Point in Time Recovery is available as an add-on'
+                  : 'Point in Time Recovery is a Pro Plan add-on'
+              }
               secondaryText={
                 !hasAccessToPitr
                   ? 'Roll back your database to a specific second. Starts at $100/month. Pro Plan already includes daily backups at no extra cost.'

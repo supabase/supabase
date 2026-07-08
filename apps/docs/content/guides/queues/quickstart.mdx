@@ -3,7 +3,6 @@ title: Quickstart
 subtitle: 'Learn how to use Supabase Queues to add and read messages'
 ---
 
-{/* <!-- vale off --> */}
 This guide is an introduction to interacting with Supabase Queues via the Dashboard and official client library. Check out [Queues API Reference](/docs/guides/queues/api) for more details on our API.
 
 ## Concepts
@@ -25,8 +24,6 @@ Supabase Queues offers three types of Queues:
 - **Basic Queue**: A durable Queue that stores Messages in a logged table.
 - **Unlogged Queue**: A transient Queue that stores Messages in an unlogged table for better performance but may result in loss of Queue Messages.
 
-- **Partitioned Queue** (_Coming Soon_): A durable and scalable Queue that stores Messages in multiple table partitions for better performance.
-
 ## Create Queues
 
 To get started, navigate to the [Supabase Queues](/dashboard/project/_/integrations/queues/overview) Postgres Module under Integrations in the Dashboard and enable the `pgmq` extension.
@@ -40,8 +37,8 @@ To get started, navigate to the [Supabase Queues](/dashboard/project/_/integrati
 <Image
   alt="Supabase Dashboard Integrations page, showing the Queues Postgres Module"
   src={{
-    dark: '/docs/img/queues-quickstart-install.png',
-    light: '/docs/img/queues-quickstart-install.png',
+    dark: '/docs/img/queues-quickstart-install-dark.png',
+    light: '/docs/img/queues-quickstart-install-light.png',
   }}
 
 width={2064}
@@ -50,29 +47,24 @@ height={1720}
 
 On the [Queues page](/dashboard/project/_/integrations/queues/queues):
 
-- Click **Add a new queue** button
-
-<Admonition type="note">
-
-If you've already created a Queue click the **Create a queue** button instead.
-
-</Admonition>
+- Click **Create queue** button
 
 - Name your queue
 
-<Admonition type="note">
+<Admonition type="tip">
 
 Queue names can only be lowercase and hyphens and underscores are permitted.
 
 </Admonition>
 
 - Select your [Queue Type](#queue-types)
+- We recommend leaving Row Level Security (RLS) enabled. With it enabled, you don't need to set additional RLS on the queue tables.
 
 <Image
-  alt="Create a Queue from the Supabase Dashboard"
+  alt="A screenshot showing the process to create a Queue from the Supabase Dashboard"
   src={{
-    dark: '/docs/img/queues-quickstart-create.png',
-    light: '/docs/img/queues-quickstart-create.png',
+    dark: '/docs/img/queues-quickstart-create-dark.png',
+    light: '/docs/img/queues-quickstart-create-light.png',
   }}
 
 className="max-w-lg mx-auto!"
@@ -81,51 +73,31 @@ width={1456}
 height={1420}
 />
 
-### What happens when you create a queue?
+<Admonition type="tip" title="What happens when you create a queue?">
 
 Every new Queue creates two tables in the `pgmq` schema. These tables are `pgmq.q_<queue_name>` to store and process active messages and `pgmq.a_<queue_name>` to store any archived messages.
 
-A "Basic Queue" will create `pgmq.q_<queue_name>` and `pgmq.a_<queue_name>` tables as logged tables.
+A "Basic Queue" creates `pgmq.q_<queue_name>` and `pgmq.a_<queue_name>` tables as logged tables.
 
-However, an "Unlogged Queue" will create `pgmq.q_<queue_name>` as an unlogged table for better performance while sacrificing durability. The `pgmq.a_<queue_name>` table will still be created as a logged table so your archived messages remain safe and secure.
+However, an "Unlogged Queue" creates `pgmq.q_<queue_name>` as an unlogged table for better performance while sacrificing durability. The `pgmq.a_<queue_name>` table is still created as a logged table so your archived messages remain safe and secure.
+
+</Admonition>
 
 ## Expose Queues to client-side consumers
 
-Queues, by default, are not exposed over Supabase Data API and are only accessible via Postgres clients.
+Queues, by default, are not exposed over the Supabase Data API and are only accessible via Postgres clients.
 
 However, you may grant client-side consumers access to your Queues by enabling the Supabase Data API and granting permissions to the Queues API, which is a collection of database functions in the `pgmq_public` schema that wraps the database functions in the `pgmq` schema.
 
 This is to prevent direct access to the `pgmq` schema and its tables (RLS is not enabled by default on any tables) and database functions.
 
-To get started, navigate to the Queues [Settings page](/dashboard/project/_/integrations/queues/settings) and toggle on “Expose Queues via PostgREST”. Once enabled, Supabase creates and exposes a `pgmq_public` schema containing database function wrappers to a subset of `pgmq`'s database functions.
+To get started, navigate to the [**Queues > Settings**](/dashboard/project/_/integrations/queues/settings) section of the Dashboard and enable **Expose Queues via PostgREST**. Once enabled, Supabase creates and exposes a `pgmq_public` schema containing database function wrappers to a subset of `pgmq`'s database functions.
 
-<Image
-  alt="Screenshot of Queues settings with toggle to expose to PostgREST"
-  src={{
-    dark: '/docs/img/queues-quickstart-settings.png',
-    light: '/docs/img/queues-quickstart-settings.png',
-  }}
+### Add an RLS policy on your tables in `pgmq` schema [#enable-rls-on-your-tables-in-pgmq-schema]
 
-width={2140}
-height={1642}
-/>
+If you expose your pgmq schema with the Data API, for security purposes, you must enable Row Level Security (RLS) on all Queue tables (all tables in `pgmq` schema that begin with `q_`)
 
-### Enable RLS on your tables in `pgmq` schema
-
-For security purposes, you must enable Row Level Security (RLS) on all Queue tables (all tables in `pgmq` schema that begin with `q_`) if the Data API is enabled.
-
-You’ll want to create RLS policies for any Queues you want your client-side consumers to interact with.
-
-<Image
-  alt="Screenshot of creating an RLS policy from the Queues settings"
-  src={{
-    dark: '/docs/img/queues-quickstart-rls.png',
-    light: '/docs/img/queues-quickstart-rls.png',
-  }}
-
-width={2130}
-height={1508}
-/>
+Add an RLS policy for any Queues you want your client-side consumers to interact with, by clicking the _Add RLS Policy_ button on [the overview page of any Queue in the Dashboard](/dashboard/project/_/integrations/queues/queues).
 
 ### Grant permissions to `pgmq_public` database functions
 
@@ -139,13 +111,13 @@ The permissions required for each Queue API database function:
 | `read` `pop`        | `Select` `Update`        |
 | `archive` `delete`  | `Select` `Delete`        |
 
-To manage your queue permissions, click on the Queue Settings button.
+To manage your queue permissions, click on the Queue Settings cog button on [the overview page of any Queue in the Dashboard](/dashboard/project/_/integrations/queues/queues).
 
 <Image
-  alt="Screenshot of accessing queue settings"
+  alt="Screenshot highlighting the Queue Settings button on the Queues overview page in the Supabase Dashboard"
   src={{
-    dark: '/docs/img/queues-quickstart-queue-settings.png',
-    light: '/docs/img/queues-quickstart-queue-settings.png',
+    dark: '/docs/img/queues-quickstart-queue-settings-dark.png',
+    light: '/docs/img/queues-quickstart-queue-settings-light.png',
   }}
 
 width={2150}
@@ -154,26 +126,22 @@ height={1192}
 
 Then enable the required roles permissions.
 
-<Image
-  alt="Screenshot of configuring API access for roles from the Queues settings"
-  src={{
-    dark: '/docs/img/queues-quickstart-roles.png',
-    light: '/docs/img/queues-quickstart-roles-light.png',
-  }}
+| ROLE          | Select  | Insert  | Update  | Delete  |
+| ------------- | ------- | ------- | ------- | ------- |
+| anon          |         |         |         |         |
+| authenticated | enabled | enabled | enabled | enabled |
+| postgres      | enabled | enabled | enabled | enabled |
+| service_role  | enabled | enabled | enabled | enabled |
 
-width={1271}
-height={1315}
-/>
+<Admonition type="caution">
 
-<Admonition type="note">
-
-`postgres` and `service_role` roles should never be exposed client-side.
+You should never expose `postgres` and `service_role` roles client-side.
 
 </Admonition>
 
 ### Enqueueing and dequeueing messages
 
-Once your Queue has been created, you can begin enqueueing and dequeueing Messages.
+Once you have created your Queue, you can begin enqueueing and dequeueing Messages.
 
 <Tabs
   scrollable

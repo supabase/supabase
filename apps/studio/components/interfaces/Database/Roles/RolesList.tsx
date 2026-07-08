@@ -138,7 +138,7 @@ export const RolesList = () => {
               filterString && (
                 <Button
                   size="tiny"
-                  type="text"
+                  variant="text"
                   onClick={() => setFilterString('')}
                   className="px-1 mr-1"
                 >
@@ -220,7 +220,7 @@ export const RolesList = () => {
               side="bottom"
             >
               <Button
-                type="primary"
+                variant="primary"
                 icon={<Plus size={12} />}
                 onClick={() => setIsCreatingRole(true)}
               >
@@ -229,7 +229,7 @@ export const RolesList = () => {
             </Shortcut>
           ) : (
             <ButtonTooltip
-              type="primary"
+              variant="primary"
               disabled
               icon={<Plus size={12} />}
               tooltip={{

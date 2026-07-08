@@ -259,7 +259,7 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
     <Dialog open={topUpModalVisible} onOpenChange={(open) => onTopUpDialogVisibilityChange(open)}>
       <DialogTrigger asChild>
         <ButtonTooltip
-          type="default"
+          variant="default"
           className="pointer-events-auto"
           disabled={!canTopUpCredits || !isPermissionsLoaded}
           tooltip={{
@@ -420,8 +420,8 @@ export const CreditTopUp = ({ slug }: { slug: string | undefined }) => {
             {!paymentIntentConfirmation?.paymentIntent && (
               <DialogFooter>
                 <Button
-                  htmlType="submit"
-                  type="primary"
+                  type="submit"
+                  variant="primary"
                   loading={
                     form.formState.isSubmitting || executingTopUp || paymentConfirmationLoading
                   }

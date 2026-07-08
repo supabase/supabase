@@ -63,7 +63,7 @@ export const SessionTimeoutModal = ({
                     Try a different browser or disable extensions that block network requests. If
                     the problem persists:
                   </p>
-                  <Button type="default" size="tiny" onClick={handleClearStorage}>
+                  <Button variant="default" size="tiny" onClick={handleClearStorage}>
                     Clear site data and reload
                   </Button>
                   <p>

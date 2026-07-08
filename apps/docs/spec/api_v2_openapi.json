@@ -265,6 +265,339 @@
         "tags": ["Projects"],
         "x-endpoint-owners": ["management-api"]
       }
+    },
+    "/v2/projects/{ref}/private-link/associations": {
+      "get": {
+        "operationId": "v2-list-private-link-associations",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2ListPrivateLinkAssociationsResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to retrieve AWS accounts for project" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_read"] }],
+        "summary": "List AWS accounts attached to the project PrivateLink share",
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["platform-networking", "management-api"]
+      },
+      "post": {
+        "description": "Adds an AWS account to the project's PrivateLink configuration and schedules the AWS resources to be created.",
+        "operationId": "v2-create-private-link-association",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/V2CreatePrivateLinkAssociationRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2PrivateLinkAssociationResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "402": {
+            "description": "This feature requires the Team, or Enterprise organization plan."
+          },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to add AWS account to PrivateLink share" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_write"] }],
+        "summary": "Add an AWS account to the project PrivateLink share",
+        "tags": ["Projects"],
+        "x-allowed-plans": ["Team", "Enterprise"],
+        "x-badges": [{ "name": "Only available on Team, Enterprise", "position": "before" }],
+        "x-endpoint-owners": ["platform-networking", "management-api"]
+      }
+    },
+    "/v2/projects/{ref}/private-link/associations/aws-account/{aws_account_id}": {
+      "delete": {
+        "description": "Removes an AWS account from the project's PrivateLink configuration. Cleans up the associated AWS resources.",
+        "operationId": "v2-delete-private-link-association",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          },
+          {
+            "name": "aws_account_id",
+            "required": false,
+            "in": "path",
+            "description": "AWS account ID used in PrivateLink association",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "204": { "description": "" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to remove AWS account from PrivateLink share" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["project_admin_write"] }],
+        "summary": "Remove an AWS account from the project PrivateLink share",
+        "tags": ["Projects"],
+        "x-endpoint-owners": ["platform-networking", "management-api"]
+      }
+    },
+    "/v2/organizations/{slug}/members": {
+      "get": {
+        "description": "Returns a cursor-paginated list of organization members including their roles and project-scoped permissions.",
+        "operationId": "v2-list-organization-members",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "description": "Organization slug",
+            "schema": {
+              "pattern": "^[\\w-]+$",
+              "example": "tsrqponmlkjihgfedcba",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "properties": {
+                "size": { "type": "integer", "minimum": 1, "maximum": 100, "required": false },
+                "after": { "type": "string", "format": "uuid", "required": false },
+                "before": { "type": "string", "format": "uuid", "required": false }
+              },
+              "type": "object"
+            }
+          },
+          {
+            "name": "filter",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "properties": {
+                "username": { "type": "string", "required": false },
+                "primary_email": { "type": "string", "format": "email", "required": false }
+              },
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2ListMembersResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["members_read"] }],
+        "summary": "List members of an organization",
+        "tags": ["Organizations"],
+        "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
+        "x-endpoint-owners": ["management-api"],
+        "x-oauth-scope": "organizations:read"
+      }
+    },
+    "/v2/organizations/{slug}/members/{user_id}/roles": {
+      "patch": {
+        "description": "Assigns an org-wide role when projects is omitted, or creates a project-scoped assignment when projects is provided. Uses an org-level role template id from GET /v2/organizations/{slug}/roles. Stale role assignments are automatically cleaned up: if a role no longer has any projects, it is deleted; overlapping project assignments in other roles are automatically removed to avoid duplication.",
+        "operationId": "v2-assign-organization-member-role",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "description": "Organization slug",
+            "schema": {
+              "pattern": "^[\\w-]+$",
+              "example": "tsrqponmlkjihgfedcba",
+              "type": "string"
+            }
+          },
+          {
+            "name": "user_id",
+            "required": true,
+            "in": "path",
+            "schema": { "format": "uuid", "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/V2AssignOrganizationMemberRoleRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/OrganizationMemberRoleResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "402": { "description": "This feature requires the Enterprise organization plan." },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Failed to assign organization member role" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["organization_admin_write"] }],
+        "summary": "Assign or change an organization member role",
+        "tags": ["Organizations"],
+        "x-allowed-plans": ["Enterprise"],
+        "x-badges": [{ "name": "Only available on Enterprise", "position": "before" }],
+        "x-endpoint-owners": ["management-api"]
+      }
+    },
+    "/v2/organizations/{slug}/roles": {
+      "get": {
+        "description": "Returns a list of org-level roles for the organization.",
+        "operationId": "v2-list-organization-roles",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "description": "Organization slug",
+            "schema": {
+              "pattern": "^[\\w-]+$",
+              "example": "tsrqponmlkjihgfedcba",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2ListRolesResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["members_read"] }],
+        "summary": "List roles of an organization",
+        "tags": ["Organizations"],
+        "x-badges": [{ "name": "OAuth scope: organizations:read", "position": "after" }],
+        "x-endpoint-owners": ["management-api"],
+        "x-oauth-scope": "organizations:read"
+      }
+    },
+    "/v2/organizations/{slug}/members/invitations": {
+      "post": {
+        "description": "Creates member invitations for an organization. Each invitation can have different role and project scope settings.",
+        "operationId": "v2-create-organization-invitations",
+        "parameters": [
+          {
+            "name": "slug",
+            "required": true,
+            "in": "path",
+            "description": "Organization slug",
+            "schema": {
+              "pattern": "^[\\w-]+$",
+              "example": "tsrqponmlkjihgfedcba",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/V2CreateInvitationsRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/V2CreateInvitationsResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" },
+          "402": { "description": "This feature requires the Enterprise organization plan." },
+          "403": { "description": "Forbidden action" },
+          "429": { "description": "Rate limit exceeded" }
+        },
+        "security": [{ "bearer": [] }, { "fga_permissions": ["members_write"] }],
+        "summary": "Creates organization invitations",
+        "tags": ["Organizations Members Invitations"],
+        "x-allowed-plans": ["Enterprise"],
+        "x-badges": [
+          { "name": "OAuth scope: organizations:write", "position": "after" },
+          { "name": "Only available on Enterprise", "position": "before" }
+        ],
+        "x-endpoint-owners": ["management-api"],
+        "x-oauth-scope": "organizations:write"
+      }
     }
   },
   "info": {
@@ -890,6 +1223,525 @@
               }
             },
             "required": ["type", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2ListPrivateLinkAssociationsResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["private_link_association"],
+                  "description": "Resource type."
+                },
+                "id": { "type": "string" },
+                "attributes": {
+                  "type": "object",
+                  "properties": {
+                    "aws_account_id": {
+                      "type": "string",
+                      "minLength": 12,
+                      "maxLength": 12,
+                      "pattern": "^\\d{12}$",
+                      "description": "The AWS account ID this PrivateLink share is associated with."
+                    },
+                    "account_name": {
+                      "type": "string",
+                      "description": "Human-readable name for the AWS account."
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "CREATING",
+                        "READY",
+                        "ASSOCIATION_REQUEST_EXPIRED",
+                        "ASSOCIATION_ACCEPTED",
+                        "CREATION_FAILED",
+                        "DELETING"
+                      ],
+                      "description": "\n  - `CREATING`: The PrivateLink resources and the Association are in the process of being created. The PrivateLink Share cannot be accepted yet.\n  - `READY`: The PrivateLink resources have been created and the PrivateLink Share can be accepted for the duration of 12h after sharing. See `shared_at`.\n  - `ASSOCIATION_REQUEST_EXPIRED`: The PrivateLink Share has not been accepted within the 12h time limit. This association can now be deleted.\n  - `ASSOCIATION_ACCEPTED`: The PrivateLink Share was successfully accepted.\n  - `CREATION_FAILED`: The PrivateLink resources failed to create. This likely means something went wrong on Supabase's and and support should be contacted.\n  - `DELETING`: The PrivateLink resources and the Association are in the process of being deleted. The PrivateLink Share cannot be accepted yet.\n"
+                    },
+                    "shared_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "nullable": true,
+                      "description": "The time and date at which the AWS Resource Share Association was requested from Supabase. `null` means that the association was not yet requested while the PrivateLink Association is pending."
+                    }
+                  },
+                  "required": ["aws_account_id", "status", "shared_at"]
+                }
+              },
+              "required": ["type", "id", "attributes"]
+            }
+          }
+        },
+        "required": ["data"]
+      },
+      "V2CreatePrivateLinkAssociationRequest": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["private_link_association"],
+                "description": "Resource type."
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "aws_account_id": {
+                    "type": "string",
+                    "minLength": 12,
+                    "maxLength": 12,
+                    "pattern": "^\\d{12}$",
+                    "description": "The AWS account ID to add to the project PrivateLink share."
+                  },
+                  "account_name": {
+                    "type": "string",
+                    "maxLength": 128,
+                    "description": "Optional human-readable name for the AWS account."
+                  }
+                },
+                "required": ["aws_account_id"]
+              }
+            },
+            "required": ["type", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2PrivateLinkAssociationResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["private_link_association"],
+                "description": "Resource type."
+              },
+              "id": { "type": "string" },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "aws_account_id": {
+                    "type": "string",
+                    "minLength": 12,
+                    "maxLength": 12,
+                    "pattern": "^\\d{12}$",
+                    "description": "The AWS account ID this PrivateLink share is associated with."
+                  },
+                  "account_name": {
+                    "type": "string",
+                    "description": "Human-readable name for the AWS account."
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "CREATING",
+                      "READY",
+                      "ASSOCIATION_REQUEST_EXPIRED",
+                      "ASSOCIATION_ACCEPTED",
+                      "CREATION_FAILED",
+                      "DELETING"
+                    ],
+                    "description": "\n  - `CREATING`: The PrivateLink resources and the Association are in the process of being created. The PrivateLink Share cannot be accepted yet.\n  - `READY`: The PrivateLink resources have been created and the PrivateLink Share can be accepted for the duration of 12h after sharing. See `shared_at`.\n  - `ASSOCIATION_REQUEST_EXPIRED`: The PrivateLink Share has not been accepted within the 12h time limit. This association can now be deleted.\n  - `ASSOCIATION_ACCEPTED`: The PrivateLink Share was successfully accepted.\n  - `CREATION_FAILED`: The PrivateLink resources failed to create. This likely means something went wrong on Supabase's and and support should be contacted.\n  - `DELETING`: The PrivateLink resources and the Association are in the process of being deleted. The PrivateLink Share cannot be accepted yet.\n"
+                  },
+                  "shared_at": {
+                    "type": "string",
+                    "format": "date-time",
+                    "nullable": true,
+                    "description": "The time and date at which the AWS Resource Share Association was requested from Supabase. `null` means that the association was not yet requested while the PrivateLink Association is pending."
+                  }
+                },
+                "required": ["aws_account_id", "status", "shared_at"]
+              }
+            },
+            "required": ["type", "id", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2ListMembersResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["organization_member"],
+                  "description": "Resource type."
+                },
+                "id": { "type": "string", "format": "uuid" },
+                "attributes": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Member's username"
+                    },
+                    "primary_email": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Member's primary email"
+                    },
+                    "mfa_enabled": {
+                      "type": "boolean",
+                      "description": "Whether Multi-Factor Authentication is enabled for this member"
+                    },
+                    "is_sso_user": {
+                      "type": "boolean",
+                      "description": "Whether this member is a Single Sign-On user"
+                    },
+                    "avatar_url": {
+                      "type": "string",
+                      "nullable": true,
+                      "description": "Member's avatar URL"
+                    },
+                    "roles": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "name": {
+                            "type": "string",
+                            "description": "Role name. For project-scoped roles this is the base role name.",
+                            "example": "developer"
+                          },
+                          "scope": {
+                            "type": "string",
+                            "enum": ["organization", "project"],
+                            "description": "Whether this role applies org-wide or is scoped to specific projects for the user."
+                          },
+                          "projects": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "ref": { "type": "string" },
+                                "name": { "type": "string" }
+                              },
+                              "required": ["ref", "name"]
+                            },
+                            "description": "Project refs this role is scoped to. Empty array for org-level roles."
+                          }
+                        },
+                        "required": ["name", "scope", "projects"]
+                      },
+                      "description": "Roles assigned to this member. Includes both org-level and project-scoped roles."
+                    }
+                  },
+                  "required": [
+                    "username",
+                    "primary_email",
+                    "mfa_enabled",
+                    "is_sso_user",
+                    "avatar_url",
+                    "roles"
+                  ]
+                }
+              },
+              "required": ["type", "id", "attributes"]
+            }
+          },
+          "links": {
+            "type": "object",
+            "properties": {
+              "first": {
+                "type": "string",
+                "nullable": true,
+                "description": "URL path to the first page if available.",
+                "example": "/v2/organizations/my-org/members?page[size]=10"
+              },
+              "prev": {
+                "type": "string",
+                "nullable": true,
+                "description": "URL path to the previous page.",
+                "example": "/v2/organizations/my-org/members?page[size]=10&page[before]=019adf7d-4513-74c5-bb9a-f1bc0f7a95d7"
+              },
+              "next": {
+                "type": "string",
+                "nullable": true,
+                "description": "URL path to the next page.",
+                "example": "/v2/organizations/my-org/members?page[size]=10&page[after]=019adf7d-4513-7062-b292-78b86cc470a4"
+              },
+              "last": {
+                "type": "string",
+                "nullable": true,
+                "description": "URL path to the last page if available.",
+                "example": "/v2/organizations/my-org/members?page[size]=10&page[after]=019adf7d-4513-71ba-b264-21900edb4295"
+              }
+            },
+            "required": ["prev", "next"]
+          }
+        },
+        "required": ["data", "links"]
+      },
+      "V2AssignOrganizationMemberRoleRequest": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["organization_member_role"],
+                "description": "Resource type."
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "role": {
+                    "type": "string",
+                    "enum": ["owner", "administrator", "developer", "read-only"],
+                    "description": "Role name to assign. Must be one of: owner, administrator, developer, read-only. Must be on a Team or Enterprise plan to use the read-only role.",
+                    "example": "developer"
+                  },
+                  "projects": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "ref": {
+                          "type": "string",
+                          "description": "Project ref",
+                          "example": "abcjuqabhgwjjutfvtpa"
+                        }
+                      },
+                      "required": ["ref"]
+                    },
+                    "minItems": 1,
+                    "description": "The projects to assign a project-scoped role for. If omitted, assigns an org-wide role."
+                  }
+                },
+                "required": ["role"]
+              }
+            },
+            "required": ["type", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "OrganizationMemberRoleResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": ["organization_member_role"],
+                "description": "Resource type."
+              },
+              "attributes": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Role name. For project-scoped assignments this is the base role name.",
+                    "example": "developer"
+                  },
+                  "scope": {
+                    "type": "string",
+                    "enum": ["organization", "project"],
+                    "description": "Whether this role applies org-wide or is scoped to specific projects for the user."
+                  },
+                  "projects": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": { "ref": { "type": "string" }, "name": { "type": "string" } },
+                      "required": ["ref", "name"]
+                    },
+                    "description": "Project refs this role is scoped to. Empty array for org-level roles."
+                  }
+                },
+                "required": ["name", "scope", "projects"]
+              }
+            },
+            "required": ["type", "attributes"]
+          }
+        },
+        "required": ["data"]
+      },
+      "V2ListRolesResponse": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["organization_role"],
+                  "description": "Resource type."
+                },
+                "id": {},
+                "attributes": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string",
+                      "description": "Role name.",
+                      "example": "developer"
+                    }
+                  },
+                  "required": ["name"]
+                }
+              },
+              "required": ["type", "attributes"]
+            }
+          }
+        },
+        "required": ["data"]
+      },
+      "V2CreateInvitationsRequest": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["organization_invitation"],
+                  "description": "Resource type."
+                },
+                "attributes": {
+                  "type": "object",
+                  "properties": {
+                    "email": { "type": "string", "format": "email" },
+                    "role": {
+                      "type": "string",
+                      "enum": ["owner", "administrator", "developer", "read-only"],
+                      "description": "Role name to assign. Must be on a Team or Enterprise plan to use the read-only role.",
+                      "example": "developer"
+                    },
+                    "projects": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "ref": {
+                            "type": "string",
+                            "description": "Project ref",
+                            "example": "abcjuqabhgwjjutfvtpa"
+                          }
+                        },
+                        "required": ["ref"]
+                      },
+                      "minItems": 1,
+                      "description": "The projects to limit a user to. If omitted, user will have org-wide access with the provided role."
+                    },
+                    "require_sso": { "type": "boolean" }
+                  },
+                  "required": ["email", "role"]
+                }
+              },
+              "required": ["type", "attributes"]
+            },
+            "minItems": 1,
+            "maxItems": 50
+          }
+        },
+        "required": ["data"]
+      },
+      "V2CreateInvitationsResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "code": { "type": "string" },
+              "message": { "type": "string" },
+              "description": { "type": "string" },
+              "links": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "properties": {
+                    "href": { "type": "string" },
+                    "rel": { "type": "string" },
+                    "title": { "type": "string" },
+                    "type": { "type": "string" },
+                    "describedby": { "type": "string" },
+                    "meta": { "type": "object", "additionalProperties": {} }
+                  },
+                  "required": ["href"]
+                }
+              },
+              "meta": { "type": "object", "additionalProperties": {} },
+              "issues": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": { "type": "string" },
+                    "code": { "type": "string" },
+                    "message": { "type": "string" },
+                    "description": { "type": "string" },
+                    "links": {
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "href": { "type": "string" },
+                          "rel": { "type": "string" },
+                          "title": { "type": "string" },
+                          "type": { "type": "string" },
+                          "describedby": { "type": "string" },
+                          "meta": { "type": "object", "additionalProperties": {} }
+                        },
+                        "required": ["href"]
+                      }
+                    },
+                    "meta": {
+                      "type": "object",
+                      "properties": { "email": { "type": "string", "format": "email" } },
+                      "required": ["email"]
+                    }
+                  },
+                  "required": ["code", "message", "meta"]
+                }
+              }
+            },
+            "required": ["code", "message"]
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["organization_invitation"],
+                  "description": "Resource type."
+                },
+                "id": {},
+                "attributes": {
+                  "type": "object",
+                  "properties": { "email": { "type": "string", "format": "email" } },
+                  "required": ["email"]
+                }
+              },
+              "required": ["type", "attributes"]
+            }
           }
         },
         "required": ["data"]

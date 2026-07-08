@@ -12,8 +12,8 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { SessionsAuthSettingsForm } from '@/components/interfaces/Auth/SessionsAuthSettingsForm/SessionsAuthSettingsForm'
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
-import NoPermission from '@/components/ui/NoPermission'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import type { NextPageWithLayout } from '@/types'
 

@@ -24,7 +24,7 @@ import {
   SelectValue,
   WarningIcon,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
@@ -158,7 +158,7 @@ export const NewTokenDialog = ({
                   be very careful when using this API.
                 </p>
                 <div className="mt-4">
-                  <Button asChild type="default" icon={<ExternalLink />}>
+                  <Button asChild variant="default" icon={<ExternalLink />}>
                     <a href="https://api.supabase.com/api/v0" target="_blank" rel="noreferrer">
                       Experimental API documentation
                     </a>
@@ -251,7 +251,7 @@ export const NewTokenDialog = ({
         </DialogSection>
         <DialogFooter>
           <Button
-            type="default"
+            variant="default"
             disabled={isPending}
             onClick={() => {
               form.reset()
@@ -262,7 +262,7 @@ export const NewTokenDialog = ({
           >
             Cancel
           </Button>
-          <Button form={formId} htmlType="submit" loading={isPending}>
+          <Button form={formId} type="submit" loading={isPending}>
             Generate token
           </Button>
         </DialogFooter>

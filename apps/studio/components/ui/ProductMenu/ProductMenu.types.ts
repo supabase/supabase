@@ -30,6 +30,7 @@ export interface ProductMenuGroupItem {
   childItems?: ProductMenuGroupItem[]
   pages?: string[]
   shortcutId?: ShortcutId
+  isLoading?: boolean
 }
 
 /**

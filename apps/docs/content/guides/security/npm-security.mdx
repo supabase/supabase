@@ -4,7 +4,7 @@ title: 'Securing npm installs'
 description: 'Consumer-side guide to hardening your npm installs of Supabase packages against supply-chain attacks.'
 ---
 
-A practical guide for anyone installing Supabase packages from npm — the JavaScript client libraries (`@supabase/supabase-js` and friends), the `supabase` CLI, or any other dependency in your tree — on defending against supply-chain attacks. Most of it applies to any npm package, not just Supabase's.
+A practical guide for anyone installing Supabase packages from npm — the JavaScript client libraries (`@supabase/supabase-js` and friends), the `supabase` CLI, or any other dependency in your tree — on defending against supply-chain attacks. Most of it applies to any npm package, not only Supabase's.
 
 <Admonition type="tip">
 
@@ -38,7 +38,7 @@ A committed lockfile is the floor, not the ceiling.
 
 - Commit `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`, or `bun.lock`.
 - In CI, install with `npm ci` / `pnpm install --frozen-lockfile` / `yarn install --immutable` / `bun install --frozen-lockfile`. These fail if `package.json` and the lockfile disagree, which is what you want.
-- Caret ranges (`^1.2.3`) in `package.json` are fine **if** you also have a lockfile and the rest of the guidance below — the lockfile is what actually gets installed.
+- Caret ranges (`^1.2.3`) in `package.json` are fine **if** you also have a lockfile and the rest of the guidance below — the lockfile is what gets installed.
 
 **Pin transitive risk with overrides.** If you don't trust a particular transitive dep version, force a known-good version via:
 
@@ -102,7 +102,7 @@ npmPreapprovedPackages: # opt specific packages out of all package gates
   - '@your-org/*'
 ```
 
-Versions newer than the gate are excluded from resolution. Yarn's docs also note this guards against the npm registry's 72-hour unpublish window — a package you just installed could vanish, breaking your build, if you don't wait it out.
+Versions newer than the gate are excluded from resolution. Yarn's docs also note this guards against the npm registry's 72-hour unpublish window — a package you recently installed could vanish, breaking your build, if you don't wait it out.
 
 Two related yarn settings worth knowing about while you're in `.yarnrc.yml`:
 
@@ -141,7 +141,7 @@ Or per-command:
 bun add @supabase/supabase-js --minimum-release-age 604800
 ```
 
-Bun's age gate only affects new resolutions — existing entries in `bun.lock` are unchanged. It also runs a stability check: if multiple versions were published close together just outside your gate, Bun extends the filter to skip those (likely unstable) versions and picks an older, more mature one. Exact-version requests (`pkg@1.1.1`) respect the gate but bypass the stability extension.
+Bun's age gate only affects new resolutions — existing entries in `bun.lock` are unchanged. It also runs a stability check: if multiple versions were published close together outside your gate, Bun extends the filter to skip those (likely unstable) versions and picks an older, more mature one. Exact-version requests (`pkg@1.1.1`) respect the gate but bypass the stability extension.
 
 For Deno-based Edge Functions, see the [Edge Functions specifics](#edge-functions-specifics) section below.
 
@@ -230,7 +230,7 @@ Corepack (bundled with modern Node) and `pnpm/action-setup@v6+` both read this f
 
 ## Prune unused dependencies
 
-Every dependency you don't actually need is attack surface you don't actually need. Two cheap habits:
+Every dependency you don't need is attack surface you don't need. Two cheap habits:
 
 - Periodically run `npx depcheck` (or the equivalent for your stack) and remove dependencies that aren't imported anywhere.
 - Look at your direct dependencies when a CVE lands. Is the dep doing something you could do in 20 lines yourself? Some of the most-exploited packages are tiny utilities that became transitive footguns.
@@ -267,7 +267,7 @@ Talk to the Supabase Functions team if your security posture depends on a featur
 
 ## If you suspect you installed a compromised version
 
-Move quickly. Order of operations:
+Act promptly. Order of operations:
 
 1. **Treat the install host as potentially compromised.** Anything readable by the user that ran the install — env vars, files, secrets in memory — should be assumed stolen.
 2. **Rotate credentials reachable from that host**: cloud provider keys (AWS, GCP, Azure), Kubernetes / Vault tokens, GitHub tokens, npm tokens, SSH keys, and any Supabase service-role keys or anon keys that touched the box.

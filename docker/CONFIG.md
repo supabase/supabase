@@ -90,8 +90,8 @@ The image tags below are pinned in `docker-compose.yml` at the time of this docu
 | `POSTGRES_HOST` | string | Self-hosted | Postgres host (service name in compose network). | Default: `db`. |
 | `POSTGRES_PASSWORD` | string | Both | Postgres password for the `POSTGRES_USER_READ_WRITE` role. | Supports `_FILE` suffix for Docker secrets. |
 | `POSTGRES_PORT` | integer | Self-hosted | Postgres TCP port. | Default: `5432`. |
-| `POSTGRES_USER_READ_ONLY` | string | | Postgres role used for read-only queries from the SQL editor. | Default: `supabase_read_only_user`. Only takes effect if you've manually created the role per the "remove superuser access" guide. |
-| `POSTGRES_USER_READ_WRITE` | string | Both | Postgres role used for read/write queries from the SQL editor. | Default: `supabase_admin`. Commented out in default compose. See "remove superuser access" guide. |
+| `POSTGRES_USER_READ_ONLY` | string | | Postgres role used by the local MCP server when running in read-only mode. | Default: `supabase_read_only_user`. This role has no password by default, so read-only MCP will fail to connect. To enable, assign a password matching `POSTGRES_PASSWORD`. |
+| `POSTGRES_USER_READ_WRITE` | string | Both | Postgres role used for read/write queries from the SQL editor. | Default: `postgres`. |
 | `STUDIO_PG_META_URL` | URL | Both | URL of the `postgres-meta` service used for schema introspection. | E.g. `http://meta:8080`. Required. |
 | `SUPABASE_PUBLIC_URL` | URL | Both | Public URL of the Supabase stack (Kong gateway) as seen by end users. | Used to construct REST API URLs and connection strings shown in the dashboard. |
 | `SUPABASE_URL` | URL | Both | Internal URL Studio uses to reach Kong from inside the Docker network. | E.g. `http://kong:8000`. |
@@ -118,7 +118,7 @@ These mirror the running PostgREST configuration so the dashboard can display co
 |---|---|---|---|---|
 | `PGRST_DB_EXTRA_SEARCH_PATH` | string (CSV) | Both | Extra Postgres schemas added to `search_path` for every PostgREST request. | Default: `public`. |
 | `PGRST_DB_MAX_ROWS` | integer (count) | Both | Maximum rows returned by any single PostgREST request. | Default: `1000`. |
-| `PGRST_DB_SCHEMAS` | string (CSV) | Both | Comma-separated list of schemas exposed via PostgREST. | Default: `public,storage,graphql_public`. Also used as the list of "Exposed schemas" in the API settings UI. |
+| `PGRST_DB_SCHEMAS` | string (CSV) | Both | Comma-separated list of schemas exposed via PostgREST. | Default: `public,graphql_public`. Also used as the list of "Exposed schemas" in the API settings UI. |
 
 ### Analytics / Logflare
 
@@ -126,7 +126,6 @@ These mirror the running PostgREST configuration so the dashboard can display co
 |---|---|---|---|---|
 | `LOGFLARE_API_KEY` | string | Self-hosted | Legacy alias for `LOGFLARE_PUBLIC_ACCESS_TOKEN`. | Deprecated. Declared in `apps/studio/turbo.jsonc` but not read by Studio code; kept only for backward compatibility with older deployments. |
 | `LOGFLARE_PRIVATE_ACCESS_TOKEN` | string | Both | Private API token Studio uses server-side to query Logflare endpoints (logs, charts). | Required for logs/analytics features to work on self-hosted. |
-| `LOGFLARE_PUBLIC_ACCESS_TOKEN` | string | Self-hosted | Public API token used by the analytics (supabase/logflare) container for ingestion. | Not read by Studio code (despite being in `apps/studio/turbo.jsonc`). Passed through the `studio` service env in `docker-compose.yml` for parity only. |
 | `LOGFLARE_URL` | URL | Both | Base URL of the Logflare/analytics service. | E.g. `http://analytics:4000`. Used to build the `PROJECT_ANALYTICS_URL`. |
 | `NEXT_ANALYTICS_BACKEND_PROVIDER` | enum | Both | Historically intended to select the analytics container's backend (`postgres` or `bigquery`). | No-op today: not read by Studio code, and the `analytics` (supabase/logflare) container chooses its backend via `POSTGRES_BACKEND_URL` / `LOGFLARE_FEATURE_FLAG_OVERRIDE` instead. Safe to ignore. |
 | `NEXT_PUBLIC_ENABLE_LOGS` | boolean | Both | Historically intended to toggle visibility of log explorer pages. | Not read by Studio code today, and not declared in `apps/studio/turbo.jsonc`. Use `ENABLED_FEATURES_LOGS_ALL` (see Feature flags below) for runtime control of the logs section. |
@@ -138,7 +137,7 @@ Self-hosted Studio reads `ENABLED_FEATURES_*` env vars at container start time t
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
 | `ENABLED_FEATURES_*` | boolean | | Per-flag runtime override. Set to `true` or `false` (case-insensitive); other values are logged and ignored. | One env var per flag. Full key list: `packages/common/enabled-features/enabled-features.json`. No-op when `NEXT_PUBLIC_IS_PLATFORM=true`. |
-| `ENABLED_FEATURES_LOGS_ALL` | boolean | | Disable the entire Logs section of the dashboard. Maps to the `logs:all` feature flag. | Documented explicitly as the runtime replacement for the legacy build-time `NEXT_PUBLIC_ENABLE_LOGS`. |
+| `ENABLED_FEATURES_LOGS_ALL` | boolean | Self-hosted | Disable the entire Logs section of the dashboard. Maps to the `logs:all` feature flag. | Documented explicitly as the runtime replacement for the legacy build-time `NEXT_PUBLIC_ENABLE_LOGS`. |
 
 ### AI features
 

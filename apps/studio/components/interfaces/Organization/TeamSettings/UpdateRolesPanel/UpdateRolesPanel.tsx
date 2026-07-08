@@ -318,7 +318,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
 
                         {!isApplyingRoleToAllProjects && (
                           <ButtonTooltip
-                            type="text"
+                            variant="text"
                             disabled={!canRemoveRole}
                             className="px-1"
                             icon={<X />}
@@ -346,7 +346,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                   modal={true}
                   onSelect={onSelectProject}
                   renderTrigger={() => (
-                    <Button type="default" className="w-min">
+                    <Button variant="default" className="w-min">
                       Add project
                     </Button>
                   )}
@@ -369,7 +369,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
             </SheetSection>
 
             <SheetFooter className="flex items-center justify-end! px-5 py-4 w-full border-t">
-              <Button type="default" disabled={false} onClick={() => onClose()}>
+              <Button variant="default" disabled={false} onClick={() => onClose()}>
                 Cancel
               </Button>
               <Button

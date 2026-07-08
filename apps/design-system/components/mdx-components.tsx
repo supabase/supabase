@@ -16,10 +16,10 @@ import {
   AlertTitle,
   AspectRatio,
   cn,
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 

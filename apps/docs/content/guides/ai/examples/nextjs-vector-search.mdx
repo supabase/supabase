@@ -24,7 +24,7 @@ We assume that you have a Next.js project with a collection of `.mdx` files nest
 
 ## Prepare the database
 
-Let's prepare the database schema. We can use the "OpenAI Vector Search" quickstart in the [SQL Editor](/dashboard/project/_/sql), or you can copy/paste the SQL below and run it yourself.
+Prepare the database schema. We can use the "OpenAI Vector Search" quickstart in the [SQL Editor](/dashboard/project/_/sql), or you can copy/paste the SQL below and run it yourself.
 
 <Tabs
   scrollable
@@ -167,7 +167,7 @@ Let's prepare the database schema. We can use the "OpenAI Vector Search" quickst
 
     Anytime the user sends a query, we want to find the content that's relevant to their questions. We can do this using pgvector's similarity search.
 
-    These are quite complex SQL operations, so let's wrap them in database functions that we can call from our frontend using [RPC](/docs/reference/javascript/rpc).
+    For complex SQL operations, wrap them in database functions that you can call from the frontend using [RPC](/docs/reference/javascript/rpc).
 
     </StepHikeCompact.Details>
 

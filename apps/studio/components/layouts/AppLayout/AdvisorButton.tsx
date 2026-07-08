@@ -46,7 +46,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   return (
     <div className="relative">
       <ButtonTooltip
-        type="outline"
+        variant="outline"
         size="tiny"
         id="advisor-center-trigger"
         className={cn(
