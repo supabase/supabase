@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 import { databaseKeys } from './keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { EMPTY_ARR } from '@/lib/void'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type SchemasVariables = {
@@ -32,7 +33,7 @@ export async function getSchemas(
     signal
   )
 
-  return result
+  return Array.isArray(result) ? result : EMPTY_ARR
 }
 
 export const useSchemasQuery = <TData = SchemasData>(

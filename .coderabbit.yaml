@@ -48,6 +48,27 @@ reviews:
         tracking for: passive views, page loads, UI-only state changes (e.g. expanding
         a panel, switching tabs in a settings page), developer/internal tooling
         interactions, or interactions clearly unrelated to product adoption.
+    - path: 'apps/studio/pages/**'
+      instructions: |
+        Studio is mid-migration from the Next.js pages router (apps/studio/pages/**)
+        to TanStack Start (apps/studio/routes/**). Both runtimes ship side-by-side, so
+        every URL served from pages/** has a mirror in routes/**. See
+        apps/studio/TANSTACK_MIGRATION.md for the full route map and strategy.
+        Leave a comment reminding the author to check whether this change needs to be
+        mirrored into the corresponding apps/studio/routes/** file so the two builds
+        don't silently drift:
+        - Most route files re-export the page's default export (Path A), so pure
+          page-body edits propagate automatically — no mirror needed.
+        - A mirror IS needed when the change touches something the route file
+          duplicates rather than imports: getLayout / layout wrapping, page title or
+          other props the route encodes as staticData, withAuth / auth gating, or the
+          route/redirect path itself.
+        - A brand-new page under pages/** needs a matching new route under routes/**
+          (and a checklist entry in apps/studio/TANSTACK_MIGRATION.md).
+        - Do NOT suggest deleting the pages/** file — the Next file stays load-bearing
+          for both runtimes until the final cleanup pass (tracked in FE-3106).
+        Keep this a reminder to verify, not a hard blocker: if no mirror is required,
+        say so briefly rather than forcing a change.
 
 # Applies our internal engineering skills (.claude/skills/) as CodeRabbit review
 # guidelines. The skills are the single source of truth — they are consumed

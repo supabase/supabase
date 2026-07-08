@@ -46,7 +46,7 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: hsl(var(--border-default, currentColor));
+    border-color: var(--border-default, currentColor);
   }
 
   code,
@@ -148,6 +148,12 @@ h6:not(.font-mono),
 .prose :where(p, a, code, pre):not(:where([class~='not-prose'], [class~='not-prose'] *)),
 .prose :where(ol > li):not(:where([class~='not-prose'], [class~='not-prose'] *))::marker {
   font-weight: inherit;
+}
+
+/* Body text inherits a heavier base weight, so override the shared `strong: 500`
+ * to keep bold text visually distinct. */
+.prose :where(strong, b):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  font-weight: 700;
 }
 
 .prose :where(h1, h2, h3, h4, h5, h6):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
@@ -399,18 +405,11 @@ th code {
   transition-timing-function: cubic-bezier(0.24, 0.25, 0.05, 1) !important;
 }
 [data-rmiz-modal-overlay='visible'] {
-  background-color: hsl(var(--background-default)) !important;
+  background-color: var(--background-default) !important;
   opacity: 0.8;
 }
 [data-rmiz-modal-img] {
   image-rendering: high-quality;
-}
-
-.skip-link {
-  @apply sr-only;
-}
-.skip-link:focus {
-  @apply not-sr-only;
 }
 
 /* Code blocks need margin applied when in content container */
@@ -425,7 +424,7 @@ th code {
   --code-foreground: #ffffff;
   --code-token-constant: #3ecf8e;
   --code-token-string: #ffcda1;
-  --code-token-comment: #7e7e7e;
+  --code-token-comment: #949494;
   --code-token-parameter: #ffffff;
   --code-token-function: #3ecf8e;
   --code-token-string-expression: #ffcda1;
@@ -437,17 +436,17 @@ th code {
 }
 [data-theme='light'],
 .light {
-  --code-token-keyword: #6b35dc;
-  --code-foreground: hsl(var(--foreground-light) / 1);
+  --code-token-keyword: #5f2fc4;
+  --code-foreground: oklch(from var(--foreground-light) l c h / 1);
   --code-token-constant: #15593b;
-  --code-token-string: #f1a10d;
-  --code-token-comment: #7e7e7e;
-  --code-token-parameter: hsl(var(--foreground-light) / 1);
+  --code-token-string: #9a5200;
+  --code-token-comment: #6a6a6a;
+  --code-token-parameter: oklch(from var(--foreground-light) l c h / 1);
   --code-token-function: #15593b;
-  --code-token-string-expression: #f1a10d;
-  --code-token-punctuation: hsl(var(--foreground-light) / 1);
-  --code-token-link: hsl(var(--foreground-light) / 1);
-  --code-token-number: hsl(var(--foreground-light) / 1);
+  --code-token-string-expression: #9a5200;
+  --code-token-punctuation: oklch(from var(--foreground-light) l c h / 1);
+  --code-token-link: oklch(from var(--foreground-light) l c h / 1);
+  --code-token-number: oklch(from var(--foreground-light) l c h / 1);
   --code-token-property: #15593b;
   --code-highlight-color: #1c1c1c;
 }

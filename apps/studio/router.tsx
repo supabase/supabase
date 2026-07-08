@@ -5,6 +5,7 @@ import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query
 import { routeTree } from './routeTree.gen'
 import { getQueryClient } from '@/data/query-client'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
+import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 
 export interface RouterContext {
   queryClient: QueryClient
@@ -75,6 +76,12 @@ export function getRouter() {
     context,
     scrollRestoration: true,
     defaultPreload: 'intent',
+    // Next-style search params (plain strings, repeated keys → arrays)
+    // instead of TanStack's JSON defaults, which coerce "2"→2/"true"→true
+    // and JSON-quote strings on write. The whole app — including the
+    // next/router compat shim and nuqs — expects the Next semantics.
+    parseSearch,
+    stringifySearch,
     // Inlined via Vite's `define` at build time; stays undefined (= app at `/`)
     // unless NEXT_PUBLIC_BASE_PATH is set. Must agree with Vite `base`
     basepath: process.env.NEXT_PUBLIC_BASE_PATH || undefined,

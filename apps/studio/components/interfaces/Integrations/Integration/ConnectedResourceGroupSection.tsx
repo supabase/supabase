@@ -1,4 +1,5 @@
 import { Settings, Trash2, TriangleAlert } from 'lucide-react'
+import Link from 'next/link'
 import { Badge, Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
@@ -46,7 +47,7 @@ export const ResourceGroupSection = ({
         group.manageAction && (
           <div className="max-w-2xl">
             <Button asChild variant="default" icon={<Settings />}>
-              <a href={group.manageAction.href}>{group.manageAction.label}</a>
+              <Link href={group.manageAction.href}>{group.manageAction.label}</Link>
             </Button>
           </div>
         )
@@ -69,7 +70,7 @@ export const ResourceGroupSection = ({
               <div className="flex shrink-0 items-center gap-x-2">
                 {group.manageAction && (
                   <Button asChild variant="default" icon={<Settings />}>
-                    <a href={group.manageAction.href}>{group.manageAction.label}</a>
+                    <Link href={group.manageAction.href}>{group.manageAction.label}</Link>
                   </Button>
                 )}
                 <Button

@@ -18,6 +18,7 @@ export const getTools = async ({
   accessToken,
   baseUrl,
   supportMode,
+  signal,
 }: {
   projectRef: string
   connectionString: string
@@ -26,6 +27,9 @@ export const getTools = async ({
   accessToken?: string
   baseUrl?: string
   supportMode?: boolean
+  // Required: tools fetched from the remote MCP server hold an HTTP connection
+  // that is closed when this signal aborts (i.e. when the request ends).
+  signal: AbortSignal
 }) => {
   // Always include studio tools
   let tools: ToolSet = getStudioTools({ projectRef, connectionString, authorization, aiOptInLevel })
@@ -42,12 +46,22 @@ export const getTools = async ({
       }),
     }
   } else if (accessToken) {
-    // If platform, fetch MCP and other platform specific tools
-    const mcpTools = await getMcpTools({
-      accessToken,
-      projectRef,
-      aiOptInLevel,
-    })
+    // If platform, fetch MCP and other platform specific tools. The MCP tools
+    // may be fetched from the remote MCP server over the network (see
+    // `USE_REMOTE_MCP`), so a failure there (outage, timeout, auth) should
+    // degrade gracefully to the remaining tools rather than break the entire
+    // assistant.
+    let mcpTools: ToolSet = {}
+    try {
+      mcpTools = await getMcpTools({
+        accessToken,
+        projectRef,
+        aiOptInLevel,
+        signal,
+      })
+    } catch (error) {
+      console.error('Failed to fetch MCP tools:', error)
+    }
 
     tools = {
       ...tools,

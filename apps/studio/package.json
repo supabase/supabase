@@ -18,7 +18,7 @@
     "smoke:tanstack": "node scripts/smoke-server.mjs",
     "start:tanstack": "node scripts/serve.js",
     "lint": "eslint .",
-    "lint:ratchet": "tsx scripts/ratchet-eslint-rules.ts --rule react-hooks/exhaustive-deps --rule import/no-anonymous-default-export --rule @tanstack/query/exhaustive-deps --rule @typescript-eslint/no-explicit-any --rule no-restricted-imports --rule no-restricted-exports --rule react/no-unstable-nested-components",
+    "lint:ratchet": "tsx scripts/ratchet-eslint-rules.ts --rules-file scripts/ratchet-rules.json",
     "clean": "rimraf node_modules tsconfig.tsbuildinfo .next .turbo",
     "test": "vitest --run --coverage",
     "test:watch": "vitest watch",
@@ -33,6 +33,7 @@
     "build:graphql-types": "tsx scripts/download-graphql-schema.mts && pnpm graphql-codegen --config scripts/codegen.ts",
     "build:graphql-types:watch": "pnpm graphql-codegen --config scripts/codegen.ts --watch",
     "evals:setup": "cp node_modules/libpg-query/wasm/libpg-query.wasm evals/libpg-query.wasm",
+    "evals:preflight": "tsx evals/preflight.ts",
     "evals:run": "braintrust eval --no-send-logs evals/assistant.eval.ts",
     "evals:upload": "braintrust eval evals/assistant.eval.ts",
     "scorers:deploy": "IS_BRAINTRUST_PUSH=true braintrust push evals/scorer-online.ts"

@@ -167,6 +167,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     const abortController = new AbortController()
     req.on('close', () => abortController.abort())
     req.on('aborted', () => abortController.abort())
+    // Fires when the response finishes streaming or the connection drops, which
+    // is what tears down the remote MCP connection opened in getTools.
+    res.on('close', () => abortController.abort())
 
     const tools = await getTools({
       projectRef,
@@ -176,6 +179,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       accessToken,
       baseUrl: getURL(),
       supportMode,
+      signal: abortController.signal,
     })
 
     // Get a list of all schemas to add to context

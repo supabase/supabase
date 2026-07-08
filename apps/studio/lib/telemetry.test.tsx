@@ -8,6 +8,7 @@ const mocks = vi.hoisted(() => ({
   useUser: vi.fn(),
   useOrganizationsQuery: vi.fn(),
   setUser: vi.fn(),
+  setTag: vi.fn(),
 }))
 
 vi.mock('common', async (importOriginal) => {
@@ -36,6 +37,7 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
 
 vi.mock('@sentry/nextjs', () => ({
   setUser: (...args: unknown[]) => mocks.setUser(...args),
+  setTag: (...args: unknown[]) => mocks.setTag(...args),
 }))
 
 const USER_ID = 'user-abc-123'
@@ -50,6 +52,7 @@ describe('Telemetry — posthog identify mirroring', () => {
     mocks.useUser.mockReset()
     mocks.useOrganizationsQuery.mockReset()
     mocks.setUser.mockReset()
+    mocks.setTag.mockReset()
   })
 
   it('fires identify with both org_count and signup_timestamp when user and orgs are loaded', async () => {

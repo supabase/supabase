@@ -320,7 +320,9 @@ changes = supabase.channel('schema-db-changes').on_postgres_changes(
 
 The channel name can be any string except 'realtime'.
 
-### Listening to `INSERT` events
+### Listening to specific events
+
+Use the `event` parameter to listen only to a specific database event. `event` can be `INSERT`, `UPDATE`, `DELETE`, or `*` to listen to all changes.
 
 <Tabs
   scrollable
@@ -331,7 +333,14 @@ The channel name can be any string except 'realtime'.
 >
 <TabPanel id="js" label="JavaScript">
 
-Use the `event` parameter to listen only to database `INSERT`s:
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="insert"
+  queryGroup="pg-changes-event"
+>
+<TabPanel id="insert" label="Insert">
 
 ```js
 const changes = supabase
@@ -339,7 +348,7 @@ const changes = supabase
   .on(
     'postgres_changes',
     {
-      event: 'INSERT', // Listen only to INSERTs
+      event: 'INSERT',
       schema: 'public',
     },
     (payload) => console.log(payload)
@@ -348,11 +357,74 @@ const changes = supabase
 ```
 
 </TabPanel>
+<TabPanel id="update" label="Update">
+
+```js
+const changes = supabase
+  .channel('schema-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'UPDATE',
+      schema: 'public',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+<TabPanel id="delete" label="Delete">
+
+```js
+const changes = supabase
+  .channel('schema-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'DELETE',
+      schema: 'public',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+<TabPanel id="all" label="All events">
+
+```js
+const changes = supabase
+  .channel('schema-db-changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
 <$Show if="sdk:dart">
 <TabPanel id="dart" label="Dart">
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="insert"
+  queryGroup="pg-changes-event"
+>
+<TabPanel id="insert" label="Insert">
+
 ```dart
-final changes = supabase
+supabase
     .channel('schema-db-changes')
     .onPostgresChanges(
         event: PostgresChangeEvent.insert,
@@ -362,11 +434,62 @@ final changes = supabase
 ```
 
 </TabPanel>
+<TabPanel id="update" label="Update">
+
+```dart
+supabase
+    .channel('schema-db-changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.update,
+        schema: 'public',
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
+<TabPanel id="delete" label="Delete">
+
+```dart
+supabase
+    .channel('schema-db-changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.delete,
+        schema: 'public',
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
+<TabPanel id="all" label="All events">
+
+```dart
+supabase
+    .channel('schema-db-changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.all,
+        schema: 'public',
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
 </$Show>
 <$Show if="sdk:swift">
 <TabPanel id="swift" label="Swift">
 
-Use `InsertAction.self` as type to listen only to database `INSERT`s:
+Pass the action type to select the event.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="insert"
+  queryGroup="pg-changes-event"
+>
+<TabPanel id="insert" label="Insert">
 
 ```swift
 let myChannel = await supabase.channel("schema-db-changes")
@@ -381,11 +504,73 @@ for await change in changes {
 ```
 
 </TabPanel>
+<TabPanel id="update" label="Update">
+
+```swift
+let myChannel = await supabase.channel("schema-db-changes")
+
+let changes = await myChannel.postgresChange(UpdateAction.self, schema: "public")
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
+<TabPanel id="delete" label="Delete">
+
+```swift
+let myChannel = await supabase.channel("schema-db-changes")
+
+let changes = await myChannel.postgresChange(DeleteAction.self, schema: "public")
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.oldRecord)
+}
+```
+
+</TabPanel>
+<TabPanel id="all" label="All events">
+
+```swift
+let myChannel = await supabase.channel("schema-db-changes")
+
+let changes = await myChannel.postgresChange(AnyAction.self, schema: "public")
+
+await myChannel.subscribe()
+
+for await change in changes {
+  switch change {
+  case .insert(let action): print(action.record)
+  case .update(let action): print(action.record)
+  case .delete(let action): print(action.oldRecord)
+  case .select(let action): print(action.record)
+  }
+}
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
 </$Show>
 <$Show if="sdk:kotlin">
 <TabPanel id="kotlin" label="Kotlin">
 
-Use `PostgresAction.Insert` as type to listen only to database `INSERT`s:
+Pass the action type to select the event.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="insert"
+  queryGroup="pg-changes-event"
+>
+<TabPanel id="insert" label="Insert">
 
 ```kotlin
 val myChannel = supabase.channel("db-changes")
@@ -402,91 +587,7 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
-</$Show>
-<$Show if="sdk:python">
-<TabPanel id="python" label="Python">
-
-```python
-changes = supabase.channel('schema-db-changes').on_postgres_changes(
-  "INSERT", # Listen only to INSERTs
-  schema="public",
-  callback=lambda payload: print(payload)
-)
-.subscribe()
-```
-
-</TabPanel>
-</$Show>
-</Tabs>
-
-The channel name can be any string except 'realtime'.
-
-### Listening to `UPDATE` events
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-<TabPanel id="js" label="JavaScript">
-
-Use the `event` parameter to listen only to database `UPDATE`s:
-
-```js
-const changes = supabase
-  .channel('schema-db-changes')
-  .on(
-    'postgres_changes',
-    {
-      event: 'UPDATE', // Listen only to UPDATEs
-      schema: 'public',
-    },
-    (payload) => console.log(payload)
-  )
-  .subscribe()
-```
-
-</TabPanel>
-<$Show if="sdk:dart">
-<TabPanel id="dart" label="Dart">
-
-```dart
-supabase
-    .channel('schema-db-changes')
-    .onPostgresChanges(
-        event: PostgresChangeEvent.update, // Listen only to UPDATEs
-        schema: 'public',
-        callback: (payload) => print(payload))
-    .subscribe();
-```
-
-</TabPanel>
-</$Show>
-<$Show if="sdk:swift">
-<TabPanel id="swift" label="Swift">
-
-Use `UpdateAction.self` as type to listen only to database `UPDATE`s:
-
-```swift
-let myChannel = await supabase.channel("schema-db-changes")
-
-let changes = await myChannel.postgresChange(UpdateAction.self, schema: "public")
-
-await myChannel.subscribe()
-
-for await change in changes {
-  print(change.oldRecord, change.record)
-}
-```
-
-</TabPanel>
-</$Show>
-<$Show if="sdk:kotlin">
-<TabPanel id="kotlin" label="Kotlin">
-
-Use `PostgresAction.Update` as type to listen only to database `UPDATE`s:
+<TabPanel id="update" label="Update">
 
 ```kotlin
 val myChannel = supabase.channel("db-changes")
@@ -503,91 +604,7 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
-</$Show>
-<$Show if="sdk:python">
-<TabPanel id="python" label="Python">
-
-```python
-changes = supabase.channel('schema-db-changes').on_postgres_changes(
-  "UPDATE", # Listen only to UPDATEs
-  schema="public",
-  callback=lambda payload: print(payload)
-)
-.subscribe()
-```
-
-</TabPanel>
-</$Show>
-</Tabs>
-
-The channel name can be any string except 'realtime'.
-
-### Listening to `DELETE` events
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-<TabPanel id="js" label="JavaScript">
-
-Use the `event` parameter to listen only to database `DELETE`s:
-
-```js
-const changes = supabase
-  .channel('schema-db-changes')
-  .on(
-    'postgres_changes',
-    {
-      event: 'DELETE', // Listen only to DELETEs
-      schema: 'public',
-    },
-    (payload) => console.log(payload)
-  )
-  .subscribe()
-```
-
-</TabPanel>
-<$Show if="sdk:dart">
-<TabPanel id="dart" label="Dart">
-
-```dart
-supabase
-    .channel('schema-db-changes')
-    .onPostgresChanges(
-        event: PostgresChangeEvent.delete, // Listen only to DELETEs
-        schema: 'public',
-        callback: (payload) => print(payload))
-    .subscribe();
-```
-
-</TabPanel>
-</$Show>
-<$Show if="sdk:swift">
-<TabPanel id="swift" label="Swift">
-
-Use `DeleteAction.self` as type to listen only to database `DELETE`s:
-
-```swift
-let myChannel = await supabase.channel("schema-db-changes")
-
-let changes = await myChannel.postgresChange(DeleteAction.self, schema: "public")
-
-await myChannel.subscribe()
-
-for await change in changes {
-  print(change.oldRecord)
-}
-```
-
-</TabPanel>
-</$Show>
-<$Show if="sdk:kotlin">
-<TabPanel id="kotlin" label="Kotlin">
-
-Use `PostgresAction.Delete` as type to listen only to database `DELETE`s:
+<TabPanel id="delete" label="Delete">
 
 ```kotlin
 val myChannel = supabase.channel("db-changes")
@@ -604,18 +621,90 @@ myChannel.subscribe()
 ```
 
 </TabPanel>
+<TabPanel id="all" label="All events">
+
+```kotlin
+val myChannel = supabase.channel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction>(schema = "public")
+
+changes
+    .onEach {
+        when (it) { //You can also check for <is PostgresAction.Insert>, etc.. manually
+            is HasRecord -> println(it.record)
+            is HasOldRecord -> println(it.oldRecord)
+            else -> println(it)
+        }
+    }
+    .launchIn(yourCoroutineScope)
+
+myChannel.subscribe()
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
 </$Show>
 <$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="insert"
+  queryGroup="pg-changes-event"
+>
+<TabPanel id="insert" label="Insert">
+
 ```python
 changes = supabase.channel('schema-db-changes').on_postgres_changes(
-  "DELETE", # Listen only to DELETEs
+  "INSERT",
   schema="public",
   callback=lambda payload: print(payload)
 )
 .subscribe()
 ```
+
+</TabPanel>
+<TabPanel id="update" label="Update">
+
+```python
+changes = supabase.channel('schema-db-changes').on_postgres_changes(
+  "UPDATE",
+  schema="public",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="delete" label="Delete">
+
+```python
+changes = supabase.channel('schema-db-changes').on_postgres_changes(
+  "DELETE",
+  schema="public",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
+<TabPanel id="all" label="All events">
+
+```python
+changes = supabase.channel('schema-db-changes').on_postgres_changes(
+  "*",
+  schema="public",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
+</Tabs>
 
 </TabPanel>
 </$Show>
@@ -955,7 +1044,40 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 
 ## Available filters
 
-Realtime offers filters so you can specify the data your client receives at a more granular level.
+Realtime offers filters so you can specify the data your client receives at a more granular level. A filter is a `column=operator.value` expression (for example `id=eq.1` or `title=like.%foo%`) that Realtime evaluates on the server, so filtered-out events never leave the database.
+
+The following operators are available:
+
+| Operator           | Matches when the column…                             | Example                   |
+| ------------------ | ---------------------------------------------------- | ------------------------- |
+| `eq`               | equals the value                                     | `id=eq.1`                 |
+| `neq`              | does not equal the value                             | `status=neq.done`         |
+| `lt` / `lte`       | is less than / less than or equal to                 | `age=lt.65`               |
+| `gt` / `gte`       | is greater than / greater than or equal to           | `quantity=gte.10`         |
+| `in`               | is one of a list (max 100 values)                    | `name=in.(red,blue)`      |
+| `like` / `ilike`   | matches a pattern (case-sensitive / insensitive)     | `title=like.%foo%`        |
+| `match` / `imatch` | matches a POSIX regex (case-sensitive / insensitive) | `slug=match.^post-`       |
+| `is`               | `IS null` / `true` / `false` / `unknown`             | `deleted_at=is.null`      |
+| `isdistinct`       | is distinct from the value (NULL-safe `!=`)          | `state=isdistinct.active` |
+
+You can also [negate any operator](#negating-a-filter-not) with `not.` and [combine multiple conditions](#combining-filters-with-and) with commas (applied as an `AND`).
+
+<$Show if="sdk:js">
+
+<Admonition type="tip">
+
+In JavaScript you can pass a raw filter string, or build one with the type-safe `postgresChangesFilter()` helper, which handles operator names, negation, `AND` composition, and escaping for you:
+
+```js
+import { postgresChangesFilter } from '@supabase/supabase-js'
+
+// → 'quantity=gte.10,status=eq.open'
+const filter = postgresChangesFilter().gte('quantity', 10).eq('status', 'open')
+```
+
+</Admonition>
+
+</$Show>
 
 ### Equal to (`eq`)
 
@@ -969,6 +1091,34 @@ To listen to changes when a column's value in a table equals a client-specified 
   queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="builder"
+  queryGroup="realtime-js-filter"
+>
+<TabPanel id="builder" label="Builder">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'messages',
+      filter: postgresChangesFilter().eq('body', 'hey'),
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+<TabPanel id="string" label="Filter string">
 
 ```js
 const channel = supabase
@@ -985,6 +1135,9 @@ const channel = supabase
   )
   .subscribe()
 ```
+
+</TabPanel>
+</Tabs>
 
 </TabPanel>
 <$Show if="sdk:dart">
@@ -1085,6 +1238,34 @@ To listen to changes when a column's value in a table does not equal a client-sp
 >
 <TabPanel id="js" label="JavaScript">
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="builder"
+  queryGroup="realtime-js-filter"
+>
+<TabPanel id="builder" label="Builder">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'messages',
+      filter: postgresChangesFilter().neq('body', 'bye'),
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+<TabPanel id="string" label="Filter string">
+
 ```js
 const channel = supabase
   .channel('changes')
@@ -1100,6 +1281,9 @@ const channel = supabase
   )
   .subscribe()
 ```
+
+</TabPanel>
+</Tabs>
 
 </TabPanel>
 <$Show if="sdk:dart">
@@ -1201,6 +1385,34 @@ To listen to changes when a column's value in a table is less than a client-spec
 >
 <TabPanel id="js" label="JavaScript">
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="builder"
+  queryGroup="realtime-js-filter"
+>
+<TabPanel id="builder" label="Builder">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'profiles',
+      filter: postgresChangesFilter().lt('age', 65),
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+<TabPanel id="string" label="Filter string">
+
 ```js
 const channel = supabase
   .channel('changes')
@@ -1216,6 +1428,9 @@ const channel = supabase
   )
   .subscribe()
 ```
+
+</TabPanel>
+</Tabs>
 
 </TabPanel>
 <$Show if="sdk:dart">
@@ -1316,6 +1531,34 @@ To listen to changes when a column's value in a table is less than or equal to a
 >
 <TabPanel id="js" label="JavaScript">
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="builder"
+  queryGroup="realtime-js-filter"
+>
+<TabPanel id="builder" label="Builder">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'profiles',
+      filter: postgresChangesFilter().lte('age', 65),
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+<TabPanel id="string" label="Filter string">
+
 ```js
 const channel = supabase
   .channel('changes')
@@ -1331,6 +1574,9 @@ const channel = supabase
   )
   .subscribe()
 ```
+
+</TabPanel>
+</Tabs>
 
 </TabPanel>
 <$Show if="sdk:dart">
@@ -1431,6 +1677,34 @@ To listen to changes when a column's value in a table is greater than a client-s
 >
 <TabPanel id="js" label="JavaScript">
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="builder"
+  queryGroup="realtime-js-filter"
+>
+<TabPanel id="builder" label="Builder">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'products',
+      filter: postgresChangesFilter().gt('quantity', 10),
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+<TabPanel id="string" label="Filter string">
+
 ```js
 const channel = supabase
   .channel('changes')
@@ -1446,6 +1720,9 @@ const channel = supabase
   )
   .subscribe()
 ```
+
+</TabPanel>
+</Tabs>
 
 </TabPanel>
 <$Show if="sdk:dart">
@@ -1546,6 +1823,34 @@ To listen to changes when a column's value in a table is greater than or equal t
 >
 <TabPanel id="js" label="JavaScript">
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="builder"
+  queryGroup="realtime-js-filter"
+>
+<TabPanel id="builder" label="Builder">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'products',
+      filter: postgresChangesFilter().gte('quantity', 10),
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+<TabPanel id="string" label="Filter string">
+
 ```js
 const channel = supabase
   .channel('changes')
@@ -1561,6 +1866,9 @@ const channel = supabase
   )
   .subscribe()
 ```
+
+</TabPanel>
+</Tabs>
 
 </TabPanel>
 <$Show if="sdk:dart">
@@ -1661,6 +1969,15 @@ To listen to changes when a column's value in a table equals any client-specifie
 >
 <TabPanel id="js" label="JavaScript">
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="builder"
+  queryGroup="realtime-js-filter"
+>
+<TabPanel id="builder" label="Builder">
+
 ```js
 const channel = supabase
   .channel('changes')
@@ -1670,12 +1987,34 @@ const channel = supabase
       event: 'INSERT',
       schema: 'public',
       table: 'colors',
-      filter: 'name=in.(red, blue, yellow)',
+      filter: postgresChangesFilter().in('name', ['red', 'blue', 'yellow']),
     },
     (payload) => console.log(payload)
   )
   .subscribe()
 ```
+
+</TabPanel>
+<TabPanel id="string" label="Filter string">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'colors',
+      filter: 'name=in.(red,blue,yellow)',
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+</Tabs>
 
 </TabPanel>
 <$Show if="sdk:dart">
@@ -1729,7 +2068,7 @@ val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
     table = "products"
-    filter = "name=in.(red, blue, yellow)"
+    filter = "name=in.(red,blue,yellow)"
 }
 
 changes
@@ -1751,7 +2090,7 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   "UPDATE",
   schema="public",
   table="products",
-  filter="name=in.(red, blue, yellow)",
+  filter="name=in.(red,blue,yellow)",
   callback=lambda payload: print(payload)
 )
 .subscribe()
@@ -1762,6 +2101,970 @@ changes = supabase.channel('db-changes').on_postgres_changes(
 </Tabs>
 
 This filter uses Postgres's `= ANY`. Realtime allows a maximum of 100 values for this filter.
+
+### Pattern matching (`like`, `ilike`)
+
+To listen to changes when a text column matches a pattern, use `like` (case-sensitive) or `ilike` (case-insensitive). Use `%` to match any sequence of characters and `_` to match a single character.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="builder"
+  queryGroup="realtime-js-filter"
+>
+<TabPanel id="builder" label="Builder">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'articles',
+      // matches "Breaking News", "BREAKING", ...
+      filter: postgresChangesFilter().ilike('title', '%breaking%'),
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+<TabPanel id="string" label="Filter string">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'articles',
+      filter: 'title=ilike.%breaking%', // matches "Breaking News", "BREAKING", ...
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase
+    .channel('changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.insert,
+        schema: 'public',
+        table: 'articles',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.ilike,
+          column: 'title',
+          value: '%breaking%',
+        ),
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  InsertAction.self,
+  schema: "public",
+  table: "articles",
+  filter: .ilike("title", value: "%breaking%")
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.channel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
+    table = "articles"
+    filter = "title=ilike.%breaking%"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+myChannel.subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "INSERT",
+  schema="public",
+  table="articles",
+  filter="title=ilike.%breaking%",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
+
+`like` uses Postgres's `LIKE` and `ilike` uses `ILIKE`. Both require a text-compatible column. The examples above use `ilike`; swap in `like` for case-sensitive matching—usage is otherwise identical.
+
+### Regular expression matching (`match`, `imatch`)
+
+To listen to changes when a text column matches a POSIX regular expression, use `match` (case-sensitive) or `imatch` (case-insensitive).
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="builder"
+  queryGroup="realtime-js-filter"
+>
+<TabPanel id="builder" label="Builder">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'posts',
+      // matches "post-1", "post-42", ...
+      filter: postgresChangesFilter().match('slug', '^post-\\d+$'),
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+<TabPanel id="string" label="Filter string">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'posts',
+      filter: 'slug=match.^post-\\d+$', // matches "post-1", "post-42", ...
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase
+    .channel('changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.insert,
+        schema: 'public',
+        table: 'posts',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.match,
+          column: 'slug',
+          value: r'^post-\d+$',
+        ),
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  InsertAction.self,
+  schema: "public",
+  table: "posts",
+  filter: .match("slug", value: "^post-\\d+$")
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.channel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
+    table = "posts"
+    filter = "slug=match.^post-\\d+$"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+myChannel.subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "INSERT",
+  schema="public",
+  table="posts",
+  filter="slug=match.^post-\\d+$",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
+
+`match` uses Postgres's `~` operator and `imatch` uses `~*`. Both require a text-compatible column, and the pattern is validated when you subscribe. The examples above use `match`; swap in `imatch` for case-insensitive matching—usage is otherwise identical.
+
+### Null and boolean checks (`is`)
+
+To listen to changes when a column `IS` `null`, `true`, `false`, or `unknown`, use `is`. `is.null` works on any column type; `is.true`, `is.false`, and `is.unknown` require a boolean column.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="builder"
+  queryGroup="realtime-js-filter"
+>
+<TabPanel id="builder" label="Builder">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'todos',
+      // only rows that are not yet completed
+      filter: postgresChangesFilter().is('completed_at', null),
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+<TabPanel id="string" label="Filter string">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'todos',
+      filter: 'completed_at=is.null', // only rows that are not yet completed
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase
+    .channel('changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.update,
+        schema: 'public',
+        table: 'todos',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.isFilter,
+          column: 'completed_at',
+          value: null,
+        ),
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  UpdateAction.self,
+  schema: "public",
+  table: "todos",
+  filter: .is("completed_at", value: .null)
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.channel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
+    table = "todos"
+    filter = "completed_at=is.null"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+myChannel.subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "UPDATE",
+  schema="public",
+  table="todos",
+  filter="completed_at=is.null",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
+
+This filter uses Postgres's `IS` operator.
+
+### Distinct from (`isdistinct`)
+
+`isdistinct` is a NULL-safe inequality (`IS DISTINCT FROM`). Unlike `neq`, it treats `null` as a comparable value, so a `null` column is considered distinct from a non-null value.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="builder"
+  queryGroup="realtime-js-filter"
+>
+<TabPanel id="builder" label="Builder">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'orders',
+      // includes rows where status is null
+      filter: postgresChangesFilter().isDistinct('status', 'shipped'),
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+<TabPanel id="string" label="Filter string">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'orders',
+      filter: 'status=isdistinct.shipped', // includes rows where status is null
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase
+    .channel('changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.update,
+        schema: 'public',
+        table: 'orders',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.isDistinct,
+          column: 'status',
+          value: 'shipped',
+        ),
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  UpdateAction.self,
+  schema: "public",
+  table: "orders",
+  filter: .isDistinct("status", value: "shipped")
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.channel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
+    table = "orders"
+    filter = "status=isdistinct.shipped"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+myChannel.subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "UPDATE",
+  schema="public",
+  table="orders",
+  filter="status=isdistinct.shipped",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
+
+### Negating a filter (`not`)
+
+Prefix any operator with `not.` to invert it — for example `not.in`, `not.is`, or `not.like`.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="builder"
+  queryGroup="realtime-js-filter"
+>
+<TabPanel id="builder" label="Builder">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'posts',
+      // anything except drafts and archived
+      filter: postgresChangesFilter().not('status', 'in', ['draft', 'archived']),
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+<TabPanel id="string" label="Filter string">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'posts',
+      filter: 'status=not.in.(draft,archived)', // anything except drafts and archived
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+Set `negate: true` on a `PostgresChangeFilter` to apply the `not.` prefix.
+
+```dart
+supabase
+    .channel('changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.all,
+        schema: 'public',
+        table: 'posts',
+        filter: PostgresChangeFilter(
+          type: PostgresChangeFilterType.inFilter,
+          column: 'status',
+          value: ['draft', 'archived'],
+          negate: true,
+        ),
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+Wrap any single-condition filter in `.not(...)`.
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  AnyAction.self,
+  schema: "public",
+  table: "posts",
+  filter: .not(.in("status", values: ["draft", "archived"]))
+)
+
+await myChannel.subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.channel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction>(schema = "public") {
+    table = "posts"
+    filter = "status=not.in.(draft,archived)"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+myChannel.subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "*",
+  schema="public",
+  table="posts",
+  filter="status=not.in.(draft,archived)",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
+
+### Combining filters with `AND`
+
+Combine multiple conditions by separating them with commas. All conditions must match (logical `AND`). You can only combine conditions with `AND` — `OR` is not supported.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="builder"
+  queryGroup="realtime-js-filter"
+>
+<TabPanel id="builder" label="Builder">
+
+The builder composes conditions and escapes reserved characters for you.
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'orders',
+      // amount > 100 AND status = "open"
+      filter: postgresChangesFilter().gt('amount', 100).eq('status', 'open'),
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+<TabPanel id="string" label="Filter string">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'orders',
+      filter: 'amount=gt.100,status=eq.open', // amount > 100 AND status = "open"
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+Pass a list of filters to `filters` to combine them with `AND`.
+
+```dart
+supabase
+    .channel('changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.insert,
+        schema: 'public',
+        table: 'orders',
+        filters: [
+          PostgresChangeFilter(
+            type: PostgresChangeFilterType.gt,
+            column: 'amount',
+            value: 100,
+          ),
+          PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: 'status',
+            value: 'open',
+          ),
+        ],
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+Use `.and([...])` to combine multiple conditions.
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  InsertAction.self,
+  schema: "public",
+  table: "orders",
+  filter: .and([
+    .gt("amount", value: 100),
+    .eq("status", value: "open"),
+  ])
+)
+
+await myChannel.subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val myChannel = supabase.channel("db-changes")
+
+val changes = myChannel.postgresChangeFlow<PostgresAction.Insert>(schema = "public") {
+    table = "orders"
+    filter = "amount=gt.100,status=eq.open"
+}
+
+changes
+    .onEach {
+        println(it.record)
+    }
+    .launchIn(yourCoroutineScope)
+
+myChannel.subscribe()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+changes = supabase.channel('db-changes').on_postgres_changes(
+  "INSERT",
+  schema="public",
+  table="orders",
+  filter="amount=gt.100,status=eq.open",
+  callback=lambda payload: print(payload)
+)
+.subscribe()
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
+
+<Admonition type="note">
+
+Values that contain reserved characters (`,`, `(`, `)`, `"`, or `\`) must be double-quoted PostgREST-style so the server doesn't read them as condition or list boundaries — for example `name=eq."Doe, Jane"`. The `postgresChangesFilter()` builder (JavaScript), `PostgresChangeFilter` (Dart), and `RealtimePostgresFilter` (Swift) apply this quoting for you.
+
+</Admonition>
+
+## Selecting specific columns
+
+By default each change event contains the full row. Use `select` to receive only a subset of columns instead. This reduces payload size and the data transferred per event, which is especially useful for tables with large `bytea`, `jsonb`, or `text` columns.
+
+The listed columns must be selectable by the subscribing role, and the table's primary key is always included so you can identify the row. `select` requires an explicit `schema` and `table` — it's not supported on wildcard subscriptions.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const channel = supabase
+  .channel('changes')
+  .on(
+    'postgres_changes',
+    {
+      event: '*',
+      schema: 'public',
+      table: 'profiles',
+      select: ['id', 'username'], // payload.new only contains { id, username }
+    },
+    (payload) => console.log(payload)
+  )
+  .subscribe()
+```
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+```dart
+supabase
+    .channel('changes')
+    .onPostgresChanges(
+        event: PostgresChangeEvent.all,
+        schema: 'public',
+        table: 'profiles',
+        select: ['id', 'username'],
+        callback: (payload) => print(payload))
+    .subscribe();
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  AnyAction.self,
+  schema: "public",
+  table: "profiles",
+  select: ["id", "username"]
+)
+
+await myChannel.subscribe()
+```
+
+</TabPanel>
+</$Show>
+</Tabs>
 
 ## Receiving `old` records
 
@@ -1875,7 +3178,7 @@ let changes = await myChannel.postgresChange(
   UpdateAction.self,
   schema: "public",
   table: "products",
-  filter: "name=in.(red, blue, yellow)"
+  filter: "name=in.(red,blue,yellow)"
 )
 
 await myChannel.subscribe()
@@ -1900,7 +3203,7 @@ val myChannel = supabase.channel("db-changes")
 
 val changes = myChannel.postgresChangeFlow<PostgresAction.Update>(schema = "public") {
     table = "products"
-    filter = "name=in.(red, blue, yellow)"
+    filter = "name=in.(red,blue,yellow)"
 }
 
 changes
@@ -1924,72 +3227,10 @@ changes = supabase.channel('db-changes').on_postgres_changes(
   "UPDATE",
   schema="public",
   table="products",
-  filter="name=in.(red, blue, yellow)",
+  filter="name=in.(red,blue,yellow)",
   callback=lambda payload: print(payload)
 )
 .subscribe()
-```
-
-</TabPanel>
-</$Show>
-</Tabs>
-
-### Refreshed tokens
-
-You will need to refresh tokens on your own, but once generated, you can pass them to Realtime.
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-<TabPanel id="js" label="JavaScript">
-
-For example, if you're using the `supabase-js` `v2` client then you can pass your token like this:
-
-```js
-// Client setup
-
-supabase.realtime.setAuth('fresh-token')
-```
-
-</TabPanel>
-<$Show if="sdk:dart">
-<TabPanel id="dart" label="Dart">
-
-```dart
-supabase.realtime.setAuth('fresh-token');
-```
-
-</TabPanel>
-</$Show>
-<$Show if="sdk:swift">
-<TabPanel id="swift" label="Swift">
-
-```swift
-await supabase.realtime.setAuth("fresh-token")
-```
-
-</TabPanel>
-</$Show>
-<$Show if="sdk:kotlin">
-<TabPanel id="kotlin" label="Kotlin">
-
-In Kotlin, you have to update the token manually per channel:
-
-```kotlin
-myChannel.updateAuth("fresh-token")
-```
-
-</TabPanel>
-</$Show>
-<$Show if="sdk:python">
-<TabPanel id="python" label="Python">
-
-```python
-supabase.realtime.set_auth('fresh-token')
 ```
 
 </TabPanel>
@@ -2002,24 +3243,23 @@ supabase.realtime.set_auth('fresh-token')
 
 You can't filter Delete events when tracking Postgres Changes. This limitation is due to the way changes are pulled from Postgres.
 
-### Spaces in table names
+## Scaling Postgres Changes
 
-Realtime currently does not work when table names contain spaces.
+Postgres Changes authorizes every event against each subscriber. When you make a single change to a table with 100 subscribed users, Realtime performs 100 authorization checks — one per user — so throughput scales with the number of subscribers, not the write rate. Changes are also processed on a single thread to preserve their order, which means larger compute add-ons don't meaningfully increase Postgres Changes throughput.
 
-### Database instance and realtime performance
+For most applications this is plenty. To get the best performance:
 
-Realtime systems usually require forethought because of their scaling dynamics. For the `Postgres Changes` feature, every change event must be checked to see if the subscribed user has access. For instance, if you have 100 users subscribed to a table where you make a single insert, it will then trigger 100 "reads": one for each user.
+- Use [filters](#available-filters) and [column selection](#selecting-specific-columns) to send each client only the events and columns it needs.
+- Keep authorization cheap by writing , indexed [RLS policies](/docs/guides/database/postgres/row-level-security).
 
-There can be a database bottleneck which limits message throughput. If your database cannot authorize the changes rapidly enough, the changes will be delayed until you receive a timeout.
-
-Database changes are processed on a single thread to maintain the change order. That means compute upgrades don't have a large effect on the performance of Postgres change subscriptions. You can estimate the expected maximum throughput for your database below.
-
-If you are using Postgres Changes at scale, you should consider using separate "public" table without RLS and filters. Alternatively, you can use Realtime server-side only and then re-stream the changes to your clients using a Realtime Broadcast.
-
-Enter your database settings to estimate the maximum throughput for your instance:
+Use the estimator below to gauge the maximum throughput for your instance, and run your own benchmarks to confirm it fits your use case:
 
 <RealtimeLimitsEstimator />
 
-Don't forget to run your own benchmarks to make sure that the performance is acceptable for your use case.
+<Admonition type="tip">
 
-We are making many improvements to Realtime's Postgres Changes. If you are uncertain about the performance of your use case, reach out using [Support Form](/dashboard/support/new) and we will be happy to help you. We have a team of engineers that can advise you on the best solution for your use-case.
+If you expect more than ~3,000 concurrent subscribers on the same changes, use [Broadcast to stream database changes](/docs/guides/realtime/subscribing-to-database-changes#using-broadcast) instead. Broadcast sends each change once and fans it out to all subscribers, so it scales to far higher connection counts than per-subscriber authorization allows.
+
+</Admonition>
+
+If you're unsure which approach fits your use case, reach out through the [Support Form](/dashboard/support/new) — our engineers are happy to help you find the best solution.

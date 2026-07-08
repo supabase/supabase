@@ -118,7 +118,7 @@ These mirror the running PostgREST configuration so the dashboard can display co
 |---|---|---|---|---|
 | `PGRST_DB_EXTRA_SEARCH_PATH` | string (CSV) | Both | Extra Postgres schemas added to `search_path` for every PostgREST request. | Default: `public`. |
 | `PGRST_DB_MAX_ROWS` | integer (count) | Both | Maximum rows returned by any single PostgREST request. | Default: `1000`. |
-| `PGRST_DB_SCHEMAS` | string (CSV) | Both | Comma-separated list of schemas exposed via PostgREST. | Default: `public,storage,graphql_public`. Also used as the list of "Exposed schemas" in the API settings UI. |
+| `PGRST_DB_SCHEMAS` | string (CSV) | Both | Comma-separated list of schemas exposed via PostgREST. | Default: `public,graphql_public`. Also used as the list of "Exposed schemas" in the API settings UI. |
 
 ### Analytics / Logflare
 

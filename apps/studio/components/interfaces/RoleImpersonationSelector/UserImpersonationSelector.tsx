@@ -18,10 +18,10 @@ import {
   InputGroupInput,
   ScrollArea,
   Switch,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
@@ -218,19 +218,19 @@ export const UserImpersonationSelector = () => {
         )}
 
         {!impersonatingUser && !isExternalAuthImpersonating && (
-          <Tabs_Shadcn_ value={selectedTab} onValueChange={(value: any) => setSelectedTab(value)}>
-            <TabsList_Shadcn_ className="gap-x-3">
-              <TabsTrigger_Shadcn_ value="user">Project user</TabsTrigger_Shadcn_>
-              <TabsTrigger_Shadcn_ value="external" className="gap-x-1.5">
+          <Tabs value={selectedTab} onValueChange={(value: any) => setSelectedTab(value)}>
+            <TabsList className="gap-x-3">
+              <TabsTrigger value="user">Project user</TabsTrigger>
+              <TabsTrigger value="external" className="gap-x-1.5">
                 External user
                 <InfoTooltip side="bottom" className="flex flex-col gap-1 max-w-96">
                   Test RLS policies with external auth providers like Clerk or Auth0 by providing a
                   user ID and optional claims.
                 </InfoTooltip>
-              </TabsTrigger_Shadcn_>
-            </TabsList_Shadcn_>
+              </TabsTrigger>
+            </TabsList>
 
-            <TabsContent_Shadcn_ value="user">
+            <TabsContent value="user">
               <div className="flex flex-col gap-y-2">
                 <InputGroup>
                   <InputGroupInput
@@ -347,9 +347,9 @@ export const UserImpersonationSelector = () => {
                   )}
                 </>
               </div>
-            </TabsContent_Shadcn_>
+            </TabsContent>
 
-            <TabsContent_Shadcn_ value="external">
+            <TabsContent value="external">
               <div className="flex flex-col gap-y-4">
                 <FormItemLayout
                   layout="horizontal"
@@ -387,8 +387,8 @@ export const UserImpersonationSelector = () => {
                   </Button>
                 </div>
               </div>
-            </TabsContent_Shadcn_>
-          </Tabs_Shadcn_>
+            </TabsContent>
+          </Tabs>
         )}
       </div>
 

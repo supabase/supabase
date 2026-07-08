@@ -10,7 +10,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { cn, Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { cn, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 
 import type { ChartDataPoint } from '../QueryInsights.types'
 import { CHART_TABS, CHART_TYPE, LEGEND_ITEMS, SEL_COLOR } from './QueryInsightsChart.constants'
@@ -84,20 +84,20 @@ export const QueryInsightsChart = ({
 
   return (
     <div className="bg-surface-100 border-b min-h-[320px]">
-      <Tabs_Shadcn_ value={selectedMetric} onValueChange={setSelectedMetric} className="w-full">
-        <TabsList_Shadcn_ className="flex justify-start rounded-none gap-x-4 border-b mt-0! pt-0 px-6">
+      <Tabs value={selectedMetric} onValueChange={setSelectedMetric} className="w-full">
+        <TabsList className="flex justify-start rounded-none gap-x-4 border-b mt-0! pt-0 px-6">
           {CHART_TABS.map((tab) => (
-            <TabsTrigger_Shadcn_
+            <TabsTrigger
               key={tab.id}
               value={tab.id}
               className="flex items-center gap-2 text-xs py-3 border-b font-mono uppercase"
             >
               {tab.label}
-            </TabsTrigger_Shadcn_>
+            </TabsTrigger>
           ))}
-        </TabsList_Shadcn_>
+        </TabsList>
 
-        <TabsContent_Shadcn_ value={selectedMetric} className="bg-surface-100 mt-0">
+        <TabsContent value={selectedMetric} className="bg-surface-100 mt-0">
           <div className="w-full gap-4 mt-4 px-6 flex items-center justify-end">
             {legendItems.map((item: { dataKey: string; label: string; color: string }) => (
               <button
@@ -181,13 +181,13 @@ export const QueryInsightsChart = ({
                       dataKey="time"
                       tick={false}
                       tickLine={false}
-                      axisLine={{ stroke: 'hsl(var(--border-default))' }}
+                      axisLine={{ stroke: 'var(--border-default)' }}
                       height={1}
                     />
                     <YAxis
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fontSize: 10, fill: 'hsl(var(--foreground-muted))' }}
+                      tick={{ fontSize: 10, fill: 'var(--foreground-muted)' }}
                       tickCount={3}
                       width={40}
                       orientation="left"
@@ -208,7 +208,7 @@ export const QueryInsightsChart = ({
                     <CartesianGrid
                       horizontal={true}
                       vertical={false}
-                      stroke="hsl(var(--border-default))"
+                      stroke="var(--border-default)"
                       strokeOpacity={0.5}
                     />
                     {legendItems.map((item) => (
@@ -253,8 +253,8 @@ export const QueryInsightsChart = ({
               </div>
             )}
           </div>
-        </TabsContent_Shadcn_>
-      </Tabs_Shadcn_>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 }
