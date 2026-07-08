@@ -65,7 +65,7 @@
   },
   "engines": {
     "pnpm": "10.24",
-    "node": ">=22"
+    "node": "^22"
   },
   "keywords": [
     "postgres",
