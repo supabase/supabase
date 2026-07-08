@@ -27,9 +27,6 @@ Sentry.init({
   ignoreErrors: [
     'ResizeObserver',
     'Failed to load Stripe.js',
-    // Next.js internals — not actual errors
-    'NEXT_NOT_FOUND',
-    'NEXT_REDIRECT',
     // Network / infrastructure
     /504 Gateway Time-out/,
     'Network request failed',

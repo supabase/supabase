@@ -12,6 +12,9 @@ catalogs:
     '@sentry/nextjs':
       specifier: ^10.59.0
       version: 10.59.0
+    '@sentry/tanstackstart-react':
+      specifier: ^10.59.0
+      version: 10.59.0
     '@supabase/auth-js':
       specifier: 2.110.1
       version: 2.110.1
@@ -949,7 +952,7 @@ importers:
         specifier: ^10.27.0
         version: 10.59.0(react@19.2.6)
       '@sentry/tanstackstart-react':
-        specifier: 10.59.0
+        specifier: 'catalog:'
         version: 10.59.0(encoding@0.1.13)(react@19.2.6)(rollup@4.60.3)(supports-color@8.1.1)(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))
       '@std/path':
         specifier: npm:@jsr/std__path@^1.0.8

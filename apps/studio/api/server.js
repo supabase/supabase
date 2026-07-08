@@ -19,10 +19,18 @@ const tanstackEntry = ['..', 'dist', 'server', 'server.js'].join('/')
 // (the Next deploy uses instrumentation.ts / sentry.server.config.ts instead).
 // Vercel functions can't use a `--import` startup flag, so we import the
 // instrument module here at boot. Vercel provides env vars via process.env.
+// A Sentry boot failure must never take the API down — mirror scripts/serve.js
+// and fall back to the identity wrapper if init or the SDK import throws.
 let wrapFetchWithSentry = (fetchHandler) => fetchHandler
 if (isTanstack) {
-  await import('../instrument.server.mjs')
-  ;({ wrapFetchWithSentry } = await import('@sentry/tanstackstart-react'))
+  try {
+    await import('../instrument.server.mjs')
+  } catch (err) {
+    console.warn('[api/server] Sentry server init skipped:', err?.message ?? err)
+  }
+  ;({ wrapFetchWithSentry } = await import('@sentry/tanstackstart-react').catch(() => ({
+    wrapFetchWithSentry: (fetchHandler) => fetchHandler,
+  })))
 }
 
 const rawHandler = isTanstack
