@@ -1,9 +1,8 @@
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { cn } from 'ui'
+
+import { useTrack } from '@/lib/telemetry/track'
 
 type SingleStatProps = {
   icon: ReactNode
@@ -27,30 +26,23 @@ export const SingleStat = ({
   onClick,
   trackingProperties,
 }: SingleStatProps) => {
-  const { mutate: sendEvent } = useSendEventMutation()
-  const { data: project } = useSelectedProjectQuery()
-  const { data: organization } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const trackActivityStat = () => {
-    if (trackingProperties && project?.ref && organization?.slug) {
-      sendEvent({
-        action: 'home_activity_stat_clicked',
-        properties: trackingProperties,
-        groups: {
-          project: project.ref,
-          organization: organization.slug,
-        },
-      })
+    if (trackingProperties) {
+      track('home_activity_stat_clicked', trackingProperties)
     }
   }
   const content = (
-    <div className={cn('group flex items-center gap-4 p-0 text-base justify-start', className)}>
+    <div
+      className={cn('group flex items-center gap-4 p-0 text-base justify-start min-w-0', className)}
+    >
       <div className="min-w-16 w-16 h-16 rounded-md bg-surface-75 group-hover:bg-muted border flex items-center justify-center">
         {icon}
       </div>
-      <div className="truncate">
+      <div className="min-w-0 flex-1">
         <div className="text-left heading-meta text-foreground-light">{label}</div>
-        <div className="text-foreground truncate h-[34px] flex items-center capitalize-sentence">
+        <div className="text-foreground min-h-[34px] flex items-center capitalize-sentence py-0.5">
           {value}
         </div>
       </div>

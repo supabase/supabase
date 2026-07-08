@@ -1,5 +1,6 @@
-import { getQuery, defineEventHandler, sendRedirect } from 'h3'
 import type { EmailOtpType } from '@supabase/supabase-js'
+import { defineEventHandler, getQuery, sendRedirect } from 'h3'
+
 import { createSupabaseServerClient } from '@/registry/default/clients/nuxtjs/server/supabase/client'
 
 export default defineEventHandler(async (event) => {

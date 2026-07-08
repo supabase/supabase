@@ -1,10 +1,12 @@
+import { BLOG_VIEW_COOKIE, isBlogView, type BlogView } from 'app/blog/blog-view'
 import type { Metadata } from 'next'
+import { cookies } from 'next/headers'
+import { notFound } from 'next/navigation'
 
-import blogAuthors from 'lib/authors.json'
-import { getAllCMSPosts } from 'lib/get-cms-posts'
-import { getSortedPosts } from 'lib/posts'
-import type PostTypes from 'types/post'
 import AuthorClient from './AuthorClient'
+import blogAuthors from '@/lib/authors.json'
+import { getSortedPosts } from '@/lib/posts'
+import type PostTypes from '@/types/post'
 
 type Params = { author: string }
 
@@ -21,13 +23,6 @@ for (const author of blogAuthors) {
 function toCanonicalAuthorId(identifier: string): string {
   return authorIdLookup.get(identifier) ?? identifier
 }
-
-export async function generateStaticParams() {
-  return blogAuthors.map((author) => ({ author: author.author_id }))
-}
-
-export const revalidate = 30
-export const dynamic = 'force-static'
 
 export async function generateMetadata({
   params: paramsPromise,
@@ -48,6 +43,15 @@ export default async function AuthorPage({ params: paramsPromise }: { params: Pr
   const authorId = params.author
 
   const author = blogAuthors.find((a) => a.author_id === authorId) ?? null
+  if (!author) {
+    notFound()
+  }
+
+  // Read the list/grid preference from a cookie so the correct view renders on
+  // first paint. Reading a cookie opts this route into dynamic rendering.
+  const cookieStore = await cookies()
+  const cookieView = cookieStore.get(BLOG_VIEW_COOKIE)?.value
+  const initialView: BlogView = isBlogView(cookieView) ? cookieView : 'list'
 
   // Get static posts where author field contains this author_id (normalize identifiers)
   const staticPosts = getSortedPosts({ directory: '_blog', limit: 0 }).filter((post: any) => {
@@ -55,17 +59,17 @@ export default async function AuthorPage({ params: paramsPromise }: { params: Pr
     return postAuthors.some((a: string) => toCanonicalAuthorId(a) === authorId)
   })
 
-  // Get CMS posts by this author (normalize identifiers)
-  const allCmsPosts = await getAllCMSPosts({})
-  const cmsPosts = allCmsPosts.filter((post: any) => {
-    return post.authors?.some(
-      (a: any) => toCanonicalAuthorId(a.author_id ?? a.username ?? '') === authorId
-    )
-  })
-
-  const blogs = [...(staticPosts as any[]), ...(cmsPosts as any[])].sort(
+  const blogs = [...(staticPosts as any[])].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   ) as unknown as PostTypes[]
 
-  return <AuthorClient author={author} authorId={authorId} blogs={blogs} />
+  return (
+    <AuthorClient
+      key={authorId}
+      author={author}
+      authorId={authorId}
+      blogs={blogs}
+      initialView={initialView}
+    />
+  )
 }

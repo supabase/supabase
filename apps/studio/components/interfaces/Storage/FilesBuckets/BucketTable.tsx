@@ -1,17 +1,28 @@
-import { useBucketPolicyCount } from 'components/interfaces/Storage/useBucketPolicyCount'
+import { FilesBucket as FilesBucketIcon } from 'icons'
+import { ChevronRight } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import {
+  Badge,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+
+import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
+import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
 import {
   VirtualizedTableCell,
   VirtualizedTableHead,
   VirtualizedTableHeader,
   VirtualizedTableRow,
-} from 'components/ui/VirtualizedTable'
-import { Bucket } from 'data/storage/buckets-query'
-import { FilesBucket as FilesBucketIcon } from 'icons'
-import { formatBytes } from 'lib/helpers'
-import { createNavigationHandler } from 'lib/navigation'
-import { ChevronRight } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import { Badge, TableCell, TableHead, TableHeader, TableRow } from 'ui'
+} from '@/components/ui/VirtualizedTable'
+import { Bucket } from '@/data/storage/buckets-query'
+import { formatBytes } from '@/lib/helpers'
+import { createNavigationHandler } from '@/lib/navigation'
 
 type BucketTableMode = 'standard' | 'virtualized'
 
@@ -108,7 +119,16 @@ export const BucketTableRow = ({
       <BucketTableCell className="flex-1">
         <div className="flex items-center gap-2.5">
           <p className="whitespace-nowrap max-w-[512px] truncate">{bucket.id}</p>
-          {bucket.public && <Badge variant="warning">Public</Badge>}
+          {bucket.public && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Badge variant="warning" className="flex">
+                  Public
+                </Badge>
+              </TooltipTrigger>
+              <TooltipContent side="top">{PUBLIC_BUCKET_TOOLTIP}</TooltipContent>
+            </Tooltip>
+          )}
         </div>
       </BucketTableCell>
 

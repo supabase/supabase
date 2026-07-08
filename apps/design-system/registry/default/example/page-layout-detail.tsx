@@ -1,4 +1,15 @@
-import { Button, Card, CardContent } from 'ui'
+import Link from 'next/link'
+import {
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  Button,
+  Card,
+  CardContent,
+} from 'ui'
+import { PageBreadcrumbs } from 'ui-patterns/PageBreadcrumbs'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -19,7 +30,21 @@ import {
 export default function PageLayoutDetail() {
   return (
     <div className="w-full">
-      <PageHeader size="large">
+      <PageBreadcrumbs>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/org/demo">Organization</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Billing</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </PageBreadcrumbs>
+
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Billing</PageHeaderTitle>
@@ -30,7 +55,7 @@ export default function PageLayoutDetail() {
         </PageHeaderMeta>
       </PageHeader>
 
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection orientation="horizontal">
           <PageSectionMeta>
             <PageSectionSummary>
@@ -57,7 +82,7 @@ export default function PageLayoutDetail() {
                     <p className="text-sm">March 15, 2024</p>
                   </div>
                   <div className="pt-2">
-                    <Button type="default" size="small">
+                    <Button variant="default" size="small">
                       Change Plan
                     </Button>
                   </div>
@@ -89,7 +114,7 @@ export default function PageLayoutDetail() {
                     <p className="text-sm">$234.50</p>
                   </div>
                   <div className="pt-2">
-                    <Button type="default" size="small">
+                    <Button variant="default" size="small">
                       Configure Limits
                     </Button>
                   </div>
@@ -121,7 +146,7 @@ export default function PageLayoutDetail() {
                     <p className="text-sm">12/2025</p>
                   </div>
                   <div className="pt-2">
-                    <Button type="default" size="small">
+                    <Button variant="default" size="small">
                       Update Payment Method
                     </Button>
                   </div>

@@ -1,4 +1,4 @@
-import type { IncidentInfo } from 'lib/api/incident-status'
+import type { IncidentInfo } from '@/lib/api/incident-status'
 
 export type IncidentImpact = 'critical' | 'major' | 'maintenance' | 'minor' | 'none'
 

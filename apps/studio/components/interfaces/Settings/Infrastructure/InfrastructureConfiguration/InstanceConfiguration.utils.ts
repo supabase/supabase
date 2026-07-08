@@ -1,17 +1,18 @@
 import dagre from '@dagrejs/dagre'
+import { Edge, Node, Position } from '@xyflow/react'
 import { groupBy } from 'lodash'
-import { Edge, Node, Position } from 'reactflow'
-
-import type { LoadBalancer } from 'data/read-replicas/load-balancers-query'
-import type { Database } from 'data/read-replicas/replicas-query'
 import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'shared-data'
+
 import {
   AVAILABLE_REPLICA_REGIONS,
   AWS_REGIONS_COORDINATES,
-  NODE_ROW_HEIGHT,
+  NODE_HEIGHT_FALLBACKS,
   NODE_SEP,
   NODE_WIDTH,
+  ReplicaNodeData,
 } from './InstanceConfiguration.constants'
+import type { LoadBalancer } from '@/data/read-replicas/load-balancers-query'
+import type { Database } from '@/data/read-replicas/replicas-query'
 
 // [Joshen] Just FYI the nodes generation assumes each project only has one load balancer
 // Will need to change if this eventually becomes otherwise
@@ -80,7 +81,7 @@ export const generateNodes = ({
       region:
         primary.cloud_provider === 'FLY'
           ? { name: 'Singapore (sin)', key: 'SOUTHEAST_ASIA' }
-          : primaryRegion ?? { name: primary.region },
+          : (primaryRegion ?? { name: primary.region }),
       provider: primary.cloud_provider,
       inserted_at: primary.inserted_at,
       computeSize: primary.size,
@@ -122,15 +123,20 @@ export const generateNodes = ({
   ]
 }
 
+const getDagreNodeHeight = (node: Node) => {
+  if (node.measured?.height) return node.measured.height
+  return NODE_HEIGHT_FALLBACKS[node.type ?? ''] ?? 100
+}
+
 export const getDagreGraphLayout = (nodes: Node[], edges: Edge[]) => {
   const dagreGraph = new dagre.graphlib.Graph()
   dagreGraph.setDefaultEdgeLabel(() => ({}))
-  dagreGraph.setGraph({ rankdir: 'TB', ranksep: 160, nodesep: NODE_SEP })
+  dagreGraph.setGraph({ rankdir: 'TB', ranksep: 60, nodesep: NODE_SEP })
 
   nodes.forEach((node) => {
     dagreGraph.setNode(node.id, {
       width: NODE_WIDTH / 2,
-      height: node.id === 'load-balancer' ? -70 : NODE_ROW_HEIGHT / 2,
+      height: getDagreNodeHeight(node),
     })
   })
 
@@ -165,7 +171,9 @@ export const getDagreGraphLayout = (nodes: Node[], edges: Edge[]) => {
  */
 export const addRegionNodes = (nodes: Node[], edges: Edge[]) => {
   const regionNodes: Node[] = []
-  const replicaNodes = nodes.filter((node) => node.type === 'READ_REPLICA')
+  const replicaNodes = nodes.filter(
+    (node) => node.type === 'READ_REPLICA'
+  ) as Node<ReplicaNodeData>[]
 
   const nodesByRegion = groupBy(replicaNodes, (node) => node.data.region.key)
   Object.entries(nodesByRegion).map(([key, value]) => {

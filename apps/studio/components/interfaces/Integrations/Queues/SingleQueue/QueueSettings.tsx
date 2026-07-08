@@ -1,25 +1,9 @@
+import { useParams } from 'common'
 import { isEqual } from 'lodash'
 import { HelpCircle, Settings } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useQueuesExposePostgrestStatusQuery } from 'data/database-queues/database-queues-expose-postgrest-status-query'
-import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import {
-  TablePrivilegesGrant,
-  useTablePrivilegesGrantMutation,
-} from 'data/privileges/table-privileges-grant-mutation'
-import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
-import {
-  TablePrivilegesRevoke,
-  useTablePrivilegesRevokeMutation,
-} from 'data/privileges/table-privileges-revoke-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import {
   Button,
   Sheet,
@@ -43,7 +27,25 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { pgmqArchiveTable, pgmqQueueTable } from '../Queues.utils'
 import { getQueueFunctionsMapping } from './Queue.utils'
+import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/database-queues-expose-postgrest-status-query'
+import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
+import {
+  TablePrivilegesGrant,
+  useTablePrivilegesGrantMutation,
+} from '@/data/privileges/table-privileges-grant-mutation'
+import { useTablePrivilegesQuery } from '@/data/privileges/table-privileges-query'
+import {
+  TablePrivilegesRevoke,
+  useTablePrivilegesRevokeMutation,
+} from '@/data/privileges/table-privileges-revoke-mutation'
+import { useTablesQuery } from '@/data/tables/tables-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getErrorMessage } from '@/lib/get-error-message'
 
 const ACTIONS = ['select', 'insert', 'update', 'delete']
 const ROLES = ['anon', 'authenticated', 'postgres', 'service_role']
@@ -83,16 +85,17 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
     connectionString: project?.connectionString,
     schema: 'pgmq',
   })
-  const queueTable = queueTables?.find((x) => x.name === `q_${name}`)
-  const archiveTable = queueTables?.find((x) => x.name === `a_${name}`)
+  const queueRelname = name ? pgmqQueueTable(name) : undefined
+  const archiveRelname = name ? pgmqArchiveTable(name) : undefined
+  const queueTable = queueTables?.find((x) => x.name === queueRelname)
+  const archiveTable = queueTables?.find((x) => x.name === archiveRelname)
 
   const { data: allTablePrivileges, isSuccess: isSuccessPrivileges } = useTablePrivilegesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    includedSchemas: ['pgmq'],
   })
-  const queuePrivileges = allTablePrivileges?.find(
-    (x) => x.schema === 'pgmq' && x.name === `q_${name}`
-  )
+  const queuePrivileges = allTablePrivileges?.find((x) => x.name === queueRelname)
 
   const { mutateAsync: grantPrivilege } = useTablePrivilegesGrantMutation()
   const { mutateAsync: revokePrivilege } = useTablePrivilegesRevokeMutation()
@@ -210,8 +213,8 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
       ])
       toast.success('Successfully updated permissions')
       setOpen(false)
-    } catch (error: any) {
-      toast.error(`Failed to update permissions: ${error.message}`)
+    } catch (error: unknown) {
+      toast.error(`Failed to update permissions: ${getErrorMessage(error)}`)
     } finally {
       setIsSaving(false)
     }
@@ -219,12 +222,15 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
 
   useEffect(() => {
     if (open && isSuccessPrivileges && queuePrivileges) {
-      const initialState = queuePrivileges.privileges.reduce((a, b) => {
-        return {
-          ...a,
-          [b.grantee]: { ...(a as any)[b.grantee], [b.privilege_type.toLowerCase()]: true },
-        }
-      }, {})
+      const initialState = queuePrivileges.privileges.reduce<{ [key: string]: Privileges }>(
+        (a, b) => {
+          return {
+            ...a,
+            [b.grantee]: { ...a[b.grantee], [b.privilege_type.toLowerCase()]: true },
+          }
+        },
+        {}
+      )
       setPrivileges(initialState)
     }
   }, [open, isSuccessPrivileges])
@@ -233,7 +239,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <ButtonTooltip
-          type="text"
+          variant="text"
           className="px-1.5"
           icon={<Settings />}
           title="Settings"
@@ -255,7 +261,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
           </SheetDescription>
         </SheetHeader>
 
-        <SheetSection className="p-0 flex-grow">
+        <SheetSection className="p-0 grow">
           {!isExposed ? (
             <Admonition
               type="default"
@@ -278,7 +284,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
             <Admonition
               type="default"
               className="rounded-none border-x-0 border-t-0"
-              title="Only relevant roles for managing queues via client libraries or PostgREST are shown here"
+              description="Only relevant roles for managing queues via client libraries or PostgREST are shown here."
             />
           )}
           <Table>
@@ -366,10 +372,10 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
           </Table>
         </SheetSection>
         <SheetFooter>
-          <Button type="default" disabled={isSaving} onClick={() => setOpen(false)}>
+          <Button variant="default" disabled={isSaving} onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button type="primary" loading={isSaving} onClick={onSaveConfiguration}>
+          <Button variant="primary" loading={isSaving} onClick={onSaveConfiguration}>
             Save changes
           </Button>
         </SheetFooter>

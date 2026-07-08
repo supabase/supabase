@@ -1,27 +1,27 @@
 import authors from 'lib/authors.json'
+
 const dayjs = require('dayjs')
 var utc = require('dayjs/plugin/utc')
 var advancedFormat = require('dayjs/plugin/advancedFormat')
 dayjs.extend(utc)
 dayjs.extend(advancedFormat)
 
-const generateRssItem = (post: any): string => {
-  const xmlEncode = (str: string) => {
-    if (str === undefined || str === null) {
-      return ''
-    }
-
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&apos;')
+export function xmlEncodeRss(str: string | undefined | null): string {
+  if (str === undefined || str === null) {
+    return ''
   }
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+}
 
-  const encodedTitle = xmlEncode(post.title)
-  const encodedPath = xmlEncode(post.path)
-  const encodedDescription = xmlEncode(post.description)
+const generateRssItem = (post: any): string => {
+  const encodedTitle = xmlEncodeRss(post.title)
+  const encodedPath = xmlEncodeRss(post.path)
+  const encodedDescription = xmlEncodeRss(post.description)
   const formattedDate = dayjs(post.date)
     .utcOffset(0, true)
     .startOf('day')
@@ -37,9 +37,19 @@ const generateRssItem = (post: any): string => {
 `
 }
 
+export type ChangelogRssItemInput = {
+  title: string
+  url: string
+  sortDate: string
+}
+
+/** Implemented in `./changelog-rss.mjs` (used by `scripts/generateStaticContent.mjs`). */
+export { generateChangelogRssXml } from './changelog-rss.mjs'
+
 // This utility generates RSS feeds for specialized content:
 // 1. Customer stories RSS feed (customers-rss.xml) - used by pages/customers.tsx via getStaticProps
 // 2. Author-specific PlanetPG RSS feeds (planetpg-{authorID}-rss.xml) - filtered feeds for individual authors
+// 3. Changelog RSS (changelog-rss.xml) — built in generateStaticContent.mjs via ./changelog-rss.mjs
 //
 // Note: The main blog RSS feed (rss.xml) containing all blog posts is generated separately
 // in generateStaticContent.mjs during the build process. This file is NOT used for the main blog feed.

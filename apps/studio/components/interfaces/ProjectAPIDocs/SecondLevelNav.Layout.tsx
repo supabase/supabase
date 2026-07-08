@@ -1,21 +1,20 @@
 import { ChevronLeft, Code } from 'lucide-react'
 import { useMemo, useState, type PropsWithChildren, type ReactNode } from 'react'
-
-import { DocsButton } from 'components/ui/DocsButton'
-import { useAppStateSnapshot } from 'state/app-state'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
-import { useIsAPIDocsSidePanelEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
+
 import { navigateToSection } from './Content/Content.utils'
 import { DOCS_RESOURCE_CONTENT } from './ProjectAPIDocs.constants'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 type DocsResourceContentItem = (typeof DOCS_RESOURCE_CONTENT)[keyof typeof DOCS_RESOURCE_CONTENT]
 
@@ -90,8 +89,6 @@ type NavTitleProps = {
 }
 
 const NavTitle = ({ title, category }: NavTitleProps) => {
-  const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
-
   const snap = useAppStateSnapshot()
   const handleBack = () => {
     snap.setActiveDocsSection([category])
@@ -99,9 +96,7 @@ const NavTitle = ({ title, category }: NavTitleProps) => {
 
   return (
     <div className="flex items-center space-x-2 mb-2">
-      {isNewAPIDocsEnabled && (
-        <Button type="text" icon={<ChevronLeft />} className="px-1" onClick={handleBack} />
-      )}
+      <Button variant="text" icon={<ChevronLeft />} className="px-1" onClick={handleBack} />
       <p className="text-sm text-foreground-light capitalize">{title}</p>
     </div>
   )
@@ -118,25 +113,25 @@ const ResourcePicker = ({ category, resource, renderResourceList }: ResourcePick
   }
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen} modal={false}>
+      <PopoverTrigger asChild>
         <Button
-          type="default"
+          variant="default"
           size="small"
           className="w-full justify-between gap-2"
           iconRight={<Code className="rotate-90" />}
         >
           <span className="truncate">{resource ?? 'Select a resource'}</span>
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="center">
+      </PopoverTrigger>
+      <PopoverContent className="p-0 w-64" side="bottom" align="center">
         {renderResourceList({
           selectedResource: resource,
           onSelect: handleSelect,
           closePopover: () => setOpen(false),
         })}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }
 
@@ -174,20 +169,20 @@ type MoreInformationProps = {
 
 const MoreInformation = ({ docsUrl }: MoreInformationProps) => {
   return (
-    <Alert_Shadcn_ className="p-3">
-      <AlertTitle_Shadcn_>
+    <Alert className="p-3">
+      <AlertTitle>
         <p className="text-xs">Unable to find what you're looking for?</p>
-      </AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_ className="space-y-1">
-        <p className="text-xs !leading-normal">
+      </AlertTitle>
+      <AlertDescription className="space-y-1">
+        <p className="text-xs leading-normal!">
           The API methods shown here are only the commonly used ones to get you started building
           quickly.
         </p>
-        <p className="text-xs !leading-normal">
+        <p className="text-xs leading-normal!">
           Head over to our docs site for the full API documentation.
         </p>
-        <DocsButton className="!mt-2" href={docsUrl} />
-      </AlertDescription_Shadcn_>
-    </Alert_Shadcn_>
+        <DocsButton className="mt-2!" href={docsUrl} />
+      </AlertDescription>
+    </Alert>
   )
 }

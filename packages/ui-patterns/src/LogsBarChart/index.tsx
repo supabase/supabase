@@ -7,14 +7,14 @@ import type { CategoricalChartState } from 'recharts/types/chart/types'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 
 const CHART_COLORS = {
-  TICK: 'hsl(var(--background-overlay-hover))',
-  AXIS: 'hsl(var(--background-overlay-hover))',
+  TICK: 'var(--background-overlay-hover)',
+  AXIS: 'var(--background-overlay-hover)',
   GREEN_1: 'hsl(var(--brand-default))',
   GREEN_2: 'hsl(var(--brand-500))',
   RED_1: 'hsl(var(--destructive-default))',
   RED_2: 'hsl(var(--destructive-500))',
-  YELLOW_1: 'hsl(var(--warning-default))',
-  YELLOW_2: 'hsl(var(--warning-500))',
+  YELLOW_1: 'var(--chart-warning)',
+  YELLOW_2: 'var(--chart-warning-muted)',
 }
 
 type LogsBarChartDatum = {
@@ -26,22 +26,35 @@ type LogsBarChartDatum = {
 
 export const LogsBarChart = ({
   data,
+  error,
   onBarClick,
   EmptyState,
+  ErrorState,
   DateTimeFormat = 'MMM D, YYYY, hh:mma',
   isFullHeight = false,
   chartConfig,
   hideZeroValues = false,
+  hideDateRange = false,
+  hideXAxis = false,
 }: {
   data: LogsBarChartDatum[]
+  error?: unknown | null
   onBarClick?: (datum: LogsBarChartDatum, tooltipData?: CategoricalChartState) => void
   EmptyState?: ReactNode
+  ErrorState?: ReactNode
   DateTimeFormat?: string
   isFullHeight?: boolean
   chartConfig?: ChartConfig
   hideZeroValues?: boolean
+  hideDateRange?: boolean
+  hideXAxis?: boolean
 }) => {
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
+
+  if (error) {
+    if (ErrorState) return ErrorState
+    return null
+  }
 
   if (data.length === 0) {
     if (EmptyState) return EmptyState
@@ -94,6 +107,7 @@ export const LogsBarChart = ({
             tick={false}
             axisLine={{ stroke: CHART_COLORS.AXIS }}
             tickLine={{ stroke: CHART_COLORS.AXIS }}
+            {...(hideXAxis ? { height: 1 } : {})}
           />
           <ChartTooltip
             animationDuration={0}
@@ -118,7 +132,7 @@ export const LogsBarChart = ({
                   active={props.active}
                   payload={filteredPayload}
                   label={props.label}
-                  className="text-foreground-light -mt-5 !transition-none"
+                  className="text-foreground-light -mt-5 transition-none!"
                   labelFormatter={(v: string) => dayjs(v).format(DateTimeFormat)}
                 />
               )
@@ -171,7 +185,7 @@ export const LogsBarChart = ({
           </Bar>
         </RechartBarChart>
       </ChartContainer>
-      {data && (
+      {data && !hideDateRange && (
         <div className="text-foreground-lighter -mt-10 flex items-center justify-between text-[10px] font-mono">
           <span>{startDate}</span>
           <span>{endDate}</span>

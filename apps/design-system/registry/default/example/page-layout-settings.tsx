@@ -1,18 +1,27 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import Link from 'next/link'
 import { useForm } from 'react-hook-form'
 import {
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
   Button,
   Card,
   CardContent,
   CardFooter,
-  Form_Shadcn_,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Input_Shadcn_,
-  PrePostTab,
+  Form,
+  FormControl,
+  FormField,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+  InputGroupText,
   Switch,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageBreadcrumbs } from 'ui-patterns/PageBreadcrumbs'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -72,6 +81,20 @@ export default function PageLayoutSettings() {
 
   return (
     <div className="w-full">
+      <PageBreadcrumbs>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/project/demo/auth">Authentication</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>User Sessions</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </PageBreadcrumbs>
+
       <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
@@ -94,11 +117,11 @@ export default function PageLayoutSettings() {
             </PageSectionSummary>
           </PageSectionMeta>
           <PageSectionContent>
-            <Form_Shadcn_ {...refreshTokenForm}>
+            <Form {...refreshTokenForm}>
               <form className="space-y-4">
                 <Card>
                   <CardContent className="pt-6">
-                    <FormField_Shadcn_
+                    <FormField
                       control={refreshTokenForm.control}
                       name="REFRESH_TOKEN_ROTATION_ENABLED"
                       render={({ field }) => (
@@ -107,15 +130,15 @@ export default function PageLayoutSettings() {
                           label="Detect and revoke potentially compromised refresh tokens"
                           description="Prevent replay attacks from potentially compromised refresh tokens."
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Switch checked={field.value} onCheckedChange={field.onChange} />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
                   </CardContent>
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={refreshTokenForm.control}
                       name="SECURITY_REFRESH_TOKEN_REUSE_INTERVAL"
                       render={({ field }) => (
@@ -124,24 +147,27 @@ export default function PageLayoutSettings() {
                           label="Refresh token reuse interval"
                           description="Time interval where the same refresh token can be used multiple times to request for an access token. Recommendation: 10 seconds."
                         >
-                          <FormControl_Shadcn_>
-                            <PrePostTab postTab="seconds">
-                              <Input_Shadcn_ type="number" min={0} {...field} />
-                            </PrePostTab>
-                          </FormControl_Shadcn_>
+                          <FormControl>
+                            <InputGroup>
+                              <InputGroupAddon align="inline-end">
+                                <InputGroupText>seconds</InputGroupText>
+                              </InputGroupAddon>
+                              <InputGroupInput type="number" min={0} {...field} />
+                            </InputGroup>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
                   </CardContent>
                   <CardFooter className="justify-end space-x-2">
                     {refreshTokenForm.formState.isDirty && (
-                      <Button type="default" onClick={() => refreshTokenForm.reset()}>
+                      <Button variant="default" onClick={() => refreshTokenForm.reset()}>
                         Cancel
                       </Button>
                     )}
                     <Button
-                      type="primary"
-                      htmlType="submit"
+                      variant="primary"
+                      type="submit"
                       disabled={!refreshTokenForm.formState.isDirty}
                     >
                       Save changes
@@ -149,7 +175,7 @@ export default function PageLayoutSettings() {
                   </CardFooter>
                 </Card>
               </form>
-            </Form_Shadcn_>
+            </Form>
           </PageSectionContent>
         </PageSection>
 
@@ -163,11 +189,11 @@ export default function PageLayoutSettings() {
             </PageSectionSummary>
           </PageSectionMeta>
           <PageSectionContent>
-            <Form_Shadcn_ {...userSessionsForm}>
+            <Form {...userSessionsForm}>
               <form className="space-y-4">
                 <Card>
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={userSessionsForm.control}
                       name="SESSIONS_SINGLE_PER_USER"
                       render={({ field }) => (
@@ -176,16 +202,16 @@ export default function PageLayoutSettings() {
                           label="Enforce single session per user"
                           description="If enabled, all but a user's most recently active session will be terminated."
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Switch checked={field.value} onCheckedChange={field.onChange} />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
                   </CardContent>
 
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={userSessionsForm.control}
                       name="SESSIONS_TIMEBOX"
                       render={({ field }) => (
@@ -195,11 +221,16 @@ export default function PageLayoutSettings() {
                           description="The amount of time before a user is forced to sign in again. Use 0 for never."
                         >
                           <div className="flex items-center">
-                            <FormControl_Shadcn_>
-                              <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
-                                <Input_Shadcn_ type="number" min={0} {...field} />
-                              </PrePostTab>
-                            </FormControl_Shadcn_>
+                            <FormControl>
+                              <InputGroup>
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>
+                                    <HoursOrNeverText value={field.value || 0} />
+                                  </InputGroupText>
+                                </InputGroupAddon>
+                                <InputGroupInput type="number" min={0} {...field} />
+                              </InputGroup>
+                            </FormControl>
                           </div>
                         </FormItemLayout>
                       )}
@@ -207,7 +238,7 @@ export default function PageLayoutSettings() {
                   </CardContent>
 
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={userSessionsForm.control}
                       name="SESSIONS_INACTIVITY_TIMEOUT"
                       render={({ field }) => (
@@ -217,11 +248,16 @@ export default function PageLayoutSettings() {
                           description="The amount of time a user needs to be inactive to be forced to sign in again. Use 0 for never."
                         >
                           <div className="flex items-center">
-                            <FormControl_Shadcn_>
-                              <PrePostTab postTab={<HoursOrNeverText value={field.value || 0} />}>
-                                <Input_Shadcn_ type="number" {...field} />
-                              </PrePostTab>
-                            </FormControl_Shadcn_>
+                            <FormControl>
+                              <InputGroup>
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupText>
+                                    <HoursOrNeverText value={field.value || 0} />
+                                  </InputGroupText>
+                                </InputGroupAddon>
+                                <InputGroupInput type="number" {...field} />
+                              </InputGroup>
+                            </FormControl>
                           </div>
                         </FormItemLayout>
                       )}
@@ -230,13 +266,13 @@ export default function PageLayoutSettings() {
 
                   <CardFooter className="justify-end space-x-2">
                     {userSessionsForm.formState.isDirty && (
-                      <Button type="default" onClick={() => userSessionsForm.reset()}>
+                      <Button variant="default" onClick={() => userSessionsForm.reset()}>
                         Cancel
                       </Button>
                     )}
                     <Button
-                      type="primary"
-                      htmlType="submit"
+                      variant="primary"
+                      type="submit"
                       disabled={!userSessionsForm.formState.isDirty}
                     >
                       Save changes
@@ -244,7 +280,7 @@ export default function PageLayoutSettings() {
                   </CardFooter>
                 </Card>
               </form>
-            </Form_Shadcn_>
+            </Form>
           </PageSectionContent>
         </PageSection>
       </PageContainer>

@@ -23,7 +23,7 @@ const Player = () => {
         href="https://supabase.productions/"
         target="_blank"
         className={cn(
-          'opacity-0 outline-none group translate-x-2 !ease-[cubic-bezier(.24,0,.22,.99)] duration-200 transition-all text-foreground-muted hover:text-foreground !leading-3 font-mono uppercase text-[10px] flex flex-col text-right',
+          'opacity-0 outline-hidden group translate-x-2 ease-[cubic-bezier(.24,0,.22,.99)]! duration-200 transition-all text-foreground-muted hover:text-foreground leading-3! font-mono uppercase text-[10px] flex flex-col text-right',
           isPlaying && 'opacity-100 translate-x-0'
         )}
       >
@@ -37,7 +37,7 @@ const Player = () => {
         onClick={isPlaying ? controls.pause : controls.play}
         className="relative outline-border-muted w-7 h-7 opacity-70 hover:opacity-100 rounded-full flex items-center justify-center text-foreground-muted hover:text-foreground-lighter transition-opacity"
         style={{
-          background: `radial-gradient(closest-side, #060809 79%, transparent 95% 100%),conic-gradient(hsl(var(--foreground-lighter)) ${progress.toFixed()}%, hsl(var(--border-muted)) 0)`,
+          background: `radial-gradient(closest-side, #060809 79%, transparent 95% 100%),conic-gradient(var(--foreground-lighter) ${progress.toFixed()}%, var(--border-muted) 0)`,
         }}
       >
         <svg
@@ -48,7 +48,7 @@ const Player = () => {
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
-          <circle opacity="0.1" cx="8" cy="8" r="7.5" stroke="hsl(var(--foreground-default))" />
+          <circle opacity="0.1" cx="8" cy="8" r="7.5" stroke="var(--foreground-default)" />
           <circle
             cx="8"
             cy="8"

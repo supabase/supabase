@@ -1,15 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import * as z from 'zod'
-
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { NO_PROJECT_MARKER } from 'components/interfaces/Support/SupportForm.utils'
-import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProfile } from 'lib/profile'
 import {
   Button,
   Dialog,
@@ -20,30 +14,36 @@ import {
   DialogSection,
   DialogTitle,
   DialogTrigger,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  Form_Shadcn_,
-  Input_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  Input,
   Separator,
 } from 'ui'
+import * as z from 'zod'
+
+import { NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.utils'
+import { useSendSupportTicketMutation } from '@/data/feedback/support-ticket-send'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useProfile } from '@/lib/profile'
 
 const setDeletionRequestFlag = () => {
   const expiryDate = new Date()
   expiryDate.setDate(expiryDate.getDate() + 30)
-  localStorage.setItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST, expiryDate.toString())
+  safeLocalStorage.setItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST, expiryDate.toString())
 }
 
 const hasActiveDeletionRequest = () => {
-  const expiryDateStr = localStorage.getItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
+  const expiryDateStr = safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
   if (!expiryDateStr) return false
 
   const expiryDate = new Date(expiryDateStr)
   const now = new Date()
 
   if (now > expiryDate) {
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
+    safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
     return false
   }
 
@@ -106,11 +106,11 @@ export const DeleteAccountButton = () => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button type="danger" loading={!accountEmail}>
+        <Button variant="danger" loading={!accountEmail}>
           Request to delete account
         </Button>
       </DialogTrigger>
-      <DialogContent className="!w-[500px]">
+      <DialogContent className="w-[500px]!">
         <DialogHeader>
           {(organizations ?? []).length > 0 ? (
             <>
@@ -144,38 +144,38 @@ export const DeleteAccountButton = () => {
                   </span>
                 </DialogSection>
                 <DialogFooter>
-                  <Button block type="primary" size="medium" onClick={() => setIsOpen(false)}>
+                  <Button block variant="primary" size="medium" onClick={() => setIsOpen(false)}>
                     Understood
                   </Button>
                 </DialogFooter>
               </>
             ) : (
-              <Form_Shadcn_ {...form}>
+              <Form {...form}>
                 <form
                   id="account-deletion-request"
                   onSubmit={form.handleSubmit(() => onConfirmDelete())}
                 >
                   <DialogSection>
-                    <FormField_Shadcn_
+                    <FormField
                       name="account"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItem_Shadcn_>
-                          <FormLabel_Shadcn_>
+                        <FormItem>
+                          <FormLabel>
                             Please type{' '}
                             <span className="font-bold">{profile?.primary_email ?? ''}</span> to
                             confirm
-                          </FormLabel_Shadcn_>
-                          <FormControl_Shadcn_>
-                            <Input_Shadcn_
+                          </FormLabel>
+                          <FormControl>
+                            <Input
                               autoFocus
                               {...field}
                               autoComplete="off"
                               disabled={isPending}
                               placeholder="Enter the account above"
                             />
-                          </FormControl_Shadcn_>
-                        </FormItem_Shadcn_>
+                          </FormControl>
+                        </FormItem>
                       )}
                     />
                   </DialogSection>
@@ -184,8 +184,8 @@ export const DeleteAccountButton = () => {
                     <Button
                       block
                       size="small"
-                      type="danger"
-                      htmlType="submit"
+                      variant="danger"
+                      type="submit"
                       loading={isPending}
                       disabled={account !== accountEmail || isPending}
                     >
@@ -193,7 +193,7 @@ export const DeleteAccountButton = () => {
                     </Button>
                   </DialogFooter>
                 </form>
-              </Form_Shadcn_>
+              </Form>
             )}
           </>
         )}

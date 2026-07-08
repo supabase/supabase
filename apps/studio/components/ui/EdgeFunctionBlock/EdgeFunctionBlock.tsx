@@ -1,10 +1,11 @@
 import { Code } from 'lucide-react'
 import Link from 'next/link'
 import type { DragEvent, ReactNode } from 'react'
+import { Button, cn } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
-import { ReportBlockContainer } from 'components/interfaces/Reports/ReportBlock/ReportBlockContainer'
-import { Button, CodeBlock, type CodeBlockLang, cn } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { ReportBlockContainer } from '@/components/interfaces/Reports/ReportBlock/ReportBlockContainer'
 
 interface EdgeFunctionBlockProps {
   /** Title of the EdgeFunctionBlock */
@@ -85,11 +86,11 @@ export const EdgeFunctionBlock = ({
       onDragStart={onDragStart}
       actions={
         hideDeployButton || !onDeploy ? (
-          actions ?? null
+          (actions ?? null)
         ) : (
           <>
             <Button
-              type="outline"
+              variant="outline"
               size="tiny"
               loading={isDeploying}
               disabled={disabled || isDeploying}
@@ -114,7 +115,7 @@ export const EdgeFunctionBlock = ({
           </p>
           <div className="flex justify-stretch mt-2 gap-2">
             <Button
-              type="outline"
+              variant="outline"
               size="tiny"
               className="w-full flex-1"
               disabled={isDeploying}
@@ -123,7 +124,7 @@ export const EdgeFunctionBlock = ({
               Cancel
             </Button>
             <Button
-              type="danger"
+              variant="danger"
               size="tiny"
               className="w-full flex-1"
               loading={isDeploying}
@@ -143,7 +144,7 @@ export const EdgeFunctionBlock = ({
           value={code}
           language={'typescript' as CodeBlockLang}
           className={cn(
-            'max-w-none block !bg-transparent !py-3 !px-3.5 prose dark:prose-dark border-0 text-foreground !rounded-none w-full',
+            'max-w-none block bg-transparent! py-3! px-3.5! prose dark:prose-dark border-0 text-foreground rounded-none! w-full',
             '[&>code]:m-0 [&>code>span]:text-foreground'
           )}
         />

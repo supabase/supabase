@@ -1,13 +1,13 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
 import { cn } from 'ui'
+
 import { DeleteMessageConfirmModal } from './DeleteMessageConfirmModal'
 import { MessageActions } from './Message.Actions'
-import type { AddToolResult, MessageInfo } from './Message.Context'
-import { MessageDisplay } from './Message.Display'
+import type { AddToolApprovalResponse, MessageInfo } from './Message.Context'
 import { MessageProvider, useMessageActionsContext, useMessageInfoContext } from './Message.Context'
+import { MessageDisplay } from './Message.Display'
 
 function AssistantMessage({ message }: { message: VercelMessage }) {
   const { id, variant, state, isLastMessage, readOnly, rating, isLoading } = useMessageInfoContext()
@@ -92,7 +92,7 @@ interface MessageProps {
   isLoading: boolean
   readOnly?: boolean
   variant?: 'default' | 'warning'
-  addToolResult?: AddToolResult
+  addToolApprovalResponse?: AddToolApprovalResponse
   onDelete: (id: string) => void
   onEdit: (id: string) => void
   isAfterEditedMessage: boolean
@@ -113,6 +113,7 @@ export function Message(props: MessageProps) {
     isLoading: props.isLoading,
     readOnly: props.readOnly,
     variant: props.variant,
+    isUserMessage,
     state: props.isBeingEdited
       ? 'editing'
       : props.isAfterEditedMessage
@@ -123,7 +124,7 @@ export function Message(props: MessageProps) {
   } satisfies MessageInfo
 
   const messageActions = {
-    addToolResult: props.addToolResult,
+    addToolApprovalResponse: props.addToolApprovalResponse,
     onDelete: props.onDelete,
     onEdit: props.onEdit,
     onCancelEdit: props.onCancelEdit,

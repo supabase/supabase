@@ -1,4 +1,4 @@
-import { DOCS_URL } from 'lib/constants'
+import { DOCS_URL } from '@/lib/constants'
 
 export interface Attribute {
   key: string

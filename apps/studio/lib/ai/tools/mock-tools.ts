@@ -1,8 +1,9 @@
-import { tool, type ToolSet } from 'ai'
-import { getRenderingTools } from '../tools/rendering-tools'
-import { z } from 'zod'
-import { getMcpTools } from 'lib/ai/tools/mcp-tools'
 import assert from 'node:assert'
+import { tool, type ToolSet } from 'ai'
+import { z } from 'zod'
+
+import { getStudioTools } from '../tools/studio-tools'
+import { createInProcessSupabaseMCPClient } from '@/lib/ai/supabase-mcp'
 
 const listTablesInputSchema = z.object({
   schemas: z.array(z.string()).describe('The schema names to list.'),
@@ -64,6 +65,7 @@ export const MOCK_TABLES_DATA = [
 const MOCK_EXTENSIONS_DATA = [
   { name: 'pgcrypto', schema: 'extensions', installed_version: '1.3' },
   { name: 'uuid-ossp', schema: 'extensions', installed_version: '1.1' },
+  { name: 'pg_cron', schema: 'pg_catalog', installed_version: '1.6.4' },
 ]
 
 const MOCK_EDGE_FUNCTIONS_DATA = [
@@ -142,31 +144,31 @@ const MOCK_LOGS_DATA = [
   },
 ]
 
-function createMockedRenderingTools() {
-  const renderingTools = getRenderingTools()
+function createMockedStudioTools() {
+  const studioTools = getStudioTools()
 
   return Object.fromEntries(
-    Object.entries(renderingTools).map(([name, baseTool]) => {
+    Object.entries(studioTools).map(([name, baseTool]) => {
+      // Always mock execute_sql and deploy_edge_function with needsApproval disabled
+      if (name === 'execute_sql') {
+        return [name, { ...baseTool, needsApproval: false, execute: async () => [] as unknown[] }]
+      }
+      if (name === 'deploy_edge_function') {
+        return [
+          name,
+          { ...baseTool, needsApproval: false, execute: async () => ({ success: true }) },
+        ]
+      }
       if (typeof baseTool.execute === 'function') {
         return [name, baseTool]
       }
 
-      const statusMessage =
-        name === 'execute_sql'
-          ? 'SQL execution mocked successfully.'
-          : name === 'deploy_edge_function'
-            ? 'Edge Function deployment mocked successfully.'
-            : 'Tool call mocked successfully.'
-
       return [
         name,
-        {
-          ...baseTool,
-          execute: async () => ({ status: statusMessage }),
-        },
+        { ...baseTool, execute: async () => ({ status: 'Tool call mocked successfully.' }) },
       ]
     })
-  ) as typeof renderingTools
+  ) as typeof studioTools
 }
 
 function createMockListTablesTool(overrideData?: Record<string, typeof MOCK_TABLES_DATA>) {
@@ -304,19 +306,30 @@ export type MockToolOverrides = {
  *
  * Note: search_docs uses the real implementation
  */
-export async function getMockTools(overrides?: MockToolOverrides) {
-  const mockedRenderingTools = createMockedRenderingTools()
+export async function getMockTools(overrides: MockToolOverrides | undefined, signal: AbortSignal) {
+  const mockedStudioTools = createMockedStudioTools()
 
-  const { search_docs } = await getMcpTools({
+  // Every tool here is a deterministic mock except `search_docs`, which uses the
+  // real implementation. We source it from an in-process MCP server directly
+  // (rather than `getMcpTools`) so the eval harness stays hermetic and decoupled
+  // from the assistant's transport gate (`USE_REMOTE_MCP`): the in-process server
+  // needs no live remote endpoint or real access token. See AI-897 for how to
+  // point evals at the remote MCP server instead.
+  const mcpClient = await createInProcessSupabaseMCPClient({
     accessToken: 'mock-access-token',
     projectRef: 'mock-project-ref',
-    aiOptInLevel: 'schema_and_log_and_data',
   })
+  // The caller owns this signal and aborts it once generation is done, which
+  // closes the client opened here (search_docs executes during generation, so
+  // the connection must stay open until then).
+  signal.addEventListener('abort', () => void mcpClient.close().catch(() => {}), { once: true })
+
+  const { search_docs } = (await mcpClient.tools()) as ToolSet
 
   assert(search_docs, 'search_docs tool not available from MCP server')
 
   return {
-    ...mockedRenderingTools,
+    ...mockedStudioTools,
     search_docs,
     list_tables: createMockListTablesTool(overrides?.list_tables),
     list_extensions: createMockListExtensionsTool(),

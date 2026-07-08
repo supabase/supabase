@@ -1,6 +1,7 @@
 import { useParams } from 'common'
-import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { PROJECT_STATUS, PROVIDERS } from 'lib/constants'
+
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { PROJECT_STATUS, PROVIDERS } from '@/lib/constants'
 
 export function useSelectedProjectQuery({ enabled = true } = {}) {
   const { ref } = useParams()
@@ -51,6 +52,11 @@ export const useIsOrioleDbInAws = () => {
   const isOrioleDbInAws =
     project?.dbVersion?.endsWith('orioledb') && project?.cloud_provider === PROVIDERS.AWS.id
   return isOrioleDbInAws
+}
+
+export const useIsHighAvailability = () => {
+  const { data: project } = useSelectedProjectQuery()
+  return project?.high_availability ?? false
 }
 
 export const useIsProjectActive = () => {

@@ -62,18 +62,18 @@ const AuthSmsProviderConfig = () => {
       >
         {selectedProvider && (
           <DialogContent
-            className="!w-[min(90vw,80ch)] !max-w-[min(90vw,80ch)] !max-h-[90dvh] prose overflow-auto"
+            className="w-[min(90vw,80ch)]! max-w-[min(90vw,80ch)]! max-h-[90dvh]! prose overflow-auto"
             onOpenAutoFocus={(evt) => {
               evt.preventDefault()
               headingRef.current?.focus()
             }}
           >
-            <DialogHeader className="pb-0 [&>h3]:!m-0 [&>h3>a]:!hidden [&>h3:focus-visible]:outline-none">
+            <DialogHeader className="pb-0 [&>h3]:m-0! [&>h3>a]:hidden! [&>h3:focus-visible]:outline-hidden">
               <Heading tag="h3" ref={headingRef} tabIndex={-1}>
                 {selectedProvider.name}
               </Heading>
             </DialogHeader>
-            <DialogSection className="[&>:first-child]:mt-0">
+            <DialogSection className="*:first:mt-0">
               {selectedProvider.name.toLowerCase().includes('messagebird') && <MessageBird />}
               {selectedProvider.name.toLowerCase().includes('twilio') && <Twilio />}
               {selectedProvider.name.toLowerCase().includes('vonage') && <Vonage />}

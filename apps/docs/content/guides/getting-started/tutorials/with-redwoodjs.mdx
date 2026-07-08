@@ -9,7 +9,7 @@ description: 'Learn how to use Supabase in your RedwoodJS App.'
 
 <Admonition type="note">
 
-If you get stuck while working through this guide, refer to the [full example on GitHub](https://github.com/redwoodjs/redwoodjs-supabase-quickstart).
+If you get stuck while working through this guide, you can find the [full example on GitHub](https://github.com/redwoodjs/redwoodjs-supabase-quickstart).
 
 </Admonition>
 
@@ -28,7 +28,7 @@ Important: When this guide refers to "API," that means the Supabase API and when
 
 The **`api side`** is an implementation of a GraphQL API. The business logic is organized into "services" that represent their own internal API and can be called both from external GraphQL requests and other internal services.
 
-The **`web side`** is built with React. Redwood's router makes it simple to map URL paths to React "Page" components (and automatically code-split your app on each route).
+The **`web side`** is built with React. Redwood's router lets you map URL paths to React "Page" components (and automatically code-split your app on each route).
 Pages may contain a "Layout" component to wrap content. They also contain "Cells" and regular React components.
 Cells allow you to declaratively manage the lifecycle of a component that fetches and displays data.
 
@@ -43,7 +43,7 @@ to how your Supabase `public` schema references the `auth.users`.
 
 ## Building the app
 
-Let's start building the RedwoodJS app from scratch.
+Build the RedwoodJS app from scratch.
 
 <Admonition type="note">
 
@@ -77,7 +77,7 @@ While the app is installing, you should see:
 Thanks for trying out Redwood!
 ```
 
-Then let's install the only additional dependency [supabase-js](https://github.com/supabase/supabase-js) by running the `setup auth` command:
+Then install the only additional dependency [supabase-js](https://github.com/supabase/supabase-js) by running the `setup auth` command:
 
 ```bash
 yarn redwood setup auth supabase
@@ -115,7 +115,7 @@ SUPABASE_JWT_SECRET=YOUR_SUPABASE_JWT_SECRET
 
 </$CodeTabs>
 
-And finally, you will also need to save **just** the `web side` environment variables to the `redwood.toml`.
+And finally, you will also need to save **only** the `web side` environment variables to the `redwood.toml`.
 
 <$CodeTabs>
 
@@ -134,7 +134,7 @@ And finally, you will also need to save **just** the `web side` environment vari
 </$CodeTabs>
 
 These variables will be exposed on the browser, and that's completely fine.
-They allow your web app to initialize the Supabase client with your public anon key
+They allow your web app to initialize the Supabase client with your publishable key
 since we have [Row Level Security](/docs/guides/auth#row-level-security) enabled on our Database.
 
 You'll see these being used to configure your Supabase client in `web/src/App.js`:
@@ -169,12 +169,12 @@ export default App
 
 ### App styling (optional)
 
-An optional step is to update the CSS file `web/src/index.css` to make the app look nice.
-You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/react-user-management/src/index.css).
+An optional step is to update the CSS file `web/src/index.css` to make the app look better.
+You can find the full contents of this file [in the example repository](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/react-user-management/src/index.css).
 
 ### Start RedwoodJS and your first page
 
-Let's test our setup at the moment by starting up the app:
+Test your setup by starting the app:
 
 ```bash
 yarn rw dev
@@ -188,7 +188,7 @@ yarn rw dev
 
 You should see a "Welcome to RedwoodJS" page and a message about not having any pages yet.
 
-So, let's create a "home" page:
+Create a "home" page:
 
 ```bash
 yarn rw generate page home /
@@ -207,7 +207,7 @@ The `/` is important here as it creates a root level route.
 
 </Admonition>
 
-You can stop the `dev` server if you want; to see your changes, just be sure to run `yarn rw dev` again.
+You can stop the `dev` server if you want; to see your changes, run `yarn rw dev` again.
 
 You should see the `Home` page route in `web/src/Routes.js`:
 
@@ -232,7 +232,7 @@ export default Routes
 
 ### Set up a login component
 
-Let's set up a Redwood component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
+Set up a Redwood component to manage logins and sign ups. We'll use Magic Links, so users can sign in with their email without using passwords.
 
 ```bash
 yarn rw g component auth
@@ -249,8 +249,8 @@ Now, update the `Auth.js` component to contain:
 <$CodeTabs>
 
 ```jsx name=/web/src/components/Auth/Auth.js
-import { useState } from 'react'
 import { useAuth } from '@redwoodjs/auth'
+import { useState } from 'react'
 
 const Auth = () => {
   const { logIn } = useAuth()
@@ -310,7 +310,7 @@ export default Auth
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
 
-Let's create a new component for that called `Account.js`.
+Create a new component called `Account.js`.
 
 ```bash
 yarn rw g component account
@@ -326,8 +326,8 @@ And then update the file to contain:
 <$CodeTabs>
 
 ```jsx name=web/src/components/Account/Account.js
-import { useState, useEffect } from 'react'
 import { useAuth } from '@redwoodjs/auth'
+import { useEffect, useState } from 'react'
 
 const Account = () => {
   const { client: supabase, currentUser, logOut } = useAuth()
@@ -457,14 +457,13 @@ of the Supabase client to interact with your API.
 
 ### Update home page
 
-Now that we have all the components in place, let's update your `HomePage` page to use them:
+With all the components in place, update your `HomePage` page to use them:
 
 <$CodeTabs>
 
 ```jsx name=web/src/pages/HomePage/HomePage.js
 import { useAuth } from '@redwoodjs/auth'
 import { MetaTags } from '@redwoodjs/web'
-
 import Account from 'src/components/Account'
 import Auth from 'src/components/Auth'
 
@@ -490,25 +489,13 @@ What we're doing here is showing the sign in form if you aren't logged in and yo
 
 </Admonition>
 
-### Launch!
+## Profile photos
 
-Once that's done, run this in a terminal window to launch the `dev` server:
-
-```bash
-yarn rw dev
-```
-
-And then open the browser to [localhost:8910](http://localhost:8910) and you should see the completed app.
-
-![Supabase RedwoodJS](/docs/img/supabase-redwoodjs-demo.png)
-
-## Bonus: Profile photos
-
-Every Supabase project is configured with [Storage](/docs/guides/storage) for managing large files like photos and videos.
+Next, add a way for users to upload a profile photo. Supabase configures every project with [Storage](/docs/guides/storage) for managing large files like photos and videos.
 
 ### Create an upload widget
 
-Let's create an avatar for the user so that they can upload a profile photo. We can start by creating a new component:
+Create an avatar so the user can upload a profile photo. Start by creating a new component:
 
 ```bash
 yarn rw g component avatar
@@ -523,8 +510,8 @@ Now, update your Avatar component to contain the following widget:
 <$CodeTabs>
 
 ```jsx name=web/src/components/Avatar/Avatar.js
-import { useEffect, useState } from 'react'
 import { useAuth } from '@redwoodjs/auth'
+import { useEffect, useState } from 'react'
 
 const Avatar = ({ url, size, onUpload }) => {
   const { client: supabase } = useAuth()
@@ -613,35 +600,17 @@ export default Avatar
 
 </$CodeTabs>
 
-### Add the new widget
+### Launch!
 
-And then we can add the widget to the Account component:
+Once that's done, run this in a terminal window to launch the `dev` server:
 
-<$CodeTabs>
-
-```jsx name=web/src/components/Account/Account.js
-// Import the new component
-import Avatar from 'src/components/Avatar'
-
-// ...
-
-return (
-  <div className="form-widget">
-    {/* Add to the body */}
-    <Avatar
-      url={avatar_url}
-      size={150}
-      onUpload={(url) => {
-        setAvatarUrl(url)
-        updateProfile({ username, website, avatar_url: url })
-      }}
-    />
-    {/* ... */}
-  </div>
-)
+```bash
+yarn rw dev
 ```
 
-</$CodeTabs>
+And then open the browser to [localhost:8910](http://localhost:8910) and you should see the completed app.
+
+![Supabase RedwoodJS](/docs/img/supabase-redwoodjs-demo.png)
 
 At this stage you have a fully functional application!
 

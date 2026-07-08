@@ -1,4 +1,6 @@
-export const ROLES_SQL = /* SQL */ `
+import { safeSql } from '../pg-format'
+
+export const ROLES_SQL = /* SQL */ safeSql`
 -- Can't use pg_authid here since some managed Postgres providers don't expose it
 -- https://github.com/supabase/postgres-meta/issues/212
 

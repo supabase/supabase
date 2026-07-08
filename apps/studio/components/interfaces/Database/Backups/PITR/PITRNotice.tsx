@@ -1,13 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { Calendar } from 'lucide-react'
 import Link from 'next/link'
 
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
 import { getPITRRetentionDuration } from './PITR.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FormPanel } from '@/components/ui/Forms/FormPanel'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 
 export const PITRNotice = () => {
   const { ref: projectRef } = useParams()
@@ -30,7 +30,7 @@ export const PITRNotice = () => {
           <ButtonTooltip
             asChild
             disabled={!canUpdateSubscription}
-            type="default"
+            variant="default"
             tooltip={{
               content: {
                 side: 'bottom',
@@ -48,7 +48,7 @@ export const PITRNotice = () => {
       }
     >
       <div className="flex p-6 space-x-6">
-        <div className="flex items-center justify-center w-10 h-10 rounded bg-border-strong">
+        <div className="flex items-center justify-center w-10 h-10 rounded-sm bg-border-strong">
           <Calendar strokeWidth={2} />
         </div>
         <div className="space-y-2">

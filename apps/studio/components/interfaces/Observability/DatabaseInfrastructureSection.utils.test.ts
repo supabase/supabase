@@ -1,7 +1,3 @@
-import type {
-  InfraMonitoringMultiResponse,
-  InfraMonitoringSingleResponse,
-} from 'data/analytics/infra-monitoring-query'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -9,6 +5,10 @@ import {
   parseInfrastructureMetrics,
   parseNumericValue,
 } from './DatabaseInfrastructureSection.utils'
+import type {
+  InfraMonitoringMultiResponse,
+  InfraMonitoringSingleResponse,
+} from '@/data/analytics/infra-monitoring-query'
 
 describe('parseNumericValue', () => {
   it('returns number value as-is', () => {
@@ -192,103 +192,114 @@ describe('parseInfrastructureMetrics', () => {
 })
 
 describe('parseConnectionsData', () => {
+  const buildResponse = (
+    values: Array<string | number | undefined>
+  ): InfraMonitoringMultiResponse => ({
+    data: values.map((v, i) => ({
+      period_start: `2026-05-22T00:0${i}:00.000Z`,
+      values: { pg_stat_database_num_backends: v as string | undefined },
+    })),
+    series: {
+      pg_stat_database_num_backends: {
+        format: 'number',
+        total: 0,
+        totalAverage: 0,
+        yAxisLimit: 100,
+      },
+    },
+  })
+
   it('returns zeros when data is undefined', () => {
-    expect(parseConnectionsData(undefined, undefined)).toEqual({ current: 0, max: 0 })
+    expect(parseConnectionsData(undefined, undefined)).toEqual({ peak: 0, max: 0 })
     expect(parseConnectionsData(undefined, { maxConnections: 100 })).toEqual({
-      current: 0,
-      max: 0,
+      peak: 0,
+      max: 100,
     })
   })
 
-  it('parses connections data correctly', () => {
-    const mockInfraData: InfraMonitoringMultiResponse = {
-      data: [],
-      series: {
-        pg_stat_database_num_backends: {
-          format: 'number',
-          total: 150,
-          totalAverage: 25.5,
-          yAxisLimit: 100,
-        },
-      },
-    }
+  it('returns the peak value across the window, not totalAverage', () => {
+    const mockInfraData = buildResponse([4, 4, 6, 4, 5, 4])
+    // totalAverage in series is intentionally stale to ensure we ignore it
+    mockInfraData.series.pg_stat_database_num_backends.totalAverage = 25
 
-    const mockMaxData = { maxConnections: 100 }
+    const result = parseConnectionsData(mockInfraData, { maxConnections: 100 })
 
-    const result = parseConnectionsData(mockInfraData, mockMaxData)
-
-    expect(result).toEqual({ current: 26, max: 100 }) // 25.5 rounded to 26
+    expect(result).toEqual({ peak: 6, max: 100 })
   })
 
-  it('handles string values for connections', () => {
-    const mockInfraData: InfraMonitoringMultiResponse = {
-      data: [],
-      series: {
-        pg_stat_database_num_backends: {
-          format: 'number',
-          total: 150,
-          totalAverage: '30.7',
-          yAxisLimit: 100,
-        },
-      },
-    }
+  it('rounds the peak value', () => {
+    const mockInfraData = buildResponse([3, 5.6, 4])
 
-    const mockMaxData = { maxConnections: 100 }
+    const result = parseConnectionsData(mockInfraData, { maxConnections: 100 })
 
-    const result = parseConnectionsData(mockInfraData, mockMaxData)
-
-    expect(result).toEqual({ current: 31, max: 100 }) // 30.7 rounded to 31
+    expect(result).toEqual({ peak: 6, max: 100 })
   })
 
-  it('returns current connections even when maxConnectionsData is undefined', () => {
-    const mockInfraData: InfraMonitoringMultiResponse = {
-      data: [],
-      series: {
-        pg_stat_database_num_backends: {
-          format: 'number',
-          total: 150,
-          totalAverage: 25,
-          yAxisLimit: 100,
-        },
-      },
-    }
+  it('handles string values when computing peak', () => {
+    const mockInfraData = buildResponse(['4', '7', '5.4'])
+
+    const result = parseConnectionsData(mockInfraData, { maxConnections: 100 })
+
+    expect(result).toEqual({ peak: 7, max: 100 })
+  })
+
+  it('skips missing values when computing peak', () => {
+    const mockInfraData = buildResponse([5, undefined, 7, undefined])
+
+    const result = parseConnectionsData(mockInfraData, { maxConnections: 100 })
+
+    expect(result).toEqual({ peak: 7, max: 100 })
+  })
+
+  it('skips empty-string values when computing peak', () => {
+    const mockInfraData = buildResponse(['5', '', '7', ''])
+
+    const result = parseConnectionsData(mockInfraData, { maxConnections: 100 })
+
+    expect(result).toEqual({ peak: 7, max: 100 })
+  })
+
+  it('returns peak connections even when maxConnectionsData is undefined', () => {
+    const mockInfraData = buildResponse([4, 9, 6])
 
     const result = parseConnectionsData(mockInfraData, undefined)
 
-    expect(result).toEqual({ current: 25, max: 0 })
+    expect(result).toEqual({ peak: 9, max: 0 })
   })
 
   it('returns 0 max when maxConnections is missing from data object', () => {
-    const mockInfraData: InfraMonitoringMultiResponse = {
-      data: [],
-      series: {
-        pg_stat_database_num_backends: {
-          format: 'number',
-          total: 150,
-          totalAverage: 25,
-          yAxisLimit: 100,
-        },
-      },
-    }
+    const mockInfraData = buildResponse([4])
 
-    const mockMaxData = {}
+    const result = parseConnectionsData(mockInfraData, {})
 
-    const result = parseConnectionsData(mockInfraData, mockMaxData)
-
-    expect(result).toEqual({ current: 25, max: 0 })
+    expect(result).toEqual({ peak: 4, max: 0 })
   })
 
-  it('returns 0 current when connections metric is missing', () => {
+  it('returns 0 peak when data array is empty', () => {
     const mockInfraData: InfraMonitoringMultiResponse = {
       data: [],
       series: {},
     }
 
-    const mockMaxData = { maxConnections: 100 }
+    const result = parseConnectionsData(mockInfraData, { maxConnections: 100 })
 
-    const result = parseConnectionsData(mockInfraData, mockMaxData)
+    expect(result).toEqual({ peak: 0, max: 100 })
+  })
 
-    expect(result).toEqual({ current: 0, max: 100 })
+  it('returns 0 peak when connections metric is missing from data points', () => {
+    const mockInfraData: InfraMonitoringMultiResponse = {
+      data: [
+        {
+          period_start: '2026-05-22T00:00:00.000Z',
+          values: { avg_cpu_usage: '50' },
+        },
+      ],
+      series: {},
+    }
+
+    const result = parseConnectionsData(mockInfraData, { maxConnections: 100 })
+
+    expect(result).toEqual({ peak: 0, max: 100 })
   })
 
   it('handles single-response format (legacy)', () => {
@@ -300,10 +311,8 @@ describe('parseConnectionsData', () => {
       yAxisLimit: 100,
     }
 
-    const mockMaxData = { maxConnections: 100 }
+    const result = parseConnectionsData(mockInfraData, { maxConnections: 100 })
 
-    const result = parseConnectionsData(mockInfraData, mockMaxData)
-
-    expect(result).toEqual({ current: 0, max: 100 })
+    expect(result).toEqual({ peak: 0, max: 100 })
   })
 })

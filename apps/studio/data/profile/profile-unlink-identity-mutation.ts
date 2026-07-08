@@ -2,9 +2,9 @@ import type { UserIdentity } from '@supabase/supabase-js'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { auth } from 'lib/gotrue'
-import { UseCustomMutationOptions } from 'types'
 import { profileKeys } from './keys'
+import { auth } from '@/lib/gotrue'
+import { UseCustomMutationOptions } from '@/types'
 
 const unlinkIdentity = async (identity: UserIdentity) => {
   const { error, data } = await auth.unlinkIdentity(identity)

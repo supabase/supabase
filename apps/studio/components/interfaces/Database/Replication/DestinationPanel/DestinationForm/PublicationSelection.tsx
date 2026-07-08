@@ -1,13 +1,13 @@
+import { useParams } from 'common'
 import { useMemo } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
-
-import { useParams } from 'common'
-import { useReplicationPublicationsQuery } from 'data/replication/publications-query'
-import { FormControl_Shadcn_, FormField_Shadcn_ } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { FormControl, FormField } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'
 import { PublicationsComboBox } from './PublicationsComboBox'
+import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
 
 type PublicationSelectionProps = {
   form: UseFormReturn<DestinationPanelSchemaType>
@@ -19,43 +19,40 @@ type PublicationSelectionProps = {
 export const PublicationSelection = ({
   form,
   sourceId,
-  visible,
   onSelectNewPublication,
 }: PublicationSelectionProps) => {
   const { ref: projectRef } = useParams()
   const { publicationName } = form.watch()
 
-  const {
-    data: publications = [],
-    isPending: isLoadingPublications,
-    isSuccess: isSuccessPublications,
-  } = useReplicationPublicationsQuery({ projectRef, sourceId })
+  const { data: publications, isSuccess: isSuccessPublications } = useReplicationPublicationsQuery({
+    projectRef,
+    sourceId,
+  })
 
   const publicationNames = useMemo(() => publications?.map((pub) => pub.name) ?? [], [publications])
   const isSelectedPublicationMissing =
     isSuccessPublications && !!publicationName && !publicationNames.includes(publicationName)
 
   return (
-    <FormField_Shadcn_
+    <FormField
       control={form.control}
       name="publicationName"
       render={({ field }) => (
         <FormItemLayout
           layout="horizontal"
           label="Publication"
-          description="Tables in the selected publication will be replicated to this destination"
+          description="Tables in the selected publication will be replicated to this destination."
         >
-          <FormControl_Shadcn_>
+          <FormControl>
             <PublicationsComboBox
-              publications={publications}
-              isLoadingPublications={isLoadingPublications}
               field={field}
+              sourceId={sourceId}
               onNewPublicationClick={() => onSelectNewPublication()}
             />
-          </FormControl_Shadcn_>
+          </FormControl>
           {isSelectedPublicationMissing && (
             <Admonition type="warning" className="mt-2">
-              <p className="!leading-normal">
+              <p className="leading-normal!">
                 The publication <strong className="text-foreground">{publicationName}</strong> was
                 not found, it may have been renamed or deleted, please select another one.
               </p>

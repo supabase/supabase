@@ -172,7 +172,7 @@ Choose the appropriate `type` for your admonition:
 - `note` for anything else
 
 ```
-<Admonition type="note" label="Optional label displays as title">
+<Admonition type="note" title="Optional title">
 
 Your content here
 
@@ -197,19 +197,87 @@ Keep code lines short to avoid scrolling. For example, you can split long shell 
 
 Optionally specify a filename for the codeblock by including it after the opening backticks and language specifier:
 
-```md
+````md
 ```ts environment.ts
+
 ```
+````
 
 Optionally highlight lines by using `mark=${lineNumber}`.
 
-```md
+````md
 ```js mark=12:13
+
 ```
+````
+
+### Content listings
+
+Overview and index pages use a single `<ContentListings id="..." />` component for curated link sections such as "Get started", "Next steps", "Examples", or "Resources". Refer to [`storage.data.ts`](data/content-listings/storage.data.ts) and [`storage.mdx`](content/guides/storage.mdx) for a full example.
+
+**Prompt to add content listings:**
+
+```text
+Add a content listing block for [TOPIC] / [SECTION] (for example, Storage / Examples).
+Follow CONTRIBUTING § Content listings in apps/docs.
+Copy structure from `storageGetStarted` in apps/docs/data/content-listings/storage.data.ts.
+Pick a globally-unique kebab-case id like `[topic]-[section]`.
+Run `pnpm test:local lib/content-listings.test.ts` from apps/docs.
+```
+
+**Manually add content listings:**
+
+1. Add or update a `ContentListingGroup` export in [`data/content-listings/[topic].data.ts`](data/content-listings/). The `id` field must be globally unique across all listing groups (e.g. `storage-get-started`, not just `get-started`) — it is used both as the lookup key and as the telemetry `listingId`.
+2. Place the component inline in guide MDX, for example `<ContentListings id="storage-get-started" />`. Use a partial only when the block is reused or gated with `$Show` at the partial level.
+3. Run `pnpm test:local lib/content-listings.test.ts` from `apps/docs`.
+
+Code snippets for manually adding content listings are available in [`.vscode/content-listing.code-snippets`](../../.vscode/content-listing.code-snippets): `cl-data` (data export with namespaced id) and `cl-inline` (MDX component).
+
 
 ### Footnotes
 
 Don't use footnotes.
+
+### Graphs
+
+Render diagrams (flowcharts, sequence diagrams, entity-relationship diagrams, etc.) by writing a fenced code block with `mermaid` as the language. The MDX renderer routes these blocks through the shared `Mermaid` component, so theming follows light/dark mode automatically.
+
+For the full list of supported diagram types and their syntax, see the [official Mermaid diagram reference](https://mermaid.js.org/intro/syntax-reference.html).
+
+Sequence diagram:
+
+````mdx
+```mermaid
+sequenceDiagram
+  participant User
+  participant Browser
+  participant Supabase
+
+  User->>Browser: Clicks "Sign in"
+  Browser->>Supabase: Request authorization
+  Supabase->>Browser: Return token
+```
+````
+
+Flowchart (`flowchart` accepts a direction like `LR`, `TD`, etc.):
+
+````mdx
+```mermaid
+flowchart LR
+  A["content/**/*.md"] -->|Contentlayer| B[MDX]
+  B --> C[Rehype]
+  C -->|Our Plugin| D[SVG]
+  D -->|Base64| E[Embedded Images]
+```
+````
+
+A few tips:
+
+- Use the standard Mermaid diagram keywords (`sequenceDiagram`, `flowchart`, `erDiagram`, etc.) on the first line of the block.
+- Keep diagrams focused on a single flow or concept. If a diagram gets too dense, split it into multiple smaller diagrams.
+- Wrap node labels that contain special characters (`*`, `/`, spaces, punctuation) in double quotes, for example `A["content/**/*.md"]`.
+- Don't hardcode colors. The component themes the diagram automatically so it matches both light and dark mode.
+- Use diagrams to support the prose, not replace it. Explain the key takeaway in text near the diagram.
 
 ### Images
 
@@ -243,7 +311,7 @@ Don't nest lists more than two deep.
 3. List item
    - List item
    - List item
-   <!-- DON'T ADD ANOTHER LEVEL OF NESTING -->
+     <!-- DON'T ADD ANOTHER LEVEL OF NESTING -->
      - Overly nested list item
 ```
 
@@ -304,7 +372,7 @@ Here are some exceptions and Supabase-specific guidelines.
 
 ### General word usage
 
-- **Filler words**: You can often make your writing more concise by removing these words. (Some of these words can also sound patronizing.)
+- **Filler words**: You can often make your writing more concise by removing these words. (Some of these words can also sound patronizing.) Most filler, marketing, and vague-verb phrases are flagged by `supa-mdx-lint` as warnings, with suggested alternatives where a direct replacement exists. Run `pnpm lint:mdx` in `apps/docs` to check your changes.
   - Actually
   - Easy, easily
   - Just
@@ -319,8 +387,8 @@ Here are some exceptions and Supabase-specific guidelines.
 
 ### Word list
 
-- `Backend` isn't hyphenated (not `back-end`).
 - `Frontend` isn't hyphenated (not `front-end`).
+- `Backend` isn't hyphenated (not `back-end`).
 - `Login` is a noun. `Log in` is a verb.
 - `Postgres` is capitalized, except in code, and used instead of `PostgreSQL`.
 - `Setup` is a noun. `Set up` is a verb.
@@ -329,6 +397,6 @@ Here are some exceptions and Supabase-specific guidelines.
 
 ## Search
 
-Search is handled using a Supabase instance. During CI, [a script](https://github.com/supabase/supabase/blob/master/apps/docs/scripts/search/generate-embeddings.ts) aggregates all content sources (eg. guides, reference docs, etc), indexes them using OpenAI embeddings, and stores them in a Supabase database.
+Search is handled using a Supabase instance. During CI, [a script](https://github.com/supabase/supabase/blob/master/apps/docs/scripts/search/generate-embeddings.ts) aggregates all content sources (for example, guides, reference docs, etc), indexes them using OpenAI embeddings, and stores them in a Supabase database.
 
 Search uses a hybrid of native Postgres FTS and embedding similarity search based on [`pgvector`](https://github.com/pgvector/pgvector). At runtime, a PostgREST call triggers the RPC that runs the weighted FTS search, and an [Edge Function](https://github.com/supabase/supabase/tree/master/supabase/functions) is executed to perform the embedding search.

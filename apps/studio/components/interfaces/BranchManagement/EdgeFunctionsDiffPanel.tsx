@@ -1,17 +1,18 @@
+import { IS_PLATFORM } from 'common'
 import { Circle, Code, Minus, Plus, Wind } from 'lucide-react'
 import Link from 'next/link'
-import { basename } from 'path'
 import { useEffect, useMemo, useState } from 'react'
+import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
 
 import { DiffEditor } from '@/components/ui/DiffEditor'
-import type { EdgeFunctionBodyData } from 'data/edge-functions/edge-function-body-query'
-import type {
-  EdgeFunctionsDiffResult,
-  FileInfo,
-  FileStatus,
-} from 'hooks/branches/useEdgeFunctionsDiff'
-import { EMPTY_ARR } from 'lib/void'
-import { Card, CardContent, CardHeader, CardTitle, cn, Skeleton } from 'ui'
+import type { EdgeFunctionBodyData } from '@/data/edge-functions/edge-function-body-query'
+import {
+  fileKey,
+  type EdgeFunctionsDiffResult,
+  type FileInfo,
+  type FileStatus,
+} from '@/hooks/branches/useEdgeFunctionsDiff'
+import { EMPTY_ARR } from '@/lib/void'
 
 const EMPTY_FUNCTION_BODY: EdgeFunctionBodyData = {
   files: EMPTY_ARR,
@@ -29,9 +30,6 @@ interface FunctionDiffProps {
   currentBranchRef?: string
   fileInfos: FileInfo[]
 }
-
-// Helper to canonicalize file identifiers to prevent mismatch due to differing root paths
-const fileKey = (fullPath: string) => basename(fullPath)
 
 // Helper to get the status color for file indicators
 const getStatusColor = (status: FileStatus): string => {
@@ -111,7 +109,7 @@ const FunctionDiff = ({
       <CardHeader>
         <CardTitle>
           <Link
-            href={`/project/${currentBranchRef}/functions/${functionSlug}`}
+            href={`/project/${currentBranchRef}/functions/${functionSlug}${IS_PLATFORM ? '' : '/details'}`}
             className="flex items-center gap-2"
           >
             <Code strokeWidth={1.5} size={16} className="text-foreground-muted" />
@@ -139,7 +137,7 @@ const FunctionDiff = ({
                       )}
                     >
                       <Icon
-                        className={cn('flex-shrink-0', getStatusColor(fileInfo.status))}
+                        className={cn('shrink-0', getStatusColor(fileInfo.status))}
                         size={12}
                         strokeWidth={1}
                       />

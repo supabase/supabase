@@ -6,7 +6,7 @@ breadcrumb: 'AI Examples'
 
 Supabase provides a [Headless Search Toolkit](https://github.com/supabase/headless-vector-search) for adding "Generative Q&A" to your documentation. The toolkit is "headless", so that you can integrate it into your existing website and style it to match your website theme.
 
-You can see how this works with the Supabase docs. Just hit `cmd+k` and "ask" for something like "what are the features of Supabase?". You will see that the response is streamed back, using the information provided in the docs:
+You can see how this works with the Supabase docs. Enter `cmd+k` and ask, for example, "what are the features of Supabase?". You will see that the response is streamed back using the information provided in the docs:
 
 ![headless search](/docs/img/ai/headless-search/headless.png)
 
@@ -65,12 +65,12 @@ jobs:
       - uses: supabase/embeddings-generator@v0.0.x # Update this to the latest version.
         with:
           supabase-url: 'https://your-project-ref.supabase.co' # Update this to your project URL.
-          supabase-service-role-key: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          supabase-secret-key: ${{ secrets.SUPABASE_SECRET_KEY }}
           openai-key: ${{ secrets.OPENAI_API_KEY }}
           docs-root-path: 'docs' # the path to the root of your md(x) files
 ```
 
-Make sure to choose the latest version, and set your `SUPABASE_SERVICE_ROLE_KEY` and `OPENAI_API_KEY` as repository secrets in your repo settings (settings > secrets > actions).
+Make sure to choose the latest version, and set your `SUPABASE_SECRET_KEY` and `OPENAI_API_KEY` as repository secrets in your repo settings (settings > secrets > actions).
 
 ### Add a search interface
 
@@ -84,7 +84,7 @@ const onSubmit = (e: Event) => {
 
   const query = new URLSearchParams({ query: inputRef.current!.value })
   const projectUrl = `https://your-project-ref.supabase.co/functions/v1`
-  const queryURL = `${projectURL}/${query}`
+  const queryURL = `${projectUrl}/${query}`
   const eventSource = new EventSource(queryURL)
 
   eventSource.addEventListener("error", (err) => {

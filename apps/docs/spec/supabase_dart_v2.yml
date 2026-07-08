@@ -26,10 +26,10 @@ functions:
         isOptional: false
         type: string
         description: The unique Supabase URL which is supplied when you create a new project in your project dashboard.
-      - name: anonKey
+      - name: publishableKey
         isOptional: false
         type: string
-        description: The unique Supabase Key which is supplied when you create a new project in your project dashboard.
+        description: The publishable (anon) key supplied when you create a new project in your project dashboard. Use this for client-side apps. The deprecated `anonKey` parameter is still accepted but `publishableKey` takes precedence when both are supplied.
       - name: headers
         isOptional: true
         type: Map<String, String>
@@ -82,6 +82,10 @@ functions:
             isOptional: true
             type: int
             description: The number of times to retry a failed upload request. Defaults to `0`.
+          - name: useNewHostname
+            isOptional: true
+            type: bool
+            description: Whether to rewrite legacy storage URLs to use the dedicated storage host (`<ref>.storage.supabase.co`). Set to `true` only if your project has the dedicated storage host enabled. Defaults to `false`.
     examples:
       - id: flutter-initialize
         name: For Flutter
@@ -90,7 +94,7 @@ functions:
           Future<void> main() async {
             await Supabase.initialize(
               url: 'https://xyzcompany.supabase.co',
-              anonKey: 'publishable-or-anon-key',
+              publishableKey: 'your-publishable-key',
             );
 
             runApp(MyApp());
@@ -105,7 +109,7 @@ functions:
           ```dart
           final supabase = SupabaseClient(
             'https://xyzcompany.supabase.co',
-            'publishable-or-anon-key',
+            'your-secret-key', // use your secret key for server-side usage
           );
           ```
 
@@ -790,6 +794,18 @@ functions:
                 kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
           );
           ```
+      - id: sign-in-with-custom-provider
+        name: Sign in with a custom OIDC provider
+        description: |
+          `OAuthProvider` is now a class instead of an enum, allowing you to use custom OIDC providers by passing a custom provider string.
+        isSpotlight: false
+        code: |
+          ```dart
+          await supabase.auth.signInWithOAuth(
+            OAuthProvider('custom:my-oidc-provider'),
+            redirectTo: kIsWeb ? null : 'my.scheme://my-host',
+          );
+          ```
       - id: sign-in-using-a-third-party-provider-with-redirect
         name: With `redirectTo`
         description: |
@@ -866,6 +882,67 @@ functions:
           await supabase.auth.signInWithSSO(
             providerId: '21648a9d-8d5a-4555-a9d1-d6375dc14e92',
           );
+          ```
+  - id: sign-in-with-passkey
+    title: 'signInWithPasskey()'
+    notes: |
+      Signs the user in with a passkey (WebAuthn).
+      - Available on `supabase_flutter` 2.15.0 and later as an extension on `GoTrueClient`.
+      - Drives the full WebAuthn ceremony end to end: starts the challenge with the Supabase server, calls the `authenticator` you supply to prompt the user for biometrics or a security key, and verifies the credential with the server.
+      - Does not require an existing session. On success the session is persisted and an `AuthChangeEvent.signedIn` event is fired.
+      - `supabase_flutter` does not depend on a passkey plugin directly. Pass an implementation of `PasskeyAuthenticatorInterface`, such as the [`passkeys`](https://pub.dev/packages/passkeys) plugin's `PasskeyAuthenticator` (since `passkeys` `2.21.0`).
+      - For native flows or custom UI, use the lower-level [`auth.passkey`](/docs/reference/dart/auth-passkey-api) namespace instead.
+      - Passkeys are a BETA feature and must be enabled for your project in the Supabase Dashboard under Authentication > Configuration > Passkeys.
+      - Platform setup the library cannot perform (Associated Domains on iOS/macOS, Digital Asset Links on Android, the `passkeys` web SDK on web) is documented in the `supabase_flutter` package README.
+    params:
+      - name: authenticator
+        isOptional: false
+        type: PasskeyAuthenticatorInterface
+        description: Performs the platform passkey ceremony (FaceID/TouchID/security key). For example, a `PasskeyAuthenticator` from the `passkeys` package.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: Captcha token to be used for captcha verification.
+    examples:
+      - id: sign-in-with-passkey
+        name: Sign in with a passkey
+        isSpotlight: true
+        code: |
+          ```dart
+          import 'package:passkeys/authenticator.dart';
+
+          final authenticator = PasskeyAuthenticator();
+
+          final AuthResponse res = await supabase.auth.signInWithPasskey(authenticator);
+          final Session? session = res.session;
+          final User? user = res.user;
+          ```
+  - id: register-passkey
+    title: 'registerPasskey()'
+    notes: |
+      Registers a new passkey (WebAuthn credential) for the signed in user.
+      - Available on `supabase_flutter` 2.15.0 and later as an extension on `GoTrueClient`.
+      - Drives the full WebAuthn ceremony end to end: starts the registration with the Supabase server, calls the `authenticator` you supply to create a credential on the device, and verifies it with the server.
+      - Requires a signed in (non-anonymous) user. If the user has verified MFA factors, the session has to be at `aal2` to manage passkeys.
+      - `supabase_flutter` does not depend on a passkey plugin directly. Pass an implementation of `PasskeyAuthenticatorInterface`, such as the [`passkeys`](https://pub.dev/packages/passkeys) plugin's `PasskeyAuthenticator` (since `passkeys` `2.21.0`).
+      - For native flows or custom UI, use the lower-level [`auth.passkey`](/docs/reference/dart/auth-passkey-api) namespace instead.
+      - Passkeys are a BETA feature and must be enabled for your project in the Supabase Dashboard under Authentication > Configuration > Passkeys.
+    params:
+      - name: authenticator
+        isOptional: false
+        type: PasskeyAuthenticatorInterface
+        description: Performs the platform passkey ceremony (FaceID/TouchID/security key). For example, a `PasskeyAuthenticator` from the `passkeys` package.
+    examples:
+      - id: register-passkey
+        name: Register a passkey for the current user
+        isSpotlight: true
+        code: |
+          ```dart
+          import 'package:passkeys/authenticator.dart';
+
+          final authenticator = PasskeyAuthenticator();
+
+          final Passkey passkey = await supabase.auth.registerPasskey(authenticator);
           ```
   - id: sign-out
     title: 'signOut()'
@@ -1490,55 +1567,50 @@ functions:
     description: |
       Receive a notification every time an auth event happens.
     notes: |
-      - Types of auth events: `AuthChangeEvent.passwordRecovery`, `AuthChangeEvent.signedIn`, `AuthChangeEvent.signedOut`, `AuthChangeEvent.tokenRefreshed`, `AuthChangeEvent.userUpdated`and `AuthChangeEvent.userDeleted`
+      - **You must provide an `onError` handler.** Network errors (e.g. an offline token refresh) are emitted as stream errors. If no `onError` is provided, Dart rethrows them as unhandled zone exceptions, crashing the app.
+      - Auth event types: `initialSession`, `signedIn`, `signedOut`, `passwordRecovery`, `tokenRefreshed`, `userUpdated`, `userDeleted`, `mfaChallengeVerified`
     examples:
       - id: listen-to-auth-changes
         name: Listen to auth changes
         isSpotlight: true
         code: |
           ```dart
-          final authSubscription = supabase.auth.onAuthStateChange.listen((data) {
-            final AuthChangeEvent event = data.event;
-            final Session? session = data.session;
-
-            print('event: $event, session: $session');
-
-            switch (event) {
-              case AuthChangeEvent.initialSession:
-              // handle initial session
-              case AuthChangeEvent.signedIn:
-              // handle signed in
-              case AuthChangeEvent.signedOut:
-              // handle signed out
-              case AuthChangeEvent.passwordRecovery:
-              // handle password recovery
-              case AuthChangeEvent.tokenRefreshed:
-              // handle token refreshed
-              case AuthChangeEvent.userUpdated:
-              // handle user updated
-              case AuthChangeEvent.userDeleted:
-              // handle user deleted
-              case AuthChangeEvent.mfaChallengeVerified:
-              // handle mfa challenge verified
-            }
-          });
+          final authSubscription = supabase.auth.onAuthStateChange.listen(
+            (data) {
+              final AuthChangeEvent event = data.event;
+              final Session? session = data.session;
+              // handle event
+            },
+            onError: (error, stackTrace) {
+              // Network errors (e.g. offline) are emitted here.
+              // Handle or log them to avoid an unhandled exception crash.
+            },
+          );
           ```
       - id: listen-to-a-specific-event
         name: Listen to a specific event
         code: |
           ```dart
-          final authSubscription = supabase.auth.onAuthStateChange.listen((data) {
-            final AuthChangeEvent event = data.event;
-            if (event == AuthChangeEvent.signedIn) {
-              // handle signIn
-            }
-          });
+          final authSubscription = supabase.auth.onAuthStateChange.listen(
+            (data) {
+              final AuthChangeEvent event = data.event;
+              if (event == AuthChangeEvent.signedIn) {
+                // handle signIn
+              }
+            },
+            onError: (error, stackTrace) {
+              // Handle or log network / auth errors here.
+            },
+          );
           ```
       - id: unsubscribe-from-auth-subscription
         name: Unsubscribe from auth subscription
         code: |
           ```dart
-          final authSubscription = supabase.auth.onAuthStateChange.listen((data) {});
+          final authSubscription = supabase.auth.onAuthStateChange.listen(
+            (data) {},
+            onError: (error, stackTrace) {},
+          );
 
           authSubscription.cancel();
           ```
@@ -1579,6 +1651,10 @@ functions:
         isOptional: false
         type: String
         description: Refresh token to use to get a new session.
+      - name: accessToken
+        isOptional: true
+        type: String
+        description: Optional access token to set along with the refresh token.
     examples:
       - id: refresh-the-session
         name: Refresh the session
@@ -1590,6 +1666,17 @@ functions:
           final AuthResponse response = await supabase.auth.setSession(refreshToken);
 
           final session = res.session;
+          ```
+      - id: set-session-with-access-token
+        name: Set session with access token
+        description: You can optionally provide an access token along with the refresh token.
+        isSpotlight: false
+        code: |
+          ```dart
+          final AuthResponse response = await supabase.auth.setSession(
+            refreshToken,
+            accessToken: accessToken,
+          );
           ```
         response: |
           ```json
@@ -2085,18 +2172,174 @@ functions:
             ]
           }
           ```
+  - id: passkey-api
+    title: 'Auth Passkey'
+    notes: |
+      This section contains methods for WebAuthn passkey registration, authentication, and management. Methods are invoked behind the `supabase.auth.passkey` namespace.
+
+      These methods expose the server side of the WebAuthn ceremony. The client side (the FaceID/TouchID/security key prompt) has to be performed with a platform passkey API: `navigator.credentials.create()`/`get()` on web, or a passkey plugin on iOS/Android/macOS. Options and credentials are exchanged as `Map<String, dynamic>` in the W3C WebAuthn Level 3 JSON format.
+
+      For a one-call alternative that runs the full ceremony, see [`signInWithPasskey()`](/docs/reference/dart/auth-signinwithpasskey) and [`registerPasskey()`](/docs/reference/dart/auth-registerpasskey) on `supabase_flutter`.
+
+      Passkey support is a BETA feature and must be enabled for your project in the Supabase Dashboard under Authentication > Configuration > Passkeys.
+  - id: passkey-list
+    title: 'passkey.list()'
+    notes: |
+      Returns the list of passkeys registered to the signed in user.
+    examples:
+      - id: list-passkeys
+        name: List the current user's passkeys
+        isSpotlight: true
+        code: |
+          ```dart
+          final List<Passkey> passkeys = await supabase.auth.passkey.list();
+          ```
+  - id: passkey-update
+    title: 'passkey.update()'
+    notes: |
+      Updates the friendly name of a passkey.
+    params:
+      - name: passkeyId
+        isOptional: false
+        type: String
+        description: ID of the passkey to rename.
+      - name: friendlyName
+        isOptional: false
+        type: String
+        description: New human readable name for the passkey. Limited to 120 characters.
+    examples:
+      - id: rename-passkey
+        name: Rename a passkey
+        isSpotlight: true
+        code: |
+          ```dart
+          final Passkey passkey = await supabase.auth.passkey.update(
+            passkeyId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+            friendlyName: 'Work laptop',
+          );
+          ```
+  - id: passkey-delete
+    title: 'passkey.delete()'
+    notes: |
+      Deletes a passkey from the signed in user.
+      - If the user has verified MFA factors, the session has to be at `aal2` to manage passkeys.
+    params:
+      - name: passkeyId
+        isOptional: false
+        type: String
+        description: ID of the passkey to delete.
+    examples:
+      - id: delete-passkey
+        name: Delete a passkey
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.passkey.delete(
+            passkeyId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+          );
+          ```
+  - id: passkey-start-registration
+    title: 'passkey.startRegistration()'
+    notes: |
+      Starts the registration of a new passkey for the signed in user.
+      - Requires a signed in (non-anonymous) user.
+      - Pass the returned `options` to the platform's passkey API to create the credential, then call [`passkey.verifyRegistration()`](/docs/reference/dart/auth-passkey-verifyregistration) with the result.
+    examples:
+      - id: start-passkey-registration
+        name: Start a passkey registration
+        isSpotlight: true
+        code: |
+          ```dart
+          final PasskeyRegistrationOptionsResponse registration =
+              await supabase.auth.passkey.startRegistration();
+
+          // Hand registration.options to the platform passkey API.
+          ```
+  - id: passkey-verify-registration
+    title: 'passkey.verifyRegistration()'
+    notes: |
+      Completes the registration of a new passkey and returns the stored [`Passkey`](/docs/reference/dart/auth-passkey-api).
+    params:
+      - name: challengeId
+        isOptional: false
+        type: String
+        description: The challenge ID returned by `passkey.startRegistration()`.
+      - name: credential
+        isOptional: false
+        type: 'Map<String, dynamic>'
+        description: The credential created by the platform's passkey API, serialized in the W3C `RegistrationResponseJSON` format.
+    examples:
+      - id: verify-passkey-registration
+        name: Verify a passkey registration
+        isSpotlight: true
+        code: |
+          ```dart
+          final Passkey passkey = await supabase.auth.passkey.verifyRegistration(
+            challengeId: registration.challengeId,
+            credential: credential,
+          );
+          ```
+  - id: passkey-start-authentication
+    title: 'passkey.startAuthentication()'
+    notes: |
+      Starts a passkey sign in.
+      - Does not require an existing session.
+      - Pass the returned `options` to the platform's passkey API to obtain an assertion, then call [`passkey.verifyAuthentication()`](/docs/reference/dart/auth-passkey-verifyauthentication) with the result.
+    params:
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: Captcha token to be used for captcha verification.
+    examples:
+      - id: start-passkey-authentication
+        name: Start a passkey sign in
+        isSpotlight: true
+        code: |
+          ```dart
+          final PasskeyAuthenticationOptionsResponse authentication =
+              await supabase.auth.passkey.startAuthentication();
+
+          // Hand authentication.options to the platform passkey API.
+          ```
+  - id: passkey-verify-authentication
+    title: 'passkey.verifyAuthentication()'
+    notes: |
+      Completes a passkey sign in and returns the new session.
+      - On success the session is persisted and an `AuthChangeEvent.signedIn` event is fired.
+    params:
+      - name: challengeId
+        isOptional: false
+        type: String
+        description: The challenge ID returned by `passkey.startAuthentication()`.
+      - name: credential
+        isOptional: false
+        type: 'Map<String, dynamic>'
+        description: The assertion produced by the platform's passkey API, serialized in the W3C `AuthenticationResponseJSON` format.
+    examples:
+      - id: verify-passkey-authentication
+        name: Verify a passkey sign in
+        isSpotlight: true
+        code: |
+          ```dart
+          final AuthResponse res = await supabase.auth.passkey.verifyAuthentication(
+            challengeId: authentication.challengeId,
+            credential: credential,
+          );
+          final Session? session = res.session;
+          final User? user = res.user;
+          ```
   - id: admin-api
     title: 'Overview'
     notes: |
-      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
-      - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the Flutter app.
+      - Any method under the `supabase.auth.admin` namespace requires a `secret` key.
+      - These methods are considered admin methods and should be called on a trusted server. Never expose your `secret` key in the Flutter app.
     examples:
       - id: create-auth-admin-client
         name: Create server-side auth client
         isSpotlight: true
         code: |
           ```dart
-          final supabase = SupabaseClient(supabaseUrl, serviceRoleKey);
+          final supabase = SupabaseClient(supabaseUrl, secretKey);
           ```
   - id: get-user-by-id
     title: 'getUserById()'
@@ -2346,11 +2589,16 @@ functions:
     notes: |
       Delete a user.
       - The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
+      - When `shouldSoftDelete` is `true`, the user is soft-deleted: their record and associated data are retained but the user is marked as deleted. Defaults to `false`, which permanently removes the user.
     params:
       - name: id
         isOptional: false
         type: String
         description: ID of the user to be deleted.
+      - name: shouldSoftDelete
+        isOptional: true
+        type: bool
+        description: If true, soft-deletes the user (keeps the record but marks it deleted). Defaults to false (permanent delete).
     examples:
       - id: removes-a-user
         name: Removes a user
@@ -2359,6 +2607,16 @@ functions:
           ```dart
           await supabase.auth.admin
               .deleteUser('715ed5db-f090-4b8c-a067-640ecee36aa0');
+          ```
+      - id: soft-delete-a-user
+        name: Soft-delete a user
+        code: |
+          ```dart
+          await supabase.auth.admin
+              .deleteUser(
+                '715ed5db-f090-4b8c-a067-640ecee36aa0',
+                shouldSoftDelete: true,
+              );
           ```
   - id: invite-user-by-email
     title: 'inviteUserByEmail()'
@@ -2566,6 +2824,55 @@ functions:
             attributes: AdminUserAttributes(
               email: 'new@email.com',
             ),
+          );
+          ```
+  - id: admin-passkey-api
+    title: 'Passkey Admin API'
+    notes: |
+      Contains passkey administration methods, accessed under the `supabase.auth.admin.passkey` namespace. Requires a `secret` key.
+
+      Passkey support is a BETA feature and must be enabled for your project in the Supabase Dashboard under Authentication > Configuration > Passkeys.
+  - id: admin-list-passkeys
+    title: 'admin.passkey.listPasskeys()'
+    notes: |
+      Returns the list of passkeys registered to the user with the given ID.
+    params:
+      - name: userId
+        isOptional: false
+        type: String
+        description: User ID whose passkeys should be returned.
+    examples:
+      - id: admin-list-passkeys
+        name: List a user's passkeys
+        isSpotlight: true
+        code: |
+          ```dart
+          final List<Passkey> passkeys = await supabase.auth.admin.passkey.listPasskeys(
+            userId: '11111111-1111-1111-1111-111111111111',
+          );
+          ```
+  - id: admin-delete-passkey
+    title: 'admin.passkey.deletePasskey()'
+    notes: |
+      Deletes a passkey from a user.
+    params:
+      - name: userId
+        isOptional: false
+        type: String
+        description: User ID that owns the passkey.
+      - name: passkeyId
+        isOptional: false
+        type: String
+        description: ID of the passkey to delete.
+    examples:
+      - id: admin-delete-passkey
+        name: Delete a user's passkey
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.admin.passkey.deletePasskey(
+            userId: '11111111-1111-1111-1111-111111111111',
+            passkeyId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
           );
           ```
   - id: invoke
@@ -3506,7 +3813,7 @@ functions:
           ```
 
   - id: rpc
-    title: 'Stored Procedures: rpc()'
+    title: 'Database Functions: rpc()'
     description: |
       Perform a function call.
 
@@ -3831,6 +4138,7 @@ functions:
       - Realtime is disabled by default for new tables. You can turn it on by [managing replication](/docs/guides/realtime/postgres-changes#replication-setup).
       - `stream()` will emit the initial data as well as any further change on the database as `Stream<List<Map<String, dynamic>>>` by combining Postgrest and Realtime.
       - Takes a list of primary key column names that will be used to update and delete the proper records within the SDK.
+      - To use a private Realtime channel, pass `channelOptions: const RealtimeChannelConfig(private: true)` to the `stream()` call.
       - The following filters are available
         - `.eq('column', value)` listens to rows where the column equals the value
         - `.neq('column', value)` listens to rows where the column does not equal the value
@@ -4341,6 +4649,10 @@ functions:
         isOptional: false
         type: int
         description: The number of seconds until the signed URL expires. For example, 60 for a URL which is valid for one minute.
+      - name: download
+        isOptional: true
+        type: DownloadBehavior
+        description: Triggers the file to be downloaded rather than opened in the browser. Use `DownloadBehavior.withOriginalName` to keep the original file name or `DownloadBehavior.named('custom.png')` to override it.
       - name: transform
         isOptional: true
         type: TransformOptions
@@ -4397,6 +4709,61 @@ functions:
           ```json
           'https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>''
           ```
+      - id: create-signed-url-with-download
+        name: With download
+        code: |
+          ```dart
+          final String signedUrl = await supabase
+            .storage
+            .from('avatars')
+            .createSignedUrl(
+              'avatar1.png',
+              60,
+              download: DownloadBehavior.withOriginalName,
+            );
+          ```
+
+  - id: from-create-signed-upload-url
+    description: |
+      Creates a signed upload URL. Signed upload URLs can be used to upload files to a bucket without further authentication. They are valid for 2 hours.
+    title: 'from.createSignedUploadUrl()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `insert`
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The file path, including the current file name. For example folder/image.png.
+      - name: upsert
+        isOptional: true
+        type: bool
+        description: If true, the signed URL allows overwriting an existing file at the path. Defaults to false.
+    examples:
+      - id: create-signed-upload-url
+        name: Create signed upload URL
+        isSpotlight: true
+        code: |
+          ```dart
+          final response = await supabase
+            .storage
+            .from('avatars')
+            .createSignedUploadUrl('folder/avatar1.png');
+          ```
+      - id: create-signed-upload-url-with-upsert
+        name: With upsert
+        code: |
+          ```dart
+          final response = await supabase
+            .storage
+            .from('avatars')
+            .createSignedUploadUrl(
+              'folder/avatar1.png',
+              upsert: true,
+            );
+          ```
 
   - id: from-get-public-url
     description: |
@@ -4413,6 +4780,10 @@ functions:
         isOptional: false
         type: String
         description: The path and name of the file to generate the public URL for. For example folder/image.png.
+      - name: download
+        isOptional: true
+        type: DownloadBehavior
+        description: Triggers the file to be downloaded rather than opened in the browser. Use `DownloadBehavior.withOriginalName` to keep the original file name or `DownloadBehavior.named('custom.png')` to override it.
       - name: transform
         isOptional: true
         type: TransformOptions
@@ -4472,6 +4843,18 @@ functions:
         response: |
           ```json
           'https://example.supabase.co/storage/v1/object/public/public-bucket/folder/avatar1.png'
+          ```
+      - id: returns-the-url-for-an-asset-with-download
+        name: Trigger download
+        code: |
+          ```dart
+          final String publicUrl = supabase
+            .storage
+            .from('public-bucket')
+            .getPublicUrl(
+              'avatar1.png',
+              download: DownloadBehavior.withOriginalName,
+            );
           ```
 
   - id: from-download
@@ -5654,7 +6037,7 @@ functions:
         name: With rpc()
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_cities')
             .not('name', 'eq', 'Mordor');
@@ -7021,7 +7404,7 @@ functions:
         name: With rpc()
         code: |
           ```dart
-          // Only valid if the Stored Procedure returns a table type.
+          // Only valid if the database function returns a table type.
           final data = await supabase
             .rpc('echo_all_countries')
             .filter('name', 'in', '("Rohan","Mordor")');

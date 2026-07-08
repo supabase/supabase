@@ -1,0 +1,27 @@
+.avatar {
+  display: block;
+  margin: auto;
+  min-height: 150px;
+}
+.avatar .avatar_wrapper {
+  margin: 16px auto 16px;
+  border-radius: 50%;
+  overflow: hidden;
+  height: 150px;
+  aspect-ratio: 1;
+  background: var(--ion-color-step-50);
+  border: thick solid var(--ion-color-step-200);
+}
+.avatar .avatar_wrapper:hover {
+  cursor: pointer;
+}
+.avatar .avatar_wrapper ion-icon.no-avatar {
+  width: 100%;
+  height: 115%;
+}
+.avatar img {
+  display: block;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}

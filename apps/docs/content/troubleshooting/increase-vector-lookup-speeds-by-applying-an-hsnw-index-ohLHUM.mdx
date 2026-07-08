@@ -26,7 +26,7 @@ operator | description | search type
 `<#>` | negative inner product | vector_ip_ops
 `<=>` | cosine distance | vector_cosine_ops
 
-Queries can only utilize the index if it matches the search type used. If you are unsure which search type to prioritize, vector_cosine_ops is the most commonly used. You can checkout our [guide](/docs/guides/ai/vector-indexes/hnsw-indexes) for more info. The folks at Crunchy Data also wrote an [explainer](https://www.crunchydata.com/blog/hnsw-indexes-with-postgres-and-pgvector) that you may find useful.
+Queries can only use the index if it matches the search type used. If you are unsure which search type to prioritize, vector_cosine_ops is the most commonly used. You can checkout our [guide](/docs/guides/ai/vector-indexes/hnsw-indexes) for more info. The folks at Crunchy Data also wrote an [explainer](https://www.crunchydata.com/blog/hnsw-indexes-with-postgres-and-pgvector) that you may find useful.
 
 Applying an index can be slow and computationally expensive, so there are a few preparations that should be made beforehand:
 
@@ -58,7 +58,7 @@ If an address is returned, you should use your direct connection string found on
 
 **3. Increase memory for index creation (optional)**
 
-The `maintance_work_mem` variable limits the maximum amount of memory that can be used by maintenance operations, such as vacuuming, altering, and indexing tables. In your session you should try to set it to a reasonably high value:
+The `maintenance_work_mem` variable limits the maximum amount of memory that can be used by maintenance operations, such as vacuuming, altering, and indexing tables. In your session you should try to set it to a reasonably high value:
 
 ```sql
 set maintenance_work_mem to <several Gb's>; -- '#GB'

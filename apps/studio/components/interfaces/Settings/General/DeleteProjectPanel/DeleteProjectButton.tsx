@@ -1,16 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { DeleteProjectModal } from './DeleteProjectModal'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export interface DeleteProjectButtonProps {
-  type?: 'danger' | 'default'
+  variant?: 'danger' | 'default'
 }
 
-export const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
+export const DeleteProjectButton = ({ variant = 'danger' }: DeleteProjectButtonProps) => {
   const { data: project } = useSelectedProjectQuery()
   const [isOpen, setIsOpen] = useState(false)
 
@@ -21,7 +21,7 @@ export const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProp
   return (
     <>
       <ButtonTooltip
-        type={type}
+        variant={variant}
         disabled={!canDeleteProject}
         onClick={() => setIsOpen(true)}
         tooltip={{

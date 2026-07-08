@@ -153,11 +153,7 @@ export const logOut = async () => {
   clearLocalStorage()
 }
 
-let currentSession: Session | null = null
-
-gotrueClient.onAuthStateChange((event, session) => {
-  currentSession = session
-})
+gotrueClient.onAuthStateChange((_event, _session) => {})
 
 /**
  * Gets a current access token.

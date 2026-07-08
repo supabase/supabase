@@ -1,11 +1,11 @@
-import Link from 'next/link'
-import { PropsWithChildren, ReactNode, forwardRef } from 'react'
-import { LoadingLine, cn } from 'ui'
-
-import { withAuth } from 'hooks/misc/withAuth'
-import { BASE_PATH } from 'lib/constants'
 import { Book, LifeBuoy, X } from 'lucide-react'
+import Link from 'next/link'
+import { forwardRef, PropsWithChildren, ReactNode } from 'react'
+import { cn, LoadingLine } from 'ui'
+
 import { ScaffoldContainer } from '../Scaffold'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { BASE_PATH } from '@/lib/constants'
 
 export type IntegrationWindowLayoutProps = {
   title: string
@@ -69,7 +69,7 @@ const Header = ({ title, integrationIcon }: HeaderProps) => {
       <ScaffoldContainer className={cn('py-3', INTEGRATION_LAYOUT_MAX_WIDTH)}>
         <div className="flex items-center gap-6 w-full">
           <div className="flex gap-2 items-center">
-            <div className="bg-white shadow border rounded p-1 w-8 h-8 flex justify-center items-center">
+            <div className="bg-white shadow-sm border rounded-sm p-1 w-8 h-8 flex justify-center items-center">
               <img src={`${BASE_PATH}/img/supabase-logo.svg`} alt="Supabase" className="w-4" />
             </div>
             <X className="text-border-stronger" strokeWidth={2} size={16} />

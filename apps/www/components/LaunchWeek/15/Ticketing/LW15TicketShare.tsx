@@ -1,3 +1,4 @@
+import { LW15_TWEET_TEXT, LW15_URL } from '~/lib/constants'
 import { useBreakpoint } from 'common'
 import dayjs from 'dayjs'
 import { Check } from 'lucide-react'
@@ -5,8 +6,8 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
+
 import useConfData from '../hooks/use-conf-data'
-import { LW15_TWEET_TEXT, LW15_URL } from '~/lib/constants'
 import supabase from '../supabase'
 
 export default function LW15TicketShare() {
@@ -17,7 +18,7 @@ export default function LW15TicketShare() {
   const [_imgReady, setImgReady] = useState(false)
   const [_loading, setLoading] = useState(false)
   const isLessThanMd = useBreakpoint()
-  const downloadLink = useRef<HTMLAnchorElement>()
+  const downloadLink = useRef<HTMLAnchorElement | undefined>(undefined)
   const link = `${LW15_URL}/tickets/${username}?lw=15&t=${dayjs(new Date()).format('DHHmmss')}`
   const permalink = encodeURIComponent(link)
   const text = LW15_TWEET_TEXT
@@ -75,7 +76,7 @@ export default function LW15TicketShare() {
     <div className="flex flex-row flex-wrap justify-stretch w-full gap-1 pointer-events-auto">
       <Button
         onClick={() => handleShare('twitter')}
-        type={userData.shared_on_twitter ? 'secondary' : 'default'}
+        variant={userData.shared_on_twitter ? 'secondary' : 'default'}
         icon={userData.shared_on_twitter && <Check strokeWidth={2} />}
         size={isLessThanMd ? 'tiny' : 'small'}
         className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] flex-1 w-full"
@@ -87,7 +88,7 @@ export default function LW15TicketShare() {
       </Button>
       <Button
         onClick={() => handleShare('linkedin')}
-        type={userData.shared_on_linkedin ? 'secondary' : 'default'}
+        variant={userData.shared_on_linkedin ? 'secondary' : 'default'}
         icon={userData.shared_on_linkedin && <Check strokeWidth={2} />}
         size={isLessThanMd ? 'tiny' : 'small'}
         className="px-2 lg:px-3.5 h-[28px] lg:h-[34px] flex-1 w-full"

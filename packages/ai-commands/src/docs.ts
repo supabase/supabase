@@ -14,8 +14,6 @@ interface PageSection {
   rag_ignore?: boolean
 }
 
-type MatchPageSectionsFunction = 'match_page_sections_v2' | 'match_page_sections_v2_nimbus'
-
 export async function clippy(
   openai: OpenAI,
   supabaseClient: SupabaseClient<any, 'public', any>,
@@ -101,7 +99,10 @@ export async function clippy(
       break
     }
 
-    const pagePath = pageSection.page.path
+    const pagePath = options?.useAltSearchIndex
+      ? // @ts-ignore
+        pageSection.page_nimbus.path
+      : pageSection.page.path
 
     // Include source reference with each section
     contextText += `[Source ${sourceIndex}: ${pagePath}]\n${content.trim()}\n---\n`

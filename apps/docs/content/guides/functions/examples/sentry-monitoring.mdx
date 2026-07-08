@@ -23,11 +23,12 @@ supabase functions new sentryfied
 Handle exceptions within your function and send them to Sentry.
 
 ```tsx
-import * as Sentry from 'https://deno.land/x/sentry/index.mjs'
+import * as Sentry from 'npm:@sentry/deno@^8'
+import { withSupabase } from 'npm:@supabase/server@^1'
 
 Sentry.init({
   // https://docs.sentry.io/product/sentry-basics/concepts/dsn-explainer/#where-to-find-your-dsn
-  dsn: SENTRY_DSN,
+  dsn: Deno.env.get('SENTRY_DSN'),
   defaultIntegrations: false,
   // Performance Monitoring
   tracesSampleRate: 1.0,
@@ -39,25 +40,25 @@ Sentry.init({
 Sentry.setTag('region', Deno.env.get('SB_REGION'))
 Sentry.setTag('execution_id', Deno.env.get('SB_EXECUTION_ID'))
 
-Deno.serve(async (req) => {
-  try {
-    const { name } = await req.json()
-    // This will throw, as `name` in our example call will be `undefined`
-    const data = {
-      message: `Hello ${name}!`,
-    }
+// Open endpoint for testing. In production, implement an authorization layer in the handler or switch the auth mode.
+export default {
+  fetch: withSupabase({ auth: 'none' }, async (req, ctx) => {
+    try {
+      const { name } = await req.json()
+      // This will throw, as `name` in our example call will be `undefined`
+      const data = {
+        message: `Hello ${name}!`,
+      }
 
-    return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } })
-  } catch (e) {
-    Sentry.captureException(e)
-    // Flush Sentry before the running process closes
-    await Sentry.flush(2000)
-    return new Response(JSON.stringify({ msg: 'error' }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json' },
-    })
-  }
-})
+      return Response.json(data)
+    } catch (e) {
+      Sentry.captureException(e)
+      // Flush Sentry before the running process closes
+      await Sentry.flush(2000)
+      return Response.json({ error: 'Internal Server Error' }, { status: 500 })
+    }
+  }),
+}
 ```
 
 ### 3. Deploy and test

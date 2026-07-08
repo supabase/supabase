@@ -1,10 +1,5 @@
-import AlertError from 'components/ui/AlertError'
-import { useScopedAccessTokenDeleteMutation } from 'data/scoped-access-tokens/scoped-access-tokens-delete-mutation'
-import {
-  ScopedAccessToken,
-  useScopedAccessTokensQuery,
-} from 'data/scoped-access-tokens/scoped-access-token-query'
-import { MoreVertical, Trash, Key } from 'lucide-react'
+import { Key, MoreVertical, Trash } from 'lucide-react'
+import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -16,18 +11,24 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { TableCell, TableRow } from 'ui/src/components/shadcn/ui/table'
-import { parseAsStringLiteral, useQueryState } from 'nuqs'
 
 import {
   ACCESS_TOKEN_SORT_VALUES,
   AccessTokenSort,
   AccessTokenSortColumn,
 } from '../AccessToken.types'
-import { handleSortChange, filterAndSortTokens } from '../AccessToken.utils'
-import { TableContainer } from '../AccessTokenTable/TableContainer'
+import { filterAndSortTokens, handleSortChange } from '../AccessToken.utils'
 import { RowLoading } from '../AccessTokenTable/RowLoading'
-import { TokenNameCell, LastUsedCell, ExpiresCell } from '../AccessTokenTable/TokenCells'
+import { TableContainer } from '../AccessTokenTable/TableContainer'
+import { ExpiresCell, LastUsedCell, TokenNameCell } from '../AccessTokenTable/TokenCells'
 import { ViewTokenSheet } from './ViewTokenSheet'
+import { AlertError } from '@/components/ui/AlertError'
+import {
+  ScopedAccessToken,
+  useScopedAccessTokensQuery,
+} from '@/data/scoped-access-tokens/scoped-access-token-query'
+import { useScopedAccessTokenDeleteMutation } from '@/data/scoped-access-tokens/scoped-access-tokens-delete-mutation'
+import { useTrack } from '@/lib/telemetry/track'
 
 export interface ScopedTokenListProps {
   searchString?: string
@@ -35,6 +36,7 @@ export interface ScopedTokenListProps {
 }
 
 export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTokenListProps) => {
+  const track = useTrack()
   const [isOpen, setIsOpen] = useState(false)
   const [token, setToken] = useState<ScopedAccessToken | undefined>(undefined)
   const [viewToken, setViewToken] = useState<ScopedAccessToken | undefined>(undefined)
@@ -50,6 +52,7 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
 
   const { mutate: deleteToken } = useScopedAccessTokenDeleteMutation({
     onSuccess: (_, vars) => {
+      track('access_token_removed', { tokenType: 'scoped' })
       onDeleteSuccess(vars.id)
       toast.success('Successfully deleted access token')
       setIsOpen(false)
@@ -123,7 +126,7 @@ export const ScopedTokenList = ({ searchString = '', onDeleteSuccess }: ScopedTo
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      type="default"
+                      variant="default"
                       title="More options"
                       className="w-7"
                       icon={<MoreVertical />}

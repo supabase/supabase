@@ -1,16 +1,9 @@
-import { AlertTriangleIcon } from 'lucide-react'
-
 import { useParams } from 'common'
-import { Markdown } from 'components/interfaces/Markdown'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useSupavisorConfigurationQuery } from 'data/database/supavisor-configuration-query'
-import { DOCS_URL } from 'lib/constants'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
+import { AlertTriangleIcon } from 'lucide-react'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Dialog,
   DialogClose,
@@ -22,6 +15,13 @@ import {
   DialogSectionSeparator,
   DialogTitle,
 } from 'ui'
+
+import { Markdown } from '@/components/interfaces/Markdown'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
+import { DOCS_URL } from '@/lib/constants'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { useDatabaseSettingsStateSnapshot } from '@/state/database-settings'
 
 export const PoolingModesModal = () => {
   const { ref: projectRef } = useParams()
@@ -77,12 +77,10 @@ This mode is similar to connecting to your database directly. There is full supp
         </DialogSection>
         {primaryConfig?.pool_mode === 'session' && (
           <div className="px-6">
-            <Alert_Shadcn_ variant="warning">
+            <Alert variant="warning">
               <AlertTriangleIcon strokeWidth={2} />
-              <AlertTitle_Shadcn_>
-                Pooling mode is currently configured to use session mode
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
+              <AlertTitle>Pooling mode is currently configured to use session mode</AlertTitle>
+              <AlertDescription>
                 To use transaction mode concurrently with session mode, change the pooling mode to
                 transaction first in the{' '}
                 <span
@@ -97,13 +95,13 @@ This mode is similar to connecting to your database directly. There is full supp
                 </span>
                 . After this, you can use transaction mode on port 6543 and session mode on port
                 5432.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
+              </AlertDescription>
+            </Alert>
           </div>
         )}
         <DialogFooter>
           <DialogClose onClick={() => snap.setShowPoolingModeHelper(false)}>
-            <Button type="default">Close</Button>
+            <Button variant="default">Close</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

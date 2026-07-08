@@ -18,11 +18,13 @@ export const SonnerProgress = ({
   progressPrefix,
   action,
   message,
+  description = 'Please do not close the browser',
 }: {
   progress: number
   progressPrefix?: string
   action?: React.ReactNode
   message: string
+  description?: string
 }) => (
   <div className="flex gap-3 w-full">
     <Loader2 className="animate-spin text-foreground-muted mt-0.5" size={16} />
@@ -36,7 +38,7 @@ export const SonnerProgress = ({
       </div>
       <Progress value={progress} className="w-full" />
       <div className="flex flex-row gap-2 items-center justify-between">
-        <small className="text-foreground-lighter text-xs">Please do not close the browser</small>
+        <small className="text-foreground-lighter text-xs">{description}</small>
         {action}
       </div>
     </div>

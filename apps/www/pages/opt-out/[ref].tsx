@@ -9,17 +9,17 @@ import { useForm } from 'react-hook-form'
 import {
   Button,
   cn,
-  Form_Shadcn_,
-  FormField_Shadcn_,
-  FormMessage_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Form,
+  FormField,
+  FormMessage,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
@@ -134,7 +134,7 @@ export default function OptOutPage() {
       <OptOutLayout>
         <div>
           <span className="label">Opt out</span>
-          <h2 className="h4 !m-0">Receive an unexpected email from Supabase?</h2>
+          <h2 className="h4 m-0!">Receive an unexpected email from Supabase?</h2>
           <p className="text-foreground-light">Please report it here so we can investigate.</p>
         </div>
 
@@ -145,66 +145,66 @@ export default function OptOutPage() {
           </Admonition>
         )}
 
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="gap-2 max-w-xs flex flex-col">
             <input hidden value={form.getValues('ref')} readOnly {...register('ref')} />
             <input hidden {...register('captchaToken')} />
-            <FormField_Shadcn_
+            <FormField
               name="reason"
               control={form.control}
               render={({ field }) => (
                 <FormItemLayout label="Choose reason for reporting" labelOptional="Optional">
-                  <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
-                    <SelectTrigger_Shadcn_ size="medium">
-                      <SelectValue_Shadcn_ placeholder="Select a reason (optional)">
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <SelectTrigger size="medium">
+                      <SelectValue placeholder="Select a reason (optional)">
                         {field.value}
-                      </SelectValue_Shadcn_>
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
-                        <SelectItem_Shadcn_ value="phishing">
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectItem value="phishing">
                           <div className={SelectItemContainerClasses}>
                             <span>Phishing</span>
                             <span className="text-foreground-light text-xs">
                               Attempt to obtain sensitive information
                             </span>
                           </div>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="advertisement">
+                        </SelectItem>
+                        <SelectItem value="advertisement">
                           <div className={SelectItemContainerClasses}>
                             <span>Advertisement</span>
                             <span className="text-foreground-light text-xs">
                               Unwanted promotional content
                             </span>
                           </div>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="malware">
+                        </SelectItem>
+                        <SelectItem value="malware">
                           <div className={SelectItemContainerClasses}>
                             <span>Malware</span>
                             <span className="text-foreground-light text-xs">
                               Contains harmful software
                             </span>
                           </div>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="scam">
+                        </SelectItem>
+                        <SelectItem value="scam">
                           <div className={SelectItemContainerClasses}>
                             <span>Scam</span>
                             <span className="text-foreground-light text-xs">
                               Fraudulent or deceptive content
                             </span>
                           </div>
-                        </SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="other">
+                        </SelectItem>
+                        <SelectItem value="other">
                           <div className={SelectItemContainerClasses}>
                             <span>Other</span>
                             <span className="text-foreground-light text-xs">
                               Any other type of spam
                             </span>
                           </div>
-                        </SelectItem_Shadcn_>
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                        </SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </FormItemLayout>
               )}
             />
@@ -227,10 +227,10 @@ export default function OptOutPage() {
               )}
             </div>
 
-            <Button htmlType="submit" size="small" disabled={submissionType === 'success'}>
+            <Button type="submit" size="small" disabled={submissionType === 'success'}>
               Report spam
             </Button>
-            <FormMessage_Shadcn_
+            <FormMessage
               className={cn(
                 'border-l pl-3',
                 submissionType === 'error'
@@ -239,9 +239,9 @@ export default function OptOutPage() {
               )}
             >
               {formMessage}
-            </FormMessage_Shadcn_>
+            </FormMessage>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </OptOutLayout>
     </>
   )

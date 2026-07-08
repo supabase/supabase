@@ -1,8 +1,10 @@
-import { TextFormatter } from 'components/interfaces/Settings/Logs/LogsFormatters'
-import Table from 'components/to-be-cleaned/Table'
-import StackedBarChart from 'components/ui/Charts/StackedBarChart'
 import { Fragment } from 'react'
+
+import { safeDecodeURIComponent } from '../Reports.utils'
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
+import { TextFormatter } from '@/components/interfaces/Settings/Logs/LogsFormatters'
+import Table from '@/components/to-be-cleaned/Table'
+import StackedBarChart from '@/components/ui/Charts/StackedBarChart'
 
 export const CacheHitRateChartRenderer = (
   props: ReportWidgetProps<{
@@ -45,13 +47,14 @@ export const TopCacheMissesRenderer = (
   }>
 ) => {
   if (props.data.length === 0) return null
-  const headerClasses = '!text-xs !py-2 p-0 font-bold !bg-surface-200'
-  const cellClasses = '!text-xs !py-2'
+  const headerClasses = 'text-xs! py-2! p-0 font-bold bg-surface-200!'
+  const cellClasses = 'text-xs! py-2!'
 
   return (
     <>
       <h3 className="py-4 px-6">Top Cache Misses</h3>
       <Table
+        containerClassName="overflow-x-auto"
         head={
           <>
             <Table.th className={headerClasses}>Request</Table.th>
@@ -68,11 +71,11 @@ export const TopCacheMissesRenderer = (
                       <TextFormatter className="text-foreground-light" value={datum.path} />
                       <TextFormatter
                         className="max-w-sm text-foreground-lighter truncate "
-                        value={decodeURIComponent(datum.search || '')}
+                        value={safeDecodeURIComponent(datum.search || '')}
                       />
                     </div>
                   </Table.td>
-                  <Table.td className={[cellClasses, 'text-right align-top'].join(' ')}>
+                  <Table.td className={[cellClasses, 'text-right'].join(' ')}>
                     {datum.count}
                   </Table.td>
                 </Table.tr>

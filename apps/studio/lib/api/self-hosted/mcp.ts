@@ -8,13 +8,15 @@ import {
   ExecuteSqlOptions,
   GetLogsOptions,
 } from '@supabase/mcp-server-supabase/platform'
-import { ResponseError } from 'types'
+
+import { DEFAULT_EXPOSED_SCHEMAS } from './constants'
 import { generateTypescriptTypes } from './generate-types'
 import { getLints } from './lints'
 import { getLogQuery, retrieveAnalyticsData } from './logs'
 import { applyAndTrackMigrations, listMigrationVersions } from './migrations'
 import { executeQuery } from './query'
 import { getProjectSettings } from './settings'
+import { ResponseError } from '@/types'
 
 export type GetDatabaseOperationsOptions = {
   headers?: HeadersInit
@@ -72,6 +74,17 @@ export function getDevelopmentOperations({
       return `${settings.app_config.protocol}://${settings.app_config.endpoint}`
     },
     async getPublishableKeys(_projectRef) {
+      if (process.env.SUPABASE_PUBLISHABLE_KEY) {
+        const publishableKeysArray: ApiKey[] = [
+          {
+            api_key: process.env.SUPABASE_PUBLISHABLE_KEY,
+            name: 'publishable',
+            type: 'publishable' as ApiKeyType,
+          },
+        ]
+        return publishableKeysArray
+      }
+
       const settings = getProjectSettings()
       const anonKey = settings.service_api_keys.find((key) => key.name === 'anon key')
 
@@ -79,17 +92,13 @@ export function getDevelopmentOperations({
         throw new Error('Anon key not found in project settings')
       }
 
-      // For self-hosted, only the legacy anon key is available and returned here.
-      // There is currently no publishable key variable in self-hosted configuration,
-      // and the migration to new publishable keys requires additional Auth and service setup.
       const publishableKeysArray: ApiKey[] = [
         {
           api_key: anonKey.api_key,
           name: anonKey.name,
-          type: 'anon' as ApiKeyType,
+          type: 'legacy' as ApiKeyType,
         },
       ]
-
       return publishableKeysArray
     },
     async generateTypescriptTypes(_projectRef) {
@@ -128,7 +137,10 @@ export function getDebuggingOperations({
       return data
     },
     async getSecurityAdvisors(_projectRef) {
-      const { data, error } = await getLints({ headers })
+      const { data, error } = await getLints({
+        headers,
+        exposedSchemas: DEFAULT_EXPOSED_SCHEMAS,
+      })
 
       if (error) {
         throw error
@@ -137,7 +149,10 @@ export function getDebuggingOperations({
       return data.filter((lint) => lint.categories.includes('SECURITY'))
     },
     async getPerformanceAdvisors(_projectRef) {
-      const { data, error } = await getLints({ headers })
+      const { data, error } = await getLints({
+        headers,
+        exposedSchemas: DEFAULT_EXPOSED_SCHEMAS,
+      })
 
       if (error) {
         throw error
