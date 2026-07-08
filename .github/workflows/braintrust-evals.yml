@@ -15,8 +15,42 @@ permissions:
   contents: read
 
 jobs:
+  # Cheap, always-on gate: verifies the eval harness can reach the MCP server
+  # (its one real tool, search_docs). Runs on every push/PR — no OpenAI, no full
+  # eval suite — so a broken MCP connection is caught early with an actionable
+  # message. The eval job depends on this, so evals never run against a broken
+  # MCP connection.
+  preflight:
+    name: Eval MCP preflight
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          persist-credentials: false
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4.2.0
+        with:
+          run_install: false
+
+      - name: Use Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Preflight — MCP connectivity
+        run: cd apps/studio && pnpm evals:preflight
+
   eval:
     name: Run evals
+    needs: preflight
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'run-evals') && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -43,8 +77,8 @@ jobs:
       - name: Use Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version-file: ".nvmrc"
-          cache: "pnpm"
+          node-version-file: '.nvmrc'
+          cache: 'pnpm'
 
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile

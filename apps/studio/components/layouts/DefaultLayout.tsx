@@ -79,6 +79,9 @@ export const DefaultLayout = ({
         <ProjectContextProvider projectRef={ref}>
           <MobileSheetProvider>
             <div className="flex flex-col h-screen w-screen">
+              <a className="sr-only" href="#main" tabIndex={0}>
+                Skip to content
+              </a>
               {/* Top Banner */}
               <AppBannerWrapper />
               <div className="shrink-0">
@@ -107,7 +110,9 @@ export const DefaultLayout = ({
                     maxSize={`${contentMaxSizePercentage}`}
                     defaultSize={`${contentMaxSizePercentage}`}
                   >
-                    <div className="h-full overflow-y-auto">{children}</div>
+                    <main id="main" className="h-full overflow-y-auto">
+                      {children}
+                    </main>
                   </ResizablePanel>
                   <LayoutSidebar
                     minSize={`${100 - contentMaxSizePercentage}`}

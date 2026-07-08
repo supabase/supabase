@@ -15,6 +15,10 @@ import type {
   StepContentProps,
 } from './Connect.types'
 import { ConnectSheetStep } from './ConnectSheetStep'
+import {
+  shouldFetchDataApiConfig,
+  shouldShowDataApiDisabledWarning,
+} from './ConnectStepsSection.utils'
 import { CopyPromptAdmonition } from './CopyPromptAdmonition'
 import { buildConnectionStringPooler, getConnectionStrings } from './DatabaseSettings.utils'
 import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
@@ -25,6 +29,7 @@ import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-config
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
+import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { DOCS_URL } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 
@@ -225,12 +230,43 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
 
   const showSelfHostedMcpNotice = deploymentMode.isSelfHosted && state.mode === 'mcp'
 
+  const shouldFetchDataApiStatus = shouldFetchDataApiConfig({
+    mode: state.mode,
+  })
+  const {
+    isEnabled: isDataApiEnabled,
+    isPending: isDataApiConfigPending,
+    isError: isDataApiConfigError,
+  } = useIsDataApiEnabled({
+    projectRef: ref,
+    enabled: shouldFetchDataApiStatus,
+  })
+  const showDataApiDisabledWarning = shouldShowDataApiDisabledWarning({
+    mode: state.mode,
+    isDataApiEnabled,
+    isPending: isDataApiConfigPending,
+    isError: isDataApiConfigError,
+  })
   if (steps.length === 0) return null
 
   return (
     <div className="bg-muted/50 flex-1">
       <div className="p-8 flex flex-col gap-y-6">
         <h3>Connect your app</h3>
+
+        {showDataApiDisabledWarning && (
+          <Admonition
+            type="warning"
+            layout="responsive"
+            title="Database access requires the Data API"
+            description="Client library database queries will not work until the Data API is enabled."
+            actions={[
+              <Button asChild key="enable" variant="default">
+                <Link href={`/project/${ref}/integrations/data_api`}>Enable Data API</Link>
+              </Button>,
+            ]}
+          />
+        )}
 
         {showIpv4AddonNotice && (
           <Admonition
