@@ -61,6 +61,10 @@
       "type": "boolean",
       "description": "Show the providers section in the authentication Sign In / Providers page"
     },
+    "authentication:show_custom_providers": {
+      "type": "boolean",
+      "description": "Show the custom oAuth providers section in the authentication Sign In / Providers page"
+    },
     "authentication:show_manual_linking": {
       "type": "boolean",
       "description": "Show the manual linking toggle in the authentication Sign In / Providers page under User Signups"
@@ -225,6 +229,18 @@
       "type": "boolean",
       "description": "Enable web apps getting started documentation"
     },
+    "docs:agent_plugin": {
+      "type": "boolean",
+      "description": "Enable documentation for the agent plugin"
+    },
+    "docs:agent_skills": {
+      "type": "boolean",
+      "description": "Enable documentation for agent skills"
+    },
+    "docs:prompts": {
+      "type": "boolean",
+      "description": "Enable documentation for prompts"
+    },
 
     "edge_functions:show_stripe_example": {
       "type": "boolean",
@@ -262,6 +278,10 @@
       "description": "Enable read replicas management"
     },
 
+    "logs:all": {
+      "type": "boolean",
+      "description": "Enable the logs pages and navigation. Disable to hide all logs pages, for example when Logflare is not configured."
+    },
     "logs:templates": {
       "type": "boolean",
       "description": "Enable the logs templates page"
@@ -484,6 +504,7 @@
     "profile:show_information",
     "profile:show_analytics_and_marketing",
     "profile:show_account_deletion",
+    "logs:all",
     "logs:templates",
     "logs:collections",
     "logs:metadata",

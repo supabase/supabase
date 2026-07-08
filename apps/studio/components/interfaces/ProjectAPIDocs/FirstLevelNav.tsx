@@ -1,20 +1,21 @@
+import { useParams } from 'common'
+import { Book, BookOpen } from 'lucide-react'
 import Link from 'next/link'
 import { Fragment, type ReactNode } from 'react'
 import SVG from 'react-inlinesvg'
-
-import { useParams } from 'common'
-import { InfiniteListDefault, type RowComponentBaseProps } from 'components/ui/InfiniteList'
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
-import { usePaginatedBucketsQuery, type Bucket } from 'data/storage/buckets-query'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { BASE_PATH, DOCS_URL } from 'lib/constants'
-import { Book, BookOpen } from 'lucide-react'
-import { useAppStateSnapshot } from 'state/app-state'
 import { Button, cn } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { navigateToSection } from './Content/Content.utils'
 import { API_DOCS_CATEGORIES, DOCS_CONTENT, DOCS_MENU } from './ProjectAPIDocs.constants'
+import { useApiDocsFunctions, useApiDocsTables } from './useApiDocsEntities'
+import { InfiniteListDefault, type RowComponentBaseProps } from '@/components/ui/InfiniteList'
+import { NotExposedEntitiesIndicator } from '@/components/ui/NotExposedEntitiesIndicator'
+import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { usePaginatedBucketsQuery, type Bucket } from '@/data/storage/buckets-query'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { BASE_PATH, DOCS_URL } from '@/lib/constants'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 type DocsSections = typeof DOCS_MENU
 type DocsSection = DocsSections[number]
@@ -23,7 +24,7 @@ type DocsCategory = DocsSection['key']
 type DocsContentRegistry = typeof DOCS_CONTENT
 type DocsSnippet = DocsContentRegistry[keyof DocsContentRegistry]
 
-const Separator = () => <hr className="border-t !mt-3 pb-1 mx-3" />
+const Separator = () => <hr className="border-t mt-3! pb-1 mx-3" />
 
 const MENU_BUTTON_CLASSES = cn(
   'w-full px-4',
@@ -106,7 +107,7 @@ export const FirstLevelNav = (): ReactNode => {
         <Button
           block
           asChild
-          type="text"
+          variant="text"
           size="small"
           icon={
             <SVG
@@ -118,16 +119,16 @@ export const FirstLevelNav = (): ReactNode => {
           }
           onClick={() => snap.setShowProjectApiDocs(false)}
         >
-          <Link className="!justify-start" href={`/project/${ref}/integrations/graphiql`}>
+          <Link className="justify-start!" href={`/project/${ref}/integrations/graphiql`}>
             GraphiQL
           </Link>
         </Button>
-        <Button block asChild type="text" size="small" icon={<BookOpen />}>
+        <Button block asChild variant="text" size="small" icon={<BookOpen />}>
           <Link
             href={`${DOCS_URL}/guides/graphql`}
             target="_blank"
             rel="noreferrer"
-            className="!justify-start"
+            className="justify-start!"
           >
             GraphQL guide
           </Link>
@@ -135,17 +136,17 @@ export const FirstLevelNav = (): ReactNode => {
       </div>
 
       <div className="px-2 py-4">
-        <Button block asChild type="text" size="small" icon={<Book />}>
-          <Link href={`${DOCS_URL}`} target="_blank" rel="noreferrer" className="!justify-start">
+        <Button block asChild variant="text" size="small" icon={<Book />}>
+          <Link href={`${DOCS_URL}`} target="_blank" rel="noreferrer" className="justify-start!">
             Documentation
           </Link>
         </Button>
-        <Button block asChild type="text" size="small" icon={<BookOpen />}>
+        <Button block asChild variant="text" size="small" icon={<BookOpen />}>
           <Link
             href={`${DOCS_URL}/guides/api`}
             target="_blank"
             rel="noreferrer"
-            className="!justify-start"
+            className="justify-start!"
           >
             REST guide
           </Link>
@@ -184,20 +185,15 @@ const Subsections = ({ category }: SubsectionsProps): ReactNode => {
 }
 
 const TablesSubsections = (): ReactNode => {
-  const { ref } = useParams()
   const snap = useAppStateSnapshot()
 
-  const { data, isLoading } = useOpenAPISpecQuery(
-    { projectRef: ref },
-    { staleTime: 1000 * 60 * 10 }
-  )
-  const tables = data?.tables ?? []
+  const { visibleEntities: tables, excludedCount, isLoading } = useApiDocsTables()
 
   // TODO: handle infinite loading of tables
   return (
     <>
       {isLoading && <LoadingIndicator />}
-      {tables.length > 0 && <Separator />}
+      {(tables.length > 0 || excludedCount > 0) && <Separator />}
       {tables.map((table) => (
         <button
           key={table.name}
@@ -207,25 +203,26 @@ const TablesSubsections = (): ReactNode => {
           {table.name}
         </button>
       ))}
+      <NotExposedEntitiesIndicator
+        count={excludedCount}
+        entityNoun="table"
+        entityNounPlural="tables"
+        onNavigate={() => snap.setShowProjectApiDocs(false)}
+      />
     </>
   )
 }
 
 const DbFunctionsSubsections = (): ReactNode => {
-  const { ref } = useParams()
   const snap = useAppStateSnapshot()
 
-  const { data, isLoading } = useOpenAPISpecQuery(
-    { projectRef: ref },
-    { staleTime: 1000 * 60 * 10 }
-  )
-  const functions = data?.functions ?? []
+  const { visibleEntities: functions, excludedCount, isLoading } = useApiDocsFunctions()
 
   // TODO: handle virtualization of DB functions
   return (
     <>
       {isLoading && <LoadingIndicator />}
-      {functions.length > 0 && <Separator />}
+      {(functions.length > 0 || excludedCount > 0) && <Separator />}
       {functions.map((fn) => (
         <button
           key={fn.name}
@@ -237,6 +234,12 @@ const DbFunctionsSubsections = (): ReactNode => {
           {fn.name}
         </button>
       ))}
+      <NotExposedEntitiesIndicator
+        count={excludedCount}
+        entityNoun="function"
+        entityNounPlural="functions"
+        onNavigate={() => snap.setShowProjectApiDocs(false)}
+      />
     </>
   )
 }

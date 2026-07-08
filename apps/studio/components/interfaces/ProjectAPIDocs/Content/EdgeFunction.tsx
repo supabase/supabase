@@ -1,10 +1,10 @@
 import { useParams } from 'common'
 
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'
+import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export const EdgeFunction = ({ language, apikey = 'API_KEY', endpoint }: ContentProps) => {
   const { ref } = useParams()

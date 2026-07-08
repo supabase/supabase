@@ -53,7 +53,7 @@ const Lw15Page = ({ user, ogImageUrl }: Props) => {
       />
 
       <Lw15ConfDataProvider initState={{ userTicketData: defaultUserData }}>
-        <DefaultLayout className="!min-h-fit !h-fit lg:!min-h-[calc(100dvh-66px)] lg:!h-full dark:bg-black">
+        <DefaultLayout className="min-h-fit! h-fit! lg:min-h-[calc(100dvh-66px)]! lg:h-full! dark:bg-black">
           <div
             style={{
               fontFamily:

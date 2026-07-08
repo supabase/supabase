@@ -1,4 +1,5 @@
-import { describe, test, expect } from 'vitest'
+import { describe, expect, test } from 'vitest'
+
 import { resolveFrameworkLibraryKey } from './Connect.utils'
 
 describe('Connect.utils:resolveFrameworkLibraryKey', () => {

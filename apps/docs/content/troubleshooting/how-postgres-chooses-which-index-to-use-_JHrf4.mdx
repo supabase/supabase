@@ -17,7 +17,7 @@ Postgres, internally, contains a few components that manage query execution:
 
 | Module            | Description                                                                                                   |
 | ----------------- | ------------------------------------------------------------------------------------------------------------- |
-| Parser            | Converts SQL into an traversable query tree                                                                   |
+| Parser            | Converts SQL into a traversable query tree                                                                    |
 | Planner/Optimizer | Takes the query tree and uses rules and database statistics to find the optimal strategy for getting the data |
 | Executor          | Executes the plan created by the planner                                                                      |
 
@@ -65,7 +65,7 @@ SELECT id FROM some_table
 WHERE data @> '[ { "itemId": "p11" } ]';
 ```
 
-In most cases, developers work with the default BTREE index. It is the most practical and performant in the majority of cases and is compatible with the following filter [operators](https://www.postgresql.org/docs/current/btree-behavior.html):
+In most cases, developers work with the default BTREE index. It is the most practical and performant in the majority of cases and is compatible with the following filter [operators](https://www.postgresql.org/docs/current/btree.html#BTREE-BEHAVIOR):
 
 | Comparison Operator |
 | ------------------- |
@@ -77,7 +77,7 @@ In most cases, developers work with the default BTREE index. It is the most prac
 
 An operator's functional equivalents, such as `IN`, `BETWEEN`, and `ANY`, are also valid.
 
-However, just because the base requirements (relevant column, filter, and operators) are present, doesn't mean that an index will be used.
+However, an index isn't guaranteed to be used, even when the base requirements (relevant column, filter, and operators) are present.
 
 Indexes have a startup cost, so for small tables, Postgres might use a sequential scan if it believes that it will take less time. The database keeps statistics about each table that it uses to inform these choices.
 
@@ -141,7 +141,7 @@ select * from test1 where lower(col1) = 'value';
 
 #### Covering indexes
 
-Indexes contain pointers to a specific row, but you could instruct an index to actually hold a copy of a column's value for even faster retrieval. These are known as `covering` indexes. Because maintaining a copy is storage intensive, you should avoid using it for values with large data footprints.[ FULL VIDEO ON TOPIC](https://www.youtube.com/watch?v=bBu_V8CfWgM)
+Indexes contain pointers to a specific row, but you could instruct an index to hold a copy of a column's value for even faster retrieval. These are known as `covering` indexes. Because maintaining a copy is storage intensive, you should avoid using it for values with large data footprints.[ FULL VIDEO ON TOPIC](https://www.youtube.com/watch?v=bBu_V8CfWgM)
 
 ```sql
 CREATE INDEX a_b_idx ON x (a,b) INCLUDE (c);
@@ -149,7 +149,7 @@ CREATE INDEX a_b_idx ON x (a,b) INCLUDE (c);
 
 #### Indexes on JSONB
 
-Although a GIN/GIST index can be used to index entire JSONB bodies, you can also target just specific Key-values with standard BTREE indexes:
+Although a GIN/GIST index can be used to index entire JSONB bodies, you can also target only specific Key-values with standard BTREE indexes:
 
 ```sql
 -- Example table

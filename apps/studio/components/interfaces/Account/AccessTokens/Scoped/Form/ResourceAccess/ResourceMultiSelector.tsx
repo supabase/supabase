@@ -1,5 +1,5 @@
 import { useMemo } from 'react'
-import { FormControl_Shadcn_ } from 'ui'
+import { FormControl } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
@@ -8,6 +8,7 @@ import {
   MultiSelectorList,
   MultiSelectorTrigger,
 } from 'ui-patterns/multi-select'
+
 import { ResourceMultiSelectorProps } from './ResourceAccess.types'
 
 export const ResourceMultiSelector = ({
@@ -37,7 +38,7 @@ export const ResourceMultiSelector = ({
 
   return (
     <FormItemLayout name={fieldName} label={label}>
-      <FormControl_Shadcn_ className="overflow-visible">
+      <FormControl className="overflow-visible">
         <MultiSelector values={displayValues} onValuesChange={handleValuesChange}>
           <MultiSelectorTrigger
             deletableBadge
@@ -62,7 +63,7 @@ export const ResourceMultiSelector = ({
             )}
           </MultiSelectorContent>
         </MultiSelector>
-      </FormControl_Shadcn_>
+      </FormControl>
     </FormItemLayout>
   )
 }

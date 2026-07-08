@@ -1,8 +1,9 @@
 import { source } from 'common-tags'
-import { makeRandomString } from 'lib/helpers'
+
 import { executeQuery } from './query'
 import { PgMetaDatabaseError, WrappedResult } from './types'
 import { assertSelfHosted } from './util'
+import { makeRandomString } from '@/lib/helpers'
 
 export type ListMigrationsResult = {
   version: string

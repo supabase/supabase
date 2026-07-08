@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react'
-import Image from 'next/image'
 import { createTimeline } from 'animejs'
 import { Check, Copy } from 'lucide-react'
+import Image from 'next/image'
+import React, { useEffect, useRef, useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import Typed from 'typed.js'
 
@@ -172,7 +172,7 @@ const FunctionsHero = () => {
       id="functions-hero"
       className="
         absolute inset-0
-        -left-28 top-4 w-[150%] md:w-[150%] aspect-[978/678]
+        -left-28 top-4 w-[150%] md:w-[150%] aspect-978/678
         sm:-left-32 sm:-top-2
         md:-left-44
         lg:-left-10 lg:-top-10 lg:w-[130%]
@@ -201,7 +201,7 @@ const FunctionsHero = () => {
               ref={typerRef}
               className="opacity-0 flex-1 text-left animate-fade-in text-foreground text-xs md:text-sm font-mono"
             />
-            <div className="text-foreground rounded p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="text-foreground rounded-sm p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
               {copied ? (
                 <span className="text-brand">
                   <Check className="w-3.5 h-3.5" />
@@ -241,9 +241,9 @@ const FunctionsHero = () => {
               y2={s?.y2}
               gradientUnits="userSpaceOnUse"
             >
-              <stop offset="0" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
-              <stop offset="0.5" stopColor="hsl(var(--foreground-default))" stopOpacity="0.6" />
-              <stop offset="1" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
+              <stop offset="0" stopColor="var(--foreground-default)" stopOpacity="0" />
+              <stop offset="0.5" stopColor="var(--foreground-default)" stopOpacity="0.6" />
+              <stop offset="1" stopColor="var(--foreground-default)" stopOpacity="0" />
             </linearGradient>
           </defs>
         </svg>
@@ -257,12 +257,12 @@ const FunctionsHero = () => {
           style={{ left: dot.left, top: dot.top }}
           className="absolute origin-center w-[2.5%] h-[3.6%] flex items-center justify-center opacity-0 transition-opacity animate-fade-in delay-75"
         >
-          <span className="absolute inset-0 w-full h-full rounded-full bg-foreground bg-opacity-20" />
-          <span className="absolute w-4/5 h-4/5 rounded-full bg-foreground bg-opacity-90" />
+          <span className="absolute inset-0 w-full h-full rounded-full bg-foreground/20" />
+          <span className="absolute w-4/5 h-4/5 rounded-full bg-foreground/90" />
         </div>
       ))}
       <div className="absolute left-[51.15%] top-[10%] w-px h-[20%] overflow-hidden">
-        <span className="absolute inset-0 w-full bg-gradient-to-t from-current to-transparent h-full delay-1200 animate-slide-in" />
+        <span className="absolute inset-0 w-full bg-linear-to-t from-current to-transparent h-full delay-1200 animate-slide-in" />
       </div>
       {/* Globe background */}
       <Image

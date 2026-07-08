@@ -1,9 +1,9 @@
 import { ReadReplicaSetupError, ReadReplicaSetupProgress } from '@supabase/shared-types/out/events'
-
-import { components } from 'data/api'
-import { PROJECT_STATUS } from 'lib/constants'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
 import { AWS_REGIONS } from 'shared-data'
+
+import { components } from '@/data/api'
+import { PROJECT_STATUS } from '@/lib/constants'
 
 export interface Region {
   key: AWS_REGIONS_KEYS
@@ -12,10 +12,52 @@ export interface Region {
   coordinates: [number, number]
 }
 
+export type NodeData = {
+  id: string
+  provider: string
+  region: Region
+  computeSize?: string
+  status: string
+  inserted_at: string
+}
+
+export type PrimaryNodeData = NodeData & {
+  numReplicas: number
+  numRegions: number
+  hasLoadBalancer: boolean
+}
+
+export type LoadBalancerData = NodeData & {
+  numDatabases: number
+}
+
+export type ReplicaNodeData = NodeData & {
+  onSelectRestartReplica: () => void
+  onSelectResizeReplica: () => void
+  onSelectDropReplica: () => void
+}
+
+export type EdgeData = {
+  status: string
+  identifier: string
+  connectionString: string | null | undefined
+}
+
 // ReactFlow is scaling everything by the factor of 2
 export const NODE_WIDTH = 660
-export const NODE_ROW_HEIGHT = 50
 export const NODE_SEP = 20
+
+// The region wrapper is a static, non-measured sibling node with a fixed size.
+export const REGION_NODE_HEIGHT = 162
+
+// First-paint fallback heights for the dagre layout, only used before React
+// Flow has measured the real nodes. Subsequent layouts use node.measured.height.
+export const NODE_HEIGHT_FALLBACKS: Record<string, number> = {
+  LOAD_BALANCER: 64,
+  PRIMARY: 140,
+  READ_REPLICA: 140,
+  REGION: REGION_NODE_HEIGHT,
+}
 
 export const REPLICA_STATUS: {
   [key: string]: components['schemas']['DatabaseStatusResponse']['status']

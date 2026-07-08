@@ -1,4 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { partition, uniqBy } from 'lodash'
 import { MoreVertical } from 'lucide-react'
@@ -13,17 +14,7 @@ import {
   Marker,
   ZoomableGroup,
 } from 'react-simple-maps'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { BASE_PATH } from 'lib/constants'
 import type { AWS_REGIONS_KEYS } from 'shared-data'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Badge,
   Button,
@@ -34,8 +25,17 @@ import {
   DropdownMenuTrigger,
   ScrollArea,
 } from 'ui'
+
 import { AVAILABLE_REPLICA_REGIONS, REPLICA_STATUS } from './InstanceConfiguration.constants'
 import GeographyData from './MapData.json'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { Database, useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { BASE_PATH } from '@/lib/constants'
+import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 // [Joshen] Foresee that we'll skip this view for initial launch
 
@@ -214,12 +214,12 @@ const MapView = ({
           {tooltip !== undefined && zoom === 1.5 && (
             <Marker coordinates={[tooltip.x - 47, tooltip.y - 5]}>
               <foreignObject width={220} height={66.25}>
-                <div className="bg-studio/50 rounded border">
+                <div className="bg-studio/50 rounded-sm border">
                   <div className="px-3 py-2 flex flex-col">
                     <div className="flex items-center gap-x-2">
                       <img
                         alt="region icon"
-                        className="w-4 rounded-sm"
+                        className="w-4 rounded-xs"
                         src={`${BASE_PATH}/img/regions/${tooltip.region.region}.svg`}
                       />
                       <p className="text-[10px]">{tooltip.region.country}</p>
@@ -240,7 +240,7 @@ const MapView = ({
       </ComposableMap>
 
       {showRegionDetails && selectedRegion && (
-        <div className="absolute bottom-4 right-4 flex flex-col bg-studio/50 backdrop-blur-sm border rounded w-[400px]">
+        <div className="absolute bottom-4 right-4 flex flex-col bg-studio/50 backdrop-blur-xs border rounded-sm w-[400px]">
           <div className="flex items-center justify-between py-4 px-4 border-b">
             <div>
               <p className="text-xs text-foreground-light">
@@ -251,7 +251,7 @@ const MapView = ({
             </div>
             <img
               alt="region icon"
-              className="w-10 rounded-sm"
+              className="w-10 rounded-xs"
               src={`${BASE_PATH}/img/regions/${selectedRegion.region}.svg`}
             />
           </div>
@@ -297,7 +297,7 @@ const MapView = ({
                       {database.identifier !== ref && (
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button type="text" icon={<MoreVertical />} className="px-1" />
+                            <Button variant="text" icon={<MoreVertical />} className="px-1" />
                           </DropdownMenuTrigger>
                           <DropdownMenuContent className="w-40" side="bottom" align="end">
                             <DropdownMenuItem
@@ -332,7 +332,7 @@ const MapView = ({
                             </DropdownMenuItem>
 
                             <DropdownMenuItemTooltip
-                              className="gap-x-2 !pointer-events-auto"
+                              className="gap-x-2 pointer-events-auto!"
                               disabled={!canManageReplicas}
                               onClick={() => onSelectDropReplica(database)}
                               tooltip={{
@@ -360,7 +360,7 @@ const MapView = ({
             }`}
           >
             <ButtonTooltip
-              type="default"
+              variant="default"
               disabled={!canManageReplicas}
               onClick={() => onSelectDeployNewReplica(selectedRegion.key)}
               tooltip={{
@@ -375,7 +375,7 @@ const MapView = ({
               Deploy new replica here
             </ButtonTooltip>
             <Button
-              type="default"
+              variant="default"
               onClick={() => {
                 setCenter([14, 7])
                 setZoom(1.5)

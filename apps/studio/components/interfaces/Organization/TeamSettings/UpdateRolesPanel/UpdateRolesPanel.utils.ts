@@ -3,8 +3,8 @@ import { groupBy, isEqual } from 'lodash'
 import {
   OrganizationRole,
   OrganizationRolesResponse,
-} from 'data/organization-members/organization-roles-query'
-import { OrganizationMember } from 'data/organizations/organization-members-query'
+} from '@/data/organization-members/organization-roles-query'
+import { OrganizationMember } from '@/data/organizations/organization-members-query'
 
 export interface ProjectRoleConfiguration {
   ref?: string

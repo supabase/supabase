@@ -1,24 +1,25 @@
 import RGL, { WidthProvider } from 'react-grid-layout'
+
 import 'react-grid-layout/css/styles.css'
 import 'react-resizable/css/styles.css'
-import { toast } from 'sonner'
 
 import { useParams } from 'common'
-import { DEFAULT_CHART_CONFIG } from 'components/ui/QueryBlock/QueryBlock'
-import { AnalyticsInterval } from 'data/analytics/constants'
-import {
-  UpsertContentPayload,
-  useContentUpsertMutation,
-} from 'data/content/content-upsert-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProfile } from 'lib/profile'
-import type { Dashboards } from 'types'
+import { toast } from 'sonner'
+
 import { createSqlSnippetSkeletonV2 } from '../SQLEditor/SQLEditor.utils'
 import { ChartConfig } from '../SQLEditor/UtilityPanel/ChartConfig'
 import { ReportBlock } from './ReportBlock/ReportBlock'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
+import { DEFAULT_CHART_CONFIG } from '@/components/ui/QueryBlock/QueryBlock'
+import { AnalyticsInterval } from '@/data/analytics/constants'
+import {
+  UpsertContentPayload,
+  useContentUpsertMutation,
+} from '@/data/content/content-upsert-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useProfile } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
+import type { Dashboards } from '@/types'
 
 const ReactGridLayout = WidthProvider(RGL)
 
@@ -54,9 +55,8 @@ export const GridResize = ({
   const { ref } = useParams()
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
-  const { data: selectedOrg } = useSelectedOrganizationQuery()
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const { mutate: upsertContent } = useContentUpsertMutation()
 
   const onUpdateLayout = (layout: RGL.Layout[]) => {
@@ -133,10 +133,7 @@ export const GridResize = ({
         },
       }
     )
-    sendEvent({
-      action: 'custom_report_assistant_sql_block_added',
-      groups: { project: ref ?? 'Unknown', organization: selectedOrg?.slug ?? 'Unknown' },
-    })
+    track('custom_report_assistant_sql_block_added')
   }
 
   if (!editableReport) return null

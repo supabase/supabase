@@ -1,11 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { FormField } from '@ui/components/shadcn/ui/form'
 import { useParams } from 'common'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsProjectActive } from 'hooks/misc/useSelectedProject'
 import { Plus } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -20,7 +15,8 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
+  Form,
+  FormField,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
@@ -28,6 +24,11 @@ import {
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
+
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import { useS3AccessKeyCreateMutation } from '@/data/storage/s3-access-key-create-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
 
 interface CreateCredentialModalProps {
   visible: boolean
@@ -87,7 +88,7 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
             <Button
-              type="default"
+              variant="default"
               icon={<Plus size={14} />}
               disabled={disableCreation}
               className="pointer-events-auto"
@@ -126,22 +127,10 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
             <DialogSectionSeparator />
             <DialogSection className="flex flex-col gap-4">
               <FormItemLayout label="Access key ID" isReactForm={false}>
-                <Input
-                  className="input-mono"
-                  readOnly
-                  copy
-                  disabled
-                  value={createS3KeyData?.access_key}
-                />
+                <Input className="input-mono" readOnly copy value={createS3KeyData?.access_key} />
               </FormItemLayout>
               <FormItemLayout label={'Secret access key'} isReactForm={false}>
-                <Input
-                  className="input-mono"
-                  readOnly
-                  copy
-                  disabled
-                  value={createS3KeyData?.secret_key}
-                />
+                <Input className="input-mono" readOnly copy value={createS3KeyData?.secret_key} />
               </FormItemLayout>
             </DialogSection>
             <DialogFooter>
@@ -165,30 +154,30 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
               </DialogDescription>
             </DialogHeader>
             <DialogSectionSeparator />
-            <Form_Shadcn_ {...form}>
+            <Form {...form}>
               <form onSubmit={form.handleSubmit(onSubmit)}>
                 <DialogSection>
                   <FormField
                     name="description"
-                    render={() => (
+                    render={({ field }) => (
                       <FormItemLayout label="Description">
                         <Input
                           autoComplete="off"
                           placeholder="My test key"
                           type="text"
-                          {...form.register('description')}
+                          {...field}
                         />
                       </FormItemLayout>
                     )}
                   />
                 </DialogSection>
                 <DialogFooter>
-                  <Button htmlType="submit" loading={isCreating}>
+                  <Button type="submit" loading={isCreating}>
                     Create access key
                   </Button>
                 </DialogFooter>
               </form>
-            </Form_Shadcn_>
+            </Form>
           </>
         )}
       </DialogContent>

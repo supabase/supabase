@@ -1,20 +1,14 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { ChevronUp, Search, X } from 'lucide-react'
-import { forwardRef, useEffect, useState, type HTMLAttributes, type ReactNode } from 'react'
-
-import { useMainScrollContainer } from 'components/layouts/MainScrollContainerContext'
-import { NoSearchResults } from 'components/ui/NoSearchResults'
-import { type Bucket } from 'data/storage/buckets-query'
-import { useStaticEffectEvent } from 'hooks/useStaticEffectEvent'
 import {
-  Button,
-  cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-} from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+  forwardRef,
+  useEffect,
+  useEffectEvent,
+  useState,
+  type HTMLAttributes,
+  type ReactNode,
+} from 'react'
+import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageSection,
@@ -24,17 +18,23 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { StoragePoliciesBucketRow } from './StoragePoliciesBucketRow'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
+import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
+import { useMainScrollContainer } from '@/components/layouts/MainScrollContainerContext'
+import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { type Bucket } from '@/data/storage/buckets-query'
 
 export type SelectBucketPolicyForAction = {
   addPolicy: (bucketName?: string, table?: string) => void
-  editPolicy: (policy: PostgresPolicy, bucketName?: string, table?: string) => void
-  deletePolicy: (policy: PostgresPolicy) => void
+  editPolicy: (policy: Policy, bucketName?: string, table?: string) => void
+  deletePolicy: (policy: Policy) => void
 }
 
 type BucketsPoliciesProps = {
-  buckets: { bucket: Bucket; policies: PostgresPolicy[] }[]
+  buckets: { bucket: Bucket; policies: Policy[] }[]
   search?: string
   debouncedSearch?: string
   setSearch: (search: string) => void
@@ -60,7 +60,7 @@ export const BucketsPolicies = ({
 
   return (
     <PageSection>
-      <Collapsible_Shadcn_ open={expanded} onOpenChange={setExpanded}>
+      <Collapsible open={expanded} onOpenChange={setExpanded}>
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>Buckets</PageSectionTitle>
@@ -68,7 +68,7 @@ export const BucketsPolicies = ({
               Write policies for each bucket to control access to the bucket and its contents
             </PageSectionDescription>
           </PageSectionSummary>
-          <CollapsibleTrigger_Shadcn_ asChild>
+          <CollapsibleTrigger asChild>
             <button>
               <span className="sr-only">Toggle bucket list</span>
               <ChevronUp
@@ -80,9 +80,9 @@ export const BucketsPolicies = ({
                 )}
               />
             </button>
-          </CollapsibleTrigger_Shadcn_>
+          </CollapsibleTrigger>
         </PageSectionMeta>
-        <CollapsibleContent_Shadcn_>
+        <CollapsibleContent>
           <PageSectionContent className="mt-6">
             {showEmptyState && <StoragePoliciesPlaceholder />}
 
@@ -103,7 +103,7 @@ export const BucketsPolicies = ({
                     search ? (
                       <Button
                         size="tiny"
-                        type="text"
+                        variant="text"
                         className="p-0 h-5 w-5"
                         icon={<X />}
                         onClick={() => setSearch('')}
@@ -124,14 +124,14 @@ export const BucketsPolicies = ({
               pagination={pagination}
             />
           </PageSectionContent>
-        </CollapsibleContent_Shadcn_>
-      </Collapsible_Shadcn_>
+        </CollapsibleContent>
+      </Collapsible>
     </PageSection>
   )
 }
 
 type BucketsPoliciesVirtualizedListProps = {
-  items: { bucket: Bucket; policies: PostgresPolicy[] }[]
+  items: { bucket: Bucket; policies: Policy[] }[]
   actions: SelectBucketPolicyForAction
   pagination: BucketsPoliciesProps['pagination']
 }
@@ -157,12 +157,15 @@ const BucketsPoliciesVirtualizedList = ({
   const virtualItems = virtualizer.getVirtualItems()
   const lastItem = virtualItems[virtualItems.length - 1]
 
-  const fetchNext = useStaticEffectEvent(() => {
+  const fetchNext = useEffectEvent(() => {
     if (lastItem && lastItem.index >= items.length - 1 && hasNextPage && !isFetchingNextPage) {
       fetchNextPage()
     }
   })
-  useEffect(fetchNext, [lastItem, fetchNext])
+  useEffect(() => {
+    fetchNext()
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
+  }, [lastItem])
 
   return (
     <div

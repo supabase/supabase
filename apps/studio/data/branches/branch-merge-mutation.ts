@@ -1,21 +1,26 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
-import { upsertMigration } from '../database/migration-upsert-mutation'
 import { getBranchDiff } from './branch-diff-query'
 import { branchKeys } from './keys'
+import { upsertMigration } from '@/data/database/migration-upsert-mutation'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type BranchMergeVariables = {
   branchProjectRef: string
   baseProjectRef: string
   migration_version?: string
+  pgdelta?: boolean
 }
 
-export async function mergeBranch({ branchProjectRef, migration_version }: BranchMergeVariables) {
+export async function mergeBranch({
+  branchProjectRef,
+  migration_version,
+  pgdelta,
+}: BranchMergeVariables) {
   // Step 1: Get the diff output from the branch
-  const diffContent = await getBranchDiff({ branchRef: branchProjectRef })
+  const diffContent = await getBranchDiff({ branchRef: branchProjectRef, pgdelta })
 
   let migrationCreated = false
 

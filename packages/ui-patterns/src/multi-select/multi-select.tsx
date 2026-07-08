@@ -2,18 +2,26 @@
 
 import { cva, VariantProps } from 'class-variance-authority'
 import { Check, ChevronsUpDown, X as RemoveIcon } from 'lucide-react'
-import React, { useEffect } from 'react'
-import { Badge, cn, useOnClickOutside } from 'ui'
+// @ts-ignore Required to avoid TS error: The inferred type of MultiSelectorContent cannot be named without a reference to @radix-ui
+import type { Popover as PopoverPrimitive } from 'radix-ui'
+import React, { isValidElement, ReactElement, useEffect } from 'react'
 import {
+  Badge,
+  cn,
   Command,
   CommandEmpty,
   CommandInput,
   CommandItem,
   CommandList,
-} from 'ui/src/components/shadcn/ui/command'
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+  PopoverContentProps,
+} from 'ui'
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from 'ui/src/lib/constants'
 
 interface MultiSelectContextProps {
+  id: string
   values: string[]
   onValuesChange: (value: string[]) => void
   toggleValue: (values: string) => void
@@ -25,7 +33,6 @@ interface MultiSelectContextProps {
   setActiveIndex: React.Dispatch<React.SetStateAction<number>>
   size: MultiSelectorProps['size']
   disabled?: boolean
-  dropdownPlacement: 'top' | 'bottom'
   dropdownMaxHeight: number
 }
 
@@ -35,9 +42,9 @@ const DROPDOWN_MAX_HEIGHT = 300
 const DROPDOWN_GAP = 8
 
 const commandItemClass = cn(
-  'relative text-foreground-lighter text-left px-2 py-1.5 rounded',
+  'relative text-foreground-lighter text-left px-2 py-1.5 rounded-sm',
   'hover:text-foreground hover:!bg-overlay-hover w-full flex items-center space-x-2',
-  'peer-data-[value=true]:bg-overlay-hover peer-data-[value=true]:text-strong'
+  'peer-data-[value=true]:bg-overlay-hover'
 )
 
 function useMultiSelect() {
@@ -77,15 +84,16 @@ function MultiSelector({
   size,
   className,
   children,
+  id: idProp,
   ...props
 }: MultiSelectorProps) {
   const ref = React.useRef(null)
   const [open, setOpen] = React.useState<boolean>(false)
   const [inputValue, setInputValue] = React.useState<string>('')
   const [activeIndex, setActiveIndex] = React.useState<number>(-1)
-
-  const [dropdownPlacement, setDropdownPlacement] = React.useState<'top' | 'bottom'>('bottom')
   const [dropdownMaxHeight, setDropdownMaxHeight] = React.useState<number>(DROPDOWN_MAX_HEIGHT)
+  const generatedId = React.useId()
+  const id = idProp ?? generatedId
 
   const toggleValue = React.useCallback(
     (toggledValue: string) => {
@@ -98,29 +106,28 @@ function MultiSelector({
     [values]
   )
 
-  const updateDropdownMetrics = React.useCallback(() => {
-    if (typeof window === 'undefined') return
-    const triggerEl = ref.current as HTMLDivElement | null
-    if (!triggerEl) return
-
-    const rect = triggerEl.getBoundingClientRect()
-    const viewportHeight = window.innerHeight
-    const spaceBelow = viewportHeight - rect.bottom - DROPDOWN_GAP
-    const spaceAbove = rect.top - DROPDOWN_GAP
-    const shouldDropUp = spaceBelow < DROPDOWN_MAX_HEIGHT && spaceAbove > spaceBelow
-    const placement = shouldDropUp ? 'top' : 'bottom'
-    const availableSpace = Math.max(placement === 'top' ? spaceAbove : spaceBelow, 0)
-    const nextHeight =
-      availableSpace > 0 ? Math.min(DROPDOWN_MAX_HEIGHT, availableSpace) : DROPDOWN_MAX_HEIGHT
-
-    setDropdownPlacement(placement)
-    setDropdownMaxHeight(nextHeight)
-  }, [])
-
   useEffect(() => {
     if (!open) return
     const controller = new AbortController()
     const { signal } = controller
+
+    const updateDropdownMetrics = () => {
+      if (typeof window === 'undefined') return
+      const triggerEl = ref.current as HTMLDivElement | null
+      if (!triggerEl) return
+
+      const rect = triggerEl.getBoundingClientRect()
+      const viewportHeight = window.innerHeight
+      const spaceBelow = viewportHeight - rect.bottom - DROPDOWN_GAP
+      const spaceAbove = rect.top - DROPDOWN_GAP
+      const shouldDropUp = spaceBelow < DROPDOWN_MAX_HEIGHT && spaceAbove > spaceBelow
+      const placement = shouldDropUp ? 'top' : 'bottom'
+      const availableSpace = Math.max(placement === 'top' ? spaceAbove : spaceBelow, 0)
+      const nextHeight =
+        availableSpace > 0 ? Math.min(DROPDOWN_MAX_HEIGHT, availableSpace) : DROPDOWN_MAX_HEIGHT
+
+      setDropdownMaxHeight(nextHeight)
+    }
 
     const handleUpdate = updateDropdownMetrics
     handleUpdate()
@@ -128,14 +135,7 @@ function MultiSelector({
     window.addEventListener('scroll', handleUpdate, { capture: true, passive: true, signal })
 
     return () => controller.abort()
-  }, [open, updateDropdownMetrics])
-
-  // detect clicks from outside
-  useOnClickOutside(ref, () => {
-    if (open) {
-      setOpen(false)
-    }
-  })
+  }, [open])
 
   const handleKeyDown = React.useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -170,6 +170,7 @@ function MultiSelector({
   return (
     <MultiSelectContext.Provider
       value={{
+        id,
         values,
         toggleValue,
         onValuesChange,
@@ -181,19 +182,21 @@ function MultiSelector({
         setActiveIndex,
         size: size || 'small',
         disabled,
-        dropdownPlacement,
         dropdownMaxHeight,
       }}
     >
-      <Command
-        ref={ref}
-        onKeyDown={handleKeyDown}
-        className={cn('relative w-auto overflow-visible bg-transparent flex flex-col', className)}
-        dir={dir}
-        {...props}
-      >
-        {children}
-      </Command>
+      <Popover open={open} onOpenChange={setOpen}>
+        <Command
+          id={id}
+          ref={ref}
+          onKeyDown={handleKeyDown}
+          className={cn('relative w-auto overflow-visible bg-transparent flex flex-col', className)}
+          dir={dir}
+          {...props}
+        >
+          {children}
+        </Command>
+      </Popover>
     </MultiSelectContext.Provider>
   )
 }
@@ -253,18 +256,17 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
       }
     }, [values, badgeLimit])
 
-    const badgeClasses = 'rounded shrink-0 px-1.5'
+    const badgeClasses = 'rounded-sm shrink-0 px-1.5'
 
     const handleTriggerClick: React.MouseEventHandler<HTMLButtonElement> = React.useCallback(
       (event) => {
         if (IS_INLINE_MODE) {
-          if (!open) {
-            setOpen(true)
-            setInputValue('')
-          }
-
           event.stopPropagation()
           event.preventDefault()
+
+          if (!open) {
+            setInputValue('')
+          }
 
           setTimeout(() => {
             inlineInputRef.current?.focus()
@@ -281,92 +283,94 @@ const MultiSelectorTrigger = React.forwardRef<HTMLButtonElement, MultiSelectorTr
     )
 
     return (
-      <button
-        ref={inputRef}
-        onClick={(e) => !isDeleteHovered && handleTriggerClick(e)}
-        disabled={disabled}
-        type="button"
-        role="combobox"
-        className={cn(
-          'flex w-full min-w-[200px] min-h-[40px] items-center justify-between rounded-md border',
-          'border-alternative bg-foreground/[.026] px-3 py-2 text-sm',
-          'ring-offset-background placeholder:text-muted-foreground',
-          'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
-          'disabled:cursor-not-allowed disabled:opacity-50',
-          'hover:border-primary transition-colors duration-200',
-          className
-        )}
-        {...props}
-      >
-        <div
-          ref={badgesRef}
+      <PopoverAnchor asChild>
+        <button
+          ref={inputRef}
+          onClick={(e) => !isDeleteHovered && handleTriggerClick(e)}
+          disabled={disabled}
+          type="button"
+          role="combobox"
           className={cn(
-            'flex gap-1 -ml-1 overflow-hidden flex-1',
-            IS_BADGE_LIMIT_WRAP && 'flex-wrap',
-            !IS_BADGE_LIMIT_WRAP &&
-              'overflow-x-auto scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg'
+            'flex w-full min-w-[200px] min-h-[40px] items-center justify-between rounded-md border',
+            'border-alternative bg-control px-3 py-2 text-sm',
+            'ring-offset-background placeholder:text-muted-foreground',
+            'focus:outline-hidden focus:ring-2 focus:ring-background-control focus:ring-offset-2 focus-visible:ring-offset-foreground-muted',
+            'disabled:cursor-not-allowed disabled:opacity-50',
+            'hover:border-primary transition-colors duration-200',
+            className
           )}
+          {...props}
         >
-          {visibleBadges.map((value) => (
-            <Badge key={value} className={badgeClasses}>
-              {value}
-              {deletableBadge && (
-                <div
-                  onMouseEnter={() => setIsDeleteHovered(true)}
-                  onMouseLeave={() => setIsDeleteHovered(false)}
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    toggleValue(value)
-                    setIsDeleteHovered(false)
-                  }}
-                  className="ml-1 text-foreground-lighter hover:text-foreground-light transition-colors pointer-events-auto"
-                >
-                  <RemoveIcon size={12} />
-                </div>
-              )}
-            </Badge>
-          ))}
-          {extraBadgesCount > 0 && (
-            <Badge className={badgeClasses}>
-              {IS_NUMERIC_LIMIT && badgeLimit < 1
-                ? `${extraBadgesCount} item${extraBadgesCount > 1 ? 's' : ''} selected`
-                : `+${extraBadgesCount}`}
-            </Badge>
-          )}
-          <span
+          <div
+            ref={badgesRef}
             className={cn(
-              'text-foreground-muted whitespace-nowrap leading-[1.375rem] ml-1 opacity-0 transition-opacity hidden',
-              !IS_INLINE_MODE &&
-                (persistLabel || values.length === 0) &&
-                'opacity-100 visible inline'
+              'flex gap-1 -ml-1 overflow-hidden flex-1',
+              IS_BADGE_LIMIT_WRAP && 'flex-wrap',
+              !IS_BADGE_LIMIT_WRAP &&
+                'overflow-x-auto scrollbar-thin scrollbar-track-transparent transition-colors scrollbar-thumb-muted-foreground dark:scrollbar-thumb-muted scrollbar-thumb-rounded-lg'
             )}
           >
-            {label}
-          </span>
-          {IS_INLINE_MODE && (
-            <MultiSelectorInput
-              ref={inlineInputRef}
-              showSearchIcon={false}
-              onValueChange={activeIndex === -1 ? setInputValue : undefined}
-              placeholder={label}
-              autoFocus={false}
-              wrapperClassName={cn(
-                'px-0 flex-1 border-none truncate',
-                IS_BADGE_LIMIT_WRAP && 'min-w-[85px]'
+            {visibleBadges.map((value) => (
+              <Badge key={value} className={badgeClasses}>
+                {value}
+                {deletableBadge && (
+                  <div
+                    onMouseEnter={() => setIsDeleteHovered(true)}
+                    onMouseLeave={() => setIsDeleteHovered(false)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      toggleValue(value)
+                      setIsDeleteHovered(false)
+                    }}
+                    className="ml-1 text-foreground-lighter hover:text-foreground-light transition-colors pointer-events-auto"
+                  >
+                    <RemoveIcon size={12} />
+                  </div>
+                )}
+              </Badge>
+            ))}
+            {extraBadgesCount > 0 && (
+              <Badge className={badgeClasses}>
+                {IS_NUMERIC_LIMIT && badgeLimit < 1
+                  ? `${extraBadgesCount} item${extraBadgesCount > 1 ? 's' : ''} selected`
+                  : `+${extraBadgesCount}`}
+              </Badge>
+            )}
+            <span
+              className={cn(
+                'text-foreground-muted whitespace-nowrap leading-5.5 ml-1 opacity-0 transition-opacity hidden',
+                !IS_INLINE_MODE &&
+                  (persistLabel || values.length === 0) &&
+                  'opacity-100 visible inline'
               )}
-              className="py-0 px-1 truncate"
+            >
+              {label}
+            </span>
+            {IS_INLINE_MODE && (
+              <MultiSelectorInput
+                ref={inlineInputRef}
+                showSearchIcon={false}
+                onValueChange={activeIndex === -1 ? setInputValue : undefined}
+                placeholder={label}
+                autoFocus={false}
+                wrapperClassName={cn(
+                  'px-0 flex-1 border-none truncate',
+                  IS_BADGE_LIMIT_WRAP && 'min-w-[85px]'
+                )}
+                className="py-0 px-1 truncate"
+              />
+            )}
+          </div>
+
+          {showIcon && (
+            <ChevronsUpDown
+              size={16}
+              strokeWidth={2}
+              className="text-foreground-lighter shrink-0 ml-1.5"
             />
           )}
-        </div>
-
-        {showIcon && (
-          <ChevronsUpDown
-            size={16}
-            strokeWidth={2}
-            className="text-foreground-lighter shrink-0 ml-1.5"
-          />
-        )}
-      </button>
+        </button>
+      </PopoverAnchor>
     )
   }
 )
@@ -385,6 +389,8 @@ const MultiSelectorInputVariants = cva('bg-control border', {
   },
 })
 
+const getInputId = (id: string) => `${id}-input`
+
 const MultiSelectorInput = React.forwardRef<
   React.ElementRef<typeof CommandInput>,
   React.ComponentPropsWithoutRef<typeof CommandInput> & {
@@ -393,14 +399,23 @@ const MultiSelectorInput = React.forwardRef<
     wrapperClassName?: string
   }
 >(({ className, wrapperClassName, showResetIcon, showSearchIcon, ...props }, ref) => {
-  const { open, setOpen, inputValue, setInputValue, activeIndex, setActiveIndex, size, disabled } =
-    useMultiSelect()
+  const {
+    id,
+    open,
+    setOpen,
+    inputValue,
+    setInputValue,
+    activeIndex,
+    setActiveIndex,
+    size,
+    disabled,
+  } = useMultiSelect()
   const inputRef = React.useRef<HTMLInputElement>(null)
 
   // Use the provided ref if available, otherwise use the local ref
   React.useImperativeHandle(ref, () => inputRef.current as HTMLInputElement)
 
-  const handleFocus = () => setOpen(true)
+  const handleFocus = () => !open && setOpen(true)
   const handleClick = () => setActiveIndex(-1)
   const handleReset = () => {
     setInputValue('')
@@ -439,10 +454,12 @@ const MultiSelectorInput = React.forwardRef<
       wrapperClassName={wrapperClassName}
       className={cn(
         MultiSelectorInputVariants({ size }),
-        'text-sm bg-transparent h-full flex-grow border-none outline-none placeholder:text-foreground-muted flex-1',
+        'text-sm bg-transparent h-full grow border-none outline-hidden placeholder:text-foreground-muted flex-1',
         activeIndex !== -1 && 'caret-transparent',
         className
       )}
+      // Can't use id as CommandInput overrides it
+      data-id={getInputId(id)}
       {...props}
     />
   )
@@ -451,28 +468,29 @@ const MultiSelectorInput = React.forwardRef<
 MultiSelectorInput.displayName = 'MultiSelectorInput'
 MultiSelector.Input = MultiSelectorInput
 
-const MultiSelectorContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, children }, ref) => {
-    const { open, dropdownPlacement } = useMultiSelect()
-
-    const closedTranslationClass = dropdownPlacement === 'top' ? 'translate-y-3' : '-translate-y-3'
-
+const MultiSelectorContent = React.forwardRef<HTMLDivElement, PopoverContentProps>(
+  ({ className, children, ...props }, ref) => {
+    const { id } = useMultiSelect()
     return (
-      <div
+      <PopoverContent
+        align="start"
         ref={ref}
         className={cn(
-          'absolute w-full bg-overlay shadow-md z-10 border border-overlay rounded-md transition-all',
-          dropdownPlacement === 'top'
-            ? 'bottom-[calc(100%+0.25rem)] origin-bottom'
-            : 'top-[calc(100%+0.25rem)] origin-top',
-          open
-            ? 'opacity-100 translate-y-0 visible duration-150 ease-[.76,0,.23,1]'
-            : cn('opacity-0 invisible duration-0', closedTranslationClass),
+          'bg-overlay shadow-md z-50 border border-overlay rounded-md p-0',
+          'w-(--radix-popper-anchor-width)',
           className
         )}
+        onFocusOutside={(event) => {
+          if (event.target instanceof HTMLElement && event.target.dataset.id === getInputId(id)) {
+            event.preventDefault()
+            event.stopPropagation()
+          }
+        }}
+        sameWidthAsTrigger
+        {...props}
       >
-        {open && children}
-      </div>
+        {children}
+      </PopoverContent>
     )
   }
 )
@@ -491,7 +509,9 @@ const MultiSelectorList = React.forwardRef<
   const options = !!children
     ? Array.isArray(children)
       ? (children as React.ReactNode[])
-      : typeof children === 'object' && 'props' in children
+      : typeof children === 'object' &&
+          'props' in children &&
+          isValidElement<{ children: ReactElement[] }>(children)
         ? children.props.children
         : []
     : []
@@ -510,6 +530,7 @@ const MultiSelectorList = React.forwardRef<
         className
       )}
       style={{ maxHeight: dropdownMaxHeight }}
+      onWheel={(e) => e.stopPropagation()}
     >
       {children}
       {creatable && inputValue.length > 0 && !isOptionExists ? (
@@ -561,17 +582,17 @@ const MultiSelectorItem = React.forwardRef<
       <div
         className={cn(
           'flex items-center justify-center',
-          'peer h-4 w-4 shrink-0 rounded border border-control bg-control/25 ring-offset-background',
+          'peer h-4 w-4 shrink-0 rounded-sm border border-control bg-control/25 ring-offset-background',
           'transition-colors duration-150 ease-in-out',
           'hover:border-strong',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           'disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-foreground data-[state=checked]:text-background',
           isSelected ? 'bg-foreground text-background' : '[&_svg]:invisible'
         )}
       >
         <Check className="h-3 w-3" strokeWidth={4} />
       </div>
-      <div className="text-xs flex-grow leading-none pointer-events-none cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:pointer-events-none peer-disabled:opacity-50">
+      <div className="text-xs grow leading-none pointer-events-none cursor-pointer peer-disabled:cursor-not-allowed peer-disabled:pointer-events-none peer-disabled:opacity-50">
         {children}
       </div>
     </CommandItem>

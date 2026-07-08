@@ -1,9 +1,9 @@
 import { AnimatePresence, motion } from 'framer-motion'
-
-import { Markdown } from 'components/interfaces/Markdown'
-import { ValidateSpamResponse } from 'data/auth/validate-spam-mutation'
 import { CardContent, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+
+import { Markdown } from '@/components/interfaces/Markdown'
+import { ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'
 
 interface SpamValidationProps {
   spamRules?: ValidateSpamResponse['rules']
@@ -54,7 +54,7 @@ export const SpamValidation = ({ spamRules = [] }: SpamValidationProps) => {
                 </Table>
               </div>
               <Markdown
-                className="!max-w-none text-foreground-lighter text-xs mt-2"
+                className="max-w-none! text-foreground-lighter text-xs mt-2"
                 content="Spam validation is powered by [SpamAssassin](https://spamassassin.apache.org/doc.html). Full list of all available warnings can be found [here](https://gist.github.com/ychaouche/a2faff159c2a1fea16019156972c7f8b)."
               />
             </div>

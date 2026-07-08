@@ -1,15 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useParams } from 'common'
 import { useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import z from 'zod'
-
-import { useParams } from 'common'
-import { DocsButton } from 'components/ui/DocsButton'
-import { InlineLinkClassName } from 'components/ui/InlineLink'
-import { useFDWImportForeignSchemaMutation } from 'data/fdw/fdw-import-foreign-schema-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import {
   Button,
   Dialog,
@@ -20,20 +13,27 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form_Shadcn_,
-  FormField_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Form,
+  FormField,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import z from 'zod'
+
 import { getAnalyticsBucketFDWServerName } from './AnalyticsBucketDetails.utils'
 import { useAnalyticsBucketAssociatedEntities } from './useAnalyticsBucketAssociatedEntities'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { useFDWImportForeignSchemaMutation } from '@/data/fdw/fdw-import-foreign-schema-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 export const UpdateForeignSchemaDialog = ({
   namespace,
@@ -91,10 +91,10 @@ export const UpdateForeignSchemaDialog = ({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button type="default">Update schema tables</Button>
+        <Button variant="default">Update schema tables</Button>
       </DialogTrigger>
       <DialogContent size="medium" aria-describedby={undefined}>
-        <Form_Shadcn_ {...form}>
+        <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
               <DialogTitle>Update schema to expose foreign tables</DialogTitle>
@@ -123,7 +123,7 @@ export const UpdateForeignSchemaDialog = ({
               </p>
 
               {schemasAssociatedWithNamespace.length > 1 ? (
-                <FormField_Shadcn_
+                <FormField
                   control={form.control}
                   name="schema"
                   render={({ field }) => (
@@ -131,21 +131,18 @@ export const UpdateForeignSchemaDialog = ({
                       layout="vertical"
                       label="Select which Postgres schema to update"
                     >
-                      <Select_Shadcn_
-                        value={field.value}
-                        onValueChange={(val) => field.onChange(val)}
-                      >
-                        <SelectTrigger_Shadcn_>
-                          <SelectValue_Shadcn_ />
-                        </SelectTrigger_Shadcn_>
-                        <SelectContent_Shadcn_>
+                      <Select value={field.value} onValueChange={(val) => field.onChange(val)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
                           {schemasAssociatedWithNamespace.map((x) => (
-                            <SelectItem_Shadcn_ key={x} value={x}>
+                            <SelectItem key={x} value={x}>
                               {x}
-                            </SelectItem_Shadcn_>
+                            </SelectItem>
                           ))}
-                        </SelectContent_Shadcn_>
-                      </Select_Shadcn_>
+                        </SelectContent>
+                      </Select>
                     </FormItemLayout>
                   )}
                 />
@@ -155,19 +152,19 @@ export const UpdateForeignSchemaDialog = ({
                 </p>
               )}
             </DialogSection>
-            <DialogFooter className="!justify-between">
+            <DialogFooter className="justify-between!">
               <DocsButton href={`${DOCS_URL}/guides/storage/analytics/query-with-postgres`} />
               <div className="flex items-center gap-x-2">
-                <Button type="default" disabled={isUpdating} onClick={() => setIsOpen(false)}>
+                <Button variant="default" disabled={isUpdating} onClick={() => setIsOpen(false)}>
                   Cancel
                 </Button>
-                <Button htmlType="submit" type="primary" loading={isUpdating}>
+                <Button type="submit" variant="primary" loading={isUpdating}>
                   Update schema
                 </Button>
               </div>
             </DialogFooter>
           </form>
-        </Form_Shadcn_>
+        </Form>
       </DialogContent>
     </Dialog>
   )

@@ -8,7 +8,7 @@ description: 'Manage your Supabase projects directly through Vercel'
 
 The Vercel Marketplace is a feature that allows you to manage third-party resources, such as Supabase, directly from the Vercel platform. This integration offers a seamless experience with unified billing, streamlined authentication, and easy access management for your team.
 
-When you create an organization and projects through Vercel Marketplace, they function just like those created directly within Supabase. However, the billing is handled through your Vercel account, and you can manage your resources directly from the Vercel dashboard or CLI. Additionally, environment variables are automatically synchronized, making them immediately available for your connected projects.
+When you create an organization and projects through Vercel Marketplace, they function like those created directly within Supabase. However, the billing is handled through your Vercel account, and you can manage your resources directly from the Vercel dashboard or CLI. Additionally, environment variables are automatically synchronized, making them immediately available for your connected projects.
 
 For more information, see [Introducing the Vercel Marketplace](https://vercel.com/blog/introducing-the-vercel-marketplace) blog post.
 
@@ -46,7 +46,7 @@ POSTGRES_USER
 POSTGRES_HOST
 POSTGRES_PASSWORD
 POSTGRES_DATABASE
-SUPABASE_SERVICE_ROLE_KEY
+SUPABASE_SECRET_KEY
 SUPABASE_PUBLISHABLE_KEY
 SUPABASE_URL
 SUPABASE_JWT_SECRET
@@ -58,7 +58,7 @@ These variables ensure your applications can connect securely to the database an
 
 ## Studio support
 
-Accessing Supabase Studio is simple through the Vercel dashboard. You can open Supabase Studio from either the Integration installation page or the Vercel Storage page.
+Open Supabase Studio from the Vercel dashboard. You can access it from either the Integration installation page or the Vercel Storage page.
 Depending on your entry point, you'll either land on the Supabase dashboard homepage or be redirected to the corresponding Supabase Project.
 
 Supabase Studio provides tools such as:

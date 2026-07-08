@@ -1,12 +1,13 @@
-import { ExternalLink } from 'lucide-react'
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
+import { safeLocalStorage, safeSessionStorage } from 'common'
+import { ExternalLink } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+
 import CopyButton from '../CopyButton'
 import { InlineLinkClassName } from '../InlineLink'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 
 interface ClientSideExceptionHandlerProps {
   message: string
@@ -26,12 +27,8 @@ export const ClientSideExceptionHandler = ({
   const isProduction = process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod'
 
   const handleClearStorage = () => {
-    try {
-      localStorage.clear()
-      sessionStorage.clear()
-    } catch (e) {
-      // ignore
-    }
+    safeLocalStorage.clear()
+    safeSessionStorage.clear()
     window.location.reload()
   }
 
@@ -40,7 +37,7 @@ export const ClientSideExceptionHandler = ({
       <div className="flex flex-col gap-y-1 text-left py-2 w-full">
         <div className="flex items-center justify-between mb-3">
           <p className="text-lg font-bold">Sorry! An unexpected error occurred.</p>
-          <CopyButton type="outline" text={message} copyLabel="Copy error" />
+          <CopyButton variant="outline" text={message} copyLabel="Copy error" />
         </div>
         <p className="text-sm">
           Application error: a client-side exception has occurred (see browser console for more
@@ -83,7 +80,7 @@ export const ClientSideExceptionHandler = ({
       </Admonition>
 
       <div className={cn('w-full mx-auto grid gap-2', 'grid-cols-2 sm:w-1/2')}>
-        <Button asChild type="default" icon={<ExternalLink />}>
+        <Button asChild variant="default" icon={<ExternalLink />}>
           <SupportLink
             queryParams={{
               category: SupportCategories.DASHBOARD_BUG,
@@ -99,11 +96,11 @@ export const ClientSideExceptionHandler = ({
         {/* [Joshen] For local and staging, allow us to escape the error boundary */}
         {/* We could actually investigate how to make this available on prod, but without being able to reliably test this, I'm not keen to do it now */}
         {isProduction ? (
-          <Button type="outline" onClick={() => router.reload()}>
+          <Button variant="outline" onClick={() => router.reload()}>
             Reload dashboard
           </Button>
         ) : (
-          <Button type="outline" onClick={() => resetErrorBoundary()}>
+          <Button variant="outline" onClick={() => resetErrorBoundary()}>
             Return to dashboard
           </Button>
         )}

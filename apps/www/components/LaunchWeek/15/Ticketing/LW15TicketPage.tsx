@@ -1,16 +1,16 @@
-import { useState } from 'react'
-import dayjs from 'dayjs'
-import { Button, cn } from 'ui'
-import SectionContainer from 'components/Layouts/SectionContainer'
 import useLw15ConfData, { UserTicketData } from 'components/LaunchWeek/15/hooks/use-conf-data'
-import { useRegistration } from '../hooks/use-registration'
-import { LWSVG, FifteenSVG, LW15ThemeSwitcher } from '../lw15.components'
+import SectionContainer from 'components/Layouts/SectionContainer'
+import dayjs from 'dayjs'
+import Link from 'next/link'
+import { useState } from 'react'
+import { Button, cn } from 'ui'
+
+import { updateTicketColors, useRegistration } from '../hooks/use-registration'
+import { FifteenSVG, LW15ThemeSwitcher, LWSVG } from '../lw15.components'
+import { BG_COLORS, TYPO_COLORS } from './colors'
 import LW15Ticket from './LW15Ticket'
 import LW15TicketShare from './LW15TicketShare'
 import TicketURLCopy from './TicketURLCopy'
-import { TYPO_COLORS, BG_COLORS } from './colors'
-import { updateTicketColors } from '../hooks/use-registration'
-import Link from 'next/link'
 
 const LW15TicketPage = ({
   user: userFromProps,
@@ -117,7 +117,7 @@ const LW15TicketPage = ({
   const handleClaimTicket = () => register.signIn()
 
   return (
-    <SectionContainer className="flex flex-col lg:grid lg:grid-cols-2 gap-6 !py-8 md:!py-10 h-full !min-h-[calc(100dvh-66px)]">
+    <SectionContainer className="flex flex-col lg:grid lg:grid-cols-2 gap-6 py-8! md:py-10! h-full min-h-[calc(100dvh-66px)]!">
       <div className="flex flex-col h-full justify-between gap-6 lg:gap-20">
         <div className="grid grid-cols-6 gap-4">
           <div className="col-span-full w-full hidden lg:flex items-center justify-between h-[60px] md:h-[90px] lg:h-[120px] gap-4">
@@ -144,7 +144,7 @@ const LW15TicketPage = ({
             <div className="col-span-full">
               <Button
                 className="h-auto py-1 px-2 min-w-[125px] min-h-[28px]"
-                type="secondary"
+                variant="secondary"
                 size="medium"
                 onClick={handleClaimTicket}
               >
@@ -154,7 +154,7 @@ const LW15TicketPage = ({
           )}
           {isSharePage && isLoggedTicketOwner && (
             <div className="col-span-full">
-              <Button className="h-auto py-1 px-2" type="secondary" size="medium" asChild>
+              <Button className="h-auto py-1 px-2" variant="secondary" size="medium" asChild>
                 <Link href="/launch-week/ticket">Customize your ticket</Link>
               </Button>
             </div>

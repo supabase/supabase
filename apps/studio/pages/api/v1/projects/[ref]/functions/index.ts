@@ -1,9 +1,9 @@
+import type { components } from 'api-types'
 import { type NextApiRequest, type NextApiResponse } from 'next'
 
-import type { components } from 'api-types'
-import { uuidv4 } from 'lib/helpers'
-import apiWrapper from 'lib/api/apiWrapper'
-import { getFunctionsArtifactStore } from 'lib/api/self-hosted/functions'
+import apiWrapper from '@/lib/api/apiWrapper'
+import { getFunctionsArtifactStore } from '@/lib/api/self-hosted/functions'
+import { uuidv4 } from '@/lib/helpers'
 
 export default function handlerWithErrorCatching(req: NextApiRequest, res: NextApiResponse) {
   return apiWrapper(req, res, handler, { withAuth: true })

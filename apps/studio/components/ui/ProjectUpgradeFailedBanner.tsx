@@ -1,15 +1,15 @@
-import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
-import dayjs from 'dayjs'
-import { X } from 'lucide-react'
-import { useEffect, useState } from 'react'
-
 import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { DatabaseUpgradeStatus } from '@supabase/shared-types/out/events'
 import { useParams } from 'common'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { useProjectUpgradingStatusQuery } from 'data/config/project-upgrade-status-query'
-import { IS_PLATFORM } from 'lib/constants'
-import { Alert, Button } from 'ui'
+import dayjs from 'dayjs'
+import { Button } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+
 import { InlineLink } from './InlineLink'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { useProjectUpgradingStatusQuery } from '@/data/config/project-upgrade-status-query'
+import { IS_PLATFORM } from '@/lib/constants'
+import { guessLocalTimezone } from '@/lib/dayjs'
 
 // [Joshen] Think twice about the category though - it doesn't correspond
 
@@ -18,21 +18,14 @@ export const ProjectUpgradeFailedBanner = () => {
   const { data } = useProjectUpgradingStatusQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { status, initiated_at, latest_status_at, error } = data?.databaseUpgradeStatus ?? {}
 
-  const key = `supabase-upgrade-${ref}-${initiated_at}`
-
-  const [hasDismissed, setHasDismissed] = useState(false)
-  useEffect(() => {
-    setHasDismissed(localStorage?.getItem(key) === 'true')
-  }, [key])
-
   const isFailed = status === DatabaseUpgradeStatus.Failed
   const initiatedAt = dayjs
     .utc(initiated_at ?? 0)
-    .tz(dayjs.tz.guess())
+    .tz(guessLocalTimezone())
     .format('DD MMM YYYY HH:mm:ss')
 
-  const subject = 'Upgrade%20failed%20for%20project'
-  const message = `Upgrade information:%0A• Initiated at: ${initiated_at}%0A• Error: ${error}`
+  const subject = 'Upgrade failed for project'
+  const message = `Upgrade information:\n• Initiated at: ${initiated_at}\n• Error: ${error}`
 
   const initiatedAtEncoded = encodeURIComponent(
     dayjs.utc(initiated_at ?? 0).format('YYYY-MM-DDTHH:mm:ss')
@@ -45,40 +38,26 @@ export const ProjectUpgradeFailedBanner = () => {
   )
   const timestampFilter = `its=${initiatedAtEncoded}&ite=${latestStatusAtEncoded}`
 
-  const acknowledgeMessage = () => {
-    setHasDismissed(true)
-    localStorage.setItem(key, 'true')
-  }
-
-  if (!isFailed || hasDismissed) return null
+  if (!isFailed) return null
 
   return (
     <div className="max-w-7xl">
-      <Alert
-        withIcon
-        variant={'warning'}
+      <Admonition
+        type="warning"
         title={`Postgres version upgrade was not successful (Initiated at ${initiatedAt})`}
         actions={
-          <div className="flex items-center h-full space-x-4">
-            <Button asChild type="default">
-              <SupportLink
-                queryParams={{
-                  category: SupportCategories.DATABASE_UNRESPONSIVE,
-                  projectRef: ref,
-                  subject,
-                  message,
-                }}
-              >
-                Contact support
-              </SupportLink>
-            </Button>
-            <Button
-              type="text"
-              className="px-1"
-              icon={<X size={16} strokeWidth={1.5} />}
-              onClick={() => acknowledgeMessage()}
-            />
-          </div>
+          <Button asChild variant="default">
+            <SupportLink
+              queryParams={{
+                category: SupportCategories.DATABASE_UNRESPONSIVE,
+                projectRef: ref,
+                subject,
+                message,
+              }}
+            >
+              Contact support
+            </SupportLink>
+          </Button>
         }
       >
         <div>
@@ -92,7 +71,7 @@ export const ProjectUpgradeFailedBanner = () => {
           </InlineLink>
           .
         </div>
-      </Alert>
+      </Admonition>
     </div>
   )
 }

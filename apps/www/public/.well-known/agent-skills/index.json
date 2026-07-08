@@ -1,0 +1,19 @@
+{
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "skills": [
+    {
+      "name": "supabase",
+      "type": "archive",
+      "description": "Use when doing ANY task involving Supabase. Triggers: Supabase products (Database, Auth, Edge Functions, Realtime, Storage, Vectors, Cron, Queues); client libraries and SSR integrations (supabase-js, @supabase/ssr) in Next.js, React, SvelteKit, Astro, Remix; auth issues (login, logout, sessions, JWT, cookies, getSession, getUser, getClaims, RLS); Supabase CLI or MCP server; schema changes, migrations, security audits, Postgres extensions (pg_graphql, pg_cron, pg_vector).",
+      "url": "https://github.com/supabase/agent-skills/releases/download/v0.1.5/supabase.tar.gz",
+      "digest": "sha256:5acb0974e54db43ac66fcb55170dee2059b423d5253a9c1f14a51df44358f07a"
+    },
+    {
+      "name": "supabase-postgres-best-practices",
+      "type": "archive",
+      "description": "Postgres performance optimization and best practices from Supabase. Use this skill when writing, reviewing, or optimizing Postgres queries, schema designs, or database configurations.",
+      "url": "https://github.com/supabase/agent-skills/releases/download/v0.1.5/supabase-postgres-best-practices.tar.gz",
+      "digest": "sha256:2db40cf84865e73c908ff080d101ab1ca60829cd379f4e6c15d7287d33ce61e5"
+    }
+  ]
+}

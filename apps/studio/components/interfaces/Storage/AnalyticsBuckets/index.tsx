@@ -1,15 +1,9 @@
+import { useParams } from 'common'
+import { AnalyticsBucket as AnalyticsBucketIcon } from 'icons'
 import { ChevronRight, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { AlphaNotice } from 'components/ui/AlphaNotice'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useAnalyticsBucketsQuery } from 'data/storage/analytics-buckets-query'
-import { AnalyticsBucket as AnalyticsBucketIcon } from 'icons'
-import { createNavigationHandler } from 'lib/navigation'
 import {
   Card,
   Table,
@@ -22,14 +16,20 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent, PageSectionTitle } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
 import { CreateAnalyticsBucketModal } from './CreateAnalyticsBucketModal'
+import { AlertError } from '@/components/ui/AlertError'
+import { AlphaNotice } from '@/components/ui/AlphaNotice'
+import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
+import { useAnalyticsBucketsQuery } from '@/data/storage/analytics-buckets-query'
+import { createNavigationHandler } from '@/lib/navigation'
 
 export const AnalyticsBuckets = () => {
   const { ref } = useParams()
@@ -103,10 +103,10 @@ export const AnalyticsBuckets = () => {
                         </Tooltip>
                       )}
                     </div>
-                    <div className="flex flex-grow justify-between gap-x-2 items-center">
+                    <div className="flex grow justify-between gap-x-2 items-center">
                       <Input
                         size="tiny"
-                        className="flex-grow lg:flex-grow-0 w-52"
+                        className="grow lg:grow-0 w-52"
                         placeholder="Search for a bucket"
                         value={filterString}
                         onChange={(e) => setFilterString(e.target.value)}

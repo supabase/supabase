@@ -1,26 +1,26 @@
-import { useMemo, useRef, useState } from 'react'
-
-import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
-import PartnerIcon from 'components/ui/PartnerIcon'
-import { useIntegrationsQuery } from 'data/integrations/integrations-query'
-import type { IntegrationName } from 'data/integrations/integrations.types'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { ChevronDown } from 'lucide-react'
-import type { Organization } from 'types'
+import { useMemo, useRef, useState } from 'react'
 import {
   Badge,
   Button,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Command_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
   cn,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
+
+import { getHasInstalledObject } from '@/components/layouts/IntegrationsLayout/Integrations.utils'
+import PartnerIcon from '@/components/ui/PartnerIcon'
+import { useIntegrationsQuery } from '@/data/integrations/integrations-query'
+import type { IntegrationName } from '@/data/integrations/integrations.types'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import type { Organization } from '@/types'
 
 export interface OrganizationPickerProps {
   integrationName: IntegrationName
@@ -58,11 +58,11 @@ const OrganizationPicker = ({
 
   return (
     <>
-      <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-        <PopoverTrigger_Shadcn_ asChild>
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <Button
             ref={ref}
-            type="default"
+            variant="default"
             size="medium"
             block
             className="justify-start"
@@ -83,21 +83,16 @@ const OrganizationPicker = ({
               )}
             </div>
           </Button>
-        </PopoverTrigger_Shadcn_>
-        <PopoverContent_Shadcn_
-          className="p-0 w-full"
-          side="bottom"
-          align="center"
-          sameWidthAsTrigger
-        >
-          <Command_Shadcn_>
-            <CommandInput_Shadcn_ placeholder="Search organizations..." />
-            <CommandList_Shadcn_>
-              <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
-              <CommandGroup_Shadcn_>
+        </PopoverTrigger>
+        <PopoverContent className="p-0 w-full" side="bottom" align="center" sameWidthAsTrigger>
+          <Command>
+            <CommandInput placeholder="Search organizations..." />
+            <CommandList>
+              <CommandEmpty>No results found.</CommandEmpty>
+              <CommandGroup>
                 {organizationsData?.map((org) => {
                   return (
-                    <CommandItem_Shadcn_
+                    <CommandItem
                       value={org.slug}
                       key={org.slug}
                       className="flex gap-2 items-center"
@@ -115,16 +110,16 @@ const OrganizationPicker = ({
                       <PartnerIcon organization={org} />
                       <span className="truncate">{org.name}</span>{' '}
                       {configurationId && installed[org.slug] && (
-                        <Badge className="!flex-none">Integration Installed</Badge>
+                        <Badge className="flex-none!">Integration Installed</Badge>
                       )}
-                    </CommandItem_Shadcn_>
+                    </CommandItem>
                   )
                 })}
-              </CommandGroup_Shadcn_>
-            </CommandList_Shadcn_>
-          </Command_Shadcn_>
-        </PopoverContent_Shadcn_>
-      </Popover_Shadcn_>
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
     </>
   )
 }

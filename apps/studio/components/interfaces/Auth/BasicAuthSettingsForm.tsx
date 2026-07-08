@@ -1,32 +1,22 @@
-import { yupResolver } from '@hookform/resolvers/yup'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { boolean, object, string } from 'yup'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { InlineLink } from 'components/ui/InlineLink'
-import NoPermission from 'components/ui/NoPermission'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { DOCS_URL } from 'lib/constants'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   Card,
   CardContent,
   CardFooter,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Form_Shadcn_,
+  Form,
+  FormControl,
+  FormField,
   Switch,
   WarningIcon,
 } from 'ui'
@@ -39,14 +29,24 @@ import {
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
-import { NO_REQUIRED_CHARACTERS } from './Auth.constants'
+import * as z from 'zod'
 
-const schema = object({
-  DISABLE_SIGNUP: boolean().required(),
-  EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean().required(),
-  SECURITY_MANUAL_LINKING_ENABLED: boolean().required(),
-  MAILER_AUTOCONFIRM: boolean().required(),
-  SITE_URL: string().required('Must have a Site URL'),
+import { NO_REQUIRED_CHARACTERS } from './Auth.constants'
+import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { DOCS_URL } from '@/lib/constants'
+
+const schema = z.object({
+  DISABLE_SIGNUP: z.boolean(),
+  EXTERNAL_ANONYMOUS_USERS_ENABLED: z.boolean(),
+  SECURITY_MANUAL_LINKING_ENABLED: z.boolean(),
+  MAILER_AUTOCONFIRM: z.boolean(),
+  SITE_URL: z.string().min(1, 'Must have a Site URL'),
 })
 
 export const BasicAuthSettingsForm = () => {
@@ -72,7 +72,7 @@ export const BasicAuthSettingsForm = () => {
   )
 
   const form = useForm({
-    resolver: yupResolver(schema),
+    resolver: zodResolver(schema),
     defaultValues: {
       DISABLE_SIGNUP: true,
       EXTERNAL_ANONYMOUS_USERS_ENABLED: false,
@@ -81,6 +81,7 @@ export const BasicAuthSettingsForm = () => {
       SITE_URL: '',
     },
   })
+  const { isDirty } = form.formState
 
   useEffect(() => {
     if (authConfig) {
@@ -159,11 +160,11 @@ export const BasicAuthSettingsForm = () => {
         )}
 
         {isSuccess && (
-          <Form_Shadcn_ {...form}>
+          <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
               <Card>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="DISABLE_SIGNUP"
                     render={({ field }) => (
@@ -172,20 +173,20 @@ export const BasicAuthSettingsForm = () => {
                         label="Allow new users to sign up"
                         description="If this is disabled, new users will not be able to sign up to your application"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={!canUpdateConfig}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
                 {showManualLinking && (
                   <CardContent>
-                    <FormField_Shadcn_
+                    <FormField
                       control={form.control}
                       name="SECURITY_MANUAL_LINKING_ENABLED"
                       render={({ field }) => (
@@ -205,20 +206,20 @@ export const BasicAuthSettingsForm = () => {
                             </>
                           }
                         >
-                          <FormControl_Shadcn_>
+                          <FormControl>
                             <Switch
                               checked={field.value}
                               onCheckedChange={field.onChange}
                               disabled={!canUpdateConfig}
                             />
-                          </FormControl_Shadcn_>
+                          </FormControl>
                         </FormItemLayout>
                       )}
                     />
                   </CardContent>
                 )}
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="EXTERNAL_ANONYMOUS_USERS_ENABLED"
                     render={({ field }) => (
@@ -238,73 +239,78 @@ export const BasicAuthSettingsForm = () => {
                           </>
                         }
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={!canUpdateConfig}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
 
                   {form.watch('EXTERNAL_ANONYMOUS_USERS_ENABLED') && (
-                    <Alert_Shadcn_
+                    <Alert
                       className="flex w-full items-center justify-between mt-4"
                       variant="warning"
                     >
                       <WarningIcon />
                       <div>
-                        <AlertTitle_Shadcn_>
+                        <AlertTitle>
                           Anonymous users will use the{' '}
                           <code className="text-code-inline">authenticated</code> role when signing
                           in
-                        </AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
+                        </AlertTitle>
+                        <AlertDescription className="flex flex-col gap-y-3">
                           <p>
                             As a result, anonymous users will be subjected to RLS policies that
                             apply to the <code className="text-code-inline">public</code> and{' '}
                             <code className="text-code-inline">authenticated</code> roles. We
                             strongly advise{' '}
                             <Link
-                              href={`/project/${projectRef}/auth/policies`}
+                              href={`/project/${projectRef}/database/policies`}
                               className="text-foreground underline"
                             >
                               reviewing your RLS policies
                             </Link>{' '}
                             to ensure that access to your data is restricted where required.
                           </p>
-                          <Button asChild type="default" className="w-min" icon={<ExternalLink />}>
+                          <Button
+                            asChild
+                            variant="default"
+                            className="w-min"
+                            icon={<ExternalLink />}
+                          >
                             <Link href={`${DOCS_URL}/guides/auth/auth-anonymous#access-control`}>
                               View access control docs
                             </Link>
                           </Button>
-                        </AlertDescription_Shadcn_>
+                        </AlertDescription>
                       </div>
-                    </Alert_Shadcn_>
+                    </Alert>
                   )}
 
                   {!authConfig?.SECURITY_CAPTCHA_ENABLED &&
                     form.watch('EXTERNAL_ANONYMOUS_USERS_ENABLED') && (
-                      <Alert_Shadcn_ className="mt-4">
+                      <Alert className="mt-4">
                         <WarningIcon />
-                        <AlertTitle_Shadcn_>
+                        <AlertTitle>
                           We highly recommend{' '}
                           <InlineLink href={`/project/${projectRef}/auth/protection`}>
                             enabling captcha
                           </InlineLink>{' '}
                           for anonymous sign-ins
-                        </AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_>
+                        </AlertTitle>
+                        <AlertDescription>
                           This will prevent potential abuse on sign-ins which may bloat your
                           database and incur costs for monthly active users (MAU)
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
+                        </AlertDescription>
+                      </Alert>
                     )}
                 </CardContent>
                 <CardContent>
-                  <FormField_Shadcn_
+                  <FormField
                     control={form.control}
                     name="MAILER_AUTOCONFIRM"
                     render={({ field }) => (
@@ -313,27 +319,27 @@ export const BasicAuthSettingsForm = () => {
                         label="Confirm email"
                         description="Users will need to confirm their email address before signing in for the first time"
                       >
-                        <FormControl_Shadcn_>
+                        <FormControl>
                           <Switch
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             disabled={!canUpdateConfig}
                           />
-                        </FormControl_Shadcn_>
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
-                  {form.formState.isDirty && (
-                    <Button type="default" onClick={() => form.reset()}>
+                  {isDirty && (
+                    <Button variant="default" onClick={() => form.reset()}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
-                    disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
+                    variant="primary"
+                    type="submit"
+                    disabled={!canUpdateConfig || isUpdatingConfig || !isDirty}
                     loading={isUpdatingConfig}
                   >
                     Save changes
@@ -341,7 +347,7 @@ export const BasicAuthSettingsForm = () => {
                 </CardFooter>
               </Card>
             </form>
-          </Form_Shadcn_>
+          </Form>
         )}
       </PageSectionContent>
     </PageSection>

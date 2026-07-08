@@ -369,6 +369,14 @@
             "type": "function"
           },
           {
+            "id": "strip-nulls",
+            "title": "Strip null values",
+            "slug": "db-strip-nulls",
+            "product": "database",
+            "parent": "modifiers",
+            "type": "function"
+          },
+          {
             "id": "returns",
             "title": "Override type of successful response",
             "slug": "db-returns",
@@ -494,6 +502,20 @@
         "id": "sign-in-with-web3",
         "title": "Sign in a user through Web3 (Solana, Ethereum)",
         "slug": "auth-signinwithweb3",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "sign-in-with-passkey",
+        "title": "Sign in with a passkey",
+        "slug": "auth-signinwithpasskey",
+        "product": "auth",
+        "type": "function"
+      },
+      {
+        "id": "register-passkey",
+        "title": "Register a passkey",
+        "slug": "auth-registerpasskey",
         "product": "auth",
         "type": "function"
       },
@@ -723,6 +745,65 @@
         ]
       },
       {
+        "id": "passkey-api",
+        "isFunc": false,
+        "title": "Auth Passkey",
+        "slug": "auth-passkey-api",
+        "product": "auth",
+        "type": "function",
+        "items": [
+          {
+            "id": "passkey-list",
+            "title": "List passkeys",
+            "slug": "auth-passkey-list",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "passkey-update",
+            "title": "Update a passkey",
+            "slug": "auth-passkey-update",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "passkey-delete",
+            "title": "Delete a passkey",
+            "slug": "auth-passkey-delete",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "passkey-start-registration",
+            "title": "Start passkey registration",
+            "slug": "auth-passkey-startregistration",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "passkey-verify-registration",
+            "title": "Verify passkey registration",
+            "slug": "auth-passkey-verifyregistration",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "passkey-start-authentication",
+            "title": "Start passkey authentication",
+            "slug": "auth-passkey-startauthentication",
+            "product": "auth",
+            "type": "function"
+          },
+          {
+            "id": "passkey-verify-authentication",
+            "title": "Verify passkey authentication",
+            "slug": "auth-passkey-verifyauthentication",
+            "product": "auth",
+            "type": "function"
+          }
+        ]
+      },
+      {
         "id": "oauth-server-api",
         "isFunc": false,
         "title": "OAuth Server",
@@ -843,7 +924,30 @@
             "product": "auth-admin",
             "type": "function"
           },
-
+          {
+            "id": "admin-passkey-api",
+            "isFunc": false,
+            "title": "Passkey Admin",
+            "slug": "auth-admin-passkey-api",
+            "product": "auth-admin",
+            "type": "function",
+            "items": [
+              {
+                "id": "admin-list-passkeys",
+                "title": "List passkeys for a user",
+                "slug": "auth-admin-passkey-listpasskeys",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-delete-passkey",
+                "title": "Delete a passkey",
+                "slug": "auth-admin-passkey-deletepasskey",
+                "product": "auth-admin",
+                "type": "function"
+              }
+            ]
+          },
           {
             "id": "oauth-admin-api",
             "isFunc": false,
@@ -889,6 +993,48 @@
               },
               {
                 "id": "auth-js-gotrueadminoauthapi-regenerateclientsecret",
+                "title": "Regenerate client secret",
+                "slug": "auth-admin-oauth-regenerateclientsecret",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-oauth-list-clients",
+                "title": "List OAuth clients",
+                "slug": "auth-admin-oauth-listclients",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-oauth-create-client",
+                "title": "Create OAuth client",
+                "slug": "auth-admin-oauth-createclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-oauth-get-client",
+                "title": "Get OAuth client",
+                "slug": "auth-admin-oauth-getclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-oauth-update-client",
+                "title": "Update OAuth client",
+                "slug": "auth-admin-oauth-updateclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-oauth-delete-client",
+                "title": "Delete OAuth client",
+                "slug": "auth-admin-oauth-deleteclient",
+                "product": "auth-admin",
+                "type": "function"
+              },
+              {
+                "id": "admin-oauth-regenerate-client-secret",
                 "title": "Regenerate client secret",
                 "slug": "auth-admin-oauth-regenerateclientsecret",
                 "product": "auth-admin",

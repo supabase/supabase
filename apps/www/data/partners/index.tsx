@@ -1,4 +1,4 @@
-import { Compass, Globe, DollarSign, TrendingUp } from 'lucide-react'
+import { Compass, DollarSign, Globe, TrendingUp } from 'lucide-react'
 
 export default {
   metaTitle: 'Partner with Supabase',
@@ -21,7 +21,7 @@ export default {
           }}
         >
           <svg
-            className="text-background-alternative h-8 w-8 flex-shrink-0"
+            className="text-background-alternative h-8 w-8 shrink-0"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -51,7 +51,7 @@ export default {
       },
       {
         title: 'Add OAuth2 Support',
-        text: 'Use the OAuth2 protocol to access a users organization or project',
+        text: "Use the OAuth2 protocol to access a user's organization or project",
       },
       {
         title: 'Receive Tokens',

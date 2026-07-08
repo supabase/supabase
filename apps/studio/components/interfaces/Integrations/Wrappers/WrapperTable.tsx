@@ -1,6 +1,4 @@
 import { useParams } from 'common'
-import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -23,6 +21,8 @@ import { DeleteWrapperModal } from './DeleteWrapperModal'
 import { EditWrapperSheet } from './EditWrapperSheet'
 import { WrapperRow } from './WrapperRow'
 import { wrapperMetaComparator } from './Wrappers.utils'
+import { useFDWsQuery } from '@/data/fdw/fdws-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 interface WrapperTableProps {
   isLatest?: boolean
@@ -35,7 +35,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
 
   const [isClosingEditWrapper, setIsClosingEditWrapper] = useState(false)
 
-  const { data, isSuccess } = useFDWsQuery({
+  const { data, isError } = useFDWsQuery({
     projectRef: ref,
     connectionString: project?.connectionString,
   })
@@ -52,11 +52,11 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
   const selectedWrapperToEdit = wrappers.find((w) => w.id.toString() === selectedWrapperIdToEdit)
 
   useEffect(() => {
-    if (isSuccess && !!selectedWrapperIdToEdit && !selectedWrapperToEdit) {
+    if (isError && !!selectedWrapperIdToEdit && !selectedWrapperToEdit) {
       toast('Wrapper not found')
       setSelectedWrapperToEdit(null)
     }
-  }, [isSuccess, selectedWrapperIdToEdit, selectedWrapperToEdit, setSelectedWrapperToEdit])
+  }, [isError, selectedWrapperIdToEdit, selectedWrapperToEdit, setSelectedWrapperToEdit])
 
   if (!integration || integration.type !== 'wrapper') {
     return (
@@ -94,7 +94,7 @@ export const WrapperTable = ({ isLatest = false }: WrapperTableProps) => {
               wrappers.length === 0 ? 'border-t-0' : ''
             )}
           >
-            <TableRow>
+            <TableRow className="border-b-0">
               <TableCell colSpan={4}>
                 {wrappers.length} {integration?.name}
                 {wrappers.length === 0 || wrappers.length > 1 ? 's' : ''} created

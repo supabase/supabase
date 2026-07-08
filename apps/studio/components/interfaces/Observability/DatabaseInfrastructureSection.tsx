@@ -1,11 +1,7 @@
 import { useParams } from 'common'
-import { useInfraMonitoringAttributesQuery } from 'data/analytics/infra-monitoring-query'
-import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import dayjs from 'dayjs'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { cn } from 'ui'
 import {
   MetricCard,
   MetricCardContent,
@@ -18,6 +14,9 @@ import {
   parseConnectionsData,
   parseInfrastructureMetrics,
 } from './DatabaseInfrastructureSection.utils'
+import { useInfraMonitoringAttributesQuery } from '@/data/analytics/infra-monitoring-query'
+import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 type DatabaseInfrastructureSectionProps = {
   interval: '1hr' | '1day' | '7day'
@@ -31,8 +30,8 @@ type DatabaseInfrastructureSectionProps = {
 export const DatabaseInfrastructureSection = ({
   interval,
   refreshKey,
-  dbErrorRate,
-  isLoading: dbLoading,
+  dbErrorRate: _dbErrorRate,
+  isLoading: _dbLoading,
   slowQueriesCount = 0,
   slowQueriesLoading = false,
 }: DatabaseInfrastructureSectionProps) => {
@@ -153,10 +152,7 @@ export const DatabaseInfrastructureSection = ({
           className="block group"
         >
           <MetricCard isLoading={slowQueriesLoading}>
-            <MetricCardHeader
-              href={`/project/${projectRef}/observability/query-performance?totalTimeFilter=${encodeURIComponent(JSON.stringify({ operator: '>', value: 1000 }))}`}
-              linkTooltip="Go to query performance"
-            >
+            <MetricCardHeader linkTooltip="Go to query performance">
               <MetricCardLabel tooltip="Queries with total execution time (execution time + planning time) greater than 1000ms. High values may indicate query optimization opportunities">
                 Slow Queries
               </MetricCardLabel>
@@ -169,17 +165,17 @@ export const DatabaseInfrastructureSection = ({
 
         <Link href={databaseReportUrl} className="block group">
           <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
-              <MetricCardLabel tooltip="Active database connections (current/max). Monitor to avoid connection exhaustion">
-                Connections
+            <MetricCardHeader linkTooltip="Go to database report">
+              <MetricCardLabel tooltip="Highest concurrent database connections observed in the selected window, against the connection limit. Monitor to avoid connection exhaustion.">
+                Peak Connections
               </MetricCardLabel>
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
               ) : connections.max > 0 ? (
                 <MetricCardValue>
-                  {connections.current}/{connections.max}
+                  {connections.peak}/{connections.max}
                 </MetricCardValue>
               ) : (
                 <MetricCardValue>--</MetricCardValue>
@@ -190,14 +186,14 @@ export const DatabaseInfrastructureSection = ({
 
         <Link href={databaseReportUrl} className="block group">
           <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
+            <MetricCardHeader linkTooltip="Go to database report">
               <MetricCardLabel tooltip="Disk usage percentage of total disk space used">
                 Disk Usage
               </MetricCardLabel>
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
               ) : metrics ? (
                 <MetricCardValue>{metrics.disk.current.toFixed(0)}%</MetricCardValue>
               ) : (
@@ -209,14 +205,14 @@ export const DatabaseInfrastructureSection = ({
 
         <Link href={databaseReportUrl} className="block group">
           <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
+            <MetricCardHeader linkTooltip="Go to database report">
               <MetricCardLabel tooltip="Disk I/O consumption percentage. High values may indicate disk bottlenecks">
                 Disk IO
               </MetricCardLabel>
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
               ) : metrics ? (
                 <MetricCardValue>{metrics.diskIo.current.toFixed(0)}%</MetricCardValue>
               ) : (
@@ -228,14 +224,14 @@ export const DatabaseInfrastructureSection = ({
 
         <Link href={databaseReportUrl} className="block group">
           <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
+            <MetricCardHeader linkTooltip="Go to database report">
               <MetricCardLabel tooltip="RAM usage percentage. Sustained high usage may indicate memory pressure">
                 Memory
               </MetricCardLabel>
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
               ) : metrics ? (
                 <MetricCardValue>{metrics.ram.current.toFixed(0)}%</MetricCardValue>
               ) : (
@@ -247,14 +243,14 @@ export const DatabaseInfrastructureSection = ({
 
         <Link href={databaseReportUrl} className="block group">
           <MetricCard isLoading={infraLoading}>
-            <MetricCardHeader href={databaseReportUrl} linkTooltip="Go to database report">
+            <MetricCardHeader linkTooltip="Go to database report">
               <MetricCardLabel tooltip="CPU usage percentage. High values may suggest CPU-intensive queries or workloads">
                 CPU
               </MetricCardLabel>
             </MetricCardHeader>
             <MetricCardContent>
               {infraError ? (
-                <div className="text-xs text-destructive break-words">{errorMessage}</div>
+                <div className="text-xs text-destructive wrap-break-word">{errorMessage}</div>
               ) : metrics ? (
                 <MetricCardValue>{metrics.cpu.current.toFixed(0)}%</MetricCardValue>
               ) : (

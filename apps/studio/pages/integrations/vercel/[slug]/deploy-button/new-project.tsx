@@ -1,27 +1,46 @@
 import { useParams } from 'common'
-import { ChangeEvent, useEffect, useState } from 'react'
-import { toast } from 'sonner'
-import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
-
-import { isVercelUrl } from 'components/interfaces/Integrations/Vercel/VercelIntegration.utils'
-import { Markdown } from 'components/interfaces/Markdown'
-import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
-import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
-import { PasswordStrengthBar } from 'components/ui/PasswordStrengthBar'
-import { useProjectSettingsV2Query } from 'data/config/project-settings-v2-query'
-import { useIntegrationsQuery } from 'data/integrations/integrations-query'
-import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations/integrations-vercel-connections-create-mutation'
-import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { BASE_PATH, PROVIDERS } from 'lib/constants'
-import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
-import { passwordStrength, PasswordStrengthScore } from 'lib/password-strength'
-import { generateStrongPassword } from 'lib/project'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
-import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
-import type { NextPageWithLayout } from 'types'
+import { toast } from 'sonner'
+import {
+  Button,
+  Checkbox,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
+import { isVercelUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
+import { Markdown } from '@/components/interfaces/Markdown'
+import VercelIntegrationWindowLayout from '@/components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
+import { ScaffoldColumn, ScaffoldContainer } from '@/components/layouts/Scaffold'
+import { PasswordStrengthBar } from '@/components/ui/PasswordStrengthBar'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useIntegrationsQuery } from '@/data/integrations/integrations-query'
+import { useIntegrationVercelConnectionsCreateMutation } from '@/data/integrations/integrations-vercel-connections-create-mutation'
+import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { useProjectCreateMutation } from '@/data/projects/project-create-mutation'
+import {
+  isInDataApiRevokeTreatment,
+  useDataApiRevokeOnCreateDefaultEnabled,
+  useTrackDefaultPrivilegesExposure,
+} from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { usePHFlag } from '@/hooks/ui/useFlag'
+import { BASE_PATH, PROVIDERS } from '@/lib/constants'
+import { getInitialMigrationSQLFromGitHubRepo } from '@/lib/integration-utils'
+import { passwordStrength, PasswordStrengthScore } from '@/lib/password-strength'
+import { generateStrongPassword } from '@/lib/project'
+import { useTrack } from '@/lib/telemetry/track'
+import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
+import type { NextPageWithLayout } from '@/types'
 
 const VercelIntegration: NextPageWithLayout = () => {
   return (
@@ -36,11 +55,12 @@ const VercelIntegration: NextPageWithLayout = () => {
             />
           </header>
           <CreateProject />
-          <Alert withIcon variant="info" title="You can uninstall this Integration at any time.">
-            <Markdown
-              content={`You can remove this integration at any time via Vercel or the Supabase dashboard.`}
-            />
-          </Alert>
+          <Admonition
+            type="default"
+            layout="horizontal"
+            title="You can uninstall this Integration at any time."
+            description="You can remove this integration at any time via Vercel or the Supabase dashboard"
+          />
         </ScaffoldColumn>
       </ScaffoldContainer>
     </>
@@ -58,9 +78,33 @@ const CreateProject = () => {
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(-1)
   const [shouldRunMigrations, setShouldRunMigrations] = useState(true)
-  const [dbRegion, setDbRegion] = useState(PROVIDERS.AWS.default_region.displayName)
+  const [dbRegion, setDbRegion] = useState<string>(PROVIDERS.AWS.default_region.displayName)
 
+  const track = useTrack()
   const snapshot = useIntegrationInstallationSnapshot()
+  const isDataApiRevokeOnCreateDefault = useDataApiRevokeOnCreateDefaultEnabled()
+  const dataApiRevokeOnCreateDefaultFlag = usePHFlag<boolean | string>(
+    'dataApiRevokeOnCreateDefault'
+  )
+  const [dataApiDefaultPrivileges, setDataApiDefaultPrivileges] = useState(
+    !isDataApiRevokeOnCreateDefault
+  )
+  const hasUserModifiedDataApiDefaultPrivileges = useRef(false)
+
+  useEffect(() => {
+    if (dataApiRevokeOnCreateDefaultFlag === undefined) return
+    if (hasUserModifiedDataApiDefaultPrivileges.current) return
+    setDataApiDefaultPrivileges(!isInDataApiRevokeTreatment(dataApiRevokeOnCreateDefaultFlag))
+  }, [dataApiRevokeOnCreateDefaultFlag])
+
+  const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
+
+  useTrackDefaultPrivilegesExposure({
+    surface: 'vercel',
+    orgSlug: slug,
+    dataApiDefaultPrivileges,
+    hasUserModified: hasUserModifiedDataApiDefaultPrivileges.current,
+  })
 
   async function checkPasswordStrength(value: string) {
     const { message, strength } = await passwordStrength(value)
@@ -68,12 +112,18 @@ const CreateProject = () => {
     setPasswordStrengthMessage(message)
   }
 
-  const { slug, next, currentProjectId: foreignProjectId, externalId } = useParams()
-
   const { mutateAsync: createConnections } = useIntegrationVercelConnectionsCreateMutation()
 
   const { data: organizationData } = useOrganizationsQuery()
   const organization = organizationData?.find((x) => x.slug === slug)
+
+  const hasTrackedFormExposed = useRef(false)
+  useEffect(() => {
+    if (hasTrackedFormExposed.current) return
+    if (!slug) return
+    hasTrackedFormExposed.current = true
+    track('project_creation_form_exposed', { surface: 'vercel' }, { organization: slug })
+  }, [slug, track])
 
   /**
    * array of integrations installed
@@ -120,6 +170,21 @@ const CreateProject = () => {
   const { mutate: createProject } = useProjectCreateMutation({
     onSuccess: (res) => {
       setNewProjectRef(res.ref)
+      track(
+        'project_creation_simple_version_submitted',
+        {
+          surface: 'vercel',
+          dataApiEnabled: true,
+          dataApiDefaultPrivilegesGranted: dataApiDefaultPrivileges,
+          ...(dataApiRevokeOnCreateDefaultFlag !== undefined && {
+            dataApiRevokeOnCreateDefaultEnabled: dataApiRevokeOnCreateDefaultFlag,
+          }),
+        },
+        {
+          project: res.ref,
+          organization: res.organization_slug,
+        }
+      )
     },
     onError: (error) => {
       toast.error(error.message)
@@ -138,7 +203,8 @@ const CreateProject = () => {
     let dbSql: string | undefined
     if (shouldRunMigrations) {
       const id = toast(`Fetching initial migrations from GitHub repo`)
-      dbSql = (await getInitialMigrationSQLFromGitHubRepo(externalId)) ?? undefined
+      const migrationSql = await getInitialMigrationSQLFromGitHubRepo(externalId)
+      if (migrationSql) dbSql = migrationSql
       toast.success(`Done fetching initial migrations`, { id })
     }
 
@@ -148,6 +214,7 @@ const CreateProject = () => {
       dbPass,
       dbRegion,
       dbSql,
+      dataApiRevokeDefaultPrivileges: !dataApiDefaultPrivileges,
     })
   }
 
@@ -210,27 +277,31 @@ const CreateProject = () => {
     <div>
       <p className="mb-2">Supabase project details</p>
       <div className="py-2">
-        <Input
-          autoFocus
+        <FormItemLayout
           id="projectName"
+          isReactForm={false}
+          layout="vertical"
           label="Project name"
-          type="text"
-          placeholder=""
-          descriptionText=""
-          value={projectName}
-          onChange={onProjectNameChange}
-        />
+          size="tiny"
+        >
+          <Input
+            autoFocus
+            id="projectName"
+            type="text"
+            placeholder=""
+            value={projectName}
+            onChange={onProjectNameChange}
+          />
+        </FormItemLayout>
       </div>
       <div className="py-2">
-        <Input
+        <FormItemLayout
           id="dbPass"
+          isReactForm={false}
+          layout="vertical"
           label="Database password"
-          type="password"
-          placeholder="Type in a strong password"
-          value={dbPass}
-          copy={dbPass.length > 0}
-          onChange={onDbPassChange}
-          descriptionText={
+          size="tiny"
+          description={
             <PasswordStrengthBar
               passwordStrengthScore={passwordStrengthScore as PasswordStrengthScore}
               password={dbPass}
@@ -238,47 +309,100 @@ const CreateProject = () => {
               generateStrongPassword={generatePassword}
             />
           }
-        />
+        >
+          <PasswordInput
+            id="dbPass"
+            type="password"
+            placeholder="Type in a strong password"
+            value={dbPass}
+            reveal
+            copy={dbPass.length > 0}
+            onChange={onDbPassChange}
+          />
+        </FormItemLayout>
       </div>
       <div className="py-2">
         <div className="mt-1">
-          <Listbox
+          <FormItemLayout
+            id="region"
+            isReactForm={false}
+            layout="vertical"
             label="Region"
-            type="select"
-            value={dbRegion}
-            onChange={(region) => setDbRegion(region)}
-            descriptionText="Select a region close to your users for the best performance."
+            description="Select a region close to your users for the best performance."
+            className="gap-[2px]"
+            size="tiny"
           >
-            {Object.keys(AWS_REGIONS).map((option: string, i) => {
-              const label = Object.values(AWS_REGIONS)[i].displayName
-              return (
-                <Listbox.Option
-                  key={option}
-                  label={label}
-                  value={label}
-                  addOnBefore={() => (
-                    <img
-                      alt="region icon"
-                      className="w-5 rounded-sm"
-                      src={`${BASE_PATH}/img/regions/${Object.values(AWS_REGIONS)[i].code}.svg`}
-                    />
-                  )}
-                >
-                  <span className="text-foreground">{label}</span>
-                </Listbox.Option>
-              )
-            })}
-          </Listbox>
+            <Select value={dbRegion} onValueChange={(region) => setDbRegion(region)}>
+              <SelectTrigger id="region">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.keys(AWS_REGIONS).map((option: string, i) => {
+                  const label = Object.values(AWS_REGIONS)[i].displayName
+                  return (
+                    <SelectItem key={option} value={label}>
+                      <div className="flex gap-2">
+                        <img
+                          alt="region icon"
+                          className="w-5 rounded-xs"
+                          src={`${BASE_PATH}/img/regions/${Object.values(AWS_REGIONS)[i].code}.svg`}
+                        />
+                        <span>{label}</span>
+                      </div>
+                    </SelectItem>
+                  )
+                })}
+              </SelectContent>
+            </Select>
+          </FormItemLayout>
         </div>
       </div>
       <div className="py-2 pb-4">
-        <Checkbox
-          name="shouldRunMigrations"
-          label="Create sample tables with seed data"
-          description="To get you started quickly, we can create new tables for you with seed (sample) data. You can delete these tables later."
-          checked={shouldRunMigrations}
-          onChange={(e) => setShouldRunMigrations(e.target.checked)}
-        />
+        <div className="items-top flex space-x-2">
+          <Checkbox
+            id="shouldRunMigrations"
+            name="shouldRunMigrations"
+            checked={shouldRunMigrations}
+            onCheckedChange={(checked) => setShouldRunMigrations(!!checked)}
+          />
+          <div className="grid gap-1.5 leading-none">
+            <label
+              htmlFor="enable-realtime"
+              className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Create sample tables with seed data
+            </label>
+            <p className="text-sm text-foreground-muted">
+              To get you started quickly, we can create new tables for you with seed (sample) data.
+              You can delete these tables later.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div className="py-2 pb-4">
+        <div className="items-top flex space-x-2">
+          <Checkbox
+            id="dataApiDefaultPrivileges"
+            name="dataApiDefaultPrivileges"
+            checked={dataApiDefaultPrivileges}
+            onCheckedChange={(checked) => {
+              hasUserModifiedDataApiDefaultPrivileges.current = true
+              setDataApiDefaultPrivileges(!!checked)
+            }}
+          />
+          <div className="grid gap-1.5 leading-none">
+            <label
+              htmlFor="dataApiDefaultPrivileges"
+              className="text-sm text-foreground-light flex items-center space-x-2 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              Automatically expose new tables
+            </label>
+            <p className="text-sm text-foreground-muted">
+              Grants privileges to Data API roles by default, exposing new tables. We recommend
+              disabling this to control access manually.
+            </p>
+          </div>
+        </div>
       </div>
       <div className="flex flex-row w-full justify-end">
         <Button

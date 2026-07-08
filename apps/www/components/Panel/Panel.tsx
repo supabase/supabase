@@ -1,7 +1,9 @@
-import React, { PropsWithChildren, useEffect, useRef } from 'react'
-import { motion } from 'framer-motion'
-import { cn } from 'ui'
+'use client'
+
 import { detectBrowser, isBrowser } from 'common'
+import { motion } from 'framer-motion'
+import React, { PropsWithChildren, useEffect, useRef } from 'react'
+import { cn } from 'ui'
 
 interface Props {
   outerClassName?: string
@@ -51,18 +53,18 @@ const Panel = ({
       const activeGlow =
         hasActiveOnHover && isActive
           ? `radial-gradient(65rem circle at ${x}px ${y}px, ${
-              activeColor === 'brand' ? 'var(--colors-brand9)' : 'hsl(var(--border-stronger))'
+              activeColor === 'brand' ? 'var(--color-brand-900)' : 'var(--border-stronger)'
             }, transparent), `
           : ''
       outerElement.style.backgroundImage = `
       ${activeGlow}radial-gradient(30rem circle at ${x}px ${y}px, ${
-        shimmerFromColor ?? 'hsl(var(--border-strong))'
-      }, ${shimmerToColor ?? 'hsl(var(--background-surface-300))'})`
+        shimmerFromColor ?? 'var(--border-strong)'
+      }, ${shimmerToColor ?? 'var(--background-surface-300)'})`
     }
 
     if (hasInnerShimmer) {
       innerElement.style.backgroundImage = isActive
-        ? `radial-gradient(7rem circle at ${x}px ${y}px, hsl(var(--background-surface-300)), transparent), radial-gradient(20rem circle at ${x}px ${y}px, hsl(var(--background-surface-200)), transparent)`
+        ? `radial-gradient(7rem circle at ${x}px ${y}px, var(--background-surface-300), transparent), radial-gradient(20rem circle at ${x}px ${y}px, var(--background-surface-200), transparent)`
         : ''
     }
   }
@@ -80,11 +82,11 @@ const Panel = ({
     <Component
       ref={outerRef}
       className={cn(
-        'group/panel relative rounded-lg md:rounded-xl p-px bg-surface-75 bg-gradient-to-b from-border to-border/50 dark:to-surface-100 transition-all hover:shadow-md flex items-center justify-center',
+        'group/panel relative rounded-lg md:rounded-xl p-px bg-surface-75 bg-linear-to-b from-border to-border/50 dark:to-surface-100 transition-all hover:shadow-md flex items-center justify-center',
         !trackCursor && hasActiveOnHover
           ? activeColor === 'brand'
-            ? 'hover:bg-none hover:!bg-brand'
-            : 'hover:bg-none hover:!bg-border-stronger'
+            ? 'hover:bg-none hover:bg-brand!'
+            : 'hover:bg-none hover:bg-border-stronger!'
           : '',
         outerClassName
       )}

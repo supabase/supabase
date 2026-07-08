@@ -1,11 +1,12 @@
-import { describe, test, expect } from 'vitest'
+import { describe, expect, test } from 'vitest'
+
 import {
-  splitSqlStatements,
+  formatNodeDuration,
   isExplainQuery,
   isExplainSql,
   isTextFormatExplain,
-  formatNodeDuration,
-} from 'components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
+  splitSqlStatements,
+} from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 
 describe('isExplainQuery', () => {
   test('returns true for valid EXPLAIN result rows', () => {

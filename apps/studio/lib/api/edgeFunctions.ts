@@ -9,14 +9,14 @@ export const isValidEdgeFunctionURL = (url: string, isPlatform: boolean) => {
 
   if (!isPlatform) {
     const regexValidLocalEdgeFunctionURL = new RegExp(
-      '^https?://[^\\s/?#]+/functions/v[0-9]{1}/.*$'
+      /^https?:\/\/[^\s/?#]+\/functions\/v[0-9]{1}\/.*$/
     )
 
     return regexValidLocalEdgeFunctionURL.test(url)
   }
 
   const regexValidEdgeFunctionURL = new RegExp(
-    '^https://[a-z]*.supabase.(red|co)/functions/v[0-9]{1}/.*$'
+    /^https:\/\/[a-z]{20}\.supabase\.(red|co)\/functions\/v[0-9]{1}\/.*$/
   )
 
   return regexValidEdgeFunctionURL.test(url)

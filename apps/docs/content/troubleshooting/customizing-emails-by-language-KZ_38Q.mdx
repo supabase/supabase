@@ -38,7 +38,7 @@ It can be accessed in a project's [Email Templates](/dashboard/project/_/auth/te
 
 If you need to update a user's meta-data, you can do so with the [`updateUser`](/docs/reference/javascript/auth-updateuser?example=update-the-users-metadata) function.
 
-The meta-data can be used to store a users language preferences. You could then use "if statements" in the email template to set the response for a specific language:
+The meta-data can be used to store a user's language preferences. You could then use "if statements" in the email template to set the response for a specific language:
 
 ```html
 {{if eq .Data.language "en" }}

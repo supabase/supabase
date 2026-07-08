@@ -14,10 +14,8 @@ import { Button } from '@/components/ui/button'
 ```
 
 ```tsx
-<Button type="outline">Button</Button>
+<Button variant="outline">Button</Button>
 ```
-
-_It is likely that the `type` prop will be changed to `variant` in the future._
 
 ## Link
 
@@ -47,9 +45,9 @@ Use the `size` prop to determine the size of the button.
 
 <ComponentPreview name="button-sizes" />
 
-### Types
+### Variants
 
-These are all the different `type` variations.
+These are all the different `variant` variations.
 
 #### Primary
 
@@ -61,15 +59,15 @@ Used for data insertion actions, confirming purchases, strong positive actions.
 
 Used for opening dialogs, navigating to pages, and other non CRUD actions.
 
-This `type` will probably be the most used button type.
-It will probably be changed to be the default type in future.
+This `variant` will probably be the most used button variant.
+It will probably be changed to be the default variant in future.
 
 <ComponentPreview name="button-default" />
 
 #### Secondary
 
 Can be used for signaling a data or config change, but not as serious as a primary button.
-For destructive or side effect actions, use the `destructive` or `warning` type.
+For destructive or side effect actions, use the `destructive` or `warning` variant.
 
 <ComponentPreview name="button-secondary" />
 
@@ -83,7 +81,7 @@ Used for actions that might have a side effect, but not as serious as a destruct
 
 Used for actions that will have a serious destructive side effect, like deleting data.
 
-prop `type` will probably be changed to `destructive` in the future.
+prop `variant` will probably be changed to `destructive` in the future.
 
 <ComponentPreview name="button-destructive" />
 
@@ -97,7 +95,7 @@ Used for secondary actions, or actions that are not as important as the primary 
 
 Used for actions that are not as important as the primary action, or for actions that are not as important as the primary action.
 
-prop `type` will probably be changed to `ghost` in the future.
+prop `variant` will probably be changed to `ghost` in the future.
 
 <ComponentPreview name="button-ghost" />
 
@@ -107,7 +105,7 @@ Used for actions that are not as important as the primary action, or for actions
 
 <ComponentPreview name="button-link" />
 
-### Only an Icon
+### Only an icon
 
 Displaying only an Icon in a button.
 
@@ -117,11 +115,27 @@ Displaying only an Icon in a button.
 
 <ComponentPreview name="button-icon" />
 
-### As Child
+### As child
 
 Supports slot behavior with `asChild` prop.
 
 <ComponentPreview name="button-as-child" />
+
+### Split with dropdown
+
+Pair a button with a chevron `DropdownMenu` trigger when there are variations of the same action, or alternative ways to accomplish the same goal. The default or most likely option should be used on the exposed button.
+
+When secondary actions are related but distinct—not alternatives to the primary action—display the primary action as a button and place the rest in an overflow menu instead. See [Table multiple actions](./table#multiple-actions).
+
+<ComponentPreview name="button-split-dropdown" peekCode />
+
+The shared middle border is the tricky part. Do **not** use `border-l-0` on the chevron button — that drops the divider on hover/focus. Instead:
+
+- Primary: `rounded-r-none` and `hover:z-10` so its border stacks above the chevron on hover.
+- Chevron trigger: `rounded-l-none`, `shrink-0`, `px-[4px] py-[5px]`, and `-ml-px` to overlap the adjacent border by one pixel.
+- Chevron trigger only: `aria-label` describing the menu (the icon is decorative).
+
+Inside [Admonition](../fragments/admonition#split-button-with-dropdown) actions, also use `flex w-full @lg:w-auto` with `flex-1 @lg:flex-none` on the primary when `layout="responsive"`.
 
 ## Accessibility
 

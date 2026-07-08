@@ -1,10 +1,10 @@
 // components/AIDemoPanel.tsx
-import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Button, Input } from 'ui'
-import { AiIconAnimation, cn } from 'ui'
-import errorGif from 'public/images/ai/error.gif'
+import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
+import errorGif from 'public/images/ai/error.gif'
+import { useEffect, useRef, useState } from 'react'
+import { AiIconAnimation, cn, Input } from 'ui'
+
 import styles from './assistant.module.css'
 
 interface DemoMessage {
@@ -192,7 +192,7 @@ export const AIDemoPanel = ({ incomingMessages = [] }: { incomingMessages?: Demo
               animate={{ opacity: 1 }}
               className="pointer-events-none z-10 -mt-24"
             >
-              <div className="h-24 w-full bg-gradient-to-t from-background muted to-transparent" />
+              <div className="h-24 w-full bg-linear-to-t from-background muted to-transparent" />
             </motion.div>
           )}
         </AnimatePresence>
@@ -204,7 +204,7 @@ export const AIDemoPanel = ({ incomingMessages = [] }: { incomingMessages?: Demo
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask your data anything..."
               className={cn(
-                'w-full bg-background-muted rounded-md [&>textarea]:border-1 [&>textarea]:rounded-md [&>textarea]:!outline-none [&>textarea]:!ring-offset-0 [&>textarea]:!ring-0 focus:outline-none'
+                'w-full bg-background-muted rounded-md [&>textarea]:border [&>textarea]:rounded-md [&>textarea]:outline-hidden! [&>textarea]:ring-offset-0! [&>textarea]:ring-0! focus:outline-hidden'
               )}
             />
           </form>

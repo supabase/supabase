@@ -1,18 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import NoPermission from 'components/ui/NoPermission'
-import { useHooksEnableMutation } from 'data/database/hooks-enable-mutation'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
 import { toast } from 'sonner'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
+import { RequiredExtensionsSection } from '../Integration/RequiredExtensionsSection'
+import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { useHooksEnableMutation } from '@/data/database/hooks-enable-mutation'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-export const WebhooksOverviewTab = () => {
+const WebhooksContent = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
@@ -59,37 +61,39 @@ export const WebhooksOverviewTab = () => {
     )
   }
 
+  if (isSchemasLoaded && isHooksEnabled) return null
+
   return (
-    <IntegrationOverviewTab
-      actions={
-        isSchemasLoaded && isHooksEnabled ? null : (
-          <Admonition
-            showIcon={false}
-            type="default"
-            title="Enable database webhooks on your project"
-          >
-            <p>
-              Database Webhooks can be used to trigger serverless functions or send requests to an
-              HTTP endpoint
-            </p>
-            <ButtonTooltip
-              className="mt-2 w-fit"
-              onClick={() => enableHooksForProject()}
-              disabled={isEnablingHooks}
-              tooltip={{
-                content: {
-                  side: 'bottom',
-                  text: !canReadWebhooks
-                    ? 'You need additional permissions to enable webhooks'
-                    : undefined,
-                },
-              }}
-            >
-              Enable webhooks
-            </ButtonTooltip>
-          </Admonition>
-        )
-      }
-    />
+    <Admonition showIcon={false} type="default" title="Enable database webhooks on your project">
+      <p>
+        Database Webhooks can be used to trigger serverless functions or send requests to an HTTP
+        endpoint
+      </p>
+      <ButtonTooltip
+        className="mt-2 w-fit"
+        onClick={() => enableHooksForProject()}
+        disabled={isEnablingHooks}
+        tooltip={{
+          content: {
+            side: 'bottom',
+            text: !canReadWebhooks
+              ? 'You need additional permissions to enable webhooks'
+              : undefined,
+          },
+        }}
+      >
+        Enable webhooks
+      </ButtonTooltip>
+    </Admonition>
   )
+}
+
+export const WebhooksOverviewTab = () => {
+  const isMarketplaceEnabled = useIsMarketplaceEnabled()
+
+  if (isMarketplaceEnabled) {
+    return <RequiredExtensionsSection />
+  }
+
+  return <IntegrationOverviewTab hideRequiredExtensionsSection actions={<WebhooksContent />} />
 }

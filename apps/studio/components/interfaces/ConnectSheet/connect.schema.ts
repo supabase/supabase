@@ -1,7 +1,7 @@
 import type { ConnectSchema, StepDefinition } from './Connect.types'
 
 /**
- * Install commands for different packages
+ * Base install commands for each library.
  */
 export const INSTALL_COMMANDS: Record<string, string> = {
   supabasejs: 'npm install @supabase/supabase-js',
@@ -12,6 +12,19 @@ export const INSTALL_COMMANDS: Record<string, string> = {
   supabasekt: 'implementation("io.github.jan-tennert.supabase:supabase-kt:VERSION")',
 }
 
+/**
+ * Extra packages required by specific frameworks on top of the base library.
+ * Keyed by library, then by framework (or framework/variant for more specificity).
+ * The install step checks the most specific key first (e.g. "nextjs/app"),
+ * then falls back to the framework key (e.g. "nextjs").
+ */
+export const EXTRA_PACKAGES: Record<string, Record<string, string[]>> = {
+  supabasejs: {
+    'nextjs/app': ['@supabase/ssr'],
+    remix: ['@supabase/ssr'],
+  },
+}
+
 // ============================================================================
 // Step Definitions (reusable)
 // All content paths use template syntax: {{stateKey}} is replaced with state values
@@ -20,6 +33,13 @@ export const INSTALL_COMMANDS: Record<string, string> = {
 const frameworkInstallStep: StepDefinition = {
   id: 'install',
   title: 'Install package',
+  description: 'Run this command to install the required dependencies.',
+  content: 'steps/install',
+}
+
+const frameworkInstallPackagesStep: StepDefinition = {
+  id: 'install',
+  title: 'Install packages',
   description: 'Run this command to install the required dependencies.',
   content: 'steps/install',
 }
@@ -51,6 +71,13 @@ const frameworkShadcnStep: StepDefinition = {
   title: 'Add Supabase UI components',
   description: 'Run this command to install the Supabase shadcn components.',
   content: 'steps/shadcn/command',
+}
+
+const frameworkShadcnEnvStep: StepDefinition = {
+  id: 'shadcn-env',
+  title: 'Set env variables',
+  description: 'Add the following values to your env file.',
+  content: 'steps/shadcn/env',
 }
 
 const frameworkShadcnExploreStep: StepDefinition = {
@@ -96,13 +123,6 @@ const codexAddServerStep: StepDefinition = {
   content: 'steps/mcp/codex/add-server',
 }
 
-const codexEnableRemoteStep: StepDefinition = {
-  id: 'codex-enable-remote',
-  title: 'Enable remote MCP client support',
-  description: 'Add this to your ~/.codex/config.toml file.',
-  content: 'steps/mcp/codex/enable-remote',
-}
-
 const codexAuthenticateStep: StepDefinition = {
   id: 'codex-authenticate',
   title: 'Authenticate',
@@ -146,6 +166,22 @@ const ormConfigureStep: StepDefinition = {
   content: '{{orm}}',
 }
 
+const serverInstallStep: StepDefinition = {
+  id: 'server-install',
+  title: 'Install package',
+  description:
+    'Add @supabase/server to your backend or API framework of choice. On Supabase Edge Functions you can import it directly, no install needed.',
+  content: 'server/install',
+}
+
+const serverEnvStep: StepDefinition = {
+  id: 'server-env',
+  title: 'Set environment variables',
+  description:
+    'Copy these into your environment so you can verify users and use the client/admin supabase-js library from the context of your handler. On Supabase Edge Functions they are injected automatically.',
+  content: 'server/env',
+}
+
 const skillsInstallStep: StepDefinition = {
   id: 'install-skills',
   title: 'Install Agent Skills (Optional)',
@@ -153,6 +189,45 @@ const skillsInstallStep: StepDefinition = {
     'Agent Skills give AI coding tools ready-made instructions, scripts, and resources for working with Supabase more accurately and efficiently.',
   content: 'steps/skills-install',
 }
+
+const serverSkillsInstallStep: StepDefinition = {
+  id: 'install-skills',
+  title: 'Install the Supabase Server skill (Optional)',
+  description:
+    'Gives AI coding tools ready-made instructions for building APIs with @supabase/server.',
+  content: 'steps/skills-install',
+}
+
+// ============================================================================
+// Mode Prompts
+// ============================================================================
+
+// Agent-ready prompt for the Server mode. Intentionally omits the project's
+// actual keys — the secret should never be pasted into an LLM prompt; users
+// copy the real values from the env step.
+const serverConnectPrompt = `Set up the @supabase/server SDK in this project.
+
+Install it:
+npm install @supabase/server
+
+It reads these environment variables (copy the real values from the Supabase dashboard's Connect dialog — never commit the secret key):
+- SUPABASE_URL
+- SUPABASE_PUBLISHABLE_KEY
+- SUPABASE_SECRET_KEY
+- SUPABASE_JWKS_URL (used to verify user JWTs)
+
+Create request handlers with \`withSupabase\` from "@supabase/server". It validates auth and provides an RLS-scoped client (\`ctx.supabase\`) and an admin client that bypasses RLS (\`ctx.supabaseAdmin\`). Example:
+
+import { withSupabase } from "@supabase/server"
+
+export default {
+  fetch: withSupabase({ auth: "user" }, async (_req, ctx) => {
+    const { data } = await ctx.supabase.from("todos").select()
+    return Response.json(data)
+  }),
+}
+
+Auth modes: "user" (valid JWT), "publishable" (publishable key), "secret" (secret key), "none". On Supabase Edge Functions these env vars are injected automatically; for non-"user" auth modes, set \`verify_jwt = false\` for the function in supabase/config.toml.`
 
 // ============================================================================
 // Main Schema
@@ -170,10 +245,17 @@ export const connectSchema: ConnectSchema = {
       fields: ['framework', 'frameworkVariant', 'library', 'frameworkUi'],
     },
     {
+      id: 'server',
+      label: 'Server',
+      description: 'Build APIs',
+      fields: [],
+      prompt: serverConnectPrompt,
+    },
+    {
       id: 'direct',
       label: 'Direct',
       description: 'Connection string',
-      fields: ['connectionMethod', 'useSharedPooler', 'connectionType'],
+      fields: ['connectionSource', 'connectionMethod', 'useSharedPooler', 'connectionType'],
     },
     {
       id: 'orm',
@@ -226,12 +308,20 @@ export const connectSchema: ConnectSchema = {
     },
 
     // Direct connection fields
+    connectionSource: {
+      id: 'connectionSource',
+      type: 'select',
+      label: 'Source',
+      options: { source: 'connectionSources' },
+      defaultValue: undefined,
+    },
     connectionMethod: {
       id: 'connectionMethod',
       type: 'radio-list',
       label: 'Connection Method',
       options: { source: 'connectionMethods' },
-      defaultValue: 'direct',
+      // Default is set per deployment mode by useConnectState.setMode('direct'):
+      // platform/CLI → 'direct', self-hosted → 'session'.
     },
     useSharedPooler: {
       id: 'useSharedPooler',
@@ -265,7 +355,7 @@ export const connectSchema: ConnectSchema = {
       label: 'Client',
       description: 'Choose the MCP client you are using.',
       options: { source: 'mcpClients' },
-      defaultValue: 'cursor',
+      defaultValue: 'claude-code',
     },
     mcpReadonly: {
       id: 'mcpReadonly',
@@ -293,14 +383,35 @@ export const connectSchema: ConnectSchema = {
       framework: {
         framework: {
           nextjs: {
-            frameworkUi: {
-              true: [
-                frameworkInstallStep,
-                frameworkShadcnStep,
-                frameworkShadcnExploreStep,
-                skillsInstallStep,
-              ],
-              DEFAULT: [frameworkInstallStep, frameworkNextJsFilesStep, skillsInstallStep],
+            frameworkVariant: {
+              app: {
+                frameworkUi: {
+                  true: [
+                    frameworkInstallPackagesStep,
+                    frameworkShadcnStep,
+                    frameworkShadcnEnvStep,
+                    frameworkShadcnExploreStep,
+                    skillsInstallStep,
+                  ],
+                  DEFAULT: [
+                    frameworkInstallPackagesStep,
+                    frameworkNextJsFilesStep,
+                    skillsInstallStep,
+                  ],
+                },
+              },
+              DEFAULT: {
+                frameworkUi: {
+                  true: [
+                    frameworkInstallStep,
+                    frameworkShadcnStep,
+                    frameworkShadcnEnvStep,
+                    frameworkShadcnExploreStep,
+                    skillsInstallStep,
+                  ],
+                  DEFAULT: [frameworkInstallStep, frameworkNextJsFilesStep, skillsInstallStep],
+                },
+              },
             },
           },
           react: {
@@ -308,12 +419,14 @@ export const connectSchema: ConnectSchema = {
               true: [
                 frameworkInstallStep,
                 frameworkShadcnStep,
+                frameworkShadcnEnvStep,
                 frameworkShadcnExploreStep,
                 skillsInstallStep,
               ],
               DEFAULT: [frameworkInstallStep, frameworkReactFilesStep, skillsInstallStep],
             },
           },
+          remix: [frameworkInstallPackagesStep, frameworkConfigureStep, skillsInstallStep],
           DEFAULT: [frameworkInstallStep, frameworkConfigureStep, skillsInstallStep],
         },
       },
@@ -330,17 +443,12 @@ export const connectSchema: ConnectSchema = {
       orm: [ormInstallStep, ormConfigureStep, skillsInstallStep],
       mcp: {
         mcpClient: {
-          codex: [
-            codexAddServerStep,
-            codexEnableRemoteStep,
-            codexAuthenticateStep,
-            codexVerifyStep,
-            skillsInstallStep,
-          ],
+          codex: [codexAddServerStep, codexAuthenticateStep, codexVerifyStep, skillsInstallStep],
           'claude-code': [claudeAddServerStep, claudeAuthenticateStep, skillsInstallStep],
           DEFAULT: [mcpConfigureStep, skillsInstallStep],
         },
       },
+      server: [serverInstallStep, serverEnvStep, serverSkillsInstallStep],
       DEFAULT: [skillsInstallStep],
     },
   },

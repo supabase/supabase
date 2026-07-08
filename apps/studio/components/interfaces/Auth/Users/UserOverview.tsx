@@ -1,33 +1,33 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { Ban, Check, Copy, Mail, ShieldOff, Trash, X } from 'lucide-react'
 import Link from 'next/link'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import CopyButton from 'components/ui/CopyButton'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
-import { useUserDeleteMFAFactorsMutation } from 'data/auth/user-delete-mfa-factors-mutation'
-import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
-import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mutation'
-import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
-import { useUserUpdateMutation } from 'data/auth/user-update-mutation'
-import { User } from 'data/auth/users-infinite-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useIsFeatureEnabled } from 'hooks/misc/useIsFeatureEnabled'
-import { BASE_PATH } from 'lib/constants'
-import { timeout } from 'lib/helpers'
 import { Button, cn, Separator } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { BanUserModal } from './BanUserModal'
 import { DeleteUserModal } from './DeleteUserModal'
 import { UserHeader } from './UserHeader'
 import { PANEL_PADDING } from './Users.constants'
 import { providerIconMap } from './Users.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import CopyButton from '@/components/ui/CopyButton'
+import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
+import { useUserDeleteMFAFactorsMutation } from '@/data/auth/user-delete-mfa-factors-mutation'
+import { useUserResetPasswordMutation } from '@/data/auth/user-reset-password-mutation'
+import { useUserSendMagicLinkMutation } from '@/data/auth/user-send-magic-link-mutation'
+import { useUserSendOTPMutation } from '@/data/auth/user-send-otp-mutation'
+import { useUserUpdateMutation } from '@/data/auth/user-update-mutation'
+import { User } from '@/data/auth/users-infinite-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { BASE_PATH } from '@/lib/constants'
+import { timeout } from '@/lib/helpers'
 
 const DATE_FORMAT = 'DD MMM, YYYY HH:mm'
 const CONTAINER_CLASS = cn(
@@ -181,7 +181,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
         {isBanned ? (
           <Admonition
             type="warning"
-            label={`User banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`}
+            description={`User banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`}
             className="border-r-0 border-l-0 rounded-none -mt-px [&_svg]:ml-0.5"
           />
         ) : (
@@ -213,24 +213,37 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           <RowData property="SSO" value={user.is_sso_user} />
         </div>
 
-        <div className={cn('flex flex-col !pt-0', PANEL_PADDING)}>
+        <div className={cn('flex flex-col pt-0!', PANEL_PADDING)}>
           <p>Provider Information</p>
           <p className="text-sm text-foreground-light">The user has the following providers</p>
         </div>
 
-        <div className={cn('flex flex-col -space-y-1 !pt-0', PANEL_PADDING)}>
+        <div className={cn('flex flex-col -space-y-1 pt-0!', PANEL_PADDING)}>
           {providers.map((provider) => {
             const providerMeta = PROVIDERS_SCHEMAS.find(
               (x) =>
                 ('key' in x && x.key === provider.name) || x.title.toLowerCase() === provider.name
             )
-            const enabledProperty = Object.keys(providerMeta?.properties ?? {}).find((x) =>
-              x.toLowerCase().endsWith('_enabled')
-            )
+            const enabledProperty =
+              provider.name.toLowerCase() === 'web3'
+                ? (
+                    {
+                      solana: 'EXTERNAL_WEB3_SOLANA_ENABLED',
+                      ethereum: 'EXTERNAL_WEB3_ETHEREUM_ENABLED',
+                    } as const
+                  )[
+                    (
+                      (user.raw_user_meta_data?.custom_claims as { chain?: string } | undefined)
+                        ?.chain ?? ''
+                    ).toLowerCase() as 'solana' | 'ethereum'
+                  ]
+                : Object.keys(providerMeta?.properties ?? {}).find((x) =>
+                    x.toLowerCase().endsWith('_enabled')
+                  )
             const providerName =
               provider.name === 'email'
                 ? provider.name.toLowerCase()
-                : providerMeta?.title ?? provider.name
+                : (providerMeta?.title ?? provider.name)
             const isActive = data?.[enabledProperty as keyof typeof data] ?? false
 
             return (
@@ -243,14 +256,14 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                     className={cn('mt-1.5', provider.name === 'github' ? 'dark:invert' : '')}
                   />
                 )}
-                <div className="flex-grow mt-0.5">
+                <div className="grow mt-0.5">
                   <p className="capitalize">{providerName}</p>
                   <p className="text-xs text-foreground-light">
                     Signed in with a {providerName} account via{' '}
                     {providerName === 'SAML' ? 'SSO' : 'OAuth'}
                   </p>
                   {authenticationSignInProviders && (
-                    <Button asChild type="default" className="mt-2">
+                    <Button asChild variant="default" className="mt-2">
                       <Link
                         href={`/project/${projectRef}/auth/providers?provider=${provider.name === 'SAML' ? 'SAML 2.0' : provider.name}`}
                       >
@@ -303,10 +316,10 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 }
               />
               <RowAction
-                title={isVerified ? 'Send Magic Link' : 'Send confirmation email'}
+                title={isVerified ? 'Send magic link' : 'Send confirmation email'}
                 description={
                   isVerified
-                    ? 'Passwordless login via email for the user'
+                    ? 'Send a passwordless magic link to the user'
                     : 'Send a confirmation email to the user'
                 }
                 button={{
@@ -365,7 +378,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
           </p>
         </div>
 
-        <div className={cn('flex flex-col -space-y-1 !pt-0', PANEL_PADDING)}>
+        <div className={cn('flex flex-col -space-y-1 pt-0!', PANEL_PADDING)}>
           <RowAction
             title="Remove MFA factors"
             description="Removes all MFA factors associated with the user"
@@ -407,7 +420,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
             description="User will no longer have access to the project"
             button={{
               icon: <Trash />,
-              type: 'danger',
+              variant: 'danger',
               text: 'Delete user',
               disabled: !canRemoveUser,
               onClick: () => setIsDeleteModalOpen(true),
@@ -492,7 +505,7 @@ export const RowData = ({ property, value }: { property: string; value?: string 
             {!!value && (
               <CopyButton
                 iconOnly
-                type="text"
+                variant="text"
                 icon={<Copy />}
                 className="transition opacity-0 group-hover:opacity-100 px-1"
                 text={value}
@@ -517,7 +530,7 @@ export const RowAction = ({
   description: string
   button: {
     icon: ReactNode
-    type?: ComponentProps<typeof Button>['type']
+    variant?: ComponentProps<typeof Button>['variant']
     text: string
     disabled?: boolean
     isLoading?: boolean
@@ -541,7 +554,7 @@ export const RowAction = ({
       </div>
 
       <ButtonTooltip
-        type={button?.type ?? 'default'}
+        variant={button?.variant ?? 'default'}
         icon={success ? <Check className="text-brand" /> : button.icon}
         loading={button.isLoading ?? false}
         onClick={button.onClick}

@@ -1,15 +1,15 @@
+import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
+import { useParams } from 'common'
 import { Loader2, Search } from 'lucide-react'
 import { useState } from 'react'
+import { Checkbox, cn, Label, Skeleton } from 'ui'
 
-import { useParams } from 'common'
-import { useUnifiedLogsFacetCountQuery } from 'data/logs/unified-logs-facet-count-query'
-import { Checkbox_Shadcn_ as Checkbox, cn, Label_Shadcn_ as Label, Skeleton } from 'ui'
 import type { DataTableCheckboxFilterField } from '../DataTable.types'
 import { formatCompactNumber } from '../DataTable.utils'
 import { InputWithAddons } from '../primitives/InputWithAddons'
 import { useDataTable } from '../providers/DataTableProvider'
-import { keepPreviousData } from '@tanstack/react-query'
+import { useUnifiedLogsFacetCountQuery } from '@/data/logs/unified-logs-facet-count-query'
 
 export function DataTableFilterCheckboxAsync<TData>({
   value: _value,
@@ -50,7 +50,7 @@ export function DataTableFilterCheckboxAsync<TData>({
 
   if (!options?.length)
     return (
-      <div className="flex items-center justify-center px-2 py-4 text-center border border-border rounded">
+      <div className="flex items-center justify-center px-2 py-4 text-center border border-border rounded-sm">
         <p className="text-xs text-foreground-light">No options available</p>
       </div>
     )
@@ -60,13 +60,13 @@ export function DataTableFilterCheckboxAsync<TData>({
       <InputWithAddons
         placeholder="Search"
         leading={<Search size={14} className="text-foreground-lighter" />}
-        containerClassName="h-8 rounded"
+        containerClassName="h-8 rounded-sm"
         value={inputValue}
         trailing={isFetchingFacetCount ? <Loader2 size={12} className="animate-spin" /> : undefined}
         onChange={(e) => setInputValue(e.target.value)}
       />
 
-      <div className="max-h-[200px] overflow-y-auto rounded border border-border empty:border-none">
+      <div className="max-h-[215px] overflow-y-auto rounded-sm border border-border empty:border-none">
         {filterOptions.length === 0 ? (
           <div className="flex items-center justify-center px-2 py-3 text-center">
             <div className="space-y-0.5">
@@ -107,7 +107,7 @@ export function DataTableFilterCheckboxAsync<TData>({
                       <span className="truncate font-normal block">{option.label}</span>
                     )}
                   </div>
-                  <span className="flex-shrink-0 flex items-center justify-center font-mono text-xs">
+                  <span className="shrink-0 flex items-center justify-center font-mono text-xs">
                     {isLoadingCounts ? (
                       <Skeleton className="h-4 w-4" />
                     ) : facetedValue?.has(option.value) ? (
@@ -120,8 +120,8 @@ export function DataTableFilterCheckboxAsync<TData>({
                     type="button"
                     onClick={() => column?.setFilterValue([option.value])}
                     className={cn(
-                      'absolute inset-y-0 right-0 hidden font-normal text-muted-foreground backdrop-blur-sm hover:text-foreground group-hover:block',
-                      'rounded-md ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                      'absolute inset-y-0 right-0 hidden font-normal text-muted-foreground backdrop-blur-xs hover:text-foreground group-hover:block',
+                      'rounded-md ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
                     )}
                   >
                     <span className="px-2">only</span>

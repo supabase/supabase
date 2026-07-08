@@ -1,9 +1,9 @@
 import { useMutation } from '@tanstack/react-query'
+import { components } from 'api-types'
 import { toast } from 'sonner'
 
-import { components } from 'api-types'
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
+import { handleError, post } from '@/data/fetchers'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type ProjectUpgradeVariables = components['schemas']['UpgradeDatabaseBody'] & {
   ref: string

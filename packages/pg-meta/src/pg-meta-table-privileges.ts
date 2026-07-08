@@ -2,7 +2,14 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
-import { ident, literal } from './pg-format'
+import {
+  ident,
+  joinSqlFragments,
+  keyword,
+  literal,
+  safeSql,
+  type SafeSqlFragment,
+} from './pg-format'
 import { TABLE_PRIVILEGES_SQL } from './sql/table-privileges'
 
 const pgTablePrivilegesZod = z.object({
@@ -50,10 +57,10 @@ function list({
   limit?: number
   offset?: number
 } = {}): {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgTablePrivilegesArrayZod
 } {
-  let sql = `
+  let sql = safeSql`
 with table_privileges as (${TABLE_PRIVILEGES_SQL})
 select *
 from table_privileges
@@ -64,13 +71,13 @@ from table_privileges
     !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
   )
   if (filter) {
-    sql += ` where schema ${filter}`
+    sql = safeSql`${sql} where schema ${filter}`
   }
   if (limit) {
-    sql += ` limit ${limit}`
+    sql = safeSql`${sql} limit ${literal(limit)}`
   }
   if (offset) {
-    sql += ` offset ${offset}`
+    sql = safeSql`${sql} offset ${literal(offset)}`
   }
   return {
     sql,
@@ -78,9 +85,12 @@ from table_privileges
   }
 }
 
-function retrieve({ id }: { id: number }): { sql: string; zod: typeof pgTablePrivilegesOptionalZod }
+function retrieve({ id }: { id: number }): {
+  sql: SafeSqlFragment
+  zod: typeof pgTablePrivilegesOptionalZod
+}
 function retrieve({ name, schema }: { name: string; schema?: string }): {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgTablePrivilegesOptionalZod
 }
 function retrieve({
@@ -92,11 +102,11 @@ function retrieve({
   name?: string
   schema?: string
 }): {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgTablePrivilegesOptionalZod
 } {
   if (id) {
-    const sql = /* SQL */ `
+    const sql = /* SQL */ safeSql`
 with table_privileges as (${TABLE_PRIVILEGES_SQL})
 select *
 from table_privileges
@@ -106,7 +116,7 @@ where table_privileges.relation_id = ${literal(id)};`
       zod: pgTablePrivilegesOptionalZod,
     }
   } else {
-    const sql = /* SQL */ `
+    const sql = /* SQL */ safeSql`
 with table_privileges as (${TABLE_PRIVILEGES_SQL})
 select *
 from table_privileges
@@ -135,18 +145,19 @@ type TablePrivilegesGrant = {
     | 'MAINTAIN'
   isGrantable?: boolean
 }
-function grant(grants: TablePrivilegesGrant[]): { sql: string } {
-  const sql = `
+function grant(grants: TablePrivilegesGrant[]): { sql: SafeSqlFragment } {
+  const sql = safeSql`
 do $$
 begin
-${grants
-  .map(
+${joinSqlFragments(
+  grants.map(
     ({ privilegeType, relationId, grantee, isGrantable }) =>
-      `execute format('grant ${privilegeType} on table %s to ${
-        grantee.toLowerCase() === 'public' ? 'public' : ident(grantee)
-      } ${isGrantable ? 'with grant option' : ''}', ${relationId}::regclass);`
-  )
-  .join('\n')}
+      safeSql`execute format('grant ${keyword(privilegeType)} on table %s to ${
+        grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
+      } ${isGrantable ? safeSql`with grant option` : safeSql``}', ${literal(relationId)}::regclass);`
+  ),
+  '\n'
+)}
 end $$;
 `
   return { sql }
@@ -166,16 +177,19 @@ type TablePrivilegesRevoke = {
     | 'TRIGGER'
     | 'MAINTAIN'
 }
-function revoke(revokes: TablePrivilegesRevoke[]): { sql: string } {
-  const sql = `
+function revoke(revokes: TablePrivilegesRevoke[]): { sql: SafeSqlFragment } {
+  const sql = safeSql`
 do $$
 begin
-${revokes
-  .map(
+${joinSqlFragments(
+  revokes.map(
     ({ privilegeType, relationId, grantee }) =>
-      `execute format('revoke ${privilegeType} on table %s from ${grantee.toLowerCase() === 'public' ? 'public' : ident(grantee)}', ${relationId}::regclass);`
-  )
-  .join('\n')}
+      safeSql`execute format('revoke ${keyword(privilegeType)} on table %s from ${
+        grantee.toLowerCase() === 'public' ? safeSql`public` : ident(grantee)
+      }', ${literal(relationId)}::regclass);`
+  ),
+  '\n'
+)}
 end $$;
 `
   return { sql }

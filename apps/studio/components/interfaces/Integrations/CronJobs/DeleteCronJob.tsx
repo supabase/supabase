@@ -1,19 +1,18 @@
-import { TextConfirmModal } from 'components/ui/TextConfirmModalWrapper'
-import { useDatabaseCronJobDeleteMutation } from 'data/database-cron-jobs/database-cron-jobs-delete-mutation'
-import { useSendEventMutation } from 'data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { cleanPointerEventsNoneOnBody } from 'lib/helpers'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
+import { parseCronJobCommand } from './CronJobs.utils'
 import { useCronJobsData } from './CronJobsTab.useCronJobsData'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import { useDatabaseCronJobDeleteMutation } from '@/data/database-cron-jobs/database-cron-jobs-delete-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { cleanPointerEventsNoneOnBody } from '@/lib/helpers'
+import { useTrack } from '@/lib/telemetry/track'
 
 export const DeleteCronJob = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
 
   const [searchQuery] = useQueryState('search', parseAsString.withDefault(''))
   const [cronJobIdForDeletion, setCronJobForDeletion] = useQueryState('delete', parseAsString)
@@ -25,17 +24,17 @@ export const DeleteCronJob = () => {
   })
   const cronJob = grid.rows.find((j) => j.jobid.toString() === cronJobIdForDeletion)
 
-  const { mutate: sendEvent } = useSendEventMutation()
+  const track = useTrack()
   const {
     mutate: deleteDatabaseCronJob,
     isPending,
     isSuccess: isSuccessDelete,
   } = useDatabaseCronJobDeleteMutation({
     onSuccess: () => {
-      sendEvent({
-        action: 'cron_job_removed',
-        groups: { project: project?.ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-      })
+      if (cronJob && project) {
+        const { type } = parseCronJobCommand(cronJob.command, project.ref)
+        track('cron_job_removed', { type })
+      }
       toast.success(`Successfully removed cron job`)
       setCronJobForDeletion(null)
     },

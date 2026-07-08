@@ -1,30 +1,32 @@
-import Editor, { Monaco, OnMount } from '@monaco-editor/react'
-import { useRouter } from 'next/router'
-import { MutableRefObject, useEffect, useRef, useState } from 'react'
+import { Monaco, OnMount } from '@monaco-editor/react'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { noop } from 'lodash'
+import { RefObject, useRef } from 'react'
+import { Admonition } from 'ui-patterns/admonition'
 
-import { useDebounce } from '@uidotdev/usehooks'
-import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { SIDEBAR_KEYS } from 'components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { useLocalStorageQuery } from 'hooks/misc/useLocalStorage'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { useProfile } from 'lib/profile'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from 'state/sidebar-manager-state'
-import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
-import { useTabsStateSnapshot } from 'state/tabs'
-import { cn } from 'ui'
-import { Admonition } from 'ui-patterns'
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
-import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
+import { useSnippetEditor } from './useSnippetEditor'
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { getEditorSelectionParts } from '@/components/ui/AIEditor/utils'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { useSqlEditorSaveCoordinator } from '@/state/sql-editor/sql-editor-save-coordinator'
 
 export type MonacoEditorProps = {
   id: string
   snippetName: string
   className?: string
-  editorRef: MutableRefObject<IStandaloneCodeEditor | null>
-  monacoRef: MutableRefObject<Monaco | null>
+  editorRef: RefObject<IStandaloneCodeEditor | null>
+  monacoRef: RefObject<Monaco | null>
   autoFocus?: boolean
   executeQuery: () => void
+  executeExplainQuery: () => void
+  showExplainAction?: boolean
+  prettifyQuery: () => void
   onHasSelection: (value: boolean) => void
   onMount?: (editor: IStandaloneCodeEditor) => void
   onPrompt?: (value: {
@@ -37,7 +39,7 @@ export type MonacoEditorProps = {
   placeholder?: string
 }
 
-const MonacoEditor = ({
+export const MonacoEditor = ({
   id,
   snippetName,
   editorRef,
@@ -46,17 +48,13 @@ const MonacoEditor = ({
   placeholder = '',
   className,
   executeQuery,
+  executeExplainQuery,
+  showExplainAction = true,
+  prettifyQuery,
   onHasSelection,
   onPrompt,
   onMount,
 }: MonacoEditorProps) => {
-  const router = useRouter()
-  const { profile } = useProfile()
-  const { ref, content } = useParams()
-  const { data: project } = useSelectedProjectQuery()
-
-  const snapV2 = useSqlEditorV2StateSnapshot()
-  const tabsSnap = useTabsStateSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar, toggleSidebar } = useSidebarManagerSnapshot()
 
@@ -64,41 +62,71 @@ const MonacoEditor = ({
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
   )
-  const [isAIAssistantHotkeyEnabled] = useLocalStorageQuery<boolean>(
-    LOCAL_STORAGE_KEYS.HOTKEY_SIDEBAR(SIDEBAR_KEYS.AI_ASSISTANT),
-    true
-  )
 
-  // [Joshen] Lodash debounce doesn't seem to be working here, so opting to use useDebounce
-  const [value, setValue] = useState('')
-  const debouncedValue = useDebounce(value, 1000)
+  const { snippet, disableEdit, handleEditorChange } = useSnippetEditor({ id, snippetName })
 
-  const snippet = snapV2.snippets[id]
-  const disableEdit =
-    snippet?.snippet.visibility === 'project' && snippet?.snippet.owner_id !== profile?.id
+  // The Monaco save action is registered once on mount, but `snippet` starts
+  // undefined for a new/deep-linked snippet and is only created on first edit.
+  // Read it through a ref so Cmd/Ctrl+S sees the latest value, not the stale
+  // mount-time closure.
+  const snippetRef = useRef(snippet)
+  snippetRef.current = snippet
 
-  const executeQueryRef = useRef(executeQuery)
-  executeQueryRef.current = executeQuery
+  const executeExplainQueryRef = useRef(executeExplainQuery)
+  executeExplainQueryRef.current = executeExplainQuery
 
-  const handleEditorOnMount: OnMount = async (editor, monaco) => {
-    editorRef.current = editor
-    monacoRef.current = monaco
+  const prettifyQueryRef = useRef(prettifyQuery)
+  prettifyQueryRef.current = prettifyQuery
 
-    const model = editorRef.current.getModel()
+  const isAIAssistantHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.AI_ASSISTANT_TOGGLE)
+  const aiHotkeyEnabledRef = useRef(isAIAssistantHotkeyEnabled)
+  aiHotkeyEnabledRef.current = isAIAssistantHotkeyEnabled
+
+  const { requestSave } = useSqlEditorSaveCoordinator()
+  const requestSaveRef = useRef(requestSave)
+  requestSaveRef.current = requestSave
+
+  const handleEditorOnMount: OnMount = (editor, monaco) => {
+    const model = editor.getModel()
     if (model !== null) {
-      monacoRef.current.editor.setModelMarkers(model, 'owner', [])
+      monaco.editor.setModelMarkers(model, 'owner', [])
     }
 
-    editor.addAction({
-      id: 'run-query',
-      label: 'Run Query',
-      keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.Enter],
-      contextMenuGroupId: 'operation',
-      contextMenuOrder: 0,
-      run: () => {
-        executeQueryRef.current()
+    // Blur the editor on Escape so users can hop out to the rest of the UI.
+    // The precondition defers to Monaco's own Escape consumers (suggest widget,
+    // find widget, parameter hints, snippet/rename mode, inline suggestions) and
+    // to selection/multi-cursor cancellation, so inline features keep working.
+    editor.addCommand(
+      monaco.KeyCode.Escape,
+      () => {
+        ;(document.activeElement as HTMLElement | null)?.blur()
       },
-    })
+      [
+        'editorTextFocus',
+        '!editorHasSelection',
+        '!editorHasMultipleSelections',
+        '!suggestWidgetVisible',
+        '!findWidgetVisible',
+        '!parameterHintsVisible',
+        '!renameInputVisible',
+        '!inSnippetMode',
+        '!accessibilityHelpWidgetVisible',
+        '!inlineSuggestionVisible',
+      ].join(' && ')
+    )
+
+    if (showExplainAction) {
+      editor.addAction({
+        id: 'run-explain-query',
+        label: 'Run EXPLAIN ANALYZE',
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter],
+        contextMenuGroupId: 'operation',
+        contextMenuOrder: 1,
+        run: () => {
+          executeExplainQueryRef.current()
+        },
+      })
+    }
 
     editor.addAction({
       id: 'save-query',
@@ -107,7 +135,19 @@ const MonacoEditor = ({
       contextMenuGroupId: 'operation',
       contextMenuOrder: 0,
       run: () => {
-        if (snippet) snapV2.addNeedsSaving(snippet.snippet.id)
+        const currentSnippet = snippetRef.current
+        if (currentSnippet) requestSaveRef.current(currentSnippet.snippet.id)
+      },
+    })
+
+    editor.addAction({
+      id: 'prettify-query',
+      label: 'Prettify SQL',
+      keybindings: [monaco.KeyMod.Alt | monaco.KeyMod.Shift | monaco.KeyCode.KeyF],
+      contextMenuGroupId: 'operation',
+      contextMenuOrder: 2,
+      run: () => {
+        prettifyQueryRef.current()
       },
     })
 
@@ -117,13 +157,15 @@ const MonacoEditor = ({
       contextMenuGroupId: 'operation',
       contextMenuOrder: 1,
       run: () => {
-        const selectedValue = (editorRef?.current as any)
-          .getModel()
-          .getValueInRange((editorRef?.current as any)?.getSelection())
+        const selection = editorRef?.current?.getSelection()
+        if (!selection) return
+
+        const selectedValue = editorRef?.current?.getModel()?.getValueInRange(selection)
+
         openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
         aiSnap.newChat({
           name: 'Explain code section',
-          sqlSnippets: [selectedValue],
+          sqlSnippets: [selectedValue ?? ''],
           initialInput: 'Can you explain this section to me in more detail?',
         })
       },
@@ -134,7 +176,7 @@ const MonacoEditor = ({
       label: 'Toggle AI Assistant',
       keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.KeyI],
       run: () => {
-        if (isAIAssistantHotkeyEnabled) {
+        if (aiHotkeyEnabledRef.current) {
           toggleSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
         }
       },
@@ -144,28 +186,10 @@ const MonacoEditor = ({
       editor.addAction({
         id: 'generate-sql',
         label: 'Generate SQL',
-        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyK],
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyK],
         run: () => {
-          const selection = editor.getSelection()
-          const model = editor.getModel()
-          if (!model || !selection) return
-
-          const allLines = model.getLinesContent()
-
-          const startLineIndex = selection.startLineNumber - 1
-          const endLineIndex = selection.endLineNumber
-
-          const beforeSelection = allLines.slice(0, startLineIndex).join('\n') + '\n'
-          const selectedText = allLines.slice(startLineIndex, endLineIndex).join('\n')
-          const afterSelection = '\n' + allLines.slice(endLineIndex).join('\n')
-
-          onPrompt({
-            selection: selectedText,
-            beforeSelection,
-            afterSelection,
-            startLineNumber: selection?.startLineNumber ?? 0,
-            endLineNumber: selection?.endLineNumber ?? 0,
-          })
+          const selectionParts = getEditorSelectionParts(editor)
+          if (selectionParts) onPrompt(selectionParts)
         },
       })
     }
@@ -177,45 +201,8 @@ const MonacoEditor = ({
       onHasSelection(!noSelection)
     })
 
-    if (autoFocus) {
-      if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
-      editor.focus()
-    }
-
     onMount?.(editor)
   }
-
-  function handleEditorChange(value: string | undefined) {
-    tabsSnap.makeActiveTabPermanent()
-    if (id && value) {
-      if (!snippet && ref && profile !== undefined && project !== undefined) {
-        const snippet = createSqlSnippetSkeletonV2({
-          idOverride: id,
-          name: snippetName,
-          sql: value,
-          owner_id: profile?.id,
-          project_id: project?.id,
-        })
-        snapV2.addSnippet({ projectRef: ref, snippet })
-        router.push(`/project/${ref}/sql/${snippet.id}`, undefined, { shallow: true })
-      }
-      setValue(value)
-    }
-  }
-
-  useEffect(() => {
-    if (debouncedValue.length > 0 && snippet) {
-      const shouldInvalidate = snippet.snippet.isNotSavedInDatabaseYet
-      snapV2.setSql({ id, sql: value, shouldInvalidate })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedValue])
-
-  // if an SQL query is passed by the content parameter, set the editor value to its content. This
-  // is usually used for sending the user to SQL editor from other pages with SQL.
-  useEffect(() => {
-    if (content && content.length > 0) handleEditorChange(content)
-  }, [])
 
   return (
     <>
@@ -227,29 +214,26 @@ const MonacoEditor = ({
           description="This snippet has been shared to the project and is only editable by the owner who created this snippet. You may duplicate this snippet into a personal copy by right clicking on the snippet and selecting “Duplicate query”."
         />
       )}
-      <Editor
-        className={cn(className, 'monaco-editor')}
-        theme={'supabase'}
-        onMount={handleEditorOnMount}
-        onChange={handleEditorChange}
-        defaultLanguage="pgsql"
-        defaultValue={snippet?.snippet.content?.sql}
-        path={id}
+      <CodeEditor
+        id={id}
+        language="pgsql"
+        className={className}
+        autofocus={autoFocus}
+        isReadOnly={disableEdit}
+        defaultValue={snippet?.snippet.content?.unchecked_sql}
+        editorRef={editorRef}
+        monacoRef={monacoRef}
+        actions={{
+          runQuery: { enabled: true, callback: executeQuery },
+          formatDocument: { enabled: false, callback: noop },
+          placeholderFill: { enabled: false },
+        }}
         options={{
-          tabSize: 2,
-          fontSize: 13,
           placeholder,
           lineDecorationsWidth: 0,
-          readOnly: disableEdit,
-          minimap: { enabled: false },
-          wordWrap: 'on',
-          padding: { top: 4 },
-          // [Joshen] Commenting the following out as it causes the autocomplete suggestion popover
-          // to be positioned wrongly somehow. I'm not sure if this affects anything though, but leaving
-          // comment just in case anyone might be wondering. Relevant issues:
-          // - https://github.com/microsoft/monaco-editor/issues/2229
-          // - https://github.com/microsoft/monaco-editor/issues/2503
-          // fixedOverflowWidgets: true,
+          fixedOverflowWidgets: false,
+          lineNumbersMinChars: 5,
+          scrollBeyondLastLine: true,
           suggest: {
             showMethods: intellisenseEnabled,
             showFunctions: intellisenseEnabled,
@@ -281,9 +265,9 @@ const MonacoEditor = ({
             showSnippets: intellisenseEnabled,
           },
         }}
+        onInputChange={handleEditorChange}
+        onMount={handleEditorOnMount}
       />
     </>
   )
 }
-
-export default MonacoEditor

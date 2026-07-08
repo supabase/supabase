@@ -1,16 +1,17 @@
+import { useParams } from 'common'
+import { SqlEditor } from 'icons'
+import { Edit, Trash } from 'lucide-react'
 import { useRouter } from 'next/router'
+import { parseAsString, useQueryStates } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { DropdownMenuItem, DropdownMenuSeparator } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { UpdateSavedQueryModal } from './Logs.UpdateSavedQueryModal'
-import { Edit, Trash } from 'lucide-react'
-import { SqlEditor } from 'icons'
 import { LogsSidebarItem } from './SidebarV2/SidebarItem'
+import { useContentDeleteMutation } from '@/data/content/content-delete-mutation'
+import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 
 interface SavedQueriesItemProps {
   item: {
@@ -24,22 +25,33 @@ interface SavedQueriesItemProps {
   }
 }
 
-const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
+export const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
   const router = useRouter()
-  const { ref } = useParams()
+  const { ref, queryId } = useParams()
   const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
   const [showUpdateModal, setShowUpdateModal] = useState<boolean>(false)
 
+  const [_, setParams] = useQueryStates({
+    queryId: parseAsString.withDefault(''),
+    q: parseAsString.withDefault(''),
+    s: parseAsString.withDefault(''),
+    its: parseAsString.withDefault(''),
+    ite: parseAsString.withDefault(''),
+  })
+
   const { mutate: deleteContent } = useContentDeleteMutation({
-    onSuccess: () => {
+    onSuccess: (_, vars) => {
       setShowConfirmModal(false)
+      if (queryId && vars.ids.includes(queryId)) {
+        setParams({ queryId: '', q: '', s: '', its: '', ite: '' })
+      }
       toast.success('Successfully deleted query')
     },
     onError: (error) => {
       toast.error(`Failed to delete saved query: ${error.message}`)
     },
   })
-  const { mutate: updateContent } = useContentUpsertMutation({
+  const { mutateAsync: updateContent } = useContentUpsertMutation({
     onSuccess: () => {
       setShowUpdateModal(false)
       toast.success('Successfully updated query')
@@ -56,7 +68,7 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
 
   const onConfirmUpdate = async ({ name, description }: { name: string; description?: string }) => {
     if (!ref || typeof ref !== 'string') return console.error('Invalid project reference')
-    updateContent({
+    await updateContent({
       projectRef: ref,
       payload: {
         ...item,
@@ -94,15 +106,13 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
             </DropdownMenuItem>
           </>
         }
-      ></LogsSidebarItem>
+      />
       <ConfirmationModal
         variant="destructive"
         visible={showConfirmModal}
         confirmLabel="Delete query"
         title="Confirm to delete saved query"
-        onCancel={() => {
-          setShowConfirmModal(false)
-        }}
+        onCancel={() => setShowConfirmModal(false)}
         onConfirm={onConfirmDelete}
       >
         <p className="text-sm text-foreground-light">
@@ -110,17 +120,14 @@ const SavedQueriesItem = ({ item }: SavedQueriesItemProps) => {
         </p>
       </ConfirmationModal>
       <UpdateSavedQueryModal
+        header="Update saved query"
         visible={showUpdateModal}
         initialValues={{ name: item.name, description: item.description }}
         onCancel={() => {
           setShowUpdateModal(false)
         }}
-        onSubmit={(newValues) => {
-          onConfirmUpdate(newValues)
-        }}
+        onSubmit={onConfirmUpdate}
       />
     </>
   )
 }
-
-export default SavedQueriesItem

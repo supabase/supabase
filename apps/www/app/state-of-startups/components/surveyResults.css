@@ -1,0 +1,72 @@
+@keyframes terminalLine {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  20% {
+    clip-path: inset(0 80% 0 0);
+  }
+  50% {
+    clip-path: inset(0 40% 0 0);
+  }
+  70% {
+    clip-path: inset(0 20% 0 0);
+  }
+  80% {
+    clip-path: inset(0 0% 0 0);
+  }
+  90% {
+    clip-path: inset(0 0 0 50%);
+  }
+  100% {
+    clip-path: inset(0 0 0 100%);
+  }
+}
+
+@keyframes blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes marqueeLeft {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes marqueeRight {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.marquee-track {
+  animation-name: marqueeLeft;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+.marquee-track--reverse {
+  animation-name: marqueeRight;
+}
+
+.marquee-row:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+}

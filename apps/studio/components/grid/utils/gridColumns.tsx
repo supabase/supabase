@@ -1,4 +1,3 @@
-import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
 import { CalculatedColumn, RenderCellProps } from 'react-data-grid'
 
 import { DefaultValue } from '../components/common/DefaultValue'
@@ -39,6 +38,7 @@ import {
   isTextColumn,
   isTimeColumn,
 } from './types'
+import { COLUMN_MIN_WIDTH } from '@/components/grid/constants'
 
 export const ESTIMATED_CHARACTER_PIXEL_WIDTH = 9
 
@@ -73,7 +73,6 @@ export function getGridColumns(
       width: columnWidth,
       minWidth: COLUMN_MIN_WIDTH,
       frozen: false,
-      isLastFrozenColumn: false,
       renderHeaderCell: (props) => (
         <ColumnHeader
           {...props}
@@ -201,14 +200,11 @@ function withPendingAddPlaceholders(
     const value = props.row[props.column.key]
 
     if (isPendingAddRow(props.row) && (value === undefined || value === null || value === '')) {
-      if (columnDef.defaultValue !== undefined && columnDef.defaultValue !== null) {
-        return <DefaultValue />
-      }
-      if (columnDef.isIdentity || columnDef.isGeneratable) {
-        return <DefaultValue />
-      }
-      if (columnDef.isNullable) {
+      if (value === null) {
         return <NullValue />
+      }
+      if (columnDef.defaultValue !== undefined || columnDef.isIdentity || columnDef.isGeneratable) {
+        return <DefaultValue />
       }
     }
 
@@ -254,7 +250,7 @@ function getCellRenderer(
   return withPendingAddPlaceholders(formatter, columnDef)
 }
 
-function getColumnType(columnDef: SupaColumn): ColumnType {
+export function getColumnType(columnDef: SupaColumn): ColumnType {
   if (isForeignKeyColumn(columnDef)) {
     return 'foreign_key'
   } else if (isNumericalColumn(columnDef.dataType)) {

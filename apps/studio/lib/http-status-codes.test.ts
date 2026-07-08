@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+
 import { getHttpStatusCodeInfo } from './http-status-codes'
 
 describe('getHttpStatusCodeInfo', () => {

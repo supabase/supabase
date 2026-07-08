@@ -1,11 +1,6 @@
 import { ChevronRight, ChevronUp } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import {
-  Button,
-  Collapsible_Shadcn_ as Collapsible,
-  CollapsibleContent_Shadcn_ as CollapsibleContent,
-  CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
-} from 'ui'
+import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { type ExposedEntity } from './DataApiEnableSwitch.utils'
@@ -154,7 +149,7 @@ const EntityList = ({ entities }: { entities: Array<ExposedEntity> }) => {
           <EntityListItem key={`${entity.schema}.${entity.name}`} entity={entity} />
         ))}
       </ul>
-      <CollapsibleContent className="transition-all data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+      <CollapsibleContent className="transition-all data-closed:animate-collapsible-up data-open:animate-collapsible-down">
         <ul className="list-disc pl-5 space-y-0.5">
           {hiddenEntities.map((entity) => (
             <EntityListItem key={`${entity.schema}.${entity.name}`} entity={entity} />
@@ -163,7 +158,7 @@ const EntityList = ({ entities }: { entities: Array<ExposedEntity> }) => {
       </CollapsibleContent>
       <CollapsibleTrigger asChild>
         <Button
-          type="text"
+          variant="text"
           size="tiny"
           className="px-0 h-auto text-xs text-foreground-lighter hover:text-foreground"
         >

@@ -1,13 +1,8 @@
-import type { ValidationFailure } from 'data/replication/validate-destination-mutation'
-import {
-  Accordion_Shadcn_,
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  AccordionTrigger_Shadcn_,
-  Badge,
-  Card,
-} from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Card } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
+
+import { Markdown } from '@/components/interfaces/Markdown'
+import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
 interface ValidationFailuresSectionProps {
   destinationFailures: ValidationFailure[]
@@ -18,7 +13,7 @@ export const ValidationFailuresSection = ({
   destinationFailures,
   pipelineFailures,
 }: ValidationFailuresSectionProps) => {
-  const validationIssues = [...destinationFailures, ...pipelineFailures].sort((a, b) =>
+  const validationIssues = [...destinationFailures, ...pipelineFailures].sort((a, _b) =>
     a.failure_type === 'critical' ? -1 : 1
   )
 
@@ -38,33 +33,33 @@ export const ValidationFailuresSection = ({
       className="px-5 rounded-none border-0"
       title="Destination configuration issues"
     >
-      <p className="text-sm text-foreground-light !mb-2">
+      <p className="text-sm text-foreground-light mb-2!">
         {hasCriticalFailures
           ? `Please fix all required issues below${hasWarnings ? ' and review the others' : ''} before continuing.`
-          : 'The following issues were identified, although you may still proceed to create the destination.'}
+          : 'The following issues were identified, although you may still create the pipeline and start replication to the destination.'}
       </p>
       <Card>
-        <Accordion_Shadcn_ type="multiple">
+        <Accordion type="multiple">
           {validationIssues.map((failure, idx) => (
-            <AccordionItem_Shadcn_
-              key={idx}
-              value={`${failure.name}+${idx}`}
-              className="last:border-b-0"
-            >
-              <AccordionTrigger_Shadcn_ className="text-sm px-3 text-foreground decoration-foreground-lighter">
+            <AccordionItem key={idx} value={`${failure.name}+${idx}`} className="last:border-b-0">
+              <AccordionTrigger className="cursor-pointer text-sm px-3 text-foreground decoration-foreground-lighter [&>p]:mb-0!">
                 <p className="flex items-center gap-x-2">
                   {failure.name}
-                  {failure.failure_type === 'critical' && <Badge variant="warning">Required</Badge>}
+                  {failure.failure_type === 'critical' ? (
+                    <Badge variant="warning">Required</Badge>
+                  ) : (
+                    <Badge variant="default">Warning</Badge>
+                  )}
                 </p>
-              </AccordionTrigger_Shadcn_>
-              <AccordionContent_Shadcn_ className="px-3">
-                <p className="whitespace-pre-wrap text-sm">
-                  {failure.reason.replaceAll('\n\n', '\n')}
-                </p>
-              </AccordionContent_Shadcn_>
-            </AccordionItem_Shadcn_>
+              </AccordionTrigger>
+              <AccordionContent className="px-3">
+                <Markdown className="text-sm text-foreground-light [&>p]:mb-2!">
+                  {failure.reason}
+                </Markdown>
+              </AccordionContent>
+            </AccordionItem>
           ))}
-        </Accordion_Shadcn_>
+        </Accordion>
       </Card>
     </Admonition>
   )

@@ -27,6 +27,7 @@ This app demonstrates how to use:
 ### Prerequisites
 
 Before you begin, make sure you have:
+
 - A Supabase account ([sign up here](https://supabase.com/dashboard))
 - Node.js installed on your machine
 
@@ -232,6 +233,7 @@ Allows users to view and edit their profile:
 - Provides sign-out functionality
 
 Key features:
+
 - Uses the `user` prop (not `session`) passed from the parent component
 - Implements proper cleanup with the `ignore` flag to prevent race conditions
 - Updates profile data with `upsert` to handle both inserts and updates
@@ -260,7 +262,9 @@ function App() {
 
     // Listen for auth changes
     supabase.auth.onAuthStateChange(async () => {
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
       setUser(user)
     })
   }, [])
@@ -276,6 +280,7 @@ export default App
 ```
 
 **Important:** This component uses the [`getUser()`](https://supabase.com/docs/reference/javascript/auth-getuser) method instead of `getSession()`. The `getUser()` method:
+
 - Performs a network request to the Supabase Auth server
 - Validates the current session on the server side
 - Returns the most up-to-date user information
@@ -325,14 +330,17 @@ react-user-management/
 ## Troubleshooting
 
 **Magic link not working?**
+
 - Check your email spam folder
 - Verify your site URL is configured correctly in Supabase Dashboard → Authentication → URL Configuration
 
 **Images not uploading?**
+
 - Ensure the `avatars` bucket exists in Storage
 - Check that storage policies are correctly set up
 
 **Profile not updating?**
+
 - Verify the `profiles` table exists
 - Check that Row Level Security policies are active
 

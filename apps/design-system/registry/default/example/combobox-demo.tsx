@@ -4,15 +4,15 @@ import { Check, ChevronsUpDown } from 'lucide-react'
 import * as React from 'react'
 import {
   Button,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
 
 import { cn } from '@/lib/utils'
@@ -45,10 +45,10 @@ export default function ComboboxDemo() {
   const [value, setValue] = React.useState('')
 
   return (
-    <Popover_Shadcn_ open={open} onOpenChange={setOpen}>
-      <PopoverTrigger_Shadcn_ asChild>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
         <Button
-          type="default"
+          variant="default"
           role="combobox"
           size={'small'}
           aria-expanded={open}
@@ -59,15 +59,15 @@ export default function ComboboxDemo() {
             ? frameworks.find((framework) => framework.value === value)?.label
             : 'Select framework...'}
         </Button>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="w-[200px] p-0">
-        <Command_Shadcn_>
-          <CommandInput_Shadcn_ placeholder="Search framework..." />
-          <CommandList_Shadcn_>
-            <CommandEmpty_Shadcn_>No framework found.</CommandEmpty_Shadcn_>
-            <CommandGroup_Shadcn_>
+      </PopoverTrigger>
+      <PopoverContent className="w-[200px] p-0">
+        <Command>
+          <CommandInput placeholder="Search framework..." />
+          <CommandList>
+            <CommandEmpty>No framework found.</CommandEmpty>
+            <CommandGroup>
               {frameworks.map((framework) => (
-                <CommandItem_Shadcn_
+                <CommandItem
                   key={framework.value}
                   value={framework.value}
                   onSelect={(currentValue) => {
@@ -82,12 +82,12 @@ export default function ComboboxDemo() {
                     )}
                   />
                   {framework.label}
-                </CommandItem_Shadcn_>
+                </CommandItem>
               ))}
-            </CommandGroup_Shadcn_>
-          </CommandList_Shadcn_>
-        </Command_Shadcn_>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }

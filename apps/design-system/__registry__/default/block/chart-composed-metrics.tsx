@@ -1,17 +1,17 @@
 'use client'
 
+import { ExternalLink } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { Skeleton } from 'ui'
 import {
   Chart,
-  ChartCard,
-  ChartHeader,
   ChartActions,
+  ChartCard,
   ChartContent,
+  ChartHeader,
   ChartMetric,
   ChartSparkline,
 } from 'ui-patterns/Chart'
-import { ExternalLink } from 'lucide-react'
-import { useState, useEffect } from 'react'
-import { Skeleton } from 'ui'
 
 export default function ChartComposedMetrics() {
   const [data, setData] = useState<Array<{ value: number; timestamp: string }>>([])
@@ -71,7 +71,7 @@ export default function ChartComposedMetrics() {
           </ChartHeader>
           <ChartContent
             className="p-0"
-            loadingState={<Skeleton className="w-full h-[6rem] rounded-none mt-4" />}
+            loadingState={<Skeleton className="w-full h-24 rounded-none mt-4" />}
           >
             <ChartSparkline data={data} dataKey="value" />
           </ChartContent>
@@ -89,7 +89,7 @@ export default function ChartComposedMetrics() {
           </ChartHeader>
           <ChartContent
             className="p-0"
-            loadingState={<Skeleton className="w-full h-[6rem] rounded-none mt-4" />}
+            loadingState={<Skeleton className="w-full h-24 rounded-none mt-4" />}
           >
             <ChartSparkline data={data} dataKey="value" />
           </ChartContent>

@@ -1,0 +1,28 @@
+{
+  "Content listing data export": {
+    "prefix": "cl-data",
+    "scope": "typescript",
+    "description": "ContentListingGroup export for overview listing blocks",
+    "body": [
+      "export const ${1:topic}${2:Section}: ContentListingGroup = {",
+      "  id: '${3:topic-section}',",
+      "  heading: '${4:Section heading}',",
+      "  description: '${5:Optional intro sentence}',",
+      "  type: '${6|grid,list|}',",
+      "  items: [",
+      "    {",
+      "      title: '${7:Link title}',",
+      "      href: '${8:/guides/...}',",
+      "      description: '${9:Short description}',",
+      "    },",
+      "  ],",
+      "}"
+    ]
+  },
+  "Content listing inline MDX": {
+    "prefix": "cl-inline",
+    "scope": "markdown,mdx",
+    "description": "Inline ContentListings component in a guide MDX file",
+    "body": ["<ContentListings id=\"${1:topic-section}\" />"]
+  }
+}

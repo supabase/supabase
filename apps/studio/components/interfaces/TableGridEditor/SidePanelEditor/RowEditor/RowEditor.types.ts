@@ -1,4 +1,4 @@
-import type { PostgresRelationship } from '@supabase/postgres-meta'
+import type { PGTableRelationship } from '@supabase/pg-meta'
 
 export interface EditValue {
   row?: any
@@ -12,9 +12,9 @@ export interface RowField {
   comment: string
   format: string
   enums: string[]
-  value: string | null
+  value: string | null | undefined
   defaultValue: string | null
-  foreignKey?: PostgresRelationship
+  foreignKey?: PGTableRelationship
   isNullable: boolean
   isIdentity: boolean
   isPrimaryKey: boolean

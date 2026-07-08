@@ -1,6 +1,11 @@
+import { useQueryClient } from '@tanstack/react-query'
+
 import { useOperationQueueActions } from './useOperationQueueActions'
-import { useIsQueueOperationsEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { useHotKey } from '@/hooks/ui/useHotKey'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { tableRowKeys } from '@/data/table-rows/keys'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
 /**
@@ -14,6 +19,8 @@ import { useTableEditorStateSnapshot } from '@/state/table-editor'
  * before the data grid handles the keyboard event.
  */
 export function useOperationQueueShortcuts() {
+  const queryClient = useQueryClient()
+  const { data: project } = useSelectedProjectQuery()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const snap = useTableEditorStateSnapshot()
   const { handleSave } = useOperationQueueActions()
@@ -22,25 +29,36 @@ export function useOperationQueueShortcuts() {
   const hasOperations = snap.hasPendingOperations
   const isEnabled = isQueueOperationsEnabled && hasOperations
 
-  useHotKey(
-    (event) => {
-      event.preventDefault()
-      event.stopPropagation()
+  useShortcut(
+    SHORTCUT_IDS.OPERATION_QUEUE_SAVE,
+    () => {
       if (!isSaving && hasOperations) {
         handleSave()
       }
     },
-    's',
     { enabled: isEnabled }
   )
 
-  useHotKey(
-    (event) => {
-      event.preventDefault()
-      event.stopPropagation()
+  useShortcut(
+    SHORTCUT_IDS.OPERATION_QUEUE_TOGGLE,
+    () => {
       snap.toggleViewOperationQueue()
     },
-    '.',
+    { enabled: isEnabled }
+  )
+
+  useShortcut(
+    SHORTCUT_IDS.OPERATION_QUEUE_UNDO,
+    () => {
+      const tableIdLatestOperation = snap.operationQueue.operations.at(-1)?.tableId
+      snap.undoLatestOperation()
+
+      if (project && tableIdLatestOperation) {
+        queryClient.invalidateQueries({
+          queryKey: tableRowKeys.tableRowsAndCount(project.ref, tableIdLatestOperation),
+        })
+      }
+    },
     { enabled: isEnabled }
   )
 }

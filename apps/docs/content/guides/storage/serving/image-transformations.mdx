@@ -15,6 +15,16 @@ Image Resizing is currently enabled for [Pro Plan and above](/pricing).
 
 </Admonition>
 
+## Manage image transformations
+
+You can enable or disable Image Transformations for your project from the [**Storage** > **Settings**](/dashboard/project/_/storage/files/settings) section of the Dashboard and toggle the **Enable Image Transformations** option.
+
+<Admonition type="note">
+
+Disabling Image Transformations prevents any image transformation requests from being processed. This can be useful to prevent unexpected usage or cost if you do not use this feature.
+
+</Admonition>
+
 ## Get a public URL for a transformed image
 
 Our client libraries methods like `getPublicUrl` and `createSignedUrl` support the `transform` option. This returns the URL that serves the transformed image.
@@ -673,7 +683,13 @@ response = supabase.storage.from_('bucket').download(
 
 ## Self hosting
 
-Our solution to image resizing and optimization can be self-hosted as with any other Supabase product. Under the hood we use [imgproxy](https://imgproxy.net/)
+Our solution to image resizing and optimization can be self-hosted as with any other Supabase product. Under the hood we use [imgproxy](https://imgproxy.net/).
+
+<Admonition type="note">
+
+If you run the official self-hosted stack from the [`supabase/supabase`](https://github.com/supabase/supabase/tree/master/docker) Docker Compose setup, an `imgproxy` service is **already included** and wired up to the `storage` service for you (the `storage` service sets `ENABLE_IMAGE_TRANSFORMATION: "true"` and `IMGPROXY_URL: http://imgproxy:5001`). You only need the steps below if you run `storage-api` outside of that Compose stack and have to provide your own imgproxy container.
+
+</Admonition>
 
 #### imgproxy configuration:
 

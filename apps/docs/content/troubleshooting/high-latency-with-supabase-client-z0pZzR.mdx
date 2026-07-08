@@ -79,7 +79,7 @@ def psycop_call(): #user_ids: list[str]):
 
 
 def supabase_call():
-    supabase: Client = create_client("SUPABASE_URL", "SUPBASE_SERVICE_ROLE_KEY")
+    supabase: Client = create_client("SUPABASE_URL", "SUPABASE_SECRET_KEY")
     start = time.time()
     result = supabase.table("your_table_name").select("*").execute()
     stop = time.time()
@@ -92,8 +92,8 @@ if __name__ == "__main__":
     print(f"postgres: {ref}, supabase: {sup}, ratio: {sup/ref}")
 ```
 
-3. You will see that the Supabase client takes longer to execute the same query, especially for smaller tables or queries returning just one row.
+3. You will see that the Supabase client takes longer to execute the same query, especially for smaller tables or queries returning only one row.
 
 ## Expected behavior
 
-The overhead from PostgREST shouldn't be higher than a few milliseconds at max. 60-70 ms is way too high. This is particular deceiving because one can run the query on the SQL Editor page and it reports the same time as the direct Postgres query, which is not what actually happens.
+The overhead from PostgREST shouldn't be higher than a few milliseconds at max. 60-70 ms is way too high. This is particular deceiving because one can run the query on the SQL Editor page and it reports the same time as the direct Postgres query, which is not what happens.

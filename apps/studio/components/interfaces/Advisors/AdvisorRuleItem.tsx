@@ -1,32 +1,32 @@
+import { useParams } from 'common'
 import { ChevronRight, Trash } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import { useLintRuleDeleteMutation } from 'data/lint/delete-lint-rule-mutation'
-import { useProjectLintRulesQuery } from 'data/lint/lint-rules-query'
-import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
 import {
   Badge,
   Button,
   Card,
   CardContent,
   cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
 import { LintInfo } from '../Linter/Linter.constants'
 import { generateRuleText } from './AdvisorRules.utils'
 import { CreateRuleSheet } from './CreateRuleSheet'
 import { DisableRuleModal } from './DisableRuleModal'
 import { EnableRuleModal } from './EnableRuleModal'
+import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useLintRuleDeleteMutation } from '@/data/lint/delete-lint-rule-mutation'
+import { useProjectLintRulesQuery } from '@/data/lint/lint-rules-query'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface AdvisorRuleItemProps {
   lint: LintInfo
@@ -98,7 +98,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
 
   return (
     <>
-      <Collapsible_Shadcn_
+      <Collapsible
         id={lint.name}
         open={expandedLint === lint.name}
         onOpenChange={(open) => {
@@ -106,7 +106,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
           else setExpandedLint(undefined)
         }}
       >
-        <CollapsibleTrigger_Shadcn_ asChild className="[&[data-state=open]>div>svg]:!rotate-90">
+        <CollapsibleTrigger asChild className="[&[data-state=open]>div>svg]:rotate-90!">
           <Card className="border-b-0 rounded-none">
             <CardContent className="py-3 flex items-center justify-between text-sm gap-4 cursor-pointer transition hover:bg-surface-200">
               <div className="flex items-center justify-center [&>svg]:text-foreground-lighter">
@@ -123,7 +123,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
               <div className="flex items-center gap-x-2">
                 <DocsButton href={lint.docsLink} />
                 <Button
-                  type="default"
+                  variant="default"
                   onClick={(e) => {
                     e.stopPropagation()
                     setOpen(true)
@@ -135,10 +135,10 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
               <ChevronRight strokeWidth={1.5} size={16} className="transition" />
             </CardContent>
           </Card>
-        </CollapsibleTrigger_Shadcn_>
-        <CollapsibleContent_Shadcn_
+        </CollapsibleTrigger>
+        <CollapsibleContent
           className={cn(
-            'bg-surface border-x border-t !rounded-none',
+            'bg-surface border-x border-t rounded-none!',
             rules.length > 0 ? 'divide-y' : ''
           )}
         >
@@ -187,7 +187,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
                           tooltip={{ content: { side: 'bottom', text: 'Edit rule' } }}
                         /> */}
                         <ButtonTooltip
-                          type="default"
+                          variant="default"
                           icon={<Trash />}
                           className="w-7"
                           onClick={() => setSelectedRuleToDelete(rule.id)}
@@ -200,8 +200,8 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
               )}
             </>
           )}
-        </CollapsibleContent_Shadcn_>
-      </Collapsible_Shadcn_>
+        </CollapsibleContent>
+      </Collapsible>
 
       <CreateRuleSheet lint={lint} open={open} onOpenChange={setOpen} />
 

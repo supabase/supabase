@@ -1,13 +1,15 @@
-import { useIncidentStatusQuery } from 'data/platform/incident-status-query'
-import { processIncidentData } from 'data/platform/incident-status-utils'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
+import { useIncidentStatusQuery } from '@/data/platform/incident-status-query'
+import { processIncidentData } from '@/data/platform/incident-status-utils'
+
 interface IncidentAdmonitionProps {
   isActive: boolean
+  className?: string
 }
 
 const STATUS_DESCRIPTION_SIGN_OFF = 'Follow the status page for updates.'
@@ -52,7 +54,7 @@ const getStatusDescription = (
   }
 }
 
-export function IncidentAdmonition({ isActive }: IncidentAdmonitionProps) {
+export function IncidentAdmonition({ isActive, className }: IncidentAdmonitionProps) {
   const { data: allStatusPageEvents, isLoading, isError } = useIncidentStatusQuery()
   const { incidents = [] } = allStatusPageEvents ?? {}
 
@@ -82,10 +84,11 @@ export function IncidentAdmonition({ isActive }: IncidentAdmonitionProps) {
           <Admonition
             type="warning"
             layout="horizontal"
+            className={className}
             title={statusTitle}
             description={getStatusDescription(overallStatus, hasMultipleIncidents, allSameStatus)}
             actions={
-              <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+              <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
                 <Link href="https://status.supabase.com/" target="_blank" rel="noreferrer">
                   Status page
                 </Link>

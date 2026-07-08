@@ -1,4 +1,4 @@
-import Table from 'components/to-be-cleaned/Table'
+import Table from '@/components/to-be-cleaned/Table'
 
 export const HooksListEmpty = () => {
   return (

@@ -2,10 +2,10 @@ import { UpdateOAuthClientParams } from '@supabase/supabase-js'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError } from 'data/fetchers'
-import { createProjectSupabaseClient } from 'lib/project-supabase-client'
-import type { ResponseError, UseCustomMutationOptions } from 'types'
 import { oauthServerAppKeys } from './keys'
+import { handleError } from '@/data/fetchers'
+import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type OAuthServerAppUpdateVariables = UpdateOAuthClientParams & {
   clientId: string | undefined
