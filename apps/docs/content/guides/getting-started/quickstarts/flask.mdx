@@ -6,7 +6,7 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 4. Create a Python app with Flask
+## 3. Create a Python app with Flask
 
 Create a new directory for your Python app and set up a virtual environment.
 
@@ -14,6 +14,16 @@ Create a new directory for your Python app and set up a virtual environment.
 mkdir my-app && cd my-app
 python3 -m venv venv
 source venv/bin/activate
+```
+
+## 4. Install Agent Skills (optional)
+
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+To install, run the following command in the root of your project:
+
+```bash
+npx skills add supabase/agent-skills
 ```
 
 ## 5. Install Flask and the Supabase client library
@@ -26,11 +36,9 @@ Install both packages using pip.
 pip install flask supabase
 ```
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
-
 ## 6. Create environment variables file
 
-Create a `.env` file in your project root and populate it with your Supabase connection variables that you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true):
+Create a `.env` file in your project root and populate it with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true):
 
 <Button variant="primary" asChild>
   <a href="/dashboard/project/_?showConnect=true">Open Connect panel</a>
@@ -40,6 +48,8 @@ Create a `.env` file in your project root and populate it with your Supabase con
 SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
+
+<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
 
 ## 7. Query data from the app
 
