@@ -47,19 +47,17 @@ const PauseProjectButton = () => {
     organization?.slug
   )
 
-  const entity = isBranch ? 'branch' : 'project'
-
   const { mutate: pauseProject, isPending: isPausing } = useProjectPauseMutation({
     onSuccess: (_, variables) => {
       setProjectStatus({ ref: variables.ref, status: PROJECT_STATUS.PAUSING })
-      toast.success(`Pausing ${entity}...`)
+      toast.success('Pausing project...')
       router.push(`/project/${projectRef}`)
     },
   })
 
   const requestPauseProject = () => {
     if (!canPauseProject) {
-      return toast.error(`You do not have the required permissions to pause this ${entity}`)
+      return toast.error('You do not have the required permissions to pause this project')
     }
     pauseProject({ ref: projectRef })
   }
@@ -72,11 +70,11 @@ const PauseProjectButton = () => {
     !isProjectActive
 
   function getTooltipText() {
-    if (isPaused) return `Your ${entity} is already paused`
-    if (!canPauseProject) return `You need additional permissions to pause this ${entity}`
+    if (isPaused) return 'Your project is already paused'
+    if (!canPauseProject) return 'You need additional permissions to pause this project'
     if (isProjectUnhealthy)
-      return `Your ${entity} is unhealthy — restart it instead to restore normal operation`
-    if (!isProjectActive) return `Unable to pause ${entity} as ${entity} is not active`
+      return 'Your project is unhealthy — restart it instead to restore normal operation'
+    if (!isProjectActive) return 'Unable to pause project as project is not active'
     if (!isBranch && !projectPausingAllowedInOrg && !isFreePlan)
       return 'Projects on a paid plan will always be running'
     return undefined
@@ -97,23 +95,22 @@ const PauseProjectButton = () => {
           },
         }}
       >
-        {isBranch ? 'Pause branch' : 'Pause project'}
+        Pause project
       </ButtonTooltip>
 
       <AlertDialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>{isBranch ? 'Pause branch?' : 'Pause project?'}</AlertDialogTitle>
+            <AlertDialogTitle>Pause project?</AlertDialogTitle>
             <AlertDialogDescription>
-              {isBranch
-                ? 'This branch will be unavailable while paused. You can resume it at any time.'
-                : 'This project will be unavailable while paused. Paused projects can be resumed for 90 days. After that, backups remain available to download.'}
+              This project will be unavailable while paused. Paused projects can be resumed for 90
+              days. After that, backups remain available to download.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isPausing}>Cancel</AlertDialogCancel>
             <AlertDialogAction disabled={isPausing} onClick={requestPauseProject} variant="danger">
-              {isPausing ? `Pausing ${entity}...` : `Pause ${entity}`}
+              {isPausing ? 'Pausing project...' : 'Pause project'}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
