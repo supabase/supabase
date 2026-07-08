@@ -9,7 +9,6 @@ import { PipelineStatusName, STATUS_REFRESH_FREQUENCY_MS } from './Replication.c
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-version-query'
 import { Pipeline } from '@/data/replication/pipelines-query'
-import { useRestartPipelineHelper } from '@/data/replication/restart-pipeline-helper'
 import { useUpdatePipelineVersionMutation } from '@/data/replication/update-pipeline-version-mutation'
 import {
   PipelineStatusRequestStatus,
@@ -51,7 +50,6 @@ export const UpdateVersionModal = ({
   const newVersionName = versionData?.new_version?.name
 
   const { mutateAsync: updatePipelineVersion } = useUpdatePipelineVersionMutation()
-  const { restartPipeline } = useRestartPipelineHelper()
 
   const onConfirmUpdate = async () => {
     if (!projectRef || !pipeline?.id) return
@@ -68,19 +66,10 @@ export const UpdateVersionModal = ({
       return
     }
 
-    // Step 2: Reflect optimistic restart (only if not stopped) and close any panels
+    // Step 2: Reflect optimistic restart status (the pipeline restarts automatically on the backend)
     if (!isStopped) {
       setRequestStatus(pipeline.id, PipelineStatusRequestStatus.RestartRequested, statusName)
-
-      // Step 3: Restart the pipeline (stop + start)
-      try {
-        await restartPipeline({ projectRef, pipelineId: pipeline.id })
-        toast.success('Pipeline successfully updated and is currently restarting')
-      } catch (e) {
-        // Clear optimistic state and surface a single concise error
-        setRequestStatus(pipeline.id, PipelineStatusRequestStatus.None)
-        toast.error(`Failed to restart pipeline: ${(e as ResponseError).message}`)
-      }
+      toast.success('Pipeline successfully updated and is currently restarting')
     } else {
       toast.success('Pipeline successfully updated')
     }
