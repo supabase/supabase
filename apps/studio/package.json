@@ -65,6 +65,7 @@
     "@number-flow/react": "^0.3.2",
     "@sentry/nextjs": "catalog:",
     "@sentry/react": "^10.27.0",
+    "@sentry/tanstackstart-react": "10.59.0",
     "@std/path": "npm:@jsr/std__path@^1.0.8",
     "@stripe/react-stripe-js": "6.1.0",
     "@stripe/stripe-js": "9.1.0",
