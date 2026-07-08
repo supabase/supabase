@@ -4,7 +4,7 @@
 #
 # Validates that the S3-compatible backend (MinIO, RustFS, etc.) handles
 # all S3 operations that Storage relies on. Uses the aws cli so the test
-# is backend-agnostic — no vendor-specific tools required.
+# is backend-agnostic - no vendor-specific tools required.
 #
 # Usage:
 #   sh test-s3-backend.sh                   # Uses localhost:9100
