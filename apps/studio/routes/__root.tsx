@@ -106,10 +106,12 @@ const FeatureFlagProviderWithOrgContext = ({
   )
 }
 
-// Keep dev-only components out of the production bundle.
-const IS_DEV_TOOLBAR_ENABLED =
+const IS_NON_PROD_ENV =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+
+// Keep dev-only components out of the production bundle.
+const IS_DEV_TOOLBAR_ENABLED = IS_NON_PROD_ENV
 
 const ResourceWarningsTab = IS_DEV_TOOLBAR_ENABLED
   ? lazy(() =>
@@ -140,11 +142,7 @@ configureMonacoLoader()
 // non-prod). Uses the same synchronous NEXT_PUBLIC_ENVIRONMENT signal as
 // IS_DEV_TOOLBAR_ENABLED above, so it works at module scope (the `head()` route
 // option isn't a React component and can't run the async CLI check _app does).
-const FAVICON_ROUTE =
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-    ? '/favicon/staging'
-    : '/favicon'
+const FAVICON_ROUTE = IS_NON_PROD_ENV ? '/favicon/staging' : '/favicon'
 const THEME_COLOR = '1E1E1E'
 const APPLICATION_NAME = 'Supabase Studio'
 

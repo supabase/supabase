@@ -69,12 +69,12 @@ export function splitInternalUrl(url: string): SplitInternalUrlResult {
     return { to: url }
   }
 
-  // Cross-origin → leave for TanStack to handle as external.
-  if (
-    typeof window !== 'undefined' &&
-    window.location &&
-    parsed.origin !== window.location.origin
-  ) {
+  // Cross-origin → leave for TanStack to handle as external. Compare against
+  // the origin of the parse base (not `window` directly) so the check is
+  // intentionally window-independent: SSR and client agree, and an absolute
+  // external URL is never mistaken for an internal path on the server.
+  const baseOrigin = new URL(base).origin
+  if (parsed.origin !== baseOrigin) {
     return { to: url }
   }
 

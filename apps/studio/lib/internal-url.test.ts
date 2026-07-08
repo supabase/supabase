@@ -68,6 +68,28 @@ describe('splitInternalUrl (compat shim URL splitting)', () => {
   })
 })
 
+describe('splitInternalUrl under SSR (no window)', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  it('leaves cross-origin absolute URLs untouched', () => {
+    vi.stubGlobal('window', undefined)
+    expect(splitInternalUrl('https://supabase.com/docs')).toEqual({
+      to: 'https://supabase.com/docs',
+    })
+  })
+
+  it('still splits relative paths', () => {
+    vi.stubGlobal('window', undefined)
+    expect(splitInternalUrl('/project/abc/editor/123?schema=public#section')).toEqual({
+      to: '/project/abc/editor/123',
+      search: { schema: 'public' },
+      hash: 'section',
+    })
+  })
+})
+
 describe('splitInternalUrl with a configured basePath', () => {
   afterEach(() => {
     vi.unstubAllEnvs()
