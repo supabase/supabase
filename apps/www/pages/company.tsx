@@ -172,23 +172,23 @@ const Investors = () => {
         {InvestorData.filter((x) => x.lead === true).map((x) => (
           <div key={x.name}>
             <div
-              className="
-              bg-surface-100
-              col-span-1 flex h-32 content-end
-              items-center justify-center"
+              className="bg-surface-100 col-span-1 flex h-32 content-end items-center justify-center"
             >
-              <div className="relative h-8 w-full overflow-auto">
+              <div
+                className="relative w-full overflow-hidden"
+                style={{ height: `${(x.scale ?? 1) * 2}rem` }}
+              >
                 <Image
                   layout="fill"
                   src={`${x.img}`}
                   alt={x.name}
                   objectFit="scale-down"
                   objectPosition="center"
-                  className="
-                    opacity-50
-                    contrast-0
-                    filter
-                  "
+                  className={
+                    x.grayscaleOnly
+                      ? 'opacity-50 grayscale filter'
+                      : 'opacity-50 contrast-0 filter'
+                  }
                 />
               </div>
             </div>

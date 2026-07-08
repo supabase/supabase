@@ -4,26 +4,63 @@ type Investor = {
   title: string
   img: string
   lead: boolean
+  scale?: number
+  objectPosition?: string
+  grayscaleOnly?: boolean
   twitter?: string | null
   linkedIn?: string | null
 }
 
 const data: Investor[] = [
+  // Row 1
+  {
+    name: 'GIC',
+    round: 'B',
+    title: 'GIC',
+    img: '/images/logos/gic--grey.png',
+    lead: true,
+    scale: 1.5,
+    twitter: null,
+    linkedIn: null,
+  },
+  {
+    name: 'Peak XV',
+    round: 'B',
+    title: 'Peak XV Partners',
+    img: '/images/logos/peakxv--grey.png',
+    lead: true,
+    scale: 0.85,
+    twitter: null,
+    linkedIn: null,
+  },
+  {
+    name: 'Accel',
+    round: 'B',
+    title: 'Accel',
+    img: '/images/logos/accel--grey.png',
+    lead: true,
+    scale: 1.12,
+    twitter: null,
+    linkedIn: null,
+  },
+  {
+    name: 'Craft',
+    round: 'B',
+    title: 'Craft Ventures',
+    img: '/images/logos/craft--grey.png',
+    lead: true,
+    scale: 0.61,
+    twitter: null,
+    linkedIn: null,
+  },
+  // Row 2
   {
     name: 'Coatue',
     round: 'SEED',
     title: 'Coatue Growth Fund',
     img: '/images/logos/coatue.png',
     lead: true,
-    twitter: null,
-    linkedIn: null,
-  },
-  {
-    name: 'Mozilla',
-    round: 'SEED',
-    title: 'Mozilla',
-    img: '/images/logos/mozilla--grey.png',
-    lead: true,
+    scale: 0.95,
     twitter: null,
     linkedIn: null,
   },
@@ -37,11 +74,61 @@ const data: Investor[] = [
     linkedIn: null,
   },
   {
+    name: 'Stripe',
+    round: 'B',
+    title: 'Stripe',
+    img: '/images/logos/stripe--grey.png',
+    lead: true,
+    scale: 1.15,
+    twitter: null,
+    linkedIn: null,
+  },
+  {
     name: 'Felicis',
     round: 'B',
     title: 'Felicis',
     img: '/images/logos/felicis.png',
     lead: true,
+    twitter: null,
+    linkedIn: null,
+  },
+  // Row 3
+  {
+    name: 'Salesforce Ventures',
+    round: 'B',
+    title: 'Salesforce Ventures',
+    img: '/images/logos/salesforce--grey.png',
+    lead: true,
+    scale: 2.01,
+    grayscaleOnly: true,
+    twitter: null,
+    linkedIn: null,
+  },
+  {
+    name: 'Georgian',
+    round: 'B',
+    title: 'Georgian',
+    img: '/images/logos/georgian--grey.png',
+    lead: true,
+    twitter: null,
+    linkedIn: null,
+  },
+  {
+    name: 'Figma',
+    round: 'B',
+    title: 'Figma',
+    img: '/images/logos/figma--grey.png',
+    lead: true,
+    twitter: null,
+    linkedIn: null,
+  },
+  {
+    name: 'Mozilla',
+    round: 'SEED',
+    title: 'Mozilla',
+    img: '/images/logos/mozilla--grey.png',
+    lead: true,
+    scale: 0.9,
     twitter: null,
     linkedIn: null,
   },
