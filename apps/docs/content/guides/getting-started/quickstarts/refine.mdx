@@ -6,7 +6,7 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 4. Create a Refine app
+## 3. Create a Refine app
 
 Create a [Refine](https://github.com/refinedev/refine) app using the [create refine-app](https://refine.dev/docs/getting-started/quickstart/).
 
@@ -18,7 +18,7 @@ npm create refine-app@latest -- --preset refine-supabase my-app
 
 ![Refine welcome page](/docs/img/refine-qs-welcome-page.png)
 
-## 5. Install Agent Skills (optional)
+## 4. Install Agent Skills (optional)
 
 Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
 
@@ -28,9 +28,7 @@ Install them in your project with:
 npx skills add supabase/agent-skills
 ```
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "refine", "tab": "frameworks" }} />
-
-## 6. Update `supabaseClient` with environment variables
+## 5. Update `supabaseClient` with environment variables
 
 Update the `supabaseClient` with the `SUPABASE_URL` and `SUPABASE_KEY` of your Supabase API, which you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=refine&tab=frameworks). The `supabaseClient` is used in auth provider and data provider methods that allow the Refine app to connect to your Supabase backend.
 
@@ -56,7 +54,9 @@ export const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
 })
 ```
 
-## 7. Add instruments resource and pages
+<$Partial path="api_settings.mdx" variables={{ "framework": "refine", "tab": "frameworks" }} />
+
+## 6. Add instruments resource and pages
 
 Use the following code to automatically add resources and generate code for the pages to show the `instruments` data using Refine Inferencer.
 
@@ -76,7 +76,7 @@ Read more on [how the Inferencer works is in the Refine docs](https://refine.dev
 npm run refine create-resource instruments
 ```
 
-## 8. Add routes for instruments pages
+## 7. Add routes for instruments pages
 
 Add routes for the `list`, `create`, `show`, and `edit` pages.
 
@@ -152,7 +152,7 @@ function App() {
 export default App
 ```
 
-## 9. View instruments pages
+## 8. View instruments pages
 
 Start the app with the following command:
 

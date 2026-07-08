@@ -29,27 +29,27 @@ To start, you need a Supabase project.
 
 Create a new Supabase project from [the Dashboard of any organization](/dashboard/new/_) you belong to.
 
-<Admonition type="tip" label="Want to use an API?">
+<Admonition type="tip" title="Want to create a project programmatically?">
 
-You can also use [the Management API](/docs/reference/api/v1-create-a-project) to create a new Supabase project.
+You can use [the Management API](/docs/reference/api/v1-create-a-project) and ask [the MCP server](/docs/guides/ai-tools/mcp#account-management) to create a new Supabase project.
 
 </Admonition>
 
-## 2. Install MCP server (optional)
-
-The Supabase MCP server lets AI assistants interact with projects on your behalf. Find out how to connect it in [the MCP docs](/docs/guides/ai-tools/mcp).
-
-## 3. Set up your database
+## 2. Set up your database
 
 When your Supabase project is up and running, create an `instruments` table with some sample data. Then set only the privileges each Postgres role needs, add [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default, and create an RLS policy to make the data in the table publicly readable.
 
-Do this visually within your project's dashboard or by using [the MCP server](/docs/guides/ai-tools/mcp) to ask your AI assistant to run the SQL snippet in your project.
-
-Copy and run the snippet in your project's [SQL Editor](/dashboard/project/_/sql/new).
+Do this within your project's dashboard by copying and running the snippet in your project's [SQL Editor](/dashboard/project/_/sql/new).
 
 <Admonition type="tip">
 
 Save some steps by <a href={`/dashboard/project/_/sql/new?content=${encodeURIComponent(sqlSetup)}`}>clicking here to prefill the SQL</a> in the SQL Editor, and then clicking **Run**.
+
+</Admonition>
+
+<Admonition type="tip" title="Want to setup the database programmatically?">
+
+You can use [the Management API](/docs/reference/api/v1-run-a-query) and ask [the MCP server](/docs/guides/ai-tools/mcp#database) to execute SQL queries.
 
 </Admonition>
 

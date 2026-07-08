@@ -6,11 +6,11 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 4. Create an iOS SwiftUI app with Xcode
+## 3. Create an iOS SwiftUI app with Xcode
 
 Select the **Xcode > New Project > iOS > App** menu item.
 
-## 5. Install Agent Skills (optional)
+## 4. Install Agent Skills (optional)
 
 Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
 
@@ -20,7 +20,7 @@ Install them in your project with:
 npx skills add supabase/agent-skills
 ```
 
-## 6. Install the Supabase client library
+## 5. Install the Supabase client library
 
 Add the [supabase-swift](https://github.com/supabase/supabase-swift) package to your app using the Swift Package Manager.
 
@@ -28,9 +28,7 @@ In Xcode, navigate to **File > Add Package Dependencies...** and enter the repos
 
 Make sure to add `Supabase` product package as a dependency to your application target.
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "swift", "tab": "mobiles" }} />
-
-## 7. Initialize the Supabase client
+## 6. Initialize the Supabase client
 
 Create a new `Supabase.swift` file add a new Supabase instance using your project URL and publishable key, which you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=swift&tab=mobiles):
 
@@ -49,7 +47,9 @@ let supabase = SupabaseClient(
 )
 ```
 
-## 8. Create a data model for instruments
+<$Partial path="api_settings.mdx" variables={{ "framework": "swift", "tab": "mobiles" }} />
+
+## 7. Create a data model for instruments
 
 Create a decodable struct to deserialize the data from the database.
 
@@ -62,7 +62,7 @@ struct Instrument: Decodable, Identifiable {
 }
 ```
 
-## 9. Query data from the app
+## 8. Query data from the app
 
 Use a `task` to fetch the data from the database and display it using a `List`.
 
@@ -95,11 +95,11 @@ struct ContentView: View {
 }
 ```
 
-## 10. Start the app
+## 9. Start the app
 
 Run the app on a simulator or a physical device by hitting `Cmd + R` on Xcode.
 
-## 11. Setting up deep links (optional)
+## 10. Setting up deep links (optional)
 
 If you want to implement authentication features like magic links or OAuth, you need to set up deep links to redirect users back to your app. For instructions on configuring custom URL schemes for your iOS app, see the [deep linking guide](/docs/guides/auth/native-mobile-deep-linking?platform=swift).
 
