@@ -35,6 +35,7 @@ export const HomeIcon = ({ className }: { className?: string }) => {
           href={href}
           onClick={() => track('header_home_logo_clicked')}
           className={cn('items-center justify-center shrink-0 flex', className)}
+          tabIndex={0}
         >
           <img
             alt="Supabase"
