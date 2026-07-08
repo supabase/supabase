@@ -2,9 +2,8 @@
 .light {
   --helpers-os-appearance: Light;
   --hue: 159;
-  /* Warm-gray surface ramp against the green brand (--primary stays on --hue). */
   --surface-hue: 34;
-  --chroma: 0.001;
+  --chroma: 0;
   /*
    * Soft-gray canvas (not pure white) so elevated surfaces have headroom to
    * brighten toward white. --elevation-step is positive here: higher surfaces
