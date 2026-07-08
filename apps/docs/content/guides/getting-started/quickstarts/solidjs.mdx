@@ -6,7 +6,7 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 3. Create a SolidJS app
+## 4. Create a SolidJS app
 
 Create a SolidJS app using the `degit` command.
 
@@ -14,7 +14,7 @@ Create a SolidJS app using the `degit` command.
 npx degit solidjs/templates/js my-app
 ```
 
-## 4. Install the Supabase client library
+## 5. Install the Supabase client library
 
 The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a SolidJS app.
 
@@ -26,20 +26,22 @@ cd my-app && npm install @supabase/supabase-js
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "solidjs", "tab": "frameworks" }} />
 
-## 5. Declare Supabase environment variables
+## 6. Declare Supabase environment variables
 
 Create a `.env.local` file and populate with your Supabase connection variables that you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=solidjs&tab=frameworks):
 
-<$CodeTabs>
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=solidjs">
+    Open Connect panel
+  </a>
+</Button>
 
 ```text name=.env.local
 VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
 
-</$CodeTabs>
-
-## 6. Query data from the app
+## 7. Query data from the app
 
 In `App.jsx`, create a Supabase client to fetch the instruments data.
 
@@ -72,7 +74,7 @@ function App() {
 export default App
 ```
 
-## 7. Start the app
+## 8. Start the app
 
 Start the app and go to http://localhost:3000 in a browser and you should see the list of instruments.
 

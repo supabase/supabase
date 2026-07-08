@@ -47,7 +47,7 @@
 /* Cell with unsaved changes - warning (amber) background/text color */
 .rdg-cell.rdg-cell--dirty {
   background-color: hsl(var(--warning-300) / 0.75);
-  color: hsl(var(--warning-default));
+  color: hsl(var(--warning-600));
 }
 
 /* Row pending addition - green background, green text */
@@ -124,7 +124,7 @@
 */
 
 .rdg-header-row {
-  @apply bg-surface-200 select-none border-none;
+  @apply select-none border-none;
 }
 
 .rdg-header-row {
@@ -134,7 +134,7 @@
 }
 
 .rdg-header-row .rdg-cell {
-  @apply bg-surface-200 border-default border-b;
+  @apply bg-dash-canvas border-default border-b;
 }
 
 .rdg-header-row .rdg-cell-frozen:nth-last-child(1 of .rdg-cell-frozen) {

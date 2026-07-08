@@ -1,27 +1,27 @@
-export const sqlSetup = `    -- Create the table
-    create table instruments (
-      id bigint primary key generated always as identity,
-      name text not null
-    );
+export const sqlSetup = `-- Create the table
+create table instruments (
+  id bigint primary key generated always as identity,
+  name text not null
+);
 
-    -- Insert sample data into the table
-    insert into instruments (name)
-    values
-      ('violin'),
-      ('viola'),
-      ('cello');
+-- Insert sample data into the table
+insert into instruments (name)
+values
+('violin'),
+('viola'),
+('cello');
 
-    -- Grant the privileges the role needs, which is read access
-    grant select on public.instruments to anon;
+-- Grant the privileges the role needs, which is read access
+grant select on public.instruments to anon;
 
-    -- Enable row level security for the table
-    alter table instruments enable row level security;
+-- Enable row level security for the table
+alter table instruments enable row level security;
 
-    -- Create a policy to allow the anon role to read from the instruments table
-    create policy "public can read instruments"
-    on public.instruments
-    for select to anon
-    using (true);`
+-- Create a policy to allow the anon role to read from the instruments table
+create policy "public can read instruments"
+on public.instruments
+for select to anon
+using (true);`
 
 ## 1. Create a Supabase project
 
@@ -70,63 +70,54 @@ curl -X POST https://api.supabase.com/v1/projects \
 
 </Tabs>
 
-## 2. Set up your database
+## 2. Install agent skills (optional)
 
-When your Supabase project is up and running, create an `instruments` table with some sample data.
+[Agent Skills](/docs/guides/ai-tools/ai-skills) are curated instruction sets that give your AI agent procedural knowledge about working with Supabase.
 
-Then set a secure baseline by setting only the privileges each Postgres role needs, add [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default, and create an RLS policy to make the data in your table publicly readable.
+Install them in your project with:
 
-You can click this button to prefill all the SQL needed in [the SQL editor of your project](/dashboard/project/_/sql) in the Dashboard.
+```bash
+npx skills add supabase/agent-skills
+```
 
-<Button variant="primary" asChild>
-  <a href={`/dashboard/project/_/sql/new?content=${encodeURIComponent(sqlSetup)}`}>Prefill SQL</a>
-</Button>
+## 3. Set up your database
 
-<Accordion
-  type="default"
-  openBehaviour="single"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-    <AccordionItem
-      header="Want to learn more about the SQL and add it manually?"
-      id="manual-sql"
-    >
+When your Supabase project is up and running, create an `instruments` table with some sample data. Then set only the privileges each Postgres role needs, add [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default, and create an RLS policy to make the data in the table publicly readable.
 
-    Run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new). You can also choose the SQL and prefill it from the **Reference > Samples** menu at the side of the SQL Editor.
+<Admonition type="tip">
 
-    ```sql SQL_EDITOR
-    -- Create the table
-    create table instruments (
-      id bigint primary key generated always as identity,
-      name text not null
-    );
+Save some steps by <a href={`/dashboard/project/_/sql/new?content=${encodeURIComponent(sqlSetup)}`}>clicking here to prefill the SQL</a> in the SQL Editor, and then clicking **Run**.
 
-    -- Insert sample data into the table
-    insert into instruments (name)
-    values
-      ('violin'),
-      ('viola'),
-      ('cello');
+</Admonition>
 
-    -- Grant the privileges the role needs, which is read access
-    grant select on public.instruments to anon;
+Or do this manually in your project's [SQL Editor](/dashboard/project/_/sql/new), by pasting the SQL below, and clicking **Run**.
 
-    -- Enable row level security for the table
-    alter table instruments enable row level security;
+```sql SQL_EDITOR
+-- Create the table
+create table instruments (
+  id bigint primary key generated always as identity,
+  name text not null
+);
 
-    -- Create a policy to allow the anon role to read from the instruments table
-    create policy "public can read instruments"
-    on public.instruments
-    for select to anon
-    using (true);
-    ```
+-- Insert sample data into the table
+insert into instruments (name)
+values
+  ('violin'),
+  ('viola'),
+  ('cello');
 
-    </AccordionItem>
+-- Grant the privileges the role needs, which is read access
+grant select on public.instruments to anon;
 
-</Accordion>
+-- Enable row level security for the table
+alter table instruments enable row level security;
+
+-- Create a policy to allow the anon role to read from the instruments table
+create policy "public can read instruments"
+on public.instruments
+for select to anon
+using (true);
+```
 
 <Admonition type="note" label="Disabled the Data API during project setup?">
 

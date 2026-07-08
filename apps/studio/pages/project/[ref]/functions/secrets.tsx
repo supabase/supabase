@@ -1,3 +1,4 @@
+import type { PropsWithChildren } from 'react'
 import { Admonition } from 'ui-patterns/admonition'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -91,27 +92,29 @@ const SecretsPage: NextPageWithLayout = () => {
   )
 }
 
-SecretsPage.getLayout = (page) => {
-  return (
-    <DefaultLayout>
-      <EdgeFunctionsLayout title="Secrets">
-        <div className="w-full min-h-full flex flex-col items-stretch">
-          <PageHeader size="large">
-            <PageHeaderMeta>
-              <PageHeaderSummary>
-                <PageHeaderTitle>Edge Function Secrets</PageHeaderTitle>
-                <PageHeaderDescription>
-                  Manage encrypted values for your functions
-                </PageHeaderDescription>
-              </PageHeaderSummary>
-            </PageHeaderMeta>
-          </PageHeader>
+// Hoisted out of `getLayout` so the TanStack route can import it
+// directly. Same body — accepts the page content as `children`.
+export const SecretsPageWrapper = ({ children }: PropsWithChildren) => (
+  <div className="w-full min-h-full flex flex-col items-stretch">
+    <PageHeader size="large">
+      <PageHeaderMeta>
+        <PageHeaderSummary>
+          <PageHeaderTitle>Edge Function Secrets</PageHeaderTitle>
+          <PageHeaderDescription>Manage encrypted values for your functions</PageHeaderDescription>
+        </PageHeaderSummary>
+      </PageHeaderMeta>
+    </PageHeader>
 
-          {page}
-        </div>
-      </EdgeFunctionsLayout>
-    </DefaultLayout>
-  )
-}
+    {children}
+  </div>
+)
+
+SecretsPage.getLayout = (page) => (
+  <DefaultLayout>
+    <EdgeFunctionsLayout title="Secrets">
+      <SecretsPageWrapper>{page}</SecretsPageWrapper>
+    </EdgeFunctionsLayout>
+  </DefaultLayout>
+)
 
 export default SecretsPage

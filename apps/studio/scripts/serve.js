@@ -164,9 +164,22 @@ async function pipeWebResponse(response, res) {
   })
 }
 
+// Security headers for the self-hosted server. Mirrors the non-platform branch
+// of next.config.ts `headers()` (self-hosted is always IS_PLATFORM=false, so the
+// CSP is just `frame-ancestors 'none'` and there's no HSTS). The platform CSP is
+// applied at the edge via vercel.ts instead; see security-headers.ts. Set before
+// any response is written so both the static and handler paths inherit them.
+const SECURITY_HEADERS = [
+  ['X-Frame-Options', 'DENY'],
+  ['X-Content-Type-Options', 'nosniff'],
+  ['Content-Security-Policy', "frame-ancestors 'none';"],
+  ['Referrer-Policy', 'strict-origin-when-cross-origin'],
+]
+
 const port = Number(process.env.PORT || 8082)
 createServer(async (req, res) => {
   try {
+    for (const [key, value] of SECURITY_HEADERS) res.setHeader(key, value)
     if (await serveStatic(req, res)) return
     const response = await handler.fetch(toWebRequest(req))
     await pipeWebResponse(response, res)

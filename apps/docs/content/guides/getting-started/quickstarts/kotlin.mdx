@@ -6,11 +6,11 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 3. Create an Android app with Android Studio
+## 4. Create an Android app with Android Studio
 
 Select the **Android Studio > New > New Android Project** menu item.
 
-## 4. Install dependencies
+## 5. Install dependencies
 
 Open `build.gradle.kts` (app) file and add the serialization plugin, Ktor client, and Supabase client.
 
@@ -36,7 +36,7 @@ dependencies {
 }
 ```
 
-## 5. Add internet access permission
+## 6. Add internet access permission
 
 Add the following line to the `AndroidManifest.xml` file under the `manifest` tag and outside the `application` tag.
 
@@ -48,13 +48,19 @@ Add the following line to the `AndroidManifest.xml` file under the `manifest` ta
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "androidkotlin", "tab": "mobiles" }} />
 
-## 6. Initialize the Supabase client
+## 7. Initialize the Supabase client
 
 You can create a Supabase client whenever you need to perform an API call.
 
 For a quick example, create a client at the top of the `MainActivity.kt` file below the imports.
 
 Replace the `supabaseUrl` and `supabaseKey` with your own, which you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=androidkotlin&tab=mobiles):
+
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=mobiles&framework=androidkotlin">
+    Open Connect panel
+  </a>
+</Button>
 
 ```kotlin
 import ...
@@ -68,7 +74,7 @@ val supabase = createSupabaseClient(
 ...
 ```
 
-## 7. Create a data model for instruments
+## 8. Create a data model for instruments
 
 Create a serializable data class to represent the data from the database.
 
@@ -82,7 +88,7 @@ data class Instrument(
 )
 ```
 
-## 8. Query data from the app
+## 9. Query data from the app
 
 Use `LaunchedEffect` to fetch data from the database and display it in a `LazyColumn`.
 
@@ -135,6 +141,6 @@ fun InstrumentsList() {
 }
 ```
 
-## 9. Start the app
+## 10. Start the app
 
 Run the app on an emulator or a physical device by clicking the `Run app` button in Android Studio.

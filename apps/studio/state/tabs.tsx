@@ -248,6 +248,12 @@ export function createTabsState(projectRef: string) {
       store.openTabs = store.openTabs.filter((tabId) => tabId !== id)
       delete store.tabsMap[id]
 
+      // Clear the preview tab reference if the removed tab was the preview tab,
+      // so it doesn't linger in (persisted) state pointing at a closed tab
+      if (store.previewTabId === id) {
+        store.previewTabId = undefined
+      }
+
       // Update active tab if the removed tab was active
       if (id === store.activeTab) {
         store.activeTab = store.openTabs[idx - 1] || store.openTabs[idx + 1] || null

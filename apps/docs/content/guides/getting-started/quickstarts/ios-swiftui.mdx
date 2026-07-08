@@ -6,11 +6,11 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 3. Create an iOS SwiftUI app with Xcode
+## 4. Create an iOS SwiftUI app with Xcode
 
 Select the **Xcode > New Project > iOS > App** menu item.
 
-## 4. Install the Supabase client library
+## 5. Install the Supabase client library
 
 Add the [supabase-swift](https://github.com/supabase/supabase-swift) package to your app using the Swift Package Manager.
 
@@ -20,9 +20,15 @@ Make sure to add `Supabase` product package as a dependency to your application 
 
 <$Partial path="api_settings.mdx" variables={{ "framework": "swift", "tab": "mobiles" }} />
 
-## 5. Initialize the Supabase client
+## 6. Initialize the Supabase client
 
 Create a new `Supabase.swift` file add a new Supabase instance using your project URL and publishable key, which you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=swift&tab=mobiles):
+
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=mobiles&framework=swift">
+    Open Connect panel
+  </a>
+</Button>
 
 ```swift name=Supabase.swift
 import Supabase
@@ -33,7 +39,7 @@ let supabase = SupabaseClient(
 )
 ```
 
-## 6. Create a data model for instruments
+## 7. Create a data model for instruments
 
 Create a decodable struct to deserialize the data from the database.
 
@@ -46,7 +52,7 @@ struct Instrument: Decodable, Identifiable {
 }
 ```
 
-## 7. Query data from the app
+## 8. Query data from the app
 
 Use a `task` to fetch the data from the database and display it using a `List`.
 
@@ -79,11 +85,11 @@ struct ContentView: View {
 }
 ```
 
-## 8. Start the app
+## 9. Start the app
 
 Run the app on a simulator or a physical device by hitting `Cmd + R` on Xcode.
 
-## Setting up deep links
+## 10. Setting up deep links (optional)
 
 If you want to implement authentication features like magic links or OAuth, you need to set up deep links to redirect users back to your app. For instructions on configuring custom URL schemes for your iOS app, see the [deep linking guide](/docs/guides/auth/native-mobile-deep-linking?platform=swift).
 
