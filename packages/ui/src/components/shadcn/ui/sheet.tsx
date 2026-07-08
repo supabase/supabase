@@ -184,7 +184,7 @@ SheetContent.displayName = SheetPrimitive.Content.displayName
 
 const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn('px-5 py-4 text-center sm:text-left border-b bg-dash-sidebar', className)}
+    className={cn('px-5 py-4 text-center sm:text-left border-b bg-popover', className)}
     {...props}
   />
 )

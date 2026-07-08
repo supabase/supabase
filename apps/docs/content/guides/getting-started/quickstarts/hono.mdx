@@ -6,7 +6,7 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 3. Create a Hono app
+## 4. Create a Hono app
 
 Bootstrap the Hono example app from the Supabase Samples using the CLI.
 
@@ -14,7 +14,7 @@ Bootstrap the Hono example app from the Supabase Samples using the CLI.
 npx supabase@latest bootstrap hono
 ```
 
-## 4. Install the Supabase client library
+## 5. Install the Supabase client library
 
 The `package.json` file in the project includes the necessary dependencies, including `@supabase/supabase-js` and `@supabase/ssr` to help with server-side auth.
 
@@ -25,7 +25,7 @@ npm install
 {/* TODO: Not ideal for frameworks that have no entry in Connect */}
 <$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "frameworks" }} />
 
-## 5. Set up the required environment variables
+## 6. Set up the required environment variables
 
 Copy the `.env.example` file to `.env` and update the values with your Supabase project URL and publishable key, which you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&tab=frameworks).
 
@@ -35,7 +35,7 @@ Lastly, [enable anonymous sign-ins](/dashboard/project/_/auth/providers) in the 
 cp .env.example .env
 ```
 
-## 6. Start the app
+## 7. Start the app
 
 Start the app, go to http://localhost:5173.
 

@@ -42,7 +42,7 @@ export interface AppLayoutDropdownWithPopoverProps {
   commandContent: ReactNode
   open: boolean
   onOpenChange: (open: boolean) => void
-  triggerButtonClassName?: string
+  triggerButton?: ReactNode
 }
 
 export function AppLayoutDropdownWithPopover({
@@ -52,7 +52,7 @@ export function AppLayoutDropdownWithPopover({
   commandContent,
   open,
   onOpenChange,
-  triggerButtonClassName,
+  triggerButton,
 }: AppLayoutDropdownWithPopoverProps) {
   return (
     <Popover open={open} onOpenChange={onOpenChange} modal={false}>
@@ -60,9 +60,7 @@ export function AppLayoutDropdownWithPopover({
         <Link href={linkHref} className={linkClassName}>
           {linkContent}
         </Link>
-        <PopoverTrigger asChild>
-          <AppLayoutDropdownTriggerButton className={triggerButtonClassName} />
-        </PopoverTrigger>
+        <PopoverTrigger asChild>{triggerButton}</PopoverTrigger>
       </div>
       <PopoverContent className="p-0" side="bottom" align="start">
         {commandContent}
