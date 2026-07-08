@@ -40,7 +40,9 @@ export const UpdateVersionModal = ({
   )
   const pipelineStatus = pipelineStatusData?.status
   const statusName = getStatusName(pipelineStatus)
-  const isStopped = statusName === PipelineStatusName.STOPPED
+  // Treat an unresolved/unknown status as stopped so we don't optimistically claim a restart
+  // for a pipeline whose active state hasn't been confirmed yet.
+  const isStopped = statusName === undefined || statusName === PipelineStatusName.STOPPED
 
   const { data: versionData, isPending: isLoadingVersion } = useReplicationPipelineVersionQuery({
     projectRef,
