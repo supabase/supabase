@@ -44,7 +44,11 @@ export const LogsSavedPage: NextPageWithLayout = () => {
               </>
             }
             body={saved.map((item) => (
-              <SavedQueriesItem key={item.id} item={item} />
+              <Table.tr key={item.id}>
+                <Table.td colSpan={5} className="p-0!">
+                  <SavedQueriesItem item={item} />
+                </Table.td>
+              </Table.tr>
             ))}
           />
         </div>
