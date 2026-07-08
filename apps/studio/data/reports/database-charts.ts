@@ -529,7 +529,7 @@ export const getReportAttributesV2: (
       entitlement: 'database',
       requiredPlan: 'Pro',
       hide: !entitledFeatures.includes('database'),
-      showTooltip: false,
+      showTooltip: true,
       showLegend: false,
       showMaxValue: false,
       showGrid: true,
