@@ -7,7 +7,7 @@ import {
 } from 'ui-patterns/PageHeader'
 
 import { Addons } from '@/components/interfaces/Settings/Addons/Addons'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import type { NextPageWithLayout } from '@/types'
 

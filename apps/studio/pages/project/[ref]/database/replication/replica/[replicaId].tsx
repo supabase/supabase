@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
 import { Badge, Button } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ReadReplicaDetails } from '@/components/interfaces/Database/Replication/ReadReplicas/ReadReplicaDetails'
 import {

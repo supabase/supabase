@@ -10,6 +10,7 @@ import {
   getNoErrorsSinceLastDeployMessage,
   getRecentErrorGroups,
   getRecentErrorGroupsBase,
+  getRecentErrorInvocationsSql,
   getRelatedExecutionIds,
   getSinceLastDeployInvocationCount,
   getSinceLastDeployInvocationCountSql,
@@ -47,10 +48,37 @@ describe('EdgeFunctionRecentErrors.utils', () => {
         executionIds: ['exec_1', "exec_'2"],
         limit: 25,
       })
-    )
-      .toBe(`select id, function_logs.timestamp, event_message, metadata.event_type, metadata.function_id, metadata.execution_id, metadata.level from function_logs
-cross join unnest(metadata) as metadata
-where metadata.function_id = 'fn_''123' and metadata.execution_id in ('exec_1', 'exec_''2')
+    ).toBe(`-- runtime logs for error groups
+select
+  toUnixTimestamp64Micro(timestamp) as timestamp,
+  event_message,
+  log_attributes['level'] as level,
+  log_attributes['event_type'] as event_type,
+  log_attributes['function_id'] as function_id,
+  log_attributes['execution_id'] as execution_id
+from logs
+where
+  source = 'function_logs'
+  and log_attributes['function_id'] = 'fn_''123'
+  and log_attributes['execution_id'] in ('exec_1', 'exec_''2')
+order by timestamp desc
+limit 25`)
+  })
+
+  it('builds recent error invocations SQL and escapes the function id', () => {
+    expect(getRecentErrorInvocationsSql("fn_'123", 25)).toBe(`-- errors since last deploy
+select
+  toUnixTimestamp64Micro(timestamp) as timestamp,
+  event_message,
+  log_attributes['request.method'] as method,
+  log_attributes['response.status_code'] as status_code,
+  toFloat64OrZero(log_attributes['execution_time_ms']) as execution_time_ms,
+  log_attributes['execution_id'] as execution_id
+from logs
+where
+  source = 'function_edge_logs'
+  and log_attributes['function_id'] = 'fn_''123'
+  and toInt32OrZero(log_attributes['response.status_code']) >= 500
 order by timestamp desc
 limit 25`)
   })
@@ -83,9 +111,11 @@ limit 25`)
 
   it('builds the since-deploy invocation count query and empty-state message', () => {
     expect(getSinceLastDeployInvocationCountSql()).toContain(
-      'SELECT count(*) as count FROM function_edge_logs'
+      "select count() as count from logs where source = 'function_edge_logs'"
     )
-    expect(getSinceLastDeployInvocationCountSql()).toContain("(`function_id` = '__pending__')")
+    expect(getSinceLastDeployInvocationCountSql()).toContain(
+      "log_attributes['function_id'] = '__pending__'"
+    )
 
     expect(
       getSinceLastDeployInvocationCount([

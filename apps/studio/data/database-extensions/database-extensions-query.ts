@@ -6,6 +6,7 @@ import { databaseExtensionsKeys } from './keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { EMPTY_ARR } from '@/lib/void'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type DatabaseExtension = components['schemas']['PostgresExtension'] & {
@@ -26,7 +27,7 @@ export async function getDatabaseExtensions(
     { projectRef, connectionString, sql, queryKey: ['database-extensions'] },
     signal
   )
-  return result as DatabaseExtension[]
+  return (Array.isArray(result) ? result : EMPTY_ARR) as DatabaseExtension[]
 }
 
 export type DatabaseExtensionsData = Awaited<ReturnType<typeof getDatabaseExtensions>>

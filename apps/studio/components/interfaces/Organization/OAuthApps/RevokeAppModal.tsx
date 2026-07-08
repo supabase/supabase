@@ -11,7 +11,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { useAuthorizedAppRevokeMutation } from '@/data/oauth/authorized-app-revoke-mutation'
 import type { AuthorizedApp } from '@/data/oauth/authorized-apps-query'

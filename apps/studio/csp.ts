@@ -188,7 +188,9 @@ export function getCSP() {
     VERCEL_LIVE_URL,
   ].join(' ')
 
-  const fontSrcDirective = [`font-src 'self'`, ...FONT_SRC_URLS, VERCEL_LIVE_URL].join(' ')
+  // `data:` is required — GraphiQL's bundled Monaco ships the codicon icon font
+  // as a data: URI, and Stripe's payment element inlines its fonts the same way.
+  const fontSrcDirective = [`font-src 'self'`, `data:`, ...FONT_SRC_URLS, VERCEL_LIVE_URL].join(' ')
 
   const workerSrcDirective = [`worker-src 'self'`, `blob:`, `data:`].join(' ')
 

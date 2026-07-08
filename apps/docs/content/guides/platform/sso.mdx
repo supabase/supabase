@@ -74,7 +74,7 @@ Users start their login at supabase.com by entering their email address, then ar
 
 - **Login flows** - Choose between IdP-initiated (users start from identity provider), SP-initiated (users start at supabase.com), or both. IdP-initiated is recommended for most organizations and requires no domain configuration. See [Choosing the Right Login Flow](/docs/guides/platform/sso/choosing-login-flow) for guidance.
 - **Email domains** - Required only if you enable SP-initiated login. You can associate one or more email domains with your SSO provider. Users with matching email addresses can sign in via SSO at supabase.com. Not required for IdP-initiated flow.
-- **Auto-join** - Optionally allow users with a matching domain to be added to your organization automatically when they sign in via SSO. Auto-join applies on every login, not just first signup, making it easy to test before enabling.
+- **Auto-join** - Optionally allow users with a matching domain to join your organization automatically when they sign in via SSO. This applies on every login, not only on first signup.
 - **Default role for auto-joined users** - Choose the role (e.g., `Read-only`, `Developer`, `Administrator`, `Owner`) that automatically joined users receive. We recommend using `Developer` as the default (principle of least privilege) and promoting users individually as needed. Refer to [access control](/docs/guides/platform/access-control) for more information about roles.
 - **Invitation types** - When inviting users to your organization, you can explicitly choose whether the invitation requires SSO authentication or allows non-SSO login (password/social). This enables mixed authentication organizations with both SSO and non-SSO users.
 

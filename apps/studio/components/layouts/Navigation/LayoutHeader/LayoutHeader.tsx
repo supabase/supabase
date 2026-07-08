@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode, useMemo } from 'react'
 import { Badge, cn } from 'ui'
-import { CommandMenuTriggerInput } from 'ui-patterns'
+import { CommandMenuTriggerInput } from 'ui-patterns/CommandMenu'
 
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'

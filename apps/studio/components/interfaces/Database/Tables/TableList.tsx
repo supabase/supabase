@@ -37,11 +37,11 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
@@ -265,12 +265,18 @@ export const TableList = ({
           </Shortcut>
           <Popover>
             <PopoverTrigger asChild>
-              <Button
-                size="tiny"
-                variant={visibleTypes.length !== 5 ? 'default' : 'dashed'}
-                className="px-1"
-                icon={<Filter />}
-              />
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    size="tiny"
+                    variant={visibleTypes.length !== 5 ? 'default' : 'dashed'}
+                    className="px-1"
+                    icon={<Filter />}
+                    aria-label="Filter"
+                  />
+                </TooltipTrigger>
+                <TooltipContent>Filter</TooltipContent>
+              </Tooltip>
             </PopoverTrigger>
             <PopoverContent className="p-0 w-56" side="bottom" align="center">
               <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
@@ -508,14 +514,19 @@ export const TableList = ({
 
                             {!isSchemaLocked && (
                               <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="default"
-                                    className="px-1"
-                                    icon={<MoreVertical />}
-                                    aria-label={`Table ${x.name} actions`}
-                                  />
-                                </DropdownMenuTrigger>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button
+                                        variant="default"
+                                        className="px-1"
+                                        icon={<MoreVertical />}
+                                        aria-label={`Table ${x.name} actions`}
+                                      />
+                                    </DropdownMenuTrigger>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="bottom">More options</TooltipContent>
+                                </Tooltip>
                                 <DropdownMenuContent side="bottom" align="end" className="w-40">
                                   <DropdownMenuItem
                                     className="flex items-center space-x-2"

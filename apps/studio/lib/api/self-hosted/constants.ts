@@ -2,8 +2,7 @@
 
 // Schemas exposed via PostgREST Data API, read from the PGRST_DB_SCHEMAS env var
 // that is passed to the Studio container via docker-compose / CLI.
-export const DEFAULT_EXPOSED_SCHEMAS =
-  process.env.PGRST_DB_SCHEMAS ?? 'public,storage,graphql_public'
+export const DEFAULT_EXPOSED_SCHEMAS = process.env.PGRST_DB_SCHEMAS ?? 'public,graphql_public'
 
 export const ENCRYPTION_KEY = process.env.PG_META_CRYPTO_KEY || 'SAMPLE_KEY'
 export const POSTGRES_PORT = parseInt(process.env.POSTGRES_PORT || '5432', 10)

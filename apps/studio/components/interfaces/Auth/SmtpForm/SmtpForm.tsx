@@ -19,9 +19,10 @@ import {
   InputGroupText,
   Switch,
 } from 'ui'
-import { Admonition, PageSection, PageSectionContent } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import * as z from 'zod'
 
 import { urlRegex } from '../Auth.constants'

@@ -151,6 +151,7 @@ export const SignUpForm = () => {
         <Form {...form}>
           <form
             id={formId}
+            method="POST"
             className="flex flex-col gap-4"
             onSubmit={form.handleSubmit(onSubmit, (errors) =>
               trackFunnelError('signup', classifyValidationError('signup', errors), 'form')

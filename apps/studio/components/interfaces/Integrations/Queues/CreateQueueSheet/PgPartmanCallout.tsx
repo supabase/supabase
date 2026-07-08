@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { usePgPartmanStatus } from '../usePgPartmanStatus'
 import { EnableExtensionModal } from '@/components/interfaces/Database/Extensions/EnableExtensionModal'

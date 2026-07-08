@@ -1,4 +1,3 @@
-import { useFlag } from 'common'
 import { FlaskConical, Loader2, ScrollText, User2 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
@@ -16,7 +15,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   singleThemes,
-  Theme,
 } from 'ui'
 
 import { ButtonTooltip } from '../ui/ButtonTooltip'
@@ -42,7 +40,6 @@ export function UserDropdown({
   const { theme, setTheme } = useTheme()
   const appStateSnapshot = useAppStateSnapshot()
   const profileShowEmailEnabled = useIsFeatureEnabled('profile:show_email')
-  const timezonePickerEnabled = useFlag('timezonePicker')
   const { username, avatarUrl, primaryEmail, isLoading } = useProfileNameAndPicture()
 
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
@@ -105,7 +102,9 @@ export function UserDropdown({
                 </span>
               )}
             </div>
+
             <DropdownMenuSeparator />
+
             <DropdownMenuGroup>
               <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
                 <Link
@@ -141,6 +140,7 @@ export function UserDropdown({
             </DropdownMenuGroup>
           </>
         )}
+
         <DropdownMenuGroup>
           <DropdownMenuLabel>Theme</DropdownMenuLabel>
           <DropdownMenuRadioGroup
@@ -149,7 +149,7 @@ export function UserDropdown({
               setTheme(value)
             }}
           >
-            {singleThemes.map((theme: Theme) => (
+            {singleThemes.map((theme) => (
               <DropdownMenuRadioItem
                 key={theme.value}
                 value={theme.value}
@@ -160,14 +160,13 @@ export function UserDropdown({
             ))}
           </DropdownMenuRadioGroup>
         </DropdownMenuGroup>
-        {timezonePickerEnabled && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <TimezoneDropdown />
-            </DropdownMenuGroup>
-          </>
-        )}
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuGroup>
+          <TimezoneDropdown />
+        </DropdownMenuGroup>
+
         {showUpgradeCta && (
           <>
             <DropdownMenuSeparator />

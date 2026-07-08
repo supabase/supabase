@@ -6,7 +6,7 @@ import { useQueryStates } from 'nuqs'
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button_Shadcn_, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, Input } from 'ui'
 import { MultiSelector } from 'ui-patterns/multi-select'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { type ITroubleshootingMetadata } from './Troubleshooting.utils'
 import {

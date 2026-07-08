@@ -11,8 +11,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { LogDrainDestinationSheetForm } from './LogDrainDestinationSheetForm'
 import { LogDrainType } from './LogDrains.constants'

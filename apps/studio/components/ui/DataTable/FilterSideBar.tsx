@@ -1,6 +1,5 @@
 import { useParams } from 'common'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { cloneElement, Dispatch, SetStateAction, useEffect } from 'react'
 import { Badge, Button, cn, ResizablePanel, usePanelRef } from 'ui'
 
@@ -9,7 +8,6 @@ import { DateRangeDisabled } from './DataTable.types'
 import { DataTableFilterControls } from './DataTableFilters/DataTableFilterControls'
 import { DataTableResetButton } from './DataTableResetButton'
 import { useDataTable } from './providers/DataTableProvider'
-import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import { UnifiedLogsBanner } from '@/components/interfaces/UnifiedLogs/UnifiedLogsBanner'
 
@@ -24,16 +22,8 @@ export function FilterSideBar({
   setIsFilterBarOpen,
   dateRangeDisabled,
 }: FilterSideBarProps) {
-  const router = useRouter()
   const { ref } = useParams()
   const { table } = useDataTable()
-
-  const { disable: disableUnifiedLogs, isEligible: isUnifiedLogsEligible } = useUnifiedLogsPreview()
-
-  const handleGoBackToOldLogs = () => {
-    disableUnifiedLogs()
-    router.push(`/project/${ref}/logs/explorer`)
-  }
 
   const panelRef = usePanelRef()
 
@@ -66,19 +56,13 @@ export function FilterSideBar({
         <div className="flex h-[48px] items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <p className="text-foreground text-lg">Logs</p>
-            {isUnifiedLogsEligible && <Badge variant="default">Beta</Badge>}
+            <Badge variant="default">Beta</Badge>
           </div>
           {table.getState().columnFilters.length ? <DataTableResetButton /> : null}
         </div>
       </div>
 
-      {isUnifiedLogsEligible && (
-        <UnifiedLogsBanner
-          variant="utility"
-          className="mx-4 mt-4"
-          onSwitchBack={handleGoBackToOldLogs}
-        />
-      )}
+      <UnifiedLogsBanner />
 
       <div className="flex-1 p-2 sm:overflow-y-scroll">
         <DataTableFilterControls dateRangeDisabled={dateRangeDisabled} />

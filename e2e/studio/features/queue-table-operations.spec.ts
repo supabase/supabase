@@ -22,6 +22,24 @@ const openQueueDropdownAndClick = async (page: Page, itemName: string) => {
 const clickReview = async (page: Page) => openQueueDropdownAndClick(page, 'Review')
 const clickDiscard = async (page: Page) => openQueueDropdownAndClick(page, 'Discard')
 
+const openTableWithQueueOperations = async (page: Page, ref: string, tableName: string) => {
+  await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+  await enableQueueOperations(page)
+  const tableLoadWait = createApiResponseWaiter(
+    page,
+    'pg-meta',
+    ref,
+    'query?key=entity-types-public-'
+  )
+  await page.reload()
+  await tableLoadWait
+
+  const gridLoadWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=table-rows-')
+  await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+  await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+  await gridLoadWait
+}
+
 test.describe('Queue Table Operations', () => {
   test.beforeEach(async ({ page, ref }) => {
     const loadPromise = waitForTableToLoad(page, ref)
@@ -1026,5 +1044,349 @@ test.describe('Queue Table Operations', () => {
     await expect(page.getByRole('gridcell', { name: 'Jones' })).toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'Alice' })).not.toBeVisible()
     await expect(page.getByRole('gridcell', { name: 'Smith' })).not.toBeVisible()
+  })
+})
+
+test.describe('Queue Table Operations - queue identity fixes', () => {
+  test('primary-key and column edits to the same row are saved together', async ({ page, ref }) => {
+    const tableName = `${tableNamePrefix}_pk_col_edit`
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await dropTable(tableName)
+        await query(
+          `CREATE TABLE ${tableName} (
+            id bigint primary key,
+            name text
+          )`
+        )
+        await query(`INSERT INTO ${tableName} (id, name) VALUES ($1, $2)`, [
+          13001,
+          'original pk row',
+        ])
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+
+    await openTableWithQueueOperations(page, ref, tableName)
+
+    const originalNameCell = page.getByRole('gridcell', { name: 'original pk row' })
+    await expect(
+      originalNameCell,
+      'Original row should be visible before editing through the row editor'
+    ).toBeVisible()
+
+    await originalNameCell.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Edit row' }).click()
+
+    const rowEditor = page.getByTestId('side-panel-row-editor')
+    await expect(rowEditor, 'Row editor should open for the selected row').toBeVisible()
+
+    await rowEditor.getByTestId('id-input').fill('13002')
+    await rowEditor.getByTestId('name-input').fill('updated pk row')
+    await page.getByTestId('action-bar-save-row').click()
+
+    await expect(
+      page.getByText('2 pending changes'),
+      'Editing the primary key and name should queue two cell edits'
+    ).toBeVisible()
+    await expect(
+      page.getByRole('gridcell', { name: '13002' }),
+      'Optimistic grid state should show the edited primary key'
+    ).toBeVisible()
+    await expect(
+      page.getByRole('gridcell', { name: 'updated pk row' }),
+      'Optimistic grid state should show the edited name'
+    ).toBeVisible()
+
+    await clickReview(page)
+
+    const sidePanel = page.getByRole('dialog')
+    await expect(sidePanel.getByText('Pending changes')).toBeVisible()
+    await expect(
+      sidePanel.getByText('2 cell edits'),
+      'Both queued edits should still be reviewed as cell edits'
+    ).toBeVisible()
+
+    const saveWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=operation-queue-save',
+      {
+        method: 'POST',
+      }
+    )
+    await sidePanel.getByRole('button', { name: /^Save/ }).click()
+    await saveWait
+    await expect(
+      page.getByText('Changes saved successfully'),
+      'Queue save should complete successfully'
+    ).toBeVisible({ timeout: 15000 })
+
+    const rows = await query<{ id: string; name: string }>(
+      `SELECT id::text AS id, name FROM ${tableName} ORDER BY id`
+    )
+    expect(rows).toEqual([{ id: '13002', name: 'updated pk row' }])
+
+    await expect(page.getByRole('gridcell', { name: 'updated pk row' })).toBeVisible()
+    await expect(page.getByRole('gridcell', { name: 'original pk row' })).not.toBeVisible()
+  })
+
+  test('primary-key edits can be reverted before saving', async ({ page, ref }) => {
+    const tableName = `${tableNamePrefix}_pk_revert`
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await dropTable(tableName)
+        await query(
+          `CREATE TABLE ${tableName} (
+            id bigint primary key,
+            name text
+          )`
+        )
+        await query(`INSERT INTO ${tableName} (id, name) VALUES ($1, $2)`, [14001, 'pk revert row'])
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+
+    await openTableWithQueueOperations(page, ref, tableName)
+
+    const originalIdCell = page.getByRole('gridcell', { name: '14001', exact: true })
+    await expect(
+      originalIdCell,
+      'Original primary key should be visible before editing'
+    ).toBeVisible()
+
+    await originalIdCell.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Edit row' }).click()
+
+    const rowEditor = page.getByTestId('side-panel-row-editor')
+    await expect(rowEditor, 'Row editor should open for the selected row').toBeVisible()
+    await rowEditor.getByTestId('id-input').fill('14002')
+    await page.getByTestId('action-bar-save-row').click()
+
+    await expect(
+      page.getByText('1 pending change'),
+      'Changing a primary-key cell should queue one pending edit'
+    ).toBeVisible()
+    await expect(
+      page.getByRole('gridcell', { name: '14002', exact: true }),
+      'Optimistic grid state should show the changed primary key'
+    ).toBeVisible()
+
+    await page.getByRole('gridcell', { name: '14002', exact: true }).click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Edit row' }).click()
+
+    const revertedRowEditor = page.getByTestId('side-panel-row-editor')
+    await expect(
+      revertedRowEditor,
+      'Row editor should reopen after the primary key changed'
+    ).toBeVisible()
+    await revertedRowEditor.getByTestId('id-input').fill('14001')
+    await page.getByTestId('action-bar-save-row').click()
+
+    await expect(
+      page.getByText('pending change'),
+      'Reverting the primary key to its original value should clear the queued edit'
+    ).not.toBeVisible()
+    await expect(page.getByRole('gridcell', { name: '14001', exact: true })).toBeVisible()
+  })
+
+  test('primary-key edits keep rows distinct when another row takes the old key', async ({
+    page,
+    ref,
+  }) => {
+    const tableName = `${tableNamePrefix}_pk_take_old`
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await dropTable(tableName)
+        await query(
+          `CREATE TABLE ${tableName} (
+            id bigint primary key,
+            name text
+          )`
+        )
+        await query(`INSERT INTO ${tableName} (id, name) VALUES ($1, $2), ($3, $4)`, [
+          15001,
+          'Alice keeps identity',
+          15002,
+          'Bob takes old key',
+        ])
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+
+    await openTableWithQueueOperations(page, ref, tableName)
+
+    const aliceCell = page.getByRole('gridcell', { name: 'Alice keeps identity' })
+    await expect(aliceCell, 'Alice row should be visible before editing').toBeVisible()
+    await aliceCell.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Edit row' }).click()
+
+    const aliceEditor = page.getByTestId('side-panel-row-editor')
+    await expect(aliceEditor, 'Row editor should open for Alice').toBeVisible()
+    await aliceEditor.getByTestId('id-input').fill('15003')
+    await page.getByTestId('action-bar-save-row').click()
+
+    await expect(
+      page.getByText('1 pending change'),
+      'Alice primary-key edit should queue one pending change'
+    ).toBeVisible()
+    await expect(
+      page.getByRole('gridcell', { name: '15003', exact: true }),
+      'Alice row should show the updated primary key in the grid'
+    ).toBeVisible()
+
+    const bobCell = page.getByRole('gridcell', { name: 'Bob takes old key' })
+    await expect(
+      bobCell,
+      'Bob row should remain visible after Alice primary-key edit'
+    ).toBeVisible()
+    await bobCell.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Edit row' }).click()
+
+    const bobEditor = page.getByTestId('side-panel-row-editor')
+    await expect(bobEditor, 'Row editor should open for Bob').toBeVisible()
+    await bobEditor.getByTestId('id-input').fill('15001')
+    await page.getByTestId('action-bar-save-row').click()
+
+    await expect(
+      page.getByText('2 pending changes'),
+      'Both primary-key edits should stay queued against their original rows'
+    ).toBeVisible()
+
+    await clickReview(page)
+
+    const sidePanel = page.getByRole('dialog')
+    await expect(
+      sidePanel.getByText('Pending changes'),
+      'Review panel should show pending changes before saving primary-key edits'
+    ).toBeVisible()
+    await expect(
+      sidePanel.getByText('2 cell edits'),
+      'Review panel should show both primary-key edits as cell edits'
+    ).toBeVisible()
+
+    const saveWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=operation-queue-save',
+      {
+        method: 'POST',
+      }
+    )
+    await sidePanel.getByRole('button', { name: /^Save/ }).click()
+    await saveWait
+    await expect(
+      page.getByText('Changes saved successfully'),
+      'Saving swapped primary-key edits should show a success toast'
+    ).toBeVisible({ timeout: 15000 })
+
+    const rows = await query<{ id: string; name: string }>(
+      `SELECT id::text AS id, name FROM ${tableName} ORDER BY id`
+    )
+    expect(rows).toEqual([
+      { id: '15001', name: 'Bob takes old key' },
+      { id: '15003', name: 'Alice keeps identity' },
+    ])
+  })
+
+  test('deleting a newly inserted row removes it from pending changes', async ({ page, ref }) => {
+    const tableName = `${tableNamePrefix}_pending_del`
+    const columnName = 'name'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await createTable(tableName, columnName)
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+
+    await openTableWithQueueOperations(page, ref, tableName)
+
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
+    await page.getByTestId(`${columnName}-input`).fill('keep pending row')
+    await page.getByTestId('action-bar-save-row').click()
+
+    await page.getByTestId('table-editor-insert-new-row').click()
+    await page.getByRole('menuitem', { name: 'Insert row' }).click()
+    await page.getByTestId(`${columnName}-input`).fill('delete pending row')
+    await page.getByTestId('action-bar-save-row').click()
+
+    await expect(
+      page.getByText('2 pending changes'),
+      'Adding two pending rows should queue two pending changes'
+    ).toBeVisible()
+    await expect(
+      page.getByRole('gridcell', { name: 'keep pending row' }),
+      'First pending row should be visible before deleting the second row'
+    ).toBeVisible()
+    await expect(
+      page.getByRole('gridcell', { name: 'delete pending row' }),
+      'Second pending row should be visible before deletion'
+    ).toBeVisible()
+
+    await page.getByRole('gridcell', { name: 'delete pending row' }).click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Delete row' }).click()
+
+    await expect(
+      page.getByText('1 pending change'),
+      'Deleting one pending insert should remove only that row from the queue'
+    ).toBeVisible()
+    await expect(
+      page.getByRole('gridcell', { name: 'keep pending row' }),
+      'Remaining pending row should stay visible after deleting the other pending row'
+    ).toBeVisible()
+    await expect(
+      page.getByRole('gridcell', { name: 'delete pending row' }),
+      'Deleted pending row should be removed from the grid'
+    ).not.toBeVisible()
+
+    await clickReview(page)
+
+    const sidePanel = page.getByRole('dialog')
+    await expect(
+      sidePanel.getByText('Pending changes'),
+      'Review panel should show pending changes after deleting one pending row'
+    ).toBeVisible()
+    await expect(
+      sidePanel.getByText('1 row addition'),
+      'Review panel should only show the remaining pending row addition'
+    ).toBeVisible()
+    await expect(
+      sidePanel.getByText('delete pending row'),
+      'Review panel should not include the deleted pending row'
+    ).not.toBeVisible()
+
+    const saveWait = createApiResponseWaiter(
+      page,
+      'pg-meta',
+      ref,
+      'query?key=operation-queue-save',
+      {
+        method: 'POST',
+      }
+    )
+    await sidePanel.getByRole('button', { name: /^Save/ }).click()
+    await saveWait
+    await expect(
+      page.getByText('Changes saved successfully'),
+      'Saving the remaining pending row should show a success toast'
+    ).toBeVisible({ timeout: 15000 })
+
+    const rows = await query<{ name: string }>(`SELECT name FROM ${tableName} ORDER BY name`)
+    expect(rows).toEqual([{ name: 'keep pending row' }])
   })
 })

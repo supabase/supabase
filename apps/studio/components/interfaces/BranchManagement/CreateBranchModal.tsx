@@ -42,7 +42,7 @@ import {
 } from './BranchManagement.utils'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { BranchingPITRNotice } from '@/components/layouts/AppLayout/EnableBranchingButton/BranchingPITRNotice'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'

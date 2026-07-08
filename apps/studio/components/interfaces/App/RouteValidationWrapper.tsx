@@ -7,7 +7,7 @@ import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
-import useLatest from '@/hooks/misc/useLatest'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 

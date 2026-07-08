@@ -430,6 +430,66 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
 }
 
 /**
+ * Project creation form was rendered and shown to the user. Passive impression that
+ * anchors the project-creation funnel (exposed -> completed). Fires once per form view,
+ * after the org and create-project permission have resolved, so it tracks the form
+ * actually being visible rather than the route loading. Disambiguate by `surface`.
+ * Completion is measured by `project_creation_simple_version_submitted` (which fires
+ * client-side on the create success callback).
+ *
+ * @group Events
+ * @source studio
+ * @page new/{slug}
+ */
+export interface ProjectCreationFormExposedEvent {
+  action: 'project_creation_form_exposed'
+  properties: {
+    /**
+     * Which surface rendered the form. 'main' is the standard project creation wizard.
+     */
+    surface?: 'main' | 'vercel'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
+ * New-organization form was rendered and shown to the user. Passive impression that
+ * anchors the organization-creation funnel (exposed -> completed). Fires once per form
+ * view, after the user's profile has resolved (i.e. an authenticated session), so it
+ * does not count pre-auth redirects. No organization group: the org does not exist yet
+ * at this point in the flow.
+ *
+ * @group Events
+ * @source studio
+ * @page new
+ */
+export interface OrganizationCreationFormExposedEvent {
+  action: 'organization_creation_form_exposed'
+}
+
+/**
+ * Organization was created and the new org slug is available client-side. Fires from the
+ * create success callback (both the free path and the paid path that confirms a pending
+ * payment intent), so org-creation completion is measurable from frontend events without
+ * relying on the backend `organization_created` event (which fires across all surfaces).
+ * Closes the organization-creation funnel (exposed -> completed).
+ *
+ * @group Events
+ * @source studio
+ * @page new
+ */
+export interface OrganizationCreationCompletedEvent {
+  action: 'organization_creation_completed'
+  properties: {
+    /**
+     * Billing tier provisioned at creation. tier_payg is uncapped PRO.
+     */
+    tier: 'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team'
+  }
+  groups: Omit<TelemetryGroups, 'project'>
+}
+
+/**
  * User toggled Data API access on a table via the switch in the table editor side panel.
  * Only fires for new tables — editing existing tables links out to the settings page instead.
  *
@@ -839,6 +899,22 @@ export interface AskAiClickedEvent {
 }
 
 /**
+ * User clicked a curated orientation link from a content listings MDX component.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsContentListingClickedEvent {
+  action: 'docs_content_listing_clicked'
+  properties: {
+    targetPath: string
+    linkTitle: string
+    groupTitle?: string
+    listingId?: string
+  }
+}
+
+/**
  * User clicked a recommended page card shown on a docs "not found" page.
  *
  * @group Events
@@ -855,6 +931,19 @@ export interface Docs404RecommendationClickedEvent {
      * The path of the "not found" page where the recommendation was shown.
      */
     sourcePath: string
+  }
+}
+
+/**
+ * User clicked the copy button on a project config variable in the docs.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsProjectConfigVariablesCopyButtonClickedEvent {
+  action: 'docs_project_config_variables_copy_button_clicked'
+  properties: {
+    variable: 'url' | 'publishable' | 'anon' | 'sessionPooler'
   }
 }
 
@@ -2860,7 +2949,14 @@ export interface DashboardErrorCreatedEvent {
      */
     errorCategory?: 'validation' | 'api' | 'network' | 'payment' | 'unknown'
     /**
-     * Controlled-vocabulary slug describing the reason (no free text, no PII)
+     * Controlled-vocabulary slug describing the reason (no free text, no PII).
+     *
+     * Typed `string` rather than a literal union on purpose: the source-of-truth
+     * union `FunnelErrorReason` lives in `apps/studio/lib/telemetry/funnel-errors.ts`,
+     * and this `common` package cannot import from an app. The constraint is enforced
+     * at the only emit site instead: `useTrackFunnelError` accepts a classified
+     * `FunnelErrorReason`, so free text never reaches this field. Do not widen usage by
+     * setting `errorReason` from a raw error message.
      */
     errorReason?: string
     /**
@@ -3022,7 +3118,7 @@ export interface IntegrationUninstallCompletedEvent {
  *
  * @group Events
  * @source studio
- * @page /project/{ref}/auth/policies
+ * @page /project/{ref}/database/policies
  */
 export interface RlsEventTriggerBannerCreateButtonClickedEvent {
   action: 'rls_event_trigger_banner_create_button_clicked'
@@ -3252,6 +3348,7 @@ export interface UnifiedLogsRowClickedEvent {
      * reaching the table; anything else is rejected upstream so the union here is exhaustive.
      */
     logType:
+      | 'edge'
       | 'postgres'
       | 'postgrest'
       | 'auth'
@@ -3471,6 +3568,9 @@ export type TelemetryEvent =
   | ProjectCreationGithubConnectClickedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
+  | ProjectCreationFormExposedEvent
+  | OrganizationCreationFormExposedEvent
+  | OrganizationCreationCompletedEvent
   | TableApiAccessToggleClickedEvent
   | RealtimeInspectorListenChannelClickedEvent
   | RealtimeInspectorBroadcastSentEvent
@@ -3496,7 +3596,9 @@ export type TelemetryEvent =
   | DocsFeedbackClickedEvent
   | CopyAsMarkdownClickedEvent
   | AskAiClickedEvent
+  | DocsContentListingClickedEvent
   | Docs404RecommendationClickedEvent
+  | DocsProjectConfigVariablesCopyButtonClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
   | HomepageProductCardClickedEvent
   | WwwPricingPlanCtaClickedEvent

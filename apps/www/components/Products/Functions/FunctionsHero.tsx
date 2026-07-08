@@ -241,9 +241,9 @@ const FunctionsHero = () => {
               y2={s?.y2}
               gradientUnits="userSpaceOnUse"
             >
-              <stop offset="0" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
-              <stop offset="0.5" stopColor="hsl(var(--foreground-default))" stopOpacity="0.6" />
-              <stop offset="1" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
+              <stop offset="0" stopColor="var(--foreground-default)" stopOpacity="0" />
+              <stop offset="0.5" stopColor="var(--foreground-default)" stopOpacity="0.6" />
+              <stop offset="1" stopColor="var(--foreground-default)" stopOpacity="0" />
             </linearGradient>
           </defs>
         </svg>
