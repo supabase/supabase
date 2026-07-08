@@ -1,53 +1,44 @@
-import { Source_Code_Pro } from 'next/font/google'
+import { Manrope } from 'next/font/google'
 import localFont from 'next/font/local'
 
-export const customFont = localFont({
-  variable: '--font-custom',
+export const manrope = Manrope({
+  variable: '--font-manrope',
   display: 'swap',
-  fallback: ['Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+  subsets: ['latin'],
+})
+
+export const inter = localFont({
+  variable: '--font-inter',
+  display: 'swap',
+  fallback: ['system-ui', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
   src: [
     {
-      path: './CustomFont-Book.woff2',
-      weight: '400',
+      path: './inter/InterVariable.woff2',
+      weight: '100 900',
       style: 'normal',
     },
     {
-      path: './CustomFont-BookItalic.woff2',
-      weight: '400',
-      style: 'italic',
-    },
-    {
-      path: './CustomFont-Medium.woff2',
-      weight: '500',
-      style: 'normal',
-    },
-    {
-      path: './CustomFont-Bold.woff2',
-      weight: '700',
-      style: 'normal',
-    },
-    {
-      path: './CustomFont-BoldItalic.woff2',
-      weight: '700',
-      style: 'italic',
-    },
-    {
-      path: './CustomFont-Black.woff2',
-      weight: '800',
-      style: 'normal',
-    },
-    {
-      path: './CustomFont-BlackItalic.woff2',
-      weight: '800',
+      path: './inter/InterVariable-Italic.woff2',
+      weight: '100 900',
       style: 'italic',
     },
   ],
 })
 
-export const sourceCodePro = Source_Code_Pro({
-  subsets: ['latin'],
-  fallback: ['Source Code Pro', 'Office Code Pro', 'Menlo', 'monospace'],
+export const sourceCodePro = localFont({
   variable: '--font-source-code-pro',
   display: 'swap',
-  weight: ['400', '500', '600', '700'],
+  fallback: ['Source Code Pro', 'Office Code Pro', 'Menlo', 'monospace'],
+  src: [
+    {
+      path: './source-code-pro/SourceCodePro-Variable.woff2',
+      weight: '200 900',
+      style: 'normal',
+    },
+    {
+      path: './source-code-pro/SourceCodePro-Variable-Italic.woff2',
+      weight: '200 900',
+      style: 'italic',
+    },
+  ],
 })

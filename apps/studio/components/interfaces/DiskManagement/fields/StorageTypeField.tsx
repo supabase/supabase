@@ -1,30 +1,30 @@
-import { UseFormReturn } from 'react-hook-form'
-
 import { useParams } from 'common'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useDiskAttributesQuery } from 'data/config/disk-attributes-query'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import { UseFormReturn } from 'react-hook-form'
 import {
   Badge,
   buttonVariants,
   cn,
-  FormControl_Shadcn_,
-  FormField_Shadcn_,
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  FormControl,
+  FormField,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
   Skeleton,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+
 import { IO2_AVAILABLE_REGIONS } from '../DiskManagement.constants'
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
 import { DISK_LIMITS, DISK_TYPE_OPTIONS, DiskType } from '../ui/DiskManagement.constants'
 import FormMessage from '../ui/FormMessage'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 type StorageTypeFieldProps = {
   form: UseFormReturn<DiskStorageSchemaType>
@@ -41,12 +41,12 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
   const { isPending: isLoading, error, isError } = useDiskAttributesQuery({ projectRef })
 
   return (
-    <FormField_Shadcn_
+    <FormField
       name="storageType"
       control={control}
       render={({ field }) => (
         <FormItemLayout layout="horizontal" label="Storage type">
-          <Select_Shadcn_
+          <Select
             {...field}
             onValueChange={async (e: DiskType) => {
               field.onChange(e)
@@ -90,24 +90,24 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                 )}
               />
             ) : (
-              <FormControl_Shadcn_>
-                <SelectTrigger_Shadcn_ className="h-14 max-w-[420px]">
-                  <SelectValue_Shadcn_ />
-                </SelectTrigger_Shadcn_>
-              </FormControl_Shadcn_>
+              <FormControl>
+                <SelectTrigger className="h-14 max-w-[420px]">
+                  <SelectValue />
+                </SelectTrigger>
+              </FormControl>
             )}
-            <SelectContent_Shadcn_>
+            <SelectContent>
               <>
                 {DISK_TYPE_OPTIONS.map((item) => {
                   const disableIo2 = item.type === 'io2' && !isIo2Supported
                   return (
                     <Tooltip key={item.type}>
                       <TooltipTrigger asChild>
-                        <SelectItem_Shadcn_
+                        <SelectItem
                           key={item.type}
                           disabled={disableInput || disableIo2}
                           value={item.type}
-                          className={cn(disableIo2 && '!pointer-events-auto')}
+                          className={cn(disableIo2 && 'pointer-events-auto!')}
                         >
                           <div className="flex flex-col gap-0 items-start">
                             <div className="flex gap-2 items-center">
@@ -118,7 +118,7 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                             </div>
                             <p className="text-foreground-light">{item.description}</p>
                           </div>
-                        </SelectItem_Shadcn_>
+                        </SelectItem>
                       </TooltipTrigger>
                       {disableIo2 && (
                         <TooltipContent side="right" className="w-64">
@@ -134,8 +134,8 @@ export function StorageTypeField({ form, disableInput }: StorageTypeFieldProps) 
                   )
                 })}
               </>
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+            </SelectContent>
+          </Select>
           {error && <FormMessage type="error" message={error.message} />}
         </FormItemLayout>
       )}

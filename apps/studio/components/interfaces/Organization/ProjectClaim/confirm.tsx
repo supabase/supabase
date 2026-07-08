@@ -1,28 +1,22 @@
 import { OAuthScope } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { CheckCircle2, ChevronRight, ChevronsLeftRight } from 'lucide-react'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-authorization-approve-mutation'
-import { ApiAuthorizationResponse } from 'data/api-authorization/api-authorization-query'
-import { useOrganizationProjectClaimMutation } from 'data/organizations/organization-project-claim-mutation'
-import { OrganizationProjectClaimResponse } from 'data/organizations/organization-project-claim-query'
-import { useInvalidateProjectsInfiniteQuery } from 'data/projects/org-projects-infinite-query'
-import { BASE_PATH } from 'lib/constants'
-import type { Organization } from 'types'
-import {
-  Button,
-  cn,
-  Collapsible_Shadcn_,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-} from 'ui'
+import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
+
 import { ScopeSection } from '../OAuthApps/AuthorizeRequesterDetails'
 import { PERMISSIONS_DESCRIPTIONS } from '../OAuthApps/OAuthApps.constants'
 import { ProjectClaimLayout } from './layout'
+import { useApiAuthorizationApproveMutation } from '@/data/api-authorization/api-authorization-approve-mutation'
+import { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
+import { useOrganizationProjectClaimMutation } from '@/data/organizations/organization-project-claim-mutation'
+import { OrganizationProjectClaimResponse } from '@/data/organizations/organization-project-claim-query'
+import { useInvalidateProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { BASE_PATH } from '@/lib/constants'
+import type { Organization } from '@/types'
 
 export const ProjectClaimConfirm = ({
   selectedOrganization,
@@ -97,7 +91,7 @@ export const ProjectClaimConfirm = ({
 
             <div className="flex items-center justify-center w-28 relative">
               <div className="h-0.5 w-full border-2 border-dashed border-stronger" />
-              <div className="rounded-full border flex items-center justify-center h-10 w-full shadow-sm">
+              <div className="rounded-full border flex items-center justify-center h-10 w-full shadow-xs">
                 <ChevronsLeftRight className="text-muted-foreground" size={24} />
               </div>
               <div className="h-0.5 w-full border-2 border-dashed border-stronger z-10" />
@@ -171,8 +165,8 @@ export const ProjectClaimConfirm = ({
               permissions to operate. This is normal and no action is needed from your side.
             </span>
           ) : (
-            <Collapsible_Shadcn_>
-              <CollapsibleTrigger_Shadcn_ className="pb-3 w-full flex items-center justify-between group">
+            <Collapsible>
+              <CollapsibleTrigger className="pb-3 w-full flex items-center justify-between group">
                 <p className="text-sm text-foreground-light text-left">
                   <span className="font-foreground">List of permissions</span> that{' '}
                   <span className="text-foreground">{requester.name}</span> will have for the{' '}
@@ -183,14 +177,14 @@ export const ProjectClaimConfirm = ({
 
                 <ChevronRight
                   size={16}
-                  className="text-foreground-light transition-all group-data-[state=open]:rotate-90 w-20"
+                  className="text-foreground-light transition-all group-data-open:rotate-90 w-20"
                   strokeWidth={1}
                 />
-              </CollapsibleTrigger_Shadcn_>
-              <CollapsibleContent_Shadcn_
+              </CollapsibleTrigger>
+              <CollapsibleContent
                 className={cn(
                   'flex flex-col gap-8 transition-all',
-                  'data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down'
+                  'data-closed:animate-collapsible-up data-open:animate-collapsible-down'
                 )}
               >
                 <div>
@@ -198,6 +192,11 @@ export const ProjectClaimConfirm = ({
                     description={PERMISSIONS_DESCRIPTIONS.ANALYTICS}
                     hasReadScope={requester.scopes.includes(OAuthScope.ANALYTICS_READ)}
                     hasWriteScope={requester.scopes.includes(OAuthScope.ANALYTICS_WRITE)}
+                  />
+                  <ScopeSection
+                    description={PERMISSIONS_DESCRIPTIONS.ANALYTICS_CONFIG}
+                    hasReadScope={requester.scopes.includes(OAuthScope.ANALYTICS_CONFIG_READ)}
+                    hasWriteScope={requester.scopes.includes(OAuthScope.ANALYTICS_CONFIG_WRITE)}
                   />
                   <ScopeSection
                     description={PERMISSIONS_DESCRIPTIONS.AUTH}
@@ -250,8 +249,8 @@ export const ProjectClaimConfirm = ({
                     hasWriteScope={requester.scopes.includes(OAuthScope.STORAGE_WRITE)}
                   />
                 </div>
-              </CollapsibleContent_Shadcn_>
-            </Collapsible_Shadcn_>
+              </CollapsibleContent>
+            </Collapsible>
           )}
         </div>
       </div>

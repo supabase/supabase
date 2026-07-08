@@ -1,22 +1,31 @@
+import { useParams } from 'common'
 import { Maximize } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
-
-import { useParams } from 'common'
-import { useIsQueueOperationsEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { isValueTruncated } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, Popover, Tooltip, TooltipContent, TooltipTrigger, cn } from 'ui'
+import {
+  Button,
+  cn,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import { BlockKeys } from '../common/BlockKeys'
 import { EmptyValue } from '../common/EmptyValue'
-import { MonacoEditor } from '../common/MonacoEditor'
 import { NullValue } from '../common/NullValue'
 import { TruncatedWarningOverlay } from './TruncatedWarningOverlay'
+import { useTableRowOperations } from '@/components/grid/hooks/useTableRowOperations'
+import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
+import { isTableLike } from '@/data/table-editor/table-editor-types'
+import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const TextEditor = <TRow, TSummaryRow = unknown>({
   row,
@@ -45,7 +54,8 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const [value, setValue] = useState<string | null>(initialValue)
   const [isConfirmNextModalOpen, setIsConfirmNextModalOpen] = useState(false)
-  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
+  const { isQueueEnabled } = useTableRowOperations()
+  const applyChangesLabel = isQueueEnabled ? 'Queue changes' : 'Save changes'
 
   const { mutate: getCellValue, isPending, isSuccess } = useGetCellValueMutation()
 
@@ -58,7 +68,7 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
     }
 
     const pkMatch = selectedTable.primary_keys.reduce((a, b) => {
-      return { ...a, [b.name]: (row as any)[b.name] }
+      return { ...a, [b.name]: row[b.name as keyof typeof row] }
     }, {})
 
     getCellValue(
@@ -104,24 +114,27 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
 
   return (
     <>
-      <Popover
-        open={isPopoverOpen}
-        side="bottom"
-        align="start"
-        sideOffset={-35}
-        className="rounded-none"
-        overlay={
-          isTruncated && !isSuccess ? (
-            <div
-              style={{ width: `${column.width}px` }}
-              className="flex items-center justify-center flex-col relative"
-            >
-              <MonacoEditor
-                readOnly
-                onChange={() => {}}
-                width={`${column.width}px`}
+      <Popover open={isPopoverOpen}>
+        <PopoverTrigger asChild>
+          <div
+            className={cn(
+              !!value && value.toString().trim().length === 0 && 'sb-grid-fill-container',
+              'text-grid overflow-hidden text-ellipsis px-2'
+            )}
+            onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+          >
+            {value === null ? <NullValue /> : value === '' ? <EmptyValue /> : value}
+          </div>
+        </PopoverTrigger>
+        <PopoverContent className="rounded-none p-0" side="bottom" align="start" sideOffset={-35}>
+          {isTruncated && !isSuccess ? (
+            <div className="flex items-center justify-center flex-col relative">
+              <CodeEditor
+                hideLineNumbers
+                isReadOnly
+                language="plaintext"
                 value={value ?? ''}
-                language="markdown"
+                className="h-[200px]"
               />
               <TruncatedWarningOverlay isLoading={isPending} loadFullValue={loadFullValue} />
             </div>
@@ -132,23 +145,26 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
               onEnter={saveChanges}
               ignoreOutsideClicks={isConfirmNextModalOpen}
             >
-              <MonacoEditor
-                width={`${column.width}px`}
+              <CodeEditor
+                hideLineNumbers
+                isReadOnly={!isEditable}
+                language="plaintext"
                 value={value ?? ''}
-                readOnly={!isEditable}
-                onChange={onChange}
+                onInputChange={onChange}
+                className="h-[200px] border-b"
               />
+
               {isEditable && (
                 <div className="flex items-start justify-between p-2 bg-surface-200 space-x-2">
                   <div className="space-y-1">
                     <div className="flex items-center space-x-2">
-                      <div className="px-1.5 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
+                      <div className="px-1.5 py-[2.5px] rounded-sm bg-surface-300 border border-strong flex items-center justify-center">
                         <span className="text-[10px]">⏎</span>
                       </div>
-                      <p className="text-xs text-foreground-light">Save changes</p>
+                      <p className="text-xs text-foreground-light">{applyChangesLabel}</p>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <div className="px-1 py-[2.5px] rounded bg-surface-300 border border-strong flex items-center justify-center">
+                      <div className="px-1 py-[2.5px] rounded-sm bg-surface-300 border border-strong flex items-center justify-center">
                         <span className="text-[10px]">Esc</span>
                       </div>
                       <p className="text-xs text-foreground-light">Cancel changes</p>
@@ -158,10 +174,11 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <Button
-                          type="default"
+                          variant="default"
                           className="px-1"
                           onClick={() => onSelectExpand()}
                           icon={<Maximize size={12} strokeWidth={2} />}
+                          aria-label="Expand editor"
                         />
                       </TooltipTrigger>
                       <TooltipContent side="bottom">Expand editor</TooltipContent>
@@ -169,11 +186,11 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                     {isNullable && (
                       <Button
                         size="tiny"
-                        type="default"
-                        htmlType="button"
+                        variant="default"
+                        type="button"
                         onClick={() => {
-                          if (isQueueOperationsEnabled) {
-                            // Skip confirmation when queue mode is enabled - changes can be reviewed/cancelled
+                          // Skip confirmation when queue mode is enabled - changes can be reviewed/cancelled
+                          if (isQueueEnabled) {
                             saveChanges(null)
                           } else {
                             setIsConfirmNextModalOpen(true)
@@ -187,18 +204,8 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                 </div>
               )}
             </BlockKeys>
-          )
-        }
-      >
-        <div
-          className={cn(
-            !!value && value.toString().trim().length === 0 && 'sb-grid-fill-container',
-            'sb-grid-text-editor__trigger'
           )}
-          onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-        >
-          {value === null ? <NullValue /> : value === '' ? <EmptyValue /> : value}
-        </div>
+        </PopoverContent>
       </Popover>
       <ConfirmationModal
         visible={isConfirmNextModalOpen}

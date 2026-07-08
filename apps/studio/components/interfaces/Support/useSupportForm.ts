@@ -1,18 +1,20 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { type Dispatch, useEffect, useRef, useState } from 'react'
-import { type DefaultValues, type UseFormReturn, useForm, useWatch } from 'react-hook-form'
-// End of third-party imports
+import { useEffect, useRef, useState, type Dispatch } from 'react'
+import { useForm, useWatch, type DefaultValues, type UseFormReturn } from 'react-hook-form'
 
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { SupportFormSchema, type SupportFormValues } from './SupportForm.schema'
 import type { SupportFormActions } from './SupportForm.state'
 import {
+  loadSupportFormInitialParams,
+  loadSupportFormInitialParamsFromObject,
   NO_ORG_MARKER,
   NO_PROJECT_MARKER,
-  type SupportFormUrlKeys,
-  loadSupportFormInitialParams,
   selectInitialOrgAndProject,
+  type SupportFormUrlKeys,
 } from './SupportForm.utils'
+// End of third-party imports
+
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 
 const supportFormDefaultValues: DefaultValues<SupportFormValues> = {
   organizationSlug: NO_ORG_MARKER,
@@ -35,7 +37,10 @@ interface UseSupportFormResult {
   orgSlug: string | null
 }
 
-export function useSupportForm(dispatch: Dispatch<SupportFormActions>): UseSupportFormResult {
+export function useSupportForm(
+  dispatch: Dispatch<SupportFormActions>,
+  initialParams?: Partial<SupportFormUrlKeys>
+): UseSupportFormResult {
   const form = useForm<SupportFormValues>({
     mode: 'onBlur',
     reValidateMode: 'onBlur',
@@ -44,11 +49,17 @@ export function useSupportForm(dispatch: Dispatch<SupportFormActions>): UseSuppo
   })
 
   const urlParamsRef = useRef<SupportFormUrlKeys | null>(null)
+  const providedInitialParamsRef = useRef(initialParams)
   const [initialError, setInitialError] = useState<string | null>(null)
 
-  // Load initial values from URL params
+  // Load initial values from URL params after mount so SSR/SSG render with
+  // bare defaults (no `window` access) and the client hydrates against the
+  // same HTML. URL-derived values are applied here, post-hydration.
   useEffect(() => {
-    const params = loadSupportFormInitialParams(window.location.search)
+    const params =
+      providedInitialParamsRef.current !== undefined
+        ? loadSupportFormInitialParamsFromObject(providedInitialParamsRef.current)
+        : loadSupportFormInitialParams(window.location.search)
     urlParamsRef.current = params
     setInitialError(params.error ?? null)
 

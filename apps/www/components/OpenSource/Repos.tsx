@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from 'react'
-import Link from 'next/link'
 import { AnimatePresence } from 'framer-motion'
+import { Pencil, Users, Users2 } from 'lucide-react'
+import Link from 'next/link'
+import React, { useEffect, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { cn } from 'ui'
-import { LogoLoader } from 'ui'
+import { cn, LogoLoader } from 'ui'
 
 import RepoCard from './RepoCard'
-import { Pencil, Users, Users2 } from 'lucide-react'
 
 interface TabProps {
   label: string
@@ -19,9 +18,7 @@ const Tab = ({ isActive, label, icon, onClick }: TabProps) => (
   <button
     onClick={onClick}
     className={`rounded-full px-4 md:px-3 py-2 md:py-1 nowrap flex group gap-1 transition-all ${
-      isActive
-        ? 'text-strong bg-surface-300'
-        : 'text-foreground-lighter bg-surface-200 hover:bg-overlay-hover'
+      isActive ? 'bg-surface-300' : 'text-foreground-lighter bg-surface-200 hover:bg-overlay-hover'
     }`}
     aria-selected={isActive}
     role="tab"
@@ -158,17 +155,17 @@ const Repos = ({ tabs }: Props) => {
                     : SWIPER_STATE.MIDDLE
               )
             }
-            className="relative flex md:!hidden justify-center max-w-full w-full overflow-hidden items-center rounded-full bg-surface-100 p-2"
+            className="relative flex md:hidden! justify-center max-w-full w-full overflow-hidden items-center rounded-full bg-surface-100 p-2"
           >
             <div
               className={cn(
-                'not-sr-only absolute inset-0 left-auto bg-gradient-to-r from-transparent to-background-surface-100 w-10 z-20 pointer-events-none opacity-0 transition-opacity',
+                'not-sr-only absolute inset-0 left-auto bg-linear-to-r from-transparent to-background-surface-100 w-10 z-20 pointer-events-none opacity-0 transition-opacity',
                 swiperState !== SWIPER_STATE.END && 'opacity-100'
               )}
             />
             <div
               className={cn(
-                'not-sr-only absolute inset-0 right-auto bg-gradient-to-l from-transparent to-background-surface-100 w-10 z-20 pointer-events-none opacity-0 transition-opacity',
+                'not-sr-only absolute inset-0 right-auto bg-linear-to-l from-transparent to-background-surface-100 w-10 z-20 pointer-events-none opacity-0 transition-opacity',
                 swiperState !== SWIPER_STATE.START && 'opacity-100'
               )}
             />

@@ -1,0 +1,224 @@
+---
+title: Realtime Flow
+description: Real-time flow diagram editor for collaborative applications
+---
+
+<DualRealtimeFlow />
+
+## Installation
+
+<BlockItem
+  name="realtime-flow-react-router"
+  description="Real-time flow diagram editor for collaborative applications."
+/>
+
+## Folder structure
+
+<RegistryBlock itemName="realtime-flow-react-router" />
+
+## Introduction
+
+The Realtime Flow component provides a collaborative diagram editor powered by [React Flow](https://reactflow.dev/) and [Yjs](https://yjs.dev/). It uses [`@supabase-labs/y-supabase`](https://github.com/supabase-community/y-supabase) under the hood to sync diagram state across clients through Supabase Realtime.
+
+**Features**
+
+- Real-time node and edge synchronization via Supabase Realtime broadcast
+- Drag nodes, create connections, and delete elements collaboratively
+- Optional persistence to Postgres so diagrams survive page reloads
+- Supports custom node and edge types
+- Room-based isolation for scoped collaboration
+
+## How it works under the hood
+
+The component creates a [Yjs](https://yjs.dev/) document with two shared maps — one for nodes and one for edges — and connects it to a Supabase Realtime channel using `SupabaseProvider` from `@supabase-labs/y-supabase`. Each node and edge is stored by its ID in the respective `Y.Map`, enabling per-element conflict resolution.
+
+When a user drags a node, creates a connection, or deletes an element, the change is applied to the local React Flow state and simultaneously written to the Yjs document. Remote changes from other clients are observed and applied to the local state automatically.
+
+When **persistence** is enabled, the full Yjs document state is saved to a Postgres table so it can be restored when clients reconnect.
+
+## Usage
+
+### Basic usage
+
+```tsx
+import { RealtimeFlow } from '@/components/realtime-flow'
+
+const nodes = [
+  { id: '1', position: { x: 0, y: 0 }, data: { label: 'Node A' } },
+  { id: '2', position: { x: 250, y: 150 }, data: { label: 'Node B' } },
+]
+
+const edges = [{ id: 'e1-2', source: '1', target: '2' }]
+
+export default function FlowPage() {
+  return <RealtimeFlow channel="realtime-flow-demo" initialNodes={nodes} initialEdges={edges} />
+}
+```
+
+### With persistence
+
+Enable persistence to save the diagram to your Supabase database. This requires a table to store the Yjs document state.
+
+First, create the required table in your Supabase project:
+
+```sql
+create table yjs_documents (
+  room text primary key,
+  state text not null
+);
+```
+
+Then pass `persistence` to the component:
+
+```tsx
+import { RealtimeFlow } from '@/components/realtime-flow'
+
+export default function FlowPage() {
+  return (
+    <RealtimeFlow
+      channel="realtime-flow-demo"
+      initialNodes={nodes}
+      initialEdges={edges}
+      persistence
+    />
+  )
+}
+```
+
+You can also pass a `SupabasePersistenceOptions` object:
+
+```tsx
+import type { SupabasePersistenceOptions } from '@supabase-labs/y-supabase'
+
+const persistenceOptions = {
+  table: 'yjs_documents',
+  roomColumn: 'room',
+  stateColumn: 'state',
+  storeTimeout: 2000,
+} satisfies SupabasePersistenceOptions
+
+export default function FlowPage() {
+  return (
+    <RealtimeFlow
+      channel="realtime-flow-demo"
+      initialNodes={nodes}
+      initialEdges={edges}
+      persistence={persistenceOptions}
+    />
+  )
+}
+```
+
+### Using the hook for full control
+
+If you need programmatic access to nodes and edges (e.g. adding nodes, custom node types with editable data), use the `useRealtimeFlow` hook directly instead of the component:
+
+```tsx
+import {
+  ReactFlow,
+  ReactFlowProvider,
+  Background,
+  Controls,
+  type Node,
+  type Edge,
+} from '@xyflow/react'
+import { useRealtimeFlow } from '@/hooks/use-realtime-flow'
+
+const initialNodes: Node[] = [
+  { id: '1', position: { x: 0, y: 0 }, data: { label: 'Node A' } },
+  { id: '2', position: { x: 250, y: 150 }, data: { label: 'Node B' } },
+]
+
+export default function FlowPage() {
+  const { nodes, edges, synced, onNodesChange, onEdgesChange, onConnect, setNodes, setEdges } =
+    useRealtimeFlow({
+      channel: 'my-flow',
+      initialNodes,
+    })
+
+  return (
+    <ReactFlowProvider>
+      <ReactFlow
+        nodes={synced ? nodes : []}
+        edges={synced ? edges : []}
+        onNodesChange={synced ? onNodesChange : undefined}
+        onEdgesChange={synced ? onEdgesChange : undefined}
+        onConnect={synced ? onConnect : undefined}
+        fitView
+      >
+        <Background />
+        <Controls />
+      </ReactFlow>
+    </ReactFlowProvider>
+  )
+}
+```
+
+`setNodes` and `setEdges` accept a new array or an updater function, just like React's `useState`:
+
+```tsx
+// Add a node
+setNodes((prev) => [...prev, newNode])
+
+// Update a node
+setNodes((prev) => prev.map((n) => (n.id === '1' ? { ...n, data: { label: 'Updated' } } : n)))
+
+// Remove a node and its connected edges
+setNodes((prev) => prev.filter((n) => n.id !== '1'))
+setEdges((prev) => prev.filter((e) => e.source !== '1' && e.target !== '1'))
+```
+
+## RealtimeFlow Props
+
+| Prop            | Type                                    | Description                                                                                                                             |
+| --------------- | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `channel`       | `string`                                | Unique channel name used to sync diagram state between collaborators in the same session.                                               |
+| `initialNodes?` | `Node[]`                                | Initial nodes to populate the diagram. Only used if no existing state is found after sync.                                              |
+| `initialEdges?` | `Edge[]`                                | Initial edges to populate the diagram. Only used if no existing state is found after sync.                                              |
+| `height?`       | `string \| number`                      | Height of the flow container. Accepts a pixel number or CSS string (e.g. `"100%"`). Defaults to `550`.                                  |
+| `className?`    | `string`                                | CSS class applied to the flow wrapper element.                                                                                          |
+| `style?`        | `React.CSSProperties`                   | Inline styles applied to the flow wrapper element.                                                                                      |
+| `persistence?`  | `boolean \| SupabasePersistenceOptions` | Persists diagram state to Supabase so it survives page reloads. Pass `true` for defaults or an options object for fine-grained control. |
+| `nodeTypes?`    | `NodeTypes`                             | Custom node type definitions for React Flow.                                                                                            |
+| `edgeTypes?`    | `EdgeTypes`                             | Custom edge type definitions for React Flow.                                                                                            |
+
+## useRealtimeFlow Options
+
+| Option          | Type                                    | Description                                                                                                                             |
+| --------------- | --------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `channel`       | `string`                                | Unique channel name used to sync diagram state between collaborators in the same session.                                               |
+| `initialNodes?` | `Node[]`                                | Initial nodes to populate the diagram. Only used if no existing state is found after sync.                                              |
+| `initialEdges?` | `Edge[]`                                | Initial edges to populate the diagram. Only used if no existing state is found after sync.                                              |
+| `awareness?`    | `boolean \| Awareness`                  | Enables presence tracking between users. Pass `false` to disable or a custom `Awareness` instance. Defaults to `true`.                  |
+| `persistence?`  | `boolean \| SupabasePersistenceOptions` | Persists diagram state to Supabase so it survives page reloads. Pass `true` for defaults or an options object for fine-grained control. |
+
+## useRealtimeFlow Return Value
+
+| Property        | Type                                                  | Description                                                            |
+| --------------- | ----------------------------------------------------- | ---------------------------------------------------------------------- |
+| `nodes`         | `Node[]`                                              | Current nodes array, kept in sync across all connected clients.        |
+| `edges`         | `Edge[]`                                              | Current edges array, kept in sync across all connected clients.        |
+| `synced`        | `boolean`                                             | Whether the initial sync has completed. Render empty state until true. |
+| `onNodesChange` | `(changes: NodeChange[]) => void`                     | Pass directly to React Flow's `onNodesChange` prop.                    |
+| `onEdgesChange` | `(changes: EdgeChange[]) => void`                     | Pass directly to React Flow's `onEdgesChange` prop.                    |
+| `onConnect`     | `(connection: Connection) => void`                    | Pass directly to React Flow's `onConnect` prop.                        |
+| `setNodes`      | `(nodes: Node[] \| (prev: Node[]) => Node[]) => void` | Update nodes programmatically. Changes are synced to all clients.      |
+| `setEdges`      | `(edges: Edge[] \| (prev: Edge[]) => Edge[]) => void` | Update edges programmatically. Changes are synced to all clients.      |
+
+### SupabasePersistenceOptions
+
+| Option         | Type     | Default           | Description                                         |
+| -------------- | -------- | ----------------- | --------------------------------------------------- |
+| `table`        | `string` | `'yjs_documents'` | Name of the Postgres table used to store documents. |
+| `schema`       | `string` | `'public'`        | Schema where the table is located.                  |
+| `roomColumn`   | `string` | `'room'`          | Column used as the document identifier.             |
+| `stateColumn`  | `string` | `'state'`         | Column used to store the binary Yjs state.          |
+| `storeTimeout` | `number` | `1000`            | Debounce delay (ms) before persisting changes.      |
+
+## Further reading
+
+- [Realtime Broadcast](https://supabase.com/docs/guides/realtime/broadcast)
+- [Realtime authorization](https://supabase.com/docs/guides/realtime/authorization)
+- [`@supabase-labs/y-supabase`](https://github.com/supabase-community/y-supabase)
+- [Yjs documentation](https://docs.yjs.dev/)
+- [React Flow documentation](https://reactflow.dev/)

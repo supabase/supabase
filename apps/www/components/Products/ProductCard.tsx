@@ -1,8 +1,8 @@
-import React from 'react'
-import Link from 'next/link'
 import Panel from '~/components/Panel'
-import { cn } from 'ui'
 import { detectBrowser, isBrowser } from 'common'
+import Link from 'next/link'
+import React from 'react'
+import { cn } from 'ui'
 
 const ProductCard = ({
   className,
@@ -30,7 +30,7 @@ const ProductCard = ({
   <Link
     href={url}
     className={cn(
-      'group relative w-full sm:h-[400px] flex flex-col gap-5 lg:flex-row focus:outline-none focus:border-none focus:ring-brand-600 focus:ring-2 focus:rounded-xl',
+      'group relative w-full sm:h-[400px] flex flex-col gap-5 lg:flex-row focus:outline-hidden focus:border-none focus:ring-brand-600 focus:ring-2 focus:rounded-xl',
       className
     )}
     onClick={onClick}
@@ -42,7 +42,7 @@ const ProductCard = ({
       outerClassName="relative w-full h-full"
       innerClassName={cn(
         'relative overflow-hidden flex-1 flex flex-row sm:flex-col gap-4 items-start sm:items-center lg:items-start justify-between',
-        'bg-surface-75 w-full h-full text-foreground-lighter [&_strong]:!font-normal [&_strong]:!text-foreground',
+        'bg-surface-75 w-full h-full text-foreground-lighter [&_strong]:font-normal! [&_strong]:text-foreground!',
         'p-4 sm:py-6'
       )}
     >
@@ -62,6 +62,7 @@ const ProductCard = ({
         <div className="flex items-center gap-2 text-foreground">
           {icon && (
             <svg
+              aria-hidden="true"
               width="18"
               height="18"
               viewBox="0 0 25 25"
@@ -81,7 +82,7 @@ const ProductCard = ({
           <h2 className="">{title}</h2>
         </div>
         <div className="flex-1 flex flex-col justify-between gap-2">
-          <p className="text-sm [&_strong]:!text-foreground">{subtitle}</p>
+          <p className="text-sm [&_strong]:text-foreground!">{subtitle}</p>
           {highlights && (
             <span className={cn('hidden lg:block text-foreground', isDatabase && 'md:block')}>
               {highlights}
@@ -89,7 +90,7 @@ const ProductCard = ({
           )}
         </div>
       </div>
-      {image && image}
+      {image && <span aria-hidden="true">{image}</span>}
     </Panel>
   </Link>
 )

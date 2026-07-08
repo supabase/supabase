@@ -76,7 +76,8 @@ When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/a
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 async function signInWithKeycloak() {
@@ -161,7 +162,7 @@ When your user signs out, call [signOut()](/docs/reference/kotlin/auth-signout) 
 
 ```kotlin
 import { createClient } from '@supabase/supabase-js';
-const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>');
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...');
 
 // ---cut---
 suspend fun signOut() {

@@ -16,7 +16,7 @@ Embeddings capture the "relatedness" of text, images, video, or other types of i
 - **Classifications:** how do we categorize a body of text?
 - **Clustering:** how do we identify trends?
 
-Let's explore an example of text embeddings. Say we have three phrases:
+The following example uses text embeddings. Given three phrases:
 
 1. "The cat chases the mouse"
 2. "The kitten hunts rodents"
@@ -39,7 +39,14 @@ So how does this relate to embeddings?
 
 Embeddings compress discrete information (words & symbols) into distributed continuous-valued data (vectors). If we took our phrases from before and plot them on a chart, it might look something like this:
 
-<img src="/docs/img/ai/vector-similarity.png" alt="Vector similarity" width="640" height="640" />
+The chart below plots example phrases as points. Phrases with similar meanings sit close together, and unrelated phrases sit far apart.
+
+<img
+  src="/docs/img/ai/vector-similarity.png"
+  alt="A two-dimensional chart plotting example phrases as points, where phrases with similar meanings sit close together and unrelated phrases sit far apart."
+  width="640"
+  height="640"
+/>
 
 Phrases 1 and 2 would be plotted close to each other, since their meanings are similar. We would expect phrase 3 to live somewhere far away since it isn't related. If we had a fourth phrase, “Sally ate Swiss cheese”, this might exist somewhere between phrase 3 (cheese can go on sandwiches) and phrase 1 (mice like Swiss cheese).
 

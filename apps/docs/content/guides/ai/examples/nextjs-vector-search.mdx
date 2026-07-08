@@ -24,7 +24,7 @@ We assume that you have a Next.js project with a collection of `.mdx` files nest
 
 ## Prepare the database
 
-Let's prepare the database schema. We can use the "OpenAI Vector Search" quickstart in the [SQL Editor](/dashboard/project/_/sql), or you can copy/paste the SQL below and run it yourself.
+Prepare the database schema. We can use the "OpenAI Vector Search" quickstart in the [SQL Editor](/dashboard/project/_/sql), or you can copy/paste the SQL below and run it yourself.
 
 <Tabs
   scrollable
@@ -121,8 +121,18 @@ Let's prepare the database schema. We can use the "OpenAI Vector Search" quickst
       type text,
       source text
     );
+
+    -- Grant the privileges the roles need
+    GRANT SELECT ON public.nods_page TO anon;
+
     alter table "public"."nods_page"
       enable row level security;
+
+    create policy "Allow public read access to nods_page"
+      on public.nods_page
+      for select
+      to anon
+      using (true);
 
     -- Stores the actual embeddings with some metadata
     create table "public"."nods_page_section" (
@@ -134,8 +144,18 @@ Let's prepare the database schema. We can use the "OpenAI Vector Search" quickst
       slug text,
       heading text
     );
+
+    -- Grant the privileges the roles need
+    GRANT SELECT ON public.nods_page_section TO anon;
+
     alter table "public"."nods_page_section"
       enable row level security;
+
+    create policy "Allow public read access to nods_page_section"
+      on public.nods_page_section
+      for select
+      to anon
+      using (true);
     ```
 
     </StepHikeCompact.Code>
@@ -147,7 +167,7 @@ Let's prepare the database schema. We can use the "OpenAI Vector Search" quickst
 
     Anytime the user sends a query, we want to find the content that's relevant to their questions. We can do this using pgvector's similarity search.
 
-    These are quite complex SQL operations, so let's wrap them in database functions that we can call from our frontend using [RPC](/docs/reference/javascript/rpc).
+    For complex SQL operations, wrap them in database functions that you can call from the frontend using [RPC](/docs/reference/javascript/rpc).
 
     </StepHikeCompact.Details>
 
@@ -284,7 +304,7 @@ With our database set up, we need to process and store all `.mdx` files in the `
       ```bash
       NEXT_PUBLIC_SUPABASE_URL=
       NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
-      SUPABASE_SERVICE_ROLE_KEY=
+      SUPABASE_SECRET_KEY=
 
       # Get your key at https://platform.openai.com/account/api-keys
       OPENAI_API_KEY=
@@ -364,7 +384,7 @@ All of this is glued together in a [Vercel Edge Function](https://vercel.com/doc
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="Perform similarity search">
 
-    Using the `embeddingResponse` we can now perform similarity search by performing an remote procedure call (RPC) to the database function we created earlier.
+    Using the `embeddingResponse` we can now perform similarity search by performing a remote procedure call (RPC) to the database function we created earlier.
 
     </StepHikeCompact.Details>
 

@@ -1,10 +1,19 @@
 import { useParams } from 'common'
 import { toast } from 'sonner'
-import { Button, Modal } from 'ui'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 
-import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
-import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
-import { Admonition } from 'ui-patterns'
+import { useNetworkRestrictionsQuery } from '@/data/network-restrictions/network-restrictions-query'
+import { useNetworkRestrictionsApplyMutation } from '@/data/network-restrictions/network-retrictions-apply-mutation'
 
 interface RemoveRestrictionModalProps {
   visible: boolean
@@ -25,7 +34,7 @@ const RemoveRestrictionModal = ({
   const ipv6Restrictions: string[] = data?.config?.dbAllowedCidrsV6 ?? []
   const restrictedIps = ipv4Restrictions.concat(ipv6Restrictions)
 
-  const { mutate: applyNetworkRestrictions, isPending: isApplying } =
+  const { mutateAsync: applyNetworkRestrictions, isPending: isApplying } =
     useNetworkRestrictionsApplyMutation({
       onSuccess: () => onClose(),
       onError: (error) => {
@@ -48,50 +57,54 @@ const RemoveRestrictionModal = ({
       : ipv6Restrictions
 
     if (dbAllowedCidrs.length === 0 && dbAllowedCidrsV6.length === 0) {
-      applyNetworkRestrictions({
+      await applyNetworkRestrictions({
         projectRef: ref,
         dbAllowedCidrs: ['0.0.0.0/0'],
         dbAllowedCidrsV6: ['::/0'],
       })
     } else {
-      applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs, dbAllowedCidrsV6 })
+      await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs, dbAllowedCidrsV6 })
     }
   }
 
   return (
-    <Modal
-      hideFooter
-      size="medium"
-      visible={visible}
-      onCancel={onClose}
-      header="Confirm to remove restriction"
-    >
-      <Modal.Content className="space-y-4">
-        <p className="text-sm text-foreground-light">
-          The IPv4 address <code className="text-code-inline">{selectedRestriction}</code> will be
-          removed from your list of network restrictions
-          {isRemovingOnlyRestriction
-            ? '.'
-            : ", and no longer have access to your project's database."}
-        </p>
-        {isRemovingOnlyRestriction && (
-          <Admonition
-            type="warning"
-            title="Database access will no longer be restricted"
-            description="Removing all network restrictions will default to your database being accessible from
-            all IP addresses."
-          />
-        )}
-      </Modal.Content>
-      <Modal.Content className="flex items-center justify-end space-x-2">
-        <Button type="default" disabled={isApplying} onClick={() => onClose()}>
-          Cancel
-        </Button>
-        <Button loading={isApplying} disabled={isApplying} onClick={() => onSubmit()}>
-          Remove restriction
-        </Button>
-      </Modal.Content>
-    </Modal>
+    <AlertDialog open={visible} onOpenChange={onClose}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Confirm to remove restriction</AlertDialogTitle>
+          <AlertDialogDescription>
+            <div className="flex flex-col space-y-4">
+              <p>
+                The IPv4 address <code className="text-code-inline">{selectedRestriction}</code>{' '}
+                will be removed from your list of network restrictions
+                {isRemovingOnlyRestriction
+                  ? '.'
+                  : ", and no longer have access to your project's database."}
+              </p>
+              {isRemovingOnlyRestriction && (
+                <Admonition
+                  type="warning"
+                  title="Database access will no longer be restricted"
+                  description="Removing all network restrictions will default to your database being accessible from
+                  all IP addresses."
+                />
+              )}
+            </div>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isApplying}>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={onSubmit}
+            disabled={isApplying}
+            loading={isApplying}
+            variant="danger"
+          >
+            Remove restriction
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
 

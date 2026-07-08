@@ -97,7 +97,7 @@ With Deep Linking, you can configure this redirect to open a specific page. This
 
     export default function Auth() {
       // Handle linking into app from email app.
-      const url = Linking.useURL();
+      const url = Linking.useLinkingURL();
       if (url) createSessionFromUrl(url);
 
       return (
@@ -120,7 +120,7 @@ With Deep Linking, you can configure this redirect to open a specific page. This
     - Go to your [auth settings](/dashboard/project/_/auth/url-configuration) page.
     - You need to enter your app redirect callback on `Additional Redirect URLs` field.
 
-    The redirect callback URL should have this format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.flutterquickstart://login-callback` is just an example, you can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
+    The redirect callback URL should have this format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.flutterquickstart://login-callback` is an example. You can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
 
     ![Supabase console deep link setting](/docs/img/deeplink-setting.png)
 
@@ -314,7 +314,7 @@ With Deep Linking, you can configure this redirect to open a specific page. This
     1. Go to your [auth settings](/dashboard/project/_/auth/url-configuration) page.
     2. Enter your app redirect URL in the `Additional Redirect URLs` field. This is the URL that the user gets redirected to after clicking a magic link.
 
-    The redirect callback URL should have the format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.user-management://login-callback` is just an example. You can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
+    The redirect callback URL should have the format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.user-management://login-callback` is an example. You can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
 
     ![Supabase console deep link setting](/docs/img/deeplink-setting.png)
 
@@ -356,7 +356,7 @@ With Deep Linking, you can configure this redirect to open a specific page. This
     1. Go to your [auth settings](/dashboard/project/_/auth/url-configuration) page.
     2. Enter your app redirect URL in the `Additional Redirect URLs` field. This is the URL that the user gets redirected to after clicking a magic link.
 
-    The redirect callback URL should have the format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.user-management://login-callback` is just an example. You can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
+    The redirect callback URL must have the format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. For example: `io.supabase.user-management://login-callback`. You can use any values for `YOUR_SCHEME` and `YOUR_HOSTNAME`, but the scheme must be unique across the user's device. For this reason, a reverse domain of your website is typically used.
 
     Now, edit the Android manifest to make sure the app opens when the user clicks on the magic link.
 

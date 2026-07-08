@@ -1,18 +1,19 @@
-import '@code-hike/mdx/styles'
-import 'config/code-hike.scss'
+import '@code-hike/mdx/styles.css'
+import 'config/code-hike.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
-import '../styles/main.scss'
-import '../styles/new-docs.scss'
-import '../styles/prism-okaidia.scss'
+import '../styles/globals.css'
+import '../styles/prism-okaidia.css'
 
-import { TelemetryTagManager } from 'common'
-
-import { genFaviconData } from 'common/MetaFavicons/app-router'
-import type { Metadata, Viewport } from 'next'
+import { SkipToContent } from '~/components/SkipToContent'
 import { GlobalProviders } from '~/features/app.providers'
 import { TopNavSkeleton } from '~/layouts/MainSkeleton'
 import { BASE_PATH, IS_PRODUCTION } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+import { TelemetryTagManager } from 'common'
+import { genFaviconData } from 'common/MetaFavicons/app-router'
+import type { Metadata, Viewport } from 'next'
+
+import { inter, manrope } from '@/fonts'
 
 const { metadataApplicationName, metadataTitle } = getCustomContent([
   'metadata:application_name',
@@ -52,8 +53,9 @@ const viewport: Viewport = {
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className={`${manrope.variable} ${inter.variable}`} suppressHydrationWarning>
       <body>
+        <SkipToContent />
         <TelemetryTagManager />
         <GlobalProviders>
           <TopNavSkeleton>{children}</TopNavSkeleton>

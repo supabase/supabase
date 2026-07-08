@@ -1,7 +1,8 @@
-import { IS_PLATFORM } from 'lib/constants'
-import { snakeCase } from 'lodash'
 import type { IncomingHttpHeaders } from 'node:http'
+import { snakeCase } from 'lodash'
 import z from 'zod'
+
+import { IS_PLATFORM } from '@/lib/constants'
 
 /**
  * Construct headers for api request.

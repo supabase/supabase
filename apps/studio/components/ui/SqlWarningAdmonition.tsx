@@ -1,5 +1,5 @@
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 export interface SqlWarningAdmonitionProps {
   warningType: 'hasWriteOperation' | 'hasUnknownFunctions'
@@ -33,7 +33,7 @@ export const SqlWarningAdmonition = ({
       className={`mb-0 rounded-none border-0 shrink-0 bg-background-100 ${className}`}
     >
       {!!message && (
-        <p className="text-xs !mb-1">
+        <p className="text-xs mb-1!">
           {`${
             warningType === 'hasWriteOperation'
               ? 'This query contains write operations.'
@@ -45,11 +45,11 @@ export const SqlWarningAdmonition = ({
         {subMessage ?? 'Make sure you are not accidentally removing something important.'}
       </p>
       <div className="flex justify-stretch mt-2 gap-2">
-        <Button type="outline" size="tiny" className="w-full flex-1" onClick={onCancel}>
+        <Button variant="outline" size="tiny" className="w-full flex-1" onClick={onCancel}>
           {cancelLabel ?? 'Cancel'}
         </Button>
         <Button
-          type="danger"
+          variant="danger"
           size="tiny"
           disabled={disabled}
           className="w-full flex-1"

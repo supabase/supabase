@@ -1,26 +1,26 @@
+import type { PGColumn, PGTable, PGTableRelationship } from '@supabase/pg-meta'
 import { MAX_ARRAY_SIZE, MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
-import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import dayjs from 'dayjs'
-import { minifyJSON, tryParseJson } from 'lib/helpers'
-import { compact, isEqual, isNull, isString, omitBy } from 'lodash'
-import type { Dictionary } from 'types'
+import { compact, isEqual, isString, isUndefined, omitBy } from 'lodash'
 
 import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import {
   DATETIME_TYPES,
   JSON_TYPES,
   TEXT_TYPES,
-  TIMESTAMP_TYPES,
   TIME_TYPES,
+  TIMESTAMP_TYPES,
 } from '../SidePanelEditor.constants'
 import type { RowField } from './RowEditor.types'
+import { minifyJSON, tryParseJson } from '@/lib/helpers'
+import type { Dictionary } from '@/types'
 
-const getRowValue = ({ column, row }: { column: PostgresColumn; row?: Dictionary<any> }) => {
+const getRowValue = ({ column, row }: { column: PGColumn; row?: Dictionary<any> }) => {
   const isNewRow = row === undefined
 
   if (isNewRow) {
     if (TEXT_TYPES.includes(column.format)) {
-      return null
+      return undefined
     } else if (column.format === 'bool') {
       if (column.default_value) {
         return column.default_value
@@ -28,7 +28,7 @@ const getRowValue = ({ column, row }: { column: PostgresColumn; row?: Dictionary
         return 'null'
       } else return null
     } else {
-      return ''
+      return undefined
     }
   } else {
     if (column.format === 'bool' && row[column.name] === null) {
@@ -43,7 +43,7 @@ const getRowValue = ({ column, row }: { column: PostgresColumn; row?: Dictionary
 
 export const generateRowFields = (
   row: Dictionary<any> | undefined,
-  table: PostgresTable,
+  table: PGTable,
   foreignKeys: ForeignKey[]
 ): RowField[] => {
   const { primary_keys = [] } = table
@@ -69,7 +69,7 @@ export const generateRowFields = (
               target_table_name: foreignKey.table,
               target_column_name:
                 foreignKey.columns.find((c) => c.source === column.name)?.target ?? '',
-            } as PostgresRelationship)
+            } as PGTableRelationship)
           : undefined,
       id: column.id,
       name: column.name,
@@ -97,7 +97,7 @@ export const validateFields = (fields: RowField[]) => {
       }
     }
     if (field.format.includes('json') && (field.value?.length ?? 0) > 0) {
-      const isTruncated = isValueTruncated(field.value)
+      const isTruncated = isValueTruncated(field.value, field.format)
       // don't validate if the value is truncated
       if (isTruncated) return
 
@@ -165,8 +165,11 @@ const convertPostgresDatetimeToInputDatetime = (format: string, value: string) =
   }
 }
 
-const convertInputDatetimeToPostgresDatetime = (format: string, value: string | null) => {
-  if (!value || value.length == 0) return null
+const convertInputDatetimeToPostgresDatetime = (
+  format: string,
+  value: string | null | undefined
+) => {
+  if (!value || value.length === 0) return value
 
   switch (format) {
     case 'timestamptz':
@@ -182,28 +185,31 @@ const convertInputDatetimeToPostgresDatetime = (format: string, value: string | 
   }
 }
 
-// [Joshen] JFYI this presents a small problem in particular when creating a new row
-// given that we don't include null properties. Because of that if the column has a default
-// value, the column value will then always be the default value, instead of null
-// which may be considered a bug if e.g for a boolean column the user specifically selects "NULL" option
-// This would probably also apply to other column types like numbers (e.g user specifically wants a null value)
-export const generateRowObjectFromFields = (
-  fields: RowField[],
-  includeNullProperties = false
-): object => {
+/**
+ * Treat `undefined` as "no input" - all else values as valid inputs (e.g NULL or empty string)
+ */
+export const generateRowObjectFromFields = ({
+  fields,
+  includeUndefinedValues = false,
+  useDefaultForEmptyValues = false,
+}: {
+  fields: RowField[]
+  includeUndefinedValues?: boolean
+  useDefaultForEmptyValues?: boolean
+}): object => {
   const rowObject = {} as any
   fields.forEach((field) => {
     const isArray = field.format.startsWith('_')
+    const value = field.value
+    const shouldUseDefaultValue =
+      useDefaultForEmptyValues &&
+      value === '' &&
+      (field.isIdentity || field.defaultValue !== null) &&
+      !TEXT_TYPES.includes(field.format)
 
-    // Do not convert empty field inputs to NULL for text types
-    // so that we discern NULL and EMPTY
-    const value = TEXT_TYPES.includes(field.format)
-      ? field.value
-      : (field?.value ?? '').length === 0
-        ? null
-        : field.value
-
-    if (isArray && value !== null) {
+    if (shouldUseDefaultValue) {
+      rowObject[field.name] = undefined
+    } else if (isArray && value !== null) {
       rowObject[field.name] = tryParseJson(value)
     } else if (field.format.includes('json')) {
       if (typeof field.value === 'object') {
@@ -224,12 +230,13 @@ export const generateRowObjectFromFields = (
       rowObject[field.name] = value
     }
   })
-  return includeNullProperties ? rowObject : omitBy(rowObject, isNull)
+
+  const results = includeUndefinedValues ? rowObject : omitBy(rowObject, isUndefined)
+  return results
 }
 
 export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) => {
-  const includeNullProperties = true
-  const rowObject = generateRowObjectFromFields(fields, includeNullProperties) as any
+  const rowObject = generateRowObjectFromFields({ fields, includeUndefinedValues: true }) as any
 
   const payload = {} as any
   const properties = Object.keys(rowObject)
@@ -246,12 +253,12 @@ export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) =
     } else if (type !== undefined && JSON_TYPES.includes(type)) {
       // don't update if the value is truncated. This is to enable the user to change cell values on rows which have
       // truncated JSON values. If the user
-      const isTruncated = isValueTruncated(field?.value)
+      const isTruncated = isValueTruncated(field?.value, field?.format)
       if (!isTruncated) {
         payload[property] = rowObject[property]
       }
     } else {
-      const originalValue = originalRow[property] === undefined ? null : originalRow[property]
+      const originalValue = originalRow[property]
       const newValue = rowObject[property]
       if (!isEqual(originalValue, newValue)) {
         payload[property] = newValue
@@ -265,7 +272,9 @@ export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) =
 /**
  * Checks if the value is truncated. The JSON types are usually truncated if they're too big to show in the editor.
  */
-export const isValueTruncated = (value: string | null | undefined) => {
+export const isValueTruncated = (value: string | null | undefined, format?: string | null) => {
+  const isArrayColumn = typeof format === 'string' && format.startsWith('_')
+
   return (
     (typeof value === 'string' && value.endsWith('...') && value.length > MAX_CHARACTERS) ||
     // if the value is an array which total representation is > MAX_CHARACTERS
@@ -277,9 +286,7 @@ export const isValueTruncated = (value: string | null | undefined) => {
       // If the array have MAX_ARRAY_SIZE elements in it
       // its a large truncated array
       (value.match(/","/g) || []).length === MAX_ARRAY_SIZE) ||
-    // if the string represent a multi-dimentional array we always consider it as possibly truncated
-    // so user load the whole value before edition
-    (typeof value === 'string' && value.startsWith('[["')) ||
+    (typeof value === 'string' && isArrayColumn && value.startsWith('[["')) ||
     // [Joshen] For json arrays, refer to getTableRowsSql from table-row-query
     // for array types, we're adding {"truncated": true} as the last item of the JSON to
     // maintain the JSON array structure

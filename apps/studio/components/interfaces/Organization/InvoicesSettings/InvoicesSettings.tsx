@@ -1,35 +1,36 @@
-import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge'
-import { InvoiceStatus } from 'components/interfaces/Billing/Invoices.types'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import PartnerManagedResource from 'components/ui/PartnerManagedResource'
-import { getInvoice } from 'data/invoices/invoice-query'
-import { getInvoiceReceipt } from 'data/invoices/invoice-receipt-query'
-import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
-import { useInvoicesQuery } from 'data/invoices/invoices-query'
 import dayjs from 'dayjs'
-import { useSelectedOrganizationQuery } from 'hooks/misc/useSelectedOrganization'
-import { MANAGED_BY } from 'lib/constants/infrastructure'
-import { formatCurrency } from 'lib/helpers'
 import { ChevronLeft, ChevronRight, FileText, Receipt, ScrollText } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Organization } from 'types/base'
 import {
   Button,
   Card,
   CardFooter,
+  cn,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  cn,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import InvoicePayButton from './InvoicePayButton'
+import { InvoiceStatus } from '@/components/interfaces/Billing/Invoices.types'
+import InvoiceStatusBadge from '@/components/interfaces/Billing/InvoiceStatusBadge'
+import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
+import { getInvoice } from '@/data/invoices/invoice-query'
+import { getInvoiceReceipt } from '@/data/invoices/invoice-receipt-query'
+import { useInvoicesCountQuery } from '@/data/invoices/invoices-count-query'
+import { useInvoicesQuery } from '@/data/invoices/invoices-query'
+import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
+import { formatCurrency } from '@/lib/helpers'
+import { Organization } from '@/types/base'
 
 const PAGE_LIMIT = 5
 
@@ -52,13 +53,16 @@ export const InvoicesSettings = () => {
 
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const slug = selectedOrganization?.slug
+  const isPartnerBilledOrganization = isPartnerBillingOrganization(
+    selectedOrganization?.billing_partner
+  )
   const offset = (page - 1) * PAGE_LIMIT
 
   const { data: count, isError: isErrorCount } = useInvoicesCountQuery(
     {
       slug,
     },
-    { enabled: selectedOrganization?.managed_by === 'supabase' }
+    { enabled: !isPartnerBilledOrganization }
   )
   const {
     data,
@@ -71,7 +75,7 @@ export const InvoicesSettings = () => {
       offset,
       limit: PAGE_LIMIT,
     },
-    { enabled: selectedOrganization?.managed_by === 'supabase' }
+    { enabled: !isPartnerBilledOrganization }
   )
   const invoices = data || []
 
@@ -99,10 +103,7 @@ export const InvoicesSettings = () => {
     }
   }
 
-  if (
-    selectedOrganization?.managed_by !== undefined &&
-    selectedOrganization?.managed_by !== 'supabase'
-  ) {
+  if (selectedOrganization && isPartnerBilledOrganization) {
     return (
       <PartnerManagedResource
         managedBy={selectedOrganization?.managed_by}
@@ -148,7 +149,7 @@ export const InvoicesSettings = () => {
             <TableRow className="rounded-b">
               <TableCell
                 colSpan={invoices.length > 0 ? 6 : 5}
-                className="!p-0 !rounded-b overflow-hidden"
+                className="p-0! rounded-b! overflow-hidden"
               >
                 <AlertError
                   className="border-0 rounded-none"
@@ -200,7 +201,7 @@ export const InvoicesSettings = () => {
                           )}
 
                         <ButtonTooltip
-                          type="outline"
+                          variant="outline"
                           className="w-7"
                           icon={<ScrollText size={16} strokeWidth={1.5} />}
                           onClick={() => fetchInvoice(x.id)}
@@ -209,7 +210,7 @@ export const InvoicesSettings = () => {
 
                         {x.status === InvoiceStatus.PAID && x.amount_due > 0 && (
                           <ButtonTooltip
-                            type="outline"
+                            variant="outline"
                             className="w-7"
                             icon={<Receipt size={16} strokeWidth={1.5} />}
                             onClick={() => fetchReceipt(x.id)}
@@ -238,7 +239,7 @@ export const InvoicesSettings = () => {
             <Button
               icon={<ChevronLeft />}
               aria-label="Previous page"
-              type="default"
+              variant="default"
               size="tiny"
               disabled={page === 1}
               onClick={async () => setPage(page - 1)}
@@ -246,7 +247,7 @@ export const InvoicesSettings = () => {
             <Button
               icon={<ChevronRight />}
               aria-label="Next page"
-              type="default"
+              variant="default"
               size="tiny"
               disabled={page * PAGE_LIMIT >= (count ?? 0)}
               onClick={async () => setPage(page + 1)}

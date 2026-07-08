@@ -1,4 +1,4 @@
-import type { UIMessage } from 'ai'
+import { isToolUIPart, type UIMessage } from 'ai'
 
 /**
  * Prepares messages for API transmission by cleaning and limiting history
@@ -22,4 +22,18 @@ export function prepareMessagesForAPI(messages: UIMessage[]): UIMessage[] {
   })
 
   return cleanedMessages
+}
+
+/**
+ * Returns approval IDs to auto-deny when the model issues multiple approval-required
+ * tool calls in the same turn — all but the first, so the model reissues them sequentially.
+ */
+export function getParallelApprovalIdsToReject(messages: UIMessage[]): string[] {
+  const lastMessage = messages.findLast((m) => m.role === 'assistant')
+  if (!lastMessage) return []
+
+  const pendingIds = (lastMessage.parts ?? []).flatMap((part) =>
+    isToolUIPart(part) && part.state === 'approval-requested' ? [part.approval.id] : []
+  )
+  return pendingIds.slice(1)
 }

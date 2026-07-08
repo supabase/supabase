@@ -4,12 +4,12 @@ import userEvent from '@testing-library/user-event'
 import { useState } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { ProjectContextProvider } from 'components/layouts/ProjectLayout/ProjectContext'
-import { Bucket } from 'data/storage/buckets-query'
-import { render } from 'tests/helpers'
-import { addAPIMock } from 'tests/lib/msw'
-import { routerMock } from 'tests/lib/route-mock'
 import { EmptyBucketModal } from '../EmptyBucketModal'
+import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
+import { Bucket } from '@/data/storage/buckets-query'
+import { render } from '@/tests/helpers'
+import { addAPIMock } from '@/tests/lib/msw'
+import { routerMock } from '@/tests/lib/route-mock'
 
 const bucket: Bucket = {
   id: faker.string.uuid(),

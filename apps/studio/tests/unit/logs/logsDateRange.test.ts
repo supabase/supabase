@@ -4,11 +4,11 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   EXPLORER_DATEPICKER_HELPERS,
   getDefaultHelper,
-} from 'components/interfaces/Settings/Logs/Logs.constants'
+} from '@/components/interfaces/Settings/Logs/Logs.constants'
 import {
   buildLogQueryParams,
   resolveLogDateRange,
-} from 'components/interfaces/Settings/Logs/logsDateRange'
+} from '@/components/interfaces/Settings/Logs/logsDateRange'
 
 const lastHourHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
 

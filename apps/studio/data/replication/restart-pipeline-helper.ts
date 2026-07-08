@@ -1,7 +1,7 @@
-import { useStopPipelineMutation } from './stop-pipeline-mutation'
 import { useStartPipelineMutation } from './start-pipeline-mutation'
+import { useStopPipelineMutation } from './stop-pipeline-mutation'
 
-export interface RestartPipelineParams {
+interface RestartPipelineParams {
   projectRef: string
   pipelineId: number
 }

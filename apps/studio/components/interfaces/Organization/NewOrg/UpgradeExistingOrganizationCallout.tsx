@@ -1,7 +1,8 @@
-import { InlineLink } from 'components/ui/InlineLink'
-import Panel from 'components/ui/Panel'
-import { DOCS_URL } from 'lib/constants'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+
+import { InlineLink } from '@/components/ui/InlineLink'
+import Panel from '@/components/ui/Panel'
+import { DOCS_URL } from '@/lib/constants'
 
 export const UpgradeExistingOrganizationCallout = () => {
   return (

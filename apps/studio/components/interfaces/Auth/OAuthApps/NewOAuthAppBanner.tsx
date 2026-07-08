@@ -1,7 +1,6 @@
 import type { OAuthClient } from '@supabase/supabase-js'
 import { X } from 'lucide-react'
 import { toast } from 'sonner'
-
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -49,7 +48,7 @@ export const NewOAuthAppBanner = ({ oauthApp, onClose }: NewOAuthAppBannerProps)
       }
     >
       <Button
-        type="text"
+        variant="text"
         icon={<X />}
         className="w-7 h-7 absolute top-0 right-0"
         onClick={onClose}

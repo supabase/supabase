@@ -1,7 +1,6 @@
-import { PropsWithChildren, createContext, useContext } from 'react'
-import { proxy, useSnapshot } from 'valtio'
-
 import { useConstant } from 'common'
+import { createContext, PropsWithChildren, useContext } from 'react'
+import { proxy, useSnapshot } from 'valtio'
 
 export function createDatabaseSettingsState() {
   const state = proxy({

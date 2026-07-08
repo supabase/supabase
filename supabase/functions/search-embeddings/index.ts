@@ -1,7 +1,7 @@
 import 'https://deno.land/x/xhr@0.2.1/mod.ts'
 import { createClient } from 'jsr:@supabase/supabase-js@2'
 import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.1.0'
-import { Database } from '../common/database-types.ts'
+import { Database } from '../../../packages/common/database-types.ts'
 import { ApplicationError, UserError } from '../common/errors.ts'
 
 const openAiKey = Deno.env.get('OPENAI_API_KEY')

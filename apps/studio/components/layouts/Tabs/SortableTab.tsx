@@ -3,12 +3,12 @@ import { CSS } from '@dnd-kit/utilities'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useMemo } from 'react'
+import { cn, TabsTrigger } from 'ui'
 
-import { EntityTypeIcon } from 'components/ui/EntityTypeIcon'
-import { useQuerySchemaState } from 'hooks/misc/useSchemaQueryState'
-import { useTabsStateSnapshot, type Tab } from 'state/tabs'
-import { cn, TabsTrigger_Shadcn_ } from 'ui'
 import { useEditorType } from '../editors/EditorsLayout.hooks'
+import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
+import { useTabsStateSnapshot, type Tab } from '@/state/tabs'
 
 /**
  * Individual draggable tab component that handles:
@@ -50,7 +50,7 @@ export const SortableTab = ({
   }, [openTabs, currentSchema, editor])
 
   // Create a motion version of TabsTrigger while preserving all functionality
-  // const MotionTabsTrigger = motion(TabsTrigger_Shadcn_)
+  // const MotionTabsTrigger = motion(TabsTrigger)
 
   return (
     <motion.div
@@ -60,9 +60,9 @@ export const SortableTab = ({
       layoutId={tab.id}
       transition={{ duration: 0.045 }}
       animate={{ opacity: isDragging ? 0 : 1 }}
-      className={cn('flex items-center h-10 first-of-type:border-l')}
+      className={cn('flex items-center h-(--header-height) first-of-type:border-l')}
     >
-      <TabsTrigger_Shadcn_
+      <TabsTrigger
         value={tab.id}
         onAuxClick={(e) => {
           // Middle click closes tab
@@ -107,7 +107,7 @@ export const SortableTab = ({
             e.preventDefault()
             e.stopPropagation()
           }}
-          className="p-0.5 ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-sm cursor-pointer"
+          className="p-0.5 ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-xs cursor-pointer"
           onMouseDown={(e) => {
             e.preventDefault()
             e.stopPropagation()
@@ -121,7 +121,7 @@ export const SortableTab = ({
           <X size={12} className="text-foreground-light" />
         </span>
         <div className="absolute w-full top-0 left-0 right-0 h-px bg-foreground opacity-0 group-data-[state=active]:opacity-100" />
-      </TabsTrigger_Shadcn_>
+      </TabsTrigger>
       {index < openTabs.length && (
         <div role="separator" className="h-full w-px bg-border" key={`separator-${tab.id}`} />
       )}

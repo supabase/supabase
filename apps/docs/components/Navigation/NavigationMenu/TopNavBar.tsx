@@ -1,16 +1,18 @@
+// End of third-party imports
+
+import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
+import { isFeatureEnabled } from 'common/enabled-features'
+import { DevToolbarTrigger } from 'dev-tools'
 import { Command, Menu, Search } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { FC } from 'react'
 import { memo, useState } from 'react'
-// End of third-party imports
-
-import { useIsLoggedIn, useIsUserLoading, useUser } from 'common'
-import { isFeatureEnabled } from 'common/enabled-features'
-import { DevToolbarTrigger } from 'dev-tools'
 import { Button, buttonVariants, cn } from 'ui'
-import { AuthenticatedDropdownMenu, CommandMenuTriggerInput } from 'ui-patterns'
+import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
+import { CommandMenuTriggerInput } from 'ui-patterns/CommandMenu'
+
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
 import useDropdownMenu from './useDropdownMenu'
@@ -31,9 +33,9 @@ const TopNavBar: FC = () => {
     <>
       <nav
         aria-label="top bar"
-        className="w-full z-40 flex flex-col border-b backdrop-blur backdrop-filter bg bg-opacity-75"
+        className="w-full z-40 flex flex-col border-b backdrop-blur-sm backdrop-filter bg-default/75"
       >
-        <div className="w-full px-5 lg:pl-10 flex justify-between h-[var(--header-height)] gap-3">
+        <div className="w-full px-5 lg:pl-10 flex justify-between h-(--header-height) gap-3">
           <div className="hidden lg:flex h-full items-center justify-center gap-2">
             <HeaderLogo />
             <GlobalNavigationMenu />
@@ -46,6 +48,7 @@ const TopNavBar: FC = () => {
             <div className="flex gap-2 items-center">
               <DevToolbarTrigger />
               <CommandMenuTriggerInput
+                className="[&>div>p]:text-foreground-lighter"
                 placeholder={
                   <>
                     Search
@@ -56,8 +59,8 @@ const TopNavBar: FC = () => {
               <button
                 title="Menu dropdown button"
                 className={cn(
-                  buttonVariants({ type: 'default' }),
-                  'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30'
+                  buttonVariants({ variant: 'default' }),
+                  'flex lg:hidden border-default bg-surface-100/75 text-foreground-light rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30'
                 )}
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               >
@@ -95,15 +98,9 @@ const HeaderLogo = memo(() => {
   const { navigationLogo } = getCustomContent(['navigation:logo'])
 
   return (
-    <Link
-      href="/"
-      className={cn(
-        buttonVariants({ type: 'default' }),
-        'flex shrink-0 items-center w-fit !bg-transparent !border-none !shadow-none'
-      )}
-    >
+    <Link href="/" className="flex shrink-0 items-center gap-1.5 w-fit">
       <Image
-        className={cn('hidden dark:block !m-0', largeLogo && 'h-[36px]')}
+        className={cn('hidden dark:block m-0!', largeLogo && 'h-[36px]')}
         src={navigationLogo?.dark ?? '/docs/supabase-dark.svg'}
         priority={true}
         loading="eager"
@@ -112,7 +109,7 @@ const HeaderLogo = memo(() => {
         alt="Supabase wordmark"
       />
       <Image
-        className={cn('block dark:hidden !m-0', largeLogo && 'h-[36px]')}
+        className={cn('block dark:hidden m-0!', largeLogo && 'h-[36px]')}
         src={navigationLogo?.light ?? '/docs/supabase-light.svg'}
         priority={true}
         loading="eager"

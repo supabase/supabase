@@ -2,7 +2,14 @@ import { z } from 'zod'
 
 import { DEFAULT_SYSTEM_SCHEMAS } from './constants'
 import { filterByList } from './helpers'
-import { ident, literal } from './pg-format'
+import {
+  ident,
+  joinSqlFragments,
+  keyword,
+  literal,
+  safeSql,
+  type SafeSqlFragment,
+} from './pg-format'
 import { POLICIES_SQL } from './sql/policies'
 
 const pgPolicyZod = z.object({
@@ -30,11 +37,11 @@ export type PGPolicy = z.infer<typeof pgPolicyZod>
 
 type PolicyIdentifier = Pick<PGPolicy, 'id'> | Pick<PGPolicy, 'name' | 'schema' | 'table'>
 
-function getIdentifierWhereClause(identifier: PolicyIdentifier): string {
+function getIdentifierWhereClause(identifier: PolicyIdentifier): SafeSqlFragment {
   if ('id' in identifier && identifier.id) {
-    return `id = ${literal(identifier.id)}`
+    return safeSql`id = ${literal(identifier.id)}`
   } else if ('name' in identifier && identifier.name && identifier.schema && identifier.table) {
-    return `name = ${literal(identifier.name)} AND schema = ${literal(identifier.schema)} AND table = ${literal(identifier.table)}`
+    return safeSql`name = ${literal(identifier.name)} AND schema = ${literal(identifier.schema)} AND table = ${literal(identifier.table)}`
   }
   throw new Error('Must provide either id or name, schema and table')
 }
@@ -52,10 +59,10 @@ function list({
   limit?: number
   offset?: number
 } = {}): {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgPolicyArrayZod
 } {
-  let sql = `
+  let sql = safeSql`
     with policies as (${POLICIES_SQL})
     select *
     from policies
@@ -66,13 +73,13 @@ function list({
     !includeSystemSchemas ? DEFAULT_SYSTEM_SCHEMAS : undefined
   )
   if (filter) {
-    sql += `where schema ${filter}`
+    sql = safeSql`${sql}where schema ${filter}`
   }
   if (limit) {
-    sql += ` limit ${limit}`
+    sql = safeSql`${sql} limit ${literal(limit)}`
   }
   if (offset) {
-    sql += ` offset ${offset}`
+    sql = safeSql`${sql} offset ${literal(offset)}`
   }
   return {
     sql,
@@ -81,10 +88,10 @@ function list({
 }
 
 function retrieve(identifier: PolicyIdentifier): {
-  sql: string
+  sql: SafeSqlFragment
   zod: typeof pgPolicyOptionalZod
 } {
-  const sql = `with policies as (${POLICIES_SQL}) select * from policies where ${getIdentifierWhereClause(identifier)};`
+  const sql = safeSql`with policies as (${POLICIES_SQL}) select * from policies where ${getIdentifierWhereClause(identifier)};`
   return {
     sql,
     zod: pgPolicyOptionalZod,
@@ -95,8 +102,8 @@ type PolicyCreateParams = {
   name: string
   schema?: string
   table: string
-  definition?: string
-  check?: string
+  definition?: SafeSqlFragment
+  check?: SafeSqlFragment
   action?: 'PERMISSIVE' | 'RESTRICTIVE'
   command?: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE'
   roles?: string[]
@@ -111,46 +118,53 @@ function create({
   action = 'PERMISSIVE',
   command = 'ALL',
   roles = ['public'],
-}: PolicyCreateParams): { sql: string } {
-  const sql = `
+}: PolicyCreateParams): { sql: SafeSqlFragment } {
+  const rolesFragment = joinSqlFragments(roles.map(ident), ', ')
+  const definitionSql = definition ? safeSql`using (${definition})` : safeSql``
+  const checkSql = check ? safeSql`with check (${check})` : safeSql``
+  const sql = safeSql`
 create policy ${ident(name)} on ${ident(schema)}.${ident(table)}
-  as ${action}
-  for ${command}
-  to ${roles.map(ident).join(',')}
-  ${definition ? `using (${definition})` : ''}
-  ${check ? `with check (${check})` : ''};`
+  as ${keyword(action)}
+  for ${keyword(command)}
+  to ${rolesFragment}
+  ${definitionSql}
+  ${checkSql};`
   return { sql }
 }
 
 type PolicyUpdateParams = {
   name?: string
-  definition?: string
-  check?: string
+  definition?: SafeSqlFragment
+  check?: SafeSqlFragment
   roles?: string[]
 }
 
 function update(
   identifier: Pick<PGPolicy, 'name' | 'schema' | 'table'>,
   params: PolicyUpdateParams
-): { sql: string } {
+): { sql: SafeSqlFragment } {
   const { name, definition, check, roles } = params
 
-  const alter = `ALTER POLICY ${ident(identifier.name)} ON ${ident(identifier.schema)}.${ident(identifier.table)}`
-  const nameSql = name === undefined ? '' : `${alter} RENAME TO ${ident(name)};`
-  const definitionSql = definition === undefined ? '' : `${alter} USING (${definition});`
-  const checkSql = check === undefined ? '' : `${alter} WITH CHECK (${check});`
-  const rolesSql = roles === undefined ? '' : `${alter} TO ${roles.map(ident).join(',')};`
+  const alter = safeSql`ALTER POLICY ${ident(identifier.name)} ON ${ident(identifier.schema)}.${ident(identifier.table)}`
+  const nameSql: SafeSqlFragment =
+    name === undefined ? safeSql`` : safeSql`${alter} RENAME TO ${ident(name)};`
+  const definitionSql: SafeSqlFragment =
+    definition === undefined ? safeSql`` : safeSql`${alter} USING (${definition});`
+  const checkSql: SafeSqlFragment =
+    check === undefined ? safeSql`` : safeSql`${alter} WITH CHECK (${check});`
+  const rolesSql: SafeSqlFragment =
+    roles === undefined
+      ? safeSql``
+      : safeSql`${alter} TO ${joinSqlFragments(roles.map(ident), ', ')};`
 
   // nameSql must be last
-  const sql = `BEGIN; ${definitionSql} ${checkSql} ${rolesSql} ${nameSql} COMMIT;`
+  const sql = safeSql`BEGIN; ${definitionSql} ${checkSql} ${rolesSql} ${nameSql} COMMIT;`
 
   return { sql }
 }
 
-function remove(identifier: Pick<PGPolicy, 'name' | 'schema' | 'table'>): { sql: string } {
-  const sql = `DROP POLICY ${ident(identifier.name)} ON ${ident(identifier.schema)}.${ident(
-    identifier.table
-  )};`
+function remove(identifier: Pick<PGPolicy, 'name' | 'schema' | 'table'>): { sql: SafeSqlFragment } {
+  const sql = safeSql`DROP POLICY ${ident(identifier.name)} ON ${ident(identifier.schema)}.${ident(identifier.table)};`
   return { sql }
 }
 

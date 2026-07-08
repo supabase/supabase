@@ -1,13 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import {
-  Button,
-  cn,
-  Collapsible_Shadcn_ as Collapsible,
-  CollapsibleContent_Shadcn_ as CollapsibleContent,
-  CollapsibleTrigger_Shadcn_ as CollapsibleTrigger,
-} from 'ui'
+import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 interface CodeBlockProps extends React.HTMLAttributes<HTMLDivElement> {
   expandButtonTitle?: string
@@ -36,12 +30,12 @@ export function CodeBlockWrapper({
         </CollapsibleContent>
         <div
           className={cn(
-            'absolute flex items-center justify-center bg-gradient-to-b from-zinc-700/30 to-zinc-950/90 p-2',
+            'absolute flex items-center justify-center bg-linear-to-b from-zinc-700/30 to-zinc-950/90 p-2',
             isOpened ? 'inset-x-0 bottom-0 h-12' : 'inset-0'
           )}
         >
           <CollapsibleTrigger asChild>
-            <Button type="secondary" className="h-8 text-xs">
+            <Button variant="secondary" className="h-8 text-xs">
               {isOpened ? 'Collapse' : expandButtonTitle}
             </Button>
           </CollapsibleTrigger>

@@ -10,13 +10,13 @@ To enable Figma Auth for your project, you need to set up a Figma OAuth applicat
 
 Setting up Figma logins for your application consists of 3 parts:
 
-- Create and configure a Figma App on the [Figma Developers page](https://www.figma.com/developers/app).
+- Create and configure a Figma App on the [Figma Developers page](https://www.figma.com/developers/apps).
 - Add your Figma `client_id` and `client_secret` to your [Supabase Project](https://app.supabase.com).
 - Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js).
 
 ## Access the Figma Developers page
 
-- Go to the [Figma Developers page](https://www.figma.com/developers/app)
+- Go to the [Figma Developers page](https://www.figma.com/developers/apps)
 - Log in (if necessary)
 
 ## Find your callback URL
@@ -61,7 +61,8 @@ When your user signs in, call [`signInWithOAuth()`](/docs/reference/javascript/a
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 async function signInWithFigma() {
@@ -118,7 +119,8 @@ When your user signs out, call [signOut()](/docs/reference/javascript/auth-signo
 
 ```js
 import { createClient } from '@supabase/supabase-js'
-const supabase = createClient('<your-project-url>', '<sb_publishable_... or anon key>')
+
+const supabase = createClient('https://your-project-id.supabase.co', 'sb_publishable_...')
 
 // ---cut---
 async function signOut() {

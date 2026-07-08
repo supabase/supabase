@@ -1,29 +1,42 @@
 import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { Download, MoreVertical, Trash } from 'lucide-react'
 import { useState } from 'react'
+import {
+  Button,
+  CriticalIcon,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogSection,
+  DialogTitle,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from 'ui'
 
-import { useParams } from 'common'
-import { DeleteProjectModal } from 'components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
-import { SupportLink } from 'components/interfaces/Support/SupportLink'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DropdownMenuItemTooltip } from 'components/ui/DropdownMenuItemTooltip'
-import { InlineLink } from 'components/ui/InlineLink'
-import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
-import { useDownloadableBackupQuery } from 'data/database/backup-query'
-import { useAsyncCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { Button, CriticalIcon, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
+import { DeleteProjectModal } from '@/components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectModal'
+import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { LogicalBackupCliInstructions } from '@/components/layouts/ProjectLayout/LogicalBackupCliInstructions'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { InlineLink } from '@/components/ui/InlineLink'
+import { useBackupDownloadMutation } from '@/data/database/backup-download-mutation'
+import { useDownloadableBackupQuery } from '@/data/database/backup-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const RestoreFailedState = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [visible, setVisible] = useState(false)
+  const [showCliBackup, setShowCliBackup] = useState(false)
 
   const { can: canDeleteProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: { project_id: project?.id },
   })
 
-  const { data } = useDownloadableBackupQuery({ projectRef: ref })
+  const { data, isPending: isLoadingBackups } = useDownloadableBackupQuery({ projectRef: ref })
   const backups = data?.backups ?? []
 
   const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
@@ -41,9 +54,18 @@ export const RestoreFailedState = () => {
 
   const onClickDownloadBackup = () => {
     if (!ref) return console.error('Project ref is required')
-    if (backups.length === 0) return console.error('No available backups to download')
+    if (backups.length === 0 || data?.status === 'physical-backups-enabled')
+      return setShowCliBackup(true)
     downloadBackup({ ref, backup: backups[0] })
   }
+
+  const downloadBackupTooltipText = isLoadingBackups
+    ? undefined
+    : data?.status === 'physical-backups-enabled'
+      ? 'Project uses physical backups — click to see CLI backup instructions'
+      : backups.length === 0
+        ? 'No downloadable backup available — click to see CLI backup instructions'
+        : undefined
 
   return (
     <>
@@ -68,7 +90,7 @@ export const RestoreFailedState = () => {
             </div>
 
             <div className="border-t border-overlay flex items-center justify-end py-4 px-8 gap-x-2">
-              <Button asChild type="default">
+              <Button asChild variant="default">
                 <SupportLink
                   queryParams={{
                     category: SupportCategories.DATABASE_UNRESPONSIVE,
@@ -81,19 +103,14 @@ export const RestoreFailedState = () => {
               </Button>
 
               <ButtonTooltip
-                type="default"
+                variant="default"
                 icon={<Download />}
-                loading={isDownloading}
-                disabled={backups.length === 0}
+                disabled={isLoadingBackups}
+                loading={isDownloading || isLoadingBackups}
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text:
-                      data?.status === 'physical-backups-enabled'
-                        ? 'No available backups to download as project is on physical backups'
-                        : backups.length === 0
-                          ? 'No available backups to download'
-                          : undefined,
+                    text: downloadBackupTooltipText,
                   },
                 }}
                 onClick={onClickDownloadBackup}
@@ -103,7 +120,7 @@ export const RestoreFailedState = () => {
 
               <DropdownMenu>
                 <DropdownMenuTrigger>
-                  <Button type="default" className="w-7" icon={<MoreVertical />} />
+                  <Button variant="default" className="w-7" icon={<MoreVertical />} />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="w-72" align="end">
                   <DropdownMenuItemTooltip
@@ -135,6 +152,18 @@ export const RestoreFailedState = () => {
           </div>
         </div>
       </div>
+
+      <Dialog open={showCliBackup} onOpenChange={setShowCliBackup}>
+        <DialogContent size="medium">
+          <DialogHeader>
+            <DialogTitle>Back up your database</DialogTitle>
+          </DialogHeader>
+          <DialogSection>
+            <LogicalBackupCliInstructions showResetPassword={false} />
+          </DialogSection>
+        </DialogContent>
+      </Dialog>
+
       <DeleteProjectModal visible={visible} onClose={() => setVisible(false)} />
     </>
   )

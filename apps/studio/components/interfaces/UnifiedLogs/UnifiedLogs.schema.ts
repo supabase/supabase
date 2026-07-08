@@ -1,11 +1,11 @@
 import { z } from 'zod'
 
+import { LOG_TYPES, METHODS, REGIONS } from './UnifiedLogs.constants'
 import {
   ARRAY_DELIMITER,
   LEVELS,
   RANGE_DELIMITER,
-} from 'components/ui/DataTable/DataTable.constants'
-import { LOG_TYPES, METHODS, REGIONS } from './UnifiedLogs.constants'
+} from '@/components/ui/DataTable/DataTable.constants'
 
 export const columnSchema = z.object({
   id: z.string(),

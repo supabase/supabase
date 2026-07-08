@@ -1,36 +1,65 @@
-import { cn } from 'ui'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import { getStaticEvents } from '~/lib/events'
-import { SupabaseEvent } from '~/lib/eventsTypes'
+'use client'
+
+import { EventsProvider, useEvents } from '~/app/events/context'
 import { EventBanner } from '~/components/Events/new/EventBanner'
-import { EventsProvider } from '~/app/events/context'
+import DefaultLayout from '~/components/Layouts/Default'
+import { SupabaseEvent } from '~/lib/eventsTypes'
+
 import { EventGallery } from './EventGallery'
+import { EventsContainer } from './EventsContainer'
+
+function EventBannerSection() {
+  const { isLoading, featuredEvent, selectedCategories } = useEvents()
+  if (selectedCategories.includes('on-demand')) return null
+  if (!isLoading && !featuredEvent) return null
+
+  return (
+    <EventsContainer className="border-x border-b flex-1 py-8 bg-surface-200">
+      <EventBanner />
+    </EventsContainer>
+  )
+}
+
+function EventsPageSubtitle() {
+  const { selectedCategories } = useEvents()
+
+  return (
+    <p className="text-foreground-light">
+      {selectedCategories.includes('on-demand')
+        ? 'Watch recordings from past webinars and sessions.'
+        : 'Explore upcoming events and on-demand recordings.'}
+    </p>
+  )
+}
 
 export function EventClientRenderer({
-  staticEvents,
-  onDemandEvents,
+  notionEvents,
+  mdxEvents,
+  onDemandMdxEvents,
 }: {
-  staticEvents: SupabaseEvent[]
-  onDemandEvents: SupabaseEvent[]
+  notionEvents: SupabaseEvent[]
+  mdxEvents: SupabaseEvent[]
+  onDemandMdxEvents: SupabaseEvent[]
 }) {
   return (
-    <EventsProvider staticEvents={staticEvents} onDemandEvents={onDemandEvents}>
+    <EventsProvider
+      notionEvents={notionEvents}
+      mdxEvents={mdxEvents}
+      onDemandMdxEvents={onDemandMdxEvents}
+    >
       <DefaultLayout className="flex flex-col">
-        <SectionContainer className="border-x border-b !py-8">
-          <h1 className="h3 !p-0 !m-0">
+        <EventsContainer className="border-x border-b">
+          <h1 className="h3 p-0! m-0!">
             <span className="sr-only">Supabase</span> Events
           </h1>
-          <p className="text-foreground-light">Join us at the following upcoming events</p>
-        </SectionContainer>
+          <EventsPageSubtitle />
+        </EventsContainer>
 
-        <SectionContainer className="border-x border-b flex-1 !py-8">
-          <EventBanner />
-        </SectionContainer>
+        <EventBannerSection />
 
-        <SectionContainer className="border-x flex-1 !pt-8">
+        <EventsContainer className="border-x flex-1">
           <EventGallery />
-        </SectionContainer>
+        </EventsContainer>
       </DefaultLayout>
     </EventsProvider>
   )

@@ -1,5 +1,5 @@
 import { isFeatureEnabled } from 'common'
-import { Fragment, type PropsWithChildren } from 'react'
+import { type PropsWithChildren } from 'react'
 
 import { cn } from 'ui'
 
@@ -43,19 +43,17 @@ export async function ReferenceNavigation({
         <RefVersionDropdown library={libPath} currentVersion={version} />
       </div>
       <ul className="flex flex-col gap-2">
-        {displayedNavSections?.map((section) => (
-          <Fragment key={section.id}>
-            {section.type === 'category' ? (
-              <li>
-                <RefCategory basePath={basePath} section={section} />
-              </li>
-            ) : (
-              <li className={topLvlRefNavItemStyles}>
-                <RefLink basePath={basePath} section={section} />
-              </li>
-            )}
-          </Fragment>
-        ))}
+        {displayedNavSections?.map((section, index) =>
+          section.type === 'category' ? (
+            <li key={section.id ?? String(index)}>
+              <RefCategory basePath={basePath} section={section} />
+            </li>
+          ) : (
+            <li key={section.id ?? String(index)} className={topLvlRefNavItemStyles}>
+              <RefLink basePath={basePath} section={section} />
+            </li>
+          )
+        )}
       </ul>
     </ReferenceNavigationScrollHandler>
   )

@@ -1,6 +1,5 @@
 import { Check, Copy } from 'lucide-react'
 import { ComponentProps, forwardRef, useEffect, useState } from 'react'
-
 import { Button, cn, copyToClipboard } from 'ui'
 
 type CopyButtonBaseProps = {
@@ -32,6 +31,9 @@ const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
       onClick,
       copyLabel = 'Copy',
       copiedLabel = 'Copied',
+      variant = 'primary',
+      icon,
+      className,
       ...props
     },
     ref
@@ -54,9 +56,17 @@ const CopyButton = forwardRef<HTMLButtonElement, CopyButtonProps>(
           onClick?.(e)
         }}
         {...props}
-        className={cn({ 'px-1': iconOnly }, props.className)}
+        variant={variant}
+        className={cn({ 'px-1': iconOnly }, className)}
         icon={
-          showCopied ? <Check strokeWidth={2} className="text-brand" /> : props.icon ?? <Copy />
+          showCopied ? (
+            <Check
+              strokeWidth={2}
+              className={cn(variant === 'primary' ? 'text-inherit' : 'text-brand')}
+            />
+          ) : (
+            (icon ?? <Copy />)
+          )
         }
       >
         {!iconOnly && <>{children ?? (showCopied ? copiedLabel : copyLabel)}</>}

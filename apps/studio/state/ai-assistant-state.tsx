@@ -1,17 +1,19 @@
 import { Chat, type UIMessage as MessageType } from '@ai-sdk/react'
-import { DefaultChatTransport, lastAssistantMessageIsCompleteWithToolCalls } from 'ai'
+import { DefaultChatTransport, lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { DBSchema, IDBPDatabase, openDB } from 'idb'
 import { debounce } from 'lodash'
 import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import { proxy, ref, snapshot, subscribe, useSnapshot } from 'valtio'
 
-import { constructHeaders } from 'data/fetchers'
-import { prepareMessagesForAPI } from 'lib/ai/message-utils'
-import { BASE_PATH, IS_PLATFORM } from 'lib/constants'
-
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
+import type { AiSupportStatus } from '@/data/feedback/ai-chat-front-sync'
+import { constructHeaders } from '@/data/fetchers'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { prepareMessagesForAPI } from '@/lib/ai/message-utils'
+import { isKnownAssistantModelId } from '@/lib/ai/model.utils'
+import type { AssistantModelId } from '@/lib/ai/model.utils'
+import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 
 type SuggestionsType = {
   title: string
@@ -22,7 +24,35 @@ export type AssistantMessageType = MessageType
 
 export type SqlSnippet = string | { label: string; content: string }
 
-export type AssistantModel = 'gpt-5' | 'gpt-5-mini'
+export type AssistantModel = AssistantModelId
+
+export type SupportChatMetadata = {
+  subject: string
+  category: string
+  severity: string
+  organizationSlug?: string
+  projectRef?: string
+  library?: string
+  affectedServices?: string
+  allowSupportAccess: boolean
+  browserInformation?: string
+  frontConversationId?: string
+  // Front thread_ref shared with the submit-time conversation. Sent as the sync
+  // API `chatId` so AI messages thread into that same Front conversation.
+  threadRef?: string
+  isSupportChat: true
+  lifecycleStatus: AiSupportStatus
+  // A lifecycle transition requested before the Front conversation id existed
+  // (e.g. the assistant resolved the chat before the first message sync
+  // returned an id). Flushed by syncSupportChatToFront once the id is assigned.
+  pendingLifecycleStatus?: AiSupportStatus
+  lifecycleClosedAt?: string
+  lastSyncedMessageCount: number
+  // Guards message syncs; lifecycle syncs use `isLifecycleSyncing` so the two
+  // never block each other.
+  isSyncing: boolean
+  isLifecycleSyncing: boolean
+}
 
 type ChatSession = {
   id: string
@@ -30,6 +60,7 @@ type ChatSession = {
   messages: AssistantMessageType[]
   createdAt: Date
   updatedAt: Date
+  supportMetadata?: SupportChatMetadata
 }
 
 export type AiAssistantContext = {
@@ -45,7 +76,7 @@ type AiAssistantData = {
   tables: { schema: string; name: string }[]
   chats: Record<string, ChatSession>
   activeChatId?: string
-  model: AssistantModel
+  model?: AssistantModel
   context: AiAssistantContext
 }
 
@@ -64,7 +95,7 @@ const INITIAL_AI_ASSISTANT: AiAssistantData = {
   tables: [],
   chats: {},
   activeChatId: undefined,
-  model: 'gpt-5',
+  model: undefined,
   context: {},
 }
 
@@ -160,7 +191,7 @@ async function loadFromIndexedDB(projectRef: string): Promise<StoredAiAssistantS
 async function tryMigrateFromLocalStorage(
   projectRef: string
 ): Promise<StoredAiAssistantState | null> {
-  const stored = localStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+  const stored = safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
   if (!stored) {
     return null
   }
@@ -184,18 +215,18 @@ async function tryMigrateFromLocalStorage(
     } else {
       console.warn('Data in localStorage is not in the expected format, ignoring.')
       // Clean up invalid data
-      localStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+      safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
     }
   } catch (error) {
     console.error('Failed to parse state from localStorage:', error)
     // Clear potentially corrupted data
-    localStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+    safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
   }
 
   if (migratedState) {
     try {
       await saveAiState(migratedState)
-      localStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
+      safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.AI_ASSISTANT_STATE(projectRef))
       return migratedState
     } catch (saveError) {
       console.error('Failed to save migrated state to IndexedDB:', saveError)
@@ -231,9 +262,17 @@ function createChatInstance(
   return new Chat<MessageType>({
     id: options.id,
     messages: options.initialMessages.map((message) => sanitizeForCloning(message)),
-    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithToolCalls,
+    sendAutomaticallyWhen: lastAssistantMessageIsCompleteWithApprovalResponses,
     transport: new DefaultChatTransport({
       api: `${BASE_PATH}/api/ai/sql/generate-v4`,
+      fetch: async (url, init) => {
+        const response = await globalThis.fetch(url as RequestInfo, init)
+        const spanId = response.headers.get('x-braintrust-span-id')
+        if (spanId) {
+          state.pendingSpanIds[options.id] = spanId
+        }
+        return response
+      },
       async prepareSendMessagesRequest({ messages, ...opts }) {
         const cleanedMessages = prepareMessagesForAPI(messages)
         const headerData = await constructHeaders()
@@ -248,7 +287,9 @@ function createChatInstance(
             messages: cleanedMessages,
             projectRef: state.context.projectRef,
             connectionString: state.context.connectionString,
+            chatId: options.id,
             chatName: chat?.name,
+            supportMode: chat?.supportMetadata?.isSupportChat ?? false,
             orgSlug: state.context.orgSlug,
             context: state.context,
             model: state.model,
@@ -263,6 +304,16 @@ function createChatInstance(
         return
       }
 
+      if (toolCall.toolName === 'escalate_to_human') {
+        state.setSupportLifecycleStatus(options.id, 'escalated')
+        return
+      }
+
+      if (toolCall.toolName === 'resolve_support_conversation') {
+        state.setSupportLifecycleStatus(options.id, 'bot_resolved')
+        return
+      }
+
       if (toolCall.toolName === 'rename_chat') {
         const { newName } = toolCall.input as { newName: string }
 
@@ -271,15 +322,32 @@ function createChatInstance(
         }
       }
     },
-    onFinish(result) {
+    onFinish(_result) {
       // Sync messages back to state
       const chatInstance = state.chatInstances[options.id]
       if (chatInstance) {
         const messages = chatInstance.messages
         const chat = state.chats[options.id]
         if (chat) {
-          chat.messages = messages as AssistantMessageType[]
+          chat.messages = messages
           chat.updatedAt = new Date()
+        }
+
+        // Associate pending span ID with the last assistant message
+        const pendingSpanId = state.pendingSpanIds[options.id]
+        if (pendingSpanId) {
+          const lastAssistantMsg = [...messages].reverse().find((m) => m.role === 'assistant')
+          if (lastAssistantMsg) {
+            state.messageSpanIds[lastAssistantMsg.id] = pendingSpanId
+          }
+          delete state.pendingSpanIds[options.id]
+        }
+
+        // Sync support chat messages to Front (fire-and-forget, dynamic import to avoid SSR issues)
+        if (chat?.supportMetadata) {
+          import('@/state/ai-chat-front-sync')
+            .then(({ syncSupportChatToFront }) => syncSupportChatToFront(options.id, state))
+            .catch(() => {})
         }
       }
     },
@@ -293,6 +361,8 @@ export const createAiAssistantState = (): AiAssistantState => {
   const state: AiAssistantState = proxy({
     ...initialState, // Spread initial values directly
     chatInstances: {},
+    pendingSpanIds: {},
+    messageSpanIds: {},
 
     setContext: (context: Partial<AiAssistantContext>) => {
       state.context = { ...state.context, ...context }
@@ -350,6 +420,28 @@ export const createAiAssistantState = (): AiAssistantState => {
       state.tables = options?.tables ?? INITIAL_AI_ASSISTANT.tables
 
       return chatId
+    },
+
+    setSupportLifecycleStatus: (chatId: string, status: AiSupportStatus) => {
+      const chat = state.chats[chatId]
+      if (!chat?.supportMetadata) return
+
+      chat.supportMetadata.lifecycleStatus = status
+      if (status !== 'bot_active') {
+        chat.supportMetadata.lifecycleClosedAt = new Date().toISOString()
+      }
+
+      // No Front conversation yet (the initial message sync hasn't returned an
+      // id). Queue the transition so syncSupportChatToFront can flush it once the
+      // id is assigned, rather than silently dropping it.
+      if (!chat.supportMetadata.frontConversationId) {
+        chat.supportMetadata.pendingLifecycleStatus = status
+        return
+      }
+
+      import('@/state/ai-chat-front-sync').then(({ syncSupportLifecycleToFront }) => {
+        syncSupportLifecycleToFront(chatId, state, status).catch(() => {})
+      })
     },
 
     selectChat: (id: string) => {
@@ -431,7 +523,7 @@ export const createAiAssistantState = (): AiAssistantState => {
         if (index !== -1) {
           state.updateMessage(msg)
         } else {
-          messagesToAdd.push(msg as AssistantMessageType)
+          messagesToAdd.push(msg)
         }
       })
 
@@ -447,7 +539,7 @@ export const createAiAssistantState = (): AiAssistantState => {
 
       const messageIndex = chat.messages.findIndex((msg) => msg.id === updatedMessage.id)
       if (messageIndex !== -1) {
-        chat.messages[messageIndex] = updatedMessage as AssistantMessageType
+        chat.messages[messageIndex] = updatedMessage
         chat.updatedAt = new Date()
       }
     },
@@ -465,7 +557,25 @@ export const createAiAssistantState = (): AiAssistantState => {
     loadPersistedState: (persistedState: StoredAiAssistantState) => {
       state.chats = persistedState.chats
       state.activeChatId = persistedState.activeChatId
-      state.model = persistedState.model ?? INITIAL_AI_ASSISTANT.model
+      const storedModel = persistedState.model
+      state.model =
+        storedModel && isKnownAssistantModelId(storedModel)
+          ? storedModel
+          : INITIAL_AI_ASSISTANT.model
+
+      // Reset sync guards on any support chats (can't be mid-sync after reload)
+      Object.values(state.chats).forEach((chat) => {
+        if (chat.supportMetadata) {
+          if (!chat.supportMetadata.isSupportChat) {
+            chat.supportMetadata.isSupportChat = true
+          }
+          if (!chat.supportMetadata.lifecycleStatus) {
+            chat.supportMetadata.lifecycleStatus = 'bot_active'
+          }
+          chat.supportMetadata.isSyncing = false
+          chat.supportMetadata.isLifecycleSyncing = false
+        }
+      })
 
       // Ensure an active chat exists after loading
       if (!state.activeChat) {
@@ -510,6 +620,8 @@ export type AiAssistantState = AiAssistantData & {
   resetAiAssistantPanel: () => void
   activeChat: ChatSession | undefined
   chatInstances: Record<string, Chat<MessageType>>
+  pendingSpanIds: Record<string, string>
+  messageSpanIds: Record<string, string>
   setContext: (context: Partial<AiAssistantContext>) => void
   setModel: (model: AssistantModel) => void
   newChat: (
@@ -517,6 +629,7 @@ export type AiAssistantState = AiAssistantData & {
       Pick<AiAssistantData, 'initialInput' | 'sqlSnippets' | 'suggestions' | 'tables'>
     >
   ) => string
+  setSupportLifecycleStatus: (chatId: string, status: AiSupportStatus) => void
   selectChat: (id: string) => void
   deleteChat: (id: string) => void
   renameChat: (id: string, name: string) => void

@@ -1,7 +1,7 @@
 ---
 id: 'http'
 title: 'http: RESTful Client'
-description: 'An HTTP Client for PostgreSQL Functions.'
+description: 'An HTTP Client for Postgres Functions.'
 video: 'https://www.youtube.com/v/rARgrELRCwY'
 ---
 
@@ -20,7 +20,7 @@ The `http` extension allows you to call RESTful endpoints within Postgres.
 
 ## Overview
 
-Let's cover some basic concepts:
+This section covers basic concepts:
 
 - REST: stands for REpresentational State Transfer. It's a way to request data from external services.
 - RESTful APIs are servers which accept HTTP "calls". The calls are typically:
@@ -88,7 +88,7 @@ A successful call to a web URL from the `http` extension returns a record with t
 
 ## Examples
 
-### Simple `GET` example
+### Basic `GET` example [#simple-get-example]
 
 ```sql
 select
@@ -97,7 +97,7 @@ from
   extensions.http_get('https://jsonplaceholder.typicode.com/todos/1');
 ```
 
-### Simple `POST` example
+### Basic `POST` example [#simple-post-example]
 
 ```sql
 select

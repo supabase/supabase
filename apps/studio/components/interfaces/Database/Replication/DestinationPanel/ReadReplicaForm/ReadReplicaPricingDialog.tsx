@@ -1,7 +1,3 @@
-import { DocsButton } from 'components/ui/DocsButton'
-import { InlineLinkClassName } from 'components/ui/InlineLink'
-import { useSelectedProjectQuery } from 'hooks/misc/useSelectedProject'
-import { DOCS_URL } from 'lib/constants'
 import {
   cn,
   Dialog,
@@ -19,7 +15,13 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+
 import { useGetReplicaCost } from './useGetReplicaCost'
+import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 export const ReadReplicaPricingDialog = () => {
   const { data: project } = useSelectedProjectQuery()
@@ -103,6 +105,7 @@ export const ReadReplicaPricingDialog = () => {
               .
             </p>
           )}
+          <TaxDisclaimer className="mt-3" />
         </DialogSection>
 
         <DialogFooter>

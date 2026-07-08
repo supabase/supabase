@@ -1,5 +1,5 @@
-import type { Dictionary } from 'types'
 import type { Suggestion } from './ColumnEditor.types'
+import type { Dictionary } from '@/types'
 
 const defaultTimeBasedExpressions: Suggestion[] = [
   {

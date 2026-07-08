@@ -5,6 +5,7 @@ import {
   calculateComputeSizeRequiredForIops,
   calculateDiskSizePrice,
   calculateIOPSPrice,
+  calculateMaxIopsAllowedForDiskSizeWithGp3,
   calculateMaxIopsForComputeSize,
   calculateThroughputPrice,
   mapAddOnVariantIdToComputeSize,
@@ -63,6 +64,18 @@ describe('DiskManagement utils', () => {
         'ci_48xlarge_high_memory',
       ]).toContain(fallback)
     })
+  })
+})
+
+describe('calculateMaxIopsAllowedForDiskSizeWithGp3', () => {
+  // Regression: old code returned `3000 * size`, letting a 2 GB disk request 6000 IOPS
+  // which the platform rejects. The real ceiling is 500 IOPS/GB capped at 16 000.
+  test('caps a sub-6 GB disk at the 3000 IOPS floor (not 3000 × size)', () => {
+    expect(calculateMaxIopsAllowedForDiskSizeWithGp3(2)).toBe(3000)
+  })
+
+  test('caps large disks at 16 000 IOPS', () => {
+    expect(calculateMaxIopsAllowedForDiskSizeWithGp3(100)).toBe(16000)
   })
 })
 

@@ -1,0 +1,298 @@
+/*
+ * Tailwind v4 animation tokens + the @keyframes they reference.
+ *
+ * Each --animate-* token in @theme generates an `animate-{name}` utility.
+ * Keyframes live outside @theme since they're @-rules, not design tokens.
+ *
+ * Migrated from packages/config/ui.config.js (theme.extend.keyframes /
+ * theme.extend.animation) and packages/config/tailwind.config.js
+ * (theme.extend.keyframes / theme.extend.animation).
+ */
+
+@theme {
+  --animate-fade-in: fadeIn 300ms both;
+  --animate-fade-out: fadeOut 300ms both;
+
+  /* may be unused — verify before pruning */
+  --animate-dropdown-content-show: overlayContentShow 100ms cubic-bezier(0.16, 1, 0.3, 1);
+  /* may be unused — verify before pruning */
+  --animate-dropdown-content-hide: overlayContentHide 100ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-overlay-show: overlayContentShow 300ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-overlay-hide: overlayContentHide 300ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* may be unused — verify before pruning */
+  --animate-fade-in-overlay-bg: fadeInOverlayBg 300ms;
+  /* may be unused — verify before pruning */
+  --animate-fade-out-overlay-bg: fadeOutOverlayBg 300ms;
+
+  --animate-slide-down: slideDown 300ms cubic-bezier(0.87, 0, 0.13, 1);
+  --animate-slide-up: slideUp 300ms cubic-bezier(0.87, 0, 0.13, 1);
+
+  --animate-slide-down-normal: slideDownNormal 300ms cubic-bezier(0.87, 0, 0.13, 1);
+  --animate-slide-up-normal: slideUpNormal 300ms cubic-bezier(0.87, 0, 0.13, 1);
+
+  /* may be unused — verify before pruning */
+  --animate-panel-slide-left-out: panelSlideLeftOut 200ms cubic-bezier(0.87, 0, 0.13, 1);
+  /* may be unused — verify before pruning */
+  --animate-panel-slide-left-in: panelSlideLeftIn 250ms cubic-bezier(0.87, 0, 0.13, 1);
+  /* may be unused — verify before pruning */
+  --animate-panel-slide-right-out: panelSlideRightOut 200ms cubic-bezier(0.87, 0, 0.13, 1);
+  /* may be unused — verify before pruning */
+  --animate-panel-slide-right-in: panelSlideRightIn 250ms cubic-bezier(0.87, 0, 0.13, 1);
+
+  --animate-line-loading: lineLoading 1.8s infinite;
+  --animate-line-loading-slower: lineLoading 2.3s infinite;
+
+  /* may be unused — verify before pruning */
+  --animate-dropdownFadeIn: dropdownFadeIn 0.1s ease-out;
+  /* may be unused — verify before pruning */
+  --animate-dropdownFadeOut: dropdownFadeOut 0.1s ease-out;
+
+  --animate-flash-code: flash-code 1s forwards;
+  --animate-flash-code-slow: flash-code 2s forwards;
+
+  --animate-accordion-down: accordion-down 0.15s ease-out;
+  --animate-accordion-up: accordion-up 0.15s ease-out;
+
+  --animate-collapsible-down: collapsible-down 0.1s ease-out;
+  --animate-collapsible-up: collapsible-up 0.1s ease-out;
+}
+
+@keyframes fadeIn {
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+}
+
+@keyframes overlayContentShow {
+  0% {
+    opacity: 0;
+    transform: translate(0%, -2%) scale(1);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0%, 0%) scale(1);
+  }
+}
+
+@keyframes overlayContentHide {
+  0% {
+    opacity: 1;
+    transform: translate(0%, 0%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(0%, -2%) scale(1);
+  }
+}
+
+@keyframes dropdownFadeIn {
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes dropdownFadeOut {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeInOverlayBg {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0.75;
+  }
+}
+
+@keyframes fadeOutOverlayBg {
+  0% {
+    opacity: 0.75;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes slideDown {
+  0% {
+    height: 0;
+    opacity: 0;
+  }
+  100% {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  0% {
+    height: var(--radix-accordion-content-height);
+    opacity: 1;
+  }
+  100% {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes slideDownNormal {
+  0% {
+    height: 0;
+    opacity: 0;
+  }
+  100% {
+    height: inherit;
+    opacity: 1;
+  }
+}
+
+@keyframes slideUpNormal {
+  0% {
+    height: inherit;
+    opacity: 1;
+  }
+  100% {
+    height: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes panelSlideLeftOut {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes panelSlideLeftIn {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes panelSlideRightOut {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes panelSlideRightIn {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@keyframes lineLoading {
+  0% {
+    margin-left: -10%;
+    width: 80px;
+  }
+  25% {
+    width: 240px;
+  }
+  50% {
+    margin-left: 100%;
+    width: 80px;
+  }
+  75% {
+    width: 240px;
+  }
+  100% {
+    margin-left: -10%;
+    width: 80px;
+  }
+}
+
+@keyframes flash-code {
+  0% {
+    background-color: rgba(63, 207, 142, 0.1);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@keyframes collapsible-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-collapsible-content-height);
+  }
+}
+
+@keyframes collapsible-up {
+  from {
+    height: var(--radix-collapsible-content-height);
+  }
+  to {
+    height: 0;
+  }
+}

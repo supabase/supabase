@@ -1,71 +1,109 @@
-import { Button, Form, Input, Modal } from 'ui'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect } from 'react'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  Textarea,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import * as z from 'zod'
 
-type SavedQuery = { name: string; description?: string }
+const formSchema = z.object({
+  name: z.string().min(1, 'Required'),
+  description: z.string().optional(),
+})
+
+type SavedQuery = z.infer<typeof formSchema>
 
 export interface UpdateSavedQueryProps {
+  header: string
   visible: boolean
   onCancel: () => void
-  onSubmit: (newValues: SavedQuery) => void
+  onSubmit: SubmitHandler<SavedQuery>
   initialValues: SavedQuery
 }
 
 export const UpdateSavedQueryModal = ({
+  header,
   visible,
   onCancel,
   onSubmit,
   initialValues,
 }: UpdateSavedQueryProps) => {
-  function validate(values: SavedQuery) {
-    const errors: Partial<SavedQuery> = {}
+  const form = useForm<SavedQuery>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { ...initialValues, description: initialValues.description ?? '' },
+  })
+  const { reset, formState } = form
+  const { isDirty, isSubmitting } = formState
 
-    if (!values.name) {
-      errors.name = 'Required'
-    }
+  useEffect(() => {
+    if (isDirty) return
+    reset({ ...initialValues, description: initialValues.description ?? '' })
+  }, [isDirty, initialValues, reset])
 
-    return errors
+  const handleCancel = () => {
+    form.reset()
+    onCancel()
   }
 
   return (
-    <Modal
-      visible={visible}
-      onCancel={onCancel}
-      hideFooter
-      header="Update saved query"
-      size="medium"
-    >
-      <Form
-        onReset={onCancel}
-        validateOnBlur
-        initialValues={initialValues}
-        validate={validate}
-        onSubmit={onSubmit}
-      >
-        {({ isSubmitting }: { isSubmitting: boolean }) => (
-          <>
-            <Modal.Content>
-              <Input label="Name" id="name" name="name" />
-            </Modal.Content>
-            <Modal.Content>
-              <Input.TextArea
-                label="Description"
-                id="description"
-                placeholder="Describe query"
-                size="medium"
-                textAreaClassName="resize-none"
+    <Dialog open={visible} onOpenChange={handleCancel}>
+      <DialogContent size="medium">
+        <DialogHeader>
+          <DialogTitle>{header}</DialogTitle>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+            <DialogSection>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItemLayout layout="vertical" label="Name">
+                    <FormControl>
+                      <Input {...field} placeholder="Enter text" />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
               />
-            </Modal.Content>
-            <Modal.Separator />
-            <Modal.Content className="flex items-center justify-end gap-2">
-              <Button htmlType="reset" type="default" onClick={onCancel} disabled={isSubmitting}>
+            </DialogSection>
+            <DialogSection>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItemLayout layout="vertical" label="Description">
+                    <FormControl>
+                      <Textarea {...field} placeholder="Describe query" className="resize-none" />
+                    </FormControl>
+                  </FormItemLayout>
+                )}
+              />
+            </DialogSection>
+            <DialogFooter>
+              <Button type="reset" variant="default" onClick={handleCancel} disabled={isSubmitting}>
                 Cancel
               </Button>
-              <Button htmlType="submit" loading={isSubmitting} disabled={isSubmitting}>
+              <Button type="submit" loading={isSubmitting} disabled={isSubmitting || !isDirty}>
                 Save query
               </Button>
-            </Modal.Content>
-          </>
-        )}
-      </Form>
-    </Modal>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   )
 }

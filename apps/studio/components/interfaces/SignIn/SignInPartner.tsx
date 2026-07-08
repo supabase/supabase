@@ -1,8 +1,9 @@
-import { InlineLink } from 'components/ui/InlineLink'
-import { auth } from 'lib/gotrue'
 import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+
+import { InlineLink } from '@/components/ui/InlineLink'
+import { auth } from '@/lib/gotrue'
 
 export const SignInPartner = () => {
   const router = useRouter()

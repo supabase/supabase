@@ -2,7 +2,6 @@ import dayjs from 'dayjs'
 import { ChevronDown } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
-
 import {
   Button,
   cn,
@@ -10,16 +9,20 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from 'ui'
-import { TimestampInfo, timestampLocalFormatter } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import { BlockKeys } from '../common/BlockKeys'
+import { TimestampInfo, timestampLocalFormatter } from 'ui-patterns/TimestampInfo'
 
-interface BaseEditorProps<TRow, TSummaryRow = unknown>
-  extends RenderEditCellProps<TRow, TSummaryRow> {
+import { BlockKeys } from '../common/BlockKeys'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+
+interface BaseEditorProps<TRow, TSummaryRow = unknown> extends RenderEditCellProps<
+  TRow,
+  TSummaryRow
+> {
   type: 'date' | 'datetime' | 'datetimetz'
   isNullable: boolean
 }
@@ -40,10 +43,12 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
 }: BaseEditorProps<TRow, TSummaryRow>) {
   const ref = useRef<HTMLInputElement>(null)
   const format = FORMAT_MAP[type]
+  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
 
   const value = row[column.key as keyof TRow] as unknown as string
   const [inputValue, setInputValue] = useState(value)
   const timeValue = inputValue ? Number(dayjs(inputValue, format)) : inputValue
+  const applyChangesLabel = isQueueOperationsEnabled ? 'Queue changes' : 'Save changes'
 
   const saveChanges = (value: string | null) => {
     if ((typeof value === 'string' && value.length === 0) || timeValue === 'Invalid Date') return
@@ -70,13 +75,13 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
   }, [])
 
   return (
-    <Popover_Shadcn_ open>
-      <PopoverTrigger_Shadcn_>
+    <Popover open>
+      <PopoverTrigger>
         <div className={cn('px-[8px]', value === null ? 'text-foreground-lighter' : '')}>
           {value === null ? 'NULL' : value}
         </div>
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ align="start" className="p-0 rounded-none w-64">
+      </PopoverTrigger>
+      <PopoverContent align="start" className="p-0 rounded-none w-64">
         <BlockKeys
           ignoreOutsideClicks
           value={inputValue}
@@ -88,7 +93,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
             value={inputValue ?? ''}
             placeholder={format}
             onChange={(e) => setInputValue(e.target.value)}
-            className="border-0 rounded-none bg-dash-sidebar outline-none !ring-0 !ring-offset-0"
+            className="border-0 rounded-none bg-dash-sidebar outline-hidden ring-0! ring-offset-0!"
           />
         </BlockKeys>
         <div className="px-3 py-1 flex flex-col gap-y-0.5">
@@ -102,7 +107,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
               displayAs="utc"
               utcTimestamp={timeValue}
               labelFormat="DD MMM YYYY HH:mm:ss (ZZ)"
-              className="text-left !text-sm font-mono tracking-tight"
+              className="text-left text-sm! font-mono tracking-tight"
             />
           ) : (
             <p className="text-sm font-mono tracking-tight">
@@ -121,13 +126,13 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
         <div className="px-3 pt-1 pb-2 flex justify-between gap-x-1">
           <div className="space-y-1">
             <div className="flex items-center space-x-2">
-              <div className="px-1.5 h-[22px] rounded bg-surface-300 border border-strong flex items-center justify-center">
+              <div className="px-1.5 h-[22px] rounded-sm bg-surface-300 border border-strong flex items-center justify-center">
                 <span className="text-[10px]">⏎</span>
               </div>
-              <p className="text-xs text-foreground-light">Save changes</p>
+              <p className="text-xs text-foreground-light">{applyChangesLabel}</p>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="px-1 h-[22px] rounded bg-surface-300 border border-strong flex items-center justify-center">
+              <div className="px-1 h-[22px] rounded-sm bg-surface-300 border border-strong flex items-center justify-center">
                 <span className="text-[10px]">Esc</span>
               </div>
               <p className="text-xs text-foreground-light">Cancel changes</p>
@@ -136,13 +141,17 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
           <div className="flex">
             {isNullable ? (
               <>
-                <Button type="default" className="rounded-r-none" onClick={() => saveChanges(null)}>
+                <Button
+                  variant="default"
+                  className="rounded-r-none"
+                  onClick={() => saveChanges(null)}
+                >
                   Set NULL
                 </Button>
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
-                      type="default"
+                      variant="default"
                       icon={<ChevronDown />}
                       className="px-1 rounded-l-none border-l-0"
                     />
@@ -153,14 +162,14 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
                 </DropdownMenu>
               </>
             ) : (
-              <Button type="default" onClick={setToNow}>
+              <Button variant="default" onClick={setToNow}>
                 Set to NOW
               </Button>
             )}
           </div>
         </div>
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </PopoverContent>
+    </Popover>
   )
 }
 
