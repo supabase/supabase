@@ -8,6 +8,8 @@
 
 /apps/studio/ @supabase/Dashboard
 
+/apps/docs/ @supabase/docs
+
 /apps/www/ @supabase/marketing
 /apps/www/public/images/blog @supabase/marketing
 /apps/www/lib/redirects.js
