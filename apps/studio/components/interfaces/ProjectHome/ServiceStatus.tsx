@@ -307,7 +307,7 @@ export const ServiceStatus = () => {
 
   return (
     <HoverCard openDelay={200} closeDelay={100}>
-      <HoverCardTrigger>
+      <HoverCardTrigger tabIndex={0}>
         <SingleStat
           icon={
             // Spinner only while the overall project is in COMING_UP; otherwise show 6-dot grid

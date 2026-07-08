@@ -53,8 +53,20 @@ describe('SQLEditor.utils.ts:checkIfAppendLimitRequired', () => {
     const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
+  test('Should return false if query already has a limit with whitespace before the semi colon', () => {
+    const sql = 'select * from countries limit 10 ;'
+    const limit = 100
+    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    expect(appendAutoLimit).toBe(false)
+  })
   test('Should return false if query already has a limit and offset', () => {
     const sql = 'select * from countries limit 10 offset 0;'
+    const limit = 100
+    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    expect(appendAutoLimit).toBe(false)
+  })
+  test('Should return false if query already has a limit and offset with whitespace before the semi colon', () => {
+    const sql = 'select * from countries limit 10 offset 0 ;'
     const limit = 100
     const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
     expect(appendAutoLimit).toBe(false)
@@ -153,6 +165,12 @@ describe('SQLEditor.utils.ts:suffixWithLimit', () => {
     const limit = 100
     const formattedSql = suffixWithLimit(sql, limit)
     expect(formattedSql).toBe('select * from countries limit 100;')
+  })
+  test('Should not append a limit if query already has one with whitespace before the semi colon', () => {
+    const sql = safeSql`select * from countries limit 10 ;`
+    const limit = 100
+    const formattedSql = suffixWithLimit(sql, limit)
+    expect(formattedSql).toBe('select * from countries limit 10 ;')
   })
 })
 

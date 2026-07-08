@@ -13,12 +13,15 @@ import { parse as parseToml } from 'smol-toml'
 import { mcpConfigPanelMarkdown as McpConfigPanel } from 'ui-patterns/McpUrlBuilder/McpConfigPanel.md'
 
 import { addBaseUrlPrefix } from './internal-links'
+import { AccordionItem } from './markdown-schema/Accordion'
 import { Admonition } from './markdown-schema/Admonition'
 import { AuthProviders } from './markdown-schema/AuthProviders'
 import { ComputeDiskLimitsTable } from './markdown-schema/ComputeDiskLimitsTable'
 import { ContentListings } from './markdown-schema/ContentListings'
 import { CustomContent } from './markdown-schema/CustomContent'
 import { ErrorCodes } from './markdown-schema/ErrorCodes'
+import { IconCheck, IconX } from './markdown-schema/Icons'
+import { Image } from './markdown-schema/Image'
 import { Link } from './markdown-schema/Link'
 import { McpCiConfigBlock } from './markdown-schema/McpCiConfigBlock'
 import { MetricsStackCards } from './markdown-schema/MetricsStackCards'
@@ -151,7 +154,11 @@ function applySchema(parent: Parent, schema: ComponentSchema): void {
  * component not listed is unwrapped (children are kept, wrapper is dropped).
  */
 const SCHEMA: ComponentSchema = {
+  AccordionItem,
   Admonition,
+  IconCheck,
+  IconX,
+  Image,
   AuthProviders,
   ComputeDiskLimitsTable,
   CustomContent,
