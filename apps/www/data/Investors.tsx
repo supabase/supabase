@@ -6,8 +6,6 @@ type Investor = {
   lead: boolean
   scale?: number
   objectPosition?: string
-  grayscaleOnly?: boolean
-  noFilter?: boolean
   twitter?: string | null
   linkedIn?: string | null
 }
@@ -98,10 +96,9 @@ const data: Investor[] = [
     name: 'Salesforce Ventures',
     round: 'B',
     title: 'Salesforce Ventures',
-    img: '/images/logos/salesforce--grey.svg',
+    img: '/images/logos/salesforce--grey.png',
     lead: true,
     scale: 2.01,
-    noFilter: true,
     twitter: null,
     linkedIn: null,
   },

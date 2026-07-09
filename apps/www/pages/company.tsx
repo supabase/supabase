@@ -182,13 +182,7 @@ const Investors = () => {
                   alt={x.name}
                   objectFit="scale-down"
                   objectPosition="center"
-                  className={
-                    x.noFilter
-                      ? 'opacity-50'
-                      : x.grayscaleOnly
-                        ? 'opacity-50 grayscale filter'
-                        : 'opacity-50 contrast-0 filter'
-                  }
+                  className="opacity-50 contrast-0 filter"
                 />
               </div>
             </div>
