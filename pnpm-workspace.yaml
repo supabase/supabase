@@ -67,6 +67,7 @@ minimumReleaseAgeExclude:
   - '@supabase/*'
   - '@supabase-labs/*'
   - typescript
+  - '@typescript/*'
   # First-party, published from supabase-community/mdast-jsx.
   - mdast-jsx
   # The following are excluded to fix vulnerablities.
