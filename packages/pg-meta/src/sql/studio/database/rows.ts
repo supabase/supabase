@@ -12,12 +12,13 @@ export const getTableRowsCountSql = ({
   table,
   filters = [],
   enforceExactCount = false,
-  isUsingReadReplica = false,
+  isReadOnlyContext = false,
 }: {
   table: any
   filters?: Filter[]
   enforceExactCount?: boolean
-  isUsingReadReplica?: boolean
+  /** Skips using the count estimate function if true and fallsback to checking reltuples from pg_class  */
+  isReadOnlyContext?: boolean
 }): SafeSqlFragment => {
   if (!table) return safeSql``
 
@@ -59,7 +60,7 @@ export const getTableRowsCountSql = ({
       ? (countBaseSql.slice(0, -1) as SafeSqlFragment)
       : countBaseSql
 
-    if (isUsingReadReplica) {
+    if (isReadOnlyContext) {
       const sql = safeSql`
 with approximation as (
     select reltuples as estimate

@@ -61,6 +61,12 @@ const MetricCard = React.forwardRef<HTMLDivElement, MetricCardProps>(
 MetricCard.displayName = 'MetricCard'
 
 interface MetricCardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {
+  /**
+   * Renders the chevron affordance as a link. Omit the href (while keeping
+   * linkTooltip) when the card is already wrapped in a link — nesting an
+   * anchor within an anchor is invalid HTML, and clicks on the chevron will
+   * fall through to the wrapping link instead.
+   */
   href?: string
   children: React.ReactNode
   linkTooltip?: string
@@ -78,7 +84,7 @@ const MetricCardHeader = React.forwardRef<HTMLDivElement, MetricCardHeaderProps>
         {...props}
       >
         <div className="flex flex-row items-center gap-2">{children}</div>
-        {href ? (
+        {href || linkTooltip ? (
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -87,10 +93,17 @@ const MetricCardHeader = React.forwardRef<HTMLDivElement, MetricCardHeaderProps>
                 className="px-1 text-foreground-lighter group-hover:text-foreground absolute right-3 transition-colors"
                 asChild
               >
-                <Link href={href}>
-                  <ChevronRight aria-disabled={true} size={14} strokeWidth={1.5} />
-                  <span className="sr-only">More information</span>
-                </Link>
+                {href ? (
+                  <Link href={href}>
+                    <ChevronRight aria-disabled={true} size={14} strokeWidth={1.5} />
+                    <span className="sr-only">More information</span>
+                  </Link>
+                ) : (
+                  <span>
+                    <ChevronRight aria-disabled={true} size={14} strokeWidth={1.5} />
+                    <span className="sr-only">More information</span>
+                  </span>
+                )}
               </Button>
             </TooltipTrigger>
             {linkTooltip ? <TooltipContent>{linkTooltip}</TooltipContent> : null}

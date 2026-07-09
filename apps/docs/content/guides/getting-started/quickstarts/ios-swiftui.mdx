@@ -6,9 +6,19 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 4. Create an iOS SwiftUI app with Xcode
+## 3. Create an iOS SwiftUI app with Xcode
 
 Select the **Xcode > New Project > iOS > App** menu item.
+
+## 4. Install Agent Skills (optional)
+
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+To install, run the following command in the root of your project:
+
+```bash
+npx skills add supabase/agent-skills
+```
 
 ## 5. Install the Supabase client library
 
@@ -18,11 +28,9 @@ In Xcode, navigate to **File > Add Package Dependencies...** and enter the repos
 
 Make sure to add `Supabase` product package as a dependency to your application target.
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "swift", "tab": "mobiles" }} />
-
 ## 6. Initialize the Supabase client
 
-Create a new `Supabase.swift` file add a new Supabase instance using your project URL and publishable key, which you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=swift&tab=mobiles):
+Create a new `Supabase.swift` file add a new Supabase instance using your project URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=swift&tab=mobiles):
 
 <Button variant="primary" asChild>
   <a href="/dashboard/project/_?showConnect=true&connectTab=mobiles&framework=swift">
@@ -38,6 +46,8 @@ let supabase = SupabaseClient(
   supabaseKey: "YOUR_SUPABASE_PUBLISHABLE_KEY"
 )
 ```
+
+<$Partial path="api_settings.mdx" variables={{ "framework": "swift", "tab": "mobiles" }} />
 
 ## 7. Create a data model for instruments
 

@@ -44,7 +44,6 @@ export const FeedbackDropdown = ({ className }: { className?: string }) => {
     >
       <PopoverTrigger asChild>
         <Button
-          asChild
           onClick={() => {
             setIsOpen((isOpen) => !isOpen)
             setStage('select')

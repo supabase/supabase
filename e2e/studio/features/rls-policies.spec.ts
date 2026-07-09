@@ -9,7 +9,7 @@ import { createApiResponseWaiter } from '../utils/wait-for-response.js'
  * Helper function to navigate to policies page and wait for it to load
  */
 const navigateToPoliciesPage = async (page: Page, ref: string) => {
-  const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'policies')
+  const wait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=policies')
   await page.goto(toUrl(`/project/${ref}/database/policies`))
   await wait
   await page.waitForTimeout(500)

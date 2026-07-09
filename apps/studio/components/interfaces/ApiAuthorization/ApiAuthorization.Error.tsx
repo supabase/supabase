@@ -18,13 +18,11 @@ export function ApiAuthorizationErrorScreen({
       <div className="flex flex-col gap-3 px-6 pb-6">
         <Admonition
           type="warning"
+          title="Retry the authorization request from the requesting app."
           description={
-            <>
-              Retry the authorization request from the requesting app.
-              {error && (
-                <span className="mt-1 block text-foreground-lighter">Error: {error.message}</span>
-              )}
-            </>
+            error && (
+              <span className="mt-1 block text-foreground-lighter">Error: {error.message}</span>
+            )
           }
         />
         <Button variant="default" block asChild>
