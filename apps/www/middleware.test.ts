@@ -131,6 +131,13 @@ describe('www middleware', () => {
       expect(res.status).not.toBe(406)
       expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/changelog/100.md')
     })
+
+    it('rewrites the changelog index .md request without doubling the suffix', () => {
+      const req = makeRequest('/changelog.md', { accept: 'text/markdown' })
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/changelog.md')
+    })
   })
 
   describe('Accept: text/markdown content negotiation', () => {
@@ -176,6 +183,13 @@ describe('www middleware', () => {
       const res = middleware(req)
 
       expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/changelog/100.md')
+    })
+
+    it('rewrites the bare changelog index to its static .md file', () => {
+      const req = makeRequest('/changelog', { accept: 'text/markdown' })
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/changelog.md')
     })
   })
 
