@@ -90,13 +90,13 @@ Inviting a user is an admin action, so it must be performed from a trusted serve
 
 ### Using the Auth Admin API
 
-Call [`inviteUserByEmail()`](/docs/reference/javascript/auth-admin-inviteuserbyemail) from the SDK's Auth Admin API in a server-side environment. This is part of Supabase Auth (accessed via `supabase.auth.admin` with your project's `service_role` key), and is distinct from the [Management API](/docs/reference/api/introduction) used to configure your project. You can optionally attach custom `user_metadata` and a redirect URL for the invite link.
+Call [`inviteUserByEmail()`](/docs/reference/javascript/auth-admin-inviteuserbyemail) from the SDK's Auth Admin API in a server-side environment. This is part of Supabase Auth (accessed via `supabase.auth.admin` with your project's [secret key](/docs/guides/getting-started/api-keys)), and is distinct from the [Management API](/docs/reference/api/introduction) used to configure your project. You can optionally attach custom `user_metadata` and a redirect URL for the invite link.
 
 ```js
 import { createClient } from '@supabase/supabase-js'
 
-// Use the service role (secret) key, and only ever on a trusted server.
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, {
+// Use your project's secret key (sb_secret_...), and only ever on a trusted server.
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY, {
   auth: {
     autoRefreshToken: false,
     persistSession: false,
@@ -112,7 +112,7 @@ const { data, error } = await supabase.auth.admin.inviteUserByEmail('someone@exa
 
 <Admonition type="caution">
 
-The `service_role` key bypasses Row Level Security and must only be used in a secure server environment. Never expose it in a browser or any publicly accessible client.
+The secret key (`sb_secret_...`, which replaces the legacy `service_role` key) bypasses Row Level Security and must only be used in a secure server environment. Never expose it in a browser or any publicly accessible client.
 
 </Admonition>
 
