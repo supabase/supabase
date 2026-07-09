@@ -84,19 +84,20 @@ describe('docs middleware — /guides/* content negotiation', () => {
     expect(res.headers.get('Vary')).toBe('Accept')
   })
 
-  it('does not 406 for LLM UAs or .md suffix paths even with a probe Accept', () => {
-    const llm = makeRequest('/docs/guides/auth', {
-      accept: 'application/x-content-negotiation-probe',
-      userAgent: 'Claude-User/1.0',
-    })
-    expect(middleware(llm).status).not.toBe(406)
-    expect(middleware(llm).headers.get(REWRITE_HEADER)).toBe(GUIDES_MD_REWRITE('auth'))
-
+  it('does not 406 for .md suffix paths even with a probe Accept', () => {
     const md = makeRequest('/docs/guides/auth.md', {
       accept: 'application/x-content-negotiation-probe',
     })
     expect(middleware(md).status).not.toBe(406)
     expect(middleware(md).headers.get(REWRITE_HEADER)).toBe(GUIDES_MD_REWRITE('auth'))
+  })
+
+  it('returns 406 for a probe Accept header regardless of user agent', () => {
+    const req = makeRequest('/docs/guides/auth', {
+      accept: 'application/x-content-negotiation-probe',
+      userAgent: 'Claude-User/1.0',
+    })
+    expect(middleware(req).status).toBe(406)
   })
 
   it('does not 406 on /reference/* (negotiation contract is /guides/* only)', () => {
@@ -106,14 +107,14 @@ describe('docs middleware — /guides/* content negotiation', () => {
     expect(middleware(req).status).not.toBe(406)
   })
 
-  it('rewrites for each LLM user agent', () => {
+  it('does not rewrite for agent user agents without a markdown Accept preference', () => {
     for (const ua of [
       'Claude-User (claude-code/2.1.119; +https://support.anthropic.com/)',
       'Claude-Web/1.0',
       'PerplexityBot/1.0',
     ]) {
       const req = makeRequest('/docs/guides/auth', { userAgent: ua })
-      expect(middleware(req).headers.get(REWRITE_HEADER)).toBe(GUIDES_MD_REWRITE('auth'))
+      expect(middleware(req).headers.get(REWRITE_HEADER)).toBeNull()
     }
   })
 
@@ -125,12 +126,12 @@ describe('docs middleware — /guides/* content negotiation', () => {
     expect(middleware(req).headers.get(REWRITE_HEADER)).toBe(GUIDES_MD_REWRITE('auth'))
   })
 
-  it('LLM UA overrides an Accept header that prefers HTML', () => {
+  it('serves HTML when Accept prefers HTML, regardless of user agent', () => {
     const req = makeRequest('/docs/guides/auth', {
       accept: 'text/html;q=1.0, text/markdown;q=0.1',
       userAgent: 'Claude-User/1.0',
     })
-    expect(middleware(req).headers.get(REWRITE_HEADER)).toBe(GUIDES_MD_REWRITE('auth'))
+    expect(middleware(req).headers.get(REWRITE_HEADER)).toBeNull()
   })
 
   it('falls through for non-LLM UAs (browsers, training crawlers, excluded agents, substring embeds)', () => {

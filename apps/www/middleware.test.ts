@@ -234,15 +234,14 @@ describe('www middleware', () => {
       expect(res.status).not.toBe(406)
     })
 
-    it('does not return 406 for LLM UAs even with a probe Accept header', () => {
+    it('returns 406 for a probe Accept header regardless of user agent', () => {
       const req = makeRequest('/pricing', {
         accept: 'application/x-content-negotiation-probe',
         userAgent: 'Claude-User/1.0',
       })
       const res = middleware(req)
 
-      expect(res.status).not.toBe(406)
-      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/pricing')
+      expect(res.status).toBe(406)
     })
 
     it('returns 406 on changelog entries when Accept excludes every type', () => {
@@ -264,77 +263,38 @@ describe('www middleware', () => {
     })
   })
 
-  describe('LLM user-agent routing', () => {
-    it('rewrites for Claude-User', () => {
-      const req = makeRequest('/pricing', {
+  describe('user-agent independence', () => {
+    it('serves HTML to agent and bot user agents that send no markdown Accept preference', () => {
+      for (const ua of [
+        'Claude-User (claude-code/2.1.119; +https://support.anthropic.com/)',
+        'Claude-Web/1.0',
+        'Mozilla/5.0 (compatible; ChatGPT-User/1.0)',
+        'PerplexityBot/1.0',
+        'GPTBot/1.0',
+        'ClaudeBot/1.0',
+        'CCBot/2.0',
+        'chatgpt-userscript/2.0',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+      ]) {
+        const req = makeRequest('/auth', { userAgent: ua })
+        const res = middleware(req)
+
+        expect(res.headers.get('x-middleware-rewrite')).toBeNull()
+      }
+    })
+
+    it('negotiates by Accept as usual when an agent user agent is present', () => {
+      const req = makeRequest('/auth', {
+        accept: 'text/markdown',
         userAgent: 'Claude-User (claude-code/2.1.119; +https://support.anthropic.com/)',
       })
       const res = middleware(req)
 
-      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/pricing')
-    })
-
-    it('serves HTML to ChatGPT-User (excluded from UA-based markdown)', () => {
-      const req = makeRequest('/auth', { userAgent: 'Mozilla/5.0 (compatible; ChatGPT-User/1.0)' })
-      const res = middleware(req)
-
-      expect(res.headers.get('x-middleware-rewrite')).toBeNull()
-    })
-
-    it('still serves ChatGPT-User markdown when Accept asks for it', () => {
-      const req = makeRequest('/auth', {
-        accept: 'text/markdown',
-        userAgent: 'Mozilla/5.0 (compatible; ChatGPT-User/1.0)',
-      })
-      const res = middleware(req)
-
       expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/auth')
-    })
-
-    it('rewrites for Claude-Web', () => {
-      const req = makeRequest('/pricing', { userAgent: 'Claude-Web/1.0' })
-      const res = middleware(req)
-
-      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/pricing')
-    })
-
-    it('rewrites for PerplexityBot', () => {
-      const req = makeRequest('/auth/', { userAgent: 'PerplexityBot/1.0' })
-      const res = middleware(req)
-
-      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/auth')
-    })
-
-    it('falls through for UAs that embed a match as a substring', () => {
-      for (const ua of ['chatgpt-userscript/2.0', 'NotPerplexityBot']) {
-        const req = makeRequest('/auth', { userAgent: ua })
-        const res = middleware(req)
-
-        expect(res.headers.get('x-middleware-rewrite')).toBeNull()
-      }
-    })
-
-    it('falls through for browser user agents', () => {
-      const req = makeRequest('/auth', {
-        userAgent:
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
-      })
-      const res = middleware(req)
-
-      expect(res.headers.get('x-middleware-rewrite')).toBeNull()
-    })
-
-    it('falls through for training crawlers (GPTBot, ClaudeBot, CCBot)', () => {
-      for (const ua of ['GPTBot/1.0', 'ClaudeBot/1.0', 'CCBot/2.0']) {
-        const req = makeRequest('/auth', { userAgent: ua })
-        const res = middleware(req)
-
-        expect(res.headers.get('x-middleware-rewrite')).toBeNull()
-      }
     })
 
     it('falls through when slug is not in the allowlist', () => {
-      const req = makeRequest('/not-a-page', { userAgent: 'Claude-User' })
+      const req = makeRequest('/not-a-page', { accept: 'text/markdown' })
       const res = middleware(req)
 
       expect(res.headers.get('x-middleware-rewrite')).toBeNull()

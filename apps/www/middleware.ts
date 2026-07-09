@@ -21,10 +21,7 @@ export function middleware(request: NextRequest) {
   const isChangelogEntry = slug === 'changelog' || /^changelog\/\d+/.test(slug)
 
   const decision = negotiateMarkdown(
-    {
-      acceptHeader: request.headers.get('accept') ?? '',
-      userAgent: request.headers.get('user-agent') ?? '',
-    },
+    { acceptHeader: request.headers.get('accept') ?? '' },
     { hasMarkdownVariant: isMdEligible || isChangelogEntry }
   )
 
