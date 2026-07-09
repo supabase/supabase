@@ -9,32 +9,17 @@ import {
 import { wrapWithRollback } from '@supabase/pg-meta/src/query'
 import { useQueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
-import { ChevronUp, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
-import {
-  Button,
-  cn,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from 'ui'
+import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
 import {
   generateSnippetTitle,
-  ROWS_PER_PAGE_OPTIONS,
   sqlAiDisclaimerComment,
   untitledSnippetTitle,
 } from './SQLEditor.constants'
@@ -57,6 +42,7 @@ import {
   suffixWithLimit,
 } from './SQLEditor.utils'
 import { useAddDefinitions } from './useAddDefinitions'
+import { UtilityActions } from './UtilityPanel/UtilityActions'
 import { UtilityPanel } from './UtilityPanel/UtilityPanel'
 import {
   isExplainQuery,
@@ -65,7 +51,6 @@ import {
 } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import ResizableAIWidget from '@/components/ui/AIEditor/ResizableAIWidget'
-import { GridFooter } from '@/components/ui/GridFooter'
 import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
 import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
 import { constructHeaders, isValidConnString } from '@/data/fetchers'
@@ -207,7 +192,6 @@ export const SQLEditor = () => {
   const id = !urlId || urlId === 'new' ? generatedId : urlId
 
   const limit = sessionSnap.limit
-  const results = sessionSnap.results[id]?.[0]
   const snippetIsLoading = !(
     id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined
   )
@@ -916,9 +900,18 @@ export const SQLEditor = () => {
         }}
       />
 
-      <div className="flex h-full">
+      <div className="flex flex-col h-full">
+        <UtilityActions
+          id={id}
+          isExecuting={isExecuting}
+          isDisabled={isDiffOpen}
+          hasSelection={hasSelection}
+          prettifyQuery={prettifyQuery}
+          executeQuery={executeQueryFromButton}
+          className="px-4 min-h-[42px] border-b shrink-0"
+        />
         <ResizablePanelGroup
-          className="relative"
+          className="relative flex-1 min-h-0"
           orientation="vertical"
           autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
         >
@@ -1047,9 +1040,6 @@ export const SQLEditor = () => {
                 isExecuting={isExecuting}
                 isExplainExecuting={isExplainExecuting}
                 isDisabled={isDiffOpen}
-                hasSelection={hasSelection}
-                prettifyQuery={prettifyQuery}
-                executeQuery={executeQueryFromButton}
                 executeExplainQuery={executeExplainQuery}
                 showExplainTab={!disablePrettyExplain}
                 onDebug={onDebug}
@@ -1059,63 +1049,6 @@ export const SQLEditor = () => {
               />
             )}
           </ResizablePanel>
-
-          <div className="h-9">
-            {results?.rows !== undefined && !isExecuting && (
-              <GridFooter className="flex items-center justify-between gap-2">
-                <Tooltip>
-                  <TooltipTrigger>
-                    <p className="text-xs">
-                      <span className="text-foreground">
-                        {results.rows.length} row{results.rows.length > 1 ? 's' : ''}
-                      </span>
-                      <span className="text-foreground-lighter ml-1">
-                        {results.autoLimit !== undefined &&
-                          ` (Limited to only ${results.autoLimit} rows)`}
-                      </span>
-                    </p>
-                  </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">
-                    <p className="flex flex-col gap-y-1">
-                      <span>
-                        Results are automatically limited to preserve browser performance, in
-                        particular if your query returns an exceptionally large number of rows.
-                      </span>
-
-                      <span className="text-foreground-light">
-                        You may change or remove this limit from the dropdown on the right
-                      </span>
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-                {results.autoLimit !== undefined && (
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="default" iconRight={<ChevronUp size={14} />}>
-                        Limit results to:{' '}
-                        {
-                          ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === sessionSnap.limit)
-                            ?.label
-                        }
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-40" align="end">
-                      <DropdownMenuRadioGroup
-                        value={sessionSnap.limit.toString()}
-                        onValueChange={(val) => sessionSnap.setLimit(Number(val))}
-                      >
-                        {ROWS_PER_PAGE_OPTIONS.map((option) => (
-                          <DropdownMenuRadioItem key={option.label} value={option.value.toString()}>
-                            {option.label}
-                          </DropdownMenuRadioItem>
-                        ))}
-                      </DropdownMenuRadioGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                )}
-              </GridFooter>
-            )}
-          </div>
         </ResizablePanelGroup>
       </div>
     </>
