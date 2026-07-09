@@ -28,21 +28,9 @@ export const InputVariants = cva(
 )
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, size = 'small', onWheel, ...props }, ref) => {
-    const handleWheel = (event: React.WheelEvent<HTMLInputElement>) => {
-      // Prevent the number input's value from changing when scrolling the page while it's focused
-      if (type === 'number') event.currentTarget.blur()
-      onWheel?.(event)
-    }
-
+  ({ className, type, size = 'small', ...props }, ref) => {
     return (
-      <input
-        type={type}
-        ref={ref}
-        onWheel={handleWheel}
-        {...props}
-        className={cn(InputVariants({ size }), className)}
-      />
+      <input type={type} ref={ref} {...props} className={cn(InputVariants({ size }), className)} />
     )
   }
 )
