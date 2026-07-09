@@ -66,6 +66,7 @@
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
     "tsx": "catalog:",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "unist-builder": "3.0.0"
   }
