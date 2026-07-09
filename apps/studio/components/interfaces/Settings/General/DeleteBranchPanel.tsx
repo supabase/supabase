@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { toast } from 'sonner'
 import { Alert, AlertDescription, AlertTitle, CriticalIcon } from 'ui'
 import {
   PageSection,
