@@ -274,8 +274,18 @@ describe('www middleware', () => {
       expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/pricing')
     })
 
-    it('rewrites for ChatGPT-User', () => {
+    it('serves HTML to ChatGPT-User (excluded from UA-based markdown)', () => {
       const req = makeRequest('/auth', { userAgent: 'Mozilla/5.0 (compatible; ChatGPT-User/1.0)' })
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBeNull()
+    })
+
+    it('still serves ChatGPT-User markdown when Accept asks for it', () => {
+      const req = makeRequest('/auth', {
+        accept: 'text/markdown',
+        userAgent: 'Mozilla/5.0 (compatible; ChatGPT-User/1.0)',
+      })
       const res = middleware(req)
 
       expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/api-v2/md/auth')

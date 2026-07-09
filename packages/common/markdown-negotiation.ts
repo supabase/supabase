@@ -1,7 +1,10 @@
 // Live-fetch agents only. Training crawlers (GPTBot, ClaudeBot, CCBot) are
 // governed by robots.txt; serving them content that differs from the HTML
-// page risks SEO and cloaking penalties.
-const LLM_USER_AGENT = /\bClaude-User\b|\bClaude-Web\b|\bChatGPT-User\b|\bPerplexityBot\b/i
+// page risks SEO and cloaking penalties. ChatGPT-User is deliberately absent:
+// OpenAI's user-facing reader hard-fails on markdown served to it by UA match,
+// so it gets the server-rendered HTML. It still gets markdown via Accept
+// negotiation or explicit .md URLs like any other client.
+const LLM_USER_AGENT = /\bClaude-User\b|\bClaude-Web\b|\bPerplexityBot\b/i
 
 // Media ranges (RFC 9110 §5.3.2) ordered most to least specific.
 const RANGES = ['text/markdown', 'text/html', 'text/*', '*/*'] as const

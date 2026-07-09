@@ -110,7 +110,6 @@ describe('docs middleware — /guides/* content negotiation', () => {
     for (const ua of [
       'Claude-User (claude-code/2.1.119; +https://support.anthropic.com/)',
       'Claude-Web/1.0',
-      'Mozilla/5.0 (compatible; ChatGPT-User/1.0)',
       'PerplexityBot/1.0',
     ]) {
       const req = makeRequest('/docs/guides/auth', { userAgent: ua })
@@ -132,6 +131,7 @@ describe('docs middleware — /guides/* content negotiation', () => {
       'GPTBot/1.0',
       'ClaudeBot/1.0',
       'CCBot/2.0',
+      'Mozilla/5.0 (compatible; ChatGPT-User/1.0)',
       'chatgpt-userscript/2.0',
       'NotPerplexityBot',
     ]) {

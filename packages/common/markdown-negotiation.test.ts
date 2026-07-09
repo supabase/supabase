@@ -38,7 +38,6 @@ describe('negotiateMarkdown', () => {
     it.each([
       'Claude-User (claude-code/2.1.119; +https://support.anthropic.com/)',
       'Claude-Web/1.0',
-      'Mozilla/5.0 (compatible; ChatGPT-User/1.0)',
       'PerplexityBot/1.0',
     ])('treats %s as an LLM agent', (userAgent) => {
       expect(negotiateMarkdown({ acceptHeader: '', userAgent }, { hasMarkdownVariant: true })).toBe(
@@ -50,13 +49,17 @@ describe('negotiateMarkdown', () => {
       'GPTBot/1.0',
       'ClaudeBot/1.0',
       'CCBot/2.0',
+      'Mozilla/5.0 (compatible; ChatGPT-User/1.0)',
       'chatgpt-userscript/2.0',
       'NotPerplexityBot',
-    ])('does not treat %s (training crawler / substring embed) as an LLM agent', (userAgent) => {
-      expect(negotiateMarkdown({ acceptHeader: '', userAgent }, { hasMarkdownVariant: true })).toBe(
-        'pass'
-      )
-    })
+    ])(
+      'does not treat %s (training crawler / excluded agent / substring embed) as an LLM agent',
+      (userAgent) => {
+        expect(
+          negotiateMarkdown({ acceptHeader: '', userAgent }, { hasMarkdownVariant: true })
+        ).toBe('pass')
+      }
+    )
 
     it('caps user-agent length before matching', () => {
       const padded = 'x'.repeat(600) + 'Claude-User'
