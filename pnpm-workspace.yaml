@@ -66,11 +66,10 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
+  # First-party, published from supabase-community/mdast-jsx.
   - mdast-jsx
+  # The following are excluded to fix vulnerablities.
   - react-use
-  - typescript
-  - '@typescript/typescript6'
-  - '@typescript/typescript-*'
 
 onlyBuiltDependencies:
   - node-pty
@@ -78,6 +77,7 @@ onlyBuiltDependencies:
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
+  'monaco-editor': 'catalog:'
   '@mapbox/node-pre-gyp>tar': ^7.5.11
   '@sentry/webpack-plugin>uuid': ^11.1.1
   '@usercentrics/cmp-browser-sdk>uuid': ^11.1.1
@@ -86,11 +86,13 @@ overrides:
   cacache>tar: ^7.5.11
   dompurify: ^3.3.2
   express-rate-limit>ip-address: ^10.1.1
-  h3@1: 1.15.11
+  # Pin h3 v1 to a single version so the Nuxt registry example (vue-blocks)
+  # doesn't end up with two copies (1.15.10 + 1.15.11) and hit nominal
+  # H3Event type mismatches. v2 (h3@2) is intentionally left untouched.
+  'h3@1': 1.15.11
   lodash: 'catalog:'
   lodash-es: 'catalog:'
   mdx-bundler>uuid: ^11.1.1
-  monaco-editor: 'catalog:'
   node-gyp>tar: ^7.5.11
   nodemailer: ^7.0.11
   postcss: 'catalog:'
