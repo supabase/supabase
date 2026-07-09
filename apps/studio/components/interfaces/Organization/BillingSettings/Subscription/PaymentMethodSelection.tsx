@@ -4,7 +4,6 @@ import { loadStripe, PaymentMethod, StripeElementsOptions } from '@stripe/stripe
 import { useParams } from 'common'
 import { Loader, Plus } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import Link from 'next/link'
 import {
   forwardRef,
   useCallback,
@@ -46,7 +45,7 @@ export interface PaymentMethodSelectionProps {
   onTaxIdChange?: (taxId: CustomerTaxId | null) => void
   useAsDefaultBillingAddress: boolean
   onUseAsDefaultBillingAddressChange: (useAsDefault: boolean) => void
-  onClose: () => void
+  onClose?: () => void
 }
 
 const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
@@ -238,10 +237,12 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
               variant="default"
               className="mt-2"
               onClick={() => {
-                snap.setPanelKey(undefined)
-                onClose()
-                const el = document.getElementById('address')
-                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                if (onClose) {
+                  onClose()
+                  snap.setPanelKey(undefined)
+                  const el = document.getElementById('address')
+                  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                }
               }}
             >
               Update tax ID
