@@ -83,7 +83,6 @@ export const DestinationForm = ({
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
-  const [isFormInteracting, setIsFormInteracting] = useState(false)
   const [showValidationWarningsDialog, setShowValidationWarningsDialog] = useState(false)
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
   const [newBucketSheetVisible, setNewBucketSheetVisible] = useState(false)
@@ -300,19 +299,24 @@ export const DestinationForm = ({
     })
   }
 
+  // Sync the form with freshly loaded edit-mode data, but never once the user has started
+  // changing values — a background refetch of destinationData/pipelineData must not clobber
+  // in-progress edits.
   useEffect(() => {
-    if (editMode && destinationData && pipelineData && !isFormInteracting) {
+    if (editMode && destinationData && pipelineData && !form.formState.isDirty) {
       form.reset(defaultValues)
     }
-  }, [destinationData, pipelineData, editMode, defaultValues, form, isFormInteracting])
+  }, [destinationData, pipelineData, editMode, defaultValues, form])
 
-  // Ensure the form always reflects the freshest data whenever the panel opens
+  // Reset the form only when the panel transitions from closed to open, not on every
+  // subsequent defaultValues recompute (e.g. a background refetch) while it stays open.
+  const wasVisibleRef = useRef(false)
   useEffect(() => {
-    if (visible) {
+    if (visible && !wasVisibleRef.current) {
       form.reset(defaultValues)
-      setIsFormInteracting(false)
       resetValidation()
     }
+    wasVisibleRef.current = visible
   }, [visible, defaultValues, form, resetValidation])
 
   useEffect(() => {
@@ -381,7 +385,6 @@ export const DestinationForm = ({
                 <AnalyticsBucketFields
                   form={form}
                   editMode={editMode}
-                  setIsFormInteracting={setIsFormInteracting}
                   onSelectNewBucket={() => setNewBucketSheetVisible(true)}
                 />
               ) : selectedType === 'DuckLake' && etlEnableDucklake ? (
