@@ -1,9 +1,9 @@
 import './globals.css'
 
 import type { Metadata, Viewport } from 'next'
-import { SonnerToaster } from 'ui'
 
 import { Providers } from './Providers'
+import { Toaster } from './toaster'
 
 export const metadata: Metadata = {
   title: 'Sales Dashboard',
@@ -26,7 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-background text-foreground">
         <Providers>
           {children}
-          <SonnerToaster position="top-center" />
+          <Toaster />
         </Providers>
       </body>
     </html>

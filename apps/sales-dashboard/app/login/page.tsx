@@ -3,10 +3,12 @@
 import { useActionState } from 'react'
 import { Button, Card, CardContent, CardDescription, CardHeader, CardTitle, Input, Label } from 'ui'
 
-import { sendMagicLink } from './actions'
+import { sendMagicLink, type LoginState } from './actions'
+
+const initialState: LoginState = {}
 
 export default function LoginPage() {
-  const [state, formAction, pending] = useActionState(sendMagicLink, {})
+  const [state, formAction, pending] = useActionState(sendMagicLink, initialState)
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-4">

@@ -4,10 +4,12 @@ import { headers } from 'next/headers'
 
 import { createClient } from '@/lib/supabase/server'
 
+export type LoginState = { error?: string; sent?: boolean }
+
 export async function sendMagicLink(
-  _prevState: { error?: string; sent?: boolean },
+  _prevState: LoginState,
   formData: FormData
-) {
+): Promise<LoginState> {
   const email = String(formData.get('email') ?? '').trim()
 
   if (!email) {
