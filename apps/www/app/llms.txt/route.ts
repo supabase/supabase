@@ -62,6 +62,7 @@ async function getSources(): Promise<Source[]> {
   return [
     ...guideSources,
     { title: 'Supabase Reference (JavaScript)', relPath: 'llms/js.txt', enabled: true },
+    { title: 'Supabase Server Library Reference', relPath: 'llms/server.txt', enabled: true },
     { title: 'Supabase Reference (Dart)', relPath: 'llms/dart.txt', enabled: sdkDart },
     { title: 'Supabase Reference (Swift)', relPath: 'llms/swift.txt', enabled: sdkSwift },
     { title: 'Supabase Reference (Kotlin)', relPath: 'llms/kotlin.txt', enabled: sdkKotlin },

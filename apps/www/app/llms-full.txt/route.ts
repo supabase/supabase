@@ -31,6 +31,7 @@ function getSources(): Source[] {
 
   return [
     { title: 'Supabase Reference (JavaScript)', slug: 'js', enabled: true },
+    { title: 'Supabase Server Library Reference', slug: 'server', enabled: true },
     { title: 'Supabase Reference (Dart)', slug: 'dart', enabled: sdkDart },
     { title: 'Supabase Reference (Swift)', slug: 'swift', enabled: sdkSwift },
     { title: 'Supabase Reference (Kotlin)', slug: 'kotlin', enabled: sdkKotlin },

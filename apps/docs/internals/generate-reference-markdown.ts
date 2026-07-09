@@ -107,6 +107,13 @@ const REFERENCES: Ref[] = [
     feature: 'sdk:dart',
   },
   {
+    kind: 'sdk-new',
+    title: 'Supabase Server Library Reference',
+    outFile: 'server.md',
+    mdxDir: path.join(MDX_ROOT, 'server'),
+    contentDir: path.join(process.cwd(), 'content/reference/server/v1'),
+  },
+  {
     kind: 'sdk-legacy',
     title: 'Kotlin Client Library Reference',
     outFile: 'kotlin.md',
