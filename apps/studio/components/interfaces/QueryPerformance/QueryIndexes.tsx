@@ -61,8 +61,6 @@ export const QueryIndexes = ({
   prefetchedIndexAdvisorResult,
   onClose,
 }: QueryIndexesProps) => {
-  // [Joshen] TODO implement this logic once the linter rules are in
-  const isLinterWarning = false
   const { data: project } = useSelectedProjectQuery()
   const [showStartupCosts, setShowStartupCosts] = useState(false)
   const [isExecuting, setIsExecuting] = useState(false)
@@ -111,6 +109,10 @@ export const QueryIndexes = ({
     : fetchedIndexAdvisorResult
   const isSuccessIndexAdvisorResult = hasPrefetchedResult || isFetchSuccessIndexAdvisorResult
   const isLoadingIndexAdvisorResult = hasPrefetchedResult ? false : isFetchLoadingIndexAdvisorResult
+
+  const isLinterWarning = indexAdvisorResult
+    ? hasIndexRecommendations(indexAdvisorResult, true)
+    : false
 
   const {
     index_statements,

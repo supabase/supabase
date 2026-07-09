@@ -14,6 +14,7 @@ import { formatSql } from '@/lib/formatSql'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { classifyQuery } from '../QueryInsights/hooks/useQueryInsightsIssues.utils'
 
 interface QueryDetailProps {
   selectedRow?: QueryPerformanceRow
@@ -30,8 +31,7 @@ const SqlMonacoBlock = dynamic(
 )
 
 export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: QueryDetailProps) => {
-  // [Joshen] TODO implement this logic once the linter rules are in
-  const isLinterWarning = false
+  const isLinterWarning = selectedRow ? classifyQuery(selectedRow).issueType !== null : false
   const report = QUERY_PERFORMANCE_COLUMNS
   const [query, setQuery] = useState(selectedRow?.['query'])
 
