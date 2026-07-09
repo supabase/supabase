@@ -87,6 +87,14 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   const isView = isTableLikeView(table)
   const isMaterializedView = isTableLikeMaterializedView(table)
 
+  const entityKind = isTable
+    ? 'table'
+    : isForeignTable
+      ? 'foreign table'
+      : isView
+        ? 'view'
+        : 'materialized view'
+
   const { realtimeAll: realtimeEnabled } = useIsFeatureEnabled(['realtime:all'])
   const { isSchemaLocked } = useIsProtectedSchema({ schema: table.schema })
 
@@ -339,7 +347,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     variant="default"
                     icon={<MoreVertical />}
                     className="h-7 w-7"
-                    aria-label={`More options for ${table.name} table`}
+                    aria-label={`More options for ${table.name} ${entityKind}`}
                   />
                 </DropdownMenuTrigger>
               </TooltipTrigger>
