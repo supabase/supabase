@@ -99,7 +99,6 @@ export const DeleteBranchPanel = () => {
         open={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onSuccess={() => {
-          toast.success('Successfully deleted branch')
           setShowDeleteModal(false)
           track(
             'branch_delete_button_clicked',

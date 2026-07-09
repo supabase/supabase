@@ -19,9 +19,10 @@ import { PROJECT_STATUS } from '@/lib/constants'
 
 export const Project = () => {
   const { data: project } = useSelectedProjectQuery()
-  const isBranch = !!project?.parent_project_ref
+  const isBranch = Boolean(project?.parent_project_ref)
   const isPaused = project?.status === PROJECT_STATUS.INACTIVE
   const entityLabel = isBranch ? 'branch' : 'project'
+  const entityLabelCapitalized = isBranch ? 'Branch' : 'Project'
 
   const { projectSettingsRestartProject } = useIsFeatureEnabled([
     'project_settings:restart_project',
@@ -56,7 +57,7 @@ export const Project = () => {
       <PageSection id="restart-project">
         <PageSectionMeta>
           <PageSectionSummary>
-            <PageSectionTitle>Project availability</PageSectionTitle>
+            <PageSectionTitle>{entityLabelCapitalized} availability</PageSectionTitle>
             <PageSectionDescription>
               {isPaused
                 ? `Resume your paused ${entityLabel} or review recovery options`
