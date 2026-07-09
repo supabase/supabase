@@ -38,7 +38,10 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
   const { mutate: updateOrgSubscription, isPending: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
       onError: (error) => {
-        toast.error(`Failed to downgrade project: ${error.message}`)
+        toast.error(`Failed to downgrade project: ${error.message}`, {
+          duration: 10_000,
+          dismissible: true,
+        })
       },
     }
   )
