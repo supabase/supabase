@@ -114,6 +114,23 @@ describe('www middleware', () => {
 
       expect(res.headers.get('x-middleware-rewrite')).toBeNull()
     })
+
+    it('rewrites changelog entry .md requests without doubling the suffix', () => {
+      const req = makeRequest('/changelog/100.md', { accept: 'text/markdown' })
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/changelog/100.md')
+    })
+
+    it('serves markdown for explicit changelog .md requests even when Accept excludes it', () => {
+      const req = makeRequest('/changelog/100.md', {
+        accept: 'application/x-content-negotiation-probe',
+      })
+      const res = middleware(req)
+
+      expect(res.status).not.toBe(406)
+      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/changelog/100.md')
+    })
   })
 
   describe('Accept: text/markdown content negotiation', () => {
@@ -152,6 +169,13 @@ describe('www middleware', () => {
       const res = middleware(req)
 
       expect(res.headers.get('x-middleware-rewrite')).toBeNull()
+    })
+
+    it('rewrites changelog entries to their static .md file', () => {
+      const req = makeRequest('/changelog/100', { accept: 'text/markdown' })
+      const res = middleware(req)
+
+      expect(res.headers.get('x-middleware-rewrite')).toBe('https://supabase.com/changelog/100.md')
     })
   })
 
