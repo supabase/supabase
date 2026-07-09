@@ -1,7 +1,7 @@
 ---
 title = "Querying Logs Efficiently in the Logs Explorer"
 topics = [ "platform", "database" ]
-keywords = [ "logs", "logs explorer", "bigquery", "edge_logs", "postgres_logs", "billing" ]
+keywords = [ "logs", "logs explorer", "clickhouse", "edge_logs", "postgres_logs", "billing" ]
 ---
 
 > A complimentary guide exists for the [Postgres logs](/docs/guides/troubleshooting/how-to-interpret-and-explore-the-postgres-logs-OuCIOj) and the [API logs](/docs/guides/troubleshooting/discovering-and-interpreting-api-errors-in-the-logs-7xREI9). This guide covers the querying discipline that applies across every log source.
@@ -12,42 +12,38 @@ The [Logs Explorer](/dashboard/project/_/logs/explorer) lets you write SQL again
 
 Efficient debugging usually takes a handful of queries, not one big one:
 
-1. **Query one log table at a time.** Each product's logs live in their own table (`edge_logs`, `postgres_logs`, `auth_logs`, and so on, listed under [Logs Explorer](/docs/guides/telemetry/logs#logs-explorer)). Pick the table for the service you suspect first; log tables have no foreign keys between them, so there's nothing to join across sources in a single query anyway.
+1. **Query one `source` at a time.** All logs live in a single `logs` table, tagged by a `source` column (`edge_logs`, `postgres_logs`, `auth_logs`, and so on). Pick the source for the service you suspect first, and always filter on it: `select ... from logs where source = 'edge_logs'`.
 2. **Filter on `timestamp` first.** Add a bounded time range before anything else. An unfiltered query over your full retention window is the single most common cause of a slow or expensive run.
-3. **Select only the columns you need.** Never pull the whole `metadata` object back (see [Unnesting arrays](/docs/guides/telemetry/logs#unnesting-arrays)); unnest only the specific nested fields you're filtering or displaying.
-4. **Widen along an anchor, not from scratch.** Once a query gives you a `timestamp`, a request path, or a `sql_state_code`, use it to query the next table. For a failing API request, take its `timestamp` from `edge_logs` and look at `postgres_logs` around that same window for the underlying database error.
+3. **Select only the columns you need.** Never pull back the whole `log_attributes` map; read the specific keys you're filtering or displaying with bracket access, for example `log_attributes['response.status_code']`.
+4. **Widen along an anchor, not from scratch.** Once a query gives you a `timestamp`, a request path, or a `sql_state_code`, use it to query the next source. For a failing API request, take its `timestamp` from `edge_logs` and look at `postgres_logs` around that same window for the underlying database error.
 
-The anti-pattern this discipline exists to avoid: an unfiltered `select *`-style scan (the Logs Explorer already blocks `*`, but the equivalent is unnesting every nested field) with no time bound, across a multi-day window. It's slow, it scans more data than needed, and the extra rows make the actual cause harder to spot.
+The anti-pattern this discipline exists to avoid: an unfiltered scan (the Logs Explorer already blocks `select *`, but the equivalent is reading every key out of `log_attributes`) with no time bound, across a multi-day window. It's slow, it scans more data than needed, and the extra rows make the actual cause harder to spot.
 
 ## Know the SQL dialect
 
-The Logs Explorer runs a subset of BigQuery SQL, with a few restrictions to keep queries fast ([full reference](/docs/guides/telemetry/logs#querying-with-the-logs-explorer)):
+The Logs Explorer runs ClickHouse SQL against the `logs` table (the `logs.all.otel` analytics endpoint), with a few restrictions to keep queries fast:
 
-- No subqueries or `WITH` statements.
-- No `*` wildcard for column names; list columns explicitly.
-- No `ILIKE`. Use [`regexp_contains(column, '(?i)pattern')`](https://cloud.google.com/bigquery/docs/reference/standard-sql/functions-and-operators#regexp_contains) for case-insensitive matching instead.
-- Nested fields (everything under `metadata`) need a `cross join unnest(...)` per level before you can select or filter on them. See [Unnesting arrays](/docs/guides/telemetry/logs#unnesting-arrays) for how the nesting works.
-- `timestamp` is stored as unix microseconds; wrap it in `datetime(timestamp)` or `cast(timestamp as datetime)` to read it, but you can filter and `order by` the raw column directly.
-- A query returns at most 1000 rows; always add `limit` and `order by timestamp desc` to make sure you get the most relevant rows within that cap.
+- No `select *` or `count(*)`. List the columns you need, and use `count()`.
+- `log_attributes` is a `Map(String, String)`. Read a field with bracket access, for example `log_attributes['request.method']`; there's no unnesting join. Map values are strings, so wrap numeric fields in `toInt32OrZero(...)` before comparing or aggregating.
+- Use `ilike` for case-insensitive substring matching, and `match(column, 'pattern')` for regex.
+- `timestamp` is a native `DateTime64` column. Filter, order, and compare it directly, no cast needed.
+- Discover the keys a source actually sets with `arrayJoin(mapKeys(log_attributes))` rather than guessing.
 
 ## Essential diagnostic queries
 
 Failing API requests by status code:
 
 ```sql
+-- failing api requests, last 15 minutes
 select
-  cast(timestamp as datetime) as timestamp,
-  request.method,
-  request.path,
-  response.status_code
-from
-  edge_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(metadata.request) as request
-  cross join unnest(metadata.response) as response
-where
-  response.status_code >= 400
-  and timestamp > timestamp_sub(current_timestamp(), interval 15 minute)
+  timestamp,
+  log_attributes['request.method'] as method,
+  log_attributes['request.path'] as path,
+  log_attributes['response.status_code'] as status
+from logs
+where source = 'edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) >= 400
+  and timestamp > now() - interval 15 minute
 order by timestamp desc
 limit 100;
 ```
@@ -55,51 +51,48 @@ limit 100;
 A specific SQLSTATE (for example `42501` permission denied, `42P01` relation missing, `23505` duplicate key):
 
 ```sql
+-- permission denied errors, last 15 minutes
 select
-  cast(timestamp as datetime) as timestamp,
-  parsed.user_name,
-  parsed.error_severity,
+  timestamp,
+  log_attributes['parsed.user_name'] as user_name,
+  log_attributes['parsed.error_severity'] as severity,
   event_message
-from
-  postgres_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(metadata.parsed) as parsed
-where
-  parsed.sql_state_code = '42501'
-  and timestamp > timestamp_sub(current_timestamp(), interval 15 minute)
+from logs
+where source = 'postgres_logs'
+  and log_attributes['parsed.sql_state_code'] = '42501'
+  and timestamp > now() - interval 15 minute
 order by timestamp desc
 limit 100;
 ```
 
-Free-text search across raw messages, using `regexp_contains` in place of `ILIKE`:
+Free-text search across raw messages, using `ilike` for a case-insensitive match:
 
 ```sql
-select cast(timestamp as datetime) as timestamp, event_message
-from postgres_logs
-where
-  regexp_contains(event_message, '(?i)deadlock')
-  and timestamp > timestamp_sub(current_timestamp(), interval 1 hour)
+-- deadlocks, last hour
+select timestamp, event_message
+from logs
+where source = 'postgres_logs'
+  and event_message ilike '%deadlock%'
+  and timestamp > now() - interval 1 hour
 order by timestamp desc
 limit 100;
 ```
 
 ## Widen along an anchor to follow a request across services
 
-Once one query surfaces a timestamp, take that same window into the next table rather than starting over with a broad scan. For example, a `5xx` from `edge_logs` might originate in Postgres:
+Once one query surfaces a timestamp, take that same window into the next source rather than starting over with a broad scan. For example, a `5xx` from `edge_logs` might originate in Postgres:
 
 ```sql
+-- postgres errors around a known edge_logs timestamp
 select
-  cast(postgres_logs.timestamp as datetime) as timestamp,
-  parsed.error_severity,
-  parsed.sql_state_code,
+  timestamp,
+  log_attributes['parsed.error_severity'] as severity,
+  log_attributes['parsed.sql_state_code'] as sql_state,
   event_message
-from
-  postgres_logs
-  cross join unnest(metadata) as metadata
-  cross join unnest(metadata.parsed) as parsed
-where
-  postgres_logs.timestamp between '2024-05-06 04:44:00' and '2024-05-06 04:46:00'
-  and parsed.error_severity in ('ERROR', 'FATAL', 'PANIC')
+from logs
+where source = 'postgres_logs'
+  and timestamp between '2026-05-06T04:44:00' and '2026-05-06T04:46:00'
+  and log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC')
 order by timestamp desc
 limit 100;
 ```
