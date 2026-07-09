@@ -61,11 +61,7 @@ describe('resolveConnectSheetHydration', () => {
   })
 
   test('falls back to storedPrefs.connectTab and backfills the URL', () => {
-    const result = resolveConnectSheetHydration(
-      EMPTY_QUERY,
-      { connectTab: 'mcp' },
-      ALL_MODES
-    )
+    const result = resolveConnectSheetHydration(EMPTY_QUERY, { connectTab: 'mcp' }, ALL_MODES)
     expect(result.mode).toBe('mcp')
     expect(result.urlUpdates.connectTab).toBe('mcp')
   })

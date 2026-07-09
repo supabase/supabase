@@ -140,7 +140,11 @@ describe('shouldShowIpv4AddonNotice', () => {
 
   test('returns true for the transaction pooler when not using the shared pooler', () => {
     expect(
-      shouldShowIpv4AddonNotice({ ...BASE, connectionMethod: 'transaction', useSharedPooler: false })
+      shouldShowIpv4AddonNotice({
+        ...BASE,
+        connectionMethod: 'transaction',
+        useSharedPooler: false,
+      })
     ).toBe(true)
   })
 
