@@ -82,6 +82,9 @@ export type SchemaSpec<TData extends MergeableSchemaData = ProjectJsonSchemaResp
   data: TData
 }
 
+type SettledSchemaSpec<TData extends MergeableSchemaData = ProjectJsonSchemaResponse> =
+  PromiseSettledResult<SchemaSpec<TData>>
+
 export function resolveDocsApiUrl(path: string) {
   const baseUrl = API_URL?.replace('/platform', '')
   const target = `${baseUrl}${path}`
@@ -148,6 +151,31 @@ export function isAbortError(error: unknown) {
   )
 }
 
+export function getResolvedSchemaSpecs<TData extends MergeableSchemaData>(
+  schemaSpecs: SettledSchemaSpec<TData>[],
+  schemas: string[],
+  subject: string
+) {
+  const abortedResult = schemaSpecs.find(
+    (result) => result.status === 'rejected' && isAbortError(result.reason)
+  )
+
+  if (abortedResult?.status === 'rejected') {
+    throw abortedResult.reason
+  }
+
+  const failedSchemas = schemaSpecs.flatMap((result, index) =>
+    result.status === 'rejected' ? [schemas[index]] : []
+  )
+
+  if (failedSchemas.length > 0) {
+    const schemaLabel = failedSchemas.length === 1 ? 'schema' : 'schemas'
+    throw new Error(`Failed to fetch ${subject} for ${schemaLabel}: ${failedSchemas.join(', ')}`)
+  }
+
+  return schemaSpecs.flatMap((result) => (result.status === 'fulfilled' ? [result.value] : []))
+}
+
 export async function getProjectJsonSchemaForSchema<TData = ProjectJsonSchemaResponse>(
   { projectRef, schema }: { projectRef: string; schema: string },
   signal?: AbortSignal
@@ -179,29 +207,7 @@ export async function getProjectJsonSchema(
       data: await getProjectJsonSchemaForSchema({ projectRef, schema }, signal),
     }))
   )
-
-  const abortedResult = settledSchemaSpecs.find(
-    (result) => result.status === 'rejected' && isAbortError(result.reason)
-  )
-
-  if (abortedResult?.status === 'rejected') {
-    throw abortedResult.reason
-  }
-
-  settledSchemaSpecs.forEach((result, index) => {
-    if (result.status === 'rejected') {
-      console.warn(`Failed to fetch JSON schema for "${targetSchemas[index]}"`, result.reason)
-    }
-  })
-
-  const schemaSpecs = settledSchemaSpecs.flatMap((result) =>
-    result.status === 'fulfilled' ? [result.value] : []
-  )
-
-  if (schemaSpecs.length === 0) {
-    const firstRejection = settledSchemaSpecs.find((result) => result.status === 'rejected')
-    throw firstRejection?.reason ?? new Error('Failed to fetch project JSON schema')
-  }
+  const schemaSpecs = getResolvedSchemaSpecs(settledSchemaSpecs, targetSchemas, 'JSON schema')
 
   return mergeSchemaResponses(schemaSpecs, targetSchemas)
 }

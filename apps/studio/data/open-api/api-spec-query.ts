@@ -5,8 +5,8 @@ import {
   getProjectJsonSchemaForSchema,
   getQualifiedEntityName,
   getQualifiedPath,
+  getResolvedSchemaSpecs,
   getTargetSchemas,
-  isAbortError,
   mergeSchemaResponses,
   type ProjectJsonSchemaResponse,
 } from '@/data/docs/project-json-schema-query'
@@ -36,29 +36,7 @@ export async function getOpenAPISpec(
       data: await getProjectJsonSchemaForSchema({ projectRef, schema }, signal),
     }))
   )
-
-  const abortedResult = settledSchemaSpecs.find(
-    (result) => result.status === 'rejected' && isAbortError(result.reason)
-  )
-
-  if (abortedResult?.status === 'rejected') {
-    throw abortedResult.reason
-  }
-
-  settledSchemaSpecs.forEach((result, index) => {
-    if (result.status === 'rejected') {
-      console.warn(`Failed to fetch OpenAPI spec for "${targetSchemas[index]}"`, result.reason)
-    }
-  })
-
-  const schemaSpecs = settledSchemaSpecs.flatMap((result) =>
-    result.status === 'fulfilled' ? [result.value] : []
-  )
-
-  if (schemaSpecs.length === 0) {
-    const firstRejection = settledSchemaSpecs.find((result) => result.status === 'rejected')
-    throw firstRejection?.reason ?? new Error('Failed to fetch OpenAPI spec')
-  }
+  const schemaSpecs = getResolvedSchemaSpecs(settledSchemaSpecs, targetSchemas, 'OpenAPI spec')
 
   const mergedData = mergeSchemaResponses(schemaSpecs, targetSchemas)
 
