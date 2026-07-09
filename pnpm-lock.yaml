@@ -294,15 +294,15 @@ importers:
       '@types/react-dom':
         specifier: 'catalog:'
         version: 19.2.3(@types/react@19.2.14)
-      concurrently:
-        specifier: ^8.2.2
-        version: 8.2.2
       config:
         specifier: workspace:*
         version: link:../../packages/config
       mdast-util-toc:
         specifier: ^6.1.1
         version: 6.1.1
+      npm-run-all:
+        specifier: ^4.1.5
+        version: 4.1.5
       postcss:
         specifier: ^8.5.10
         version: 8.5.10
@@ -649,9 +649,6 @@ importers:
       chokidar:
         specifier: ^4.0.3
         version: 4.0.3
-      concurrently:
-        specifier: ^9.1.2
-        version: 9.1.2
       dotenv:
         specifier: ^16.0.3
         version: 16.3.1
@@ -664,6 +661,9 @@ importers:
       graphiql:
         specifier: ^4.0.2
         version: 4.0.2(@codemirror/language@6.11.0)(@emotion/is-prop-valid@1.4.0)(@types/node@22.13.14)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(graphql-ws@6.0.4(graphql@16.11.0)(ws@8.21.0))(graphql@16.11.0)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      npm-run-all:
+        specifier: ^4.1.5
+        version: 4.1.5
       openapi-types:
         specifier: ^12.1.3
         version: 12.1.3
@@ -9819,16 +9819,6 @@ packages:
   concat-with-sourcemaps@1.1.0:
     resolution: {integrity: sha512-4gEjHJFT9e+2W/77h/DS5SGUgwDaOwprX8L/gl5+3ixnzkVJJsZWDSelmN3Oilw3LNDZjZV0yqH1hLG3k6nghg==}
 
-  concurrently@8.2.2:
-    resolution: {integrity: sha512-1dP4gpXFhei8IOtlXRE/T/4H88ElHgTiUzh71YUmtjTEHMSRS2Z/fgOxHSxxusGHogsRfxNq1vyAwxSC+EVyDg==}
-    engines: {node: ^14.13.0 || >=16.0.0}
-    hasBin: true
-
-  concurrently@9.1.2:
-    resolution: {integrity: sha512-H9MWcoPsYddwbOGM6difjVwVZHl63nwMEwDJG/L7VGtuaJhb12h2caPG2tVPWs7emuYix252iGfqOyrz1GczTQ==}
-    engines: {node: '>=18'}
-    hasBin: true
-
   confbox@0.1.8:
     resolution: {integrity: sha512-RMtmw0iFkeR4YV+fUOSucriAQNb9g8zFR52MWCtl+cCZOFRNL6zeB395vPzFhEjjn4fMxXudmELnl/KF/WrK6w==}
 
@@ -15827,9 +15817,6 @@ packages:
   space-separated-tokens@2.0.2:
     resolution: {integrity: sha512-PEGlAwrG8yXGXRjW32fGbg66JAlOAwbObuqVoJpv/mRgoWDQfgH1wDPvtzWyUSNAXBGSk8h755YDbbcEy3SH2Q==}
 
-  spawn-command@0.0.2:
-    resolution: {integrity: sha512-zC8zGoGkmc8J9ndvml8Xksr1Amk9qBujgbF0JAIWO7kXr43w0h/0GJNM/Vustixu+YE8N/MTrQ7N31FvHUACxQ==}
-
   spdx-correct@3.2.0:
     resolution: {integrity: sha512-kN9dJbvnySHULIluDHy32WHRUu3Og7B9sbY7tsFLctQkIqnMh3hErYgdMjTYuqmcXX+lK5T1lnUt3G7zNswmZA==}
 
@@ -16324,10 +16311,6 @@ packages:
     engines: {node: '>=10.0'}
     peerDependencies:
       tslib: '2'
-
-  tree-kill@1.2.2:
-    resolution: {integrity: sha512-L0Orpi8qGpRG//Nd+H90vFB+3iHnue1zSSGmNOOCh1GLJ7rUKVwV2HvijphGQS2UmhUZewS9VgvxYIdgr+fG1A==}
-    hasBin: true
 
   trim-lines@3.0.1:
     resolution: {integrity: sha512-kRj8B+YHZCc9kQYdWfJB2/oUl9rA99qbowYYBtr4ui4mZyAQ2JpvVBd/6U2YloATfqBhBTSMhTpgBHtU0Mf3Rg==}
@@ -25465,7 +25448,7 @@ snapshots:
     dependencies:
       ansi-align: 3.0.1
       camelcase: 8.0.0
-      chalk: 5.4.1
+      chalk: 5.6.2
       cli-boxes: 3.0.0
       string-width: 7.2.0
       type-fest: 4.30.0
@@ -25995,28 +25978,6 @@ snapshots:
   concat-with-sourcemaps@1.1.0:
     dependencies:
       source-map: 0.6.1
-
-  concurrently@8.2.2:
-    dependencies:
-      chalk: 4.1.2
-      date-fns: 2.30.0
-      lodash: 4.18.1
-      rxjs: 7.8.1
-      shell-quote: 1.8.4
-      spawn-command: 0.0.2
-      supports-color: 8.1.1
-      tree-kill: 1.2.2
-      yargs: 17.7.2
-
-  concurrently@9.1.2:
-    dependencies:
-      chalk: 4.1.2
-      lodash: 4.18.1
-      rxjs: 7.8.1
-      shell-quote: 1.8.4
-      supports-color: 8.1.1
-      tree-kill: 1.2.2
-      yargs: 17.7.2
 
   confbox@0.1.8: {}
 
@@ -26819,7 +26780,7 @@ snapshots:
       has-property-descriptors: 1.0.2
       has-proto: 1.2.0
       has-symbols: 1.1.0
-      hasown: 2.0.2
+      hasown: 2.0.4
       internal-slot: 1.1.0
       is-array-buffer: 3.0.5
       is-callable: 1.2.7
@@ -26892,7 +26853,7 @@ snapshots:
 
   es-shim-unscopables@1.0.2:
     dependencies:
-      hasown: 2.0.2
+      hasown: 2.0.4
 
   es-to-primitive@1.3.0:
     dependencies:
@@ -27113,7 +27074,7 @@ snapshots:
       eslint: 9.37.0(jiti@2.7.0)(supports-color@8.1.1)
       eslint-import-resolver-node: 0.3.9(supports-color@8.1.1)
       eslint-module-utils: 2.12.0(@typescript-eslint/parser@8.48.0(eslint@9.37.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.2))(eslint-import-resolver-node@0.3.9(supports-color@8.1.1))(eslint-import-resolver-typescript@3.6.1)(eslint@9.37.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)
-      hasown: 2.0.2
+      hasown: 2.0.4
       is-core-module: 2.16.1
       is-glob: 4.0.3
       minimatch: 3.1.4
@@ -27163,7 +27124,7 @@ snapshots:
       es-iterator-helpers: 1.2.1
       eslint: 9.37.0(jiti@2.7.0)(supports-color@8.1.1)
       estraverse: 5.3.0
-      hasown: 2.0.2
+      hasown: 2.0.4
       jsx-ast-utils: 3.3.5
       minimatch: 3.1.4
       object.entries: 1.1.9
@@ -27794,7 +27755,7 @@ snapshots:
       call-bound: 1.0.4
       define-properties: 1.2.1
       functions-have-names: 1.2.3
-      hasown: 2.0.2
+      hasown: 2.0.4
       is-callable: 1.2.7
 
   functions-have-names@1.2.3: {}
@@ -28599,7 +28560,7 @@ snapshots:
   internal-slot@1.1.0:
     dependencies:
       es-errors: 1.3.0
-      hasown: 2.0.2
+      hasown: 2.0.4
       side-channel: 1.1.0
 
   internmap@1.0.1: {}
@@ -28692,7 +28653,7 @@ snapshots:
 
   is-core-module@2.16.1:
     dependencies:
-      hasown: 2.0.2
+      hasown: 2.0.4
 
   is-data-view@1.0.2:
     dependencies:
@@ -28806,7 +28767,7 @@ snapshots:
       call-bound: 1.0.4
       gopd: 1.2.0
       has-tostringtag: 1.0.2
-      hasown: 2.0.2
+      hasown: 2.0.4
 
   is-regexp@3.1.0: {}
 
@@ -29366,7 +29327,7 @@ snapshots:
 
   log-symbols@6.0.0:
     dependencies:
-      chalk: 5.4.1
+      chalk: 5.6.2
       is-unicode-supported: 1.3.0
 
   log-update@4.0.0:
@@ -31472,7 +31433,7 @@ snapshots:
 
   ora@8.2.0:
     dependencies:
-      chalk: 5.4.1
+      chalk: 5.6.2
       cli-cursor: 5.0.0
       cli-spinners: 2.9.2
       is-interactive: 2.0.0
@@ -33567,8 +33528,6 @@ snapshots:
 
   space-separated-tokens@2.0.2: {}
 
-  spawn-command@0.0.2: {}
-
   spdx-correct@3.2.0:
     dependencies:
       spdx-expression-parse: 3.0.1
@@ -34082,8 +34041,6 @@ snapshots:
   tree-dump@1.0.1(tslib@2.8.1):
     dependencies:
       tslib: 2.8.1
-
-  tree-kill@1.2.2: {}
 
   trim-lines@3.0.1: {}
 
