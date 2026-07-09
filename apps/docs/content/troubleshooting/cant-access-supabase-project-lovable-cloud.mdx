@@ -28,21 +28,21 @@ You might be affected by this if:
 
 ## How to fix
 
-There is **no one-click transfer** from Lovable Cloud to your own Supabase account. However, you can remove Lovable Cloud from your project and connect a Supabase project you own instead:
+There is **no one-click transfer** from Lovable Cloud to your own Supabase account. However, you can export your data, restore it into a project you own, and then remove Lovable Cloud:
 
 1. **Export your data.** In Lovable, open the project panel (layers icon in the top bar) and go to **Cloud > Overview > Advanced settings**, then use **Export data** to download a copy of your database. Exports are limited to 5 GB, and you can request one export every 24 hours. Download any storage files you need separately.
 
    ![Export, Pause, and Remove options in Lovable Cloud Advanced settings](/docs/img/troubleshooting/cant-access-supabase-project-lovable-cloud-0.png)
 
-2. **Remove Lovable Cloud.** In the same **Advanced settings** section, use the **Remove Lovable Cloud** flow. Lovable asks you to confirm the warnings and type the project name before removal.
+2. **Create your own Supabase project and import your data.** Create a project from the [Supabase Dashboard](/dashboard) and restore the exported data into it. See [Import Lovable Cloud Data into Your Own Supabase Project](/docs/guides/troubleshooting/import-lovable-cloud-data-to-supabase) for detailed restore steps and post-restore fixes. Verify that your data, users, and policies are in place before continuing.
+
+3. **Remove Lovable Cloud.** Once you have verified the import, go to **Cloud > Overview > Advanced settings** and use the **Remove Lovable Cloud** flow. Lovable asks you to confirm the warnings and type the project name before removal.
 
    ![Remove Lovable Cloud confirmation dialog](/docs/img/troubleshooting/cant-access-supabase-project-lovable-cloud-1.png)
 
-3. **Connect your own Supabase project.** Create a project from the [Supabase Dashboard](/dashboard), then connect it to your Lovable project by following Lovable's official guide: [Connect to Supabase (Lovable Docs)](https://docs.lovable.dev/integrations/supabase).
+4. **Connect your own Supabase project.** Connect the new project to your Lovable project by following Lovable's official guide: [Connect to Supabase (Lovable Docs)](https://docs.lovable.dev/integrations/supabase).
 
    ![Connect your own Supabase project after removing Lovable Cloud](/docs/img/troubleshooting/cant-access-supabase-project-lovable-cloud-2.png)
-
-4. **Import your data.** Restore the exported data into your new Supabase project. You also need to reconfigure authentication and any external services manually. See [Import Lovable Cloud Data into Your Own Supabase Project](/docs/guides/troubleshooting/import-lovable-cloud-data-to-supabase) for detailed restore steps and post-restore fixes.
 
 For more details, see Lovable's [Cloud documentation](https://docs.lovable.dev/integrations/cloud).
 

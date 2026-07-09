@@ -28,13 +28,13 @@ The export is a `pg_dump` archive in custom format with `zstd` compression, deli
 
 - Full schema: tables, indexes, sequences, and extensions
 - All table data
-- Row Level Security (RLS) policies
+- Row Level Security (RLS) policy definitions (verify that RLS is enabled on your tables after the restore)
 - Database functions and triggers
 - Auth users and identities, **including password hashes** — migrated users keep their original credentials
 
 It does **not** include:
 
-- Storage files (bucket and object metadata restore, but the actual files don't travel)
+- Storage files (bucket and object metadata are restored, but the actual files don't travel)
 - Edge function code (it lives in your project's GitHub repository, under `supabase/functions/`)
 - Edge function secrets (never exportable; `vault.secrets` rows restore but can't be decrypted in another project)
 
@@ -112,7 +112,8 @@ If identities are missing, run a targeted second pass:
 
 ```bash
 pg_restore --data-only -n auth -t identities \
-  -d "your-connection-string" your-export.backup
+  -d "postgresql://postgres.[project-ref]:[password]@[pooler-host]:5432/postgres" \
+  your-export.backup
 ```
 
 After this, migrated users can sign in with their original passwords.
@@ -175,7 +176,7 @@ After removal, connect the new project: in the Lovable project panel, use **"Alr
 
 - Sign in with an existing user and their original password
 - Compare table row counts against your pre-migration inventory
-- Confirm RLS is enabled on your tables (**Database > Tables**)
+- Confirm RLS is enabled on your tables (**Database > Tables**) — if any table shows RLS as disabled, enable it from the table's settings
 - Confirm scheduled jobs are listed and pointing at the new project: `select * from cron.job;`
 - Open a few storage files from the app
 
