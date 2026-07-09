@@ -117,6 +117,14 @@ describe('docs middleware — /guides/* content negotiation', () => {
     }
   })
 
+  it('still serves ChatGPT-User markdown when Accept asks for it', () => {
+    const req = makeRequest('/docs/guides/auth', {
+      accept: 'text/markdown',
+      userAgent: 'Mozilla/5.0 (compatible; ChatGPT-User/1.0)',
+    })
+    expect(middleware(req).headers.get(REWRITE_HEADER)).toBe(GUIDES_MD_REWRITE('auth'))
+  })
+
   it('LLM UA overrides an Accept header that prefers HTML', () => {
     const req = makeRequest('/docs/guides/auth', {
       accept: 'text/html;q=1.0, text/markdown;q=0.1',
@@ -125,7 +133,7 @@ describe('docs middleware — /guides/* content negotiation', () => {
     expect(middleware(req).headers.get(REWRITE_HEADER)).toBe(GUIDES_MD_REWRITE('auth'))
   })
 
-  it('falls through for non-LLM UAs (browsers, training crawlers, substring embeds)', () => {
+  it('falls through for non-LLM UAs (browsers, training crawlers, excluded agents, substring embeds)', () => {
     for (const ua of [
       'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
       'GPTBot/1.0',
