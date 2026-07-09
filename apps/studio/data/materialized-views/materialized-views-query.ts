@@ -8,23 +8,23 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 export type MaterializedViewsVariables = {
   projectRef?: string
   connectionString?: string | null
-  schema?: string
+  schemas?: string[]
 }
 
 export async function getMaterializedViews(
-  { projectRef, connectionString, schema }: MaterializedViewsVariables,
+  { projectRef, connectionString, schemas }: MaterializedViewsVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { sql } = pgMeta.materializedViews.list({ includedSchemas: schema ? [schema] : undefined })
+  const { sql } = pgMeta.materializedViews.list({ includedSchemas: schemas })
 
   const { result } = await executeSql(
     {
       projectRef,
       connectionString,
       sql,
-      queryKey: ['materialized-views', schema].filter(Boolean),
+      queryKey: ['materialized-views', schemas].filter(Boolean),
     },
     signal
   )
@@ -36,17 +36,18 @@ export type MaterializedViewsData = Awaited<ReturnType<typeof getMaterializedVie
 export type MaterializedViewsError = ResponseError
 
 export const useMaterializedViewsQuery = <TData = MaterializedViewsData>(
-  { projectRef, connectionString, schema }: MaterializedViewsVariables,
+  { projectRef, connectionString, schemas }: MaterializedViewsVariables,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<MaterializedViewsData, MaterializedViewsError, TData> = {}
 ) =>
   useQuery<MaterializedViewsData, MaterializedViewsError, TData>({
-    queryKey: schema
-      ? materializedViewKeys.listBySchema(projectRef, schema)
+    queryKey: schemas
+      ? materializedViewKeys.listBySchema(projectRef, schemas)
       : materializedViewKeys.list(projectRef),
-    queryFn: ({ signal }) => getMaterializedViews({ projectRef, connectionString, schema }, signal),
+    queryFn: ({ signal }) =>
+      getMaterializedViews({ projectRef, connectionString, schemas }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     staleTime: 0,
     ...options,

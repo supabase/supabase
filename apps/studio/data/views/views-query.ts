@@ -8,22 +8,22 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 export type ViewsVariables = {
   projectRef?: string
   connectionString?: string | null
-  schema?: string
+  schemas?: string[]
 }
 
 export async function getViews(
-  { projectRef, connectionString, schema }: ViewsVariables,
+  { projectRef, connectionString, schemas }: ViewsVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { sql } = pgMeta.views.list({ includedSchemas: schema ? [schema] : undefined })
+  const { sql } = pgMeta.views.list({ includedSchemas: schemas })
   const { result } = await executeSql(
     {
       projectRef,
       connectionString,
       sql,
-      queryKey: ['views', schema].filter(Boolean),
+      queryKey: ['views', schemas].filter(Boolean),
     },
     signal
   )
@@ -35,12 +35,12 @@ export type ViewsData = Awaited<ReturnType<typeof getViews>>
 export type ViewsError = ResponseError
 
 export const useViewsQuery = <TData = ViewsData>(
-  { projectRef, connectionString, schema }: ViewsVariables,
+  { projectRef, connectionString, schemas }: ViewsVariables,
   { enabled = true, ...options }: UseCustomQueryOptions<ViewsData, ViewsError, TData> = {}
 ) =>
   useQuery<ViewsData, ViewsError, TData>({
-    queryKey: schema ? viewKeys.listBySchema(projectRef, schema) : viewKeys.list(projectRef),
-    queryFn: ({ signal }) => getViews({ projectRef, connectionString, schema }, signal),
+    queryKey: schemas ? viewKeys.listBySchema(projectRef, schemas) : viewKeys.list(projectRef),
+    queryFn: ({ signal }) => getViews({ projectRef, connectionString, schemas }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     staleTime: 0,
     ...options,

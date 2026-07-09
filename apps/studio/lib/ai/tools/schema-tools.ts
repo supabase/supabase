@@ -20,7 +20,7 @@ export const getSchemaTools = ({
         {
           projectRef,
           connectionString,
-          schema: schemas?.join(','),
+          schemas,
         },
         undefined
       )

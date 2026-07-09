@@ -90,7 +90,7 @@ export const getFallbackTools = ({
               {
                 projectRef,
                 connectionString,
-                schema: schemas?.join(','),
+                schemas,
               },
               undefined
             )

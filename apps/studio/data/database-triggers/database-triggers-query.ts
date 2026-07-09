@@ -13,15 +13,16 @@ function markSavedTriggerSafe(trigger: DatabaseTriggersData[number]): PostgresTr
 export type DatabaseTriggersVariables = {
   projectRef?: string
   connectionString?: string | null
+  schemas?: string[]
 }
 
 export async function getDatabaseTriggers(
-  { projectRef, connectionString }: DatabaseTriggersVariables,
+  { projectRef, connectionString, schemas }: DatabaseTriggersVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { sql } = pgMeta.triggers.list()
+  const { sql } = pgMeta.triggers.list({ includedSchemas: schemas })
   const { result } = await executeSql(
     {
       projectRef,
@@ -39,14 +40,14 @@ export type DatabaseTriggersData = Awaited<ReturnType<typeof getDatabaseTriggers
 export type DatabaseTriggersError = ResponseError
 
 export const useDatabaseHooksQuery = <TData = DatabaseTriggersData>(
-  { projectRef, connectionString }: DatabaseTriggersVariables,
+  { projectRef, connectionString, schemas }: DatabaseTriggersVariables,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<DatabaseTriggersData, DatabaseTriggersError, TData> = {}
 ) =>
   useQuery<DatabaseTriggersData, DatabaseTriggersError, TData>({
-    queryKey: databaseTriggerKeys.list(projectRef),
+    queryKey: databaseTriggerKeys.list(projectRef, schemas),
     queryFn: ({ signal }) => getDatabaseTriggers({ projectRef, connectionString }, signal),
     select: (data) => {
       return data.filter((trigger) => {
