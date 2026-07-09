@@ -209,6 +209,7 @@ export const CronJobTableCell = ({
             size="medium"
             disabled={isToggling}
             checked={active}
+            aria-label={active ? `Disable ${jobname}` : `Enable ${jobname}`}
           />
         </DialogTrigger>
         <DialogContent
