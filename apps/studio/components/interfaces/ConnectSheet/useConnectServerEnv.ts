@@ -94,11 +94,20 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
     return revealPromiseRef.current
   }, [reveal])
 
+  // clear() invalidates the in-flight reveal request (by request id) but
+  // doesn't know about revealPromiseRef, so a hide immediately followed by
+  // another reveal would otherwise reuse that now-invalidated promise
+  // instead of firing a fresh request.
+  const clearReveal = useCallback(() => {
+    revealPromiseRef.current = null
+    clear()
+  }, [clear])
+
   const toggle = useCallback(async () => {
     if (!secretKey || !canReadAPIKeys) return
     if (isRevealed) {
       setIsRevealed(false)
-      clear()
+      clearReveal()
     } else {
       setIsRevealed(true)
       try {
@@ -108,15 +117,15 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
         throw new Error('Failed to reveal secret API key', { cause: error })
       }
     }
-  }, [secretKey, canReadAPIKeys, isRevealed, clear, revealOnce])
+  }, [secretKey, canReadAPIKeys, isRevealed, clearReveal, revealOnce])
 
   const getSecretValue = useCallback(async () => {
     if (!secretKey || !canReadAPIKeys) return 'your-secret-key'
     if (revealedSecret) return revealedSecret
     const value = await revealOnce()
-    if (!isRevealedRef.current) clear()
+    if (!isRevealedRef.current) clearReveal()
     return value ?? 'your-secret-key'
-  }, [secretKey, canReadAPIKeys, revealedSecret, revealOnce, clear])
+  }, [secretKey, canReadAPIKeys, revealedSecret, revealOnce, clearReveal])
 
   const buildEnv = useCallback(async () => {
     const secretValue = await getSecretValue()
@@ -132,10 +141,10 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
     if (!isRevealed || !revealedSecret) return
     const timer = setTimeout(() => {
       setIsRevealed(false)
-      clear()
+      clearReveal()
     }, AUTO_HIDE_MS)
     return () => clearTimeout(timer)
-  }, [isRevealed, revealedSecret, clear])
+  }, [isRevealed, revealedSecret, clearReveal])
 
   return {
     isLoading: isLoadingUrl || isLoadingKeys || isLoadingPermission,
