@@ -429,6 +429,7 @@ export const Grid = memo(
                       rows: rows ?? [],
                       columns: snap.table.columns,
                       onRowsChange,
+                      sensitiveDataColumns: snap.sensitiveDataColumns,
                     })
                   }
                 />

@@ -33,7 +33,7 @@ const deleteTable = async (page: Page, ref: string, tableName: string) => {
 }
 
 const deleteEnumIfExist = async (page: Page, ref: string, enumName: string) => {
-  const loadTypesPromise = waitForApiResponse(page, 'pg-meta', ref, `types`)
+  const loadTypesPromise = waitForApiResponse(page, 'pg-meta', ref, `query?key=types`)
   await page.goto(toUrl(`/project/${ref}/database/types?schema=public`))
   await loadTypesPromise
   expect(page.getByText('public').first()).toBeVisible()
