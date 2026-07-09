@@ -185,8 +185,11 @@ export const RegionSelector = ({
                         {field.value !== undefined && (
                           <div className="flex items-center gap-x-3">
                             {selectedRegion?.code && (
+                              // For some reason, Safari considered the empty string alt text on this icon as misspelled (with VoiceOver)
+                              // Only way to fix it is to set the role. Not needed for the combobox options
+                              // eslint-disable-next-line jsx-a11y/alt-text
                               <img
-                                alt=""
+                                role="presentation"
                                 className="w-5 rounded-xs"
                                 src={`${BASE_PATH}/img/regions/${selectedRegion.code}.svg`}
                               />
