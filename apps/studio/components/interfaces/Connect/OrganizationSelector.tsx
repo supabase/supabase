@@ -213,7 +213,7 @@ const ConnectOrganizationButton = ({
       )}
     />
     {selected && (
-      <span className="pointer-events-none absolute right-3 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full bg-brand-500 dark:bg-brand-200 text-white dark:text-brand">
+      <span className="pointer-events-none absolute right-3 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full bg-brand-500 text-primary-foreground dark:bg-brand-200 dark:text-brand-600">
         <Check className="size-3.5" strokeWidth={2} />
       </span>
     )}
