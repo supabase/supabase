@@ -118,7 +118,7 @@ The secret key (`sb_secret_...`, which replaces the legacy `service_role` key) b
 
 <Admonition type="note">
 
-The `redirectTo` URL must be in your project's [allowed redirect URLs](/docs/guides/auth/redirect-urls). If it isn't, the invite link falls back to your Site URL instead of the URL you specified.
+The `redirectTo` URL must be in your project's [allowed redirect URLs](/docs/guides/auth/redirect-urls) configuration. If it isn't, the redirectTo value is ignored and the invite link redirects to your Site URL instead (no error is raised).
 
 </Admonition>
 
@@ -126,7 +126,7 @@ The invitation email uses the **Invite user** email template, which you can cust
 
 <Admonition type="caution">
 
-Invitation links expire after the duration set by the **Email OTP Expiration** setting (**Authentication > Sign In / Providers > Auth Providers > Email > Email OTP expiration**), which defaults to 24 hours. This is the same value used for [email OTPs](/docs/guides/auth/auth-email-passwordless#enabling-email-otp), magic links, and other email confirmation links. If an invitation expires before it's accepted, send the user a new invite.
+Invitation links expire after the duration set by the **Email OTP Expiration** [setting](/dashboard/project/_/auth/providers?provider=Email), which defaults to 1 hour. This is the same value used for [email OTPs](/docs/guides/auth/auth-email-passwordless#enabling-email-otp), magic links, and other email confirmation links. If an invitation expires before it's accepted, send the user a new invite.
 
 </Admonition>
 
