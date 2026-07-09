@@ -634,13 +634,18 @@ export const SQLEditor = () => {
     try {
       setIsAcceptDiffLoading(true)
 
-      // TODO: show error if undefined
-      if (!sourceSqlDiff || !editorRef.current || !diffEditorRef.current) return
+      if (!sourceSqlDiff || !editorRef.current || !diffEditorRef.current) {
+        toast.error('Failed to accept changes: Editor is not fully initialized.')
+        return
+      }
 
       const editorModel = editorRef.current.getModel()
       const diffModel = diffEditorRef.current.getModel()
 
-      if (!editorModel || !diffModel) return
+      if (!editorModel || !diffModel) {
+        toast.error('Failed to accept changes: Editor models are missing.')
+        return
+      }
 
       const sql = diffModel.modified.getValue()
 
