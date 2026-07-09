@@ -164,13 +164,17 @@ export function getResolvedSchemaSpecs<TData extends MergeableSchemaData>(
     throw abortedResult.reason
   }
 
-  const failedSchemas = schemaSpecs.flatMap((result, index) =>
-    result.status === 'rejected' ? [schemas[index]] : []
+  const failedSchemaResults = schemaSpecs.flatMap((result, index) =>
+    result.status === 'rejected' ? [{ schema: schemas[index], reason: result.reason }] : []
   )
 
-  if (failedSchemas.length > 0) {
-    const schemaLabel = failedSchemas.length === 1 ? 'schema' : 'schemas'
-    throw new Error(`Failed to fetch ${subject} for ${schemaLabel}: ${failedSchemas.join(', ')}`)
+  if (failedSchemaResults.length === 1) {
+    throw failedSchemaResults[0].reason
+  }
+
+  if (failedSchemaResults.length > 1) {
+    const failedSchemas = failedSchemaResults.map(({ schema }) => schema)
+    throw new Error(`Failed to fetch ${subject} for schemas: ${failedSchemas.join(', ')}`)
   }
 
   return schemaSpecs.flatMap((result) => (result.status === 'fulfilled' ? [result.value] : []))
