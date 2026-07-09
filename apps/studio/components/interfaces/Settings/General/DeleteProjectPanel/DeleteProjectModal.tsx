@@ -122,7 +122,7 @@ export const DeleteProjectModal = ({
           ? 'This action cannot be undone.'
           : `This will permanently delete the ${project?.name}`,
         description: (
-          <span>
+          <>
             {!isFree && 'All project data will be lost, and cannot be undone. '}
             Read the{' '}
             <a
@@ -134,7 +134,7 @@ export const DeleteProjectModal = ({
               documentation
             </a>{' '}
             for prerequisites, implications, and recovery information.
-          </span>
+          </>
         ),
       }}
       text={
