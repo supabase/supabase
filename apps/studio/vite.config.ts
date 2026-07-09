@@ -372,12 +372,31 @@ export default defineConfig(({ command, mode }) => {
     // router.tsx). Both are build-time system env vars on Vercel.
     'VERCEL_DEPLOYMENT_ID',
     'VERCEL_SKEW_PROTECTION_ENABLED',
+    // Sentry release (sentry.tanstack.ts): the SDK silently drops session
+    // envelopes when the client has no release, so Release Health would send
+    // nothing. The commit SHA is also what withSentryConfig resolves the Next
+    // build's release to, keeping release names aligned across both builds.
+    'VERCEL_GIT_COMMIT_SHA',
   ] as const
   for (const key of vercelPublicVars) {
     const value = env[key]
     if (value !== undefined) {
       publicEnvDefines[`process.env.NEXT_PUBLIC_${key}`] = JSON.stringify(value)
     }
+  }
+
+  // Sentry init (lib/sentry-client-options.ts, reached via router.tsx) reads
+  // these at runtime in the browser. When a var is unset it gets no define
+  // entry above, which would leave a literal `process.env.*` in the built
+  // bundle — and an undeclared `process` throws in the browser. Inline
+  // `undefined` as the fallback, mirroring how Next inlines unset
+  // NEXT_PUBLIC_* vars.
+  for (const key of [
+    'NEXT_PUBLIC_SENTRY_DSN',
+    'NEXT_PUBLIC_SENTRY_ENVIRONMENT',
+    'NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA',
+  ]) {
+    publicEnvDefines[`process.env.${key}`] ??= 'undefined'
   }
 
   // Mirror Next's `basePath` via NEXT_PUBLIC_BASE_PATH. Unlike Next, TanStack

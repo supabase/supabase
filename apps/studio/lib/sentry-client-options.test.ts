@@ -1,12 +1,13 @@
-import type { Event as SentryEvent, StackFrame } from '@sentry/nextjs'
+import type { Event as SentryEvent, StackFrame } from '@sentry/react'
 import { describe, expect, it } from 'vitest'
 
 import {
+  buildSentryClientOptions,
   isBrowserWalletExtensionError,
   isCancellationRejection,
   isChallengeExpiredError,
   isUserAbortedOperation,
-} from './instrumentation-client'
+} from './sentry-client-options'
 
 describe('Sentry beforeSend filtering functions', () => {
   describe('isBrowserWalletExtensionError', () => {
@@ -415,5 +416,82 @@ describe('Sentry beforeSend filtering functions', () => {
       expect(isCancellationRejection(event)).toBe(false)
       expect(isChallengeExpiredError(error, event)).toBe(false)
     })
+  })
+})
+
+describe('buildSentryClientOptions', () => {
+  // Representative subset of Sentry's default integrations. `integrations`
+  // is the function form: Sentry.init calls it with the defaults and installs
+  // whatever it returns, so dropping these here would disable session
+  // envelopes (BrowserSession) and window.onerror capture (GlobalHandlers).
+  const fakeDefaultIntegrations = [{ name: 'BrowserSession' }, { name: 'GlobalHandlers' }]
+
+  const getIntegrationNames = (options: ReturnType<typeof buildSentryClientOptions>) => {
+    const integrations = options.integrations
+    if (typeof integrations !== 'function') {
+      throw new Error('expected the function form of integrations')
+    }
+    return integrations(fakeDefaultIntegrations).map((integration) => integration.name)
+  }
+
+  it('preserves the default integrations passed in by Sentry.init', () => {
+    for (const includeThirdPartyErrorFilter of [true, false]) {
+      const names = getIntegrationNames(buildSentryClientOptions({ includeThirdPartyErrorFilter }))
+      // browserSessionIntegration is what sends the session envelope on every
+      // page load; globalHandlers is window.onerror / unhandledrejection.
+      expect(names).toContain('BrowserSession')
+      expect(names).toContain('GlobalHandlers')
+    }
+  })
+
+  it('sets the release only when one is provided', () => {
+    const withRelease = buildSentryClientOptions({
+      includeThirdPartyErrorFilter: false,
+      release: 'abc123',
+    })
+    expect(withRelease.release).toBe('abc123')
+
+    // The key must be ABSENT when no release is passed: on the Next build a
+    // `release: undefined` entry would override the release injected into
+    // @sentry/nextjs's init by withSentryConfig (options are spread last).
+    const withoutRelease = buildSentryClientOptions({ includeThirdPartyErrorFilter: true })
+    expect('release' in withoutRelease).toBe(false)
+  })
+
+  it('includes the third-party error filter only when the build annotates frames', () => {
+    // Next build: withSentryConfig injects the applicationKey metadata.
+    expect(
+      getIntegrationNames(buildSentryClientOptions({ includeThirdPartyErrorFilter: true }))
+    ).toContain('ThirdPartyErrorsFilter')
+
+    // TanStack/Vite build: no bundler metadata — including the integration
+    // would tag every event third_party_code=true and beforeSend would drop
+    // them all.
+    expect(
+      getIntegrationNames(buildSentryClientOptions({ includeThirdPartyErrorFilter: false }))
+    ).not.toContain('ThirdPartyErrorsFilter')
+  })
+
+  it('appends build-specific extra integrations', () => {
+    const options = buildSentryClientOptions({
+      includeThirdPartyErrorFilter: false,
+      extraIntegrations: [{ name: 'FakeRouterTracing' }],
+    })
+
+    expect(getIntegrationNames(options)).toContain('FakeRouterTracing')
+  })
+
+  it('builds the same shared options for both builds (parity)', () => {
+    const nextOptions = buildSentryClientOptions({ includeThirdPartyErrorFilter: true })
+    const tanstackOptions = buildSentryClientOptions({ includeThirdPartyErrorFilter: false })
+
+    // Everything except the integrations array must be identical between the
+    // two runtimes.
+    const { integrations: _next, ...nextRest } = nextOptions
+    const { integrations: _tanstack, ...tanstackRest } = tanstackOptions
+    expect(Object.keys(nextRest)).toEqual(Object.keys(tanstackRest))
+    expect(nextRest.tracesSampleRate).toBe(tanstackRest.tracesSampleRate)
+    expect(nextRest.allowUrls).toEqual(tanstackRest.allowUrls)
+    expect(nextRest.ignoreErrors).toEqual(tanstackRest.ignoreErrors)
   })
 })
