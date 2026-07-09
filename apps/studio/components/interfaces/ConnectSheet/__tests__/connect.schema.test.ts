@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest'
 
-import { resolveSteps } from './connect.resolver'
-import { connectSchema, EXTRA_PACKAGES, INSTALL_COMMANDS } from './connect.schema'
-import type { ConnectState } from './Connect.types'
+import { resolveSteps } from '../connect.resolver'
+import { connectSchema, EXTRA_PACKAGES, INSTALL_COMMANDS } from '../connect.schema'
+import type { ConnectState } from '../Connect.types'
 
 // ============================================================================
 // Schema Structure Tests
