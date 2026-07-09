@@ -18,6 +18,7 @@ import {
 import { ActivityForm } from '@/components/quick-add/activity-form'
 import { LeadForm } from '@/components/quick-add/lead-form'
 import { QuoteForm } from '@/components/quick-add/quote-form'
+import { VoiceForm } from '@/components/quick-add/voice-form'
 
 interface QuickAddButtonProps {
   leadOptions: { id: string; name: string; company: string | null }[]
@@ -45,12 +46,16 @@ export function QuickAddButton({ leadOptions }: QuickAddButtonProps) {
         <SheetHeader>
           <SheetTitle>Quick add</SheetTitle>
         </SheetHeader>
-        <Tabs defaultValue="lead" className="mt-2">
-          <TabsList className="grid w-full grid-cols-3">
+        <Tabs defaultValue="voice" className="mt-2">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="voice">Voice</TabsTrigger>
             <TabsTrigger value="lead">Lead</TabsTrigger>
             <TabsTrigger value="quote">Quote</TabsTrigger>
             <TabsTrigger value="activity">Activity</TabsTrigger>
           </TabsList>
+          <TabsContent value="voice" className="pt-4">
+            <VoiceForm leadOptions={leadOptions} onSuccess={handleSuccess} />
+          </TabsContent>
           <TabsContent value="lead" className="pt-4">
             <LeadForm onSuccess={handleSuccess} />
           </TabsContent>

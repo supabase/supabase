@@ -23,7 +23,9 @@ pipeline overview. Phase 1 of a Salesforce/HubSpot-style mobile CRM.
 
 2. Copy `.env.local.example` to `.env.local` and fill in the values printed by
    `supabase status` (`API URL` → `NEXT_PUBLIC_SUPABASE_URL`, `anon key` →
-   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`).
+   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`). Add an `ANTHROPIC_API_KEY` (from
+   https://console.anthropic.com) to enable voice logging — without it every
+   other feature still works, only the "Voice" quick-add tab needs it.
 
 3. From the repo root:
 
@@ -68,10 +70,13 @@ follows:
 3. Add environment variables in the Vercel project settings:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+   - `ANTHROPIC_API_KEY` (for voice logging)
 4. Deploy. Then add the production URL's `/auth/callback` path to the
    Supabase redirect allow list (see above).
 
-## What's here (Phase 1)
+## What's here
+
+### Phase 1
 
 - **Dashboard** (`/`) — revenue this month, quotes sent, win rate,
   follow-ups due, and pipeline by stage.
@@ -81,9 +86,15 @@ follows:
 - **Quick add** — a floating action button opens a bottom sheet with tabs to
   add a lead, quote, or activity from anywhere in the app.
 
-## Next up
+### Phase 2
 
-Per the product plan, Phase 2 adds voice-based logging (speak an update, AI
-drafts a lead/quote/activity entry for review) and a sales calendar for calls
-and meetings. The `activities` table's `due_at` column is already in place to
-support calendar views.
+- **Voice logging** — a "Voice" tab in the quick-add sheet records a spoken
+  update with the browser's Web Speech API (falls back to a plain text box
+  on browsers without support), sends the transcript to Claude
+  (`lib/ai/extract-voice-draft.ts`) to classify it as a lead, quote, or
+  activity and extract its fields, then opens the matching form pre-filled
+  with that draft for the rep to review, correct, and save. Nothing is
+  written to the database until the rep confirms.
+- **Calendar** (`/calendar`) — a week strip + day agenda view of activities
+  with a due date (calls, meetings, follow-ups), with the same "mark done"
+  action as the Activities list.

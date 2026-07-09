@@ -64,3 +64,22 @@ export async function getLeadOptions() {
 
   return data ?? []
 }
+
+export async function getCalendarActivities() {
+  const supabase = await createClient()
+
+  const rangeStart = new Date()
+  rangeStart.setDate(rangeStart.getDate() - 30)
+  const rangeEnd = new Date()
+  rangeEnd.setDate(rangeEnd.getDate() + 60)
+
+  const { data } = await supabase
+    .from('activities')
+    .select('*, leads(name, company)')
+    .not('due_at', 'is', null)
+    .gte('due_at', rangeStart.toISOString())
+    .lte('due_at', rangeEnd.toISOString())
+    .order('due_at', { ascending: true })
+
+  return data ?? []
+}

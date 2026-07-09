@@ -14,15 +14,26 @@ import {
 } from 'ui'
 
 import { createQuote, type ActionState } from '@/lib/actions'
+import type { QuoteStage } from '@/types/database'
 
 const initialState: ActionState = {}
+
+export interface QuoteFormDefaultValues {
+  title?: string
+  amount?: number
+  stage?: QuoteStage
+  valid_until?: string | null
+  notes?: string | null
+  lead_id?: string | null
+}
 
 interface QuoteFormProps {
   leadOptions: { id: string; name: string; company: string | null }[]
   onSuccess: () => void
+  defaultValues?: QuoteFormDefaultValues
 }
 
-export function QuoteForm({ leadOptions, onSuccess }: QuoteFormProps) {
+export function QuoteForm({ leadOptions, onSuccess, defaultValues }: QuoteFormProps) {
   const [state, formAction, pending] = useActionState(createQuote, initialState)
 
   useEffect(() => {
@@ -33,12 +44,18 @@ export function QuoteForm({ leadOptions, onSuccess }: QuoteFormProps) {
     <form action={formAction} className="flex flex-col gap-4">
       <div className="flex flex-col gap-2">
         <Label htmlFor="quote-title">Title</Label>
-        <Input id="quote-title" name="title" placeholder="Annual license renewal" required />
+        <Input
+          id="quote-title"
+          name="title"
+          placeholder="Annual license renewal"
+          defaultValue={defaultValues?.title}
+          required
+        />
       </div>
       {leadOptions.length > 0 && (
         <div className="flex flex-col gap-2">
           <Label htmlFor="quote-lead">Lead</Label>
-          <Select name="lead_id">
+          <Select name="lead_id" defaultValue={defaultValues?.lead_id ?? undefined}>
             <SelectTrigger id="quote-lead">
               <SelectValue placeholder="Not linked to a lead" />
             </SelectTrigger>
@@ -56,11 +73,19 @@ export function QuoteForm({ leadOptions, onSuccess }: QuoteFormProps) {
       <div className="grid grid-cols-2 gap-3">
         <div className="flex flex-col gap-2">
           <Label htmlFor="quote-amount">Amount (USD)</Label>
-          <Input id="quote-amount" name="amount" type="number" min="0" step="0.01" required />
+          <Input
+            id="quote-amount"
+            name="amount"
+            type="number"
+            min="0"
+            step="0.01"
+            defaultValue={defaultValues?.amount}
+            required
+          />
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor="quote-stage">Stage</Label>
-          <Select name="stage" defaultValue="draft">
+          <Select name="stage" defaultValue={defaultValues?.stage ?? 'draft'}>
             <SelectTrigger id="quote-stage">
               <SelectValue />
             </SelectTrigger>
@@ -77,11 +102,16 @@ export function QuoteForm({ leadOptions, onSuccess }: QuoteFormProps) {
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="quote-valid-until">Valid until</Label>
-        <Input id="quote-valid-until" name="valid_until" type="date" />
+        <Input
+          id="quote-valid-until"
+          name="valid_until"
+          type="date"
+          defaultValue={defaultValues?.valid_until ?? undefined}
+        />
       </div>
       <div className="flex flex-col gap-2">
         <Label htmlFor="quote-notes">Notes</Label>
-        <TextArea id="quote-notes" name="notes" rows={3} />
+        <TextArea id="quote-notes" name="notes" rows={3} defaultValue={defaultValues?.notes ?? undefined} />
       </div>
       {state.error && <p className="text-sm text-destructive-600">{state.error}</p>}
       <Button type="submit" block loading={pending}>

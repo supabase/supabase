@@ -1,6 +1,6 @@
 'use client'
 
-import { BarChart3, ListChecks, Receipt, Users } from 'lucide-react'
+import { BarChart3, Calendar, ListChecks, Receipt, Users } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from 'ui'
@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { href: '/leads', label: 'Leads', icon: Users },
   { href: '/quotes', label: 'Quotes', icon: Receipt },
   { href: '/activities', label: 'Activities', icon: ListChecks },
+  { href: '/calendar', label: 'Calendar', icon: Calendar },
 ]
 
 export function BottomNav() {

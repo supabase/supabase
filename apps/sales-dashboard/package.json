@@ -13,8 +13,10 @@
     "clean": "rimraf node_modules .next .turbo"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^4.0.8",
     "@supabase/ssr": "catalog:",
     "@supabase/supabase-js": "catalog:",
+    "ai": "^7.0.15",
     "common": "workspace:*",
     "config": "workspace:*",
     "lucide-react": "^0.436.0",
@@ -22,7 +24,8 @@
     "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "ui": "workspace:*"
+    "ui": "workspace:*",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.4",
