@@ -723,7 +723,11 @@ describe('project creation wizard', () => {
 
       await renderWizard()
 
-      fireEvent.click(await screen.findByRole('button', { name: 'Choose GitHub repository' }))
+      // The GitHub field is gated behind the permissions, entitlements, and GitHub
+      // auth/repos queries resolving in sequence, so allow longer than the default 1s.
+      fireEvent.click(
+        await screen.findByRole('button', { name: 'Choose GitHub repository' }, { timeout: 5000 })
+      )
       await user.click(await screen.findByText('my-org/my-repo'))
 
       await waitFor(() =>
