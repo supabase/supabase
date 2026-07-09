@@ -103,6 +103,18 @@
   box-sizing: inherit;
 }
 
+/*
+  The persistent-scrollbar rules that keep .rdg's scrollbar grabbable on
+  macOS (https://github.com/supabase/supabase/issues/44369) live in
+  globals.css so every data grid in Studio shares one definition. Override
+  just the size here for a slightly larger thumb on the grid's own scroll
+  area.
+*/
+.rdg {
+  --persistent-scrollbar-size: 10px;
+  --persistent-scrollbar-radius: 5px;
+}
+
 @supports not (contain: strict) {
   .rdg {
     position: relative;
