@@ -6,7 +6,9 @@ import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'
 import { tempRemovePostgrestText } from './Content.utils'
+import { getSchemaQualifiedEntity } from '@/components/interfaces/Docs/Snippets'
 import Table from '@/components/to-be-cleaned/Table'
+import { useExposedSchemasQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectJsonSchemaQuery } from '@/data/docs/project-json-schema-query'
 import { useAppStateSnapshot } from '@/state/app-state'
 
@@ -34,8 +36,19 @@ export const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) =
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
   const resource = snap.activeDocsSection[1]
+  const { data: exposedSchemas = ['public'], isSuccess: areSchemasReady } = useExposedSchemasQuery({
+    projectRef: ref,
+  })
 
-  const { data: jsonSchema, refetch } = useProjectJsonSchemaQuery({ projectRef: ref })
+  const { data: jsonSchema, refetch } = useProjectJsonSchemaQuery(
+    {
+      projectRef: ref,
+      schemas: exposedSchemas,
+    },
+    { enabled: areSchemasReady }
+  )
+  const { name: resourceName, schema: resourceSchema } =
+    resource !== undefined ? getSchemaQualifiedEntity(resource) : { name: '', schema: 'public' }
 
   const definition = jsonSchema?.definitions?.[resource]
   const columns =
@@ -95,7 +108,8 @@ export const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) =
         selectedLanguage={language}
         snippet={DOCS_RESOURCE_CONTENT.readRows}
         codeSnippets={DOCS_RESOURCE_CONTENT.readRows.code({
-          resourceId: resource,
+          resourceId: resourceName,
+          schema: resourceSchema,
           endpoint,
           apikey,
         })}
@@ -104,7 +118,8 @@ export const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) =
         selectedLanguage={language}
         snippet={DOCS_RESOURCE_CONTENT.filtering}
         codeSnippets={DOCS_RESOURCE_CONTENT.filtering.code({
-          resourceId: resource,
+          resourceId: resourceName,
+          schema: resourceSchema,
           endpoint,
           apikey,
         })}
@@ -113,7 +128,8 @@ export const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) =
         selectedLanguage={language}
         snippet={DOCS_RESOURCE_CONTENT.insertRows}
         codeSnippets={DOCS_RESOURCE_CONTENT.insertRows.code({
-          resourceId: resource,
+          resourceId: resourceName,
+          schema: resourceSchema,
           endpoint,
           apikey,
         })}
@@ -122,7 +138,8 @@ export const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) =
         selectedLanguage={language}
         snippet={DOCS_RESOURCE_CONTENT.updateRows}
         codeSnippets={DOCS_RESOURCE_CONTENT.updateRows.code({
-          resourceId: resource,
+          resourceId: resourceName,
+          schema: resourceSchema,
           endpoint,
           apikey,
         })}
@@ -131,7 +148,8 @@ export const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) =
         selectedLanguage={language}
         snippet={DOCS_RESOURCE_CONTENT.deleteRows}
         codeSnippets={DOCS_RESOURCE_CONTENT.deleteRows.code({
-          resourceId: resource,
+          resourceId: resourceName,
+          schema: resourceSchema,
           endpoint,
           apikey,
         })}
@@ -139,7 +157,10 @@ export const Entity = ({ language, apikey = '', endpoint = '' }: ContentProps) =
       <ResourceContent
         selectedLanguage={language}
         snippet={DOCS_RESOURCE_CONTENT.subscribeChanges}
-        codeSnippets={DOCS_RESOURCE_CONTENT.subscribeChanges.code({ resourceId: resource })}
+        codeSnippets={DOCS_RESOURCE_CONTENT.subscribeChanges.code({
+          resourceId: resourceName,
+          schema: resourceSchema,
+        })}
       />
     </div>
   )

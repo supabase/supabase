@@ -1,10 +1,10 @@
 import { useParams } from 'common'
 
 import { DocSection } from './DocSection'
+import Snippets, { getSchemaQualifiedEntity } from './Snippets'
 import CodeSnippet from '@/components/interfaces/Docs/CodeSnippet'
 import Description from '@/components/interfaces/Docs/Description'
 import Param from '@/components/interfaces/Docs/Param'
-import Snippets from '@/components/interfaces/Docs/Snippets'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { ProjectJsonSchemaPaths } from '@/data/docs/project-json-schema-query'
 
@@ -39,6 +39,7 @@ export const RpcContent = ({
   const pathKey = `/rpc/${rpcId}`
   const path = paths && pathKey in paths ? paths[pathKey] : undefined
   const keyToShow = !!showApiKey ? showApiKey : 'SUPABASE_KEY'
+  const { name: rpcName, schema: rpcSchema } = getSchemaQualifiedEntity(rpcId)
 
   const { parameters, summary } = path?.post || {}
   const rpcParamsObject =
@@ -67,12 +68,13 @@ export const RpcContent = ({
           <CodeSnippet
             selectedLang={selectedLang}
             snippet={Snippets.rpcSingle({
-              rpcName: rpcId,
+              rpcName,
               // @ts-ignore
               rpcCamelCase: meta.camelCase,
               rpcParams: rpcParams,
               apiKey: keyToShow,
               endpoint: endpoint,
+              schema: rpcSchema,
             })}
           />
         }

@@ -10,8 +10,12 @@ import { RpcContent } from '@/components/interfaces/Docs/RpcContent'
 import { buildEntityMaps } from '@/components/interfaces/Integrations/DataApi/DataApi.utils'
 import { DocViewError } from '@/components/interfaces/Integrations/DataApi/DocViewError'
 import { DocViewLoading } from '@/components/interfaces/Integrations/DataApi/DocViewLoading'
+import { useExposedSchemasQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useProjectJsonSchemaQuery } from '@/data/docs/project-json-schema-query'
+import {
+  ProjectJsonSchemaPaths,
+  useProjectJsonSchemaQuery,
+} from '@/data/docs/project-json-schema-query'
 
 interface DocViewProps {
   selectedLang: 'js' | 'bash'
@@ -24,13 +28,22 @@ export const DocView = ({ selectedLang, selectedApiKey }: DocViewProps) => {
 
   const { data: settings, error: settingsError } = useProjectSettingsV2Query({ projectRef })
   const {
+    data: exposedSchemas,
+    error: exposedSchemasError,
+    isPending: isExposedSchemasPending,
+    isSuccess: areExposedSchemasReady,
+  } = useExposedSchemasQuery({ projectRef })
+  const {
     data: jsonSchema,
     error: jsonSchemaError,
     isPending: isLoading,
     refetch,
-  } = useProjectJsonSchemaQuery({ projectRef })
+  } = useProjectJsonSchemaQuery(
+    { projectRef, schemas: exposedSchemas },
+    { enabled: areExposedSchemasReady }
+  )
 
-  const { paths } = jsonSchema || {}
+  const paths: ProjectJsonSchemaPaths = jsonSchema?.paths ?? {}
   const PAGE_KEY = resource || rpc || page || 'index'
 
   const { resources, rpcs } = buildEntityMaps(paths)
@@ -56,11 +69,11 @@ export const DocView = ({ selectedLang, selectedApiKey }: DocViewProps) => {
     router,
   ])
 
-  if (settingsError || jsonSchemaError) {
-    return <DocViewError error={settingsError || jsonSchemaError} />
+  if (settingsError || exposedSchemasError || jsonSchemaError) {
+    return <DocViewError error={settingsError || exposedSchemasError || jsonSchemaError} />
   }
 
-  if (isLoading || !settings || !jsonSchema) {
+  if (isExposedSchemasPending || isLoading || !settings || !jsonSchema) {
     return <DocViewLoading />
   }
 
@@ -72,6 +85,8 @@ export const DocView = ({ selectedLang, selectedApiKey }: DocViewProps) => {
             selectedLang={selectedLang}
             resourceId={resource}
             resources={resources}
+            definitions={jsonSchema.definitions}
+            paths={paths}
             showApiKey={selectedApiKey.key}
             refreshDocs={refetch}
           />

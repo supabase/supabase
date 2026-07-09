@@ -1,69 +1,115 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { openApiKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import {
+  getProjectJsonSchemaForSchema,
+  getQualifiedEntityName,
+  getQualifiedPath,
+  getTargetSchemas,
+  isAbortError,
+  mergeSchemaResponses,
+  type ProjectJsonSchemaResponse,
+} from '@/data/docs/project-json-schema-query'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type OpenAPISpecVariables = {
   projectRef?: string
+  schemas?: string[]
 }
 
 export type OpenAPISpecResponse = {
-  data: any
+  data: ProjectJsonSchemaResponse
   tables: any[]
   functions: any[]
 }
 
-export async function getOpenAPISpec({ projectRef }: OpenAPISpecVariables, signal?: AbortSignal) {
+export async function getOpenAPISpec(
+  { projectRef, schemas }: OpenAPISpecVariables,
+  signal?: AbortSignal
+) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const { data, error } = await get(`/platform/projects/{ref}/api/rest`, {
-    params: { path: { ref: projectRef } },
-    signal,
+  const targetSchemas = getTargetSchemas(schemas)
+  const settledSchemaSpecs = await Promise.allSettled(
+    targetSchemas.map(async (schema) => ({
+      schema,
+      data: await getProjectJsonSchemaForSchema({ projectRef, schema }, signal),
+    }))
+  )
+
+  const abortedResult = settledSchemaSpecs.find(
+    (result) => result.status === 'rejected' && isAbortError(result.reason)
+  )
+
+  if (abortedResult?.status === 'rejected') {
+    throw abortedResult.reason
+  }
+
+  settledSchemaSpecs.forEach((result, index) => {
+    if (result.status === 'rejected') {
+      console.warn(`Failed to fetch OpenAPI spec for "${targetSchemas[index]}"`, result.reason)
+    }
   })
 
-  if (error) handleError(error)
+  const schemaSpecs = settledSchemaSpecs.flatMap((result) =>
+    result.status === 'fulfilled' ? [result.value] : []
+  )
 
-  const definitions = (data as any).definitions
-  const tables = definitions
-    ? Object.entries(definitions).map(([key, table]: any) => ({
-        ...table,
-        name: key,
-        fields: Object.entries(table.properties || {}).map(([key, field]: any) => ({
-          ...field,
-          name: key,
-        })),
-      }))
-    : []
+  if (schemaSpecs.length === 0) {
+    const firstRejection = settledSchemaSpecs.find((result) => result.status === 'rejected')
+    throw firstRejection?.reason ?? new Error('Failed to fetch OpenAPI spec')
+  }
 
-  const paths = (data as any).paths
-  const functions = paths
-    ? Object.entries(paths)
-        .map(([path, value]: any) => ({
-          ...value,
-          path,
-          name: path.replace('/rpc/', ''),
-        }))
-        .filter((x) => x.path.includes('/rpc'))
-        .sort((a, b) => a.name.localeCompare(b.name))
-    : []
+  const mergedData = mergeSchemaResponses(schemaSpecs, targetSchemas)
 
-  return { data: data, tables, functions }
+  const tables = schemaSpecs.flatMap(({ data, schema }) =>
+    Object.entries<any>(data?.definitions ?? {}).map(([name, table]) => ({
+      ...table,
+      schema,
+      name: getQualifiedEntityName(schema, name, targetSchemas),
+      entityName: name,
+      fields: Object.entries(table.properties || {}).map(([fieldName, field]: any) => ({
+        ...field,
+        name: fieldName,
+      })),
+    }))
+  )
+
+  const functions = schemaSpecs
+    .flatMap(({ data, schema }) =>
+      Object.entries<any>(data?.paths ?? {})
+        .map(([path, value]) => {
+          if (!path.startsWith('/rpc/')) return null
+
+          const functionName = path.replace('/rpc/', '')
+          return {
+            ...value,
+            schema,
+            path: getQualifiedPath(schema, path, targetSchemas),
+            name: getQualifiedEntityName(schema, functionName, targetSchemas),
+            entityName: functionName,
+          }
+        })
+        .filter((value): value is NonNullable<typeof value> => value !== null)
+    )
+    .sort((a, b) => a.name.localeCompare(b.name))
+
+  return { data: mergedData, tables, functions }
 }
 
 export type OpenAPISpecData = Awaited<OpenAPISpecResponse>
 export type OpenAPISpecError = ResponseError
 
 export const useOpenAPISpecQuery = <TData = OpenAPISpecData>(
-  { projectRef }: OpenAPISpecVariables,
+  { projectRef, schemas }: OpenAPISpecVariables,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<OpenAPISpecData, OpenAPISpecError, TData> = {}
 ) =>
   useQuery<OpenAPISpecData, OpenAPISpecError, TData>({
-    queryKey: openApiKeys.apiSpec(projectRef),
-    queryFn: ({ signal }) => getOpenAPISpec({ projectRef }, signal),
+    queryKey: openApiKeys.apiSpec(projectRef, schemas),
+    queryFn: ({ signal }) => getOpenAPISpec({ projectRef, schemas }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...options,
   })

@@ -44,6 +44,11 @@ export async function getProjectPostgrestConfig(
 export type ProjectPostgrestConfigData = Awaited<ReturnType<typeof getProjectPostgrestConfig>>
 export type ProjectPostgrestConfigError = ResponseError
 
+type UseExposedSchemasQueryOptions = Omit<
+  UseCustomQueryOptions<ProjectPostgrestConfigData, ProjectPostgrestConfigError, string[]>,
+  'select'
+>
+
 export const useProjectPostgrestConfigQuery = <TData = ProjectPostgrestConfigData>(
   { projectRef }: ProjectPostgrestConfigVariables,
   {
@@ -57,3 +62,16 @@ export const useProjectPostgrestConfigQuery = <TData = ProjectPostgrestConfigDat
     enabled: enabled && typeof projectRef !== 'undefined',
     ...options,
   })
+
+export const useExposedSchemasQuery = (
+  { projectRef }: ProjectPostgrestConfigVariables,
+  { enabled = true, ...options }: UseExposedSchemasQueryOptions = {}
+) =>
+  useProjectPostgrestConfigQuery(
+    { projectRef },
+    {
+      enabled,
+      select: ({ db_schema }) => parseDbSchemaString(db_schema ?? ''),
+      ...options,
+    }
+  )
