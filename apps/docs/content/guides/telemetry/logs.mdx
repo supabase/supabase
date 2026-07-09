@@ -353,6 +353,18 @@ from
   cross join unnest(m.request) as r;
 ```
 
+3. Query one source at a time
+
+Identify which service owns the problem from the error or status code first, then query only that source. Scanning every source at once buries the signal you need and scans far more data than the investigation requires.
+
+4. Follow a request across sources with an anchor
+
+Once a query gives you an anchor such as a timestamp, request id, or SQL state, filter the adjacent source by that anchor to correlate the request across layers (for example `edge_logs` to `postgres_logs`), instead of re-scanning each source from scratch.
+
+5. Reference only fields you have confirmed
+
+A misspelled or non-existent field name either errors or silently returns nothing, which makes a working query look empty. Confirm field names in the [field reference](#logs-field-reference), or select `event_message` and inspect a sample row first.
+
 ### Examples and templates
 
 The Logs Explorer includes **Templates** (available in the Templates tab or the dropdown in the Query tab) to help you get started.
