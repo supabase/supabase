@@ -121,7 +121,21 @@ export const DeleteProjectModal = ({
         title: isFree
           ? 'This action cannot be undone.'
           : `This will permanently delete the ${project?.name}`,
-        description: !isFree ? `All project data will be lost, and cannot be undone` : '',
+        description: (
+          <>
+            {!isFree && 'All project data will be lost, and cannot be undone. '}
+            Read the{' '}
+            <a
+              href="https://supabase.com/docs/guides/platform/delete-project"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-foreground"
+            >
+              documentation
+            </a>{' '}
+            for prerequisites, implications, and recovery information.
+          </>
+        ),
       }}
       text={
         isFree

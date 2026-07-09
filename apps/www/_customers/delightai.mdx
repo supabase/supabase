@@ -1,0 +1,149 @@
+---
+name: delight.ai
+title: How delight.ai lets every team build production apps on Supabase
+# Use meta_title to add a custom meta title. Otherwise it defaults to '{name} | Supabase Customer Stories':
+# meta_title:
+description: delight.ai builds AI agents for customer experience. With Supabase, Vercel, and Claude Code, every team at the 220-person company ships its own production apps, without pulling engineers off the core product.
+# Use meta_description to add a custom meta description. Otherwise it defaults to {description}:
+meta_description: How delight.ai runs one Supabase project per team, about 20 to 25 projects powering more than 200 internal apps, so non-engineers can build production tools with Claude Code and Vercel.
+author: prashant
+author_title: Prashant Sridharan
+author_url: https://github.com/CoolAssPuppy
+author_image_url: https://avatars.githubusercontent.com/u/914007?v=4
+logo: /images/customers/logos/delightai.svg
+logo_inverse: /images/customers/logos/light/delightai.svg
+tags:
+  - supabase
+date: '2026-07-08'
+company_url: https://delight.ai
+misc:
+  - { label: 'Company size', text: '~220 employees' }
+  - {
+      label: 'Use case',
+      text: 'Internal app building across departments on managed Postgres, behind apps hosted on Vercel and built with Claude Code',
+    }
+  - {
+      label: 'Products used',
+      text: 'Postgres, preview branches, backups, default RLS; exploring Auth',
+    }
+about: 'delight.ai builds AI agents for customer experience, one of the most crowded categories in AI. It differentiates on infrastructure most competitors have not built: an Agent Memory Platform that forms a living understanding of each customer, a Trust OS for observability and control, and Agent Steward, an agentic approach to complex, multi-step problems. It serves mid-market and enterprise brands across retail, travel, on-demand services, B2B SaaS, fintech, and healthcare.'
+# "healthcare" | "fintech" | "ecommerce" | "education" | "gaming" | "media" | "real-estate" | "saas" | "social" | "analytics" | "ai" | "developer-tools"
+industry: ['ai', 'saas']
+# "startup" | "enterprise" | "indie_dev"
+company_size: 'startup'
+# "Asia" | "Europe" | "North America" | "South America" | "Africa" | "Oceania"
+region: 'North America'
+# "database" | "auth" | "storage" | "realtime" | "functions" | "vector"
+supabase_products: ['database', 'auth']
+---
+
+<Quote img="abhi-jothilingam-delightai.jpeg" caption="Abhi Jothilingam, Head of Growth, delight.ai">
+  I call it the holy trinity: Claude Code, Vercel, and Supabase. With those three things you can
+  build virtually any idea you have. Once you've got Vercel and Supabase connected to Claude Code,
+  everything becomes easier.
+</Quote>
+
+[delight.ai](https://delight.ai) builds AI agents for customer experience, one of the most crowded categories in AI. It differentiates on infrastructure most competitors have not built. An [Agent Memory Platform](https://delight.ai/product-release/agent-memory-platform) forms a living understanding of each customer from every conversation, instead of relying on static CRM records. Trust OS gives teams observability into the agent's reasoning and control over its behavior. And [Agent Steward](https://delight.ai/product-release/agent-steward), an agentic approach to complex, multi-step problems, handles cases a single conversation cannot resolve on its own.
+
+Agent Steward is easiest to see in practice. Most AI agents stop at tier-one tickets like "where is my order." delight.ai goes further. When an order is canceled, Agent Steward dispatches specialized sub-agents to work the case in parallel, contacting the restaurant and the driver at the same time, and it holds the case open until it is resolved instead of leaving the customer waiting on a single thread. delight.ai serves [mid-market and enterprise brands](https://delight.ai/customers) across retail, travel, on-demand services, B2B SaaS, fintech, and healthcare.
+
+## The challenge
+
+delight.ai's teams are building automations for every team in the company: go-to-market, sales, forward deployed engineering, customer success, recruiting, and more. Most of those tools do not justify pulling an engineer off building the product. They need a fast way to stand up an app with a real database behind it, built by the people closest to the problem, who are often not engineers.
+
+Abhi Jothilingam leads growth, covering ABM and paid media. Six months ago, building software was not part of his job.
+
+<Quote img="abhi-jothilingam-delightai.jpeg" caption="Abhi Jothilingam, Head of Growth, delight.ai">
+  It was zero. I'd never thought about building an app before Claude Code. I used to be really proud
+  of the Google Sheets I created, but I was limited to Google Sheets. I'd have ideas and workflows,
+  but it was all manual.
+</Quote>
+
+The shift, once AI coding tools arrived, was sudden. In six months, Jothilingam went from having never heard of GitHub or a pull request to pushing apps that have transformed the efficiency and efficacy of the delight.ai business.
+
+## Why they chose Supabase
+
+The team had already standardized on Vercel for hosting and Claude Code for building. They needed a database that fit cleanly into that workflow, so anyone could build with AI coding tools and still have a production Postgres database behind their app. For Abhi, the appeal was how little he had to think about it.
+
+Abhi can build almost anything he imagines. But dozens of non-engineers shipping their own apps only works if someone makes that building fast, consistent, and safe. That is the engineering side of the story. Ishaan Bansal, an AI engineer at delight.ai, wired the workflow together so the rest of the company could move quickly without breaking things. For him, the deciding factor was branching.
+
+<Quote img="ishaan-bansal-delightai.jpeg" caption="Ishaan Bansal, AI Engineer, delight.ai">
+  The main reason we chose Supabase was the branching feature. Nobody really tests their code
+  locally when they're building these internal apps. Claude Code opens a PR, it deploys to Vercel as
+  a preview link, and it spins up a preview database in Supabase with a dump of our prod or staging
+  data. So it's almost like you're testing on prod. There's never this gap where the app works on my
+  computer but not for anyone else.
+</Quote>
+
+## The solution: one Supabase project per team
+
+Each team gets one Supabase project, connected through the Supabase integration on the Vercel Marketplace, so builders do not manage credentials by hand. Today the team runs about 20 to 25 Supabase projects across the org, and together they power more than 200 apps. Because a team's apps all share one project, they draw on the same underlying data instead of each app duplicating it.
+
+That sharing comes down to how the code is organized. Prisma is the ORM, and it sits at the root of a single monorepo that manages all of a team's apps. With the ORM at the root, every app can share tables and run migrations without stepping on each other.
+
+The integrations are what tie the workflow together. Supabase branches, along with the GitHub and Vercel integrations, keep the developer experience smooth. And because so many builders are non-engineers building their own tools, the team leans on Supabase guardrails to protect data.
+
+<Quote img="ishaan-bansal-delightai.jpeg" caption="Ishaan Bansal, AI Engineer, delight.ai">
+  We're using the default RLS in Supabase. And because of vibe coding, we were scared someone might
+  just drop a table. So there's that feature where you can restore data from within the last 30
+  days. We use that too.
+</Quote>
+
+Security shaped how they expose these apps. Internal tools sit behind Vercel deployment protection and are reachable only from devices on the company VPN. The harder case is apps meant for people outside the company.
+
+<Quote img="ishaan-bansal-delightai.jpeg" caption="Ishaan Bansal, AI Engineer, delight.ai">
+  Sometimes a team has an app where they want to put it in front of people outside our company.
+  That's the part that's tricky, because we can't use Vercel deployment protection there. That's
+  where we're starting to explore Supabase Auth.
+</Quote>
+
+With Supabase Auth, adding support for Google Single Sign-On or tools like Okta is just a few steps of configuration.
+
+## What delight.ai teams are building
+
+The apps span the company. Recruiting, forward-deployed engineering, sales, finance, and customer success each run their own Supabase. Customer success built an internal version of Gainsight. Growth built two of the most-used tools:
+
+- An ABM geo-intelligence app that plots target accounts and contacts on a map of the US, with about 40,000 contacts and accounts loaded into Supabase, so the team can see where accounts cluster and plan field events around them.
+- Buzzboard, an internal answer to Sprout Social Employee Advocacy. When delight.ai launches a feature or runs an event, everything related to it lands in Buzzboard, and employees can grab a post and share it on LinkedIn. A company-wide, gamified lead report keeps it competitive.
+
+## The results
+
+The change is less about any single app than about how the team thinks.
+
+<Quote img="abhi-jothilingam-delightai.jpeg" caption="Abhi Jothilingam, Head of Growth, delight.ai">
+  I used to think in terms of writing a report to document what was needed. Now I just think, okay,
+  what can I vibe code to solve this? That mindset shift has been super powerful.
+</Quote>
+
+The time savings are concrete.
+
+<Quote img="abhi-jothilingam-delightai.jpeg" caption="Abhi Jothilingam, Head of Growth, delight.ai">
+  Competitor analysis used to take forever. Now we store the data on Supabase, then come back to
+  Vercel and Claude Code to visualize and present it. It's saved us a ton of time.
+</Quote>
+
+What the team can see so far:
+
+- More internal apps in production than employees, built by teams across the company rather than a central engineering group.
+- One Supabase project per team, about 20 to 25 projects powering more than 200 apps, keeps each team's data shared and easy to govern.
+- Preview branches seeded with prod data mean apps work for everyone on day one, not just on the builder's machine.
+- Default RLS and 30-day backups protect data created by non-engineers.
+
+## What's next
+
+Having gotten every team onto an app, delight.ai is now consolidating. At a 220-person company with more internal apps than employees, the push is toward one app that does many things instead of many apps that each do one, modeled on Ramp's single pane of glass. The team is also making each team space headless, so the work happens inside Claude rather than on a website. A GTM space with its own MCP lets someone add a field marketing event or a Buzzboard campaign without leaving Claude.
+
+The longer arc runs from connected AI, where every enterprise tool is wired into Claude, to autonomous agents that do the work on their own. Getting there depended on a lesson the team learned the hard way: standardize the infrastructure early, before AI coding tools scatter apps across half a dozen backends.
+
+<Quote img="ishaan-bansal-delightai.jpeg" caption="Ishaan Bansal, AI Engineer, delight.ai">
+  When I came into this job, we had apps deployed on many products along with Supabase. It was all
+  over the place. If you just let Claude decide for you, you end up with apps everywhere, accessible
+  on the public internet. With AI you can do anything, but having a standard path as an enterprise
+  company is still important. Supabase has the features to help us make that happen.
+</Quote>
+
+<Quote img="abhi-jothilingam-delightai.jpeg" caption="Abhi Jothilingam, Head of Growth, delight.ai">
+  Nothing's gone wrong so far. We love Supabase. We love that it's scalable too. We just spin up a
+  bunch of mini projects, and when one needs to expand or add capabilities, it's very reasonable and
+  very easy to do.
+</Quote>

@@ -80,7 +80,7 @@ export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean })
 
   const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
     onSuccess: () => {
-      toast.success('Successfully deleted GitHub connection')
+      toast.success('GitHub connection deleted')
     },
   })
 
@@ -96,6 +96,10 @@ export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean })
   useShortcut(SHORTCUT_IDS.ORG_INTEGRATIONS_ADD_CONNECTION, onAddGitHubConnection, {
     enabled: !isProjectScoped && canCreateGitHubConnection,
   })
+
+  const description = isProjectScoped
+    ? 'Connect this Supabase project to a GitHub repository. Supabase applies database changes when you merge into your production branch. If branching is enabled, each pull request gets its own preview database.'
+    : 'Connect GitHub repositories to Supabase projects in this organization. The Supabase GitHub app watches file, branch, and pull request activity in each connected repository.'
 
   const onDeleteGitHubConnection = useCallback(
     async (connection: IntegrationProjectConnection) => {
@@ -118,14 +122,8 @@ export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean })
         <div className="flex flex-1 items-start gap-6">
           <IntegrationSectionIcon title="github" />
           <PageSectionSummary>
-            <PageSectionTitle>
-              {isProjectScoped ? 'GitHub Integration' : 'GitHub Connections'}
-            </PageSectionTitle>
-            <PageSectionDescription>
-              {isProjectScoped
-                ? 'Connect any of your GitHub repositories to a project. Supabase applies database changes when you merge into your production branch. If branching is enabled, each pull request gets its own preview database.'
-                : 'Connect any of your GitHub repositories to a project. The GitHub app watches file, branch, and pull request activity in your repository.'}
-            </PageSectionDescription>
+            <PageSectionTitle>GitHub</PageSectionTitle>
+            <PageSectionDescription>{description}</PageSectionDescription>
           </PageSectionSummary>
         </div>
       </PageSectionMeta>
@@ -133,7 +131,7 @@ export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean })
         {isLoadingPermissions ? (
           <GenericSkeletonLoader />
         ) : !canReadGitHubConnection ? (
-          <NoPermission resourceText="view this organization's GitHub connections" />
+          <NoPermission resourceText="view GitHub connections" />
         ) : isProjectScoped ? (
           <GitHubIntegrationConnectionForm connection={existingConnection} />
         ) : (
@@ -162,7 +160,7 @@ export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean })
 
             {gitHubAuthorization && (
               <p className="text-sm text-foreground-light">
-                You are authorized with the Supabase GitHub App. You can configure your{' '}
+                You are authorized with the Supabase GitHub app. You can configure your{' '}
                 <InlineLink href={GITHUB_INTEGRATION_INSTALLATION_URL}>
                   GitHub App installations and repository access
                 </InlineLink>

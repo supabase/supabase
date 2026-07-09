@@ -330,7 +330,7 @@ export const PolicyEditorPanel = memo(function ({
               showClose={false}
               size={showTools ? 'lg' : 'default'}
               className={cn(
-                'bg-surface-200 p-0 flex flex-row gap-0',
+                'bg-popover p-0 flex flex-row gap-0',
                 showTools ? 'min-w-screen! lg:min-w-[1000px]!' : 'min-w-screen! lg:min-w-[600px]!'
               )}
             >
