@@ -21,6 +21,7 @@ const pgTypeZod = z.object({
 })
 
 const pgTypeArrayZod = z.array(pgTypeZod)
+export type PGType = z.infer<typeof pgTypeZod>
 
 function list({
   includeArrayTypes = false,
@@ -68,7 +69,4 @@ function list({
   }
 }
 
-export default {
-  list,
-  zod: pgTypeZod,
-}
+export { list }
