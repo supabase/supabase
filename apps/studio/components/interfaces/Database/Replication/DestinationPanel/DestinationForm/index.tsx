@@ -299,24 +299,11 @@ export const DestinationForm = ({
     })
   }
 
-  // Sync the form with freshly loaded edit-mode data, but never once the user has started
-  // changing values — a background refetch of destinationData/pipelineData must not clobber
-  // in-progress edits.
   useEffect(() => {
-    if (editMode && destinationData && pipelineData && !form.formState.isDirty) {
-      form.reset(defaultValues)
-    }
-  }, [destinationData, pipelineData, editMode, defaultValues, form])
-
-  // Reset the form only when the panel transitions from closed to open, not on every
-  // subsequent defaultValues recompute (e.g. a background refetch) while it stays open.
-  const wasVisibleRef = useRef(false)
-  useEffect(() => {
-    if (visible && !wasVisibleRef.current) {
+    if (visible && !form.formState.isDirty) {
       form.reset(defaultValues)
       resetValidation()
     }
-    wasVisibleRef.current = visible
   }, [visible, defaultValues, form, resetValidation])
 
   useEffect(() => {
