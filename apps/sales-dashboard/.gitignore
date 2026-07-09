@@ -1,0 +1,19 @@
+# Dependencies
+/node_modules
+
+# Next.js
+/.next/
+/out/
+next-env.d.ts
+
+# Production
+/build
+
+# Misc
+.DS_Store
+*.tsbuildinfo
+.turbo
+
+# Env
+.env
+.env*.local
