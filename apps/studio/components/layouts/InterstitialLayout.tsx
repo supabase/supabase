@@ -128,10 +128,20 @@ export const LogoPair = ({ left, right }: { left: ReactNode; right: ReactNode })
   </div>
 )
 
-/** Partner logo rendered edge-to-edge inside a LogoBox. */
-export const PartnerLogo = ({ src, alt }: { src: string; alt: string }) => (
-  <LogoBox>
-    <img alt={alt} src={src} className="size-full object-cover" />
+/** Partner logo rendered edge-to-edge inside a LogoBox by default. */
+export const PartnerLogo = ({
+  src,
+  alt,
+  className,
+  imageClassName,
+}: {
+  src: string
+  alt: string
+  className?: string
+  imageClassName?: string
+}) => (
+  <LogoBox className={className}>
+    <img alt={alt} src={src} className={cn('size-full object-cover', imageClassName)} />
   </LogoBox>
 )
 

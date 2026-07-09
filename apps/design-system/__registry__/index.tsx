@@ -159,6 +159,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "admonition-button-split": {
+      name: "admonition-button-split",
+      type: "components:example",
+      registryDependencies: ["admonition","button","dropdown-menu"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-button-split")),
+      source: "",
+      files: ["registry/default/example/admonition-button-split.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "admonition-description-only": {
       name: "admonition-description-only",
       type: "components:example",
@@ -573,6 +584,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/button-as-child")),
       source: "",
       files: ["registry/default/example/button-as-child.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "button-split-dropdown": {
+      name: "button-split-dropdown",
+      type: "components:example",
+      registryDependencies: ["button","dropdown-menu"],
+      component: React.lazy(() => import("@/registry/default/example/button-split-dropdown")),
+      source: "",
+      files: ["registry/default/example/button-split-dropdown.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

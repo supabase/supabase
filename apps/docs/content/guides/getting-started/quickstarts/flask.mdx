@@ -2,150 +2,103 @@
 title: 'Use Supabase with Python'
 subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Python app.'
 breadcrumb: 'Framework Quickstarts'
-hideToc: true
 ---
 
-<StepHikeCompact>
+<$Partial path="quickstart_db_setup.mdx" />
 
-  <StepHikeCompact.Step step={1}>
+## 3. Create a Python app with Flask
 
-    <$Partial path="quickstart_db_setup.mdx" />
+Create a new directory for your Python app and set up a virtual environment.
 
-  </StepHikeCompact.Step>
+```bash
+mkdir my-app && cd my-app
+python3 -m venv venv
+source venv/bin/activate
+```
 
-  <StepHikeCompact.Step step={2}>
+## 4. Install Agent Skills (optional)
 
-    <StepHikeCompact.Details title="Create a Python app with Flask">
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
 
-    Create a new directory for your Python app and set up a virtual environment.
+To install, run the following command in the root of your project:
 
-    </StepHikeCompact.Details>
+```bash
+npx skills add supabase/agent-skills
+```
 
-    <StepHikeCompact.Code>
+## 5. Install Flask and the Supabase client library
 
-      ```bash name=Terminal
-      mkdir my-app && cd my-app
-      python3 -m venv venv
-      source venv/bin/activate
-      ```
+The fastest way to get started is to use Flask for the web framework and the `supabase-py` client library which provides a convenient interface for working with Supabase from a Python app.
 
-    </StepHikeCompact.Code>
+Install both packages using pip.
 
-  </StepHikeCompact.Step>
+```bash
+pip install flask supabase
+```
 
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Install Flask and the Supabase client library">
+## 6. Create environment variables file
 
-    The fastest way to get started is to use Flask for the web framework and the `supabase-py` client library which provides a convenient interface for working with Supabase from a Python app.
+Create a `.env` file in your project root and populate it with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true):
 
-    Install both packages using pip.
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true">Open Connect panel</a>
+</Button>
 
-    </StepHikeCompact.Details>
+```text name=.env
+SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+```
 
-    <StepHikeCompact.Code>
+<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
 
-      ```bash name=Terminal
-      pip install flask supabase
-      ```
+## 7. Query data from the app
 
-    </StepHikeCompact.Code>
+Install the `python-dotenv` package to load environment variables:
 
-  </StepHikeCompact.Step>
+```bash
+pip install python-dotenv
+```
 
-  <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Create Environment Variables file">
+Create an `app.py` file and add a route that fetches data from your `instruments` table using the Supabase client.
 
-    Create a `.env` file in your project root and populate it with your Supabase connection variables:
+```python name=app.py
+import os
+from flask import Flask
+from supabase import create_client, Client
+from dotenv import load_dotenv
 
-    <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="publishable" />
+load_dotenv()
 
+app = Flask(__name__)
 
-    </StepHikeCompact.Details>
+supabase: Client = create_client(
+    os.environ.get("SUPABASE_URL"),
+    os.environ.get("SUPABASE_PUBLISHABLE_KEY")
+)
 
-    <StepHikeCompact.Code>
+@app.route('/')
+def index():
+    response = supabase.table('instruments').select("*").execute()
+    instruments = response.data
 
-      <$CodeTabs>
+    html = '<h1>Instruments</h1><ul>'
+    for instrument in instruments:
+        html += f'<li>{instrument["name"]}</li>'
+    html += '</ul>'
 
-        ```text name=.env
-        SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
-        SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
-        ```
+    return html
 
-      </$CodeTabs>
+if __name__ == '__main__':
+    app.run(debug=True)
+```
 
-      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "", "tab": "" }} />
+## 8. Start the app
 
-    </StepHikeCompact.Code>
+Run the Flask development server, and go to http://localhost:5000 in your browser, you should see the list of instruments.
 
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={5}>
-    <StepHikeCompact.Details title="Query data from the app">
-
-    Install the `python-dotenv` package to load environment variables:
-
-    ```bash
-    pip install python-dotenv
-    ```
-
-    Create an `app.py` file and add a route that fetches data from your `instruments` table using the Supabase client.
-
-    </StepHikeCompact.Details>
-    <StepHikeCompact.Code>
-
-      ```python name=app.py
-      import os
-      from flask import Flask
-      from supabase import create_client, Client
-      from dotenv import load_dotenv
-
-      load_dotenv()
-
-      app = Flask(__name__)
-
-      supabase: Client = create_client(
-          os.environ.get("SUPABASE_URL"),
-          os.environ.get("SUPABASE_PUBLISHABLE_KEY")
-      )
-
-      @app.route('/')
-      def index():
-          response = supabase.table('instruments').select("*").execute()
-          instruments = response.data
-
-          html = '<h1>Instruments</h1><ul>'
-          for instrument in instruments:
-              html += f'<li>{instrument["name"]}</li>'
-          html += '</ul>'
-
-          return html
-
-      if __name__ == '__main__':
-          app.run(debug=True)
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={6}>
-    <StepHikeCompact.Details title="Start the app">
-
-    Run the Flask development server, go to http://localhost:5000 in a browser and you should see the list of instruments.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```bash name=Terminal
-      python app.py
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-</StepHikeCompact>
+```bash
+python app.py
+```
 
 ## Next steps
 

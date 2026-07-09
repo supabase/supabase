@@ -54,7 +54,7 @@ function ExampleCard(props: any) {
                         fillRule="evenodd"
                         clipRule="evenodd"
                         d={framework.icon}
-                        fill="hsl(var(--foreground-lighter))"
+                        fill="var(--foreground-lighter)"
                       />
                     </svg>
                   </div>

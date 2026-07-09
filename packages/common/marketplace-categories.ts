@@ -20,8 +20,8 @@ import {
 } from 'lucide-react'
 
 /**
- * Maps marketplace category slugs to Lucide icons.
- * Used in both Supabase Studio and the public Partner Catalog.
+ * Maps integration category slugs to Lucide icons.
+ * Used in both Supabase Studio's Dashboard Integrations and the public Partner Catalog.
  * Unknown slugs fall back to the neutral Boxes icon.
  */
 export const CATEGORY_ICONS: Record<string, LucideIcon> = {

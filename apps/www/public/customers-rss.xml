@@ -5,9 +5,30 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Mon, 18 May 2026 00:00:00 -0700</lastBuildDate>
+      <lastBuildDate>Wed, 08 Jul 2026 00:00:00 -0700</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/customers/delightai</guid>
+  <title>How delight.ai lets every team build production apps on Supabase</title>
+  <link>https://supabase.com/customers/delightai</link>
+  <description>delight.ai builds AI agents for customer experience. With Supabase, Vercel, and Claude Code, every team at the 220-person company ships its own production apps, without pulling engineers off the core product.</description>
+  <pubDate>Wed, 08 Jul 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/drew-crew</guid>
+  <title>Built for everyone: how Drew Clayborn is coding a lifeline for home care</title>
+  <link>https://supabase.com/customers/drew-crew</link>
+  <description>Drew Clayborn is building General Home Health, a HIPAA-compliant home care charting app, by himself. Supabase gives a solo developer the database, auth, realtime, and HIPAA-ready foundation to protect patients, nurses, and agencies.</description>
+  <pubDate>Wed, 08 Jul 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/customers/lovable</guid>
+  <title>How Lovable helps power millions of apps on Supabase</title>
+  <link>https://supabase.com/customers/lovable</link>
+  <description>Lovable lets anyone create software by describing it. Behind many of the one million projects people create on Lovable every week is a Supabase backend, provisioned end to end through the Management API.</description>
+  <pubDate>Wed, 08 Jul 2026 00:00:00 -0700</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/customers/chatbase</guid>
   <title>Chatbase goes upmarket on Supabase</title>
   <link>https://supabase.com/customers/chatbase</link>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
 import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
 
 interface MultipleCodeBlockFile {
@@ -125,25 +125,25 @@ export const MultipleCodeBlock = ({ files, value, onValueChange }: MultipleCodeB
   }
 
   return (
-    <Tabs_Shadcn_
+    <Tabs
       value={activeValue}
       onValueChange={handleValueChange}
       className="border rounded-lg gap-0 space-y-0 overflow-hidden"
     >
-      <TabsList_Shadcn_ className="bg-surface-75 px-5 gap-5 overflow-x-auto border-0 border-b">
+      <TabsList className="bg-surface-75 px-5 gap-5 overflow-x-auto border-0 border-b">
         {files.map((file) => (
-          <TabsTrigger_Shadcn_
+          <TabsTrigger
             key={file.name}
             value={file.name}
             className="flex items-center gap-1 text-xs px-0 data-[state=active]:bg-transparent py-2.5"
           >
             {file.name}
-          </TabsTrigger_Shadcn_>
+          </TabsTrigger>
         ))}
-      </TabsList_Shadcn_>
+      </TabsList>
 
       {trimmedFiles.map((file) => (
-        <TabsContent_Shadcn_
+        <TabsContent
           key={file.name}
           value={file.name}
           forceMount
@@ -156,8 +156,8 @@ export const MultipleCodeBlock = ({ files, value, onValueChange }: MultipleCodeB
             language={resolveLanguage(file.language, file.name)}
             className="min-h-72 !bg-surface-75 rounded-none border-0"
           />
-        </TabsContent_Shadcn_>
+        </TabsContent>
       ))}
-    </Tabs_Shadcn_>
+    </Tabs>
   )
 }

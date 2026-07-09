@@ -2,91 +2,58 @@
 title: 'Use Supabase with Hono'
 subtitle: 'Learn how to create a Supabase project, add some sample data to your database, secure it with auth, and query the data from a Hono app.'
 breadcrumb: 'Framework Quickstarts'
-hideToc: true
 ---
 
-<StepHikeCompact>
+<$Partial path="quickstart_db_setup.mdx" />
 
-  <StepHikeCompact.Step step={1}>
+## 3. Create a Hono app
 
-    <StepHikeCompact.Details title="Create a Hono app">
+Bootstrap the Hono example app from the Supabase Samples using the CLI.
 
-    Bootstrap the Hono example app from the Supabase Samples using the CLI.
+```bash
+npx supabase@latest bootstrap hono
+```
 
-    </StepHikeCompact.Details>
+## 4. Install Agent Skills (optional)
 
-    <StepHikeCompact.Code>
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
 
-      ```bash name=Terminal
-      npx supabase@latest bootstrap hono
-      ```
+To install, run the following command in the root of your project:
 
-    </StepHikeCompact.Code>
+```bash
+npx skills add supabase/agent-skills
+```
 
-  </StepHikeCompact.Step>
+## 5. Install the Supabase client library
 
-  <StepHikeCompact.Step step={2}>
-    <StepHikeCompact.Details title="Install the Supabase client library">
+The `package.json` file in the project includes the necessary dependencies, including `@supabase/supabase-js` and `@supabase/ssr` to help with server-side auth.
 
-    The `package.json` file in the project includes the necessary dependencies, including `@supabase/supabase-js` and `@supabase/ssr` to help with server-side auth.
+```bash
+npm install
+```
 
-    </StepHikeCompact.Details>
+## 6. Set up the required environment variables
 
-    <StepHikeCompact.Code>
+Copy the `.env.example` file to `.env` and update the values with your Supabase project URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&tab=frameworks).
 
-      ```bash name=Terminal
-      npm install
-      ```
+Lastly, [enable anonymous sign-ins](/dashboard/project/_/auth/providers) in the Auth settings.
 
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Set up the required environment variables">
-
-    Copy the `.env.example` file to `.env` and update the values with your Supabase project URL and publishable key.
-
-    Lastly, [enable anonymous sign-ins](/dashboard/project/_/auth/providers) in the Auth settings.
-
-    <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="publishable" />
-
-
-    </StepHikeCompact.Details>
-    <StepHikeCompact.Code>
-
-
-      ```bash name=Terminal
-      cp .env.example .env
-      ```
+```bash
+cp .env.example .env
+```
 
 {/* TODO: Not ideal for frameworks that have no entry in Connect */}
-<$Partial path="api_settings_steps.mdx" variables={{ "framework": "", "tab": "frameworks" }} />
+<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "frameworks" }} />
 
-    </StepHikeCompact.Code>
+## 7. Start the app
 
-  </StepHikeCompact.Step>
+Start the app, go to http://localhost:5173.
 
-  <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Start the app">
+Learn how [server side auth](/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=hono) works with Hono.
 
-    Start the app, go to http://localhost:5173.
-
-    Learn how [server side auth](/docs/guides/auth/server-side/creating-a-client?queryGroups=framework&framework=hono) works with Hono.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```bash name=Terminal
-      npm run dev
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-</StepHikeCompact>
+```bash
+npm run dev
+```
 
 ## Next steps
 

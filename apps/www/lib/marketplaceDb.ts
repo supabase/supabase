@@ -40,7 +40,7 @@ const URL_SLUG_TO_LISTING: Record<string, string> = Object.fromEntries(
   Object.entries(SUPABASE_LISTING_OVERRIDES).map(([listingSlug, { slug }]) => [slug, listingSlug])
 )
 
-// Only FDW wrappers need the dashboard marketplace treatment (install button + dashboard URL).
+// Only FDW wrappers need the Dashboard Integration treatment (install button + dashboard URL).
 const MARKETPLACE_SLUGS = ['bigquery-wrapper', 'firebase-wrapper', 'stripe-wrapper']
 
 /** Returns true if a listing is in the Supabase Marketplace. */
@@ -51,7 +51,7 @@ export function isMarketplaceListing(listing: CatalogListing): boolean {
 
 // Partners whose catalog pages are not yet ready to launch.
 // Excluded from listing, detail, slug generation, and search.
-const PRE_LAUNCH_CATALOG_BLOCKLIST = new Set(['grafana'])
+const PRE_LAUNCH_CATALOG_BLOCKLIST = new Set<string>([])
 
 // Listings that must show as "Integration", never "Dashboard Integration",
 // regardless of what published_in_marketplace_at is set to in the DB.
@@ -86,7 +86,7 @@ function aggregateCategories(listings: CatalogListing[]): Category[] {
 
 /**
  * Picks the listing to use for narrative content (description, docs, images…).
- * Prefers a marketplace-published listing, then a dashboard-published one, then any.
+ * Prefers a Partner Catalog-published listing, then a Dashboard Integration-published one, then any.
  */
 function selectPrimaryListing(listings: CatalogListing[]): CatalogListing | undefined {
   return (
@@ -162,14 +162,16 @@ async function getPartnersFromMarketplace(): Promise<Partner[]> {
     byPartnerSlug.set(slug, arr)
   }
 
-  // Exclude 'supabase', overridden slugs, and pre-launch partners.
+  // Exclude 'supabase', overridden slugs, pre-launch partners, and partners with no
+  // catalog-published listing.
   const regularPartners = partnersData
     .filter(
       (p) =>
         p.slug &&
         p.slug !== SUPABASE_PARTNER_SLUG &&
         !OVERRIDE_URL_SLUGS.has(p.slug) &&
-        !PRE_LAUNCH_CATALOG_BLOCKLIST.has(p.slug)
+        !PRE_LAUNCH_CATALOG_BLOCKLIST.has(p.slug) &&
+        byPartnerSlug.has(p.slug)
     )
     .flatMap((p) => {
       const slug = p.slug
@@ -243,6 +245,7 @@ async function getPartnerFromMarketplace(slug: string): Promise<Partner | null> 
       .from('catalog_listings')
       .select('*')
       .eq('slug', listingSlugForOverride)
+      .not('published_in_catalog_at', 'is', null)
       .maybeSingle()
 
     if (!listing) return null
@@ -288,6 +291,8 @@ async function getPartnerFromMarketplace(slug: string): Promise<Partner | null> 
   if (!partnerSlug) return null
 
   const listings = listingsData ?? []
+  // No catalog-published listing → this partner isn't part of the catalog.
+  if (!listings.length) return null
 
   const listingDetails: ListingDetail[] = listings.map((listing) => ({
     slug: listing.slug,
@@ -325,22 +330,31 @@ async function getPartnerFromMarketplace(slug: string): Promise<Partner | null> 
  * Excludes 'supabase'; adds the remapped listing slugs instead.
  */
 async function getPartnerSlugsFromMarketplace(): Promise<string[]> {
-  const [{ data: partnerRows }, { data: overriddenRows }] = await Promise.all([
-    marketplaceClient.from('partners').select('slug').neq('slug', SUPABASE_PARTNER_SLUG),
+  const [{ data: catalogListingRows }, { data: overriddenRows }] = await Promise.all([
+    // Derive partner slugs from catalog-published listings, not the raw partners table —
+    // a partner with no catalog-published listing isn't part of the Partner Catalog.
+    marketplaceClient
+      .from('listings')
+      .select('partner_slug')
+      .not('published_in_catalog_at', 'is', null),
     // Fetch overridden listing slugs directly by listing slug (not by partner_slug).
     marketplaceClient
       .from('listings')
       .select('slug')
-      .in('slug', Object.keys(SUPABASE_LISTING_OVERRIDES)),
+      .in('slug', Object.keys(SUPABASE_LISTING_OVERRIDES))
+      .not('published_in_catalog_at', 'is', null),
   ])
 
-  // Exclude any partner whose URL slug is covered by an override or is pre-launch.
-  const partnerSlugs =
-    partnerRows?.flatMap((row) =>
-      row.slug && !OVERRIDE_URL_SLUGS.has(row.slug) && !PRE_LAUNCH_CATALOG_BLOCKLIST.has(row.slug)
-        ? [row.slug]
-        : []
-    ) ?? []
+  // Exclude 'supabase', any slug covered by an override, and pre-launch partners.
+  const catalogPartnerSlugs = new Set(
+    catalogListingRows?.flatMap((row) => (row.partner_slug ? [row.partner_slug] : [])) ?? []
+  )
+  const partnerSlugs = Array.from(catalogPartnerSlugs).filter(
+    (slug) =>
+      slug !== SUPABASE_PARTNER_SLUG &&
+      !OVERRIDE_URL_SLUGS.has(slug) &&
+      !PRE_LAUNCH_CATALOG_BLOCKLIST.has(slug)
+  )
   // Map each listing DB slug to its clean URL slug (e.g. 'bigquery-wrapper' → 'bigquery').
   const overriddenSlugs =
     overriddenRows?.flatMap((row) => {
@@ -360,14 +374,36 @@ async function searchPartnersFromMarketplace(search: string): Promise<Partner[] 
     .select('*')
     .not('published_in_catalog_at', 'is', null)
 
-  if (searchTerm) {
-    const searchPattern = `%${searchTerm}%`
-    query = query.or(
-      `title.ilike.${searchPattern},description.ilike.${searchPattern},partner_name.ilike.${searchPattern}`
-    )
+  if (!searchTerm) return getPartnersFromMarketplace()
+
+  const searchPattern = `%${searchTerm}%`
+
+  const { data: nameMatchedPartners, error: partnersError } = await marketplaceClient
+    .from('partners')
+    .select('slug')
+    .ilike('name', searchPattern)
+
+  if (partnersError) {
+    console.error('Marketplace search error:', partnersError)
+    return null
   }
 
-  const { data, error } = await query
+  const nameMatchedSlugs = nameMatchedPartners?.flatMap((p) => (p.slug ? [p.slug] : [])) ?? []
+
+  const orConditions = [
+    `title.ilike.${searchPattern}`,
+    `description.ilike.${searchPattern}`,
+    `partner_name.ilike.${searchPattern}`,
+  ]
+  if (nameMatchedSlugs.length) {
+    orConditions.push(`partner_slug.in.(${nameMatchedSlugs.join(',')})`)
+  }
+
+  const { data, error } = await marketplaceClient
+    .from('listings')
+    .select('*')
+    .not('published_in_catalog_at', 'is', null)
+    .or(orConditions.join(','))
 
   if (error) {
     console.error('Marketplace search error:', error)
@@ -390,6 +426,16 @@ async function searchPartnersFromMarketplace(search: string): Promise<Partner[] 
     byPartnerSlug.set(slug, arr)
   }
 
+  // Fetch partner-level names (which take priority over listing.partner_name, see buildPartner)
+  // for every non-overridden partner surfaced above.
+  const plainPartnerSlugs = Array.from(byPartnerSlug.keys()).filter(
+    (slug) => !URL_SLUG_TO_LISTING[slug]
+  )
+  const { data: partnerRows } = plainPartnerSlugs.length
+    ? await marketplaceClient.from('partners').select('slug, name').in('slug', plainPartnerSlugs)
+    : { data: [] }
+  const partnerNameBySlug = new Map((partnerRows ?? []).map((p) => [p.slug, p.name]))
+
   return Array.from(byPartnerSlug.entries()).map(([partnerSlug, listings]) => {
     const first = listings[0]
     const listingSlug = URL_SLUG_TO_LISTING[partnerSlug]
@@ -397,7 +443,9 @@ async function searchPartnersFromMarketplace(search: string): Promise<Partner[] 
     return buildPartner(
       {
         slug: partnerSlug,
-        name: isOverridden ? SUPABASE_LISTING_OVERRIDES[listingSlug].name : first.partner_name,
+        name: isOverridden
+          ? SUPABASE_LISTING_OVERRIDES[listingSlug].name
+          : (partnerNameBySlug.get(partnerSlug) ?? first.partner_name),
         description: first.description,
         logo: isOverridden ? first.listing_logo : (first.partner_logo ?? first.listing_logo),
         website: first.website_url,
@@ -410,7 +458,7 @@ async function searchPartnersFromMarketplace(search: string): Promise<Partner[] 
 
 // ---------------------------------------------------------------------------
 // Catalog API — always uses the marketplace DB directly, independent of isUseMarketplaceDb.
-// The Partner Catalog is a marketplace-specific feature; the legacy misc DB does not carry
+// The Partner Catalog is backed by the marketplace DB; the legacy misc DB does not carry
 // the listings (BigQuery/Firebase/Stripe FDW integrations, etc.) that the catalog needs.
 // ---------------------------------------------------------------------------
 
@@ -424,9 +472,9 @@ export const listCatalogPartnerSlugs = getPartnerSlugsFromMarketplace
 // ---------------------------------------------------------------------------
 
 /**
- * Lists all partner marketplace entries for the public website, from the configured database.
- * Returns one entry per partner company, with categories and marketplace flags aggregated
- * across all of that partner's listings.
+ * Lists all partner entries for the public website, from the configured database.
+ * Returns one entry per partner company, with categories and Dashboard Integration flags
+ * aggregated across all of that partner's listings.
  */
 export async function listPartners(): Promise<Partner[]> {
   if (isUseMarketplaceDb) {

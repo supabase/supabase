@@ -4,18 +4,23 @@ import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger, WarningIcon } 
 
 import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { type ParseSQLQueryOperations } from '@/data/misc/parse-query-mutation'
 
 interface RLSTableCardProps {
   table: { schema: string; name: string; isRLSEnabled: boolean }
+  operation: ParseSQLQueryOperations
   role?: string
   policies: Policy[]
+  hasError: boolean
   handleSelectEditPolicy: (policy: Policy) => void
 }
 
 export const RLSTableCard = ({
   table,
+  operation,
   role,
   policies,
+  hasError,
   handleSelectEditPolicy,
 }: RLSTableCardProps) => {
   const { schema, name, isRLSEnabled } = table
@@ -37,8 +42,11 @@ export const RLSTableCard = ({
       return (
         <p>
           RLS is enabled but no policies exist for the{' '}
-          <code className="text-code-inline">{role}</code> role on this table - no data will be
-          returned.
+          <code className="text-code-inline">{role}</code> role on this table -{' '}
+          {operation === 'SELECT'
+            ? 'no data will be returned'
+            : `no data will be ${operation?.toLowerCase()}${operation?.toLowerCase().endsWith('e') ? 'd' : 'ed'}`}
+          .
         </p>
       )
     }
@@ -54,6 +62,7 @@ export const RLSTableCard = ({
           </p>
           <TableAccessPolicySummary
             policies={policies}
+            operation={operation}
             handleSelectEditPolicy={handleSelectEditPolicy}
           />
         </>
@@ -71,6 +80,7 @@ export const RLSTableCard = ({
           </p>
           <TableAccessPolicySummary
             policies={policies}
+            operation={operation}
             handleSelectEditPolicy={handleSelectEditPolicy}
           />
         </>
@@ -81,11 +91,14 @@ export const RLSTableCard = ({
       <>
         <p>
           {policies.length} {policies.length > 1 ? 'policies apply' : 'policy applies'} for the{' '}
-          <code className="text-code-inline">{role}</code> role on this table. Only rows that match{' '}
-          {policies.length > 1 ? 'these conditions' : 'this condition'} are returned.
+          <code className="text-code-inline">{role}</code> role on this table.{' '}
+          {operation === 'SELECT'
+            ? `Only rows that match ${policies.length > 1 ? 'these conditions' : 'this condition'} are returned.`
+            : `The ${operation} operation will only be successful if the conditions are matched.`}
         </p>
         <TableAccessPolicySummary
           policies={policies}
+          operation={operation}
           handleSelectEditPolicy={handleSelectEditPolicy}
         />
       </>
@@ -97,6 +110,7 @@ export const RLSTableCard = ({
     falseOnlyPolicy,
     policies,
     role,
+    operation,
     handleSelectEditPolicy,
   ])
 
@@ -109,7 +123,7 @@ export const RLSTableCard = ({
           <div className="flex items-center gap-x-2">
             {!isRLSEnabled ? (
               <WarningIcon />
-            ) : noPolicies || falseOnlyPolicy ? (
+            ) : (hasError && operation === 'INSERT') || noPolicies || falseOnlyPolicy ? (
               <X size={16} className="text-destructive" />
             ) : (
               <Check size={16} className="text-brand" />
@@ -120,18 +134,20 @@ export const RLSTableCard = ({
           </div>
         </div>
         <div className="flex items-center gap-x-2">
-          <p
-            className={cn(
-              'text-xs text-foreground-light w-max',
-              !isRLSEnabled && 'text-foreground'
-            )}
-          >
-            {noPolicies || falseOnlyPolicy
-              ? 'Returns no rows'
-              : !isRLSEnabled || !!trueOnlyPolicy
-                ? 'Returns all rows'
-                : null}
-          </p>
+          {operation === 'SELECT' && (
+            <p
+              className={cn(
+                'text-xs text-foreground-light w-max',
+                !isRLSEnabled && 'text-foreground'
+              )}
+            >
+              {noPolicies || falseOnlyPolicy
+                ? 'Returns no rows'
+                : !isRLSEnabled || !!trueOnlyPolicy
+                  ? 'Returns all rows'
+                  : null}
+            </p>
+          )}
           <ChevronDown className="transition-transform duration-200" strokeWidth={1.5} size={14} />
         </div>
       </CollapsibleTrigger>
@@ -149,9 +165,11 @@ export const RLSTableCard = ({
 
 const TableAccessPolicySummary = ({
   policies,
+  operation,
   handleSelectEditPolicy,
 }: {
   policies: Policy[]
+  operation: ParseSQLQueryOperations
   handleSelectEditPolicy: (policy: Policy) => void
 }) => {
   return (
@@ -165,8 +183,11 @@ const TableAccessPolicySummary = ({
             <div>
               <p>{policy.name}</p>
               <p className="text-foreground-lighter">
-                Show rows where:{' '}
-                <code className="text-code-inline text-foreground">{policy.definition}</code>
+                {operation === 'SELECT' ? 'Show rows' : `Allow ${operation?.toLocaleLowerCase()}s`}{' '}
+                where:{' '}
+                <code className="text-code-inline text-foreground">
+                  {policy.definition ?? policy.check}
+                </code>
               </p>
             </div>
             <ButtonTooltip

@@ -46,7 +46,6 @@
   --delay-1500: 1500ms;
 
   /* font sizing and weights optimized for Inter */
-  --text-sm: 0.8125rem;
   --text-base: 0.9375rem;
   --text-lg: 1rem;
   --text-xl: 1.125rem;
@@ -135,22 +134,25 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: hsl(var(--border-default, currentColor));
+    border-color: var(--border-default, currentColor);
   }
 
-  h1,
   h2,
   h3,
   h4,
   h5,
   h6,
-  .h1,
   .h2,
   .h3,
   .h4,
   .h5,
   .h6 {
     @apply font-heading font-semibold;
+  }
+
+  h1,
+  .h1 {
+    @apply font-heading font-medium tracking-normal;
   }
 }
 
@@ -313,7 +315,7 @@ h6:not(.overwrite) {
 .stroke-text {
   -webkit-text-fill-color: transparent; /* Will override color (regardless of order) */
   -webkit-text-stroke-width: 1px;
-  -webkit-text-stroke-color: hsl(var(--background-selection));
+  -webkit-text-stroke-color: var(--background-selection);
 }
 
 .stroke-text.fill {
@@ -602,8 +604,8 @@ launch week
     rgba(57, 97, 125, 0.32) 0%,
     rgba(57, 97, 125, 0.32) 5%,
     rgba(0, 222, 209, 0.75) 8%,
-    hsl(var(--background-default)) 65%,
-    hsl(var(--background-default)) 100%
+    var(--background-default) 65%,
+    var(--background-default) 100%
   );
 }
 
@@ -625,7 +627,7 @@ launch week
   background: radial-gradient(
     circle at 50% -60%,
     rgba(255, 255, 255, 0) 0%,
-    hsl(var(--background-default)) 65%
+    var(--background-default) 65%
   );
 }
 
@@ -634,7 +636,7 @@ launch week
     background: radial-gradient(
       circle at 50% -40%,
       rgba(255, 255, 255, 0) 0%,
-      hsl(var(--background-default)) 65%
+      var(--background-default) 65%
     );
   }
 }
@@ -654,7 +656,7 @@ launch week
 /* The inside of the circle */
 .flair-mask-b {
   position: absolute;
-  background-color: hsl(var(--background-default));
+  background-color: var(--background-default);
   top: 0px;
   width: 182%;
   left: -41%;
@@ -736,8 +738,8 @@ launch week
   .gradient-text-500 {
     background-image: -webkit-linear-gradient(
       45deg,
-      hsl(var(--foreground-lighter)) 0%,
-      hsl(var(--foreground-default)) 100%
+      var(--foreground-lighter) 0%,
+      var(--foreground-default) 100%
     );
   }
 

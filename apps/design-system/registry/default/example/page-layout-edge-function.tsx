@@ -150,7 +150,7 @@ const buildMockChartData = (intervalKey: string) => {
 const EXECUTION_TIME_CHART_CONFIG = {
   avg_execution_time: {
     label: 'Average Execution Time',
-    color: 'hsl(var(--foreground-default))',
+    color: 'var(--foreground-default)',
   },
   max_execution_time: {
     label: 'Max Execution Time',
@@ -485,7 +485,7 @@ function OverviewPage() {
                         {
                           y: averageExecutionTime,
                           label: 'average',
-                          stroke: 'hsl(var(--foreground-default))',
+                          stroke: 'var(--foreground-default)',
                           strokeWidth: 1.5,
                         },
                       ]}
@@ -538,7 +538,7 @@ function OverviewPage() {
                           {
                             y: averageCpuTime,
                             label: 'average',
-                            stroke: 'hsl(var(--foreground-default))',
+                            stroke: 'var(--foreground-default)',
                             strokeWidth: 1.5,
                           },
                         ]}
@@ -589,7 +589,7 @@ function OverviewPage() {
                           {
                             y: averageMemoryUsage,
                             label: 'average',
-                            stroke: 'hsl(var(--foreground-default))',
+                            stroke: 'var(--foreground-default)',
                             strokeWidth: 1.5,
                           },
                         ]}

@@ -12,7 +12,7 @@ import { useTableColumnsQuery } from '@/data/database/table-columns-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export const useAddDefinitions = (id: string, monaco: Monaco | null) => {
   const { data: project } = useSelectedProjectQuery()
