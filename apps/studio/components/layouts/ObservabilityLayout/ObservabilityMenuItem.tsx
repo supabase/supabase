@@ -73,7 +73,7 @@ export const ObservabilityMenuItem = ({
                 }}
               />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-42 *:gap-x-2">
+            <DropdownMenuContent align="start" className="w-44 *:gap-x-2">
               <DropdownMenuItem
                 onClick={(e) => {
                   e.preventDefault()
