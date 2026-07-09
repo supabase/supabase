@@ -1,9 +1,9 @@
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
+import pgMeta, { type PGTrigger } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
+import { executeSql } from '../sql/execute-sql-mutation'
 import { databaseTriggerKeys } from './keys'
 import type { PostgresTrigger } from '@/components/interfaces/Database/Triggers/TriggersList/TriggerList.utils'
-import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 function markSavedTriggerSafe(trigger: DatabaseTriggersData[number]): PostgresTrigger {
@@ -21,24 +21,18 @@ export async function getDatabaseTriggers(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await get('/platform/pg-meta/{ref}/triggers', {
-    params: {
-      header: {
-        'x-connection-encrypted': connectionString!,
-        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
-      },
-      path: { ref: projectRef },
-      query: undefined as any,
+  const { sql } = pgMeta.triggers.list()
+  const { result } = await executeSql(
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['triggers'],
     },
-    headers,
-    signal,
-  })
+    signal
+  )
 
-  if (error) handleError(error)
-  return data
+  return result as PGTrigger[]
 }
 
 export type DatabaseTriggersData = Awaited<ReturnType<typeof getDatabaseTriggers>>

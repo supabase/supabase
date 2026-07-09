@@ -1,9 +1,8 @@
-import type { PGView } from '@supabase/pg-meta'
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
+import pgMeta, { type PGView } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
+import { executeSql } from '../sql/execute-sql-mutation'
 import { viewKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type ViewsVariables = {
@@ -18,26 +17,18 @@ export async function getViews(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await get('/platform/pg-meta/{ref}/views', {
-    params: {
-      header: {
-        'x-connection-encrypted': connectionString!,
-        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
-      },
-      path: { ref: projectRef },
-      query: {
-        included_schemas: schema || '',
-      } as any,
+  const { sql } = pgMeta.views.list({ includedSchemas: schema ? [schema] : undefined })
+  const { result } = await executeSql(
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['views', schema].filter(Boolean),
     },
-    headers,
-    signal,
-  })
+    signal
+  )
 
-  if (error) handleError(error)
-  return data as PGView[]
+  return result as PGView[]
 }
 
 export type ViewsData = Awaited<ReturnType<typeof getViews>>

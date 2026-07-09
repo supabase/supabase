@@ -92,8 +92,7 @@ export const getFallbackTools = ({
                 connectionString,
                 schema: schemas?.join(','),
               },
-              undefined,
-              headers
+              undefined
             )
           : []
 

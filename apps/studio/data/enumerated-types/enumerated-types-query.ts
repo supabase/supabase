@@ -1,9 +1,9 @@
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
+import pgMeta, { type PGType } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
+import { executeSql } from '../sql/execute-sql-mutation'
 import { enumeratedTypesKeys } from './keys'
 import type { components } from '@/data/api'
-import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type EnumeratedTypesVariables = {
@@ -19,23 +19,18 @@ export async function getEnumeratedTypes(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
-
-  const { data, error } = await get('/platform/pg-meta/{ref}/types', {
-    params: {
-      header: {
-        'x-connection-encrypted': connectionString!,
-        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
-      },
-      path: { ref: projectRef },
+  const { sql } = pgMeta.types.list()
+  const { result } = await executeSql(
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['types'],
     },
-    headers: Object.fromEntries(headers),
-    signal,
-  })
+    signal
+  )
 
-  if (error) handleError(error)
-  return data
+  return result as PGType[]
 }
 
 export type EnumeratedTypesData = Awaited<ReturnType<typeof getEnumeratedTypes>>

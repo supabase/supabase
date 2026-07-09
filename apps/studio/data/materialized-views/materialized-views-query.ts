@@ -1,9 +1,8 @@
-import type { PGMaterializedView } from '@supabase/pg-meta'
-import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
+import pgMeta, { type PGMaterializedView } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
+import { executeSql } from '../sql/execute-sql-mutation'
 import { materializedViewKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type MaterializedViewsVariables = {
@@ -18,27 +17,19 @@ export async function getMaterializedViews(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
+  const { sql } = pgMeta.materializedViews.list({ includedSchemas: schema ? [schema] : undefined })
 
-  const { data, error } = await get('/platform/pg-meta/{ref}/materialized-views', {
-    params: {
-      header: {
-        'x-connection-encrypted': connectionString!,
-        'x-pg-application-name': DEFAULT_PLATFORM_APPLICATION_NAME,
-      },
-      path: { ref: projectRef },
-      query: {
-        included_schemas: schema || '',
-        include_columns: true,
-      } as any,
+  const { result } = await executeSql(
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['materialized-views', schema].filter(Boolean),
     },
-    headers,
-    signal,
-  })
+    signal
+  )
 
-  if (error) handleError(error)
-  return data as PGMaterializedView[]
+  return result as PGMaterializedView[]
 }
 
 export type MaterializedViewsData = Awaited<ReturnType<typeof getMaterializedViews>>
