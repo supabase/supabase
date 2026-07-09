@@ -158,11 +158,6 @@
   --header-height: 3rem;
 }
 
-[data-theme='light'],
-.light {
-  --surface: 0.99;
-}
-
 [data-theme='dark'],
 .dark {
   --chart-1: hsl(var(--brand-default));

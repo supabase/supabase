@@ -6,12 +6,22 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 4. Create a Flutter app
+## 3. Create a Flutter app
 
 Create a Flutter app using the `flutter create` command.
 
 ```bash
 flutter create my_app
+```
+
+## 4. Install Agent Skills (optional)
+
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+To install, run the following command in the root of your project:
+
+```bash
+npx skills add supabase/agent-skills
 ```
 
 ## 5. Install the Supabase client library
@@ -24,11 +34,9 @@ Open the `pubspec.yaml` file inside your Flutter app and add `supabase_flutter` 
 supabase_flutter: ^2.0.0
 ```
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "flutter", "tab": "mobiles" }} />
-
 ## 6. Initialize the Supabase client
 
-Open `lib/main.dart` and edit the main function to initialize Supabase using your project URL and publishable key, which you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=flutter&tab=mobiles):
+Open `lib/main.dart` and edit the main function to initialize Supabase using your project URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=flutter&tab=mobiles):
 
 <Button variant="primary" asChild>
   <a href="/dashboard/project/_?showConnect=true&connectTab=mobiles&framework=flutter">
@@ -49,6 +57,8 @@ Future<void> main() async {
   runApp(MyApp());
 }
 ```
+
+<$Partial path="api_settings.mdx" variables={{ "framework": "flutter", "tab": "mobiles" }} />
 
 ## 7. Query data from the app
 

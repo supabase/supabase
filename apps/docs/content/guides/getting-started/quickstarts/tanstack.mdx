@@ -6,12 +6,22 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 4. Create a TanStack Start app
+## 3. Create a TanStack Start app
 
 Create a TanStack Start app using the official CLI.
 
 ```bash
 npm create @tanstack/start@latest my-app -- --package-manager npm --toolchain biome
+```
+
+## 4. Install Agent Skills (optional)
+
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+To install, run the following command in the root of your project:
+
+```bash
+npx skills add supabase/agent-skills
 ```
 
 ## 5. Install the Supabase client library
@@ -24,11 +34,9 @@ Navigate to the TanStack Start app and install `supabase-js`.
 cd my-app && npm install @supabase/supabase-js
 ```
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
-
 ## 6. Declare Supabase environment variables
 
-Create a `.env` file in the root of your project and populate with your Supabase connection variables that you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true):
+Create a `.env` file in the root of your project and populate with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true):
 
 <Button variant="primary" asChild>
   <a href="/dashboard/project/_?showConnect=true">Open Connect panel</a>
@@ -38,6 +46,8 @@ Create a `.env` file in the root of your project and populate with your Supabase
 VITE_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 VITE_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
+
+<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
 
 ## 7. Create a Supabase client utility
 
