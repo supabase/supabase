@@ -13,7 +13,7 @@ const page: GoPageInput = {
     title: 'Supabase Pipelines destinations',
     subtitle: 'Early Access',
     description:
-      'Managed change-data-capture pipelines that replicate your Supabase Postgres data to analytical systems in near real time. Request early access to upcoming destination support.',
+      "Managed change-data-capture pipelines that replicate your Supabase Postgres data to analytical systems in near real time. Request early access to the destinations we're adding next: ClickHouse, Snowflake, and DuckLake.",
     image: {
       src: '/images/blog/2025-12-02-introducing-supabase-pipelines/thumb.png',
       alt: 'Introducing Supabase Pipelines',
