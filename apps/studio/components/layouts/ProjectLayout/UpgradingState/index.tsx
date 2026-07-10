@@ -202,12 +202,8 @@ export const UpgradingState = () => {
                                 />
                               </div>
                             ) : isCompleted ? (
-                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand border-brand">
-                                <Check
-                                  size={12}
-                                  className="text-primary-foreground"
-                                  strokeWidth={3}
-                                />
+                              <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-brand-500 border-brand-500 dark:bg-brand-200 dark:border-brand-200 text-white dark:text-brand">
+                                <Check size={12} strokeWidth={3} />
                               </div>
                             ) : (
                               <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-overlay-hover" />
