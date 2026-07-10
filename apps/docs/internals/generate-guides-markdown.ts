@@ -12,7 +12,7 @@ import { mdxjs } from 'micromark-extension-mdxjs'
 import { parse as parseToml } from 'smol-toml'
 import { mcpConfigPanelMarkdown as McpConfigPanel } from 'ui-patterns/McpUrlBuilder/McpConfigPanel.md'
 
-import { addBaseUrlPrefix } from './internal-links'
+import { addBaseUrlPrefix, getInternalLinkBaseUrl, withDocsBasePath } from './internal-links'
 import { AccordionItem } from './markdown-schema/Accordion'
 import { Admonition } from './markdown-schema/Admonition'
 import { AuthProviders } from './markdown-schema/AuthProviders'
@@ -230,7 +230,8 @@ async function renderTroubleshootingIndex(troubleshooting: MarkdownSource[]): Pr
     troubleshooting.map(async ({ sourceFile, slug }) => {
       const raw = await fs.readFile(sourceFile, 'utf8')
       const { data } = parseFrontmatter(raw, 'toml')
-      return `- [${data.title}](/guides/${slug})`
+      const url = `${getInternalLinkBaseUrl()}${withDocsBasePath(`/guides/${slug}`)}`
+      return `- [${data.title}](${url})`
     })
   )
   return `# Troubleshooting guides\n\n${entries.join('\n')}\n`
