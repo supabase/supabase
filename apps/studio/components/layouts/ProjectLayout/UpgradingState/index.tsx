@@ -17,7 +17,7 @@ import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import { BrandCheckCircle } from '@/components/ui/BrandCheckCircle'
+import { SuccessCheckCircle } from '@/components/ui/SuccessCheckCircle'
 import { useProjectUpgradingStatusQuery } from '@/data/config/project-upgrade-status-query'
 import { useInvalidateProjectDetailsQuery } from '@/data/projects/project-detail-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -202,7 +202,7 @@ export const UpgradingState = () => {
                                 />
                               </div>
                             ) : isCompleted ? (
-                              <BrandCheckCircle />
+                              <SuccessCheckCircle />
                             ) : (
                               <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-overlay-hover" />
                             )}

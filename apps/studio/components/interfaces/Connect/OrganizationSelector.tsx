@@ -6,7 +6,7 @@ import {
   CreateOrganizationCard,
   OrganizationCard,
 } from '@/components/interfaces/Organization/OrganizationCard'
-import { BrandCheckCircle } from '@/components/ui/BrandCheckCircle'
+import { SuccessCheckCircle } from '@/components/ui/SuccessCheckCircle'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import type { Organization } from '@/types'
 
@@ -214,7 +214,7 @@ const ConnectOrganizationButton = ({
       )}
     />
     {selected && (
-      <BrandCheckCircle className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" />
+      <SuccessCheckCircle className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" />
     )}
   </button>
 )
