@@ -1788,7 +1788,7 @@ export interface BranchDeleteButtonClickedEvent {
     /**
      * Where the delete action was initiated from
      */
-    origin: 'branches_page' | 'merge_page'
+    origin: 'branches_page' | 'merge_page' | 'settings_page'
   }
   groups: TelemetryGroups
 }

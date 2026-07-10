@@ -322,8 +322,13 @@ const Wizard: NextPageWithLayout = () => {
       router.push(`/project/${res.ref}`)
     },
     onError: (error) => {
-      toast.error(`Failed to create new project: ${error.message}`)
-      trackFunnelError('project_creation', classifyApiError('project_creation', error), 'toast')
+      const toastId = toast.error(`Failed to create new project: ${error.message}`)
+      trackFunnelError(
+        'project_creation',
+        classifyApiError('project_creation', error),
+        'toast',
+        toastId
+      )
     },
   })
 
@@ -364,12 +369,14 @@ const Wizard: NextPageWithLayout = () => {
     } = values
 
     if (useOrioleDb && !availableOrioleVersion) {
+      const toastId = toast.error('No available OrioleDB image found, only Postgres is available')
       trackFunnelError(
         'project_creation',
         { errorCategory: 'validation', errorReason: 'oriole_unavailable' },
-        'toast'
+        'toast',
+        toastId
       )
-      return toast.error('No available OrioleDB image found, only Postgres is available')
+      return
     }
 
     const { postgresEngine, releaseChannel } =
