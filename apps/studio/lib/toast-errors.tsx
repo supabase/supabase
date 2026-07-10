@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { useSonner } from 'sonner'
 
+import { isDashboardErrorSampled } from '@/lib/telemetry/error-sampling'
 import type { FunnelErrorClassification, FunnelOrigin } from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -28,7 +29,7 @@ export const ToastErrorTracker = () => {
       seenToastIds.current.add(toast.id)
       const funnelProperties = funnelErrorToasts.get(toast.id)
       funnelErrorToasts.delete(toast.id)
-      if (Math.random() < 0.1) {
+      if (isDashboardErrorSampled()) {
         track('dashboard_error_created', {
           source: 'toast',
           ...funnelProperties,

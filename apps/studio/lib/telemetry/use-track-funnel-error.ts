@@ -1,13 +1,9 @@
 import { useCallback } from 'react'
 
+import { isDashboardErrorSampled } from '@/lib/telemetry/error-sampling'
 import type { FunnelErrorClassification, FunnelOrigin } from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
 import { registerFunnelErrorToast } from '@/lib/toast-errors'
-
-// Matches the existing dashboard_error_created capture rate; keeps PostHog volume bounded.
-// Only form-sourced events are sampled here — toast-sourced events are sampled once by
-// ToastErrorTracker, which is the sole emitter for them.
-const SAMPLE_RATE = 0.1
 
 interface TrackFunnelError {
   /**
@@ -47,7 +43,9 @@ export function useTrackFunnelError() {
         if (toastId !== undefined) registerFunnelErrorToast(toastId, properties)
         return
       }
-      if (Math.random() >= SAMPLE_RATE) return
+      // Form-sourced events are sampled here — toast-sourced events are sampled once by
+      // ToastErrorTracker, which is the sole emitter for them.
+      if (!isDashboardErrorSampled()) return
       track('dashboard_error_created', { source, ...properties })
     },
     [track]
