@@ -90,6 +90,7 @@
     "shiki": "^4.2.0",
     "swiper": "^12.1.2",
     "typed.js": "^2.0.16",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "ui": "workspace:*",
     "ui-patterns": "workspace:*",

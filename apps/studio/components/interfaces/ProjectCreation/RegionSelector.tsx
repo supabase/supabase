@@ -4,6 +4,7 @@ import type { CloudProvider } from 'shared-data'
 import {
   Badge,
   cn,
+  FormControl,
   FormField,
   Select,
   SelectContent,
@@ -149,6 +150,7 @@ export const RegionSelector = ({
           return (
             <>
               <FormItemLayout
+                id="region"
                 layout={layout}
                 label="Region"
                 description={
@@ -167,125 +169,133 @@ export const RegionSelector = ({
                   </>
                 }
               >
-                <Select value={field.value} onValueChange={field.onChange} disabled={isLoading}>
-                  <SelectTrigger className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start">
-                    <SelectValue
-                      placeholder={
-                        isLoading
-                          ? 'Loading available regions...'
-                          : 'Select a region for your project..'
-                      }
+                <FormControl>
+                  <Select value={field.value} onValueChange={field.onChange} disabled={isLoading}>
+                    <SelectTrigger
+                      id="region"
+                      className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start"
                     >
-                      {field.value !== undefined && (
-                        <div className="flex items-center gap-x-3">
-                          {selectedRegion?.code && (
-                            <img
-                              alt="region icon"
-                              className="w-5 rounded-xs"
-                              src={`${BASE_PATH}/img/regions/${selectedRegion.code}.svg`}
-                            />
-                          )}
-                          <span className="text-foreground">
-                            {selectedRegion?.name
-                              ? getDisplayNameForSmartRegion(selectedRegion.name)
-                              : field.value}
-                          </span>
-                        </div>
+                      <SelectValue
+                        placeholder={
+                          isLoading
+                            ? 'Loading available regions...'
+                            : 'Select a region for your project..'
+                        }
+                      >
+                        {field.value !== undefined && (
+                          <div className="flex items-center gap-x-3">
+                            {selectedRegion?.code && (
+                              // For some reason, Safari considered the empty string alt text on this icon as misspelled (with VoiceOver)
+                              // Only way to fix it is to set the role. Not needed for the combobox options
+                              // eslint-disable-next-line jsx-a11y/alt-text
+                              <img
+                                role="presentation"
+                                className="w-5 rounded-xs"
+                                src={`${BASE_PATH}/img/regions/${selectedRegion.code}.svg`}
+                              />
+                            )}
+                            <span className="text-foreground">
+                              {selectedRegion?.name
+                                ? getDisplayNameForSmartRegion(selectedRegion.name)
+                                : field.value}
+                            </span>
+                          </div>
+                        )}
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {smartRegionEnabled && (
+                        <>
+                          <SelectGroup>
+                            <SelectLabel>General regions</SelectLabel>
+                            {smartRegions.map((value) => {
+                              return (
+                                <SelectItem
+                                  key={value.code}
+                                  value={value.name}
+                                  className="w-full [&>:nth-child(2)]:w-full"
+                                >
+                                  <div className="flex flex-row items-center justify-between w-full">
+                                    <div className="flex items-center gap-x-3">
+                                      <img
+                                        alt=""
+                                        className="w-5 rounded-xs"
+                                        src={`${BASE_PATH}/img/regions/${value.code}.svg`}
+                                      />
+                                      <span className="text-foreground">
+                                        {getDisplayNameForSmartRegion(value.name)}
+                                      </span>
+                                    </div>
+
+                                    <div>
+                                      {recommendedSmartRegions.has(value.code) && (
+                                        <Badge variant="success" className="mr-1">
+                                          Recommended
+                                        </Badge>
+                                      )}
+                                    </div>
+                                  </div>
+                                </SelectItem>
+                              )
+                            })}
+                          </SelectGroup>
+                          <SelectSeparator />
+                        </>
                       )}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent>
-                    {smartRegionEnabled && (
-                      <>
-                        <SelectGroup>
-                          <SelectLabel>General regions</SelectLabel>
-                          {smartRegions.map((value) => {
-                            return (
-                              <SelectItem
-                                key={value.code}
-                                value={value.name}
-                                className="w-full [&>:nth-child(2)]:w-full"
-                              >
-                                <div className="flex flex-row items-center justify-between w-full">
-                                  <div className="flex items-center gap-x-3">
-                                    <img
-                                      alt="region icon"
-                                      className="w-5 rounded-xs"
-                                      src={`${BASE_PATH}/img/regions/${value.code}.svg`}
-                                    />
-                                    <span className="text-foreground">
-                                      {getDisplayNameForSmartRegion(value.name)}
+
+                      <SelectGroup>
+                        <SelectLabel>Specific regions</SelectLabel>
+                        {regionOptions.map((value) => {
+                          return (
+                            <SelectItem
+                              key={value.code}
+                              value={value.name}
+                              className={cn(
+                                'w-full [&>:nth-child(2)]:w-full',
+                                value.status !== undefined && 'pointer-events-auto!'
+                              )}
+                              disabled={value.status !== undefined}
+                            >
+                              <div className="flex flex-row items-center justify-between w-full gap-x-2">
+                                <div className="flex items-center gap-x-3">
+                                  <img
+                                    alt=""
+                                    className="w-5 rounded-xs"
+                                    src={`${BASE_PATH}/img/regions/${value.code}.svg`}
+                                  />
+                                  <div className="flex items-center gap-x-2">
+                                    <span className="text-foreground">{value.name}</span>
+                                    <span className="text-xs text-foreground-lighter font-mono">
+                                      {value.code}
                                     </span>
                                   </div>
+                                </div>
 
-                                  <div>
-                                    {recommendedSmartRegions.has(value.code) && (
-                                      <Badge variant="success" className="mr-1">
-                                        Recommended
+                                {recommendedSpecificRegions.has(value.code) && (
+                                  <Badge variant="success" className="mr-1">
+                                    Recommended
+                                  </Badge>
+                                )}
+                                {value.status !== undefined && value.status === 'capacity' && (
+                                  <Tooltip>
+                                    <TooltipTrigger>
+                                      <Badge variant="warning" className="mr-1">
+                                        Unavailable
                                       </Badge>
-                                    )}
-                                  </div>
-                                </div>
-                              </SelectItem>
-                            )
-                          })}
-                        </SelectGroup>
-                        <SelectSeparator />
-                      </>
-                    )}
-
-                    <SelectGroup>
-                      <SelectLabel>Specific regions</SelectLabel>
-                      {regionOptions.map((value) => {
-                        return (
-                          <SelectItem
-                            key={value.code}
-                            value={value.name}
-                            className={cn(
-                              'w-full [&>:nth-child(2)]:w-full',
-                              value.status !== undefined && 'pointer-events-auto!'
-                            )}
-                            disabled={value.status !== undefined}
-                          >
-                            <div className="flex flex-row items-center justify-between w-full gap-x-2">
-                              <div className="flex items-center gap-x-3">
-                                <img
-                                  alt="region icon"
-                                  className="w-5 rounded-xs"
-                                  src={`${BASE_PATH}/img/regions/${value.code}.svg`}
-                                />
-                                <div className="flex items-center gap-x-2">
-                                  <span className="text-foreground">{value.name}</span>
-                                  <span className="text-xs text-foreground-lighter font-mono">
-                                    {value.code}
-                                  </span>
-                                </div>
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                      Temporarily unavailable due to this region being at capacity.
+                                    </TooltipContent>
+                                  </Tooltip>
+                                )}
                               </div>
-
-                              {recommendedSpecificRegions.has(value.code) && (
-                                <Badge variant="success" className="mr-1">
-                                  Recommended
-                                </Badge>
-                              )}
-                              {value.status !== undefined && value.status === 'capacity' && (
-                                <Tooltip>
-                                  <TooltipTrigger>
-                                    <Badge variant="warning" className="mr-1">
-                                      Unavailable
-                                    </Badge>
-                                  </TooltipTrigger>
-                                  <TooltipContent>
-                                    Temporarily unavailable due to this region being at capacity.
-                                  </TooltipContent>
-                                </Tooltip>
-                              )}
-                            </div>
-                          </SelectItem>
-                        )
-                      })}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                            </SelectItem>
+                          )
+                        })}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
               </FormItemLayout>
 
               {affectingIncidents.length > 0 && (
