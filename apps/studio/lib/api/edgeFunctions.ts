@@ -22,8 +22,6 @@ export const isValidEdgeFunctionURL = (url: string, isPlatform: boolean) => {
   return regexValidEdgeFunctionURL.test(url)
 }
 
-// Self-hosted (Kong-fronted) edge runtime errors use `message`, while
-// platform errors use `error` - check both rather than assuming one shape.
 export const getEdgeFunctionErrorMessage = (responseBody: string): string => {
   try {
     const errorBody = JSON.parse(responseBody)
