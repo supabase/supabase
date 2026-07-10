@@ -51,7 +51,7 @@ export function VercelEnvVarsSyncDescription() {
         <HoverCardContent align="center" className="w-80">
           <div className="space-y-2">
             <h4 className="text-sm font-medium text-foreground">Environment variables</h4>
-            <ul className="max-h-48 space-y-1 overflow-y-auto">
+            <ul className="max-h-52 space-y-1 overflow-y-auto">
               {ENV_VAR_RAW_KEYS.map((key) => (
                 <li key={key} className="font-mono text-xs text-foreground-lighter">
                   {key}

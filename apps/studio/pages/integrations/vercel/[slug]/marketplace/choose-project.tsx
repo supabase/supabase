@@ -17,8 +17,9 @@ import {
   VercelIntegrationInterstitialErrorState,
   VercelIntegrationLogo,
 } from '@/components/interfaces/Integrations/Vercel/VercelIntegrationInterstitial'
-import ProjectLinker, {
-  ForeignProject,
+import {
+  ProjectLinker,
+  type ForeignProject,
 } from '@/components/interfaces/Integrations/VercelGithub/ProjectLinker'
 import { InterstitialAccountRow, InterstitialLayout } from '@/components/layouts/InterstitialLayout'
 import { vercelIcon } from '@/components/to-be-cleaned/ListIcons'

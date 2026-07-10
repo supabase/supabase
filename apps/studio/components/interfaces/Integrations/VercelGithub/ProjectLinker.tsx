@@ -1,7 +1,7 @@
 import { Check, ChevronDown, Plus, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { ReactNode, useEffect, useState } from 'react'
+import { HTMLAttributes, ReactNode, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -26,14 +26,13 @@ import {
   IntegrationProjectConnection,
 } from '@/data/integrations/integrations.types'
 import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
-import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { BASE_PATH } from '@/lib/constants'
 import { openInstallGitHubIntegrationWindow } from '@/lib/github'
 import { EMPTY_ARR } from '@/lib/void'
 
-export interface Project {
+interface Project {
   name: string
   ref: string
 }
@@ -44,7 +43,21 @@ export interface ForeignProject {
   installation_id?: number
 }
 
-export interface ProjectLinkerProps {
+const Panel = ({ children, className, ...props }: HTMLAttributes<HTMLDivElement>) => {
+  return (
+    <div
+      className={cn(
+        'flex-1 min-w-0 flex flex-col grow gap-6 px-5 mx-auto w-full justify-center items-center',
+        className
+      )}
+      {...props}
+    >
+      {children}
+    </div>
+  )
+}
+
+interface ProjectLinkerProps {
   slug?: string
   organizationIntegrationId?: string
   foreignProjects: ForeignProject[]
@@ -57,14 +70,13 @@ export interface ProjectLinkerProps {
   onSkip?: () => void
   loadingForeignProjects?: boolean
   showNoEntitiesState?: boolean
-
-  defaultSupabaseProjectRef?: string
+  defaultSupabaseProject?: Project
   defaultForeignProjectId?: string
   mode: 'Vercel' | 'GitHub'
   variant?: 'default' | 'interstitial'
 }
 
-const ProjectLinker = ({
+export const ProjectLinker = ({
   slug,
   organizationIntegrationId,
   foreignProjects,
@@ -77,8 +89,7 @@ const ProjectLinker = ({
   onSkip,
   loadingForeignProjects,
   showNoEntitiesState = true,
-
-  defaultSupabaseProjectRef,
+  defaultSupabaseProject,
   defaultForeignProjectId,
   mode,
   variant = 'default',
@@ -91,9 +102,11 @@ const ProjectLinker = ({
   const [foreignProjectId, setForeignProjectId] = useState<string | undefined>(
     defaultForeignProjectId
   )
-  const [supabaseProjectRef, setSupabaseProjectRef] = useState<string | undefined>(
-    defaultSupabaseProjectRef
-  )
+  const [selectedSupabaseProject, setSelectedSupabaseProject] = useState<Project>()
+
+  // const [supabaseProjectRef, setSupabaseProjectRef] = useState<string | undefined>(
+  //   defaultSupabaseProjectRef
+  // )
 
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: orgProjects, isPending: loadingSupabaseProjects } = useOrgProjectsInfiniteQuery({
@@ -102,9 +115,9 @@ const ProjectLinker = ({
   const numProjects = orgProjects?.pages[0].pagination.count ?? 0
 
   useEffect(() => {
-    if (defaultSupabaseProjectRef !== undefined && supabaseProjectRef === undefined)
-      setSupabaseProjectRef(defaultSupabaseProjectRef)
-  }, [defaultSupabaseProjectRef, supabaseProjectRef])
+    if (defaultSupabaseProject !== undefined && selectedSupabaseProject === undefined)
+      setSelectedSupabaseProject(defaultSupabaseProject)
+  }, [defaultSupabaseProject, selectedSupabaseProject])
 
   useEffect(() => {
     if (defaultForeignProjectId !== undefined && foreignProjectId === undefined)
@@ -113,8 +126,6 @@ const ProjectLinker = ({
 
   // create a flat array of foreign project ids. ie, ["prj_MlkO6AiLG5ofS9ojKrkS3PhhlY3f", ..]
   const flatInstalledConnectionsIds = new Set(installedConnections.map((x) => x.foreign_project_id))
-
-  const { data: selectedSupabaseProject } = useProjectDetailQuery({ ref: supabaseProjectRef })
 
   const selectedForeignProject = foreignProjectId
     ? foreignProjects.find((x) => x.id?.toLowerCase() === foreignProjectId?.toLowerCase())
@@ -152,20 +163,6 @@ const ProjectLinker = ({
     })
   }
 
-  const Panel = ({ children, className, ...props }: React.HTMLAttributes<HTMLDivElement>) => {
-    return (
-      <div
-        className={cn(
-          'flex-1 min-w-0 flex flex-col grow gap-6 px-5 mx-auto w-full justify-center items-center',
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </div>
-    )
-  }
-
   const noSupabaseProjects = numProjects === 0
   const noForeignProjects = foreignProjects.length === 0
   const missingEntity = noSupabaseProjects ? 'Supabase' : mode
@@ -184,9 +181,9 @@ const ProjectLinker = ({
       open={openProjectsDropdown}
       setOpen={setOpenProjectsDropdown}
       slug={slug}
-      selectedRef={supabaseProjectRef}
+      selectedRef={selectedSupabaseProject?.ref}
       onSelect={(project) => {
-        setSupabaseProjectRef(project.ref)
+        setSelectedSupabaseProject(project)
         setOpenProjectsDropdown(false)
       }}
       renderRow={(project) => {
@@ -202,7 +199,7 @@ const ProjectLinker = ({
               {project.status === 'INACTIVE' && <Badge>Paused</Badge>}
               {project.status === 'GOING_DOWN' && <Badge>Pausing</Badge>}
             </div>
-            {project.ref === supabaseProjectRef && <Check size={16} />}
+            {project.ref === selectedSupabaseProject?.ref && <Check size={16} />}
           </div>
         )
       }}
@@ -211,11 +208,11 @@ const ProjectLinker = ({
           <Button
             variant="default"
             block
-            disabled={defaultSupabaseProjectRef !== undefined || loadingSupabaseProjects}
+            disabled={defaultSupabaseProject !== undefined || loadingSupabaseProjects}
             loading={loadingSupabaseProjects}
             className="justify-between h-[34px]"
             iconRight={
-              defaultSupabaseProjectRef === undefined ? (
+              defaultSupabaseProject === undefined ? (
                 <span className="grow flex justify-end">
                   <ChevronDown />
                 </span>
@@ -346,6 +343,17 @@ const ProjectLinker = ({
     <div
       className={cn('flex w-full gap-2', variant === 'interstitial' ? 'flex-col' : 'justify-end')}
     >
+      <Button
+        size={variant === 'interstitial' ? undefined : 'medium'}
+        variant={variant === 'interstitial' ? 'primary' : 'default'}
+        block={variant === 'interstitial'}
+        className={variant === 'default' ? 'self-end' : undefined}
+        onClick={onCreateConnections}
+        loading={isLoading}
+        disabled={connectDisabled}
+      >
+        Connect project
+      </Button>
       {onSkip !== undefined && (
         <Button
           size={variant === 'interstitial' ? undefined : 'medium'}
@@ -358,17 +366,6 @@ const ProjectLinker = ({
           Skip
         </Button>
       )}
-      <Button
-        size={variant === 'interstitial' ? undefined : 'medium'}
-        variant={variant === 'interstitial' ? 'primary' : 'default'}
-        block={variant === 'interstitial'}
-        className={variant === 'default' ? 'self-end' : undefined}
-        onClick={onCreateConnections}
-        loading={isLoading}
-        disabled={connectDisabled}
-      >
-        Connect project
-      </Button>
     </div>
   )
 
@@ -458,5 +455,3 @@ const ProjectLinker = ({
     </div>
   )
 }
-
-export default ProjectLinker
