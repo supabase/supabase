@@ -38,7 +38,11 @@ Client (supabase-js / SSR)
 
 Edge Functions sit outside this stack and log separately: `function_edge_logs` for the HTTP request to the function, and `function_logs` for `console` output from inside it.
 
-A permission error or an unexpectedly empty result at the API layer is almost always a Postgres row-level security or privilege problem one layer down. When in doubt, trace toward the database.
+<Admonition type="note">
+
+A permission error or an unexpectedly empty result at the API layer is often a Postgres row-level security or privilege problem one layer down, though filters, authentication, query shape, or a stale schema cache can produce the same symptom. When in doubt, trace toward the database.
+
+</Admonition>
 
 ## Reading logs
 
