@@ -1,5 +1,4 @@
 import {
-  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -32,7 +31,7 @@ export const ReadReplicaPricingDialog = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <button className={cn(InlineLinkClassName, 'text-sm text-foreground-light')}>
+        <button type="button" className={InlineLinkClassName}>
           Learn more
         </button>
       </DialogTrigger>

@@ -116,9 +116,9 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
         <div className="flex items-center gap-x-4">
           <InfoIcon className="h-5 w-5" />
           <p className="text-sm">
-            New replica will cost an additional <span translate="no">{totalCost}/month</span>
+            New replica will cost an additional <span translate="no">{totalCost}/month</span>.{' '}
+            <ReadReplicaPricingDialog />
           </p>
-          <ReadReplicaPricingDialog />
         </div>
 
         <div className="flex items-center gap-x-2">
