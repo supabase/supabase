@@ -14,6 +14,7 @@ const MobileSheetNav: React.FC<{
   className?: string
   shouldCloseOnRouteChange?: boolean
   shouldCloseOnViewportResize?: boolean
+  onInteractOutside?: React.ComponentProps<typeof SheetContent>['onInteractOutside']
 }> = ({
   children,
   open = false,
@@ -21,6 +22,7 @@ const MobileSheetNav: React.FC<{
   className,
   shouldCloseOnRouteChange = true,
   shouldCloseOnViewportResize = true,
+  onInteractOutside,
 }) => {
   const router = useRouter()
   const { width } = useWindowSize()
@@ -48,6 +50,7 @@ const MobileSheetNav: React.FC<{
         showClose={false}
         size="full"
         side="bottom"
+        onInteractOutside={onInteractOutside}
         className={cn(
           'rounded-t-lg bg-background overflow-hidden overflow-y-scroll h-[85dvh] md:max-h-[500px]',
           className
