@@ -93,14 +93,20 @@ export const UtilityActions = ({
       {IS_PLATFORM && !isManualSaveEnabled && <SavingIndicator id={id} />}
 
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            data-testid="sql-editor-utility-actions"
-            variant="default"
-            className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
-            icon={<MoreVertical className="text-foreground-light" />}
-          />
-        </DropdownMenuTrigger>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenuTrigger asChild>
+              <Button
+                aria-label="More actions"
+                data-testid="sql-editor-utility-actions"
+                variant="default"
+                className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
+                icon={<MoreVertical className="text-foreground-light" />}
+              />
+            </DropdownMenuTrigger>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">More actions</TooltipContent>
+        </Tooltip>
         <DropdownMenuContent className="w-48">
           <DropdownMenuItem className="justify-between" onClick={toggleIntellisense}>
             <span className="flex items-center gap-x-2">
