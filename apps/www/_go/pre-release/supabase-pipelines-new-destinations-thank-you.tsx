@@ -12,7 +12,7 @@ const page: GoPageInput = {
     title: 'Thanks for your request',
     subtitle: 'Early Access',
     description:
-      'We received your destination preferences for Supabase Pipelines. If your workspace is selected for early access to ClickHouse, Snowflake, or DuckLake destinations, we may try to reach out with next steps.',
+      "We received your destination preferences for Supabase Pipelines. If your workspace is selected for early access to ClickHouse, Snowflake, or DuckLake destinations, we'll reach out with next steps.",
     ctas: [
       {
         label: 'Back to Supabase',
