@@ -36,6 +36,7 @@ import {
 } from '@/lib/integrations/vercel-install.utils'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { useProfileNameAndPicture } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
 import type { NextPageWithLayout, Organization } from '@/types'
 
@@ -59,6 +60,7 @@ const VercelIntegration: NextPageWithLayout = () => {
   const { code, configurationId, currentProjectId, externalId, next, teamId, source } = useParams()
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
   const { username, primaryEmail, avatarUrl } = useProfileNameAndPicture()
+  const track = useTrack()
 
   const snapshot = useIntegrationInstallationSnapshot()
   const displayName = primaryEmail ?? username ?? ''
@@ -195,6 +197,11 @@ const VercelIntegration: NextPageWithLayout = () => {
      * Only install if integration hasn't already been installed
      */
     if (!isIntegrationInstalled) {
+      track(
+        'integration_install_submitted',
+        { integrationName: 'Vercel', method: source },
+        { organization: orgSlug }
+      )
       mutate({
         code,
         configurationId,

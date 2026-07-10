@@ -7,17 +7,16 @@ import { LogoPair, PartnerLogo, SupabaseLogo } from '@/components/layouts/Inters
 import { BASE_PATH } from '@/lib/constants'
 
 const VERCEL_ENV_VAR_COUNT = ENV_VAR_RAW_KEYS.length
+const VERCEL_ICON_SRC = `${BASE_PATH}/img/icons/vercel-icon.svg`
 
-export const VERCEL_INTEGRATION_ICON = (
-  <img src={`${BASE_PATH}/img/icons/vercel-icon.svg`} alt="Vercel" className="w-4" />
-)
+export const VERCEL_INTEGRATION_ICON = <img src={VERCEL_ICON_SRC} alt="Vercel" className="w-4" />
 
 export function VercelIntegrationLogo() {
   return (
     <LogoPair
       left={
         <PartnerLogo
-          src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
+          src={VERCEL_ICON_SRC}
           alt="Vercel"
           className="bg-surface-75"
           imageClassName="size-7 object-contain dark:invert"

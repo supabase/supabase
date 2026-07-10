@@ -65,13 +65,17 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
 
   const integration = findVercelIntegrationByConfigurationId(integrationData, configurationId)
 
-  const { data: vercelProjectsData, isPending: isLoadingVercelProjectsData } =
-    useVercelProjectsQuery(
-      {
-        organization_integration_id: integration?.id,
-      },
-      { enabled: integration?.id !== undefined }
-    )
+  const {
+    data: vercelProjectsData,
+    isPending: isLoadingVercelProjectsData,
+    isError: isVercelProjectsError,
+    error: vercelProjectsError,
+  } = useVercelProjectsQuery(
+    {
+      organization_integration_id: integration?.id,
+    },
+    { enabled: integration?.id !== undefined }
+  )
 
   const vercelProjects = useMemo(() => vercelProjectsData ?? EMPTY_ARR, [vercelProjectsData])
   const vercelProjectsById = useMemo(() => keyBy(vercelProjects, 'id'), [vercelProjects])
@@ -138,8 +142,11 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
     isLoadingIntegrationsQuery ||
     (integration?.id !== undefined && isLoadingVercelProjectsData)
 
-  const isError = isOrganizationsError || isIntegrationsError
-  const errorMessage = getErrorMessage(organizationsError) ?? getErrorMessage(integrationsError)
+  const isError = isOrganizationsError || isIntegrationsError || isVercelProjectsError
+  const errorMessage =
+    getErrorMessage(organizationsError) ??
+    getErrorMessage(integrationsError) ??
+    getErrorMessage(vercelProjectsError)
   const integrationNotFound =
     !isLoadingIntegrationsQuery && integrationData !== undefined && integration === undefined
 
