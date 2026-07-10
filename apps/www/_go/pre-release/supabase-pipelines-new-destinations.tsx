@@ -70,7 +70,7 @@ const page: GoPageInput = {
         {
           type: 'email',
           name: 'email',
-          label: 'Email Address',
+          label: 'Email address',
           placeholder: 'Work email',
           required: true,
         },
