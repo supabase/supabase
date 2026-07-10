@@ -18,7 +18,9 @@ Work through these steps in order, skipping straight to a fix before you have ev
 
 ## The Supabase request stack
 
-A request from a client passes through several layers before it reaches your data. Errors propagate upward, so the layer that *reports* an error is often not the layer that *caused* it. Knowing the shape of the stack is what makes isolating the layer possible.
+A request from a client passes through several layers before it reaches your data. Errors propagate upward, so the layer that *reports* an error is often not the layer that *caused* it.
+
+Knowing the shape of the stack is what makes isolating the layer possible.
 
 ```
 Client (supabase-js / SSR)
