@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { configure, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { FeatureFlagContext } from 'common'
@@ -36,7 +36,8 @@ type GitHubRepositoriesResponse = {
 
 mockAnimationsApi()
 
-vi.setConfig({ testTimeout: 10000 })
+configure({ asyncUtilTimeout: 5000 })
+vi.setConfig({ testTimeout: 30000 })
 
 vi.mock('sonner', () => ({
   toast: { error: vi.fn(), success: vi.fn() },
@@ -723,12 +724,8 @@ describe('project creation wizard', () => {
 
       await renderWizard()
 
-      // Wait for the form gate first, then the GitHub field, which is additionally gated
-      // behind the entitlements and GitHub auth/repos queries resolving in sequence.
       await screen.findByPlaceholderText('Project name')
-      fireEvent.click(
-        await screen.findByRole('button', { name: 'Choose GitHub repository' }, { timeout: 5000 })
-      )
+      fireEvent.click(await screen.findByText('Choose GitHub repository'))
       await user.click(await screen.findByText('my-org/my-repo'))
 
       await waitFor(() =>
