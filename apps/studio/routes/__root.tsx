@@ -77,6 +77,7 @@ import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/const
 import { NuqsAdapter } from '@/lib/nuqs-tanstack-adapter'
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
+import { ToastErrorTracker } from '@/lib/toast-errors'
 import { Toaster } from '@/lib/toaster'
 import Error404 from '@/pages/404'
 import Error500 from '@/pages/500'
@@ -340,6 +341,7 @@ function RootComponent() {
                             </FeaturePreviewContextProvider>
                           </BannerStackProvider>
                           <Toaster />
+                          <ToastErrorTracker />
                           <MonacoThemeProvider />
                         </CommandProvider>
                       </AiAssistantStateContextProvider>

@@ -6,8 +6,8 @@ import {
   resetDependentFields,
   resolveConditional,
   resolveSteps,
-} from './connect.resolver'
-import type { ConditionalValue, ConnectSchema, ConnectState, StepTree } from './Connect.types'
+} from '../connect.resolver'
+import type { ConditionalValue, ConnectSchema, ConnectState, StepTree } from '../Connect.types'
 
 // ============================================================================
 // resolveConditional Tests

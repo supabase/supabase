@@ -8,7 +8,7 @@ import {
   parseConnectionParams,
   PASSWORD_PLACEHOLDER,
   resolveConnectionString,
-} from './ConnectionString.utils'
+} from '../ConnectionString.utils'
 
 describe('parseConnectionParams', () => {
   test('returns hidden defaults for an empty string', () => {
