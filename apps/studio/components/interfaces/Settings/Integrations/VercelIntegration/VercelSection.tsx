@@ -167,7 +167,7 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
                   <IntegrationConnectionHeader
                     title={ConnectionHeaderTitle}
                     className={connections.length === 0 ? 'pb-0' : undefined}
-                    markdown="Repository connections for Vercel"
+                    markdown="Project connections for Vercel"
                   />
                   {connections.length > 0 && (
                     <ul className="flex flex-col gap-y-2">
