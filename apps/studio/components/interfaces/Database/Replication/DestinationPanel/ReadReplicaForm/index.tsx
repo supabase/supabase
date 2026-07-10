@@ -110,8 +110,8 @@ export const ReadReplicaForm = ({ onSuccess, onClose }: ReadReplicaFormProps) =>
           </Select>
         </FormItemLayout>
       </SheetSection>
-      <SheetFooter className="justify-between!">
-        <div className="flex items-center gap-x-4">
+      <SheetFooter className="justify-between! gap-x-6">
+        <div className="flex items-center gap-x-3">
           <InfoIcon className="h-5 w-5" />
           <ReadReplicaPricingDialog />
         </div>
