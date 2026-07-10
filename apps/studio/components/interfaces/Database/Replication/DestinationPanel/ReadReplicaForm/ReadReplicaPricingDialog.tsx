@@ -24,17 +24,20 @@ import { DOCS_URL } from '@/lib/constants'
 
 export const ReadReplicaPricingDialog = () => {
   const { data: project } = useSelectedProjectQuery()
-  const { compute, disk, iops, throughput } = useGetReplicaCost()
+  const { totalCost, compute, disk, iops, throughput } = useGetReplicaCost()
 
   const showNewDiskManagementUI = project?.cloud_provider === 'AWS'
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        <button type="button" className={InlineLinkClassName}>
-          Learn more
-        </button>
-      </DialogTrigger>
+      <p className="text-sm">
+        New replica will cost an additional <span translate="no">{totalCost}/month</span>.{' '}
+        <DialogTrigger asChild>
+          <button type="button" className={InlineLinkClassName}>
+            Learn more
+          </button>
+        </DialogTrigger>
+      </p>
       <DialogContent
         size={showNewDiskManagementUI ? 'medium' : 'small'}
         aria-describedby={undefined}
