@@ -25,7 +25,7 @@ const IPv4StatusIcon = ({ className, active }: { className?: string; active: boo
 
       {!active ? (
         <div className="absolute -right-1.5 -top-1.5 bg-destructive rounded-sm w-4 h-4 flex items-center justify-center">
-          <X size={10} strokeWidth={4} className="text-destructive-foreground rounded-full" />
+          <X size={10} strokeWidth={4} className="text-white rounded-full" />
         </div>
       ) : (
         <div className="absolute -right-1.5 -top-1.5 bg-brand-500 rounded-sm w-4 h-4 flex items-center justify-center">
@@ -35,11 +35,10 @@ const IPv4StatusIcon = ({ className, active }: { className?: string; active: boo
             viewBox="0 0 10 10"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            className="text-primary-foreground"
           >
             <path
               d="M8.33325 2.5L3.74992 7.08333L1.66659 5"
-              stroke="currentColor"
+              stroke="white"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
