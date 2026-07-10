@@ -149,7 +149,7 @@ export const SchemaGraph = () => {
   const { data: policies = [] } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: selectedSchema,
+    schemas: [selectedSchema],
   })
 
   const schema = (schemas ?? []).find((s) => s.name === selectedSchema)
