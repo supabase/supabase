@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Input } from 'ui'
@@ -21,6 +21,7 @@ import { AVAILABLE_REPLICA_REGIONS } from '../Infrastructure/InfrastructureConfi
 import { ProjectAccessSection } from './ProjectAccessSection'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { useBranchesQuery } from '@/data/branches/branches-query'
 import { useProjectUpdateMutation } from '@/data/projects/project-update-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
@@ -28,8 +29,17 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 export const General = () => {
+  const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const isBranch = Boolean(project?.parent_project_ref)
+  const entityLabel = isBranch ? 'Branch' : 'Project'
+
+  const { data: branches } = useBranchesQuery(
+    { projectRef: project?.parent_project_ref },
+    { enabled: isBranch }
+  )
+  const branch = branches?.find((x) => x.project_ref === ref)
+  const projectName = isBranch ? branch?.name : project?.name
 
   const { can: canUpdateProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
     resource: {
@@ -43,7 +53,7 @@ export const General = () => {
     name: z.string().trim().min(3, 'Project name must be at least 3 characters long'),
   })
 
-  const defaultValues = { name: project?.name ?? '' }
+  const defaultValues = { name: projectName ?? '' }
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues,
@@ -170,14 +180,14 @@ export const General = () => {
                       render={({ field }) => (
                         <FormItemLayout
                           layout="flex-row-reverse"
-                          label="Project name"
+                          label={`${entityLabel} name`}
                           description="Displayed throughout the dashboard."
                           className="[&>div]:md:w-1/2"
                         >
                           <FormControl>
                             <Input
                               {...field}
-                              disabled={isBranch || !canUpdateProject}
+                              readOnly={isBranch || !canUpdateProject}
                               autoComplete="off"
                             />
                           </FormControl>
@@ -186,10 +196,25 @@ export const General = () => {
                     />
                   </CardContent>
 
+                  {isBranch && (
+                    <CardContent>
+                      <FormItemLayout
+                        layout="flex-row-reverse"
+                        label={`${entityLabel} type`}
+                        description="Preview or persistent"
+                        className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
+                      >
+                        <FormControl>
+                          <Input readOnly value={branch?.persistent ? 'Persistent' : 'Preview'} />
+                        </FormControl>
+                      </FormItemLayout>
+                    </CardContent>
+                  )}
+
                   <CardContent>
                     <FormItemLayout
                       layout="flex-row-reverse"
-                      label="Project ID"
+                      label={`${entityLabel} ID`}
                       description="Reference used in APIs and URLs."
                       className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
                     >
@@ -202,7 +227,7 @@ export const General = () => {
                   <CardContent>
                     <FormItemLayout
                       layout="flex-row-reverse"
-                      label="Project region"
+                      label={`${entityLabel} region`}
                       description={regionLabel?.name}
                       className="[&>div]:md:w-1/2 [&>div>div]:md:w-full"
                     >
