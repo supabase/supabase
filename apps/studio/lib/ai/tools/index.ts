@@ -69,7 +69,6 @@ export const getTools = async ({
       ...getSchemaTools({
         projectRef,
         connectionString,
-        authorization,
       }),
       ...(baseUrl ? getIncidentTools({ baseUrl }) : {}),
     }

@@ -21,14 +21,15 @@ The Envoy gateway is provided as a Docker Compose override.
 
 <Admonition type="note">
 
-If your stack is already running from the initial setup, bring it down first with `docker compose down`.
+If your stack is already running from the initial setup, bring it down first with `sh run.sh stop`.
 
 </Admonition>
 
-Start your self-hosted Supabase stack with both the base compose file and the Envoy override:
+Enable the Envoy override, then start the stack:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.envoy.yml up -d
+sh run.sh config add envoy
+sh run.sh start
 ```
 
 The override disables the default Kong gateway and starts Envoy on the same port (default `8000`). It also reconfigures the Functions service to wait for Envoy via a dependency.
@@ -118,7 +119,7 @@ Envoy cannot natively read environment variables inside its config. The entrypoi
 Configuration changes require restarting the container so the entrypoint re-renders the template:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.envoy.yml restart api-gw
+sh run.sh restart api-gw
 ```
 
 </Admonition>
@@ -263,7 +264,7 @@ All routing, filter, and cluster changes are made in the YAML files under `./vol
 - **Applying changes.** Envoy reads the rendered `lds.yaml` from the filesystem. Configuration changes require restarting the container so the entrypoint re-renders the template:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.envoy.yml restart api-gw
+sh run.sh restart api-gw
 ```
 
 <Admonition type="note">
@@ -303,7 +304,7 @@ docker run --rm --network container:supabase-envoy curlimages/curl http://127.0.
 Envoy writes access logs and filter output to stdout. View them with:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.envoy.yml logs api-gw
+docker compose logs api-gw
 ```
 
 The access log format is a standard combined log with the request method, original path, response code, and bytes sent.

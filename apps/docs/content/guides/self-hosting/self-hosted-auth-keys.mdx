@@ -68,7 +68,7 @@ Nested variable interpolation (`${A:-${B}}`) requires `podman-compose >= 1.6.0`.
 Restart all services:
 
 ```sh
-docker compose down && docker compose up -d
+sh run.sh recreate
 ```
 
 ### New API keys format
@@ -156,7 +156,7 @@ sh utils/rotate-new-api-keys.sh --update-env
 After rotating, restart services and update your client applications with the new keys:
 
 ```sh
-docker compose down && docker compose up -d
+sh run.sh recreate
 ```
 
 <Admonition type="note">

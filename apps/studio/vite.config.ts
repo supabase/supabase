@@ -3,6 +3,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { sentryTanstackStart } from '@sentry/tanstackstart-react/vite'
 import tailwindcss from '@tailwindcss/vite'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
@@ -372,12 +373,31 @@ export default defineConfig(({ command, mode }) => {
     // router.tsx). Both are build-time system env vars on Vercel.
     'VERCEL_DEPLOYMENT_ID',
     'VERCEL_SKEW_PROTECTION_ENABLED',
+    // Sentry release (sentry.tanstack.ts): the SDK silently drops session
+    // envelopes when the client has no release, so Release Health would send
+    // nothing. The commit SHA is also what withSentryConfig resolves the Next
+    // build's release to, keeping release names aligned across both builds.
+    'VERCEL_GIT_COMMIT_SHA',
   ] as const
   for (const key of vercelPublicVars) {
     const value = env[key]
     if (value !== undefined) {
       publicEnvDefines[`process.env.NEXT_PUBLIC_${key}`] = JSON.stringify(value)
     }
+  }
+
+  // Sentry init (lib/sentry-client-options.ts, reached via router.tsx) reads
+  // these at runtime in the browser. When a var is unset it gets no define
+  // entry above, which would leave a literal `process.env.*` in the built
+  // bundle — and an undeclared `process` throws in the browser. Inline
+  // `undefined` as the fallback, mirroring how Next inlines unset
+  // NEXT_PUBLIC_* vars.
+  for (const key of [
+    'NEXT_PUBLIC_SENTRY_DSN',
+    'NEXT_PUBLIC_SENTRY_ENVIRONMENT',
+    'NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA',
+  ]) {
+    publicEnvDefines[`process.env.${key}`] ??= 'undefined'
   }
 
   // Mirror Next's `basePath` via NEXT_PUBLIC_BASE_PATH. Unlike Next, TanStack
@@ -572,6 +592,23 @@ export default defineConfig(({ command, mode }) => {
         ...(basePath && { router: { basepath: basePath } }),
       }),
       viteReact(),
+      // Sentry's TanStack Start plugin(s) MUST be last so source maps reflect
+      // every prior transform. `sentryTanstackStart` returns an ARRAY of
+      // plugins (route patterns, source-map upload, middleware auto-wrap), so
+      // it's spread. Source-map UPLOAD is skipped gracefully without
+      // SENTRY_AUTH_TOKEN (and under SKIP_ASSET_UPLOAD). We disable the
+      // middleware auto-wrap because start.ts wires the Sentry global
+      // middlewares explicitly.
+      ...sentryTanstackStart({
+        org: process.env.SENTRY_ORG ?? 'supabase',
+        project: process.env.SENTRY_PROJECT ?? 'supabase-studio-tanstack',
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+        autoInstrumentMiddleware: false,
+        sourcemaps:
+          process.env.SKIP_ASSET_UPLOAD === '1' || !process.env.SENTRY_AUTH_TOKEN
+            ? { disable: true }
+            : undefined,
+      }),
     ],
   }
 })
