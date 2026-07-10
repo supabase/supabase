@@ -7,6 +7,27 @@ import Link from 'next/link'
 
 const sections = [
   {
+    id: 'customer-legal-resources',
+    title: 'Customer Legal Resources',
+    links: [
+      {
+        label: 'Terms of Service',
+        href: '/terms',
+        type: 'document' as const,
+      },
+      {
+        label: 'Support Policy',
+        href: '/support-policy',
+        type: 'document' as const,
+      },
+      {
+        label: 'Service Level Agreement',
+        href: '/sla',
+        type: 'document' as const,
+      },
+    ],
+  },
+  {
     id: 'partner-legal-resources',
     title: 'Partner Legal Resources',
     links: [
@@ -32,17 +53,17 @@ const linkIcons = {
 export default function LegalHubPage() {
   return (
     <DefaultLayout>
-      <NextSeo title="Legal" description="Supabase legal documents and resources." />
+      <NextSeo title="Legal Hub" description="Supabase legal documents and resources." />
       <PageHeader
-        h1="Legal"
+        h1="Legal Hub"
         subheader="Legal documents and resources for Supabase customers and partners."
       />
       <SectionContainer className="prose">
-        <div className="divide-y divide-border">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
           {sections.map((section) => (
             <section key={section.title} id={section.id} className="scroll-mt-24">
               <h2 className="mt-0">{section.title}</h2>
-              <div className="divide-y divide-border lg:max-w-1/2">
+              <div className="divide-y divide-border">
                 {section.links.map((link) => {
                   const Icon = linkIcons[link.type]
                   return (

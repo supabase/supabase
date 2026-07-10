@@ -14,7 +14,6 @@ import {
   useCreateDestinationPipelineMutation,
   type BatchConfig,
 } from '@/data/replication/create-destination-pipeline-mutation'
-import { useRestartPipelineHelper } from '@/data/replication/restart-pipeline-helper'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
 import { useUpdateDestinationPipelineMutation } from '@/data/replication/update-destination-pipeline-mutation'
@@ -34,7 +33,6 @@ import { type ResponseError } from '@/types'
 export const useDestinationForm = ({ selectedType }: { selectedType: DestinationType }) => {
   const { ref: projectRef } = useParams()
   const { setRequestStatus } = usePipelineRequestStatus()
-  const { restartPipeline } = useRestartPipelineHelper()
 
   const [hasRunValidation, setHasRunValidation] = useState(false)
   const [destinationValidationFailures, setDestinationValidationFailures] = useState<
@@ -238,13 +236,13 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
         const snapshot =
           existingDestination.statusName ?? (existingDestination.enabled ? 'started' : 'stopped')
         if (existingDestination.enabled) {
+          // The pipeline restarts automatically on the backend when its config is updated
           setRequestStatus(
             existingDestination.pipelineId,
             PipelineStatusRequestStatus.RestartRequested,
             snapshot
           )
           toast.success('Settings applied. Restarting the pipeline...')
-          restartPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         } else {
           setRequestStatus(
             existingDestination.pipelineId,

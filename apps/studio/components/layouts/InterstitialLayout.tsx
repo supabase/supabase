@@ -128,10 +128,20 @@ export const LogoPair = ({ left, right }: { left: ReactNode; right: ReactNode })
   </div>
 )
 
-/** Partner logo rendered edge-to-edge inside a LogoBox. */
-export const PartnerLogo = ({ src, alt }: { src: string; alt: string }) => (
-  <LogoBox>
-    <img alt={alt} src={src} className="size-full object-cover" />
+/** Partner logo rendered edge-to-edge inside a LogoBox by default. */
+export const PartnerLogo = ({
+  src,
+  alt,
+  className,
+  imageClassName,
+}: {
+  src: string
+  alt: string
+  className?: string
+  imageClassName?: string
+}) => (
+  <LogoBox className={className}>
+    <img alt={alt} src={src} className={cn('size-full object-cover', imageClassName)} />
   </LogoBox>
 )
 
@@ -157,11 +167,13 @@ export const InterstitialAccountRow = ({
   displayName,
   action,
   className,
+  detail,
 }: {
   avatarUrl?: string
   displayName?: string
   action?: ReactNode
   className?: string
+  detail?: string
 }) => (
   <Card className={cn('shadow-none', !action && 'border-muted bg-surface-200/50', className)}>
     <CardContent
@@ -180,6 +192,7 @@ export const InterstitialAccountRow = ({
         <p className="truncate text-sm text-foreground">
           {displayName || <span className="invisible">Loading account</span>}
         </p>
+        {detail && <p className="mt-1 truncate text-xs text-foreground-light">{detail}</p>}
       </div>
       {action}
     </CardContent>

@@ -23,7 +23,8 @@ export function ApiAuthorizationInvalidScreen({
       <div className="flex flex-col gap-3 px-6 pb-6">
         <Admonition
           type="warning"
-          description={`Retry the authorization request from the requesting app. The URL is missing parameter${
+          title="Retry the authorization request from the requesting app. "
+          description={`The URL is missing parameter${
             isPlural ? 's' : ''
           }: ${missingParameters.join(', ')}.`}
         />

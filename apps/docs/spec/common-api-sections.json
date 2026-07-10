@@ -731,6 +731,12 @@
     "title": "Organizations",
     "items": [
       {
+        "id": "v2-assign-organization-member-role",
+        "title": "Assign organization member role",
+        "slug": "v2-assign-organization-member-role",
+        "type": "operation"
+      },
+      {
         "id": "v1-create-an-organization",
         "title": "Create an organization",
         "slug": "v1-create-an-organization",
@@ -776,6 +782,18 @@
   },
   {
     "type": "category",
+    "title": "Organizations Members Invitations",
+    "items": [
+      {
+        "id": "v2-create-organization-invitations",
+        "title": "Create organization invitations",
+        "slug": "v2-create-organization-invitations",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
     "title": "Profile",
     "items": [
       {
@@ -803,6 +821,12 @@
         "type": "operation"
       },
       {
+        "id": "v2-create-private-link-association",
+        "title": "Create private link association",
+        "slug": "v2-create-private-link-association",
+        "type": "operation"
+      },
+      {
         "id": "v1-delete-a-project",
         "title": "Delete a project",
         "slug": "v1-delete-a-project",
@@ -812,6 +836,12 @@
         "id": "v1-delete-network-bans",
         "title": "Delete network bans",
         "slug": "v1-delete-network-bans",
+        "type": "operation"
+      },
+      {
+        "id": "v2-delete-private-link-association",
+        "title": "Delete private link association",
+        "slug": "v2-delete-private-link-association",
         "type": "operation"
       },
       {
@@ -896,6 +926,12 @@
         "id": "v1-list-available-restore-versions",
         "title": "List available restore versions",
         "slug": "v1-list-available-restore-versions",
+        "type": "operation"
+      },
+      {
+        "id": "v2-list-private-link-associations",
+        "title": "List private link associations",
+        "slug": "v2-list-private-link-associations",
         "type": "operation"
       },
       {

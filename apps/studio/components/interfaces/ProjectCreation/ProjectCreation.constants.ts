@@ -255,6 +255,4 @@ export const COUNTRY_LAT_LON = {
   ZW: { lat: -20, lon: 30 },
 }
 
-export const DATABASE_PASSWORD_REGEX = /^[^@:\/]*$/
-
 export const sizes: DesiredInstanceSize[] = ['micro', 'small', 'medium']

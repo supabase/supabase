@@ -12,11 +12,45 @@ See per-service updates below for details. Only the most important changes relev
 
 ## Unreleased
 
-⚠️ **Upcoming changes:**
-- ⚠️ **Breaking change** (week of July 6, 2026): Access to the OpenAPI spec at `/rest/v1/` via the anon (publishable) key will be removed. Requests using the service role or new secret keys are unaffected, and data access via `/rest/v1/your_table` or any client library continues to work as it does today. See discussion [#42949](https://github.com/orgs/supabase/discussions/42949).
-- ⚠️ **Breaking change** (week of July 6, 2026): `API_EXTERNAL_URL` will be updated to include the `/auth/v1` path prefix (e.g. `http://localhost:8000/auth/v1`), aligning self-hosted with the platform and CLI. This makes custom OAuth providers work out of the box and moves SAML SSO endpoints to `/auth/v1/sso/saml/*`. See discussion [#47093](https://github.com/orgs/supabase/discussions/47093).
-
 Check the main Supabase [changelog](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted) for updates.
+
+---
+
+## [0.7.0](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.7.0) - 2026-07-07
+
+⚠️ **Note:** This update contains **breaking changes**:
+- Access to the OpenAPI spec at `/rest/v1/` via the anon (publishable) key has been removed. Requests using the service role or new secret API key are unaffected, and data access via `/rest/v1/your_table` or any client library continues to work as-is. See discussion [#42949](https://github.com/orgs/supabase/discussions/42949)
+- `API_EXTERNAL_URL` has been updated to include the `/auth/v1` path prefix (e.g. `http://localhost:8000/auth/v1`), aligning self-hosted with the platform and CLI. This makes custom OAuth providers work out of the box and moves SAML SSO endpoints to `/auth/v1/sso/saml/*`. See discussion [#47093](https://github.com/orgs/supabase/discussions/47093) and PR [#47640](https://github.com/supabase/supabase/pull/47640)
+
+### Configuration
+- ⚠️ Added `KONG_ROUTER_FLAVOR` to the compose configuration for Kong (requires `docker-compose.yml` update) - PR [#45462](https://github.com/supabase/supabase/pull/45462)
+- ⚠️ Changed the default `API_EXTERNAL_URL` in `.env.example` to contain `/auth/v1` - PR [#47640](https://github.com/supabase/supabase/pull/47640)
+- ⚠️ Changed the default `PGRST_DB_SCHEMAS` to `public,graphql_public` in `.env.example` to avoid exposing `storage` (a protected schema)
+
+### Documentation
+- Minor updates to the how-to guides following the configuration changes
+
+### Utils and tests
+- Updated `setup.sh` to match the new `API_EXTERNAL_URL` configuration
+- Updated `utils/generate-keys.sh` to also generate a unique `REALTIME_DB_ENC_KEY`
+- Updated `tests/test-self-hosted.sh` and `tests/test-auth-keys.sh` to reflect the changes in the API gateway configuration
+
+### API gateway
+- ⚠️ Updated Kong and Envoy configuration to restrict access to PostgREST `/rest/v1/` (requires `docker-compose.yml`, `volumes/api/kong.yml` and `volumes/api/envoy` update) - PR [#45462](https://github.com/supabase/supabase/pull/45462) (via [@luizfelmach](https://github.com/luizfelmach/))
+- ⚠️ Updated Kong and Envoy configuration to match the new `/auth/v1/sso` routing for SAML SSO (requires `docker-compose.yml`, `volumes/api/kong.yml` and `volumes/api/envoy` update) - PR [#47640](https://github.com/supabase/supabase/pull/47640)
+
+### Studio
+- Updated to `2026.07.07-sha-a6a04f2`
+- Fixed the local SQL snippets not being shown in the SQL Editor - PR [#47403](https://github.com/supabase/supabase/pull/47403), PR [#47409](https://github.com/supabase/supabase/pull/47409)
+- Fixed the exposed schemas and tables UI to properly reflect non-platform configuration (Data API > Settings) - PR [#47511](https://github.com/supabase/supabase/pull/47511)
+- Fixed the behavior of the type generator (Data API > Docs) - PR [#47577](https://github.com/supabase/supabase/pull/47577)
+
+### Auth
+- ⚠️ Changed Auth configuration placeholders to match the new default `API_EXTERNAL_URL` (requires `docker-compose.yml` update) - PR [#47640](https://github.com/supabase/supabase/pull/47640)
+- ⚠️ Changed `GOTRUE_JWT_ISSUER` to match the new default `API_EXTERNAL_URL` (requires `docker-compose.yml` update) - PR [#47640](https://github.com/supabase/supabase/pull/47640)
+
+### Realtime
+- ⚠️ Added a new configuration variable `REALTIME_DB_ENC_KEY` for Realtime with a fallback to the default value (requires `docker-compose.yml` update) - PR [#46021](https://github.com/supabase/supabase/pull/46021)
 
 ---
 

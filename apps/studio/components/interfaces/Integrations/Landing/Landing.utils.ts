@@ -28,12 +28,28 @@ export const isStripeSyncEngineInstalled = (schemas: Schema[]) => {
   return checkIsInstalled(parsedSchema.status)
 }
 
-type ProjectOAuthIntegrationData = {
+export type ProjectOAuthIntegrationData = {
   apiKeys: APIKey[]
   edgeFunctionSecrets: ProjectSecret[]
-  authConfig: ProjectAuthConfigData | undefined
+  authConfig: ProjectAuthConfigData | null
   partnerIntegrations: IntegrationStatus[]
   oauthApps: AuthorizedApp[]
+}
+
+const isPermissionError = (error: unknown): error is ResponseError =>
+  error instanceof ResponseError && error.code === 403
+
+/**
+ * Reinterprets a 403 from an existing query as a fallback value, for graceful degradation of the
+ * marketplace UI for users in roles that don't have access to certain resources.
+ */
+function permissionSafeData<TData, TDefault>(
+  data: TData | undefined,
+  error: ResponseError | null,
+  defaultVal: TDefault
+): TData | TDefault {
+  if (isPermissionError(error)) return defaultVal
+  return data ?? defaultVal
 }
 
 /**
@@ -56,37 +72,50 @@ export const useProjectOAuthIntegrationData = (
     edgeFunctionSecrets: useSecretsQuery({ projectRef }, { enabled }),
     authConfig: useAuthConfigQuery({ projectRef }, { enabled }),
     partnerIntegrations: usePartnerIntegrationsQuery({ projectRef }, { enabled }),
-    oauthApps: useAuthorizedAppsQuery({ slug: org?.slug }, { enabled: !!org }),
+    oauthApps: useAuthorizedAppsQuery({ slug: org?.slug }, { enabled: enabled && !!org }),
   }
 
-  // memoize to prevent object creation from triggering a re-render when the result data is used
-  // as a dependency.
   const data = useMemo(() => {
     return {
-      apiKeys: queries.apiKeys.data ?? [],
-      edgeFunctionSecrets: queries.edgeFunctionSecrets.data ?? [],
-      authConfig: queries.authConfig.data,
-      partnerIntegrations: queries.partnerIntegrations.data ?? [],
-      oauthApps: queries.oauthApps.data ?? [],
+      apiKeys: permissionSafeData(queries.apiKeys.data, queries.apiKeys.error, []),
+      edgeFunctionSecrets: permissionSafeData(
+        queries.edgeFunctionSecrets.data,
+        queries.edgeFunctionSecrets.error,
+        []
+      ),
+      authConfig: permissionSafeData(queries.authConfig.data, queries.authConfig.error, null),
+      partnerIntegrations: permissionSafeData(
+        queries.partnerIntegrations.data,
+        queries.partnerIntegrations.error,
+        []
+      ),
+      oauthApps: permissionSafeData(queries.oauthApps.data, queries.oauthApps.error, []),
     }
   }, [
     queries.apiKeys.data,
+    queries.apiKeys.error,
     queries.edgeFunctionSecrets.data,
+    queries.edgeFunctionSecrets.error,
     queries.authConfig.data,
+    queries.authConfig.error,
     queries.partnerIntegrations.data,
+    queries.partnerIntegrations.error,
     queries.oauthApps.data,
+    queries.oauthApps.error,
   ])
+
+  // A 403 is intentionally handled (the resource degrades to its fallback), so it should not
+  // surface as an error to consumers, and a query that 403s still counts as "settled".
+  const queryList = Object.values(queries)
+  const unhandledErrors = queryList.map((q) => q.error).filter((e) => !!e && !isPermissionError(e))
 
   return {
     data,
-    error:
-      Object.values(queries)
-        .map((q) => q.error)
-        .find((e) => !!e) || null,
-    isError: Object.values(queries).some((x) => x.isError),
-    isLoading: Object.values(queries).some((x) => x.isLoading),
-    isPending: Object.values(queries).some((x) => x.isPending),
-    isSuccess: Object.values(queries).every((x) => x.isSuccess),
+    error: unhandledErrors[0] ?? null,
+    isError: unhandledErrors.length > 0,
+    isLoading: queryList.some((q) => q.isLoading),
+    isPending: queryList.some((q) => q.isPending),
+    isSuccess: queryList.every((q) => q.isSuccess || isPermissionError(q.error)),
   }
 }
 

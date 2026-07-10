@@ -117,6 +117,7 @@ const GlobalNavigationMenu: FC = () => {
                                     href={item.href}
                                     title={item.label}
                                     community={item.community}
+                                    new={item.new}
                                     icon={item.icon}
                                   />
                                 </NavigationMenuLink>
@@ -162,8 +163,9 @@ export const MenuItem = React.forwardRef<
   React.ComponentPropsWithoutRef<'a'> & {
     icon?: string
     community?: boolean
+    new?: boolean
   }
->(({ className, title, href = '', icon, community, children, ...props }, ref) => {
+>(({ className, title, href = '', icon, community, new: isNew, children, ...props }, ref) => {
   return (
     <Link
       href={href}
@@ -180,6 +182,7 @@ export const MenuItem = React.forwardRef<
           {icon && <MenuIconPicker icon={icon} className="text-foreground-lighter" />}
           <span className="flex-1">{title}</span>
           {community && <Badge>Community</Badge>}
+          {isNew && <Badge variant="success">New</Badge>}
         </>
       )}
     </Link>
