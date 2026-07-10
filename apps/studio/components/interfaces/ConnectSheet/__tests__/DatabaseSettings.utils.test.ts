@@ -4,7 +4,7 @@ import {
   buildConnectionStringPooler,
   getSelfHostedDirectStrings,
   getSelfHostedPoolerStrings,
-} from './DatabaseSettings.utils'
+} from '../DatabaseSettings.utils'
 import type { DeploymentMode } from '@/hooks/misc/useDeploymentMode'
 
 const platform: DeploymentMode = { isPlatform: true, isCli: false, isSelfHosted: false }

@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { useConnectState } from './useConnectState'
+import { useConnectState } from '../useConnectState'
 
 vi.mock('common', () => ({
   useParams: () => ({ ref: 'test-ref' }),

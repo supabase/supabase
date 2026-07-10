@@ -16,8 +16,12 @@ import type {
 } from './Connect.types'
 import { ConnectSheetStep } from './ConnectSheetStep'
 import {
+  resolveContentPath,
   shouldFetchDataApiConfig,
   shouldShowDataApiDisabledWarning,
+  shouldShowIpv4AddonNotice,
+  shouldShowSelfHostedMcpNotice,
+  shouldShowSessionPoolerNotice,
 } from './ConnectStepsSection.utils'
 import { CopyPromptAdmonition } from './CopyPromptAdmonition'
 import { buildConnectionStringPooler, getConnectionStrings } from './DatabaseSettings.utils'
@@ -37,26 +41,6 @@ interface ConnectStepsSectionProps {
   steps: ResolvedStep[]
   state: ConnectState
   projectKeys: ProjectKeys
-}
-
-/**
- * Resolves a content path template by replacing {{key}} placeholders with state values.
- * Empty segments are filtered out to handle optional state values like frameworkVariant.
- *
- * Examples:
- *   - '{{framework}}/{{frameworkVariant}}/{{library}}' with state {framework: 'nextjs', frameworkVariant: 'app', library: 'supabasejs'}
- *     → 'nextjs/app/supabasejs'
- *   - '{{orm}}' with state {orm: 'prisma'}
- *     → 'prisma'
- *   - 'steps/install' (no templates)
- *     → 'steps/install'
- */
-function resolveContentPath(template: string, state: ConnectState): string {
-  return template
-    .replace(/\{\{(\w+)\}\}/g, (_, key) => String(state[key] ?? ''))
-    .split('/')
-    .filter(Boolean)
-    .join('/')
 }
 
 /**
@@ -219,16 +203,22 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
       },
     }
   )
-  const showIpv4AddonNotice =
-    deploymentMode.isPlatform &&
-    state.mode === 'direct' &&
-    !ipv4Addon &&
-    (state.connectionMethod === 'direct' ||
-      (state.connectionMethod === 'transaction' && !state.useSharedPooler))
-  const showSessionPoolerNotice =
-    deploymentMode.isPlatform && state.mode === 'direct' && state.connectionMethod === 'session'
-
-  const showSelfHostedMcpNotice = deploymentMode.isSelfHosted && state.mode === 'mcp'
+  const showIpv4AddonNotice = shouldShowIpv4AddonNotice({
+    isPlatform: deploymentMode.isPlatform,
+    mode: state.mode,
+    connectionMethod: state.connectionMethod,
+    useSharedPooler: state.useSharedPooler,
+    hasIpv4Addon: !!ipv4Addon,
+  })
+  const showSessionPoolerNotice = shouldShowSessionPoolerNotice({
+    isPlatform: deploymentMode.isPlatform,
+    mode: state.mode,
+    connectionMethod: state.connectionMethod,
+  })
+  const showSelfHostedMcpNotice = shouldShowSelfHostedMcpNotice({
+    isSelfHosted: deploymentMode.isSelfHosted,
+    mode: state.mode,
+  })
 
   const shouldFetchDataApiStatus = shouldFetchDataApiConfig({
     mode: state.mode,

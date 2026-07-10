@@ -39,7 +39,25 @@ for (const [k, v] of Object.entries(parsed)) {
   )
 }
 
-const { default: handler } = await import(path.join(studioRoot, 'dist/server/server.js'))
+// Initialize server-side Sentry now that .env values are in process.env (the
+// instrument module reads process.env.NEXT_PUBLIC_SENTRY_DSN at call time).
+// Imported dynamically here rather than via a `--import` flag so it runs after
+// the env-loading block above. Non-fatal if the SDK isn't present.
+try {
+  await import(path.join(studioRoot, 'instrument.server.mjs'))
+} catch (err) {
+  console.warn('[serve] Sentry server init skipped:', err?.message ?? err)
+}
+const { wrapFetchWithSentry } = await import('@sentry/tanstackstart-react').catch(() => ({
+  wrapFetchWithSentry: (fetchHandler) => fetchHandler,
+}))
+
+const { default: rawHandler } = await import(path.join(studioRoot, 'dist/server/server.js'))
+// Wrap so request-scoped errors (incl. ones swallowed into a 500) are captured.
+const handler = {
+  ...rawHandler,
+  fetch: wrapFetchWithSentry(rawHandler.fetch.bind(rawHandler)),
+}
 
 const mimeByExt = new Map([
   ['.js', 'application/javascript; charset=utf-8'],
