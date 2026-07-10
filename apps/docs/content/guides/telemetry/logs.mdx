@@ -357,9 +357,7 @@ from
 
 Identify which service owns the problem from the error or status code first, then query only that source. Scanning every source at once buries the signal you need and scans far more data than the investigation requires.
 
-4. Follow a request across sources with an anchor
-
-Once a query gives you an anchor such as a timestamp, request id, or SQL state, filter the adjacent source by that anchor to correlate the request across layers (for example `edge_logs` to `postgres_logs`), instead of re-scanning each source from scratch.
+4. **Follow a request across sources with an anchor.** Once a query gives you an anchor such as a timestamp, request id, or SQL state, filter the adjacent source by that anchor to correlate the request across layers (for example `edge_logs` to `postgres_logs`), instead of re-scanning each source from scratch.
 
 5. Reference only fields you have confirmed
 
