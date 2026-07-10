@@ -94,9 +94,16 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       try {
         const errorBody = JSON.parse(responseBody)
 
+        // Self-hosted (Kong-fronted) edge runtime errors use `message`, while
+        // platform errors use `error` - check both rather than assuming one shape.
+        const message =
+          (typeof errorBody?.message === 'string' && errorBody.message) ||
+          (typeof errorBody?.error === 'string' && errorBody.error) ||
+          'Edge function returned an error'
+
         return res.status(response.status).json({
           status: response.status,
-          error: { message: errorBody?.error || 'Edge function returned an error' },
+          error: { message },
         })
       } catch (parseError) {
         // If not JSON, return the raw error
