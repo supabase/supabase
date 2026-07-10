@@ -74,7 +74,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 export const CHART_CONFIG = {
   success: {
     label: <TooltipLabel level="success" />,
-    color: 'var(--foreground-muted)',
+    color: 'var(--chart-success)',
   },
   warning: {
     label: <TooltipLabel level="warning" />,

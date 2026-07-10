@@ -31,12 +31,7 @@ const ICON_MAP: Partial<Record<(typeof LOG_TYPES)[number], IconComponent>> = {
   multigres: Network,
 }
 
-export const LogTypeIcon = ({
-  type,
-  size = 16,
-  strokeWidth = 1.5,
-  className,
-}: LogTypeIconProps) => {
+export const LogTypeIcon = ({ type, size = 16, strokeWidth = 1.5, className }: LogTypeIconProps) => {
   const Icon = ICON_MAP[type] ?? Box
 
   return (
