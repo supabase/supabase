@@ -39,7 +39,6 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
     <nav
       ref={navRef}
       aria-label="Floating toolbar"
-      data-floating-mobile-toolbar
       className={cn(
         'flex pointer-events-auto cursor-grab active:cursor-grabbing flex-row items-centerw-auto',
         'gap-2',
@@ -101,8 +100,7 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
           {sheet.showMenuButton && sheet.isSheetOpen && (
             <Button
               key="menu"
-              aria-label={sheet.isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-              title={sheet.isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              title="Menu dropdown button"
               variant={sheet.isMenuOpen ? 'secondary' : 'default'}
               className={cn(
                 'flex lg:hidden mr-1 rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30',
@@ -116,7 +114,6 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
       </div>
       <AnimatePresence initial={false}>
         <Button
-          aria-label="Close open panel"
           title="close"
           variant="text"
           className={cn(

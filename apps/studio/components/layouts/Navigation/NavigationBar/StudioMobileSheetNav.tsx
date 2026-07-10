@@ -8,7 +8,6 @@ import {
 } from '../../ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import type { MobileSheetContentType } from './MobileSheetContext'
 import { useMobileSheet } from './MobileSheetContext'
-import { preventFloatingToolbarDismiss } from './StudioMobileSheetNav.utils'
 import { CommandMenuInnerContent } from '@/components/interfaces/App/CommandMenu/CommandMenu'
 import { sidebarManagerState, useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -54,7 +53,6 @@ const StudioMobileSheetNav = () => {
     <MobileSheetNav
       open={content !== null}
       onOpenChange={handleOpenChange}
-      onInteractOutside={preventFloatingToolbarDismiss}
       shouldCloseOnViewportResize={!activeSidebar}
     >
       {sheetChildren}
