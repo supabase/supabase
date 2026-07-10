@@ -1,4 +1,4 @@
-import { Check, ChevronDown } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { useMemo, useState, type ReactNode } from 'react'
 import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
@@ -6,6 +6,7 @@ import {
   CreateOrganizationCard,
   OrganizationCard,
 } from '@/components/interfaces/Organization/OrganizationCard'
+import { BrandCheckCircle } from '@/components/ui/BrandCheckCircle'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import type { Organization } from '@/types'
 
@@ -213,9 +214,7 @@ const ConnectOrganizationButton = ({
       )}
     />
     {selected && (
-      <span className="pointer-events-none absolute right-3 top-1/2 flex size-5 -translate-y-1/2 items-center justify-center rounded-full bg-brand-500 dark:bg-brand-200 text-white dark:text-brand">
-        <Check className="size-3.5" strokeWidth={2} />
-      </span>
+      <BrandCheckCircle className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" />
     )}
   </button>
 )
