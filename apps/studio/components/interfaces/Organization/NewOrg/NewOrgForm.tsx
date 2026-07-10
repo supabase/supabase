@@ -65,6 +65,7 @@ import {
 } from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
 import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
+import { markToastAsTracked } from '@/lib/toast-errors'
 
 interface NewOrgFormProps {
   onPaymentMethodReset: () => void
@@ -253,7 +254,7 @@ export const NewOrgForm = ({
       }
     },
     onError: (data) => {
-      toast.error(data.message, { duration: 10_000 })
+      markToastAsTracked(toast.error(data.message, { duration: 10_000 }))
       trackFunnelError('org_creation', classifyApiError('org_creation', data), 'toast')
       setNewOrgLoading(false)
     },
@@ -266,7 +267,7 @@ export const NewOrgForm = ({
       }
     },
     onError: (error) => {
-      toast.error(error.message, { dismissible: true, duration: 10_000 })
+      markToastAsTracked(toast.error(error.message, { dismissible: true, duration: 10_000 }))
       trackFunnelError('org_creation', classifyApiError('org_creation', error), 'toast')
     },
   })
@@ -289,9 +290,11 @@ export const NewOrgForm = ({
         'toast'
       )
       // If the payment intent is not successful, we reset the payment method and show an error
-      toast.error(`Could not confirm payment. Please try again or use a different card.`, {
-        duration: 10_000,
-      })
+      markToastAsTracked(
+        toast.error(`Could not confirm payment. Please try again or use a different card.`, {
+          duration: 10_000,
+        })
+      )
       resetPaymentMethod()
       setNewOrgLoading(false)
     }
@@ -591,7 +594,7 @@ export const NewOrgForm = ({
               }
               onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
               onError={(err) => {
-                toast.error(err.message, { duration: 10_000 })
+                markToastAsTracked(toast.error(err.message, { duration: 10_000 }))
                 trackFunnelError(
                   'org_creation',
                   { errorCategory: 'payment', errorReason: 'payment_error' },

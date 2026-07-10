@@ -27,6 +27,7 @@ import { BASE_PATH } from '@/lib/constants'
 import { buildPathWithParams } from '@/lib/gotrue'
 import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
 import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
+import { markToastAsTracked } from '@/lib/toast-errors'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -79,7 +80,7 @@ export const SignUpForm = () => {
     onError: (error) => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
-      toast.error(`Failed to sign up: ${error.message}`)
+      markToastAsTracked(toast.error(`Failed to sign up: ${error.message}`))
       trackFunnelError('signup', classifyApiError('signup', error), 'toast')
     },
   })
