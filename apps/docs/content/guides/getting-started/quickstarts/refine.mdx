@@ -18,11 +18,25 @@ npm create refine-app@latest -- --preset refine-supabase my-app
 
 ![Refine welcome page](/docs/img/refine-qs-welcome-page.png)
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "refine", "tab": "frameworks" }} />
+## 4. Install Agent Skills (optional)
 
-## 4. Update `supabaseClient` with environment variables
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
 
-Update the `supabaseClient` with the `SUPABASE_URL` and `SUPABASE_KEY` of your Supabase API, which you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=refine&tab=frameworks). The `supabaseClient` is used in auth provider and data provider methods that allow the Refine app to connect to your Supabase backend.
+To install, run the following command in the root of your project:
+
+```bash
+npx skills add supabase/agent-skills
+```
+
+## 5. Update `supabaseClient` with environment variables
+
+Update the `supabaseClient` with the `SUPABASE_URL` and `SUPABASE_KEY` of your Supabase API, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=refine&tab=frameworks). The `supabaseClient` is used in auth provider and data provider methods that allow the Refine app to connect to your Supabase backend.
+
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=refine">
+    Open Connect panel
+  </a>
+</Button>
 
 ```ts name=src/utility/supabaseClient.ts
 import { createClient } from '@refinedev/supabase'
@@ -40,7 +54,9 @@ export const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
 })
 ```
 
-## 5. Add instruments resource and pages
+<$Partial path="api_settings.mdx" variables={{ "framework": "refine", "tab": "frameworks" }} />
+
+## 6. Add instruments resource and pages
 
 Use the following code to automatically add resources and generate code for the pages to show the `instruments` data using Refine Inferencer.
 
@@ -60,7 +76,7 @@ Read more on [how the Inferencer works is in the Refine docs](https://refine.dev
 npm run refine create-resource instruments
 ```
 
-## 6. Add routes for instruments pages
+## 7. Add routes for instruments pages
 
 Add routes for the `list`, `create`, `show`, and `edit` pages.
 
@@ -136,7 +152,7 @@ function App() {
 export default App
 ```
 
-## 7. View instruments pages
+## 8. View instruments pages
 
 Start the app with the following command:
 

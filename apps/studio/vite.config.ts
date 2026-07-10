@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-exports */
 
+import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
@@ -52,6 +53,89 @@ function nextCompat(): Plugin {
   }
 }
 
+// Import specifiers (as they appear in app source) for files that import as
+// raw text but whose extension the bundler would otherwise treat as code —
+// the Deno typings that `components/ui/AIEditor` feeds to Monaco as extra
+// libs. Deliberately an exact-specifier allowlist — do NOT widen to
+// `*.d.ts`: hijacking declaration-file resolution globally would corrupt
+// every package that ships `.d.ts` next to its JS.
+const RAW_TEXT_SPECIFIERS: Record<string, string> = {
+  '@/public/deno/edge-runtime.d.ts': path.join(rootDir, 'public/deno/edge-runtime.d.ts'),
+  '@/public/deno/lib.deno.d.ts': path.join(rootDir, 'public/deno/lib.deno.d.ts'),
+}
+
+// `\0`-prefixed so the Rolldown dep scanner externalizes the module instead
+// of descending into it (see `shouldExternalizeDep` in vite); `.js`-suffixed
+// so no TS transform ever sees a `.d.ts`-looking id.
+const RAW_TEXT_PREFIX = '\0studio-raw-text:'
+const RAW_TEXT_SUFFIX = '.js'
+
+// Mirror the raw-loader rules from next.config.ts: serve `*.md` files (used
+// by `static-data/integrations/*/overview.md` via
+// `static-data/integrations/overviews.ts`) and the Deno typings in
+// `public/deno/*.d.ts` as JS modules whose default export is the file's
+// text. Vite has `?raw` for this, but the query suffix would have to live
+// in shared app source where it breaks the webpack/turbopack raw-loader
+// rule, so the import specifiers stay query-free and this plugin does the
+// conversion for the Vite pipeline.
+//
+// The `.d.ts` files can't go through a plain `transform` like the `.md`
+// files do: the dep scanner's native scan pipeline skips JS transform/load
+// hooks entirely and parses whatever the id resolves to, and raw TS
+// *declaration* syntax (`get stdin(): WritableStream;`) is a parse error in
+// its runtime-TS grammar — the whole dependency scan fails and Vite skips
+// pre-bundling outright. Resolving the specifier to a `\0`-virtual id keeps
+// the scanner out (it externalizes `\0` ids) and the `load` hook then
+// serves the file's text for the real pipelines (dev, build, SSR).
+function rawTextLoader(): Plugin {
+  return {
+    name: 'studio-raw-text-loader',
+    enforce: 'pre',
+    resolveId(id) {
+      const file = RAW_TEXT_SPECIFIERS[id]
+      if (file) return RAW_TEXT_PREFIX + file + RAW_TEXT_SUFFIX
+    },
+    load(id) {
+      if (!id.startsWith(RAW_TEXT_PREFIX)) return
+      const file = id.slice(RAW_TEXT_PREFIX.length, -RAW_TEXT_SUFFIX.length)
+      const content = fs.readFileSync(file, 'utf-8')
+      return { code: `export default ${JSON.stringify(content)}`, map: null }
+    },
+    transform(code, id) {
+      if (!id.endsWith('.md')) return
+      return { code: `export default ${JSON.stringify(code)}`, map: null }
+    },
+  }
+}
+
+// Swap graphiql's webpack worker setup for its Vite one in client builds.
+//
+// App source imports `graphiql/setup-workers/webpack` (GraphiQLTab.tsx),
+// which registers `MonacoEnvironment.getWorker` using
+// `new Worker(new URL('monaco-editor/...', import.meta.url))` — the URL form
+// webpack/turbopack rewrites at build time. Vite doesn't rewrite bare module
+// specifiers inside `new URL(..., import.meta.url)`, so under the TanStack
+// build the worker URLs 404 and Monaco falls back to running the json /
+// editorWorkerService / graphql workers on the main thread ("Could not
+// create web worker(s)..." console warning). graphiql also ships
+// `setup-workers/vite`, which imports the same three workers via Vite's
+// `?worker` suffix; importing that unconditionally would break the Next
+// build, so the swap happens here instead of in app source.
+//
+// SSR resolution is left untouched: neither variant's `getWorker` ever runs
+// during SSR, and the webpack flavor is a plain global assignment while the
+// vite flavor's `?worker` imports don't belong in the server graph.
+function graphiqlViteWorkers(): Plugin {
+  return {
+    name: 'studio-graphiql-vite-workers',
+    enforce: 'pre',
+    resolveId(id, importer, options) {
+      if (id !== 'graphiql/setup-workers/webpack' || options.ssr) return
+      return this.resolve('graphiql/setup-workers/vite', importer, { skipSelf: true })
+    },
+  }
+}
+
 // Short-circuit UMD wrappers' AMD branch by string-replacing the
 // `define.amd` check. Vite's `config.define` doesn't reach pre-bundled
 // deps (Vite 8's Rolldown-based optimizer doesn't honour member-
@@ -75,12 +159,29 @@ function nextCompat(): Plugin {
 function umdAmdShortCircuit(): Plugin {
   // Matches both unminified (`typeof define === 'function' && define.amd`)
   // and minified (`"function" == typeof define && define.amd`) forms of
-  // the UMD AMD-detection check. Replaces the whole expression with
-  // `false` so dead-code elimination drops the AMD branch.
+  // the UMD AMD-detection check.
   const AMD_CHECK_PATTERNS = [
     /typeof\s+define\s*===?\s*['"]function['"]\s*&&\s*define\.amd/g,
     /['"]function['"]\s*===?\s*typeof\s+define\s*&&\s*define\.amd/g,
   ]
+
+  // Only short-circuit when `define` is the *global* AMD loader (Monaco's
+  // CDN loader) — that's the one we never want UMD wrappers to register
+  // against. Some vendored bundles install their own *local* `define` shim
+  // and rely on the AMD branch to capture their exports:
+  // `monaco-editor/esm/vs/base/common/marked/marked.js` (pulled in by
+  // @graphiql/react's bundled Monaco) wraps marked's UMD in
+  // `function define(deps, factory) { factory(__marked_exports) }` and its
+  // ESM tail reads `__marked_exports.X || exports.X`. Replacing the check
+  // with a bare `false` diverts the factory to the global-object branch,
+  // leaving `__marked_exports` empty, and the tail's `exports.X` fallback
+  // then throws `ReferenceError: exports is not defined` — the GraphiQL
+  // editor pane never mounts. The `define !== globalThis.define` guard
+  // keeps such local AMD shims working while still disarming the global
+  // one. (The operand order — guard *before* `define.amd` — also ensures
+  // the emitted expression can never re-match AMD_CHECK_PATTERNS.)
+  const AMD_CHECK_REPLACEMENT =
+    '(typeof define === "function" && define !== globalThis.define && define.amd)'
 
   return {
     name: 'studio-umd-amd-short-circuit',
@@ -92,7 +193,7 @@ function umdAmdShortCircuit(): Plugin {
       if (id.includes('monaco-editor/min/vs/loader')) return
       let next = code
       for (const pattern of AMD_CHECK_PATTERNS) {
-        next = next.replace(pattern, 'false')
+        next = next.replace(pattern, AMD_CHECK_REPLACEMENT)
       }
       if (next === code) return
       return { code: next, map: null }
@@ -271,12 +372,31 @@ export default defineConfig(({ command, mode }) => {
     // router.tsx). Both are build-time system env vars on Vercel.
     'VERCEL_DEPLOYMENT_ID',
     'VERCEL_SKEW_PROTECTION_ENABLED',
+    // Sentry release (sentry.tanstack.ts): the SDK silently drops session
+    // envelopes when the client has no release, so Release Health would send
+    // nothing. The commit SHA is also what withSentryConfig resolves the Next
+    // build's release to, keeping release names aligned across both builds.
+    'VERCEL_GIT_COMMIT_SHA',
   ] as const
   for (const key of vercelPublicVars) {
     const value = env[key]
     if (value !== undefined) {
       publicEnvDefines[`process.env.NEXT_PUBLIC_${key}`] = JSON.stringify(value)
     }
+  }
+
+  // Sentry init (lib/sentry-client-options.ts, reached via router.tsx) reads
+  // these at runtime in the browser. When a var is unset it gets no define
+  // entry above, which would leave a literal `process.env.*` in the built
+  // bundle — and an undeclared `process` throws in the browser. Inline
+  // `undefined` as the fallback, mirroring how Next inlines unset
+  // NEXT_PUBLIC_* vars.
+  for (const key of [
+    'NEXT_PUBLIC_SENTRY_DSN',
+    'NEXT_PUBLIC_SENTRY_ENVIRONMENT',
+    'NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA',
+  ]) {
+    publicEnvDefines[`process.env.${key}`] ??= 'undefined'
   }
 
   // Mirror Next's `basePath` via NEXT_PUBLIC_BASE_PATH. Unlike Next, TanStack
@@ -311,19 +431,15 @@ export default defineConfig(({ command, mode }) => {
   //   - `global` → `globalThis`: makes Node-style libs (`randombytes` via
   //     `generate-password-browser`, etc.) work in the browser. Surfaces
   //     on /auth/hooks via `randombytes/browser.js:16`.
-  //   - `define.amd` → `false`: short-circuits the AMD branch in UMD
-  //     wrappers (papaparse, others). Monaco's CDN loader installs an
-  //     AMD-style `window.define` at runtime; without this substitution,
-  //     UMD libs evaluate after Monaco has loaded and call an anonymous
-  //     `define([], t)` that Monaco's queue rejects with "Can only have
-  //     one anonymous define call per script file". Surfaces concretely
-  //     on /functions/[slug] (papaparse pulled in by invocations).
-  //     Monaco's loader.js itself runs from a CDN script tag (not in our
-  //     bundle / not pre-bundled), so its own `define.amd = true` write
-  //     isn't affected by the substitution.
+  //
+  // NOTE: `define.amd` is deliberately NOT substituted here. The AMD
+  // short-circuit is handled exclusively by the `umdAmdShortCircuit()`
+  // transform above — a blanket `'define.amd': 'false'` define would also
+  // rewrite the *read* in vendored bundles that install their own local
+  // `define` shim (monaco-editor's `esm/vs/base/common/marked/marked.js`)
+  // and break them — see the plugin's comment for the failure mode.
   const sharedDefines = {
     global: 'globalThis',
-    'define.amd': 'false',
   }
 
   return {
@@ -332,8 +448,40 @@ export default defineConfig(({ command, mode }) => {
     },
     resolve: {
       tsconfigPaths: true,
+      alias: [
+        // `@sentry/nextjs`'s client entry drags in Next runtime internals
+        // (`next/dist/shared/lib/constants`), whose module scope evaluates
+        // `process?.features?.typescript` — optional chaining doesn't guard
+        // an undeclared `process` in the browser, so every built chunk
+        // containing it (e.g. table-editor) crashes at load with
+        // "ReferenceError: process is not defined". Dev is unaffected
+        // because the dev pipeline shims `process`. Point the bare import
+        // at a shim that re-exports `@sentry/react` (same 10.x version —
+        // it's what `@sentry/nextjs` wraps on the client) plus explicit
+        // stand-ins for the Next-only APIs. Next build (`build:next`)
+        // doesn't read this config and keeps the real package.
+        {
+          find: /^@sentry\/nextjs$/,
+          replacement: path.resolve(rootDir, 'compat/sentry-nextjs.ts'),
+        },
+      ],
     },
     ...(basePath && { base: basePath }),
+    optimizeDeps: {
+      // graphiql's Vite worker setup (swapped in for the webpack one by the
+      // `graphiqlViteWorkers` plugin above) imports Monaco's workers with
+      // Vite's `?worker` suffix. The dep optimizer can't load `?worker` ids
+      // (UNLOADABLE_DEPENDENCY: "No such file or directory" for
+      // `json.worker.js?worker` etc.), so keep the whole chain out of
+      // pre-bundling; the modules then go through the normal transform
+      // pipeline where Vite's built-in worker plugin turns each `?worker`
+      // import into a spawnable Worker constructor.
+      exclude: [
+        'graphiql/setup-workers/webpack',
+        'graphiql/setup-workers/vite',
+        '@graphiql/react/setup-workers/vite',
+      ],
+    },
     define: {
       ...publicEnvDefines,
       ...sharedDefines,
@@ -418,34 +566,16 @@ export default defineConfig(({ command, mode }) => {
       // entire exports object `{ default: fn }`, and call sites like
       // `AwesomeDebouncePromise(fn, 500)` crash with "is not a function" at
       // SSR module evaluation. Surfaces on routes that load the table grid.
-      // `@sentry/nextjs`'s CJS entry doesn't surface `startSpan` (and other
-      // v8 APIs) onto the namespace shape Vite's SSR externalizer produces,
-      // so `import * as Sentry from '@sentry/nextjs'` + `Sentry.startSpan`
-      // crashes with "is not a function" inside the pg-meta proxy on the
-      // first table-editor request.
-      noExternal: [
-        'lodash',
-        /^next(\/|$)/,
-        'tslib',
-        'react-use',
-        'awesome-debounce-promise',
-        '@sentry/nextjs',
-      ],
-      // Vite 8.0.13's SSR module runner evaluates `@sentry/nextjs`'s
-      // CJS file via `runInlinedModule` without the CJS-compat wrapper
-      // older vite applied, crashing with "exports is not defined" at
-      // SSR. Forcing pre-bundling via esbuild rewrites it to ESM
-      // before the SSR runner sees it. Only `@sentry/nextjs` needs
-      // this — the other CJS deps in `noExternal` work via vite's SSR
-      // transform; pre-bundling React-using deps (e.g. `react-use`)
-      // inlines a duplicate React into the bundle and breaks hook
-      // dedupe at SSR (useRef → null).
-      optimizeDeps: {
-        include: ['@sentry/nextjs'],
-      },
+      // `@sentry/nextjs` deliberately has no entry here: the resolve.alias
+      // above rewrites it to the `@sentry/react`-backed shim before SSR
+      // resolution ever sees the id, and `@sentry/react` ships real ESM
+      // ("import" condition → build/esm), so plain externalization works.
+      noExternal: ['lodash', /^next(\/|$)/, 'tslib', 'react-use', 'awesome-debounce-promise'],
     },
     plugins: [
       nextCompat(),
+      rawTextLoader(),
+      graphiqlViteWorkers(),
       ssrStubGraphiql(),
       umdAmdShortCircuit(),
       assertNoChunkCycles(),

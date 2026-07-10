@@ -29,7 +29,11 @@ import { useIntegrationsQuery } from '@/data/integrations/integrations-query'
 import { useVercelIntegrationCreateMutation } from '@/data/integrations/vercel-integration-create-mutation'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { withAuth } from '@/hooks/misc/withAuth'
-import { getErrorMessage } from '@/lib/get-error-message'
+import {
+  buildVercelInstallRouteQuery,
+  getErrorMessage,
+  getVercelInstallSource,
+} from '@/lib/integrations/vercel-install.utils'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { useProfileNameAndPicture } from '@/lib/profile'
 import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
@@ -52,7 +56,7 @@ export type VercelIntegrationFlow = 'deploy-button' | 'marketing'
 
 const VercelIntegration: NextPageWithLayout = () => {
   const router = useRouter()
-  const { code, configurationId, teamId, source } = useParams()
+  const { code, configurationId, currentProjectId, externalId, next, teamId, source } = useParams()
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
   const { username, primaryEmail, avatarUrl } = useProfileNameAndPicture()
 
@@ -118,12 +122,21 @@ const VercelIntegration: NextPageWithLayout = () => {
    */
   function handleRouteChange() {
     const orgSlug = selectedOrg?.slug
+    const vercelInstallSource = getVercelInstallSource(source)
+    const query = buildVercelInstallRouteQuery({
+      source: vercelInstallSource,
+      organizationSlug: orgSlug,
+      configurationId,
+      currentProjectId,
+      externalId,
+      next,
+    })
 
-    switch (source) {
+    switch (vercelInstallSource) {
       case 'deploy-button': {
         router.push({
           pathname: `/integrations/vercel/${orgSlug}/deploy-button/new-project`,
-          query: { ...router.query, organizationSlug: orgSlug },
+          query,
         })
         break
       }
@@ -131,7 +144,7 @@ const VercelIntegration: NextPageWithLayout = () => {
       case 'external': {
         router.push({
           pathname: `/integrations/vercel/${orgSlug}/marketplace/choose-project`,
-          query: { ...router.query, organizationSlug: orgSlug },
+          query,
         })
         break
       }
@@ -228,19 +241,6 @@ const VercelIntegration: NextPageWithLayout = () => {
     !selectedOrg ||
     missingParams.length > 0 ||
     isError
-
-  const isLoading = useMemo(() => {
-    return (
-      isLoadingVercelIntegrationCreateMutation ||
-      isLoadingOrganizationsQuery ||
-      isLoadingIntegrationsQuery
-    )
-  }, [
-    isLoadingVercelIntegrationCreateMutation,
-    isLoadingIntegrationsQuery,
-    isLoadingOrganizationsQuery,
-  ])
-
   return (
     <>
       <Head>
@@ -268,7 +268,7 @@ const VercelIntegration: NextPageWithLayout = () => {
               <OrganizationSelect
                 organizations={organizationsData ?? []}
                 selectedOrg={selectedOrg}
-                disabled={noOrganizations || isLoading}
+                disabled={noOrganizations || dataLoading}
                 installed={installed}
                 onSelectedOrgChange={setSelectedOrg}
               />

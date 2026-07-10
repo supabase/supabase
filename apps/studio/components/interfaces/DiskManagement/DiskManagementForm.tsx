@@ -201,7 +201,7 @@ export function DiskManagementForm() {
     DISK_LIMITS[DiskType.GP3].minIops
   )
   // Suggested target when prompting a resize, sits above the floor so users
-  // aren't pinned at the minimum during the 4-hour disk-config cooldown.
+  // aren't pinned at the minimum between disk-config modifications.
   const suggestedDiskSizeForCustomIops = PLAN_DETAILS.pro.includedDiskGB.gp3
   const isDiskTooSmallForCustomIops =
     watchedStorageType === 'gp3' && watchedTotalSize < minDiskSizeForCustomIops
@@ -551,7 +551,7 @@ export function DiskManagementForm() {
                             <Admonition
                               type="default"
                               title="Increase disk size to adjust IOPS or throughput"
-                              description={`This disk is too small to update IOPS or throughput, since gp3 volumes are capped at 500 IOPS per GB with a 3,000 IOPS minimum. Resizing to ${suggestedDiskSizeForCustomIops} GB unlocks custom IOPS and throughput, and leaves headroom for further adjustments (disk config changes are locked for 4 hours after each resize).`}
+                              description={`This disk is too small to update IOPS or throughput, since gp3 volumes are capped at 500 IOPS per GB with a 3,000 IOPS minimum. Resizing to ${suggestedDiskSizeForCustomIops} GB unlocks custom IOPS and throughput, and leaves headroom for further adjustments (disk config changes are limited to 4 within a rolling 24-hour window).`}
                               actions={
                                 !disableDiskSizeInput ? (
                                   <Button

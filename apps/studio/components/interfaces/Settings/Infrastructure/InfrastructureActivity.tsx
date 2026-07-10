@@ -438,7 +438,12 @@ export const InfrastructureActivity = () => {
                       title="Looking for actual disk activity?"
                       description="The chart above shows your remaining burst budget, not real disk throughput. For detailed read/write IOPS and throughput charts, head to the Database Observability page."
                     >
-                      <Button asChild variant="default" icon={<ChartLine size={14} />}>
+                      <Button
+                        asChild
+                        variant="default"
+                        className="mt-2"
+                        icon={<ChartLine size={14} />}
+                      >
                         <Link href={`/project/${projectRef}/observability/database`}>
                           View detailed IOPS and throughput
                         </Link>

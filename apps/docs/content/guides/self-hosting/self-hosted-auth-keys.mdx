@@ -82,14 +82,14 @@ sb_secret_<22-char-random>_<8-char-checksum>
 
 ### Verifying the setup
 
-Test with the new publishable key:
+Test with the new secret key:
 
 ```sh
 curl http://<your-domain>/rest/v1/ \
 -H "apikey: your-supabase-secret-key"
 ```
 
-You should receive a valid response from PostgREST. Then verify that the legacy key still works:
+You should receive a valid response from PostgREST. Then verify that the legacy service role key still works:
 
 ```sh
 curl http://<your-domain>/rest/v1/ \
@@ -97,6 +97,12 @@ curl http://<your-domain>/rest/v1/ \
 ```
 
 Both should work and return the same result.
+
+<Admonition type="note">
+
+`/rest/v1/` is the Open API root and requires admin-level keys (`sb_secret_*` or legacy `SERVICE_ROLE_KEY`). Public keys (`sb_publishable_*` or legacy `ANON_KEY`) return `403` for this endpoint.
+
+</Admonition>
 
 You can also verify the public JWKS endpoint:
 

@@ -274,7 +274,7 @@ export const EditorPanel = () => {
   }
 
   return (
-    <div className="flex h-full flex-col bg-background">
+    <div className="flex h-full flex-col bg-card">
       <div className="border-b border-b-muted flex items-center justify-between gap-x-4 pl-4 pr-3 h-(--header-height)">
         {isEditingTitle ? (
           <input
@@ -482,7 +482,7 @@ export const EditorPanel = () => {
       </div>
 
       <div className="flex-1 overflow-hidden flex flex-col h-full">
-        <div className="flex-1 min-h-0 relative [&_.monaco-editor]:!bg [&_.monaco-editor_.margin]:!bg [&_.monaco-editor_.monaco-editor-background]:!bg">
+        <div className="flex-1 min-h-0 relative [&_.monaco-editor]:!bg-card [&_.monaco-editor_.margin]:!bg-card [&_.monaco-editor_.monaco-editor-background]:!bg-card">
           <AIEditor
             autoFocus
             language="pgsql"

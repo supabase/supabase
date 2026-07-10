@@ -20,9 +20,15 @@ import {
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
 } from '@/components/interfaces/Settings/Logs/Logs.constants'
 import { DatePickerValue } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
-import { LogData, LogsWarning, LogTemplate } from '@/components/interfaces/Settings/Logs/Logs.types'
+import {
+  LogData,
+  LogQueryError,
+  LogsWarning,
+  LogTemplate,
+} from '@/components/interfaces/Settings/Logs/Logs.types'
 import { UpdateSavedQueryModal } from '@/components/interfaces/Settings/Logs/Logs.UpdateSavedQueryModal'
 import {
+  checkForLimitClause,
   maybeShowUpgradePromptIfNotEntitled,
   useEditorHints,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
@@ -74,18 +80,27 @@ const OTEL_PLACEHOLDER_QUERY =
 const otelSourceQuery = (source: string) =>
   `select\n  timestamp,\n  event_message,\n  log_attributes\nfrom logs\nwhere source = '${source}'\norder by timestamp desc\nlimit 100`
 
+const MISSING_LIMIT_ERROR: LogQueryError = {
+  error: {
+    code: 400,
+    status: 'INVALID_ARGUMENT',
+    message: 'A LIMIT clause is required.',
+    errors: [{ domain: 'logs', reason: 'missingLimit', message: 'A LIMIT clause is required.' }],
+  },
+}
+
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
+  const track = useTrack()
   const monaco = useMonaco()
   const router = useRouter()
   const { profile } = useProfile()
+  const { ref: projectRef, q, queryId } = useParams()
+  const useOtelEndpoint = useFlag('otelLegacyLogs')
+  const { logsShowMetadataIpTemplate } = useIsFeatureEnabled(['logs:show_metadata_ip_template'])
+
   const { data: project } = useSelectedProjectQuery()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { ref, q, queryId } = useParams()
-  const track = useTrack()
-  const projectRef = ref as string
-  const { logsShowMetadataIpTemplate } = useIsFeatureEnabled(['logs:show_metadata_ip_template'])
-  const useOtelEndpoint = useFlag('otelLegacyLogs')
 
   const allTemplates = useMemo(() => {
     const templates = getLogsTemplates(useOtelEndpoint)
@@ -123,6 +138,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const [editorValue, setEditorValue] = useState<string>(PLACEHOLDER_QUERY)
   const [saveModalOpen, setSaveModalOpen] = useState<boolean>(false)
   const [warnings, setWarnings] = useState<LogsWarning[]>([])
+  const [showMissingLimitError, setShowMissingLimitError] = useState<boolean>(false)
   const [selectedLog, setSelectedLog] = useState<LogData | null>(null)
   const [rewriteProposal, setRewriteProposal] = useState<{
     original: string
@@ -142,10 +158,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   const { getEntitlementNumericValue } = useCheckEntitlements('log.retention_days')
   const entitledToAuditLogDays = getEntitlementNumericValue()
 
-  const { data: content } = useContentQuery({
-    projectRef: ref,
-    type: 'log_sql',
-  })
+  const { data: content } = useContentQuery({ projectRef, type: 'log_sql' })
   const query = content?.content.find((x) => x.id === queryId)
 
   const resolvedRange = useMemo(() => {
@@ -164,15 +177,15 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     error,
     isLoading: logsLoading,
     setParams,
-  } = useLogsQuery(
+  } = useLogsQuery({
     projectRef,
-    {
+    initialParams: {
       iso_timestamp_start: resolvedRange.from,
       iso_timestamp_end: resolvedRange.to,
     },
-    true,
-    { useOtel: useOtelEndpoint }
-  )
+    enabled: true,
+    options: { useOtel: useOtelEndpoint },
+  })
 
   const results = logData
   const isLoading = logsLoading
@@ -242,11 +255,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       const headerData = await constructHeaders()
       const source = detectLogSource(currentSql)
       const availableKeys = source
-        ? await fetchOtelLogKeys({ projectRef, source }).catch(() => undefined)
+        ? await fetchOtelLogKeys({ projectRef: projectRef!, source }).catch(() => undefined)
         : undefined
       const rewritten = await rewriteLogsSqlWithAI({
         sql: currentSql,
-        projectRef,
+        projectRef: projectRef!,
         connectionString: project?.connectionString,
         orgSlug: organization?.slug,
         authorizationHeader: headerData.get('Authorization'),
@@ -285,6 +298,14 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
     // keeps the Run button consistent with the Cmd+Enter keybinding.
     const liveValue = editorRef.current?.getValue()
     const query = typeof value === 'string' ? value || editorValue : (liveValue ?? editorValue)
+
+    if (!checkForLimitClause(query)) {
+      setShowMissingLimitError(true)
+      setSelectedLog(null)
+      return
+    }
+    setShowMissingLimitError(false)
+
     const resolvedParams = buildLogQueryParams(datePickerValue, query)
 
     setSelectedLog(null)
@@ -444,11 +465,14 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         text: 'Querying large date ranges can be slow. Consider selecting a smaller date range.',
       })
     }
-    if (editorValue && !editorValue.toLowerCase().includes('limit')) {
-      newWarnings.push({ text: 'When querying large date ranges, include a LIMIT clause.' })
-    }
     setWarnings(newWarnings)
-  }, [editorValue, timestampStart, timestampEnd])
+  }, [timestampStart, timestampEnd])
+
+  useEffect(() => {
+    if (showMissingLimitError && checkForLimitClause(editorValue)) {
+      setShowMissingLimitError(false)
+    }
+  }, [editorValue, showMissingLimitError])
 
   // Show the prompt on page load based on query params
   useEffect(() => {
@@ -537,9 +561,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               onRun={handleRun}
               onSave={handleOnSave}
               hasEditorValue={Boolean(editorValue)}
-              data={results}
-              error={error}
-              projectRef={projectRef}
+              data={showMissingLimitError ? [] : results}
+              error={showMissingLimitError ? MISSING_LIMIT_ERROR : error}
+              projectRef={projectRef!}
               onSelectedLogChange={setSelectedLog}
               selectedLog={selectedLog || undefined}
               sqlQuery={editorValue}

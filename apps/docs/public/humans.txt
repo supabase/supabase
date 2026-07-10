@@ -32,6 +32,7 @@ Artur Zakirov
 Artyom Borissov
 Aziz Quadri
 Barco Fourie
+Barry Roodt
 Beng Eu
 Benjamin Coenen
 Bo Lu
@@ -263,6 +264,7 @@ Sean Romberg
 Sean Thompson
 Sergio Cioban Filho
 Shaii O
+Shane Adams
 Shane E
 Shreekar Shetty
 Sreyas Udayavarman

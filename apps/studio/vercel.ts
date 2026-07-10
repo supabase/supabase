@@ -7,6 +7,7 @@ import {
   SHARED_REDIRECTS,
   type StudioRedirect,
 } from './redirects.shared'
+import { getSecurityHeaders } from './security-headers'
 
 // STUDIO_FRAMEWORK gates the TanStack Start deploy. When the env var is
 // unset (the default — used by the Next.js prod deploy) this file returns
@@ -55,6 +56,11 @@ function routesFor(prefix: string) {
       routes.rewrite(`${prefix}/((?!.*\\.\\w+$).*)`, '/_shell'),
     ],
     headers: [
+      // Security headers for every response. The Next build sets these via
+      // next.config.ts `headers()`; the TanStack build serves a static shell
+      // with no server to attach them, so they live here. Matches next.config's
+      // `/(.*?)` block (CSP, X-Frame-Options, HSTS, etc.).
+      { source: `${prefix}/(.*)`, headers: getSecurityHeaders() },
       // Dynamic function responses must not be cached by any shared cache —
       // handlers can still opt in with their own Cache-Control on the
       // Response when a response IS safe to cache.

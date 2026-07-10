@@ -1,7 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
 import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
-import { filterTablePolicies } from '@/components/interfaces/Database/RLSTester/useTestQueryRLS.utils'
+import {
+  filterTablePolicies,
+  getTestQueryBlockedReason,
+} from '@/components/interfaces/Database/RLSTester/useTestQueryRLS.utils'
 
 const makePolicy = (overrides: Partial<Policy>): Policy =>
   ({
@@ -142,6 +145,121 @@ describe('filterTablePolicies', () => {
       })
       expect(result).toHaveLength(1)
       expect(result[0]).toBe(match)
+    })
+  })
+})
+
+describe('getTestQueryBlockedReason', () => {
+  const blockedBase = {
+    statementCount: 1,
+    operation: 'SELECT' as const,
+    hasSandbox: false,
+    acknowledgeMutation: false,
+  }
+
+  describe('multiple statements', () => {
+    it('blocks when statementCount is greater than 1', () => {
+      expect(getTestQueryBlockedReason({ ...blockedBase, statementCount: 2 })).toStrictEqual({
+        type: 'multiple-statements',
+      })
+    })
+
+    it('takes priority over an unsupported operation', () => {
+      expect(
+        getTestQueryBlockedReason({ ...blockedBase, statementCount: 2, operation: 'DELETE' })
+      ).toStrictEqual({ type: 'multiple-statements' })
+    })
+
+    it('takes priority over an unacknowledged mutation', () => {
+      expect(
+        getTestQueryBlockedReason({ ...blockedBase, statementCount: 2, operation: 'INSERT' })
+      ).toStrictEqual({ type: 'multiple-statements' })
+    })
+
+    it('does not block when statementCount is exactly 1', () => {
+      expect(getTestQueryBlockedReason({ ...blockedBase, statementCount: 1 })).toBeUndefined()
+    })
+
+    it('does not block when statementCount is 0', () => {
+      expect(getTestQueryBlockedReason({ ...blockedBase, statementCount: 0 })).toBeUndefined()
+    })
+  })
+
+  describe('unsupported operations', () => {
+    it('blocks UPDATE', () => {
+      expect(getTestQueryBlockedReason({ ...blockedBase, operation: 'UPDATE' })).toStrictEqual({
+        type: 'unsupported-operation',
+        operation: 'UPDATE',
+      })
+    })
+
+    it('blocks DELETE', () => {
+      expect(getTestQueryBlockedReason({ ...blockedBase, operation: 'DELETE' })).toStrictEqual({
+        type: 'unsupported-operation',
+        operation: 'DELETE',
+      })
+    })
+
+    it('blocks UPDATE even with a sandbox available', () => {
+      expect(
+        getTestQueryBlockedReason({ ...blockedBase, operation: 'UPDATE', hasSandbox: true })
+      ).toStrictEqual({ type: 'unsupported-operation', operation: 'UPDATE' })
+    })
+
+    it('blocks DELETE even when already acknowledged', () => {
+      expect(
+        getTestQueryBlockedReason({
+          ...blockedBase,
+          operation: 'DELETE',
+          acknowledgeMutation: true,
+        })
+      ).toStrictEqual({ type: 'unsupported-operation', operation: 'DELETE' })
+    })
+  })
+
+  describe('INSERT mutation warning', () => {
+    it('blocks an unacknowledged INSERT with no sandbox', () => {
+      expect(getTestQueryBlockedReason({ ...blockedBase, operation: 'INSERT' })).toStrictEqual({
+        type: 'mutation',
+        operation: 'INSERT',
+      })
+    })
+
+    it('does not block an INSERT when a sandbox is available', () => {
+      expect(
+        getTestQueryBlockedReason({ ...blockedBase, operation: 'INSERT', hasSandbox: true })
+      ).toBeUndefined()
+    })
+
+    it('does not block an INSERT once acknowledged', () => {
+      expect(
+        getTestQueryBlockedReason({
+          ...blockedBase,
+          operation: 'INSERT',
+          acknowledgeMutation: true,
+        })
+      ).toBeUndefined()
+    })
+
+    it('does not require acknowledgement when a sandbox is available', () => {
+      expect(
+        getTestQueryBlockedReason({
+          ...blockedBase,
+          operation: 'INSERT',
+          hasSandbox: true,
+          acknowledgeMutation: false,
+        })
+      ).toBeUndefined()
+    })
+  })
+
+  describe('unblocked operations', () => {
+    it('does not block SELECT', () => {
+      expect(getTestQueryBlockedReason({ ...blockedBase, operation: 'SELECT' })).toBeUndefined()
+    })
+
+    it('does not block when operation is undefined', () => {
+      expect(getTestQueryBlockedReason({ ...blockedBase, operation: undefined })).toBeUndefined()
     })
   })
 })

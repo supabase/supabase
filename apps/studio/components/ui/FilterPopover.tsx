@@ -180,7 +180,6 @@ export const FilterPopover = <T extends Record<string, any>>({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          asChild
           disabled={disabled}
           variant={buttonType ?? (activeOptions.length > 0 ? 'default' : 'dashed')}
           onClick={() => setOpen(false)}

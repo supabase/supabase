@@ -55,6 +55,13 @@ jobs:
         working-directory: apps/docs/spec
         run: make download.tsdoc.v2
 
+      - name: Generate Dart reference dump
+        # Dart has no upstream TypeDoc dump; its gitignored dump is generated
+        # from the committed `supabase_dart_v2.yml` so the reference-content
+        # snapshot test has something to walk.
+        working-directory: apps/docs
+        run: pnpm run codegen:references:dart
+
       - name: Run tests
         run: |
           touch .env
