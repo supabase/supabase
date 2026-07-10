@@ -63,7 +63,7 @@ export const RealtimeSettings = () => {
   const { data: policies, isSuccess: isSuccessPolicies } = useDatabasePoliciesQuery({
     projectRef,
     connectionString: project?.connectionString,
-    schema: 'realtime',
+    schemas: ['realtime'],
   })
 
   const isFreePlan = organization?.plan.id === 'free'

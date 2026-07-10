@@ -1,6 +1,8 @@
 REPO_DIR=$(shell pwd)
 GENERATOR_DIR=../../../packages/generator
 
+.PHONY: run download download.api.v1 download.storage.v1 download.tsdoc.v2 download.server.v1 transform dereference.api.v1 dereference.auth.v1 dereference.storage.v0 generate generate.sections.api.v1 format
+
 run: download transform generate format
 
 
@@ -9,7 +11,7 @@ run: download transform generate format
 ###############################################################################
 # comment out download.auth.v1 temporarily, we're manually creating the file
 # download: download.api.v1 download.auth.v1 download.storage.v1 download.tsdoc.v2
-download: download.api.v1 download.storage.v1 download.tsdoc.v2
+download: download.api.v1 download.storage.v1 download.tsdoc.v2 download.server.v1
 
 download.api.v1:
 	curl -sS https://api.supabase.com/api/v1-json > $(REPO_DIR)/api_v1_openapi.json
@@ -43,6 +45,9 @@ download.tsdoc.v2:
 	curl -sS https://supabase.github.io/supabase-js/realtime-js/v2/spec.json > $(REPO_DIR)/reference/javascript/v2/realtime.json
 	curl -sS https://supabase.github.io/supabase-js/storage-js/v2/spec.json > $(REPO_DIR)/reference/javascript/v2/storage.json
 	curl -sS https://supabase.github.io/supabase-js/functions-js/v2/spec.json > $(REPO_DIR)/reference/javascript/v2/functions.json
+
+download.server.v1:
+	curl -sSf https://supabase.github.io/server/spec.json > $(REPO_DIR)/reference/server/v1/server.json
 
 download.analytics.v0:
 	curl -sS https://logflare.app/api/openapi > $(REPO_DIR)/analytics_v0_openapi.json

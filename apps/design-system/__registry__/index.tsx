@@ -621,6 +621,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "calendar-disabled-days-demo": {
+      name: "calendar-disabled-days-demo",
+      type: "components:example",
+      registryDependencies: ["calendar","form","popover"],
+      component: React.lazy(() => import("@/registry/default/example/calendar-disabled-days-demo")),
+      source: "",
+      files: ["registry/default/example/calendar-disabled-days-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "single-value-field-array-demo": {
       name: "single-value-field-array-demo",
       type: "components:example",

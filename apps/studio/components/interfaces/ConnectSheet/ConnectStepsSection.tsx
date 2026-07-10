@@ -15,6 +15,14 @@ import type {
   StepContentProps,
 } from './Connect.types'
 import { ConnectSheetStep } from './ConnectSheetStep'
+import {
+  resolveContentPath,
+  shouldFetchDataApiConfig,
+  shouldShowDataApiDisabledWarning,
+  shouldShowIpv4AddonNotice,
+  shouldShowSelfHostedMcpNotice,
+  shouldShowSessionPoolerNotice,
+} from './ConnectStepsSection.utils'
 import { CopyPromptAdmonition } from './CopyPromptAdmonition'
 import { buildConnectionStringPooler, getConnectionStrings } from './DatabaseSettings.utils'
 import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
@@ -25,6 +33,7 @@ import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-config
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
+import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { DOCS_URL } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 
@@ -32,26 +41,6 @@ interface ConnectStepsSectionProps {
   steps: ResolvedStep[]
   state: ConnectState
   projectKeys: ProjectKeys
-}
-
-/**
- * Resolves a content path template by replacing {{key}} placeholders with state values.
- * Empty segments are filtered out to handle optional state values like frameworkVariant.
- *
- * Examples:
- *   - '{{framework}}/{{frameworkVariant}}/{{library}}' with state {framework: 'nextjs', frameworkVariant: 'app', library: 'supabasejs'}
- *     → 'nextjs/app/supabasejs'
- *   - '{{orm}}' with state {orm: 'prisma'}
- *     → 'prisma'
- *   - 'steps/install' (no templates)
- *     → 'steps/install'
- */
-function resolveContentPath(template: string, state: ConnectState): string {
-  return template
-    .replace(/\{\{(\w+)\}\}/g, (_, key) => String(state[key] ?? ''))
-    .split('/')
-    .filter(Boolean)
-    .join('/')
 }
 
 /**
@@ -214,23 +203,60 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
       },
     }
   )
-  const showIpv4AddonNotice =
-    deploymentMode.isPlatform &&
-    state.mode === 'direct' &&
-    !ipv4Addon &&
-    (state.connectionMethod === 'direct' ||
-      (state.connectionMethod === 'transaction' && !state.useSharedPooler))
-  const showSessionPoolerNotice =
-    deploymentMode.isPlatform && state.mode === 'direct' && state.connectionMethod === 'session'
+  const showIpv4AddonNotice = shouldShowIpv4AddonNotice({
+    isPlatform: deploymentMode.isPlatform,
+    mode: state.mode,
+    connectionMethod: state.connectionMethod,
+    useSharedPooler: state.useSharedPooler,
+    hasIpv4Addon: !!ipv4Addon,
+  })
+  const showSessionPoolerNotice = shouldShowSessionPoolerNotice({
+    isPlatform: deploymentMode.isPlatform,
+    mode: state.mode,
+    connectionMethod: state.connectionMethod,
+  })
+  const showSelfHostedMcpNotice = shouldShowSelfHostedMcpNotice({
+    isSelfHosted: deploymentMode.isSelfHosted,
+    mode: state.mode,
+  })
 
-  const showSelfHostedMcpNotice = deploymentMode.isSelfHosted && state.mode === 'mcp'
-
+  const shouldFetchDataApiStatus = shouldFetchDataApiConfig({
+    mode: state.mode,
+  })
+  const {
+    isEnabled: isDataApiEnabled,
+    isPending: isDataApiConfigPending,
+    isError: isDataApiConfigError,
+  } = useIsDataApiEnabled({
+    projectRef: ref,
+    enabled: shouldFetchDataApiStatus,
+  })
+  const showDataApiDisabledWarning = shouldShowDataApiDisabledWarning({
+    mode: state.mode,
+    isDataApiEnabled,
+    isPending: isDataApiConfigPending,
+    isError: isDataApiConfigError,
+  })
   if (steps.length === 0) return null
 
   return (
     <div className="bg-muted/50 flex-1">
       <div className="p-8 flex flex-col gap-y-6">
         <h3>Connect your app</h3>
+
+        {showDataApiDisabledWarning && (
+          <Admonition
+            type="warning"
+            layout="responsive"
+            title="Database access requires the Data API"
+            description="Client library database queries will not work until the Data API is enabled."
+            actions={[
+              <Button asChild key="enable" variant="default">
+                <Link href={`/project/${ref}/integrations/data_api`}>Enable Data API</Link>
+              </Button>,
+            ]}
+          />
+        )}
 
         {showIpv4AddonNotice && (
           <Admonition

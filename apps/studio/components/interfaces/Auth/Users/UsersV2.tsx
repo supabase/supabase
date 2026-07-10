@@ -807,6 +807,7 @@ export const UsersV2 = () => {
                   renderRow(id, props) {
                     return (
                       <Row
+                        key={id}
                         {...props}
                         onClick={() => {
                           const user = users.find((u) => u.id === id)

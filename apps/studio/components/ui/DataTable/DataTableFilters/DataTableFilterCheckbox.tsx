@@ -92,11 +92,11 @@ export function DataTableFilterCheckbox<TData>({
             return (
               <div
                 key={String(option.value)}
-                className={cn('py-2', index !== filterOptions.length - 1 ? 'border-b' : undefined)}
+                className={cn(index !== filterOptions.length - 1 ? 'border-b' : undefined)}
               >
                 <div
                   className={cn(
-                    'group relative flex items-center space-x-2 px-2 hover:bg-accent/50'
+                    'group relative flex items-center space-x-2 pl-2 hover:bg-accent/50'
                   )}
                 >
                   <Checkbox
@@ -111,7 +111,7 @@ export function DataTableFilterCheckbox<TData>({
                   />
                   <Label
                     htmlFor={`${value}-${option.value}`}
-                    className="relative flex w-full items-center justify-between gap-2 text-foreground/70 group-hover:text-accent-foreground text-[0.8rem] min-w-0"
+                    className="py-2 relative flex w-full items-center justify-between gap-2 text-foreground/70 group-hover:text-accent-foreground text-[0.8rem] min-w-0"
                   >
                     <div className="flex-1 min-w-0 overflow-hidden">
                       {Component ? (
@@ -129,13 +129,13 @@ export function DataTableFilterCheckbox<TData>({
                         className={cn(
                           'flex h-4 w-4 shrink-0 items-center justify-center rounded-sm text-foreground-lighter',
                           'hover:bg-selection hover:text-foreground',
-                          'absolute top-0 right-10'
+                          'absolute top-2 right-10'
                         )}
                       >
                         {isExpanded ? <Minus size={12} /> : <Plus size={12} />}
                       </button>
                     )}
-                    <span className="shrink-0 flex items-center justify-center font-mono text-xs">
+                    <span className="shrink-0 flex items-center justify-center font-mono text-xs pr-2">
                       {isLoadingCounts ? (
                         <Skeleton className="h-4 w-4" />
                       ) : facetedValue?.has(option.value) ? (
@@ -148,62 +148,73 @@ export function DataTableFilterCheckbox<TData>({
                       type="button"
                       onClick={() => column?.setFilterValue([option.value])}
                       className={cn(
-                        'absolute inset-y-0 right-0 -top-0.5 hidden font-normal text-muted-foreground backdrop-blur-xs hover:text-foreground group-hover:block',
+                        'absolute inset-y-0 right-0 hidden font-normal text-muted-foreground backdrop-blur-xs hover:text-foreground group-hover:block',
                         'rounded-md ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
                       )}
                     >
-                      <span className="pr-2">only</span>
+                      <span className="pl-1 pr-2">only</span>
                     </button>
                   </Label>
                 </div>
 
-                {hasNested &&
-                  isExpanded &&
-                  option.options?.map((optionNested, nestedIndex) => {
-                    const nestedChecked = getBooleanParam(optionNested.value)
-                    const isLastNested = nestedIndex === (option.options?.length ?? 0) - 1
+                {hasNested && isExpanded && (
+                  <div className="pb-1">
+                    {option.options?.map((optionNested, nestedIndex) => {
+                      const nestedChecked = getBooleanParam(optionNested.value)
+                      const isLastNested = nestedIndex === (option.options?.length ?? 0) - 1
 
-                    return (
-                      <div
-                        key={optionNested.value}
-                        className={cn(
-                          'group/nested relative flex items-stretch',
-                          nestedIndex === 0 && '[&>div:last-child]:pt-2'
-                        )}
-                      >
-                        <div aria-hidden className="relative w-7 shrink-0">
-                          {isLastNested ? (
-                            <span
-                              className={cn(
-                                'absolute left-4 top-0 w-3 rounded-bl-sm border-b border-l border-border',
-                                option.options?.length === 1 ? 'h-[60%]' : 'h-1/2'
-                              )}
+                      return (
+                        <div
+                          key={optionNested.value}
+                          className="group/nested relative flex items-stretch"
+                        >
+                          <div aria-hidden className="relative w-7 shrink-0">
+                            {isLastNested ? (
+                              <span
+                                className={cn(
+                                  'absolute left-[0.95rem] w-3 rounded-bl-sm border-b border-l border-border',
+                                  nestedIndex === 0
+                                    ? 'top-[-8px] h-[calc(60%+8px)]'
+                                    : cn(
+                                        'top-0',
+                                        option.options?.length === 1 ? 'h-[60%]' : 'h-1/2'
+                                      )
+                                )}
+                              />
+                            ) : (
+                              <>
+                                <span
+                                  className={cn(
+                                    'absolute left-[0.95rem] w-px bg-border',
+                                    nestedIndex === 0
+                                      ? 'top-[-8px] h-[calc(100%+8px)]'
+                                      : 'top-0 h-full'
+                                  )}
+                                />
+                                <span className="absolute left-4 top-[55%] h-px w-3 bg-border" />
+                              </>
+                            )}
+                          </div>
+                          <div className="flex flex-1 items-center gap-x-2 rounded-sm py-1 pr-2 hover:bg-accent/50 min-w-0">
+                            <Checkbox
+                              id={`${value}-${optionNested.value}`}
+                              checked={nestedChecked}
+                              onCheckedChange={(isChecked) =>
+                                setBooleanParam(optionNested.value, Boolean(isChecked))
+                              }
                             />
-                          ) : (
-                            <>
-                              <span className="absolute left-4 top-0 h-full w-px bg-border" />
-                              <span className="absolute left-4 top-[55%] h-px w-3 bg-border" />
-                            </>
-                          )}
+                            <Label
+                              htmlFor={`${value}-${optionNested.value}`}
+                              className="flex w-full cursor-pointer items-center text-[0.8rem] font-normal text-foreground/70 group-hover/nested:text-accent-foreground min-w-0"
+                            >
+                              <span className="truncate text-xs">{optionNested.label}</span>
+                            </Label>
+                          </div>
                         </div>
-                        <div className="flex flex-1 items-center gap-x-2 rounded-sm py-1 pr-2 hover:bg-accent/50 min-w-0">
-                          <Checkbox
-                            id={`${value}-${optionNested.value}`}
-                            checked={nestedChecked}
-                            onCheckedChange={(isChecked) =>
-                              setBooleanParam(optionNested.value, Boolean(isChecked))
-                            }
-                          />
-                          <Label
-                            htmlFor={`${value}-${optionNested.value}`}
-                            className="flex w-full cursor-pointer items-center text-[0.8rem] font-normal text-foreground/70 group-hover/nested:text-accent-foreground min-w-0"
-                          >
-                            <span className="truncate text-xs">{optionNested.label}</span>
-                          </Label>
-                        </div>
-                      </div>
-                    )
-                  })}
+                      )
+                    })}
+                  </div>
+                )}
               </div>
             )
           })

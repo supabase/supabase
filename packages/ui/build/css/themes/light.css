@@ -2,21 +2,20 @@
 .light {
   --helpers-os-appearance: Light;
   --hue: 159;
-  /* Warm-gray surface ramp against the green brand (--primary stays on --hue). */
   --surface-hue: 34;
-  --chroma: 0.004;
+  --chroma: 0;
   /*
    * Soft-gray canvas (not pure white) so elevated surfaces have headroom to
    * brighten toward white. --elevation-step is positive here: higher surfaces
    * get lighter, matching dark mode's direction. Tuned literal (previously
    * derived from 1 - surface); retune alongside --surface.
    */
-  --surface: 0.98;
+  --surface: 0.995;
   --elevation-step: 0.024;
   --contrast: 0.53;
-  --foreground-lightness: 0.16;
-  --muted-foreground-level: 0.68;
-  --tertiary-foreground-level: 0.48;
+  --foreground-lightness: 0.1;
+  --muted-foreground-level: 0.65;
+  --tertiary-foreground-level: 0.5;
   /*
    * Expressive fills run darker than the dark-theme anchors so they hold contrast
    * against the near-white surface (a light amber on white disappears). Lightness
@@ -32,11 +31,14 @@
   --code-block-2: 33.1deg 80% 52.9%;
   --code-block-1: 170.6deg 43.2% 51%;
 
+  --code-token-string: #c46a0a;
+  --code-token-string-expression: #c46a0a;
+
   /* Stepped numeric scales (per-theme literals; mapped in theme.css) */
   --secondary-default: 247.8deg 100% 70%;
   --secondary-400: 248.3deg 54.5% 25.9%;
   --secondary-200: 248deg 53.6% 11%;
-  --brand-link: 153.4deg 100% 36.7%;
+  --brand-link: 153.4deg 86.5% 28.3%;
   --brand-default: 152.9deg 60% 52.9%;
   --brand-600: 156.5deg 86.5% 26.1%;
   --brand-500: 155.3deg 78.4% 40%;

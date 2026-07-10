@@ -1,7 +1,7 @@
 import { components } from 'api-types'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 import { getProjectSettings } from '@/lib/api/self-hosted/settings'
 
 type ProjectAppConfig = components['schemas']['ProjectSettingsResponse']['app_config'] & {

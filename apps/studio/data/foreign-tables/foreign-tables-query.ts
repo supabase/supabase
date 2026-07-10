@@ -9,19 +9,19 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 export type ForeignTablesVariables = {
   projectRef?: string
   connectionString?: string | null
-  schema?: string
+  schemas?: string[]
 }
 
 export async function getForeignTables(
-  { projectRef, connectionString, schema }: ForeignTablesVariables,
+  { projectRef, connectionString, schemas }: ForeignTablesVariables,
   signal?: AbortSignal
 ) {
   const { result } = await executeSql(
     {
       projectRef,
       connectionString,
-      sql: pgMeta.foreignTables.list(schema ? { includedSchemas: [schema] } : undefined).sql,
-      queryKey: ['foreign-tables', schema],
+      sql: pgMeta.foreignTables.list({ includedSchemas: schemas }).sql,
+      queryKey: ['foreign-tables', schemas].filter(Boolean),
     },
     signal
   )
@@ -33,17 +33,17 @@ export type ForeignTablesData = Awaited<ReturnType<typeof getForeignTables>>
 export type ForeignTablesError = ResponseError
 
 export const useForeignTablesQuery = <TData = ForeignTablesData>(
-  { projectRef, connectionString, schema }: ForeignTablesVariables,
+  { projectRef, connectionString, schemas }: ForeignTablesVariables,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<ForeignTablesData, ForeignTablesError, TData> = {}
 ) =>
   useQuery<ForeignTablesData, ForeignTablesError, TData>({
-    queryKey: schema
-      ? foreignTableKeys.listBySchema(projectRef, schema)
+    queryKey: schemas
+      ? foreignTableKeys.listBySchema(projectRef, schemas)
       : foreignTableKeys.list(projectRef),
-    queryFn: ({ signal }) => getForeignTables({ projectRef, connectionString, schema }, signal),
+    queryFn: ({ signal }) => getForeignTables({ projectRef, connectionString, schemas }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...options,
   })
