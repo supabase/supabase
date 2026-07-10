@@ -916,6 +916,16 @@ export const examples: Registry = [
     files: ['example/success-check-demo.tsx'],
   },
   {
+    name: 'success-check-selected',
+    type: 'components:example',
+    files: ['example/success-check-selected.tsx'],
+  },
+  {
+    name: 'success-check-progress',
+    type: 'components:example',
+    files: ['example/success-check-progress.tsx'],
+  },
+  {
     name: 'switch-demo',
     type: 'components:example',
     registryDependencies: ['switch'],
