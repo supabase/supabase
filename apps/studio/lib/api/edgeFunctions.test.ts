@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { isValidEdgeFunctionURL } from './edgeFunctions'
+import { getEdgeFunctionErrorMessage, isValidEdgeFunctionURL } from './edgeFunctions'
 
 describe('isValidEdgeFunctionURL', () => {
   const validEdgeFunctionUrls = [
@@ -63,5 +63,55 @@ describe('isValidEdgeFunctionURL', () => {
     for (const url of invalidEdgeFunctionUrls) {
       expect(isValidEdgeFunctionURL(url, false), `Expected ${url} to be invalid`).toBe(false)
     }
+  })
+})
+
+describe('getEdgeFunctionErrorMessage', () => {
+  it('should extract message from self-hosted (Kong-fronted) error shape', () => {
+    expect(getEdgeFunctionErrorMessage(JSON.stringify({ message: 'name resolution failed' }))).toBe(
+      'name resolution failed'
+    )
+  })
+
+  it('should extract message from platform error shape', () => {
+    expect(
+      getEdgeFunctionErrorMessage(JSON.stringify({ error: 'Missing authorization header' }))
+    ).toBe('Missing authorization header')
+  })
+
+  it('should prefer `message` over `error` when both are present', () => {
+    expect(
+      getEdgeFunctionErrorMessage(JSON.stringify({ message: 'from message', error: 'from error' }))
+    ).toBe('from message')
+  })
+
+  it('should fall back to `error` when `message` is not a string', () => {
+    expect(getEdgeFunctionErrorMessage(JSON.stringify({ message: 42, error: 'from error' }))).toBe(
+      'from error'
+    )
+  })
+
+  it('should fall back to `error` when `message` is an empty string', () => {
+    expect(getEdgeFunctionErrorMessage(JSON.stringify({ message: '', error: 'from error' }))).toBe(
+      'from error'
+    )
+  })
+
+  it('should return generic message when neither `message` nor `error` is a string', () => {
+    expect(getEdgeFunctionErrorMessage(JSON.stringify({ code: 500 }))).toBe(
+      'Edge function returned an error'
+    )
+  })
+
+  it('should return generic message for an empty JSON object', () => {
+    expect(getEdgeFunctionErrorMessage(JSON.stringify({}))).toBe('Edge function returned an error')
+  })
+
+  it('should return the raw body when it is not valid JSON', () => {
+    expect(getEdgeFunctionErrorMessage('Internal Server Error')).toBe('Internal Server Error')
+  })
+
+  it('should return generic message when the raw body is empty', () => {
+    expect(getEdgeFunctionErrorMessage('')).toBe('Edge function returned an error')
   })
 })

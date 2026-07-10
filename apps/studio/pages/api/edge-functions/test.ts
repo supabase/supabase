@@ -1,7 +1,7 @@
 import { IS_PLATFORM } from 'common'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { isValidEdgeFunctionURL } from '@/lib/api/edgeFunctions'
+import { getEdgeFunctionErrorMessage, isValidEdgeFunctionURL } from '@/lib/api/edgeFunctions'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -90,28 +90,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
 
     if (!response.ok) {
-      // Try to parse error response if it's JSON
-      try {
-        const errorBody = JSON.parse(responseBody)
-
-        // Self-hosted (Kong-fronted) edge runtime errors use `message`, while
-        // platform errors use `error` - check both rather than assuming one shape.
-        const message =
-          (typeof errorBody?.message === 'string' && errorBody.message) ||
-          (typeof errorBody?.error === 'string' && errorBody.error) ||
-          'Edge function returned an error'
-
-        return res.status(response.status).json({
-          status: response.status,
-          error: { message },
-        })
-      } catch (parseError) {
-        // If not JSON, return the raw error
-        return res.status(response.status).json({
-          status: response.status,
-          error: { message: responseBody || 'Edge function returned an error' },
-        })
-      }
+      return res.status(response.status).json({
+        status: response.status,
+        error: { message: getEdgeFunctionErrorMessage(responseBody) },
+      })
     }
 
     const responseHeaders: Record<string, string> = {}
