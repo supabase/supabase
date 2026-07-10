@@ -1,5 +1,5 @@
 import { Auth, EdgeFunctions, Realtime, Storage } from 'icons'
-import { Box, Cable, Code2, Database } from 'lucide-react'
+import { Box, Cable, Code2, Database, Network } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { type LOG_TYPES } from '../UnifiedLogs.constants'
@@ -28,11 +28,12 @@ const ICON_MAP: Partial<Record<(typeof LOG_TYPES)[number], IconComponent>> = {
   realtime: Realtime,
   supavisor: Cable,
   pgbouncer: Cable,
+  multigres: Network,
 }
 
 export const LogTypeIcon = ({
   type,
-  size = 16,
+  size = 14,
   strokeWidth = 1.5,
   className,
 }: LogTypeIconProps) => {

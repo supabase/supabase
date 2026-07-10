@@ -2,7 +2,9 @@ import { LucideIcon } from 'lucide-react'
 import { ReactNode } from 'react'
 import { cn } from 'ui'
 
-type IconComponent = LucideIcon | React.ComponentType<{ size?: number; className?: string }>
+type IconComponent =
+  | LucideIcon
+  | React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>
 
 interface DetailSectionHeaderProps {
   title: string
@@ -25,7 +27,7 @@ export const DetailSectionHeader = ({
     )}
     <div className="flex min-w-0 items-center gap-2">
       {Icon ? (
-        <Icon size={14} className="shrink-0 text-foreground-lighter" />
+        <Icon size={14} strokeWidth={1.5} className="shrink-0 text-foreground-lighter" />
       ) : (
         <span className="w-3.5 shrink-0" aria-hidden />
       )}
