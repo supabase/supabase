@@ -13,8 +13,6 @@ Self-hosted Supabase Storage has two independent S3-related features:
 
 You can configure either feature independently. For example, you can enable the S3 protocol endpoint to use `rclone` while keeping the default file-based storage, or switch to an S3 backend without enabling the S3 protocol endpoint.
 
-<$Partial path="self_hosted_run_sh.mdx" />
-
 ## Enable the S3 protocol endpoint
 
 The S3 protocol endpoint at `/storage/v1/s3` allows standard S3 clients to interact with your self-hosted Storage instance. It works with any storage backend, including the default file-based storage - you do not need to configure an S3 backend first. The Supabase REST API and SDK do not use the S3 protocol.

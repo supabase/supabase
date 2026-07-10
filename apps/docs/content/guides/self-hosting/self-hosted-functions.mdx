@@ -12,8 +12,6 @@ On managed Supabase platform, Edge Functions are deployed across multiple region
 
 </Admonition>
 
-<$Partial path="self_hosted_run_sh.mdx" />
-
 ## Invoke the default function
 
 The default `hello` function is located at `volumes/functions/hello/index.ts`. You can invoke it immediately after starting your stack:
@@ -208,7 +206,7 @@ The request URL must include the function name after `/functions/v1/`. For examp
 Check the functions service logs:
 
 ```sh
-sh run.sh logs functions
+docker compose logs functions
 ```
 
 Common causes: syntax errors in your function code, invalid imports, or missing dependencies.
