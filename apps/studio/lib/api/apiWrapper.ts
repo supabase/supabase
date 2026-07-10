@@ -1,6 +1,6 @@
+import * as Sentry from '@sentry/nextjs'
 import type { JwtPayload } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
-import * as Sentry from '@sentry/nextjs'
 
 import { IS_PLATFORM } from '../constants'
 import { apiAuthenticate } from './apiAuthenticate'
