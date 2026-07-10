@@ -99,6 +99,9 @@ You can use Supabase to store and process Protected Health Information (PHI). Yo
 - Turning on [SSL Enforcement](/docs/guides/platform/ssl-enforcement).
 - Enabling [Network Restrictions](/docs/guides/platform/network-restrictions).
 - Keeping [Postgres connection logging](/docs/guides/platform/postgres-connection-logging) enabled. Supabase sets `log_connections` to off by default for new projects. Projects that need HIPAA compliance should keep connection logging on for audit trails, and the Security Advisor warns if it is disabled.
+
+<$Partial path="log_connections_default_effective_date.mdx" />
+
 - Complying with encryption requirements in the HIPAA Security Rule. Data is encrypted at rest and in transit by Supabase. You can consider encrypting the data at your application layer.
 - Not storing PHI in [public Storage buckets](/docs/guides/storage/buckets/fundamentals#public-buckets).
 - Not [transferring projects](/docs/guides/platform/project-transfer) to a non-HIPAA organization.

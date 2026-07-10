@@ -159,6 +159,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "admonition-button-split": {
+      name: "admonition-button-split",
+      type: "components:example",
+      registryDependencies: ["admonition","button","dropdown-menu"],
+      component: React.lazy(() => import("@/registry/default/example/admonition-button-split")),
+      source: "",
+      files: ["registry/default/example/admonition-button-split.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "admonition-description-only": {
       name: "admonition-description-only",
       type: "components:example",
@@ -368,6 +379,72 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "breadcrumb-demo": {
+      name: "breadcrumb-demo",
+      type: "components:example",
+      registryDependencies: ["breadcrumb"],
+      component: React.lazy(() => import("@/registry/default/example/breadcrumb-demo")),
+      source: "",
+      files: ["registry/default/example/breadcrumb-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "breadcrumb-separator": {
+      name: "breadcrumb-separator",
+      type: "components:example",
+      registryDependencies: ["breadcrumb"],
+      component: React.lazy(() => import("@/registry/default/example/breadcrumb-separator")),
+      source: "",
+      files: ["registry/default/example/breadcrumb-separator.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "breadcrumb-dropdown": {
+      name: "breadcrumb-dropdown",
+      type: "components:example",
+      registryDependencies: ["breadcrumb","dropdown-menu"],
+      component: React.lazy(() => import("@/registry/default/example/breadcrumb-dropdown")),
+      source: "",
+      files: ["registry/default/example/breadcrumb-dropdown.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "breadcrumb-ellipsis": {
+      name: "breadcrumb-ellipsis",
+      type: "components:example",
+      registryDependencies: ["breadcrumb"],
+      component: React.lazy(() => import("@/registry/default/example/breadcrumb-ellipsis")),
+      source: "",
+      files: ["registry/default/example/breadcrumb-ellipsis.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "breadcrumb-link": {
+      name: "breadcrumb-link",
+      type: "components:example",
+      registryDependencies: ["breadcrumb"],
+      component: React.lazy(() => import("@/registry/default/example/breadcrumb-link")),
+      source: "",
+      files: ["registry/default/example/breadcrumb-link.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "breadcrumb-responsive": {
+      name: "breadcrumb-responsive",
+      type: "components:example",
+      registryDependencies: ["breadcrumb","button","drawer","dropdown-menu"],
+      component: React.lazy(() => import("@/registry/default/example/breadcrumb-responsive")),
+      source: "",
+      files: ["registry/default/example/breadcrumb-responsive.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "button-demo": {
       name: "button-demo",
       type: "components:example",
@@ -507,6 +584,17 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/button-as-child")),
       source: "",
       files: ["registry/default/example/button-as-child.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "button-split-dropdown": {
+      name: "button-split-dropdown",
+      type: "components:example",
+      registryDependencies: ["button","dropdown-menu"],
+      component: React.lazy(() => import("@/registry/default/example/button-split-dropdown")),
+      source: "",
+      files: ["registry/default/example/button-split-dropdown.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

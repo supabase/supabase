@@ -345,7 +345,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
                             href={`/project/${projectRef}/database/replication/${pipeline?.id}?search=${inferredPostgresTable.schema}.${inferredPostgresTable.name}`}
                           >
                             <Eye size={12} className="text-foreground-lighter" />
-                            <p>View replication</p>
+                            <p>View pipeline</p>
                           </Link>
                         </DropdownMenuItem>
                       )}

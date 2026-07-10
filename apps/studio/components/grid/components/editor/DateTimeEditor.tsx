@@ -13,8 +13,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from 'ui'
-import { TimestampInfo, timestampLocalFormatter } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
+import { TimestampInfo, timestampLocalFormatter } from 'ui-patterns/TimestampInfo'
 
 import { BlockKeys } from '../common/BlockKeys'
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'

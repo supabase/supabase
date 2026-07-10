@@ -26,7 +26,8 @@ import {
   isCustomEmailTemplateRestrictionStatusKnown,
   slugifyTitle,
 } from './EmailTemplates.utils'
-import AlertError from '@/components/ui/AlertError'
+import { SendEmailHookActiveAdmonition } from './SendEmailHookActiveAdmonition'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
@@ -79,6 +80,9 @@ export const EmailTemplates = () => {
   })
 
   const usingBuiltInEmailSender = !hasCustomEmailSender(authConfig)
+  const hasSendEmailHook = !!(
+    authConfig?.HOOK_SEND_EMAIL_ENABLED && authConfig?.HOOK_SEND_EMAIL_URI
+  )
   const isTemplateRestrictionStatusKnown = isCustomEmailTemplateRestrictionStatusKnown({
     authConfig,
     organization: selectedOrganization,
@@ -135,10 +139,24 @@ export const EmailTemplates = () => {
       )}
       {isSuccess && (
         <>
+          {isTemplateEditBlocked && !hasSendEmailHook && (
+            <PageSection>
+              <PageSectionContent>
+                <CustomEmailTemplateRestrictionAdmonition />
+              </PageSectionContent>
+            </PageSection>
+          )}
+
+          {hasSendEmailHook && (
+            <PageSection>
+              <PageSectionContent>
+                <SendEmailHookActiveAdmonition />
+              </PageSectionContent>
+            </PageSection>
+          )}
+
           <PageSection>
-            {isTemplateEditBlocked ? (
-              <CustomEmailTemplateRestrictionAdmonition />
-            ) : usingBuiltInEmailSender ? (
+            {usingBuiltInEmailSender && !isTemplateEditBlocked && (
               <Admonition
                 type="warning"
                 title="Set up custom SMTP"
@@ -160,7 +178,7 @@ export const EmailTemplates = () => {
                   </Button>
                 }
               />
-            ) : null}
+            )}
             <PageSectionMeta>
               <PageSectionSummary>
                 <PageSectionTitle>Authentication</PageSectionTitle>

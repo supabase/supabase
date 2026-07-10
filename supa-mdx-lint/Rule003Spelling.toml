@@ -52,6 +52,7 @@ allow_list = [
     "[Cc]ryptosystem",
     "[Cc]utover",
     "[Dd]ata[Ff]rames?",
+    "dbpedia",
     "[Dd]atasets?",
     "[Dd]atasources?",
     "[Dd]atetime",
@@ -347,6 +348,7 @@ allow_list = [
     # We prefer Postgres, but check for vocabulary preference in a separate rule
     "PostgreSQL",
     "PowerBI",
+    "[Pp]refill",
     "ProGuard",
     "PubSub",
     "Prisma",

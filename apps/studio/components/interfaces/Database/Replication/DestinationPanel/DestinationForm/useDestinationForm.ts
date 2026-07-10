@@ -14,7 +14,6 @@ import {
   useCreateDestinationPipelineMutation,
   type BatchConfig,
 } from '@/data/replication/create-destination-pipeline-mutation'
-import { useRestartPipelineHelper } from '@/data/replication/restart-pipeline-helper'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
 import { useUpdateDestinationPipelineMutation } from '@/data/replication/update-destination-pipeline-mutation'
@@ -34,7 +33,6 @@ import { type ResponseError } from '@/types'
 export const useDestinationForm = ({ selectedType }: { selectedType: DestinationType }) => {
   const { ref: projectRef } = useParams()
   const { setRequestStatus } = usePipelineRequestStatus()
-  const { restartPipeline } = useRestartPipelineHelper()
 
   const [hasRunValidation, setHasRunValidation] = useState(false)
   const [destinationValidationFailures, setDestinationValidationFailures] = useState<
@@ -238,12 +236,12 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
         const snapshot =
           existingDestination.statusName ?? (existingDestination.enabled ? 'started' : 'stopped')
         if (existingDestination.enabled) {
+          // The pipeline restarts automatically on the backend when its config is updated
           setRequestStatus(
             existingDestination.pipelineId,
             PipelineStatusRequestStatus.RestartRequested,
             snapshot
           )
-          await restartPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
           toast.success('Settings applied. Restarting the pipeline...')
         } else {
           setRequestStatus(
@@ -251,8 +249,8 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
             PipelineStatusRequestStatus.StartRequested,
             snapshot
           )
-          await startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
           toast.success('Settings applied. Starting the pipeline...')
+          startPipeline({ projectRef, pipelineId: existingDestination.pipelineId })
         }
         onClose()
       } else {
@@ -268,13 +266,17 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
         )
         // Set request status only right before starting, then fire and close
         setRequestStatus(pipelineId, PipelineStatusRequestStatus.StartRequested, undefined)
-        await startPipeline({ projectRef, pipelineId })
-        toast.success('Destination created. Starting the pipeline...')
+        toast.success('Pipeline created. Starting the pipeline...')
+        startPipeline({ projectRef, pipelineId })
         onClose()
       }
     } catch (error) {
-      const action = editMode ? 'apply and run' : 'create and start'
-      toast.error(`Failed to ${action} destination: ${(error as ResponseError).message}`)
+      const action = editMode
+        ? existingDestination?.enabled
+          ? 'apply changes and restart pipeline'
+          : 'apply changes and start pipeline'
+        : 'create and start pipeline'
+      toast.error(`Failed to ${action}: ${(error as ResponseError).message}`)
     }
   }
 

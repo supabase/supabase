@@ -1,4 +1,4 @@
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import {
   getAllProductAreas,
   getAllStacks,

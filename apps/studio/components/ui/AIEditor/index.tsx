@@ -1,23 +1,25 @@
-import Editor, { Monaco, OnMount } from '@monaco-editor/react'
+import { Monaco, OnMount } from '@monaco-editor/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { editor as monacoEditor } from 'monaco-editor'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { KeyboardShortcut } from 'ui'
-import { useSetCommandMenuOpen } from 'ui-patterns'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
+import { CodeEditor, type ValidLanguages } from '../CodeEditor/CodeEditor'
 import { DiffEditor } from '../DiffEditor'
 import ResizableAIWidget from './ResizableAIWidget'
 import { getEditorSelectionParts } from './utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { constructHeaders } from '@/data/fetchers'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AIEditorProps {
   id?: string
-  language?: string
+  language: ValidLanguages
   value?: string
   defaultValue?: string
   aiEndpoint?: string
@@ -71,14 +73,9 @@ export const AIEditor = ({
   const isCommandMenuHotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
   const setCommandMenuOpen = useSetCommandMenuOpen()
 
-  const executeQueryRef = useRef(executeQuery)
-  executeQueryRef.current = executeQuery
-
-  const commandMenuHotkeyEnabledRef = useRef(isCommandMenuHotkeyEnabled)
-  commandMenuHotkeyEnabledRef.current = isCommandMenuHotkeyEnabled
-
-  const setCommandMenuOpenRef = useRef(setCommandMenuOpen)
-  setCommandMenuOpenRef.current = setCommandMenuOpen
+  const executeQueryRef = useLatest(executeQuery)
+  const commandMenuHotkeyEnabledRef = useLatest(isCommandMenuHotkeyEnabled)
+  const setCommandMenuOpenRef = useLatest(setCommandMenuOpen)
 
   const [currentValue, setCurrentValue] = useState(value || defaultValue)
   const [isDiffMode, setIsDiffMode] = useState(false)
@@ -217,33 +214,26 @@ export const AIEditor = ({
     })
 
     if (language === 'javascript' || language === 'typescript') {
-      // The Deno libs are loaded as a raw text via raw-loader in next.config.ts. They're passed as raw text to the
-      // Monaco editor.
-      import('@/public/deno/edge-runtime.d.ts' as string)
-        .then((module) => {
-          monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
-        })
-        .catch((error) => {
-          console.error('Failed to load Deno edge-runtime typings:', error)
-        })
-      import('@/public/deno/lib.deno.d.ts' as string)
-        .then((module) => {
-          monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
-        })
-        .catch((error) => {
-          console.error('Failed to load Deno lib typings:', error)
-        })
-    }
-
-    if (!!executeQueryRef.current) {
-      editor.addAction({
-        id: 'run-query',
-        label: 'Run Query',
-        keybindings: [monaco.KeyMod.CtrlCmd + monaco.KeyCode.Enter],
-        contextMenuGroupId: 'operation',
-        contextMenuOrder: 0,
-        run: () => executeQueryRef.current?.(),
-      })
+      // The Deno libs load as raw text — via the raw-loader rules in
+      // next.config.ts (Next/turbopack) and the `rawTextLoader` plugin in
+      // vite.config.ts (TanStack/Vite) — and are registered as Monaco extra
+      // libs. The specifiers must stay string literals so both bundlers can
+      // statically analyze and code-split them; the `as string` cast keeps
+      // tsc from resolving the `.d.ts` files as declaration files (TS2846 /
+      // "not a module") while erasing to a plain literal for the bundlers.
+      const denoTypeLibs: Record<string, Promise<{ default: string }>> = {
+        'edge-runtime': import('@/public/deno/edge-runtime.d.ts' as string),
+        'lib.deno': import('@/public/deno/lib.deno.d.ts' as string),
+      }
+      for (const [lib, loading] of Object.entries(denoTypeLibs)) {
+        loading
+          .then((module) => {
+            monaco.languages.typescript.typescriptDefaults.addExtraLib(module.default)
+          })
+          .catch((error) => {
+            console.error(`Failed to load Deno ${lib} typings:`, error)
+          })
+      }
     }
 
     refreshCloseAction()
@@ -279,11 +269,6 @@ export const AIEditor = ({
         setCommandMenuOpenRef.current(true)
       }
     })
-
-    if (autoFocus) {
-      if (editor.getValue().length === 1) editor.setPosition({ lineNumber: 1, column: 2 })
-      editor.focus()
-    }
   }
 
   const handlePrompt = async (
@@ -321,19 +306,6 @@ export const AIEditor = ({
     } catch (error) {
       setPromptState((prev) => ({ ...prev, isOpen: false }))
     }
-  }
-
-  const defaultOptions: monacoEditor.IStandaloneEditorConstructionOptions = {
-    tabSize: 2,
-    fontSize: 13,
-    readOnly,
-    minimap: { enabled: false },
-    wordWrap: 'on',
-    lineNumbers: 'on',
-    folding: false,
-    padding: { top: 4 },
-    lineNumbersMinChars: 3,
-    ...options,
   }
 
   useEffect(() => {
@@ -412,19 +384,20 @@ export const AIEditor = ({
         </div>
       ) : (
         <div className="w-full h-full relative">
-          {/* [Joshen] Refactor: Use CodeEditor.tsx instead, reduce duplicate declaration of Editor */}
-          <Editor
-            theme="supabase"
+          <CodeEditor
             language={language}
+            autofocus={autoFocus}
+            className={className}
+            isReadOnly={readOnly}
+            options={options}
             value={currentValue}
-            options={defaultOptions}
-            onChange={(value: string | undefined) => {
+            onInputChange={(value) => {
               const newValue = value || ''
               setCurrentValue(newValue)
               onChange?.(newValue)
             }}
             onMount={handleEditorOnMount}
-            className={className}
+            actions={{ runQuery: { enabled: true, callback: () => executeQueryRef.current?.() } }}
           />
           {promptState.isOpen && editorRef.current && (
             <ResizableAIWidget

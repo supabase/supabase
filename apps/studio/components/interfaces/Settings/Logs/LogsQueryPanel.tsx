@@ -1,11 +1,12 @@
-import { useFlag } from 'common'
-import { BookOpen, Check, ChevronDown, ChevronsUpDown, Copy, ExternalLink, X } from 'lucide-react'
+import { useFlag, useParams } from 'common'
+import { BookOpen, Check, ChevronDown, ChevronsUpDown, Copy, ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useEffect, useState } from 'react'
 import { logConstants } from 'shared-data'
 import {
   Badge,
   Button,
+  Card,
   cn,
   Command,
   CommandEmpty,
@@ -18,16 +19,27 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  Label,
   Popover,
   PopoverContent,
   PopoverTrigger,
-  SidePanel,
-  Switch,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetSection,
+  SheetTitle,
+  SheetTrigger,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   EXPLORER_DATEPICKER_HELPERS,
@@ -35,21 +47,23 @@ import {
   LogsTableName,
 } from './Logs.constants'
 import { DatePickerValue, LogsDatePicker } from './Logs.DatePickers'
+import { otelFieldsFromKeys, toOtelFieldSchemas } from './Logs.fieldReference'
 import { LogsWarning, LogTemplate } from './Logs.types'
-import Table from '@/components/to-be-cleaned/Table'
+import { useOtelLogKeysQuery } from '@/data/logs/otel-log-keys-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
 import { DOCS_URL } from '@/lib/constants'
 
-export interface LogsQueryPanelProps {
+interface LogsQueryPanelProps {
   templates?: LogTemplate[]
   value: DatePickerValue
   warnings: LogsWarning[]
   onSelectTemplate: (template: LogTemplate) => void
   onSelectSource: (source: string) => void
   onDateChange: (value: DatePickerValue) => void
-  useOtel?: boolean
-  onUseOtelChange?: (value: boolean) => void
+  showRewriteAction?: boolean
+  isRewriting?: boolean
+  onRewrite?: () => void
 }
 
 function DropdownMenuItemContent({ name, desc }: { name: ReactNode; desc?: string }) {
@@ -61,20 +75,19 @@ function DropdownMenuItemContent({ name, desc }: { name: ReactNode; desc?: strin
   )
 }
 
-const LogsQueryPanel = ({
+export const LogsQueryPanel = ({
   templates = [],
   value,
   warnings,
   onSelectTemplate,
   onSelectSource,
   onDateChange,
-  useOtel = false,
-  onUseOtelChange,
+  showRewriteAction = false,
+  isRewriting = false,
+  onRewrite,
 }: LogsQueryPanelProps) => {
   const [showReference, setShowReference] = useState(false)
   const { logsTemplates } = useIsFeatureEnabled(['logs:templates'])
-  const showChToggleInLogExplorer = useFlag('showChToggleInLogExplorer')
-  const otelToggleEnabled = !!showChToggleInLogExplorer && !!onUseOtelChange
 
   const {
     projectAuthAll: authEnabled,
@@ -101,11 +114,20 @@ const LogsQueryPanel = ({
   const [open, setOpen] = useState(false)
 
   const showMultigresLogs = useShowMultigresLogs()
-  const schemas = logConstants.schemas.filter(
+  const useOtel = useFlag('otelLegacyLogs')
+  const baseSchemas = logConstants.schemas.filter(
     (schema) => schema.reference !== 'multigres_logs' || showMultigresLogs
   )
+  const schemas = useOtel ? toOtelFieldSchemas(baseSchemas) : baseSchemas
 
-  const [selectedSchema, setSelectedSchema] = useState(schemas[0])
+  const [selectedRef, setSelectedRef] = useState(schemas[0]?.reference)
+  const selectedSchema = schemas.find((s) => s.reference === selectedRef) ?? schemas[0]
+
+  const { ref: projectRef } = useParams()
+  const { data: discoveredKeys, isPending: isLoadingKeys } = useOtelLogKeysQuery(
+    { projectRef, source: selectedRef },
+    { enabled: useOtel && showReference }
+  )
 
   return (
     <div className="flex items-center border-b bg-surface-100 h-(--header-height)">
@@ -167,30 +189,6 @@ const LogsQueryPanel = ({
               helpers={EXPLORER_DATEPICKER_HELPERS}
             />
 
-            {otelToggleEnabled && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      id="logs-explorer-otel-toggle"
-                      checked={useOtel}
-                      onCheckedChange={(checked) => onUseOtelChange?.(checked)}
-                    />
-                    <Label
-                      htmlFor="logs-explorer-otel-toggle"
-                      className="text-xs text-foreground-light cursor-pointer"
-                    >
-                      OTEL endpoint
-                    </Label>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-xs">
-                  Run this query against the new ClickHouse-backed OTEL endpoint instead of
-                  BigQuery. Use to validate ClickHouse SQL before relying on it.
-                </TooltipContent>
-              </Tooltip>
-            )}
-
             <div
               data-testid="log-explorer-warnings"
               className={`transition-all duration-300 h-full ${
@@ -220,116 +218,142 @@ const LogsQueryPanel = ({
             </div>
           </div>
 
-          <SidePanel
-            size="large"
-            header={
-              <div className="flex flex-row justify-between items-center">
-                <h3>Field Reference</h3>
-                <Button
-                  variant="text"
-                  className="px-1"
-                  onClick={() => setShowReference(false)}
-                  icon={<X />}
-                />
-              </div>
-            }
-            visible={showReference}
-            cancelText="Close"
-            onCancel={() => setShowReference(false)}
-            hideFooter
-            triggerElement={
-              <Button
-                variant="text"
-                onClick={() => setShowReference(true)}
-                icon={<BookOpen />}
-                className="px-2"
-              >
-                <span>Field Reference</span>
-              </Button>
-            }
-          >
-            <SidePanel.Content>
-              <div className="pt-4 pb-2 space-y-1">
-                <p className="text-sm">
-                  The following table shows all the available paths that can be queried from each
-                  respective source. Do note that to access nested keys, you would need to perform
-                  the necessary{' '}
-                  <Link
-                    href={`${DOCS_URL}/guides/platform/logs#unnesting-arrays`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-brand"
-                  >
-                    unnesting joins
-                    <ExternalLink
-                      size="14"
-                      className="ml-1 inline translate-y-[-2px]"
-                      strokeWidth={1.5}
-                    />
-                  </Link>
-                </p>
-              </div>
-            </SidePanel.Content>
-            <SidePanel.Separator />
-
-            <div className="px-4 pb-4 flex flex-col gap-4">
-              <Popover open={open} onOpenChange={setOpen}>
-                <PopoverTrigger asChild>
+          <div className="flex items-center gap-1">
+            {showRewriteAction && onRewrite && (
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <Button
-                    variant="default"
-                    role="combobox"
-                    size={'small'}
-                    aria-expanded={open}
-                    className="w-full justify-between"
-                    iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                    variant="outline"
+                    loading={isRewriting}
+                    onClick={onRewrite}
+                    className="px-2"
                   >
-                    {value ? selectedSchema?.name : 'Select source...'}
+                    Rewrite query to ClickHouse SQL
                   </Button>
-                </PopoverTrigger>
-                <PopoverContent className="p-0" sameWidthAsTrigger>
-                  <Command>
-                    <CommandInput placeholder="Search source..." />
-                    <CommandList>
-                      <CommandEmpty>No source found.</CommandEmpty>
-                      <CommandGroup>
-                        {schemas.map((schema) => (
-                          <CommandItem
-                            key={schema.reference}
-                            value={schema.reference}
-                            onSelect={() => {
-                              setSelectedSchema(schema)
-                              setOpen(false)
-                            }}
-                          >
-                            <Check
-                              className={cn(
-                                'mr-2 h-4 w-4',
-                                selectedSchema === schema ? 'opacity-100' : 'opacity-0'
-                              )}
-                            />
-                            {schema.name}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-              <Table
-                head={[
-                  <Table.th className="text-xs p-2!" key="path">
-                    Path
-                  </Table.th>,
-                  <Table.th key="type" className="text-xs p-2!">
-                    Type
-                  </Table.th>,
-                ]}
-                body={selectedSchema.fields.map((field) => (
-                  <Field key={field.path} field={field} />
-                ))}
-              />
-            </div>
-          </SidePanel>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" className="w-72 text-center">
+                  Logs now run on a ClickHouse-backed engine. Click to rewrite this query with the
+                  Assistant.
+                </TooltipContent>
+              </Tooltip>
+            )}
+
+            <Sheet open={showReference} onOpenChange={setShowReference}>
+              <SheetTrigger asChild>
+                <Button variant="text" icon={<BookOpen />} className="px-2">
+                  <span>Field Reference</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent size="lg" className="flex w-full flex-col gap-0 p-0">
+                <SheetHeader>
+                  <SheetTitle>Field Reference</SheetTitle>
+                  {useOtel ? (
+                    <SheetDescription>
+                      The following table shows the fields available on each source. Nested fields
+                      live in the{' '}
+                      <code className="text-code-inline text-xs !break-keep">log_attributes</code>{' '}
+                      map and are read with{' '}
+                      <code className="text-code-inline text-xs !break-keep">
+                        log_attributes['key']
+                      </code>{' '}
+                      — no unnesting joins needed.
+                    </SheetDescription>
+                  ) : (
+                    <SheetDescription>
+                      The following table shows all the available paths that can be queried from
+                      each respective source. Do note that to access nested keys, you would need to
+                      perform the necessary{' '}
+                      <Link
+                        href={`${DOCS_URL}/guides/platform/logs#unnesting-arrays`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-brand"
+                      >
+                        unnesting joins
+                        <ExternalLink
+                          size="14"
+                          className="ml-1 inline translate-y-[-2px]"
+                          strokeWidth={1.5}
+                        />
+                      </Link>
+                    </SheetDescription>
+                  )}
+                </SheetHeader>
+
+                <SheetSection className="flex flex-col gap-y-4 overflow-y-auto ">
+                  <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="default"
+                        role="combobox"
+                        size={'small'}
+                        aria-expanded={open}
+                        className="w-full justify-between"
+                        iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                      >
+                        {value ? selectedSchema?.name : 'Select source...'}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="p-0" sameWidthAsTrigger>
+                      <Command>
+                        <CommandInput placeholder="Search source..." />
+                        <CommandList>
+                          <CommandEmpty>No source found.</CommandEmpty>
+                          <CommandGroup>
+                            {schemas.map((schema) => (
+                              <CommandItem
+                                key={schema.reference}
+                                value={schema.reference}
+                                onSelect={() => {
+                                  setSelectedRef(schema.reference)
+                                  setOpen(false)
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4',
+                                    selectedSchema?.reference === schema.reference
+                                      ? 'opacity-100'
+                                      : 'opacity-0'
+                                  )}
+                                />
+                                {schema.name}
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+
+                  <Card className="overflow-y-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-xs p-2!">Path</TableHead>
+                          <TableHead className="text-xs p-2!">Type</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {useOtel && isLoadingKeys
+                          ? Array.from({ length: 3 }).map((_, i) => (
+                              <TableRow key={i}>
+                                <TableCell colSpan={2} className="p-2">
+                                  <ShimmeringLoader />
+                                </TableCell>
+                              </TableRow>
+                            ))
+                          : (useOtel
+                              ? otelFieldsFromKeys(discoveredKeys ?? [])
+                              : selectedSchema.fields
+                            ).map((field) => <Field key={field.path} field={field} />)}
+                      </TableBody>
+                    </Table>
+                  </Card>
+                </SheetSection>
+              </SheetContent>
+            </Sheet>
+          </div>
         </div>
       </div>
     </div>
@@ -347,8 +371,8 @@ const Field = ({
   const [isCopied, setIsCopied] = useState(false)
 
   return (
-    <Table.tr>
-      <Table.td
+    <TableRow>
+      <TableCell
         className="font-mono text-xs p-2! cursor-pointer hover:text-foreground transition flex items-center space-x-2"
         onClick={() =>
           copyToClipboard(field.path, () => {
@@ -373,10 +397,8 @@ const Field = ({
             <TooltipContent side="bottom">Copy value</TooltipContent>
           </Tooltip>
         )}
-      </Table.td>
-      <Table.td className="font-mono text-xs p-2!">{field.type}</Table.td>
-    </Table.tr>
+      </TableCell>
+      <TableCell className="font-mono text-xs p-2!">{field.type}</TableCell>
+    </TableRow>
   )
 }
-
-export default LogsQueryPanel

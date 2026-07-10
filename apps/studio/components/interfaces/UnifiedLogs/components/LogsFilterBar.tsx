@@ -6,7 +6,7 @@ import {
   type FilterBarHandle,
   type FilterGroup,
   type FilterProperty,
-} from 'ui-patterns'
+} from 'ui-patterns/FilterBar'
 
 import {
   isLogsFilterColumnValue,

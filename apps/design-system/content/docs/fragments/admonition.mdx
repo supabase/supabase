@@ -46,6 +46,18 @@ Style the color of the button based upon the _context_ of the Admonition, not it
 
 Only ever use the `primary` (green) button `type` on a `default` Admonition. Even then—given that Admonition is an isolated callout—the `primary` button `type` should rarely be used.
 
+### Split button with dropdown
+
+When a callout offers alternative ways to accomplish the same goal, use a [split button](../components/button#split-with-dropdown) instead of crowding the callout with multiple buttons. For related but distinct actions, use an overflow menu. See [Table multiple actions](../components/table#multiple-actions).
+
+<ComponentPreview
+  name="admonition-button-split"
+  className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
+  peekCode
+/>
+
+In responsive Admonitions, wrap the pair in `flex w-full @lg:w-auto`, give the primary `flex-1 @lg:flex-none`, and keep the chevron `shrink-0`.
+
 ## Examples
 
 <ComponentPreview
@@ -53,7 +65,7 @@ Only ever use the `primary` (green) button `type` on a `default` Admonition. Eve
   className="[&_.preview>[data-orientation=vertical]]:sm:max-w-[70%]"
 />
 
-## Responsive
+### Responsive
 
 Resize your browser to see the button(s) change `layout` based on the Admonition’s width.
 

@@ -25,6 +25,8 @@ import PasswordConditionsHelper from './PasswordConditionsHelper'
 import { useSignUpMutation } from '@/data/misc/signup-mutation'
 import { BASE_PATH } from '@/lib/constants'
 import { buildPathWithParams } from '@/lib/gotrue'
+import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),
@@ -67,6 +69,8 @@ export const SignUpForm = () => {
     token: parseAsString.withDefault(''),
   })
 
+  const trackFunnelError = useTrackFunnelError()
+
   const { mutate: signup, isPending: isSigningUp } = useSignUpMutation({
     onSuccess: () => {
       toast.success(`Signed up successfully!`)
@@ -76,6 +80,7 @@ export const SignUpForm = () => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
       toast.error(`Failed to sign up: ${error.message}`)
+      trackFunnelError('signup', classifyApiError('signup', error), 'toast')
     },
   })
 
@@ -144,7 +149,14 @@ export const SignUpForm = () => {
         )}
       >
         <Form {...form}>
-          <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+            id={formId}
+            method="POST"
+            className="flex flex-col gap-4"
+            onSubmit={form.handleSubmit(onSubmit, (errors) =>
+              trackFunnelError('signup', classifyValidationError('signup', errors), 'form')
+            )}
+          >
             <FormField
               key="email"
               name="email"

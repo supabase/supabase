@@ -200,7 +200,7 @@ function ChangelogIndex({ featured, restIndex, allIndex }: PageProps) {
         }}
       />
       <DefaultLayout>
-        <div className="container mx-auto max-w-5xl flex flex-col gap-8 px-4 py-10 sm:px-16 xl:px-20">
+        <div className="container mx-auto max-w-6xl flex flex-col gap-8 px-4 py-10 sm:px-16 xl:px-24">
           <div className="pb-4">
             <h1 className="h1">Changelog</h1>
             <div className="flex flex-wrap items-center justify-between gap-2">

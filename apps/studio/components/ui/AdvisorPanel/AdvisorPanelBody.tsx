@@ -1,6 +1,6 @@
 import { AlertTriangle, ChevronRight, Inbox } from 'lucide-react'
 import { Badge, Button, cn } from 'ui'
-import { GenericSkeletonLoader } from 'ui-patterns'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { AdvisorItem } from './AdvisorPanel.types'
 import {

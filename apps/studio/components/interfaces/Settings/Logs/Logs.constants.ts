@@ -286,8 +286,159 @@ limit 100;
   },
 ]
 
+// ClickHouse rewrites of the custom BigQuery templates above, used when the OTEL
+// logs engine is on. Keyed by template label. Simple-mode templates are plain
+// event_message searches that work unchanged, so they have no entry here.
+const OTEL_TEMPLATE_SEARCH_STRINGS: Record<string, string> = {
+  'Commits By User': `select
+  log_attributes['parsed.user_name'] as user_name,
+  count() as count
+from logs
+where source = 'postgres_logs'
+  and event_message like '%COMMIT%'
+group by user_name
+order by count desc
+limit 100`,
+  'Metadata IP': `select
+  timestamp,
+  log_attributes['request.headers.x_real_ip'] as x_real_ip
+from logs
+where source = 'edge_logs'
+  and log_attributes['request.headers.x_real_ip'] != ''
+order by timestamp desc
+limit 100`,
+  'Requests by Geography': `select
+  log_attributes['request.cf.country'] as country,
+  count() as count
+from logs
+where source = 'edge_logs'
+group by country
+order by count desc
+limit 100`,
+  'Slow Response Time': `select
+  timestamp,
+  event_message,
+  toInt32OrZero(log_attributes['response.origin_time']) as origin_time
+from logs
+where source = 'edge_logs'
+  and toInt32OrZero(log_attributes['response.origin_time']) > 1000
+order by timestamp desc
+limit 100`,
+  '500 Request Codes': `select
+  timestamp,
+  event_message,
+  toInt32OrZero(log_attributes['response.status_code']) as status_code
+from logs
+where source = 'edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) >= 500
+order by timestamp desc
+limit 100`,
+  'Top Paths': `select
+  log_attributes['request.path'] as path,
+  log_attributes['request.search'] as params,
+  count() as c
+from logs
+where source = 'edge_logs'
+group by path, params
+order by c desc
+limit 100`,
+  'REST Requests': `select
+  timestamp,
+  event_message
+from logs
+where source = 'edge_logs'
+  and log_attributes['request.path'] like '%rest/v1%'
+order by timestamp desc
+limit 100`,
+  Errors: `select
+  timestamp,
+  log_attributes['parsed.error_severity'] as error_severity,
+  event_message
+from logs
+where source = 'postgres_logs'
+  and log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC')
+order by timestamp desc
+limit 100`,
+  'Error Count by User': `select
+  count() as count,
+  log_attributes['parsed.user_name'] as user_name,
+  log_attributes['parsed.error_severity'] as error_severity
+from logs
+where source = 'postgres_logs'
+  and log_attributes['parsed.error_severity'] in ('ERROR', 'FATAL', 'PANIC')
+group by user_name, error_severity
+order by count desc
+limit 100`,
+  'Auth Endpoint Events': `select
+  timestamp,
+  event_message
+from logs
+where source = 'auth_logs'
+  and match(event_message, 'level.{3}(info|warning|error|fatal)')
+order by timestamp desc
+limit 100`,
+  'Auth Audit Logs': `select
+  timestamp,
+  event_message,
+  log_attributes
+from logs
+where source = 'auth_audit_logs'
+order by timestamp desc
+limit 10`,
+  'Storage Object Requests': `select
+  log_attributes['request.method'] as http_verb,
+  log_attributes['request.path'] as filepath,
+  count() as num_requests
+from logs
+where source = 'edge_logs'
+  and log_attributes['request.path'] like '%storage/v1/object/%'
+group by http_verb, filepath
+order by num_requests desc
+limit 100`,
+  'Storage Egress Requests': `select
+  log_attributes['request.method'] as http_verb,
+  log_attributes['request.path'] as filepath,
+  (log_attributes['response.headers.cf_cache_status'] = 'HIT') as cached,
+  count() as num_requests
+from logs
+where source = 'edge_logs'
+  and (
+    log_attributes['request.path'] like '%storage/v1/object/%'
+    or log_attributes['request.path'] like '%storage/v1/render/%'
+  )
+  and log_attributes['request.method'] = 'GET'
+group by http_verb, filepath, cached
+order by num_requests desc
+limit 100`,
+  'Storage Top Cache Misses': `select
+  log_attributes['request.path'] as path,
+  log_attributes['request.search'] as search,
+  count() as count
+from logs
+where source = 'edge_logs'
+  and startsWith(log_attributes['request.path'], '/storage/v1/object')
+  and log_attributes['request.method'] = 'GET'
+  and log_attributes['response.headers.cf_cache_status'] in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')
+group by path, search
+order by count desc
+limit 100`,
+}
+
+/**
+ * Returns the log templates for the active engine. On the OTEL/ClickHouse engine
+ * the custom templates, written for BigQuery, are swapped for their ClickHouse
+ * rewrites; everything else is returned unchanged.
+ */
+export function getLogsTemplates(useOtel: boolean): LogTemplate[] {
+  if (!useOtel) return TEMPLATES
+  return TEMPLATES.map((template) => {
+    const otelSearchString = template.label && OTEL_TEMPLATE_SEARCH_STRINGS[template.label]
+    return otelSearchString ? { ...template, searchString: otelSearchString } : template
+  })
+}
+
 type SqlFilterFn = (value: any) => SafeLogSqlFragment
-type SqlFilterEntry = SafeLogSqlFragment | SqlFilterFn
+export type SqlFilterEntry = SafeLogSqlFragment | SqlFilterFn
 
 const _SQL_FILTER_COMMON: Record<string, SqlFilterEntry> = {
   search_query: (value: string) =>

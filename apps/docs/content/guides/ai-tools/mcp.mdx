@@ -112,11 +112,11 @@ The [configuration panel above](#step-2-configure-your-ai-tool) can set these op
 | `project_ref=<id>`  | Scope to a specific project (disables account tools) | `?project_ref=abc123`     |
 | `features=<groups>` | Enable only specific tool groups (comma-separated)   | `?features=database,docs` |
 
-Parameters can be combined: `https://mcp.supabase.com/mcp?project_ref=abc123&read_only=true`
+Parameters can be combined: <code><CustomContent data="mcp:servers">remote</CustomContent>?project_ref=abc123&read_only=true</code>
 
 <Admonition type="tip">
 
-When using [Supabase CLI](/docs/guides/cli) for local development, the MCP server is available at `http://localhost:54321/mcp`.
+When using [Supabase CLI](/docs/guides/cli) for local development, the MCP server is available at <code><CustomContent data="mcp:servers">local</CustomContent></code>.
 
 </Admonition>
 
@@ -139,19 +139,7 @@ To authenticate the MCP server in a CI environment, you can create a personal ac
 
 1. Pass the token to the `Authorization` header in your MCP server configuration. For example if you are using [Claude Code](https://docs.claude.com/en/docs/claude-code/github-actions), your MCP server configuration might look like this:
 
-   ```json
-   {
-     "mcpServers": {
-       "supabase": {
-         "type": "http",
-         "url": "https://mcp.supabase.com/mcp?project_ref=${SUPABASE_PROJECT_REF}",
-         "headers": {
-           "Authorization": "Bearer ${SUPABASE_ACCESS_TOKEN}"
-         }
-       }
-     }
-   }
-   ```
+   <McpCiConfigBlock />
 
    The above example assumes you have environment variables `SUPABASE_ACCESS_TOKEN` and `SUPABASE_PROJECT_REF` set in your CI environment.
 

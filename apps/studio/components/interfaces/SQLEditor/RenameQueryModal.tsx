@@ -26,7 +26,7 @@ import * as z from 'zod'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useCheckOpenAIKeyQuery } from '@/data/ai/check-api-key-query'
 import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
-import { getContentById } from '@/data/content/content-id-query'
+import { getContentById, getSqlSnippetById } from '@/data/content/content-id-query'
 import {
   UpsertContentPayload,
   useContentUpsertMutation,
@@ -35,7 +35,7 @@ import { Snippet } from '@/data/content/sql-folders-query'
 import type { SqlSnippet } from '@/data/content/sql-snippets-query'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { IS_PLATFORM } from '@/lib/constants'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 
 export interface RenameQueryModalProps {
@@ -109,8 +109,9 @@ export const RenameQueryModal = ({
 
       // [Joshen] For SQL V2 - content is loaded on demand so we need to fetch the data if its not already loaded in the valtio state
       if (!('content' in localSnippet)) {
-        localSnippet = await getContentById({ projectRef: ref, id })
-        snapV2.addSnippet({ projectRef: ref, snippet: localSnippet })
+        const fetched = await getSqlSnippetById({ projectRef: ref, id })
+        snapV2.addSnippet({ projectRef: ref, snippet: fetched })
+        localSnippet = fetched
       }
 
       const changedSnippet = await upsertContent({

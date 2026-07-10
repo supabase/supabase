@@ -17,28 +17,28 @@ const withFilters = (...entries: string[]) => ({ ...baseSearch, filter: entries 
 
 describe('UnifiedLogs.queries (OTEL flat)', () => {
   describe('getUnifiedLogsQuery', () => {
-    it('defaults to postgres + postgrest log types when none specified', () => {
+    it('defaults to postgres + edge log types when none specified', () => {
       const sql = getUnifiedLogsQuery(baseSearch)
-      expect(sql).toContain(`source = 'postgres_logs'`)
-      // postgrest = edge_logs filtered by /rest/ path
-      expect(sql).toContain(
-        `source = 'edge_logs' AND log_attributes['request.path'] LIKE '%/rest/%'`
-      )
-    })
-
-    it('routes the `edge` log type to edge_logs without /rest/ or /storage/ paths', () => {
-      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:edge'))
-      expect(sql).toContain(`NOT LIKE '%/rest/%'`)
-      expect(sql).toContain(`NOT LIKE '%/storage/%'`)
       const where = sql.split(/\bWHERE\b/)[1] ?? ''
-      expect(where).not.toContain(`source = 'postgres_logs'`)
+      expect(where).toContain(`source = 'postgres_logs'`)
+      expect(where).toContain(`source = 'edge_logs'`)
+      expect(where).not.toContain(`source = 'postgrest_logs'`)
     })
 
-    it('routes the `storage` log type to edge_logs filtered by /storage/', () => {
+    it('routes the `postgrest` log type solely to postgrest_logs (mutually exclusive from edge_logs)', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:eq:postgrest'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`source = 'postgrest_logs'`)
+      expect(where).not.toContain(`source = 'edge_logs'`)
+      expect(where).not.toContain(`log_attributes['request.path'] LIKE '%/rest/%'`)
+    })
+
+    it('routes the `storage` log type solely to storage_logs (mutually exclusive from edge_logs)', () => {
       const sql = getUnifiedLogsQuery(withFilters('log_type:eq:storage'))
-      expect(sql).toContain(
-        `source = 'edge_logs' AND log_attributes['request.path'] LIKE '%/storage/%'`
-      )
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`source = 'storage_logs'`)
+      expect(where).not.toContain(`source = 'edge_logs'`)
+      expect(where).not.toContain(`log_attributes['request.path'] LIKE '%/storage/%'`)
     })
 
     it('escapes single quotes in filter values to prevent SQL injection', () => {
@@ -111,17 +111,56 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).not.toContain(`'%error%%'`)
     })
 
-    it('excludes connection log messages by default (hide_connection_logs=true)', () => {
-      const sql = getUnifiedLogsQuery({ ...baseSearch, hide_connection_logs: true } as any)
+    it('excludes connection log messages when show_connection_logs=false', () => {
+      const sql = getUnifiedLogsQuery({ ...baseSearch, show_connection_logs: false } as any)
       expect(sql).toContain("source != 'postgres_logs'")
       expect(sql).toContain("event_message NOT LIKE 'connection received%'")
       expect(sql).toContain("event_message NOT LIKE 'connection authenticated%'")
       expect(sql).toContain("event_message NOT LIKE 'connection authorized%'")
     })
 
-    it('includes connection log messages when hide_connection_logs=false', () => {
-      const sql = getUnifiedLogsQuery({ ...baseSearch, hide_connection_logs: false } as any)
+    it('includes connection log messages by default (show_connection_logs=true)', () => {
+      const sql = getUnifiedLogsQuery({ ...baseSearch, show_connection_logs: true } as any)
       expect(sql).not.toContain("event_message NOT LIKE 'connection received%'")
+    })
+
+    it.each([
+      ['edge_auth', '%/auth/%'],
+      ['edge_storage', '%/storage/%'],
+      ['edge_postgrest', '%/rest/%'],
+    ] as const)('excludes %s-pathed requests from edge_logs when %s=false', (key, pathFilter) => {
+      const sql = getUnifiedLogsQuery({ ...baseSearch, [key]: false } as any)
+      expect(sql).toContain("source != 'edge_logs'")
+      expect(sql).toContain(`log_attributes['request.path'] NOT LIKE '${pathFilter}'`)
+    })
+
+    it('does not filter edge_logs by service path by default (all edge_* toggles true)', () => {
+      const sql = getUnifiedLogsQuery(baseSearch)
+      expect(sql).not.toContain("log_attributes['request.path'] NOT LIKE '%/auth/%'")
+      expect(sql).not.toContain("log_attributes['request.path'] NOT LIKE '%/storage/%'")
+      expect(sql).not.toContain("log_attributes['request.path'] NOT LIKE '%/rest/%'")
+    })
+
+    it('leaves dedicated auth_logs/storage_logs/postgrest_logs rows untouched by the edge_* toggles', () => {
+      // These toggles only hide traffic nested inside the `edge_logs` (API
+      // Gateway) source — the dedicated sources are separate log types now
+      // that log types are mutually exclusive, so they shouldn't be scoped by
+      // a `source != 'edge_logs' OR ...` guard meant for gateway rows.
+      const sql = getUnifiedLogsQuery({
+        ...baseSearch,
+        edge_auth: false,
+        edge_storage: false,
+        edge_postgrest: false,
+      } as any)
+      expect(sql).toContain(
+        "(source != 'edge_logs' OR log_attributes['request.path'] NOT LIKE '%/auth/%')"
+      )
+      expect(sql).toContain(
+        "(source != 'edge_logs' OR log_attributes['request.path'] NOT LIKE '%/storage/%')"
+      )
+      expect(sql).toContain(
+        "(source != 'edge_logs' OR log_attributes['request.path'] NOT LIKE '%/rest/%')"
+      )
     })
 
     it('does not emit subqueries or CTEs (rejected by the OTEL endpoint)', () => {
@@ -144,7 +183,7 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toContain('arrayJoin([')
       expect(sql).toContain('multiIf(')
       expect(sql).toContain(`facet = 'total', 'all'`)
-      for (const lt of ['edge', 'postgrest', 'storage', 'postgres', 'edge function', 'auth']) {
+      for (const lt of ['postgrest', 'storage', 'postgres', 'edge function', 'auth']) {
         expect(sql).toContain(`'${lt}'`)
       }
       for (const lvl of ['success', 'warning', 'error']) {
@@ -157,17 +196,36 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
     })
 
     it('honours an active log_type filter in the total count scan', () => {
-      const sql = getLogsCountQuery(withFilters('log_type:eq:edge'))
+      const sql = getLogsCountQuery(withFilters('log_type:eq:storage'))
       // Assert on the WHERE only: value expressions mention other sources inline.
       const totalWhere = whereOfBranchContaining(sql, `'all'`)
-      expect(totalWhere).toContain(`source = 'edge_logs'`)
+      expect(totalWhere).toContain(`source = 'storage_logs'`)
+      expect(totalWhere).not.toContain(`source = 'edge_logs'`)
       expect(totalWhere).not.toContain(`source = 'postgres_logs'`)
     })
 
     it('gives the log_type facet its own scan that excludes the log_type filter', () => {
-      const sql = getLogsCountQuery(withFilters('log_type:eq:edge'))
+      const sql = getLogsCountQuery(withFilters('log_type:eq:postgrest'))
       const logTypeWhere = whereOfBranchContaining(sql, `'log_type'`)
-      expect(logTypeWhere).not.toContain(`NOT LIKE '%/rest/%'`)
+      expect(logTypeWhere).not.toContain(`LIKE '%/rest/%'`)
+    })
+
+    it('applies the connection-logs filter to every count scan so badges match the list', () => {
+      const sql = getLogsCountQuery({ ...baseSearch, show_connection_logs: false } as any)
+      const scans = sql.split(/\bUNION ALL\b/)
+      expect(scans.length).toBeGreaterThan(1)
+      for (const scan of scans) {
+        expect(scan).toContain("event_message NOT LIKE 'connection received%'")
+      }
+    })
+
+    it('applies the edge_* service filters to every count scan so badges match the list', () => {
+      const sql = getLogsCountQuery({ ...baseSearch, edge_postgrest: false } as any)
+      const scans = sql.split(/\bUNION ALL\b/)
+      expect(scans.length).toBeGreaterThan(1)
+      for (const scan of scans) {
+        expect(scan).toContain("log_attributes['request.path'] NOT LIKE '%/rest/%'")
+      }
     })
   })
 

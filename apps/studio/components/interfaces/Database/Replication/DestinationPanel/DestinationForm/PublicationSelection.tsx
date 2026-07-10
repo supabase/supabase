@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { useMemo } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import { FormControl, FormField } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { DestinationPanelSchemaType } from './DestinationForm.schema'

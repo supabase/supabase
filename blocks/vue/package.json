@@ -26,6 +26,8 @@
   "devDependencies": {
     "shadcn": "^3.3.1",
     "tsconfig": "workspace:*",
+    "@typescript/native": "catalog:",
+    "typescript": "catalog:",
     "vite": "^7.3.2"
   }
 }

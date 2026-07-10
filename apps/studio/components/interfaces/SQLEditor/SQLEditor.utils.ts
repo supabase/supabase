@@ -9,11 +9,11 @@ import {
   updateWithoutWhereRegex,
 } from './SQLEditor.constants'
 import { ContentDiff } from './SQLEditor.types'
+import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { removeCommentsFromSql } from '@/lib/helpers'
 import { sqlEventParser } from '@/lib/sql-event-parser'
-import type { SnippetWithContent } from '@/state/sql-editor-v2'
 
 export type CreateTableWithoutRLS = {
   schema?: string
@@ -83,7 +83,7 @@ export const createSqlSnippetSkeletonV2 = ({
       content_id: id ?? '',
       unchecked_sql: untrustedSql(sql ?? ''),
     } as any,
-    isNotSavedInDatabaseYet: true,
+    status: 'new',
   }
 }
 
@@ -249,8 +249,8 @@ export const checkIfAppendLimitRequired = (sql: string, limit: number = 0) => {
     !cleanedSql.toLowerCase().match(/fetch\s+first/i) &&
     !cleanedSql.match(/limit$/i) &&
     !cleanedSql.match(/limit;$/i) &&
-    !cleanedSql.match(/limit [0-9]* offset [0-9]*[;]?$/i) &&
-    !cleanedSql.match(/limit [0-9]*[;]?$/i)
+    !cleanedSql.match(/limit [0-9]* offset [0-9]*\s*[;]?$/i) &&
+    !cleanedSql.match(/limit [0-9]*\s*[;]?$/i)
   return { cleanedSql, appendAutoLimit }
 }
 

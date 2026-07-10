@@ -12,7 +12,7 @@ import { filterByProjects, sortAuditLogs } from './AuditLogs.utils'
 import { LogDetailsPanel } from '@/components/interfaces/AuditLogs/LogDetailsPanel'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import Table from '@/components/to-be-cleaned/Table'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import {

@@ -40,7 +40,7 @@ This situation often arises in large, high-write tables (e.g., `your_table`, whi
 
 ### **Mitigating performance impact during a critical autovacuum**
 
-Since the wraparound prevention autovacuum cannot be stopped, the best approach is to provide the database with sufficient resources to complete the operation as quickly and efficiently as possible.
+Since the wraparound prevention autovacuum cannot be stopped, the best approach is to provide the database with sufficient resources to complete the operation as efficiently as possible.
 
 1.  **Upgrade your Database Compute Instance:**
     - **Action:** Temporarily scale up your instance's CPU (e.g., from `m6g.4xlarge` to `m6g.8xlarge` or higher).

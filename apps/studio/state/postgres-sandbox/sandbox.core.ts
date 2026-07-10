@@ -54,10 +54,8 @@ const boot = async (): Promise<SandboxCore> => {
 
   const run = async ({ sql }: { sql: string }) => {
     try {
-      // [Joshen] First 2 results will be from role impersonation, the actual result from the
-      // query will be returned as the 3rd result.
       const results = await pg.exec(sql)
-      return { result: results[2].rows ?? [] }
+      return { result: results.at(-1)?.rows ?? [] }
     } catch (error) {
       await pg.exec('ROLLBACK').catch(() => {})
       throw error instanceof Error ? error : new Error(getErrorMessage(error) ?? String(error))

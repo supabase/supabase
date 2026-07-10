@@ -2,148 +2,106 @@
 title: 'Use Supabase with Nuxt'
 subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Nuxt app.'
 breadcrumb: 'Framework Quickstarts'
-hideToc: true
 ---
 
-<StepHikeCompact>
+<$Partial path="quickstart_db_setup.mdx" />
 
-  <StepHikeCompact.Step step={1}>
+## 3. Create a Nuxt app
 
-    <$Partial path="quickstart_db_setup.mdx" />
+Create a Nuxt app using the `npx nuxi` command.
 
-  </StepHikeCompact.Step>
+```bash
+npx nuxi@latest init my-app
+```
 
-  <StepHikeCompact.Step step={2}>
+## 4. Install Agent Skills (optional)
 
-    <StepHikeCompact.Details title="Create a Nuxt app">
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
 
-    - Create a Nuxt app using the `npx nuxi` command.
+To install, run the following command in the root of your project:
 
-    <$Partial path="uiLibCta.mdx" />
+```bash
+npx skills add supabase/agent-skills
+```
 
-    </StepHikeCompact.Details>
+## 5. Install the Supabase client library
 
-    <StepHikeCompact.Code>
+The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a Nuxt app.
 
-      ```bash name=Terminal
-      npx nuxi@latest init my-app
-      ```
+Navigate to the Nuxt app and install `supabase-js`.
 
-    </StepHikeCompact.Code>
+```bash
+cd my-app && npm install @supabase/supabase-js
+```
 
-  </StepHikeCompact.Step>
+## 6. Declare Supabase environment variables
 
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Install the Supabase client library">
+Create a `.env` file and populate with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=nuxt&tab=frameworks):
 
-      The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a Nuxt app.
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=nuxt">
+    Open Connect panel
+  </a>
+</Button>
 
-      Navigate to the Nuxt app and install `supabase-js`.
+<$CodeTabs>
 
-    </StepHikeCompact.Details>
+```text name=.env
+SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+```
 
-    <StepHikeCompact.Code>
+```ts name=nuxt.config.ts
+export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      supabaseUrl: process.env.SUPABASE_URL,
+      supabasePublishableKey: process.env.SUPABASE_PUBLISHABLE_KEY,
+    },
+  },
+})
+```
 
-      ```bash name=Terminal
-      cd my-app && npm install @supabase/supabase-js
-      ```
+</$CodeTabs>
 
-    </StepHikeCompact.Code>
+<$Partial path="api_settings.mdx" variables={{ "framework": "nuxt", "tab": "frameworks" }} />
 
-  </StepHikeCompact.Step>
+## 7. Query data from the app
 
-    <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Declare Supabase Environment Variables">
+In `app.vue`, create a Supabase client using your config values and replace the existing content with the following code.
 
-    Create a `.env` file and populate with your Supabase connection variables:
+```vue name=app.vue
+<script setup>
+import { createClient } from '@supabase/supabase-js'
 
-    <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="publishable" />
+const config = useRuntimeConfig()
+const supabase = createClient(config.public.supabaseUrl, config.public.supabasePublishableKey)
+const instruments = ref([])
 
+async function getInstruments() {
+  const { data } = await supabase.from('instruments').select()
+  instruments.value = data
+}
 
-    </StepHikeCompact.Details>
+onMounted(() => {
+  getInstruments()
+})
+</script>
 
-    <StepHikeCompact.Code>
+<template>
+  <ul>
+    <li v-for="instrument in instruments" :key="instrument.id">{{ instrument.name }}</li>
+  </ul>
+</template>
+```
 
-      <$CodeTabs>
+## 8. Start the app
 
-        ```text name=.env.local
-        SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
-        SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
-        ```
+Start the app, navigate to http://localhost:3000 in the browser, and you should see the list of instruments.
 
-        ```ts name=nuxt.config.tsx
-        export default defineNuxtConfig({
-          runtimeConfig: {
-            public: {
-              supabaseUrl: process.env.SUPABASE_URL,
-              supabasePublishableKey: process.env.SUPABASE_PUBLISHABLE_KEY,
-            },
-          },
-        });
-        ```
-
-      </$CodeTabs>
-      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "nuxt", "tab": "frameworks" }} />
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={5}>
-    <StepHikeCompact.Details title="Query data from the app">
-
-    In `app.vue`, create a Supabase client using your config values and replace the existing content with the following code.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```vue name=app.vue
-      <script setup>
-      import { createClient } from '@supabase/supabase-js'
-      const config = useRuntimeConfig()
-      const supabase = createClient(config.public.supabaseUrl, config.public.supabasePublishableKey)
-      const instruments = ref([])
-
-      async function getInstruments() {
-        const { data } = await supabase.from('instruments').select()
-        instruments.value = data
-      }
-
-      onMounted(() => {
-        getInstruments()
-      })
-      </script>
-
-      <template>
-        <ul>
-          <li v-for="instrument in instruments" :key="instrument.id">{{ instrument.name }}</li>
-        </ul>
-      </template>
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={6}>
-    <StepHikeCompact.Details title="Start the app">
-
-    Start the app, navigate to http://localhost:3000 in the browser, open the browser console, and you should see the list of instruments.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```bash name=Terminal
-      npm run dev
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-</StepHikeCompact>
+```bash
+npm run dev
+```
 
 <Admonition type="tip">
 

@@ -1,84 +1,87 @@
-<StepHikeCompact.Details title="Create a Supabase project">
+export const sqlSetup = `-- Create the table
+create table instruments (
+  id bigint primary key generated always as identity,
+  name text not null
+);
 
-Go to [database.new](https://database.new) and create a new Supabase project.
+-- Insert sample data into the table
+insert into instruments (name)
+values
+('violin'),
+('viola'),
+('cello');
 
-Alternatively, you can create a project using the Management API:
+-- Grant the privileges the role needs, which is read access
+grant select on public.instruments to anon;
 
-</StepHikeCompact.Details>
+-- Enable row level security for the table
+alter table instruments enable row level security;
 
-<StepHikeCompact.Code>
+-- Create a policy to allow the anon role to read from the instruments table
+create policy "public can read instruments"
+on public.instruments
+for select to anon
+using (true);`
 
-```bash
-# First, get your access token from https://supabase.com/dashboard/account/tokens
-export SUPABASE_ACCESS_TOKEN="your-access-token"
+## 1. Create a Supabase project
 
-# List your organizations to get the organization ID
-curl -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-  https://api.supabase.com/v1/organizations
+To start, you need a Supabase project.
 
-# Create a new project (replace <org-id> with your organization ID)
-curl -X POST https://api.supabase.com/v1/projects \
-  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "organization_id": "<org-id>",
-    "name": "My Project",
-    "region": "us-east-1",
-    "db_pass": "<your-secure-password>"
-  }'
+Create a new Supabase project from [the Dashboard of any organization](/dashboard/new/_) you belong to.
+
+<Admonition type="tip" title="Want to create a project programmatically?">
+
+Use [the Management API](/docs/reference/api/v1-create-a-project) or ask [the MCP server](/docs/guides/ai-tools/mcp#account-management) to create a new Supabase project.
+
+</Admonition>
+
+## 2. Set up your database
+
+When your Supabase project is up and running, create an `instruments` table with some sample data. Then set only the privileges each Postgres role needs, add [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default, and create an RLS policy to make the data in the table publicly readable.
+
+Do these steps within your project's dashboard by copying and running the snippet in your project's [SQL Editor](/dashboard/project/_/sql/new).
+
+<Admonition type="tip">
+
+Save some steps by <a href={`/dashboard/project/_/sql/new?content=${encodeURIComponent(sqlSetup)}`}>clicking here to prefill the SQL</a> in the SQL Editor, and then clicking **Run**.
+
+</Admonition>
+
+<Admonition type="tip" title="Want to setup the database programmatically?">
+
+You can use [the Management API](/docs/reference/api/v1-run-a-query) or ask [the MCP server](/docs/guides/ai-tools/mcp#database) to execute SQL queries.
+
+</Admonition>
+
+```sql SQL_EDITOR
+-- Create the table
+create table instruments (
+  id bigint primary key generated always as identity,
+  name text not null
+);
+
+-- Insert sample data into the table
+insert into instruments (name)
+values
+  ('violin'),
+  ('viola'),
+  ('cello');
+
+-- Grant the privileges the role needs, which is read access
+grant select on public.instruments to anon;
+
+-- Enable row level security for the table
+alter table instruments enable row level security;
+
+-- Create a policy to allow the anon role to read from the instruments table
+create policy "public can read instruments"
+on public.instruments
+for select to anon
+using (true);
 ```
 
-</StepHikeCompact.Code>
+<Admonition type="note" label="Disabled the Data API during project setup?">
 
-<StepHikeCompact.Details>
+If you disabled the Data API during project setup, enable it in the [**Integrations > Data API**](/dashboard/project/_/integrations/data_api/settings) section of the Dashboard and expose the specific tables or functions you want to access. To automatically grant access for new tables and functions in `public`, enable **Automatically expose new tables**.
 
-When your project is up and running, go to the [**Table Editor**](/dashboard/project/_/editor) section of the Dashboard, create a new table and insert some data. Then in the [**Integrations > Data API**](/dashboard/project/_/integrations/data_api/settings) section of the Dashboard, expose the specific tables or functions you want to access. To automatically grant access for new tables and functions in `public`, enable **Default privileges for new entities**.
-
-Alternatively, you can run the following snippet in your project's [SQL Editor](/dashboard/project/_/sql/new).
-
-This creates an `instruments` table with some sample data, sets a secure baseline by setting only the privileges each Postgres role needs, and adds [Row Level Security (RLS)](/docs/guides/database/postgres/row-level-security) for enhanced security for database data by default.
-
-</StepHikeCompact.Details>
-
-<StepHikeCompact.Code>
-
-    ```sql SQL_EDITOR
-    -- Create the table
-    create table instruments (
-      id bigint primary key generated always as identity,
-      name text not null
-    );
-
-    -- Insert sample data into the table
-    insert into instruments (name)
-    values
-      ('violin'),
-      ('viola'),
-      ('cello');
-
-    -- Grant the privileges the role needs, which is read access
-    grant select on public.instruments to anon;
-
-    -- Enable row level security for the table
-    alter table instruments enable row level security;
-    ```
-
-</StepHikeCompact.Code>
-
-<StepHikeCompact.Details>
-
-Create an RLS policy to make the data in your table publicly readable:
-
-</StepHikeCompact.Details>
-
-<StepHikeCompact.Code>
-
-    ```sql SQL_EDITOR
-    -- Create a policy to allow the anon role to read from the instruments table
-    create policy "public can read instruments"
-    on public.instruments
-    for select to anon
-    using (true);
-    ```
-
-</StepHikeCompact.Code>
+</Admonition>

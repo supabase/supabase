@@ -23,7 +23,7 @@ All comments are **advisory**.
 3. **`getByText` with exact match** — good for unique text
 
    ```typescript
-   page.getByText('Data API Access', { exact: true })
+   page.getByText('Data API access', { exact: true })
    ```
 
 4. **`locator` with CSS** — use sparingly, more fragile

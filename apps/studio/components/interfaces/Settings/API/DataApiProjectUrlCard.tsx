@@ -3,6 +3,7 @@ import { AlertCircle } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useEffectEvent } from 'react'
 import { Alert, AlertTitle } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageSection,
   PageSectionAside,
@@ -11,8 +12,7 @@ import {
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
-} from 'ui-patterns'
-import { Input } from 'ui-patterns/DataInputs/Input'
+} from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getApiEndpoint } from '@/components/interfaces/Integrations/DataApi/DataApi.utils'

@@ -2,7 +2,7 @@ import { format } from 'date-fns'
 import { useState } from 'react'
 import { DateRange } from 'react-day-picker'
 import { Button, Calendar } from 'ui'
-import { CustomOptionProps, FilterBar, FilterGroup } from 'ui-patterns'
+import { CustomOptionProps, FilterBar, FilterGroup } from 'ui-patterns/FilterBar'
 
 function CustomDatePicker({ onChange, onCancel, search }: CustomOptionProps) {
   const [date, setDate] = useState<DateRange | undefined>(

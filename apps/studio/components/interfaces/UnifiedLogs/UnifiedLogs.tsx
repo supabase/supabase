@@ -29,7 +29,6 @@ import {
 
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
-import { ConnectionLogsToggle } from './components/ConnectionLogsToggle'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
@@ -70,11 +69,11 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 export const CHART_CONFIG = {
   success: {
     label: <TooltipLabel level="success" />,
-    color: 'hsl(var(--foreground-muted))',
+    color: 'var(--foreground-muted)',
   },
   warning: {
     label: <TooltipLabel level="warning" />,
-    color: 'hsl(var(--warning-default))',
+    color: 'var(--chart-warning)',
   },
   error: {
     label: <TooltipLabel level="error" />,
@@ -377,7 +376,6 @@ export const UnifiedLogs = () => {
             isFilterBarOpen={isFilterBarOpen}
             setIsFilterBarOpen={setIsFilterBarOpen}
             dateRangeDisabled={{ after: new Date() }}
-            afterFilters={<ConnectionLogsToggle />}
           />
           <ResizableHandle withHandle />
           <ResizablePanel
@@ -461,7 +459,7 @@ export const UnifiedLogs = () => {
                   className={cn(
                     'h-full [&>div]:h-full',
                     '[&_thead_th]:[border-top:none]! [&_thead_th]:[border-bottom:none]!',
-                    '[&_thead_th]:[box-shadow:inset_0_-1px_0_hsl(var(--border-default))]!',
+                    '[&_thead_th]:[box-shadow:inset_0_-1px_0_var(--border-default)]!',
                     '[&_thead_th]:text-foreground-lighter! [&_thead_tr:hover]:bg-surface-75',
                     '[&_thead_tr]:border-b-0! [&_tbody_tr]:border-b-0!'
                   )}

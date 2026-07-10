@@ -40,13 +40,17 @@ export const NotificationDetail = ({ notification, onUpdateStatus }: Notificatio
               <Link
                 title={organization.name}
                 href={`/org/${organization.slug}/general`}
-                className="text-link"
+                className="text-sm text-link"
               >
                 {organization.name}
               </Link>
             )}
             {project !== undefined && (
-              <Link title={project.name} href={`/project/${project.ref}`} className="text-link">
+              <Link
+                title={project.name}
+                href={`/project/${project.ref}`}
+                className="text-sm text-link"
+              >
                 {project.name}
               </Link>
             )}

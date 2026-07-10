@@ -14,7 +14,7 @@ import {
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export const useNewQuery = () => {
   const router = useRouter()
@@ -149,5 +149,3 @@ export function useSqlEditorPrompt() {
     resetPrompt,
   }
 }
-
-export default useNewQuery

@@ -32,28 +32,37 @@ You can only read data from a Read Replica. This is in contrast to a Primary dat
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
   chevronAlign="right"
   justified
   size="large"
   className="text-foreground-light mt-8 mb-6"
 >
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
+  <AccordionItem
       header="Do you need Read Replicas?"
       id="rr-flow"
     >
 
-    When your database starts slowing down, you face a choice: make your existing database bigger (scale vertically), or spread the load across multiple databases (scale horizontally). Both approaches work. Neither is universally correct. The right answer depends on your workload, your budget, and where the bottleneck actually is.
+    When your database starts slowing down, you face a choice: make your existing database bigger (scale vertically), or spread the load across multiple databases (scale horizontally). Both approaches work. Neither is universally correct. The right answer depends on your workload, your budget, and where the bottleneck is.
 
-    <Image
-      src="/docs/img/guides/platform/read-replicas/read-replicas-flow.svg"
-      alt="Read Replicas decision flowchart"
-    />
+    ```mermaid
+    flowchart TD
+      A[Database slowing down] --> B{CPU above 70% sustained?}
+      B -->|No| C[Monitor, do not scale yet]
+      B -->|Yes| D{Queries optimized? Indexes in place?}
+      D -->|No| E[Run EXPLAIN ANALYZE<br/>Add missing indexes<br/>Optimize first]
+      E --> D
+      D -->|Yes| F{Workload 80%+ reads?}
+      F -->|No| G[Upgrade compute<br/>Replicas will not help writes]
+      F -->|Yes| H{Already at 16XL?}
+      H -->|Yes| I[Read Replicas<br/>Only horizontal option left]
+      H -->|No| J{Need workload isolation<br/>or geo-distribution?}
+      J -->|Yes| K[Read Replicas]
+      J -->|No| L[Either works<br/>Compute is simpler<br/>Replicas scale further]
+    ```
+
+    Supabase recommends not scaling until CPU is sustained above 70%. After it is, confirm your queries are already optimized and properly indexed with `EXPLAIN ANALYZE` before adding hardware. If your workload is less than roughly 80% reads, upgrade compute. Read Replicas only serve reads and won't help writes. If it's read-heavy, Read Replicas become the right choice after you reach the largest compute size of 16XL or earlier if you need workload isolation or geographic distribution. Below 16XL with no isolation need, either option works. While compute is simpler, Read Replicas scale further.
 
     </AccordionItem>
-
-  </div>
 
 </Accordion>
 

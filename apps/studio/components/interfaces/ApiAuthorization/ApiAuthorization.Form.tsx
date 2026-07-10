@@ -1,4 +1,5 @@
 import dayjs from 'dayjs'
+import Link from 'next/link'
 import { type ReactNode } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
@@ -14,7 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'ui'
-import { Admonition, ShimmeringLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { ApprovalState, IApprovalFormSchema } from './ApiAuthorization.Schema'
 import {
@@ -193,6 +195,12 @@ function OrganizationsEmptyState(): ReactNode {
       type="warning"
       title="No organizations found"
       description="Create an organization before authorizing this request."
+      actions={[
+        // [Joshen] JFYI this is a short term solution to guide users with creating an org from here
+        <Button asChild key="new-org" variant="default">
+          <Link href="/new">Create an organization</Link>
+        </Button>,
+      ]}
     />
   )
 }

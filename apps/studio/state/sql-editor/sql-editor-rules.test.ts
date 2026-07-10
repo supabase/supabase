@@ -9,7 +9,7 @@ import {
   validateMoveToFolder,
   type LoadedSnippet,
 } from './sql-editor-rules'
-import type { SnippetWithContent } from './types'
+import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 
 function makeSnippet(overrides: Omit<Partial<SnippetWithContent>, 'content'> = {}): LoadedSnippet {
   return {
@@ -22,6 +22,7 @@ function makeSnippet(overrides: Omit<Partial<SnippetWithContent>, 'content'> = {
     owner_id: 7,
     folder_id: null,
     favorite: false,
+    status: 'saved',
     inserted_at: '2024-01-01T00:00:00.000Z',
     updated_at: '2024-01-01T00:00:00.000Z',
     ...overrides,
