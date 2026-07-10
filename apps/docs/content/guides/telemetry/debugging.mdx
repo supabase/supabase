@@ -8,7 +8,7 @@ Debug by evidence, not by guessing. A Supabase error almost always surfaces at o
 
 ## The debugging loop
 
-Work through these steps in order. Skipping straight to a fix before you have evidence for the cause is the most common way to waste time on a bug.
+Work through these steps in order, skipping straight to a fix before you have evidence for the cause is the most common way to waste time on a bug.
 
 1. **Reproduce the issue and read the error precisely.** Capture the exact status code, the error code, and the full message, not a paraphrase. A `401` is not a `403`; `PGRST002` is not `PGRST106`; a Postgres `SQLSTATE` such as `42501`, `42P01`, or `23505` points at the exact failure. The precise error is your strongest clue. If you're using `supabase-js`, remember that errors are **returned, not thrown**: they show up in the `error` field of `{ data, error }`. Check that your code inspects `error` — a swallowed error is why many bugs look like "nothing happened".
 2. **Locate the failing layer.** Use the request stack below. The status code and error code usually name the layer for you.
