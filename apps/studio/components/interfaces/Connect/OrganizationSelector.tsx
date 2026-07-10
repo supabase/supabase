@@ -1,12 +1,11 @@
 import { ChevronDown } from 'lucide-react'
 import { useMemo, useState, type ReactNode } from 'react'
-import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
+import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger, SuccessCheckCircle } from 'ui'
 
 import {
   CreateOrganizationCard,
   OrganizationCard,
 } from '@/components/interfaces/Organization/OrganizationCard'
-import { SuccessCheckCircle } from '@/components/ui/SuccessCheckCircle'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import type { Organization } from '@/types'
 

@@ -911,6 +911,11 @@ export const examples: Registry = [
     files: ['example/sonner-upload.tsx'],
   },
   {
+    name: 'success-check-circle-demo',
+    type: 'components:example',
+    files: ['example/success-check-circle-demo.tsx'],
+  },
+  {
     name: 'switch-demo',
     type: 'components:example',
     registryDependencies: ['switch'],

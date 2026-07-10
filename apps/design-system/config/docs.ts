@@ -488,6 +488,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Success Check Circle',
+          href: '/docs/components/success-check-circle',
+          items: [],
+        },
+        {
           title: 'Switch',
           href: '/docs/components/switch',
           items: [],

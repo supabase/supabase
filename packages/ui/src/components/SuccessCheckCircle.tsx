@@ -1,5 +1,6 @@
 import { Check } from 'lucide-react'
-import { cn } from 'ui'
+
+import { cn } from '../lib/utils'
 
 export const SuccessCheckCircle = ({ className }: { className?: string }) => (
   <span

@@ -13,11 +13,10 @@ import {
 } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
-import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, SuccessCheckCircle, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import { SuccessCheckCircle } from '@/components/ui/SuccessCheckCircle'
 import { useProjectUpgradingStatusQuery } from '@/data/config/project-upgrade-status-query'
 import { useInvalidateProjectDetailsQuery } from '@/data/projects/project-detail-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
