@@ -127,7 +127,7 @@ export function PITRForm({
         }
       >
         <div className="flex flex-col gap-y-6 lg:flex-row lg:gap-y-0 justify-between px-4 md:px-10 py-6 lg:space-x-10">
-          <div className="w-full lg:w-1/3 space-y-2 [&>div:first-child]:w-min [&>div]:px-0 py-2">
+          <div className="w-full lg:w-1/3 space-y-2 py-2">
             <p className="text-sm text-foreground">Select a date to restore to</p>
             <Calendar
               mode="single"
@@ -142,6 +142,7 @@ export function PITRForm({
                 { after: latestAvailableBackupAsDate },
               ]}
               classNames={{
+                root: 'w-min px-0',
                 day: cn(
                   '[&:not(:has(:disabled))]:border [&:not(:has(:disabled))]:border-stronger not-last:border-r-0 [&:not(:has(:disabled))]:bg-overlay-hover',
                   'rounded-none'
