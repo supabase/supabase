@@ -32,6 +32,7 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
         name="instanceSize"
         render={({ field }) => (
           <FormItemLayout
+            id="instanceSize"
             layout="horizontal"
             label="Compute size"
             description={
@@ -51,7 +52,10 @@ export const ComputeSizeSelector = ({ form }: ComputeSizeSelectorProps) => {
             }
           >
             <Select value={field.value} onValueChange={(value) => field.onChange(value)}>
-              <SelectTrigger className="[&>span>div>div>[data-field=instance-details]]:hidden">
+              <SelectTrigger
+                id="instanceSize"
+                className="[&>span>div>div>[data-field=instance-details]]:hidden"
+              >
                 <SelectValue placeholder="Select a compute size" />
               </SelectTrigger>
               <SelectContent>

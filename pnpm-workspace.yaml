@@ -20,6 +20,12 @@ catalog:
   '@types/node': ^22.0.0
   '@types/react': ^19.2.14
   '@types/react-dom': ^19.2.3
+  # TypeScript 7 has no programmatic API until 7.1, so `typescript` stays aliased
+  # to the 6.0-API compat package for tools that import it (typescript-eslint,
+  # Next.js build typechecking), while `@typescript/native` provides the native
+  # TS 7 `tsc` binary used by typecheck scripts.
+  # https://devblogs.microsoft.com/typescript/announcing-typescript-7-0/
+  '@typescript/native': npm:typescript@~7.0.2
   '@vitejs/plugin-react': ^6.0.1
   '@vitest/coverage-v8': ^4.1.4
   '@vitest/ui': ^4.1.4
@@ -35,7 +41,7 @@ catalog:
   recharts: ^2.15.4
   tailwindcss: ^4.2.4
   tsx: ^4.22.0
-  typescript: ~6.0.0
+  typescript: ~6.0.2
   valtio: ^1.12.0
   vite: ^8.0.16
   vite-tsconfig-paths: ^6.1.1
@@ -60,6 +66,8 @@ minimumReleaseAgeExclude:
   - '@ai-sdk/*'
   - '@supabase/*'
   - '@supabase-labs/*'
+  - typescript
+  - '@typescript/*'
   # First-party, published from supabase-community/mdast-jsx.
   - mdast-jsx
   # The following are excluded to fix vulnerablities.

@@ -4,7 +4,12 @@ import { toast } from 'sonner'
 import { proxy, snapshot, useSnapshot } from 'valtio'
 import { devtools, proxyMap } from 'valtio/utils'
 
-import { folderStatusOnSaveStart, isNewFolder, statusOnEdit } from './sql-editor-lifecycle'
+import {
+  folderStatusOnSaveStart,
+  isNewFolder,
+  statusOnDiscard,
+  statusOnEdit,
+} from './sql-editor-lifecycle'
 import { sqlEditorSessionState } from './sql-editor-session-state'
 import type { StateSnippet, StateSnippetFolder } from './types'
 import type { SnippetWithContent } from '@/data/content/sql-folders-query'
@@ -55,6 +60,19 @@ export const sqlEditorState = proxy({
     if (sqlEditorState.snippets[snippet.id]) return
 
     sqlEditorState.snippets[snippet.id] = { projectRef, splitSizes: [50, 50], snippet }
+  },
+
+  /**
+   *
+   * Clear local snippet content that is not persisted to the database. Deletes
+   * user edits that have not been saved.
+   */
+  clearSnippetContent: (id: string) => {
+    const storeSnippet = sqlEditorState.snippets[id]
+    if (storeSnippet) {
+      storeSnippet.snippet.content = undefined
+      storeSnippet.snippet.status = statusOnDiscard(storeSnippet.snippet.status)
+    }
   },
 
   /**

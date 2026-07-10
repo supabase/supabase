@@ -16,8 +16,11 @@ import {
   TooltipTrigger,
 } from 'ui'
 
+import { AutosaveStatus } from './AutosaveStatus'
 import { SqlRunButton } from './RunButton'
+import { SqlSaveButton } from './SaveButton'
 import SavingIndicator from './SavingIndicator'
+import { useIsSqlEditorManualSaveEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
@@ -47,6 +50,7 @@ export const UtilityActions = ({
   const { ref } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const sessionSnap = useSqlEditorSessionSnapshot()
+  const isManualSaveEnabled = useIsSqlEditorManualSaveEnabled()
 
   const [isAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
@@ -83,7 +87,10 @@ export const UtilityActions = ({
 
   return (
     <div className="inline-flex items-center justify-end gap-x-2">
-      {IS_PLATFORM && <SavingIndicator id={id} />}
+      <AutosaveStatus id={id} />
+      {/* SavingIndicator reports auto-save progress (spinner/checkmark). In manual
+          mode AutosaveStatus + the Save button own the status, so hide it there. */}
+      {IS_PLATFORM && !isManualSaveEnabled && <SavingIndicator id={id} />}
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -204,7 +211,7 @@ export const UtilityActions = ({
         </Tooltip>
       </div>
 
-      <div className="flex items-center justify-between gap-x-2">
+      <div className="flex items-center gap-x-2">
         <div className="flex items-center">
           {IS_PLATFORM && (
             <DatabaseSelector
@@ -216,13 +223,17 @@ export const UtilityActions = ({
           <RoleImpersonationPopover
             serviceRoleLabel="postgres"
             header="Run SQL query as a role"
-            variant={IS_PLATFORM ? 'connected-on-both' : 'connected-on-right'}
+            variant={IS_PLATFORM ? 'connected-on-left' : 'regular'}
           />
+        </div>
+
+        <div className="flex items-center">
+          {isManualSaveEnabled && <SqlSaveButton id={id} className="rounded-r-none" />}
           <SqlRunButton
             hasSelection={hasSelection}
             isDisabled={isDisabled || isExecuting}
             isExecuting={isExecuting}
-            className="rounded-l-none"
+            className={isManualSaveEnabled ? 'rounded-l-none' : undefined}
             onClick={executeQuery}
           />
         </div>

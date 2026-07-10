@@ -209,6 +209,7 @@
     "require-in-the-middle": "^8.0.0",
     "tsconfig": "workspace:*",
     "tsx": "catalog:",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vite-tsconfig-paths": "catalog:",
