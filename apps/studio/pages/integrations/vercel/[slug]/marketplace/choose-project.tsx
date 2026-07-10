@@ -142,11 +142,6 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
   const errorMessage = getErrorMessage(organizationsError) ?? getErrorMessage(integrationsError)
   const integrationNotFound =
     !isLoadingIntegrationsQuery && integrationData !== undefined && integration === undefined
-  const organizationNotFound =
-    !isLoadingOrganizationsQuery &&
-    organizationsData !== undefined &&
-    slug !== undefined &&
-    organization === undefined
 
   return (
     <>
@@ -168,7 +163,7 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
               title="Unable to load project connection"
               errorMessage={errorMessage}
             />
-          ) : organizationNotFound ? (
+          ) : organization === undefined ? (
             <VercelIntegrationInterstitialErrorState
               title="Unable to load project connection"
               errorMessage="Organization not found. Retry the installation from Vercel."
