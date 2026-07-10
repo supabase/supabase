@@ -27,9 +27,7 @@ import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/Fore
 import type { ImportContent } from './TableEditor/TableEditor.types'
 import type { SupaRow } from '@/components/grid/types'
 import { SparkBar } from '@/components/ui/SparkBar'
-import { createDatabaseColumn } from '@/data/database-columns/database-column-create-mutation'
 import { deleteDatabaseColumn } from '@/data/database-columns/database-column-delete-mutation'
-import { updateDatabaseColumn } from '@/data/database-columns/database-column-update-mutation'
 import type { Constraint } from '@/data/database/constraints-query'
 import { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
 import { databaseKeys } from '@/data/database/keys'
@@ -184,7 +182,44 @@ const updateForeignKey = async ({
  * dashboard and hence do not sit within their own stores
  */
 
-/** TODO: Refactor to do in a single transaction */
+const getUpdateForeignKeysSQL = ({
+  table,
+  foreignKeys,
+  existingForeignKeyRelations,
+}: {
+  table: { schema: string; name: string }
+  foreignKeys: ForeignKey[]
+  existingForeignKeyRelations: ForeignKeyConstraint[]
+}): SafeSqlFragment | null => {
+  const sqlFragments: SafeSqlFragment[] = []
+
+  const relationsToAdd = foreignKeys.filter((x) => typeof x.id === 'string')
+  if (relationsToAdd.length > 0) {
+    sqlFragments.push(getAddForeignKeySQL({ table, foreignKeys: relationsToAdd }))
+  }
+
+  const relationsToRemove = foreignKeys.filter((x) => x.toRemove)
+  if (relationsToRemove.length > 0) {
+    sqlFragments.push(getRemoveForeignKeySQL({ table, foreignKeys: relationsToRemove }))
+  }
+
+  const remainingRelations = foreignKeys.filter((x) => typeof x.id === 'number' && !x.toRemove)
+  const relationsToUpdate = remainingRelations.filter((x) => {
+    const existingRelation = existingForeignKeyRelations.find((y) => x.id === y.id)
+    if (existingRelation !== undefined) {
+      return checkIfRelationChanged(existingRelation as unknown as ForeignKeyConstraint, x)
+    } else return false
+  })
+  if (relationsToUpdate.length > 0) {
+    // Drop the old relation and add the newly configured one
+    sqlFragments.push(
+      safeSql`${getRemoveForeignKeySQL({ table, foreignKeys: relationsToUpdate })};\n${getAddForeignKeySQL({ table, foreignKeys: relationsToUpdate })}`
+    )
+  }
+
+  return sqlFragments.length > 0 ? joinSqlFragments(sqlFragments, ';\n') : null
+}
+
 export const createColumn = async ({
   projectRef,
   connectionString,
@@ -206,49 +241,71 @@ export const createColumn = async ({
 }) => {
   const toastId = _toastId ?? toast.loading(`Creating column "${payload.name}"...`)
   try {
-    // Once pg-meta supports composite keys, we can remove this logic
     const { isPrimaryKey, ...formattedPayload } = payload
-    await createDatabaseColumn({
-      projectRef: projectRef,
-      connectionString: connectionString,
-      payload: formattedPayload,
-    })
+    const sqlFragments: SafeSqlFragment[] = []
 
-    // Firing createColumn in createTable will bypass this block
+    // 1. Column creation SQL
+    const { sql: createColumnSql } = pgMeta.columns.create({
+      schema: formattedPayload.schema,
+      table: formattedPayload.table,
+      name: formattedPayload.name,
+      type: formattedPayload.type,
+      default_value: formattedPayload.defaultValue,
+      default_value_format: formattedPayload.defaultValueFormat,
+      is_identity: formattedPayload.isIdentity,
+      identity_generation: formattedPayload.identityGeneration,
+      is_nullable: formattedPayload.isNullable,
+      is_primary_key: isPrimaryKey,
+      is_unique: formattedPayload.isUnique,
+      comment: formattedPayload.comment,
+      check: formattedPayload.check,
+    })
+    sqlFragments.push(createColumnSql)
+
+    // 2. PK Modification SQL
     if (isPrimaryKey) {
       toast.loading('Assigning primary key to column...', { id: toastId })
-      // Same logic in createTable: Remove any primary key constraints first (we'll add it back later)
       const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
 
       if (existingPrimaryKeys.length > 0 && primaryKey !== undefined) {
-        await dropConstraint(
-          projectRef,
-          connectionString,
-          payload.schema,
-          payload.table,
-          primaryKey.name
+        sqlFragments.push(
+          getDropConstraintSQL({
+            schema: payload.schema,
+            table: payload.table,
+            name: primaryKey.name,
+          })
         )
       }
 
       const primaryKeyColumns = existingPrimaryKeys.concat([formattedPayload.name])
-      await addPrimaryKey(
-        projectRef,
-        connectionString,
-        payload.schema,
-        payload.table,
-        primaryKeyColumns
+      sqlFragments.push(
+        getAddPrimaryKeySQL({
+          schema: payload.schema,
+          table: payload.table,
+          columns: primaryKeyColumns,
+        })
       )
     }
 
-    // Then add the foreign key constraints here
+    // 3. FK Addition SQL
     if (foreignKeyRelations.length > 0) {
-      await addForeignKey({
-        projectRef,
-        connectionString,
-        table: { schema: payload.schema, name: payload.table },
-        foreignKeys: foreignKeyRelations,
-      })
+      sqlFragments.push(
+        getAddForeignKeySQL({
+          table: { schema: payload.schema, name: payload.table },
+          foreignKeys: foreignKeyRelations,
+        })
+      )
     }
+
+    // Bundle it all into one transaction
+    const transactionSql = safeSql`BEGIN;\n${joinSqlFragments(sqlFragments, ';\n')};\nCOMMIT;`
+
+    await executeSql({
+      projectRef,
+      connectionString,
+      sql: transactionSql,
+      queryKey: ['column', 'create'],
+    })
 
     if (!skipSuccessMessage) {
       toast.success(`Successfully created column "${formattedPayload.name}"`, { id: toastId })
@@ -260,7 +317,6 @@ export const createColumn = async ({
   }
 }
 
-/** TODO: Refactor to do in a single transaction */
 export const updateColumn = async ({
   projectRef,
   connectionString,
@@ -286,24 +342,38 @@ export const updateColumn = async ({
 }) => {
   try {
     const { isPrimaryKey, ...formattedPayload } = payload
-    await updateDatabaseColumn({
-      projectRef,
-      connectionString,
-      originalColumn,
-      payload: formattedPayload,
-    })
+    const sqlFragments: SafeSqlFragment[] = []
 
+    // 1. Column Update SQL
+    const { sql: updateColumnSql } = pgMeta.columns.update(
+      originalColumn as any,
+      {
+        name: formattedPayload.name,
+        type: formattedPayload.type,
+        drop_default: formattedPayload.dropDefault,
+        default_value: formattedPayload.defaultValue,
+        default_value_format: formattedPayload.defaultValueFormat,
+        is_identity: formattedPayload.isIdentity,
+        identity_generation: formattedPayload.identityGeneration,
+        is_nullable: formattedPayload.isNullable,
+        is_unique: formattedPayload.isUnique,
+        comment: formattedPayload.comment,
+        check: formattedPayload.check,
+      }
+    )
+    sqlFragments.push(updateColumnSql)
+
+    // 2. PK Modification SQL
     if (!skipPKCreation && isPrimaryKey !== undefined) {
       const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
 
-      // Primary key is getting updated for the column
       if (existingPrimaryKeys.length > 0 && primaryKey !== undefined) {
-        await dropConstraint(
-          projectRef,
-          connectionString,
-          originalColumn.schema,
-          originalColumn.table,
-          primaryKey.name
+        sqlFragments.push(
+          getDropConstraintSQL({
+            schema: originalColumn.schema,
+            table: originalColumn.table,
+            name: primaryKey.name,
+          })
         )
       }
 
@@ -313,26 +383,35 @@ export const updateColumn = async ({
         : existingPrimaryKeys.filter((x) => x !== columnName)
 
       if (primaryKeyColumns.length) {
-        await addPrimaryKey(
-          projectRef,
-          connectionString,
-          originalColumn.schema,
-          originalColumn.table,
-          primaryKeyColumns
+        sqlFragments.push(
+          getAddPrimaryKeySQL({
+            schema: originalColumn.schema,
+            table: originalColumn.table,
+            columns: primaryKeyColumns,
+          })
         )
       }
     }
 
-    // Then update foreign keys
+    // 3. FK Update SQL
     if (foreignKeyRelations.length > 0) {
-      await updateForeignKeys({
-        projectRef,
-        connectionString,
+      const updateFkSql = getUpdateForeignKeysSQL({
         table: { schema: originalColumn.schema, name: originalColumn.table },
         foreignKeys: foreignKeyRelations,
         existingForeignKeyRelations,
       })
+      if (updateFkSql) sqlFragments.push(updateFkSql)
     }
+
+    // Bundle it all into one transaction
+    const transactionSql = safeSql`BEGIN;\n${joinSqlFragments(sqlFragments, ';\n')};\nCOMMIT;`
+
+    await executeSql({
+      projectRef,
+      connectionString,
+      sql: transactionSql,
+      queryKey: ['column', 'update', originalColumn.id],
+    })
 
     if (!skipSuccessMessage) toast.success(`Successfully updated column "${originalColumn.name}"`)
   } catch (error: any) {
