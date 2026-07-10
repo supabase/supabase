@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { buildConnectPrompt } from './CopyPromptAdmonition'
+import { buildConnectPrompt } from '../CopyPromptAdmonition'
 
 describe('buildConnectPrompt', () => {
   test('uses redacted copy values instead of temporarily visible passwords', () => {

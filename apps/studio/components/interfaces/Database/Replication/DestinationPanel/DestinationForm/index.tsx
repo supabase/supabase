@@ -83,7 +83,6 @@ export const DestinationForm = ({
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
-  const [isFormInteracting, setIsFormInteracting] = useState(false)
   const [showValidationWarningsDialog, setShowValidationWarningsDialog] = useState(false)
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
   const [newBucketSheetVisible, setNewBucketSheetVisible] = useState(false)
@@ -301,16 +300,8 @@ export const DestinationForm = ({
   }
 
   useEffect(() => {
-    if (editMode && destinationData && pipelineData && !isFormInteracting) {
+    if (visible && !form.formState.isDirty) {
       form.reset(defaultValues)
-    }
-  }, [destinationData, pipelineData, editMode, defaultValues, form, isFormInteracting])
-
-  // Ensure the form always reflects the freshest data whenever the panel opens
-  useEffect(() => {
-    if (visible) {
-      form.reset(defaultValues)
-      setIsFormInteracting(false)
       resetValidation()
     }
   }, [visible, defaultValues, form, resetValidation])
@@ -381,7 +372,6 @@ export const DestinationForm = ({
                 <AnalyticsBucketFields
                   form={form}
                   editMode={editMode}
-                  setIsFormInteracting={setIsFormInteracting}
                   onSelectNewBucket={() => setNewBucketSheetVisible(true)}
                 />
               ) : selectedType === 'DuckLake' && etlEnableDucklake ? (

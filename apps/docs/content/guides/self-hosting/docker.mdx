@@ -353,10 +353,10 @@ curl http://<your-domain>:8000/functions/v1/hello
 Add new functions at `volumes/functions/<FUNCTION_NAME>/index.ts`, then restart the service to pick them up:
 
 ```sh
-sh run.sh recreate functions
+sh run.sh restart functions
 ```
 
-This force-recreates the container (equivalent to `docker compose up -d --wait --force-recreate --no-deps functions`). A plain `docker compose restart` is not sufficient as it does not pick up configuration changes.
+The main worker loads each function from disk per request, so a restart is enough to pick up new or changed function code. Use `sh run.sh recreate functions` instead when you change environment variables or secrets (for example `.env.functions` or the service's `environment:` block), since those are only applied when the container is recreated.
 
 See the [Self-hosted Edge Functions](/docs/guides/self-hosting/self-hosted-functions) guide for more details.
 
@@ -414,18 +414,18 @@ The `config add` / `config remove` commands manage the `COMPOSE_FILE` [variable]
 
 ## Updating
 
-We publish stable releases of the Docker Compose setup approximately once a month. The versions in each release are tested together, so they may lag behind the latest images on Docker Hub. To update, apply the latest changes from the repository and restart the services. If you want to run different versions of individual services, you can change the image tags in the Docker Compose file, but compatibility is **not guaranteed**. All Supabase images are available on [Docker Hub](https://hub.docker.com/u/supabase).
+We publish stable releases of the Docker Compose setup approximately once a month. The versions in each release are tested together, so they may lag behind the latest images on Docker Hub. To update, apply the latest changes from the repository, then stop and start the services. If you want to run different versions of individual services, you can change the image tags in the Docker Compose file, but compatibility is **not guaranteed**. All Supabase images are available on [Docker Hub](https://hub.docker.com/u/supabase).
 
 To follow the changes and updates, refer to the self-hosted Supabase [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md). Make sure to also check the [GitHub Discussions](https://github.com/orgs/supabase/discussions/categories/changelog?discussions_q=is%3Aopen+category%3AChangelog+label%3Aself-hosted).
 
-After updating the configuration, you need to restart services to pick up the changes, which may result in downtime for your applications and users.
+After updating the configuration, stop and start the stack or individual services to pick up the changes. This may result in downtime for your applications and users.
 
 For example, you'd like to update or rollback the Studio image. Follow the steps below:
 
 1. Check the [supabase/studio](https://hub.docker.com/r/supabase/studio/tags) images on [Supabase Docker Hub](https://hub.docker.com/u/supabase)
 2. Find the latest version (tag) number. It looks something like `2026.04.27-sha-5f60601`
 3. Update the Studio `image` configuration in the `docker-compose.yml` file. It should look like this: `image: supabase/studio:2026.04.27-sha-5f60601`
-4. Run `sh run.sh pull` to pull the new image, then `sh run.sh recreate studio` to restart Studio from it without taking down the rest of the stack.
+4. Run `sh run.sh pull` to pull the new image, then `sh run.sh recreate studio` to update Studio without taking down the rest of the stack.
 
 ## Uninstalling
 
@@ -503,7 +503,7 @@ To change the database password after the initial setup, run:
 sh utils/db-passwd.sh
 ```
 
-The script generates a new password, updates all database roles, and modifies your `.env` file. After running it, restart the services with:
+The script generates a new password, updates all database roles, and modifies your `.env` file. After running it, stop and start the services with:
 
 ```sh
 sh run.sh recreate

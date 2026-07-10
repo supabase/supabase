@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { resolveFrameworkLibraryKey } from './Connect.utils'
+import { resolveFrameworkLibraryKey } from '../Connect.utils'
 
 describe('Connect.utils:resolveFrameworkLibraryKey', () => {
   test('should return null if no framework provided', () => {

@@ -136,7 +136,7 @@ export const GitHubSection = ({ isProjectScoped }: { isProjectScoped: boolean })
           <GitHubIntegrationConnectionForm connection={existingConnection} />
         ) : (
           <div className="space-y-6">
-            <div>
+            <div className="flex flex-col gap-y-2">
               <ul className="flex flex-col gap-y-2">
                 {connections?.map((connection) => (
                   <IntegrationConnectionItem
