@@ -127,6 +127,12 @@ export const useIsJitDbAccessEnabled = () => {
   return jitDbAccessEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]
 }
 
+export const useIsSqlEditorManualSaveEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  const sqlEditorManualSaveEnabled = useFlag('sqlEditorManualSave')
+  return sqlEditorManualSaveEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]
+}
+
 export const useIsRLSTesterEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]

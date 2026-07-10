@@ -58,12 +58,10 @@ const getS3AccessKeyTriggerLabel = ({
 export const AnalyticsBucketFields = ({
   form,
   editMode,
-  setIsFormInteracting,
   onSelectNewBucket,
 }: {
   form: UseFormReturn<DestinationPanelSchemaType>
   editMode: boolean
-  setIsFormInteracting: (value: boolean) => void
   onSelectNewBucket: () => void
 }) => {
   const { warehouseName, s3AccessKeyId, namespace } = form.watch()
@@ -151,7 +149,6 @@ export const AnalyticsBucketFields = ({
                       if (value === 'new-bucket') {
                         onSelectNewBucket()
                       } else {
-                        setIsFormInteracting(true)
                         field.onChange(value)
                         // [Joshen] Ideally should select the first namespace of the selected bucket
                         form.setValue('namespace', '')
@@ -216,10 +213,7 @@ export const AnalyticsBucketFields = ({
                 <FormControl>
                   <Select
                     value={field.value}
-                    onValueChange={(value) => {
-                      setIsFormInteracting(true)
-                      field.onChange(value)
-                    }}
+                    onValueChange={field.onChange}
                     disabled={!canSelectNamespace}
                   >
                     <SelectTrigger>

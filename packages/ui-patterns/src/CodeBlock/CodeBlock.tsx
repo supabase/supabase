@@ -222,7 +222,7 @@ export const CodeBlock = ({
                       : 'var(--background-selection)',
                     borderLeft: highlightBorder
                       ? `1px solid ${styleConfig?.highlightBorderColor ? styleConfig?.highlightBorderColor : 'var(--foreground-default)'}`
-                      : null,
+                      : undefined,
                   },
                   class: 'hljs-line-highlight',
                 }

@@ -48,11 +48,11 @@ vi.mock('@/components/interfaces/Project/ResumeProjectButton', () => ({
 }))
 
 vi.mock('./Infrastructure/PauseProjectButton', () => ({
-  default: () => <div>PauseProjectButton</div>,
+  PauseProjectButton: () => <div>PauseProjectButton</div>,
 }))
 
 vi.mock('./Infrastructure/RestartServerButton', () => ({
-  default: () => <div>RestartServerButton</div>,
+  RestartServerButton: () => <div>RestartServerButton</div>,
 }))
 
 vi.mock('@/data/projects/project-pause-status-query', () => ({

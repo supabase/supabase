@@ -102,7 +102,7 @@ export const PostgresVersionSelector = ({
   }, [isSuccess, availableVersions, form])
 
   return (
-    <FormItemLayout label={label} layout={layout}>
+    <FormItemLayout id={field.name} label={label} layout={layout}>
       <Select
         value={postgresVersionSelection}
         onValueChange={field.onChange}
@@ -112,7 +112,10 @@ export const PostgresVersionSelector = ({
           (type === 'unpause' && isLoadingProjectUnpauseVersions)
         }
       >
-        <SelectTrigger className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start">
+        <SelectTrigger
+          id={field.name}
+          className="[&>:nth-child(1)]:w-full [&>:nth-child(1)]:flex [&>:nth-child(1)]:items-start"
+        >
           <SelectValue placeholder="Select a Postgres version for your project" />
         </SelectTrigger>
         <SelectContent>
