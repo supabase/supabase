@@ -1,13 +1,20 @@
 import { useEffect, useRef } from 'react'
 import { useSonner } from 'sonner'
 
+import type { FunnelErrorClassification, FunnelOrigin } from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
 
-const trackedToastIds = new Set<string | number>()
+type FunnelErrorProperties = { origin: FunnelOrigin } & FunnelErrorClassification
 
-export function markToastAsTracked(toastId: string | number) {
-  trackedToastIds.add(toastId)
-  return toastId
+// Funnel call sites register their toast id (via useTrackFunnelError) so the tracker emits a
+// single enriched event for that toast instead of an untagged duplicate.
+const funnelErrorToasts = new Map<string | number, FunnelErrorProperties>()
+
+export function registerFunnelErrorToast(
+  toastId: string | number,
+  properties: FunnelErrorProperties
+) {
+  funnelErrorToasts.set(toastId, properties)
 }
 
 export const ToastErrorTracker = () => {
@@ -19,10 +26,12 @@ export const ToastErrorTracker = () => {
     toasts.forEach((toast) => {
       if (toast.type !== 'error' || seenToastIds.current.has(toast.id)) return
       seenToastIds.current.add(toast.id)
-      if (trackedToastIds.has(toast.id)) return
+      const funnelProperties = funnelErrorToasts.get(toast.id)
+      funnelErrorToasts.delete(toast.id)
       if (Math.random() < 0.1) {
         track('dashboard_error_created', {
           source: 'toast',
+          ...funnelProperties,
         })
       }
     })

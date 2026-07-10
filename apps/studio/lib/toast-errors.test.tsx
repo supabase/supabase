@@ -1,8 +1,9 @@
-import { act, render, waitFor } from '@testing-library/react'
+import { act, render, renderHook, waitFor } from '@testing-library/react'
 import { toast } from 'sonner'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { markToastAsTracked, ToastErrorTracker } from './toast-errors'
+import { registerFunnelErrorToast, ToastErrorTracker } from './toast-errors'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
 const { mockTrack } = vi.hoisted(() => ({ mockTrack: vi.fn() }))
 
@@ -18,7 +19,7 @@ describe('ToastErrorTracker', () => {
     vi.restoreAllMocks()
   })
 
-  it('tracks an unmarked error toast', async () => {
+  it('tracks an unregistered error toast without funnel properties', async () => {
     render(<ToastErrorTracker />)
     act(() => {
       toast.error('request failed')
@@ -29,16 +30,50 @@ describe('ToastErrorTracker', () => {
     expect(mockTrack).toHaveBeenCalledTimes(1)
   })
 
-  it('skips a toast marked as tracked', async () => {
+  it('fires a single enriched event for a registered funnel toast', async () => {
     render(<ToastErrorTracker />)
     act(() => {
-      markToastAsTracked(toast.error('funnel error tracked at the call site'))
+      registerFunnelErrorToast(toast.error('funnel error'), {
+        origin: 'signup',
+        errorCategory: 'api',
+        errorReason: 'other',
+        errorCode: 500,
+      })
     })
+    await waitFor(() =>
+      expect(mockTrack).toHaveBeenCalledWith('dashboard_error_created', {
+        source: 'toast',
+        origin: 'signup',
+        errorCategory: 'api',
+        errorReason: 'other',
+        errorCode: 500,
+      })
+    )
+    expect(mockTrack).toHaveBeenCalledTimes(1)
+  })
+
+  it('routes toast-sourced funnel errors from useTrackFunnelError into one enriched event', async () => {
+    render(<ToastErrorTracker />)
+    const { result } = renderHook(() => useTrackFunnelError())
     act(() => {
-      toast.error('unmarked sentinel')
+      const toastId = toast.error('funnel failure')
+      result.current(
+        'project_creation',
+        { errorCategory: 'api', errorReason: 'rate_limited', errorCode: 429 },
+        'toast',
+        toastId
+      )
     })
-    await waitFor(() => expect(mockTrack).toHaveBeenCalledTimes(1))
-    expect(mockTrack).toHaveBeenCalledWith('dashboard_error_created', { source: 'toast' })
+    await waitFor(() =>
+      expect(mockTrack).toHaveBeenCalledWith('dashboard_error_created', {
+        source: 'toast',
+        origin: 'project_creation',
+        errorCategory: 'api',
+        errorReason: 'rate_limited',
+        errorCode: 429,
+      })
+    )
+    expect(mockTrack).toHaveBeenCalledTimes(1)
   })
 
   it('ignores non-error toasts', async () => {
