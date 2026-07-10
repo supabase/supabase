@@ -104,10 +104,6 @@ export const ProjectLinker = ({
   )
   const [selectedSupabaseProject, setSelectedSupabaseProject] = useState<Project>()
 
-  // const [supabaseProjectRef, setSupabaseProjectRef] = useState<string | undefined>(
-  //   defaultSupabaseProjectRef
-  // )
-
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const { data: orgProjects, isPending: loadingSupabaseProjects } = useOrgProjectsInfiniteQuery({
     slug,
