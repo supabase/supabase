@@ -4,6 +4,7 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { isDashboardErrorSampled } from '@/lib/telemetry/error-sampling'
 import { useTrack } from '@/lib/telemetry/track'
 
 export interface AlertErrorProps {
@@ -70,7 +71,7 @@ export const AlertError = ({
   useEffect(() => {
     if (!hasTrackedRef.current) {
       hasTrackedRef.current = true
-      if (Math.random() < 0.1) {
+      if (isDashboardErrorSampled()) {
         track('dashboard_error_created', {
           source: 'admonition',
         })
