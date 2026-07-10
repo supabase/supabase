@@ -171,7 +171,7 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
   } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema,
+    schemas: [schema],
   })
   const selectedPolicyToEdit = policies.find((policy) => policy.id.toString() === selectedIdToEdit)
 

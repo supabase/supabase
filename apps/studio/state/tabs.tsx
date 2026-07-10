@@ -1,7 +1,14 @@
 import { safeLocalStorage, useParams } from 'common'
 import { partition } from 'lodash'
 import { type NextRouter } from 'next/router'
-import { createContext, PropsWithChildren, useContext, useEffect, useState } from 'react'
+import {
+  createContext,
+  PropsWithChildren,
+  useContext,
+  useEffect,
+  useState,
+  type ComponentType,
+} from 'react'
 import { proxy, subscribe, useSnapshot } from 'valtio'
 
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
@@ -41,6 +48,42 @@ export interface Tab {
   isPreview?: boolean
   createdAt?: Date
   updatedAt?: Date
+}
+
+/** Copy shown in the confirmation dialog before a close is allowed to proceed. */
+export interface TabCloseConfirmation {
+  title: string
+  description: string
+}
+
+/**
+ * Per-tab-type behavior and UI the tabs layout delegates to, so the layout
+ * stays agnostic of what any given tab kind means. A domain (e.g. the SQL
+ * editor) registers a handler for its tab type via `registerTabTypeHandler`;
+ * tabs of types without a handler close with no extra behavior and show no
+ * status indicator.
+ */
+export interface TabTypeHandler {
+  /**
+   * Cleanup to run when the user closes a tab of this type (e.g. discarding a
+   * SQL snippet's unsaved local edits). Runs after the tab has been removed.
+   */
+  onClose?: (tab: Tab) => void
+  /**
+   * Whether closing these tabs needs user confirmation. Receives the whole set
+   * of this type being closed (e.g. a bulk "Close Others") so the handler owns
+   * the dialog copy, including wording it for one vs. many. Return the copy to
+   * confirm first; return null/undefined to close immediately.
+   */
+  confirmClose?: (tabs: Tab[]) => TabCloseConfirmation | null | undefined
+  /**
+   * Optional component rendered inside the tab to show type-specific status
+   * (e.g. a VS Code-style unsaved-changes dot for a SQL snippet). Owning the
+   * component here keeps the layout agnostic of what "status" means per type and
+   * lets the domain drive its own reactivity. Rendered only when it has
+   * something to show; otherwise it should render nothing.
+   */
+  StatusIndicator?: ComponentType<{ tab: Tab }>
 }
 
 const MAX_RECENT_ITEMS = 8
@@ -127,6 +170,11 @@ const syncRecentItemWithTab = (item: RecentItem, tab: Pick<Tab, 'label' | 'metad
 export function createTabsState(projectRef: string) {
   const recentItems = getSavedRecentItems(projectRef)
   const { openTabs, activeTab, tabsMap, previewTabId } = getSavedTabs(projectRef)
+
+  // Per-type behavior/UI, kept outside the Valtio proxy so handler closures
+  // (which may capture non-serializable things like a React Query client or a
+  // React component) are never proxied or persisted.
+  const tabHandlers = new Map<TabType, TabTypeHandler>()
 
   const store = proxy({
     // RECENT ITEMS
@@ -248,6 +296,12 @@ export function createTabsState(projectRef: string) {
       store.openTabs = store.openTabs.filter((tabId) => tabId !== id)
       delete store.tabsMap[id]
 
+      // Clear the preview tab reference if the removed tab was the preview tab,
+      // so it doesn't linger in (persisted) state pointing at a closed tab
+      if (store.previewTabId === id) {
+        store.previewTabId = undefined
+      }
+
       // Update active tab if the removed tab was active
       if (id === store.activeTab) {
         store.activeTab = store.openTabs[idx - 1] || store.openTabs[idx + 1] || null
@@ -322,6 +376,67 @@ export function createTabsState(projectRef: string) {
           break
       }
     },
+    // TAB TYPE HANDLER REGISTRY
+    //
+    // Lets a domain own what a tab of its type means — how it closes and what
+    // status it shows — without the layout having to know. Registered per tab
+    // type; returns an unregister function.
+    //
+    // Bumped on every (un)register so components that render per-type UI (the
+    // status indicator) re-render to pick up a handler registered after they
+    // first rendered — handlers register in an effect, which runs after the
+    // tabs first paint.
+    handlerRegistrationVersion: 0,
+    registerTabTypeHandler: (type: TabType, handler: TabTypeHandler) => {
+      tabHandlers.set(type, handler)
+      store.handlerRegistrationVersion++
+      return () => {
+        if (tabHandlers.get(type) === handler) {
+          tabHandlers.delete(type)
+          store.handlerRegistrationVersion++
+        }
+      }
+    },
+
+    // The status-indicator component registered for a tab type, if any. Read
+    // `handlerRegistrationVersion` alongside this in render to stay reactive to
+    // late registration.
+    getTabStatusIndicator: (type: TabType) => tabHandlers.get(type)?.StatusIndicator,
+
+    // The confirmation to show before closing the given tabs, or null if none
+    // need confirming. Tabs are grouped by type and each type's handler is asked
+    // about its own set (so it can word the copy for one vs. many); the first
+    // handler that asks to confirm wins. The store authors no copy itself — that
+    // stays a concern of the registering domain.
+    getCloseConfirmation: (ids: string[]): TabCloseConfirmation | null => {
+      const tabsByType = new Map<TabType, Tab[]>()
+      for (const id of ids) {
+        const tab = store.tabsMap[id]
+        if (!tab) continue
+        const group = tabsByType.get(tab.type)
+        if (group) group.push(tab)
+        else tabsByType.set(tab.type, [tab])
+      }
+
+      for (const [type, tabs] of tabsByType) {
+        const confirmation = tabHandlers.get(type)?.confirmClose?.(tabs)
+        if (confirmation) return confirmation
+      }
+      return null
+    },
+
+    // Close multiple tabs as an intentional user action, running each tab type's
+    // close handler afterwards. Distinct from `removeTabs`, the low-level store
+    // mutation used for re-keying (rename/move) and stale cleanup, which must
+    // NOT trigger discard behavior.
+    closeTabs: (ids: string[]) => {
+      const closedTabs = ids
+        .map((id) => store.tabsMap[id])
+        .filter((tab): tab is Tab => tab !== undefined)
+      store.removeTabs(ids)
+      closedTabs.forEach((tab) => tabHandlers.get(tab.type)?.onClose?.(tab))
+    },
+
     handleTabClose: ({
       id,
       router,
@@ -393,6 +508,12 @@ export function createTabsState(projectRef: string) {
       }
 
       onClose?.(id)
+
+      // Run the tab type's registered close behavior (e.g. discard a SQL
+      // snippet's unsaved edits). `tabBeingClosed` is captured before removal.
+      if (tabBeingClosed) {
+        tabHandlers.get(tabBeingClosed.type)?.onClose?.(tabBeingClosed)
+      }
     },
     handleTabCloseAll: ({
       editor,

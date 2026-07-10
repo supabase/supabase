@@ -214,7 +214,7 @@ export function LogsSidebarMenuV2() {
 
       <div
         className={cn(
-          'flex gap-x-2 items-center sticky top-0 bg-background-200 z-1 px-4',
+          'flex gap-x-2 items-center sticky top-0 bg-dash-sidebar z-1 px-4',
           !templatesEnabled ? 'pt-4' : 'py-4'
         )}
       >
