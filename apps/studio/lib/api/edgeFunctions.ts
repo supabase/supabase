@@ -22,6 +22,11 @@ export const isValidEdgeFunctionURL = (url: string, isPlatform: boolean) => {
   return regexValidEdgeFunctionURL.test(url)
 }
 
+/**
+ * Extracts a human-readable message from an edge function's error response
+ * body, checking both the `message` and `error` keys since different edge
+ * runtimes shape their error JSON differently.
+ */
 export const getEdgeFunctionErrorMessage = (responseBody: string): string => {
   try {
     const errorBody = JSON.parse(responseBody)
