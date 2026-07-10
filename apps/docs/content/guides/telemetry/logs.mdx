@@ -265,6 +265,12 @@ You can access the following logs from the **Sources** drop-down:
 
 The Logs Explorer uses BigQuery and supports all [available SQL functions and operators](https://cloud.google.com/bigquery/docs/reference/standard-sql/functions-and-operators).
 
+<Admonition type="caution">
+
+The Logs Explorer now defaults to ClickHouse, where every source shares a single `logs` table and nested fields are read from a `log_attributes` map rather than with `cross join unnest(metadata)`. The examples below still use the legacy BigQuery syntax and are being migrated. Adjust field access accordingly on projects already on ClickHouse.
+
+</Admonition>
+
 ### Timestamp display and behavior
 
 Each log entry is stored with a `timestamp` as a `TIMESTAMP` data type. Use the appropriate [timestamp function](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp) to use the `timestamp` field in a query.
