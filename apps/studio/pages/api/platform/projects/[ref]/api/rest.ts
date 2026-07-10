@@ -1,9 +1,8 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import { parseDbSchemaString } from '@/data/config/project-postgrest-config-query'
-import apiWrapper from '@/lib/api/apiWrapper'
-import { DEFAULT_EXPOSED_SCHEMAS } from '@/lib/api/self-hosted/constants'
 import { apiWrapper } from '@/lib/api/apiWrapper'
+import { DEFAULT_EXPOSED_SCHEMAS } from '@/lib/api/self-hosted/constants'
 
 export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
 
