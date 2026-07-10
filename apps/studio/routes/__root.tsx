@@ -20,7 +20,6 @@ import '@/styles/stripe.css'
 import '@/styles/ui.css'
 import 'ui-patterns/ShimmeringLoader/index.css'
 
-import { loader } from '@monaco-editor/react'
 import * as Sentry from '@sentry/react'
 import { TanStackDevtools } from '@tanstack/react-devtools'
 import type { QueryClient } from '@tanstack/react-query'
@@ -47,7 +46,6 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import { DevToolbar, DevToolbarProvider, DevToolbarTrigger, type ExtraTab } from 'dev-tools'
-import { NuqsAdapter } from 'nuqs/adapters/tanstack-router'
 import {
   lazy,
   Suspense,
@@ -72,7 +70,11 @@ import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalEr
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { AuthProvider } from '@/lib/auth'
+import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
 import { API_URL, BASE_PATH, IS_PLATFORM, useDefaultProvider } from '@/lib/constants'
+// Custom adapter instead of `nuqs/adapters/tanstack-router` — the stock one
+// injects a trailing slash before the query on every nuqs write (see module).
+import { NuqsAdapter } from '@/lib/nuqs-tanstack-adapter'
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
 import { Toaster } from '@/lib/toaster'
@@ -104,10 +106,12 @@ const FeatureFlagProviderWithOrgContext = ({
   )
 }
 
-// Keep dev-only components out of the production bundle.
-const IS_DEV_TOOLBAR_ENABLED =
+const IS_NON_PROD_ENV =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
+
+// Keep dev-only components out of the production bundle.
+const IS_DEV_TOOLBAR_ENABLED = IS_NON_PROD_ENV
 
 const ResourceWarningsTab = IS_DEV_TOOLBAR_ENABLED
   ? lazy(() =>
@@ -131,20 +135,14 @@ const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
     ]
   : []
 
-// [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
-// locally. We're however, only storing the assets which we need (based on what the network tab loads
-// while using monaco). If we end up facing more effort trying to maintain this, probably to either
-// use cloudflare or find some way to pull all the files from a CDN via a CLI, rather than tracking individual files
-// The alternative was to import * as monaco from 'monaco-editor' but i couldn't get it working
-loader.config({
-  paths: {
-    vs: IS_PLATFORM
-      ? 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs'
-      : `${BASE_PATH}/monaco-editor`,
-  },
-})
+configureMonacoLoader()
 
-const FAVICON_ROUTE = '/favicon'
+// Non-prod (local + hosted staging) uses the white favicon, matching the Next
+// build (pages/_app.tsx passes `/favicon/staging` to MetaFaviconsPagesRouter for
+// non-prod). Uses the same synchronous NEXT_PUBLIC_ENVIRONMENT signal as
+// IS_DEV_TOOLBAR_ENABLED above, so it works at module scope (the `head()` route
+// option isn't a React component and can't run the async CLI check _app does).
+const FAVICON_ROUTE = IS_NON_PROD_ENV ? '/favicon/staging' : '/favicon'
 const THEME_COLOR = '1E1E1E'
 const APPLICATION_NAME = 'Supabase Studio'
 
@@ -200,13 +198,10 @@ function buildRootHead() {
   ]
 
   const links: Array<Record<string, string>> = [
-    // Google Fonts — Source Code Pro (the local CustomFont is declared in styles/fonts.css).
-    { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-    { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: '' },
-    {
-      rel: 'stylesheet',
-      href: 'https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;500;600;700&display=swap',
-    },
+    // Fonts (Inter, Manrope, Source Code Pro) are all vendored via @font-face in
+    // styles/fonts.css — no Google Fonts CDN dependency at runtime, matching how
+    // next/font self-hosts them on the Next build (and keeping self-hosted/offline
+    // studio working).
     ...APPLE_TOUCH_ICON_SIZES.map((size) => ({
       rel: 'apple-touch-icon-precomposed',
       sizes: size,
@@ -288,6 +283,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       pathname: location.pathname,
       search: location.search as Record<string, string | string[] | undefined>,
       isPlatform: IS_PLATFORM,
+      hash: location.hash,
     })
     if (!match) return
     const href = BASE_PATH ? `${BASE_PATH}${match.destination}` : match.destination

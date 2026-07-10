@@ -164,7 +164,7 @@ export const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfiguratio
                               <Markdown
                                 className="max-w-full"
                                 content={`
-We auto-scale your disk as you need more storage, but can only do this once every 4 hours.
+We auto-scale your disk as you need more storage, up to 4 modifications within a rolling 24-hour window.
 If you upload more than 1.5x the current size of your storage, your database will go
 into read-only mode. If you know how big your database is going to be, you can
 manually increase the size here.

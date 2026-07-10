@@ -106,7 +106,7 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
                 'flex lg:hidden mr-1 rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30',
                 !sheet.isMenuOpen && 'bg-surface-300!'
               )}
-              icon={<Menu />}
+              icon={<Menu className={cn(sheet.isMenuOpen && 'text-background')} />}
               onClick={sheet.handleMenuClick}
             />
           )}

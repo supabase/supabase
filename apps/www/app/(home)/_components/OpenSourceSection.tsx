@@ -63,7 +63,7 @@ const TEXT_OFFSET_X = Math.floor((COLS - TEXT_W) / 2)
 const TEXT_OFFSET_Y = Math.floor((ROWS - TEXT_H) / 2)
 
 const LEVELS_BG = [
-  'hsl(var(--background-surface-300) / 0.2)',
+  'color-mix(in oklch, var(--foreground) 5%, var(--background))',
   'hsl(var(--brand-400) / 0.08)',
   'hsl(var(--brand-500) / 0.1)',
   'hsl(var(--brand-600) / 0.12)',

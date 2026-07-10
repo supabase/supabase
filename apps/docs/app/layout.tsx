@@ -4,6 +4,7 @@ import 'ui-patterns/ShimmeringLoader/index.css'
 import '../styles/globals.css'
 import '../styles/prism-okaidia.css'
 
+import { SkipToContent } from '~/components/SkipToContent'
 import { GlobalProviders } from '~/features/app.providers'
 import { TopNavSkeleton } from '~/layouts/MainSkeleton'
 import { BASE_PATH, IS_PRODUCTION } from '~/lib/constants'
@@ -54,6 +55,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en" className={`${manrope.variable} ${inter.variable}`} suppressHydrationWarning>
       <body>
+        <SkipToContent />
         <TelemetryTagManager />
         <GlobalProviders>
           <TopNavSkeleton>{children}</TopNavSkeleton>

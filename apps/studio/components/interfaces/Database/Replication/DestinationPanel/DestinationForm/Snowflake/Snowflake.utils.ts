@@ -31,6 +31,11 @@ const SNOWFLAKE_REQUIRED_FIELDS: { path: SnowflakeFieldPath; message: string }[]
 ]
 
 export const getSnowflakeValidationIssues = (
-  data: Pick<DestinationPanelSchemaType, SnowflakeFieldPath>
+  data: Pick<DestinationPanelSchemaType, SnowflakeFieldPath>,
+  options: { secretsOptional?: boolean } = {}
 ): SnowflakeValidationIssue[] =>
-  SNOWFLAKE_REQUIRED_FIELDS.filter(({ path }) => !data[path]?.trim().length)
+  SNOWFLAKE_REQUIRED_FIELDS.filter(({ path }) => {
+    if (options.secretsOptional && path === 'snowflakePrivateKey') return false
+
+    return !data[path]?.trim().length
+  })

@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Check, ChevronDown, Copy, Database, KeyRound, Link2, Terminal } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   Button,
   cn,
@@ -37,7 +37,6 @@ interface ProjectConnectionPopoverProps {
 export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopoverProps) => {
   const [open, setOpen] = useState(false)
   const [copiedItem, setCopiedItem] = useState<string | null>(null)
-  const copiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const { isLoading: isLoadingPermissions, can: canReadAPIKeys } = useAsyncCheckPermissions(
@@ -159,10 +158,10 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
   )
 
   useEffect(() => {
-    return () => {
-      if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current)
+    if (!open) {
+      setCopiedItem(null)
     }
-  }, [])
+  }, [open])
 
   return (
     <div className="mt-3 inline-flex max-w-full items-center gap-3 min-w-0">
@@ -183,7 +182,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
               <ChevronDown size={14} className={cn('transition-transform', open && 'rotate-180')} />
             }
           >
-            Copy
+            Copy <span className="sr-only">project URL and API keys</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" align="end" className="w-80 p-1">
@@ -201,14 +200,17 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
 
                   copyToClipboard(item.value)
                   setCopiedItem(item.label)
-
-                  if (copiedTimeoutRef.current) clearTimeout(copiedTimeoutRef.current)
-                  copiedTimeoutRef.current = setTimeout(() => setCopiedItem(null), 1500)
                 }}
               >
                 <Icon size={14} className="mt-0.5 shrink-0 text-foreground-light" />
                 <div className="min-w-0 flex-1">
-                  <div className="text-sm text-foreground">{item.label}</div>
+                  <div className="text-sm text-foreground">
+                    {copiedItem !== item.label ? <span className="sr-only">Copy</span> : null}
+                    {item.label}
+                    {copiedItem === item.label ? (
+                      <span className="sr-only">copied to your clipboard</span>
+                    ) : null}
+                  </div>
                   <div className="truncate text-sm text-foreground-lighter">
                     {item.displayValue}
                   </div>

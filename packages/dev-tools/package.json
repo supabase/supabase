@@ -31,6 +31,7 @@
     "next-router-mock": "^0.9.13",
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:"
   },

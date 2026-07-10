@@ -5,9 +5,9 @@ import { useEffect, useEffectEvent } from 'react'
 import { createSqlSnippetSkeletonV2 } from './SQLEditor.utils'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useProfile } from '@/lib/profile'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
 import { wasNeverPersisted } from '@/state/sql-editor/sql-editor-lifecycle'
 import { canEditSnippet } from '@/state/sql-editor/sql-editor-rules'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 import { useTabsStateSnapshot } from '@/state/tabs'
 
 /**

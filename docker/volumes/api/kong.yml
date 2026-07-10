@@ -84,7 +84,7 @@ services:
       - name: auth-v1-open-sso-acs
         strip_path: true
         paths:
-        - /sso/saml/acs
+        - /auth/v1/sso/saml/acs
     plugins:
       - name: cors
 
@@ -94,7 +94,7 @@ services:
       - name: auth-v1-open-sso-metadata
         strip_path: true
         paths:
-        - /sso/saml/metadata
+        - /auth/v1/sso/saml/metadata
     plugins:
       - name: cors
 
@@ -126,6 +126,33 @@ services:
           allow:
             - admin
             - anon
+
+  ## OpenAPI root - admin only
+  - name: rest-v1-openapi
+    _comment: 'PostgREST OpenAPI root: /rest/v1/ -> <http://rest:3000/> (admin only). See <https://github.com/orgs/supabase/discussions/42949>'
+    url: http://rest:3000/
+    routes:
+      - name: rest-v1-openapi-root
+        strip_path: true
+        expression: 'http.path == "/rest/v1/"'
+    plugins:
+      - name: cors
+      - name: key-auth
+        config:
+          hide_credentials: false
+      - name: request-transformer
+        config:
+          add:
+            headers:
+              - "Authorization: $LUA_AUTH_EXPR"
+          replace:
+            headers:
+              - "Authorization: $LUA_AUTH_EXPR"
+      - name: acl
+        config:
+          hide_groups_header: true
+          allow:
+            - admin
 
   ## Secure PostgREST routes
   - name: rest-v1

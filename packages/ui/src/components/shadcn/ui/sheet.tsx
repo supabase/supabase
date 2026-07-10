@@ -49,7 +49,7 @@ const SheetOverlay = React.forwardRef<
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName
 
 const classes = cn([
-  'fixed z-50 scale-100 gap-4 bg-studio opacity-100 shadow-lg',
+  'fixed z-50 scale-100 gap-4 bg-popover opacity-100 shadow-lg',
   'data-[state=open]:animate-in data-[state=open]:duration-300 data-[state=closed]:animate-out data-[state=closed]:duration-300',
 ])
 
@@ -184,7 +184,7 @@ SheetContent.displayName = SheetPrimitive.Content.displayName
 
 const SheetHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
   <div
-    className={cn('px-5 py-4 text-center sm:text-left border-b bg-dash-sidebar', className)}
+    className={cn('px-5 py-4 text-center sm:text-left border-b bg-popover', className)}
     {...props}
   />
 )

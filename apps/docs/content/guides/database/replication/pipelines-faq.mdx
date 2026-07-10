@@ -18,6 +18,14 @@ Pipelines currently supports **BigQuery** as the managed destination. See the [B
 
 We are working on new destinations. Supported destinations can be Supabase-managed or third-party systems as support expands. Availability may continue to vary based on the planned roll-out strategy.
 
+## Does the destination's region affect performance?
+
+Yes. The further apart your source database, the pipeline, and your destination are, the more network latency is added to replication, which increases replication lag and reduces throughput.
+
+Pipelines run out of **eu-central-1 (Frankfurt)**. For the best performance, place both your source project and your destination as close to this region as possible.
+
+If you can only optimize one side, prioritize placing your **destination** close to the pipeline's region. Replicated data continuously streams out to the destination, so latency on that leg has a bigger impact on overall replication lag than latency between the pipeline and the source.
+
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
 ## Which plans support Pipelines?

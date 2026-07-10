@@ -121,14 +121,20 @@ export const PolicyRow = ({
       <TableCell className="text-right whitespace-nowrap">
         {!isLocked && (
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="default"
-                className="px-1.5"
-                icon={<MoreVertical />}
-                data-testid={`policy-${policy.name}-actions-button`}
-              />
-            </DropdownMenuTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="default"
+                    className="px-1.5"
+                    icon={<MoreVertical />}
+                    data-testid={`policy-${policy.name}-actions-button`}
+                    aria-label={`${policy.name} actions`}
+                  />
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">More options</TooltipContent>
+            </Tooltip>
             <DropdownMenuContent side="bottom" align="end" className="w-52">
               <DropdownMenuItem className="gap-x-2" onClick={() => onSelectEditPolicy(policy)}>
                 <Edit size={14} />

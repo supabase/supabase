@@ -14,6 +14,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -264,13 +267,18 @@ export const Indexes = () => {
                                 View definition
                               </Button>
                               {!isSchemaLocked && (
-                                <Button
-                                  aria-label="Delete index"
-                                  variant="text"
-                                  className="px-1"
-                                  icon={<Trash />}
-                                  onClick={() => setDeleteIndexId(index.name)}
-                                />
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <Button
+                                      aria-label="Delete index"
+                                      variant="text"
+                                      className="px-1"
+                                      icon={<Trash />}
+                                      onClick={() => setDeleteIndexId(index.name)}
+                                    />
+                                  </TooltipTrigger>
+                                  <TooltipContent side="bottom">Delete index</TooltipContent>
+                                </Tooltip>
                               )}
                             </div>
                           </TableCell>

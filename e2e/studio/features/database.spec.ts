@@ -540,7 +540,7 @@ test.describe('Database', () => {
 
   test.describe('Triggers', () => {
     test('actions works as expected', async ({ page, ref }) => {
-      const triggersLoadWait = createApiResponseWaiter(page, 'pg-meta', ref, 'triggers')
+      const triggersLoadWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=triggers')
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/triggers?schema=public`))
 
       // Wait for database triggers to be populated
@@ -582,7 +582,12 @@ test.describe('Database', () => {
         }
       )
 
-      const triggersCrudLoadWait = createApiResponseWaiter(page, 'pg-meta', ref, 'triggers')
+      const triggersCrudLoadWait = createApiResponseWaiter(
+        page,
+        'pg-meta',
+        ref,
+        'query?key=triggers'
+      )
       await page.goto(toUrl(`/project/${env.PROJECT_REF}/database/triggers?schema=public`))
 
       // Wait for database triggers to be populated
@@ -1190,7 +1195,7 @@ test.describe('Database Enumerated Types', () => {
     await page.locator('input[name="values.0.value"]').fill(databaseEnumValue1Name)
     await page.getByRole('button', { name: 'Add value' }).click()
     await page.locator('input[name="values.1.value"]').fill(databaseEnumValue2Name)
-    const enumCreateWait = createApiResponseWaiter(page, 'pg-meta', ref, 'types')
+    const enumCreateWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=types')
     await page.getByRole('button', { name: 'Create type' }).click()
 
     // Wait for enum response to be completed and validate it
@@ -1224,7 +1229,7 @@ test.describe('Database Enumerated Types', () => {
     await page.locator('input[name="values.0.value"]').fill(quotedEnumValue1Name)
     await page.getByRole('button', { name: 'Add value' }).click()
     await page.locator('input[name="values.1.value"]').fill(quotedEnumValue2Name)
-    const quotedEnumCreateWait = createApiResponseWaiter(page, 'pg-meta', ref, 'types')
+    const quotedEnumCreateWait = createApiResponseWaiter(page, 'pg-meta', ref, 'query?key=types')
     await page.getByRole('button', { name: 'Create type' }).click()
 
     await quotedEnumCreateWait
