@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { useConnectSheetShortcut } from './useConnectSheetShortcut'
+import { useConnectSheetShortcut } from '../useConnectSheetShortcut'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
