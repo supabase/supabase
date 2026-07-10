@@ -140,7 +140,6 @@ export function PITRForm({
               ]}
               classNames={{
                 day: cn(
-                  'w-9 box-border',
                   '[&:not(:has(:disabled))]:border [&:not(:has(:disabled))]:border-stronger not-last:border-r-0 [&:not(:has(:disabled))]:bg-overlay-hover',
                   'rounded-none'
                 ),
