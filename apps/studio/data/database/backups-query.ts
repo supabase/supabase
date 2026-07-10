@@ -17,6 +17,17 @@ export type DatabaseBackup = components['schemas']['BackupsResponse']['backups']
 export async function getBackups({ projectRef }: BackupsVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('Project ref is required')
 
+  return {
+    region: 'ap-southeast-1',
+    pitr_enabled: true,
+    walg_enabled: true,
+    backups: [],
+    physicalBackupData: {
+      earliestPhysicalBackupDateUnix: 1783102261,
+      latestPhysicalBackupDateUnix: 1783689708,
+    },
+  }
+
   const { data, error } = await get(`/platform/database/{ref}/backups`, {
     params: { path: { ref: projectRef } },
     signal,

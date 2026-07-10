@@ -121,6 +121,13 @@ const PITR = () => {
 
   return (
     <>
+      <PITRNotice />
+      <PITRSelection />
+    </>
+  )
+
+  return (
+    <>
       {isError && <AlertError error={error} subject="Failed to retrieve PITR backups" />}
       {isSuccess && (
         <>
