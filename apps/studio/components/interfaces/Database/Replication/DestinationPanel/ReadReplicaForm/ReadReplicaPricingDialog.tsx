@@ -1,4 +1,5 @@
 import {
+  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -33,7 +34,10 @@ export const ReadReplicaPricingDialog = () => {
       <p className="text-sm">
         New replica will cost an additional <span translate="no">{totalCost}/month</span>.{' '}
         <DialogTrigger asChild>
-          <button type="button" className={InlineLinkClassName}>
+          <button
+            type="button"
+            className={cn(InlineLinkClassName, 'cursor-pointer text-foreground-light')}
+          >
             Learn more
           </button>
         </DialogTrigger>
