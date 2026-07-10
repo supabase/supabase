@@ -25,10 +25,10 @@ import {
   SheetFooter,
   SheetHeader,
   SheetTitle,
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
   Textarea,
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
@@ -39,7 +39,7 @@ import { HTTP_METHODS } from './EdgeFunctionDetails.constants'
 import { ErrorWithStatus, ResponseData } from './EdgeFunctionDetails.types'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useSessionAccessTokenQuery } from '@/data/auth/session-access-token-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
@@ -102,11 +102,11 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
   const [error, setError] = useState<string | null>(null)
 
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
+  const { data: apiKeysData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const { serviceKey } = apiKeysData ?? {}
   const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   const { data: accessToken } = useSessionAccessTokenQuery({ enabled: IS_PLATFORM })
-  const { serviceKey } = getKeys(apiKeys)
 
   const track = useTrack()
   const { mutate: testEdgeFunction, isPending } = useEdgeFunctionTestMutation({
@@ -249,7 +249,7 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
       <div className="flex items-center justify-between">
         <Label className="text-foreground text-sm">{label}</Label>
         <Button
-          type="default"
+          variant="default"
           size="tiny"
           icon={<Plus size={14} />}
           onClick={() => addKeyValuePair(type)}
@@ -293,7 +293,7 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
             <div className="flex items-center justify-center">
               {(type === 'headers' ? headerFields : queryParamFields).length > 1 && (
                 <Button
-                  type="text"
+                  variant="text"
                   size="tiny"
                   icon={<X strokeWidth={1.5} size={14} />}
                   className="w-6 h-6"
@@ -472,8 +472,8 @@ const EdgeFunctionTesterSheetContent = ({ visible, onClose }: EdgeFunctionTester
                 />
                 <ShortcutTooltip shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_SUBMIT_TEST} side="top">
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     loading={isPending}
                     disabled={isPending}
                     onClick={() =>

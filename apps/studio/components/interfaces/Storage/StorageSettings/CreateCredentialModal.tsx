@@ -88,7 +88,7 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
             <Button
-              type="default"
+              variant="default"
               icon={<Plus size={14} />}
               disabled={disableCreation}
               className="pointer-events-auto"
@@ -172,7 +172,7 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
                   />
                 </DialogSection>
                 <DialogFooter>
-                  <Button htmlType="submit" loading={isCreating}>
+                  <Button type="submit" loading={isCreating}>
                     Create access key
                   </Button>
                 </DialogFooter>

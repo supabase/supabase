@@ -3,16 +3,19 @@ import { useParams } from 'common'
 import { Search } from 'lucide-react'
 import { useMemo, useRef, useState } from 'react'
 import { Card, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { PublicationTablesSkeleton } from './PublicationSkeleton'
 import { PublicationsTableItem } from './PublicationsTableItem'
 import { AlertError } from '@/components/ui/AlertError'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
+import { Shortcut } from '@/components/ui/Shortcut'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -21,7 +24,10 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 export const PublicationsTables = () => {
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { selectedSchema, setSelectedSchema } = useQuerySchemaState()
+
   const [filterString, setFilterString] = useState<string>('')
+  const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   const { can: canUpdatePublications, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
@@ -53,6 +59,7 @@ export const PublicationsTables = () => {
   } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    schema: selectedSchema,
   })
 
   const tables = useMemo(() => {
@@ -63,7 +70,23 @@ export const PublicationsTables = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap mb-4">
+        <Shortcut
+          id={SHORTCUT_IDS.LIST_PAGE_FOCUS_SCHEMA}
+          onTrigger={() => setSchemaSelectorOpen(true)}
+          side="bottom"
+          tooltipOpen={schemaSelectorOpen ? false : undefined}
+        >
+          <SchemaSelector
+            className="w-full lg:w-[180px]"
+            size="tiny"
+            showError={false}
+            selectedSchemaName={selectedSchema}
+            onSelectSchema={setSelectedSchema}
+            open={schemaSelectorOpen}
+            onOpenChange={setSchemaSelectorOpen}
+          />
+        </Shortcut>
         <Input
           size="tiny"
           ref={searchInputRef}
@@ -89,11 +112,10 @@ export const PublicationsTables = () => {
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
-              <TableHead>Schema</TableHead>
               <TableHead className="hidden lg:table-cell">Description</TableHead>
-              {/* 
-                    We've disabled All tables toggle for publications. 
-                    See https://github.com/supabase/supabase/pull/7233. 
+              {/*
+                    We've disabled All tables toggle for publications.
+                    See https://github.com/supabase/supabase/pull/7233.
                   */}
               <TableHead />
             </TableRow>
@@ -106,7 +128,7 @@ export const PublicationsTables = () => {
 
             {isError && (
               <TableRow>
-                <TableCell colSpan={4}>
+                <TableCell colSpan={3}>
                   <AlertError error={error} subject="Failed to retrieve tables" />
                 </TableCell>
               </TableRow>
@@ -114,7 +136,7 @@ export const PublicationsTables = () => {
 
             {!isLoading && !isLoadingPermissions && tables.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4}>
+                <TableCell colSpan={3}>
                   <NoSearchResults
                     className="border-none !p-0"
                     searchString={filterString}
@@ -135,7 +157,7 @@ export const PublicationsTables = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={4}>
+                  <TableCell colSpan={3}>
                     <p>The selected publication with ID {id} cannot be found</p>
                     <p className="text-foreground-light">
                       Head back to the list of publications to select one from there

@@ -8,8 +8,9 @@ import {
   ReportQueryDb,
 } from '@/components/interfaces/Reports/Reports.types'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 export interface DbQueryHook<T = any> {
@@ -43,8 +44,15 @@ const useDbQuery = ({
   const { data: databases } = useReadReplicasQuery({ projectRef: project?.ref })
   const connectionString = (databases || []).find(
     (db) => db.identifier === state.selectedDatabaseId
-  )?.connectionString
+  )?.connection_string_read_only // default to using the read_only string
   const identifier = state.selectedDatabaseId
+
+  // When a read-replica is selected, require its connection string before fetching.
+  // Falling back to the primary's connection string would silently query the wrong database.
+  const isPrimarySelected = !state.selectedDatabaseId || state.selectedDatabaseId === project?.ref
+  const effectiveConnectionString = isPrimarySelected
+    ? (connectionString ?? project?.connectionString)
+    : connectionString
 
   const resolvedSql = typeof sql === 'function' ? sql([]) : sql
 
@@ -59,7 +67,7 @@ const useDbQuery = ({
       'projects',
       project?.ref,
       'db',
-      { ...params, sql: resolvedSql, identifier },
+      { ...params, sql: resolvedSql, identifier, connectionString: effectiveConnectionString },
       where,
       orderBy,
     ],
@@ -67,13 +75,17 @@ const useDbQuery = ({
       return executeSql(
         {
           projectRef: project?.ref,
-          connectionString: connectionString || project?.connectionString,
+          connectionString: effectiveConnectionString,
           sql: resolvedSql,
         },
         signal
       ).then((res) => res.result) as Promise<MetaQueryResponse>
     },
-    enabled: Boolean(resolvedSql),
+    // Don't run until we have a connection string for the selected database.
+    // For replicas this prevents a silent fallback to the primary before replicas load.
+    // In self-hosted mode (IS_PLATFORM=false) there is no real connection string, so we
+    // skip the check — executeSql works fine without one on self-hosted deployments.
+    enabled: Boolean(resolvedSql) && (!IS_PLATFORM || Boolean(effectiveConnectionString)),
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   })

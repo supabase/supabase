@@ -4,7 +4,7 @@ description: 'The Supabase CLI provides tools to develop your project locally, d
 subtitle: 'Develop locally, deploy to the Supabase Platform, and set up CI/CD workflows'
 ---
 
-The Supabase CLI enables you to run the entire Supabase stack locally, on your machine or in a CI environment. With just two commands, you can set up and start a new local project:
+The Supabase CLI enables you to run the entire Supabase stack locally, on your machine or in a CI environment. With two commands, you can set up and start a new local project:
 
 1. `supabase init` to create a new local project
 2. `supabase start` to launch the Supabase services
@@ -58,7 +58,7 @@ and run one of the following:
 - `sudo rpm -i <...>.rpm`
 
 </TabPanel>
-<TabPanel id="npm" label="nodejs">
+<TabPanel id="npm" label="Node.js">
 
 Run the CLI by prefixing each command with `npx` or `bunx`:
 
@@ -72,27 +72,11 @@ The Supabase CLI requires **Node.js 20 or later** when run via `npx` or `npm`. O
 
 </Admonition>
 
-<Admonition type="note">
-
-Installing the Supabase CLI globally using `npm install -g supabase` is **not supported**.
-
-For global usage, install the CLI via Homebrew, Scoop, or the standalone binary.
-
-Alternatively, you can run the CLI using `npx supabase` or install it locally as a dev dependency.
-
-</Admonition>
-
 You can also install the CLI as dev dependency via [npm](https://www.npmjs.com/package/supabase):
 
 ```sh
 npm install supabase --save-dev
 ```
-
-<Admonition type="note">
-
-Global installation using `npm install -g supabase` is not supported. For global CLI usage, install via [Homebrew](/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=macos), [Scoop](/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=windows), or the [standalone binary](/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=linux).
-
-</Admonition>
 
 </TabPanel>
 </Tabs>
@@ -138,7 +122,7 @@ brew link --overwrite supabase-beta
 Beta builds are attached to [GitHub pre-releases](https://github.com/supabase/cli/releases). Download the `.apk`, `.deb`, or `.rpm` for your platform and install with the same commands as [Linux packages](#linux-packages) above.
 
 </TabPanel>
-<TabPanel id="npm" label="nodejs">
+<TabPanel id="npm" label="Node.js">
 
 Install as a dev dependency:
 
@@ -157,7 +141,7 @@ npx supabase@beta --help
 
 ## Updating the Supabase CLI
 
-When a new [version](https://github.com/supabase/cli/releases) is released, you can update the CLI using the same methods.
+When a new [version](https://github.com/supabase/cli/releases) is released, you can update the CLI using the same channels.
 
 <Tabs
   scrollable
@@ -215,7 +199,7 @@ brew upgrade supabase-beta
    - `sudo rpm -i <...>.rpm`
 
 </TabPanel>
-<TabPanel id="npm" label="nodejs">
+<TabPanel id="npm" label="Node.js">
 
 If you have installed the CLI as dev dependency via [npm](https://www.npmjs.com/package/supabase), you can update it with:
 
@@ -248,46 +232,7 @@ supabase stop --no-backup
 
 ## Running Supabase locally
 
-The Supabase CLI uses Docker containers to manage the local development stack. Follow the official guide to install and configure [Docker Desktop](https://docs.docker.com/desktop):
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="macos"
-  queryGroup="platform"
->
-<TabPanel id="macos" label="macOS">
-
-<Image
-  alt="Docker settings on Mac: Select Integrated, Virtualization Framework, and osxfs"
-  src={{
-    dark: '/docs/img/guides/cli/docker-mac.png',
-    light: '/docs/img/guides/cli/docker-mac-light.png',
-  }}
-
-width={2880}
-height={1800}
-/>
-
-</TabPanel>
-<TabPanel id="windows" label="Windows">
-
-<Image
-  alt="Docker settings on Windows: Select Integrated, Expose Daemon, WSL2, and Add to /etc/hosts file."
-  src={{
-    dark: '/docs/img/guides/cli/docker-win.png',
-    light: '/docs/img/guides/cli/docker-win-light.png',
-  }}
-
-width={2560}
-height={1520}
-/>
-
-</TabPanel>
-</Tabs>
-
-<Admonition type="note">
+The Supabase CLI uses Docker containers to manage the local development stack. Follow the official guide to install and configure [Docker Desktop](https://docs.docker.com/desktop) on your machine.
 
 Alternately, you can use a different container tool that offers Docker compatible APIs.
 
@@ -296,15 +241,13 @@ Alternately, you can use a different container tool that offers Docker compatibl
 - [OrbStack](https://orbstack.dev/) (macOS)
 - [colima](https://github.com/abiosoft/colima) (macOS)
 
-</Admonition>
-
 Inside the folder where you want to create your project, run:
 
 ```bash
 supabase init
 ```
 
-This will create a new `supabase` folder. It's safe to commit this folder to your version control system.
+This creates a new `supabase` folder. It's safe to commit this folder to version control.
 
 Now, to start the Supabase stack, run:
 
@@ -312,11 +255,11 @@ Now, to start the Supabase stack, run:
 supabase start
 ```
 
-This takes time on your first run because the CLI needs to download the Docker images to your local machine. The CLI includes the entire Supabase toolset, and a few additional images that are useful for local development (like a local SMTP server and a database diff tool).
+This takes time on your first run because the CLI needs to download the Docker images to your local machine. The CLI includes the entire Supabase stack, and a few additional images useful for local development (like a local SMTP server and a database diff tool).
 
 ## Access your project's services
 
-Once all of the Supabase services are running, you'll see output containing your local Supabase credentials. It should look like this, with urls and keys that you'll use in your local project:
+Once all the Supabase services are running, you'll see output containing your local Supabase credentials. It should look like the below, with urls and keys that you use in your local project:
 
 ```
 Started supabase local development setup.
@@ -427,7 +370,7 @@ For advanced logs analysis using the Logs Explorer, it is advised to use the Big
 
 </Admonition>
 
-All logs will be stored in the local database under the `_analytics` schema.
+All logs are stored in the local database under the `_analytics` schema.
 
 </TabPanel>
 </Tabs>

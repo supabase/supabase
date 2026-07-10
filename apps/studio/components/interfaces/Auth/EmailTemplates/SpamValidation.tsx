@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { CardContent, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { Markdown } from '@/components/interfaces/Markdown'
 import { ValidateSpamResponse } from '@/data/auth/validate-spam-mutation'

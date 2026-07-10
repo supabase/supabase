@@ -9,8 +9,8 @@ export const databaseKeys = {
     schema: string | undefined,
     table: string | undefined
   ) => ['projects', projectRef, 'table-columns', schema, table] as const,
-  databaseFunctions: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'database-functions'] as const,
+  databaseFunctions: (projectRef: string | undefined, schema?: string) =>
+    ['projects', projectRef, 'database-functions', schema].filter(Boolean),
   entityDefinition: (projectRef: string | undefined, id?: number) =>
     ['projects', projectRef, 'entity-definition', id] as const,
   entityDefinitions: (projectRef: string | undefined, schemas: string[]) =>

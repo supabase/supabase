@@ -11,7 +11,7 @@ import { Filter, Sort, SupaRow, SupaTable } from '@/components/grid/types'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { handleError } from '@/data/fetchers'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
-import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
 import { isMsSqlForeignTable } from '@/data/table-editor/table-editor-types'
 import { timeout } from '@/lib/helpers'
@@ -316,7 +316,7 @@ type TableRowsVariables = Omit<GetTableRowsArgs, 'table'> & {
 }
 
 export type TableRowsData = TableRows
-type TableRowsError = ExecuteSqlError
+type TableRowsError = ResponseError
 
 async function getTableRows(
   {

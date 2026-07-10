@@ -69,5 +69,3 @@ export const GenericTableLoader = ({
     </Card>
   )
 }
-
-export default ShimmeringLoader

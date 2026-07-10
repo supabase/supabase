@@ -2,204 +2,143 @@
 title: 'Use Supabase with SvelteKit'
 subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a SvelteKit app.'
 breadcrumb: 'Framework Quickstarts'
-hideToc: true
 ---
 
-<StepHikeCompact>
+<$Partial path="quickstart_db_setup.mdx" />
 
-  <StepHikeCompact.Step step={1}>
+## 3. Create a SvelteKit app
 
-    <$Partial path="quickstart_db_setup.mdx" />
+Create a SvelteKit app using the `npm create` command.
 
-  </StepHikeCompact.Step>
+```bash
+npx sv create my-app
+```
 
-  <StepHikeCompact.Step step={2}>
+## 4. Install Agent Skills (optional)
 
-    <StepHikeCompact.Details title="Create a SvelteKit app">
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
 
-    Create a SvelteKit app using the `npm create` command.
+To install, run the following command in the root of your project:
 
-    </StepHikeCompact.Details>
+```bash
+npx skills add supabase/agent-skills
+```
 
-    <StepHikeCompact.Code>
+## 5. Install the Supabase client library
 
-      ```bash name=Terminal
-      npx sv create my-app
-      ```
+The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a SvelteKit app.
 
-    </StepHikeCompact.Code>
+Navigate to the SvelteKit app and install `supabase-js`.
 
-  </StepHikeCompact.Step>
+```bash
+cd my-app && npm install @supabase/supabase-js
+```
 
-  <StepHikeCompact.Step step={3}>
-    <StepHikeCompact.Details title="Install the Supabase client library">
+## 6. Declare Supabase environment variables
 
-    The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a SvelteKit app.
+Create a `.env` file at the root of your project and populate with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=sveltekit&tab=frameworks):
 
-    Navigate to the SvelteKit app and install `supabase-js`.
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=sveltekit">
+    Open Connect panel
+  </a>
+</Button>
 
-    </StepHikeCompact.Details>
+```text name=.env
+PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
+PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
+```
 
-    <StepHikeCompact.Code>
+<$Partial path="api_settings.mdx" variables={{ "framework": "sveltekit", "tab": "frameworks" }} />
 
-      ```bash name=Terminal
-      cd my-app && npm install @supabase/supabase-js
-      ```
+## 7. Create the Supabase client
 
-    </StepHikeCompact.Code>
+Create a `src/lib` directory in your SvelteKit app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client:
 
-  </StepHikeCompact.Step>
+<$CodeTabs>
 
-  <StepHikeCompact.Step step={4}>
+```js name=src/lib/supabaseClient.js
+import { createClient } from '@supabase/supabase-js'
+import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 
-  <StepHikeCompact.Details title="Declare Supabase Environment Variables">
+export const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY)
+```
 
-    Create a `.env` file at the root of your project and populate with your Supabase connection variables:
+```ts name=src/lib/supabaseClient.ts
+import { createClient } from '@supabase/supabase-js'
+import { PUBLIC_SUPABASE_PUBLISHABLE_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 
-    <ProjectConfigVariables variable="url" />
-    <ProjectConfigVariables variable="publishable" />
+export const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY)
+```
 
+</$CodeTabs>
 
-    </StepHikeCompact.Details>
+## 8. Query data from the app
 
-    <StepHikeCompact.Code>
+Use `load` method to fetch the data server-side and display the query results as a list.
 
-      <$CodeTabs>
+Create `+page.server.js` file in the `src/routes` directory with the following code.
 
-        ```text name=.env
-        PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
-        PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
-        ```
+<$CodeTabs>
 
-      </$CodeTabs>
-      <$Partial path="api_settings_steps.mdx" variables={{ "framework": "sveltekit", "tab": "frameworks" }} />
+```js name=src/routes/+page.server.js
+import { supabase } from '$lib/supabaseClient'
 
-    </StepHikeCompact.Code>
+export async function load() {
+  const { data } = await supabase.from('instruments').select()
+  return {
+    instruments: data ?? [],
+  }
+}
+```
 
-  </StepHikeCompact.Step>
+```ts name=src/routes/+page.server.ts
+import { supabase } from '$lib/supabaseClient'
 
-  <StepHikeCompact.Step step={5}>
-    <StepHikeCompact.Details title="Create the Supabase client">
+import type { PageServerLoad } from './$types'
 
-    Create a `src/lib` directory in your SvelteKit app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client:
+type Instrument = {
+  id: number
+  name: string
+}
 
-    </StepHikeCompact.Details>
+export const load: PageServerLoad = async () => {
+  const { data, error } = await supabase.from('instruments').select<'instruments', Instrument>()
 
-    <StepHikeCompact.Code>
+  if (error) {
+    console.error('Error loading instruments:', error.message)
+    return { instruments: [] }
+  }
 
-      <$CodeTabs>
+  return {
+    instruments: data ?? [],
+  }
+}
+```
 
-        ```js name=src/lib/supabaseClient.js
-        import { createClient } from '@supabase/supabase-js';
-        import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public';
+</$CodeTabs>
 
-        export const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY)
-        ```
+Replace the existing content in your `+page.svelte` file in the `src/routes` directory with the following code.
 
-        ```ts name=src/lib/supabaseClient.ts
-        import { createClient } from '@supabase/supabase-js';
-        import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY } from '$env/static/public';
+```svelte name=src/routes/+page.svelte
+<script>
+  let { data } = $props();
+</script>
 
-        export const supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_PUBLISHABLE_KEY)
-        ```
+<ul>
+  {#each data.instruments as instrument}
+    <li>{instrument.name}</li>
+  {/each}
+</ul>
+```
 
-      </$CodeTabs>
+## 9. Start the app
 
-    </StepHikeCompact.Code>
+Start the app and go to http://localhost:5173 in a browser and you should see the list of instruments.
 
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={6}>
-    <StepHikeCompact.Details title="Query data from the app">
-
-    Use `load` method to fetch the data server-side and display the query results as a simple list.
-
-    Create `+page.server.js` file in the `src/routes` directory with the following code.
-
-    </StepHikeCompact.Details>
-    <StepHikeCompact.Code>
-
-      <$CodeTabs>
-
-        ```js name=src/routes/+page.server.js
-          import { supabase } from "$lib/supabaseClient";
-
-          export async function load() {
-            const { data } = await supabase.from("instruments").select();
-            return {
-              instruments: data ?? [],
-            };
-          }
-        ```
-
-        ```ts name=src/routes/+page.server.ts
-        import type { PageServerLoad } from './$types';
-        import { supabase } from '$lib/supabaseClient';
-
-        type Instrument = {
-          id: number;
-          name: string;
-        };
-
-        export const load: PageServerLoad = async () => {
-          const { data, error } = await supabase.from('instruments').select<'instruments', Instrument>();
-
-          if (error) {
-            console.error('Error loading instruments:', error.message);
-            return { instruments: [] };
-          }
-
-          return {
-            instruments: data ?? [],
-          };
-        };
-        ```
-
-      </$CodeTabs>
-
-    </StepHikeCompact.Code>
-
-    <StepHikeCompact.Details title="">
-
-    Replace the existing content in your `+page.svelte` file in the `src/routes` directory with the following code.
-
-    </StepHikeCompact.Details>
-    <StepHikeCompact.Code>
-
-
-      ```svelte name=src/routes/+page.svelte
-      <script>
-        let { data } = $props();
-      </script>
-
-      <ul>
-        {#each data.instruments as instrument}
-          <li>{instrument.name}</li>
-        {/each}
-      </ul>
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={7}>
-    <StepHikeCompact.Details title="Start the app">
-
-    Start the app and go to http://localhost:5173 in a browser and you should see the list of instruments.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```bash name=Terminal
-      npm run dev
-      ```
-
-    </StepHikeCompact.Code>
-
-  </StepHikeCompact.Step>
-</StepHikeCompact>
+```bash
+npm run dev
+```
 
 ## Next steps
 

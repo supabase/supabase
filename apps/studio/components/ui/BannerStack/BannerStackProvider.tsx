@@ -8,6 +8,7 @@ export const BANNER_ID = {
   RLS_TESTER: 'rls-tester-banner',
   FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner',
   TOS_UPDATE: 'tos-update-banner',
+  UNIFIED_LOGS: 'unified-logs-banner',
 } as const
 
 export type BannerId = (typeof BANNER_ID)[keyof typeof BANNER_ID]

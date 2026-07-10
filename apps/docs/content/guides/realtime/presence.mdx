@@ -4,7 +4,7 @@ description: 'Share state between users with Realtime Presence.'
 subtitle: 'Share state between users with Realtime Presence.'
 ---
 
-Let's explore how to implement Realtime Presence to track state between multiple users.
+Use Realtime Presence to track state between multiple users.
 
 ## Usage
 
@@ -30,7 +30,7 @@ For high-frequency or fire-and-forget updates, use [Broadcast](/docs/guides/real
 
 <Admonition type="note" title="Sync event behavior">
 
-During a `sync` event, you may receive `join` and `leave` events simultaneously, even though no users are actually joining or leaving. This is expected behavior—Presence reconciles its local state with the server state, which can trigger these events as part of the synchronization process. This reflects state reconciliation, not real user movement.
+During a `sync` event, you may receive `join` and `leave` events simultaneously, even though no users are joining or leaving. This is expected behavior—Presence reconciles its local state with the server state, which can trigger these events as part of the synchronization process. This reflects state reconciliation, not real user movement.
 
 </Admonition>
 
@@ -47,17 +47,8 @@ The complete presence state returned by `presenceState()` looks like this:
 
 Get the Project URL and key from [the project's **Connect** dialog](/dashboard/project/_?showConnect=true).
 
-<Admonition type="note" title="Changes to API keys">
-
-Supabase is changing the way keys work to improve project security and developer experience. You can [read the full announcement](https://github.com/orgs/supabase/discussions/29260), but in the transition period, you can use both the current `anon` and `service_role` keys and the new publishable key with the form `sb_publishable_xxx` which will replace the older keys.
-
-**The legacy keys will be deprecated shortly, so we strongly encourage switching to and using the new publishable and secret API keys**.
-
-In most cases, you can get the correct key from [the Project's **Connect** dialog](/dashboard/project/_?showConnect=true), but if you want a specific key, you can find all keys in [the API Keys section of a Project's Settings page](/dashboard/project/_/settings/api-keys/):
-
-**For new keys**, open the **API Keys** tab, if you don't have a publishable key already, click **Create new API Keys**, and copy the value from the **Publishable key** section.
-
-</Admonition>
+<$Partial path="api_keys_deprecation.mdx" variables={{ "framework": "{{ .framework }}", "tab": "{{ .tab }}" }}
+/>
 
 <Tabs
   scrollable

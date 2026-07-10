@@ -13,7 +13,7 @@ export type Partner = {
   type: 'technology' | 'expert'
   slug: string
   title: string
-  partnerName: string
+  builtBy: string
   description: string
   content: string
   websiteUrl: string
@@ -47,7 +47,7 @@ export function toPartner(dbPartner: DbPartner): Partner {
     type,
     slug,
     title,
-    partnerName: developer,
+    builtBy: developer,
     description,
     content: overview,
     websiteUrl: website,

@@ -4,6 +4,7 @@ import { ArrowRight, RefreshCw } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
@@ -16,8 +17,9 @@ import {
   LogsDatePicker,
 } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
@@ -42,6 +44,8 @@ PostgRESTReport.getLayout = (page) => (
 
 export type UpdateDateRange = (from: string, to: string) => void
 export default PostgRESTReport
+
+const REPORT_TITLE = 'Data API'
 
 const PostgrestReport = () => {
   const { db, chart } = useParams()
@@ -115,18 +119,19 @@ const PostgrestReport = () => {
 
   return (
     <>
-      <ReportHeader showDatabaseSelector={false} title="Data API" />
+      <ReportHeader showDatabaseSelector={false} title={REPORT_TITLE} />
       <ReportStickyNav
         content={
-          <div className="flex flex-col gap-2">
-            <div className="flex gap-2">
+          <div className="flex flex-col gap-2 w-full">
+            <div className="ml-auto flex items-center gap-2 flex-wrap">
+              <DocsButton href={OBSERVABILITY_DOCS_HREFS.dataApi} topic={REPORT_TITLE} />
               <ShortcutTooltip
                 shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
                 label="Refresh report"
                 side="bottom"
               >
                 <Button
-                  type="default"
+                  variant="default"
                   disabled={isRefetching}
                   icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
                   className="w-7"

@@ -79,6 +79,7 @@ vi.mock('common', () => ({
       `free-micro-upgrade-banner-dismissed-${ref}`,
     PROJECT_INTEGRATION_BANNER_DISMISSED: (ref: string, integrationSource: string) =>
       `project-integration-banner-dismissed-${ref}-${integrationSource}`,
+    UNIFIED_LOGS_BANNER_DISMISSED: 'unified-logs-banner-dismissed',
   },
   isFeatureEnabled: () => false,
 }))
@@ -126,6 +127,7 @@ vi.mock('../editors/EditorsLayout.hooks', () => ({
 }))
 
 vi.mock('../MainScrollContainerContext', () => ({
+  useMainScrollContainer: () => null,
   useSetMainScrollContainer: () => () => {},
 }))
 
@@ -169,7 +171,10 @@ vi.mock('@/hooks/misc/useLocalStorage', () => ({
 }))
 
 vi.mock('@/components/ui/BannerStack/BannerStackProvider', () => ({
-  BANNER_ID: { FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner' },
+  BANNER_ID: {
+    FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner',
+    UNIFIED_LOGS: 'unified-logs-banner',
+  },
   useBannerStack: () => ({
     addBanner: mockAddBanner,
     dismissBanner: mockDismissBanner,
@@ -179,6 +184,19 @@ vi.mock('@/components/ui/BannerStack/BannerStackProvider', () => ({
 
 vi.mock('@/components/ui/BannerStack/Banners/BannerFreeMicroUpgrade', () => ({
   BannerFreeMicroUpgrade: () => null,
+}))
+
+vi.mock('@/components/ui/BannerStack/Banners/BannerUnifiedLogs', () => ({
+  BannerUnifiedLogs: () => null,
+}))
+
+vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
+  useUnifiedLogsPreview: () => ({
+    isEnabled: false,
+    isLoading: false,
+    enable: () => {},
+    disable: () => {},
+  }),
 }))
 
 vi.mock('@/data/usage/resource-warnings-query', () => ({
@@ -373,7 +391,9 @@ describe('FREE_MICRO_UPGRADE banner', () => {
     await waitFor(() => {
       expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')
     })
-    expect(mockAddBanner).not.toHaveBeenCalled()
+    expect(mockAddBanner).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'free-micro-upgrade-banner' })
+    )
   })
 
   it('calls dismissBanner when compute warnings are cleared', async () => {
@@ -391,7 +411,9 @@ describe('FREE_MICRO_UPGRADE banner', () => {
     await waitFor(() => {
       expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')
     })
-    expect(mockAddBanner).not.toHaveBeenCalled()
+    expect(mockAddBanner).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'free-micro-upgrade-banner' })
+    )
   })
 
   it('calls dismissBanner when project is not nano compute', async () => {
@@ -402,6 +424,8 @@ describe('FREE_MICRO_UPGRADE banner', () => {
     await waitFor(() => {
       expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')
     })
-    expect(mockAddBanner).not.toHaveBeenCalled()
+    expect(mockAddBanner).not.toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'free-micro-upgrade-banner' })
+    )
   })
 })

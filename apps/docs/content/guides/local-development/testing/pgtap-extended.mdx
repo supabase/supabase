@@ -83,7 +83,7 @@ The test helpers package provides several advantages over writing raw pgTAP test
 
 ## Schema-wide Row Level Security testing
 
-When working with Row Level Security, it's crucial to ensure that RLS is enabled on all tables that need it. Create a simple test to verify RLS is enabled across an entire schema:
+When working with Row Level Security, it's crucial to ensure that RLS is enabled on all tables that need it. Create a basic test to verify RLS is enabled across an entire schema:
 
 ```sql
 begin;
@@ -112,7 +112,7 @@ This setup file should contain:
 
 1. All shared extensions and dependencies
 2. Common test utilities
-3. A simple always green test to verify the setup
+3. A basic always-green test to verify the setup
 
 Here's an example setup file:
 
@@ -494,7 +494,7 @@ create policy "Users can update their own comments"
 
 #### 4. Test cases:
 
-Now everything is setup, let's write RLS test cases, note that each section could be in its own test:
+With setup complete, write RLS test cases. Each section can be in its own test:
 
 ```sql
 -- Assuming we already have: 000-setup-tests-hooks.sql file we can use tests helpers

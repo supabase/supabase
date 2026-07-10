@@ -308,6 +308,41 @@ withTestDatabase(
 )
 
 withTestDatabase(
+  'nameFilter matches fully-qualified schema.table names when no schema filter is set',
+  async ({ executeQuery }) => {
+    await executeQuery(`
+      create schema if not exists cmdk_regression;
+      create table cmdk_regression.repro_table (id bigint primary key);
+    `)
+
+    const baseSql = getTablesPaginatedSql({
+      limit: 100,
+      afterOid: 0,
+      nameFilter: 'cmdk_regression.repro_table',
+    })
+    const baseRows = await executeQuery<Row[]>(baseSql)
+
+    expect(baseRows.map((r) => ({ schema: r.schema, name: r.name }))).toContainEqual({
+      schema: 'cmdk_regression',
+      name: 'repro_table',
+    })
+
+    const withColumnsSql = getTablesPaginatedSql({
+      limit: 100,
+      afterOid: 0,
+      includeColumns: true,
+      nameFilter: 'cmdk_regression.repro_table',
+    })
+    const withColumnsRows = await executeQuery<Row[]>(withColumnsSql)
+
+    expect(withColumnsRows.map((r) => ({ schema: r.schema, name: r.name }))).toContainEqual({
+      schema: 'cmdk_regression',
+      name: 'repro_table',
+    })
+  }
+)
+
+withTestDatabase(
   'nameFilter escapes LIKE wildcards so they match literally',
   async ({ executeQuery }) => {
     await executeQuery(`

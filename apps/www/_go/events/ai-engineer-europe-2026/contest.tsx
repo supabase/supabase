@@ -57,7 +57,7 @@ const page: GoPageInput = {
             </p>
             <p className="text-foreground-lighter text-sm">Supabase</p>
           </div>
-          <Button asChild type="default" size="medium">
+          <Button asChild variant="default" size="medium">
             <Link
               href="https://supabase.link/ai-engineer-europe-2026-slides"
               target="_blank"
@@ -81,7 +81,7 @@ const page: GoPageInput = {
             <li>Fill out the entry form below</li>
             <li>Complete these steps by the contest deadline</li>
           </ol>
-          <Button asChild type="default" size="medium">
+          <Button asChild variant="default" size="medium">
             <Link href="https://supabase.com/dashboard">Create your account</Link>
           </Button>
           <p className="text-xs text-foreground-lighter mt-4">

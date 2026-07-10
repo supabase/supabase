@@ -31,7 +31,7 @@ To test locally, within the `apps/docs` directory:
 1. Run `pnpm build:guides-markdown`
 2. Run `pnpm dev`
 
-This creates Markdown files for all routes under the `public/docs/guides` directory, ignored by Git.
+This creates Markdown files for all routes under the `public/markdown/guides` directory, ignored by Git.
 
 For production this setup runs as a `prebuild` task to allow Vercel to bundle these files with middleware and functions.
 

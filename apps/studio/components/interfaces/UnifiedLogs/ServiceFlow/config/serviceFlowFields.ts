@@ -673,6 +673,20 @@ export const postgresPrimaryFields: BlockFieldConfig[] = [
     getValue: (data, enrichedData) => enrichedData?.database_user || data?.database_user,
     requiresEnrichedData: true,
   },
+  {
+    id: 'query',
+    label: 'Query',
+    getValue: (data, enrichedData) => enrichedData?.query || data?.query,
+    requiresEnrichedData: true,
+    wrap: true,
+  },
+  {
+    id: 'detail',
+    label: 'Details',
+    getValue: (data, enrichedData) => enrichedData?.detail || data?.detail,
+    requiresEnrichedData: true,
+    wrap: true,
+  },
 ]
 
 // Postgres Details (Collapsible)

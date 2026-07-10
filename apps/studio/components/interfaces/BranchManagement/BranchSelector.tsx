@@ -21,7 +21,7 @@ interface BranchSelectorProps {
   onBranchSelected?: (branch: Branch) => void
   disabled?: boolean
   isUpdating?: boolean
-  type?: 'primary' | 'outline'
+  variant?: 'primary' | 'outline'
   align?: 'end' | 'center'
 }
 
@@ -30,7 +30,7 @@ export const BranchSelector = ({
   onBranchSelected,
   disabled = false,
   isUpdating = false,
-  type = 'primary',
+  variant = 'primary',
   align = 'end',
 }: BranchSelectorProps) => {
   const [open, setOpen] = useState(false)
@@ -49,7 +49,7 @@ export const BranchSelector = ({
       <PopoverTrigger asChild>
         <ButtonTooltip
           icon={<GitMerge size={14} strokeWidth={1.5} />}
-          type={type}
+          variant={variant}
           disabled={
             disabled || isUpdating || branches.length === 0 || availableBranches.length === 0
           }

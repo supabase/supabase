@@ -22,7 +22,7 @@ vi.mock('@/data/query-client', () => ({
   }),
 }))
 
-vi.mock('@/data/sql/execute-sql-query', () => ({
+vi.mock('@/data/sql/execute-sql-mutation', () => ({
   executeSql: (...args: unknown[]) => mockExecuteSql(...args),
 }))
 
@@ -132,7 +132,6 @@ describe('createTable', () => {
     })
 
     expect(mockTrack).toHaveBeenCalledWith('table_created', {
-      has_generated_policies: false,
       method: 'table_editor',
       schema_name: 'public',
       table_name: 'test_table',
@@ -148,7 +147,6 @@ describe('createTable', () => {
     )
 
     expect(result).toStrictEqual({
-      failedPolicies: [],
       table: mockTableResult,
     })
   })

@@ -130,10 +130,10 @@ const inputGroupButtonVariants = cva('', {
 const InputGroupButton = React.forwardRef<
   HTMLButtonElement,
   Omit<React.ComponentProps<typeof Button>, 'size'> & VariantProps<typeof inputGroupButtonVariants>
->(function InputGroupButton({ className, type = 'text', size = 'tiny', ...props }, ref) {
+>(function InputGroupButton({ className, variant = 'text', size = 'tiny', ...props }, ref) {
   return (
     <Button
-      type={type}
+      variant={variant}
       size={size}
       className={cn(inputGroupButtonVariants({ size }), className)}
       ref={ref}

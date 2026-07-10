@@ -1,8 +1,6 @@
 import { useParams } from 'common'
-import Link from 'next/link'
 import {
   Badge,
-  Button,
   Input,
   InputGroup,
   InputGroupAddon,
@@ -21,7 +19,6 @@ import {
   ValidationErrorsWarning,
   ValidationWarningsAdmonition,
 } from './UpgradeWarnings'
-import { NoticeBar } from '@/components/interfaces/DiskManagement/ui/NoticeBar'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -29,7 +26,7 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { useProjectUpgradeEligibilityQuery } from '@/data/config/project-upgrade-eligibility-query'
 import { useProjectServiceVersionsQuery } from '@/data/projects/project-service-versions'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
@@ -40,15 +37,12 @@ export const InfrastructureInfo = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const {
-    projectAuthAll: authEnabled,
-    projectSettingsDatabaseUpgrades: showDatabaseUpgrades,
-    databaseReplication: showReplication,
-  } = useIsFeatureEnabled([
-    'project_auth:all',
-    'project_settings:database_upgrades',
-    'database:replication',
-  ])
+  const { projectAuthAll: authEnabled, projectSettingsDatabaseUpgrades: showDatabaseUpgrades } =
+    useIsFeatureEnabled([
+      'project_auth:all',
+      'project_settings:database_upgrades',
+      'database:replication',
+    ])
 
   const {
     data,
@@ -90,26 +84,6 @@ export const InfrastructureInfo = () => {
   return (
     <>
       <ScaffoldDivider />
-
-      {project?.cloud_provider !== 'FLY' && showReplication && (
-        <ScaffoldContainer>
-          <ScaffoldSection isFullWidth>
-            <NoticeBar
-              visible={true}
-              type="default"
-              title="Management of read replicas has moved"
-              description="Read replicas is now managed under Replication in the Database section."
-              actions={
-                <Button type="default" asChild>
-                  <Link href={`/project/${ref}/database/replication`} className="no-underline!">
-                    Go to Replication
-                  </Link>
-                </Button>
-              }
-            />
-          </ScaffoldSection>
-        </ScaffoldContainer>
-      )}
 
       <ScaffoldContainer>
         <ScaffoldSection>

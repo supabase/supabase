@@ -119,7 +119,7 @@ Parameters marked with **Restart: Yes** cause the CLI to automatically restart y
 
 </Admonition>
 
-Use the examples below with `supabase --experimental --project-ref <project-ref> postgres-config update`:
+Use the examples below with `supabase postgres-config update --project-ref <project-ref> --experimental`:
 
 | Parameter                                                                                                                                                                                                                      | Type      | Restart | Example                                       |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------- | ------- | --------------------------------------------- |
@@ -149,6 +149,12 @@ Use the examples below with `supabase --experimental --project-ref <project-ref>
 | [wal_sender_timeout](https://www.postgresql.org/docs/current/runtime-config-replication.html#GUC-WAL-SENDER-TIMEOUT)                                                                                                           | CLI only  | No      | `--config wal_sender_timeout=60s`             |
 | [work_mem](https://www.postgresql.org/docs/current/runtime-config-resource.html#GUC-WORK-MEM)                                                                                                                                  | CLI + SQL | No      | `--config work_mem=64MB`                      |
 
+#### Management API only parameters
+
+Some Postgres settings are configurable through the [Management API](/docs/reference/api/v1-update-postgres-config) but not the CLI. These include logging settings such as `log_connections`. See [Postgres connection logging](/docs/guides/platform/postgres-connection-logging) for details.
+
+`cron.log_statement` (which logs each [pg_cron](/docs/guides/database/extensions/pg_cron) job statement before it runs) is also Management API only. It is a `postmaster`-context parameter, so updating it **requires a database restart** to take effect.
+
 #### Managing Postgres configuration with the CLI
 
 To start:
@@ -159,26 +165,26 @@ To start:
 To update Postgres configurations, use the [`postgres config`](/docs/reference/cli/supabase-postgres-config) command:
 
 ```bash
-supabase --experimental \
+supabase postgres-config update --config shared_buffers=250MB \
 --project-ref <project-ref> \
-postgres-config update --config shared_buffers=250MB
+--experimental
 ```
 
 By default, the CLI will merge any provided config overrides with any existing ones. The `--replace-existing-overrides` flag can be used to instead force all existing overrides to be replaced with the ones being provided:
 
 ```bash
-supabase --experimental \
+supabase postgres-config update --config max_parallel_workers=3 \
+--replace-existing-overrides \
 --project-ref <project-ref> \
-postgres-config update --config max_parallel_workers=3 \
---replace-existing-overrides
+--experimental
 ```
 
 To delete specific configuration overrides, use the `postgres-config delete` command:
 
 ```bash
-supabase --experimental \
+supabase postgres-config delete --config shared_buffers,work_mem \
 --project-ref <project-ref> \
-postgres-config delete --config shared_buffers,work_mem
+--experimental
 ```
 
 By default, CLI v2 (≥ 2.0.0) checks the parameter’s context and requests the correct action (reload or restart):
@@ -212,14 +218,14 @@ You can also pass the `--no-restart` flag to attempt a reload-only apply. If the
 
 Postgres requires several parameters to be synchronized between the Primary cluster and [Read Replicas](/docs/guides/platform/read-replicas).
 
-By default, Supabase ensures that this propagation is executed correctly. However, if the `--no-restart` behavior is used in conjunction with parameters that cannot be reloaded without a restart, the user is responsible for ensuring that both the primaries and the read replicas get restarted in a timely manner to ensure a stable running state. Leaving the configuration updated, but not utilized (via a restart) in such a case can result in read replica failure if the primary, or a read replica, restarts in isolation (e.g. due to an out-of-memory event, or hardware failure).
+By default, Supabase ensures that this propagation is executed correctly. However, if the `--no-restart` behavior is used in conjunction with parameters that cannot be reloaded without a restart, the user is responsible for ensuring that both the primaries and the read replicas get restarted in a timely manner to ensure a stable running state. Leaving the configuration updated, but not used (via a restart) in such a case can result in read replica failure if the primary, or a read replica, restarts in isolation (e.g. due to an out-of-memory event, or hardware failure).
 
 </Admonition>
 
 ```bash
-supabase --experimental \
+supabase postgres-config delete --config shared_buffers --no-restart \
 --project-ref <project-ref> \
-postgres-config delete --config shared_buffers --no-restart
+--experimental
 ```
 
 ### Resetting to default config

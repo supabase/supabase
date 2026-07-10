@@ -71,6 +71,9 @@
         "OPENAI_API_KEY",
         "BRAINTRUST_API_KEY",
         "BRAINTRUST_PROJECT_ID",
+        // Gates the dashboard assistant between the remote MCP server and the
+        // legacy in-process one (see lib/ai/tools/mcp-tools.ts).
+        "USE_REMOTE_MCP",
         "AUTH_JWT_SECRET",
         "LOGFLARE_API_KEY",
         "LOGFLARE_PUBLIC_ACCESS_TOKEN",
@@ -79,6 +82,7 @@
         "SENTRY_ORG",
         "SENTRY_PROJECT",
         "SENTRY_AUTH_TOKEN",
+        "SKIP_ASSET_UPLOAD",
         "NEXT_PUBLIC_SENTRY_DSN",
         "AWS_BEDROCK_PROFILE",
         "AWS_BEDROCK_ROLE_ARN",
@@ -100,6 +104,22 @@
         "STATUSPAGE_PAGE_ID",
         "INCIDENT_IO_API_KEY",
         "LIVE_SUPABASE_SECRET_KEY",
+        // Selects the build mode for the studio's `build`/`start` scripts
+        // (e.g. e2e sets `MODE=test`). Listed so turbo invalidates the
+        // cache when it changes — without this, switching between test and
+        // production builds reuses a stale cached output.
+        "MODE",
+        // Read by scripts/serve.js (the Node host for `pnpm start`).
+        // Declared here so the studio-package turbo env lint rule passes
+        // even though turbo doesn't directly drive `start`.
+        "PORT",
+        // Gates the TanStack vs Next path in api/server.js, vercel.ts,
+        // and scripts/dispatch.js (the dev/build/start dispatcher).
+        "STUDIO_FRAMEWORK",
+        // Vite's built-in `import.meta.env.SSR` flag (used in ConnectStepsSection
+        // to gate Vite-only `import.meta.glob`). Not a real process env var
+        // but turbo's `no-undeclared-env-vars` lint flags any `env.SSR` access.
+        "SSR",
       ],
       "passThroughEnv": [
         "CURRENT_CLI_VERSION",
@@ -110,7 +130,12 @@
         "S3_PROTOCOL_ACCESS_KEY_ID",
         "S3_PROTOCOL_ACCESS_KEY_SECRET",
       ],
-      "outputs": [".next/**", "!.next/cache/**", "!.next/dev/**/*"],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "!.next/dev/**/*",
+        "dist/**",
+      ],
     },
   },
 }

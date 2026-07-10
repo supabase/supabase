@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import type { ComponentProps } from 'react'
 import { useState } from 'react'
 import { Button, CommandGroup, CommandItem } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AppLayoutDropdownTriggerButton } from './AppLayoutDropdown'
 import { sanitizeRoute } from './ProjectDropdown.utils'
@@ -42,7 +42,13 @@ function ProjectDropdownNewProjectActions({
 
   if (embedded) {
     return (
-      <Button type="default" block size="small" asChild icon={<Plus size={14} strokeWidth={1.5} />}>
+      <Button
+        variant="default"
+        block
+        size="small"
+        asChild
+        icon={<Plus size={14} strokeWidth={1.5} />}
+      >
         <Link
           href={href}
           onClick={onClose}
@@ -105,7 +111,12 @@ function ProjectDropdownPlatformView({
 
       <OrganizationProjectSelector
         {...selectorProps}
-        renderTrigger={() => <AppLayoutDropdownTriggerButton className="shrink-0" />}
+        renderTrigger={() => (
+          <AppLayoutDropdownTriggerButton
+            className="shrink-0"
+            aria-label="Show organization projects"
+          />
+        )}
       />
     </div>
   )

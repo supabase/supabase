@@ -38,7 +38,10 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
   const { mutate: updateOrgSubscription, isPending: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
       onError: (error) => {
-        toast.error(`Failed to downgrade project: ${error.message}`)
+        toast.error(`Failed to downgrade project: ${error.message}`, {
+          duration: 10_000,
+          dismissible: true,
+        })
       },
     }
   )
@@ -160,7 +163,7 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
                   id="message"
                   name="message"
                   value={message}
-                  onChange={(event: any) => setMessage(event.target.value)}
+                  onChange={(event) => setMessage(event.target.value)}
                   rows={3}
                 />
               </div>
@@ -190,18 +193,18 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
         </DialogSection>
 
         <DialogFooter>
-          <Button type="default" onClick={() => onClose()}>
+          <Button variant="default" onClick={() => onClose()}>
             Cancel
           </Button>
           <ProjectUpdateDisabledTooltip projectUpdateDisabled={subscriptionUpdateDisabled}>
             <Button
-              type="danger"
+              variant="danger"
               className="pointer-events-auto"
               loading={isSubmitting}
               disabled={subscriptionUpdateDisabled || isSubmitting}
               onClick={onSubmit}
             >
-              Confirm downgrade
+              Downgrade Now
             </Button>
           </ProjectUpdateDisabledTooltip>
         </DialogFooter>

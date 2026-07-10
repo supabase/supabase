@@ -24,6 +24,7 @@ import DatabasePostgresColumnRender from './LogColumnRenderers/DatabasePostgresC
 import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewColumnRenderer'
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
+import MultigresColumnRender from './LogColumnRenderers/MultigresColumnRender'
 import type { LogData, LogQueryError, QueryType } from './Logs.types'
 import {
   formatLogsAsCsv,
@@ -33,6 +34,7 @@ import {
 } from './Logs.utils'
 import LogSelection from './LogSelection'
 import { DefaultErrorRenderer } from './LogsErrorRenderers/DefaultErrorRenderer'
+import { MissingLimitErrorRenderer } from './LogsErrorRenderers/MissingLimitErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { LogsTableEmptyState } from './LogsTableEmptyState'
 import { MultiSelectActionBar, type LogCopyFormat } from './MultiSelectActionBar'
@@ -265,6 +267,9 @@ export const LogTable = ({
       case 'pg_cron':
         columns = DatabasePostgresColumnRender
         break
+      case 'multigres':
+        columns = MultigresColumnRender
+        break
       default:
         if (firstRow && isDefaultLogPreviewFormat(firstRow)) {
           columns = DefaultPreviewColumnRenderer
@@ -467,7 +472,7 @@ export const LogTable = ({
     >
       <div className="flex items-center gap-2">
         <DownloadResultsButton
-          type="text"
+          variant="text"
           text={`Results ${data && data.length ? `(${data.length})` : ''}`}
           results={data}
           fileName={`supabase-logs-${ref}.csv`}
@@ -478,7 +483,7 @@ export const LogTable = ({
       {showHistogramToggle && (
         <div className="flex items-center gap-2">
           <Button
-            type="default"
+            variant="default"
             icon={isHistogramShowing ? <Eye /> : <EyeOff />}
             onClick={onHistogramToggle}
           >
@@ -487,10 +492,10 @@ export const LogTable = ({
         </div>
       )}
 
-      <div className="space-x-2">
+      <div className="gap-x-2 flex items-center">
         {IS_PLATFORM && (
           <ButtonTooltip
-            type="default"
+            variant="default"
             onClick={onSave}
             loading={isSaving}
             disabled={!canCreateLogQuery || !hasEditorValue}
@@ -508,7 +513,7 @@ export const LogTable = ({
         )}
         <Button
           title="run-logs-query"
-          type={hasEditorValue ? 'primary' : 'alternative'}
+          variant="primary"
           disabled={!hasEditorValue}
           onClick={onRun}
           iconRight={<Play size={12} />}
@@ -525,6 +530,12 @@ export const LogTable = ({
     const childProps = {
       isCustomQuery: queryType ? false : true,
       error: error!,
+    }
+    if (
+      typeof error === 'object' &&
+      error.error?.errors.find((err) => err.reason === 'missingLimit')
+    ) {
+      return <MissingLimitErrorRenderer />
     }
     if (
       typeof error === 'object' &&

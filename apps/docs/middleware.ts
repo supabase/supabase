@@ -1,33 +1,46 @@
+import { clientSdkIds } from '~/content/navigation.references'
+import { BASE_PATH } from '~/lib/constants'
+import MARKDOWN_SLUGS from '~/public/markdown/manifest.json'
+import { negotiateMarkdown } from 'common/markdown-negotiation'
 import { isbot } from 'isbot'
 import { NextResponse, type NextRequest } from 'next/server'
 
-import { clientSdkIds } from '~/content/navigation.references'
-import { BASE_PATH } from '~/lib/constants'
-
 const REFERENCE_PATH = `${BASE_PATH ?? ''}/reference`
-
 const GUIDES_PATH = `${BASE_PATH ?? ''}/guides`
+const GUIDES_MARKDOWN_SLUGS = new Set(MARKDOWN_SLUGS)
 
 export function middleware(request: NextRequest) {
   const url = new URL(request.url)
+  const { pathname } = url
 
-  const requestsMarkdown =
-    request.headers.get('Accept')?.includes('text/markdown') || url.pathname.endsWith('.md')
+  if (pathname.startsWith(GUIDES_PATH + '/')) {
+    const isMdSuffix = pathname.endsWith('.md')
+    const slug = pathname.replace(`${GUIDES_PATH}/`, '').replace(/\.md$/, '')
+    const decision = negotiateMarkdown(
+      { acceptHeader: request.headers.get('accept') ?? '' },
+      { hasMarkdownVariant: GUIDES_MARKDOWN_SLUGS.has(slug), isMarkdownSuffix: isMdSuffix }
+    )
 
-  // Serve pre-generated .md files before the [[...slug]] page route can intercept them
-  if (url.pathname.startsWith(GUIDES_PATH + '/') && requestsMarkdown) {
-    const slug = url.pathname.replace(`${GUIDES_PATH}/`, '').replace(/\.md$/, '')
-    const rewriteUrl = new URL(url)
-    rewriteUrl.pathname = `${BASE_PATH ?? ''}/api/guides-md/${slug}`
-    return NextResponse.rewrite(rewriteUrl)
+    if (decision === 'not-acceptable') {
+      return new NextResponse('Not Acceptable', {
+        status: 406,
+        headers: { 'Cache-Control': 'no-store', Vary: 'Accept' },
+      })
+    }
+
+    if (decision === 'markdown') {
+      const rewriteUrl = new URL(url)
+      rewriteUrl.pathname = `${BASE_PATH ?? ''}/api/guides-md/${slug}`
+      return NextResponse.rewrite(rewriteUrl)
+    }
   }
 
-  if (!url.pathname.startsWith(REFERENCE_PATH)) {
+  if (!pathname.startsWith(REFERENCE_PATH)) {
     return NextResponse.next()
   }
 
   if (isbot(request.headers.get('user-agent'))) {
-    let [, lib, maybeVersion, ...slug] = url.pathname.replace(REFERENCE_PATH, '').split('/')
+    let [, lib, maybeVersion, ...slug] = pathname.replace(REFERENCE_PATH, '').split('/')
 
     if (clientSdkIds.includes(lib)) {
       const version = /v\d+/.test(maybeVersion) ? maybeVersion : undefined
@@ -43,7 +56,7 @@ export function middleware(request: NextRequest) {
     }
   }
 
-  const [, lib, maybeVersion] = url.pathname.replace(REFERENCE_PATH, '').split('/')
+  const [, lib, maybeVersion] = pathname.replace(REFERENCE_PATH, '').split('/')
 
   if (lib === 'cli') {
     const rewritePath = [REFERENCE_PATH, 'cli'].join('/')

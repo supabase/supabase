@@ -1,7 +1,5 @@
 import fs from 'fs'
 import path from 'path'
-import { expect, Page } from '@playwright/test'
-
 import { env } from '../env.config.js'
 import { expectClipboardValue } from '../utils/clipboard.js'
 import { dropTable, query } from '../utils/db/index.js'
@@ -16,6 +14,7 @@ import {
   waitForGridDataToLoad,
   waitForTableToLoad,
 } from '../utils/wait-for-response.js'
+import { expect, Page } from '@playwright/test'
 
 const deleteTable = async (page: Page, ref: string, tableName: string) => {
   const viewLocator = page.getByLabel(`View ${tableName}`)
@@ -34,7 +33,7 @@ const deleteTable = async (page: Page, ref: string, tableName: string) => {
 }
 
 const deleteEnumIfExist = async (page: Page, ref: string, enumName: string) => {
-  const loadTypesPromise = waitForApiResponse(page, 'pg-meta', ref, `types`)
+  const loadTypesPromise = waitForApiResponse(page, 'pg-meta', ref, `query?key=types`)
   await page.goto(toUrl(`/project/${ref}/database/types?schema=public`))
   await loadTypesPromise
   expect(page.getByText('public').first()).toBeVisible()
@@ -153,6 +152,37 @@ testRunner('table editor', () => {
 
     await expect(page.getByLabel(`View ${authTableSso}`)).not.toBeVisible()
     await expect(page.getByLabel(`View ${authTableMfa}`)).toBeVisible()
+  })
+
+  test('protected schema empty tables do not expose CSV import actions', async ({ page, ref }) => {
+    const emptyAuthTables = await query<{ relname: string }>(`
+      select relname
+      from pg_stat_user_tables
+      where schemaname = 'auth'
+        and n_live_tup = 0
+        and relname <> 'schema_migrations'
+      order by relname
+      limit 1;
+    `)
+    test.skip(emptyAuthTables.length === 0, 'Requires an empty auth table in the test dataset')
+    const [{ relname: tableName }] = emptyAuthTables
+
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+
+    await page.getByTestId('schema-selector').click()
+    await page.getByPlaceholder('Find schema...').fill('auth')
+
+    const tableLoadPromise = waitForTableToLoad(page, ref, 'auth')
+    await page.getByRole('option', { name: 'auth' }).click()
+    await tableLoadPromise
+
+    await expect(page.getByRole('button', { name: `View ${tableName}`, exact: true })).toBeVisible()
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=auth$/)
+
+    await expect(page.getByText('This table is empty')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Import data from CSV' })).not.toBeVisible()
+    await expect(page.getByText('or drag and drop a CSV file here')).not.toBeVisible()
   })
 
   test('should show rls accordingly', async ({ page, ref }) => {
@@ -845,6 +875,52 @@ testRunner('table editor', () => {
       value: 'second_row_value',
       exact: true,
     })
+  })
+
+  test('copying cell values preserves false and zero', async ({ page, ref }) => {
+    const tableName = 'pw_table_copy_falsy_values'
+
+    await using _ = await withSetupCleanup(
+      async () => {
+        await query(`
+          create table if not exists public.${tableName} (
+            bool_false boolean,
+            bool_true boolean,
+            zero_int integer
+          );
+        `)
+        await query(`
+          insert into public.${tableName} (bool_false, bool_true, zero_int)
+          values (false, true, 0);
+        `)
+      },
+      async () => {
+        await dropTable(tableName)
+      }
+    )
+
+    await page.goto(toUrl(`/project/${ref}/editor?schema=public`))
+    await page.getByRole('button', { name: `View ${tableName}`, exact: true }).click()
+    await page.waitForURL(/\/editor\/\d+\?schema=public$/)
+    await expect(page.getByRole('grid')).toBeVisible()
+
+    const falseCell = page.getByRole('gridcell', { name: 'FALSE' }).first()
+    await expect(falseCell).toBeVisible()
+    await falseCell.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Copy cell' }).click()
+    await expectClipboardValue({ page, value: 'false', exact: true })
+
+    const zeroCell = page.getByRole('gridcell', { name: '0' }).first()
+    await expect(zeroCell).toBeVisible()
+    await zeroCell.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Copy cell' }).click()
+    await expectClipboardValue({ page, value: '0', exact: true })
+
+    const trueCell = page.getByRole('gridcell', { name: 'TRUE' }).first()
+    await expect(trueCell).toBeVisible()
+    await trueCell.click({ button: 'right' })
+    await page.getByRole('menuitem', { name: 'Copy cell' }).click()
+    await expectClipboardValue({ page, value: 'true', exact: true })
   })
 
   test('boolean fields can be edited correctly', async ({ page, ref }) => {

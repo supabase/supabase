@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react'
 
 import { Entity } from '@/data/entity-types/entity-types-infinite-query'
-import useLatest from '@/hooks/misc/useLatest'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { createTabId, editorEntityTypes, useTabsStateSnapshot } from '@/state/tabs'
 
 export function useTableEditorTabsCleanUp() {

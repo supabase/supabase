@@ -119,7 +119,7 @@ const ColumnForeignKey = ({
           </div>
         )}
 
-        <Button type="default" className="w-min" onClick={() => setOpen(true)}>
+        <Button variant="default" className="w-min" onClick={() => setOpen(true)}>
           Add foreign key
         </Button>
       </div>

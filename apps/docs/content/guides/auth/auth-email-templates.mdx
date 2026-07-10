@@ -49,7 +49,27 @@ The templating system provides the following variables for use:
 
 ## Editing email templates
 
-On hosted Supabase projects, edit your email templates on the [Email Templates](/dashboard/project/_/auth/templates) page. On self-hosted projects or in local development, edit your [configuration files](/docs/guides/local-development/customizing-email-templates).
+Where you edit templates depends on how you run Supabase.
+
+### Hosted projects
+
+Edit templates on the [Email Templates](/dashboard/project/_/auth/templates) page in the dashboard. The template builder uses the same [terminology](#terminology) and variables documented on this page.
+
+### Local development and self-hosted
+
+The dashboard template builder **does not apply** when running [local development with CLI](/docs/guides/local-development) or [self-hosted Supabase](/docs/guides/self-hosting). Customize templates in `supabase/config.toml` and local HTML files instead.
+
+<Admonition type="note" title="Customizing templates locally">
+
+See [Customizing email templates](/docs/guides/local-development/customizing-email-templates) for:
+
+- [`config.toml` keys and HTML file paths](/docs/guides/local-development/customizing-email-templates#configuring-templates)
+- [Template variables](/docs/guides/local-development/customizing-email-templates#template-variables) — the same placeholders as the [terminology](#terminology) table above
+- Default subjects and behavior for each [authentication](/docs/guides/local-development/customizing-email-templates#available-authentication-email-templates) and [security notification](/docs/guides/local-development/customizing-email-templates#available-security-notification-email-templates) template
+
+For self-hosted deployments, refer to [Custom email templates](/docs/guides/self-hosting/custom-email-templates).
+
+</Admonition>
 
 You can also manage email templates using the Management API:
 

@@ -81,7 +81,7 @@ const FunctionSelector = ({
   return (
     <div className={className}>
       {isLoading && (
-        <Button type="default" className="justify-start" block size={size} loading>
+        <Button variant="default" className="justify-start" block size={size} loading>
           Loading functions...
         </Button>
       )}
@@ -92,7 +92,7 @@ const FunctionSelector = ({
 
           <AlertDescription className="text-xs mb-2">Error: {error.message}</AlertDescription>
 
-          <Button type="default" size="tiny" onClick={() => refetch()}>
+          <Button variant="default" size="tiny" onClick={() => refetch()}>
             Reload functions
           </Button>
         </Alert>
@@ -104,7 +104,7 @@ const FunctionSelector = ({
             <Button
               size={size}
               disabled={!!disabled}
-              type="default"
+              variant="default"
               className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
               iconRight={
                 <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />

@@ -41,10 +41,7 @@ pnpm add @supabase/supabase-js @supabase/ssr
 
 Create a `.env.local` file in the project root directory. In the file, set the project's Supabase URL and Key:
 
-<ProjectConfigVariables variable="url" />
-<ProjectConfigVariables variable="publishable" />
-
-<$Partial path="api_settings_steps.mdx" variables={{ "framework": "nextjs", "tab": "frameworks" }} />
+<$Partial path="api_settings.mdx" variables={{ "framework": "nextjs", "tab": "frameworks" }} />
 
 <Tabs scrollable size="small" type="underlined" defaultActiveId="nextjs" queryGroup="framework">
 
@@ -172,6 +169,8 @@ You need setup code to configure a Supabase client to use cookies. Once you have
 
 Use the browser client in code that runs on the browser, and the server client in code that runs on the server.
 
+<$Partial path="auth_methods.mdx" />
+
 <Tabs
   scrollable
   size="small"
@@ -196,10 +195,12 @@ The Proxy is responsible for:
 2. Passing the refreshed Auth token to Server Components, so they don't attempt to refresh the same token themselves. This is accomplished with `request.cookies.set`.
 3. Passing the refreshed Auth token to the browser, so it replaces the old token. This is accomplished with `response.cookies.set`.
 
+<$Partial path="auth_methods.mdx" />
+
 <Accordion>
 
     <AccordionItem
-      header={<span className="text-foreground">What does the `cookies` object do?</span>}
+      header="What does the `cookies` object do?"
       id="utility-cookies"
     >
 
@@ -212,7 +213,7 @@ The Proxy is responsible for:
     </AccordionItem>
 
     <AccordionItem
-      header={<span className="text-foreground">Do I need to create a new client for every route?</span>}
+      header="Do I need to create a new client for every route?"
       id="client-deduplication"
     >
 
@@ -258,6 +259,8 @@ It's safe to trust `getClaims()` because it validates the JWT signature against 
 
 </Admonition>
 
+<$Partial path="auth_methods.mdx" />
+
 <div className="mt-12">
   <$CodeTabs>
     <$CodeSample path="/auth/nextjs/proxy.ts" meta="name=proxy.ts" language="typescript" />
@@ -290,6 +293,8 @@ Set up server-side hooks in `src/hooks.server.ts`. The hooks:
 - Create a request-specific Supabase client, using the user credentials from the request cookie. This client is used for server-only code.
 - Check user authentication.
 - Guard protected pages.
+
+<$Partial path="auth_methods.mdx" />
 
 <$CodeSample
 path="/auth/sveltekit/src/hooks.server.ts"
@@ -609,7 +614,7 @@ export default defineEventHandler(async (event) => {
     }
   )
 
-  await supabase.auth.getUser()
+  await supabase.auth.getClaims()
 
   return { ok: true }
 })
@@ -842,6 +847,8 @@ language="typescript"
 <TabPanel id="hono-route" label="Route">
 
 You can now use this middleware in your Hono application to create a server Supabase client that can be used to make authenticated requests.
+
+<$Partial path="auth_methods.mdx" />
 
 <$CodeSample
 path="/auth/hono/src/index.tsx"

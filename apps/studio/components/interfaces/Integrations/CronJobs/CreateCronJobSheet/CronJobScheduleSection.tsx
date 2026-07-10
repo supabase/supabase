@@ -131,7 +131,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
                   {PRESETS.map((preset) => (
                     <li key={preset.name}>
                       <Button
-                        type="outline"
+                        variant="outline"
                         onClick={() => {
                           if (useNaturalLanguage) {
                             setUseNaturalLanguage(false)

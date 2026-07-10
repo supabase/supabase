@@ -3,7 +3,6 @@ import { Elements } from '@stripe/react-stripe-js'
 import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import { useDebounce } from '@uidotdev/usehooks'
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { groupBy } from 'lodash'
 import { HelpCircle } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -55,9 +54,17 @@ import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-quer
 import { SetupIntentResponse } from '@/data/stripe/setup-intent-mutation'
 import { useConfirmPendingSubscriptionCreateMutation } from '@/data/subscriptions/org-subscription-confirm-pending-create'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { validateReturnTo } from '@/lib/gotrue'
 import { useProfile } from '@/lib/profile'
+import {
+  classifyApiError,
+  classifyStripeError,
+  classifyValidationError,
+} from '@/lib/telemetry/funnel-errors'
+import { useTrack } from '@/lib/telemetry/track'
+import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
 interface NewOrgFormProps {
   onPaymentMethodReset: () => void
@@ -92,18 +99,15 @@ export const NewOrgForm = ({
 }: NewOrgFormProps) => {
   const router = useRouter()
   const user = useProfile()
+  const track = useTrack()
   const { resolvedTheme } = useTheme()
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const isBillingEnabled = useIsFeatureEnabled('billing:all')
 
   const { data: organizations, isSuccess } = useOrganizationsQuery()
   const { data } = useProjectsInfiniteQuery({})
   const projects = useMemo(() => data?.pages.flatMap((page) => page.projects) ?? [], [data?.pages])
-
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
 
   const freeOrgs = (organizations || []).filter((it) => it.plan.id === 'free')
 
@@ -168,6 +172,14 @@ export const NewOrgForm = ({
     }
   }, [isSuccess, form, organizations?.length, user.profile?.username, user.isSuccess])
 
+  const hasTrackedFormExposed = useRef(false)
+  useEffect(() => {
+    if (hasTrackedFormExposed.current) return
+    if (!user.isSuccess) return
+    hasTrackedFormExposed.current = true
+    track('organization_creation_form_exposed')
+  }, [user.isSuccess, track])
+
   const [latestAddress, setLatestAddress] = useState<CustomerAddress>()
   const [latestTaxId, setLatestTaxId] = useState<CustomerTaxId | null>()
 
@@ -230,6 +242,8 @@ export const NewOrgForm = ({
     [freeOrgs, projectsByOrg]
   )
 
+  const trackFunnelError = useTrackFunnelError()
+
   const { mutate: createOrganization } = useOrganizationCreateMutation({
     onSuccess: async (org) => {
       if ('pending_payment_intent_secret' in org && org.pending_payment_intent_secret) {
@@ -239,7 +253,8 @@ export const NewOrgForm = ({
       }
     },
     onError: (data) => {
-      toast.error(data.message, { duration: 10_000 })
+      const toastId = toast.error(data.message, { duration: 10_000 })
+      trackFunnelError('org_creation', classifyApiError('org_creation', data), 'toast', toastId)
       setNewOrgLoading(false)
     },
   })
@@ -249,6 +264,10 @@ export const NewOrgForm = ({
       if (data && 'slug' in data) {
         onOrganizationCreated({ slug: data.slug })
       }
+    },
+    onError: (error) => {
+      const toastId = toast.error(error.message, { dismissible: true, duration: 10_000 })
+      trackFunnelError('org_creation', classifyApiError('org_creation', error), 'toast', toastId)
     },
   })
 
@@ -265,21 +284,36 @@ export const NewOrgForm = ({
       })
     } else {
       // If the payment intent is not successful, we reset the payment method and show an error
-      toast.error(`Could not confirm payment. Please try again or use a different card.`, {
-        duration: 10_000,
-      })
+      const toastId = toast.error(
+        `Could not confirm payment. Please try again or use a different card.`,
+        { duration: 10_000 }
+      )
+      trackFunnelError(
+        'org_creation',
+        classifyStripeError(paymentIntentConfirmation.error),
+        'toast',
+        toastId
+      )
       resetPaymentMethod()
       setNewOrgLoading(false)
     }
   }
 
   const onOrganizationCreated = (org: { slug: string }) => {
+    if (submittedTier.current) {
+      track(
+        'organization_creation_completed',
+        { tier: submittedTier.current },
+        { organization: org.slug }
+      )
+    }
+
     const prefilledProjectName = user.profile?.username
       ? user.profile.username + `'s Project`
       : 'My Project'
 
     if (searchParams.returnTo) {
-      const url = new URL(searchParams.returnTo, window.location.origin)
+      const url = new URL(validateReturnTo(searchParams.returnTo, '/'), window.location.origin)
       if (searchParams.auth_id) {
         url.searchParams.set('auth_id', searchParams.auth_id)
       }
@@ -300,6 +334,8 @@ export const NewOrgForm = ({
     } as StripeElementsOptions
   }, [paymentIntentSecret, resolvedTheme])
 
+  const submittedTier = useRef<'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | null>(null)
+
   async function createOrg(
     formValues: z.infer<typeof formSchema>,
     paymentMethodId?: string,
@@ -310,15 +346,17 @@ export const NewOrgForm = ({
     }
   ) {
     const dbTier = formValues.plan === 'PRO' && !formValues.spend_cap ? 'PAYG' : formValues.plan
+    const tier = ('tier_' + dbTier.toLowerCase()) as
+      | 'tier_payg'
+      | 'tier_pro'
+      | 'tier_free'
+      | 'tier_team'
+    submittedTier.current = tier
 
     createOrganization({
       name: formValues.name,
       kind: formValues.kind,
-      tier: ('tier_' + dbTier.toLowerCase()) as
-        | 'tier_payg'
-        | 'tier_pro'
-        | 'tier_free'
-        | 'tier_team',
+      tier,
       ...(formValues.kind == 'COMPANY' ? { size: formValues.size } : {}),
       payment_method: paymentMethodId,
       billing_name: dbTier === 'FREE' ? undefined : customerData?.billing_name,
@@ -358,7 +396,12 @@ export const NewOrgForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} id={FORM_ID}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit, (errors) =>
+          trackFunnelError('org_creation', classifyValidationError('org_creation', errors), 'form')
+        )}
+        id={FORM_ID}
+      >
         <Panel
           title={
             <div key="panel-title">
@@ -372,7 +415,7 @@ export const NewOrgForm = ({
           footer={
             <div key="panel-footer" className="flex w-full items-center justify-between">
               <Button
-                type="default"
+                variant="default"
                 disabled={newOrgLoading || paymentConfirmationLoading}
                 onClick={() => {
                   if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
@@ -384,8 +427,8 @@ export const NewOrgForm = ({
 
               <Button
                 form={FORM_ID}
-                htmlType="submit"
-                type="primary"
+                type="submit"
+                variant="primary"
                 loading={newOrgLoading}
                 disabled={newOrgLoading || creationPreviewIsFetching}
               >
@@ -550,7 +593,13 @@ export const NewOrgForm = ({
               }
               onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
               onError={(err) => {
-                toast.error(err.message, { duration: 10_000 })
+                const toastId = toast.error(err.message, { duration: 10_000 })
+                trackFunnelError(
+                  'org_creation',
+                  { errorCategory: 'payment', errorReason: 'payment_error' },
+                  'toast',
+                  toastId
+                )
                 setNewOrgLoading(false)
                 resetPaymentMethod()
               }}

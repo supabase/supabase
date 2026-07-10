@@ -13,33 +13,28 @@ You can also use other Postgres clients like [Deno Postgres](https://deno.land/x
 
 ## Using supabase-js
 
-The `supabase-js` client handles authorization with Row Level Security and automatically formats responses as JSON. This is the recommended approach for most applications:
+The [`withSupabase`](/docs/guides/functions/auth) wrapper from `@supabase/server` hands you a `supabase-js` client (`ctx.supabase`) already scoped to the caller's Row Level Security policies, so you don't manage keys or authorization headers yourself. It also provides `ctx.supabaseAdmin` for privileged operations that bypass Row Level Security. Responses are automatically formatted as JSON. This is the recommended approach for most applications:
 
 ```ts index.ts
-import { createClient } from 'npm:@supabase/supabase-js@2'
+import { withSupabase } from 'npm:@supabase/server@^1'
 
-Deno.serve(async (req) => {
-  try {
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_PUBLISHABLE_KEY') ?? '',
-      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
-    )
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
+    try {
+      // ctx.supabase respects the caller's RLS policies.
+      // ctx.supabaseAdmin bypasses RLS for privileged operations.
+      const { data, error } = await ctx.supabase.from('countries').select('*')
 
-    const { data, error } = await supabase.from('countries').select('*')
+      if (error) {
+        throw error
+      }
 
-    if (error) {
-      throw error
+      return Response.json({ data })
+    } catch (err) {
+      return Response.json({ error: String(err?.message ?? err) }, { status: 500 })
     }
-
-    return new Response(JSON.stringify({ data }), {
-      headers: { 'Content-Type': 'application/json' },
-      status: 200,
-    })
-  } catch (err) {
-    return new Response(String(err?.message ?? err), { status: 500 })
-  }
-})
+  }),
+}
 ```
 
 This enables:

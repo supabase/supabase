@@ -2,20 +2,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { components } from 'api-types'
 import { toast } from 'sonner'
 
+import { optionalSecret } from './destination-secret-utils'
 import { replicationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DestinationConfig =
-  | {
-      bigQuery: BigQueryDestinationConfig
-    }
-  | {
-      iceberg: IcebergDestinationConfig
-    }
-  | {
-      ducklake: DucklakeDestinationConfig
-    }
+  | { bigQuery: BigQueryDestinationConfig }
+  | { iceberg: IcebergDestinationConfig }
+  | { ducklake: DucklakeDestinationConfig }
+  | { snowflake: SnowflakeDestinationConfig }
 
 export type BigQueryDestinationConfig = {
   projectId: string
@@ -35,7 +31,9 @@ export type IcebergDestinationConfig = {
   s3Region: string
 }
 
-export type DucklakeDestinationConfig = {
+// "Custom parameters" DuckLake: caller provides the PostgreSQL catalog URL and the
+// S3-compatible storage credentials directly.
+export type DucklakeManualDestinationConfig = {
   catalogUrl: string
   dataPath: string
   poolSize?: number
@@ -46,6 +44,88 @@ export type DucklakeDestinationConfig = {
   s3UrlStyle?: 'path' | 'vhost'
   s3UseSsl?: boolean
   metadataSchema?: string
+}
+
+// "Use Supabase" DuckLake: caller provides Supabase project refs and a bucket; the platform
+// API resolves these into a catalog URL + provisioned S3 credentials before persisting.
+export type DucklakeSupabaseDestinationConfig = {
+  catalogProjectRef: string
+  storageProjectRef: string
+  bucket: string
+  path?: string
+  poolSize?: number
+  metadataSchema?: string
+}
+
+export type DucklakeDestinationConfig =
+  | DucklakeManualDestinationConfig
+  | DucklakeSupabaseDestinationConfig
+
+function isDucklakeSupabaseConfig(
+  config: DucklakeDestinationConfig
+): config is DucklakeSupabaseDestinationConfig {
+  return 'catalogProjectRef' in config
+}
+
+const maybeOmitBlankSecret = (value: string | undefined, omitBlankSecrets: boolean) => {
+  if (omitBlankSecrets) return optionalSecret(value)
+
+  return value
+}
+
+// Maps the studio-side DuckLake config to the snake_case `{ ducklake: ... }` payload accepted
+// by the platform API. Shared by the create / update / validate mutations.
+export function buildDucklakeApiConfig(
+  config: DucklakeDestinationConfig,
+  options: { omitBlankSecrets?: boolean } = {}
+) {
+  const omitBlankSecrets = options.omitBlankSecrets ?? false
+
+  if (isDucklakeSupabaseConfig(config)) {
+    return {
+      ducklake: {
+        // pool_size / metadata_schema live on the catalog so they apply to the selected
+        // Supabase Postgres catalog (the API resolves catalog-level values over top-level).
+        catalog: {
+          type: 'supabase_project' as const,
+          project_ref: config.catalogProjectRef,
+          pool_size: config.poolSize,
+          metadata_schema: config.metadataSchema,
+        },
+        storage: {
+          type: 'supabase_storage' as const,
+          project_ref: config.storageProjectRef,
+          bucket: config.bucket,
+          ...(config.path ? { path: config.path } : {}),
+        },
+      },
+    }
+  }
+
+  return {
+    ducklake: {
+      catalog_url: maybeOmitBlankSecret(config.catalogUrl, omitBlankSecrets),
+      data_path: config.dataPath,
+      pool_size: config.poolSize,
+      s3_access_key_id: maybeOmitBlankSecret(config.s3AccessKeyId, omitBlankSecrets),
+      s3_secret_access_key: maybeOmitBlankSecret(config.s3SecretAccessKey, omitBlankSecrets),
+      s3_region: config.s3Region,
+      s3_endpoint: config.s3Endpoint,
+      s3_url_style: config.s3UrlStyle,
+      s3_use_ssl: config.s3UseSsl,
+      metadata_schema: config.metadataSchema,
+    },
+  }
+}
+
+export type SnowflakeDestinationConfig = {
+  accountId: string
+  user: string
+  privateKey: string
+  privateKeyPassphrase?: string
+  database: string
+  schema: string
+  role?: string
 }
 
 export type BatchConfig = {
@@ -125,35 +205,28 @@ async function createDestinationPipeline(
       },
     }
   } else if ('ducklake' in destinationConfig) {
-    const {
-      catalogUrl,
-      dataPath,
-      poolSize,
-      s3AccessKeyId,
-      s3SecretAccessKey,
-      s3Region,
-      s3Endpoint,
-      s3UrlStyle,
-      s3UseSsl,
-      metadataSchema,
-    } = destinationConfig.ducklake
+    destination_config = buildDucklakeApiConfig(
+      destinationConfig.ducklake
+    ) as components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
+  } else if ('snowflake' in destinationConfig) {
+    const { accountId, user, privateKey, privateKeyPassphrase, database, schema, role } =
+      destinationConfig.snowflake
 
     destination_config = {
-      ducklake: {
-        catalog_url: catalogUrl,
-        data_path: dataPath,
-        pool_size: poolSize,
-        s3_access_key_id: s3AccessKeyId,
-        s3_secret_access_key: s3SecretAccessKey,
-        s3_region: s3Region,
-        s3_endpoint: s3Endpoint,
-        s3_url_style: s3UrlStyle,
-        s3_use_ssl: s3UseSsl,
-        metadata_schema: metadataSchema,
+      snowflake: {
+        account_id: accountId,
+        user,
+        private_key: privateKey,
+        private_key_passphrase: privateKeyPassphrase,
+        database,
+        schema,
+        role,
       },
     } as unknown as components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
   } else {
-    throw new Error('Invalid destination config: must specify bigQuery, iceberg, or ducklake')
+    throw new Error(
+      'Invalid destination config: must specify bigQuery, iceberg, ducklake, or snowflake'
+    )
   }
 
   const pipeline_config = {

@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 
 import { materializedViewKeys } from './keys'
 import { entityTypeKeys } from '@/data/entity-types/keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { tableEditorKeys } from '@/data/table-editor/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -60,7 +60,7 @@ export const useMaterializedViewDeleteMutation = ({
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: tableEditorKeys.tableEditor(projectRef, id) }),
         queryClient.invalidateQueries({
-          queryKey: materializedViewKeys.listBySchema(projectRef, schema),
+          queryKey: materializedViewKeys.listBySchema(projectRef, [schema]),
         }),
         queryClient.invalidateQueries({ queryKey: entityTypeKeys.list(projectRef) }),
       ])

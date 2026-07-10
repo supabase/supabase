@@ -195,7 +195,10 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Exchange auth code for user's access and refresh token */
+    /**
+     * [Beta] Exchange auth code for user's access and refresh token
+     * @description Supports `authorization_code`, `refresh_token`, and `urn:ietf:params:oauth:grant-type:jwt-bearer` grant types. The `jwt-bearer` grant type (IDJAG — identity-directed JWT assertion) is in beta and available on Team and Enterprise plans only.
+     */
     post: operations['v1-exchange-oauth-token']
     delete?: never
     options?: never
@@ -1818,6 +1821,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v1/projects/{ref}/restart': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Restarts the given project */
+    post: operations['v1-restart-a-project']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v1/projects/{ref}/restore': {
     parameters: {
       query?: never
@@ -2162,6 +2182,7 @@ export interface components {
         | 'auth_mfa_phone'
         | 'auth_mfa_web_authn'
         | 'log_drain'
+        | 'etl_pipeline'
       addon_variant:
         | (
             | 'ci_micro'
@@ -3236,6 +3257,7 @@ export interface components {
           | 'auth_mfa_phone'
           | 'auth_mfa_web_authn'
           | 'log_drain'
+          | 'etl_pipeline'
         variants: {
           id:
             | (
@@ -3264,6 +3286,7 @@ export interface components {
             | 'auth_mfa_phone_default'
             | 'auth_mfa_web_authn_default'
             | 'log_drain_default'
+            | 'etl_pipeline_default'
           /** @description Any JSON-serializable value */
           meta?: unknown
           name: string
@@ -3287,6 +3310,7 @@ export interface components {
           | 'auth_mfa_phone'
           | 'auth_mfa_web_authn'
           | 'log_drain'
+          | 'etl_pipeline'
         variant: {
           id:
             | (
@@ -3315,6 +3339,7 @@ export interface components {
             | 'auth_mfa_phone_default'
             | 'auth_mfa_web_authn_default'
             | 'log_drain_default'
+            | 'etl_pipeline_default'
           /** @description Any JSON-serializable value */
           meta?: unknown
           name: string
@@ -3485,13 +3510,18 @@ export interface components {
      *       "scope": "projects:read projects:write"
      *     } */
     OAuthTokenBody: {
+      /** @description IDJAG assertion JWT for grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer. Beta - available on Team and Enterprise plans only. */
+      assertion?: string
       /** Format: uuid */
       client_id?: string
       client_secret?: string
       code?: string
       code_verifier?: string
       /** @enum {string} */
-      grant_type?: 'authorization_code' | 'refresh_token'
+      grant_type?:
+        | 'authorization_code'
+        | 'refresh_token'
+        | 'urn:ietf:params:oauth:grant-type:jwt-bearer'
       redirect_uri?: string
       refresh_token?: string
       /**
@@ -3504,7 +3534,8 @@ export interface components {
     OAuthTokenResponse: {
       access_token: string
       expires_in: number
-      refresh_token: string
+      /** @description The `urn:ietf:params:oauth:grant-type:jwt-bearer` grant type issues access tokens only, no refresh token is returned and the token cannot be revoked via `/v1/oauth/revoke`. */
+      refresh_token?: string
       /** @enum {string} */
       token_type: 'Bearer'
     }
@@ -3643,8 +3674,21 @@ export interface components {
     PostgresConfigResponse: {
       /** @description Default unit: s */
       checkpoint_timeout?: string
+      'cron.log_statement'?: boolean
       effective_cache_size?: string
       hot_standby_feedback?: boolean
+      /** @description Default unit: ms */
+      log_autovacuum_min_duration?: string
+      log_checkpoints?: boolean
+      log_connections?: boolean
+      log_disconnections?: boolean
+      log_duration?: boolean
+      log_lock_waits?: boolean
+      log_recovery_conflict_waits?: boolean
+      log_replication_commands?: boolean
+      /** @description Default unit: ms */
+      log_startup_progress_interval?: string
+      log_temp_files?: string
       logical_decoding_work_mem?: string
       maintenance_work_mem?: string
       max_connections?: number
@@ -3782,10 +3826,20 @@ export interface components {
             type: 'project_hibernating'
           }
       )[]
-      warnings: {
-        /** @enum {string} */
-        type: 'pg_graphql_introspection_change'
-      }[]
+      warnings: (
+        | {
+            /** @enum {string} */
+            type: 'pg_graphql_introspection_change'
+          }
+        | {
+            /** @enum {string} */
+            type: 'ltree_reindex_required'
+          }
+        | {
+            /** @enum {string} */
+            type: 'operator_estimator_gate'
+          }
+      )[]
     }
     ProjectUpgradeInitiateResponse: {
       tracking_id: string
@@ -4511,8 +4565,21 @@ export interface components {
     UpdatePostgresConfigBody: {
       /** @description Default unit: s */
       checkpoint_timeout?: string
+      'cron.log_statement'?: boolean
       effective_cache_size?: string
       hot_standby_feedback?: boolean
+      /** @description Default unit: ms */
+      log_autovacuum_min_duration?: string
+      log_checkpoints?: boolean
+      log_connections?: boolean
+      log_disconnections?: boolean
+      log_duration?: boolean
+      log_lock_waits?: boolean
+      log_recovery_conflict_waits?: boolean
+      log_replication_commands?: boolean
+      /** @description Default unit: ms */
+      log_startup_progress_interval?: string
+      log_temp_files?: string
       logical_decoding_work_mem?: string
       maintenance_work_mem?: string
       max_connections?: number
@@ -5789,7 +5856,7 @@ export interface operations {
       }
     }
     responses: {
-      201: {
+      200: {
         headers: {
           [name: string]: unknown
         }
@@ -9912,7 +9979,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Feature requires a higher plan */
+      /** @description This feature requires the Enterprise organization plan. */
       402: {
         headers: {
           [name: string]: unknown
@@ -9987,7 +10054,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Feature requires a higher plan */
+      /** @description This feature requires the Enterprise organization plan. */
       402: {
         headers: {
           [name: string]: unknown
@@ -12153,7 +12220,7 @@ export interface operations {
       }
     }
     responses: {
-      201: {
+      204: {
         headers: {
           [name: string]: unknown
         }
@@ -12205,7 +12272,7 @@ export interface operations {
       }
     }
     responses: {
-      201: {
+      204: {
         headers: {
           [name: string]: unknown
         }
@@ -12213,6 +12280,13 @@ export interface operations {
       }
       /** @description Unauthorized */
       401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
         headers: {
           [name: string]: unknown
         }
@@ -12332,6 +12406,47 @@ export interface operations {
       }
       /** @description Failed to disable project's readonly mode */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-restart-a-project': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
         headers: {
           [name: string]: unknown
         }
@@ -13000,6 +13115,13 @@ export interface operations {
           'application/json': components['schemas']['VanitySubdomainConfigResponse']
         }
       }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Unauthorized */
       401: {
         headers: {
@@ -13102,6 +13224,13 @@ export interface operations {
           'application/json': components['schemas']['ActivateVanitySubdomainResponse']
         }
       }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Unauthorized */
       401: {
         headers: {
@@ -13155,6 +13284,13 @@ export interface operations {
         content: {
           'application/json': components['schemas']['SubdomainAvailabilityResponse']
         }
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Unauthorized */
       401: {

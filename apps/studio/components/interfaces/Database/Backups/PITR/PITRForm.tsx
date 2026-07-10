@@ -106,7 +106,7 @@ export function PITRForm({
         footer={
           <div className="flex items-center justify-end gap-3 p-6">
             <ButtonTooltip
-              type="default"
+              variant="default"
               disabled={disabled || !selectedDate || !isWithinRange}
               onClick={handleSubmit}
               tooltip={{
@@ -143,6 +143,7 @@ export function PITRForm({
                   '[&:not(:has(:disabled))]:border [&:not(:has(:disabled))]:border-stronger not-last:border-r-0 [&:not(:has(:disabled))]:bg-overlay-hover',
                   'rounded-none'
                 ),
+                day_button: 'w-full rounded-none',
                 selected: 'bg-brand-500!',
               }}
             />

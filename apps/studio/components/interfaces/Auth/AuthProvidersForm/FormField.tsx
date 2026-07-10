@@ -122,7 +122,7 @@ const FormField = ({
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
-                          type="outline"
+                          variant="outline"
                           className="w-full justify-start text-left font-normal px-3 py-4"
                           icon={<CalendarIcon className="h-4 w-4" />}
                           size="small"
@@ -299,7 +299,7 @@ const FormField = ({
                       {description ? <Markdown content={description} /> : null}
                       {properties.link && (
                         <span>
-                          <Button asChild type="default" size="tiny" icon={<ExternalLink />}>
+                          <Button asChild variant="default" size="tiny" icon={<ExternalLink />}>
                             <a href={properties.link} target="_blank" rel="noreferrer noopener">
                               Documentation
                             </a>

@@ -20,12 +20,12 @@ import {
   InputGroupText,
   Switch,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ToggleSpendCapButton } from '@/components/ui/ToggleSpendCapButton'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
@@ -63,7 +63,7 @@ export const RealtimeSettings = () => {
   const { data: policies, isSuccess: isSuccessPolicies } = useDatabasePoliciesQuery({
     projectRef,
     connectionString: project?.connectionString,
-    schema: 'realtime',
+    schemas: ['realtime'],
   })
 
   const isFreePlan = organization?.plan.id === 'free'
@@ -288,7 +288,7 @@ export const RealtimeSettings = () => {
                                       table. No messages will be received by users.
                                     </p>
 
-                                    <Button asChild type="default" className="mt-2">
+                                    <Button asChild variant="default" className="mt-2">
                                       <Link href={`/project/${projectRef}/realtime/policies`}>
                                         Create policy
                                       </Link>
@@ -552,13 +552,13 @@ export const RealtimeSettings = () => {
                 </div>
                 <div className="flex items-center gap-x-2">
                   {form.formState.isDirty && (
-                    <Button type="default" onClick={() => form.reset(data as any)}>
+                    <Button variant="default" onClick={() => form.reset(data as any)}>
                       Cancel
                     </Button>
                   )}
                   <Button
-                    type="primary"
-                    htmlType="submit"
+                    variant="primary"
+                    type="submit"
                     form={formId}
                     disabled={!canUpdateConfig || isUpdatingConfig || !form.formState.isDirty}
                     loading={isUpdatingConfig}

@@ -158,7 +158,7 @@ const EntityList = ({ entities }: { entities: Array<ExposedEntity> }) => {
       </CollapsibleContent>
       <CollapsibleTrigger asChild>
         <Button
-          type="text"
+          variant="text"
           size="tiny"
           className="px-0 h-auto text-xs text-foreground-lighter hover:text-foreground"
         >

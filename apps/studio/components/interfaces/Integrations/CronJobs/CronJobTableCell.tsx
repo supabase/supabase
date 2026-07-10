@@ -35,11 +35,12 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
+import { type CronTableColumn } from './CronJobs.constants'
 import { useDatabaseCronJobRunCommandMutation } from '@/data/database-cron-jobs/database-cron-job-run-mutation'
-import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
+import { type CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
 import { useDatabaseCronJobToggleMutation } from '@/data/database-cron-jobs/database-cron-jobs-toggle-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -75,8 +76,8 @@ const getNextRun = (schedule: string, lastRun?: string) => {
 }
 
 interface CronJobTableCellProps {
-  col: any
-  row: any
+  col: CronTableColumn
+  row: CronJob
   onSelectEdit: (job: CronJob) => void
   onSelectDelete: (job: CronJob) => void
 }
@@ -92,19 +93,20 @@ export const CronJobTableCell = ({
 
   const [showToggleModal, setShowToggleModal] = useState(false)
 
-  const value = row?.[col.id]
+  const value = row?.[col.id as keyof typeof row]
   const { jobid, schedule, latest_run, status, active, jobname } = row
 
-  const formattedValue =
+  const formattedValue = (
     col.id === 'jobname' && !jobname
       ? 'No name provided'
       : col.id === 'lastest_run'
         ? !!value
-          ? dayjs(value).valueOf()
+          ? dayjs(value as string).valueOf()
           : undefined
         : col.id === 'next_run'
           ? getNextRun(schedule, latest_run)
           : value
+  ) as string
 
   const hasValue = col.id === 'next_run' ? !!formattedValue : col.id in row
 
@@ -147,7 +149,8 @@ export const CronJobTableCell = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              type="text"
+              variant="text"
+              aria-label="More actions"
               loading={isRunning}
               className="h-6 w-6"
               icon={<MoreVertical />}
@@ -203,13 +206,16 @@ export const CronJobTableCell = ({
   if (col.id === 'active') {
     return (
       <Dialog open={showToggleModal} onOpenChange={setShowToggleModal}>
-        <DialogTrigger className="flex items-center" onClick={(e) => e.stopPropagation()}>
-          <Switch
-            id={`cron-job-active-${jobid}`}
-            size="medium"
-            disabled={isToggling}
-            checked={active}
-          />
+        <DialogTrigger asChild onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center">
+            <Switch
+              id={`cron-job-active-${jobid}`}
+              aria-label={`${active ? 'Disable' : 'Enable'} cron job`}
+              size="medium"
+              disabled={isToggling}
+              checked={active}
+            />
+          </div>
         </DialogTrigger>
         <DialogContent
           onClick={(e) => e.stopPropagation()}
@@ -226,11 +232,11 @@ export const CronJobTableCell = ({
             </p>
           </DialogSection>
           <DialogFooter>
-            <Button type="default" onClick={() => setShowToggleModal(false)}>
+            <Button variant="default" onClick={() => setShowToggleModal(false)}>
               Cancel
             </Button>
             <Button
-              type={active ? 'warning' : 'primary'}
+              variant={active ? 'warning' : 'primary'}
               loading={isToggling}
               onClick={onConfirmToggle}
             >

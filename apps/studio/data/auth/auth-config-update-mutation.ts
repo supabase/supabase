@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import type { ProjectAuthConfigData } from './auth-config-query'
 import { authKeys } from './keys'
 import type { components } from '@/data/api'
 import { handleError, patch } from '@/data/fetchers'
@@ -46,10 +45,8 @@ export const useAuthConfigUpdateMutation = ({
       const { projectRef, skipInvalidation = false } = variables
 
       if (!skipInvalidation) {
-        queryClient.setQueryData<ProjectAuthConfigData>(authKeys.authConfig(projectRef), data)
         await queryClient.invalidateQueries({
           queryKey: authKeys.authConfig(projectRef),
-          refetchType: 'none',
         })
       }
 

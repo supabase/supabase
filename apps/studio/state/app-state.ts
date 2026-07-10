@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS as COMMON_LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { type ConnectSheetSource } from 'common/telemetry-constants'
 import { proxy, snapshot, useSnapshot } from 'valtio'
 
@@ -36,8 +36,8 @@ export const appState = proxy({
   isOptedInTelemetry: false,
   setIsOptedInTelemetry: (value: boolean | null) => {
     appState.isOptedInTelemetry = value === null ? false : value
-    if (typeof window !== 'undefined' && value !== null) {
-      localStorage.setItem(COMMON_LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
+    if (value !== null) {
+      safeLocalStorage.setItem(COMMON_LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT, value.toString())
     }
   },
 

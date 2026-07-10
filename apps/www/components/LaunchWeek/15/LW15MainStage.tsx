@@ -134,7 +134,11 @@ const DayCardShipped = ({ day }: { day: WeekDayProps }) => {
             className="block lg:opacity-0 lg:blur-lg duration-300 group-hover/main:lg:blur-none transition-all group-hover/main:lg:opacity-100"
             ref={hiddenRef}
           >
-            <Button type="outline" size="small" className="text-current rounded-xs border-dashed">
+            <Button
+              variant="outline"
+              size="small"
+              className="text-current rounded-xs border-dashed"
+            >
               <Link href={day.blog!}>Read more</Link>
             </Button>
           </div>

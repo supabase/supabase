@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
@@ -227,7 +227,7 @@ export default function OptOutPage() {
               )}
             </div>
 
-            <Button htmlType="submit" size="small" disabled={submissionType === 'success'}>
+            <Button type="submit" size="small" disabled={submissionType === 'success'}>
               Report spam
             </Button>
             <FormMessage

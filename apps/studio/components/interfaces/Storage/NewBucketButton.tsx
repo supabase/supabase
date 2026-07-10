@@ -16,7 +16,7 @@ export const CreateBucketButton = ({
     <ButtonTooltip
       block
       size="tiny"
-      type="primary"
+      variant="primary"
       className="w-fit"
       icon={<Plus size={14} />}
       disabled={!canCreateBuckets}

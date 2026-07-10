@@ -1,7 +1,9 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
 import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { ReactNode } from 'react'
+import { toast } from 'sonner'
 import {
   Badge,
   Button,
@@ -14,6 +16,9 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   ScrollArea,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import {
   Select,
@@ -25,11 +30,12 @@ import {
 import { AdvisorRulesPreview } from './AdvisorRulesPreview'
 import { CLSPreview } from './CLSPreview'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
+import { IntegrationsLayoutPreview } from './IntegrationsLayoutPreview'
 import { JitDbAccessPreview } from './JitDbAccessPreview'
-import { MarketplacePreview } from './MarketplacePreview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
 import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
 import { RLSTesterPreview } from './RLSTesterPreview'
+import { SqlEditorManualSavePreview } from './SqlEditorManualSavePreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
 import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
@@ -47,10 +53,12 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]: <PlatformWebhooksPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]: <JitDbAccessPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]: <RLSTesterPreview />,
-  [LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]: <MarketplacePreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]: <SqlEditorManualSavePreview />,
+  [LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]: <IntegrationsLayoutPreview />,
 }
 
 export const FeaturePreviewModal = () => {
+  const router = useRouter()
   const { ref } = useParams()
   const featurePreviews = useFeaturePreviews()
   const {
@@ -78,18 +86,40 @@ export const FeaturePreviewModal = () => {
     allFeaturePreviews[0]
   const isSelectedFeatureEnabled = flags[selectedFeature?.key]
 
+  const selectedFeatureRoute = selectedFeature?.getRoute?.(ref)
+  const hasRoute = selectedFeatureRoute !== undefined && ref !== undefined
+
   const toggleFeature = () => {
     if (!selectedFeature) return
+
+    const isEnabling = !isSelectedFeatureEnabled
 
     if (selectedFeature.key === LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER) {
       dismissBanner('rls-tester-banner')
       setIsDismissedRlsTesterBanner(true)
     }
 
-    onUpdateFlag(selectedFeature.key, !isSelectedFeatureEnabled)
-    track(isSelectedFeatureEnabled ? 'feature_preview_disabled' : 'feature_preview_enabled', {
+    onUpdateFlag(selectedFeature.key, isEnabling)
+    track(isEnabling ? 'feature_preview_enabled' : 'feature_preview_disabled', {
       feature: selectedFeature.key,
     })
+
+    if (!isEnabling) {
+      toast(`${selectedFeature.name} disabled`)
+      return
+    }
+
+    toggleFeaturePreviewModal(false)
+    if (hasRoute) {
+      router.push(selectedFeatureRoute)
+      toast.success(`${selectedFeature.name} enabled`, {
+        description: "We've taken you to where you can try it out.",
+      })
+    } else {
+      toast.success(`${selectedFeature.name} enabled`, {
+        description: "It's now active across the dashboard.",
+      })
+    }
   }
 
   return (
@@ -152,12 +182,12 @@ export const FeaturePreviewModal = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="h-auto min-h-0 max-h-auto md:max-h-[550px] p-4 pb-0 flex flex-col">
+              <div className="w-full h-auto min-h-0 max-h-auto md:max-h-[550px] p-4 pb-0 flex flex-col">
                 <div className="flex items-center justify-between border-b gap-2 pb-3">
                   <p>{selectedFeature?.name}</p>
                   <div className="flex items-center gap-x-2">
                     {selectedFeature?.discussionsUrl !== undefined && (
-                      <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                      <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
                         <Link
                           href={selectedFeature.discussionsUrl}
                           target="_blank"
@@ -167,9 +197,24 @@ export const FeaturePreviewModal = () => {
                         </Link>
                       </Button>
                     )}
-                    <Button type="default" onClick={() => toggleFeature()}>
-                      {isSelectedFeatureEnabled ? 'Disable' : 'Enable'} feature
-                    </Button>
+                    {isSelectedFeatureEnabled ? (
+                      <Button variant="default" onClick={() => toggleFeature()}>
+                        Disable feature
+                      </Button>
+                    ) : (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="default" onClick={() => toggleFeature()}>
+                            Enable feature
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="max-w-64 text-center">
+                          {hasRoute
+                            ? 'Enables the feature and takes you to where you can try it out'
+                            : 'Enables this preview across the dashboard'}
+                        </TooltipContent>
+                      </Tooltip>
+                    )}
                   </div>
                 </div>
                 <div className="overflow-y-scroll pt-3 pb-4">
@@ -186,7 +231,7 @@ export const FeaturePreviewModal = () => {
                   Have an idea for the dashboard? Let us know via GitHub Discussions!
                 </p>
               </div>
-              <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
+              <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
                 <Link
                   href="https://github.com/orgs/supabase/discussions/categories/feature-requests"
                   target="_blank"

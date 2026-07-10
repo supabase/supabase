@@ -79,7 +79,7 @@ export const MarketplaceFilterBar = ({
   return (
     <div
       className={cn(
-        'sticky top-0 z-5 -mx-6 flex flex-wrap items-center gap-2 px-6 py-3 xl:-mx-10 xl:px-10',
+        'sticky top-0 z-20 -mx-6 flex flex-wrap items-center gap-2 px-6 py-3 xl:-mx-10 xl:px-10',
         'bg-dash-sidebar/95 backdrop-blur',
         showClear ? 'border-b border-muted' : 'border-b border-transparent'
       )}
@@ -97,7 +97,7 @@ export const MarketplaceFilterBar = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" iconRight={<ChevronDown />} className={triggerCls}>
+          <Button variant="default" iconRight={<ChevronDown />} className={triggerCls}>
             <span className="truncate">Category: {categoryLabel}</span>
           </Button>
         </DropdownMenuTrigger>
@@ -136,7 +136,7 @@ export const MarketplaceFilterBar = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" iconRight={<ChevronDown />} className={triggerCls}>
+          <Button variant="default" iconRight={<ChevronDown />} className={triggerCls}>
             <span className="truncate">Type: {typeLabel}</span>
           </Button>
         </DropdownMenuTrigger>
@@ -170,7 +170,7 @@ export const MarketplaceFilterBar = ({
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="default" iconRight={<ChevronDown />} className={triggerCls}>
+          <Button variant="default" iconRight={<ChevronDown />} className={triggerCls}>
             <span className="truncate">Source: {sourceLabel}</span>
           </Button>
         </DropdownMenuTrigger>

@@ -5,7 +5,7 @@ import { IS_PLATFORM } from 'common'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { getOrgAIDetails, getProjectAIDetails } from '@/lib/ai/ai-details'
 import { isTracingAllowed } from '@/lib/ai/braintrust-logger'
@@ -20,7 +20,7 @@ import {
   type AssistantModelId,
 } from '@/lib/ai/model.utils'
 import { getTools } from '@/lib/ai/tools'
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 import { getURL } from '@/lib/helpers'
 
@@ -62,6 +62,7 @@ const requestBodySchema = z.object({
   table: z.string().optional(),
   chatId: z.string().optional(),
   chatName: z.string().optional(),
+  supportMode: z.boolean().optional(),
   orgSlug: z.string().optional(),
   model: z.string().optional(),
 })
@@ -91,6 +92,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     chatId,
     chatName,
     model: rawRequestedModel,
+    supportMode,
   } = data
 
   const requestedModel: AssistantModelId | undefined =
@@ -165,6 +167,9 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     const abortController = new AbortController()
     req.on('close', () => abortController.abort())
     req.on('aborted', () => abortController.abort())
+    // Fires when the response finishes streaming or the connection drops, which
+    // is what tears down the remote MCP connection opened in getTools.
+    res.on('close', () => abortController.abort())
 
     const tools = await getTools({
       projectRef,
@@ -173,6 +178,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       aiOptInLevel,
       accessToken,
       baseUrl: getURL(),
+      supportMode,
+      signal: abortController.signal,
     })
 
     // Get a list of all schemas to add to context
@@ -213,6 +220,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
         projectIsSensitive,
         projectRegion,
       }),
+      supportMode,
       userId,
       orgId,
       planId,

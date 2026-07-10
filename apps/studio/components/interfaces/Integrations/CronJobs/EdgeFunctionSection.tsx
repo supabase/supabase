@@ -103,7 +103,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
         <div className="space-y-1">
           <p className="text-sm text-foreground-light">Select which edge function to trigger</p>
           {isLoading ? (
-            <Button type="default" className="justify-start" block size="small" loading>
+            <Button variant="default" className="justify-start" block size="small" loading>
               Loading edge functions...
             </Button>
           ) : (
@@ -129,7 +129,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
-                        type="default"
+                        variant="default"
                         role="combobox"
                         aria-expanded={open}
                         aria-controls={listboxId}

@@ -10,8 +10,9 @@
 #   sudo bash tests/test-pg17-upgrade.sh
 #
 # Prerequisites:
-#   - Running self-hosted Supabase with a clean, tests-only Postgres 15:
-#       docker compose up -d
+#   - Running self-hosted Supabase with a clean, tests-only Postgres 15.
+#     Postgres 17 is now the default, so start PG 15 explicitly via the override:
+#       docker compose -f docker-compose.yml -f docker-compose.pg15.yml up -d
 #   - .env file with POSTGRES_PASSWORD, ANON_KEY
 #
 
@@ -48,7 +49,7 @@ echo ""
 current_version=$(run_sql -A -t -c "SHOW server_version;" | head -1)
 case "$current_version" in
     15.*) echo "Starting version: PostgreSQL $current_version" ;;
-    17.*) echo "Error: Already on Postgres 17. Start with a PG15 stack."; exit 1 ;;
+    17.*) echo "Error: Already on Postgres 17. Start with a PG 15 stack."; exit 1 ;;
     *) echo "Error: Unexpected version: $current_version"; exit 1 ;;
 esac
 
@@ -88,6 +89,21 @@ $$;
 
 -- Grant access so PostgREST can read it
 GRANT SELECT ON public._upgrade_test TO anon, authenticated;
+
+-- pg_cron: created here as supabase_admin (the common manually-enabled case),
+-- so the extension is owned by supabase_admin, NOT postgres. complete.sh's
+-- drop+recreate only fires for postgres-owned pg_cron, so this exercises the
+-- version reconcile in the upgrade script: Supabase PG 15 registers pg_cron
+-- as '1.6', while the target image packages it as '1.6.4' with no update
+-- path between them.
+CREATE EXTENSION IF NOT EXISTS pg_cron;
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'upgrade_test_job') THEN
+        PERFORM cron.unschedule('upgrade_test_job');
+    END IF;
+END $$;
+SELECT cron.schedule('upgrade_test_job', '5 4 * * *', 'SELECT 1');
 EOSQL
 
 pre_count=$(run_sql -A -t -c "SELECT count(*) FROM public._upgrade_test;" | tr -d '[:space:]')
@@ -95,6 +111,37 @@ pre_checksum=$(run_sql -A -t -c "SELECT md5(string_agg(name || value::text, ',' 
 
 echo "  Rows: $pre_count"
 echo "  Checksum: $pre_checksum"
+
+# --- Seed a Vault secret ---------------------------------------------------
+# Verifies the pgsodium root key survives the volume swap/chown AND that Vault
+# secrets still decrypt on Postgres 17. For legacy (key_id-based) secrets this
+# also exercises complete.sh's pgsodium->Vault re-encryption; on a stock
+# self-hosted stack the secret is already pgsodium-less, so this confirms the
+# round-trip and the post-upgrade invariant (key_id IS NULL).
+VAULT_SECRET_NAME="upgrade_test_secret"
+VAULT_SECRET_VALUE="upgrade-test-secret-value-42"
+vault_available="f"
+if [ "$(run_sql -A -t -c "SELECT EXISTS (SELECT 1 FROM pg_available_extensions WHERE name = 'supabase_vault');" | tr -d '[:space:]')" = "t" ]; then
+    echo ""
+    echo "Seeding Vault secret on Postgres 15..."
+    run_sql <<EOSQL
+CREATE EXTENSION IF NOT EXISTS supabase_vault;
+-- Pre-clean so a re-run after a mid-run failure (where the trailing cleanup
+-- never executed) does not abort on the unique (name) index.
+DELETE FROM vault.secrets WHERE name = '${VAULT_SECRET_NAME}';
+SELECT vault.create_secret('${VAULT_SECRET_VALUE}', '${VAULT_SECRET_NAME}', 'pg17 upgrade test');
+EOSQL
+    pre_secret=$(run_sql -A -t -c "SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = '${VAULT_SECRET_NAME}';" | tr -d '\n')
+    if [ "$pre_secret" = "$VAULT_SECRET_VALUE" ]; then
+        echo "  Seeded '${VAULT_SECRET_NAME}' (decrypts correctly on PG 15)"
+    else
+        echo "  Warning: seeded secret did not decrypt as expected on PG 15" >&2
+    fi
+    vault_available="t"
+else
+    echo ""
+    echo "Skipping Vault seed: supabase_vault extension not available."
+fi
 
 # --- Run upgrade -----------------------------------------------------------
 
@@ -111,11 +158,37 @@ echo ""
 echo "Running pgTAP verification..."
 echo ""
 
-# Use a non-quoted heredoc so $pre_count and $pre_checksum are interpolated
+# Optional Vault assertions, only when a secret was seeded above.
+vault_plan=0
+vault_tests=""
+if [ "$vault_available" = "t" ]; then
+    vault_plan=3
+    vault_tests=$(cat <<EOSQL
+-- Vault secret survived the upgrade and still decrypts (root key intact).
+SELECT ok(
+    EXISTS (SELECT 1 FROM vault.secrets WHERE name = '${VAULT_SECRET_NAME}'),
+    'Vault secret survived upgrade'
+);
+SELECT is(
+    (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = '${VAULT_SECRET_NAME}'),
+    '${VAULT_SECRET_VALUE}',
+    'Vault secret still decrypts to original plaintext after upgrade'
+);
+SELECT ok(
+    (SELECT key_id IS NULL FROM vault.secrets WHERE name = '${VAULT_SECRET_NAME}'),
+    'Vault secret is in pgsodium-less format (key_id IS NULL) after upgrade'
+);
+EOSQL
+)
+fi
+total_plan=$((16 + vault_plan))
+
+# Use a non-quoted heredoc so $pre_count, $pre_checksum, $total_plan and
+# $vault_tests are interpolated.
 run_sql <<EOSQL
 CREATE EXTENSION IF NOT EXISTS pgtap;
 
-SELECT plan(11);
+SELECT plan(${total_plan});
 
 -- Version
 SELECT ok(version() LIKE 'PostgreSQL 17%', 'Running Postgres 17');
@@ -169,6 +242,37 @@ SELECT ok(
     'postgres role is not superuser'
 );
 
+-- pg_cron: registered as 1.6 on PG 15; the upgrade must reconcile the version
+-- label to the target's packaged 1.6.4 and preserve scheduled jobs.
+SELECT ok(
+    EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'pg_cron'),
+    'pg_cron extension exists'
+);
+SELECT is(
+    (SELECT extversion FROM pg_extension WHERE extname = 'pg_cron'),
+    '1.6.4',
+    'pg_cron version label reconciled to 1.6.4'
+);
+SELECT ok(
+    EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'upgrade_test_job'),
+    'pg_cron scheduled job survived the upgrade'
+);
+
+-- New predefined role (initdb-only migration; the target image's supautils.conf
+-- references it, so it must exist on an upgraded instance).
+SELECT ok(
+    EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'supabase_privileged_role'),
+    'supabase_privileged_role exists'
+);
+
+-- Extension version reconcile: complete.sh ran with .063 binaries, so the
+-- catalog should be reconciled to the target image's default version.
+SELECT is(
+    (SELECT extversion FROM pg_extension WHERE extname = 'pg_net'),
+    (SELECT default_version FROM pg_available_extensions WHERE name = 'pg_net'),
+    'pg_net version reconciled to image default'
+);
+${vault_tests}
 SELECT * FROM finish(true);
 EOSQL
 
@@ -222,6 +326,18 @@ run_sql <<'EOSQL' || true
 DROP FUNCTION IF EXISTS public._upgrade_test_fn(int);
 DROP TABLE IF EXISTS public._upgrade_test;
 DROP EXTENSION IF EXISTS pgtap;
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'upgrade_test_job') THEN
+        PERFORM cron.unschedule('upgrade_test_job');
+    END IF;
+END $$;
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM pg_extension WHERE extname = 'supabase_vault') THEN
+        DELETE FROM vault.secrets WHERE name = 'upgrade_test_secret';
+    END IF;
+END $$;
 EOSQL
 
 # --- Summary --------------------------------------------------------------

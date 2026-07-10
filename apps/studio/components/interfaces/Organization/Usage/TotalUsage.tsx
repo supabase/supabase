@@ -7,7 +7,7 @@ import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/B
 import { BillingMetric } from '../BillingSettings/BillingBreakdown/BillingMetric'
 import { ComputeMetric } from '../BillingSettings/BillingBreakdown/ComputeMetric'
 import { SectionContent } from './SectionContent'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import {
   ComputeUsageMetric,
   computeUsageMetricLabel,

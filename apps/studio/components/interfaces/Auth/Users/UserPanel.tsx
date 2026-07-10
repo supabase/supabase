@@ -7,10 +7,10 @@ import {
   Input,
   ResizableHandle,
   ResizablePanel,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
@@ -59,12 +59,12 @@ export const UserPanel = () => {
       <ResizableHandle withHandle />
       <ResizablePanel defaultSize="35" maxSize="45" minSize="35" className="bg-studio border-t">
         <Button
-          type="text"
+          variant="text"
           className="absolute top-3 right-3 px-1"
           icon={<X />}
           onClick={() => setSelectedId(null)}
         />
-        <Tabs_Shadcn_
+        <Tabs
           value={view}
           className="flex flex-col h-full"
           onValueChange={(value) => setView(value as 'overview' | 'raw' | 'logs')}
@@ -78,39 +78,36 @@ export const UserPanel = () => {
             </div>
           ) : !!selectedUser ? (
             <>
-              <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[46px]">
-                <TabsTrigger_Shadcn_
+              <TabsList className="px-5 flex gap-x-4 min-h-[46px]">
+                <TabsTrigger
                   value="overview"
                   className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent shadow-none!"
                 >
                   Overview
-                </TabsTrigger_Shadcn_>
-                <TabsTrigger_Shadcn_
+                </TabsTrigger>
+                <TabsTrigger
                   value="logs"
                   className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
                 >
                   Logs
-                </TabsTrigger_Shadcn_>
-                <TabsTrigger_Shadcn_
+                </TabsTrigger>
+                <TabsTrigger
                   value="raw"
                   className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent shadow-none!"
                 >
                   Raw JSON
-                </TabsTrigger_Shadcn_>
-              </TabsList_Shadcn_>
+                </TabsTrigger>
+              </TabsList>
 
-              <TabsContent_Shadcn_
-                value="overview"
-                className={cn('mt-0 grow min-h-0 overflow-y-auto')}
-              >
+              <TabsContent value="overview" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
                 {selectedUser && (
                   <UserOverview user={selectedUser} onDeleteSuccess={() => setSelectedId(null)} />
                 )}
-              </TabsContent_Shadcn_>
-              <TabsContent_Shadcn_ value="logs" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
+              </TabsContent>
+              <TabsContent value="logs" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
                 {selectedUser && <UserLogs user={selectedUser} />}
-              </TabsContent_Shadcn_>
-              <TabsContent_Shadcn_
+              </TabsContent>
+              <TabsContent
                 value="raw"
                 className={cn('mt-0 grow min-h-0 overflow-y-auto', PANEL_PADDING)}
               >
@@ -124,7 +121,7 @@ export const UserPanel = () => {
                     className="mr-2"
                   />
                   <Button
-                    type="text"
+                    variant="text"
                     disabled={!searchQuery}
                     onClick={() => setSearchQuery('')}
                     className="text-xs"
@@ -135,7 +132,7 @@ export const UserPanel = () => {
                 <SimpleCodeBlock className="javascript" parentClassName="[&>*>span]:text-xs">
                   {JSON.stringify(filteredProperties, null, 2)}
                 </SimpleCodeBlock>
-              </TabsContent_Shadcn_>
+              </TabsContent>
             </>
           ) : (
             <div className="flex items-center justify-center w-full h-full flex-col gap-y-2">
@@ -145,7 +142,7 @@ export const UserPanel = () => {
               <p className="text-foreground-lighter text-xs">ID: {selectedId}</p>
             </div>
           )}
-        </Tabs_Shadcn_>
+        </Tabs>
       </ResizablePanel>
     </>
   )

@@ -1,7 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
+import { safeLocalStorage, safeSessionStorage } from 'common'
 import { useEffect } from 'react'
-import { toast } from 'sonner'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -39,12 +39,8 @@ export const SessionTimeoutModal = ({
   }, [visible])
 
   const handleClearStorage = () => {
-    try {
-      localStorage.clear()
-      sessionStorage.clear()
-    } catch (e) {
-      toast.error('Failed to clear browser storage')
-    }
+    safeLocalStorage.clear()
+    safeSessionStorage.clear()
     window.location.reload()
   }
 
@@ -67,7 +63,7 @@ export const SessionTimeoutModal = ({
                     Try a different browser or disable extensions that block network requests. If
                     the problem persists:
                   </p>
-                  <Button type="default" size="tiny" onClick={handleClearStorage}>
+                  <Button variant="default" size="tiny" onClick={handleClearStorage}>
                     Clear site data and reload
                   </Button>
                   <p>

@@ -70,6 +70,7 @@ export const ProjectCard = ({
     <>
       <li className="list-none h-min">
         <CardButton
+          tabIndex={0}
           linkHref={rewriteHref ? rewriteHref : `/project/${projectRef}`}
           className="h-44 px-0! group pt-5 pb-0 overflow-hidden relative"
           hideChevron
@@ -77,12 +78,12 @@ export const ProjectCard = ({
             <div className="w-full flex flex-col gap-y-4 justify-between px-5">
               <div className="flex flex-col gap-y-0.5 relative">
                 <div className="flex items-center justify-between">
-                  <h5 className="text-sm shrink truncate pr-5">{name}</h5>
+                  <h2 className="text-sm shrink truncate pr-5">{name}</h2>
                   <div onClick={(e) => e.preventDefault()}>
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
-                          type="text"
+                          variant="text"
                           icon={<MoreVertical size={14} />}
                           className="w-6 h-6 px-0"
                           onClick={(e) => {
@@ -90,6 +91,7 @@ export const ProjectCard = ({
                             e.preventDefault()
                           }}
                           onPointerDown={(e) => e.stopPropagation()}
+                          aria-label={`Project ${name} actions`}
                         />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="w-48">

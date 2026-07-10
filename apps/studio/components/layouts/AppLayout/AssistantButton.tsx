@@ -16,7 +16,7 @@ export const AssistantButton = () => {
 
   return (
     <ButtonTooltip
-      type="outline"
+      variant="outline"
       size="tiny"
       id="assistant-trigger"
       className={cn(

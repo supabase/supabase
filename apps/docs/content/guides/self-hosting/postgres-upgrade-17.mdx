@@ -4,39 +4,26 @@ description: 'Start a new self-hosted Supabase deployment with Postgres 17, or u
 subtitle: 'Start a new self-hosted Supabase deployment with Postgres 17, or upgrade an existing Postgres 15 installation.'
 ---
 
-Self-hosted Supabase ships with Postgres 15 by default. This guide covers two scenarios:
+Self-hosted Supabase ships with Postgres 17 by default. This guide covers two scenarios:
 
 - **New deployment** - start fresh with Postgres 17 (no existing data)
 - **Upgrade existing deployment** - migrate from Postgres 15 to Postgres 17 using `pg_upgrade`
 
-## Before you begin
-
-- Complete the [Self-Hosting with Docker](/docs/guides/self-hosting/docker) setup
-- Your current database image should be `supabase/postgres:15.x`
-
 ## New deployment with Postgres 17
 
-If you are starting a new self-hosted Supabase instance with **no existing data**, use the Postgres 17 compose override:
+Postgres 17 is the default, so a new self-hosted instance with **no existing data** starts on Postgres 17 - no override needed:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.pg17.yml up -d
+sh run.sh start
 ```
 
-This uses the `docker-compose.pg17.yml` override file which swaps the database image:
+The rest of the setup is unchanged (see the Docker install [guide](/docs/guides/self-hosting/docker)).
 
-```yaml name=docker-compose.pg17.yml
-services:
-  db:
-    image: supabase/postgres:17.6.1.084
-```
+<Admonition type="note" title="GraphQL is off by default">
 
-<Admonition type="tip">
-
-If you use the override file, remember to include both compose files when running commands. Alternatively, you can update the image tag directly in `docker-compose.yml` instead of using an override.
+On a fresh Postgres 17 deployment, the `pg_graphql` extension is **disabled by default**. Enable it from Studio (**Database** > **Extensions**) or with `create extension pg_graphql;`. Databases that already use GraphQL keep it after an upgrade.
 
 </Admonition>
-
-The rest of the setup is the same as for Postgres 15 (see the Docker install [guide](/docs/guides/self-hosting/docker)).
 
 {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
 If the new Postgres 17 container fails to start, make sure to check for an old `db-config` Docker volume. See [Postgres 17 fails to start with a leftover db-config volume](#postgres-17-fails-to-start-with-a-leftover-db-config-volume) for details.
@@ -54,7 +41,7 @@ Upgrading an existing deployment uses `pg_upgrade` to migrate data in place. The
 5. Runs additional tasks inside a temporary Postgres 17 container (re-enables extensions, applies patches, runs `VACUUM ANALYZE`)
 6. Swaps data directories (the original is kept as a backup)
 7. Starts self-hosted Supabase with Postgres 17
-8. Applies additional role migrations (new in Postgres 17)
+8. Applies post-upgrade migrations and reconciles extension versions to the target image
 
 ### Create a backup
 
@@ -121,16 +108,10 @@ The script might require your confirmation at some steps (e.g., while checking f
 
 ### After the upgrade
 
-After a successful upgrade, always use both compose files:
-
-```sh
-docker compose -f docker-compose.yml -f docker-compose.pg17.yml up -d
-```
-
 To verify that Postgres 17 is running:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.pg17.yml exec db psql -U postgres -c "SELECT version();"
+docker compose exec db psql -U postgres -c "SELECT version();"
 ```
 
 The original Postgres 15 data is preserved at `./volumes/db/data.bak.pg15`. The pgsodium root key is saved as `./volumes/db/pgsodium_root.key.bak.pg15`. The upgrade binaries tarball is cached at `./volumes/db/pg17_upgrade_bin_*.tar.gz`. Once you have verified that everything works, you can reclaim disk space:
@@ -152,14 +133,15 @@ Do not delete `data.bak.pg15` until you have verified the upgrade. Rollback is o
 If you need to revert to Postgres 15 (run the following commands as root):
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.pg17.yml down && \
+docker compose down && \
 rm -rf ./volumes/db/data && \
 mv ./volumes/db/data.bak.pg15 ./volumes/db/data && \
+sh run.sh config add pg15 && \
 docker compose run --rm db chown -R postgres:postgres /etc/postgresql-custom/ && \
-docker compose up -d
+sh run.sh start
 ```
 
-This restores the original data directory, fixes file ownership on the `db-config` volume (Supabase's Postgres 15 and 17 images use different user IDs), and starts with the old Postgres 15 image.
+This restores the original data directory, fixes file ownership on the `db-config` volume, and configures Supabase to use the old Postgres 15 image. Supabase's Postgres 15 and 17 images use different user IDs, so the `chown` and startup must run as Postgres 15.
 
 ### Custom Postgres configuration
 
@@ -182,13 +164,13 @@ EOF'
 Restart to apply (`max_connections` requires a full restart):
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.pg17.yml restart db
+sh run.sh restart db
 ```
 
 Verify the new settings:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.pg17.yml exec db psql -U postgres -c "SHOW max_connections;"
+docker compose exec db psql -U postgres -c "SHOW max_connections;"
 ```
 
 ### Upgrade process details
@@ -197,7 +179,7 @@ The upgrade script delegates the core migration work to two scripts from the [su
 
 **Phase 1 - Migrate data (Postgres 15 container):**
 
-1. Disables extensions that are incompatible with `pg_upgrade` (`pg_graphql`, `pg_stat_monitor`, `pg_backtrace`, `wrappers`, `pgrouting`) and generates SQL to re-enable them after the upgrade
+1. Disables extensions that are incompatible with `pg_upgrade` (`pg_graphql`, `pg_stat_monitor`, `pg_backtrace`) and generates SQL to re-enable them after the upgrade
 2. Temporarily grants superuser to the `postgres` role (required by `pg_upgrade`)
 3. Extracts the previously saved Postgres 17 binaries tarball and runs `initdb` to create a new empty database
 4. Runs `pg_upgrade --check` to verify the upgrade can succeed before making changes
@@ -213,7 +195,7 @@ The upgrade script delegates the core migration work to two scripts from the [su
 5. Grants predefined roles (`pg_monitor`, `pg_read_all_data`, `pg_signal_backend`, and on Postgres 16+ also `pg_create_subscription`) and revokes the temporary superuser grant
 6. Restarts Postgres and runs `vacuumdb --all --analyze-in-stages` to rebuild optimizer statistics
 
-After both phases complete, the upgrade script preserves the original Postgres 15 data directory as a backup and starts the full Supabase stack with Postgres 17.
+After both phases, the upgrade script applies migrations that normally run only on a fresh install, and reconciles installed extensions to the target image's versions. It then preserves the original Postgres 15 data directory as a backup and starts the full Supabase stack with Postgres 17.
 
 ## Troubleshooting
 
@@ -237,7 +219,7 @@ Then re-run the upgrade script. Replication slots will need to be manually recre
 The upgrade script fixes file ownership automatically (Postgres 15 and 17 use different UIDs). If you still see permission errors, run:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.pg17.yml run --rm db \
+docker compose run --rm db \
 chown -R postgres:postgres /var/lib/postgresql/data
 ```
 
@@ -252,8 +234,7 @@ The `db-config` named volume contains the pgsodium root encryption key at `/etc/
 Restart all services to pick up the new database:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.pg17.yml down && \
-docker compose -f docker-compose.yml -f docker-compose.pg17.yml up -d
+sh run.sh recreate
 ```
 
 ### Disk space issues during upgrade
@@ -281,9 +262,9 @@ If you are starting a **fresh** Postgres 17 deployment (not using the upgrade sc
 To fix, remove the old volume and let Postgres 17 initialize a clean configuration:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.pg17.yml down && \
+sh run.sh stop && \
 docker volume rm $(docker volume ls --filter "name=db-config" --format '{{.Name}}') && \
-docker compose -f docker-compose.yml -f docker-compose.pg17.yml up -d
+sh run.sh start
 ```
 
 <Admonition type="caution">
@@ -299,9 +280,10 @@ If the upgrade fails and the script's built-in rollback isn't sufficient, restor
 Restore the data:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.pg17.yml down && \
+docker compose down && \
 rm -rf ./volumes/db/data && \
-cp -a ./volumes/db/data-manual-backup ./volumes/db/data
+cp -a ./volumes/db/data-manual-backup ./volumes/db/data && \
+sh run.sh config add pg15
 ```
 
 Restore the pgsodium key to the `db-config` volume:
@@ -310,13 +292,13 @@ Restore the pgsodium key to the `db-config` volume:
 docker compose run --rm db \
   sh -c 'cat > /etc/postgresql-custom/pgsodium_root.key' < ./pgsodium_root.key.backup && \
 docker compose run --rm db \
-  chown postgres:postgres /etc/postgresql-custom/pgsodium_root.key && \
+  chown -R postgres:postgres /etc/postgresql-custom/ && \
 docker compose run --rm db \
   chmod 600 /etc/postgresql-custom/pgsodium_root.key
 ```
 
-Start Postgres 15:
+Start self-hosted Supabase with Postgres 15:
 
 ```sh
-docker compose up -d
+sh run.sh start
 ```

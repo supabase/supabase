@@ -45,23 +45,29 @@ const LegalDocVersions = ({ versions }: Props) => {
 
   return (
     <>
-      <div className="not-prose mb-8 flex items-center gap-3">
-        <label htmlFor="legal-doc-version" className="text-foreground-lighter text-sm">
-          Version
-        </label>
-        <Select value={activeId} onValueChange={handleChange}>
-          <SelectTrigger id="legal-doc-version" className="w-auto min-w-[260px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {versions.map((v) => (
-              <SelectItem key={v.id} value={v.id}>
-                {v.label} — {v.effectiveDate}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {versions.length > 1 ? (
+        <div className="not-prose mb-8 flex items-center gap-3">
+          <label htmlFor="legal-doc-version" className="text-foreground-lighter text-sm sr-only">
+            Version
+          </label>
+          <Select value={activeId} onValueChange={handleChange}>
+            <SelectTrigger id="legal-doc-version" className="w-auto min-w-[260px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {versions.map((v) => (
+                <SelectItem key={v.id} value={v.id}>
+                  {v.label} — {v.effectiveDate}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      ) : (
+        <p className="not-prose mb-8 text-sm text-foreground-lighter">
+          {versions[0].label} — {versions[0].effectiveDate}
+        </p>
+      )}
       <ActiveComponent />
     </>
   )

@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -30,10 +30,6 @@ import * as z from 'zod'
 
 import { StorageFileSizeLimitErrorMessage } from './StorageFileSizeLimitErrorMessage'
 import {
-  StorageListV2MigratingCallout,
-  StorageListV2MigrationCallout,
-} from './StorageListV2MigrationCallout'
-import {
   STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_CAPPED,
   STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED,
   StorageSizeUnits,
@@ -44,9 +40,9 @@ import {
   encodeBucketLimitErrorMessage,
 } from './StorageSettings.utils'
 import { ValidateSizeLimit } from './StorageSettings.ValidateSizeLimit'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from '@/data/config/project-storage-config-update-mutation'
@@ -70,8 +66,6 @@ export const StorageSettings = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
-  const showMigrationCallout = useFlag('storageMigrationCallout')
-
   const { can: canReadStorageSettings, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
     PermissionAction.STORAGE_ADMIN_READ,
     '*'
@@ -88,10 +82,6 @@ export const StorageSettings = () => {
     isSuccess,
     isError,
   } = useProjectStorageConfigQuery({ projectRef })
-  const isListV2UpgradeAvailable =
-    !!config && !config.capabilities.list_v2 && config.external.upstreamTarget === 'main'
-  const isListV2Upgrading =
-    !!config && !config.capabilities.list_v2 && config.external.upstreamTarget === 'canary'
 
   const {
     runCondition: sizeLimitCheckCondition,
@@ -282,210 +272,200 @@ export const StorageSettings = () => {
                   />
                 )}
                 {isSuccess && (
-                  <>
-                    {showMigrationCallout && (
-                      <>
-                        {isListV2UpgradeAvailable && <StorageListV2MigrationCallout />}
-                        {isListV2Upgrading && <StorageListV2MigratingCallout />}
-                      </>
-                    )}
-                    <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-                      <Card>
-                        <CardContent>
-                          <FormField
-                            control={form.control}
-                            name="imageTransformationEnabled"
-                            render={({ field }) => (
-                              <FormItemLayout
-                                layout="flex-row-reverse"
-                                label="Enable image transformation"
-                                description={
-                                  <>
-                                    Optimize and resize images on the fly.{' '}
-                                    <InlineLink
-                                      href={`${DOCS_URL}/guides/storage/serving/image-transformations`}
-                                    >
-                                      Learn more
-                                    </InlineLink>
-                                    .
-                                  </>
-                                }
-                              >
-                                <FormControl>
-                                  <Switch
-                                    size="large"
-                                    disabled={
-                                      !hasAccessToImageTransformations || !canUpdateStorageSettings
-                                    }
-                                    checked={hasAccessToImageTransformations && field.value}
-                                    onCheckedChange={field.onChange}
-                                  />
-                                </FormControl>
-                              </FormItemLayout>
-                            )}
-                          />
-                        </CardContent>
-
-                        <CardContent>
-                          <FormField
-                            control={form.control}
-                            name="fileSizeLimit"
-                            render={({ field }) => (
-                              <FormItemLayout
-                                hideMessage
-                                layout="flex-row-reverse"
-                                label="Global file size limit"
-                                className="[&>div]:md:w-1/2 [&>div]:xl:w-2/5 [&>div>div]:w-full [&>div]:min-w-100"
-                                description={
-                                  <>
-                                    Restrict the size of files uploaded across all buckets.{' '}
-                                    <InlineLink
-                                      href={`${DOCS_URL}/guides/storage/uploads/file-limits`}
-                                    >
-                                      Learn more
-                                    </InlineLink>
-                                    .
-                                    {!shouldAutoValidateBucketLimits && (
-                                      <p>
-                                        Ensure that the global limit is greater than that of
-                                        individual buckets
-                                      </p>
-                                    )}
-                                  </>
-                                }
-                              >
-                                <FormControl>
-                                  <div className="flex items-center justify-end">
-                                    <Input
-                                      type="number"
-                                      {...field}
-                                      onChange={(e) => {
-                                        field.onChange(e)
-                                        form.clearErrors('fileSizeLimit')
-                                      }}
-                                      className="w-32 rounded-r-none border-r-0"
-                                      disabled={
-                                        !hasAccessToFileSizeConfiguration ||
-                                        !canUpdateStorageSettings
-                                      }
-                                    />
-                                    <FormField
-                                      control={form.control}
-                                      name="unit"
-                                      render={({ field: unitField }) => (
-                                        <Select
-                                          value={unitField.value}
-                                          onValueChange={(val) => {
-                                            unitField.onChange(val)
-                                            form.clearErrors('fileSizeLimit')
-                                          }}
-                                          disabled={
-                                            !hasAccessToFileSizeConfiguration ||
-                                            !canUpdateStorageSettings
-                                          }
-                                        >
-                                          <SelectTrigger className="w-[90px] text-xs font-mono rounded-l-none bg-surface-300">
-                                            <SelectValue placeholder="Choose a prefix">
-                                              {storageUnit}
-                                            </SelectValue>
-                                          </SelectTrigger>
-                                          <SelectContent>
-                                            {Object.values(StorageSizeUnits).map((unit: string) => (
-                                              <SelectItem
-                                                key={unit}
-                                                disabled={!hasAccessToFileSizeConfiguration}
-                                                value={unit}
-                                              >
-                                                {unit}
-                                              </SelectItem>
-                                            ))}
-                                          </SelectContent>
-                                        </Select>
-                                      )}
-                                    />
-                                  </div>
-                                </FormControl>
-                                {sizeLimitCheckCondition === 'confirm' && (
-                                  <ValidateSizeLimit
-                                    onValidate={sizeLimitCheckQuery}
-                                    projectRef={projectRef}
-                                    isLoadingBucketEstimate={isBucketEstimatePending}
-                                  />
-                                )}
-                              </FormItemLayout>
-                            )}
-                          />
-                          {fileSizeLimitError && (
-                            <FormMessage className="ml-auto mt-2 text-right w-1/2">
-                              <StorageFileSizeLimitErrorMessage
-                                error={fileSizeLimitError}
-                                projectRef={projectRef}
-                              />
-                            </FormMessage>
-                          )}
-                        </CardContent>
-                        {hasLimitedStorageAccess && (
-                          <UpgradeToPro
-                            fullWidth
-                            variant="primary"
-                            source="storageSizeLimit"
-                            featureProposition="configure upload file size limits in Storage"
-                            primaryText="Free Plan has a fixed upload file size limit of 50 MB"
-                            secondaryText={`Upgrade to Pro Plan for a configurable upload file size limit of ${formatBytes(
-                              STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
-                            )} and unlock image transformations.`}
-                          />
-                        )}
-                        {isSpendCapOn && (
-                          <UpgradeToPro
-                            fullWidth
-                            addon="spendCap"
-                            variant="default"
-                            source="storageSizeLimit"
-                            featureProposition="increase the file upload size limits in Storage"
-                            buttonText="Disable spend cap"
-                            primaryText="Reduced max upload file size limit due to spend cap"
-                            secondaryText={`Disable your spend cap to allow file uploads of up to ${formatBytes(
-                              STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
-                            )}.`}
-                          />
-                        )}
-
-                        {!canUpdateStorageSettings && (
-                          <CardContent>
-                            <p className="text-sm text-foreground-light">
-                              You need additional permissions to update storage settings
-                            </p>
-                          </CardContent>
-                        )}
-
-                        <CardFooter className="justify-end space-x-2">
-                          {form.formState.isDirty && (
-                            <Button
-                              type="default"
-                              htmlType="reset"
-                              onClick={() => form.reset()}
-                              disabled={
-                                !form.formState.isDirty || !canUpdateStorageSettings || isUpdating
+                  <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+                    <Card>
+                      <CardContent>
+                        <FormField
+                          control={form.control}
+                          name="imageTransformationEnabled"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              layout="flex-row-reverse"
+                              label="Enable image transformation"
+                              description={
+                                <>
+                                  Optimize and resize images on the fly.{' '}
+                                  <InlineLink
+                                    href={`${DOCS_URL}/guides/storage/serving/image-transformations`}
+                                  >
+                                    Learn more
+                                  </InlineLink>
+                                  .
+                                </>
                               }
                             >
-                              Cancel
-                            </Button>
+                              <FormControl>
+                                <Switch
+                                  size="large"
+                                  disabled={
+                                    !hasAccessToImageTransformations || !canUpdateStorageSettings
+                                  }
+                                  checked={hasAccessToImageTransformations && field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                            </FormItemLayout>
                           )}
+                        />
+                      </CardContent>
+
+                      <CardContent>
+                        <FormField
+                          control={form.control}
+                          name="fileSizeLimit"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              hideMessage
+                              layout="flex-row-reverse"
+                              label="Global file size limit"
+                              description={
+                                <>
+                                  Restrict the size of files uploaded across all buckets.{' '}
+                                  <InlineLink
+                                    href={`${DOCS_URL}/guides/storage/uploads/file-limits`}
+                                  >
+                                    Learn more
+                                  </InlineLink>
+                                  .
+                                  {!shouldAutoValidateBucketLimits && (
+                                    <p>
+                                      Ensure that the global limit is greater than that of
+                                      individual buckets
+                                    </p>
+                                  )}
+                                </>
+                              }
+                            >
+                              <FormControl>
+                                <div className="flex items-center justify-end">
+                                  <Input
+                                    type="number"
+                                    {...field}
+                                    onChange={(e) => {
+                                      field.onChange(e)
+                                      form.clearErrors('fileSizeLimit')
+                                    }}
+                                    className="w-32 rounded-r-none border-r-0"
+                                    disabled={
+                                      !hasAccessToFileSizeConfiguration || !canUpdateStorageSettings
+                                    }
+                                  />
+                                  <FormField
+                                    control={form.control}
+                                    name="unit"
+                                    render={({ field: unitField }) => (
+                                      <Select
+                                        value={unitField.value}
+                                        onValueChange={(val) => {
+                                          unitField.onChange(val)
+                                          form.clearErrors('fileSizeLimit')
+                                        }}
+                                        disabled={
+                                          !hasAccessToFileSizeConfiguration ||
+                                          !canUpdateStorageSettings
+                                        }
+                                      >
+                                        <SelectTrigger className="w-[90px] text-xs font-mono rounded-l-none bg-surface-300">
+                                          <SelectValue placeholder="Choose a prefix">
+                                            {storageUnit}
+                                          </SelectValue>
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                          {Object.values(StorageSizeUnits).map((unit: string) => (
+                                            <SelectItem
+                                              key={unit}
+                                              disabled={!hasAccessToFileSizeConfiguration}
+                                              value={unit}
+                                            >
+                                              {unit}
+                                            </SelectItem>
+                                          ))}
+                                        </SelectContent>
+                                      </Select>
+                                    )}
+                                  />
+                                </div>
+                              </FormControl>
+                              {sizeLimitCheckCondition === 'confirm' && (
+                                <ValidateSizeLimit
+                                  onValidate={sizeLimitCheckQuery}
+                                  projectRef={projectRef}
+                                  isLoadingBucketEstimate={isBucketEstimatePending}
+                                />
+                              )}
+                            </FormItemLayout>
+                          )}
+                        />
+                        {fileSizeLimitError && (
+                          <FormMessage className="ml-auto mt-2 text-right w-1/2">
+                            <StorageFileSizeLimitErrorMessage
+                              error={fileSizeLimitError}
+                              projectRef={projectRef}
+                            />
+                          </FormMessage>
+                        )}
+                      </CardContent>
+                      {hasLimitedStorageAccess && (
+                        <UpgradeToPro
+                          fullWidth
+                          variant="primary"
+                          source="storageSizeLimit"
+                          featureProposition="configure upload file size limits in Storage"
+                          primaryText="Free Plan has a fixed upload file size limit of 50 MB"
+                          secondaryText={`Upgrade to Pro Plan for a configurable upload file size limit of ${formatBytes(
+                            STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
+                          )} and unlock image transformations.`}
+                        />
+                      )}
+                      {isSpendCapOn && (
+                        <UpgradeToPro
+                          fullWidth
+                          addon="spendCap"
+                          variant="default"
+                          source="storageSizeLimit"
+                          featureProposition="increase the file upload size limits in Storage"
+                          buttonText="Disable spend cap"
+                          primaryText="Reduced max upload file size limit due to spend cap"
+                          secondaryText={`Disable your spend cap to allow file uploads of up to ${formatBytes(
+                            STORAGE_FILE_SIZE_LIMIT_MAX_BYTES_UNCAPPED
+                          )}.`}
+                        />
+                      )}
+
+                      {!canUpdateStorageSettings && (
+                        <CardContent>
+                          <p className="text-sm text-foreground-light">
+                            You need additional permissions to update storage settings
+                          </p>
+                        </CardContent>
+                      )}
+
+                      <CardFooter className="justify-end space-x-2">
+                        {form.formState.isDirty && (
                           <Button
-                            type={hasLimitedStorageAccess ? 'default' : 'primary'}
-                            htmlType="submit"
-                            loading={isUpdating}
+                            variant="default"
+                            type="reset"
+                            onClick={() => form.reset()}
                             disabled={
-                              !canUpdateStorageSettings || isUpdating || !form.formState.isDirty
+                              !form.formState.isDirty || !canUpdateStorageSettings || isUpdating
                             }
                           >
-                            Save
+                            Cancel
                           </Button>
-                        </CardFooter>
-                      </Card>
-                    </form>
-                  </>
+                        )}
+                        <Button
+                          variant={hasLimitedStorageAccess ? 'default' : 'primary'}
+                          type="submit"
+                          loading={isUpdating}
+                          disabled={
+                            !canUpdateStorageSettings || isUpdating || !form.formState.isDirty
+                          }
+                        >
+                          Save
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  </form>
                 )}
               </>
             )}

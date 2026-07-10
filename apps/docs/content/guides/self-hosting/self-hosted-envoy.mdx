@@ -21,14 +21,15 @@ The Envoy gateway is provided as a Docker Compose override.
 
 <Admonition type="note">
 
-If your stack is already running from the initial setup, bring it down first with `docker compose down`.
+If your stack is already running from the initial setup, bring it down first with `sh run.sh stop`.
 
 </Admonition>
 
-Start your self-hosted Supabase stack with both the base compose file and the Envoy override:
+Enable the Envoy override, then start the stack:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.envoy.yml up -d
+sh run.sh config add envoy
+sh run.sh start
 ```
 
 The override disables the default Kong gateway and starts Envoy on the same port (default `8000`). It also reconfigures the Functions service to wait for Envoy via a dependency.
@@ -60,13 +61,14 @@ HTTP filter chain
   ├─ CORS
   ├─ Basic Auth  (dashboard only)
   ├─ Lua: copy ?apikey query to header
+  ├─ Lua: 401 for missing/invalid API key
   ├─ Lua: translate opaque keys in query
   ├─ Lua: translate opaque keys in header
   ├─ Lua: mirror apikey to x-api-key (Realtime WS)
   ├─ Lua: synthesize Authorization header
-  ├─ Lua: 401 for missing/invalid API key
   ├─ RBAC  (global: service_role → /pg/, apikey → other API routes;
-  │         per-route DENY override on /mcp)
+  │         per-route DENY override on /mcp and Realtime
+  │         /api/tenants, /api/openapi)
   └─ Router
           │
           ▼
@@ -117,7 +119,7 @@ Envoy cannot natively read environment variables inside its config. The entrypoi
 Configuration changes require restarting the container so the entrypoint re-renders the template:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.envoy.yml restart api-gw
+sh run.sh restart api-gw
 ```
 
 </Admonition>
@@ -126,26 +128,29 @@ docker compose -f docker-compose.yml -f docker-compose.envoy.yml restart api-gw
 
 Routes are matched in the order declared. The first matching prefix wins. Protected routes require a valid `apikey` header; open routes pass through without API key validation.
 
-| Path prefix                               | Upstream  | Path rewrite             | Access control    | Notes                                                                  |
-| ----------------------------------------- | --------- | ------------------------ | ----------------- | ---------------------------------------------------------------------- |
-| `/auth/v1/verify`                         | auth      | `/verify`                | Open              | Email verification                                                     |
-| `/auth/v1/callback`                       | auth      | `/callback`              | Open              | OAuth callback                                                         |
-| `/auth/v1/authorize`                      | auth      | `/authorize`             | Open              | OAuth authorize                                                        |
-| `/auth/v1/.well-known/jwks.json`          | auth      | `/.well-known/jwks.json` | Open              | JWKS for third-party verification                                      |
-| `/.well-known/oauth-authorization-server` | auth      | -                        | Open              | OAuth 2.0 Authorization Server Metadata (RFC 8414)                     |
-| `/sso/saml/acs`                           | auth      | -                        | Open              | SAML assertion consumer                                                |
-| `/sso/saml/metadata`                      | auth      | -                        | Open              | SAML metadata                                                          |
-| `/functions/v1/`                          | functions | `/`                      | Bypass            | Edge Functions runtime performs its own JWT verification; 150s timeout |
-| `/storage/v1/`                            | storage   | `/`                      | Bypass            | Storage performs its own authorization                                 |
-| `/auth/v1/`                               | auth      | `/`                      | API key           | Protected Auth endpoints                                               |
-| `/rest/v1/`                               | rest      | `/`                      | API key           | PostgREST                                                              |
-| `/graphql/v1`                             | rest      | `/rpc/graphql`           | API key           | pg_graphql (adds `Content-Profile: graphql_public`)                    |
-| `/realtime/v1/api`                        | realtime  | `/api`                   | API key           | Realtime REST API                                                      |
-| `/realtime/v1/`                           | realtime  | `/socket/`               | API key           | Realtime WebSocket                                                     |
-| `/pg/`                                    | meta      | `/`                      | Service role only | postgres-meta - used by Studio for database access                     |
-| `/api/mcp`                                | studio    | -                        | Denied            | MCP endpoint (blocked by default via RBAC DENY)                        |
-| `/mcp`                                    | studio    | `/api/mcp`               | Denied            | MCP endpoint (blocked by default via RBAC DENY)                        |
-| `/` (catch-all)                           | studio    | -                        | Basic auth        | Dashboard; strips inbound `Authorization` header                       |
+| Path prefix                               | Upstream  | Path rewrite             | Access control | Notes                                                                  |
+| ----------------------------------------- | --------- | ------------------------ | -------------- | ---------------------------------------------------------------------- |
+| `/auth/v1/verify`                         | auth      | `/verify`                | Open           | Email verification                                                     |
+| `/auth/v1/callback`                       | auth      | `/callback`              | Open           | OAuth callback                                                         |
+| `/auth/v1/authorize`                      | auth      | `/authorize`             | Open           | OAuth authorize                                                        |
+| `/auth/v1/.well-known/jwks.json`          | auth      | `/.well-known/jwks.json` | Open           | JWKS for third-party verification                                      |
+| `/.well-known/oauth-authorization-server` | auth      | -                        | Open           | OAuth 2.0 Authorization Server Metadata (RFC 8414)                     |
+| `/auth/v1/sso/saml/acs`                   | auth      | `/sso/saml/acs`          | Open           | SAML assertion consumer                                                |
+| `/auth/v1/sso/saml/metadata`              | auth      | `/sso/saml/metadata`     | Open           | SAML metadata                                                          |
+| `/functions/v1/`                          | functions | `/`                      | Bypass         | Edge Functions runtime performs its own JWT verification; 150s timeout |
+| `/storage/v1/`                            | storage   | `/`                      | Bypass         | Storage performs its own authorization                                 |
+| `/auth/v1/`                               | auth      | `/`                      | API key        | Protected Auth endpoints                                               |
+| `/rest/v1/`                               | rest      | `/`                      | API key        | PostgREST Open API root (requires secret key)                          |
+| `/rest/v1/*`                              | rest      | `/`                      | API key        | PostgREST data endpoints                                               |
+| `/graphql/v1`                             | rest      | `/rpc/graphql`           | API key        | pg_graphql (adds `Content-Profile: graphql_public`)                    |
+| `/realtime/v1/api/tenants`                | realtime  | -                        | Denied         | Realtime management API (blocked by default)                           |
+| `/realtime/v1/api/openapi`                | realtime  | -                        | Denied         | Realtime OpenAPI spec (blocked by default)                             |
+| `/realtime/v1/api`                        | realtime  | `/api`                   | API key        | Realtime REST API (broadcast, channels, ping)                          |
+| `/realtime/v1/`                           | realtime  | `/socket/`               | API key        | Realtime WebSocket                                                     |
+| `/pg/`                                    | meta      | `/`                      | API key        | postgres-meta / Studio database operations (requires secret key)       |
+| `/api/mcp`                                | studio    | -                        | Denied         | MCP endpoint (blocked by default via RBAC DENY)                        |
+| `/mcp`                                    | studio    | `/api/mcp`               | Denied         | MCP endpoint (blocked by default via RBAC DENY)                        |
+| `/` (catch-all)                           | studio    | -                        | Basic auth     | Dashboard; strips inbound `Authorization` header                       |
 
 <Admonition type="note">
 
@@ -167,8 +172,9 @@ The protected routes (`/auth/v1/`, `/rest/v1/`, `/graphql/v1`, `/realtime/v1/api
 
 A Lua filter rejects missing or invalid keys with HTTP `401 Unauthorized`. An RBAC filter then applies finer-grained rules:
 
-- `/pg/` - only `service_role` keys (`sb_secret_*` or legacy `SERVICE_ROLE_KEY`) are allowed (HTTP `403` otherwise).
-- All other protected routes - any valid configured key is allowed.
+- `/pg/` - only `service_role` keys (`sb_secret_*` or legacy `SERVICE_ROLE_KEY`) are allowed
+- `/rest/v1/` (exact path, OpenAPI schema root) - only `service_role` keys are allowed
+- `/rest/v1/<table>` and other Data API paths remain accessible to all valid keys
 
 ### Opaque key translation
 
@@ -258,7 +264,7 @@ All routing, filter, and cluster changes are made in the YAML files under `./vol
 - **Applying changes.** Envoy reads the rendered `lds.yaml` from the filesystem. Configuration changes require restarting the container so the entrypoint re-renders the template:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.envoy.yml restart api-gw
+sh run.sh restart api-gw
 ```
 
 <Admonition type="note">
@@ -271,7 +277,7 @@ This guide does not cover Envoy's route, filter, and cluster reference. See the 
 
 Envoy exposes an admin interface on `127.0.0.1:9901` inside the container, with endpoints like `/ready`, `/clusters`, `/stats`, and `/config_dump`. The standard `envoyproxy/envoy` image is minimal (no `curl` or `wget`), so the admin endpoints are not reachable via `docker exec` without adding tooling.
 
-The simplest way to query the admin interface during debugging is to run a short-lived `curl` container that joins the same network namespace as `supabase-envoy`:
+You can query the admin interface during debugging by running a short-lived `curl` container that joins the same network namespace as `supabase-envoy`:
 
 ```sh
 docker run --rm --network container:supabase-envoy curlimages/curl http://127.0.0.1:9901/clusters
@@ -298,7 +304,7 @@ docker run --rm --network container:supabase-envoy curlimages/curl http://127.0.
 Envoy writes access logs and filter output to stdout. View them with:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.envoy.yml logs api-gw
+docker compose logs api-gw
 ```
 
 The access log format is a standard combined log with the request method, original path, response code, and bytes sent.
@@ -308,6 +314,7 @@ The access log format is a standard combined log with the request method, origin
 - **`401 Unauthorized` on a protected route.** The `apikey` header is missing or does not match any configured key. Verify that the header value exactly matches one of `ANON_KEY`, `SERVICE_ROLE_KEY`, `SUPABASE_PUBLISHABLE_KEY`, or `SUPABASE_SECRET_KEY` in your `.env` file. Note that `SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY` are only accepted when the new key configuration is fully set up - see [New API Keys and Asymmetric Authentication](/docs/guides/self-hosting/self-hosted-auth-keys).
 - **`403 Forbidden` on `/pg/`.** The `/pg/` route requires a service_role key (`SUPABASE_SECRET_KEY` or legacy `SERVICE_ROLE_KEY`). Anon and publishable keys are rejected.
 - **`403 Forbidden` on `/api/mcp` or `/mcp`.** These routes are blocked by default. See [Enabling MCP Server Access](/docs/guides/self-hosting/enable-mcp).
+- **`403 Forbidden` on `/realtime/v1/api/tenants` or `/realtime/v1/api/openapi`.** These Realtime management endpoints are blocked at the gateway by design and are not reachable by external clients, even with a valid key.
 - **`SignatureDoesNotMatch` on S3 requests to Storage.** Verify that the Storage service configuration in `docker-compose.yml` contains `REQUEST_ALLOW_X_FORWARDED_PATH=true` and `STORAGE_PUBLIC_URL`. Storage uses the `X-Forwarded-Prefix` header the gateway sends to reconstruct the original request path for SigV4 verification.
 - **`400 Bad Request` with underscore headers.** `headers_with_underscores_action: REJECT_REQUEST` is enabled. Some clients send headers like `X_Forwarded_For` with underscores; these are rejected. Use hyphens in header names.
 

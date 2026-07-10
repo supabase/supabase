@@ -1,4 +1,3 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
 import { Check, ChevronDown } from 'lucide-react'
 import { useMemo, useState, type ReactNode } from 'react'
 import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
@@ -7,7 +6,7 @@ import {
   CreateOrganizationCard,
   OrganizationCard,
 } from '@/components/interfaces/Organization/OrganizationCard'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import type { Organization } from '@/types'
 
 const VISIBLE_ORGANIZATIONS_LIMIT = 3
@@ -46,10 +45,7 @@ export const OrganizationSelector = ({
   unavailableReason?: ReactNode
 }) => {
   const [showMore, setShowMore] = useState(false)
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const { visibleOrganizations, overflowOrganizations } = useMemo(() => {
     const lastVisitedOrg = organizations.find(({ slug }) => slug === lastVisitedOrganization)

@@ -6,13 +6,20 @@ import { useRouter } from 'next/router'
 import { useCallback, useMemo, useState } from 'react'
 import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
+import { useUnifiedLogsPreview } from '../App/FeaturePreview/FeaturePreviewContext'
 import { DatabaseInfrastructureSection } from './DatabaseInfrastructureSection'
+import { OBSERVABILITY_DOCS_HREFS } from './Observability.constants'
 import { useObservabilityOverviewData } from './ObservabilityOverview.utils'
 import { ObservabilityOverviewFooter } from './ObservabilityOverviewFooter'
 import { ServiceHealthTable } from './ServiceHealthTable'
 import { useSlowQueriesCount } from './useSlowQueriesCount'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import {
+  buildUnifiedLogsUrl,
+  type UnifiedLogType,
+} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ChartIntervalDropdown } from '@/components/ui/Logs/ChartIntervalDropdown'
 import { CHART_INTERVALS } from '@/components/ui/Logs/logs.utils'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
@@ -22,6 +29,8 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
+const REPORT_TITLE = 'Overview'
+
 type ChartIntervalKey = '1hr' | '1day' | '7day'
 
 export const ObservabilityOverview = () => {
@@ -30,6 +39,7 @@ export const ObservabilityOverview = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const queryClient = useQueryClient()
 
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const { projectStorageAll: storageSupported } = useIsFeatureEnabled(['project_storage:all'])
   const { isEnabled: isDataApiEnabled } = useIsDataApiEnabled({ projectRef })
 
@@ -65,13 +75,22 @@ export const ObservabilityOverview = () => {
     setShowIntervalDropdown((open) => !open)
   })
 
+  const getLogsUrl = useCallback(
+    (logType: UnifiedLogType, legacyLogsUrl: string) =>
+      isUnifiedLogsEnabled
+        ? buildUnifiedLogsUrl({ projectRef: projectRef!, logType })
+        : `/project/${projectRef}${legacyLogsUrl}`,
+    [projectRef, isUnifiedLogsEnabled]
+  )
+
   const serviceBase = useMemo(
     () => [
       {
         key: 'data_api' as const,
         name: 'API Gateway',
         reportUrl: undefined,
-        logsUrl: `/project/${projectRef}/logs/edge-logs`,
+        logType: 'edge' as const,
+        logsUrl: getLogsUrl('edge', '/logs/edge-logs'),
         enabled: isDataApiEnabled,
         hasReport: false,
       },
@@ -79,7 +98,8 @@ export const ObservabilityOverview = () => {
         key: 'db' as const,
         name: 'Database',
         reportUrl: `/project/${projectRef}/observability/database`,
-        logsUrl: `/project/${projectRef}/logs/postgres-logs`,
+        logType: 'postgres' as const,
+        logsUrl: getLogsUrl('postgres', '/logs/postgres-logs'),
         enabled: true,
         hasReport: true,
       },
@@ -87,7 +107,8 @@ export const ObservabilityOverview = () => {
         key: 'postgrest' as const,
         name: 'PostgREST',
         reportUrl: `/project/${projectRef}/observability/postgrest`,
-        logsUrl: `/project/${projectRef}/logs/postgrest-logs`,
+        logType: 'postgrest' as const,
+        logsUrl: getLogsUrl('postgrest', '/logs/postgrest-logs'),
         enabled: true,
         hasReport: true,
       },
@@ -95,7 +116,8 @@ export const ObservabilityOverview = () => {
         key: 'auth' as const,
         name: 'Auth',
         reportUrl: `/project/${projectRef}/observability/auth`,
-        logsUrl: `/project/${projectRef}/logs/auth-logs`,
+        logType: 'auth' as const,
+        logsUrl: getLogsUrl('auth', '/logs/auth-logs'),
         enabled: true,
         hasReport: true,
       },
@@ -103,7 +125,8 @@ export const ObservabilityOverview = () => {
         key: 'functions' as const,
         name: 'Edge Functions',
         reportUrl: `/project/${projectRef}/observability/edge-functions`,
-        logsUrl: `/project/${projectRef}/logs/edge-functions-logs`,
+        logType: 'edge function' as const,
+        logsUrl: getLogsUrl('edge function', '/logs/edge-functions-logs'),
         enabled: true,
         hasReport: true,
       },
@@ -111,7 +134,8 @@ export const ObservabilityOverview = () => {
         key: 'storage' as const,
         name: 'Storage',
         reportUrl: `/project/${projectRef}/observability/storage`,
-        logsUrl: `/project/${projectRef}/logs/storage-logs`,
+        logType: 'storage' as const,
+        logsUrl: getLogsUrl('storage', '/logs/storage-logs'),
         enabled: storageSupported,
         hasReport: true,
       },
@@ -119,12 +143,13 @@ export const ObservabilityOverview = () => {
         key: 'realtime' as const,
         name: 'Realtime',
         reportUrl: `/project/${projectRef}/observability/realtime`,
-        logsUrl: `/project/${projectRef}/logs/realtime-logs`,
+        logType: 'realtime' as const,
+        logsUrl: getLogsUrl('realtime', '/logs/realtime-logs'),
         enabled: true,
         hasReport: true,
       },
     ],
-    [projectRef, storageSupported, isDataApiEnabled]
+    [projectRef, storageSupported, isDataApiEnabled, getLogsUrl]
   )
 
   const enabledServices = serviceBase.filter((s) => s.enabled)
@@ -133,7 +158,7 @@ export const ObservabilityOverview = () => {
 
   // Navigate to the log view scoped to the clicked bar's bucket window
   const handleBarClick = useCallback(
-    (logsUrl: string) => (datum: any) => {
+    (service: { logType: UnifiedLogType; logsUrl: string }) => (datum: any) => {
       if (!datum?.timestamp) return
 
       // datum.timestamp is already the UTC-truncated bucket boundary from timestamp_trunc(),
@@ -142,17 +167,24 @@ export const ObservabilityOverview = () => {
       const start = datum.timestamp
       const end = dayjs.utc(datum.timestamp).add(1, unit).toISOString()
 
-      const queryParams = new URLSearchParams({ its: start, ite: end })
-      router.push(`${logsUrl}?${queryParams.toString()}`)
+      if (isUnifiedLogsEnabled) {
+        router.push(
+          buildUnifiedLogsUrl({ projectRef: projectRef!, logType: service.logType, start, end })
+        )
+      } else {
+        const queryParams = new URLSearchParams({ its: start, ite: end })
+        const separator = service.logsUrl.includes('?') ? '&' : '?'
+        router.push(`${service.logsUrl}${separator}${queryParams.toString()}`)
+      }
     },
-    [router, interval]
+    [router, interval, isUnifiedLogsEnabled, projectRef]
   )
 
   return (
     <ReportPadding>
       <div className="flex flex-row justify-between items-center">
         <div className="flex items-center gap-3">
-          <ReportHeader title="Overview" />
+          <ReportHeader title={REPORT_TITLE} />
           <Tooltip>
             <TooltipTrigger asChild>
               <Badge variant="warning">Beta</Badge>
@@ -163,12 +195,13 @@ export const ObservabilityOverview = () => {
           </Tooltip>
         </div>
         <div className="flex items-center gap-2">
+          <DocsButton href={OBSERVABILITY_DOCS_HREFS.overview} topic={REPORT_TITLE} />
           <ShortcutTooltip
             shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
             label="Refresh report"
             side="bottom"
           >
-            <Button type="outline" icon={<RefreshCw size={14} />} onClick={handleRefresh}>
+            <Button variant="outline" icon={<RefreshCw size={14} />} onClick={handleRefresh}>
               Refresh
             </Button>
           </ShortcutTooltip>
@@ -200,6 +233,7 @@ export const ObservabilityOverview = () => {
             name: service.name,
             description: '',
             reportUrl: service.hasReport ? service.reportUrl : undefined,
+            logType: service.logType,
             logsUrl: service.logsUrl,
           }))}
           serviceData={overviewData.services}

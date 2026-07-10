@@ -1,6 +1,12 @@
 import { LoaderCircle, Search } from 'lucide-react'
-import { useEffect, useEffectEvent, useState } from 'react'
-import { FilterBar, FilterCondition, type FilterGroup, type FilterProperty } from 'ui-patterns'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
+import {
+  FilterBar,
+  FilterCondition,
+  type FilterBarHandle,
+  type FilterGroup,
+  type FilterProperty,
+} from 'ui-patterns/FilterBar'
 
 import {
   isLogsFilterColumnValue,
@@ -8,6 +14,8 @@ import {
   type LogsFilterOperator,
 } from '../UnifiedLogs.filters'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const buildFilterGroup = (
   columnFilters: { id: string; value: unknown }[],
@@ -34,6 +42,11 @@ const buildFilterGroup = (
 
 export const LogsFilterBar = () => {
   const { table, filterFields, columnFilters, isFetching } = useDataTable()
+
+  const filterBarRef = useRef<FilterBarHandle>(null)
+  useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_FOCUS_FILTER, () => filterBarRef.current?.focus(), {
+    registerInCommandMenu: true,
+  })
 
   const [freeformText, setFreeformText] = useState('')
 
@@ -113,6 +126,7 @@ export const LogsFilterBar = () => {
 
   return (
     <FilterBar
+      ref={filterBarRef}
       variant="pill"
       freeformDefaultProperty="event_message"
       className="bg-transparent border-0 [&>div>div>div>input]:!text-xs"

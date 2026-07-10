@@ -18,7 +18,7 @@ interface Source {
  * included in the serverless bundle via outputFileTracingIncludes in
  * next.config.mjs so reads work on Vercel.
  */
-const GUIDES_MD_DIR = path.join(process.cwd(), '..', 'docs', 'public', 'docs', 'guides')
+const GUIDES_MD_DIR = path.join(process.cwd(), '..', 'docs', 'public', 'markdown', 'guides')
 
 function getSources(): Source[] {
   const { sdkCsharp, sdkDart, sdkKotlin, sdkPython, sdkSwift } = isFeatureEnabled([
@@ -36,7 +36,9 @@ function getSources(): Source[] {
     { title: 'Supabase Reference (Kotlin)', slug: 'kotlin', enabled: sdkKotlin },
     { title: 'Supabase Reference (Python)', slug: 'python', enabled: sdkPython },
     { title: 'Supabase Reference (C#)', slug: 'csharp', enabled: sdkCsharp },
+    { title: 'Supabase Server SDK Reference', slug: 'server', enabled: true },
     { title: 'Supabase CLI Reference', slug: 'cli', enabled: true },
+    { title: 'Supabase Management API Reference', slug: 'api', enabled: true },
   ]
 }
 
@@ -64,7 +66,7 @@ async function fetchSourceContent(slug: string): Promise<string | null> {
   const docsUrl = process.env.NEXT_PUBLIC_DOCS_URL
   if (!docsUrl) return null
 
-  const response = await fetch(`${docsUrl}/llms/${slug}.txt`)
+  const response = await fetch(`${docsUrl}/markdown/reference/${slug}.md`)
   if (!response.ok) return null
 
   return response.text()

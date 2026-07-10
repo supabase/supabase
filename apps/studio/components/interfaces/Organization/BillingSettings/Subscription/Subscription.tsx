@@ -5,8 +5,8 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { ProjectUpdateDisabledTooltip } from '../ProjectUpdateDisabledTooltip'
 import { Restriction } from '../Restriction'
+import { InitiateCancellationFlowButton } from './CancellationFlow'
 import { PlanUpdateSidePanel } from './PlanUpdateSidePanel'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import {
@@ -14,8 +14,8 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from '@/components/layouts/Scaffold'
-import AlertError from '@/components/ui/AlertError'
-import NoPermission from '@/components/ui/NoPermission'
+import { AlertError } from '@/components/ui/AlertError'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
@@ -77,52 +77,62 @@ const Subscription = () => {
               {isError && <AlertError subject="Failed to retrieve subscription" error={error} />}
 
               {isSuccess && (
-                <div className="space-y-6">
-                  <div>
-                    <p className="text-2xl text-brand">{currentPlan?.name ?? 'Unknown'} Plan</p>
-                  </div>
+                <div className="space-y-6 w-full">
+                  <div className="flex justify-between items-center">
+                    <p className="text-2xl text-brand leading-none">
+                      {currentPlan?.name ?? 'Unknown'} Plan
+                    </p>
 
-                  <div>
-                    {canChangeTier ? (
-                      <ProjectUpdateDisabledTooltip projectUpdateDisabled={projectUpdateDisabled}>
+                    {canChangeTier && (
+                      <div className="flex space-x-2">
                         <Button
-                          type="default"
+                          variant="default"
                           className="pointer-events-auto"
-                          disabled={!canChangeTier}
                           onClick={() => snap.setPanelKey('subscriptionPlan')}
                         >
                           Change subscription plan
                         </Button>
-                      </ProjectUpdateDisabledTooltip>
-                    ) : projectUpdateDisabled ? (
-                      <Admonition
-                        type="default"
-                        layout="horizontal"
-                        title={`Unable to update plan from ${planName}`}
-                        description="We have temporarily disabled project and subscription changes - our
-                          engineers are working on a fix."
-                      />
-                    ) : (
-                      <Admonition
-                        type="default"
-                        layout="horizontal"
-                        title={`Unable to update plan from ${planName}`}
-                        description="Please contact us if you'd like to change your plan."
-                        actions={
-                          <Button asChild key="contact-support" type="default">
-                            <SupportLink
-                              queryParams={{
-                                category: SupportCategories.SALES_ENQUIRY,
-                                subject: `Change plan away from ${planName}`,
-                              }}
-                            >
-                              Contact support
-                            </SupportLink>
-                          </Button>
-                        }
-                      />
+                        {currentPlan && currentPlan.id !== 'free' && (
+                          <InitiateCancellationFlowButton variant="danger">
+                            Cancel Subscription
+                          </InitiateCancellationFlowButton>
+                        )}
+                      </div>
                     )}
                   </div>
+
+                  {!canChangeTier && (
+                    <div>
+                      {projectUpdateDisabled ? (
+                        <Admonition
+                          type="default"
+                          layout="horizontal"
+                          title={`Unable to update plan from ${planName}`}
+                          description="We have temporarily disabled project and subscription changes - our
+                          engineers are working on a fix."
+                        />
+                      ) : (
+                        <Admonition
+                          type="default"
+                          layout="horizontal"
+                          title={`Unable to update plan from ${planName}`}
+                          description="Please contact us if you'd like to change your plan."
+                          actions={
+                            <Button asChild key="contact-support" variant="default">
+                              <SupportLink
+                                queryParams={{
+                                  category: SupportCategories.SALES_ENQUIRY,
+                                  subject: `Change plan away from ${planName}`,
+                                }}
+                              >
+                                Contact support
+                              </SupportLink>
+                            </Button>
+                          }
+                        />
+                      )}
+                    </div>
+                  )}
 
                   {!subscription?.usage_billing_enabled && (
                     <Admonition

@@ -30,7 +30,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { pgmqArchiveTable, pgmqQueueTable } from '../Queues.utils'
 import { getQueueFunctionsMapping } from './Queue.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useQueuesExposePostgrestStatusQuery } from '@/data/database-queues/database-queues-expose-postgrest-status-query'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
@@ -45,6 +45,7 @@ import {
 } from '@/data/privileges/table-privileges-revoke-mutation'
 import { useTablesQuery } from '@/data/tables/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getErrorMessage } from '@/lib/get-error-message'
 
 const ACTIONS = ['select', 'insert', 'update', 'delete']
 const ROLES = ['anon', 'authenticated', 'postgres', 'service_role']
@@ -92,10 +93,9 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
   const { data: allTablePrivileges, isSuccess: isSuccessPrivileges } = useTablePrivilegesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
+    includedSchemas: ['pgmq'],
   })
-  const queuePrivileges = allTablePrivileges?.find(
-    (x) => x.schema === 'pgmq' && x.name === queueRelname
-  )
+  const queuePrivileges = allTablePrivileges?.find((x) => x.name === queueRelname)
 
   const { mutateAsync: grantPrivilege } = useTablePrivilegesGrantMutation()
   const { mutateAsync: revokePrivilege } = useTablePrivilegesRevokeMutation()
@@ -213,8 +213,8 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
       ])
       toast.success('Successfully updated permissions')
       setOpen(false)
-    } catch (error: any) {
-      toast.error(`Failed to update permissions: ${error.message}`)
+    } catch (error: unknown) {
+      toast.error(`Failed to update permissions: ${getErrorMessage(error)}`)
     } finally {
       setIsSaving(false)
     }
@@ -222,12 +222,15 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
 
   useEffect(() => {
     if (open && isSuccessPrivileges && queuePrivileges) {
-      const initialState = queuePrivileges.privileges.reduce((a, b) => {
-        return {
-          ...a,
-          [b.grantee]: { ...(a as any)[b.grantee], [b.privilege_type.toLowerCase()]: true },
-        }
-      }, {})
+      const initialState = queuePrivileges.privileges.reduce<{ [key: string]: Privileges }>(
+        (a, b) => {
+          return {
+            ...a,
+            [b.grantee]: { ...a[b.grantee], [b.privilege_type.toLowerCase()]: true },
+          }
+        },
+        {}
+      )
       setPrivileges(initialState)
     }
   }, [open, isSuccessPrivileges])
@@ -236,7 +239,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <ButtonTooltip
-          type="text"
+          variant="text"
           className="px-1.5"
           icon={<Settings />}
           title="Settings"
@@ -369,10 +372,10 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
           </Table>
         </SheetSection>
         <SheetFooter>
-          <Button type="default" disabled={isSaving} onClick={() => setOpen(false)}>
+          <Button variant="default" disabled={isSaving} onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button type="primary" loading={isSaving} onClick={onSaveConfiguration}>
+          <Button variant="primary" loading={isSaving} onClick={onSaveConfiguration}>
             Save changes
           </Button>
         </SheetFooter>

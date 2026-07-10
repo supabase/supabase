@@ -12,16 +12,26 @@ interface InterstitialLayoutProps {
   logo?: ReactNode
   title?: ReactNode
   description?: ReactNode
+  /** Optional content rendered beneath the card (e.g. a terms disclaimer), at the card's width. */
+  footer?: ReactNode
   containerClassName?: string
   cardClassName?: string
   titleClassName?: string
   descriptionClassName?: string
 }
 
+/**
+ * Minimal full-screen centered layout for interstitial flows:
+ * partner authorization, org invites, CLI auth, credit redemption, etc.
+ *
+ * The logo, title, and description render inside the card (above children),
+ * so every consumer gets a consistent header for free.
+ */
 export const InterstitialLayout = ({
   logo,
   title,
   description,
+  footer,
   containerClassName,
   cardClassName,
   titleClassName,
@@ -31,6 +41,49 @@ export const InterstitialLayout = ({
   const TitleElement = typeof title === 'string' ? 'h1' : 'div'
   const DescriptionElement = typeof description === 'string' ? 'p' : 'div'
 
+  const titleElement = title ? (
+    <TitleElement
+      className={cn(
+        'font-sans tracking-tight text-balance text-lg font-medium normal-case text-foreground',
+        titleClassName
+      )}
+    >
+      {title}
+    </TitleElement>
+  ) : null
+
+  const descriptionElement = description ? (
+    <DescriptionElement
+      className={cn(
+        '!m-0 px-3 !text-balance text-sm text-foreground-lighter leading-tight',
+        descriptionClassName
+      )}
+    >
+      {description}
+    </DescriptionElement>
+  ) : null
+
+  const card = (
+    <MotionCard
+      layout="size"
+      transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+      className={cn('overflow-hidden max-w-[400px] w-full mx-auto', cardClassName)}
+    >
+      {(logo || title || description) && (
+        <CardHeader className="font-normal items-center gap-0 space-y-0 px-6 py-6 text-center [--card-padding-x:1.5rem] border-0">
+          {logo && <div className="mb-4 flex justify-center">{logo}</div>}
+          {(titleElement || descriptionElement) && (
+            <div className="flex flex-col items-center gap-1">
+              {titleElement}
+              {descriptionElement}
+            </div>
+          )}
+        </CardHeader>
+      )}
+      {children}
+    </MotionCard>
+  )
+
   return (
     <div
       className={cn(
@@ -38,46 +91,23 @@ export const InterstitialLayout = ({
         containerClassName
       )}
     >
-      <MotionCard
-        layout="size"
-        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-        className={cn('mx-auto w-full max-w-[400px] overflow-hidden', cardClassName)}
-      >
-        {(logo || title || description) && (
-          <CardHeader className="items-center gap-0 space-y-0 border-0 px-6 py-6 text-center font-normal [--card-padding-x:1.5rem]">
-            {logo && <div className="mb-4 flex justify-center">{logo}</div>}
-            {(title || description) && (
-              <div className="flex flex-col items-center gap-1">
-                {title && (
-                  <TitleElement
-                    className={cn(
-                      'font-sans text-lg font-medium tracking-tight text-balance text-foreground',
-                      titleClassName
-                    )}
-                  >
-                    {title}
-                  </TitleElement>
-                )}
-                {description && (
-                  <DescriptionElement
-                    className={cn(
-                      '!m-0 px-3 text-sm leading-tight !text-balance text-foreground-lighter',
-                      descriptionClassName
-                    )}
-                  >
-                    {description}
-                  </DescriptionElement>
-                )}
-              </div>
-            )}
-          </CardHeader>
-        )}
-        {children}
-      </MotionCard>
+      {footer ? (
+        <div className="flex w-full max-w-[400px] flex-col items-center gap-4">
+          {card}
+          <div className="px-2 text-center text-balance">{footer}</div>
+        </div>
+      ) : (
+        card
+      )}
     </div>
   )
 }
 
+/**
+ * Standard rounded-rect logo container (48x48).
+ * Partner logos fill edge-to-edge (see `PartnerLogo`); the Supabase symbol and
+ * Lucide icons sit inset (sized at `size-7`).
+ */
 export const LogoBox = ({ children, className }: { children: ReactNode; className?: string }) => (
   <div
     className={cn(
@@ -89,6 +119,7 @@ export const LogoBox = ({ children, className }: { children: ReactNode; classNam
   </div>
 )
 
+/** Two pre-boxed logos side-by-side with a swap separator. */
 export const LogoPair = ({ left, right }: { left: ReactNode; right: ReactNode }) => (
   <div className="flex items-center justify-center gap-2.5">
     {left}
@@ -97,15 +128,37 @@ export const LogoPair = ({ left, right }: { left: ReactNode; right: ReactNode })
   </div>
 )
 
-export const SupabaseLogo = () => (
-  <LogoBox>
-    <img alt="Supabase" src={`${BASE_PATH}/img/supabase-logo.svg`} className="size-7" />
+/** Partner logo rendered edge-to-edge inside a LogoBox by default. */
+export const PartnerLogo = ({
+  src,
+  alt,
+  className,
+  imageClassName,
+}: {
+  src: string
+  alt: string
+  className?: string
+  imageClassName?: string
+}) => (
+  <LogoBox className={className}>
+    <img alt={alt} src={src} className={cn('size-full object-cover', imageClassName)} />
   </LogoBox>
 )
 
-export const PartnerLogo = ({ src, alt }: { src: string; alt: string }) => (
+/**
+ * Sign-in destination mark, inset to match {@link SupabaseLogo}. Falls back to the destination's
+ * initial when no icon is available.
+ */
+export const DestinationLogo = ({ icon, name }: { icon?: ReactNode; name: string }) => (
   <LogoBox>
-    <img alt={alt} src={src} className="size-full object-cover" />
+    {icon ?? <span className="text-lg font-medium text-foreground-light">{name.slice(0, 1)}</span>}
+  </LogoBox>
+)
+
+/** Supabase symbol (not the wordmark) rendered inset inside a LogoBox. */
+export const SupabaseLogo = () => (
+  <LogoBox className="bg-surface-75">
+    <img alt="Supabase" src={`${BASE_PATH}/img/supabase-logo.svg`} className="size-7" />
   </LogoBox>
 )
 
@@ -114,11 +167,13 @@ export const InterstitialAccountRow = ({
   displayName,
   action,
   className,
+  detail,
 }: {
   avatarUrl?: string
   displayName?: string
   action?: ReactNode
   className?: string
+  detail?: string
 }) => (
   <Card className={cn('shadow-none', !action && 'border-muted bg-surface-200/50', className)}>
     <CardContent
@@ -137,6 +192,7 @@ export const InterstitialAccountRow = ({
         <p className="truncate text-sm text-foreground">
           {displayName || <span className="invisible">Loading account</span>}
         </p>
+        {detail && <p className="mt-1 truncate text-xs text-foreground-light">{detail}</p>}
       </div>
       {action}
     </CardContent>

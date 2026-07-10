@@ -62,31 +62,37 @@ get_container_id() {
     printf '%s' "$1"
 }
 
-# Check that a service's logs contain all expected patterns
+# Check that a service's logs contain all expected patterns.
+# Logs are written to a temp file so that grep -q exits cleanly.
 check_logs() {
     service="$1"
     shift
 
-    logs=$(docker compose logs "$service" 2>/dev/null || true)
-    if [ -z "$logs" ]; then
+    logfile=$(mktemp)
+
+    docker compose logs "$service" > "$logfile" 2>/dev/null || true
+    if [ ! -s "$logfile" ]; then
         container_id=$(get_container_id "$service")
         if [ -n "$container_id" ]; then
-            logs=$(docker logs "$container_id" 2>&1 || true)
+            docker logs "$container_id" > "$logfile" 2>&1 || true
         fi
     fi
 
-    if [ -z "$logs" ]; then
+    if [ ! -s "$logfile" ]; then
+        rm -f "$logfile"
         fail_msg "$service (no logs found)"
         return
     fi
 
     for pattern in "$@"; do
-        if ! echo "$logs" | grep -q -i -E "$pattern"; then
+        if ! grep -q -i -E "$pattern" "$logfile"; then
+            rm -f "$logfile"
             fail_msg "$service (missing: $pattern)"
             return
         fi
     done
 
+    rm -f "$logfile"
     pass_msg "$service"
 }
 

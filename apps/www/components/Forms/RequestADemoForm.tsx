@@ -256,7 +256,7 @@ const RequestADemoForm: FC<Props> = ({ className }) => {
             <Separator className="col-span-full" />
             <Button
               block
-              htmlType="submit"
+              type="submit"
               size="small"
               className="col-span-full"
               disabled={isSubmitting}

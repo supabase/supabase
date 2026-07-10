@@ -10,7 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 import { useOrganizationPaymentMethodDeleteMutation } from '@/data/organizations/organization-payment-method-delete-mutation'
 import type { OrganizationPaymentMethod } from '@/data/organizations/organization-payment-methods-query'

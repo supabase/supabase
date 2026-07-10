@@ -2,7 +2,7 @@ import { isEmpty, noop } from 'lodash'
 import { useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Badge, Checkbox, Input, SidePanel } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { ActionBar } from '../ActionBar'
@@ -242,7 +242,6 @@ export const TableEditor = ({
             columns,
             foreignKeyRelations: fkRelations,
             resolve,
-            generatedPolicies: [],
           })
         } else if (isDuplicating) {
           const payload: SaveTablePayloadFor<'duplicate'> = {
@@ -256,7 +255,6 @@ export const TableEditor = ({
             columns,
             foreignKeyRelations: fkRelations,
             resolve,
-            generatedPolicies: [],
           })
         } else {
           const payload: SaveTablePayloadFor<'update'> = {
@@ -271,7 +269,6 @@ export const TableEditor = ({
             columns,
             foreignKeyRelations: fkRelations,
             resolve,
-            generatedPolicies: [],
           })
         }
       } else {
@@ -478,7 +475,7 @@ export const TableEditor = ({
           >
             <DocsButton
               abbrev={false}
-              className="mt-2"
+              className="mt-2 w-min"
               href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
           </Admonition>
@@ -496,7 +493,7 @@ export const TableEditor = ({
           >
             <DocsButton
               abbrev={false}
-              className="mt-2"
+              className="mt-2 w-min"
               href={`${DOCS_URL}${docsRowLevelSecurityGuidePath}`}
             />
           </Admonition>

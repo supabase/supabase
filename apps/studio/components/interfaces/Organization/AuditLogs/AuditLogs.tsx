@@ -14,10 +14,10 @@ import { LogDetailsPanel } from '@/components/interfaces/AuditLogs/LogDetailsPan
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import Table from '@/components/to-be-cleaned/Table'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import {
@@ -236,7 +236,7 @@ export const AuditLogs = () => {
                   )}
                 </div>
                 <Button
-                  type="default"
+                  variant="default"
                   disabled={isLoading || isRefetching}
                   icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
                   onClick={() => refetch()}
@@ -301,7 +301,7 @@ export const AuditLogs = () => {
                           <p>Date</p>
 
                           <ButtonTooltip
-                            type="text"
+                            variant="text"
                             className="px-1"
                             icon={
                               dateSortDesc ? (
@@ -413,7 +413,7 @@ export const AuditLogs = () => {
                               )}
                             </Table.td>
                             <Table.td align="right">
-                              <Button type="default">View details</Button>
+                              <Button variant="default">View details</Button>
                             </Table.td>
                           </Table.tr>
                         )

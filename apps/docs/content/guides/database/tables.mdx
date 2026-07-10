@@ -92,7 +92,7 @@ You must define the "data type" when you create a column.
 
 ### Data types
 
-Every column is a predefined type. Postgres provides many [default types](https://www.postgresql.org/docs/current/datatype.html), and you can even design your own (or use extensions) if the default types don't fit your needs. You can use any data type that Postgres supports via the SQL editor. We only support a subset of these in the Table Editor in an effort to keep the experience simple for people with less experience with databases.
+Every column is a predefined type. Postgres provides many [default types](https://www.postgresql.org/docs/current/datatype.html), and you can even design your own (or use extensions) if the default types don't fit your needs. You can use any data type that Postgres supports via the SQL editor. We only support a subset of these in the Table Editor in an effort to keep the experience focused for people with less experience with databases.
 
 <details>
 <summary>Show/Hide default data types</summary>
@@ -357,7 +357,7 @@ height={1145}
 This is where the "Relational" naming comes from, as data typically forms some sort of relationship.
 
 In our "movies" example above, we might want to add a "category" for each movie (for example, "Action", or "Documentary").
-Let's create a new table called `categories` and "link" our `movies` table.
+Create a new table called `categories` and link it to the `movies` table.
 
 ```sql
 create table categories (
@@ -451,6 +451,12 @@ create table private.salaries (
   actor_id bigint not null references public.actors
 );
 ```
+
+<Admonition type="tip">
+
+If you want to access a custom schema through the Supabase Data API, you need to expose it and grant the appropriate permissions. See [Using Custom Schemas](/docs/guides/api/using-custom-schemas) for detailed steps. For security best practices around schema exposure, see [Securing your API](/docs/guides/api/securing-your-api).
+
+</Admonition>
 
 ## Views
 
@@ -579,7 +585,7 @@ from
 where courses.code != 'PG101';
 ```
 
-Without a view, we would need to go into every dependent query to add the new rule. This would increase in the likelihood of errors and inconsistencies, as well as introducing a lot of effort for a developer. With views, we can alter just the underlying query in the view **transcripts**. The change will be applied to all applications using this view.
+Without a view, we would need to go into every dependent query to add the new rule. This would increase in the likelihood of errors and inconsistencies, as well as introducing a lot of effort for a developer. With views, we can alter the underlying query in the view **transcripts**. The change will be applied to all applications using this view.
 
 #### Logical organization
 

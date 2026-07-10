@@ -2,7 +2,7 @@ import { literal, safeSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { pgGraphqlKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import type { UseCustomQueryOptions } from '@/types'

@@ -1,16 +1,14 @@
 import { useParams } from 'common'
-import { useMemo } from 'react'
+import { Check, KeyRound } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import { Badge } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { buildConnectionStringPooler, getConnectionStrings } from '../../../DatabaseSettings.utils'
-import { IPv4StatusPanel, type IPv4Status } from './IPv4StatusPanel'
 import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import {
   DATABASE_CONNECTION_TYPES,
-  IPV4_ADDON_TEXT,
-  PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT,
   type ConnectionStringMethod,
   type DatabaseConnectionType,
 } from '@/components/interfaces/ConnectSheet/Connect.constants'
@@ -22,11 +20,14 @@ import type {
 import { ConnectionParameters } from '@/components/interfaces/ConnectSheet/ConnectionParameters'
 import {
   buildConnectionParameters,
+  buildConnectionStringWithPassword,
   buildSafeConnectionString,
   parseConnectionParams,
   PASSWORD_PLACEHOLDER,
   resolveConnectionString,
 } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
+import { PasswordEncodingNote } from '@/components/interfaces/ConnectSheet/PasswordEncodingNote'
+import { ResetDbPasswordDialog } from '@/components/interfaces/Settings/Database/DatabaseSettings/ResetDbPasswordDialog'
 import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
@@ -143,9 +144,9 @@ const CONNECTION_METHOD_TO_TELEMETRY: Record<
  */
 function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
   const track = useTrack()
-  const { ref: projectRef } = useParams()
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
   const isHighAvailability = useIsHighAvailability()
+  const [temporaryDatabasePassword, setTemporaryDatabasePassword] = useState('')
 
   const connectionSource = state.connectionSource
   const connectionType = (state.connectionType as DatabaseConnectionType) ?? 'uri'
@@ -155,8 +156,6 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
   const connectionStrings = useConnectionStringDatabases(deploymentMode)
   const connectionStringPooler: ConnectionStringPooler | undefined =
     connectionStrings[connectionSource as keyof typeof connectionStrings]
-  const hasIPv4Addon = connectionStringPooler?.ipv4SupportedForDedicatedPooler ?? false
-
   // Determine which connection string to use
   const resolvedConnectionString = useMemo(
     () =>
@@ -178,7 +177,7 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
     [resolvedConnectionString, connectionParams]
   )
 
-  const connectionString = useMemo(() => {
+  const redactedConnectionString = useMemo(() => {
     switch (connectionType) {
       case 'psql':
         return buildPsqlCommand(connectionParams)
@@ -191,6 +190,16 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
         return safeConnectionString
     }
   }, [connectionType, connectionParams, safeConnectionString])
+
+  const connectionString = useMemo(() => {
+    if (!temporaryDatabasePassword) return redactedConnectionString
+
+    if (connectionType === 'psql') {
+      return redactedConnectionString
+    }
+
+    return buildConnectionStringWithPassword(redactedConnectionString, temporaryDatabasePassword)
+  }, [connectionType, redactedConnectionString, temporaryDatabasePassword])
 
   const trackCopy = () => {
     const typeConfig = DATABASE_CONNECTION_TYPES.find((t) => t.id === connectionType)
@@ -211,57 +220,6 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
     )
   }
 
-  const sharedPoolerPreferred = !hasDedicatedPooler
-  const ipv4AddOnUrl = {
-    text: 'IPv4 add-on',
-    url: `/project/${projectRef}/settings/addons?panel=ipv4`,
-  }
-  const ipv4SettingsUrl = {
-    text: 'IPv4 settings',
-    url: `/project/${projectRef}/settings/addons?panel=ipv4`,
-  }
-  const poolerSettingsUrl = {
-    text: 'Pooler settings',
-    url: `/project/${projectRef}/database/settings#connection-pooling`,
-  }
-  const buttonLinks = !hasIPv4Addon
-    ? [ipv4AddOnUrl, ...(sharedPoolerPreferred ? [poolerSettingsUrl] : [])]
-    : [ipv4SettingsUrl, ...(sharedPoolerPreferred ? [poolerSettingsUrl] : [])]
-
-  let ipv4Status: IPv4Status
-  if (connectionMethod === 'direct') {
-    ipv4Status = {
-      type: !hasIPv4Addon ? 'error' : 'success',
-      title: !hasIPv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
-      description:
-        !sharedPoolerPreferred && !hasIPv4Addon
-          ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
-          : sharedPoolerPreferred
-            ? 'Use Session Pooler if on a IPv4 network or purchase IPv4 add-on'
-            : IPV4_ADDON_TEXT,
-      links: buttonLinks,
-    }
-  } else if (connectionMethod === 'transaction') {
-    const isUsingSharedPooler = useSharedPooler || !hasDedicatedPooler
-    ipv4Status = {
-      type: !isUsingSharedPooler && !hasIPv4Addon ? 'error' : 'success',
-      title: !isUsingSharedPooler && !hasIPv4Addon ? 'Not IPv4 compatible' : 'IPv4 compatible',
-      description:
-        !isUsingSharedPooler && !hasIPv4Addon
-          ? PGBOUNCER_ENABLED_BUT_NO_IPV4_ADDON_TEXT
-          : isUsingSharedPooler
-            ? 'Transaction pooler connections are IPv4 proxied for free.'
-            : IPV4_ADDON_TEXT,
-      links: !isUsingSharedPooler ? buttonLinks : undefined,
-    }
-  } else {
-    ipv4Status = {
-      type: 'success',
-      title: 'IPv4 compatible',
-      description: 'Session pooler connections are IPv4 proxied for free',
-    }
-  }
-
   const poolerBadge =
     connectionMethod === 'transaction'
       ? useSharedPooler || !hasDedicatedPooler
@@ -280,16 +238,40 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
           <Badge>{poolerBadge}</Badge>
         </div>
       )}
-      <CodeBlock
-        className="[&_code]:text-foreground"
-        wrapperClassName="lg:col-span-2"
-        value={connectionString}
-        hideLineNumbers
-        language="bash"
-        onCopyCallback={trackCopy}
-      >
-        {connectionString}
-      </CodeBlock>
+      {connectionString.includes(PASSWORD_PLACEHOLDER) && <PasswordEncodingNote />}
+      <div className="overflow-hidden rounded-lg border bg-surface-75">
+        <div data-connect-copy-value={redactedConnectionString}>
+          <CodeBlock
+            className="rounded-none border-0 [&_code]:text-foreground"
+            wrapperClassName="lg:col-span-2"
+            value={connectionString}
+            hideLineNumbers
+            language="bash"
+            onCopyCallback={trackCopy}
+          >
+            {connectionString}
+          </CodeBlock>
+        </div>
+        {deploymentMode.isPlatform && (
+          <div className="flex flex-col gap-2 border-t px-6 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-sm text-foreground-light">
+              {temporaryDatabasePassword ? (
+                <span className="flex items-center gap-2">
+                  <Check size={16} className="text-brand shrink-0" />
+                  <span>New password shown until refresh.</span>
+                </span>
+              ) : (
+                'Forgot your database password?'
+              )}
+            </div>
+            <ResetDbPasswordDialog
+              triggerLabel="Reset password"
+              triggerIcon={<KeyRound />}
+              onPasswordReset={setTemporaryDatabasePassword}
+            />
+          </div>
+        )}
+      </div>
       {showSelfHostedDirectNotice && (
         <p className="text-sm text-foreground-light">
           Manually{' '}
@@ -303,15 +285,6 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
           </a>{' '}
           for self-hosted Supabase.
         </p>
-      )}
-      {deploymentMode.isPlatform && projectRef && !isHighAvailability && (
-        <div className="mt-2">
-          <IPv4StatusPanel
-            method={connectionMethod}
-            ipv4Status={ipv4Status}
-            projectRef={projectRef}
-          />
-        </div>
       )}
       <ConnectionParameters
         parameters={buildConnectionParameters(connectionParams)}

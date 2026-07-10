@@ -1427,7 +1427,7 @@ export const WRAPPERS: WrapperMeta[] = [
     description: 'Cloud storage service for high-dimensional vectors',
     extensionName: 'S3VectorsFdw',
     label: 'S3 Vectors',
-    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/s3-vectors`,
+    docsUrl: `${DOCS_URL}/guides/database/extensions/wrappers/s3_vectors`,
     categories: ['ai_vectors', 'storage'],
     minimumExtensionVersion: '0.5.6',
     server: {

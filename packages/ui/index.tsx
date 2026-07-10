@@ -3,10 +3,6 @@
 export * from './src/components/Button'
 export * from './src/components/Icon/IconBackground'
 
-// DISPLAYS
-
-export * from './src/components/Tabs'
-
 // NAV
 
 export * from './src/components/Menu'
@@ -14,7 +10,6 @@ export * from './src/components/NavMenu'
 
 // OVERLAYS
 
-export * from './src/components/Modal'
 export * from './src/components/SidePanel'
 
 // HTML
@@ -23,7 +18,6 @@ export { Heading } from './src/components/CustomHTMLElements'
 
 // UTILITIES
 
-export * from './src/components/Space'
 export * from './src/components/Loading'
 export * from './src/components/LogoLoader'
 export * from './src/components/AnimatedCounter'
@@ -39,7 +33,6 @@ export * from './src/components/LoadingLine'
 export * from './src/layout/ai-icon-animation'
 
 // theme switcher
-export * from './src/components/ThemeProvider/themes'
 export * from './src/components/ThemeProvider/singleThemes'
 
 // shadcn
@@ -114,12 +107,7 @@ export * from './src/components/ShadowScrollArea'
 
 export * from './src/components/shadcn/ui/collapsible'
 
-export {
-  Tabs as Tabs_Shadcn_,
-  TabsContent as TabsContent_Shadcn_,
-  TabsList as TabsList_Shadcn_,
-  TabsTrigger as TabsTrigger_Shadcn_,
-} from './src/components/shadcn/ui/tabs'
+export * from './src/components/shadcn/ui/tabs'
 
 export * from './src/components/shadcn/ui/tooltip'
 

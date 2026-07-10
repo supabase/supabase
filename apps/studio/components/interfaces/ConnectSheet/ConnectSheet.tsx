@@ -5,35 +5,18 @@ import { useEffect, useMemo, useRef } from 'react'
 import { cn, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from 'ui'
 
 import type { ConnectMode, ProjectKeys } from './Connect.types'
-import { CONNECT_MODES } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
+import { resolveConnectSheetHydration } from './ConnectSheet.utils'
 import { ConnectStepsSection } from './ConnectStepsSection'
 import { useAvailableConnectModes } from './useAvailableConnectModes'
 import { useConnectSheetParams } from './useConnectSheetParams'
 import { useConnectSheetShortcut } from './useConnectSheetShortcut'
 import { useConnectState } from './useConnectState'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
-
-function isConnectMode(value: string): value is ConnectMode {
-  return CONNECT_MODES.some((mode) => mode === value)
-}
-
-function mapConnectTabToMode(tab: string | null): ConnectMode | null {
-  if (!tab) return null
-  switch (tab) {
-    case 'frameworks':
-    case 'mobiles':
-      return 'framework'
-    case 'orms':
-      return 'orm'
-    default:
-      return isConnectMode(tab) ? tab : null
-  }
-}
 
 export const ConnectSheet = () => {
   const track = useTrack()
@@ -72,52 +55,21 @@ export const ConnectSheet = () => {
     track('connect_sheet_opened', { source: connectSheetSource })
     setConnectSheetSource('header_button')
 
-    const effectiveTab = connectTab ?? storedPrefs.connectTab
-    const effectiveFramework = queryFramework ?? storedPrefs.framework
-    const effectiveUsing = queryUsing ?? storedPrefs.using
-    const effectiveMethod = queryMethod ?? storedPrefs.method
-    const effectiveType = queryType ?? storedPrefs.type
-    const effectiveMcpClient = queryMcpClient ?? storedPrefs.mcpClient
+    const { mode, fieldUpdates, urlUpdates } = resolveConnectSheetHydration(
+      {
+        connectTab,
+        framework: queryFramework,
+        using: queryUsing,
+        method: queryMethod,
+        type: queryType,
+        mcpClient: queryMcpClient,
+      },
+      storedPrefs,
+      availableModeIds
+    )
 
-    const mappedMode = mapConnectTabToMode(effectiveTab ?? null)
-    if (mappedMode && availableModeIds.includes(mappedMode)) {
-      setMode(mappedMode)
-    }
-
-    // Hydrate URL from storedPrefs so the URL reflects the restored state.
-    // Only write params relevant to the active mode (matches how
-    // handleModeChange/handleFieldChange manage URL params).
-    const urlUpdates: Parameters<typeof setConnectParams>[0] = {}
-    if (connectTab === null && effectiveTab) urlUpdates.connectTab = effectiveTab
-    if (mappedMode === 'framework') {
-      if (effectiveFramework) {
-        updateField('framework', effectiveFramework)
-        if (queryFramework === null) urlUpdates.framework = effectiveFramework
-        if (effectiveUsing) {
-          updateField('frameworkVariant', effectiveUsing)
-          if (queryUsing === null) urlUpdates.using = effectiveUsing
-        }
-      }
-    } else if (mappedMode === 'orm') {
-      if (effectiveFramework) {
-        updateField('orm', effectiveFramework)
-        if (queryFramework === null) urlUpdates.framework = effectiveFramework
-      }
-    } else if (mappedMode === 'direct') {
-      if (effectiveMethod) {
-        updateField('connectionMethod', effectiveMethod)
-        if (queryMethod === null) urlUpdates.method = effectiveMethod
-      }
-      if (effectiveType) {
-        updateField('connectionType', effectiveType)
-        if (queryType === null) urlUpdates.type = effectiveType
-      }
-    } else if (mappedMode === 'mcp') {
-      if (effectiveMcpClient) {
-        updateField('mcpClient', effectiveMcpClient)
-        if (queryMcpClient === null) urlUpdates.mcpClient = effectiveMcpClient
-      }
-    }
+    if (mode) setMode(mode)
+    fieldUpdates.forEach(({ fieldId, value }) => updateField(fieldId, value))
     if (Object.keys(urlUpdates).length > 0) setQueryParams(urlUpdates)
   }, [
     showConnect,
@@ -159,18 +111,16 @@ export const ConnectSheet = () => {
     PermissionAction.READ,
     'service_api_keys'
   )
-  const { data: apiKeys } = useAPIKeysQuery({ projectRef }, { enabled: canReadAPIKeys })
-  const { anonKey, publishableKey } = canReadAPIKeys
-    ? getKeys(apiKeys)
-    : { anonKey: null, publishableKey: null }
+  const { data: apiKeysData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
 
   const projectKeys: ProjectKeys = useMemo(() => {
+    const { anonKey, publishableKey } = apiKeysData ?? {}
     return {
       apiUrl: endpoint,
       anonKey: anonKey?.api_key ?? null,
       publishableKey: publishableKey?.api_key ?? null,
     }
-  }, [endpoint, anonKey?.api_key, publishableKey?.api_key])
+  }, [endpoint, apiKeysData])
 
   const availableModes = useMemo(
     () => schema.modes.filter((m) => availableModeIds.includes(m.id)),
@@ -224,14 +174,16 @@ export const ConnectSheet = () => {
             />
           </div>
 
-          <div className="border-b p-8">
-            <ConnectConfigSection
-              state={state}
-              activeFields={activeFields}
-              onFieldChange={handleFieldChange}
-              getFieldOptions={getFieldOptions}
-            />
-          </div>
+          {activeFields.length > 0 && (
+            <div className="border-b p-8">
+              <ConnectConfigSection
+                state={state}
+                activeFields={activeFields}
+                onFieldChange={handleFieldChange}
+                getFieldOptions={getFieldOptions}
+              />
+            </div>
+          )}
 
           <ConnectStepsSection steps={resolvedSteps} state={state} projectKeys={projectKeys} />
         </div>

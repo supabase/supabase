@@ -115,6 +115,10 @@
       "type": "boolean",
       "description": "Enable the sign in with github provider"
     },
+    "dashboard_auth:sign_in_with_chatgpt": {
+      "type": "boolean",
+      "description": "Enable the sign in with chatgpt provider"
+    },
     "dashboard_auth:sign_in_with_sso": {
       "type": "boolean",
       "description": "Enable the sign in with sso provider"
@@ -228,6 +232,18 @@
     "docs:web_apps": {
       "type": "boolean",
       "description": "Enable web apps getting started documentation"
+    },
+    "docs:agent_plugin": {
+      "type": "boolean",
+      "description": "Enable documentation for the agent plugin"
+    },
+    "docs:agent_skills": {
+      "type": "boolean",
+      "description": "Enable documentation for agent skills"
+    },
+    "docs:prompts": {
+      "type": "boolean",
+      "description": "Enable documentation for prompts"
     },
 
     "edge_functions:show_stripe_example": {
@@ -456,6 +472,7 @@
     "billing:all",
     "dashboard_auth:sign_up",
     "dashboard_auth:sign_in_with_github",
+    "dashboard_auth:sign_in_with_chatgpt",
     "dashboard_auth:sign_in_with_sso",
     "dashboard_auth:sign_in_with_email",
     "dashboard_auth:show_tos",

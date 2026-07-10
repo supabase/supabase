@@ -1,4 +1,5 @@
 import { getTableRowsCountSql } from '@supabase/pg-meta'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 
@@ -7,11 +8,12 @@ import { formatFilterValue } from './utils'
 import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import type { Filter, SupaTable } from '@/components/grid/types'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
-import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
-import { UseCustomQueryOptions } from '@/types'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type GetTableRowsCountArgs = {
   table?: SupaTable
@@ -33,7 +35,7 @@ export type TableRowsCountVariables = Omit<GetTableRowsCountArgs, 'table'> & {
 }
 
 export type TableRowsCountData = TableRowsCount
-export type TableRowsCountError = ExecuteSqlError
+export type TableRowsCountError = ResponseError
 
 export async function getTableRowsCount(
   {
@@ -44,8 +46,8 @@ export async function getTableRowsCount(
     filters,
     roleImpersonationState,
     enforceExactCount,
-    isUsingReadReplica = false,
-  }: TableRowsCountVariables & { isUsingReadReplica?: boolean },
+    isReadOnlyContext = false,
+  }: TableRowsCountVariables & { isReadOnlyContext?: boolean },
   signal?: AbortSignal
 ) {
   const entity = await prefetchTableEditor(queryClient, {
@@ -65,7 +67,7 @@ export async function getTableRowsCount(
       table,
       filters: formattedFilters,
       enforceExactCount,
-      isUsingReadReplica,
+      isReadOnlyContext,
     }),
     roleImpersonationState
   )
@@ -103,6 +105,10 @@ export const useTableRowsCountQuery = <TData = TableRowsCountData>(
     identifier: readReplicaIdentifier,
     type,
   } = useConnectionStringForReadOps()
+  const { can: canSQLAdminWrite } = useAsyncCheckPermissions(
+    PermissionAction.TENANT_SQL_ADMIN_WRITE,
+    'tables'
+  )
 
   return useQuery<TableRowsCountData, TableRowsCountError, TData>({
     queryKey: tableRowKeys.tableRowsCount(projectRef, {
@@ -117,7 +123,7 @@ export const useTableRowsCountQuery = <TData = TableRowsCountData>(
           projectRef,
           connectionString,
           tableId,
-          isUsingReadReplica: type === 'replica',
+          isReadOnlyContext: type === 'replica' || !canSQLAdminWrite,
           ...args,
         },
         signal

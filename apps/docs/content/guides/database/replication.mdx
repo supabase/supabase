@@ -1,7 +1,7 @@
 ---
 id: 'replication'
 title: 'Database replication'
-description: 'Compare read replicas, external replication, and manual replication.'
+description: 'Compare read replicas, Supabase Pipelines, and manual replication.'
 subtitle: 'An introduction to database replication and change data capture.'
 sidebar_label: 'Overview'
 ---
@@ -18,7 +18,7 @@ You might use database replication for:
 
 ## Replication methods
 
-Supabase supports three replication methods. Choose based on whether you need another Supabase Postgres database, a managed pipeline to an external system, or full control over your own logical replication setup.
+Supabase supports three replication methods. Choose based on whether you need another Supabase Postgres database, a managed replication pipeline to a destination system, or full control over your own logical replication setup.
 
 ### Read replicas
 
@@ -26,21 +26,23 @@ Read replicas are additional Supabase Postgres databases kept in sync with your 
 
 - [Set up read replicas](/docs/guides/platform/read-replicas)
 
-### External replication
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+### Pipelines
 
 <Admonition type="caution" title="Private Alpha">
 
-External replication is currently in private alpha. Access is limited and features may change.
+Supabase Pipelines is currently in private alpha. Private alpha features can be unstable and may introduce breaking changes while we evaluate the product direction, refine the feature set, and incorporate customer feedback.
 
 </Admonition>
 
-External replication is powered by [Supabase ETL](https://github.com/supabase/etl). It uses Postgres logical replication under the hood and provides a managed Dashboard workflow for replicating data from Supabase Postgres to external data systems.
+Pipelines is a managed CDC feature for creating replication pipelines from Supabase Postgres to destination systems. It uses Postgres logical replication under the hood with the open-source [Supabase ETL engine](https://github.com/supabase/etl). A destination is where your replicated data is stored; the pipeline is the managed process that continuously streams database changes to that destination.
 
-- [Set up external replication](/docs/guides/database/replication/external-replication-setup)
+- [Set up Pipelines](/docs/guides/database/replication/pipelines)
 
 #### Supported destinations
 
-External replication currently supports BigQuery as the managed destination. We are working on new destinations, and this table will be updated as support expands.
+Pipelines currently supports BigQuery as the managed destination. We are working on new destinations, and this table will be updated as support expands.
 
 | Destination                                            | Insert       | Update       | Delete       | Truncate     | Schema change | Description                                                         |
 | ------------------------------------------------------ | ------------ | ------------ | ------------ | ------------ | ------------- | ------------------------------------------------------------------- |
@@ -48,7 +50,7 @@ External replication currently supports BigQuery as the managed destination. We 
 
 ### Manual replication
 
-Manual replication uses the same underlying Postgres logical replication features as external replication, but you configure and operate the pieces yourself. Use this path when you want to connect tools such as Airbyte, Estuary, Fivetran, Materialize, Stitch, AWS DMS, or another system that supports Postgres logical replication.
+Manual replication uses the same underlying Postgres logical replication features as Pipelines, but you configure and operate the pieces yourself. Use this path when you want to connect tools such as Airbyte, Estuary, Fivetran, Materialize, Stitch, AWS DMS, or another system that supports Postgres logical replication.
 
 - [Set up manual replication](/docs/guides/database/replication/manual-replication-setup)
 
@@ -78,7 +80,7 @@ When setting up logical replication, three key components are involved:
 
 - `publication` - A set of tables on your primary database that will be `published`
 - `replication slot` - A slot used for replicating the data from a single publication. The slot, when created, will specify the output format of the changes
-- `subscription` - A subscription is created from an external system (i.e. another Postgres database) and must specify the name of the `publication`. If you do not specify a replication slot, one is automatically created
+- `subscription` - A subscription is created from an external system (that is, another Postgres database) and must specify the name of the `publication`. If you do not specify a replication slot, one is automatically created
 
 ## Logical replication output format
 
@@ -86,7 +88,7 @@ Logical replication is typically output in two forms, `pgoutput` and `wal2json`.
 
 ## Logical replication configuration
 
-When using logical replication, Postgres keeps WAL files around for longer than it otherwise needs them. If the files are removed too quickly, then your `replication slot` can become inactive or lost if the database receives a large number of changes in a short time.
+When using logical replication, Postgres keeps WAL files around for longer than it otherwise needs them. If the files are removed too soon, then your `replication slot` can become inactive or lost if the database receives a large number of changes in a short time.
 
 In order to mitigate this, Postgres has many options and settings that can be [tweaked](/docs/guides/database/custom-postgres-config) to manage the WAL usage effectively. Not all of these settings are user configurable as they can impact the stability of your database. For those that are, these should be considered as advanced configuration and not changed without understanding that they can cause additional disk space and resources to be used, as well as incur additional costs.
 

@@ -176,6 +176,51 @@ describe('generateRowObjectFromFields', () => {
     const result = generateRowObjectFromFields({ fields: sampleRowFields })
     expect(result).toEqual({ name: '' })
   })
+  it('should omit cleared identity and default fields for new rows', () => {
+    const sampleRowFields: RowField[] = [
+      {
+        id: '1',
+        name: 'id',
+        value: '',
+        comment: '',
+        defaultValue: null,
+        format: 'int8',
+        enums: [],
+        isNullable: false,
+        isIdentity: true,
+        isPrimaryKey: true,
+      },
+      {
+        id: '2',
+        name: 'created_at',
+        value: '',
+        comment: '',
+        defaultValue: 'now()',
+        format: 'timestamptz',
+        enums: [],
+        isNullable: false,
+        isIdentity: false,
+        isPrimaryKey: false,
+      },
+      {
+        id: '3',
+        name: 'name',
+        value: '',
+        comment: '',
+        defaultValue: null,
+        format: 'text',
+        enums: [],
+        isNullable: false,
+        isIdentity: false,
+        isPrimaryKey: false,
+      },
+    ]
+    const result = generateRowObjectFromFields({
+      fields: sampleRowFields,
+      useDefaultForEmptyValues: true,
+    })
+    expect(result).toEqual({ name: '' })
+  })
   it('should discern NULL values for text', () => {
     const sampleRowFields: RowField[] = [
       {
@@ -274,12 +319,12 @@ describe('isValueTruncated', () => {
 
     // Pattern 4: Multi-dimensional array (lines 211-212)
     // column[1:50]::type[] - no special marker, just detect by [[ pattern
-    expect(isValueTruncated('[["item"]]')).toBe(true)
-    expect(isValueTruncated('[["item1","item2"]]')).toBe(true)
+    expect(isValueTruncated('[["item"]]', '_text')).toBe(true)
+    expect(isValueTruncated('[["item1","item2"]]', '_text')).toBe(true)
   })
 
   it('should detect multidimensional arrays', () => {
-    expect(isValueTruncated('[["item1", "item2"]]')).toBe(true)
+    expect(isValueTruncated('[["item1", "item2"]]', '_text')).toBe(true)
   })
 
   it('should detect truncated JSON arrays with truncated flag', () => {
@@ -301,6 +346,12 @@ describe('isValueTruncated', () => {
   it('should handle non-string values', () => {
     expect(isValueTruncated(123 as any)).toBe(false)
     expect(isValueTruncated({} as any)).toBe(false)
+  })
+
+  it('should not flag small jsonb arrays as truncated', () => {
+    expect(
+      isValueTruncated('[["infrequently","frequently","constantly"],["90","30","180"]]', 'jsonb')
+    ).toBe(false)
   })
 
   it('should test edge cases that could break coordination with table-row-query.ts', () => {

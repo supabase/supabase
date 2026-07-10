@@ -1,5 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useFlag, useParams } from 'common'
+import { IS_PLATFORM, useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
@@ -35,15 +35,15 @@ function useLastSeen({ projectRef, enabled }: { projectRef: string; enabled?: bo
 } {
   const now = useRef(new Date()).current
 
-  const query = useLogsQuery(
+  const query = useLogsQuery({
+    enabled,
     projectRef,
-    {
+    initialParams: {
       iso_timestamp_start: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
       iso_timestamp_end: now.toISOString(),
       sql: "-- last-used-secret-api-keys\nSELECT unix_millis(max(timestamp)) as timestamp, apikey.`hash` FROM edge_logs cross join unnest(metadata) as m cross join unnest(m.request) as request cross join unnest(request.sb) as sb cross join unnest(sb.apikey) as sbapikey cross join unnest(sbapikey.apikey) as apikey WHERE apikey.error is null and apikey.`hash` is not null and apikey.prefix like 'sb_secret_%' GROUP BY apikey.`hash`",
     },
-    enabled
-  )
+  })
 
   return useMemo(() => {
     if (query.isLoading || !query.logData) {
@@ -130,7 +130,7 @@ export const SecretAPIKeys = () => {
       <FormHeader
         title="Secret keys"
         description="These API keys allow privileged access to your project's APIs. Use in servers, functions, workers or other backend components of your application."
-        actions={<CreateSecretAPIKeyDialog />}
+        actions={IS_PLATFORM ? <CreateSecretAPIKeyDialog /> : null}
       />
 
       {!canReadAPIKeys && !isLoadingPermissions ? (
@@ -159,7 +159,7 @@ export const SecretAPIKeys = () => {
                 {showApiKeysLastUsed && (
                   <TableHead className="hidden lg:table-cell">Last Used</TableHead>
                 )}
-                <TableHead />
+                {IS_PLATFORM && <TableHead />}
               </TableRow>
             </TableHeader>
             <TableBody>

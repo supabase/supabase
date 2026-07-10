@@ -5,7 +5,7 @@ description: 'Learn how to use vectors within your own Postgres tables'
 sidebar_label: 'Vector columns'
 ---
 
-Supabase offers a number of different ways to store and query vectors within Postgres. The SQL included in this guide is applicable for clients in all programming languages. If you are a Python user see your [Python client options](/docs/guides/ai/python-clients) after reading the `Learn` section.
+Supabase offers a number of different ways to store and query vectors within Postgres. The SQL included in this guide is applicable for clients in all programming languages. If you are a Python user, see your [Python client options](/docs/guides/ai/python-clients) after reading the `Learn` section.
 
 Vectors in Supabase are enabled via [pgvector](https://github.com/pgvector/pgvector/), a Postgres extension for storing and querying vectors in Postgres. It can be used to store [embeddings](/docs/guides/ai/concepts#what-are-embeddings).
 
@@ -48,7 +48,7 @@ To disable an extension, call `drop extension`.
 
 ### Create a table to store vectors
 
-After enabling the `vector` extension, you will get access to a new data type called `vector`. The size of the vector (indicated in parenthesis) represents the number of dimensions stored in that vector.
+After enabling the `vector` extension, you will get access to a new data type called `vector`. The size of the vector (indicated in parentheses) represents the number of dimensions stored in that vector.
 
 ```sql
 create table documents (
@@ -59,7 +59,7 @@ create table documents (
 );
 ```
 
-In the above SQL snippet, we create a `documents` table with a column called `embedding` (note this is just a regular Postgres column - you can name it whatever you like). We give the `embedding` column a `vector` data type with 384 dimensions. Change this to the number of dimensions produced by your embedding model. For example, if you are [generating embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings) using the open source [`gte-small`](https://huggingface.co/Supabase/gte-small) model, you would set this number to 384 since that model produces 384 dimensions.
+In the SQL snippet above, we create a `documents` table with an `embedding` column. This is a standard Postgres column, so you can name it anything you like. The `embedding` column uses the `vector` data type with 384 dimensions. Change this number to match the dimensions your embedding model produces. For example, if you're [generating embeddings](/docs/guides/ai/quickstarts/generate-text-embeddings) using the open source [`gte-small`](https://huggingface.co/Supabase/gte-small) model, set this to 384.
 
 <Admonition type="tip">
 
@@ -73,6 +73,7 @@ In this example we'll generate a vector using Transformers.js, then store it in 
 
 ```js
 import { pipeline } from '@huggingface/transformers'
+
 const generateEmbedding = await pipeline('feature-extraction', 'Supabase/gte-small')
 
 const title = 'First post!'
@@ -99,7 +100,7 @@ This example uses the JavaScript Supabase client, but you can modify it to work 
 
 ### Querying a vector / embedding
 
-Similarity search is the most common use case for vectors. `pgvector` support 3 new operators for computing distance:
+Similarity search is the most common use case for vectors. `pgvector` supports 3 new operators for computing distance:
 
 | Operator | Description            |
 | -------- | ---------------------- |

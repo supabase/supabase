@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Button, cn } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 export const UnknownInterface = ({
   urlBack,
@@ -17,7 +17,7 @@ export const UnknownInterface = ({
         title="Looking for something?"
         description="We couldn't find the page that you're looking for"
       >
-        <Button asChild type="default" className="mt-2">
+        <Button asChild variant="default" className="mt-2">
           <Link href={urlBack}>Head back</Link>
         </Button>
       </Admonition>

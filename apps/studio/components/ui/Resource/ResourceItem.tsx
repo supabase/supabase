@@ -68,7 +68,7 @@ export const ResourceItem = forwardRef<HTMLDivElement, ResourceItemProps>(
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                type="text"
+                variant="text"
                 className="px-1"
                 icon={<MoreVertical size={16} />}
                 onClick={(e) => {

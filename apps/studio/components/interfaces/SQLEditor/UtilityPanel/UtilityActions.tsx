@@ -16,15 +16,19 @@ import {
   TooltipTrigger,
 } from 'ui'
 
+import { AutosaveStatus } from './AutosaveStatus'
 import { SqlRunButton } from './RunButton'
+import { SqlSaveButton } from './SaveButton'
 import SavingIndicator from './SavingIndicator'
+import { useIsSqlEditorManualSaveEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor-v2'
+import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
+import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
 
 export type UtilityActionsProps = {
   id: string
@@ -45,6 +49,8 @@ export const UtilityActions = ({
 }: UtilityActionsProps) => {
   const { ref } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
+  const sessionSnap = useSqlEditorSessionSnapshot()
+  const isManualSaveEnabled = useIsSqlEditorManualSaveEnabled()
 
   const [isAiOpen] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_OPEN, true)
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
@@ -75,23 +81,32 @@ export const UtilityActions = ({
   const removeFavorite = () => snapV2.removeFavorite(id)
 
   const onSelectDatabase = (databaseId: string) => {
-    snapV2.resetResults(id)
+    sessionSnap.resetResults(id)
     setLastSelectedDb(databaseId)
   }
 
   return (
     <div className="inline-flex items-center justify-end gap-x-2">
-      {IS_PLATFORM && <SavingIndicator id={id} />}
+      <AutosaveStatus id={id} />
+      {/* SavingIndicator reports auto-save progress (spinner/checkmark). In manual
+          mode AutosaveStatus + the Save button own the status, so hide it there. */}
+      {IS_PLATFORM && !isManualSaveEnabled && <SavingIndicator id={id} />}
 
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            data-testid="sql-editor-utility-actions"
-            type="default"
-            className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
-            icon={<MoreVertical className="text-foreground-light" />}
-          />
-        </DropdownMenuTrigger>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenuTrigger asChild>
+              <Button
+                aria-label="More actions"
+                data-testid="sql-editor-utility-actions"
+                variant="default"
+                className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
+                icon={<MoreVertical className="text-foreground-light" />}
+              />
+            </DropdownMenuTrigger>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">More actions</TooltipContent>
+        </Tooltip>
         <DropdownMenuContent className="w-48">
           <DropdownMenuItem className="justify-between" onClick={toggleIntellisense}>
             <span className="flex items-center gap-x-2">
@@ -133,13 +148,19 @@ export const UtilityActions = ({
 
       <div className={cn('items-center gap-x-2', isAiOpen ? 'hidden 2xl:flex' : 'flex')}>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              type="text"
-              className="px-1"
-              icon={<Keyboard className="text-foreground-light" />}
-            />
-          </DropdownMenuTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="text"
+                  className="px-1"
+                  icon={<Keyboard className="text-foreground-light" />}
+                  aria-label="Enable Intellisense"
+                />
+              </DropdownMenuTrigger>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">Enable Intellisense</TooltipContent>
+          </Tooltip>
           <DropdownMenuContent className="w-48">
             <DropdownMenuItem className="justify-between" onClick={toggleIntellisense}>
               Intellisense enabled
@@ -153,19 +174,21 @@ export const UtilityActions = ({
             <TooltipTrigger asChild>
               {isFavorite ? (
                 <Button
-                  type="text"
+                  variant="text"
                   size="tiny"
                   onClick={removeFavorite}
                   className="px-1"
                   icon={<Heart className="fill-brand stroke-none" />}
+                  aria-label="Remove from favorites"
                 />
               ) : (
                 <Button
-                  type="text"
+                  variant="text"
                   size="tiny"
                   onClick={addFavorite}
                   className="px-1"
                   icon={<Heart className="fill-none stroke-foreground-light" />}
+                  aria-label="Add to favorites"
                 />
               )}
             </TooltipTrigger>
@@ -178,10 +201,11 @@ export const UtilityActions = ({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              type="text"
+              variant="text"
               onClick={prettifyQuery}
               className="px-1"
               icon={<AlignLeft strokeWidth={2} className="text-foreground-light" />}
+              aria-label="Prettify SQL"
             />
           </TooltipTrigger>
           <TooltipContent side="bottom" className="p-1 pl-2.5">
@@ -193,7 +217,7 @@ export const UtilityActions = ({
         </Tooltip>
       </div>
 
-      <div className="flex items-center justify-between gap-x-2">
+      <div className="flex items-center gap-x-2">
         <div className="flex items-center">
           {IS_PLATFORM && (
             <DatabaseSelector
@@ -205,13 +229,17 @@ export const UtilityActions = ({
           <RoleImpersonationPopover
             serviceRoleLabel="postgres"
             header="Run SQL query as a role"
-            variant={IS_PLATFORM ? 'connected-on-both' : 'connected-on-right'}
+            variant={IS_PLATFORM ? 'connected-on-left' : 'regular'}
           />
+        </div>
+
+        <div className="flex items-center">
+          {isManualSaveEnabled && <SqlSaveButton id={id} className="rounded-r-none" />}
           <SqlRunButton
             hasSelection={hasSelection}
             isDisabled={isDisabled || isExecuting}
             isExecuting={isExecuting}
-            className="rounded-l-none"
+            className={isManualSaveEnabled ? 'rounded-l-none' : undefined}
             onClick={executeQuery}
           />
         </div>

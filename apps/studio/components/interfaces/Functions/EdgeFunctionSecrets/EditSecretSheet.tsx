@@ -17,8 +17,8 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
+  Textarea,
 } from 'ui'
-import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
@@ -117,25 +117,42 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
                     description="Secrets can’t be retrieved once saved. Enter a new value to overwrite the existing value."
                   >
                     <FormControl>
-                      <PasswordInput
-                        {...field}
-                        type={showSecretValue ? 'text' : 'password'}
-                        placeholder="my-secret-value"
-                        data-1p-ignore
-                        data-lpignore="true"
-                        data-form-type="other"
-                        data-bwignore
-                        actions={
-                          <div className="mr-1">
-                            <Button
-                              type="text"
-                              className="px-1"
-                              icon={showSecretValue ? <EyeOff /> : <Eye />}
-                              onClick={() => setShowSecretValue(!showSecretValue)}
-                            />
-                          </div>
-                        }
-                      />
+                      <div className="relative">
+                        <Textarea
+                          {...field}
+                          rows={1}
+                          ref={(el) => {
+                            field.ref(el)
+                            if (el) {
+                              el.style.height = 'auto'
+                              el.style.height = Math.max(40, el.scrollHeight) + 'px'
+                            }
+                          }}
+                          placeholder="my-secret-value"
+                          data-1p-ignore
+                          data-lpignore="true"
+                          data-form-type="other"
+                          data-bwignore
+                          className="min-h-0 resize-none"
+                          style={
+                            {
+                              WebkitTextSecurity: showSecretValue ? undefined : 'disc',
+                            } as React.CSSProperties
+                          }
+                          onChange={(e) => {
+                            field.onChange(e)
+                            e.currentTarget.style.height = 'auto'
+                            e.currentTarget.style.height =
+                              Math.max(40, e.currentTarget.scrollHeight) + 'px'
+                          }}
+                        />
+                        <Button
+                          variant="text"
+                          className="absolute right-1 top-1 px-1"
+                          icon={showSecretValue ? <EyeOff /> : <Eye />}
+                          onClick={() => setShowSecretValue(!showSecretValue)}
+                        />
+                      </div>
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -145,10 +162,10 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
         </SheetSection>
 
         <SheetFooter>
-          <Button disabled={isUpdating} type="default" onClick={confirmOnClose}>
+          <Button disabled={isUpdating} variant="default" onClick={confirmOnClose}>
             Cancel
           </Button>
-          <Button form={FORM_ID} htmlType="submit" disabled={!isValid} loading={isUpdating}>
+          <Button form={FORM_ID} type="submit" disabled={!isValid} loading={isUpdating}>
             Save
           </Button>
         </SheetFooter>

@@ -158,8 +158,8 @@ export const LinkSupportTicketForm = ({
         <div className="px-6 py-8">
           <Button
             block
-            type="primary"
-            htmlType="submit"
+            variant="primary"
+            type="submit"
             size="large"
             icon={<Link2 />}
             loading={isPending}

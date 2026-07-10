@@ -13,7 +13,7 @@ import {
 import type { SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
 import { REPORT_STATUS_CODE_COLORS } from '@/data/reports/report.utils'
 import useDbQuery, { DbQueryHook } from '@/hooks/analytics/useDbQuery'
-import useLogsQuery, { LogsQueryHook } from '@/hooks/analytics/useLogsQuery'
+import { useLogsQuery, type LogsQueryHook } from '@/hooks/analytics/useLogsQuery'
 import { getHttpStatusCodeInfo } from '@/lib/http-status-codes'
 
 /**
@@ -21,6 +21,21 @@ import { getHttpStatusCodeInfo } from '@/lib/http-status-codes'
  */
 export const queryParamsToObject = (params: string) => {
   return Object.fromEntries(new URLSearchParams(params))
+}
+
+/**
+ * Decodes a URI component, returning the original string if it is malformed.
+ *
+ * `decodeURIComponent` throws a `URIError` on invalid percent-encoding (e.g. a
+ * literal `%` such as `?discount=100%`). Request paths are user-controlled, so
+ * decoding inline during render can crash the page.
+ */
+export const safeDecodeURIComponent = (value: string) => {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
 }
 
 export type PresetHookResult = LogsQueryHook | DbQueryHook
@@ -43,7 +58,7 @@ export const queriesFactory = <T extends string>(
     } else {
       return {
         ...acc,
-        [k]: () => useLogsQuery(projectRef),
+        [k]: () => useLogsQuery({ projectRef }),
       }
     }
   }, {})

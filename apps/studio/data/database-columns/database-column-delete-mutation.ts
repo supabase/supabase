@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 
 import { databaseKeys } from '@/data/database/keys'
 import { entityTypeKeys } from '@/data/entity-types/keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { tableEditorKeys } from '@/data/table-editor/keys'
 import { tableRowKeys } from '@/data/table-rows/keys'
 import { viewKeys } from '@/data/views/keys'
@@ -66,7 +66,7 @@ export const useDatabaseColumnDeleteMutation = ({
         // invalidate all views from this schema, not sure if this is needed since you can't actually delete a column
         // which has a view dependent on it
         queryClient.invalidateQueries({
-          queryKey: viewKeys.listBySchema(projectRef, column.schema),
+          queryKey: viewKeys.listBySchema(projectRef, [column.schema]),
         }),
       ])
 

@@ -37,7 +37,7 @@ export function DataTableFilterControlsDrawer() {
           <DrawerTrigger asChild>
             <Button
               size="tiny"
-              type="text"
+              variant="text"
               icon={<FilterIcon />}
               className="w-[26px]"
               ref={isMobile ? triggerButtonRef : null}
@@ -67,7 +67,7 @@ export function DataTableFilterControlsDrawer() {
         </div>
         <DrawerFooter>
           <DrawerClose asChild>
-            <Button type="outline" className="w-full">
+            <Button variant="outline" className="w-full">
               Close
             </Button>
           </DrawerClose>

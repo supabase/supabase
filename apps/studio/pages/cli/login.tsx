@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from 'react'
 import { Button, Card, CardContent } from 'ui'
-import { Admonition, ShimmeringLoader } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   InterstitialAccountRow,
@@ -206,7 +207,7 @@ export const CliLoginScreen = ({
               isPlural ? 's' : ''
             }: ${status.missingParameters.join(', ')}.`}
           />
-          <Button type="default" block asChild>
+          <Button variant="default" block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
@@ -234,7 +235,7 @@ export const CliLoginScreen = ({
               </>
             }
           />
-          <Button type="default" block asChild>
+          <Button variant="default" block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
@@ -270,7 +271,7 @@ export const CliLoginScreen = ({
             text={status.deviceCode}
             copyLabel="Copy code"
             copiedLabel="Copied"
-            type="primary"
+            variant="primary"
             size="tiny"
             className="w-full"
           />

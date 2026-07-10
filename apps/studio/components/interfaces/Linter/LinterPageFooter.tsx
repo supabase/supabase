@@ -34,7 +34,7 @@ export const LinterPageFooter = ({
     <div className="px-6 py-6 flex gap-x-4 border-t relative">
       <Button
         className="absolute top-1.5 right-3 px-1.5"
-        type="text"
+        variant="text"
         size="tiny"
         onClick={() => setShowBottomSection(false)}
       >
@@ -55,7 +55,7 @@ export const LinterPageFooter = ({
           align="start"
         >
           <Button
-            type="default"
+            variant="default"
             className="mt-3! w-min"
             disabled={isLoading || isRefetching}
             loading={isLoading || isRefetching}

@@ -1,5 +1,7 @@
 import posthog, { PostHogConfig } from 'posthog-js'
 
+import { safeSessionStorage } from './safe-storage'
+
 // Limit the max number of queued events
 // (e.g. if a user navigates around a lot before accepting consent)
 const MAX_PENDING_EVENTS = 20
@@ -373,11 +375,11 @@ class PostHogClient {
     const storageKey = `ph_exposed:${experimentId}`
 
     try {
-      if (sessionStorage.getItem(storageKey) === sessionId) return
+      if (safeSessionStorage.getItem(storageKey) === sessionId) return
 
       const eventName = `${experimentId}_experiment_exposed`
       posthog.capture(eventName, { experiment_id: experimentId, ...properties })
-      sessionStorage.setItem(storageKey, sessionId)
+      safeSessionStorage.setItem(storageKey, sessionId)
     } catch (error) {
       console.error('PostHog experiment exposure capture failed:', error)
     }

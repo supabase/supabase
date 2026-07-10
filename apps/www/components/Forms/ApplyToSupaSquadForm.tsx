@@ -544,15 +544,15 @@ const FormContent = memo(function FormContent({
             <div className="flex flex-row gap-3">
               <Button
                 size="small"
-                htmlType="button"
-                type="outline"
+                type="button"
+                variant="outline"
                 onClick={handleCancel}
                 disabled={isSubmitting}
                 className="border-border text-foreground hover:bg-muted flex-1"
               >
                 Cancel
               </Button>
-              <Button size="small" htmlType="submit" disabled={isSubmitting} className="flex-1">
+              <Button size="small" type="submit" disabled={isSubmitting} className="flex-1">
                 {isSubmitting ? <>Submitting...</> : <>Submit Application</>}
               </Button>
             </div>

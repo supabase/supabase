@@ -46,7 +46,7 @@ import {
 } from './ProjectNeedsSecuring.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { createNavigationHandler } from '@/lib/navigation'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -111,7 +111,7 @@ export const ProjectNeedsSecuringView = ({
             <PageHeaderDescription>{formatRlsDescription(issueCount)}</PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
-            <Button asChild type="text" iconRight={<ArrowRight />}>
+            <Button asChild variant="text" iconRight={<ArrowRight />}>
               <Link
                 href={`/project/${projectRef}`}
                 onClick={() => {

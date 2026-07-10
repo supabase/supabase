@@ -20,6 +20,12 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DestinationType } from '../DestinationPanel.types'
+import {
+  DEFAULT_CONNECTION_POOL_SIZE,
+  DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
+  DEFAULT_MAX_FILL_MS,
+  DEFAULT_MAX_TABLE_SYNC_WORKERS,
+} from './DestinationForm.constants'
 import { type DestinationPanelSchemaType } from './DestinationForm.schema'
 
 export const AdvancedSettings = ({
@@ -43,7 +49,7 @@ export const AdvancedSettings = ({
             <div className="flex flex-col items-start gap-0.5">
               <span className="text-sm font-medium">Advanced settings</span>
               <span className="text-sm text-foreground-lighter font-normal">
-                Optional performance tuning
+                Optional settings to control the pipeline in more depth
               </span>
             </div>
           </AccordionTrigger>
@@ -76,7 +82,7 @@ export const AdvancedSettings = ({
                         type="number"
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder="Default: 10000"
+                        placeholder={`Default: ${DEFAULT_MAX_FILL_MS}`}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>milliseconds</InputGroupText>
@@ -110,7 +116,7 @@ export const AdvancedSettings = ({
                         type="number"
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder="Default: 4"
+                        placeholder={`Default: ${DEFAULT_MAX_TABLE_SYNC_WORKERS}`}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>workers</InputGroupText>
@@ -147,7 +153,7 @@ export const AdvancedSettings = ({
                         type="number"
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder="Default: 2"
+                        placeholder={`Default: ${DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE}`}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>connections</InputGroupText>
@@ -165,7 +171,7 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   label="Invalidated slot behavior"
                   layout="horizontal"
-                  description="Behavior when the replication slot is invalidated"
+                  description="Behavior of the pipeline's replication slot when invalidated."
                 >
                   <FormControl>
                     <Select value={field.value ?? 'error'} onValueChange={field.onChange}>
@@ -174,13 +180,13 @@ export const AdvancedSettings = ({
                         <SelectItem value="error" className="[&>span]:top-2.5">
                           <p>Error</p>
                           <p className="text-foreground-lighter">
-                            Blocks startup for manual recovery
+                            Blocks startup for manual recovery.
                           </p>
                         </SelectItem>
                         <SelectItem value="recreate" className="[&>span]:top-2.5">
                           <p>Recreate</p>
                           <p className="text-foreground-lighter">
-                            Rebuilds the slot and restarts replication from scratch
+                            Rebuilds the slot and restarts replication from scratch.
                           </p>
                         </SelectItem>
                       </SelectContent>
@@ -220,7 +226,7 @@ export const AdvancedSettings = ({
                             type="number"
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
-                            placeholder="Default: 4"
+                            placeholder={`Default: ${DEFAULT_CONNECTION_POOL_SIZE}`}
                           />
                           <InputGroupAddon align="inline-end">
                             <InputGroupText>connections</InputGroupText>

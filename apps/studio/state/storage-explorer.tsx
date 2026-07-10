@@ -1790,7 +1790,7 @@ function createStorageExplorerState({
             toastId && (
               <Button
                 size="tiny"
-                type="default"
+                variant="default"
                 className="ml-6"
                 onClick={() => state.abortUploads(toastId)}
               >

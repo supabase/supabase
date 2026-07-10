@@ -1,7 +1,7 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { HeaderBanner } from '@/components/interfaces/Organization/HeaderBanner'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
@@ -9,7 +9,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 // Update this whenever the banner content below changes so old client bundles
 // stop displaying outdated notices after the relevant date passes.
-const BANNER_EXPIRES_AT = new Date('2026-06-03T15:00:00Z')
+const BANNER_EXPIRES_AT = new Date('2026-06-09T15:00:00Z')
 
 const SUPAVISOR_UPDATE_REGIONS = {
   'eu-central-1': {
@@ -17,9 +17,9 @@ const SUPAVISOR_UPDATE_REGIONS = {
     end: Date.UTC(2026, 4, 26, 15, 0, 0),
     url: 'https://status.supabase.com/incidents/jy1tm4wfs68t',
   },
-  'eu-west-1': {
-    start: Date.UTC(2026, 5, 1, 13, 0, 0),
-    end: Date.UTC(2026, 5, 1, 15, 0, 0),
+  'eu-west-2': {
+    start: Date.UTC(2026, 5, 9, 13, 0, 0),
+    end: Date.UTC(2026, 5, 9, 15, 0, 0),
     url: 'https://status.supabase.com/incidents/3t293hpd545z',
   },
   'us-west-1': {
@@ -30,7 +30,7 @@ const SUPAVISOR_UPDATE_REGIONS = {
   'us-east-1': {
     start: Date.UTC(2026, 5, 3, 13, 0, 0),
     end: Date.UTC(2026, 5, 3, 15, 0, 0),
-    url: 'https://status.supabase.com/incidents/7zgmgh2p343n',
+    url: 'https://status.supabase.com/incidents/y8rp6dwjyplw',
   },
 }
 

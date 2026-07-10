@@ -4,7 +4,7 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { billingMetricUnit, formatUsage } from '../helpers'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import {
@@ -47,6 +47,7 @@ const usageBillingDocsLink: { [K in PricingMetric]?: string } = {
   [PricingMetric.DISK_IOPS_IO2]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-iops`,
   [PricingMetric.DISK_THROUGHPUT_GP3]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-throughput`,
   [PricingMetric.LOG_DRAIN]: `${DOCS_URL}/guides/platform/manage-your-usage/log-drains`,
+  [PricingMetric.ETL_PIPELINE]: `${DOCS_URL}/guides/platform/manage-your-usage/etl`,
 }
 
 export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
@@ -277,9 +278,7 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                                     docs
                                   </InlineLink>{' '}
                                   on how billing for {item.description} works and{' '}
-                                  <InlineLink href={`/organization/${slug}/usage`}>
-                                    usage page
-                                  </InlineLink>{' '}
+                                  <InlineLink href={`/org/${slug}/usage`}>usage page</InlineLink>{' '}
                                   for a detailed breakdown.
                                 </p>
                               )}

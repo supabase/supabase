@@ -1,20 +1,18 @@
 import { Check, ChevronDown, ChevronUp, PanelBottom, PanelRight, X } from 'lucide-react'
-import { useCallback, useEffect, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  KeyboardShortcut,
   Separator,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface ServiceFlowPanelControlsProps {
   dock: 'bottom' | 'right'
@@ -58,77 +56,46 @@ export const ServiceFlowPanelControls = ({
     setOpenRowId(undefined)
   }, [setOpenRowId])
 
-  useEffect(() => {
-    const down = (e: KeyboardEvent) => {
-      if (!openRowId) return
-
-      const activeElement = document.activeElement
-      if (activeElement?.closest('[role="menu"]')) return
-
-      const tag = activeElement?.tagName
-      const isEditable =
-        tag === 'INPUT' ||
-        tag === 'TEXTAREA' ||
-        (activeElement as HTMLElement | null)?.isContentEditable ||
-        activeElement?.getAttribute('role') === 'textbox'
-      if (isEditable) return
-
-      if (e.key === 'ArrowUp') {
-        e.preventDefault()
-        onPrev()
-      }
-      if (e.key === 'ArrowDown') {
-        e.preventDefault()
-        onNext()
-      }
-    }
-
-    document.addEventListener('keydown', down)
-    return () => document.removeEventListener('keydown', down)
-  }, [openRowId, onNext, onPrev])
-
   return (
     <div className="flex h-7 items-center gap-1">
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            size="tiny"
-            type="text"
-            disabled={!prevId}
-            onClick={onPrev}
-            className="px-1"
-            icon={<ChevronUp />}
-          />
-        </TooltipTrigger>
-        <TooltipContent side="top" className="flex items-center gap-2">
-          <span>Previous</span>
-          <KeyboardShortcut keys={['ArrowUp']} />
-        </TooltipContent>
-      </Tooltip>
+      <Shortcut
+        id={SHORTCUT_IDS.UNIFIED_LOGS_PREV_ROW}
+        onTrigger={onPrev}
+        options={{ enabled: !!prevId }}
+        side="top"
+      >
+        <Button
+          size="tiny"
+          variant="text"
+          disabled={!prevId}
+          onClick={onPrev}
+          className="px-1"
+          icon={<ChevronUp />}
+        />
+      </Shortcut>
 
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            size="tiny"
-            type="text"
-            disabled={!nextId}
-            onClick={onNext}
-            className="px-1"
-            icon={<ChevronDown />}
-          />
-        </TooltipTrigger>
-        <TooltipContent side="top" className="flex items-center gap-2">
-          <span>Next</span>
-          <KeyboardShortcut keys={['ArrowDown']} />
-        </TooltipContent>
-      </Tooltip>
+      <Shortcut
+        id={SHORTCUT_IDS.UNIFIED_LOGS_NEXT_ROW}
+        onTrigger={onNext}
+        options={{ enabled: !!nextId }}
+        side="top"
+      >
+        <Button
+          size="tiny"
+          variant="text"
+          disabled={!nextId}
+          onClick={onNext}
+          className="px-1"
+          icon={<ChevronDown />}
+        />
+      </Shortcut>
 
       <Separator orientation="vertical" className="mx-1 h-4" />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <ButtonTooltip
-            type="text"
+            variant="text"
             className="px-1"
             icon={dock === 'bottom' ? <PanelBottom /> : <PanelRight />}
             tooltip={{ content: { side: 'top', text: 'Dock side' } }}
@@ -152,14 +119,14 @@ export const ServiceFlowPanelControls = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button size="tiny" type="text" onClick={onClose} className="px-1" icon={<X />} />
-        </TooltipTrigger>
-        <TooltipContent side="top">
-          <span>Close</span>
-        </TooltipContent>
-      </Tooltip>
+      <Shortcut
+        id={SHORTCUT_IDS.UNIFIED_LOGS_CLOSE_PANEL}
+        onTrigger={onClose}
+        options={{ conflictBehavior: 'allow' }}
+        side="top"
+      >
+        <Button size="tiny" variant="text" onClick={onClose} className="px-1" icon={<X />} />
+      </Shortcut>
     </div>
   )
 }
