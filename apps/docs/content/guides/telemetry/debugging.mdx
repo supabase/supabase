@@ -42,7 +42,11 @@ A permission error or an unexpectedly empty result at the API layer is almost al
 
 ## Reading logs
 
-Once you know the layer, query that layer's log source directly rather than scanning everything. Pick one `source`, bound the time window, and select only the fields you need. When a query comes up empty, widen along an anchor, such as a timestamp, request ID, or error code, to follow the same request into the adjacent source (for example from `edge_logs` into `postgres_logs`) instead of broadening into an unfiltered scan. A wide, unfiltered query across every source buries the one line you need and, on paid projects, costs more in scanned data.
+Once you know the layer, query that layer's log source directly rather than scanning everything. Pick one `source`, bound the time window, and select only the fields you need.
+
+When a query comes up empty, widen along an anchor, such as a timestamp, request ID, or error code, to follow the same request into the adjacent source (for example from `edge_logs` into `postgres_logs`) instead of broadening into an unfiltered scan.
+
+A wide, unfiltered query across every source buries the one line you need and, on paid projects, costs more in scanned data.
 
 The [Logging guide](/docs/guides/telemetry/logs) covers the Logs Explorer, the available log sources, and how to write queries against them.
 
