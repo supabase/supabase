@@ -1,6 +1,6 @@
 import { ChevronDown } from 'lucide-react'
 import { useMemo, useState, type ReactNode } from 'react'
-import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger, SuccessCheckCircle } from 'ui'
+import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger, SuccessCheck } from 'ui'
 
 import {
   CreateOrganizationCard,
@@ -213,7 +213,7 @@ const ConnectOrganizationButton = ({
       )}
     />
     {selected && (
-      <SuccessCheckCircle className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" />
+      <SuccessCheck className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" />
     )}
   </button>
 )

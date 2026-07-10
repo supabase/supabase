@@ -911,9 +911,9 @@ export const examples: Registry = [
     files: ['example/sonner-upload.tsx'],
   },
   {
-    name: 'success-check-circle-demo',
+    name: 'success-check-demo',
     type: 'components:example',
-    files: ['example/success-check-circle-demo.tsx'],
+    files: ['example/success-check-demo.tsx'],
   },
   {
     name: 'switch-demo',

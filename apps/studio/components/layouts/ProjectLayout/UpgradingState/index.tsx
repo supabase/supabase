@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
-import { Button, SuccessCheckCircle, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Button, SuccessCheck, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { DATABASE_UPGRADE_MESSAGES } from './UpgradingState.constants'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
@@ -201,7 +201,7 @@ export const UpgradingState = () => {
                                 />
                               </div>
                             ) : isCompleted ? (
-                              <SuccessCheckCircle />
+                              <SuccessCheck />
                             ) : (
                               <div className="flex items-center justify-center w-5 h-5 border rounded-full bg-overlay-hover" />
                             )}
