@@ -191,7 +191,7 @@ sh run.sh recreate auth
 Check the auth container logs for errors:
 
 ```sh
-sh run.sh logs auth --tail 50
+docker compose logs auth --tail 50
 ```
 
 Verify provider credentials reach the container:

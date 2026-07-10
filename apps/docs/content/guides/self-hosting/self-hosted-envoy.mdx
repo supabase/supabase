@@ -306,7 +306,7 @@ docker run --rm --network container:supabase-envoy curlimages/curl http://127.0.
 Envoy writes access logs and filter output to stdout. View them with:
 
 ```sh
-sh run.sh logs api-gw
+docker compose logs api-gw
 ```
 
 The access log format is a standard combined log with the request method, original path, response code, and bytes sent.

@@ -143,7 +143,7 @@ docker compose run --rm db chown -R postgres:postgres /etc/postgresql-custom/ &&
 sh run.sh start
 ```
 
-This restores the original data directory, fixes file ownership on the `db-config` volume, and starts with the old Postgres 15 image. The Postgres 15 override is required because Supabase's Postgres 15 and 17 images use different user IDs, so the `chown` and startup must run as Postgres 15.
+This restores the original data directory, fixes file ownership on the `db-config` volume, and configures Supabase to use the old Postgres 15 image. Supabase's Postgres 15 and 17 images use different user IDs, so the `chown` and startup must run as Postgres 15.
 
 ### Custom Postgres configuration
 
