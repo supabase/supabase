@@ -45,6 +45,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
       cell: ({ row }) => {
         return (
           <Checkbox
+            className="hit-area-2 hover:border-foreground-muted"
             checked={row.getIsSelected()}
             onCheckedChange={(value) => row.toggleSelected(!!value)}
             onClick={(e) => e.stopPropagation()}
@@ -112,7 +113,7 @@ export function generateDynamicColumns({ data }: { data: ColumnSchema[] }): {
         const logType = row.getValue<ColumnSchema['log_type']>('log_type')
         return (
           <div className="flex items-center justify-end gap-1">
-            <LogTypeIcon type={logType} size={16} className="text-foreground-muted" />
+            <LogTypeIcon type={logType} size={14} className="text-foreground-lighter" />
           </div>
         )
       },

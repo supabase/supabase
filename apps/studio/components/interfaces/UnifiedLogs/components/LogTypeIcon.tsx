@@ -33,7 +33,7 @@ const ICON_MAP: Partial<Record<(typeof LOG_TYPES)[number], IconComponent>> = {
 
 export const LogTypeIcon = ({
   type,
-  size = 16,
+  size = 14,
   strokeWidth = 1.5,
   className,
 }: LogTypeIconProps) => {
