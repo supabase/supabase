@@ -93,10 +93,21 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       // Try to parse error response if it's JSON
       try {
         const errorBody = JSON.parse(responseBody)
+        let errorMessage = 'Edge function returned an error'
+
+        if (typeof errorBody?.error === 'string') {
+          errorMessage = errorBody.error
+        } else if (typeof errorBody?.error?.message === 'string') {
+          errorMessage = errorBody.error.message
+        } else if (typeof errorBody?.message === 'string') {
+          errorMessage = errorBody.message
+        } else if (typeof errorBody?.msg === 'string') {
+          errorMessage = errorBody.msg
+        }
 
         return res.status(response.status).json({
           status: response.status,
-          error: { message: errorBody?.error || 'Edge function returned an error' },
+          error: { message: errorMessage },
         })
       } catch (parseError) {
         // If not JSON, return the raw error
