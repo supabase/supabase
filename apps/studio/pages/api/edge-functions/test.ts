@@ -1,7 +1,7 @@
 import { IS_PLATFORM } from 'common'
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import { getEdgeFunctionErrorMessage, isValidEdgeFunctionURL } from '@/lib/api/edgeFunctions'
+import { isValidEdgeFunctionURL } from '@/lib/api/edgeFunctions'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -90,10 +90,19 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
     }
 
     if (!response.ok) {
-      return res.status(response.status).json({
-        status: response.status,
-        error: { message: getEdgeFunctionErrorMessage(responseBody) },
-      })
+      try {
+        const errorBody = JSON.parse(responseBody)
+
+        return res.status(response.status).json({
+          status: response.status,
+          error: { message: errorBody?.error || 'Edge function returned an error' },
+        })
+      } catch (parseError) {
+        return res.status(response.status).json({
+          status: response.status,
+          error: { message: responseBody || 'Edge function returned an error' },
+        })
+      }
     }
 
     const responseHeaders: Record<string, string> = {}
