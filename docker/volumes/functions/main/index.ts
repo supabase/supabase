@@ -111,14 +111,14 @@ Deno.serve(async (req: Request) => {
       const isValidJWT = await isValidHybridJWT(token);
 
       if (!isValidJWT) {
-        return new Response(JSON.stringify({ msg: 'Invalid JWT' }), {
+        return new Response(JSON.stringify({ error: 'Invalid JWT' }), {
           status: 401,
           headers: { 'Content-Type': 'application/json' },
         })
       }
     } catch (e) {
       console.error(e)
-      return new Response(JSON.stringify({ msg: e.toString() }), {
+      return new Response(JSON.stringify({ error: e.toString() }), {
         status: 401,
         headers: { 'Content-Type': 'application/json' },
       })
@@ -131,7 +131,7 @@ Deno.serve(async (req: Request) => {
   const service_name = path_parts[1]
 
   if (!service_name || service_name === '') {
-    const error = { msg: 'missing function name in request' }
+    const error = { error: 'missing function name in request' }
     return new Response(JSON.stringify(error), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
@@ -159,7 +159,7 @@ Deno.serve(async (req: Request) => {
     })
     return await worker.fetch(req)
   } catch (e) {
-    const error = { msg: e.toString() }
+    const error = { error: e.toString() }
     return new Response(JSON.stringify(error), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
