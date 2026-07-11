@@ -40,7 +40,7 @@ export async function AuthMiddleware(req: Request, next: (req: Request) => Promi
     if (isValidJWT) return await next(req)
 
     return Response.json(
-      { msg: 'Invalid JWT' },
+      { error: 'Invalid JWT' },
       {
         status: 401,
       }
@@ -48,7 +48,7 @@ export async function AuthMiddleware(req: Request, next: (req: Request) => Promi
   } catch (e) {
     console.error(e)
     return Response.json(
-      { msg: e?.toString() },
+      { error: e?.toString() },
       {
         status: 401,
       }
