@@ -3,6 +3,13 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import { isValidEdgeFunctionURL } from '@/lib/api/edgeFunctions'
 
+/**
+ * Main API route handler for testing Edge Functions.
+ * Routes requests based on HTTP method.
+ *
+ * @param {NextApiRequest} req - The incoming HTTP request
+ * @param {NextApiResponse} res - The outgoing HTTP response
+ */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
 
@@ -20,6 +27,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
+/**
+ * Handles POST requests to test an Edge Function.
+ * Parses the URL, merges custom headers, executes the fetch call to the function,
+ * and robustly extracts JSON error messages from failed executions.
+ *
+ * @param {NextApiRequest} req - The incoming HTTP request with function test payload
+ * @param {NextApiResponse} res - The outgoing HTTP response forwarding the function result
+ */
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { url: requestUrl, method, body: requestBody, headers: customHeaders } = req.body
