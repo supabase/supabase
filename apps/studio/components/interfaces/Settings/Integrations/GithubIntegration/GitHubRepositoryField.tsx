@@ -133,10 +133,11 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
       control={form.control}
       name={name}
       render={({ field }) => (
-        <FormItemLayout label={label} layout={layout} description={description}>
+        <FormItemLayout id={name} label={label} layout={layout} description={description}>
           {gitHubAuthorization === null ? (
             <FormControl>
               <Button
+                id={name}
                 variant="default"
                 size="small"
                 type="button"
@@ -155,6 +156,7 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
               <PopoverTrigger asChild>
                 <FormControl>
                   <Button
+                    id={name}
                     variant="default"
                     type="button"
                     className="justify-start h-[34px] w-full"

@@ -91,7 +91,7 @@ For providers **not** pre-configured in the files (see the [full provider list](
 ### Step 4: Restart the auth service
 
 ```sh
-docker compose up -d --force-recreate --no-deps auth
+sh run.sh recreate auth
 ```
 
 ### Step 5: Verify the configuration
@@ -385,7 +385,7 @@ For detailed client-side integration, see [Social Login](/docs/guides/auth/socia
 ### "Provider not enabled" or provider seen as false in settings
 
 - Check that `GOTRUE_EXTERNAL_*_ENABLED` is set to `true` in `docker-compose.yml`
-- Verify the `.env` variable is not empty, e.g., check with `docker compose exec auth env | grep GOOGLE`
+- Verify the `.env` variable is not empty, e.g., check with `sh run.sh printenv auth | grep GOOGLE`
 
 ### Variables added to the environment but provider still not working
 
@@ -398,7 +398,7 @@ auth:
     GOTRUE_EXTERNAL_GOOGLE_ENABLED: ${GOOGLE_ENABLED}
 ```
 
-Run `docker compose exec auth env | grep GOTRUE_EXTERNAL` to verify the variables are reaching the container.
+Run `sh run.sh printenv auth | grep GOTRUE_EXTERNAL` to verify the variables are reaching the container.
 
 ### Site URL or redirect URL errors after login
 

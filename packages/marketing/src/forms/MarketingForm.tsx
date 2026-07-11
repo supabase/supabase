@@ -149,13 +149,20 @@ function Field({
 }) {
   if (field.type === 'checkbox') {
     return (
-      <label className="flex items-start gap-3 cursor-pointer text-sm text-foreground-light leading-relaxed">
+      <label className="flex items-start gap-3 cursor-pointer rounded-lg border border-muted bg-surface-100 p-4 text-sm text-foreground-light leading-relaxed transition-colors hover:bg-surface-200">
         <Checkbox
           className="mt-0.5"
           checked={value === 'true'}
           onCheckedChange={(checked) => onChange(checked === true ? 'true' : 'false')}
         />
-        <span>{field.label}</span>
+        <span className="flex flex-col gap-1">
+          <span className="font-medium text-foreground">{field.label}</span>
+          {field.description && (
+            <span className="text-xs text-foreground-lighter leading-relaxed">
+              {field.description}
+            </span>
+          )}
+        </span>
       </label>
     )
   }
@@ -208,12 +215,34 @@ export default function MarketingForm({
 
     // Required checkboxes aren't covered by HTML5 validation; check them manually.
     const uncheckedRequired = visibleFields.filter(
-      (f) => f.type === 'checkbox' && f.required && values[f.name] !== 'true'
+      (f) => f.type === 'checkbox' && f.required && !f.group && values[f.name] !== 'true'
     )
     if (uncheckedRequired.length > 0) {
       setSubmitState('error')
       setErrorMessages(
         uncheckedRequired.map((f) => `Please confirm: ${f.label.replace(/\*$/, '').trim()}`)
+      )
+      return
+    }
+
+    const requiredCheckboxGroups = new Map<string, MarketingFormField[]>()
+    visibleFields.forEach((field) => {
+      if (field.type !== 'checkbox' || !field.group || !field.groupRequired) return
+      const groupFields = requiredCheckboxGroups.get(field.group) ?? []
+      groupFields.push(field)
+      requiredCheckboxGroups.set(field.group, groupFields)
+    })
+
+    const missingRequiredGroups = Array.from(requiredCheckboxGroups.values()).filter((group) =>
+      group.every((field) => values[field.name] !== 'true')
+    )
+    if (missingRequiredGroups.length > 0) {
+      setSubmitState('error')
+      setErrorMessages(
+        missingRequiredGroups.map((group) => {
+          const labels = group.map((field) => field.label).join(', ')
+          return `Please select at least one option: ${labels}`
+        })
       )
       return
     }

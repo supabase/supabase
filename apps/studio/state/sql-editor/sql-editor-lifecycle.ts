@@ -60,6 +60,11 @@ export function statusOnEdit(status: SnippetStatus): SnippetStatus {
   return status === 'saved' ? 'unsaved' : status
 }
 
+/** Transition when a snippet is discarded — the snippet is now either never persisted or clean. */
+export function statusOnDiscard(status: SnippetStatus): SnippetStatus {
+  return wasNeverPersisted(status) ? 'new' : 'saved'
+}
+
 /**
  * The lifecycle of a folder in the SQL editor nav, as a single set of
  * mutually-exclusive states. Like SnippetStatus, this collapses two orthogonal
