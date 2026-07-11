@@ -6,12 +6,22 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 4. Create an Expo app
+## 3. Create an Expo app
 
 Create a minimal Expo app using the `create-expo-app` command with the blank TypeScript template.
 
 ```bash
 npx create-expo-app my-app --template blank-typescript
+```
+
+## 4. Install Agent Skills (optional)
+
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+To install, run the following command in the root of your project:
+
+```bash
+npx skills add supabase/agent-skills
 ```
 
 ## 5. Install the Supabase client library
@@ -24,11 +34,9 @@ Navigate to the Expo app and install `supabase-js` along with the required depen
 cd my-app && npx expo install @supabase/supabase-js react-native-url-polyfill expo-sqlite
 ```
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
-
 ## 6. Declare Supabase environment variables
 
-Create a `.env` file in the root of your project and populate it with your Supabase connection variables that you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true).
+Create a `.env` file in the root of your project and populate it with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true).
 
 <Button variant="primary" asChild>
   <a href="/dashboard/project/_?showConnect=true">Open Connect panel</a>
@@ -40,6 +48,8 @@ Expo requires environment variables to be prefixed with `EXPO_PUBLIC_` to be acc
 EXPO_PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
+
+<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "" }} />
 
 ## 7. Initialize the Supabase client
 

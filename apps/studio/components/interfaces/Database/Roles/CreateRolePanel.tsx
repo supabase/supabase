@@ -51,6 +51,7 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
+    defaultValues: initialValues,
   })
 
   const { mutate: createDatabaseRole, isPending: isCreating } = useDatabaseRoleCreateMutation({

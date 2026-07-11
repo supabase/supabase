@@ -26,7 +26,7 @@ import { Admonition } from 'ui-patterns/admonition'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
+import { DEFAULT_DUCKLAKE_POOL_SIZE, STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 import {
   DUCKLAKE_MODE_CUSTOM,
@@ -227,7 +227,7 @@ const DuckLakeSupabaseFields = ({ form }: { form: UseFormReturn<DestinationPanel
                 min={1}
                 max={6}
                 value={field.value ?? ''}
-                placeholder="Default: 4"
+                placeholder={`Default: ${DEFAULT_DUCKLAKE_POOL_SIZE}`}
                 onChange={(event) =>
                   field.onChange(event.target.value === '' ? undefined : Number(event.target.value))
                 }
@@ -449,7 +449,7 @@ const DuckLakeCustomFields = ({
                   min={1}
                   max={6}
                   value={field.value ?? ''}
-                  placeholder="Default: 4"
+                  placeholder={`Default: ${DEFAULT_DUCKLAKE_POOL_SIZE}`}
                   onChange={(event) =>
                     field.onChange(
                       event.target.value === '' ? undefined : Number(event.target.value)

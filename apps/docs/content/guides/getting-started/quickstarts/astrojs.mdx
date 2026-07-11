@@ -6,13 +6,23 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 4. Create an Astro app
+## 3. Create an Astro app
 
 Create an Astro app using the `npm create` command.
 
 ```bash
 npm create astro@latest my-app
 cd my-app
+```
+
+## 4. Install Agent Skills (optional)
+
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+To install, run the following command in the root of your project:
+
+```bash
+npx skills add supabase/agent-skills
 ```
 
 ## 5. Install Supabase client library and Node adapter
@@ -39,11 +49,9 @@ export default defineConfig({
 })
 ```
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "astro", "tab": "frameworks" }} />
-
 ## 7. Declare Supabase environment variables
 
-Create a `.env.local` file and populate with your Supabase connection variables that you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=astro&tab=frameworks):
+Create a `.env.local` file and populate with your Supabase connection variables that you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=astro&tab=frameworks):
 
 <Button variant="primary" asChild>
   <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=astro">
@@ -55,6 +63,8 @@ Create a `.env.local` file and populate with your Supabase connection variables 
 PUBLIC_SUPABASE_URL=<SUBSTITUTE_SUPABASE_URL>
 PUBLIC_SUPABASE_PUBLISHABLE_KEY=<SUBSTITUTE_SUPABASE_PUBLISHABLE_KEY>
 ```
+
+<$Partial path="api_settings.mdx" variables={{ "framework": "astro", "tab": "frameworks" }} />
 
 ## 8. Create a Supabase client helper
 

@@ -797,6 +797,7 @@
     "next-router-mock": "^0.9.13",
     "tailwindcss": "^4.2.4",
     "tsx": "catalog:",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "unified": "^11.0.5",
     "vfile": "^6.0.3",

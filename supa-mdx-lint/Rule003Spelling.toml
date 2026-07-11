@@ -175,6 +175,7 @@ allow_list = [
     "Astro",
     "AsyncStorage",
     "Authn",
+    "AuthRetryableFetchError",
     "Authy",
     "B-tree",
     "Better Stack",

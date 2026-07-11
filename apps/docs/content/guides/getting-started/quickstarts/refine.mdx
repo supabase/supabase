@@ -6,7 +6,7 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 4. Create a Refine app
+## 3. Create a Refine app
 
 Create a [Refine](https://github.com/refinedev/refine) app using the [create refine-app](https://refine.dev/docs/getting-started/quickstart/).
 
@@ -18,11 +18,19 @@ npm create refine-app@latest -- --preset refine-supabase my-app
 
 ![Refine welcome page](/docs/img/refine-qs-welcome-page.png)
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "refine", "tab": "frameworks" }} />
+## 4. Install Agent Skills (optional)
+
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+To install, run the following command in the root of your project:
+
+```bash
+npx skills add supabase/agent-skills
+```
 
 ## 5. Update `supabaseClient` with environment variables
 
-Update the `supabaseClient` with the `SUPABASE_URL` and `SUPABASE_KEY` of your Supabase API, which you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=refine&tab=frameworks). The `supabaseClient` is used in auth provider and data provider methods that allow the Refine app to connect to your Supabase backend.
+Update the `supabaseClient` with the `SUPABASE_URL` and `SUPABASE_KEY` of your Supabase API, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=refine&tab=frameworks). The `supabaseClient` is used in auth provider and data provider methods that allow the Refine app to connect to your Supabase backend.
 
 <Button variant="primary" asChild>
   <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=refine">
@@ -45,6 +53,8 @@ export const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY, {
   },
 })
 ```
+
+<$Partial path="api_settings.mdx" variables={{ "framework": "refine", "tab": "frameworks" }} />
 
 ## 6. Add instruments resource and pages
 

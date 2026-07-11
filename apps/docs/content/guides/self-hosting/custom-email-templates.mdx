@@ -98,7 +98,7 @@ services:
 ### Step 3: Restart containers
 
 ```sh
-docker compose up -d --force-recreate --no-deps auth templates-server
+sh run.sh recreate auth templates-server
 ```
 
 ## Notification email templates
@@ -171,5 +171,5 @@ services:
 ### Step 3: Restart containers
 
 ```sh
-docker compose up -d --force-recreate --no-deps auth templates-server
+sh run.sh recreate auth templates-server
 ```

@@ -79,8 +79,8 @@ export const SignUpForm = () => {
     onError: (error) => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
-      toast.error(`Failed to sign up: ${error.message}`)
-      trackFunnelError('signup', classifyApiError('signup', error), 'toast')
+      const toastId = toast.error(`Failed to sign up: ${error.message}`)
+      trackFunnelError('signup', classifyApiError('signup', error), 'toast', toastId)
     },
   })
 
