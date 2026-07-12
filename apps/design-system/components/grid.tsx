@@ -29,10 +29,10 @@ const GridItem = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
         className={cn(
           `
             relative
-            min-h-32 
+            min-h-32
             flex gap-4 flex-col items-center p-4
             border-b border-r
-            bg-surface-75/50 
+            bg-surface-75/50
             justify-center hover:bg-surface-100
             group
             cursor-pointer
@@ -44,11 +44,11 @@ const GridItem = forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(
           className="
                     absolute
                     w-full h-full box-content
-                    transition 
-                    group-hover:border 
-                    group-hover:border-foreground-muted 
-                    group-data-open:border 
-                    group-data-open:border-foreground-muted 
+                    transition
+                    group-hover:border
+                    group-hover:border-foreground-muted
+                    group-data-open:border
+                    group-data-open:border-foreground-muted
                 "
         ></div>
         {children}

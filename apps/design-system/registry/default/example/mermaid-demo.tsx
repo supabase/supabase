@@ -6,8 +6,8 @@ export default function MermaidDemo() {
       chart={`
 flowchart TB
     Client[Your Application]
-    
-    
+
+
     Gateway[API Gateway]
     Auth[Auth]
     API[PostgREST]

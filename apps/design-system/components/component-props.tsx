@@ -34,13 +34,13 @@ export function ComponentProps(props: any) {
           {Object.entries(docs.props).map(([propName, prop], index) => (
             <TableRow key={index}>
               <TableCell>{propName}</TableCell>
-              {/* 
+              {/*
               // @ts-ignore */}
               <TableCell>{prop.required ? 'Yes' : 'No'}</TableCell>
-              {/* 
+              {/*
               // @ts-ignore */}
               <TableCell>{prop.flowType.name}</TableCell>
-              {/* 
+              {/*
               // @ts-ignore */}
               <TableCell className="text-right">{prop.description}</TableCell>
             </TableRow>
