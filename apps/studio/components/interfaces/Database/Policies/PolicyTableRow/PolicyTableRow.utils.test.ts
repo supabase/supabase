@@ -32,19 +32,8 @@ const noGrants: TableApiAccessData = { apiAccessType: 'exposed-schema-no-grants'
 const schemaNotExposedData: TableApiAccessData = { apiAccessType: 'none' }
 
 describe('getTableDataApiStatus', () => {
-  it('returns schema-not-exposed when the schema is not in the exposed list', () => {
-    const status = getTableDataApiStatus({
-      isSchemaExposed: false,
-      apiAccessData: grantedAccess,
-      isRLSEnabled: true,
-      policiesCount: 1,
-    })
-    expect(status).toBe('schema-not-exposed')
-  })
-
   it('returns no-grants when schema is exposed but no API roles have privileges', () => {
     const status = getTableDataApiStatus({
-      isSchemaExposed: true,
       apiAccessData: noGrants,
       isRLSEnabled: true,
       policiesCount: 0,
@@ -54,7 +43,6 @@ describe('getTableDataApiStatus', () => {
 
   it('returns custom-grants for partial/non-standard grants — even if RLS is off', () => {
     const status = getTableDataApiStatus({
-      isSchemaExposed: true,
       apiAccessData: customAccess,
       isRLSEnabled: false,
       policiesCount: 0,
@@ -64,7 +52,6 @@ describe('getTableDataApiStatus', () => {
 
   it('returns publicly-readable when fully granted and RLS is off', () => {
     const status = getTableDataApiStatus({
-      isSchemaExposed: true,
       apiAccessData: grantedAccess,
       isRLSEnabled: false,
       policiesCount: 3,
@@ -74,7 +61,6 @@ describe('getTableDataApiStatus', () => {
 
   it('returns locked-by-rls when fully granted + RLS on + no policies', () => {
     const status = getTableDataApiStatus({
-      isSchemaExposed: true,
       apiAccessData: grantedAccess,
       isRLSEnabled: true,
       policiesCount: 0,
@@ -84,7 +70,6 @@ describe('getTableDataApiStatus', () => {
 
   it('returns secured when fully granted + RLS on + policies exist', () => {
     const status = getTableDataApiStatus({
-      isSchemaExposed: true,
       apiAccessData: grantedAccess,
       isRLSEnabled: true,
       policiesCount: 2,
@@ -97,7 +82,6 @@ describe('getTableDataApiStatus', () => {
     // but data stays undefined). We must not fall through to 'schema-not-exposed' — that
     // would tell the user to reconfigure API settings for a schema that is in fact exposed.
     const status = getTableDataApiStatus({
-      isSchemaExposed: true,
       apiAccessData: undefined,
       isRLSEnabled: true,
       policiesCount: 0,
@@ -109,7 +93,6 @@ describe('getTableDataApiStatus', () => {
     // Defensive: the query shouldn't emit apiAccessType=none when schema is exposed,
     // but if it does we still don't want the false "schema not exposed" admonition.
     const status = getTableDataApiStatus({
-      isSchemaExposed: true,
       apiAccessData: schemaNotExposedData,
       isRLSEnabled: true,
       policiesCount: 0,
@@ -117,25 +100,13 @@ describe('getTableDataApiStatus', () => {
     expect(status).toBe('unknown')
   })
 
-  it('isSchemaExposed=false wins over any apiAccessData value', () => {
-    const status = getTableDataApiStatus({
-      isSchemaExposed: false,
-      apiAccessData: noGrants,
-      isRLSEnabled: true,
-      policiesCount: 0,
-    })
-    expect(status).toBe('schema-not-exposed')
-  })
-
   it('custom-grants wins over RLS state — we never claim public-readable for partial grants', () => {
     const rlsOff = getTableDataApiStatus({
-      isSchemaExposed: true,
       apiAccessData: customAccess,
       isRLSEnabled: false,
       policiesCount: 0,
     })
     const rlsOnNoPolicies = getTableDataApiStatus({
-      isSchemaExposed: true,
       apiAccessData: customAccess,
       isRLSEnabled: true,
       policiesCount: 0,
@@ -172,10 +143,6 @@ describe('getTableAdmonitionMessage', () => {
 
   it('returns null for secured — no admonition needed', () => {
     expect(getTableAdmonitionMessage('secured')).toBeNull()
-  })
-
-  it('returns null for schema-not-exposed — handled by a separate admonition with a link', () => {
-    expect(getTableAdmonitionMessage('schema-not-exposed')).toBeNull()
   })
 
   it('returns null for unknown — caller should stay silent during loading/errored state', () => {
