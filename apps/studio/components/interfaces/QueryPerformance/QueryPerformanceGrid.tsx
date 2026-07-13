@@ -14,10 +14,10 @@ import {
   SheetContent,
   SheetDescription,
   SheetTitle,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
@@ -604,31 +604,31 @@ export const QueryPerformanceGrid = ({
             }
           }}
         >
-          <Tabs_Shadcn_
+          <Tabs
             value={view}
             className="flex flex-col h-full"
             onValueChange={(value: any) => setView(value)}
           >
             <div className="px-5 border-b">
-              <TabsList_Shadcn_ className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
-                <TabsTrigger_Shadcn_
+              <TabsList className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
+                <TabsTrigger
                   value="details"
                   className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
                 >
                   Query details
-                </TabsTrigger_Shadcn_>
+                </TabsTrigger>
                 {selectedRow !== undefined && canShowIndexesTab && (
-                  <TabsTrigger_Shadcn_
+                  <TabsTrigger
                     value="suggestion"
                     className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
                   >
                     Indexes
-                  </TabsTrigger_Shadcn_>
+                  </TabsTrigger>
                 )}
-              </TabsList_Shadcn_>
+              </TabsList>
             </div>
 
-            <TabsContent_Shadcn_ value="details" className="mt-0 grow min-h-0 overflow-y-auto">
+            <TabsContent value="details" className="mt-0 grow min-h-0 overflow-y-auto">
               {selectedRow !== undefined && (
                 <QueryDetail
                   selectedRow={reportData[selectedRow]}
@@ -636,13 +636,13 @@ export const QueryPerformanceGrid = ({
                   onClose={() => setSelectedRow(undefined)}
                 />
               )}
-            </TabsContent_Shadcn_>
+            </TabsContent>
             {selectedRow !== undefined && canShowIndexesTab && (
-              <TabsContent_Shadcn_ value="suggestion" className="mt-0 grow min-h-0 overflow-y-auto">
+              <TabsContent value="suggestion" className="mt-0 grow min-h-0 overflow-y-auto">
                 <QueryIndexes selectedRow={reportData[selectedRow]} />
-              </TabsContent_Shadcn_>
+              </TabsContent>
             )}
-          </Tabs_Shadcn_>
+          </Tabs>
         </SheetContent>
       </Sheet>
     </div>

@@ -1,7 +1,6 @@
 # Developing Supabase
 
 - [Developing Supabase](#developing-supabase)
-
   - [Getting started](#getting-started)
     - [Install dependencies](#install-dependencies)
   - [Local development](#local-development)
@@ -34,11 +33,11 @@ To ensure a positive and inclusive environment, please read our [code of conduct
 
 You will need to install and configure the following dependencies on your machine to build [Supabase](https://supabase.com):
 
-- [Git](https://git-scm.com/)
-- [Node.js](https://nodejs.org) version as documented in [.nvmrc](./.nvmrc)
-- [pnpm](https://pnpm.io/) version 9.x.x or higher
-- [make](https://www.gnu.org/software/make/) or the equivalent to `build-essentials` for your OS
-- [Docker](https://docs.docker.com/get-docker/) (to run studio locally)
+- [**Git**](https://git-scm.com/)
+- [**Node.js**](https://nodejs.org) (version as documented in [`.nvmrc`](./.nvmrc))
+- [**pnpm**](https://pnpm.io/) (version as documented in the `packageManager` field in [`package.json`](./package.json))
+- [**make**](https://www.gnu.org/software/make/) (or the equivalent to `build-essentials` for your OS)
+- [**Docker**](https://docs.docker.com/get-docker/) (to run studio locally)
 
 ## Local development
 
@@ -119,7 +118,6 @@ For example:
 
 1. `cd apps/studio`: move to the `studio` workspace.
 2. `pnpm add react`: installs `react` into `studio` workspace.
-
 
 ---
 

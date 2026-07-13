@@ -201,14 +201,15 @@ resources:
                                       - any: true
 
                       - match:
-                          prefix: /sso/saml/acs
+                          prefix: /auth/v1/sso/saml/acs
                         route:
                           cluster: auth
+                          prefix_rewrite: /sso/saml/acs
                           timeout: 30s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
-                              value: /sso/saml/acs
+                              value: /auth/v1/sso/saml/acs
                             append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
@@ -229,14 +230,15 @@ resources:
                                       - any: true
 
                       - match:
-                          prefix: /sso/saml/metadata
+                          prefix: /auth/v1/sso/saml/metadata
                         route:
                           cluster: auth
+                          prefix_rewrite: /sso/saml/metadata
                           timeout: 30s
                         request_headers_to_add:
                           - header:
                               key: X-Forwarded-Prefix
-                              value: /sso/saml/metadata
+                              value: /auth/v1/sso/saml/metadata
                             append_action: ADD_IF_ABSENT
                         typed_per_filter_config:
                           envoy.filters.http.basic_auth:
@@ -332,6 +334,41 @@ resources:
                             '@type': >-
                               type.googleapis.com/envoy.config.route.v3.FilterConfig
                             disabled: true
+
+                      - name: rest-v1-openapi-protected
+                        match:
+                          path: /rest/v1/
+                        route:
+                          cluster: rest
+                          prefix_rewrite: /
+                          timeout: 30s
+                        request_headers_to_add:
+                          - header:
+                              key: X-Forwarded-Prefix
+                              value: /rest/v1/
+                            append_action: ADD_IF_ABSENT
+                        typed_per_filter_config:
+                          envoy.filters.http.basic_auth:
+                            '@type': type.googleapis.com/envoy.config.route.v3.FilterConfig
+                            disabled: true
+                          envoy.filters.http.rbac:
+                            '@type': type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBACPerRoute
+                            rbac:
+                              rules:
+                                action: ALLOW
+                                policies:
+                                  admin:
+                                    permissions:
+                                      - any: true
+                                    principals:
+                                      - header:
+                                          name: apikey
+                                          string_match:
+                                            exact: '${SERVICE_ROLE_KEY}'
+                                      - header:
+                                          name: apikey
+                                          string_match:
+                                            exact: '${SERVICE_ROLE_KEY_ASYMMETRIC}'
 
                       - name: rest-v1-protected
                         match:
@@ -665,6 +702,7 @@ resources:
 
                       local PROTECTED_ROUTES = {
                         ["auth-v1-protected"] = true,
+                        ["rest-v1-openapi-protected"] = true,
                         ["rest-v1-protected"] = true,
                         ["graphql-v1-protected"] = true,
                         ["realtime-v1-api-protected"] = true,

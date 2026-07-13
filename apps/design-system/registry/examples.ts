@@ -26,6 +26,12 @@ export const examples: Registry = [
     files: ['example/admonition-button.tsx'],
   },
   {
+    name: 'admonition-button-split',
+    type: 'components:example',
+    registryDependencies: ['admonition', 'button', 'dropdown-menu'],
+    files: ['example/admonition-button-split.tsx'],
+  },
+  {
     name: 'admonition-description-only',
     type: 'components:example',
     registryDependencies: ['admonition'],
@@ -139,42 +145,42 @@ export const examples: Registry = [
     registryDependencies: ['badge'],
     files: ['example/badge-secondary.tsx'],
   },
-  // {
-  //   name: 'breadcrumb-demo',
-  //   type: 'components:example',
-  //   registryDependencies: ['breadcrumb'],
-  //   files: ['example/breadcrumb-demo.tsx'],
-  // },
-  // {
-  //   name: 'breadcrumb-separator',
-  //   type: 'components:example',
-  //   registryDependencies: ['breadcrumb'],
-  //   files: ['example/breadcrumb-separator.tsx'],
-  // },
-  // {
-  //   name: 'breadcrumb-dropdown',
-  //   type: 'components:example',
-  //   registryDependencies: ['breadcrumb'],
-  //   files: ['example/breadcrumb-dropdown.tsx'],
-  // },
-  // {
-  //   name: 'breadcrumb-ellipsis',
-  //   type: 'components:example',
-  //   registryDependencies: ['breadcrumb'],
-  //   files: ['example/breadcrumb-ellipsis.tsx'],
-  // },
-  // {
-  //   name: 'breadcrumb-link',
-  //   type: 'components:example',
-  //   registryDependencies: ['breadcrumb'],
-  //   files: ['example/breadcrumb-link.tsx'],
-  // },
-  // {
-  //   name: 'breadcrumb-responsive',
-  //   type: 'components:example',
-  //   registryDependencies: ['breadcrumb'],
-  //   files: ['example/breadcrumb-responsive.tsx'],
-  // },
+  {
+    name: 'breadcrumb-demo',
+    type: 'components:example',
+    registryDependencies: ['breadcrumb'],
+    files: ['example/breadcrumb-demo.tsx'],
+  },
+  {
+    name: 'breadcrumb-separator',
+    type: 'components:example',
+    registryDependencies: ['breadcrumb'],
+    files: ['example/breadcrumb-separator.tsx'],
+  },
+  {
+    name: 'breadcrumb-dropdown',
+    type: 'components:example',
+    registryDependencies: ['breadcrumb', 'dropdown-menu'],
+    files: ['example/breadcrumb-dropdown.tsx'],
+  },
+  {
+    name: 'breadcrumb-ellipsis',
+    type: 'components:example',
+    registryDependencies: ['breadcrumb'],
+    files: ['example/breadcrumb-ellipsis.tsx'],
+  },
+  {
+    name: 'breadcrumb-link',
+    type: 'components:example',
+    registryDependencies: ['breadcrumb'],
+    files: ['example/breadcrumb-link.tsx'],
+  },
+  {
+    name: 'breadcrumb-responsive',
+    type: 'components:example',
+    registryDependencies: ['breadcrumb', 'button', 'drawer', 'dropdown-menu'],
+    files: ['example/breadcrumb-responsive.tsx'],
+  },
   {
     name: 'button-demo',
     type: 'components:example',
@@ -254,6 +260,12 @@ export const examples: Registry = [
     files: ['example/button-as-child.tsx'],
   },
   {
+    name: 'button-split-dropdown',
+    type: 'components:example',
+    registryDependencies: ['button', 'dropdown-menu'],
+    files: ['example/button-split-dropdown.tsx'],
+  },
+  {
     name: 'calendar-demo',
     type: 'components:example',
     registryDependencies: ['calendar'],
@@ -264,6 +276,12 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['calendar', 'form', 'popover'],
     files: ['example/calendar-form.tsx'],
+  },
+  {
+    name: 'calendar-disabled-days-demo',
+    type: 'components:example',
+    registryDependencies: ['calendar', 'form', 'popover'],
+    files: ['example/calendar-disabled-days-demo.tsx'],
   },
   {
     name: 'single-value-field-array-demo',

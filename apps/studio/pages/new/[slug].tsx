@@ -107,7 +107,6 @@ const Wizard: NextPageWithLayout = () => {
   )
 
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
-  const smartRegionEnabled = useFlag('enableSmartRegion')
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const showInternalOnlyConfiguration = useFlag('newProjectInternalOnlyConfiguration')
 
@@ -172,6 +171,7 @@ const Wizard: NextPageWithLayout = () => {
   } = useWatch({ control: form.control })
   const { dirtyFields } = useFormState(form)
   const isDbRegionDirty = dirtyFields.dbRegion
+  const smartRegionEnabled = cloudProvider !== 'AWS_NIMBUS'
 
   // Read dirty state during render rather than depending on form.formState in the
   // effect — form.formState is a Proxy that gets a new reference every render, which
@@ -221,9 +221,10 @@ const Wizard: NextPageWithLayout = () => {
     ? 0
     : monthlyInstancePrice(instanceSize) - availableComputeCredits
 
+  const selectedCloudProvider = cloudProvider as CloudProvider
   const { data: autoDefaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
     {
-      cloudProvider: PROVIDERS[defaultProvider].id,
+      cloudProvider: selectedCloudProvider,
     },
     {
       enabled: flagsLoaded && !smartRegionEnabled,
@@ -255,7 +256,7 @@ const Wizard: NextPageWithLayout = () => {
     ? availableRegionsData?.recommendations.smartGroup.name
     : ''
 
-  const fixedDefaultRegion = PROVIDERS[defaultProvider].default_region.displayName
+  const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
   const regionError =
     smartRegionEnabled && defaultProvider !== 'AWS_NIMBUS'
       ? availableRegionsError
@@ -321,8 +322,13 @@ const Wizard: NextPageWithLayout = () => {
       router.push(`/project/${res.ref}`)
     },
     onError: (error) => {
-      toast.error(`Failed to create new project: ${error.message}`)
-      trackFunnelError('project_creation', classifyApiError('project_creation', error), 'toast')
+      const toastId = toast.error(`Failed to create new project: ${error.message}`)
+      trackFunnelError(
+        'project_creation',
+        classifyApiError('project_creation', error),
+        'toast',
+        toastId
+      )
     },
   })
 
@@ -363,12 +369,14 @@ const Wizard: NextPageWithLayout = () => {
     } = values
 
     if (useOrioleDb && !availableOrioleVersion) {
+      const toastId = toast.error('No available OrioleDB image found, only Postgres is available')
       trackFunnelError(
         'project_creation',
         { errorCategory: 'validation', errorReason: 'oriole_unavailable' },
-        'toast'
+        'toast',
+        toastId
       )
-      return toast.error('No available OrioleDB image found, only Postgres is available')
+      return
     }
 
     const { postgresEngine, releaseChannel } =

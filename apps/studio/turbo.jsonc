@@ -71,6 +71,9 @@
         "OPENAI_API_KEY",
         "BRAINTRUST_API_KEY",
         "BRAINTRUST_PROJECT_ID",
+        // Gates the dashboard assistant between the remote MCP server and the
+        // legacy in-process one (see lib/ai/tools/mcp-tools.ts).
+        "USE_REMOTE_MCP",
         "AUTH_JWT_SECRET",
         "LOGFLARE_API_KEY",
         "LOGFLARE_PUBLIC_ACCESS_TOKEN",
@@ -79,6 +82,7 @@
         "SENTRY_ORG",
         "SENTRY_PROJECT",
         "SENTRY_AUTH_TOKEN",
+        "SKIP_ASSET_UPLOAD",
         "NEXT_PUBLIC_SENTRY_DSN",
         "AWS_BEDROCK_PROFILE",
         "AWS_BEDROCK_ROLE_ARN",

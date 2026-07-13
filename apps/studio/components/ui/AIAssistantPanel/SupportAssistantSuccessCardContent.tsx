@@ -20,7 +20,11 @@ import type { SubmittedSupportRequest } from '@/components/interfaces/Support/Su
 import { NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useTrack } from '@/lib/telemetry/track'
-import { useAiAssistantStateSnapshot, type AiAssistantState } from '@/state/ai-assistant-state'
+import {
+  useAiAssistantState,
+  useAiAssistantStateSnapshot,
+  type AiAssistantState,
+} from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 type SupportAssistantPreviewChat = AiAssistantState['chatInstances'][string]
@@ -47,6 +51,7 @@ export function SupportAssistantSuccessCardContent({
 }: SupportAssistantSuccessCardContentProps) {
   const hasAssistantContext = hasProjectScopedAssistantContext(request.projectRef)
   const aiAssistant = useAiAssistantStateSnapshot()
+  const aiAssistantState = useAiAssistantState()
   const { openSidebar } = useSidebarManagerSnapshot()
   const track = useTrack()
   const createdChatIdRef = useRef<string | null>(null)
@@ -79,7 +84,38 @@ export function SupportAssistantSuccessCardContent({
     )
 
     if (chatId) {
-      aiAssistant.selectChat(chatId)
+      // Tag the chat as a support chat on first engagement so its messages and
+      // lifecycle sync to Front. Gated on the click (rather than on chat creation)
+      // so chats the user never opens don't create Front conversations.
+      const chat = aiAssistantState.chats[chatId]
+      if (chat && !chat.supportMetadata) {
+        chat.supportMetadata = {
+          subject: request.subject,
+          category: request.category,
+          severity: request.severity,
+          organizationSlug: request.organizationSlug,
+          projectRef: request.projectRef,
+          library: request.library,
+          affectedServices: request.affectedServices,
+          allowSupportAccess: request.allowSupportAccess,
+          // Reuse the Front conversation created at submit so AI messages thread into it.
+          frontConversationId: request.frontConversationId,
+          threadRef: request.threadRef,
+          isSupportChat: true,
+          lifecycleStatus: 'bot_active',
+          lastSyncedMessageCount: 0,
+          isSyncing: false,
+          isLifecycleSyncing: false,
+        }
+
+        // Flush any messages produced before the user engaged (the initial prompt
+        // and any assistant reply). Subsequent turns sync via the onFinish hook.
+        void import('@/state/ai-chat-front-sync')
+          .then(({ syncSupportChatToFront }) => syncSupportChatToFront(chatId, aiAssistantState))
+          .catch(() => {})
+      }
+
+      aiAssistantState.selectChat(chatId)
     }
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
   }

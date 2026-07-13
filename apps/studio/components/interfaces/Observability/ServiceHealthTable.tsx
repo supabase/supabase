@@ -9,11 +9,13 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  type ChartConfig,
 } from 'ui'
 import { ChartEmptyState, ChartLoadingState } from 'ui-patterns/Chart'
 import { LogsBarChart } from 'ui-patterns/LogsBarChart'
 
 import type { LogsBarChartDatum } from '../ProjectHome/ProjectUsage.metrics'
+import type { UnifiedLogType } from '../UnifiedLogs/UnifiedLogs.utils'
 import { getHealthStatus, type ServiceKey } from './ObservabilityOverview.utils'
 
 type ServiceConfig = {
@@ -21,6 +23,7 @@ type ServiceConfig = {
   name: string
   description: string
   reportUrl?: string
+  logType: UnifiedLogType
   logsUrl: string
 }
 
@@ -36,7 +39,7 @@ type ServiceData = {
 export type ServiceHealthTableProps = {
   services: ServiceConfig[]
   serviceData: Record<string, ServiceData>
-  onBarClick: (logsUrl: string) => (datum: LogsBarChartDatum) => void
+  onBarClick: (service: ServiceConfig) => (datum: LogsBarChartDatum) => void
   datetimeFormat: string
 }
 
@@ -45,6 +48,12 @@ const colorClassMap: Record<string, string> = {
   destructive: 'bg-destructive',
   warning: 'bg-warning',
   brand: 'bg-brand',
+}
+
+const LEVEL_CHART_CONFIG: ChartConfig = {
+  error_count: { label: 'Errors' },
+  warning_count: { label: 'Warnings' },
+  ok_count: { label: 'Infos' },
 }
 
 const SERVICE_DESCRIPTIONS: Record<ServiceKey, string> = {
@@ -171,6 +180,7 @@ const ServiceCell = ({
             hideDateRange
             hideXAxis
             data={data.eventChartData}
+            chartConfig={LEVEL_CHART_CONFIG}
             DateTimeFormat={datetimeFormat}
             onBarClick={onBarClick}
             EmptyState={<ChartEmptyState className="h-full" description="No traffic" />}
@@ -208,7 +218,7 @@ export const ServiceHealthTable = ({
                   key={service.key}
                   service={service}
                   data={data}
-                  onBarClick={onBarClick(service.logsUrl)}
+                  onBarClick={onBarClick(service)}
                   datetimeFormat={datetimeFormat}
                   className={cn(
                     'border-default border-b',

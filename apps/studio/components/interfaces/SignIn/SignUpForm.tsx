@@ -79,8 +79,8 @@ export const SignUpForm = () => {
     onError: (error) => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
-      toast.error(`Failed to sign up: ${error.message}`)
-      trackFunnelError('signup', classifyApiError('signup', error), 'toast')
+      const toastId = toast.error(`Failed to sign up: ${error.message}`)
+      trackFunnelError('signup', classifyApiError('signup', error), 'toast', toastId)
     },
   })
 
@@ -151,6 +151,7 @@ export const SignUpForm = () => {
         <Form {...form}>
           <form
             id={formId}
+            method="POST"
             className="flex flex-col gap-4"
             onSubmit={form.handleSubmit(onSubmit, (errors) =>
               trackFunnelError('signup', classifyValidationError('signup', errors), 'form')

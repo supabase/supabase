@@ -17,7 +17,7 @@ import {
   getGeneralPolicyTemplates,
   getQueuePolicyTemplates,
   getRealtimePolicyTemplates,
-} from '../PolicyEditorModal/PolicyEditorModal.constants'
+} from '../Policies.constants'
 import { Markdown } from '@/components/interfaces/Markdown'
 import CardButton from '@/components/ui/CardButton'
 import CopyButton from '@/components/ui/CopyButton'

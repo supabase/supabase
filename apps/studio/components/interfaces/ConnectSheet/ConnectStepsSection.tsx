@@ -1,12 +1,11 @@
 import { useParams } from 'common'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, type ComponentType } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { connectSchema } from './connect.schema'
 import type {
   ConnectionStringPooler,
   ConnectState,
@@ -16,6 +15,14 @@ import type {
   StepContentProps,
 } from './Connect.types'
 import { ConnectSheetStep } from './ConnectSheetStep'
+import {
+  resolveContentPath,
+  shouldFetchDataApiConfig,
+  shouldShowDataApiDisabledWarning,
+  shouldShowIpv4AddonNotice,
+  shouldShowSelfHostedMcpNotice,
+  shouldShowSessionPoolerNotice,
+} from './ConnectStepsSection.utils'
 import { CopyPromptAdmonition } from './CopyPromptAdmonition'
 import { buildConnectionStringPooler, getConnectionStrings } from './DatabaseSettings.utils'
 import { getAddons } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
@@ -26,6 +33,7 @@ import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-config
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
+import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { DOCS_URL } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 
@@ -33,26 +41,6 @@ interface ConnectStepsSectionProps {
   steps: ResolvedStep[]
   state: ConnectState
   projectKeys: ProjectKeys
-}
-
-/**
- * Resolves a content path template by replacing {{key}} placeholders with state values.
- * Empty segments are filtered out to handle optional state values like frameworkVariant.
- *
- * Examples:
- *   - '{{framework}}/{{frameworkVariant}}/{{library}}' with state {framework: 'nextjs', frameworkVariant: 'app', library: 'supabasejs'}
- *     → 'nextjs/app/supabasejs'
- *   - '{{orm}}' with state {orm: 'prisma'}
- *     → 'prisma'
- *   - 'steps/install' (no templates)
- *     → 'steps/install'
- */
-function resolveContentPath(template: string, state: ConnectState): string {
-  return template
-    .replace(/\{\{(\w+)\}\}/g, (_, key) => String(state[key] ?? ''))
-    .split('/')
-    .filter(Boolean)
-    .join('/')
 }
 
 /**
@@ -129,6 +117,27 @@ function useConnectionStringPooler(deploymentMode: DeploymentMode): ConnectionSt
   )
 }
 
+// Vite needs `import.meta.glob` to statically discover the step content
+// modules because the `${filePath}` template can span multiple directory
+// segments (`flask/supabasepy`, `steps/shadcn/explore`, ...) which Vite's
+// dynamic-import-vars plugin can't analyze. Skip the glob on the SSR bundle
+// — Vite replaces `import.meta.env.SSR` at build time and tree-shakes the
+// call so the 37 content modules stay out of the server graph (pulling them
+// in reshuffles chunks enough to surface latent circular-dep bugs in
+// unrelated modules). Next/webpack doesn't know about `import.meta.glob`
+// either; the try/catch lets that branch fall through to the webpack-friendly
+// `import()` below.
+let contentModules: Record<string, () => Promise<unknown>> = {}
+if (!import.meta.env?.SSR) {
+  try {
+    contentModules = import.meta.glob('./content/**/content.{tsx,ts}')
+  } catch {
+    // webpack build: import.meta.glob is undefined, keep empty map
+  }
+}
+
+type StepContentModule = { default: ComponentType<StepContentProps> }
+
 /**
  * Dynamically loads and renders a content component from the content directory.
  * All step content uses this unified loader - no built-in component registry needed.
@@ -151,7 +160,16 @@ function StepContent({
 
   // Dynamically import the content component
   const ContentComponent = useMemo(() => {
-    return dynamic<StepContentProps>(() => import(`./content/${filePath}/content`), {
+    const viteLoader =
+      contentModules[`./content/${filePath}/content.tsx`] ??
+      contentModules[`./content/${filePath}/content.ts`]
+
+    const loader = viteLoader
+      ? (viteLoader as () => Promise<StepContentModule>)
+      : () =>
+          import(/* @vite-ignore */ `./content/${filePath}/content`) as Promise<StepContentModule>
+
+    return dynamic<StepContentProps>(loader, {
       loading: () => (
         <div className="p-4 min-h-[200px]">
           <GenericSkeletonLoader />
@@ -185,28 +203,60 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
       },
     }
   )
-  const showIpv4AddonNotice =
-    deploymentMode.isPlatform &&
-    state.mode === 'direct' &&
-    !ipv4Addon &&
-    (state.connectionMethod === 'direct' ||
-      (state.connectionMethod === 'transaction' && !state.useSharedPooler))
-  const showSessionPoolerNotice =
-    deploymentMode.isPlatform && state.mode === 'direct' && state.connectionMethod === 'session'
+  const showIpv4AddonNotice = shouldShowIpv4AddonNotice({
+    isPlatform: deploymentMode.isPlatform,
+    mode: state.mode,
+    connectionMethod: state.connectionMethod,
+    useSharedPooler: state.useSharedPooler,
+    hasIpv4Addon: !!ipv4Addon,
+  })
+  const showSessionPoolerNotice = shouldShowSessionPoolerNotice({
+    isPlatform: deploymentMode.isPlatform,
+    mode: state.mode,
+    connectionMethod: state.connectionMethod,
+  })
+  const showSelfHostedMcpNotice = shouldShowSelfHostedMcpNotice({
+    isSelfHosted: deploymentMode.isSelfHosted,
+    mode: state.mode,
+  })
 
-  const showSelfHostedMcpNotice = deploymentMode.isSelfHosted && state.mode === 'mcp'
-
-  const customPrompt = useMemo(
-    () => connectSchema.modes.find((m) => m.id === state.mode)?.prompt,
-    [state.mode]
-  )
-
+  const shouldFetchDataApiStatus = shouldFetchDataApiConfig({
+    mode: state.mode,
+  })
+  const {
+    isEnabled: isDataApiEnabled,
+    isPending: isDataApiConfigPending,
+    isError: isDataApiConfigError,
+  } = useIsDataApiEnabled({
+    projectRef: ref,
+    enabled: shouldFetchDataApiStatus,
+  })
+  const showDataApiDisabledWarning = shouldShowDataApiDisabledWarning({
+    mode: state.mode,
+    isDataApiEnabled,
+    isPending: isDataApiConfigPending,
+    isError: isDataApiConfigError,
+  })
   if (steps.length === 0) return null
 
   return (
     <div className="bg-muted/50 flex-1">
       <div className="p-8 flex flex-col gap-y-6">
         <h3>Connect your app</h3>
+
+        {showDataApiDisabledWarning && (
+          <Admonition
+            type="warning"
+            layout="responsive"
+            title="Database access requires the Data API"
+            description="Client library database queries will not work until the Data API is enabled."
+            actions={[
+              <Button asChild key="enable" variant="default">
+                <Link href={`/project/${ref}/integrations/data_api`}>Enable Data API</Link>
+              </Button>,
+            ]}
+          />
+        )}
 
         {showIpv4AddonNotice && (
           <Admonition
@@ -244,7 +294,7 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
           />
         )}
 
-        <CopyPromptAdmonition stepsContainerRef={stepsContainerRef} customPrompt={customPrompt} />
+        <CopyPromptAdmonition stepsContainerRef={stepsContainerRef} />
 
         <div className="mt-6" ref={stepsContainerRef}>
           {steps.map((step, index) => (

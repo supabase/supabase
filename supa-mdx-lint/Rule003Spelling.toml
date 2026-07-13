@@ -175,6 +175,7 @@ allow_list = [
     "Astro",
     "AsyncStorage",
     "Authn",
+    "AuthRetryableFetchError",
     "Authy",
     "B-tree",
     "Better Stack",
@@ -348,6 +349,7 @@ allow_list = [
     # We prefer Postgres, but check for vocabulary preference in a separate rule
     "PostgreSQL",
     "PowerBI",
+    "[Pp]refill",
     "ProGuard",
     "PubSub",
     "Prisma",

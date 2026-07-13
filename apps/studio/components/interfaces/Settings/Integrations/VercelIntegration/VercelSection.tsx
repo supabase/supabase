@@ -138,6 +138,9 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
     connections.length,
     'connection'
   )} `
+  const description = isProjectScoped
+    ? 'Connect Vercel projects to this Supabase project. Supabase keeps environment variables up to date in each connected Vercel project.'
+    : 'Connect your Vercel teams to this Supabase organization. Supabase keeps environment variables up to date in each connected project. You can also link multiple Vercel projects to the same Supabase project.'
 
   return (
     <PageSection>
@@ -145,12 +148,8 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
         <div className="flex flex-1 items-start gap-6">
           <IntegrationSectionIcon title="vercel" />
           <PageSectionSummary>
-            <PageSectionTitle>Vercel Integration</PageSectionTitle>
-            <PageSectionDescription>
-              Connect your Vercel teams to your Supabase organization. Supabase keeps environment
-              variables up to date in each assigned project. You can also link multiple Vercel
-              projects to the same Supabase project.
-            </PageSectionDescription>
+            <PageSectionTitle>Vercel</PageSectionTitle>
+            <PageSectionDescription>{description}</PageSectionDescription>
           </PageSectionSummary>
         </div>
       </PageSectionMeta>
@@ -164,49 +163,42 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
             <div>
               {vercelIntegration ? (
                 <div key={vercelIntegration.id}>
-                  <IntegrationInstallation title={'Vercel'} integration={vercelIntegration} />
-                  {connections.length > 0 ? (
-                    <>
-                      <IntegrationConnectionHeader
-                        title={ConnectionHeaderTitle}
-                        markdown={`Repository connections for Vercel`}
-                      />
-                      <ul className="flex flex-col">
-                        {connections.map((connection) => (
-                          <div
-                            key={connection.id}
-                            className={cn(
-                              isProjectScoped && 'relative flex flex-col -gap-[1px] [&>li]:pb-0'
-                            )}
-                          >
-                            <IntegrationConnectionItem
-                              connection={connection}
-                              disabled={isBranch || !canUpdateVercelConnection}
-                              type={'Vercel' as IntegrationName}
-                              onDeleteConnection={onDeleteVercelConnection}
-                              className={cn(isProjectScoped && 'rounded-b-none! mb-0!')}
-                            />
-                            {isProjectScoped ? (
-                              <div className="relative pl-8 ml-6 border-l border-muted pb-6">
-                                <div className="border-b border-l border-r rounded-b-lg">
-                                  <VercelIntegrationConnectionForm
-                                    connection={connection}
-                                    integration={vercelIntegration}
-                                    disabled={isBranch || !canUpdateVercelConnection}
-                                  />
-                                </div>
+                  <IntegrationInstallation title="Vercel" integration={vercelIntegration} />
+                  <IntegrationConnectionHeader
+                    title={ConnectionHeaderTitle}
+                    className={connections.length === 0 ? 'pb-0' : undefined}
+                    markdown="Project connections for Vercel"
+                  />
+                  {connections.length > 0 && (
+                    <ul className="flex flex-col gap-y-2">
+                      {connections.map((connection) => (
+                        <div
+                          key={connection.id}
+                          className={cn(
+                            isProjectScoped && 'relative flex flex-col -gap-[1px] [&>li]:pb-0'
+                          )}
+                        >
+                          <IntegrationConnectionItem
+                            connection={connection}
+                            disabled={isBranch || !canUpdateVercelConnection}
+                            type={'Vercel' as IntegrationName}
+                            onDeleteConnection={onDeleteVercelConnection}
+                            className={cn(isProjectScoped && 'rounded-b-none! mb-0!')}
+                          />
+                          {isProjectScoped ? (
+                            <div className="relative pl-8 ml-6 border-l border-muted pb-6">
+                              <div className="border-b border-l border-r rounded-b-lg">
+                                <VercelIntegrationConnectionForm
+                                  connection={connection}
+                                  integration={vercelIntegration}
+                                  disabled={isBranch || !canUpdateVercelConnection}
+                                />
                               </div>
-                            ) : null}
-                          </div>
-                        ))}
-                      </ul>
-                    </>
-                  ) : (
-                    <IntegrationConnectionHeader
-                      title={ConnectionHeaderTitle}
-                      className="pb-0"
-                      markdown={`Repository connections for Vercel`}
-                    />
+                            </div>
+                          ) : null}
+                        </div>
+                      ))}
+                    </ul>
                   )}
                   <EmptyIntegrationConnection
                     disabled={isBranch || !canCreateVercelConnection}
@@ -221,9 +213,9 @@ export const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean })
                   disabled={isBranch}
                   href={integrationUrl}
                   icon={<ExternalLink />}
-                  disabledTooltip="Install Vercel Integration on your project's main branch"
+                  disabledTooltip="Install the Vercel integration on your project's main branch"
                 >
-                  Install Vercel Integration
+                  Install Vercel integration
                 </EmptyIntegrationConnection>
               )}
             </div>

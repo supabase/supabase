@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { cn } from 'ui'
 
 import { Markdown } from '@/components/interfaces/Markdown'
+import { loadIntegrationOverview } from '@/static-data/integrations/overviews'
 
 const CHAR_LIMIT = 500 // Adjust this number as needed
 
@@ -17,9 +18,16 @@ export const MarkdownContent = ({
   const [isExpanded, setIsExpanded] = useState(initiallyExpanded ?? false)
 
   useEffect(() => {
-    import(`@/static-data/integrations/${integrationId}/overview.md`)
-      .then((module) => setContent(String(module.default)))
+    let cancelled = false
+    loadIntegrationOverview(integrationId)
+      .then((markdown) => {
+        if (!cancelled && markdown !== null) setContent(markdown)
+      })
       .catch((error) => console.error('Error loading markdown:', error))
+
+    return () => {
+      cancelled = true
+    }
   }, [integrationId])
 
   const displayContent = isExpanded ? content : content.slice(0, CHAR_LIMIT)

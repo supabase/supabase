@@ -1,8 +1,9 @@
-import styles from './features-grid.module.css'
+import Panel from '~/components/Panel'
 import React from 'react'
 import { cn } from 'ui'
-import Panel from '~/components/Panel'
+
 import SectionContainer from '../Layouts/SectionContainer'
+import styles from './features-grid.module.css'
 
 export default function FeaturesGrid(props: any) {
   const hasExtendedCards = props.features.some(
@@ -75,9 +76,11 @@ const Content = ({ card, innerClassName }: { card: any; innerClassName?: string 
         </div>
       )}
       <div className="content-container flex flex-col justify-between gap-3 p-6 flex-1">
-        <h3 className="text-foreground-lighter flex items-center gap-2">{card.heading}</h3>
+        <h3 className="text-foreground-lighter flex items-center gap-2 text-balance">
+          {card.heading}
+        </h3>
         <div className="flex flex-col justify-between gap-2">
-          <p className="text-sm text-foreground-lighter">{card.subheading}</p>
+          <p className="text-sm text-foreground-lighter text-pretty">{card.subheading}</p>
         </div>
       </div>
     </Panel>

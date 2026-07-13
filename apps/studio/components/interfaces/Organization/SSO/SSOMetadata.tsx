@@ -8,10 +8,10 @@ import {
   FormItem,
   FormMessage,
   Input,
-  Tabs_Shadcn_,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
@@ -65,20 +65,20 @@ export const SSOMetadata = ({
       className="gap-1"
     >
       <div className=" w-96">
-        <Tabs_Shadcn_
+        <Tabs
           value={tab}
           onValueChange={(value: string) => setTab(value as 'url' | 'file')}
           className="max-w-2xl"
         >
-          <TabsList_Shadcn_ className="mx-auto gap-5 w-auto">
-            <TabsTrigger_Shadcn_ className=" " value="url">
+          <TabsList className="mx-auto gap-5 w-auto">
+            <TabsTrigger className=" " value="url">
               URL
-            </TabsTrigger_Shadcn_>
-            <TabsTrigger_Shadcn_ className=" " value="file">
+            </TabsTrigger>
+            <TabsTrigger className=" " value="file">
               Upload file
-            </TabsTrigger_Shadcn_>
-          </TabsList_Shadcn_>
-          <TabsContent_Shadcn_ value="url">
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="url">
             <FormField
               name="metadataXmlUrl"
               render={({ field }) => (
@@ -94,8 +94,8 @@ export const SSOMetadata = ({
                 </FormItem>
               )}
             />
-          </TabsContent_Shadcn_>
-          <TabsContent_Shadcn_ value="file">
+          </TabsContent>
+          <TabsContent value="file">
             <FormField
               name="metadataXmlUrl"
               render={() => (
@@ -121,8 +121,8 @@ export const SSOMetadata = ({
                 </div>
               )}
             />
-          </TabsContent_Shadcn_>
-        </Tabs_Shadcn_>
+          </TabsContent>
+        </Tabs>
       </div>
     </FormItemLayout>
   )

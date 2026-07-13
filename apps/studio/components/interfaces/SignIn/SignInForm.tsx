@@ -121,7 +121,12 @@ export const SignInForm = () => {
 
   return (
     <Form {...form}>
-      <form id={formId} className="flex flex-col gap-4" onSubmit={form.handleSubmit(onSubmit)}>
+      <form
+        id={formId}
+        method="POST"
+        className="flex flex-col gap-4"
+        onSubmit={form.handleSubmit(onSubmit)}
+      >
         {authError && <AlertError error={authError} subject="Error while signing in" />}
         <FormField
           key="email"

@@ -87,15 +87,16 @@ export const EdgeFunctionRecentErrors = ({
     logData: recentErrorInvocations,
     isLoading: isLoadingRecentErrorInvocations,
     error: recentErrorInvocationsError,
-  } = useLogsQuery(
-    projectRef as string,
-    {
+  } = useLogsQuery({
+    projectRef: projectRef!,
+    initialParams: {
       sql: recentErrorInvocationsSql,
       iso_timestamp_start: isoTimestampStart,
       iso_timestamp_end: isoTimestampEnd,
     },
-    isQueryEnabled
-  )
+    enabled: isQueryEnabled,
+    options: { useOtel: true },
+  })
 
   const recentErrorGroupsBase = useMemo(
     () => getRecentErrorGroupsBase(recentErrorInvocations),
@@ -105,15 +106,16 @@ export const EdgeFunctionRecentErrors = ({
     logData: sinceLastDeployInvocationCountRows,
     isLoading: isLoadingSinceLastDeployInvocationCount,
     error: sinceLastDeployInvocationCountError,
-  } = useLogsQuery(
-    projectRef as string,
-    {
+  } = useLogsQuery({
+    projectRef: projectRef!,
+    initialParams: {
       sql: sinceLastDeployInvocationCountSql,
       iso_timestamp_start: isoTimestampStart,
       iso_timestamp_end: isoTimestampEnd,
     },
-    Boolean(projectRef && sinceLastDeployInvocationCountSql && isoTimestampStart)
-  )
+    enabled: Boolean(projectRef && sinceLastDeployInvocationCountSql && isoTimestampStart),
+    options: { useOtel: true },
+  })
 
   const relatedExecutionIds = useMemo(
     () => getRelatedExecutionIds(recentErrorGroupsBase),
@@ -129,15 +131,16 @@ export const EdgeFunctionRecentErrors = ({
     logData: functionRuntimeLogs,
     isLoading: isLoadingFunctionRuntimeLogs,
     error: functionRuntimeLogsError,
-  } = useLogsQuery(
-    projectRef as string,
-    {
+  } = useLogsQuery({
+    projectRef: projectRef!,
+    initialParams: {
       sql: functionRuntimeLogsSql,
       iso_timestamp_start: isoTimestampStart,
       iso_timestamp_end: isoTimestampEnd,
     },
-    Boolean(projectRef && functionRuntimeLogsSql && isoTimestampStart)
-  )
+    enabled: Boolean(projectRef && functionRuntimeLogsSql && isoTimestampStart),
+    options: { useOtel: true },
+  })
   const queryError =
     toAlertError(recentErrorInvocationsError) ?? toAlertError(functionRuntimeLogsError)
 

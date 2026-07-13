@@ -61,14 +61,14 @@ storage:
 
 <Admonition type="caution">
 
-Podman does not support nested variable interpolation (`${A:-${B}}`). If you are using Podman, replace each nested expression with the required variable directly - see the inline comments in `docker-compose.yml` for the exact substitutions.
+Nested variable interpolation (`${A:-${B}}`) requires `podman-compose >= 1.6.0`. Earlier versions (still shipped by some Linux distributions) do not support it - if you are on an older `podman-compose`, either upgrade or replace each nested expression with the required variable directly, see the inline comments in `docker-compose.yml` for the exact substitutions.
 
 </Admonition>
 
 Restart all services:
 
 ```sh
-docker compose down && docker compose up -d
+sh run.sh recreate
 ```
 
 ### New API keys format
@@ -82,14 +82,14 @@ sb_secret_<22-char-random>_<8-char-checksum>
 
 ### Verifying the setup
 
-Test with the new publishable key:
+Test with the new secret key:
 
 ```sh
 curl http://<your-domain>/rest/v1/ \
 -H "apikey: your-supabase-secret-key"
 ```
 
-You should receive a valid response from PostgREST. Then verify that the legacy key still works:
+You should receive a valid response from PostgREST. Then verify that the legacy service role key still works:
 
 ```sh
 curl http://<your-domain>/rest/v1/ \
@@ -97,6 +97,12 @@ curl http://<your-domain>/rest/v1/ \
 ```
 
 Both should work and return the same result.
+
+<Admonition type="note">
+
+`/rest/v1/` is the Open API root and requires admin-level keys (`sb_secret_*` or legacy `SERVICE_ROLE_KEY`). Public keys (`sb_publishable_*` or legacy `ANON_KEY`) return `403` for this endpoint.
+
+</Admonition>
 
 You can also verify the public JWKS endpoint:
 
@@ -150,7 +156,7 @@ sh utils/rotate-new-api-keys.sh --update-env
 After rotating, restart services and update your client applications with the new keys:
 
 ```sh
-docker compose down && docker compose up -d
+sh run.sh recreate
 ```
 
 <Admonition type="note">

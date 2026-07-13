@@ -34,7 +34,7 @@ export const OrganizationCard = ({
   const numProjects = data?.pages[0].pagination.count ?? 0
   const isMfaRequired = organization.organization_requires_mfa
 
-  const renderContent = () => (
+  const card = (
     <ActionCard
       bgColor="bg border"
       className={cn(
@@ -80,9 +80,13 @@ export const OrganizationCard = ({
   )
 
   if (isLink) {
-    return <Link href={href ?? `/org/${organization.slug}`}>{renderContent()}</Link>
+    return (
+      <Link href={href ?? `/org/${organization.slug}`} tabIndex={0}>
+        {card}
+      </Link>
+    )
   } else {
-    return <Fragment>{renderContent()}</Fragment>
+    return <Fragment>{card}</Fragment>
   }
 }
 

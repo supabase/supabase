@@ -280,7 +280,7 @@ export const InviteMemberButton = () => {
           </ButtonTooltip>
         </Shortcut>
       </SheetTrigger>
-      <SheetContent className="flex flex-col gap-0">
+      <SheetContent size="lg" className="flex flex-col gap-0">
         <SheetHeader>
           <SheetTitle>Invite team members</SheetTitle>
           <SheetDescription>
