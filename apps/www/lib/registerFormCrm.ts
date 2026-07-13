@@ -3,7 +3,6 @@ import 'server-only'
 import { setFormCrmResolver } from 'marketing'
 
 import { getGoPageBySlug } from './go'
-import { staticFormCrmRegistry } from './staticFormCrm'
 
 /**
  * Wire the marketing form server action to look up the trusted CRM config for
@@ -13,9 +12,6 @@ import { staticFormCrmRegistry } from './staticFormCrm'
  */
 export function registerFormCrmResolver() {
   setFormCrmResolver(({ slug, formId }) => {
-    const staticEntry = staticFormCrmRegistry[`${slug}/${formId}`]
-    if (staticEntry) return staticEntry
-
     const page = getGoPageBySlug(slug)
     if (!page || !('sections' in page) || !page.sections) return undefined
 
