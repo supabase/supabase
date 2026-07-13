@@ -108,7 +108,7 @@ async function updateDestinationPipeline(
         schema,
         role,
       },
-    } as unknown as UpdateDestinationConfig
+    } as UpdateDestinationConfig
   } else if ('clickHouse' in destinationConfig) {
     const { url, user, password, database, engine } = destinationConfig.clickHouse
     destination_config = {
@@ -119,7 +119,7 @@ async function updateDestinationPipeline(
         database,
         engine,
       },
-    } as unknown as UpdateDestinationConfig
+    } as UpdateDestinationConfig
   } else {
     throw new Error(
       'Invalid destination config: must specify bigQuery, iceberg, ducklake, snowflake, or clickHouse'

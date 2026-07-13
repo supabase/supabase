@@ -557,6 +557,56 @@ describe('DestinationForm.utils ClickHouse', () => {
       { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
     ])
   })
+
+  it.each([
+    ['loopback hostname', 'https://localhost:8443'],
+    ['loopback subdomain', 'https://foo.localhost:8443'],
+    ['IPv4 loopback', 'https://127.0.0.1:8443'],
+    ['IPv4 unspecified', 'https://0.0.0.0:8443'],
+    ['RFC 1918 10.0.0.0/8', 'https://10.1.2.3:8443'],
+    ['RFC 1918 172.16.0.0/12', 'https://172.16.0.1:8443'],
+    ['RFC 1918 172.16.0.0/12 upper bound', 'https://172.31.255.254:8443'],
+    ['RFC 1918 192.168.0.0/16', 'https://192.168.1.1:8443'],
+    ['link-local 169.254.0.0/16', 'https://169.254.1.1:8443'],
+    ['CGNAT 100.64.0.0/10', 'https://100.64.0.1:8443'],
+    ['CGNAT 100.64.0.0/10 upper bound', 'https://100.127.255.254:8443'],
+    ['benchmarking 198.18.0.0/15', 'https://198.18.0.1:8443'],
+    ['multicast/reserved 224.0.0.0/4+', 'https://224.0.0.1:8443'],
+    ['broadcast', 'https://255.255.255.255:8443'],
+    ['IPv6 loopback', 'https://[::1]:8443'],
+    ['IPv6 unspecified', 'https://[::]:8443'],
+    ['IPv6 link-local', 'https://[fe80::1]:8443'],
+    ['IPv6 unique local (fc00::/7)', 'https://[fc00::1]:8443'],
+    ['IPv6 unique local (fd00::/8)', 'https://[fd12:3456::1]:8443'],
+    ['IPv4-mapped IPv6', 'https://[::ffff:127.0.0.1]:8443'],
+    ['NAT64', 'https://[64:ff9b::127.0.0.1]:8443'],
+    ['decimal-encoded IPv4 loopback', 'https://2130706433:8443'],
+    ['hex-encoded IPv4 loopback', 'https://0x7f000001:8443'],
+  ])('rejects ClickHouse URLs targeting an internal address: %s', (_label, clickhouseUrl) => {
+    expect(
+      getClickHouseValidationIssues({
+        clickhouseUrl,
+        clickhouseUser: 'default',
+        clickhouseDatabase: 'analytics',
+      })
+    ).toEqual([
+      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
+    ])
+  })
+
+  it.each([
+    ['public IPv4 address', 'https://8.8.8.8:8443'],
+    ['public hostname', 'https://your-cluster.clickhouse.cloud:8443'],
+    ['public IPv6 address', 'https://[2606:4700:4700::1111]:8443'],
+  ])('accepts ClickHouse URLs targeting a public address: %s', (_label, clickhouseUrl) => {
+    expect(
+      getClickHouseValidationIssues({
+        clickhouseUrl,
+        clickhouseUser: 'default',
+        clickhouseDatabase: 'analytics',
+      })
+    ).toEqual([])
+  })
 })
 
 describe('DestinationForm.utils BigQuery', () => {

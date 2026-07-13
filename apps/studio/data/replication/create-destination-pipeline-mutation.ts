@@ -231,7 +231,7 @@ async function createDestinationPipeline(
         schema,
         role,
       },
-    } as unknown as components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
+    } as components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
   } else if ('clickHouse' in destinationConfig) {
     const { url, user, password, database, engine } = destinationConfig.clickHouse
 
@@ -243,7 +243,7 @@ async function createDestinationPipeline(
         database,
         engine,
       },
-    } as unknown as components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
+    } as components['schemas']['CreateReplicationDestinationPipelineBody']['destination_config']
   } else {
     throw new Error(
       'Invalid destination config: must specify bigQuery, iceberg, ducklake, snowflake, or clickHouse'
