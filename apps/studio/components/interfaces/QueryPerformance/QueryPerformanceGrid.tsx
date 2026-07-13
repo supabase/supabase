@@ -136,6 +136,7 @@ export const QueryPerformanceGrid = ({
                     className="p-1 h-5 w-5 shrink-0"
                     icon={<ChevronDown size={14} className="text-foreground-muted" />}
                     onClick={(e) => e.stopPropagation()}
+                    aria-label={`Sort options for ${col.name}`}
                   />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
