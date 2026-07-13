@@ -84,8 +84,10 @@ jobs:
           path: ./coverage
       - name: Upload coverage results to Coveralls
         uses: coverallsapp/github-action@648a8eb78e6d50909eff900e4ec85cab4524a45b # v2.3.6
+        continue-on-error: true
         with:
           flag-name: ui-tests
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path-to-lcov: ./coverage/lcov.info
           base-path: './packages/ui'
+          fail-on-error: false

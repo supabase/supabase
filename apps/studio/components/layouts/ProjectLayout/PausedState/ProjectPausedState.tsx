@@ -59,16 +59,16 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
         <PauseCircle size={48} strokeWidth={1} className="text-foreground-lighter shrink-0 mb-4" />
         <div className="flex-1">
           <div>
-            <h2 className="mb-4">The project "{project?.name}" is currently paused</h2>
+            <h2 className="mb-4">Project "{project?.name}" is paused</h2>
             <div className="text-foreground-light max-w-4xl">
               {isLoading && <GenericSkeletonLoader className="mt-3" />}
 
               {isPauseStatusSuccess && !isRestoreDisabled ? (
                 isFreePlan ? (
-                  <>
-                    <p className="text-sm">
-                      All data, including backups and storage objects, remains safe. You can resume
-                      this project from the dashboard within{' '}
+                  <ul className="text-sm list-disc pl-4 space-y-2">
+                    <li>All data, including backups and storage objects, remains safe.</li>
+                    <li>
+                      You can resume this project from the dashboard within{' '}
                       <Tooltip>
                         <TooltipTrigger>
                           <span className={cn(InlineLinkClassName, 'text-foreground')}>
@@ -91,20 +91,42 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                         className="text-sm text-foreground"
                         labelFormat="DD MMM YYYY"
                       />
-                      ). After that, this project will not be resumable, but data will still be
+                      ).
+                    </li>
+                    <li>
+                      After that, this project will not be resumable, but data will still be
                       available for download.
-                    </p>
-                    <p className="text-sm mt-4">
+                    </li>
+                    <li>
                       {enableProBenefitWording === 'variant-a'
                         ? 'Upgrade to Pro to prevent pauses and unlock features like branching, compute upgrades, and daily backups.'
                         : 'To prevent future pauses, consider upgrading to Pro.'}
+                    </li>
+                  </ul>
+                ) : (
+                  <>
+                    <p className="text-sm">
+                      Your project data is safe and available for{' '}
+                      <span className="text-foreground">
+                        {finalDaysRemainingBeforeRestoreDisabled} day
+                        {finalDaysRemainingBeforeRestoreDisabled > 1 ? 's' : ''}
+                      </span>{' '}
+                      (until{' '}
+                      <TimestampInfo
+                        displayAs="local"
+                        utcTimestamp={dayjs()
+                          .utc()
+                          .add(pauseStatus.remaining_days_till_restore_disabled ?? 0, 'day')
+                          .toISOString()}
+                        className="text-sm text-foreground"
+                        labelFormat="DD MMM YYYY"
+                      />
+                      ), but inaccessible while paused.
+                    </p>
+                    <p className="text-sm mt-2">
+                      Once resumed, usage will be billed by compute size and hours active.
                     </p>
                   </>
-                ) : (
-                  <p className="text-sm">
-                    Your project data is safe but inaccessible while paused. Once resumed, usage
-                    will be billed by compute size and hours active.
-                  </p>
                 )
               ) : !isLoading ? (
                 <p className="text-sm">
