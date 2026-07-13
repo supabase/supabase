@@ -100,7 +100,14 @@ export async function POST(request: Request) {
       )
     }
 
-    // 4. Return the generated SQL
+    // 4. Validate that the generated SQL is a safe, read-only SELECT statement
+    const trimmedSql = sql.trim().toUpperCase()
+    const forbiddenPatterns =
+      /\b(DROP|DELETE|TRUNCATE|INSERT|UPDATE|ALTER|CREATE|REPLACE|MERGE|GRANT|REVOKE|EXEC|EXECUTE)\b/
+    if (!trimmedSql.startsWith('SELECT') || forbiddenPatterns.test(trimmedSql)) {
+      return NextResponse.json({ message: 'Only SELECT queries are allowed.' }, { status: 400 })
+    }
+
     return NextResponse.json({ sql })
   } catch (error: any) {
     console.error('AI SQL generation error:', error)
