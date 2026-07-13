@@ -246,38 +246,6 @@ export default function MarketingForm({
       )
       return
     }
-    // Required checkboxes aren't covered by HTML5 validation; check them manually.
-    const uncheckedRequired = visibleFields.filter(
-      (f) => f.type === 'checkbox' && f.required && !f.group && values[f.name] !== 'true'
-    )
-    if (uncheckedRequired.length > 0) {
-      setSubmitState('error')
-      setErrorMessages(validationErrors)
-      return
-    }
-
-    const requiredCheckboxGroups = new Map<string, MarketingFormField[]>()
-    visibleFields.forEach((field) => {
-      if (field.type !== 'checkbox' || !field.group || !field.groupRequired) return
-      const groupFields = requiredCheckboxGroups.get(field.group) ?? []
-      groupFields.push(field)
-      requiredCheckboxGroups.set(field.group, groupFields)
-    })
-
-    const missingRequiredGroups = Array.from(requiredCheckboxGroups.values()).filter((group) =>
-      group.every((field) => values[field.name] !== 'true')
-    )
-    if (missingRequiredGroups.length > 0) {
-      setSubmitState('error')
-      setErrorMessages(
-        missingRequiredGroups.map((group) => {
-          const labels = group.map((field) => field.label).join(', ')
-          return `Please select at least one option: ${labels}`
-        })
-      )
-      return
-    }
-
     // Strip values for fields that are currently hidden so stale data doesn't leak.
     const submittedValues = Object.fromEntries(
       Object.entries(values).filter(([name]) => visibleFieldNames.has(name))
