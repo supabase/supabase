@@ -45,12 +45,12 @@ export function UserDropdown({
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
   const track = useTrack()
 
-  const { showUpgradeCta: isFreePlanOrg } = useShowUpgradeCta()
-  // The upgrade CTA is org-scoped, so only show it on routes where an org is in scope.
-  // Excludes /account/*, /organizations, /new, marketing routes, etc.
+  // The upgrade CTA is org-scoped, so only enable it on routes where an org is in scope.
+  // Excludes /account/*, /organizations, /new, marketing routes, etc. Gating the hook here
+  // also skips fetching organization data on routes where the CTA can't render.
   const isOrgScopedRoute =
     router.pathname.startsWith('/project/') || router.pathname.startsWith('/org/')
-  const showUpgradeCta = isFreePlanOrg && isOrgScopedRoute
+  const { showUpgradeCta } = useShowUpgradeCta({ enabled: isOrgScopedRoute })
 
   const [isOpen, setIsOpen] = useState(false)
 

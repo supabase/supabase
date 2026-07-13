@@ -1,6 +1,5 @@
-import { IS_PLATFORM } from 'common'
-
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { IS_PLATFORM } from '@/lib/constants'
 
 /**
  * Whether to show the "Upgrade to Pro" CTA for the currently selected organization.
@@ -11,12 +10,18 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
  *
  * `showUpgradeCta` stays false until the org plan is known, so the CTA never flashes for
  * paid users; it simply fades in for free users once the plan resolves.
+ *
+ * Pass `enabled: false` from callers mounted where the CTA can never render (e.g. the
+ * globally-mounted user dropdown on non-org routes) to skip fetching organization data.
  */
-export const useShowUpgradeCta = () => {
-  const { data: organization, isPending } = useSelectedOrganizationQuery()
+export const useShowUpgradeCta = ({ enabled = true }: { enabled?: boolean } = {}) => {
+  const shouldEvaluate = IS_PLATFORM && enabled
+  const { data: organization, isPending } = useSelectedOrganizationQuery({
+    enabled: shouldEvaluate,
+  })
 
   const isFreePlan = organization?.plan?.id === 'free'
-  const showUpgradeCta = IS_PLATFORM && !isPending && isFreePlan
+  const showUpgradeCta = shouldEvaluate && !isPending && isFreePlan
 
   return { isFreePlan, showUpgradeCta }
 }
