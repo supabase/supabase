@@ -104,8 +104,8 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                     </li>
                   </ul>
                 ) : (
-                  <ul className="text-sm list-disc pl-4 space-y-2">
-                    <li>
+                  <>
+                    <p className="text-sm">
                       Your project data is safe and available for{' '}
                       <span className="text-foreground">
                         {finalDaysRemainingBeforeRestoreDisabled} day
@@ -122,9 +122,11 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                         labelFormat="DD MMM YYYY"
                       />
                       ), but inaccessible while paused.
-                    </li>
-                    <li>Once resumed, usage will be billed by compute size and hours active.</li>
-                  </ul>
+                    </p>
+                    <p className="text-sm mt-2">
+                      Once resumed, usage will be billed by compute size and hours active.
+                    </p>
+                  </>
                 )
               ) : !isLoading ? (
                 <p className="text-sm">
