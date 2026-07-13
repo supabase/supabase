@@ -1,0 +1,9 @@
+import * as z from 'zod'
+
+export const BigQueryFormSchema = z.object({
+  projectId: z.string().optional(),
+  datasetId: z.string().optional(),
+  serviceAccountKey: z.string().optional(),
+  connectionPoolSize: z.number().int().min(1).optional(),
+  maxStalenessMins: z.number().nonnegative().optional(),
+})
