@@ -173,7 +173,6 @@ export const checkboxFieldSchema = formFieldBase.extend({
    */
   group: z.string().optional(),
   groupRequired: z.boolean().optional().default(false),
-<<<<<<< HEAD
 })
 
 /**
@@ -185,8 +184,6 @@ export const checkboxFieldSchema = formFieldBase.extend({
 export const checkboxGroupFieldSchema = formFieldBase.extend({
   type: z.literal('checkbox-group'),
   options: z.array(z.object({ label: z.string(), value: z.string() })).min(1),
-=======
->>>>>>> a6caa95564 (remove partners landing page from branch)
 })
 
 export const formFieldSchema = z.discriminatedUnion('type', [
