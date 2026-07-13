@@ -45,7 +45,11 @@ import {
 import { useLiveMode, useResetFocus } from './UnifiedLogs.hooks'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType } from './UnifiedLogs.types'
-import { getFacetedUniqueValues, getLevelRowClassName } from './UnifiedLogs.utils'
+import {
+  gateMultigresLogType,
+  getFacetedUniqueValues,
+  getLevelRowClassName,
+} from './UnifiedLogs.utils'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
 import { arrSome, inDateRange } from '@/components/ui/DataTable/DataTable.utils'
@@ -62,6 +66,7 @@ import { useUnifiedLogsChartQuery } from '@/data/logs/unified-logs-chart-query'
 import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -69,7 +74,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 export const CHART_CONFIG = {
   success: {
     label: <TooltipLabel level="success" />,
-    color: 'var(--foreground-muted)',
+    color: 'var(--chart-success)',
   },
   warning: {
     label: <TooltipLabel level="warning" />,
@@ -105,6 +110,8 @@ export const UnifiedLogs = () => {
     observer.observe(topBar)
     return () => observer.unobserve(topBar)
   }, [])
+
+  const showMultigresLogs = useShowMultigresLogs()
 
   const [sorting, setSorting] = useState<SortingState>(defaultColumnSorting)
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(defaultColumnFilters)
@@ -266,7 +273,9 @@ export const UnifiedLogs = () => {
   // Will need to refactor this bit
   // - Each facet just handles its own state, rather than getting passed down like this
   const filterFields = useMemo(() => {
-    return defaultFilterFields.map((field) => {
+    const gatedFields = gateMultigresLogType(defaultFilterFields, showMultigresLogs)
+
+    return gatedFields.map((field) => {
       const facetsField = facets?.[field.value]
 
       // If no facets data available, use the predefined field
@@ -292,7 +301,7 @@ export const UnifiedLogs = () => {
 
       return { ...field, options }
     })
-  }, [facets])
+  }, [facets, showMultigresLogs])
 
   const applyFilterSearch = () => {
     setSearch(buildFilterSearchUpdate(columnFilters, filterFields))

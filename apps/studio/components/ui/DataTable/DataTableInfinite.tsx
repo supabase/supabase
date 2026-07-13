@@ -14,7 +14,7 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const TableRowClassName = 'border-b group data-[state=selected]:bg-muted hover:bg-surface-200'
-const TableCellClassName = 'text-xs py-1! p-2 *:[[role=checkbox]]:translate-y-[2px] truncate'
+const TableCellClassName = 'text-xs py-1! p-2 truncate'
 
 // TODO: add a possible chartGroupBy
 export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
@@ -105,7 +105,6 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                     'w-full text-xs! font-normal! text-foreground-lighter font-mono',
                     'relative select-none truncate [&>.cursor-col-resize]:last:opacity-0',
                     'text-muted-foreground h-9 px-2 text-left align-middle',
-                    '[&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-[2px]',
                     headerClassName
                   )}
                   aria-sort={sort === 'asc' ? 'ascending' : sort === 'desc' ? 'descending' : 'none'}

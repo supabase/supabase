@@ -1,14 +1,20 @@
-import { safeSql } from '@supabase/pg-meta'
+import { safeSql, untrustedSql } from '@supabase/pg-meta'
 import { stripIndent } from 'common-tags'
 import { describe, expect, it, test } from 'vitest'
 
+import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import {
   appendEnableRLSStatements,
+  assembleCompletionDiff,
+  buildDebugPromptText,
+  buildExplainSql,
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
+  computeErrorHighlightLine,
   filterTablesCoveredByEnsureRLSTrigger,
   getCreateTablesMissingRLS,
+  getEditorSql,
   hasActiveEnsureRLSTrigger,
   isUpdateWithoutWhere,
   suffixWithLimit,
@@ -960,5 +966,99 @@ describe('SQLEditor.utils:checkAlterDatabaseConnection', () => {
       alter database postgres allow_connections false;
     `)
     expect(match).toBe(true)
+  })
+})
+
+// Minimal fake editor for exercising getEditorSql's selection/value logic.
+const makeEditor = ({
+  value,
+  selectionValue,
+  hasSelection = selectionValue !== undefined,
+}: {
+  value: string | undefined
+  selectionValue?: string
+  hasSelection?: boolean
+}): IStandaloneCodeEditor =>
+  ({
+    getValue: () => value,
+    getSelection: () => (hasSelection ? ({ startLineNumber: 1 } as any) : null),
+    getModel: () => ({ getValueInRange: () => selectionValue }) as any,
+  }) as unknown as IStandaloneCodeEditor
+
+describe('SQLEditor.utils:getEditorSql', () => {
+  it('returns the selected text when there is a selection', () => {
+    const editor = makeEditor({ value: 'select 1;', selectionValue: 'select 2;' })
+    expect(getEditorSql(editor)).toBe('select 2;')
+  })
+
+  it('returns the full editor value when there is no selection', () => {
+    const editor = makeEditor({ value: 'select 1;', hasSelection: false })
+    expect(getEditorSql(editor)).toBe('select 1;')
+  })
+
+  it('falls back to the full value when the selection is empty', () => {
+    const editor = makeEditor({ value: 'select 1;', selectionValue: '' })
+    expect(getEditorSql(editor)).toBe('select 1;')
+  })
+
+  it('falls back to snippet content only when there is no editor value', () => {
+    // Real Monaco always returns a string from getValue(); this guards the
+    // last-resort snippet-content fallback contract.
+    const editor = makeEditor({ value: undefined, hasSelection: false })
+    expect(getEditorSql(editor, untrustedSql('stored sql'))).toBe('stored sql')
+  })
+})
+
+describe('SQLEditor.utils:computeErrorHighlightLine', () => {
+  it('parses the LINE marker and offsets by the selection start line', () => {
+    const error = { formattedError: 'ERROR:  syntax error\nLINE 3: slect 1;\n        ^' }
+    expect(computeErrorHighlightLine(error, 0)).toBe(3)
+    expect(computeErrorHighlightLine(error, 5)).toBe(8)
+  })
+
+  it('returns NaN when there is no LINE marker', () => {
+    expect(computeErrorHighlightLine({ formattedError: 'boom' }, 0)).toBeNaN()
+  })
+
+  it('returns NaN when formattedError is missing', () => {
+    expect(computeErrorHighlightLine({}, 2)).toBeNaN()
+  })
+})
+
+describe('SQLEditor.utils:assembleCompletionDiff', () => {
+  it('assembles original and modified from before/selection/after', () => {
+    const result = assembleCompletionDiff(
+      { textBeforeCursor: 'a ', selection: 'b', textAfterCursor: ' c' },
+      'X'
+    )
+    expect(result).toEqual({ original: 'a b c', modified: 'a X c' })
+  })
+
+  it('treats missing metadata fields as empty strings', () => {
+    expect(assembleCompletionDiff({}, 'X')).toEqual({ original: '', modified: 'X' })
+  })
+})
+
+describe('SQLEditor.utils:buildExplainSql', () => {
+  it('wraps a non-EXPLAIN query in EXPLAIN ANALYZE and a rollback transaction', () => {
+    const result = buildExplainSql(safeSql`select 1`)
+    expect(result).toMatch(/begin;/i)
+    expect(result).toMatch(/explain analyze select 1/i)
+    expect(result).toMatch(/rollback;/i)
+  })
+
+  it('does not double-wrap a query that is already an EXPLAIN', () => {
+    const result = buildExplainSql(safeSql`explain select 1`)
+    expect(result).toMatch(/explain select 1/i)
+    expect(result).not.toMatch(/analyze/i)
+    expect(result).toMatch(/rollback;/i)
+  })
+})
+
+describe('SQLEditor.utils:buildDebugPromptText', () => {
+  it('builds the debug prompt with the error message and SQL block', () => {
+    const result = buildDebugPromptText('select 1;', 'relation does not exist')
+    expect(result).toContain('relation does not exist')
+    expect(result).toContain('```sql\nselect 1;\n```')
   })
 })

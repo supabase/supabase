@@ -3,6 +3,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { sentryTanstackStart } from '@sentry/tanstackstart-react/vite'
 import tailwindcss from '@tailwindcss/vite'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
@@ -591,6 +592,23 @@ export default defineConfig(({ command, mode }) => {
         ...(basePath && { router: { basepath: basePath } }),
       }),
       viteReact(),
+      // Sentry's TanStack Start plugin(s) MUST be last so source maps reflect
+      // every prior transform. `sentryTanstackStart` returns an ARRAY of
+      // plugins (route patterns, source-map upload, middleware auto-wrap), so
+      // it's spread. Source-map UPLOAD is skipped gracefully without
+      // SENTRY_AUTH_TOKEN (and under SKIP_ASSET_UPLOAD). We disable the
+      // middleware auto-wrap because start.ts wires the Sentry global
+      // middlewares explicitly.
+      ...sentryTanstackStart({
+        org: process.env.SENTRY_ORG ?? 'supabase',
+        project: process.env.SENTRY_PROJECT ?? 'supabase-studio-tanstack',
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+        autoInstrumentMiddleware: false,
+        sourcemaps:
+          process.env.SKIP_ASSET_UPLOAD === '1' || !process.env.SENTRY_AUTH_TOKEN
+            ? { disable: true }
+            : undefined,
+      }),
     ],
   }
 })

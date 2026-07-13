@@ -4,6 +4,7 @@ import { cn } from 'ui'
 import { LOG_TYPES_LABELS } from './UnifiedLogs.constants'
 import { FacetMetadataSchema } from './UnifiedLogs.schema'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
+import { Option } from '@/components/ui/DataTable/DataTable.types'
 
 export type UnifiedLogType = keyof typeof LOG_TYPES_LABELS
 
@@ -120,6 +121,7 @@ export function formatServiceTypeForDisplay(serviceType: string): string {
     realtime: 'Realtime',
     supavisor: 'Supavisor',
     pgbouncer: 'PgBouncer',
+    multigres: 'Multigres',
   }
 
   return specialCases[serviceType.toLowerCase()] || serviceType
@@ -155,4 +157,63 @@ export function parseAuthLogEventMessage(value: string | undefined): string | un
   } catch (error) {
     return value
   }
+}
+
+/**
+ * Parses a Multigres log event_message, which is a stringified JSON object
+ * (e.g. {"time":"...","level":"INFO","msg":"user pool capacity updated",...}).
+ * Extracts the human-readable msg field, falling back to the raw string so
+ * unexpected formats still render.
+ */
+export function parseMultigresEventMessage(value: string | undefined): string | undefined {
+  if (!value) return value
+
+  try {
+    const parsed = JSON.parse(value)
+
+    if (
+      parsed &&
+      typeof parsed === 'object' &&
+      typeof parsed.msg === 'string' &&
+      parsed.msg.trim()
+    ) {
+      return parsed.msg
+    }
+
+    return value
+  } catch (error) {
+    return value
+  }
+}
+
+/**
+ * Returns the display text for a log row's event_message alongside whether it
+ * should be rendered as a capitalized sentence. Keeps the per-service parsing
+ * and its capitalization rule in one place so callers don't re-derive the list.
+ */
+export function getEventMessageDisplay(
+  logType: string,
+  value: string | undefined
+): { message: string | undefined; capitalize: boolean } {
+  if (logType === 'auth') return { message: parseAuthLogEventMessage(value), capitalize: true }
+  if (logType === 'multigres')
+    return { message: parseMultigresEventMessage(value), capitalize: true }
+  return { message: value, capitalize: false }
+}
+
+/**
+ * Multigres logs are gated behind the `showMultigresLogs` flag, so the multigres
+ * log_type option is removed from the filter fields when the flag is disabled.
+ */
+export function gateMultigresLogType<T extends { value: string; options?: Option[] }>(
+  fields: T[],
+  showMultigresLogs: boolean
+): T[] {
+  if (showMultigresLogs) return fields
+
+  return fields.map((field) =>
+    field.value === 'log_type' && field.options
+      ? ({ ...field, options: field.options.filter((option) => option.value !== 'multigres') } as T)
+      : field
+  )
 }

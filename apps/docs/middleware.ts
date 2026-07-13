@@ -17,10 +17,7 @@ export function middleware(request: NextRequest) {
     const isMdSuffix = pathname.endsWith('.md')
     const slug = pathname.replace(`${GUIDES_PATH}/`, '').replace(/\.md$/, '')
     const decision = negotiateMarkdown(
-      {
-        acceptHeader: request.headers.get('accept') ?? '',
-        userAgent: request.headers.get('user-agent') ?? '',
-      },
+      { acceptHeader: request.headers.get('accept') ?? '' },
       { hasMarkdownVariant: GUIDES_MARKDOWN_SLUGS.has(slug), isMarkdownSuffix: isMdSuffix }
     )
 
