@@ -18,19 +18,17 @@ import {
 import { Admonition } from 'ui-patterns/admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { getHasInstalledObject } from '@/components/layouts/IntegrationsLayout/Integrations.utils'
 import {
-  InterstitialAccountRow,
-  InterstitialLayout,
-  LogoPair,
-  PartnerLogo,
-  SupabaseLogo,
-} from '@/components/layouts/InterstitialLayout'
+  VercelIntegrationFooter,
+  VercelIntegrationInterstitialErrorState,
+  VercelIntegrationLogo,
+} from '@/components/interfaces/Integrations/Vercel/VercelIntegrationInterstitial'
+import { getHasInstalledObject } from '@/components/layouts/IntegrationsLayout/Integrations.utils'
+import { InterstitialAccountRow, InterstitialLayout } from '@/components/layouts/InterstitialLayout'
 import { useIntegrationsQuery } from '@/data/integrations/integrations-query'
 import { useVercelIntegrationCreateMutation } from '@/data/integrations/vercel-integration-create-mutation'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { withAuth } from '@/hooks/misc/withAuth'
-import { BASE_PATH } from '@/lib/constants'
 import {
   buildVercelInstallRouteQuery,
   getErrorMessage,
@@ -38,6 +36,7 @@ import {
 } from '@/lib/integrations/vercel-install.utils'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { useProfileNameAndPicture } from '@/lib/profile'
+import { useTrack } from '@/lib/telemetry/track'
 import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
 import type { NextPageWithLayout, Organization } from '@/types'
 
@@ -61,6 +60,7 @@ const VercelIntegration: NextPageWithLayout = () => {
   const { code, configurationId, currentProjectId, externalId, next, teamId, source } = useParams()
   const [selectedOrg, setSelectedOrg] = useState<Organization | null>(null)
   const { username, primaryEmail, avatarUrl } = useProfileNameAndPicture()
+  const track = useTrack()
 
   const snapshot = useIntegrationInstallationSnapshot()
   const displayName = primaryEmail ?? username ?? ''
@@ -197,6 +197,11 @@ const VercelIntegration: NextPageWithLayout = () => {
      * Only install if integration hasn't already been installed
      */
     if (!isIntegrationInstalled) {
+      track(
+        'integration_install_submitted',
+        { integrationName: 'Vercel', method: source },
+        { organization: orgSlug }
+      )
       mutate({
         code,
         configurationId,
@@ -243,7 +248,6 @@ const VercelIntegration: NextPageWithLayout = () => {
     !selectedOrg ||
     missingParams.length > 0 ||
     isError
-
   return (
     <>
       <Head>
@@ -251,27 +255,19 @@ const VercelIntegration: NextPageWithLayout = () => {
       </Head>
 
       <InterstitialLayout
-        logo={
-          <LogoPair
-            left={
-              <PartnerLogo
-                src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
-                alt="Vercel"
-                className="bg-surface-75"
-                imageClassName="size-7 object-contain dark:invert"
-              />
-            }
-            right={<SupabaseLogo />}
-          />
-        }
-        title="Install Vercel integration"
-        description="Choose an organization to connect to Vercel"
+        logo={<VercelIntegrationLogo />}
+        title="Install Vercel Integration"
+        description="Choose the Supabase organization Vercel can connect to"
+        footer={<VercelIntegrationFooter />}
       >
         <div className="px-6 pb-6">
           {showLoadingState ? (
             <InstallationLoadingState />
           ) : isError ? (
-            <InstallationErrorState errorMessage={errorMessage} />
+            <VercelIntegrationInterstitialErrorState
+              title="Unable to load installation"
+              errorMessage={errorMessage}
+            />
           ) : (
             <div className="flex flex-col gap-5">
               <InterstitialAccountRow avatarUrl={avatarUrl} displayName={displayName} />
@@ -354,26 +350,6 @@ const InstallationLoadingState = () => (
       <ShimmeringLoader className="h-[34px] w-full rounded-md py-0" />
     </section>
     <ShimmeringLoader className="h-10 w-full rounded-md py-0" />
-  </div>
-)
-
-const InstallationErrorState = ({ errorMessage }: { errorMessage?: string }) => (
-  <div className="flex flex-col gap-3">
-    <Admonition
-      type="warning"
-      title="Unable to load installation"
-      description={
-        <>
-          Retry the installation request from Vercel.
-          {errorMessage && (
-            <span className="mt-1 block text-foreground-lighter">Error: {errorMessage}</span>
-          )}
-        </>
-      }
-    />
-    <Button variant="default" block asChild>
-      <Link href="/">Back to dashboard</Link>
-    </Button>
   </div>
 )
 

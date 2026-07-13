@@ -133,11 +133,6 @@ export const useIsSqlEditorManualSaveEnabled = () => {
   return sqlEditorManualSaveEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]
 }
 
-export const useIsRLSTesterEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]
-}
-
 export const useIsMarketplaceEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')

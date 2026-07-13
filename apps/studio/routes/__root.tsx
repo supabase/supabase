@@ -122,6 +122,14 @@ const ResourceWarningsTab = IS_DEV_TOOLBAR_ENABLED
     )
   : () => null
 
+const ProjectStatusTab = IS_DEV_TOOLBAR_ENABLED
+  ? lazy(() =>
+      import('@/components/ui/DevToolbar/ProjectStatusTab').then((m) => ({
+        default: m.ProjectStatusTab,
+      }))
+    )
+  : () => null
+
 const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
   ? [
       {
@@ -130,6 +138,15 @@ const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
         content: (
           <Suspense fallback={null}>
             <ResourceWarningsTab />
+          </Suspense>
+        ),
+      },
+      {
+        id: 'project-status',
+        label: 'Project Status',
+        content: (
+          <Suspense fallback={null}>
+            <ProjectStatusTab />
           </Suspense>
         ),
       },
