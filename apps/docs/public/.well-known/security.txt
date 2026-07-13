@@ -1,4 +1,5 @@
 Contact: https://hackerone.com/supabase
+Expires: 2027-07-13T00:00:00.000Z
 Canonical: https://supabase.com/.well-known/security.txt
 
 
