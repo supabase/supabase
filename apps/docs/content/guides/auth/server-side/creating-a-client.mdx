@@ -504,7 +504,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   // Use `supabase` here for server-side work, e.g. await supabase.auth.getUser()
 
-  // Return the env vars so the browser can create its own client.
+  // Return the environment variables so the browser can create its own client.
   return json(
     {
       env: {
