@@ -9,18 +9,14 @@ import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useEffectEvent, useMemo, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useState } from 'react'
 import { toast } from 'sonner'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
-import {
-  generateSnippetTitle,
-  sqlAiDisclaimerComment,
-  untitledSnippetTitle,
-} from './SQLEditor.constants'
-import { DiffType, IStandaloneCodeEditor, type PotentialIssues } from './SQLEditor.types'
+import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
+import { DiffType, type PotentialIssues } from './SQLEditor.types'
 import {
   appendEnableRLSStatements,
   assembleCompletionDiff,
@@ -32,13 +28,16 @@ import {
   createSqlSnippetSkeletonV2,
   filterTablesCoveredByEnsureRLSTrigger,
   getCreateTablesMissingRLS,
-  getEditorSql,
   hasActiveEnsureRLSTrigger,
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
 import { SQLEditorProvider, useSQLEditorContext } from './SQLEditorContext'
 import { useAddDefinitions } from './useAddDefinitions'
+import { useEditorMount } from './useEditorMount'
+import { usePrettifyQuery } from './usePrettifyQuery'
+import { useSnippetIdentity } from './useSnippetIdentity'
+import { useSnippetTitleGenerator } from './useSnippetTitleGenerator'
 import { UtilityActions } from './UtilityPanel/UtilityActions'
 import { UtilityPanel } from './UtilityPanel/UtilityPanel'
 import {
@@ -47,7 +46,6 @@ import {
 } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import ResizableAIWidget from '@/components/ui/AIEditor/ResizableAIWidget'
-import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
 import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
 import { constructHeaders, isValidConnString } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
@@ -57,7 +55,6 @@ import { isError } from '@/data/utils/error-check'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { generateUuid } from '@/lib/api/snippets.browser'
 import { BASE_PATH } from '@/lib/constants'
 import { formatSql } from '@/lib/formatSql'
 import { detectOS } from '@/lib/helpers'
@@ -108,7 +105,7 @@ const SQLEditorContent = () => {
 
   const os = detectOS()
   const router = useRouter()
-  const { ref, id: urlId } = useParams()
+  const { ref } = useParams()
 
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
@@ -146,9 +143,6 @@ const SQLEditorContent = () => {
   const [potentialIssues, setPotentialIssues] = useState<PotentialIssues>()
 
   const [showWidget, setShowWidget] = useState(false)
-  // Bumped on every editor mount (including the keyed remount on snippet switch)
-  // so a diff request that arrived before the editor was ready gets re-processed.
-  const [editorMountCount, setEditorMountCount] = useState(0)
   const [activeUtilityTab, setActiveUtilityTab] = useState<string>('results')
 
   useShortcut(SHORTCUT_IDS.SQL_EDITOR_FOCUS_EDITOR, refocusEditor, {
@@ -167,21 +161,10 @@ const SQLEditorContent = () => {
     registerInCommandMenu: true,
   })
 
-  // generate a new snippet title and an id to be used for new snippets. The dependency on urlId is to avoid a bug which
-  // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
-  const [generatedNewSnippetName, generatedId] = useMemo(() => {
-    const name = generateSnippetTitle()
-    return [name, generateUuid([`${name}.sql`])]
-  }, [urlId])
-
-  // the id is stable across renders - it depends either on the url or on the memoized generated id
-  const id = !urlId || urlId === 'new' ? generatedId : urlId
+  const { id, urlId, generatedNewSnippetName, isLoading } = useSnippetIdentity()
+  const { onMount, editorMountCount } = useEditorMount({ id })
 
   const limit = sessionSnap.limit
-  const snippetIsLoading = !(
-    id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined
-  )
-  const isLoading = urlId === 'new' ? false : snippetIsLoading
 
   useAddDefinitions(id, monacoRef.current)
 
@@ -201,7 +184,7 @@ const SQLEditorContent = () => {
   )
 
   /* React query mutations */
-  const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
+  const { generateSqlTitle, setAiTitle } = useSnippetTitleGenerator()
   const track = useTrack()
   const { mutate: execute, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
@@ -246,45 +229,7 @@ const SQLEditorContent = () => {
     },
   })
 
-  const setAiTitle = useCallback(
-    async (id: string, sql: string) => {
-      try {
-        const { title: name } = await generateSqlTitle({ sql })
-        snapV2.updateSnippet({ id, snippet: { name } })
-        snapV2.addNeedsSaving(id)
-        const tabId = createTabId('sql', { id })
-        tabs.updateTab(tabId, { label: name })
-      } catch (error) {
-        // [Joshen] No error handler required as this happens in the background and not necessary to ping the user
-      }
-    },
-    [generateSqlTitle, snapV2]
-  )
-
-  const prettifyQuery = useCallback(async () => {
-    if (isDiffOpen) return
-
-    // use the latest state
-    const state = getSqlEditorV2StateSnapshot()
-    const snippet = state.snippets[id]
-
-    if (editorRef.current && project) {
-      const editor = editorRef.current
-      const sql = getEditorSql(editor, snippet?.snippet.content?.unchecked_sql)
-      const formattedSql = formatSql(sql)
-
-      const editorModel = editorRef?.current?.getModel()
-      if (editorRef.current && editorModel) {
-        editorRef.current.executeEdits('apply-prettify-edit', [
-          {
-            text: formattedSql,
-            range: editorModel.getFullModelRange(),
-          },
-        ])
-        snapV2.setSql({ id, sql: formattedSql })
-      }
-    }
-  }, [editorRef, id, isDiffOpen, project, snapV2])
+  const prettifyQuery = usePrettifyQuery({ id, isDiffOpen })
 
   useShortcut(SHORTCUT_IDS.SQL_EDITOR_FORMAT, prettifyQuery, {
     registerInCommandMenu: true,
@@ -504,21 +449,6 @@ const SQLEditorContent = () => {
     [profile?.id, project?.id, ref, router, snapV2]
   )
 
-  const onMount = (editor: IStandaloneCodeEditor) => {
-    setEditorMountCount((count) => count + 1)
-
-    const tabId = createTabId('sql', { id })
-    const tabData = tabs.tabsMap[tabId]
-
-    // [Joshen] Tiny timeout to give a bit of time for the content to load before scrolling
-    setTimeout(() => {
-      if (tabData?.metadata?.scrollTop) {
-        editor.setScrollTop(tabData.metadata.scrollTop)
-      }
-    }, 20)
-    editor.onDidScrollChange((e) => (scrollTopRef.current = e.scrollTop))
-  }
-
   const buildDebugPrompt = useCallback(() => {
     const snippet = snapV2.snippets[id]
     const result = sessionSnap.results[id]?.[0]
@@ -696,19 +626,24 @@ const SQLEditorContent = () => {
 
   /** All useEffects are at the bottom before returning the TSX */
 
-  useEffect(() => {
+  const resetDiff = useEffectEvent(() => {
     if (id) {
       closeDiff()
       setPromptState((prev) => ({ ...prev, isOpen: false }))
     }
-    return () => {
-      if (ref) {
-        const tabId = createTabId('sql', { id })
-        tabs.updateTab(tabId, { scrollTop: scrollTopRef.current })
-      }
+  })
+  const saveScrollPosition = useEffectEvent((snippetId: string) => {
+    if (ref) {
+      const tabId = createTabId('sql', { id: snippetId })
+      tabs.updateTab(tabId, { scrollTop: scrollTopRef.current })
     }
+  })
+  useEffect(() => {
+    resetDiff()
+    return () => saveScrollPosition(id)
+    // Temporary until we update eslint to ignore useEffectEvent
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [closeDiff, id])
+  }, [id])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
