@@ -141,16 +141,19 @@ export const SchemaGraph = () => {
   const tables = useMemo(() => tablesData?.pages.flat() ?? [], [tablesData])
   const hasNoTables = isSuccessTables && isSuccessSchemas && tables.length === 0 && !hasNextPage
 
-  const { data: enumeratedTypes = [] } = useEnumeratedTypesQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data: enumeratedTypes = [], isPending: isLoadingEnumeratedTypes } =
+    useEnumeratedTypesQuery({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    })
 
-  const { data: policies = [] } = useDatabasePoliciesQuery({
+  const { data: policies = [], isPending: isLoadingPolicies } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schemas: [selectedSchema],
   })
+
+  const isMarkdownDataLoading = isLoadingEnumeratedTypes || isLoadingPolicies
 
   const schema = (schemas ?? []).find((s) => s.name === selectedSchema)
   const [, setStoredPositions] = useLocalStorage(
@@ -239,6 +242,8 @@ export const SchemaGraph = () => {
   }
 
   const copyAsMarkdown = () => {
+    if (isMarkdownDataLoading) return
+
     const tableNodes = reactFlowInstance
       .getNodes()
       .filter((node) => node.type === 'table')
@@ -285,7 +290,7 @@ export const SchemaGraph = () => {
 
   useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_COPY_SQL, copyAsSQL, { enabled: shortcutsEnabled })
   useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_COPY_MARKDOWN, copyAsMarkdown, {
-    enabled: shortcutsEnabled,
+    enabled: shortcutsEnabled && !isMarkdownDataLoading,
   })
   useShortcut(SHORTCUT_IDS.SCHEMA_VISUALIZER_DOWNLOAD_PNG, () => downloadImage('png'), {
     enabled: shortcutsEnabled,
@@ -462,12 +467,17 @@ export const SchemaGraph = () => {
                     <DropdownMenuContent align="end" className="w-44">
                       <DropdownMenuItem
                         className="flex items-center space-x-2 whitespace-nowrap"
+                        disabled={isMarkdownDataLoading}
                         onClick={(e) => {
                           e.stopPropagation()
                           copyAsMarkdown()
                         }}
                       >
-                        <Copy size={12} />
+                        {isMarkdownDataLoading ? (
+                          <Loader2 size={12} className="animate-spin" />
+                        ) : (
+                          <Copy size={12} />
+                        )}
                         <span>Copy as Markdown</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem
