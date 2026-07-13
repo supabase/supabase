@@ -1,4 +1,4 @@
-import { Index } from 'icons/__registry__/index'
+import { IconsIndex } from '@/__registry__/icons'
 import { Copy } from 'lucide-react'
 import {
   DropdownMenu,
@@ -14,7 +14,7 @@ function Icons() {
   return (
     <>
       <Grid>
-        {Index.map((icon: any, i: number) => (
+        {IconsIndex.map((icon: any, i: number) => (
           <DropdownMenu key={i} modal={false}>
             <DropdownMenuTrigger asChild>
               <GridItem>
