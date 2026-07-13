@@ -468,7 +468,15 @@ You can now use any Supabase features from your client or server code!
 </TabPanel>
 <TabPanel id="remix" label="Remix">
 
-In Remix, a route module (`_index.tsx`) can export a `loader` (runs on the server to load data), an `action` (runs on the server to handle form submissions), and a default component (runs in the browser). Create a server client inside the `loader` and `action`, and a browser client inside the component. Because the browser client needs your Supabase URL and key, return them from the `loader` and read them with `useLoaderData`.
+With Remix, in a route module such as `_index.tsx`, you can export a `loader`, an `action`, and a default component.
+
+Configure Supabase clients as follows:
+
+1. **Create a server client in the `loader`.** Use it to load data and manage the user session on the server. Return your Supabase URL and publishable key so the browser can create a client.
+2. **Create a server client in the `action`.** Use it to handle form submissions and other mutations on the server.
+3. **Create a browser client in the default component.** Call `useLoaderData` to read the URL and key, then call `createBrowserClient`.
+
+The following example shows all three exports in one route module:
 
 ```ts _index.tsx
 import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node'
