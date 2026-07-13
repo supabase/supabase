@@ -11,7 +11,6 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  pull-requests: write
   contents: read
 
 jobs:
@@ -51,6 +50,8 @@ jobs:
   eval:
     name: Run evals
     needs: preflight
+    permissions:
+      pull-requests: write
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'run-evals') && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 20
