@@ -227,8 +227,8 @@ async function renderManifest(sources: MarkdownSource[], extraSlugs: string[] = 
   const slugs = Array.from(new Set([...sources.map((s) => s.slug), ...extraSlugs]))
   const content = `${JSON.stringify(slugs, null, 2)}\n`
 
-  await fs.mkdir(path.dirname(TROUBLESHOOTING_INDEX_PATH), { recursive: true })
-  await fs.writeFile(TROUBLESHOOTING_INDEX_PATH, content)
+  await fs.mkdir(path.dirname(MANIFEST_PATH), { recursive: true })
+  await fs.writeFile(MANIFEST_PATH, content)
 }
 
 async function renderTroubleshootingIndex(troubleshooting: MarkdownSource[]): Promise<void> {
@@ -242,8 +242,8 @@ async function renderTroubleshootingIndex(troubleshooting: MarkdownSource[]): Pr
   )
   const content = `# Troubleshooting guides\n\n${entries.join('\n')}\n`
 
-  await fs.mkdir(path.dirname(MANIFEST_PATH), { recursive: true })
-  await fs.writeFile(MANIFEST_PATH, content)
+  await fs.mkdir(path.dirname(TROUBLESHOOTING_INDEX_PATH), { recursive: true })
+  await fs.writeFile(TROUBLESHOOTING_INDEX_PATH, content)
 }
 
 async function generate() {
