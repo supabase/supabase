@@ -132,11 +132,11 @@ export const SidebarContent = ({ footer }: { footer?: ReactNode }) => {
       <AnimatePresence mode="wait">
         <SidebarContentPrimitive>
           {projectRef ? (
-            <motion.div key="project-links">
+            <motion.nav key="project-links">
               <ProjectLinks />
-            </motion.div>
+            </motion.nav>
           ) : (
-            <motion.div
+            <motion.nav
               key="org-links"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -144,7 +144,7 @@ export const SidebarContent = ({ footer }: { footer?: ReactNode }) => {
               transition={{ duration: 0.2, ease: 'easeOut' }}
             >
               <OrganizationLinks />
-            </motion.div>
+            </motion.nav>
           )}
         </SidebarContentPrimitive>
       </AnimatePresence>
