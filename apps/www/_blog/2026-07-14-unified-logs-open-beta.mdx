@@ -21,7 +21,7 @@ Unified Logs puts all of that in one place.
 
 ## One stream across your services
 
-Open Logs in the dashboard and you see every event as it happens, newest first. Each row shows the timestamp, the service, the method, the path, and the status. Postgres connection events sit next to API requests sit next to Auth events, in the same table.
+Open Logs in the dashboard and you see every event as it happens, newest first. Each row shows the timestamp, the service, the method, the path, and the status. One row might be an API request, the next a Postgres connection, the next an Auth event, all in the same table.
 
 The sidebar lets you narrow the stream by log type. Turn off Storage and Realtime to focus on Postgres. Turn everything back on to see the full picture. The counts next to each type update as you filter, so you know how much traffic each service is producing.
 
@@ -41,7 +41,7 @@ The histogram above the table shows log volume over your selected time range, co
 
 ## Follow a request through every service
 
-Click a row to open the detail panel. Instead of a wall of JSON, you see the request as it moved through your project: the network timing, the gateway, the database query, the Auth check. Each service adds its own block with the fields that matter for that service. The raw JSON is still there in a second tab when you need it.
+Click a row to open the detail panel. Instead of a wall of JSON, you see the request as it moved through your project: the network timing, the gateway, the database query, the Auth check. Each service adds its own block with the fields that matter. The raw JSON is still there in a second tab when you need it.
 
 ## Send logs anywhere
 
