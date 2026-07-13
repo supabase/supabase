@@ -505,6 +505,18 @@ export const QueryPerformanceGrid = ({
   const isProtectedSchemaQuery = queryInvolvesProtectedSchemas(selectedQuery)
   const canShowIndexesTab = isSelectQuery(selectedQuery) && !isProtectedSchemaQuery
 
+  const openQueryDetails = (idx: number) => {
+    setSelectedRow(idx)
+
+    const hasRecommandations = hasIndexRecommendations(
+      reportData[idx]?.index_advisor_result,
+      true
+    )
+
+    setView(hasRecommandations ? 'suggestion' : 'details')
+    gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+  }
+
   return (
     <div className="relative flex grow bg-alternative min-h-0">
       <div ref={dataGridContainerRef} className="flex-1 min-w-0 overflow-x-auto">
@@ -517,6 +529,12 @@ export const QueryPerformanceGrid = ({
           columns={columns}
           rows={reportData}
           onScroll={onScroll}
+          onCellKeyDown={(args, event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+              event.preventDefault()
+              openQueryDetails(args.rowIdx)
+            }
+          }}
           rowClass={(_, idx) => {
             const isSelected = idx === selectedRow
             const query = reportData[idx]?.query
@@ -551,13 +569,7 @@ export const QueryPerformanceGrid = ({
                           onCurrentSelectQuery(query)
                         }
                       } else {
-                        setSelectedRow(idx)
-                        const hasRecommendations = hasIndexRecommendations(
-                          reportData[idx]?.index_advisor_result,
-                          true
-                        )
-                        setView(hasRecommendations ? 'suggestion' : 'details')
-                        gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+                        openQueryDetails(idx)
                       }
                     }
                   }}
