@@ -97,7 +97,7 @@ export const APIKeyRow = ({
         alert={{
           title: 'This cannot be undone',
           description:
-            'Make sure all backend components using it have been updated before deletion. Deletion will cause them to receive HTTP 401 Unauthorized status codes on all Supabase APIs.',
+            'Make sure all applications and services using it have been updated before deletion. Deletion will cause them to receive HTTP 401 Unauthorized status codes on all Supabase APIs.',
         }}
       />
     </>
