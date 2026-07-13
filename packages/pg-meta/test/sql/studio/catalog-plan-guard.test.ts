@@ -249,29 +249,27 @@ test('getTableDefinitionSql: plan stays scoped for a single table', async () => 
 }, 60_000)
 
 // ── getEntityDefinitionsSql (database/table-definition.ts) — per-schema list ─
-// The SQL-level plan is clean (only pg_namespace), so there is no unscoped CTE
-// to guard against here. But EXPLAIN ANALYZE measured ~5.6s for a 25-entity
-// page at 2000 tables (~224ms/entity): the cost is the opaque pg_temp.
-// pg_get_tabledef plpgsql function, which reconstructs full DDL (incl. FK
-// clauses) per entity via its own catalog introspection that the plan guard
-// cannot see inside.
-//
-// KNOWN ISSUE: this per-entity DDL reconstruction is expensive at scale and is
-// the same incident family (heavy per-dashboard-interaction work on large
-// catalogs) as the CTE regression this suite guards against, but it lives
-// inside a plpgsql function so seq-scan detection is blind to it. Flagged for a
-// separate follow-up investigation; do NOT treat the loosened time bound below
-// as an endorsement of the current cost. `limit` is kept small (25 vs the
-// production default of 100) purely to bound CI time, since cost is linear in
-// page size.
+// The SQL-level plan is clean (only pg_namespace); the real cost is the opaque
+// pg_temp.pg_get_tabledef plpgsql function, which reconstructs full DDL per
+// entity via its own catalog introspection that the plan guard cannot see
+// inside. That function used to scan all of information_schema.columns once
+// PER COLUMN (and information_schema.tables once per call) just to decide
+// whether a name needs double-quoting — ~5.6s for a 25-entity page at 2000
+// tables, growing superlinearly with catalog size (~3.7s for a SINGLE entity
+// at 12K tables). Those scans were replaced with direct string tests, so the
+// whole page now runs in well under a second; the time bound below is the
+// guard against that per-entity cost regressing, since seq-scan detection is
+// blind inside the function. The production default limit is 100; 100 entities
+// on a 12K-table catalog measured ~0.9s post-fix.
 test('getEntityDefinitionsSql: plan stays scoped for a schema', async () => {
   const result = await explainDefinitionQuery(
-    getEntityDefinitionsSql({ schemas: ['stress'], limit: 25 })
+    getEntityDefinitionsSql({ schemas: ['stress'], limit: 100 })
   )
   assertPlanWithinBudget(result, {
-    // Loosened only to accommodate the opaque plpgsql per-entity cost noted
-    // above (~5.6s measured); still catches a gross per-entity regression.
-    maxExecutionTimeMs: 15_000,
+    // ~0.3s measured at 2000 tables post-fix for a 100-entity page; loose
+    // enough for slow CI, tight enough to catch reintroduced O(catalog)
+    // work inside pg_get_tabledef (which measured 5.6s for just 25 entities).
+    maxExecutionTimeMs: 3_000,
   })
 }, 60_000)
 

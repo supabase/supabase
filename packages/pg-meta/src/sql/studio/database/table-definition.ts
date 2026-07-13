@@ -251,10 +251,12 @@ export const CREATE_PG_GET_TABLEDEF_SQL = safeSql`
       END IF;
       IF bPartition THEN
         --Issue#17 fix for case-sensitive tables
+        -- Supabase perf fix: the original scanned all of information_schema.tables (O(catalog) with
+        -- per-row privilege checks) just to detect uppercase in the table name; the name is already
+        -- in hand, so test it directly. The table's existence was validated above via v_table_oid.
         -- SELECT count(*) INTO v_cnt1 FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s
-        -- WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = quote_ident(in_schema) AND t.table_name = quote_ident(in_table) AND t.table_type = 'BASE TABLE');
-        SELECT count(*) INTO v_cnt1 FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s
-        WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = in_schema AND t.table_name = in_table AND t.table_type = 'BASE TABLE');
+        -- WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = in_schema AND t.table_name = in_table AND t.table_type = 'BASE TABLE');
+        v_cnt1 := CASE WHEN in_table ~ '[A-Z]' THEN 1 ELSE 0 END;
 
         --Issue#19 put double-quotes around SQL keyword column names
         -- Issue#121: fix keyword lookup for table name not column name that does not apply here
@@ -305,10 +307,11 @@ export const CREATE_PG_GET_TABLEDEF_SQL = safeSql`
       -- start the create definition for regular tables unless we are in progress creating an inheritance-based child table
       IF NOT bPartition THEN
         --Issue#17 fix for case-sensitive tables
+        -- Supabase perf fix: same as the partition branch above — replace the O(catalog)
+        -- information_schema.tables scan with a direct uppercase test on the known table name.
         -- SELECT count(*) INTO v_cnt1 FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s
-        -- WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = quote_ident(in_schema) AND t.table_name = quote_ident(in_table) AND t.table_type = 'BASE TABLE');
-        SELECT count(*) INTO v_cnt1 FROM information_schema.tables t WHERE EXISTS (SELECT REGEXP_MATCHES(s.table_name, '([A-Z]+)','g') FROM information_schema.tables s
-        WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = in_schema AND t.table_name = in_table AND t.table_type = 'BASE TABLE');
+        -- WHERE t.table_schema=s.table_schema AND t.table_name=s.table_name AND t.table_schema = in_schema AND t.table_name = in_table AND t.table_type = 'BASE TABLE');
+        v_cnt1 := CASE WHEN in_table ~ '[A-Z]' THEN 1 ELSE 0 END;
         IF v_cnt1 > 0 THEN
           v_table_ddl := 'CREATE ' || v_temp || ' TABLE ' || in_schema || '."' || in_table || '" (' || E'\\n';
         ELSE
@@ -338,8 +341,15 @@ export const CREATE_PG_GET_TABLEDEF_SQL = safeSql`
           END IF;
 
           --Issue#17 put double-quotes around case-sensitive column names
-          SELECT COUNT(*) INTO v_cnt1 FROM information_schema.columns t WHERE EXISTS (SELECT REGEXP_MATCHES(s.column_name, '([A-Z]+)','g') FROM information_schema.columns s
-          WHERE t.table_schema=s.table_schema and t.table_name=s.table_name and t.column_name=s.column_name AND t.table_schema = quote_ident(in_schema) AND column_name = v_colrec.column_name);
+          -- Supabase perf fix: the original scanned all of information_schema.columns (O(total
+          -- columns in the database), with per-row privilege checks) PER COLUMN just to detect
+          -- uppercase in the column name — the dominant cost of this function on large catalogs.
+          -- The name is already in hand, so test it directly. The quote_ident(in_schema) = in_schema
+          -- comparison preserves the original's behavior of never matching (count 0) when the
+          -- schema name itself needs quoting, since it compared t.table_schema = quote_ident(in_schema).
+          -- SELECT COUNT(*) INTO v_cnt1 FROM information_schema.columns t WHERE EXISTS (SELECT REGEXP_MATCHES(s.column_name, '([A-Z]+)','g') FROM information_schema.columns s
+          -- WHERE t.table_schema=s.table_schema and t.table_name=s.table_name and t.column_name=s.column_name AND t.table_schema = quote_ident(in_schema) AND column_name = v_colrec.column_name);
+          v_cnt1 := CASE WHEN quote_ident(in_schema) = in_schema AND v_colrec.column_name ~ '[A-Z]' THEN 1 ELSE 0 END;
 
           --Issue#19 put double-quotes around SQL keyword column names
           SELECT COUNT(*) INTO v_cnt2 FROM pg_get_keywords() WHERE word = v_colrec.column_name AND catcode = 'R';
@@ -633,9 +643,16 @@ export const CREATE_PG_GET_TABLEDEF_SQL = safeSql`
             v_table_ddl := v_table_ddl || v_indexrec.indexdef || ';' || E'\\n';
         ELSE
             -- Issue#25: see if partial index or not
+            -- Supabase perf fix: scope by the table OID resolved earlier instead of casting
+            -- relnamespace::regnamespace::text for every pg_class row (O(catalog) per index).
+            -- Indexes always live in the same schema as their table, so the schema quals were
+            -- redundant with v_table_oid.
+            -- select CASE WHEN i.indpred IS NOT NULL THEN True ELSE False END INTO v_partial
+            -- FROM pg_index i JOIN pg_class c1 ON (i.indexrelid = c1.oid) JOIN pg_class c2 ON (i.indrelid = c2.oid)
+            -- WHERE c1.relnamespace::regnamespace::text = in_schema AND c2.relnamespace::regnamespace::text = in_schema AND c2.relname = in_table AND c1.relname = v_indexrec.indexname;
             select CASE WHEN i.indpred IS NOT NULL THEN True ELSE False END INTO v_partial
-            FROM pg_index i JOIN pg_class c1 ON (i.indexrelid = c1.oid) JOIN pg_class c2 ON (i.indrelid = c2.oid)
-            WHERE c1.relnamespace::regnamespace::text = in_schema AND c2.relnamespace::regnamespace::text = in_schema AND c2.relname = in_table AND c1.relname = v_indexrec.indexname;
+            FROM pg_index i JOIN pg_class c1 ON (i.indexrelid = c1.oid)
+            WHERE i.indrelid = v_table_oid AND c1.relname = v_indexrec.indexname;
             IF v_partial THEN
                 -- Put tablespace def before WHERE CLAUSE
                 v_temp = v_indexrec.indexdef;
