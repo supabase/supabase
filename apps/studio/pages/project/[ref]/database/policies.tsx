@@ -1,5 +1,5 @@
-import { ident, safeSql } from '@supabase/pg-meta'
 import type { PGTable } from '@supabase/pg-meta'
+import { ident, safeSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { Search, X } from 'lucide-react'
@@ -21,7 +21,6 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useIsInlineEditorEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
-import { useIsRLSTesterEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Policies } from '@/components/interfaces/Database/Policies/Policies'
 import { getGeneralPolicyTemplates } from '@/components/interfaces/Database/Policies/Policies.constants'
 import { PoliciesDataProvider } from '@/components/interfaces/Database/Policies/PoliciesDataContext'
@@ -30,15 +29,12 @@ import {
   generatePolicyUpdateSQL,
   type Policy,
 } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
-import { RLSTesterSheet } from '@/components/interfaces/Database/RLSTester/RLSTesterSheet'
 import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { getExposedSchemas } from '@/components/layouts/ProjectNeedsSecuring/ProjectNeedsSecuring.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { AutoEnableRLSNotice } from '@/components/ui/AutoEnableRLSNotice'
-import { BannerRlsTester } from '@/components/ui/BannerStack/Banners/BannerRlsTester'
-import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
@@ -121,7 +117,6 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
   )
 
   const isInlineEditorEnabled = useIsInlineEditorEnabled()
-  const rlsTesterEnabled = useIsRLSTesterEnabled()
 
   const { openSidebar } = useSidebarManagerSnapshot()
   const {
@@ -150,15 +145,9 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
   useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setSearchString(''))
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: schema, excludedSchemas: ['realtime'] })
-  const { addBanner, dismissBanner } = useBannerStack()
 
   const [isAutoEnableRLSMinimized] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.RLS_EVENT_TRIGGER_BANNER_DISMISSED(projectRef ?? ''),
-    false
-  )
-
-  const [isRlsTesterBannerDismissed] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.RLS_TESTER_BANNER_DISMISSED(projectRef ?? ''),
     false
   )
 
@@ -250,25 +239,6 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
   const handleResetSearch = useCallback(() => setSearchString(''), [setSearchString])
 
   useEffect(() => {
-    if (rlsTesterEnabled) return
-
-    if (!isRlsTesterBannerDismissed) {
-      addBanner({
-        id: 'rls-tester-banner',
-        isDismissed: false,
-        content: <BannerRlsTester />,
-        priority: 3,
-      })
-    } else {
-      dismissBanner('rls-tester-banner')
-    }
-
-    return () => {
-      dismissBanner('rls-tester-banner')
-    }
-  }, [addBanner, dismissBanner, isRlsTesterBannerDismissed, rlsTesterEnabled])
-
-  useEffect(() => {
     if (selectedIdToEdit && isPoliciesSuccess && !selectedPolicyToEdit) {
       toast(`Policy ID ${selectedIdToEdit} cannot be found`)
       setSelectedIdToEdit(null)
@@ -294,7 +264,6 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
           <PageHeaderAside>
             {isAutoEnableRLSMinimized && <AutoEnableRLSNotice iconOnly />}
             <DocsButton href={`${DOCS_URL}/learn/auth-deep-dive/auth-row-level-security`} />
-            {rlsTesterEnabled && <RLSTesterSheet handleSelectEditPolicy={handleSelectEditPolicy} />}
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
@@ -343,6 +312,7 @@ const DatabasePoliciesPage: NextPageWithLayout = () => {
                     <Button
                       size="tiny"
                       variant="text"
+                      aria-label="Clear filter"
                       className="p-0 h-5 w-5"
                       icon={<X />}
                       onClick={() => setSearchString('')}

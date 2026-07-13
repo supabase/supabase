@@ -1,9 +1,16 @@
 import { useParams } from 'common'
 import { toast } from 'sonner'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 import { ChartConfig } from './ChartConfig'
-import { UtilityActions } from './UtilityActions'
 import { UtilityTabExplain } from './UtilityTabExplain'
 import { UtilityTabResults } from './UtilityTabResults'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
@@ -19,9 +26,6 @@ export type UtilityPanelProps = {
   isExplainExecuting?: boolean
   isDebugging?: boolean
   isDisabled?: boolean
-  hasSelection: boolean
-  prettifyQuery: () => void
-  executeQuery: () => void
   executeExplainQuery: () => void
   showExplainTab?: boolean
   onDebug: () => void
@@ -45,9 +49,6 @@ export const UtilityPanel = ({
   isExplainExecuting,
   isDebugging,
   isDisabled,
-  hasSelection,
-  prettifyQuery,
-  executeQuery,
   executeExplainQuery,
   showExplainTab = true,
   onDebug,
@@ -144,6 +145,34 @@ export const UtilityPanel = ({
           <TabsTrigger className="py-3 text-xs" value="chart">
             <span className="translate-y-px">Chart</span>
           </TabsTrigger>
+        </div>
+
+        <div className="flex items-center gap-4">
+          {result?.rows !== undefined && !isExecuting && (
+            <Tooltip>
+              <TooltipTrigger>
+                <p className="text-xs">
+                  <span className="text-foreground">
+                    {result.rows.length} row{result.rows.length === 1 ? '' : 's'}
+                  </span>
+                  <span className="text-foreground-lighter ml-1">
+                    {result.autoLimit !== undefined && `(Limited to only ${result.autoLimit} rows)`}
+                  </span>
+                </p>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p className="flex flex-col gap-y-1">
+                  <span>
+                    Results are automatically limited to preserve browser performance, in particular
+                    if your query returns an exceptionally large number of rows.
+                  </span>
+                  <span className="text-foreground-light">
+                    You may change or remove this limit from the toolbar above.
+                  </span>
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          )}
 
           {result?.rows && (
             <DownloadResultsButton
@@ -157,15 +186,6 @@ export const UtilityPanel = ({
             />
           )}
         </div>
-
-        <UtilityActions
-          id={id}
-          isExecuting={isExecuting}
-          isDisabled={isDisabled}
-          hasSelection={hasSelection}
-          prettifyQuery={prettifyQuery}
-          executeQuery={executeQuery}
-        />
       </TabsList>
 
       <TabsContent asChild value="results" className="mt-0 grow">

@@ -71,6 +71,7 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         day: cn(
           'text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md',
           'last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
+          'w-9 box-border',
           day
         ),
         day_button: cn(

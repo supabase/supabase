@@ -20,6 +20,12 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DestinationType } from '../DestinationPanel.types'
+import {
+  DEFAULT_CONNECTION_POOL_SIZE,
+  DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
+  DEFAULT_MAX_FILL_MS,
+  DEFAULT_MAX_TABLE_SYNC_WORKERS,
+} from './DestinationForm.constants'
 import { type DestinationPanelSchemaType } from './DestinationForm.schema'
 
 export const AdvancedSettings = ({
@@ -76,7 +82,7 @@ export const AdvancedSettings = ({
                         type="number"
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder="Default: 10000"
+                        placeholder={`Default: ${DEFAULT_MAX_FILL_MS}`}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>milliseconds</InputGroupText>
@@ -110,7 +116,7 @@ export const AdvancedSettings = ({
                         type="number"
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder="Default: 4"
+                        placeholder={`Default: ${DEFAULT_MAX_TABLE_SYNC_WORKERS}`}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>workers</InputGroupText>
@@ -147,7 +153,7 @@ export const AdvancedSettings = ({
                         type="number"
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
-                        placeholder="Default: 2"
+                        placeholder={`Default: ${DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE}`}
                       />
                       <InputGroupAddon align="inline-end">
                         <InputGroupText>connections</InputGroupText>
@@ -220,7 +226,7 @@ export const AdvancedSettings = ({
                             type="number"
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
-                            placeholder="Default: 4"
+                            placeholder={`Default: ${DEFAULT_CONNECTION_POOL_SIZE}`}
                           />
                           <InputGroupAddon align="inline-end">
                             <InputGroupText>connections</InputGroupText>

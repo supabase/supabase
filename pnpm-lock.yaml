@@ -12,6 +12,9 @@ catalogs:
     '@sentry/nextjs':
       specifier: ^10.59.0
       version: 10.59.0
+    '@sentry/tanstackstart-react':
+      specifier: ^10.59.0
+      version: 10.59.0
     '@supabase/auth-js':
       specifier: 2.110.1
       version: 2.110.1
@@ -440,7 +443,7 @@ importers:
         version: 5.1.2
       js-yaml:
         specifier: ^3.14.2
-        version: 3.14.2
+        version: 3.15.0
       jsrsasign:
         specifier: ^11.0.0
         version: 11.1.1
@@ -918,12 +921,6 @@ importers:
       '@dnd-kit/utilities':
         specifier: ^3.2.2
         version: 3.2.2(react@19.2.6)
-      '@electric-sql/pglite':
-        specifier: 0.4.5
-        version: 0.4.5
-      '@electric-sql/pglite-tools':
-        specifier: ^0.3.4
-        version: 0.3.5(@electric-sql/pglite@0.4.5)
       '@graphiql/react':
         specifier: ^0.37.3
         version: 0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@22.13.14)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(graphql-ws@5.14.1(graphql@16.11.0))(graphql@16.11.0)(immer@10.1.1)(react-compiler-runtime@19.1.0-rc.1(react@19.2.6))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(use-sync-external-store@1.6.0(react@19.2.6))
@@ -960,6 +957,9 @@ importers:
       '@sentry/react':
         specifier: ^10.27.0
         version: 10.59.0(react@19.2.6)
+      '@sentry/tanstackstart-react':
+        specifier: 'catalog:'
+        version: 10.59.0(encoding@0.1.13)(react@19.2.6)(rollup@4.60.3)(supports-color@8.1.1)(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))
       '@std/path':
         specifier: npm:@jsr/std__path@^1.0.8
         version: '@jsr/std__path@1.0.8'
@@ -2634,7 +2634,7 @@ importers:
         version: link:../icons
       js-yaml:
         specifier: ^3.14.1
-        version: 3.14.2
+        version: 3.15.0
       lodash:
         specifier: ^4.18.1
         version: 4.18.1
@@ -3574,11 +3574,6 @@ packages:
 
   '@effect-ts/system@0.57.5':
     resolution: {integrity: sha512-/crHGujo0xnuHIYNc1VgP0HGJGFSoSqq88JFXe6FmFyXPpWt8Xu39LyLg7rchsxfXFeEdA9CrIZvLV5eswXV5g==}
-
-  '@electric-sql/pglite-tools@0.3.5':
-    resolution: {integrity: sha512-4him0RnIyqrSqk0zzeBJKJ++VVFk6bFCwKSVV7DP3T8fOQgRSVZShlrHfAChLG2uA/T4JdQ8b/15CxBn+E34TQ==}
-    peerDependencies:
-      '@electric-sql/pglite': 0.4.5
 
   '@electric-sql/pglite@0.4.5':
     resolution: {integrity: sha512-aGG2zGEyZzGWKy8P+9ZoNUV0jxt1+hgbeTf+bVAYyxVZZLXg3/9aFlfLxb08AYZVAfAkQlQIysmWjhc5hwDG8g==}
@@ -7230,6 +7225,15 @@ packages:
     resolution: {integrity: sha512-fpHL25JErsSfTyusuyZ3Q5JmRZeWYWynJO3PNiQH6A/58EqaCp8U5y8LCJ+CSPaeuBMka3S3Qn6U4eXcvkDMRA==}
     engines: {node: '>=18'}
 
+  '@sentry/rollup-plugin@5.3.0':
+    resolution: {integrity: sha512-hgPGPYdQJ/G1cGYOxAb7d4z3V+/k/E5/P/5TFPEEBLuIbFFk+JG0CISUDJdzXJjO382Lb99PBJuXGbueBmO79w==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      rollup: '>=3.2.0'
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+
   '@sentry/server-utils@10.59.0':
     resolution: {integrity: sha512-mR3fWaU7uGxIstRba6YO+/6V3qIa7432F7/U8EWHry+dY4C9DWAVG90E2GCzeD2MwLSP0tB25i8p1TWTGiQgVg==}
     engines: {node: '>=18'}
@@ -7239,9 +7243,17 @@ packages:
       vite:
         optional: true
 
+  '@sentry/tanstackstart-react@10.59.0':
+    resolution: {integrity: sha512-K+22B4iGrlzp+trP9O22N4DdVQZQYlpyljw3SQw8cvOoTwHYarWAyvChvsPCqK7eB1zp+qIr2FP/Y/WO6UNXwQ==}
+    engines: {node: '>=18'}
+
   '@sentry/vercel-edge@10.59.0':
     resolution: {integrity: sha512-4iVIZemakPvF8xlRAD7rlYtUlIloCvFHl3s2WGwO4vCa6vs1HtqggOdsDzW/zj6CoZ7kTu7+e7/Rw0EXYsWYrQ==}
     engines: {node: '>=18'}
+
+  '@sentry/vite-plugin@5.3.0':
+    resolution: {integrity: sha512-qcoSzo4n2MulVQ70UUPLq6dTleb2a2HwL2wuwvAgWhPChrYTuk6A6mDg6aQb9fairPAwFPiU9PzOANpoDJcz1A==}
+    engines: {node: '>= 18'}
 
   '@sentry/webpack-plugin@5.3.0':
     resolution: {integrity: sha512-i3OQUrS0FZlXLgq57RIKDp+vHHzuvYKPCKewAPXULWKMsBXFGhP6veGRQ+6To/pmZkkXjEX5ofVNDy9C3jEPKQ==}
@@ -12669,12 +12681,12 @@ packages:
   js-yaml-loader@1.2.2:
     resolution: {integrity: sha512-H+NeuNrG6uOs/WMjna2SjkaCw13rMWiT/D7l9+9x5n8aq88BDsh2sRmdfxckWPIHtViYHWRG6XiCKYvS1dfyLg==}
 
-  js-yaml@3.14.2:
-    resolution: {integrity: sha512-PMSmkqxr106Xa156c2M265Z+FTrPl+oxd/rgOQy2tijQeK5TxQ43psO1ZCwhVOSdnn+RzkzlRz/eY4BgJBYVpg==}
+  js-yaml@3.15.0:
+    resolution: {integrity: sha512-ttBQIIQPDeLjpPOohtUdXuXUVoA2uIB6fEH9HyJ7234s5mBJ5wTx20njxplLZQgLaOfpmPQA7X2t5AX6tIPbog==}
     hasBin: true
 
-  js-yaml@4.2.0:
-    resolution: {integrity: sha512-ePWsvanv0DWuDRsW8dnt+R4jQ31SCRCQ7hhNcPXZPsoBZiemuZNYGf7adZdqX2D86j6rvKp3RpCxVTSb8WQlOw==}
+  js-yaml@4.3.0:
+    resolution: {integrity: sha512-1td788aAnnZ5qs7V2QIRl1owjtYpbKt749Y3xauqQgwIIGF/xXWz1wMTEBx5O3LK3lXLVuqXPdPxj2BoFHaW9Q==}
     hasBin: true
 
   jsbi@4.3.0:
@@ -18984,11 +18996,8 @@ snapshots:
 
   '@effect-ts/system@0.57.5': {}
 
-  '@electric-sql/pglite-tools@0.3.5(@electric-sql/pglite@0.4.5)':
-    dependencies:
-      '@electric-sql/pglite': 0.4.5
-
-  '@electric-sql/pglite@0.4.5': {}
+  '@electric-sql/pglite@0.4.5':
+    optional: true
 
   '@emnapi/core@1.10.0':
     dependencies:
@@ -19154,7 +19163,7 @@ snapshots:
       globals: 14.0.0
       ignore: 5.3.2
       import-fresh: 3.3.0
-      js-yaml: 4.2.0
+      js-yaml: 4.3.0
       minimatch: 3.1.4
       strip-json-comments: 3.1.1
     transitivePeerDependencies:
@@ -19739,7 +19748,7 @@ snapshots:
       http-proxy-agent: 7.0.2(supports-color@8.1.1)
       https-proxy-agent: 7.0.6(supports-color@8.1.1)
       jose: 5.9.6
-      js-yaml: 4.2.0
+      js-yaml: 4.3.0
       lodash: 4.18.1
       scuid: 1.1.0
       tslib: 2.8.1
@@ -19827,7 +19836,7 @@ snapshots:
 
   '@har-sdk/core@1.4.5':
     dependencies:
-      js-yaml: 4.2.0
+      js-yaml: 4.3.0
       openapi-types: 10.0.0
       tslib: 2.8.1
 
@@ -22476,7 +22485,7 @@ snapshots:
       colorette: 1.4.0
       https-proxy-agent: 7.0.6(supports-color@9.4.0)
       js-levenshtein: 1.1.6
-      js-yaml: 4.2.0
+      js-yaml: 4.3.0
       minimatch: 5.1.8
       node-fetch: 2.7.0(encoding@0.1.13)
       pluralize: 8.0.0
@@ -22884,6 +22893,16 @@ snapshots:
       '@sentry/browser-utils': 10.59.0
       '@sentry/core': 10.59.0
 
+  '@sentry/rollup-plugin@5.3.0(encoding@0.1.13)(rollup@4.60.3)(supports-color@8.1.1)':
+    dependencies:
+      '@sentry/bundler-plugin-core': 5.3.0(encoding@0.1.13)(supports-color@8.1.1)
+      magic-string: 0.30.21
+    optionalDependencies:
+      rollup: 4.60.3
+    transitivePeerDependencies:
+      - encoding
+      - supports-color
+
   '@sentry/server-utils@10.59.0(supports-color@8.1.1)(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))':
     dependencies:
       '@apm-js-collab/code-transformer': 0.15.0
@@ -22897,11 +22916,37 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  '@sentry/tanstackstart-react@10.59.0(encoding@0.1.13)(react@19.2.6)(rollup@4.60.3)(supports-color@8.1.1)(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))':
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+      '@sentry/browser-utils': 10.59.0
+      '@sentry/conventions': 0.12.0
+      '@sentry/core': 10.59.0
+      '@sentry/node': 10.59.0(supports-color@8.1.1)(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))
+      '@sentry/react': 10.59.0(react@19.2.6)
+      '@sentry/vite-plugin': 5.3.0(encoding@0.1.13)(rollup@4.60.3)(supports-color@8.1.1)
+    transitivePeerDependencies:
+      - '@opentelemetry/exporter-trace-otlp-http'
+      - encoding
+      - react
+      - rollup
+      - supports-color
+      - vite
+
   '@sentry/vercel-edge@10.59.0':
     dependencies:
       '@opentelemetry/api': 1.9.1
       '@opentelemetry/resources': 2.8.0(@opentelemetry/api@1.9.1)
       '@sentry/core': 10.59.0
+
+  '@sentry/vite-plugin@5.3.0(encoding@0.1.13)(rollup@4.60.3)(supports-color@8.1.1)':
+    dependencies:
+      '@sentry/bundler-plugin-core': 5.3.0(encoding@0.1.13)(supports-color@8.1.1)
+      '@sentry/rollup-plugin': 5.3.0(encoding@0.1.13)(rollup@4.60.3)(supports-color@8.1.1)
+    transitivePeerDependencies:
+      - encoding
+      - rollup
+      - supports-color
 
   '@sentry/webpack-plugin@5.3.0(encoding@0.1.13)(supports-color@8.1.1)(webpack@5.105.4(esbuild@0.28.1))':
     dependencies:
@@ -25522,7 +25567,7 @@ snapshots:
       ajv: 8.18.0
       compute-cosine-similarity: 1.1.0
       js-levenshtein: 1.1.6
-      js-yaml: 4.2.0
+      js-yaml: 4.3.0
       linear-sum-assignment: 1.0.9
       mustache: 4.2.0
       openai: 6.22.0(ws@8.21.0)(zod@3.25.76)
@@ -26325,7 +26370,7 @@ snapshots:
   cosmiconfig@8.3.6(typescript@6.0.2):
     dependencies:
       import-fresh: 3.3.0
-      js-yaml: 4.2.0
+      js-yaml: 4.3.0
       parse-json: 5.2.0
       path-type: 4.0.0
     optionalDependencies:
@@ -26335,7 +26380,7 @@ snapshots:
     dependencies:
       env-paths: 2.2.1
       import-fresh: 3.3.0
-      js-yaml: 4.2.0
+      js-yaml: 4.3.0
       parse-json: 5.2.0
     optionalDependencies:
       typescript: 6.0.2
@@ -28312,12 +28357,12 @@ snapshots:
       ansi-red: 0.1.1
       coffee-script: 1.12.7
       extend-shallow: 2.0.1
-      js-yaml: 3.14.2
+      js-yaml: 3.15.0
       toml: 2.3.6
 
   gray-matter@4.0.3:
     dependencies:
-      js-yaml: 3.14.2
+      js-yaml: 3.15.0
       kind-of: 6.0.3
       section-matter: 1.0.0
       strip-bom-string: 1.0.0
@@ -29187,16 +29232,16 @@ snapshots:
 
   js-yaml-loader@1.2.2:
     dependencies:
-      js-yaml: 3.14.2
+      js-yaml: 3.15.0
       loader-utils: 1.4.2
       un-eval: 1.2.0
 
-  js-yaml@3.14.2:
+  js-yaml@3.15.0:
     dependencies:
       argparse: 1.0.10
       esprima: 4.0.1
 
-  js-yaml@4.2.0:
+  js-yaml@4.3.0:
     dependencies:
       argparse: 2.0.1
 
@@ -35429,7 +35474,7 @@ snapshots:
       '@oozcitak/dom': 2.0.2
       '@oozcitak/infra': 2.0.2
       '@oozcitak/util': 10.0.0
-      js-yaml: 4.2.0
+      js-yaml: 4.3.0
 
   xmlchars@2.2.0: {}
 

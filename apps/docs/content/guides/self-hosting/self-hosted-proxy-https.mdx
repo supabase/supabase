@@ -76,10 +76,11 @@ defaultActiveId="caddy"
 
 [Caddy](https://caddyserver.com/) automatically provisions and renews Let's Encrypt TLS certificates with zero configuration. It also handles HTTP-to-HTTPS redirects, WebSocket upgrades, and HTTP/2 and HTTP/3 out of the box.
 
-Start Caddy by using the pre-configured `docker-compose.caddy.yml` override:
+Enable the pre-configured `docker-compose.caddy.yml` override, then start the stack:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.caddy.yml up -d
+sh run.sh config add caddy
+sh run.sh start
 ```
 
 Caddy configuration is in `volumes/proxy/caddy/Caddyfile`.
@@ -89,10 +90,11 @@ Caddy configuration is in `volumes/proxy/caddy/Caddyfile`.
 
 This option uses a third-party Nginx Docker image ([`jonasal/nginx-certbot`](https://github.com/JonasAlfredsson/docker-nginx-certbot)), which includes Certbot for automatic Let's Encrypt certificate issuance and renewal in a single container.
 
-Start Nginx by using the pre-configured `docker-compose.nginx.yml` override:
+Enable the pre-configured `docker-compose.nginx.yml` override, then start the stack:
 
 ```sh
-docker compose -f docker-compose.yml -f docker-compose.nginx.yml up -d
+sh run.sh config add nginx
+sh run.sh start
 ```
 
 Nginx configuration template is in `volumes/proxy/nginx/supabase-nginx.conf.tpl`. On container startup, `${NGINX_SERVER_NAME}` is substituted using the environment variable from the `.env` file. The [`jonasal/nginx-certbot`](https://github.com/JonasAlfredsson/docker-nginx-certbot) image reads the resolved `server_name` to determine which domain to request a Let's Encrypt certificate for.
@@ -180,7 +182,7 @@ SITE_URL=https://<your-app-domain>
 ### Step 4: Restart and verify
 
 ```sh
-docker compose down && docker compose up -d
+sh run.sh recreate
 ```
 
 ```sh
@@ -213,7 +215,7 @@ If OAuth redirects fail with a callback URL error:
 
 - Verify `API_EXTERNAL_URL` in `.env` is set to your HTTPS URL + `/auth/v1`
 - Verify the callback URL registered with your OAuth provider matches `API_EXTERNAL_URL` followed by `/callback`
-- After changing `API_EXTERNAL_URL`, restart all services with `docker compose down && docker compose up -d`
+- After changing `API_EXTERNAL_URL`, restart all services with `sh run.sh recreate`
 
 ### Mixed content warnings
 

@@ -3,7 +3,15 @@ import { snakeCase } from 'lodash'
 import z from 'zod'
 
 import { DestinationType } from '../DestinationPanel.types'
-import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
+import {
+  CREATE_NEW_KEY,
+  CREATE_NEW_NAMESPACE,
+  DEFAULT_CONNECTION_POOL_SIZE,
+  DEFAULT_DUCKLAKE_POOL_SIZE,
+  DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
+  DEFAULT_MAX_FILL_MS,
+  DEFAULT_MAX_TABLE_SYNC_WORKERS,
+} from './DestinationForm.constants'
 import {
   DestinationPanelFormSchema,
   type DestinationPanelSchemaType,
@@ -85,9 +93,12 @@ export const generateDefaultValues = ({
     // Common fields
     name: destinationData?.name ?? '',
     publicationName: pipelineData?.config.publication_name ?? '',
-    maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? undefined,
-    maxTableSyncWorkers: pipelineData?.config?.max_table_sync_workers ?? undefined,
-    maxCopyConnectionsPerTable: pipelineData?.config?.max_copy_connections_per_table ?? undefined,
+    maxFillMs: pipelineData?.config?.batch?.max_fill_ms ?? DEFAULT_MAX_FILL_MS,
+    maxTableSyncWorkers:
+      pipelineData?.config?.max_table_sync_workers ?? DEFAULT_MAX_TABLE_SYNC_WORKERS,
+    maxCopyConnectionsPerTable:
+      pipelineData?.config?.max_copy_connections_per_table ??
+      DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE,
     invalidatedSlotBehavior:
       (pipelineData?.config as { invalidated_slot_behavior?: 'error' | 'recreate' } | undefined)
         ?.invalidated_slot_behavior ?? undefined,
@@ -97,7 +108,7 @@ export const generateDefaultValues = ({
     serviceAccountKey: isBigQueryConfig ? config.big_query.service_account_key : '',
     connectionPoolSize:
       (config as { big_query?: { connection_pool_size?: number } } | undefined)?.big_query
-        ?.connection_pool_size ?? undefined,
+        ?.connection_pool_size ?? DEFAULT_CONNECTION_POOL_SIZE,
     maxStalenessMins: isBigQueryConfig ? config.big_query.max_staleness_mins : undefined, // Default: null
     // Analytics Bucket fields
     warehouseName: isIcebergConfig ? config.iceberg.supabase.warehouse_name : '',
@@ -117,7 +128,7 @@ export const generateDefaultValues = ({
     ducklakeStorageBucket: '',
     ducklakeCatalogUrl: ducklakeConfig?.catalog_url ?? '',
     ducklakeDataPath: ducklakeConfig?.data_path ?? '',
-    ducklakePoolSize: ducklakeConfig?.pool_size,
+    ducklakePoolSize: ducklakeConfig?.pool_size ?? DEFAULT_DUCKLAKE_POOL_SIZE,
     ducklakeS3AccessKeyId: ducklakeConfig?.s3_access_key_id ?? '',
     ducklakeS3SecretAccessKey: ducklakeConfig?.s3_secret_access_key ?? '',
     ducklakeS3Region: ducklakeConfig?.s3_region ?? '',

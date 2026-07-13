@@ -1,6 +1,6 @@
 import { Hotkey } from '@tanstack/react-hotkeys'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { AlignLeft, Check, Heart, Keyboard, MoreVertical } from 'lucide-react'
+import { AlignLeft, Check, ChevronDown, Heart, Keyboard, MoreVertical } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -8,6 +8,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   KeyboardShortcut,
@@ -16,6 +18,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 
+import { ROWS_PER_PAGE_OPTIONS } from '../SQLEditor.constants'
 import { AutosaveStatus } from './AutosaveStatus'
 import { SqlRunButton } from './RunButton'
 import { SqlSaveButton } from './SaveButton'
@@ -37,6 +40,7 @@ export type UtilityActionsProps = {
   hasSelection?: boolean
   prettifyQuery: () => void
   executeQuery: () => void
+  className?: string
 }
 
 export const UtilityActions = ({
@@ -46,6 +50,7 @@ export const UtilityActions = ({
   hasSelection = false,
   prettifyQuery,
   executeQuery,
+  className,
 }: UtilityActionsProps) => {
   const { ref } = useParams()
   const snapV2 = useSqlEditorV2StateSnapshot()
@@ -86,21 +91,27 @@ export const UtilityActions = ({
   }
 
   return (
-    <div className="inline-flex items-center justify-end gap-x-2">
+    <div className={cn('flex items-center justify-end gap-x-2', className)}>
       <AutosaveStatus id={id} />
       {/* SavingIndicator reports auto-save progress (spinner/checkmark). In manual
           mode AutosaveStatus + the Save button own the status, so hide it there. */}
       {IS_PLATFORM && !isManualSaveEnabled && <SavingIndicator id={id} />}
 
       <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            data-testid="sql-editor-utility-actions"
-            variant="default"
-            className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
-            icon={<MoreVertical className="text-foreground-light" />}
-          />
-        </DropdownMenuTrigger>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <DropdownMenuTrigger asChild>
+              <Button
+                aria-label="More actions"
+                data-testid="sql-editor-utility-actions"
+                variant="default"
+                className={cn('px-1', isAiOpen ? 'block 2xl:hidden' : 'hidden')}
+                icon={<MoreVertical className="text-foreground-light" />}
+              />
+            </DropdownMenuTrigger>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">More actions</TooltipContent>
+        </Tooltip>
         <DropdownMenuContent className="w-48">
           <DropdownMenuItem className="justify-between" onClick={toggleIntellisense}>
             <span className="flex items-center gap-x-2">
@@ -226,6 +237,30 @@ export const UtilityActions = ({
             variant={IS_PLATFORM ? 'connected-on-left' : 'regular'}
           />
         </div>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="default"
+              iconRight={<ChevronDown size={14} className="text-foreground-light" />}
+            >
+              <span className="text-foreground-light">Limit</span>{' '}
+              {ROWS_PER_PAGE_OPTIONS.find((opt) => opt.value === sessionSnap.limit)?.label}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-40" align="end">
+            <DropdownMenuRadioGroup
+              value={sessionSnap.limit.toString()}
+              onValueChange={(val) => sessionSnap.setLimit(Number(val))}
+            >
+              {ROWS_PER_PAGE_OPTIONS.map((option) => (
+                <DropdownMenuRadioItem key={option.label} value={option.value.toString()}>
+                  {option.label}
+                </DropdownMenuRadioItem>
+              ))}
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         <div className="flex items-center">
           {isManualSaveEnabled && <SqlSaveButton id={id} className="rounded-r-none" />}

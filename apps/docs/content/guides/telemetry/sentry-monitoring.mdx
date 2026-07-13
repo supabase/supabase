@@ -105,13 +105,13 @@ Sentry.init({
 })
 ```
 
-## Example Next.js configuration
+## Configuration for Next.js
 
 Next.js runs Sentry across browser, server, and edge runtimes, and auth-aware setups (like `@supabase/ssr`) create a Supabase client per request. Since `instrumentSupabaseClient` patches database calls per runtime and auth calls per client instance, call it inside each of your client factories rather than on a single shared instance.
 
-First, run through the [Sentry Next.js wizard](https://docs.sentry.io/platforms/javascript/guides/nextjs/#install) to set up the base Sentry configuration.
+1. Run through the [Sentry Next.js wizard](https://docs.sentry.io/platforms/javascript/guides/nextjs/#install) to set up the base Sentry configuration.
 
-Then add `Sentry.instrumentSupabaseClient` to each factory. For example, the server client with `@supabase/ssr`:
+2. Add `Sentry.instrumentSupabaseClient` to each factory. For example, the server client with `@supabase/ssr`:
 
 ```ts utils/supabase/server.ts
 import * as Sentry from '@sentry/nextjs'
@@ -125,6 +125,8 @@ export async function createClient() {
 }
 ```
 
-Do the same in your browser client (`createBrowserClient`) and middleware client so every runtime is covered. To include query filters and mutation bodies, enable `dataCollection: { userInfo: true }` in each runtime's Sentry config, or pass `Sentry.instrumentSupabaseClient(client, { sendOperationData: true })` at the call site.
+3. Apply the same in your browser client using (`createBrowserClient`) and middleware client so every runtime is covered.
 
-Afterwards, build and run your application (`npm run build && npm run start`). Supabase queries now appear as `db` spans in your Sentry traces.
+4. To include query filters and mutation bodies, enable `dataCollection: { userInfo: true }` in each runtime's Sentry config, or pass `Sentry.instrumentSupabaseClient(client, { sendOperationData: true })` at the call site.
+
+5. Build and run your application (`npm run build && npm run start`). Supabase queries now appear as `db` spans in your Sentry traces.

@@ -166,6 +166,13 @@ export const selectFieldSchema = formFieldBase.extend({
 
 export const checkboxFieldSchema = formFieldBase.extend({
   type: z.literal('checkbox'),
+  /**
+   * Optional group identifier for related checkboxes. When any visible checkbox
+   * in a group has `groupRequired: true`, at least one checkbox in that group
+   * must be selected.
+   */
+  group: z.string().optional(),
+  groupRequired: z.boolean().optional().default(false),
 })
 
 /**
