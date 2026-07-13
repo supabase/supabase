@@ -97,8 +97,16 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
         form.setValue('httpHeaders', updatedHttpHeaders)
       }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [httpUrl, isSuccessEdgeFunctions])
+  }, [
+    form,
+    functions,
+    httpHeaders,
+    httpUrl,
+    isSuccessEdgeFunctions,
+    legacyServiceRole,
+    ref,
+    restUrl,
+  ])
 
   return (
     <div>
