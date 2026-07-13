@@ -23,7 +23,7 @@ import { TimezoneDropdown } from './UserDropdown/TimezoneDropdown'
 import { ProfileImage } from '@/components/ui/ProfileImage'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useUpgradeCtaExperiment } from '@/hooks/misc/useUpgradeCtaExperiment'
+import { useShowUpgradeCta } from '@/hooks/misc/useShowUpgradeCta'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useProfileNameAndPicture } from '@/lib/profile'
 import { useTrack } from '@/lib/telemetry/track'
@@ -45,12 +45,12 @@ export function UserDropdown({
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
   const track = useTrack()
 
-  const { variant: upgradeCtaVariant } = useUpgradeCtaExperiment()
-  // Per Slack feedback (Jonny): the upgrade CTA is org-scoped, so only show it on routes
-  // where an org is in scope. Excludes /account/*, /organizations, /new, marketing routes, etc.
+  const { showUpgradeCta: isFreePlanOrg } = useShowUpgradeCta()
+  // The upgrade CTA is org-scoped, so only show it on routes where an org is in scope.
+  // Excludes /account/*, /organizations, /new, marketing routes, etc.
   const isOrgScopedRoute =
     router.pathname.startsWith('/project/') || router.pathname.startsWith('/org/')
-  const showUpgradeCta = upgradeCtaVariant === 'user_dropdown' && isOrgScopedRoute
+  const showUpgradeCta = isFreePlanOrg && isOrgScopedRoute
 
   const [isOpen, setIsOpen] = useState(false)
 
