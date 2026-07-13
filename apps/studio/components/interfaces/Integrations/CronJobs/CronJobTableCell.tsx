@@ -21,7 +21,6 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-  DialogTrigger,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
