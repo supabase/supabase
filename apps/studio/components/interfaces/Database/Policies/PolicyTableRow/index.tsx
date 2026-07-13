@@ -1,4 +1,3 @@
-import { useParams } from 'common'
 import { noop } from 'lodash'
 import { memo, useMemo } from 'react'
 import {
@@ -22,7 +21,6 @@ import type { Policy } from './PolicyTableRow.utils'
 import { getTableAdmonitionMessage, getTableDataApiStatus } from './PolicyTableRow.utils'
 import { PolicyTableRowHeader } from './PolicyTableRowHeader'
 import { AlertError } from '@/components/ui/AlertError'
-import { InlineLink } from '@/components/ui/InlineLink'
 import { useTableApiAccessQuery } from '@/data/privileges/table-api-access-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -43,9 +41,8 @@ const PolicyTableRowComponent = ({
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
 }: PolicyTableRowProps) => {
-  const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { getPoliciesForTable, isPoliciesLoading, isPoliciesError, policiesError, exposedSchemas } =
+  const { getPoliciesForTable, isPoliciesLoading, isPoliciesError, policiesError } =
     usePoliciesData()
 
   const policies = useMemo(
@@ -72,12 +69,11 @@ const PolicyTableRowComponent = ({
   const status = useMemo(
     () =>
       getTableDataApiStatus({
-        isSchemaExposed: exposedSchemas.has(table.schema),
         apiAccessData: apiAccessMap?.[table.name],
         isRLSEnabled: table.rls_enabled,
         policiesCount: policies.length,
       }),
-    [exposedSchemas, apiAccessMap, table.schema, table.name, table.rls_enabled, policies.length]
+    [apiAccessMap, table.schema, table.name, table.rls_enabled, policies.length]
   )
 
   const hasApiAccess =
@@ -106,23 +102,6 @@ const PolicyTableRowComponent = ({
           onSelectCreatePolicy={onSelectCreatePolicy}
         />
       </CardHeader>
-
-      {!isLoadingRolesAccess && !isRolesAccessError && status === 'schema-not-exposed' && (
-        <Admonition
-          showIcon={false}
-          type="warning"
-          className="border-0 border-y rounded-none min-h-12 flex items-center"
-        >
-          <p className="text-foreground-light">
-            No data will be selectable via Supabase APIs as this schema is not exposed. You may
-            configure this in your project’s{' '}
-            <InlineLink href={`/project/${ref}/integrations/data_api/settings`}>
-              API settings
-            </InlineLink>
-            .
-          </p>
-        </Admonition>
-      )}
 
       {!isLoadingRolesAccess && !isRolesAccessError && admonitionMessage !== null && (
         <Admonition

@@ -14,7 +14,6 @@ export type Policy = Omit<PGPolicy, 'definition' | 'check'> & {
  * page's ExposedTableSelector so the two views agree on what counts as exposed.
  */
 export type TableDataApiStatus =
-  | 'schema-not-exposed' // schema isn't in the PostgREST exposed list
   | 'no-grants' // schema exposed, no API roles have any privileges (revoked)
   | 'custom-grants' // schema exposed, partial / non-standard grants
   | 'publicly-readable' // fully granted + RLS disabled (dangerous)
@@ -23,17 +22,14 @@ export type TableDataApiStatus =
   | 'unknown' // privileges query is still loading or errored — caller should stay silent
 
 export function getTableDataApiStatus({
-  isSchemaExposed,
   apiAccessData,
   isRLSEnabled,
   policiesCount,
 }: {
-  isSchemaExposed: boolean
   apiAccessData: TableApiAccessData | undefined
   isRLSEnabled: boolean
   policiesCount: number
 }): TableDataApiStatus {
-  if (!isSchemaExposed) return 'schema-not-exposed'
   if (apiAccessData?.apiAccessType === 'exposed-schema-no-grants') return 'no-grants'
   if (apiAccessData?.apiAccessType === 'access') {
     if (apiAccessData.grantStatus === 'custom') return 'custom-grants'
