@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { SqlEditor, TableEditor } from 'icons'
-import { Copy, Trash, UserIcon } from 'lucide-react'
+import { Copy, ScrollText, Trash, UserIcon } from 'lucide-react'
 import { Column, useRowSelection } from 'react-data-grid'
 import {
   Checkbox,
@@ -262,6 +262,7 @@ export const formatUserColumns = ({
   setSortByValue,
   onSelectDeleteUser,
   onSelectImpersonateUser,
+  onSelectViewLogs,
 }: {
   specificFilterColumn: string
   columns: UsersTableColumn[]
@@ -271,6 +272,7 @@ export const formatUserColumns = ({
   setSortByValue: (val: string) => void
   onSelectDeleteUser: (user: User) => void
   onSelectImpersonateUser: (user: User, destination: 'sql' | 'table-editor') => Promise<void>
+  onSelectViewLogs: (user: User) => void
 }) => {
   const columnOrder = config.map((c) => c.id) ?? columns.map((c) => c.id)
 
@@ -428,6 +430,17 @@ export const formatUserColumns = ({
               >
                 <SqlEditor size={12} />
                 <span>Run SQL as user</span>
+              </ContextMenuItem>
+
+              <ContextMenuItem
+                className="gap-x-2"
+                onFocusCapture={(e) => e.stopPropagation()}
+                onSelect={() => {
+                  if (user) onSelectViewLogs(user)
+                }}
+              >
+                <ScrollText size={12} />
+                <span>View user logs</span>
               </ContextMenuItem>
 
               <ContextMenuSeparator />

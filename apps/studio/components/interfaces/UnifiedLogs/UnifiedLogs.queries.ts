@@ -280,7 +280,10 @@ const buildBaseWhere = (
     if (logTypeFilter) {
       const condition = translateFilter('log_type', logTypeFilter.values, logTypeFilter.operator)
       if (condition) parts.push(condition)
-    } else {
+    } else if (!userFilterValue(search)) {
+      // Skip the default (postgres|edge) source restriction while the user filter is
+      // active — the user clause governs which sources are eligible (auth + postgres),
+      // and the default would otherwise exclude auth_logs, the primary attributable source.
       parts.push(logTypeWhereCondition([...DEFAULT_LOG_TYPES]))
     }
   }
@@ -320,8 +323,42 @@ const EDGE_SERVICE_PATH_FILTER: Record<'edge_auth' | 'edge_storage' | 'edge_post
  * so the row list, chart and sidebar facet counts stay in sync (otherwise the
  * badges over-count by the rows the list hides).
  */
+/** Trimmed value of the cross-cutting user filter, or '' when inactive. */
+const userFilterValue = (search: QuerySearchParamsType): string =>
+  typeof search.user === 'string' ? search.user.trim() : ''
+
+/**
+ * Cross-cutting "attributable to one user" condition. Only the two sources that can
+ * be positively tied to a user are eligible, each with its own match:
+ *   - auth_logs: structured identity (`auth_event.actor_id` / `traits.user_email`),
+ *     plus a raw event_message match so a failed signup (no auth.users row, so the
+ *     identifier is an email) still surfaces.
+ *   - postgres_logs: the identifier appears verbatim in the error text (e.g. a 23502
+ *     failing row echoing the id column).
+ * edge_logs / storage_logs / realtime_logs carry no per-user field and can't satisfy
+ * either branch, so they're auto-excluded while the filter is active — never guessed
+ * at via IP or timestamp proximity.
+ */
+const userAttributionCondition = (search: QuerySearchParamsType): SafeLogSqlFragment | null => {
+  const value = userFilterValue(search)
+  if (!value) return null
+  const exact = lit(value)
+  const contains = lit('%' + value + '%')
+  return safeSql`(
+    (source = 'auth_logs' AND (
+      log_attributes['auth_event.actor_id'] = ${exact}
+      OR log_attributes['auth_event.traits.user_email'] = ${exact}
+      OR event_message ILIKE ${contains}
+    ))
+    OR (source = 'postgres_logs' AND event_message ILIKE ${contains})
+  )`
+}
+
 const applySearchParamsFilter = (search: QuerySearchParamsType): SafeLogSqlFragment | null => {
   const conditions: SafeLogSqlFragment[] = []
+
+  const userCondition = userAttributionCondition(search)
+  if (userCondition) conditions.push(userCondition)
 
   // Visible by default — only an explicit `false` hides connection logs.
   if (search.show_connection_logs === false) {
