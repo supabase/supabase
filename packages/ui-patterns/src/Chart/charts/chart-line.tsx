@@ -137,7 +137,7 @@ export const ChartLine = ({
   const margin = {
     top: 0,
     right: 0,
-    left: showYAxis ? -40 : 0,
+    left: showYAxis ? -(YAxisProps?.width ?? 40) : 0,
     bottom: 0,
   }
 
