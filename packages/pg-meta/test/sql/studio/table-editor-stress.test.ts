@@ -156,44 +156,32 @@ function assertPlanStaysScoped(plan: { Plan: unknown; 'Execution Time': number }
   expect(plan['Execution Time']).toBeLessThan(1000)
 }
 
-test(
-  'plan stays index-only for a mid-chain table (stress.t_1000)',
-  async () => {
-    const plan = await explainTableEditorQuery(midChainTableId)
-    assertPlanStaysScoped(plan)
-  },
-  60_000
-)
+test('plan stays index-only for a mid-chain table (stress.t_1000)', async () => {
+  const plan = await explainTableEditorQuery(midChainTableId)
+  assertPlanStaysScoped(plan)
+}, 60_000)
 
-test(
-  'plan stays index-only for the hub table with many incoming FKs (stress.t_0)',
-  async () => {
-    const plan = await explainTableEditorQuery(hubTableId)
-    assertPlanStaysScoped(plan)
-  },
-  60_000
-)
+test('plan stays index-only for the hub table with many incoming FKs (stress.t_0)', async () => {
+  const plan = await explainTableEditorQuery(hubTableId)
+  assertPlanStaysScoped(plan)
+}, 60_000)
 
-test(
-  'sanity: the real (non-EXPLAIN) query returns a well-formed, non-vacuous entity for t_1000',
-  async () => {
-    const sql = getTableEditorSql({ id: midChainTableId })
-    const [{ entity }] = await db.executeQuery<Array<{ entity: any }>>(sql)
+test('sanity: the real (non-EXPLAIN) query returns a well-formed, non-vacuous entity for t_1000', async () => {
+  const sql = getTableEditorSql({ id: midChainTableId })
+  const [{ entity }] = await db.executeQuery<Array<{ entity: any }>>(sql)
 
-    expect(entity.schema).toBe('stress')
-    expect(entity.name).toBe('t_1000')
-    expect(entity.primary_keys.length).toBeGreaterThan(0)
-    expect(entity.relationships.length).toBeGreaterThan(0)
-    expect(
-      entity.relationships.some(
-        (r: any) => r.source_table_name === 't_1000' && r.target_table_name === 't_999'
-      )
-    ).toBe(true)
-    expect(
-      entity.relationships.some(
-        (r: any) => r.source_table_name === 't_1001' && r.target_table_name === 't_1000'
-      )
-    ).toBe(true)
-  },
-  60_000
-)
+  expect(entity.schema).toBe('stress')
+  expect(entity.name).toBe('t_1000')
+  expect(entity.primary_keys.length).toBeGreaterThan(0)
+  expect(entity.relationships.length).toBeGreaterThan(0)
+  expect(
+    entity.relationships.some(
+      (r: any) => r.source_table_name === 't_1000' && r.target_table_name === 't_999'
+    )
+  ).toBe(true)
+  expect(
+    entity.relationships.some(
+      (r: any) => r.source_table_name === 't_1001' && r.target_table_name === 't_1000'
+    )
+  ).toBe(true)
+}, 60_000)
