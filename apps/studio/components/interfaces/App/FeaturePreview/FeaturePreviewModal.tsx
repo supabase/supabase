@@ -34,12 +34,9 @@ import { IntegrationsLayoutPreview } from './IntegrationsLayoutPreview'
 import { JitDbAccessPreview } from './JitDbAccessPreview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
 import { PlatformWebhooksPreview } from './PlatformWebhooksPreview'
-import { RLSTesterPreview } from './RLSTesterPreview'
 import { SqlEditorManualSavePreview } from './SqlEditorManualSavePreview'
 import { UnifiedLogsPreview } from './UnifiedLogsPreview'
 import { FeaturePreview, useFeaturePreviews } from './useFeaturePreviews'
-import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -52,7 +49,6 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS]: <UnifiedLogsPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]: <PlatformWebhooksPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]: <JitDbAccessPreview />,
-  [LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER]: <RLSTesterPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]: <SqlEditorManualSavePreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]: <IntegrationsLayoutPreview />,
 }
@@ -69,12 +65,6 @@ export const FeaturePreviewModal = () => {
   } = useFeaturePreviewModal()
   const featurePreviewContext = useFeaturePreviewContext()
   const track = useTrack()
-
-  const { dismissBanner } = useBannerStack()
-  const [, setIsDismissedRlsTesterBanner] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.RLS_TESTER_BANNER_DISMISSED(ref ?? ''),
-    false
-  )
 
   const { flags, onUpdateFlag } = featurePreviewContext
   const allFeaturePreviews = (
@@ -93,11 +83,6 @@ export const FeaturePreviewModal = () => {
     if (!selectedFeature) return
 
     const isEnabling = !isSelectedFeatureEnabled
-
-    if (selectedFeature.key === LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER) {
-      dismissBanner('rls-tester-banner')
-      setIsDismissedRlsTesterBanner(true)
-    }
 
     onUpdateFlag(selectedFeature.key, isEnabling)
     track(isEnabling ? 'feature_preview_enabled' : 'feature_preview_disabled', {
@@ -270,7 +255,7 @@ const FeaturePreviewItem = ({
       onClick={() => selectFeaturePreview(feature.key)}
       className={cn(
         'w-full! flex-1 flex items-center justify-between p-4 border-b cursor-pointer bg transition',
-        selectedFeature?.key === feature.key ? 'bg-surface-300' : 'bg-surface-100',
+        selectedFeature?.key === feature.key ? 'bg-accent' : 'bg-card',
         className
       )}
     >
