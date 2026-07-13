@@ -214,18 +214,24 @@ async function transformBody(content: string, data: Record<string, unknown>): Pr
   return output
 }
 
-async function generateOne(sourceFile: string, frontmatter: FrontmatterFormat): Promise<string> {
+async function parseSingleSource(
+  sourceFile: string,
+  frontmatter: FrontmatterFormat
+): Promise<string> {
   const raw = await fs.readFile(sourceFile, 'utf8')
   const { content, data } = parseFrontmatter(raw, frontmatter)
   return transformBody(content, data)
 }
 
-function renderManifest(sources: MarkdownSource[]): string {
-  const slugs = [...new Set(sources.map((source) => source.slug))].sort()
-  return `${JSON.stringify(slugs, null, 2)}\n`
+async function renderManifest(sources: MarkdownSource[], extraSlugs: string[] = []): Promise<void> {
+  const slugs = Array.from(new Set([...sources.map((s) => s.slug), ...extraSlugs]))
+  const content = `${JSON.stringify(slugs, null, 2)}\n`
+
+  await fs.mkdir(path.dirname(TROUBLESHOOTING_INDEX_PATH), { recursive: true })
+  await fs.writeFile(TROUBLESHOOTING_INDEX_PATH, content)
 }
 
-async function renderTroubleshootingIndex(troubleshooting: MarkdownSource[]): Promise<string> {
+async function renderTroubleshootingIndex(troubleshooting: MarkdownSource[]): Promise<void> {
   const entries = await Promise.all(
     troubleshooting.map(async ({ sourceFile, slug }) => {
       const raw = await fs.readFile(sourceFile, 'utf8')
@@ -234,7 +240,10 @@ async function renderTroubleshootingIndex(troubleshooting: MarkdownSource[]): Pr
       return `- [${data.title}](${url})`
     })
   )
-  return `# Troubleshooting guides\n\n${entries.join('\n')}\n`
+  const content = `# Troubleshooting guides\n\n${entries.join('\n')}\n`
+
+  await fs.mkdir(path.dirname(MANIFEST_PATH), { recursive: true })
+  await fs.writeFile(MANIFEST_PATH, content)
 }
 
 async function generate() {
@@ -245,7 +254,7 @@ async function generate() {
     sources.map(async ({ sourceFile, outPath, frontmatter }) => {
       let output: string
       try {
-        output = await generateOne(sourceFile, frontmatter)
+        output = await parseSingleSource(sourceFile, frontmatter)
       } catch (err) {
         throw new Error(
           `Failed to process ${sourceFile}: ${err instanceof Error ? err.message : err}`,
@@ -258,10 +267,8 @@ async function generate() {
     })
   )
 
-  await fs.mkdir(path.dirname(MANIFEST_PATH), { recursive: true })
-  await fs.writeFile(MANIFEST_PATH, renderManifest(sources))
-  const troubleshootingIndexContent = await renderTroubleshootingIndex(troubleshooting)
-  await fs.writeFile(TROUBLESHOOTING_INDEX_PATH, troubleshootingIndexContent)
+  await renderManifest(sources, ['troubleshooting'])
+  await renderTroubleshootingIndex(troubleshooting)
 
   console.log(
     `Generated ${sources.length} markdown files under public/markdown/guides/, troubleshooting guides index at public/markdown/guides/troubleshooting.md and updated public/markdown/manifest.json`
