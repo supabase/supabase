@@ -921,12 +921,6 @@ importers:
       '@dnd-kit/utilities':
         specifier: ^3.2.2
         version: 3.2.2(react@19.2.6)
-      '@electric-sql/pglite':
-        specifier: 0.4.5
-        version: 0.4.5
-      '@electric-sql/pglite-tools':
-        specifier: ^0.3.4
-        version: 0.3.5(@electric-sql/pglite@0.4.5)
       '@graphiql/react':
         specifier: ^0.37.3
         version: 0.37.3(@emotion/is-prop-valid@1.4.0)(@types/node@22.13.14)(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(graphql-ws@5.14.1(graphql@16.11.0))(graphql@16.11.0)(immer@10.1.1)(react-compiler-runtime@19.1.0-rc.1(react@19.2.6))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(use-sync-external-store@1.6.0(react@19.2.6))
@@ -3577,11 +3571,6 @@ packages:
 
   '@effect-ts/system@0.57.5':
     resolution: {integrity: sha512-/crHGujo0xnuHIYNc1VgP0HGJGFSoSqq88JFXe6FmFyXPpWt8Xu39LyLg7rchsxfXFeEdA9CrIZvLV5eswXV5g==}
-
-  '@electric-sql/pglite-tools@0.3.5':
-    resolution: {integrity: sha512-4him0RnIyqrSqk0zzeBJKJ++VVFk6bFCwKSVV7DP3T8fOQgRSVZShlrHfAChLG2uA/T4JdQ8b/15CxBn+E34TQ==}
-    peerDependencies:
-      '@electric-sql/pglite': 0.4.5
 
   '@electric-sql/pglite@0.4.5':
     resolution: {integrity: sha512-aGG2zGEyZzGWKy8P+9ZoNUV0jxt1+hgbeTf+bVAYyxVZZLXg3/9aFlfLxb08AYZVAfAkQlQIysmWjhc5hwDG8g==}
@@ -19004,11 +18993,8 @@ snapshots:
 
   '@effect-ts/system@0.57.5': {}
 
-  '@electric-sql/pglite-tools@0.3.5(@electric-sql/pglite@0.4.5)':
-    dependencies:
-      '@electric-sql/pglite': 0.4.5
-
-  '@electric-sql/pglite@0.4.5': {}
+  '@electric-sql/pglite@0.4.5':
+    optional: true
 
   '@emnapi/core@1.10.0':
     dependencies:

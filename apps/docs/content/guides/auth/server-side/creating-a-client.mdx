@@ -468,19 +468,27 @@ You can now use any Supabase features from your client or server code!
 </TabPanel>
 <TabPanel id="remix" label="Remix">
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="remix-loader"
-  queryGroup="environment"
->
-<TabPanel id="remix-loader" label="Loader">
+With Remix, in a route module such as `_index.tsx`, you can export a `loader`, an `action`, and a default component.
+
+Configure Supabase clients as follows:
+
+1. **Create a server client in the `loader`.** Use it to load data and manage the user session on the server. Return your Supabase URL and publishable key so the browser can create a client.
+2. **Create a server client in the `action`.** Use it to handle form submissions and other mutations on the server.
+3. **Create a browser client in the default component.** Call `useLoaderData` to read the URL and key, then call `createBrowserClient`.
+
+The following example shows all three exports in one route module:
 
 ```ts _index.tsx
-import { type LoaderFunctionArgs } from '@remix-run/node'
-import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
+import { json, type ActionFunctionArgs, type LoaderFunctionArgs } from '@remix-run/node'
+import { useLoaderData } from '@remix-run/react'
+import {
+  createBrowserClient,
+  createServerClient,
+  parseCookieHeader,
+  serializeCookieHeader,
+} from '@supabase/ssr'
 
+// Server: load data and manage the user's session.
 export async function loader({ request }: LoaderFunctionArgs) {
   const responseHeaders = new Headers()
 
@@ -502,20 +510,21 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
   )
 
-  return new Response('...', {
-    headers: responseHeaders,
-  })
+  // Use `supabase` here for server-side work, e.g. await supabase.auth.getUser()
+
+  // Return the environment variables so the browser can create its own client.
+  return json(
+    {
+      env: {
+        SUPABASE_URL: process.env.SUPABASE_URL!,
+        SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY!,
+      },
+    },
+    { headers: responseHeaders }
+  )
 }
-```
 
-</TabPanel>
-
-<TabPanel id="remix-action" label="Action">
-
-```ts _index.tsx
-import { type ActionFunctionArgs } from '@remix-run/node'
-import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
-
+// Server: handle form submissions and mutations.
 export async function action({ request }: ActionFunctionArgs) {
   const responseHeaders = new Headers()
 
@@ -537,41 +546,18 @@ export async function action({ request }: ActionFunctionArgs) {
     }
   )
 
-  return new Response('...', {
-    headers: responseHeaders,
-  })
-}
-```
-
-</TabPanel>
-
-<TabPanel id="remix-component" label="Component">
-
-```ts _index.tsx
-import { type LoaderFunctionArgs } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import { createBrowserClient } from "@supabase/ssr";
-
-export async function loader({}: LoaderFunctionArgs) {
-  return {
-    env: {
-      SUPABASE_URL: process.env.SUPABASE_URL!,
-      SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY!,
-    },
-  };
+  return json(null, { headers: responseHeaders })
 }
 
+// Browser: create a client using the env vars returned by the loader.
 export default function Index() {
-  const { env } = useLoaderData<typeof loader>();
+  const { env } = useLoaderData<typeof loader>()
 
-  const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_PUBLISHABLE_KEY);
+  const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_PUBLISHABLE_KEY)
 
-  return ...
+  return <div>...</div>
 }
 ```
-
-</TabPanel>
-</Tabs>
 
 ## Congratulations
 
@@ -654,19 +640,19 @@ You can now use any Supabase features from your client or server code!
 
 <TabPanel id="react-router" label="React Router">
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="react-router-loader"
-  queryGroup="environment"
->
-<TabPanel id="react-router-loader" label="Loader">
+In React Router, a route module (`_index.tsx`) can export a `loader`, an `action`, and a default component. Create a server client inside the `loader` and `action`, and a browser client inside the component, passing the env vars through the `loader`.
 
 ```ts _index.tsx
-import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
-import { LoaderFunctionArgs } from 'react-router'
+import { data, type ActionFunctionArgs, type LoaderFunctionArgs } from 'react-router'
+import { useLoaderData } from 'react-router'
+import {
+  createBrowserClient,
+  createServerClient,
+  parseCookieHeader,
+  serializeCookieHeader,
+} from '@supabase/ssr'
 
+// Server: load data and manage the user's session.
 export async function loader({ request }: LoaderFunctionArgs) {
   const responseHeaders = new Headers()
 
@@ -679,8 +665,8 @@ export async function loader({ request }: LoaderFunctionArgs) {
           return parseCookieHeader(request.headers.get('Cookie') ?? '')
         },
         setAll(cookiesToSet, cacheHeaders) {
-          cookiesToSet.forEach(({ name, value }) =>
-            responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value))
+          cookiesToSet.forEach(({ name, value, options }) =>
+            responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value, options))
           )
           Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
         },
@@ -688,20 +674,21 @@ export async function loader({ request }: LoaderFunctionArgs) {
     }
   )
 
-  return new Response('...', {
-    headers: responseHeaders,
-  })
+  // Use `supabase` here for server-side work, e.g. await supabase.auth.getUser()
+
+  // Return the env vars so the browser can create its own client.
+  return data(
+    {
+      env: {
+        SUPABASE_URL: process.env.SUPABASE_URL!,
+        SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY!,
+      },
+    },
+    { headers: responseHeaders }
+  )
 }
-```
 
-</TabPanel>
-
-<TabPanel id="react-router-action" label="Action">
-
-```ts _index.tsx
-import { type ActionFunctionArgs } from '@react-router'
-import { createServerClient, parseCookieHeader, serializeCookieHeader } from '@supabase/ssr'
-
+// Server: handle form submissions and mutations.
 export async function action({ request }: ActionFunctionArgs) {
   const responseHeaders = new Headers()
 
@@ -714,8 +701,8 @@ export async function action({ request }: ActionFunctionArgs) {
           return parseCookieHeader(request.headers.get('Cookie') ?? '')
         },
         setAll(cookiesToSet, cacheHeaders) {
-          cookiesToSet.forEach(({ name, value }) =>
-            responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value))
+          cookiesToSet.forEach(({ name, value, options }) =>
+            responseHeaders.append('Set-Cookie', serializeCookieHeader(name, value, options))
           )
           Object.entries(cacheHeaders).forEach(([key, value]) => responseHeaders.set(key, value))
         },
@@ -723,41 +710,18 @@ export async function action({ request }: ActionFunctionArgs) {
     }
   )
 
-  return new Response('...', {
-    headers: responseHeaders,
-  })
-}
-```
-
-</TabPanel>
-
-<TabPanel id="react-router-component" label="Component">
-
-```ts _index.tsx
-import { type LoaderFunctionArgs } from "react-router";
-import { useLoaderData } from "react-router";
-import { createBrowserClient } from "@supabase/ssr";
-
-export async function loader({}: LoaderFunctionArgs) {
-  return {
-    env: {
-      SUPABASE_URL: process.env.SUPABASE_URL!,
-      SUPABASE_PUBLISHABLE_KEY: process.env.SUPABASE_PUBLISHABLE_KEY!,
-    },
-  };
+  return data(null, { headers: responseHeaders })
 }
 
+// Browser: create a client using the env vars returned by the loader.
 export default function Index() {
-  const { env } = useLoaderData<typeof loader>();
+  const { env } = useLoaderData<typeof loader>()
 
-  const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_PUBLISHABLE_KEY);
+  const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_PUBLISHABLE_KEY)
 
-  return ...
+  return <div>...</div>
 }
 ```
-
-</TabPanel>
-</Tabs>
 
 ## Congratulations
 
