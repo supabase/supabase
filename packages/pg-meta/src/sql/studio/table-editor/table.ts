@@ -99,6 +99,7 @@ export const getTableEditorSql = ({ id }: { id?: number }): SafeSqlFragment => {
         join pg_namespace n on c.relnamespace = n.oid
 		join pg_attribute a on a.attrelid = c.oid and a.attnum = any(i.indkey)
         where i.indisprimary
+            and i.indrelid = ${literal(id)}
         group by i.indrelid
     ),
     index_cols as (
@@ -115,6 +116,7 @@ export const getTableEditorSql = ({ id }: { id?: number }): SafeSqlFragment => {
             and a.attnum = any(i.indkey)
         where i.indisunique
             and i.indisprimary = false
+            and i.indrelid = ${literal(id)}
         group by i.indrelid, i.indkey
     ),
     unique_indexes as (
@@ -157,6 +159,7 @@ export const getTableEditorSql = ({ id }: { id?: number }): SafeSqlFragment => {
         join pg_namespace nta on cta.relnamespace = nta.oid
         join pg_attribute ta on (ta.attrelid = c.confrelid and ta.attnum = any(c.confkey))
         where c.contype = 'f'
+            and (c.conrelid = ${literal(id)} or c.confrelid = ${literal(id)})
     ),
     columns as (
         select
@@ -228,6 +231,7 @@ export const getTableEditorSql = ({ id }: { id?: number }): SafeSqlFragment => {
                 conkey[1] as ordinal_position
             from pg_catalog.pg_constraint
             where contype = 'u' and cardinality(conkey) = 1
+                and conrelid = ${literal(id)}
             group by conrelid, conkey[1]
         ) as uniques on uniques.table_id = a.attrelid and uniques.ordinal_position = a.attnum
         left join (
@@ -241,6 +245,7 @@ export const getTableEditorSql = ({ id }: { id?: number }): SafeSqlFragment => {
                 ) as definition
             from pg_constraint
             where contype = 'c' and cardinality(conkey) = 1
+                and conrelid = ${literal(id)}
             order by conrelid, conkey[1], oid asc
         ) as check_constraints on check_constraints.table_id = a.attrelid
                             and check_constraints.ordinal_position = a.attnum
