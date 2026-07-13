@@ -250,21 +250,17 @@ export const TableEditorMenu = () => {
             </InnerSideBarFilterSearchInput>
             <Popover>
               <PopoverTrigger asChild>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant={visibleTypes.length !== 5 ? 'default' : 'dashed'}
-                      className="h-[32px] md:h-[28px] px-1.5"
-                      icon={<Filter />}
-                      aria-label="Filter"
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">Filter</TooltipContent>
-                </Tooltip>
+                <ButtonTooltip
+                  variant={visibleTypes.length !== 5 ? 'default' : 'dashed'}
+                  className="h-[32px] md:h-[28px] px-1.5"
+                  icon={<Filter />}
+                  aria-label="Filter"
+                  tooltip={{ content: { side: 'bottom', text: 'Filter' } }}
+                />
               </PopoverTrigger>
-              <PopoverContent className="p-0 w-56" side="bottom" align="center">
+              <PopoverContent className="p-0 w-60" side="bottom" align="center">
                 <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
-                  <p className="text-xs">Show entity types</p>
+                  <p className="text-xs">Filter entity types</p>
                   <div className="flex flex-col">
                     {Object.entries(ENTITY_TYPE).map(([key, value]) => (
                       <div key={key} className="group flex items-center justify-between py-0.5">
