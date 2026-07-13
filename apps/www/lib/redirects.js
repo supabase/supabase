@@ -2955,7 +2955,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/marketplace',
-    destination: '/docs/guides/integrations/supabase-marketplace',
+    destination: '/docs/guides/integrations/partner-catalog',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/supabase-marketplace',
+    destination: '/docs/guides/integrations/partner-catalog',
   },
   {
     permanent: true,

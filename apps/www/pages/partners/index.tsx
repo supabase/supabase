@@ -139,7 +139,7 @@ const Partners = () => {
                     Use your favorite tools with Supabase.
                   </p>
                 </div>
-                <Link href="/partners/integrations" className="absolute inset-0" />
+                <Link href="/partners/catalog" className="absolute inset-0" />
               </Panel>
             </div>
           </div>
