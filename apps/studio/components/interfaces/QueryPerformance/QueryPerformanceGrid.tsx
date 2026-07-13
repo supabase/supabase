@@ -13,6 +13,7 @@ import {
   Sheet,
   SheetContent,
   SheetDescription,
+  SheetHeader,
   SheetTitle,
   Tabs,
   TabsContent,
@@ -590,10 +591,6 @@ export const QueryPerformanceGrid = ({
         }}
         modal={false}
       >
-        <SheetTitle className="sr-only">Query details</SheetTitle>
-        <SheetDescription className="sr-only">
-          Query Performance Details &amp; Indexes
-        </SheetDescription>
         <SheetContent
           side="right"
           className="flex flex-col h-full bg-studio border-l lg:w-[calc(100vw-802px)]! max-w-[700px] w-full"
@@ -604,6 +601,12 @@ export const QueryPerformanceGrid = ({
             }
           }}
         >
+          <SheetHeader>
+            <SheetTitle className="sr-only">Query details</SheetTitle>
+            <SheetDescription className="sr-only">
+              Query Performance Details &amp; Indexes
+            </SheetDescription>
+          </SheetHeader>
           <Tabs
             value={view}
             className="flex flex-col h-full"
