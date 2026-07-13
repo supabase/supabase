@@ -270,7 +270,7 @@ const FeaturePreviewItem = ({
       onClick={() => selectFeaturePreview(feature.key)}
       className={cn(
         'w-full! flex-1 flex items-center justify-between p-4 border-b cursor-pointer bg transition',
-        selectedFeature?.key === feature.key ? 'bg-surface-300' : 'bg-surface-100',
+        selectedFeature?.key === feature.key ? 'bg-accent' : 'bg-card',
         className
       )}
     >
