@@ -73,7 +73,7 @@ const PolicyTableRowComponent = ({
         isRLSEnabled: table.rls_enabled,
         policiesCount: policies.length,
       }),
-    [apiAccessMap, table.schema, table.name, table.rls_enabled, policies.length]
+    [apiAccessMap, table.name, table.rls_enabled, policies.length]
   )
 
   const hasApiAccess =
