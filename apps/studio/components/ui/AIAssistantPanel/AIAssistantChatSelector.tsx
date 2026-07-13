@@ -39,24 +39,18 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
   }
 
   const handleDeleteChat = (id: string, e?: React.MouseEvent) => {
-    if (e) {
-      e.stopPropagation()
-    }
+    if (e) e.stopPropagation()
     snap.deleteChat(id)
   }
 
   const handleStartEditChat = (id: string, name: string, e?: React.MouseEvent) => {
-    if (e) {
-      e.stopPropagation()
-    }
+    if (e) e.stopPropagation()
     setEditingChatId(id)
     setEditingChatName(name)
   }
 
   const handleSaveEditChat = (e?: React.MouseEvent) => {
-    if (e) {
-      e.stopPropagation()
-    }
+    if (e) e.stopPropagation()
     if (editingChatId && editingChatName.trim()) {
       snap.renameChat(editingChatId, editingChatName.trim())
       setEditingChatId(null)
@@ -65,9 +59,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
   }
 
   const handleCancelEditChat = (e?: React.MouseEvent | React.FocusEvent) => {
-    if (e) {
-      e.stopPropagation()
-    }
+    if (e) e.stopPropagation()
     setEditingChatId(null)
     setEditingChatName('')
   }
@@ -96,7 +88,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
           {currentChat}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[250px] p-0" align="start">
+      <PopoverContent className="w-[250px] p-0" align="center">
         <Command>
           <CommandInput className="text-xs" placeholder="Search chats..." />
           <CommandList>
@@ -138,6 +130,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
                           />
                           <div className="flex items-center gap-0">
                             <Button
+                              aria-label="Save chat name"
                               variant="text"
                               size="tiny"
                               icon={<Check size={14} />}
@@ -145,6 +138,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
                               className="h-7 w-7"
                             />
                             <Button
+                              aria-label="Cancel edit chat"
                               variant="text"
                               size="tiny"
                               icon={<X size={14} />}
@@ -168,6 +162,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
                     {editingChatId !== id && (
                       <div className="flex items-center gap-x-0 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
                         <Button
+                          aria-label="Edit chat name"
                           variant="text"
                           size="tiny"
                           icon={<Edit size={14} />}
@@ -176,6 +171,7 @@ export const AIAssistantChatSelector = ({ disabled = false }: AIAssistantChatSel
                         />
                         {chats.length > 1 && (
                           <Button
+                            aria-label="Delete chat"
                             variant="text"
                             size="tiny"
                             icon={<Trash size={14} />}

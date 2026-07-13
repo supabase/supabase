@@ -36,12 +36,7 @@ export const AIOnboarding = ({
       : defaultPrompts
 
   const { ref: projectRef } = useParams()
-  const {
-    data: lints,
-    isPending: isLoadingLints,
-    isFetching: isFetchingLints,
-  } = useProjectLintsQuery({ projectRef })
-  const isLintsLoading = isLoadingLints || isFetchingLints
+  const { data: lints, isPending: isPendingLints } = useProjectLintsQuery({ projectRef })
 
   const errorLints: Lint[] = (lints?.filter((lint) => lint.level === LINTER_LEVELS.ERROR) ??
     []) as Lint[]
@@ -82,7 +77,7 @@ export const AIOnboarding = ({
             </div>
           ) : (
             <>
-              {isLintsLoading ? (
+              {isPendingLints ? (
                 <div className="px-4 flex flex-col gap-2">
                   {Array.from({ length: 6 }).map((_, index) => (
                     <Skeleton key={`loader-${index}`} className="h-4 w-full" />
