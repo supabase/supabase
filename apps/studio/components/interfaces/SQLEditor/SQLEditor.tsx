@@ -1,12 +1,10 @@
 import type { Monaco } from '@monaco-editor/react'
 import {
   acceptUntrustedSql,
-  rawSql,
-  safeSql,
+  untrustedSql,
   type SafeSqlFragment,
   type UntrustedSqlFragment,
 } from '@supabase/pg-meta'
-import { wrapWithRollback } from '@supabase/pg-meta/src/query'
 import { useQueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { Loader2 } from 'lucide-react'
@@ -31,12 +29,17 @@ import {
 } from './SQLEditor.types'
 import {
   appendEnableRLSStatements,
+  assembleCompletionDiff,
+  buildDebugPromptText,
+  buildExplainSql,
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
+  computeErrorHighlightLine,
   createSqlSnippetSkeletonV2,
   filterTablesCoveredByEnsureRLSTrigger,
   getCreateTablesMissingRLS,
+  getEditorSql,
   hasActiveEnsureRLSTrigger,
   isUpdateWithoutWhere,
   suffixWithLimit,
@@ -46,7 +49,6 @@ import { UtilityActions } from './UtilityPanel/UtilityActions'
 import { UtilityPanel } from './UtilityPanel/UtilityPanel'
 import {
   isExplainQuery,
-  isExplainSql,
   splitSqlStatements,
 } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
@@ -243,10 +245,7 @@ export const SQLEditor = () => {
 
           const startLineNumber = hasSelection ? (editor?.getSelection()?.startLineNumber ?? 0) : 0
 
-          const formattedError = error.formattedError ?? ''
-          const lineError = formattedError.slice(formattedError.indexOf('LINE'))
-          const line =
-            startLineNumber + Number(lineError.slice(0, lineError.indexOf(':')).split(' ')[1])
+          const line = computeErrorHighlightLine(error, startLineNumber)
 
           if (!isNaN(line)) {
             const decorations = editor?.deltaDecorations(
@@ -314,12 +313,7 @@ export const SQLEditor = () => {
 
     if (editorRef.current && project) {
       const editor = editorRef.current
-      const selection = editor.getSelection()
-      const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
-      const sql = snippet
-        ? ((selectedValue || editorRef.current?.getValue()) ??
-          snippet.snippet.content?.unchecked_sql)
-        : selectedValue || editorRef.current?.getValue()
+      const sql = getEditorSql(editor, snippet?.snippet.content?.unchecked_sql)
       const formattedSql = formatSql(sql)
 
       const editorModel = editorRef?.current?.getModel()
@@ -339,31 +333,28 @@ export const SQLEditor = () => {
     registerInCommandMenu: true,
   })
 
+  // Reads the SQL to run from the editor as an UntrustedSqlFragment. The
+  // untrusted→safe promotion (acceptUntrustedSql) happens in the small run /
+  // explain gesture handlers below — never inside the longer execute* helpers,
+  // which by construction only accept already-reviewed SafeSqlFragments.
+  const readEditorSql = useCallback((): UntrustedSqlFragment | undefined => {
+    const editor = editorRef.current
+    if (!editor) return undefined
+    const snippet = getSqlEditorV2StateSnapshot().snippets[id]
+    return getEditorSql(editor, snippet?.snippet.content?.unchecked_sql)
+  }, [id])
+
   const executeQuery = useCallback(
-    async (force: boolean = false, sqlOverride?: SafeSqlFragment) => {
+    async (sql: SafeSqlFragment, force: boolean = false) => {
       if (isDiffOpen) {
         clearPendingRunRefocus()
         return
       }
 
-      // use the latest state
-      const state = getSqlEditorV2StateSnapshot()
-      const snippet = state.snippets[id]
-
       if (editorRef.current === null || isExecuting || project === undefined) {
         clearPendingRunRefocus()
         return
       }
-
-      const editor = editorRef.current
-      const selection = editor.getSelection()
-      const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
-
-      const editorSql = snippet
-        ? ((selectedValue || editorRef.current?.getValue()) ??
-          snippet.snippet.content?.unchecked_sql)
-        : selectedValue || editorRef.current?.getValue()
-      const sql = sqlOverride ?? editorSql
 
       const hasDestructiveOperations = checkDestructiveQuery(sql)
       const hasUpdateWithoutWhere = isUpdateWithoutWhere(sql)
@@ -390,6 +381,8 @@ export const SQLEditor = () => {
         return
       }
 
+      // use the latest state for the title-generation check
+      const snippet = getSqlEditorV2StateSnapshot().snippets[id]
       if (
         // Don't auto-generate a title when the org has disabled AI or is a HIPAA project,
         // as that would silently forward the query to the AI provider without consent
@@ -402,7 +395,7 @@ export const SQLEditor = () => {
       }
 
       if (lineHighlights.length > 0) {
-        editor?.deltaDecorations(lineHighlights, [])
+        editorRef.current?.deltaDecorations(lineHighlights, [])
         setLineHighlights([])
       }
 
@@ -415,9 +408,8 @@ export const SQLEditor = () => {
         return toast.error('Unable to run query: Connection string is missing')
       }
 
-      const userSql = rawSql(sql)
-      const { appendAutoLimit } = checkIfAppendLimitRequired(userSql, limit)
-      const formattedSql = suffixWithLimit(userSql, limit)
+      const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+      const formattedSql = suffixWithLimit(sql, limit)
 
       execute({
         projectRef: project.ref,
@@ -453,87 +445,87 @@ export const SQLEditor = () => {
     ]
   )
 
+  // Run gesture from the toolbar button: promote here, then run.
   const executeQueryFromButton = useCallback(() => {
     shouldRefocusAfterRunRef.current = true
     refocusEditor()
-    void executeQuery()
-  }, [executeQuery, refocusEditor])
+    const sql = readEditorSql()
+    if (sql === undefined) return clearPendingRunRefocus()
+    void executeQuery(acceptUntrustedSql(sql))
+  }, [clearPendingRunRefocus, executeQuery, readEditorSql, refocusEditor])
 
-  const executeExplainQuery = useCallback(async () => {
-    if (isDiffOpen) return
+  // Run gesture from the editor (Cmd/Ctrl+Enter): promote here, then run.
+  const handleRunShortcut = useCallback(() => {
+    const sql = readEditorSql()
+    if (sql !== undefined) void executeQuery(acceptUntrustedSql(sql))
+  }, [executeQuery, readEditorSql])
 
-    // use the latest state
-    const state = getSqlEditorV2StateSnapshot()
-    const snippet = state.snippets[id]
+  const executeExplainQuery = useCallback(
+    async (sql: SafeSqlFragment) => {
+      if (isDiffOpen) return
 
-    if (editorRef.current !== null && !isExplainExecuting && project !== undefined) {
-      const editor = editorRef.current
-      const selection = editor.getSelection()
-      const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
+      if (editorRef.current !== null && !isExplainExecuting && project !== undefined) {
+        // Check for multiple statements - EXPLAIN only works on a single statement
+        const statements = splitSqlStatements(sql)
+        if (statements.length > 1) {
+          sessionSnap.addExplainResultError(id, {
+            message:
+              'EXPLAIN only works on a single SQL statement. Please select just one query to analyze.',
+          })
+          setActiveUtilityTab('explain')
+          return
+        }
 
-      const sql = snippet
-        ? ((selectedValue || editorRef.current?.getValue()) ??
-          snippet.snippet.content?.unchecked_sql)
-        : selectedValue || editorRef.current?.getValue()
+        if (lineHighlights.length > 0) {
+          editorRef.current?.deltaDecorations(lineHighlights, [])
+          setLineHighlights([])
+        }
 
-      // Check for multiple statements - EXPLAIN only works on a single statement
-      const statements = splitSqlStatements(sql)
-      if (statements.length > 1) {
-        sessionSnap.addExplainResultError(id, {
-          message:
-            'EXPLAIN only works on a single SQL statement. Please select just one query to analyze.',
+        const impersonatedRoleState = getImpersonatedRoleState()
+        const connectionString = databases?.find(
+          (db) => db.identifier === databaseSelectorState.selectedDatabaseId
+        )?.connectionString
+        if (!isValidConnString(connectionString)) {
+          return toast.error('Unable to run query: Connection string is missing')
+        }
+
+        // Wrap in EXPLAIN ANALYZE (unless already an EXPLAIN), apply role
+        // impersonation, and wrap in a rollback transaction so EXPLAIN ANALYZE
+        // INSERT/UPDATE/DELETE queries don't actually modify data.
+        const explainSqlWithTransaction = buildExplainSql(sql, impersonatedRoleState)
+
+        executeExplain({
+          projectRef: project.ref,
+          connectionString: connectionString,
+          sql: explainSqlWithTransaction,
+          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
+          handleError: (error) => {
+            throw error
+          },
         })
-        setActiveUtilityTab('explain')
-        return
       }
+    },
+    [
+      isDiffOpen,
+      id,
+      isExplainExecuting,
+      project,
+      executeExplain,
+      getImpersonatedRoleState,
+      databaseSelectorState.selectedDatabaseId,
+      databases,
+      lineHighlights,
+      sessionSnap,
+    ]
+  )
 
-      if (lineHighlights.length > 0) {
-        editor?.deltaDecorations(lineHighlights, [])
-        setLineHighlights([])
-      }
+  // Explain gesture (editor action, toolbar, shortcut): promote here, then run.
+  const handleRunExplain = useCallback(() => {
+    const sql = readEditorSql()
+    if (sql !== undefined) void executeExplainQuery(acceptUntrustedSql(sql))
+  }, [executeExplainQuery, readEditorSql])
 
-      const impersonatedRoleState = getImpersonatedRoleState()
-      const connectionString = databases?.find(
-        (db) => db.identifier === databaseSelectorState.selectedDatabaseId
-      )?.connectionString
-      if (!isValidConnString(connectionString)) {
-        return toast.error('Unable to run query: Connection string is missing')
-      }
-
-      // Wrap the query with EXPLAIN ANALYZE only if it's not already an EXPLAIN query
-      const userSql = rawSql(sql ?? '')
-      const explainSql = isExplainSql(sql) ? userSql : safeSql`EXPLAIN ANALYZE ${userSql}`
-
-      // Wrap EXPLAIN queries in a transaction with rollback to prevent data modifications
-      // This ensures EXPLAIN ANALYZE INSERT/UPDATE/DELETE queries don't actually modify data
-      const explainSqlWithTransaction = wrapWithRollback(
-        wrapWithRoleImpersonation(explainSql, impersonatedRoleState)
-      )
-
-      executeExplain({
-        projectRef: project.ref,
-        connectionString: connectionString,
-        sql: explainSqlWithTransaction,
-        isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
-        handleError: (error) => {
-          throw error
-        },
-      })
-    }
-  }, [
-    isDiffOpen,
-    id,
-    isExplainExecuting,
-    project,
-    executeExplain,
-    getImpersonatedRoleState,
-    databaseSelectorState.selectedDatabaseId,
-    databases,
-    lineHighlights,
-    sessionSnap,
-  ])
-
-  useShortcut(SHORTCUT_IDS.SQL_EDITOR_EXPLAIN, executeExplainQuery, {
+  useShortcut(SHORTCUT_IDS.SQL_EDITOR_EXPLAIN, handleRunExplain, {
     enabled: !disablePrettyExplain,
     registerInCommandMenu: true,
   })
@@ -584,9 +576,8 @@ export const SQLEditor = () => {
       .replace(sqlAiDisclaimerComment, '')
       .trim()
     const errorMessage = result?.error?.message ?? 'Unknown error'
-    const prompt = `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`
 
-    return `${prompt}\n\nSQL Query:\n\`\`\`sql\n${sql}\n\`\`\``
+    return buildDebugPromptText(sql, errorMessage)
   }, [id, sessionSnap.results, snapV2.snippets])
 
   const onDebug = useCallback(async () => {
@@ -694,12 +685,7 @@ export const SQLEditor = () => {
         const text: string = await response.json()
 
         const meta = options?.body?.completionMetadata ?? {}
-        const beforeSelection: string = meta.textBeforeCursor ?? ''
-        const afterSelection: string = meta.textAfterCursor ?? ''
-        const selection: string = meta.selection ?? ''
-
-        const original = beforeSelection + selection + afterSelection
-        const modified = beforeSelection + text + afterSelection
+        const { original, modified } = assembleCompletionDiff(meta, text)
 
         const formattedModified = formatSql(modified)
         setSourceSqlDiff({ original, modified: formattedModified })
@@ -881,22 +867,21 @@ export const SQLEditor = () => {
           shouldRefocusAfterRunRef.current = true
           setPotentialIssues(undefined)
           refocusEditor()
-          void executeQuery(true)
+          // The user has reviewed the warning and confirmed — promote here.
+          const sql = readEditorSql()
+          if (sql === undefined) return clearPendingRunRefocus()
+          void executeQuery(acceptUntrustedSql(sql), true)
         }}
         onConfirmWithRLS={() => {
           const tables = potentialIssues?.createTablesMissingRLS ?? []
           if (tables.length === 0) return
-          const editor = editorRef.current
-          const selection = editor?.getSelection()
-          const selectedValue = selection
-            ? editor?.getModel()?.getValueInRange(selection)
-            : undefined
-          const baseSql = selectedValue || editor?.getValue() || ''
+          const baseSql = readEditorSql() ?? untrustedSql('')
           const rewrittenSql = appendEnableRLSStatements(baseSql, tables)
           shouldRefocusAfterRunRef.current = true
           setPotentialIssues(undefined)
           refocusEditor()
-          void executeQuery(true, acceptUntrustedSql(rewrittenSql as UntrustedSqlFragment))
+          // The user has reviewed the warning and confirmed — promote here.
+          void executeQuery(acceptUntrustedSql(untrustedSql(rewrittenSql)), true)
         }}
       />
 
@@ -977,8 +962,8 @@ export const SQLEditor = () => {
                       className={cn(isDiffOpen && 'hidden')}
                       editorRef={editorRef}
                       monacoRef={monacoRef}
-                      executeQuery={executeQuery}
-                      executeExplainQuery={executeExplainQuery}
+                      executeQuery={handleRunShortcut}
+                      executeExplainQuery={handleRunExplain}
                       showExplainAction={!disablePrettyExplain}
                       prettifyQuery={prettifyQuery}
                       onHasSelection={setHasSelection}
@@ -1040,7 +1025,7 @@ export const SQLEditor = () => {
                 isExecuting={isExecuting}
                 isExplainExecuting={isExplainExecuting}
                 isDisabled={isDiffOpen}
-                executeExplainQuery={executeExplainQuery}
+                executeExplainQuery={handleRunExplain}
                 showExplainTab={!disablePrettyExplain}
                 onDebug={onDebug}
                 buildDebugPrompt={buildDebugPrompt}

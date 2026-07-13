@@ -31,16 +31,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
     () =>
       [
         {
-          key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER,
-          name: 'RLS Tester',
-          discussionsUrl: 'https://github.com/orgs/supabase/discussions/45233',
-          enabled: true,
-          isNew: true,
-          isPlatformOnly: false,
-          isDefaultOptIn: false,
-          getRoute: (ref?: string) => `/project/${ref}/database/policies`,
-        },
-        {
           key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
           name: 'Updated Logs interface',
           discussionsUrl: 'https://github.com/orgs/supabase/discussions/37234',
