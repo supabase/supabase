@@ -23,7 +23,7 @@ values
     'authenticated',
     'authenticated',
     'test@test.com',
-    '$2a$10$rIvxpnRv5waKFZIQFpMJke079cHjJlqACLZXaONomkc4FaZ4Btlbe',
+    crypt('password', gen_salt('bf')),
     '2024-02-03 23:38:34.499444+00',
     '2024-02-03 23:38:21.438042+00',
     'a73278d79e14c427ad5d21509fe88963d258377f77fe9e268d0a92ed',
