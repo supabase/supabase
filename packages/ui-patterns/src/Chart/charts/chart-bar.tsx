@@ -108,7 +108,9 @@ export const ChartBar = ({
   const chartCursor = cursor || (chartHighlight ? 'crosshair' : 'default')
 
   const yAxisConfig = {
-    tick: showYAxis,
+    tick: showYAxis
+      ? { fill: 'var(--color-foreground-lighter)', fontSize: 10, fontFamily: 'var(--font-mono)' }
+      : false,
     hide: !showYAxis,
     tickMargin: showYAxis ? (YAxisProps?.tickMargin ?? 4) : 0,
     width: showYAxis ? (YAxisProps?.width ?? 60) : 0,
@@ -216,7 +218,7 @@ export const ChartBar = ({
         </RechartBarChart>
       </ChartContainer>
       {data && data.length > 0 && (
-        <div className="text-foreground-lighter -mt-10 flex items-center justify-between text-[10px] font-mono">
+        <div className="text-foreground-lighter -mt-6 flex items-center justify-between text-[10px] font-mono">
           <span>{dayjs(data[0]['timestamp']).format(DateTimeFormat)}</span>
           <span>{dayjs(data[data.length - 1]?.['timestamp']).format(DateTimeFormat)}</span>
         </div>
