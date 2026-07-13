@@ -25,6 +25,7 @@
     "config": "workspace:*",
     "tailwindcss": "^4.2.4",
     "tsconfig": "workspace:",
+    "@typescript/native": "catalog:",
     "typescript": "catalog:"
   },
   "license": "MIT"

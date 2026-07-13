@@ -424,6 +424,7 @@ export function ComposedChart({
         className={className}
         attribute={title}
         format={format}
+        docsUrl={docsUrl}
         titleTooltip={titleTooltip}
       />
     )

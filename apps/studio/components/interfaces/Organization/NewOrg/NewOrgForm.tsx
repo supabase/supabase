@@ -253,8 +253,8 @@ export const NewOrgForm = ({
       }
     },
     onError: (data) => {
-      toast.error(data.message, { duration: 10_000 })
-      trackFunnelError('org_creation', classifyApiError('org_creation', data), 'toast')
+      const toastId = toast.error(data.message, { duration: 10_000 })
+      trackFunnelError('org_creation', classifyApiError('org_creation', data), 'toast', toastId)
       setNewOrgLoading(false)
     },
   })
@@ -266,8 +266,8 @@ export const NewOrgForm = ({
       }
     },
     onError: (error) => {
-      toast.error(error.message, { dismissible: true, duration: 10_000 })
-      trackFunnelError('org_creation', classifyApiError('org_creation', error), 'toast')
+      const toastId = toast.error(error.message, { dismissible: true, duration: 10_000 })
+      trackFunnelError('org_creation', classifyApiError('org_creation', error), 'toast', toastId)
     },
   })
 
@@ -283,15 +283,17 @@ export const NewOrgForm = ({
         size: form.getValues('size'),
       })
     } else {
+      // If the payment intent is not successful, we reset the payment method and show an error
+      const toastId = toast.error(
+        `Could not confirm payment. Please try again or use a different card.`,
+        { duration: 10_000 }
+      )
       trackFunnelError(
         'org_creation',
         classifyStripeError(paymentIntentConfirmation.error),
-        'toast'
+        'toast',
+        toastId
       )
-      // If the payment intent is not successful, we reset the payment method and show an error
-      toast.error(`Could not confirm payment. Please try again or use a different card.`, {
-        duration: 10_000,
-      })
       resetPaymentMethod()
       setNewOrgLoading(false)
     }
@@ -591,11 +593,12 @@ export const NewOrgForm = ({
               }
               onLoadingChange={(loading) => setPaymentConfirmationLoading(loading)}
               onError={(err) => {
-                toast.error(err.message, { duration: 10_000 })
+                const toastId = toast.error(err.message, { duration: 10_000 })
                 trackFunnelError(
                   'org_creation',
                   { errorCategory: 'payment', errorReason: 'payment_error' },
-                  'toast'
+                  'toast',
+                  toastId
                 )
                 setNewOrgLoading(false)
                 resetPaymentMethod()
