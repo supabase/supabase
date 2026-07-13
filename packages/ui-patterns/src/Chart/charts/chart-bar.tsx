@@ -120,7 +120,7 @@ export const ChartBar = ({
   const margin = {
     top: 0,
     right: 0,
-    left: showYAxis ? -(YAxisProps?.width ?? 40) : 0,
+    left: 0,
     bottom: 0,
   }
 
