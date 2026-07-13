@@ -1,6 +1,9 @@
+import { render } from '@testing-library/react'
+import type { ReactElement } from 'react'
 import { describe, expect, it } from 'vitest'
 
 import { getTableAdmonitionMessage, getTableDataApiStatus } from './PolicyTableRow.utils'
+import type { TableDataApiStatus } from './PolicyTableRow.utils'
 import type { TableApiAccessData } from '@/data/privileges/table-api-access-query'
 import type { ApiPrivilegesByRole } from '@/lib/data-api-types'
 
@@ -116,36 +119,48 @@ describe('getTableDataApiStatus', () => {
   })
 })
 
+const renderAdmonitionText = (status: TableDataApiStatus) => {
+  const message = getTableAdmonitionMessage({ status })
+  return render(message as ReactElement).container.textContent
+}
+
 describe('getTableAdmonitionMessage', () => {
   it('returns the custom-grants copy', () => {
-    expect(getTableAdmonitionMessage('custom-grants')).toBe(
+    expect(renderAdmonitionText('custom-grants')).toBe(
       'This table has custom Data API permissions — access may be restricted for some roles or operations.'
     )
   })
 
-  it('returns the no-grants copy', () => {
-    expect(getTableAdmonitionMessage('no-grants')).toBe(
+  it('returns the no-grants copy, linking to the Data API settings for the given project ref', () => {
+    const message = getTableAdmonitionMessage({ status: 'no-grants', ref: 'my-project' })
+    const { container, getByRole } = render(message as ReactElement)
+
+    expect(container.textContent).toBe(
       'This table cannot be accessed via the Data API. Enable access in your project’s Data API settings.'
+    )
+    expect(getByRole('link', { name: 'Data API' })).toHaveAttribute(
+      'href',
+      '/project/my-project/integrations/data_api/settings'
     )
   })
 
   it('returns the publicly-readable copy', () => {
-    expect(getTableAdmonitionMessage('publicly-readable')).toBe(
+    expect(renderAdmonitionText('publicly-readable')).toBe(
       'This table can be accessed by anyone via the Data API as RLS is disabled.'
     )
   })
 
   it('returns the locked-by-rls copy', () => {
-    expect(getTableAdmonitionMessage('locked-by-rls')).toBe(
+    expect(renderAdmonitionText('locked-by-rls')).toBe(
       'No data will be returned via the Data API as no RLS policies exist on this table.'
     )
   })
 
   it('returns null for secured — no admonition needed', () => {
-    expect(getTableAdmonitionMessage('secured')).toBeNull()
+    expect(getTableAdmonitionMessage({ status: 'secured' })).toBeNull()
   })
 
   it('returns null for unknown — caller should stay silent during loading/errored state', () => {
-    expect(getTableAdmonitionMessage('unknown')).toBeNull()
+    expect(getTableAdmonitionMessage({ status: 'unknown' })).toBeNull()
   })
 })

@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { noop } from 'lodash'
 import { memo, useMemo } from 'react'
 import {
@@ -41,6 +42,7 @@ const PolicyTableRowComponent = ({
   onSelectEditPolicy = noop,
   onSelectDeletePolicy = noop,
 }: PolicyTableRowProps) => {
+  const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { getPoliciesForTable, isPoliciesLoading, isPoliciesError, policiesError } =
     usePoliciesData()
@@ -86,7 +88,7 @@ const PolicyTableRowComponent = ({
 
   const showPolicies = !isPoliciesLoading && !isPoliciesError && !isLoadingRolesAccess
 
-  const admonitionMessage = useMemo(() => getTableAdmonitionMessage(status), [status])
+  const admonitionMessage = useMemo(() => getTableAdmonitionMessage({ status, ref }), [status, ref])
 
   return (
     <Card className={cn(isPubliclyReadable && 'border-warning-500')}>
@@ -109,7 +111,7 @@ const PolicyTableRowComponent = ({
           type={isPubliclyReadable ? 'warning' : 'default'}
           className="border-0 border-y rounded-none min-h-12 flex items-center"
         >
-          <p>{admonitionMessage}</p>
+          {admonitionMessage}
         </Admonition>
       )}
 

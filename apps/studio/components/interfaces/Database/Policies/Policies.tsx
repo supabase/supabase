@@ -163,7 +163,7 @@ export const Policies = ({
             This schema is not exposed via the Supabase APIs. You may configure this in your
             project’s{' '}
             <InlineLink href={`/project/${ref}/integrations/data_api/settings`}>
-              API settings
+              Data API settings
             </InlineLink>
             .
           </Admonition>
