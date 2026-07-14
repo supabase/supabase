@@ -1,3 +1,8 @@
+import {
+  acceptUntrustedSql,
+  type SafeSqlFragment,
+  type UntrustedSqlFragment,
+} from '@supabase/pg-meta'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect } from 'react'
@@ -12,7 +17,8 @@ type UseSqlEditorShortcutsArgs = {
   isPromptOpen: boolean
   disablePrettyExplain: boolean
   prettifyQuery: () => void
-  runExplain: () => void
+  readEditorSql: () => UntrustedSqlFragment | undefined
+  executeExplainQuery: (sql: SafeSqlFragment) => unknown
   acceptAiHandler: () => void
   discardAiHandler: () => void
   resetPrompt: () => void
@@ -28,7 +34,8 @@ export function useSqlEditorShortcuts({
   isPromptOpen,
   disablePrettyExplain,
   prettifyQuery,
-  runExplain,
+  readEditorSql,
+  executeExplainQuery,
   acceptAiHandler,
   discardAiHandler,
   resetPrompt,
@@ -46,6 +53,15 @@ export function useSqlEditorShortcuts({
     router.push(`/project/${ref}/sql/new?skip=true`)
   }, [ref, router])
 
+  // The Explain keyboard shortcut is an explicit user action, so the
+  // untrusted→safe promotion (acceptUntrustedSql) happens here in the shortcut
+  // handler itself — right next to where it is registered — before the SQL
+  // reaches the explain pipeline.
+  const runExplainShortcut = useCallback(() => {
+    const sql = readEditorSql()
+    if (sql !== undefined) void executeExplainQuery(acceptUntrustedSql(sql))
+  }, [executeExplainQuery, readEditorSql])
+
   useShortcut(SHORTCUT_IDS.SQL_EDITOR_FOCUS_EDITOR, refocusEditor, {
     registerInCommandMenu: true,
   })
@@ -58,7 +74,7 @@ export function useSqlEditorShortcuts({
     registerInCommandMenu: true,
   })
 
-  useShortcut(SHORTCUT_IDS.SQL_EDITOR_EXPLAIN, runExplain, {
+  useShortcut(SHORTCUT_IDS.SQL_EDITOR_EXPLAIN, runExplainShortcut, {
     enabled: !disablePrettyExplain,
     registerInCommandMenu: true,
   })

@@ -5,7 +5,7 @@ import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
 import { untitledSnippetTitle } from './SQLEditor.constants'
-import type { PotentialIssues } from './SQLEditor.types'
+import type { PotentialIssues, UtilityTab } from './SQLEditor.types'
 import {
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
@@ -39,8 +39,8 @@ type UseSqlEditorExecutionArgs = {
   id: string
   isDiffOpen: boolean
   hasSelection: boolean
-  activeUtilityTab: string
-  setActiveUtilityTab: (tab: string) => void
+  activeUtilityTab: UtilityTab
+  setActiveUtilityTab: (tab: UtilityTab) => void
   setAiTitle: (id: string, sql: string) => void
 }
 
