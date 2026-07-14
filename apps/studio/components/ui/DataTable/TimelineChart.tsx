@@ -69,6 +69,11 @@ export function TimelineChart<TChart extends BaseChartSchema>({
     return { interval, period: calculatePeriod(interval) }
   }, [data])
 
+  const bucketWidthMs = useMemo(
+    () => (data.length > 1 ? data[1].timestamp - data[0].timestamp : 0),
+    [data]
+  )
+
   const highlightActions: ChartHighlightAction[] = useMemo(
     () => [
       {
@@ -101,15 +106,43 @@ export function TimelineChart<TChart extends BaseChartSchema>({
         <BarChart
           data={chart}
           margin={{ top: 0, left: 0, right: 0, bottom: 0 }}
-          onMouseDown={({ activeLabel, activeTooltipIndex }) => {
+          onMouseDown={({ activeLabel, activeTooltipIndex, chartX, chartY }) => {
             if (activeTooltipIndex === undefined || activeTooltipIndex === null) return
-            chartHighlight.handleMouseDown({ activeLabel, coordinates: activeLabel })
+            chartHighlight.handleMouseDown({
+              activeLabel,
+              coordinates: activeLabel,
+              chartX,
+              chartY,
+            })
           }}
-          onMouseMove={({ activeLabel, activeTooltipIndex }) => {
+          onMouseMove={({ activeLabel, activeTooltipIndex, chartX, chartY }) => {
             if (activeTooltipIndex === undefined || activeTooltipIndex === null) return
-            chartHighlight.handleMouseMove({ activeLabel, coordinates: activeLabel })
+            chartHighlight.handleMouseMove({
+              activeLabel,
+              coordinates: activeLabel,
+              chartX,
+              chartY,
+            })
           }}
-          onMouseUp={chartHighlight.handleMouseUp}
+          onMouseUp={({ activeLabel, activeTooltipIndex, chartX, chartY }) => {
+            const isClick =
+              chartHighlight.isSelecting &&
+              typeof activeTooltipIndex === 'number' &&
+              chartHighlight.left === activeLabel &&
+              chartHighlight.right === activeLabel
+
+            if (!isClick) {
+              chartHighlight.handleMouseUp({ chartX, chartY })
+              return
+            }
+
+            const nextItem = chart[activeTooltipIndex + 1]
+            const fallbackRight = nextItem
+              ? nextItem[columnId]
+              : new Date(data[activeTooltipIndex].timestamp + bucketWidthMs).toString()
+
+            chartHighlight.handleMouseUp({ chartX, chartY }, { fallbackRight })
+          }}
           style={{ cursor: 'crosshair' }}
         >
           <CartesianGrid vertical={false} horizontal={false} />

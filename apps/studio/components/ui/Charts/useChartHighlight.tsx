@@ -4,7 +4,11 @@ import { useState } from 'react'
 type ChartHighlightMouseEvent = {
   activeLabel?: string
   coordinates?: string
+  chartX?: number
+  chartY?: number
 }
+
+type Pixel = { x: number; y: number }
 
 export interface ChartHighlight {
   left: string | undefined
@@ -14,7 +18,10 @@ export interface ChartHighlight {
   popoverPosition: { x: number; y: number } | null
   handleMouseDown: (e: ChartHighlightMouseEvent) => void
   handleMouseMove: (e: ChartHighlightMouseEvent) => void
-  handleMouseUp: (e: { chartX?: number; chartY?: number }) => void
+  handleMouseUp: (
+    e: { chartX?: number; chartY?: number },
+    options?: { fallbackRight?: string }
+  ) => void
   clearHighlight: () => void
 }
 
@@ -28,6 +35,8 @@ export function useChartHighlight(): ChartHighlight {
   const [isSelecting, setIsSelecting] = useState(false)
   const [popoverPosition, setPopoverPosition] = useState<{ x: number; y: number } | null>(null)
   const [initialPoint, setInitialPoint] = useState<string | undefined>(undefined)
+  const [startPixel, setStartPixel] = useState<Pixel | undefined>(undefined)
+  const [currentPixel, setCurrentPixel] = useState<Pixel | undefined>(undefined)
 
   const handleMouseDown = (e: ChartHighlightMouseEvent) => {
     clearHighlight()
@@ -37,10 +46,17 @@ export function useChartHighlight(): ChartHighlight {
     setRight(e.activeLabel)
     setInitialPoint(e.activeLabel)
     setCoordinates({ left: e.coordinates, right: e.coordinates })
+    if (typeof e.chartX === 'number' && typeof e.chartY === 'number') {
+      setStartPixel({ x: e.chartX, y: e.chartY })
+    }
   }
 
   const handleMouseMove = (e: ChartHighlightMouseEvent) => {
     if (!isSelecting || !e || !e.activeLabel) return
+
+    if (typeof e.chartX === 'number' && typeof e.chartY === 'number') {
+      setCurrentPixel({ x: e.chartX, y: e.chartY })
+    }
 
     const currentTimestamp = dayjs(e.activeLabel)
     const initialTimestamp = dayjs(initialPoint)
@@ -64,21 +80,38 @@ export function useChartHighlight(): ChartHighlight {
     }
   }
 
-  const handleMouseUp = (e: unknown) => {
+  const handleMouseUp = (e: unknown, options?: { fallbackRight?: string }) => {
     if (!isSelecting) return
     setIsSelecting(false)
     setInitialPoint(undefined)
 
-    if (
+    const upPixel: Partial<Pixel> =
       typeof e === 'object' &&
       e !== null &&
       'chartX' in e &&
       'chartY' in e &&
       typeof e.chartX === 'number' &&
       typeof e.chartY === 'number'
-    ) {
-      setPopoverPosition({ x: e.chartX, y: e.chartY })
+        ? { x: e.chartX, y: e.chartY }
+        : {}
+
+    if (options?.fallbackRight && left !== undefined && left === right) {
+      setRight(options.fallbackRight)
+      setCoordinates({ ...coordinates, right: options.fallbackRight })
     }
+
+    // Anchor the popover to the start (leftmost pixel) of the selection rather
+    // than wherever the mouse happened to be released.
+    const xs = [startPixel?.x, currentPixel?.x, upPixel.x].filter(
+      (value): value is number => typeof value === 'number'
+    )
+    const y = startPixel?.y ?? currentPixel?.y ?? upPixel.y
+    if (xs.length > 0 && typeof y === 'number') {
+      setPopoverPosition({ x: Math.min(...xs), y })
+    }
+
+    setStartPixel(undefined)
+    setCurrentPixel(undefined)
   }
 
   const clearHighlight = () => {
@@ -87,6 +120,8 @@ export function useChartHighlight(): ChartHighlight {
     setCoordinates({ left: undefined, right: undefined })
     setPopoverPosition(null)
     setInitialPoint(undefined)
+    setStartPixel(undefined)
+    setCurrentPixel(undefined)
   }
 
   return {
