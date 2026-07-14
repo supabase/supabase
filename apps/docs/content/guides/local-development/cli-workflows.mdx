@@ -39,13 +39,13 @@ If you want a working project to explore rather than an empty one, `supabase boo
 
 After `supabase init`, your project contains a `./supabase` directory. Here's what goes in it and what to commit:
 
-| Path                   | Purpose                                                           | Commit?         |
-| ---------------------- | ----------------------------------------------------------------- | --------------- |
-| `config.toml`          | Local stack configuration (ports, auth settings, etc.)            | Yes             |
-| `migrations/`          | Timestamped SQL migration files, applied in order                 | Yes             |
-| `seed.sql`             | Dev/test data, applied after migrations on `start` and `db reset` | Yes             |
-| `schemas/`             | Declarative schema files (if using that approach)                 | Yes             |
-| `.temp/`, `.branches/` | CLI internal state                                                | No              |
+| Path                   | Purpose                                                           | Commit? |
+| ---------------------- | ----------------------------------------------------------------- | ------- |
+| `config.toml`          | Local stack configuration (ports, auth settings, etc.)            | Yes     |
+| `migrations/`          | Timestamped SQL migration files, applied in order                 | Yes     |
+| `seed.sql`             | Dev/test data, applied after migrations on `start` and `db reset` | Yes     |
+| `schemas/`             | Declarative schema files (if using that approach)                 | Yes     |
+| `.temp/`, `.branches/` | CLI internal state                                                | No      |
 
 The `config.toml` is safe to commit. It contains no secrets by default. If you add sensitive values (OAuth credentials, API keys), use the `env()` function to reference environment variables instead of hardcoding them. See [Managing config and secrets](/docs/guides/local-development/managing-config).
 
@@ -274,11 +274,11 @@ Both starting points converge here. You have a working `./supabase` directory in
 <TabPanel id="declarative" label="Declarative schemas">
 
 1. Edit your schema file(s) in `supabase/schemas/` (add a table, a column, a policy, etc.)
-2. Generate a migration: `supabase db diff -f add-due-date-to-todo`    
+2. Generate a migration: `supabase db diff -f add-due-date-to-todo`
 3. Review the generated migration file. See [Cleaning up generated migrations](#cleaning-up-generated-migrations)
 4. Verify the full chain: `supabase db reset`
 5. Commit the schema file **and** the migration together
-    
+
   </TabPanel>
   <TabPanel id="imperative" label="Imperative migrations">
     
