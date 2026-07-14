@@ -148,9 +148,19 @@ export function TimelineChart<TChart extends BaseChartSchema>({
             />
           )}
           {/* TODO: we could use the `{timestamp, ...rest} = data[0]` to dynamically create the bars but that would mean the order can be very much random */}
-          <Bar dataKey="error" stackId="a" fill="var(--color-error)" />
-          <Bar dataKey="warning" stackId="a" fill="var(--color-warning)" />
-          <Bar dataKey="success" stackId="a" fill="var(--color-success)" />
+          <Bar dataKey="error" stackId="a" fill="var(--color-error)" isAnimationActive={false} />
+          <Bar
+            dataKey="warning"
+            stackId="a"
+            fill="var(--color-warning)"
+            isAnimationActive={false}
+          />
+          <Bar
+            dataKey="success"
+            stackId="a"
+            fill="var(--color-success)"
+            isAnimationActive={false}
+          />
           {showHighlight && (
             <ReferenceArea
               x1={chartHighlight.left}
