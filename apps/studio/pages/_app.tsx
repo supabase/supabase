@@ -102,11 +102,11 @@ const FeatureFlagProviderWithOrgContext = ({
   const cloudProvider = useDefaultProvider()
 
   const getConfigCatFlags = useCallback(
-    (userEmail?: string, projectRef?: string) => {
+    (userEmail?: string) => {
       const customAttributes: Record<string, string> = {}
       if (cloudProvider) customAttributes.cloud_provider = cloudProvider
       if (selectedOrganization?.plan?.id) customAttributes.plan = selectedOrganization.plan.id
-      return getFlags(userEmail, customAttributes, projectRef)
+      return getFlags(userEmail, customAttributes)
     },
     [cloudProvider, selectedOrganization?.plan?.id]
   )

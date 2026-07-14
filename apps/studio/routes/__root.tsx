@@ -319,9 +319,9 @@ function RootComponent() {
   const cloudProvider = useDefaultProvider()
 
   const getConfigCatFlags = useCallback(
-    (userEmail?: string, projectRef?: string) => {
+    (userEmail?: string) => {
       const customAttributes = cloudProvider ? { cloud_provider: cloudProvider } : undefined
-      return getFlags(userEmail, customAttributes, projectRef)
+      return getFlags(userEmail, customAttributes)
     },
     [cloudProvider]
   )

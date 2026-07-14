@@ -56,15 +56,10 @@ async function getClient() {
   }
 }
 
-export async function getFlags(
-  userEmail: string = '',
-  customAttributes?: Record<string, string>,
-  projectRef?: string
-) {
+export async function getFlags(userEmail: string = '', customAttributes?: Record<string, string>) {
   const client = await getClient()
   const _customAttributes = {
     ...customAttributes,
-    ...(projectRef ? { project_ref: projectRef } : {}),
     is_staff: !!userEmail ? userEmail.includes('@supabase.').toString() : 'false',
   }
 
