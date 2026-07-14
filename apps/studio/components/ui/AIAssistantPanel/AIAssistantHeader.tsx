@@ -1,17 +1,7 @@
-import {
-  Clipboard,
-  Edit,
-  Ellipsis,
-  MessageCirclePlus,
-  MoreVertical,
-  Plus,
-  Settings,
-  X,
-} from 'lucide-react'
+import { Clipboard, Edit, MessageCirclePlus, MoreVertical, Settings, X } from 'lucide-react'
 import { KeyboardEvent, useState } from 'react'
 import { toast } from 'sonner'
 import {
-  AiIconAnimation,
   Button,
   copyToClipboard,
   DropdownMenu,
