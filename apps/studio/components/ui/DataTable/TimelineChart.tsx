@@ -164,10 +164,11 @@ export function TimelineChart<TChart extends BaseChartSchema>({
               return format(date, 'LLL dd, y')
             }}
           />
-          {!chartHighlight.popoverPosition && (
-            <ChartTooltip
-              content={
+          <ChartTooltip
+            content={(props) =>
+              chartHighlight.popoverPosition ? null : (
                 <ChartTooltipContent
+                  {...props}
                   labelFormatter={(value) => {
                     const date = new Date(value)
                     if (isNaN(date.getTime())) return 'N/A'
@@ -177,9 +178,9 @@ export function TimelineChart<TChart extends BaseChartSchema>({
                     return format(date, 'LLL dd, y HH:mm')
                   }}
                 />
-              }
-            />
-          )}
+              )
+            }
+          />
           {/* TODO: we could use the `{timestamp, ...rest} = data[0]` to dynamically create the bars but that would mean the order can be very much random */}
           <Bar dataKey="error" stackId="a" fill="var(--color-error)" isAnimationActive={false} />
           <Bar
