@@ -175,49 +175,55 @@ export const PipelineCostDialog = ({
 
               <DialogSectionSeparator />
 
-              <DialogSection>
+              <DialogSection className="flex flex-col gap-y-5">
                 <div className="flex flex-col gap-y-2">
                   <p className="text-sm font-medium text-foreground">Ongoing</p>
-                  <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center justify-between gap-x-4 text-sm">
                     <span className="text-foreground-light">Active pipeline</span>
-                    <span className="font-mono text-foreground" translate="no">
+                    <span className="shrink-0 text-right font-mono text-foreground" translate="no">
                       ${estimate.pipeline.hourly_cost}/hour{' '}
                       <span className="text-foreground-lighter">
                         (~{formatCurrency(estimate.pipeline.monthly_cost)}/month)
                       </span>
                     </span>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center justify-between gap-x-4 text-sm">
                     <span className="text-foreground-light">Streaming changes</span>
-                    <span className="font-mono text-foreground" translate="no">
+                    <span className="shrink-0 text-right font-mono text-foreground" translate="no">
                       {formatCurrency(estimate.streaming.rate_per_gb)}/GB
                     </span>
                   </div>
-                  <p className="text-xs text-foreground-lighter text-balance">
+                  <p className="text-xs text-foreground-lighter">
                     Streaming is billed on the volume of changes replicated after the initial copy,
                     so the total depends on how often your data changes.
                   </p>
                 </div>
 
-                <div className="flex items-center justify-between rounded-md border bg-surface-100 px-4 py-3">
-                  <div>
-                    <p className="text-sm font-medium text-foreground">
-                      Estimated first month total
-                    </p>
-                    <p className="text-xs text-foreground-lighter">
-                      Initial copy + first pipeline fee, excluding usage-based streaming
-                    </p>
+                <div className="flex flex-col gap-y-2">
+                  <div className="flex items-center justify-between gap-x-6 rounded-md border bg-surface-100 px-4 py-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-foreground">
+                        Estimated first month total
+                      </p>
+                      <p className="text-xs text-foreground-lighter">
+                        Initial copy + first pipeline fee, excluding usage-based streaming
+                      </p>
+                    </div>
+                    <span
+                      className="shrink-0 text-right font-mono text-lg font-semibold text-foreground"
+                      translate="no"
+                    >
+                      {formatCurrency(firstMonthTotal)}
+                      {hasRowFilteredTables ? '*' : null}
+                    </span>
                   </div>
-                  <span className="font-mono text-lg font-semibold text-foreground" translate="no">
-                    {formatCurrency(firstMonthTotal)}
-                  </span>
-                </div>
 
-                {hasRowFilteredTables && (
-                  <p className="text-xs text-foreground-lighter">
-                    Tables with row filters may cost less than shown.
-                  </p>
-                )}
+                  {hasRowFilteredTables && (
+                    <p className="text-xs text-foreground-lighter">
+                      *Tables with row filters may cost less than shown.
+                    </p>
+                  )}
+                </div>
               </DialogSection>
             </>
           )
