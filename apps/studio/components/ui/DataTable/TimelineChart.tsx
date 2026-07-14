@@ -148,20 +148,20 @@ export function TimelineChart<TChart extends BaseChartSchema>({
             }}
           />
           <ChartTooltip
-            content={(props) =>
-              chartHighlight.popoverPosition || chartHighlight.isSelecting ? null : (
-                <ChartTooltipContent
-                  {...props}
-                  labelFormatter={(value) => {
-                    const date = new Date(value)
-                    if (isNaN(date.getTime())) return 'N/A'
-                    if (timerange.period === '10m') {
-                      return format(date, 'LLL dd, HH:mm:ss')
-                    }
-                    return format(date, 'LLL dd, y HH:mm')
-                  }}
-                />
-              )
+            active={
+              chartHighlight.popoverPosition || chartHighlight.isSelecting ? false : undefined
+            }
+            content={
+              <ChartTooltipContent
+                labelFormatter={(value) => {
+                  const date = new Date(value)
+                  if (isNaN(date.getTime())) return 'N/A'
+                  if (timerange.period === '10m') {
+                    return format(date, 'LLL dd, HH:mm:ss')
+                  }
+                  return format(date, 'LLL dd, y HH:mm')
+                }}
+              />
             }
           />
           {/* TODO: we could use the `{timestamp, ...rest} = data[0]` to dynamically create the bars but that would mean the order can be very much random */}
