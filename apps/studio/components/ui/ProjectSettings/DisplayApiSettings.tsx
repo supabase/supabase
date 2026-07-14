@@ -3,7 +3,7 @@ import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useFlag, useParams } from 'common'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import { toast } from 'sonner'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
@@ -52,14 +52,20 @@ export const DisplayApiSettings = ({
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
 
-  const now = useRef(new Date()).current
   const showApiKeyLastUsed = useFlag('showApiKeysLastUsed')
-  const { isLoading: isLoadingLastUsed, data: lastUsedLogData } = useApiKeysLastUsedQuery(
-    {
-      projectRef,
-      isoTimestampStart: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
-      isoTimestampEnd: now.toISOString(),
-    },
+  const { isoTimestampStart, isoTimestampEnd } = useMemo(() => {
+    const end = new Date()
+    return {
+      isoTimestampStart: new Date(end.getTime() - 24 * 60 * 60 * 1000).toISOString(),
+      isoTimestampEnd: end.toISOString(),
+    }
+  }, [projectRef, showApiKeyLastUsed])
+  const {
+    isLoading: isLoadingLastUsed,
+    isError: isLastUsedError,
+    data: lastUsedLogData,
+  } = useApiKeysLastUsedQuery(
+    { projectRef, isoTimestampStart, isoTimestampEnd },
     { enabled: showApiKeyLastUsed }
   )
 
@@ -217,9 +223,11 @@ export const DisplayApiSettings = ({
                 className="pt-2 text-foreground-lighter w-full text-sm data-[invisible=true]:invisible"
                 data-invisible={isLoadingLastUsed}
               >
-                {lastUsedAPIKeys[x.api_key]
-                  ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
-                  : 'No requests in the past 24 hours.'}
+                {isLastUsedError
+                  ? 'Unable to load requests from the past 24 hours.'
+                  : lastUsedAPIKeys[x.api_key]
+                    ? `Last request was ${lastUsedAPIKeys[x.api_key]} ago.`
+                    : 'No requests in the past 24 hours.'}
               </div>
             )}
           </Panel.Content>
