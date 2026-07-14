@@ -3,7 +3,7 @@ import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useFlag, useParams } from 'common'
 import { AlertCircle, Loader2 } from 'lucide-react'
 import Link from 'next/link'
-import { useMemo } from 'react'
+import { useMemo, useRef } from 'react'
 import { toast } from 'sonner'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
@@ -52,20 +52,18 @@ export const DisplayApiSettings = ({
   // api keys should not be empty. However it can be populated with a delay on project creation
   const isApiKeysEmpty = apiKeys.length === 0
 
+  const now = useRef(new Date()).current
   const showApiKeyLastUsed = useFlag('showApiKeysLastUsed')
-  const { isoTimestampStart, isoTimestampEnd } = useMemo(() => {
-    const end = new Date()
-    return {
-      isoTimestampStart: new Date(end.getTime() - 24 * 60 * 60 * 1000).toISOString(),
-      isoTimestampEnd: end.toISOString(),
-    }
-  }, [projectRef, showApiKeyLastUsed])
   const {
     isLoading: isLoadingLastUsed,
     isError: isLastUsedError,
     data: lastUsedLogData,
   } = useApiKeysLastUsedQuery(
-    { projectRef, isoTimestampStart, isoTimestampEnd },
+    {
+      projectRef,
+      isoTimestampStart: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
+      isoTimestampEnd: now.toISOString(),
+    },
     { enabled: showApiKeyLastUsed }
   )
 
