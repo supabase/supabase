@@ -135,14 +135,15 @@ export const getSinceLastDeployLogRange = (updatedAt?: string | number, now: Dat
 
   const startDate = new Date(isoTimestampStart)
   const normalizedNow = new Date(now)
-  const endDate = Number.isNaN(normalizedNow.valueOf()) ? new Date() : normalizedNow
+  const nowDate = Number.isNaN(normalizedNow.valueOf()) ? new Date() : normalizedNow
+  const endDate = new Date(Math.max(startDate.valueOf(), nowDate.valueOf()))
   const earliestAllowedStart = endDate.valueOf() - SINCE_LAST_DEPLOY_MAX_RANGE_MS
 
   return {
     isoTimestampStart: new Date(
-      Math.min(Math.max(startDate.valueOf(), earliestAllowedStart), endDate.valueOf())
+      Math.max(startDate.valueOf(), earliestAllowedStart)
     ).toISOString(),
-    isoTimestampEnd: new Date(Math.max(startDate.valueOf(), endDate.valueOf())).toISOString(),
+    isoTimestampEnd: endDate.toISOString(),
   }
 }
 
