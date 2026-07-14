@@ -48,8 +48,7 @@ export function TimelineChart<TChart extends BaseChartSchema>({
   const { table } = useDataTable()
   const chartHighlight = useChartHighlight()
 
-  const showHighlight =
-    chartHighlight?.left && chartHighlight?.right && chartHighlight?.left !== chartHighlight?.right
+  const showHighlight = !!chartHighlight?.left && !!chartHighlight?.right
 
   // REMINDER: date has to be a string for tooltip label to work - don't ask me why
   const chart = useMemo(
@@ -81,7 +80,9 @@ export function TimelineChart<TChart extends BaseChartSchema>({
         label: 'Filter logs to selected range',
         icon: <SearchIcon className="text-foreground-lighter" size={12} />,
         onSelect: ({ start, end, clear }) => {
-          const [left, right] = [start, end].sort(
+          const resolvedEnd =
+            start === end ? new Date(new Date(start).getTime() + bucketWidthMs).toString() : end
+          const [left, right] = [start, resolvedEnd].sort(
             (a, b) => new Date(a).getTime() - new Date(b).getTime()
           )
           table.getColumn(resolvedFilterColumnId)?.setFilterValue([new Date(left), new Date(right)])
@@ -124,25 +125,7 @@ export function TimelineChart<TChart extends BaseChartSchema>({
               chartY,
             })
           }}
-          onMouseUp={({ activeLabel, activeTooltipIndex, chartX, chartY }) => {
-            const isClick =
-              chartHighlight.isSelecting &&
-              typeof activeTooltipIndex === 'number' &&
-              chartHighlight.left === activeLabel &&
-              chartHighlight.right === activeLabel
-
-            if (!isClick) {
-              chartHighlight.handleMouseUp({ chartX, chartY })
-              return
-            }
-
-            const nextItem = chart[activeTooltipIndex + 1]
-            const fallbackRight = nextItem
-              ? nextItem[columnId]
-              : new Date(data[activeTooltipIndex].timestamp + bucketWidthMs).toString()
-
-            chartHighlight.handleMouseUp({ chartX, chartY }, { fallbackRight })
-          }}
+          onMouseUp={chartHighlight.handleMouseUp}
           style={{ cursor: 'crosshair' }}
         >
           <CartesianGrid vertical={false} horizontal={false} />

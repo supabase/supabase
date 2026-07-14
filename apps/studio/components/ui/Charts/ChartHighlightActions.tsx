@@ -48,7 +48,7 @@ export const ChartHighlightActions = ({
   const formatChartDate = useFormatDateTime()
 
   useEffect(() => {
-    setIsOpen(!!chartHighlight?.popoverPosition && selectedRangeStart !== selectedRangeEnd)
+    setIsOpen(!!chartHighlight?.popoverPosition)
   }, [chartHighlight?.popoverPosition])
 
   const ctx: ChartHighlightActionContext | undefined =
