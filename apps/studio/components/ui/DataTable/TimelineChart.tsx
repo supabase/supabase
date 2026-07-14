@@ -149,7 +149,7 @@ export function TimelineChart<TChart extends BaseChartSchema>({
           />
           <ChartTooltip
             content={(props) =>
-              chartHighlight.popoverPosition ? null : (
+              chartHighlight.popoverPosition || chartHighlight.isSelecting ? null : (
                 <ChartTooltipContent
                   {...props}
                   labelFormatter={(value) => {
