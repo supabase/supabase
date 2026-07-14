@@ -237,7 +237,7 @@ let stars = 0
 // GitHub Stars
 const fetchOctoData = async () => {
   const { Octokit } = await import('@octokit/core')
-  const octokit = new Octokit()
+  const octokit = new Octokit(process.env.GITHUB_TOKEN ? { auth: process.env.GITHUB_TOKEN } : {})
   const res = await octokit.request('GET /repos/{org}/{repo}', {
     org: 'supabase',
     repo: 'supabase',

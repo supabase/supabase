@@ -7,39 +7,43 @@
 @source './../../../packages/ui/src/**/*.{tsx,ts,js}';
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
 
+@theme inline {
+  --font-heading: var(--font-heading, var(--font-sans));
+}
+
 @theme {
   --text-grid: 13px;
 
-  --color-typography-body-light: hsl(var(--foreground-light));
-  --color-typography-body-dark: hsl(var(--foreground-light));
-  --color-typography-body-secondary-light: hsl(var(--foreground-lighter));
-  --color-typography-body-secondary-dark: hsl(var(--foreground-lighter));
-  --color-typography-body-strong-light: hsl(var(--foreground-default));
-  --color-typography-body-strong-dark: hsl(var(--foreground-default));
-  --color-typography-body-faded-light: hsl(var(--foreground-muted));
-  --color-typography-body-faded-dark: hsl(var(--foreground-muted));
+  --color-typography-body-light: var(--foreground-light);
+  --color-typography-body-dark: var(--foreground-light);
+  --color-typography-body-secondary-light: var(--foreground-lighter);
+  --color-typography-body-secondary-dark: var(--foreground-lighter);
+  --color-typography-body-strong-light: var(--foreground-default);
+  --color-typography-body-strong-dark: var(--foreground-default);
+  --color-typography-body-faded-light: var(--foreground-muted);
+  --color-typography-body-faded-dark: var(--foreground-muted);
 
-  --color-table-body-light: hsl(var(--background-default));
-  --color-table-body-dark: hsl(var(--background-default));
-  --color-table-header-light: hsl(var(--background-surface-100));
-  --color-table-header-dark: hsl(var(--background-surface-100));
-  --color-table-footer-light: hsl(var(--background-surface-100));
-  --color-table-footer-dark: hsl(var(--background-surface-100));
-  --color-table-border-light: hsl(var(--border-default));
-  --color-table-border-dark: hsl(var(--border-default));
+  --color-table-body-light: var(--background-default);
+  --color-table-body-dark: var(--background-default);
+  --color-table-header-light: var(--background-surface-100);
+  --color-table-header-dark: var(--background-surface-100);
+  --color-table-footer-light: var(--background-surface-100);
+  --color-table-footer-dark: var(--background-surface-100);
+  --color-table-border-light: var(--border-default);
+  --color-table-border-dark: var(--border-default);
 
-  --color-panel-body-light: hsl(var(--background-surface-100));
-  --color-panel-body-dark: hsl(var(--background-surface-100));
-  --color-panel-header-light: hsl(var(--background-surface-100));
-  --color-panel-header-dark: hsl(var(--background-surface-100));
-  --color-panel-footer-light: hsl(var(--background-surface-100));
-  --color-panel-footer-dark: hsl(var(--background-surface-100));
-  --color-panel-border-light: hsl(var(--border-default));
-  --color-panel-border-dark: hsl(var(--border-default));
-  --color-panel-border-interior-light: hsl(var(--border-muted));
-  --color-panel-border-interior-dark: hsl(var(--border-muted));
-  --color-panel-border-hover-light: hsl(var(--border-muted));
-  --color-panel-border-hover-dark: hsl(var(--border-muted));
+  --color-panel-body-light: var(--background-surface-100);
+  --color-panel-body-dark: var(--background-surface-100);
+  --color-panel-header-light: var(--background-surface-100);
+  --color-panel-header-dark: var(--background-surface-100);
+  --color-panel-footer-light: var(--background-surface-100);
+  --color-panel-footer-dark: var(--background-surface-100);
+  --color-panel-border-light: var(--border-default);
+  --color-panel-border-dark: var(--border-default);
+  --color-panel-border-interior-light: var(--border-muted);
+  --color-panel-border-interior-dark: var(--border-muted);
+  --color-panel-border-hover-light: var(--border-muted);
+  --color-panel-border-hover-dark: var(--border-muted);
 
   --animate-shimmer: shimmer 2s infinite linear;
   --animate-badge-shimmer: badge-shimmer 3s ease-in-out infinite;
@@ -47,6 +51,21 @@
   --animate-chevron-up: chevron-up 2s ease-in-out infinite;
   --animate-sway: sway 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   --animate-marketplace-featured-progress: marketplace-featured-progress linear forwards;
+
+  /* font sizing and weights optimized for Inter */
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-lg: 1rem;
+  --text-xl: 1.125rem;
+  --text-2xl: 1.375rem;
+  --text-3xl: 1.75rem;
+  --text-4xl: 2.125rem;
+  --text-5xl: 2.875rem;
+  --text-6xl: 3.625rem;
+  --text-7xl: 4.375rem;
+  --text-8xl: 5.875rem;
+  --text-9xl: 7.875rem;
+  --font-weight-normal: 450;
 }
 
 @keyframes shimmer {
@@ -119,43 +138,47 @@
 }
 
 :root {
-  --chart-1: var(--brand-default);
+  --chart-1: hsl(var(--brand-default));
   --chart-2: 173 58% 39%;
   --chart-3: 197 37% 24%;
   --chart-4: 43 74% 66%;
   --chart-5: 27 87% 67%;
   --chart-blue: 217 91% 60%;
-  --chart-warning: hsl(var(--warning-default));
+  --chart-warning: hsl(var(--warning-500));
+  --chart-warning-muted: hsl(var(--warning-400));
   --chart-destructive: hsl(var(--destructive-default));
+  --chart-success: color-mix(in oklch, var(--foreground-muted) 65%, white);
   --sidebar-background: var(--background-dash-sidebar);
   --sidebar-foreground: var(--foreground-default);
   --sidebar-primary: var(--foreground-default);
-  --sidebar-primary-foreground: var(--warning-default);
+  --sidebar-primary-foreground: var(--warning);
   --sidebar-accent: var(--background-selection);
   --sidebar-accent-foreground: var(--foreground-default);
   --sidebar-border: var(--border-default);
-  --sidebar-ring: 217.2 91.2% 59.8%;
+  --sidebar-ring: var(--ring);
   --header-height: 3rem;
 }
 
 [data-theme='dark'],
 .dark {
-  --chart-1: var(--brand-default);
+  --chart-1: hsl(var(--brand-default));
   --chart-2: 160 60% 45%;
   --chart-3: 30 80% 55%;
   --chart-4: 280 65% 60%;
   --chart-5: 340 75% 55%;
   --chart-blue: 217 91% 65%;
   --chart-warning: hsl(var(--warning-default));
+  --chart-warning-muted: hsl(var(--warning-500));
   --chart-destructive: hsl(var(--destructive-default));
+  --chart-success: color-mix(in oklch, var(--foreground-muted) 65%, white);
   --sidebar-background: var(--background-dash-sidebar);
   --sidebar-foreground: var(--foreground-default);
   --sidebar-primary: var(--foreground-default);
-  --sidebar-primary-foreground: var(--warning-default);
+  --sidebar-primary-foreground: var(--warning);
   --sidebar-accent: var(--background-selection);
   --sidebar-accent-foreground: var(--foreground-default);
   --sidebar-border: var(--border-default);
-  --sidebar-ring: 217.2 91.2% 59.8%;
+  --sidebar-ring: var(--ring);
 }
 
 @layer base {
@@ -164,7 +187,7 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: hsl(var(--border-default, currentColor));
+    border-color: var(--border-default, currentColor);
   }
 }
 
@@ -178,10 +201,20 @@ body,
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   overscroll-behavior: none;
+  font-weight: 450;
 }
 
 * {
   box-sizing: border-box;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply font-heading font-semibold;
 }
 
 .form-group .form-text,

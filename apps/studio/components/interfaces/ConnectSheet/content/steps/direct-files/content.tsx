@@ -16,6 +16,7 @@ import {
   PASSWORD_PLACEHOLDER,
   resolveConnectionString,
 } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
+import { PasswordEncodingNote } from '@/components/interfaces/ConnectSheet/PasswordEncodingNote'
 
 const DOTNET_CONFIG_COMMAND =
   'dotnet add package Microsoft.Extensions.Configuration.Json --version YOUR_DOTNET_VERSION'
@@ -27,6 +28,8 @@ type DirectFilesConfig = {
     code: string
   }[]
   connectionStringFile?: string
+  /** The password ends up inside a connection URL, so special characters must be percent-encoded */
+  passwordInUrl?: boolean
   postCommands?: { label: string; command: string }[]
 }
 
@@ -79,6 +82,7 @@ export default sql`,
             envFile,
           ],
           connectionStringFile: envFile.name,
+          passwordInUrl: true,
         }
 
       case 'golang':
@@ -115,6 +119,7 @@ func main() {
             envFile,
           ],
           connectionStringFile: envFile.name,
+          passwordInUrl: true,
         }
 
       case 'dotnet':
@@ -161,6 +166,7 @@ connection = psycopg2.connect(DATABASE_URL)`,
             envFile,
           ],
           connectionStringFile: envFile.name,
+          passwordInUrl: true,
         }
 
       case 'sqlalchemy':
@@ -213,6 +219,7 @@ except Exception as e:
             },
           ],
           connectionStringFile: '.env',
+          passwordInUrl: true,
         }
 
       default:
@@ -242,6 +249,7 @@ except Exception as e:
   return (
     <div className="flex flex-col gap-3">
       <MultipleCodeBlock files={config.files} value={activeFile} onValueChange={setActiveFile} />
+      {config.passwordInUrl && <PasswordEncodingNote />}
       <ConnectionParameters parameters={buildConnectionParameters(connectionParams)} />
       {(config.postCommands ?? []).map((command) => (
         <div key={command.command} className="flex flex-col gap-2">

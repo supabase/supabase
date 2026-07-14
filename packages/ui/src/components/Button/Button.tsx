@@ -58,17 +58,6 @@ const buttonVariants = cva(
           data-[state=open]:border-foreground-lighter
           data-[state=open]:outline-border-strong
         `,
-        /** @deprecated use 'primary' instead */
-        alternative: `
-          text-foreground
-          bg-brand-400 hover:bg-brand-500
-          border-brand-500
-          focus-visible:border-brand-500
-          focus-visible:outline-brand-600
-          data-[state=open]:bg-brand-500
-          data-[state=open]:border-brand-500
-          data-[state=open]:outline-brand-600
-        `,
         outline: `
           text-foreground
           bg-transparent
@@ -99,31 +88,31 @@ const buttonVariants = cva(
         `,
         text: `
           text-foreground
-          hover:bg-surface-300
+          hover:bg-accent
           shadow-none
           focus-visible:outline-border-strong
-          data-[state=open]:bg-surface-300
+          data-[state=open]:bg-accent
           data-[state=open]:outline-border-strong
           border-transparent
         `,
         danger: `
           text-foreground
           bg-destructive-300 dark:bg-destructive-400 hover:bg-destructive-400 dark:hover:bg-destructive/50
-          border-destructive-500 hover:border-destructive
+          border-border-destructive hover:border-destructive
           hover:text-hi-contrast
-          focus-visible:outline-amber-700
+          focus-visible:outline-destructive
           data-[state=open]:border-destructive
-          data-[state=open]:bg-destructive-400 dark:data-[state=open]:bg-destructive-/50
+          data-[state=open]:bg-destructive-400 dark:data-[state=open]:bg-destructive/50
           data-[state=open]:outline-destructive
         `,
         warning: `
           text-foreground
           bg-warning-300 dark:bg-warning-400 hover:bg-warning-400 dark:hover:bg-warning/50
-          border-warning-500 hover:border-warning
+          border-border-warning hover:border-warning
           hover:text-hi-contrast
-          focus-visible:outline-amber-700
+          focus-visible:outline-warning
           data-[state=open]:border-warning
-          data-[state=open]:bg-warning-400 dark:data-[state=open]:bg-warning-/50
+          data-[state=open]:bg-warning-400 dark:data-[state=open]:bg-warning/50
           data-[state=open]:outline-warning
         `,
       },
@@ -174,7 +163,7 @@ const IconContainerVariants = cva('inline-flex items-center justify-center shrin
       dashed: 'text-foreground-lighter',
       link: 'text-brand-600',
       text: 'text-foreground-lighter',
-      danger: 'text-destructive-600',
+      danger: 'text-destructive',
       warning: 'text-warning',
     },
   },
@@ -192,7 +181,7 @@ const loadingVariants = cva('', {
       dashed: 'text-foreground-lighter',
       link: 'text-brand-600',
       text: 'text-foreground-muted',
-      danger: 'text-destructive-600',
+      danger: 'text-destructive',
       warning: 'text-warning',
     },
     loading: {
@@ -250,6 +239,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     // - Otherwise, default to 0 for keyboard accessibility
     const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
 
+    const renderIconContainer = (content: ReactNode) => (
+      <div aria-hidden className={cn(IconContainerVariants({ size, variant }))}>
+        {content}
+      </div>
+    )
+
     return (
       <Comp
         ref={ref}
@@ -271,35 +266,31 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               children,
               undefined,
               showIcon &&
-                (loading ? (
-                  <div className={cn(IconContainerVariants({ size, variant }))}>
-                    <Loader2 className={cn(loadingVariants({ loading, variant }))} />
-                  </div>
-                ) : _iconLeft ? (
-                  <div className={cn(IconContainerVariants({ size, variant }))}>{_iconLeft}</div>
-                ) : null),
+                (loading
+                  ? renderIconContainer(
+                      <Loader2 className={cn(loadingVariants({ loading, variant }))} />
+                    )
+                  : _iconLeft
+                    ? renderIconContainer(_iconLeft)
+                    : null),
               children.props.children && (
                 <span className={'truncate'}>{children.props.children}</span>
               ),
-              iconRight && !loading && (
-                <div className={cn(IconContainerVariants({ size, variant }))}>{iconRight}</div>
-              )
+              iconRight && !loading && renderIconContainer(iconRight)
             )
           ) : null
         ) : (
           <>
             {showIcon &&
-              (loading ? (
-                <div className={cn(IconContainerVariants({ size, variant }))}>
-                  <Loader2 className={cn(loadingVariants({ loading, variant }))} />
-                </div>
-              ) : _iconLeft ? (
-                <div className={cn(IconContainerVariants({ size, variant }))}>{_iconLeft}</div>
-              ) : null)}{' '}
+              (loading
+                ? renderIconContainer(
+                    <Loader2 className={cn(loadingVariants({ loading, variant }))} />
+                  )
+                : _iconLeft
+                  ? renderIconContainer(_iconLeft)
+                  : null)}{' '}
             {children && <span className={'truncate'}>{children}</span>}{' '}
-            {iconRight && !loading && (
-              <div className={cn(IconContainerVariants({ size, variant }))}>{iconRight}</div>
-            )}
+            {iconRight && !loading && renderIconContainer(iconRight)}
           </>
         )}
       </Comp>

@@ -189,3 +189,83 @@ select graphql.resolve('{ __schema { queryType { name } } }');
 ```
 
 Existing projects on pg_graphql 1.5.x are not impacted unless they choose to upgrade.
+
+### Ltree indexes require reindexing after upgrade
+
+_Applies when upgrading to Postgres 15.18 or 17.10._
+
+<Admonition type="caution">
+
+You are affected only if you have indexes on `ltree` columns and your database uses a multibyte encoding or a non-`libc` collation provider.
+
+</Admonition>
+
+After upgrading, indexes on `ltree` columns that were built under the previous version can return incomplete results until the index is rebuilt. For example, label searches silently miss rows that are present. This affects databases using a multibyte encoding, such as UTF-8, or a non-`libc` collation provider such as ICU or builtin.
+
+To mitigate this issue:
+
+1. Check whether your database needs reindexing:
+
+   ```sql
+   select
+     pg_encoding_to_char(encoding) as encoding,
+     pg_encoding_max_length(encoding) as max_bytes_per_char, -- 1 = single-byte, >1 = multibyte
+     datlocprovider as collation_provider, -- 'c' libc, 'i' icu, 'b' builtin
+     (pg_encoding_max_length(encoding) > 1 or datlocprovider != 'c') as reindex_required
+   from pg_database
+   where datname = current_database();
+   ```
+
+   If `reindex_required` is `false`, such as a single-byte encoding like LATIN1 with `libc` collation, no action is needed.
+
+2. If `reindex_required` is `true`, find the affected indexes:
+
+   ```sql
+   select schemaname, tablename, indexname
+   from pg_indexes
+   where
+     indexname in (
+       select c.relname
+       from
+         pg_index as i
+         join pg_class as c on i.indexrelid = c.oid
+         join pg_attribute as a on a.attrelid = i.indrelid and a.attnum = ANY(i.indkey)
+         join pg_type as t on a.atttypid = t.oid
+       where t.typname in ('ltree', '_ltree')
+     );
+   ```
+
+3. Reindex each affected index. `REINDEX INDEX CONCURRENTLY` runs online with no downtime:
+
+   ```sql
+   REINDEX INDEX CONCURRENTLY <index_name>;
+   ```
+
+### Custom operator selectivity estimators
+
+_Applies when upgrading to Postgres 15.18 or 17.10._
+
+Attaching a non-built-in (extension- or user-provided) selectivity estimator function to an operator now requires superuser. Existing operators continue to work — the check only fires when an operator is (re)created, most commonly during `pg_dump` / `pg_restore`, a logical restore, or a branch.
+
+Because Supabase database roles are not superusers, recreating such an operator on your behalf (for example during a restore or branch) can fail with:
+
+```
+ERROR: must be superuser to specify a non-built-in restriction estimator function
+```
+
+Most projects are not affected. To check whether your database has any user-defined operators that reference a non-built-in estimator:
+
+```sql
+SELECT n.nspname AS schema, o.oprname AS operator
+FROM pg_operator o
+JOIN pg_namespace n ON o.oprnamespace = n.oid
+WHERE n.nspname NOT IN ('pg_catalog', 'information_schema')
+  AND ((o.oprrest <> 0 AND o.oprrest::oid >= 10000)
+    OR (o.oprjoin <> 0 AND o.oprjoin::oid >= 10000))
+  AND NOT EXISTS (
+    SELECT 1 FROM pg_depend d
+    WHERE d.classid = 'pg_operator'::regclass AND d.objid = o.oid AND d.deptype = 'e'
+  );
+```
+
+If this returns no rows, your project is unaffected.

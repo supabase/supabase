@@ -11,6 +11,29 @@
 @source './../../../packages/ui/src/**/*.{tsx,ts,js}';
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
 
+@theme inline {
+  --font-sans:
+    var(--font-inter), Inter, Helvetica Neue, Helvetica, ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-manrope, var(--font-sans));
+  --font-mono: 'Source Code Pro', ui-monospace, Menlo, monospace;
+}
+
+@theme {
+  --text-sm: 0.8125rem;
+  --text-base: 0.9375rem;
+  --text-lg: 1rem;
+  --text-xl: 1.125rem;
+  --text-2xl: 1.375rem;
+  --text-3xl: 1.75rem;
+  --text-4xl: 2.125rem;
+  --text-5xl: 2.875rem;
+  --text-6xl: 3.625rem;
+  --text-7xl: 4.375rem;
+  --text-8xl: 5.875rem;
+  --text-9xl: 7.875rem;
+  --font-weight-normal: 450;
+}
+
 @layer utilities {
   .prose--remove-p-margin p {
     margin: 0;
@@ -23,28 +46,30 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    border-color: hsl(var(--border-default, currentColor));
+    border-color: var(--border-default, currentColor);
   }
-}
 
-@font-face {
-  font-family: 'custom-font';
-  src:
-    url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
-    url(../../../packages/common/assets/fonts/CustomFont-Book.woff) format('woff');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'custom-font';
-  src:
-    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff2) format('woff2'),
-    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff) format('woff');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
+  code,
+  .code-content,
+  pre,
+  kbd,
+  samp,
+  .font-mono {
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+    --text-4xl: 2.25rem;
+    --text-5xl: 3rem;
+    --text-6xl: 3.75rem;
+    --text-7xl: 4.5rem;
+    --text-8xl: 6rem;
+    --text-9xl: 8rem;
+    --font-weight-normal: 400;
+  }
 }
 
 :root {
@@ -52,9 +77,17 @@
   --header-height: 50px;
 }
 
+html {
+  scroll-behavior: smooth;
+  font-weight: 500;
+}
+
+html[data-theme*='dark'] {
+  font-weight: 450;
+}
+
 body {
   @apply bg-background text-foreground;
-  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -64,14 +97,19 @@ body {
   color: #333 !important;
 }
 
-/* a { */
-/*   text-decoration: none !important; */
-/* } */
-
-article h1 {
-  /* margin-bottom: 2rem !important; */
-  /* font-size: 3rem !important; */
-  /* font-weight: 400 !important; */
+h1:not(.font-mono),
+h2:not(.font-mono),
+h3:not(.font-mono),
+h4:not(.font-mono),
+h5:not(.font-mono),
+h6:not(.font-mono),
+.h1:not(.font-mono),
+.h2:not(.font-mono),
+.h3:not(.font-mono),
+.h4:not(.font-mono),
+.h5:not(.font-mono),
+.h6:not(.font-mono) {
+  @apply font-heading font-semibold;
 }
 
 .thin-scrollbar {
@@ -103,8 +141,40 @@ article h1 {
   @apply text-foreground-muted text-xs;
 }
 
-.prose :where(p):not(:where([class~='not-prose'] *)) {
+.prose :where(p):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   white-space: pre-line;
+}
+
+.prose :where(p, a, code, pre):not(:where([class~='not-prose'], [class~='not-prose'] *)),
+.prose :where(ol > li):not(:where([class~='not-prose'], [class~='not-prose'] *))::marker {
+  font-weight: inherit;
+}
+
+/* Body text inherits a heavier base weight, so override the shared `strong: 500`
+ * to keep bold text visually distinct. */
+.prose :where(strong, b):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  font-weight: 700;
+}
+
+.prose :where(h1, h2, h3, h4, h5, h6):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  @apply font-heading font-semibold;
+}
+
+.prose
+  :where(p, li, a, figcaption):not(:where([class~='not-prose'], [class~='not-prose'] *)):not(
+    :where(h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6) *
+  ) {
+  @apply text-base leading-7;
+}
+
+.prose :where(h1, .h1):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  @apply text-4xl;
+}
+.prose :where(h2, .h2):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  @apply text-2xl;
+}
+.prose :where(h3, .h3):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+  @apply text-xl leading-7;
 }
 
 code[class*='language-'],
@@ -136,7 +206,7 @@ pre[class*='language-'] {
 }
 
 .method-list-title-isChild {
-  font-family: var(--custom-font-size-xs);
+  font-family: var(--font-mono);
   & h5 {
     font-weight: 200;
   }
@@ -303,11 +373,24 @@ th code {
 }
 
 /*
- * Prevents very long code lines (checksums, URLs, etc., from breaking table
- * widths
+ * First column (e.g. variable names): wrap at word boundaries, not mid-token.
  */
-.prose :where(td) code {
+.prose :where(td:first-child) code {
+  @apply break-words whitespace-normal;
+}
+
+/*
+ * Other columns: prevents very long code lines (checksums, URLs, etc.) from
+ * breaking table widths.
+ */
+.prose :where(td:not(:first-child)) code {
   @apply break-all;
+}
+
+.prose table td:first-child,
+.prose table th:first-child {
+  min-width: 12rem;
+  width: 30%;
 }
 
 /* Zoomable image */
@@ -322,18 +405,11 @@ th code {
   transition-timing-function: cubic-bezier(0.24, 0.25, 0.05, 1) !important;
 }
 [data-rmiz-modal-overlay='visible'] {
-  background-color: hsl(var(--background-default)) !important;
+  background-color: var(--background-default) !important;
   opacity: 0.8;
 }
 [data-rmiz-modal-img] {
   image-rendering: high-quality;
-}
-
-.skip-link {
-  @apply sr-only;
-}
-.skip-link:focus {
-  @apply not-sr-only;
 }
 
 /* Code blocks need margin applied when in content container */
@@ -348,7 +424,7 @@ th code {
   --code-foreground: #ffffff;
   --code-token-constant: #3ecf8e;
   --code-token-string: #ffcda1;
-  --code-token-comment: #7e7e7e;
+  --code-token-comment: #949494;
   --code-token-parameter: #ffffff;
   --code-token-function: #3ecf8e;
   --code-token-string-expression: #ffcda1;
@@ -360,17 +436,17 @@ th code {
 }
 [data-theme='light'],
 .light {
-  --code-token-keyword: #6b35dc;
-  --code-foreground: hsl(var(--foreground-light) / 1);
+  --code-token-keyword: #5f2fc4;
+  --code-foreground: oklch(from var(--foreground-light) l c h / 1);
   --code-token-constant: #15593b;
-  --code-token-string: #f1a10d;
-  --code-token-comment: #7e7e7e;
-  --code-token-parameter: hsl(var(--foreground-light) / 1);
+  --code-token-string: #9a5200;
+  --code-token-comment: #6a6a6a;
+  --code-token-parameter: oklch(from var(--foreground-light) l c h / 1);
   --code-token-function: #15593b;
-  --code-token-string-expression: #f1a10d;
-  --code-token-punctuation: hsl(var(--foreground-light) / 1);
-  --code-token-link: hsl(var(--foreground-light) / 1);
-  --code-token-number: hsl(var(--foreground-light) / 1);
+  --code-token-string-expression: #9a5200;
+  --code-token-punctuation: oklch(from var(--foreground-light) l c h / 1);
+  --code-token-link: oklch(from var(--foreground-light) l c h / 1);
+  --code-token-number: oklch(from var(--foreground-light) l c h / 1);
   --code-token-property: #15593b;
   --code-highlight-color: #1c1c1c;
 }

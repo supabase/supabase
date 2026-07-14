@@ -1,0 +1,330 @@
+---
+id: 'pipelines'
+title: 'Set up Pipelines'
+description: 'Create a managed replication pipeline using Postgres logical replication.'
+subtitle: 'Configure publications, destinations, and managed replication pipelines.'
+sidebar_label: 'Setting up'
+---
+
+<Admonition type="caution" title="Private Alpha">
+
+Supabase Pipelines is currently in private alpha. Private alpha features can be unstable and may introduce breaking changes while we evaluate the product direction, refine the feature set, and incorporate customer feedback.
+
+</Admonition>
+
+Pipelines is a managed CDC feature for creating replication pipelines from Supabase Postgres to destination systems. It uses **Postgres logical replication** with the open-source [Supabase ETL engine](https://github.com/supabase/etl). You choose a destination in the Dashboard, and Supabase runs the pipeline that streams database changes to that destination.
+
+## Pricing
+
+<$Partial path="billing/pricing/pricing_pipelines.mdx" />
+
+## Setup overview
+
+Pipelines requires two main components: a **Postgres publication** (defines what to replicate) and a **destination** (where data is sent). Supabase runs the managed pipeline that reads from the publication and writes to the destination. Follow these steps to set up your replication pipeline.
+
+<Admonition type="tip">
+
+If you already have a Postgres publication set up, you can skip to [Step 2: Enable Pipelines](#step-2-enable-pipelines).
+
+</Admonition>
+
+### Step 1: Create a Postgres publication
+
+A Postgres publication defines which tables and change types will be replicated from your database. You create publications using SQL.
+
+#### Creating a publication
+
+The following SQL examples assume you have `users` and `orders` tables in your database.
+
+##### Publication for specific tables
+
+```sql
+-- Create publication for both tables
+create publication pub_users_orders
+for table users, orders;
+```
+
+This publication tracks all changes (INSERT, UPDATE, DELETE, TRUNCATE) for both the `users` and `orders` tables.
+
+##### Publication for all tables in a schema
+
+```sql
+-- Create a publication for all tables in the public schema
+create publication pub_all_public for tables in schema public;
+```
+
+This tracks changes for all existing and future tables in the `public` schema.
+
+##### Publication for all tables
+
+```sql
+-- Create a publication for all tables
+create publication pub_all_tables for all tables;
+```
+
+This tracks changes for all tables in your database.
+
+#### Advanced publication options
+
+##### Selecting specific columns
+
+You can replicate only a subset of columns from a table:
+
+```sql
+-- Replicate only specific columns from the users table
+create publication pub_users_subset
+for table users (id, email, created_at);
+```
+
+This only replicates the `id`, `email`, and `created_at` columns from the `users` table.
+
+##### Filtering rows with a predicate
+
+You can filter which rows to replicate using a `WHERE` clause:
+
+```sql
+-- Only replicate active users
+create publication pub_active_users
+for table users where (status = 'active');
+
+-- Only replicate recent orders
+create publication pub_recent_orders
+for table orders where (created_at > '2024-01-01');
+```
+
+##### Partitioned tables
+
+Pipelines follows Postgres publication semantics for partitioned tables. The `publish_via_partition_root` publication setting controls whether changes from partitions are emitted as the partition root or as the leaf partitions.
+
+| Publication setting                        | What gets replicated                                                                                       | Destination shape                                                       |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `publish_via_partition_root = true`        | Rows from the published partition root, including rows stored in its leaf partitions                       | One table matching the published partition root                         |
+| `publish_via_partition_root = false`       | Rows from the leaf partitions under the published partition root                                           | One table per replicated leaf partition                                 |
+| Not set in SQL                             | Same as `false`, because Postgres defaults `publish_via_partition_root` to `false`                         | One table per replicated leaf partition                                 |
+| Publishing an individual leaf partition    | The leaf partition itself, regardless of `publish_via_partition_root`                                      | One table for that leaf partition                                       |
+| `FOR ALL TABLES` or `FOR TABLES IN SCHEMA` | Partition roots plus regular tables when `true`; leaf partitions plus regular tables when `false` or unset | Destination tables follow the effective Postgres publication table list |
+
+For example, if `orders` is partitioned by month:
+
+```sql
+-- Replicate the whole partition hierarchy as the parent table.
+create publication pub_orders_root
+for table orders
+with (publish_via_partition_root = true);
+
+-- Replicate each leaf partition as its own table.
+create publication pub_orders_leaves
+for table orders
+with (publish_via_partition_root = false);
+```
+
+Use `publish_via_partition_root = true` when you want analytics queries to read from a single destination table that has the parent table's schema. Use `false` when each partition should remain a separate destination table.
+
+Publications created from the Dashboard replication flow use `publish_via_partition_root = true`. If you create or alter a publication manually with SQL, set this option explicitly so the destination shape matches what you expect.
+
+On Postgres 15 and newer, row filters on partition publications apply during both the initial copy and streaming phases. Pipelines uses the row filter attached to the effective publication table entry: the published partition root when `publish_via_partition_root = true`, and the published leaf relation when `publish_via_partition_root = false`.
+
+<Admonition type="note">
+
+With `publish_via_partition_root = true`, truncating an individual leaf partition is not replicated as a truncate event for the published parent. If you need truncate replication, run `TRUNCATE` on the published partition root.
+
+</Admonition>
+
+#### Viewing publications in the Dashboard
+
+After creating a publication via SQL, you can view it in the Dashboard:
+
+1. Navigate to the [**Database > Publications**](/dashboard/project/_/database/publications) section of the Dashboard
+2. You'll see all your publications listed with their tables
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+### Step 2: Enable Pipelines
+
+Before creating a managed replication pipeline, enable Pipelines for your project:
+
+1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
+2. Click **Add destination** to show the replication side panel
+3. Select a Pipelines destination, such as **BigQuery**
+4. Click **Enable Pipelines**
+
+<Image
+  alt="Enable Pipelines"
+  src="/docs/img/database/replication/replication-enable-replication.png"
+  width={3560}
+  height={2156}
+/>
+
+### Step 3: Configure a destination
+
+Once Pipelines is enabled and you have a Postgres publication, configure a destination. The destination is where your replicated data will be stored, while the pipeline is the active Postgres replication process that continuously streams changes from your database to that destination.
+
+#### Choose and configure your destination
+
+Follow these steps to configure your destination. Each destination has its own setup requirements and behavior. **BigQuery** is currently available, and we are working on new destinations.
+
+1. Navigate to the [**Database > Replication**](/dashboard/project/_/database/replication) section of the Dashboard
+2. Click **Add destination** if the destination side panel isn't already open
+
+3. Configure the general settings:
+   - **Destination name**: A name to identify this destination
+   - **Publication**: The publication to replicate data from (created in [Step 1](#step-1-create-a-postgres-publication))
+   - **Destination type**: Select the destination you want to use
+
+4. Configure the destination-specific settings. See the destination guide for required credentials, permissions, and limitations:
+   - [BigQuery](/docs/guides/database/replication/bigquery)
+
+5. Optionally expand **Advanced settings** to tune pipeline behavior. These settings apply to the pipeline rather than the destination:
+
+   | Setting                        | Default              | Description                                                                                                                                                                                                                            |
+   | ------------------------------ | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | **Batch wait time**            | `10000` milliseconds | Maximum time the pipeline waits to collect additional changes before flushing them. Lower values reduce replication latency. Higher values can improve batching efficiency.                                                            |
+   | **Table sync workers**         | `4` workers          | Number of tables copied in parallel during the initial snapshot phase. Each worker uses one replication slot, up to `N + 1` total replication slots while syncing.                                                                     |
+   | **Copy connections per table** | `2` connections      | Number of parallel database connections each table copy can use during the initial sync. Increasing this can speed up large table copies, but uses more database connections.                                                          |
+   | **Invalidated slot behavior**  | `Error`              | What the pipeline does when its replication slot is invalidated. **Error** blocks startup so you can recover manually. **Recreate** rebuilds the slot on the next pipeline restart and starts replication from scratch for all tables. |
+
+   Leave these settings at their defaults unless you need to tune initial copy speed, latency, or recovery behavior.
+
+   Use **Invalidated slot behavior** carefully. If **Recreate** is selected and the pipeline restarts after Postgres has invalidated the main replication slot, the pipeline creates a new slot and copies all replicated tables again. This full restart is required for consistency because the old slot can no longer provide every change the pipeline missed.
+
+6. Click **Create and start pipeline** to begin replication
+
+Your replication pipeline now starts copying data from your database to your destination.
+
+### Step 4: Monitor your pipeline
+
+After you create and start the pipeline, its destination appears in the destinations list. You can monitor the pipeline's status and performance from the Dashboard.
+
+<Image
+  alt="Replication pipelines destinations list"
+  src="/docs/img/database/replication/replication-destinations-list.png"
+  width={3560}
+  height={2146}
+
+/>
+
+For comprehensive monitoring instructions including pipeline states, metrics, and logs, see [Monitor pipeline status](/docs/guides/database/replication/pipelines-monitoring).
+
+### Managing your pipeline
+
+You can manage your pipeline from the destinations list using the actions menu.
+
+<Image
+  alt="Pipeline actions"
+  src="/docs/img/database/replication/replication-pipeline-actions.png"
+  width={3560}
+  height={2146}
+
+/>
+
+Available actions:
+
+- **Start pipeline**: Begin replication for a stopped pipeline
+- **Stop**: Pause replication (changes will queue up in the WAL)
+- **Restart pipeline**: Stop and start the pipeline (required after publication changes)
+- **Edit destination**: Modify destination settings like credentials or advanced options
+- **Delete**: Remove the destination and permanently stop replication
+
+{/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
+
+### Disabling Pipelines
+
+To turn off Pipelines for a project, delete all replication pipelines first. After all pipelines are removed, open the three-dot actions menu on the Replication page and click **Disable Pipelines**.
+
+<Image
+  alt="Disable Pipelines from the Replication page actions menu"
+  src="/docs/img/database/replication/replication-disable-external-replication.png"
+  width={3560}
+  height={2156}
+/>
+
+For cleanup details, see [What happens when you disable Pipelines?](/docs/guides/database/replication/pipelines-faq#what-happens-when-you-disable-pipelines).
+
+### Adding or removing tables
+
+If you need to modify which tables are replicated after your replication pipeline is already running, follow these steps:
+
+<Admonition type="note">
+
+If your Postgres publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, new tables in that scope are automatically included in the publication. However, you still **must restart the replication pipeline** for the changes to take effect.
+
+</Admonition>
+
+#### Adding tables to replication
+
+1. Add the table to your publication using SQL:
+
+   ```sql
+   -- Add a single table to an existing publication
+   alter publication pub_users_orders add table products;
+
+   -- Or add multiple tables at once
+   alter publication pub_users_orders add table products, categories;
+   ```
+
+2. **Restart the replication pipeline** using the actions menu (see [Managing your pipeline](#managing-your-pipeline)) for the changes to take effect.
+
+#### Removing tables from replication
+
+1. Remove the table from your Postgres publication using SQL:
+
+   ```sql
+   -- Remove a single table from a publication
+   alter publication pub_users_orders drop table orders;
+
+   -- Or remove multiple tables at once
+   alter publication pub_users_orders drop table orders, products;
+   ```
+
+2. **Restart the replication pipeline** using the actions menu (see [Managing your pipeline](#managing-your-pipeline)) for the changes to take effect.
+
+<Admonition type="note">
+
+When a table is deleted at the destination, the behavior depends on the destination. In general, the pipeline tries to recreate the table so replication can continue. To permanently delete a table, pause the pipeline first or remove it from the publication before deleting. See the [Pipelines FAQ](/docs/guides/database/replication/pipelines-faq#what-happens-if-a-table-is-deleted-at-the-destination) for details.
+
+</Admonition>
+
+### Schema change support
+
+Schema change support depends on the destination. BigQuery is currently the only destination with beta schema change support. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for supported and unsupported changes.
+
+### How it works
+
+Once configured, a replication pipeline:
+
+1. **Captures** changes from your Postgres database using Postgres publications and logical replication
+2. **Streams** the changes through the managed pipeline
+3. **Loads** the data to your destination
+
+Pipelines automatically optimizes how changes are delivered to the destination. It currently performs data extraction and loading only, without transformation - your data is replicated as-is to the destination.
+
+### Troubleshooting
+
+If you encounter issues during setup:
+
+- **Publication not appearing**: Ensure you created the Postgres publication via SQL and refresh the dashboard
+- **Tables not showing in publication**: Verify your tables have primary keys (required for Postgres logical replication)
+- **Pipeline failed to start**: Check the error message in the status view for specific details
+- **No data being replicated**: Verify your Postgres publication includes the correct tables and event types
+
+For more troubleshooting help, see the [Pipelines FAQ](/docs/guides/database/replication/pipelines-faq).
+
+### Limitations
+
+Pipelines has the following limitations:
+
+- **Primary keys required**: Tables must have primary keys (Postgres logical replication requirement)
+- **Custom data types**: Custom values replicate as strings. Check that your destination can interpret those string values correctly.
+- **Generated columns**: Generated columns are skipped. Use triggers to store derived values in regular columns if you need them in the destination.
+- **Replica identity**: `REPLICA IDENTITY FULL` is strongly recommended. Updates and deletes need enough row data to apply changes correctly at the destination.
+- **Schema changes**: Currently in beta and limited to BigQuery
+- **No data transformation**: Data is replicated as-is without transformation
+- **Data duplicates**: Duplicates can occur when stopping a pipeline if your database has transactions that take longer than a few minutes to complete. See [Can data duplicates occur during pipeline operations?](/docs/guides/database/replication/pipelines-faq#can-data-duplicates-occur-during-pipeline-operations) for details
+
+Destination-specific limitations, such as BigQuery's row size limits, are documented in each destination guide.
+
+### Next steps
+
+- [Set up BigQuery](/docs/guides/database/replication/bigquery)
+- [Monitor pipeline status](/docs/guides/database/replication/pipelines-monitoring)
+- [View the Pipelines FAQ](/docs/guides/database/replication/pipelines-faq)

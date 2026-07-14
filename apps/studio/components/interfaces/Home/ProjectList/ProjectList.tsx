@@ -25,7 +25,7 @@ import {
   toTableHeadSortValue,
 } from './ProjectListSort.utils'
 import { ProjectTableRow } from './ProjectTableRow'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
 import { useOrgIntegrationsQuery } from '@/data/integrations/integrations-query-org-only'

@@ -23,12 +23,12 @@ supabase functions new sentryfied
 Handle exceptions within your function and send them to Sentry.
 
 ```tsx
-import * as Sentry from 'https://deno.land/x/sentry/index.mjs'
+import * as Sentry from 'npm:@sentry/deno@^8'
 import { withSupabase } from 'npm:@supabase/server@^1'
 
 Sentry.init({
   // https://docs.sentry.io/product/sentry-basics/concepts/dsn-explainer/#where-to-find-your-dsn
-  dsn: SENTRY_DSN,
+  dsn: Deno.env.get('SENTRY_DSN'),
   defaultIntegrations: false,
   // Performance Monitoring
   tracesSampleRate: 1.0,
@@ -55,7 +55,7 @@ export default {
       Sentry.captureException(e)
       // Flush Sentry before the running process closes
       await Sentry.flush(2000)
-      return Response.json({ msg: 'error' }, { status: 500 })
+      return Response.json({ error: 'Internal Server Error' }, { status: 500 })
     }
   }),
 }

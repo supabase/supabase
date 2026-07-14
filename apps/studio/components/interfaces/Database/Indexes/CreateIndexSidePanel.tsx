@@ -33,7 +33,7 @@ import {
   SheetSection,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   MultiSelector,
@@ -46,7 +46,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
 import { INDEX_TYPES } from './Indexes.constants'
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDatabaseIndexCreateMutation } from '@/data/database-indexes/index-create-mutation'
 import { useSchemasQuery } from '@/data/database/schemas-query'

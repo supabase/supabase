@@ -195,7 +195,7 @@ export const ChartHeader = ({
             <TooltipTrigger asChild>
               <InfoIcon className="w-4 h-4 text-foreground-lighter" />
             </TooltipTrigger>
-            <TooltipContent side="top" className="max-w-xs">
+            <TooltipContent side="bottom" className="max-w-xs">
               {titleTooltip}
               {docsUrl && (
                 <>

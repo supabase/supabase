@@ -1,47 +1,70 @@
 /*
  * Defines every Tailwind v4 --color-* design token. Tailwind generates
  * bg-{name} / text-{name} / border-{name} / ring-{name} / border-{r,l,t,b}-{name}
- * utilities for each entry. Semantic tokens wrap their HSL triplet in hsl();
- * Radix/scale/brand tokens self-reference the matching var declared in
- * colors.css, which holds the per-theme literal values.
+ * utilities for each entry. Semantic tokens are complete color values derived
+ * from the shared OKLCH system. Radix scale tokens self-reference the matching
+ * var declared in colors.css, which holds the per-theme literal values.
  */
 
 @theme inline {
-  --color-foreground: hsl(var(--foreground-default));
-  --color-foreground-light: hsl(var(--foreground-light));
-  --color-foreground-lighter: hsl(var(--foreground-lighter));
-  --color-foreground-muted: hsl(var(--foreground-muted));
-  --color-foreground-contrast: hsl(var(--foreground-contrast));
-  --color-background-200: hsl(var(--background-200));
-  --color-background: hsl(var(--background-default));
-  --color-background-alternative-200: hsl(var(--background-alternative-200));
-  --color-background-alternative: hsl(var(--background-alternative-default));
-  --color-background-selection: hsl(var(--background-selection));
-  --color-background-control: hsl(var(--background-control));
-  --color-background-surface-75: hsl(var(--background-surface-75));
-  --color-background-surface-100: hsl(var(--background-surface-100));
-  --color-background-surface-200: hsl(var(--background-surface-200));
-  --color-background-surface-300: hsl(var(--background-surface-300));
-  --color-background-surface-400: hsl(var(--background-surface-400));
-  --color-background-overlay: hsl(var(--background-overlay-default));
-  --color-background-overlay-hover: hsl(var(--background-overlay-hover));
-  --color-background-muted: hsl(var(--background-muted));
-  --color-background-button: hsl(var(--background-button-default));
-  --color-background-dialog: hsl(var(--background-dialog-default));
-  --color-background-dash-sidebar: hsl(var(--background-dash-sidebar));
-  --color-background-dash-canvas: hsl(var(--background-dash-canvas));
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-foreground: var(--tertiary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Backwards-compatible utility names */
+  --color-foreground-light: var(--muted-foreground);
+  --color-foreground-lighter: var(--tertiary-foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-foreground-contrast: var(--primary-foreground);
+  --color-background-200: var(--background-200);
+  --color-background-alternative-200: var(--background-alternative-200);
+  --color-background-alternative: var(--background-alternative-default);
+  --color-background-selection: var(--background-selection);
+  --color-background-control: var(--background-control);
+  --color-background-surface-75: var(--background-surface-75);
+  --color-background-surface-100: var(--background-surface-100);
+  --color-background-surface-200: var(--background-surface-200);
+  --color-background-surface-300: var(--background-surface-300);
+  --color-background-surface-400: var(--background-surface-400);
+  --color-background-overlay: var(--background-overlay-default);
+  --color-background-overlay-hover: var(--background-overlay-hover);
+  --color-background-muted: var(--background-muted);
+  --color-background-button: var(--background-button-default);
+  --color-background-dialog: var(--background-dialog-default);
+  --color-background-dash-sidebar: var(--background-dash-sidebar);
+  --color-background-dash-canvas: var(--background-dash-canvas);
   --color-destructive-200: hsl(var(--destructive-200));
   --color-destructive-300: hsl(var(--destructive-300));
   --color-destructive-400: hsl(var(--destructive-400));
   --color-destructive-500: hsl(var(--destructive-500));
   --color-destructive-600: hsl(var(--destructive-600));
-  --color-destructive: hsl(var(--destructive-default));
   --color-warning-200: hsl(var(--warning-200));
   --color-warning-300: hsl(var(--warning-300));
   --color-warning-400: hsl(var(--warning-400));
   --color-warning-500: hsl(var(--warning-500));
   --color-warning-600: hsl(var(--warning-600));
-  --color-warning: hsl(var(--warning-default));
   --color-brand-200: hsl(var(--brand-200));
   --color-brand-300: hsl(var(--brand-300));
   --color-brand-400: hsl(var(--brand-400));
@@ -256,75 +279,78 @@
   --color-brand-1000: var(--color-brand-1000);
   --color-brand-1100: var(--color-brand-1100);
   --color-brand-1200: var(--color-brand-1200);
-  --color-sidebar: hsl(var(--sidebar-background));
-  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
-  --color-sidebar-primary: hsl(var(--sidebar-primary));
-  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
-  --color-sidebar-accent: hsl(var(--sidebar-accent));
-  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
-  --color-sidebar-border: hsl(var(--sidebar-border));
-  --color-sidebar-ring: hsl(var(--sidebar-ring));
-  --color-hi-contrast: hsl(var(--foreground-default));
-  --color-lo-contrast: hsl(var(--background-alternative-default));
+  --color-sidebar: var(--sidebar-background);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-hi-contrast: var(--foreground);
+  --color-lo-contrast: var(--background-alternative-default);
 
   /*
    * This will generate colors only for bg utilities.
    */
-  --background-color-200: hsl(var(--background-200));
-  --background-color-default: hsl(var(--background-default));
-  --background-color-muted: hsl(var(--background-muted));
-  --background-color-alternative-200: hsl(var(--background-alternative-200));
-  --background-color-alternative: hsl(var(--background-alternative-default));
-  --background-color-selection: hsl(var(--background-selection));
-  --background-color-control: hsl(var(--background-control));
-  --background-color-surface-75: hsl(var(--background-surface-75));
-  --background-color-surface-100: hsl(var(--background-surface-100));
-  --background-color-surface-200: hsl(var(--background-surface-200));
-  --background-color-surface-300: hsl(var(--background-surface-300));
-  --background-color-surface-400: hsl(var(--background-surface-400));
-  --background-color-overlay: hsl(var(--background-overlay-default));
-  --background-color-overlay-hover: hsl(var(--background-overlay-hover));
-  --background-color-button: hsl(var(--background-button-default));
-  --background-color-dialog: hsl(var(--background-dialog-default));
-  --background-color-dash-sidebar: hsl(var(--background-dash-sidebar));
-  --background-color-dash-canvas: hsl(var(--background-dash-canvas));
-  --background-color-studio: hsl(var(--background-200));
+  --background-color-200: var(--background-200);
+  --background-color-default: var(--background);
+  --background-color-muted: var(--background-muted);
+  --background-color-alternative-200: var(--background-alternative-200);
+  --background-color-alternative: var(--background-alternative-default);
+  --background-color-selection: var(--background-selection);
+  --background-color-control: var(--background-control);
+  --background-color-surface-75: var(--background-surface-75);
+  --background-color-surface-100: var(--background-surface-100);
+  --background-color-surface-200: var(--background-surface-200);
+  --background-color-surface-300: var(--background-surface-300);
+  --background-color-surface-400: var(--background-surface-400);
+  --background-color-overlay: var(--background-overlay-default);
+  --background-color-overlay-hover: var(--background-overlay-hover);
+  --background-color-button: var(--background-button-default);
+  --background-color-dialog: var(--background-dialog-default);
+  --background-color-dash-sidebar: var(--background-dash-sidebar);
+  --background-color-dash-canvas: var(--background-dash-canvas);
+  --background-color-studio: var(--background);
 
   /*
    * This will generate colors for all utilities, they'll have border in the name i.e. bg-border-overlay, text-border-muted
    * This usage should be discouraged and deprecated.
    */
-  --color-border: hsl(var(--border-default));
-  --color-border-overlay: hsl(var(--border-overlay));
-  --color-border-muted: hsl(var(--border-muted));
-  --color-border-control: hsl(var(--border-control));
-  --color-border-strong: hsl(var(--border-strong));
-  --color-border-stronger: hsl(var(--border-stronger));
+  --color-border-overlay: var(--border-overlay);
+  --color-border-muted: var(--border-muted);
+  --color-border-control: var(--border-control);
+  --color-border-strong: var(--border-strong);
+  --color-border-stronger: var(--border-stronger);
+  --color-border-destructive: var(--border-destructive);
+  --color-border-warning: var(--border-warning);
+  --color-border-info: var(--border-info);
+  --color-border-brand: var(--border-brand);
   /*
    * This will generate colors only for border utilities
    * i.e. bg-muted and they'll only have border-color: var(--border-muted) rule
    */
-  --border-color-default: hsl(var(--border-default));
-  --border-color-overlay: hsl(var(--border-overlay));
-  --border-color-muted: hsl(var(--border-muted));
-  --border-color-control: hsl(var(--border-control));
-  --border-color-strong: hsl(var(--border-strong));
-  --border-color-stronger: hsl(var(--border-stronger));
-  --border-color-secondary: hsl(var(--border-secondary));
-  --border-color-alternative: hsl(var(--border-alternative));
-  --border-color-button: hsl(var(--border-button-default));
-  --border-color-button-hover: hsl(var(--border-button-hover));
+  --border-color-default: var(--border);
+  --border-color-overlay: var(--border-overlay);
+  --border-color-muted: var(--border-muted);
+  --border-color-control: var(--border-control);
+  --border-color-strong: var(--border-strong);
+  --border-color-stronger: var(--border-stronger);
+  --border-color-secondary: var(--border-secondary);
+  --border-color-alternative: var(--border-alternative);
+  --border-color-button: var(--border-button-default);
+  --border-color-button-hover: var(--border-button-hover);
 
   /* This will generate colors only for text utilities */
-  --text-color-default: hsl(var(--foreground-default));
-  --text-color-light: hsl(var(--foreground-light));
-  --text-color-lighter: hsl(var(--foreground-lighter));
-  --text-color-muted: hsl(var(--foreground-muted));
-  --text-color-contrast: hsl(var(--foreground-contrast));
+  --text-color-default: var(--foreground);
+  --text-color-light: var(--muted-foreground);
+  --text-color-lighter: var(--tertiary-foreground);
+  --text-color-muted: var(--foreground-muted);
+  --text-color-contrast: var(--primary-foreground);
 
   /* misc theme tokens — typography, breakpoints, sizing, transform-origin */
   --font-sans: var(
-    --font-custom,
+    --font-sans,
     Circular,
     custom-font,
     Helvetica Neue,

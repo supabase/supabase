@@ -5,8 +5,8 @@ import {
   InnerSideMenuCollapsible,
   InnerSideMenuCollapsibleContent,
   InnerSideMenuCollapsibleTrigger,
-} from 'ui-patterns'
-import { InnerSideMenuDataItem } from 'ui-patterns/InnerSideMenu'
+  InnerSideMenuDataItem,
+} from 'ui-patterns/InnerSideMenu'
 
 import { DEFAULT_SECTION_STATE, type SectionState } from './SQLEditorNav.constants'
 import { useLocalStorage } from '@/hooks/misc/useLocalStorage'

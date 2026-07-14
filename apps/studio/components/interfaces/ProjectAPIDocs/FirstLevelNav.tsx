@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Fragment, type ReactNode } from 'react'
 import SVG from 'react-inlinesvg'
 import { Button, cn } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { navigateToSection } from './Content/Content.utils'
 import { API_DOCS_CATEGORIES, DOCS_CONTENT, DOCS_MENU } from './ProjectAPIDocs.constants'

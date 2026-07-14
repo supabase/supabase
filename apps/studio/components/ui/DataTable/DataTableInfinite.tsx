@@ -5,7 +5,7 @@ import { LoaderCircle } from 'lucide-react'
 import { useQueryState } from 'nuqs'
 import { Fragment, UIEvent, useCallback, useRef } from 'react'
 import { Button, cn, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AlertError } from '../AlertError'
 import { formatCompactNumber } from './DataTable.utils'
@@ -14,7 +14,7 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const TableRowClassName = 'border-b group data-[state=selected]:bg-muted hover:bg-surface-200'
-const TableCellClassName = 'text-xs py-1! p-2 *:[[role=checkbox]]:translate-y-[2px] truncate'
+const TableCellClassName = 'text-xs py-1! p-2 truncate'
 
 // TODO: add a possible chartGroupBy
 export interface DataTableInfiniteProps<TData, TValue, _TMeta> {
@@ -54,15 +54,17 @@ export function DataTableInfinite<TData, TValue, TMeta>({
 
   const onScroll = useCallback(
     (e: UIEvent<HTMLElement>) => {
+      // Trigger fetching slightly before reaching the very bottom for a smoother experience
+      const BOTTOM_BUFFER_PX = 300
       const onPageBottom =
         Math.ceil(e.currentTarget.scrollTop + e.currentTarget.clientHeight) >=
-        e.currentTarget.scrollHeight
+        e.currentTarget.scrollHeight - BOTTOM_BUFFER_PX
 
-      if (onPageBottom && !isFetching && totalRows > totalRowsFetched) {
+      if (onPageBottom && !isFetching && hasNextPage) {
         fetchNextPage()
       }
     },
-    [fetchNextPage, isFetching, totalRows, totalRowsFetched]
+    [fetchNextPage, isFetching, hasNextPage]
   )
 
   useShortcut(
@@ -103,7 +105,6 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                     'w-full text-xs! font-normal! text-foreground-lighter font-mono',
                     'relative select-none truncate [&>.cursor-col-resize]:last:opacity-0',
                     'text-muted-foreground h-9 px-2 text-left align-middle',
-                    '[&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-[2px]',
                     headerClassName
                   )}
                   aria-sort={sort === 'asc' ? 'ascending' : sort === 'desc' ? 'descending' : 'none'}

@@ -17,15 +17,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        framework: [next, tanstack]
         shardIndex: [1, 2]
         shardTotal: [2]
     outputs:
       tests_ran: ${{ steps.filter.outputs.studio == 'true' }}
 
     permissions:
-      contents: write
+      contents: read
+      id-token: write
     env:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      # Consumed by `apps/studio/scripts/dispatch.js` to pick which framework
+      # build/start scripts run. `next` keeps the existing pages-router flow;
+      # `tanstack` exercises the Vite/TanStack-Start migration in parallel
+      # so we catch regressions on either side per-PR.
+      STUDIO_FRAMEWORK: ${{ matrix.framework }}
 
     steps:
       - uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
@@ -79,9 +86,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nextjs-${{ hashFiles('pnpm-lock.yaml') }}-
 
-      - name: Reset supabase
-        if: steps.filter.outputs.studio == 'true'
-        run: rm -rf supabase && pnpm exec supabase init && mkdir supabase/functions
+      # Authenticate with AWS ECR to avoid rate limiting
+      - name: configure aws credentials
+        if: steps.filter.outputs.studio == 'true' && !github.event.pull_request.head.repo.fork
+        uses: aws-actions/configure-aws-credentials@5fd3084fc36e372ff1fff382a39b10d03659f355 # v2.2.0
+        with:
+          role-to-assume: ${{ secrets.PROD_AWS_ROLE }}
+          aws-region: us-east-1
+      - uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+        if: steps.filter.outputs.studio == 'true' && !github.event.pull_request.head.repo.fork
+        with:
+          registry: public.ecr.aws
 
       - name: Pre-start diagnostics
         run: |
@@ -101,7 +116,12 @@ jobs:
 
       - name: Build studio
         if: steps.filter.outputs.studio == 'true'
-        run: SKIP_ASSET_UPLOAD=1 NODE_ENV=test NODE_OPTIONS="--max-old-space-size=4096" pnpm run build:studio
+        # `MODE=test` so the Vite build (TanStack) loads `.env.test` for env
+        # resolution; Next ignores it but reads `NODE_ENV=test` for the same
+        # purpose. Vite's `vite.config.ts` overrides the bundle NODE_ENV to
+        # 'production' regardless of input, mirroring Next's build behaviour
+        # so vitest-only constants (e.g. `API_URL`) don't bleed in here.
+        run: SKIP_ASSET_UPLOAD=1 NODE_ENV=test MODE=test NODE_OPTIONS="--max-old-space-size=4096" pnpm run build:studio
 
       - name: 🚀 Run Playwright tests against local studio build
         if: steps.filter.outputs.studio == 'true'
@@ -112,7 +132,7 @@ jobs:
         if: always() && steps.filter.outputs.studio == 'true'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: blob-report-${{ matrix.shardIndex }}
+          name: blob-report-${{ matrix.framework }}-${{ matrix.shardIndex }}
           path: e2e/studio/blob-report
           retention-days: 7
 
@@ -123,11 +143,15 @@ jobs:
           exit 1
 
   merge-reports:
-    name: 'E2E reports'
+    name: 'E2E reports (${{ matrix.framework }})'
     # Merge reports after playwright-tests, even if some shards have failed
     if: ${{ !cancelled() && needs.test.outputs.tests_ran == 'true' }}
     needs: [test]
     runs-on: blacksmith-4vcpu-ubuntu-2404
+    strategy:
+      fail-fast: false
+      matrix:
+        framework: [next, tanstack]
     permissions:
       contents: write
       pull-requests: write
@@ -144,7 +168,7 @@ jobs:
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v 5.0.0
         with:
           path: e2e/studio/blob-report
-          pattern: blob-report-*
+          pattern: blob-report-${{ matrix.framework }}-*
           merge-multiple: true
 
       - name: Merge Playwright reports
@@ -152,7 +176,7 @@ jobs:
 
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: playwright-artifacts
+          name: playwright-artifacts-${{ matrix.framework }}
           path: |
             e2e/studio/playwright-report/
             e2e/studio/test-results/
@@ -163,7 +187,7 @@ jobs:
         uses: daun/playwright-report-comment@be9e270edd5ad86038604d3caa84a819a6ff6fed # v3.10.0
         with:
           report-file: e2e/studio/test-results/test-results.json
-          comment-title: '🎭 Playwright Test Results'
+          comment-title: '🎭 Playwright Test Results (${{ matrix.framework }})'
 
   merge-results:
     name: 'E2E results'

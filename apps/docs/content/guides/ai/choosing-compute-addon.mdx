@@ -120,8 +120,10 @@ It is possible to upload more vectors to a single table if Memory allows it (for
 
 </Admonition>
 
+The chart below compares HNSW queries-per-second across compute sizes for different embedding dimensions.
+
 <Image
-  alt="multi database"
+  alt="Chart comparing HNSW queries-per-second across Supabase compute sizes for different embedding dimensions."
   src={{
     light: '/docs/img/ai/instance-type/hnsw-dims--light.png',
     dark: '/docs/img/ai/instance-type/hnsw-dims--dark.png',
@@ -256,8 +258,10 @@ For 1,000,000 vectors 40 probes results to accuracy of 0.98. Note that exact val
 </TabPanel>
 </Tabs>
 
+The chart below plots requests-per-second against compute size.
+
 <Image
-  alt="multi database"
+  alt="Chart plotting requests-per-second against Supabase compute size."
   src={{
     light: '/docs/img/ai/going-prod/size-to-rps--light.png',
     dark: '/docs/img/ai/going-prod/size-to-rps--dark.png',
@@ -294,8 +298,10 @@ You can increase the Requests per Second by increasing `m` and `ef_construction`
 >
 <TabPanel id="hnsw" label="HNSW">
 
+The chart below shows how the HNSW build parameters `m` and `ef_construction` affect requests-per-second on the dbpedia dataset.
+
 <Image
-  alt="multi database"
+  alt="Chart showing how HNSW build parameters (m and ef_construction) affect requests-per-second on the dbpedia dataset."
   src={{
     light: '/docs/img/ai/going-prod/dbpedia-hnsw-build-parameters--light.png',
     dark: '/docs/img/ai/going-prod/dbpedia-hnsw-build-parameters--dark.png',
@@ -308,8 +314,10 @@ You can increase the Requests per Second by increasing `m` and `ef_construction`
 </TabPanel>
 <TabPanel id="ivfflat" label="IVFFlat">
 
+The chart below shows how the number of IVFFlat lists affects performance for one million vectors.
+
 <Image
-  alt="multi database"
+  alt="Chart showing how the number of IVFFlat lists affects performance for 1 million vectors."
   src={{
     light: '/docs/img/ai/instance-type/lists-for-1m--light.png',
     dark: '/docs/img/ai/instance-type/lists-for-1m--dark.png',
@@ -329,7 +337,7 @@ Check out more tips and the complete step-by-step guide in [Going to Production 
 We follow techniques outlined in the [ANN Benchmarks](https://github.com/erikbern/ann-benchmarks) methodology. A Python test runner is responsible for uploading the data, creating the index, and running the queries. The pgvector engine is implemented using [vecs](https://github.com/supabase/vecs), a Python client for pgvector.
 
 <Image
-  alt="multi database"
+  alt="Diagram of the vecs benchmark setup: a Python test runner uploads data, builds the index, and runs queries against pgvector."
   src={{
     light: '/docs/img/ai/instance-type/vecs-benchmark--light.png',
     dark: '/docs/img/ai/instance-type/vecs-benchmark--dark.png',
@@ -339,6 +347,8 @@ We follow techniques outlined in the [ANN Benchmarks](https://github.com/erikber
   height={1194}
 
 />
+
+_The diagram above shows the vecs benchmark setup: a Python test runner uploads data, builds the index, and runs queries against pgvector._
 
 Each test is run for a minimum of 30-40 minutes. They include a series of experiments executed at different concurrency levels to measure the engine's performance under different load types. The results are then averaged.
 

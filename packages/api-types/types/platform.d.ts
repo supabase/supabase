@@ -2507,6 +2507,23 @@ export interface paths {
     patch: operations['ProjectsRefController_updateProject']
     trace?: never
   }
+  '/platform/projects/{ref}/analytics/endpoints/api_keys.last_used.otel': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the project's last-used API keys */
+    get: operations['ApiKeysLastUsedController_getApiKeysLastUsed']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/projects/{ref}/analytics/endpoints/auth.metrics': {
     parameters: {
       query?: never
@@ -22177,6 +22194,60 @@ export interface operations {
         content?: never
       }
       /** @description Failed to update project */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ApiKeysLastUsedController_getApiKeysLastUsed: {
+    parameters: {
+      query?: {
+        iso_timestamp_start?: string
+        iso_timestamp_end?: string
+        days?: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AnalyticsResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to get project's last-used API keys */
       500: {
         headers: {
           [name: string]: unknown

@@ -75,14 +75,12 @@ chmod +x sync_supabase_config.sh
 
 <Accordion
   type="default"
-  openBehaviour="multiple"
   chevronAlign="right"
   justified
   size="medium"
   className="text-foreground-light mt-8 mb-6"
 >
-  <div className="border-b mt-3 pb-3">
-    <AccordionItem
+  <AccordionItem
       header="Config sync script"
       id="config-sync-script"
     >
@@ -280,7 +278,6 @@ echo "Done. Configs saved to ${OUTDIR}/"
 
     </AccordionItem>
 
-  </div>
 </Accordion>
 
 The script saves both source and target configs to a local `config_sync_<timestamp>/` directory so you can review exactly what changed. Use `--dry-run` to preview differences without applying them.

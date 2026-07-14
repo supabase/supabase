@@ -53,9 +53,9 @@ import {
 } from './Schemas.utils'
 import { TableNode } from './SchemaTableNode'
 import { useExportSchemaToImage } from './useExportSchemaToImage'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
@@ -553,7 +553,7 @@ export const SchemaGraph = () => {
                     zoomable
                     nodeColor={miniMapNodeColor}
                     maskColor={miniMapMaskColor}
-                    className="border rounded-md shadow-xs"
+                    className="border rounded-md shadow-xs mb-11!"
                   />
                   <SchemaGraphLegend />
                   {hasNextPage && (

@@ -1,44 +1,19 @@
 ---
 id: 'database'
 title: 'Database'
-description: 'Every Supabase project is a full Postgres database. Learn how to connect, manage, and secure your data.'
+subtitle: 'Use Supabase to connect, manage, and secure your Postgres database.'
+description: 'Use Supabase to connect, manage, and secure your Postgres database.'
 sidebar_label: 'Overview'
 ---
 
-Every Supabase project has a full [Postgres](https://www.postgresql.org/) database — not a Postgres abstraction.
+Every Supabase project gets a full [Postgres](https://www.postgresql.org/) database, not a Postgres abstraction. This database is the foundation that Auth, Storage, Realtime, and Edge Functions are built on, and Supabase manages daily database backups and offers point-in-time recovery on paid plans.
 
-<Admonition type="tip" label="Working with your database">
-
-You can work with a project's database in several ways:
+Work with your project's database in the following ways:
 
 - Visually using the [**Table Editor**](/dashboard/project/_/editor) section of the Dashboard.
 - With query syntax using the [**SQL Editor**](/dashboard/project/_/sql) section of the Dashboard.
-- Programmatically using a variety of methods.
+- Programmatically using a variety of different methods.
 
-Read the [Connect to your database](/docs/guides/database/connecting-to-postgres#how-to-connect-to-your-postgres-databases) guide for details on connection strings and options.
+<ContentListings id="database-get-started" />
 
-</Admonition>
-
-The database is the foundation that Auth, Storage, Realtime, and Edge Functions are built on, and Supabase manages daily database backups and offers point-in-time recovery on paid plans.
-
-## Get started
-
-If you're new to the database section, these are the pages to read first:
-
-- **[Connect to your database](/docs/guides/database/connecting-to-postgres)**: Connection strings, the Supavisor connection pooler, and when to use direct, transaction, or session mode.
-- **[Tables and data](/docs/guides/database/tables)**: Create tables and relationships, and edit rows from the Dashboard.
-- **[Import data](/docs/guides/database/import-data)**: Load existing data from CSV files, `pg_dump`, or another Postgres database.
-- **[Secure your data](/docs/guides/database/secure-data)**: Row Level Security (RLS) is how Supabase makes the database safe to query directly from the client. Read this before exposing any table to your app.
-- **[Extensions](/docs/guides/database/extensions)**: Enable Postgres extensions — including `pgvector` for embeddings, `PostGIS` for geospatial data, and `pg_cron` for scheduled jobs — from the Dashboard.
-- **[Run SQL commands](/dashboard/project/_/sql)**: Use the Dashboard's SQL Editor for ad-hoc queries and saved snippets.
-
-## Going further
-
-Once you've covered the basics, these guides help with other use cases and features:
-
-- **[Database functions](/docs/guides/database/functions)** and **[triggers](/docs/guides/database/postgres/triggers)**: Run logic inside the database in response to inserts, updates, or deletes.
-- **[Database webhooks](/docs/guides/database/webhooks)**: Send row changes to an external HTTP endpoint.
-- **[Replication and read replicas](/docs/guides/database/replication)**: Stream changes to other systems or read from a geographically closer replica.
-- **[Backups](/docs/guides/platform/backups)**: Daily backups on every project, with point-in-time recovery on paid plans. Backups cover the database itself; objects stored through the Storage API are not included.
-- **[Query performance and optimization](/docs/guides/database/query-optimization)**: Indexes, the query planner, and tools for finding slow queries.
-- **[Roles and permissions](/docs/guides/database/postgres/roles)**: The Postgres roles Supabase ships with and how to add your own.
+<ContentListings id="database-next-steps" />

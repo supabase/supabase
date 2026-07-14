@@ -2,7 +2,18 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { noop } from 'lodash'
-import { Check, Copy, Edit, Eye, Filter, MoreVertical, Plus, Search, Trash, X } from 'lucide-react'
+import {
+  Check,
+  ChevronDown,
+  Copy,
+  Edit,
+  Eye,
+  MoreVertical,
+  Plus,
+  Search,
+  Trash,
+  X,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
@@ -37,11 +48,11 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
 import { formatAllEntities } from './Tables.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
-import SchemaSelector from '@/components/ui/SchemaSelector'
+import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
@@ -137,7 +148,7 @@ export const TableList = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: selectedSchema,
+      schemas: [selectedSchema],
     },
     {
       select(views) {
@@ -158,7 +169,7 @@ export const TableList = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: selectedSchema,
+      schemas: [selectedSchema],
     },
     {
       select(materializedViews) {
@@ -181,7 +192,7 @@ export const TableList = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: selectedSchema,
+      schemas: [selectedSchema],
     },
     {
       select(foreignTables) {
@@ -232,6 +243,8 @@ export const TableList = ({
   const isSuccess =
     isSuccessTables && isSuccessViews && isSuccessMaterializedViews && isSuccessForeignTables
 
+  const hasFiltersApplied = visibleTypes.length !== 5
+
   const formatTooltipText = (entityType: string) => {
     const text =
       Object.entries(ENTITY_TYPE)
@@ -246,110 +259,108 @@ export const TableList = ({
   return (
     <div className="flex flex-col gap-y-4">
       <div className="flex flex-col lg:flex-row lg:items-center gap-2 flex-wrap">
-        <div className="flex gap-2 items-center">
-          <Shortcut
-            id={SHORTCUT_IDS.LIST_PAGE_FOCUS_SCHEMA}
-            onTrigger={() => setSchemaSelectorOpen(true)}
-            side="bottom"
-            tooltipOpen={schemaSelectorOpen ? false : undefined}
-          >
-            <SchemaSelector
-              className="grow lg:grow-0 w-[180px]"
-              size="tiny"
-              showError={false}
-              selectedSchemaName={selectedSchema}
-              onSelectSchema={setSelectedSchema}
-              open={schemaSelectorOpen}
-              onOpenChange={setSchemaSelectorOpen}
-            />
-          </Shortcut>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                size="tiny"
-                variant={visibleTypes.length !== 5 ? 'default' : 'dashed'}
-                className="px-1"
-                icon={<Filter />}
-              />
-            </PopoverTrigger>
-            <PopoverContent className="p-0 w-56" side="bottom" align="center">
-              <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
-                <p className="text-xs">Show entity types</p>
-                <div className="flex flex-col">
-                  {Object.entries(ENTITY_TYPE).map(([key, value]) => (
-                    <div key={key} className="group flex items-center justify-between py-0.5">
-                      <div className="flex items-center gap-x-2">
-                        <Checkbox
-                          id={key}
-                          name={key}
-                          checked={visibleTypes.includes(value)}
-                          onCheckedChange={() => {
-                            if (visibleTypes.includes(value)) {
-                              setVisibleTypes(visibleTypes.filter((y) => y !== value))
-                            } else {
-                              setVisibleTypes(visibleTypes.concat([value]))
-                            }
-                          }}
-                        />
-                        <Label htmlFor={key} className="capitalize text-xs">
-                          {key.toLowerCase().replace('_', ' ')}
-                        </Label>
-                      </div>
-                      <Button
-                        size="tiny"
-                        variant="default"
-                        onClick={() => setVisibleTypes([value])}
-                        className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
-                      >
-                        Select only
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
-        </div>
-        <div className="flex grow justify-between gap-2 items-center">
-          <Input
-            ref={searchInputRef}
+        <Shortcut
+          id={SHORTCUT_IDS.LIST_PAGE_FOCUS_SCHEMA}
+          onTrigger={() => setSchemaSelectorOpen(true)}
+          side="bottom"
+          tooltipOpen={schemaSelectorOpen ? false : undefined}
+        >
+          <SchemaSelector
+            className="grow lg:grow-0 w-[180px]"
             size="tiny"
-            containerClassName="grow lg:grow-0 w-52"
-            placeholder="Search for a table"
-            value={filterString}
-            onChange={(e) => setFilterString(e.target.value)}
-            onKeyDown={onSearchInputEscape(filterString, setFilterString)}
-            icon={<Search />}
+            showError={false}
+            selectedSchemaName={selectedSchema}
+            onSelectSchema={setSelectedSchema}
+            open={schemaSelectorOpen}
+            onOpenChange={setSchemaSelectorOpen}
           />
+        </Shortcut>
+        <Input
+          ref={searchInputRef}
+          size="tiny"
+          containerClassName="grow lg:grow-0 w-52"
+          placeholder="Search for a table"
+          value={filterString}
+          onChange={(e) => setFilterString(e.target.value)}
+          onKeyDown={onSearchInputEscape(filterString, setFilterString)}
+          icon={<Search />}
+        />
 
-          {!isSchemaLocked &&
-            (canAddTables ? (
-              <Shortcut
-                id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
-                label="Create new table"
-                onTrigger={() => onAddTable()}
-                side="bottom"
-              >
-                <Button className="w-auto ml-auto" icon={<Plus />} onClick={() => onAddTable()}>
-                  New table
-                </Button>
-              </Shortcut>
-            ) : (
-              <ButtonTooltip
-                className="w-auto ml-auto"
-                icon={<Plus />}
-                disabled
-                tooltip={{
-                  content: {
-                    side: 'bottom',
-                    text: 'You need additional permissions to create tables',
-                  },
-                }}
-              >
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              size="tiny"
+              variant={hasFiltersApplied ? 'default' : 'dashed'}
+              iconRight={<ChevronDown />}
+            >
+              Entity Type
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="p-0 w-60" side="bottom" align="center">
+            <div className="px-3 pt-3 pb-2 flex flex-col gap-y-2">
+              <p className="text-xs">Show entity types</p>
+              <div className="flex flex-col">
+                {Object.entries(ENTITY_TYPE).map(([key, value]) => (
+                  <div key={key} className="group flex items-center justify-between py-0.5">
+                    <div className="flex items-center gap-x-2">
+                      <Checkbox
+                        id={key}
+                        name={key}
+                        checked={visibleTypes.includes(value)}
+                        onCheckedChange={() => {
+                          if (visibleTypes.includes(value)) {
+                            setVisibleTypes(visibleTypes.filter((y) => y !== value))
+                          } else {
+                            setVisibleTypes(visibleTypes.concat([value]))
+                          }
+                        }}
+                      />
+                      <Label htmlFor={key} className="capitalize text-xs">
+                        {key.toLowerCase().replace('_', ' ')}
+                      </Label>
+                    </div>
+                    <Button
+                      size="tiny"
+                      variant="default"
+                      onClick={() => setVisibleTypes([value])}
+                      className="transition opacity-0 group-hover:opacity-100 h-auto px-1 py-0.5"
+                    >
+                      Select only
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        {!isSchemaLocked &&
+          (canAddTables ? (
+            <Shortcut
+              id={SHORTCUT_IDS.LIST_PAGE_NEW_ITEM}
+              label="Create new table"
+              onTrigger={() => onAddTable()}
+              side="bottom"
+            >
+              <Button className="w-auto ml-auto" icon={<Plus />} onClick={() => onAddTable()}>
                 New table
-              </ButtonTooltip>
-            ))}
-        </div>
+              </Button>
+            </Shortcut>
+          ) : (
+            <ButtonTooltip
+              className="w-auto ml-auto"
+              icon={<Plus />}
+              disabled
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: 'You need additional permissions to create tables',
+                },
+              }}
+            >
+              New table
+            </ButtonTooltip>
+          ))}
       </div>
 
       {isSchemaLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="tables" />}
@@ -508,14 +519,19 @@ export const TableList = ({
 
                             {!isSchemaLocked && (
                               <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button
-                                    variant="default"
-                                    className="px-1"
-                                    icon={<MoreVertical />}
-                                    aria-label={`Table ${x.name} actions`}
-                                  />
-                                </DropdownMenuTrigger>
+                                <Tooltip>
+                                  <TooltipTrigger asChild>
+                                    <DropdownMenuTrigger asChild>
+                                      <Button
+                                        variant="default"
+                                        className="px-1"
+                                        icon={<MoreVertical />}
+                                        aria-label={`Table ${x.name} actions`}
+                                      />
+                                    </DropdownMenuTrigger>
+                                  </TooltipTrigger>
+                                  <TooltipContent side="bottom">More options</TooltipContent>
+                                </Tooltip>
                                 <DropdownMenuContent side="bottom" align="end" className="w-40">
                                   <DropdownMenuItem
                                     className="flex items-center space-x-2"

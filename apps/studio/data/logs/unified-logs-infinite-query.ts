@@ -4,6 +4,7 @@ import { useFlag } from 'common'
 import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
+import { parseOtelTimestamp } from './otel-inspection.utils'
 import { analyticsLiteral, safeSql } from './safe-analytics-sql'
 import { extractLogMetadata } from './unified-logs.utils'
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
@@ -124,16 +125,7 @@ export async function getUnifiedLogs(
   const resultData = data?.result ?? []
 
   const result = resultData.map((row: any) => {
-    // Disambiguate timestamp shape by format, not by Number.isFinite — a
-    // numeric string of microseconds is always finite, so checking finite-
-    // ness can't tell us whether the value is microseconds or already-ms.
-    // ISO-like strings contain `T` or `-` and are parsed via Date; anything
-    // else is treated as numeric microseconds-since-epoch.
-    const ts = String(row.timestamp ?? '')
-    const looksLikeIso = /[T-]/.test(ts)
-    const date = looksLikeIso
-      ? new Date(/Z$|[+-]\d{2}:?\d{2}$/.test(ts) ? ts : `${ts}Z`)
-      : new Date(Number(ts) / 1000)
+    const date = parseOtelTimestamp(row.timestamp)
 
     const { status, method, pathname } = extractLogMetadata(row)
 

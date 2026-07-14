@@ -12,25 +12,42 @@ The use of a QR code was [initially introduced by Google Authenticator](https://
 
 Below is a flow chart illustrating how the Enrollment, Challenge, and Verify APIs work in the context of MFA (TOTP).
 
-<Image
-  alt="Diagram showing the flow of Multi-Factor authentication"
-  src={{
-    light: '/docs/img/guides/auth-mfa/auth-mfa-flow.svg',
-    dark: '/docs/img/guides/auth-mfa/auth-mfa-flow.svg',
-  }}
-  containerClassName="max-w-[700px]"
-  width={111}
-  height={150}
-/>
+```mermaid
+flowchart TD
+  InitS((Setup flow)) --> SAAL1[/Session is AAL1/]
+  SAAL1 --> Enroll[Enroll API]
+  Enroll --> ShowQR[Show QR code]
+  ShowQR --> Scan([User: Scan QR code in authenticator])
+  Scan --> Enter([User: Enter code])
+  Enter --> Verify[Challenge + Verify API]
+  Verify --> Check{{Is code correct?}}
+  Check -->|Yes| AAL2[/Upgrade to AAL2/]
+  AAL2 --> Done((Done))
+  Check -->|No| Enter
+  InitA((Login flow)) --> SignIn([User: Sign-in])
+  SignIn --> AAL1[/Upgrade to AAL1/]
+  AAL1 --> ListFactors[List Factors API]
+  ListFactors -->|1 or more factors| OpenAuth([User: Open authenticator])
+  OpenAuth --> Enter
+  ListFactors -->|0 factors| Setup[[Setup flow]]
+```
+
+In the **setup flow**, a session already at AAL1 calls the Enroll API, which returns a QR code for the user to scan with their authenticator app. The user enters the generated code, the Challenge and Verify APIs check it, and on success the session is upgraded to AAL2. If the code is incorrect, the user is prompted to enter it again.
+
+In the **login flow**, the user signs in (upgrading the session to AAL1) and the List Factors API is called. If the user has one or more factors, they open their authenticator and enter a code, which follows the same Challenge and Verify path to reach AAL2. If they have no factors enrolled, they are sent through the setup flow first.
+
+<Admonition type="tip">
 
 [TOTP MFA API](/docs/reference/javascript/auth-mfa-api) is free to use and is enabled on all Supabase projects by default.
+
+</Admonition>
 
 ### Add enrollment flow
 
 An enrollment flow provides a UI for users to set up additional authentication factors. Most applications add the enrollment flow in two places within their app:
 
 1. Right after login or sign up.
-   This lets users quickly set up MFA immediately after they log in or create an
+   This lets users set up MFA immediately after they log in or create an
    account. We recommend encouraging all users to set up MFA if that makes sense
    for your application. Many applications offer this as an opt-in step in an
    effort to reduce onboarding friction.
@@ -294,29 +311,6 @@ function AuthMFA() {
 
 ## Frequently asked questions
 
-<Accordion
-  type="default"
-  openBehaviour="multiple"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6 [&>div]:space-y-4"
->
-
-<AccordionItem
-header={<span className="text-foreground">What's inside the QR code?</span>}
-id="what-is-inside-the-qr-code"
->
-
-</AccordionItem>
-
-<AccordionItem
-header={<span className="text-foreground">How long is the TOTP code valid for?</span>}
-id="how-long-is-the-totp-code-valid-for"
->
+### How long is the TOTP code valid for?
 
 In our TOTP implementation, each generated code remains valid for one interval, which spans 30 seconds. To account for minor time discrepancies, we allow for a one-interval clock skew. This ensures that users can successfully authenticate within this timeframe, even if there are slight variations in system clocks.
-
-</AccordionItem>
-
-</Accordion>

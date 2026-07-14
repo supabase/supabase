@@ -37,7 +37,7 @@ import {
   OAUTH_APP_CLIENT_TYPE_OPTIONS,
   OAUTH_APP_REGISTRATION_TYPE_OPTIONS,
 } from './oauthApps.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import { Shortcut } from '@/components/ui/Shortcut'

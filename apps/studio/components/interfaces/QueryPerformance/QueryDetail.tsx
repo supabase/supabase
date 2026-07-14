@@ -99,9 +99,7 @@ export const QueryDetail = ({ selectedRow, onClickViewSuggestion, onClose }: Que
         >
           <SqlMonacoBlock
             value={query}
-            height={322}
-            lineNumbers="off"
-            wrapperClassName={cn('pl-3 bg-surface-100', !isExpanded && 'pointer-events-none')}
+            wrapperClassName={cn('bg-surface-100', !isExpanded && 'pointer-events-none')}
           />
           {isLinterWarning && (
             <Alert

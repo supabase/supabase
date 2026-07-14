@@ -9,10 +9,10 @@ import {
   SelectValue,
   WarningIcon,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { Admonition } from 'ui-patterns/admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { SingleValueFieldArray } from 'ui-patterns/form/SingleValueFieldArray/SingleValueFieldArray'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import type { JitRoleGrantDraft, JitRoleOption, JitUserRuleDraft } from './JitDbAccess.types'
 import { createEmptyIpRange, getRelativeDatetimeByMode } from './JitDbAccess.utils'

@@ -6,6 +6,26 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/blog/introducing-supabase-etl',
+    destination: '/blog/introducing-supabase-pipelines',
+  },
+  {
+    permanent: true,
+    source: '/blog/supabase-etl',
+    destination: '/blog/introducing-supabase-pipelines',
+  },
+  {
+    permanent: true,
+    source: '/blog/realtime-or-etl-how-to-choose-the-right-tool',
+    destination: '/blog/realtime-or-pipelines-how-to-choose-the-right-tool',
+  },
+  {
+    permanent: true,
+    source: '/features/supabase-etl',
+    destination: '/features/supabase-pipelines',
+  },
+  {
+    permanent: true,
     source: '/ui/docs/ai-editors-rules/prompts',
     destination: '/ui/docs/ai-editors-rules/skills',
   },
@@ -2435,8 +2455,28 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/partners/integrations/atomic_crm',
+    destination: '/partners/integrations/atomic-crm',
+  },
+  {
+    permanent: true,
     source: '/partners/integrations/refine_dev',
     destination: '/partners/integrations/refine',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/sequin_io',
+    destination: '/partners/integrations/sequin',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/supabase_wrapper_bigquery',
+    destination: '/partners/integrations/bigquery-wrapper',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/supabase_wrapper_firebase',
+    destination: '/partners/integrations/firebase-wrapper',
   },
   {
     permanent: true,
@@ -2704,27 +2744,42 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/database/replication/etl-destinations',
-    destination: '/docs/guides/database/replication/external-replication-setup',
+    destination: '/docs/guides/database/replication/pipelines',
   },
   {
     permanent: true,
     source: '/docs/guides/storage/analytics/replication',
-    destination: '/docs/guides/database/replication/external-replication-setup',
+    destination: '/docs/guides/database/replication/pipelines',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/external-replication-setup',
+    destination: '/docs/guides/database/replication/pipelines',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/external-replication-monitoring',
+    destination: '/docs/guides/database/replication/pipelines-monitoring',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/replication/external-replication-faq',
+    destination: '/docs/guides/database/replication/pipelines-faq',
   },
   {
     permanent: true,
     source: '/docs/guides/database/replication/replication-setup',
-    destination: '/docs/guides/database/replication/external-replication-setup',
+    destination: '/docs/guides/database/replication/pipelines',
   },
   {
     permanent: true,
     source: '/docs/guides/database/replication/replication-monitoring',
-    destination: '/docs/guides/database/replication/external-replication-monitoring',
+    destination: '/docs/guides/database/replication/pipelines-monitoring',
   },
   {
     permanent: true,
     source: '/docs/guides/database/replication/replication-faq',
-    destination: '/docs/guides/database/replication/external-replication-faq',
+    destination: '/docs/guides/database/replication/pipelines-faq',
   },
   {
     permanent: true,

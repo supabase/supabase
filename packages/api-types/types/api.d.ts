@@ -3826,10 +3826,20 @@ export interface components {
             type: 'project_hibernating'
           }
       )[]
-      warnings: {
-        /** @enum {string} */
-        type: 'pg_graphql_introspection_change'
-      }[]
+      warnings: (
+        | {
+            /** @enum {string} */
+            type: 'pg_graphql_introspection_change'
+          }
+        | {
+            /** @enum {string} */
+            type: 'ltree_reindex_required'
+          }
+        | {
+            /** @enum {string} */
+            type: 'operator_estimator_gate'
+          }
+      )[]
     }
     ProjectUpgradeInitiateResponse: {
       tracking_id: string

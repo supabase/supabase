@@ -83,7 +83,7 @@ export const ReportsSelectFilter = ({
       <PopoverContent align="start" className="p-0 w-72">
         <Command>
           {showSearch && <CommandInput placeholder="Search..." />}
-          <CommandList>
+          <CommandList className="max-h-72">
             <CommandEmpty>No options found.</CommandEmpty>
             <CommandGroup>
               {options.map((option) => (

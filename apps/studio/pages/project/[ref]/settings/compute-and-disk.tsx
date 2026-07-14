@@ -1,5 +1,5 @@
 import { DiskManagementForm } from '@/components/interfaces/DiskManagement/DiskManagementForm'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import {
   ScaffoldContainer,

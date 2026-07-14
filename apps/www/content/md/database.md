@@ -17,7 +17,7 @@ Supabase Database gives you a full Postgres database with no compromises. It is 
 - **Read Replicas**: distribute read traffic across replicas in multiple regions for lower latency and higher throughput
 - **Realtime**: subscribe to INSERT, UPDATE, DELETE, and other changes via WebSockets
 - **Database Webhooks**: trigger Edge Functions or external HTTP endpoints on table events
-- **Supabase ETL**: stream Postgres changes to external data warehouses in real time, with no pipelines
+- **Supabase Pipelines**: create managed replication pipelines that stream Postgres changes to external data warehouses in near real time
 
 ## Technical Details
 

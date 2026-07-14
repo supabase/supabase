@@ -164,7 +164,7 @@ Push notifications are an important part of any mobile app. They allow you to se
 
     ```ts supabase/functions/push/index.ts
     import { withSupabase } from 'npm:@supabase/server@^1'
-    import { JWT } from 'npm:google-auth-library@9'
+    import { JWT } from 'npm:google-auth-library@^10'
     import serviceAccount from '../service-account.json' with { type: 'json' }
 
     interface Notification {

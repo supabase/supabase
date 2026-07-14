@@ -12,7 +12,7 @@ import {
   isGroup,
   SerializableFilterProperty,
   updateGroupAtPath,
-} from 'ui-patterns'
+} from 'ui-patterns/FilterBar'
 
 import { columnToFilterProperty } from './FilterPopoverNew.utils'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'

@@ -24,7 +24,7 @@ import { notFound } from 'next/navigation'
 import rehypeSlug from 'rehype-slug'
 import emoji from 'remark-emoji'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/admonition'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -222,6 +222,14 @@ const pageMap = [
       dashboardIntegrationPath: 'logflare_wrapper',
     },
     remoteFile: 'logflare.md',
+  },
+  {
+    slug: 'mongodb',
+    meta: {
+      title: 'MongoDB',
+      dashboardIntegrationPath: undefined,
+    },
+    remoteFile: 'mongodb.md',
   },
   {
     slug: 'mssql',

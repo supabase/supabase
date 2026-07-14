@@ -23,7 +23,7 @@ You need:
 - Open SSL installed (for key generation)
 - Your IdP's SAML metadata URL or metadata XML
 - The `SERVICE_ROLE_KEY` from your `.env` file (needed for admin API calls)
-- `API_EXTERNAL_URL` set to the publicly-accessible URL of your Supabase Auth service (e.g., `https://<your-domain>`). This URL is used as the SAML Service Provider entity ID and for constructing the ACS endpoint URL
+- `API_EXTERNAL_URL` set to the publicly-accessible URL of your Supabase Auth service (e.g., `https://<your-domain>/auth/v1`). Used as the base for constructing the SAML Service Provider entity ID and ACS endpoint URL
 
 ## How SAML SSO works in Supabase
 
@@ -37,7 +37,7 @@ The login flow works as follows:
 1. Your app calls `POST /auth/v1/sso` with a domain or provider_id
 2. Auth generates a SAML `AuthnRequest` and returns a redirect URL to the IdP
 3. The user authenticates at the IdP
-4. The IdP POSTs a SAML Response to `POST /sso/saml/acs`
+4. The IdP POSTs a SAML Response to `POST /auth/v1/sso/saml/acs`
 5. Auth validates the assertion, creates or links the user, and issues a session
 6. The user is redirected back to your app with session tokens
 
@@ -89,10 +89,6 @@ SAML_PRIVATE_KEY=<your-base64-encoded-private-key>
 # Optional: how long relay state tokens remain valid (default: 2m0s)
 # SAML_RELAY_STATE_VALIDITY_PERIOD=2m0s
 
-# Optional: override the SAML entity ID / ACS base URL
-# Defaults to API_EXTERNAL_URL if not set
-# SAML_EXTERNAL_URL=https://supabase.example.com:8000
-
 # Optional: rate limit on the ACS endpoint (requests per second, default: 15)
 # SAML_RATE_LIMIT_ASSERTION=15
 ```
@@ -111,7 +107,6 @@ auth:
     GOTRUE_SAML_PRIVATE_KEY: ${SAML_PRIVATE_KEY}
     # GOTRUE_SAML_ALLOW_ENCRYPTED_ASSERTIONS: ${SAML_ALLOW_ENCRYPTED_ASSERTIONS}
     # GOTRUE_SAML_RELAY_STATE_VALIDITY_PERIOD: ${SAML_RELAY_STATE_VALIDITY_PERIOD}
-    # GOTRUE_SAML_EXTERNAL_URL: ${SAML_EXTERNAL_URL}
     # GOTRUE_SAML_RATE_LIMIT_ASSERTION: ${SAML_RATE_LIMIT_ASSERTION}
 ```
 
@@ -120,14 +115,13 @@ auth:
 Apply the configuration changes:
 
 ```sh
-docker compose down && \
-docker compose up -d
+sh run.sh recreate
 ```
 
 Verify the Auth service is healthy:
 
 ```sh
-docker compose ps auth
+sh run.sh status auth
 ```
 
 ## Step 5: Retrieve your service provider metadata
@@ -137,7 +131,7 @@ Once SAML is enabled, your Supabase instance exposes service provider (SP) metad
 Verify it using `curl`:
 
 ```sh
-curl http://<your-domain>/sso/saml/metadata
+curl http://<your-domain>/auth/v1/sso/saml/metadata
 ```
 
 This returns an XML document containing your SP entity ID, ACS endpoint URL, and signing certificate. You will need to provide this to your IdP.
@@ -301,6 +295,21 @@ On the IdP side, create a new SAML application and configure it with your SP det
 - ACS URL: `{API_EXTERNAL_URL}/sso/saml/acs`
 - Entity ID: `{API_EXTERNAL_URL}/sso/saml/metadata`
 - Name ID format: `PERSISTENT`
+
+</TabPanel>
+
+<TabPanel id="auth0" label="Auth0">
+
+**Auth0:**
+
+- Dashboard → Applications → Applications → Create Application → Regular Web Application
+- Settings tab → Advanced Settings → Endpoints tab
+- Copy the **SAML Metadata URL** (this is the IdP metadata URL for Supabase)
+- Settings tab → Advanced Settings → Add-ons → SAML2 Web App
+- Enable SAML2 Web App add-on
+- Settings tab in the add-on:
+  - Application Callback URL (ACS): `{API_EXTERNAL_URL}/sso/saml/acs`
+- Enable the add-on
 
 </TabPanel>
 
@@ -528,7 +537,6 @@ The response should include `app_metadata.provider: "sso:saml"` and any mapped a
 | `SAML_PRIVATE_KEY` | - | Base64-encoded PKCS#1 RSA private key (min 2048-bit). Used to sign SAML requests and optionally decrypt assertions. |
 | `SAML_ALLOW_ENCRYPTED_ASSERTIONS` | `false` | Accept encrypted SAML assertions from IdPs |
 | `SAML_RELAY_STATE_VALIDITY_PERIOD` | `2m0s` | How long relay state tokens remain valid. Increase if users on slow networks time out during the IdP redirect. |
-| `SAML_EXTERNAL_URL` | `API_EXTERNAL_URL` | Override the base URL used for the SAML entity ID and ACS endpoint. Only needed if the SAML endpoints are served on a different URL than the rest of the Auth API. |
 | `SAML_RATE_LIMIT_ASSERTION` | `15` | Maximum ACS requests per second. Protects against assertion replay floods. |
 {/* supa-mdx-lint-enable Rule003Spelling */}
 
@@ -539,7 +547,7 @@ The response should include `app_metadata.provider: "sso:saml"` and any mapped a
 The `GOTRUE_SAML_ENABLED` variable is not set to `true`, or the Auth container did not pick up the change. Verify the env var is passed through `docker-compose.yml` and restart:
 
 ```sh
-docker compose down && docker compose up -d
+sh run.sh recreate
 ```
 
 ### "Invalid private key" on startup
@@ -560,8 +568,8 @@ base64 -w 0 -i pk_rsa1.der
 
 ### IdP cannot reach the ACS endpoint
 
-- Verify `API_EXTERNAL_URL` is set to a URL the IdP can reach (not `localhost` unless testing locally)
-- Check that the API gateway routes for `/sso/saml/acs` and `/sso/saml/metadata` are configured as open (no `key-auth` plugin).
+- Verify `API_EXTERNAL_URL` is set to a URL containing `/auth/v1` the IdP can reach (not `localhost` unless testing locally)
+- Check that the API gateway routes for `/auth/v1/sso/saml/acs` and `/auth/v1/sso/saml/metadata` are configured as open (no `key-auth` plugin).
 - Check the Auth container logs: `docker compose logs auth`
 
 ### "No SSO provider found for this domain"
