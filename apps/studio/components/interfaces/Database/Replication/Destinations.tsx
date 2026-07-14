@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { MoreVertical, Plus, Search, X } from 'lucide-react'
+import { ChartArea, MoreVertical, Plus, Search, X } from 'lucide-react'
+import Link from 'next/link'
 import { parseAsStringEnum, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -46,6 +47,7 @@ import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { checkLocalETLNotSetUp } from '@/data/replication/utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { DOCS_URL } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -53,6 +55,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 export const Destinations = () => {
   const queryClient = useQueryClient()
   const { ref: projectRef } = useParams()
+  const { data: organization } = useSelectedOrganizationQuery()
 
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
@@ -258,6 +261,11 @@ export const Destinations = () => {
                 Add destination
               </Button>
             </Shortcut>
+            {organization?.slug && (
+              <Button asChild variant="default" icon={<ChartArea />}>
+                <Link href={`/org/${organization.slug}/usage`}>Usage</Link>
+              </Button>
+            )}
             <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
             {canDisablePipelines && (
               <DropdownMenu>
