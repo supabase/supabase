@@ -4,7 +4,6 @@ import {
   Area,
   Bar,
   CartesianGrid,
-  Customized,
   Label,
   Line,
   ComposedChart as RechartComposedChart,
@@ -14,7 +13,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts'
-import { CategoricalChartState } from 'recharts/types/chart/types'
+import type { MouseHandlerDataParam } from 'recharts'
 import { cn } from 'ui'
 
 import { ChartHeader } from './ChartHeader'
@@ -52,7 +51,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   yAxisKey: string
   xAxisKey: string
   displayDateInUtc?: boolean
-  onBarClick?: (datum: Datum, tooltipData?: CategoricalChartState) => void
+  onBarClick?: (datum: Datum, tooltipData?: MouseHandlerDataParam) => void
   emptyStateMessage?: string
   showLegend?: boolean
   xAxisIsDate?: boolean
@@ -78,22 +77,6 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   highlightActions?: ChartHighlightAction[]
   showNewBadge?: boolean
   normalizeVisibleStackToPercent?: boolean
-}
-
-interface CustomizedDotProps {
-  formattedGraphicalItems?: Array<{
-    props?: {
-      points?: Array<{ x: number; y: number }>
-      dataKey?: string
-    }
-    item?: {
-      props?: {
-        points?: Array<{ x: number; y: number }>
-        dataKey?: string
-      }
-    }
-    points?: Array<{ x: number; y: number }>
-  }>
 }
 
 export function ComposedChart({
@@ -191,9 +174,12 @@ export function ComposedChart({
     const needsTopPadding = normalizeVisibleStackToPercent && chartStyle !== 'bar'
     if (!needsTopPadding) return _YAxisProps.padding
 
+    // recharts v3 widened the YAxis `padding` type to `{ top?, bottom? } | 'gap' | 'no-gap'`,
+    // so only spread/read it when it's the object form.
+    const basePadding = typeof _YAxisProps.padding === 'object' ? _YAxisProps.padding : undefined
     return {
-      ..._YAxisProps.padding,
-      top: Math.max(8, _YAxisProps.padding?.top ?? 0),
+      ...basePadding,
+      top: Math.max(8, basePadding?.top ?? 0),
     }
   }, [_YAxisProps.padding, chartStyle, normalizeVisibleStackToPercent])
 
@@ -470,29 +456,30 @@ export function ComposedChart({
           style={{ cursor: 'crosshair' }}
           onMouseMove={({ activeLabel, activeTooltipIndex }) => {
             if (activeTooltipIndex === undefined || activeTooltipIndex === null) return
+            // recharts v3 types `activeTooltipIndex` as `number | string`; coerce to number.
+            const index = Number(activeTooltipIndex)
 
             setIsActiveHoveredChart(true)
-            if (activeTooltipIndex !== focusDataIndex) {
-              setFocusDataIndex(activeTooltipIndex)
+            if (index !== focusDataIndex) {
+              setFocusDataIndex(index)
             }
 
-            setHover(activeTooltipIndex)
+            setHover(index)
 
-            const activeTimestamp =
-              data[activeTooltipIndex]?.[xAxisKey] ?? data[activeTooltipIndex]?.timestamp
+            const activeTimestamp = data[index]?.[xAxisKey] ?? data[index]?.timestamp
             chartHighlight?.handleMouseMove({
               activeLabel: activeTimestamp?.toString(),
-              coordinates: activeLabel,
+              coordinates: activeLabel?.toString(),
             })
           }}
           onMouseDown={({ activeLabel, activeTooltipIndex }) => {
             if (activeTooltipIndex === undefined || activeTooltipIndex === null) return
+            const index = Number(activeTooltipIndex)
 
-            const activeTimestamp =
-              data[activeTooltipIndex]?.[xAxisKey] ?? data[activeTooltipIndex]?.timestamp
+            const activeTimestamp = data[index]?.[xAxisKey] ?? data[index]?.timestamp
             chartHighlight?.handleMouseDown({
               activeLabel: activeTimestamp?.toString(),
-              coordinates: activeLabel,
+              coordinates: activeLabel?.toString(),
             })
           }}
           onMouseUp={chartHighlight?.handleMouseUp}
@@ -503,8 +490,11 @@ export function ComposedChart({
             clearHover()
           }}
           onClick={(tooltipData) => {
-            const datum = tooltipData?.activePayload?.[0]?.payload
-            if (onBarClick) onBarClick(datum, tooltipData)
+            // recharts v3 no longer exposes `activePayload` on the click handler arg;
+            // derive the clicked datum from the active index instead.
+            const index = tooltipData?.activeTooltipIndex
+            const datum = index != null ? displayData[Number(index)] : undefined
+            if (onBarClick && datum) onBarClick(datum, tooltipData)
           }}
         >
           {showGrid && <CartesianGrid stroke={CHART_COLORS.AXIS} />}
@@ -573,7 +563,12 @@ export function ComposedChart({
                     attributes?.find((a) => a.attribute === attribute.name)?.label || attribute.name
                   }
                   dot={false}
-                  activeDot={false}
+                  activeDot={{
+                    r: 4,
+                    fill: attribute.fill,
+                    stroke: attribute.color,
+                    strokeWidth: 1,
+                  }}
                 />
               ))}
           {/* Max value, if available */}
@@ -624,10 +619,14 @@ export function ComposedChart({
             />
           )}
           <Tooltip
+            isAnimationActive={false}
             content={(props) =>
               showTooltip && !showHighlightActions ? (
                 <CustomTooltip
                   {...props}
+                  // recharts v3 payload is a readonly array; copy it to the mutable
+                  // `any[]` the tooltip util expects.
+                  payload={props.payload ? [...props.payload] : undefined}
                   data={data}
                   format={format}
                   isPercentage={isPercentage}
@@ -645,39 +644,6 @@ export function ComposedChart({
             cursor={{
               stroke: isDarkMode ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
               strokeWidth: 1,
-            }}
-          />
-          <Customized
-            component={(props: CustomizedDotProps) => {
-              const { formattedGraphicalItems } = props
-              if (!formattedGraphicalItems || focusDataIndex === null) return null
-
-              return (
-                <g>
-                  {formattedGraphicalItems.map((item, index: number) => {
-                    const points = item.props?.points || item.item?.props?.points || item.points
-                    const dataKey = item.props?.dataKey || item.item?.props?.dataKey
-
-                    if (!points || !points[focusDataIndex]) return null
-
-                    const point = points[focusDataIndex]
-                    const attribute = visibleAttributes.find((a) => a.name === dataKey)
-                    if (!attribute) return null
-
-                    return (
-                      <circle
-                        key={`custom-dot-${dataKey}-${index}`}
-                        cx={point.x}
-                        cy={point.y}
-                        r={4}
-                        fill={attribute.fill}
-                        stroke={attribute.color}
-                        strokeWidth={1}
-                      />
-                    )
-                  })}
-                </g>
-              )
             }}
           />
         </RechartComposedChart>

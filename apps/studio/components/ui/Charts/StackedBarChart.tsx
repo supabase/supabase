@@ -129,11 +129,13 @@ const StackedBarChart: React.FC<Props> = ({
           className="cursor-pointer overflow-visible"
           //   mouse hover focusing logic
           onMouseMove={(e: any) => {
-            if (e.activeTooltipIndex !== focusDataIndex) {
-              setFocusDataIndex(e.activeTooltipIndex)
+            // recharts v3 types `activeTooltipIndex` as `string | null`; coerce to number.
+            const index = e.activeTooltipIndex != null ? Number(e.activeTooltipIndex) : null
+            if (index !== focusDataIndex) {
+              setFocusDataIndex(index)
             }
 
-            setHover(e.activeTooltipIndex)
+            setHover(index)
           }}
           onMouseLeave={() => {
             setFocusDataIndex(null)
@@ -179,6 +181,7 @@ const StackedBarChart: React.FC<Props> = ({
             </Bar>
           ))}
           <Tooltip
+            isAnimationActive={false}
             labelFormatter={
               xAxisFormatAsDate ? (label) => formatChartDate(label as number | string) : undefined
             }
@@ -188,7 +191,7 @@ const StackedBarChart: React.FC<Props> = ({
                 const index = percentagesStackedData.findIndex(
                   (pStack) => pStack === props.payload!
                 )
-                const val = stackedData[index][name]
+                const val = stackedData[index][name as string]
                 const percentage = precisionFormatter(Number(value) * 100, 1) + '%'
                 return `${percentage} (${val}${suffix})`
               }

@@ -296,8 +296,11 @@ export const QueryBlock = ({
                   margin={{ left: 0, right: 0, top: 10 }}
                   data={chartData}
                   onMouseMove={(e: any) => {
-                    if (e.activeTooltipIndex !== focusDataIndex) {
-                      setFocusDataIndex(e.activeTooltipIndex)
+                    // recharts v3 types `activeTooltipIndex` as `string | null`; coerce to number.
+                    const index =
+                      e.activeTooltipIndex != null ? Number(e.activeTooltipIndex) : undefined
+                    if (index !== focusDataIndex) {
+                      setFocusDataIndex(index)
                     }
                   }}
                   onMouseLeave={() => setFocusDataIndex(undefined)}
@@ -325,6 +328,7 @@ export const QueryBlock = ({
                     tickFormatter={effectiveLogScale ? formatLogTick : formatYAxisTick}
                   />
                   <Tooltip
+                    isAnimationActive={false}
                     content={
                       portalTooltip ? (
                         <PortalChartTooltip

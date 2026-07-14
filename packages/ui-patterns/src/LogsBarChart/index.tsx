@@ -2,8 +2,14 @@
 
 import dayjs from 'dayjs'
 import { ReactNode, useState } from 'react'
-import { Bar, Cell, BarChart as RechartBarChart, XAxis, YAxis } from 'recharts'
-import type { CategoricalChartState } from 'recharts/types/chart/types'
+import {
+  Bar,
+  Cell,
+  MouseHandlerDataParam,
+  BarChart as RechartBarChart,
+  XAxis,
+  YAxis,
+} from 'recharts'
 import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 
 const CHART_COLORS = {
@@ -39,7 +45,7 @@ export const LogsBarChart = ({
 }: {
   data: LogsBarChartDatum[]
   error?: unknown | null
-  onBarClick?: (datum: LogsBarChartDatum, tooltipData?: CategoricalChartState) => void
+  onBarClick?: (datum: LogsBarChartDatum, tooltipData?: MouseHandlerDataParam) => void
   EmptyState?: ReactNode
   ErrorState?: ReactNode
   DateTimeFormat?: string
@@ -84,15 +90,20 @@ export const LogsBarChart = ({
       <ChartContainer className="h-full" config={chartConfig ?? defaultChartConfig}>
         <RechartBarChart
           data={data}
-          onMouseMove={(e: any) => {
-            if (e.activeTooltipIndex !== focusDataIndex) {
-              setFocusDataIndex(e.activeTooltipIndex)
+          onMouseMove={(e) => {
+            // recharts v3 types `activeTooltipIndex` as `string | null`; coerce to number.
+            const index = e.activeTooltipIndex != null ? Number(e.activeTooltipIndex) : null
+            if (index !== focusDataIndex) {
+              setFocusDataIndex(index)
             }
           }}
           onMouseLeave={() => setFocusDataIndex(null)}
           onClick={(tooltipData) => {
-            const datum = tooltipData?.activePayload?.[0]?.payload
-            if (onBarClick) onBarClick(datum, tooltipData)
+            // recharts v3 no longer exposes `activePayload` on the click handler arg;
+            // derive the clicked datum from the active index instead.
+            const index = tooltipData?.activeTooltipIndex
+            const datum = index != null ? data[Number(index)] : undefined
+            if (onBarClick && datum) onBarClick(datum, tooltipData)
           }}
         >
           <YAxis
@@ -133,7 +144,7 @@ export const LogsBarChart = ({
                   payload={filteredPayload}
                   label={props.label}
                   className="text-foreground-light -mt-5 transition-none!"
-                  labelFormatter={(v: string) => dayjs(v).format(DateTimeFormat)}
+                  labelFormatter={(v) => dayjs(v as string).format(DateTimeFormat)}
                 />
               )
             }}

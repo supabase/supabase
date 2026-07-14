@@ -1,4 +1,4 @@
-import type { Payload, ValueType } from 'recharts/types/component/DefaultTooltipContent'
+import type { TooltipPayloadEntry as Payload, TooltipValueType as ValueType } from 'recharts'
 import { cn } from 'ui'
 
 import { Attribute, COLOR_MAP } from './Usage.constants'
@@ -35,7 +35,7 @@ export const SingleAttributeTooltipContent = ({
 
 export interface MultiAttributeTooltipContentProps {
   attributes: Attribute[]
-  values: Payload<ValueType, string | number>[]
+  values: ReadonlyArray<Payload<ValueType, string | number>>
   isAfterToday: boolean
   tooltipFormatter?: (value: any) => any
   unit: 'bytes' | 'percentage' | 'absolute' | 'hours' | 'gigabytes'

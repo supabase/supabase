@@ -92,12 +92,25 @@ ${colorConfig
   )
 }
 
-const ChartTooltip = RechartsPrimitive.Tooltip
+// recharts v3 animates the tooltip wrapper's position by default (`isAnimationActive: 'auto'`),
+// which makes it visibly slide in from its previous position instead of appearing next to the
+// cursor as it did in v2. Default it to `false` here so all consumers get the v2 behaviour
+// unless they explicitly opt back into the animation.
+const ChartTooltip = ({
+  isAnimationActive = false,
+  ...props
+}: React.ComponentProps<typeof RechartsPrimitive.Tooltip>) => (
+  <RechartsPrimitive.Tooltip isAnimationActive={isAnimationActive} {...props} />
+)
 
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
-    React.ComponentProps<'div'> & {
+    React.ComponentProps<'div'> &
+    // In recharts v3, `payload`/`label`/`coordinate` moved off `TooltipProps` onto the
+    // content render-prop type `TooltipContentProps`. Pick them back as optional so this
+    // component can be used both as a `content` callback and standalone.
+    Partial<Pick<RechartsPrimitive.TooltipContentProps, 'payload' | 'label' | 'coordinate'>> & {
       hideLabel?: boolean
       hideIndicator?: boolean
       indicator?: 'line' | 'dot' | 'dashed'
@@ -176,7 +189,7 @@ const ChartTooltipContent = React.forwardRef<
 
             return (
               <div
-                key={item.dataKey}
+                key={`${item.dataKey ?? index}`}
                 className={cn(
                   'flex w-full items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-foreground-muted',
                   indicator === 'dot' && 'items-center'
@@ -246,7 +259,9 @@ const ChartLegend = RechartsPrimitive.Legend
 const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<'div'> &
-    Pick<RechartsPrimitive.LegendProps, 'payload' | 'verticalAlign'> & {
+    // `payload` was removed from `LegendProps` in recharts v3; it now lives on the
+    // default/content legend props type.
+    Pick<RechartsPrimitive.DefaultLegendContentProps, 'payload' | 'verticalAlign'> & {
       hideIcon?: boolean
       nameKey?: string
     }

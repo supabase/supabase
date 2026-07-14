@@ -61,6 +61,7 @@ const UsageBarChart = ({
             tickFormatter={yFormatter}
           />
           <Tooltip
+            isAnimationActive={false}
             content={(props) => {
               const { active, payload } = props
               if (active && payload && payload.length) {
