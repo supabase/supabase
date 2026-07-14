@@ -8,7 +8,6 @@ import {
   Copy,
   Edit,
   Eye,
-  Filter,
   MoreVertical,
   Plus,
   Search,
