@@ -10930,11 +10930,6 @@ export interface components {
            */
           estimated_cost: number
           /**
-           * @description Estimated on-disk size of the table in GB
-           * @example 0.0102
-           */
-          estimated_gb: number
-          /**
            * @description Whether this table has a row filter. The estimate does not account for how many rows the filter excludes, so the actual replicated volume may be lower than shown.
            * @example false
            */
@@ -10960,11 +10955,6 @@ export interface components {
          * @example 0.01
          */
         total_cost: number
-        /**
-         * @description Total estimated GB across all tables
-         * @example 0.0111
-         */
-        total_gb: number
       }
     }
     ReplicationPublicationsResponse: {

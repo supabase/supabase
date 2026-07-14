@@ -38,8 +38,8 @@ interface PipelineCostDialogProps {
 }
 
 // Final gate before a pipeline is created and started: shows an estimate of what
-// the pipeline will cost (one-time initial copy, flat monthly pipeline fee, and
-// the usage-based streaming rate) so customers can make an informed decision and
+// the pipeline will cost (one-time initial copy, hourly pipeline fee, and the
+// usage-based streaming rate) so customers can make an informed decision and
 // avoid bill shock. Shown for every customer.
 export const PipelineCostDialog = ({
   open,
