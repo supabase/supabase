@@ -1,7 +1,7 @@
-import { Loader2 } from 'lucide-react'
 import { useEffect } from 'react'
 import {
   Button,
+  Card,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -18,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useReplicationCostEstimateQuery } from '@/data/replication/cost-estimate-query'
 import { useLatest } from '@/hooks/misc/useLatest'
@@ -77,139 +78,150 @@ export const PipelineCostDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent size="large">
         <DialogHeader>
-          <DialogTitle>Review estimated costs</DialogTitle>
+          <DialogTitle>Confirm to create and start pipeline</DialogTitle>
           <DialogDescription>
-            An estimate of what this pipeline will cost before you create and start it.
+            Review the estimated costs before you create and start the pipeline.
           </DialogDescription>
         </DialogHeader>
 
         <DialogSectionSeparator />
 
+        {/* Review these costs before you create and start the pipeline. */}
         {isLoading || isError ? (
-          <DialogSection className="flex items-center gap-x-2 py-6">
-            <Loader2 className="animate-spin" size={16} />
-            <p className="text-sm text-foreground-light">Estimating costs...</p>
+          <DialogSection className="py-6">
+            <GenericSkeletonLoader className="w-full" />
           </DialogSection>
-        ) : isSuccess && estimate ? (
-          <DialogSection className="flex flex-col gap-y-5">
-            <p className="text-sm text-foreground-light">
-              This pipeline will replicate{' '}
-              <span className="text-foreground">
-                {tableCount} {tableCount === 1 ? 'table' : 'tables'}
-              </span>
-              {publicationName ? (
-                <>
-                  {' '}
-                  from the{' '}
-                  <span className="text-foreground" translate="no">
-                    {publicationName}
-                  </span>{' '}
-                  publication
-                </>
-              ) : null}
-              .
-            </p>
-
-            <div className="flex flex-col gap-y-2">
-              <p className="text-sm font-medium text-foreground">Initial table copy</p>
-
-              {tableCount > 0 ? (
-                <Table>
-                  <TableHeader className="[&_th]:h-auto [&_th]:py-2">
-                    <TableRow>
-                      <TableHead>Table</TableHead>
-                      <TableHead className="text-right">Est. size</TableHead>
-                      <TableHead className="text-right" translate="no">
-                        Est. cost ({formatCurrency(estimate.table_copy.rate_per_gb)}/GB)
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody className="[&_td]:py-2">
-                    {visibleTables.map((table) => (
-                      <TableRow key={`${table.schema}.${table.name}`}>
-                        <TableCell className="font-mono text-xs" translate="no">
-                          {table.schema}.{table.name}
-                        </TableCell>
-                        <TableCell className="text-right text-xs">
-                          {formatBytes(table.estimated_bytes)}
-                        </TableCell>
-                        <TableCell className="text-right font-mono text-xs" translate="no">
-                          {formatCurrency(table.estimated_cost)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    {hiddenTableCount > 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={3} className="text-xs text-foreground-lighter">
-                          +{hiddenTableCount} more {hiddenTableCount === 1 ? 'table' : 'tables'}
-                        </TableCell>
-                      </TableRow>
-                    ) : null}
-                  </TableBody>
-                  <TableFooter>
-                    <TableRow>
-                      <TableCell className="py-2">Total</TableCell>
-                      <TableCell className="text-right py-2 text-xs">
-                        {formatBytes(estimate.table_copy.total_bytes)}
-                      </TableCell>
-                      <TableCell className="text-right py-2 font-mono" translate="no">
-                        {formatCurrency(estimate.table_copy.total_cost)}
-                      </TableCell>
-                    </TableRow>
-                  </TableFooter>
-                </Table>
-              ) : (
+        ) : (
+          isSuccess &&
+          estimate && (
+            <>
+              <DialogSection className="flex flex-col gap-y-5">
                 <p className="text-sm text-foreground-light">
-                  This publication has no tables to copy.
-                </p>
-              )}
-            </div>
-
-            <DialogSectionSeparator />
-
-            <div className="flex flex-col gap-y-2">
-              <p className="text-sm font-medium text-foreground">Ongoing</p>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-foreground-light">Active pipeline</span>
-                <span className="font-mono text-foreground" translate="no">
-                  ${estimate.pipeline.hourly_cost}/hour{' '}
-                  <span className="text-foreground-lighter">
-                    (~{formatCurrency(estimate.pipeline.monthly_cost)}/month)
+                  This pipeline will replicate{' '}
+                  <span className="text-foreground">
+                    {tableCount} {tableCount === 1 ? 'table' : 'tables'}
                   </span>
-                </span>
-              </div>
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-foreground-light">Streaming changes</span>
-                <span className="font-mono text-foreground" translate="no">
-                  {formatCurrency(estimate.streaming.rate_per_gb)}/GB
-                </span>
-              </div>
-              <p className="text-xs text-foreground-lighter">
-                Streaming is billed on the volume of changes replicated after the initial copy, so
-                the total depends on how often your data changes.
-              </p>
-            </div>
-
-            <div className="flex items-center justify-between rounded-md border bg-surface-100 px-4 py-3">
-              <div>
-                <p className="text-sm font-medium text-foreground">Estimated first month total</p>
-                <p className="text-xs text-foreground-lighter">
-                  Initial copy + first pipeline fee, excluding usage-based streaming
+                  {publicationName ? (
+                    <>
+                      {' '}
+                      from the{' '}
+                      <span className="text-foreground" translate="no">
+                        {publicationName}
+                      </span>{' '}
+                      publication
+                    </>
+                  ) : null}
+                  .
                 </p>
-              </div>
-              <span className="font-mono text-lg font-semibold text-foreground" translate="no">
-                {formatCurrency(firstMonthTotal)}
-              </span>
-            </div>
 
-            {hasRowFilteredTables ? (
-              <p className="text-xs text-foreground-lighter">
-                Some of these tables only replicate part of their data, so actual costs may be lower
-                than shown.
-              </p>
-            ) : null}
-          </DialogSection>
-        ) : null}
+                <div className="flex flex-col gap-y-2">
+                  <p className="text-sm font-medium text-foreground">Initial table copy</p>
+
+                  {tableCount > 0 ? (
+                    <Card>
+                      <Table>
+                        <TableHeader className="[&_th]:h-auto [&_th]:py-2">
+                          <TableRow>
+                            <TableHead>Table</TableHead>
+                            <TableHead className="text-right">Est. size</TableHead>
+                            <TableHead className="text-right" translate="no">
+                              Est. cost ({formatCurrency(estimate.table_copy.rate_per_gb)}/GB)
+                            </TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody className="[&_td]:py-2">
+                          {visibleTables.map((table) => (
+                            <TableRow key={`${table.schema}.${table.name}`}>
+                              <TableCell className="font-mono text-xs" translate="no">
+                                {table.schema}.{table.name}
+                              </TableCell>
+                              <TableCell className="text-right text-xs">
+                                {formatBytes(table.estimated_bytes)}
+                              </TableCell>
+                              <TableCell className="text-right font-mono text-xs" translate="no">
+                                {formatCurrency(table.estimated_cost)}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                          {hiddenTableCount > 0 && (
+                            <TableRow>
+                              <TableCell colSpan={3} className="text-xs text-foreground-lighter">
+                                +{hiddenTableCount} more{' '}
+                                {hiddenTableCount === 1 ? 'table' : 'tables'}
+                              </TableCell>
+                            </TableRow>
+                          )}
+                        </TableBody>
+                        <TableFooter>
+                          <TableRow>
+                            <TableCell className="py-2">Total</TableCell>
+                            <TableCell className="text-right py-2 text-xs">
+                              {formatBytes(estimate.table_copy.total_bytes)}
+                            </TableCell>
+                            <TableCell className="text-right py-2 font-mono" translate="no">
+                              {formatCurrency(estimate.table_copy.total_cost)}
+                            </TableCell>
+                          </TableRow>
+                        </TableFooter>
+                      </Table>
+                    </Card>
+                  ) : (
+                    <p className="text-sm text-foreground-light">
+                      This publication has no tables to copy.
+                    </p>
+                  )}
+                </div>
+              </DialogSection>
+
+              <DialogSectionSeparator />
+
+              <DialogSection>
+                <div className="flex flex-col gap-y-2">
+                  <p className="text-sm font-medium text-foreground">Ongoing</p>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-foreground-light">Active pipeline</span>
+                    <span className="font-mono text-foreground" translate="no">
+                      ${estimate.pipeline.hourly_cost}/hour{' '}
+                      <span className="text-foreground-lighter">
+                        (~{formatCurrency(estimate.pipeline.monthly_cost)}/month)
+                      </span>
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-foreground-light">Streaming changes</span>
+                    <span className="font-mono text-foreground" translate="no">
+                      {formatCurrency(estimate.streaming.rate_per_gb)}/GB
+                    </span>
+                  </div>
+                  <p className="text-xs text-foreground-lighter text-balance">
+                    Streaming is billed on the volume of changes replicated after the initial copy,
+                    so the total depends on how often your data changes.
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between rounded-md border bg-surface-100 px-4 py-3">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      Estimated first month total
+                    </p>
+                    <p className="text-xs text-foreground-lighter">
+                      Initial copy + first pipeline fee, excluding usage-based streaming
+                    </p>
+                  </div>
+                  <span className="font-mono text-lg font-semibold text-foreground" translate="no">
+                    {formatCurrency(firstMonthTotal)}
+                  </span>
+                </div>
+
+                {hasRowFilteredTables && (
+                  <p className="text-xs text-foreground-lighter">
+                    Tables with row filters may cost less than shown.
+                  </p>
+                )}
+              </DialogSection>
+            </>
+          )
+        )}
 
         <DialogFooter>
           <Button variant="default" disabled={isConfirming} onClick={() => onOpenChange(false)}>
