@@ -3234,7 +3234,7 @@ export const integrations: NavMenuConstant = {
     },
     {
       name: 'Dashboard Integrations',
-      url: '/guides/integrations#supabase-dashboard-integrations',
+      url: '/guides/integrations#dashboard-integrations',
     },
     {
       name: 'Partner Catalog',
