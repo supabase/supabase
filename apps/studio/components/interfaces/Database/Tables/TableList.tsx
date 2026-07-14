@@ -292,7 +292,6 @@ export const TableList = ({
               size="tiny"
               variant={hasFiltersApplied ? 'default' : 'dashed'}
               iconRight={<ChevronDown />}
-              aria-label="Filter"
             >
               Entity Type
             </Button>
