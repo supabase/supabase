@@ -138,7 +138,7 @@ describe('getTableAdmonitionMessage', () => {
     expect(container.textContent).toBe(
       'This table cannot be accessed via the Data API. Enable access in your project’s Data API settings.'
     )
-    expect(getByRole('link', { name: 'Data API' })).toHaveAttribute(
+    expect(getByRole('link', { name: 'Data API settings' })).toHaveAttribute(
       'href',
       '/project/my-project/integrations/data_api/settings'
     )
