@@ -14,6 +14,7 @@ import {
 import { CHART_INTERVALS } from './logs.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import type { ChartIntervals } from '@/types'
 
 function getDaysRequired(startValue: number, startUnit: string): number {
   if (startUnit === 'day') return startValue
@@ -24,6 +25,7 @@ function getDaysRequired(startValue: number, startUnit: string): number {
 interface ChartIntervalDropdownProps {
   value: string
   onChange: (value: string) => void
+  intervals?: ChartIntervals[]
   organizationSlug?: string
   dropdownAlign?: 'start' | 'center' | 'end'
   tooltipSide?: 'left' | 'right' | 'top' | 'bottom'
@@ -34,13 +36,14 @@ interface ChartIntervalDropdownProps {
 export const ChartIntervalDropdown = ({
   value,
   onChange,
+  intervals = CHART_INTERVALS,
   organizationSlug,
   dropdownAlign = 'start',
   tooltipSide = 'right',
   open,
   onOpenChange,
 }: ChartIntervalDropdownProps) => {
-  const selectedInterval = CHART_INTERVALS.find((i) => i.key === value) || CHART_INTERVALS[1]
+  const selectedInterval = intervals.find((i) => i.key === value) || intervals[1]
 
   const { getEntitlementMax } = useCheckEntitlements('log.retention_days')
   const retentionDays = getEntitlementMax()
@@ -54,7 +57,7 @@ export const ChartIntervalDropdown = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent side="bottom" align={dropdownAlign} className="w-40">
         <DropdownMenuRadioGroup value={value} onValueChange={onChange}>
-          {CHART_INTERVALS.map((i) => {
+          {intervals.map((i) => {
             const daysRequired = getDaysRequired(i.startValue, i.startUnit)
             const disabled = retentionDays !== undefined && daysRequired > retentionDays
 
