@@ -809,7 +809,6 @@ export const UsersV2 = () => {
                       <Row
                         key={id}
                         {...props}
-                        key={id}
                         onClick={() => {
                           const user = users.find((u) => u.id === id)
                           if (user) {
