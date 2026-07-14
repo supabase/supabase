@@ -8,8 +8,6 @@ on:
 
 permissions:
   contents: read
-  packages: write
-  id-token: write
 
 jobs:
   settings:
@@ -145,6 +143,10 @@ jobs:
     needs:
       - settings
       - merge_manifest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
     # Call workflow explicitly because events from actions cannot trigger more actions
     uses: ./.github/workflows/mirror.yml
     with:
