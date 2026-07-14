@@ -1,11 +1,5 @@
-import {
-  acceptUntrustedSql,
-  untrustedSql,
-  type SafeSqlFragment,
-  type UntrustedSqlFragment,
-} from '@supabase/pg-meta'
-import { useQueryClient } from '@tanstack/react-query'
-import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
+import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
+import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
@@ -15,22 +9,13 @@ import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
-import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
-import { DiffType, type PotentialIssues } from './SQLEditor.types'
+import { sqlAiDisclaimerComment } from './SQLEditor.constants'
+import { DiffType } from './SQLEditor.types'
 import {
   appendEnableRLSStatements,
   assembleCompletionDiff,
   buildDebugPromptText,
-  buildExplainSql,
-  checkAlterDatabaseConnection,
-  checkDestructiveQuery,
-  checkIfAppendLimitRequired,
   createSqlSnippetSkeletonV2,
-  filterTablesCoveredByEnsureRLSTrigger,
-  getCreateTablesMissingRLS,
-  hasActiveEnsureRLSTrigger,
-  isUpdateWithoutWhere,
-  suffixWithLimit,
 } from './SQLEditor.utils'
 import { SQLEditorProvider, useSQLEditorContext } from './SQLEditorContext'
 import { useAddDefinitions } from './useAddDefinitions'
@@ -38,35 +23,24 @@ import { useEditorMount } from './useEditorMount'
 import { usePrettifyQuery } from './usePrettifyQuery'
 import { useSnippetIdentity } from './useSnippetIdentity'
 import { useSnippetTitleGenerator } from './useSnippetTitleGenerator'
+import { useSqlEditorExecution } from './useSqlEditorExecution'
+import { useSqlEditorExplain } from './useSqlEditorExplain'
 import { UtilityActions } from './UtilityPanel/UtilityActions'
 import { UtilityPanel } from './UtilityPanel/UtilityPanel'
-import {
-  isExplainQuery,
-  splitSqlStatements,
-} from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import ResizableAIWidget from '@/components/ui/AIEditor/ResizableAIWidget'
-import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
 import { constructHeaders, isValidConnString } from '@/data/fetchers'
-import { lintKeys } from '@/data/lint/keys'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { isError } from '@/data/utils/error-check'
-import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
 import { formatSql } from '@/lib/formatSql'
 import { detectOS } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
-import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
-import {
-  isRoleImpersonationEnabled,
-  useGetImpersonatedRoleState,
-} from '@/state/role-impersonation-state'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
@@ -97,10 +71,7 @@ const SQLEditorContent = () => {
     refocusEditor,
     clearPendingRunRefocus,
     markRefocusAfterRun,
-    refocusEditorAfterRunIfNeeded,
     getEditorSql: getEditorSqlFromEditor,
-    clearHighlights,
-    applyErrorHighlight,
   } = useSQLEditorContext()
 
   const os = detectOS()
@@ -111,16 +82,13 @@ const SQLEditorContent = () => {
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
 
-  const queryClient = useQueryClient()
   const tabs = useTabsStateSnapshot()
   const aiSnap = useAiAssistantStateSnapshot()
   const { openSidebar } = useSidebarManagerSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const sessionSnap = useSqlEditorSessionSnapshot()
   const diffRequest = useSqlEditorDiffRequestSnapshot()
-  const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
-  const { aiOptInLevel } = useOrgAiOptInLevel()
 
   // [Ali] Kill switch to hide the SQL Editor Explain tab and its entry points
   const disablePrettyExplain = useFlag('DisablePrettyExplainOnSqlEditor')
@@ -140,7 +108,6 @@ const SQLEditorContent = () => {
 
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const [isDiffEditorMounted, setIsDiffEditorMounted] = useState(false)
-  const [potentialIssues, setPotentialIssues] = useState<PotentialIssues>()
 
   const [showWidget, setShowWidget] = useState(false)
   const [activeUtilityTab, setActiveUtilityTab] = useState<string>('results')
@@ -164,8 +131,6 @@ const SQLEditorContent = () => {
   const { id, urlId, generatedNewSnippetName, isLoading } = useSnippetIdentity()
   const { onMount, editorMountCount } = useEditorMount({ id })
 
-  const limit = sessionSnap.limit
-
   useAddDefinitions(id, monacoRef.current)
 
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery(
@@ -175,59 +140,8 @@ const SQLEditorContent = () => {
     { enabled: isValidConnString(project?.connectionString) }
   )
 
-  const { data: eventTriggers } = useDatabaseEventTriggersQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    { enabled: isValidConnString(project?.connectionString) }
-  )
-
-  /* React query mutations */
   const { generateSqlTitle, setAiTitle } = useSnippetTitleGenerator()
   const track = useTrack()
-  const { mutate: execute, isPending: isExecuting } = useExecuteSqlMutation({
-    onSuccess(data, vars) {
-      if (id) {
-        sessionSnap.addResult(id, data.result, vars.autoLimit)
-
-        if (!disablePrettyExplain && isExplainQuery(data.result)) {
-          sessionSnap.addExplainResult(id, data.result)
-          setActiveUtilityTab('explain')
-        } else if (activeUtilityTab === 'explain') {
-          // If on Explain tab but ran a non-EXPLAIN query, switch to Results tab
-          setActiveUtilityTab('results')
-        }
-      }
-
-      // revalidate lint query
-      queryClient.invalidateQueries({ queryKey: lintKeys.lint(ref) })
-      refocusEditorAfterRunIfNeeded()
-    },
-    onError(error: any, vars) {
-      if (id) {
-        applyErrorHighlight(error, hasSelection)
-        sessionSnap.addResultError(id, error, vars.autoLimit)
-      }
-
-      refocusEditorAfterRunIfNeeded()
-    },
-  })
-
-  const { mutate: executeExplain, isPending: isExplainExecuting } = useExecuteSqlMutation({
-    onSuccess(data) {
-      if (id) {
-        sessionSnap.addExplainResult(id, data.result)
-        setActiveUtilityTab('explain')
-      }
-    },
-    onError(error) {
-      if (id) {
-        sessionSnap.addExplainResultError(id, error)
-        setActiveUtilityTab('explain')
-      }
-    },
-  })
 
   const prettifyQuery = usePrettifyQuery({ id, isDiffOpen })
 
@@ -244,105 +158,25 @@ const SQLEditorContent = () => {
     return getEditorSqlFromEditor(snippet?.snippet.content?.unchecked_sql)
   }, [getEditorSqlFromEditor, id])
 
-  const executeQuery = useCallback(
-    async (sql: SafeSqlFragment, force: boolean = false) => {
-      if (isDiffOpen) {
-        clearPendingRunRefocus()
-        return
-      }
-
-      if (editorRef.current === null || isExecuting || project === undefined) {
-        clearPendingRunRefocus()
-        return
-      }
-
-      const hasDestructiveOperations = checkDestructiveQuery(sql)
-      const hasUpdateWithoutWhere = isUpdateWithoutWhere(sql)
-      const hasAlterDatabasePreventConnection = checkAlterDatabaseConnection(sql)
-      const createTablesMissingRLS = filterTablesCoveredByEnsureRLSTrigger(
-        getCreateTablesMissingRLS(sql),
-        hasActiveEnsureRLSTrigger(eventTriggers)
-      )
-
-      const queryHasIssues =
-        !force &&
-        (hasDestructiveOperations ||
-          hasUpdateWithoutWhere ||
-          hasAlterDatabasePreventConnection ||
-          createTablesMissingRLS.length > 0)
-
-      if (queryHasIssues) {
-        setPotentialIssues({
-          hasDestructiveOperations,
-          hasUpdateWithoutWhere,
-          hasAlterDatabasePreventConnection,
-          createTablesMissingRLS,
-        })
-        return
-      }
-
-      // use the latest state for the title-generation check
-      const snippet = getSqlEditorV2StateSnapshot().snippets[id]
-      if (
-        // Don't auto-generate a title when the org has disabled AI or is a HIPAA project,
-        // as that would silently forward the query to the AI provider without consent
-        aiOptInLevel !== 'disabled' &&
-        snippet?.snippet.name.startsWith(untitledSnippetTitle) &&
-        IS_PLATFORM
-      ) {
-        // Intentionally don't await title gen (lazy)
-        setAiTitle(id, sql)
-      }
-
-      clearHighlights()
-
-      const impersonatedRoleState = getImpersonatedRoleState()
-      const connectionString = databases?.find(
-        (db) => db.identifier === databaseSelectorState.selectedDatabaseId
-      )?.connectionString
-      if (!isValidConnString(connectionString)) {
-        clearPendingRunRefocus()
-        return toast.error('Unable to run query: Connection string is missing')
-      }
-
-      const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
-      const formattedSql = suffixWithLimit(sql, limit)
-
-      execute({
-        projectRef: project.ref,
-        connectionString: connectionString,
-        sql: wrapWithRoleImpersonation(formattedSql, impersonatedRoleState),
-        autoLimit: appendAutoLimit ? limit : undefined,
-        isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
-        isStatementTimeoutDisabled: true,
-        contextualInvalidation: true,
-        handleError: (error) => {
-          throw error
-        },
-      })
-
-      track('sql_editor_query_run_button_clicked')
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [
-      clearPendingRunRefocus,
-      isDiffOpen,
+  const { executeQuery, isExecuting, potentialIssues, resetPotentialIssues } =
+    useSqlEditorExecution({
       id,
-      isExecuting,
-      project,
-      aiOptInLevel,
-      execute,
-      getImpersonatedRoleState,
+      isDiffOpen,
+      hasSelection,
+      activeUtilityTab,
+      setActiveUtilityTab,
       setAiTitle,
-      databaseSelectorState.selectedDatabaseId,
-      databases,
-      eventTriggers,
-      limit,
-      track,
-    ]
-  )
+    })
 
-  // Run gesture from the toolbar button: promote here, then run.
+  const { executeExplainQuery, isExplainExecuting } = useSqlEditorExplain({
+    id,
+    isDiffOpen,
+    setActiveUtilityTab,
+  })
+
+  // Run/explain gestures. These are the deliberate user actions, so the
+  // untrusted→safe promotion (acceptUntrustedSql) happens here — as close to the
+  // event handler as possible — before the SQL reaches the execute* pipelines.
   const executeQueryFromButton = useCallback(() => {
     markRefocusAfterRun()
     refocusEditor()
@@ -351,70 +185,11 @@ const SQLEditorContent = () => {
     void executeQuery(acceptUntrustedSql(sql))
   }, [clearPendingRunRefocus, executeQuery, markRefocusAfterRun, readEditorSql, refocusEditor])
 
-  // Run gesture from the editor (Cmd/Ctrl+Enter): promote here, then run.
   const handleRunShortcut = useCallback(() => {
     const sql = readEditorSql()
     if (sql !== undefined) void executeQuery(acceptUntrustedSql(sql))
   }, [executeQuery, readEditorSql])
 
-  const executeExplainQuery = useCallback(
-    async (sql: SafeSqlFragment) => {
-      if (isDiffOpen) return
-
-      if (editorRef.current !== null && !isExplainExecuting && project !== undefined) {
-        // Check for multiple statements - EXPLAIN only works on a single statement
-        const statements = splitSqlStatements(sql)
-        if (statements.length > 1) {
-          sessionSnap.addExplainResultError(id, {
-            message:
-              'EXPLAIN only works on a single SQL statement. Please select just one query to analyze.',
-          })
-          setActiveUtilityTab('explain')
-          return
-        }
-
-        clearHighlights()
-
-        const impersonatedRoleState = getImpersonatedRoleState()
-        const connectionString = databases?.find(
-          (db) => db.identifier === databaseSelectorState.selectedDatabaseId
-        )?.connectionString
-        if (!isValidConnString(connectionString)) {
-          return toast.error('Unable to run query: Connection string is missing')
-        }
-
-        // Wrap in EXPLAIN ANALYZE (unless already an EXPLAIN), apply role
-        // impersonation, and wrap in a rollback transaction so EXPLAIN ANALYZE
-        // INSERT/UPDATE/DELETE queries don't actually modify data.
-        const explainSqlWithTransaction = buildExplainSql(sql, impersonatedRoleState)
-
-        executeExplain({
-          projectRef: project.ref,
-          connectionString: connectionString,
-          sql: explainSqlWithTransaction,
-          isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
-          handleError: (error) => {
-            throw error
-          },
-        })
-      }
-    },
-    [
-      editorRef,
-      isDiffOpen,
-      id,
-      isExplainExecuting,
-      project,
-      executeExplain,
-      getImpersonatedRoleState,
-      databaseSelectorState.selectedDatabaseId,
-      databases,
-      clearHighlights,
-      sessionSnap,
-    ]
-  )
-
-  // Explain gesture (editor action, toolbar, shortcut): promote here, then run.
   const handleRunExplain = useCallback(() => {
     const sql = readEditorSql()
     if (sql !== undefined) void executeExplainQuery(acceptUntrustedSql(sql))
@@ -753,12 +528,12 @@ const SQLEditorContent = () => {
         potentialIssues={potentialIssues}
         onCancel={() => {
           clearPendingRunRefocus()
-          setPotentialIssues(undefined)
+          resetPotentialIssues()
           refocusEditor()
         }}
         onConfirm={() => {
           markRefocusAfterRun()
-          setPotentialIssues(undefined)
+          resetPotentialIssues()
           refocusEditor()
           // The user has reviewed the warning and confirmed — promote here.
           const sql = readEditorSql()
@@ -771,7 +546,7 @@ const SQLEditorContent = () => {
           const baseSql = readEditorSql() ?? untrustedSql('')
           const rewrittenSql = appendEnableRLSStatements(baseSql, tables)
           markRefocusAfterRun()
-          setPotentialIssues(undefined)
+          resetPotentialIssues()
           refocusEditor()
           // The user has reviewed the warning and confirmed — promote here.
           void executeQuery(acceptUntrustedSql(untrustedSql(rewrittenSql)), true)
