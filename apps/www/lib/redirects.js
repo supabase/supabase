@@ -2492,6 +2492,30 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/partners/integrations/atomic_crm',
+    destination: '/partners/catalog/atomic-crm',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/refine_dev',
+    destination: '/partners/catalog/refine',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/supabase_wrapper_bigquery',
+    destination: '/partners/catalog/bigquery-wrapper',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/supabase_wrapper_firebase',
+    destination: '/partners/catalog/firebase-wrapper',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/supabase_wrapper_stripe',
+    destination: '/partners/catalog/stripe-wrapper',
+  {
+    permanent: true,
     source: '/docs/guides/integrations/sequin',
     destination: '/partners/catalog/sequin',
   },
