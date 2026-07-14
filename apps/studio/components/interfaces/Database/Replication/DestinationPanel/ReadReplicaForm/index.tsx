@@ -4,6 +4,7 @@ import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'shared-data'
 import { toast } from 'sonner'
 import {
   Button,
+  CriticalIcon,
   InfoIcon,
   Select,
   SelectContent,
@@ -12,6 +13,7 @@ import {
   SelectValue,
   SheetFooter,
   SheetSection,
+  WarningIcon,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 

@@ -235,6 +235,7 @@ export const Destinations = () => {
               actions={
                 filterString.length > 0 && (
                   <Button
+                    aria-label="Clear filter"
                     variant="text"
                     icon={<X />}
                     className="p-0 h-5 w-5"
@@ -263,14 +264,19 @@ export const Destinations = () => {
             </Shortcut>
             {organization?.slug && (
               <Button asChild variant="default" icon={<ChartArea />}>
-                <Link href={`/org/${organization.slug}/usage`}>Usage</Link>
+                <Link href={`/org/${organization.slug}/usage#pipeline-backfill-data`}>Usage</Link>
               </Button>
             )}
             <DocsButton href={`${DOCS_URL}/guides/database/replication`} />
             {canDisablePipelines && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="default" icon={<MoreVertical />} className="w-7" />
+                  <Button
+                    aria-label="More actions"
+                    variant="default"
+                    icon={<MoreVertical />}
+                    className="w-7"
+                  />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-52">
                   <DropdownMenuItem onClick={() => setShowDisablePipelinesDialog(true)}>

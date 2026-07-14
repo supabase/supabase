@@ -1,5 +1,5 @@
 import { Loader2 } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import {
   Button,
   Dialog,
@@ -20,11 +20,9 @@ import {
 } from 'ui'
 
 import { useReplicationCostEstimateQuery } from '@/data/replication/cost-estimate-query'
+import { useLatest } from '@/hooks/misc/useLatest'
 import { formatBytes, formatCurrency } from '@/lib/helpers'
 
-// Dialogs render at most this many table rows individually; the rest are
-// summarized as a single "+N more" line. The table footer total below always
-// covers every replicated table regardless of how many rows are rendered.
 const MAX_VISIBLE_TABLES = 10
 
 interface PipelineCostDialogProps {
@@ -37,10 +35,13 @@ interface PipelineCostDialogProps {
   onConfirm: () => void
 }
 
-// Final gate before a pipeline is created and started: shows an estimate of what
-// the pipeline will cost (one-time initial copy, hourly pipeline fee, and the
-// usage-based streaming rate) so customers can make an informed decision and
-// avoid bill shock. Shown for every customer.
+/**
+ * Shows an estimate of what the pipeline will cost (one-time initial copy, hourly pipeline
+ * fee, and the usage-based streaming rate).
+ *
+ * This should be a non-blocking enhancement - so if there's an error while fetching the
+ * pricing estimate, we skip this gate rather than block the user from creating pipeline
+ */
 export const PipelineCostDialog = ({
   open,
   isConfirming,
@@ -50,6 +51,8 @@ export const PipelineCostDialog = ({
   onOpenChange,
   onConfirm,
 }: PipelineCostDialogProps) => {
+  const onConfirmRef = useLatest(onConfirm)
+
   const {
     data: estimate,
     isLoading,
@@ -57,34 +60,18 @@ export const PipelineCostDialog = ({
     isSuccess,
   } = useReplicationCostEstimateQuery({ projectRef, sourceId, publicationName }, { enabled: open })
 
-  // Cost estimation is a non-blocking enhancement: pricing has to come from the
-  // backend, never a frontend fallback, so if it can't be fetched we skip the
-  // gate entirely rather than showing an error the user can't act on.
-  //
-  // `onConfirm` gets a new identity on every parent render, so it's read via a
-  // ref instead of listed as a dependency — otherwise an unrelated parent
-  // re-render while the dialog is still closing (`open` hasn't flipped to
-  // `false` yet) would re-trigger this effect and call `onConfirm` (and thus
-  // submit the pipeline) a second time.
-  const onConfirmRef = useRef(onConfirm)
-  onConfirmRef.current = onConfirm
-
-  useEffect(() => {
-    if (open && isError) {
-      onConfirmRef.current()
-    }
-  }, [open, isError])
-
   const tables = estimate?.table_copy.tables ?? []
   const tableCount = tables.length
   const visibleTables = tables.slice(0, MAX_VISIBLE_TABLES)
   const hiddenTableCount = tableCount - visibleTables.length
   const hasRowFilteredTables = tables.some((table) => table.is_row_filtered)
 
-  // The only two components that are knowable up front; streaming is
-  // usage-based and deliberately excluded from this figure.
   const firstMonthTotal =
     (estimate?.table_copy.total_cost ?? 0) + (estimate?.pipeline.monthly_cost ?? 0)
+
+  useEffect(() => {
+    if (open && isError) onConfirmRef.current()
+  }, [open, isError, onConfirmRef])
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
