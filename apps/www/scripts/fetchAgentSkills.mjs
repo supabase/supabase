@@ -9,10 +9,8 @@
  *
  * Spec: https://github.com/agentskills/agentskills/pull/254
  *
- * Uses GITHUB_TOKEN when set (any CI job has it for free) to get the 5,000/hr
- * authenticated rate limit instead of the 60/hr unauthenticated-per-IP one —
- * on shared CI runners that IP's unauthenticated quota is exhausted by other
- * builds too, causing sporadic 403s here.
+ * Uses GITHUB_TOKEN when set (e.g via CI job during typecheck GHA) for better rate-limits
+ * to get past sporadic 403s
  */
 
 import { promises as fs } from 'node:fs'
@@ -33,7 +31,10 @@ async function main() {
   const authHeaders = process.env.GITHUB_TOKEN
     ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
     : {}
-  const release = await fetchJson(`https://api.github.com/repos/${REPO}/releases/latest`, authHeaders)
+  const release = await fetchJson(
+    `https://api.github.com/repos/${REPO}/releases/latest`,
+    authHeaders
+  )
   console.log(`Fetching agent-skills release: ${release.tag_name}`)
 
   const indexAsset = release.assets.find((a) => a.name === 'index.json')
