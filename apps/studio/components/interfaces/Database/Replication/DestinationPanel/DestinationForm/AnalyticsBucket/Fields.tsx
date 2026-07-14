@@ -255,7 +255,7 @@ export const AnalyticsBucketFields = ({
             name="newNamespaceName"
             render={({ field }) => (
               <FormItemLayout
-                label="New Namespace Name"
+                label="New namespace name"
                 layout="horizontal"
                 description="A unique name for the new namespace"
               >
@@ -273,7 +273,7 @@ export const AnalyticsBucketFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="Catalog Token"
+              label="Catalog token"
               description={
                 editMode ? (
                   'Stored catalog token is hidden and kept automatically.'
@@ -315,7 +315,7 @@ export const AnalyticsBucketFields = ({
           render={({ field }) => (
             <FormItemLayout
               layout="horizontal"
-              label="S3 Access Key ID"
+              label="S3 access key ID"
               description={
                 <div className="flex flex-col gap-y-2">
                   <p>
@@ -403,7 +403,7 @@ export const AnalyticsBucketFields = ({
             render={({ field }) => (
               <FormItemLayout
                 layout="horizontal"
-                label="S3 Secret Access Key"
+                label="S3 secret access key"
                 className="relative"
                 description={
                   editMode
