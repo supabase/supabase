@@ -42,6 +42,8 @@ jobs:
 
       - name: Run TypeScript type check
         run: pnpm run typecheck
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Lint
         run: pnpm run lint
