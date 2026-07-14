@@ -15,7 +15,7 @@ export interface PipelinesProps {
   isLoadingOrgDailyStats: boolean
 }
 
-const Pipelines = ({
+export const Pipelines = ({
   orgSlug,
   projectRef,
   subscription,
@@ -55,5 +55,3 @@ const Pipelines = ({
     />
   )
 }
-
-export default Pipelines

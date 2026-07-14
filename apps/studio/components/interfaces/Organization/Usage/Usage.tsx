@@ -15,7 +15,7 @@ import Activity from './Activity'
 import Compute from './Compute'
 import Egress from './Egress'
 import OrgLogUsage from './OrgLogUsage'
-import Pipelines from './Pipelines'
+import { Pipelines } from './Pipelines'
 import SizeAndCounts from './SizeAndCounts'
 import { TotalUsage } from './TotalUsage'
 import {
