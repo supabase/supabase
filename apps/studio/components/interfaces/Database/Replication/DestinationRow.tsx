@@ -172,9 +172,9 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                   {destinationName || type}
                 </p>
                 <div className="flex items-center gap-x-1.5 text-xs text-foreground-lighter">
-                  <span>{type}</span>
-                  <span aria-hidden>&middot;</span>
                   <span className="font-mono">#{pipeline?.id}</span>
+                  <span aria-hidden>&middot;</span>
+                  <span>{type}</span>
                 </div>
               </div>
             )}
