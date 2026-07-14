@@ -15,6 +15,7 @@ import {
 import { useTableEditorTabsCleanUp } from '../Tabs/Tabs.utils'
 import { EntityListItem } from './EntityListItem'
 import { TableMenuEmptyState } from './TableMenuEmptyState'
+import { TableMenuFilterEmptyState } from './TableMenuFilterEmptyState'
 import { ExportDialog } from '@/components/grid/components/header/ExportDialog'
 import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import { SupaTable } from '@/components/grid/types'
@@ -38,6 +39,8 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
+type Sort = 'alphabetical' | 'grouped-alphabetical'
+
 export const TableEditorMenu = () => {
   const { id: _id, ref: projectRef } = useParams()
   const id = _id ? Number(_id) : undefined
@@ -48,10 +51,7 @@ export const TableEditorMenu = () => {
   const [isSchemaDropdownOpen, setIsSchemaDropdownOpen] = useState(false)
   const [tableToExport, setTableToExport] = useState<SupaTable>()
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
-  const [sort, setSort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
-    'table-editor-sort',
-    'alphabetical'
-  )
+  const [sort, setSort] = useLocalStorage<Sort>('table-editor-sort', 'alphabetical')
 
   const { data: project } = useSelectedProjectQuery()
   const {
@@ -73,6 +73,7 @@ export const TableEditorMenu = () => {
       filterTypes: visibleTypes,
     },
     {
+      enabled: visibleTypes.length > 0,
       placeholderData: Boolean(searchText) ? keepPreviousData : undefined,
     }
   )
@@ -148,6 +149,8 @@ export const TableEditorMenu = () => {
     [project?.ref, id, isSchemaLocked, onSelectExportCLI, apiAccessByTableName]
   )
 
+  const hasFiltersApplied = visibleTypes.length !== 5
+
   useEffect(() => {
     // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
     if (entityTypes && !searchText) {
@@ -221,7 +224,7 @@ export const TableEditorMenu = () => {
             >
               <InnerSideBarFilterSortDropdown
                 value={sort}
-                onValueChange={(value: any) => setSort(value)}
+                onValueChange={(value) => setSort(value as Sort)}
               >
                 <InnerSideBarFilterSortDropdownItem
                   key="alphabetical"
@@ -238,11 +241,12 @@ export const TableEditorMenu = () => {
                 </InnerSideBarFilterSortDropdownItem>
               </InnerSideBarFilterSortDropdown>
             </InnerSideBarFilterSearchInput>
+
             <Popover>
               <PopoverTrigger asChild>
                 <ButtonTooltip
-                  variant={visibleTypes.length !== 5 ? 'default' : 'dashed'}
                   className="h-[32px] md:h-[28px] px-1.5"
+                  variant={hasFiltersApplied ? 'default' : 'dashed'}
                   icon={<Filter />}
                   aria-label="Filter"
                   tooltip={{ content: { side: 'bottom', text: 'Filter' } }}
@@ -286,6 +290,12 @@ export const TableEditorMenu = () => {
               </PopoverContent>
             </Popover>
           </InnerSideBarFilters>
+
+          {visibleTypes.length === 0 && (
+            <TableMenuFilterEmptyState
+              onResetFilters={() => setVisibleTypes(Object.values(ENTITY_TYPE))}
+            />
+          )}
 
           {isLoading && <EditorMenuListSkeleton />}
 
