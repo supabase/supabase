@@ -20,7 +20,7 @@ import { Button, cn } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 
-import SectionContainerWithCn from '../../../../components/Layouts/SectionContainerWithCn'
+import SectionContainerWithCn from '@/components/Layouts/SectionContainerWithCn'
 
 function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
   return {
@@ -120,7 +120,7 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
 
       <DefaultLayout>
         <div className="relative h-auto w-full">
-          <SectionContainerWithCn height="narrow" className="col-span-12  lg:col-span-2">
+          <SectionContainerWithCn height="narrow" className="col-span-12 lg:col-span-2">
             {/* Back button */}
             <Link
               href="/partners/catalog"
@@ -154,33 +154,35 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
               )}
             </div>
           </SectionContainerWithCn>
-          <SectionContainerWithCn
-            height="none"
-            className="border-b overflow-x-scroll overflow-y-hidden"
-            ref={tabsRef}
-          >
-            {/* Listings tabs */}
-            <div className="flex">
-              {allListings.map((listing, i) => (
-                <button
-                  key={listing.slug}
-                  type="button"
-                  onClick={() => {
-                    setActiveSlug(listing.slug)
-                    setFocusedImage(null)
-                  }}
-                  className={cn(
-                    'px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap hover:cursor-pointer',
-                    activeTabIndex === i
-                      ? 'border-foreground text-foreground'
-                      : 'border-transparent text-foreground-lighter hover:text-foreground'
-                  )}
-                >
-                  {listing.label}
-                </button>
-              ))}
-            </div>
-          </SectionContainerWithCn>
+          <div className="border-b">
+            <SectionContainerWithCn
+              height="none"
+              className="overflow-x-scroll overflow-y-hidden"
+              ref={tabsRef}
+            >
+              {/* Listings tabs */}
+              <div className="flex">
+                {allListings.map((listing, i) => (
+                  <button
+                    key={listing.slug}
+                    type="button"
+                    onClick={() => {
+                      setActiveSlug(listing.slug)
+                      setFocusedImage(null)
+                    }}
+                    className={cn(
+                      'px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors whitespace-nowrap hover:cursor-pointer',
+                      activeTabIndex === i
+                        ? 'border-foreground text-foreground'
+                        : 'border-transparent text-foreground-lighter hover:text-foreground'
+                    )}
+                  >
+                    {listing.label}
+                  </button>
+                ))}
+              </div>
+            </SectionContainerWithCn>
+          </div>
 
           {/* Images for active listing */}
           {(activeListing.images?.length ?? 0) > 0 && (

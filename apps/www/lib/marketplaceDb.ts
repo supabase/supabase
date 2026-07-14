@@ -53,18 +53,6 @@ export function isMarketplaceListing(listing: CatalogListing): boolean {
 // Excluded from listing, detail, slug generation, and search.
 const PRE_LAUNCH_CATALOG_BLOCKLIST = new Set<string>([])
 
-// Listings that must show as "Integration", never "Dashboard Integration",
-// regardless of what published_in_marketplace_at is set to in the DB.
-const PLAIN_INTEGRATION_SLUGS = new Set([
-  'aikido',
-  'aikido-security',
-  'doppler',
-  'stripe-sync-engine',
-])
-
-// Listings that must show as "Guide", regardless of marketplace_url or DB flags.
-const GUIDE_SLUGS = new Set(['resend'])
-
 /** Returns true if a listing is a Foreign Data Wrapper (FDW). */
 function isFdwListing(listing: CatalogListing): boolean {
   return !!listing.categories?.some(
@@ -210,19 +198,12 @@ async function getPartnersFromMarketplace(): Promise<Partner[]> {
 }
 
 /**
- * Derives a human-readable tab label from a listing's metadata.
- * Priority: one-click install → Foreign Data Wrapper → plain integration → guide/overview.
- * FDW listings use their own title (e.g. "BigQuery Wrapper") rather than the generic
- * "Foreign Data Wrapper" string, so partners with more than one FDW (e.g. Amazon's S3 and
- * Redshift wrappers) get distinct, identifiable tabs instead of two identical labels.
+ * Derives a human-readable tab label from a listing's metadata — always the listing's own
+ * title (e.g. "BigQuery Wrapper", "Stripe Sync Engine"), so partners with more than one listing
+ * get distinct, identifiable tabs instead of generic "Guide"/"Integration" labels.
  */
 function getLabelForListing(listing: CatalogListing): string {
-  if (isFdwListing(listing)) return listing.title || 'Foreign Data Wrapper'
-  if (GUIDE_SLUGS.has(listing.slug)) return 'Guide'
-  if (listing.published_in_marketplace && !PLAIN_INTEGRATION_SLUGS.has(listing.slug))
-    return 'Dashboard Integration'
-  if (listing.marketplace_url || PLAIN_INTEGRATION_SLUGS.has(listing.slug)) return 'Integration'
-  return 'Guide'
+  return listing.title || listing.slug || 'Listing'
 }
 
 /**
