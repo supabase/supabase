@@ -10,6 +10,7 @@ import policies from './pg-meta-policies'
 import publications from './pg-meta-publications'
 import roles from './pg-meta-roles'
 import schemas from './pg-meta-schemas'
+import sequences from './pg-meta-sequences'
 import tablePrivileges from './pg-meta-table-privileges'
 import * as tables from './pg-meta-tables'
 import triggers from './pg-meta-triggers'
@@ -53,6 +54,7 @@ export type { PGView } from './pg-meta-views'
 export type { PGMaterializedView } from './pg-meta-materialized-views'
 export type { PGForeignTable } from './pg-meta-foreign-tables'
 export type { PGSchema } from './pg-meta-schemas'
+export type { PGSequence } from './pg-meta-sequences'
 export type { PGPublication } from './pg-meta-publications'
 export type { PGType } from './pg-meta-types'
 
@@ -60,6 +62,7 @@ export default {
   roles,
   columns,
   schemas,
+  sequences,
   tables,
   functions,
   tablePrivileges,
