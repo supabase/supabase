@@ -87,7 +87,8 @@ export const FeatureFlagProvider = ({
   projectRef?: string
   /** Custom fetcher for ConfigCat flags if passing in custom attributes */
   getConfigCatFlags?: (
-    userEmail?: string
+    userEmail?: string,
+    projectRef?: string
   ) => Promise<{ settingKey: string; settingValue: boolean | number | string | null | undefined }[]>
 }>) => {
   const { isLoading } = useAuth()
@@ -159,8 +160,8 @@ export const FeatureFlagProvider = ({
           : Promise.resolve({}),
         loadCCFlags
           ? typeof getConfigCatFlags === 'function'
-            ? getConfigCatFlags(userEmail)
-            : getDefaultConfigCatFlags(userEmail)
+            ? getConfigCatFlags(userEmail, resolvedProjectRef)
+            : getDefaultConfigCatFlags(userEmail, undefined, resolvedProjectRef)
           : Promise.resolve([]),
       ])
 
