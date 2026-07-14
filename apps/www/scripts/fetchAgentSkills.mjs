@@ -8,9 +8,7 @@
  * URLs — no rewriting needed on this side.
  *
  * Spec: https://github.com/agentskills/agentskills/pull/254
- *
- * Uses GITHUB_TOKEN when set (e.g via CI job during typecheck GHA) for better rate-limits
- * to get past sporadic 403s
+ * Runs unauthenticated — public repo, build-time only.
  */
 
 import { promises as fs } from 'node:fs'
@@ -21,20 +19,14 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const OUT_DIR = join(__dirname, '..', 'public', '.well-known', 'agent-skills')
 const REPO = 'supabase/agent-skills'
 
-async function fetchJson(url, extraHeaders = {}) {
-  const res = await fetch(url, { headers: { 'User-Agent': 'supabase-www-build', ...extraHeaders } })
+async function fetchJson(url) {
+  const res = await fetch(url, { headers: { 'User-Agent': 'supabase-www-build' } })
   if (!res.ok) throw new Error(`GET ${url} → ${res.status}`)
   return res.json()
 }
 
 async function main() {
-  const authHeaders = process.env.GITHUB_TOKEN
-    ? { Authorization: `Bearer ${process.env.GITHUB_TOKEN}` }
-    : {}
-  const release = await fetchJson(
-    `https://api.github.com/repos/${REPO}/releases/latest`,
-    authHeaders
-  )
+  const release = await fetchJson(`https://api.github.com/repos/${REPO}/releases/latest`)
   console.log(`Fetching agent-skills release: ${release.tag_name}`)
 
   const indexAsset = release.assets.find((a) => a.name === 'index.json')
