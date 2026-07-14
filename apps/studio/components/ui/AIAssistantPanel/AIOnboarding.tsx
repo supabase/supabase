@@ -36,12 +36,7 @@ export const AIOnboarding = ({
       : defaultPrompts
 
   const { ref: projectRef } = useParams()
-  const {
-    data: lints,
-    isPending: isLoadingLints,
-    isFetching: isFetchingLints,
-  } = useProjectLintsQuery({ projectRef })
-  const isLintsLoading = isLoadingLints || isFetchingLints
+  const { data: lints, isLoading: isLoadingLints } = useProjectLintsQuery({ projectRef })
 
   const errorLints: Lint[] = (lints?.filter((lint) => lint.level === LINTER_LEVELS.ERROR) ??
     []) as Lint[]
@@ -52,7 +47,14 @@ export const AIOnboarding = ({
     <div className="flex-1 overflow-y-auto">
       <div className="w-full flex-1 max-h-full min-h-full px-4 flex flex-col gap-0">
         <div className="mt-auto w-full space-y-6 py-8 ">
-          <h2 className="heading-section text-foreground mx-4">How can I assist you?</h2>
+          <motion.h2
+            className="heading-section text-foreground mx-4"
+            initial={{ y: 5, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.3 }}
+          >
+            How can I assist you?
+          </motion.h2>
           {suggestions?.prompts?.length ? (
             <div>
               <h3 className="heading-meta text-foreground-light mb-3 mx-4">Suggestions</h3>
@@ -82,10 +84,11 @@ export const AIOnboarding = ({
             </div>
           ) : (
             <>
-              {isLintsLoading ? (
+              {isLoadingLints ? (
                 <div className="px-4 flex flex-col gap-2">
+                  <Skeleton className="h-5 w-20" />
                   {Array.from({ length: 6 }).map((_, index) => (
-                    <Skeleton key={`loader-${index}`} className="h-4 w-full" />
+                    <Skeleton key={`loader-${index}`} className="h-7 w-full" />
                   ))}
                 </div>
               ) : (
