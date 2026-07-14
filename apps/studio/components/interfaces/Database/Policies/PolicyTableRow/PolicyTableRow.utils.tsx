@@ -1,6 +1,8 @@
 import { ident, joinSqlFragments, safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import type { PGPolicy } from '@supabase/pg-meta'
+import { ReactNode } from 'react'
 
+import { InlineLink } from '@/components/ui/InlineLink'
 import type { TableApiAccessData } from '@/data/privileges/table-api-access-query'
 
 export type Policy = Omit<PGPolicy, 'definition' | 'check'> & {
@@ -14,7 +16,6 @@ export type Policy = Omit<PGPolicy, 'definition' | 'check'> & {
  * page's ExposedTableSelector so the two views agree on what counts as exposed.
  */
 export type TableDataApiStatus =
-  | 'schema-not-exposed' // schema isn't in the PostgREST exposed list
   | 'no-grants' // schema exposed, no API roles have any privileges (revoked)
   | 'custom-grants' // schema exposed, partial / non-standard grants
   | 'publicly-readable' // fully granted + RLS disabled (dangerous)
@@ -23,17 +24,14 @@ export type TableDataApiStatus =
   | 'unknown' // privileges query is still loading or errored — caller should stay silent
 
 export function getTableDataApiStatus({
-  isSchemaExposed,
   apiAccessData,
   isRLSEnabled,
   policiesCount,
 }: {
-  isSchemaExposed: boolean
   apiAccessData: TableApiAccessData | undefined
   isRLSEnabled: boolean
   policiesCount: number
 }): TableDataApiStatus {
-  if (!isSchemaExposed) return 'schema-not-exposed'
   if (apiAccessData?.apiAccessType === 'exposed-schema-no-grants') return 'no-grants'
   if (apiAccessData?.apiAccessType === 'access') {
     if (apiAccessData.grantStatus === 'custom') return 'custom-grants'
@@ -52,16 +50,37 @@ export function getTableDataApiStatus({
  * admonition (the "everything is fine" `secured` case and the orthogonal
  * `schema-not-exposed` case which is rendered separately with a link).
  */
-export function getTableAdmonitionMessage(status: TableDataApiStatus): string | null {
+export function getTableAdmonitionMessage({
+  status,
+  ref = '_',
+}: {
+  status: TableDataApiStatus
+  ref?: string
+}): ReactNode | null {
   switch (status) {
     case 'custom-grants':
-      return 'This table has custom Data API permissions — access may be restricted for some roles or operations.'
+      return (
+        <p>
+          This table has custom Data API permissions — access may be restricted for some roles or
+          operations.
+        </p>
+      )
     case 'no-grants':
-      return 'This table cannot be accessed via the Data API. Enable access in your project’s Data API settings.'
+      return (
+        <p>
+          This table cannot be accessed via the Data API. Enable access in your project’s{' '}
+          <InlineLink href={`/project/${ref}/integrations/data_api/settings`}>
+            Data API settings
+          </InlineLink>
+          .
+        </p>
+      )
     case 'publicly-readable':
-      return 'This table can be accessed by anyone via the Data API as RLS is disabled.'
+      return <p>This table can be accessed by anyone via the Data API as RLS is disabled.</p>
     case 'locked-by-rls':
-      return 'No data will be returned via the Data API as no RLS policies exist on this table.'
+      return (
+        <p>No data will be returned via the Data API as no RLS policies exist on this table.</p>
+      )
     default:
       return null
   }

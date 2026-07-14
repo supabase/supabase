@@ -1,3 +1,4 @@
+import { CONTENT_LISTINGS } from '~/data/content-listings'
 import { storageGetStarted } from '~/data/content-listings/storage.data'
 import {
   ContentListings as ContentListingsMarkdownHandler,
@@ -5,6 +6,21 @@ import {
 } from '~/internals/markdown-schema/ContentListings'
 import { isExternalContentListingHref } from '~/lib/content-listings.utils'
 import { describe, expect, it } from 'vitest'
+
+const SUPABASE_DASHBOARD_ORIGIN = 'https://supabase.com/dashboard'
+
+function isDashboardHref(href: string): boolean {
+  try {
+    const url = new URL(href, 'https://supabase.com')
+    return url.pathname === '/dashboard' || url.pathname.startsWith('/dashboard/')
+  } catch {
+    return href === '/dashboard' || href.startsWith('/dashboard/')
+  }
+}
+
+function isAbsoluteSupabaseDashboardHref(href: string): boolean {
+  return href === SUPABASE_DASHBOARD_ORIGIN || href.startsWith(`${SUPABASE_DASHBOARD_ORIGIN}/`)
+}
 
 describe('isExternalContentListingHref', () => {
   it('treats protocol-relative URLs as external', () => {
@@ -147,6 +163,25 @@ describe('ContentListings markdown handler', () => {
     const handler = ContentListingsMarkdownHandler({ props: { id: 'storage-get-started' } })
     const direct = serializeContentListingGroupToMarkdown(storageGetStarted, '')
     expect(handler).toBe(direct)
+  })
+})
+
+describe('dashboard content listing hrefs', () => {
+  // Root-relative /dashboard hrefs get the docs basePath and 404; use absolute URLs.
+  it('uses absolute https://supabase.com dashboard URLs', () => {
+    const dashboardLinks = Object.values(CONTENT_LISTINGS).flatMap((group) =>
+      group.items
+        .filter((item) => isDashboardHref(item.href))
+        .map((item) => ({ listingId: group.id, title: item.title, href: item.href }))
+    )
+
+    expect(dashboardLinks.length).toBeGreaterThan(0)
+
+    const relativeOrNonCanonical = dashboardLinks.filter(
+      (link) => !isAbsoluteSupabaseDashboardHref(link.href)
+    )
+
+    expect(relativeOrNonCanonical).toEqual([])
   })
 })
 

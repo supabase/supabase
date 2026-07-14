@@ -1,0 +1,58 @@
+name: zizmor
+
+on:
+  pull_request:
+    branches:
+      - 'master'
+    paths:
+      - '.github/workflows/**'
+      - 'zizmor.yml'
+
+# Cancel old builds on new commit for same workflow + branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  ZIZMOR_VERSION: 1.26.1
+
+jobs:
+  zizmor:
+    name: zizmor
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
+        with:
+          persist-credentials: false
+          sparse-checkout: |
+            .github/workflows
+            zizmor.yml
+
+      - name: Cache zizmor binary
+        id: cache-zizmor
+        uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
+        with:
+          path: ~/.local/bin/zizmor
+          key: zizmor-${{ runner.os }}-${{ runner.arch }}-${{ env.ZIZMOR_VERSION }}
+
+      - name: Download zizmor
+        if: steps.cache-zizmor.outputs.cache-hit != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          archive="zizmor-x86_64-unknown-linux-gnu.tar.gz"
+          curl -sSLO "https://github.com/zizmorcore/zizmor/releases/download/v${ZIZMOR_VERSION}/${archive}"
+          gh attestation verify "${archive}" --repo zizmorcore/zizmor
+          mkdir -p ~/.local/bin
+          tar -xzf "${archive}" -C ~/.local/bin zizmor
+          chmod +x ~/.local/bin/zizmor
+
+      - name: Run zizmor
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: ~/.local/bin/zizmor --config zizmor.yml .github/workflows
