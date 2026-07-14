@@ -217,8 +217,8 @@ export const PipelineCostDialog = ({
 
             {hasRowFilteredTables ? (
               <p className="text-xs text-foreground-lighter">
-                Some of these tables only replicate part of their data, so actual costs may be
-                lower than shown.
+                Some of these tables only replicate part of their data, so actual costs may be lower
+                than shown.
               </p>
             ) : null}
           </DialogSection>
