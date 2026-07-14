@@ -69,7 +69,7 @@ export function TimelineChart<TChart extends BaseChartSchema>({
   }, [data])
 
   const bucketWidthMs = useMemo(
-    () => (data.length > 1 ? data[1].timestamp - data[0].timestamp : 0),
+    () => (data.length > 1 ? Math.abs(data[1].timestamp - data[0].timestamp) : 0),
     [data]
   )
 
