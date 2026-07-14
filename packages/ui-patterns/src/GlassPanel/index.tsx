@@ -17,6 +17,7 @@ interface Props {
   hasLightIcon?: boolean
   showLink?: boolean
   showIconBg?: boolean
+  badge?: React.ReactNode
 }
 
 const IconBackground = ({
@@ -71,6 +72,7 @@ export const GlassPanel = ({
   hasLightIcon,
   showLink = false,
   showIconBg = false,
+  badge,
   className,
 }: Props) => {
   const { resolvedTheme } = useTheme()
@@ -143,7 +145,10 @@ export const GlassPanel = ({
           ) : (
             icon && <IconBackground showIconBg={showIconBg}>{icon}</IconBackground>
           )}
-          <p className="text-base text-foreground">{title}</p>
+          <p className="text-base text-foreground flex items-center gap-2">
+            {title}
+            {badge}
+          </p>
         </div>
 
         {children && <span className="text-sm text-foreground-light grow">{children}</span>}

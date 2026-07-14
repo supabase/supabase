@@ -1,4 +1,3 @@
-import type { Monaco } from '@monaco-editor/react'
 import {
   acceptUntrustedSql,
   untrustedSql,
@@ -10,23 +9,14 @@ import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import { Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useState } from 'react'
 import { toast } from 'sonner'
 import { cn, ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
 
 import { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
 import { RunQueryWarningModal } from './RunQueryWarningModal'
-import {
-  generateSnippetTitle,
-  sqlAiDisclaimerComment,
-  untitledSnippetTitle,
-} from './SQLEditor.constants'
-import {
-  DiffType,
-  IStandaloneCodeEditor,
-  IStandaloneDiffEditor,
-  type PotentialIssues,
-} from './SQLEditor.types'
+import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
+import { DiffType, type PotentialIssues } from './SQLEditor.types'
 import {
   appendEnableRLSStatements,
   assembleCompletionDiff,
@@ -35,16 +25,19 @@ import {
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
-  computeErrorHighlightLine,
   createSqlSnippetSkeletonV2,
   filterTablesCoveredByEnsureRLSTrigger,
   getCreateTablesMissingRLS,
-  getEditorSql,
   hasActiveEnsureRLSTrigger,
   isUpdateWithoutWhere,
   suffixWithLimit,
 } from './SQLEditor.utils'
+import { SQLEditorProvider, useSQLEditorContext } from './SQLEditorContext'
 import { useAddDefinitions } from './useAddDefinitions'
+import { useEditorMount } from './useEditorMount'
+import { usePrettifyQuery } from './usePrettifyQuery'
+import { useSnippetIdentity } from './useSnippetIdentity'
+import { useSnippetTitleGenerator } from './useSnippetTitleGenerator'
 import { UtilityActions } from './UtilityPanel/UtilityActions'
 import { UtilityPanel } from './UtilityPanel/UtilityPanel'
 import {
@@ -53,7 +46,6 @@ import {
 } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import ResizableAIWidget from '@/components/ui/AIEditor/ResizableAIWidget'
-import { useSqlTitleGenerateMutation } from '@/data/ai/sql-title-mutation'
 import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
 import { constructHeaders, isValidConnString } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
@@ -63,7 +55,6 @@ import { isError } from '@/data/utils/error-check'
 import { useOrgAiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { generateUuid } from '@/lib/api/snippets.browser'
 import { BASE_PATH } from '@/lib/constants'
 import { formatSql } from '@/lib/formatSql'
 import { detectOS } from '@/lib/helpers'
@@ -97,10 +88,24 @@ const DiffEditor = dynamic(
   { ssr: false }
 )
 
-export const SQLEditor = () => {
+const SQLEditorContent = () => {
+  const {
+    editorRef,
+    monacoRef,
+    diffEditorRef,
+    scrollTopRef,
+    refocusEditor,
+    clearPendingRunRefocus,
+    markRefocusAfterRun,
+    refocusEditorAfterRunIfNeeded,
+    getEditorSql: getEditorSqlFromEditor,
+    clearHighlights,
+    applyErrorHighlight,
+  } = useSQLEditorContext()
+
   const os = detectOS()
   const router = useRouter()
-  const { ref, id: urlId } = useParams()
+  const { ref } = useParams()
 
   const { profile } = useProfile()
   const { data: project } = useSelectedProjectQuery()
@@ -133,28 +138,12 @@ export const SQLEditor = () => {
   const { promptState, setPromptState, promptInput, setPromptInput, resetPrompt } =
     useSqlEditorPrompt()
 
-  const editorRef = useRef<IStandaloneCodeEditor | null>(null)
-  const monacoRef = useRef<Monaco | null>(null)
-  const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
-  const scrollTopRef = useRef<number>(0)
-  const shouldRefocusAfterRunRef = useRef(false)
-
   const [hasSelection, setHasSelection] = useState<boolean>(false)
-  const [lineHighlights, setLineHighlights] = useState<string[]>([])
   const [isDiffEditorMounted, setIsDiffEditorMounted] = useState(false)
   const [potentialIssues, setPotentialIssues] = useState<PotentialIssues>()
 
   const [showWidget, setShowWidget] = useState(false)
-  // Bumped on every editor mount (including the keyed remount on snippet switch)
-  // so a diff request that arrived before the editor was ready gets re-processed.
-  const [editorMountCount, setEditorMountCount] = useState(0)
   const [activeUtilityTab, setActiveUtilityTab] = useState<string>('results')
-
-  const refocusEditor = useCallback(() => {
-    requestAnimationFrame(() => {
-      setTimeout(() => editorRef.current?.focus(), 0)
-    })
-  }, [])
 
   useShortcut(SHORTCUT_IDS.SQL_EDITOR_FOCUS_EDITOR, refocusEditor, {
     registerInCommandMenu: true,
@@ -172,32 +161,10 @@ export const SQLEditor = () => {
     registerInCommandMenu: true,
   })
 
-  const clearPendingRunRefocus = useCallback(() => {
-    shouldRefocusAfterRunRef.current = false
-  }, [])
-
-  const refocusEditorAfterRunIfNeeded = useCallback(() => {
-    if (!shouldRefocusAfterRunRef.current) return
-
-    shouldRefocusAfterRunRef.current = false
-    refocusEditor()
-  }, [refocusEditor])
-
-  // generate a new snippet title and an id to be used for new snippets. The dependency on urlId is to avoid a bug which
-  // shows up when clicking on the SQL Editor while being in the SQL editor on a random snippet.
-  const [generatedNewSnippetName, generatedId] = useMemo(() => {
-    const name = generateSnippetTitle()
-    return [name, generateUuid([`${name}.sql`])]
-  }, [urlId])
-
-  // the id is stable across renders - it depends either on the url or on the memoized generated id
-  const id = !urlId || urlId === 'new' ? generatedId : urlId
+  const { id, urlId, generatedNewSnippetName, isLoading } = useSnippetIdentity()
+  const { onMount, editorMountCount } = useEditorMount({ id })
 
   const limit = sessionSnap.limit
-  const snippetIsLoading = !(
-    id in snapV2.snippets && snapV2.snippets[id].snippet.content !== undefined
-  )
-  const isLoading = urlId === 'new' ? false : snippetIsLoading
 
   useAddDefinitions(id, monacoRef.current)
 
@@ -217,7 +184,7 @@ export const SQLEditor = () => {
   )
 
   /* React query mutations */
-  const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
+  const { generateSqlTitle, setAiTitle } = useSnippetTitleGenerator()
   const track = useTrack()
   const { mutate: execute, isPending: isExecuting } = useExecuteSqlMutation({
     onSuccess(data, vars) {
@@ -239,34 +206,7 @@ export const SQLEditor = () => {
     },
     onError(error: any, vars) {
       if (id) {
-        if (error.position && monacoRef.current) {
-          const editor = editorRef.current
-          const monaco = monacoRef.current
-
-          const startLineNumber = hasSelection ? (editor?.getSelection()?.startLineNumber ?? 0) : 0
-
-          const line = computeErrorHighlightLine(error, startLineNumber)
-
-          if (!isNaN(line)) {
-            const decorations = editor?.deltaDecorations(
-              [],
-              [
-                {
-                  range: new monaco.Range(line, 1, line, 20),
-                  options: {
-                    isWholeLine: true,
-                    inlineClassName: 'bg-warning-400',
-                  },
-                },
-              ]
-            )
-            if (decorations) {
-              editor?.revealLineInCenter(line)
-              setLineHighlights(decorations)
-            }
-          }
-        }
-
+        applyErrorHighlight(error, hasSelection)
         sessionSnap.addResultError(id, error, vars.autoLimit)
       }
 
@@ -289,45 +229,7 @@ export const SQLEditor = () => {
     },
   })
 
-  const setAiTitle = useCallback(
-    async (id: string, sql: string) => {
-      try {
-        const { title: name } = await generateSqlTitle({ sql })
-        snapV2.updateSnippet({ id, snippet: { name } })
-        snapV2.addNeedsSaving(id)
-        const tabId = createTabId('sql', { id })
-        tabs.updateTab(tabId, { label: name })
-      } catch (error) {
-        // [Joshen] No error handler required as this happens in the background and not necessary to ping the user
-      }
-    },
-    [generateSqlTitle, snapV2]
-  )
-
-  const prettifyQuery = useCallback(async () => {
-    if (isDiffOpen) return
-
-    // use the latest state
-    const state = getSqlEditorV2StateSnapshot()
-    const snippet = state.snippets[id]
-
-    if (editorRef.current && project) {
-      const editor = editorRef.current
-      const sql = getEditorSql(editor, snippet?.snippet.content?.unchecked_sql)
-      const formattedSql = formatSql(sql)
-
-      const editorModel = editorRef?.current?.getModel()
-      if (editorRef.current && editorModel) {
-        editorRef.current.executeEdits('apply-prettify-edit', [
-          {
-            text: formattedSql,
-            range: editorModel.getFullModelRange(),
-          },
-        ])
-        snapV2.setSql({ id, sql: formattedSql })
-      }
-    }
-  }, [id, isDiffOpen, project, snapV2])
+  const prettifyQuery = usePrettifyQuery({ id, isDiffOpen })
 
   useShortcut(SHORTCUT_IDS.SQL_EDITOR_FORMAT, prettifyQuery, {
     registerInCommandMenu: true,
@@ -338,11 +240,9 @@ export const SQLEditor = () => {
   // explain gesture handlers below — never inside the longer execute* helpers,
   // which by construction only accept already-reviewed SafeSqlFragments.
   const readEditorSql = useCallback((): UntrustedSqlFragment | undefined => {
-    const editor = editorRef.current
-    if (!editor) return undefined
     const snippet = getSqlEditorV2StateSnapshot().snippets[id]
-    return getEditorSql(editor, snippet?.snippet.content?.unchecked_sql)
-  }, [id])
+    return getEditorSqlFromEditor(snippet?.snippet.content?.unchecked_sql)
+  }, [getEditorSqlFromEditor, id])
 
   const executeQuery = useCallback(
     async (sql: SafeSqlFragment, force: boolean = false) => {
@@ -394,10 +294,7 @@ export const SQLEditor = () => {
         setAiTitle(id, sql)
       }
 
-      if (lineHighlights.length > 0) {
-        editorRef.current?.deltaDecorations(lineHighlights, [])
-        setLineHighlights([])
-      }
+      clearHighlights()
 
       const impersonatedRoleState = getImpersonatedRoleState()
       const connectionString = databases?.find(
@@ -447,12 +344,12 @@ export const SQLEditor = () => {
 
   // Run gesture from the toolbar button: promote here, then run.
   const executeQueryFromButton = useCallback(() => {
-    shouldRefocusAfterRunRef.current = true
+    markRefocusAfterRun()
     refocusEditor()
     const sql = readEditorSql()
     if (sql === undefined) return clearPendingRunRefocus()
     void executeQuery(acceptUntrustedSql(sql))
-  }, [clearPendingRunRefocus, executeQuery, readEditorSql, refocusEditor])
+  }, [clearPendingRunRefocus, executeQuery, markRefocusAfterRun, readEditorSql, refocusEditor])
 
   // Run gesture from the editor (Cmd/Ctrl+Enter): promote here, then run.
   const handleRunShortcut = useCallback(() => {
@@ -476,10 +373,7 @@ export const SQLEditor = () => {
           return
         }
 
-        if (lineHighlights.length > 0) {
-          editorRef.current?.deltaDecorations(lineHighlights, [])
-          setLineHighlights([])
-        }
+        clearHighlights()
 
         const impersonatedRoleState = getImpersonatedRoleState()
         const connectionString = databases?.find(
@@ -506,6 +400,7 @@ export const SQLEditor = () => {
       }
     },
     [
+      editorRef,
       isDiffOpen,
       id,
       isExplainExecuting,
@@ -514,7 +409,7 @@ export const SQLEditor = () => {
       getImpersonatedRoleState,
       databaseSelectorState.selectedDatabaseId,
       databases,
-      lineHighlights,
+      clearHighlights,
       sessionSnap,
     ]
   )
@@ -553,21 +448,6 @@ export const SQLEditor = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [profile?.id, project?.id, ref, router, snapV2]
   )
-
-  const onMount = (editor: IStandaloneCodeEditor) => {
-    setEditorMountCount((count) => count + 1)
-
-    const tabId = createTabId('sql', { id })
-    const tabData = tabs.tabsMap[tabId]
-
-    // [Joshen] Tiny timeout to give a bit of time for the content to load before scrolling
-    setTimeout(() => {
-      if (tabData?.metadata?.scrollTop) {
-        editor.setScrollTop(tabData.metadata.scrollTop)
-      }
-    }, 20)
-    editor.onDidScrollChange((e) => (scrollTopRef.current = e.scrollTop))
-  }
 
   const buildDebugPrompt = useCallback(() => {
     const snippet = snapV2.snippets[id]
@@ -746,19 +626,24 @@ export const SQLEditor = () => {
 
   /** All useEffects are at the bottom before returning the TSX */
 
-  useEffect(() => {
+  const resetDiff = useEffectEvent(() => {
     if (id) {
       closeDiff()
       setPromptState((prev) => ({ ...prev, isOpen: false }))
     }
-    return () => {
-      if (ref) {
-        const tabId = createTabId('sql', { id })
-        tabs.updateTab(tabId, { scrollTop: scrollTopRef.current })
-      }
+  })
+  const saveScrollPosition = useEffectEvent((snippetId: string) => {
+    if (ref) {
+      const tabId = createTabId('sql', { id: snippetId })
+      tabs.updateTab(tabId, { scrollTop: scrollTopRef.current })
     }
+  })
+  useEffect(() => {
+    resetDiff()
+    return () => saveScrollPosition(id)
+    // Temporary until we update eslint to ignore useEffectEvent
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [closeDiff, id])
+  }, [id])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -780,7 +665,15 @@ export const SQLEditor = () => {
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [os, isDiffOpen, promptState.isOpen, acceptAiHandler, discardAiHandler, resetPrompt])
+  }, [
+    editorRef,
+    os,
+    isDiffOpen,
+    promptState.isOpen,
+    acceptAiHandler,
+    discardAiHandler,
+    resetPrompt,
+  ])
 
   useEffect(() => {
     if (isDiffOpen) {
@@ -851,7 +744,7 @@ export const SQLEditor = () => {
       setShowWidget(true)
       return () => setShowWidget(false)
     }
-  }, [isDiffOpen, isDiffEditorMounted])
+  }, [diffEditorRef, isDiffOpen, isDiffEditorMounted])
 
   return (
     <>
@@ -864,7 +757,7 @@ export const SQLEditor = () => {
           refocusEditor()
         }}
         onConfirm={() => {
-          shouldRefocusAfterRunRef.current = true
+          markRefocusAfterRun()
           setPotentialIssues(undefined)
           refocusEditor()
           // The user has reviewed the warning and confirmed — promote here.
@@ -877,7 +770,7 @@ export const SQLEditor = () => {
           if (tables.length === 0) return
           const baseSql = readEditorSql() ?? untrustedSql('')
           const rewrittenSql = appendEnableRLSStatements(baseSql, tables)
-          shouldRefocusAfterRunRef.current = true
+          markRefocusAfterRun()
           setPotentialIssues(undefined)
           refocusEditor()
           // The user has reviewed the warning and confirmed — promote here.
@@ -1039,3 +932,9 @@ export const SQLEditor = () => {
     </>
   )
 }
+
+export const SQLEditor = () => (
+  <SQLEditorProvider>
+    <SQLEditorContent />
+  </SQLEditorProvider>
+)
