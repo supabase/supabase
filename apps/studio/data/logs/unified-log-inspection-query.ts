@@ -20,6 +20,7 @@ import {
   getPostgrestServiceFlowQuery,
   getStorageServiceFlowQuery,
 } from '@/components/interfaces/UnifiedLogs/Queries/ServiceFlowQueries/ServiceFlow.sql'
+import { LOG_TYPE_TO_SOURCE } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -36,14 +37,16 @@ export type ServiceFlowType = (typeof SERVICE_FLOW_TYPES)[number]
 
 // The logs table's primary key is (project, source, timestamp) — filtering on
 // source narrows the sorted range ClickHouse has to scan before the timestamp
-// bound even applies, so it matters for performance, not just correctness
-// (mirrors the `type` -> `source` mapping in UnifiedLogs.queries.ts's LOG_TYPE_CONDITION).
+// bound even applies, so it matters for performance, not just correctness.
+// Values are drawn from LOG_TYPE_TO_SOURCE (shared with LOG_TYPE_CONDITION in
+// UnifiedLogs.queries.ts) so there's one source of truth for the type -> source
+// mapping; only the key spelling differs ('edge-function' vs 'edge function').
 const SERVICE_FLOW_TYPE_SOURCE: Record<ServiceFlowType, SafeLogSqlFragment> = {
-  postgrest: safeSql`'postgrest_logs'`,
-  auth: safeSql`'auth_logs'`,
-  'edge-function': safeSql`'function_edge_logs'`,
-  storage: safeSql`'storage_logs'`,
-  postgres: safeSql`'postgres_logs'`,
+  postgrest: lit(LOG_TYPE_TO_SOURCE.postgrest),
+  auth: lit(LOG_TYPE_TO_SOURCE.auth),
+  'edge-function': lit(LOG_TYPE_TO_SOURCE['edge function']),
+  storage: lit(LOG_TYPE_TO_SOURCE.storage),
+  postgres: lit(LOG_TYPE_TO_SOURCE.postgres),
 }
 
 export type UnifiedLogInspectionVariables = {
