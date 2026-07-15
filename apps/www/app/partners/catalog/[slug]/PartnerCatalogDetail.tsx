@@ -331,6 +331,7 @@ function PartnerDetails({
         {activeListing.youtubeId && (
           <ExpandableVideo
             videoId={activeListing.youtubeId}
+            imgUrl={`https://img.youtube.com/vi/${activeListing.youtubeId}/0.jpg`}
             imgOverlayText="Watch an introductory video"
             triggerContainerClassName="w-full"
           />
