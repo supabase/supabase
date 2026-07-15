@@ -88,9 +88,9 @@ async function getPartnersImpl() {
         return [{ name: listingName, url: catalogUrl as `https://${string}` }]
       }
 
-      // otherwise show partner name plus listing name (or slug if no title).
+      // otherwise show listing name (or slug if no title) plus partner name.
       return partnerListings.map((listing) => ({
-        name: `${partnerName} (${listing.title || listing.slug})`,
+        name: `${listing.title || listing.slug} (${partnerName})`,
         url: `${catalogUrl}?tab=${listing.slug}` as `https://${string}`,
       }))
     }),
