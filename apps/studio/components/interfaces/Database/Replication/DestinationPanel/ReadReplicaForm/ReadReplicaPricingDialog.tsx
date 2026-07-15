@@ -1,4 +1,5 @@
 import {
+  Card,
   cn,
   Dialog,
   DialogContent,
@@ -57,48 +58,52 @@ export const ReadReplicaPricingDialog = () => {
                 Read replicas will match the compute size of your primary database and will include
                 25% more disk size than the primary database to accommodate WAL files.
               </p>
+
               <p className="text-foreground-light text-sm">
                 The additional cost for the replica breaks down to:
               </p>
-              <Table>
-                <TableHeader className="font-mono uppercase text-xs [&_th]:h-auto [&_th]:pb-2 [&_th]:pt-4">
-                  <TableRow>
-                    <TableHead className="w-[140px] pl-0">Item</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead className="text-right pr-0">Cost (/month)</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted">
-                  <TableRow>
-                    <TableCell className="pl-0">Compute size</TableCell>
-                    <TableCell>{compute.label}</TableCell>
-                    <TableCell className="text-right font-mono pr-0" translate="no">
-                      {compute.cost}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="pl-0">Disk size</TableCell>
-                    <TableCell>{disk.label}</TableCell>
-                    <TableCell className="text-right font-mono pr-0" translate="no">
-                      {disk.cost}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell className="pl-0">IOPS</TableCell>
-                    <TableCell>{iops.label}</TableCell>
-                    <TableCell className="text-right font-mono pr-0" translate="no">
-                      {iops.cost}
-                    </TableCell>
-                  </TableRow>
-                  {disk.type === 'gp3' && (
+
+              <Card className="mt-2">
+                <Table>
+                  <TableHeader>
                     <TableRow>
-                      <TableCell className="pl-0">Throughput</TableCell>
-                      <TableCell>{throughput.label}</TableCell>
-                      <TableCell className="text-right font-mono pr-0">{throughput.cost}</TableCell>
+                      <TableHead className="w-[140px]">Item</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead className="text-right">Cost (/month)</TableHead>
                     </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody className="[&_td]:py-0 [&_tr]:h-[50px] [&_tr]:border-dotted">
+                    <TableRow>
+                      <TableCell>Compute size</TableCell>
+                      <TableCell>{compute.label}</TableCell>
+                      <TableCell className="text-right font-mono" translate="no">
+                        {compute.cost}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>Disk size</TableCell>
+                      <TableCell>{disk.label}</TableCell>
+                      <TableCell className="text-right font-mono" translate="no">
+                        {disk.cost}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>IOPS</TableCell>
+                      <TableCell>{iops.label}</TableCell>
+                      <TableCell className="text-right font-mono" translate="no">
+                        {iops.cost}
+                      </TableCell>
+                    </TableRow>
+                    {disk.type === 'gp3' && (
+                      <TableRow>
+                        <TableCell>Throughput</TableCell>
+                        <TableCell>{throughput.label}</TableCell>
+                        <TableCell className="text-right font-mono">{throughput.cost}</TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </Card>
             </>
           ) : (
             <p className="text-foreground-light text-sm">

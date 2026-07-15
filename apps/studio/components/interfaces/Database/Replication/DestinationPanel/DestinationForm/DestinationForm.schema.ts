@@ -9,16 +9,16 @@ import { SnowflakeFormSchema } from './Snowflake/Snowflake.schema'
 const CommonFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   publicationName: z.string().min(1, 'Publication is required'),
-  maxFillMs: z.number().min(1, 'Max Fill milliseconds should be greater than 0').int().optional(),
+  maxFillMs: z.number().min(1, 'Max fill milliseconds must be greater than 0').int().optional(),
   maxTableSyncWorkers: z
     .number()
-    .min(1, 'Max table sync workers should be greater than 0')
+    .min(1, 'Max table sync workers must be greater than 0')
     .int()
     .optional(),
   maxCopyConnectionsPerTable: z
     .number()
     .int()
-    .min(1, 'Max copy connections per table should be greater than 0')
+    .min(1, 'Max copy connections per table must be greater than 0')
     .optional(),
   invalidatedSlotBehavior: z.enum(['error', 'recreate']).optional(),
 })
