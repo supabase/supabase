@@ -81,7 +81,7 @@ export const UserLogFilterControl = () => {
         <div className="p-1">
           <InputWithAddons
             placeholder="Email or user id"
-            leading={<User className="h-4 w-4" />}
+            leading={<User size={14} className="text-foreground-lighter" />}
             containerClassName="h-9 rounded-sm"
             name="user"
             id="user"
