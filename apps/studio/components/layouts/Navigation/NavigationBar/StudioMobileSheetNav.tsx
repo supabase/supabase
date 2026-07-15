@@ -47,9 +47,11 @@ const StudioMobileSheetNav = () => {
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       setContent(null)
-      if (isMobile) sidebarManagerState.closeActive()
+      sidebarManagerState.closeActive()
     }
   }
+
+  if (!isMobile) return null
 
   return (
     <MobileSheetNav
