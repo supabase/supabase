@@ -390,22 +390,22 @@ For multi-environment setups with CI/CD (feature branches, staging, production),
 
 ## Key commands at a glance
 
-| Command                                | What it does                                                                |
-| -------------------------------------- | --------------------------------------------------------------------------- |
-| `supabase init`                        | Creates `./supabase/config.toml`                                            |
-| `supabase start`                       | Starts the local stack, applies migrations + seed                           |
-| `supabase stop`                        | Stops the local stack (data persists until `db reset`)                      |
-| `supabase db reset`                    | Destroys local DB, applies all migrations + seed from scratch               |
+| Command                                | What it does                                                                                            |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `supabase init`                        | Creates `./supabase/config.toml`                                                                        |
+| `supabase start`                       | Starts the local stack, applies migrations + seed                                                       |
+| `supabase stop`                        | Stops the local stack (data persists until `db reset`)                                                  |
+| `supabase db reset`                    | Destroys local DB, applies all migrations + seed from scratch                                           |
 | `supabase db reset --linked`           | Destroys the **linked remote** DB and rebuilds it from local migrations (destructive; dev/staging only) |
-| `supabase db diff -f <name>`           | Generates a migration by diffing current DB state against a shadow database |
-| `supabase db pull`                     | Pulls remote schema into a new local migration file                         |
-| `supabase db push`                     | Applies pending local migrations to the remote database                     |
-| `supabase db dump`                     | Exports remote DB schema (or `--data-only` for data) via `pg_dump`          |
-| `supabase migration new <name>`        | Creates an empty migration file                                             |
-| `supabase migration list`              | Compares local migrations against remote migration history                  |
-| `supabase gen types --lang typescript` | Generates TypeScript types from your database schema                        |
-| `supabase link --project-ref`          | Connects local project to a remote Supabase project                         |
-| `supabase login`                       | Authenticates with the Supabase platform                                    |
+| `supabase db diff -f <name>`           | Generates a migration by diffing current DB state against a shadow database                             |
+| `supabase db pull`                     | Pulls remote schema into a new local migration file                                                     |
+| `supabase db push`                     | Applies pending local migrations to the remote database                                                 |
+| `supabase db dump`                     | Exports remote DB schema (or `--data-only` for data) via `pg_dump`                                      |
+| `supabase migration new <name>`        | Creates an empty migration file                                                                         |
+| `supabase migration list`              | Compares local migrations against remote migration history                                              |
+| `supabase gen types --lang typescript` | Generates TypeScript types from your database schema                                                    |
+| `supabase link --project-ref`          | Connects local project to a remote Supabase project                                                     |
+| `supabase login`                       | Authenticates with the Supabase platform                                                                |
 
 For the full command reference and every flag, see the [CLI reference](/docs/reference/cli).
 
