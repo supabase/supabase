@@ -35,7 +35,11 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
   const [selectedReason, setSelectedReason] = useState<string[]>([])
 
   const { mutateAsync: sendExitSurvey, isPending: isSubmittingFeedback } =
-    useSendDowngradeFeedbackMutation()
+    useSendDowngradeFeedbackMutation({
+      onError: () => {
+        // the user should not get a toast saying "submitting survey failed"
+      },
+    })
 
   const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { mutate: updateOrgSubscription, isPending: isUpdating } = useOrgSubscriptionUpdateMutation(
