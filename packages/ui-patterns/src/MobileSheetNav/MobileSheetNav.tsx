@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { ComponentProps, useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { useWindowSize } from 'react-use'
 import { CommandEmpty, Sheet, SheetContent } from 'ui'
@@ -14,6 +14,7 @@ const MobileSheetNav: React.FC<{
   className?: string
   shouldCloseOnRouteChange?: boolean
   shouldCloseOnViewportResize?: boolean
+  onPointerDownOutside?: ComponentProps<typeof SheetContent>['onPointerDownOutside']
 }> = ({
   children,
   open = false,
@@ -21,6 +22,7 @@ const MobileSheetNav: React.FC<{
   className,
   shouldCloseOnRouteChange = true,
   shouldCloseOnViewportResize = true,
+  onPointerDownOutside,
 }) => {
   const router = useRouter()
   const { width } = useWindowSize()
@@ -48,15 +50,7 @@ const MobileSheetNav: React.FC<{
         showClose={false}
         size="full"
         side="bottom"
-        onPointerDownOutside={(event) => {
-          // Buttons in the floating toolbar (#mobile-nav-actions) render outside this sheet, so
-          // Radix treats taps on them as an outside click and closes the sheet before the button's
-          // own onClick runs. Those buttons already manage the sheet themselves, so don't let
-          // Radix's outside-dismiss pre-empt them.
-          if ((event.target as HTMLElement | null)?.closest('#mobile-nav-actions')) {
-            event.preventDefault()
-          }
-        }}
+        onPointerDownOutside={onPointerDownOutside}
         className={cn(
           'rounded-t-lg bg-background overflow-hidden overflow-y-scroll h-[85dvh] md:max-h-[500px]',
           className
