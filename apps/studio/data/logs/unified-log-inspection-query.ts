@@ -40,6 +40,29 @@ export type UnifiedLogInspectionVariables = {
   type?: ServiceFlowType
   search: QuerySearchParamsType
   useOtel?: boolean
+  /**
+   * The selected row's own timestamp (ms since epoch), when known. A single log
+   * is always looked up by `id`, so we can bound the query tightly around this
+   * timestamp instead of the (potentially much wider) selected search range.
+   */
+  logTimestampMs?: number | null
+}
+
+// Generous enough to absorb clock/precision differences between the row data
+// and the stored log, while still being far tighter than an arbitrary search range.
+const INSPECTION_WINDOW_MS = 60 * 60 * 1000
+
+function getInspectionISOStartEnd(
+  search: QuerySearchParamsType,
+  logTimestampMs: number | null | undefined
+) {
+  if (typeof logTimestampMs === 'number' && Number.isFinite(logTimestampMs)) {
+    return {
+      isoTimestampStart: new Date(logTimestampMs - INSPECTION_WINDOW_MS).toISOString(),
+      isoTimestampEnd: new Date(logTimestampMs + INSPECTION_WINDOW_MS).toISOString(),
+    }
+  }
+  return getUnifiedLogsISOStartEnd(search)
 }
 
 export type UnifiedLogInspectionResponse = {
@@ -124,7 +147,14 @@ export interface UnifiedLogInspectionEntry {
 }
 
 export async function getUnifiedLogInspection(
-  { projectRef, logId, type, search, useOtel = false }: UnifiedLogInspectionVariables,
+  {
+    projectRef,
+    logId,
+    type,
+    search,
+    useOtel = false,
+    logTimestampMs,
+  }: UnifiedLogInspectionVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) {
@@ -137,7 +167,7 @@ export async function getUnifiedLogInspection(
     throw new Error('type is required')
   }
 
-  const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
+  const { isoTimestampStart, isoTimestampEnd } = getInspectionISOStartEnd(search, logTimestampMs)
 
   if (!useOtel) {
     let sql: SafeLogSqlFragment
@@ -249,7 +279,7 @@ export type UnifiedLogInspectionData = Awaited<ReturnType<typeof getUnifiedLogIn
 export type UnifiedLogInspectionError = ResponseError
 
 export const useUnifiedLogInspectionQuery = <TData = UnifiedLogInspectionData>(
-  { projectRef, logId, type, search }: UnifiedLogInspectionVariables,
+  { projectRef, logId, type, search, logTimestampMs }: UnifiedLogInspectionVariables,
   {
     enabled = true,
     ...options
@@ -259,7 +289,7 @@ export const useUnifiedLogInspectionQuery = <TData = UnifiedLogInspectionData>(
   return useQuery<UnifiedLogInspectionData, UnifiedLogInspectionError, TData>({
     queryKey: [...logsKeys.serviceFlow(projectRef, search, logId), { otel: useOtel }],
     queryFn: ({ signal }) =>
-      getUnifiedLogInspection({ projectRef, logId, type, search, useOtel }, signal),
+      getUnifiedLogInspection({ projectRef, logId, type, search, useOtel, logTimestampMs }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
     ...UNIFIED_LOGS_QUERY_OPTIONS,
     ...options,
