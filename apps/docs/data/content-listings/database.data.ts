@@ -37,7 +37,7 @@ export const databaseGetStarted: ContentListingGroup = {
     },
     {
       title: 'Run SQL commands',
-      href: '/dashboard/project/_/sql',
+      href: 'https://supabase.com/dashboard/project/_/sql',
       description: "Use the Dashboard's SQL Editor for ad-hoc queries and saved snippets.",
     },
   ],

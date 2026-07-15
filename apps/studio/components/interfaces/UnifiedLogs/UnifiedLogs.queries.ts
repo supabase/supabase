@@ -388,7 +388,7 @@ const applySearchParamsFilter = (search: QuerySearchParamsType): SafeLogSqlFragm
  */
 export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
   const conditions = buildBaseWhere(search)
-  return safeSql`
+  return safeSql`-- unified logs: row list
 SELECT ${rowProjection()}
 FROM logs
 ${whereClause(conditions)}
@@ -434,7 +434,7 @@ export const getFacetCountQuery = ({
     conditions.push(safeSql`(${facetExpr}) LIKE ${lit('%' + facetSearch + '%')}`)
   }
 
-  return safeSql`
+  return safeSql`-- unified logs: single-facet counts (${lit(facet)})
 SELECT ${lit(facet)} AS facet, (${facetExpr}) AS value, count() AS count
 FROM logs
 ${whereClause(conditions)}
@@ -503,7 +503,8 @@ HAVING value != ''
   // rejects LIMIT BY inside the shared arrayJoin).
   blocks.push(safeSql`(${getFacetCountQuery({ search, facet: 'pathname' })})`)
 
-  return joinSqlFragments(blocks, ' UNION ALL ')
+  return safeSql`-- unified logs: sidebar facet counts
+${joinSqlFragments(blocks, ' UNION ALL ')}`
 }
 
 /**
@@ -514,7 +515,7 @@ export const getLogsChartQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
   const truncFn = truncationFunction(truncationLevel)
   const conditions = buildBaseWhere(search)
 
-  return safeSql`
+  return safeSql`-- unified logs: severity chart (${truncFn} buckets)
 SELECT
   ${truncFn}(timestamp) AS time_bucket,
   countIf((${LEVEL_EXPR}) = 'success') AS success,

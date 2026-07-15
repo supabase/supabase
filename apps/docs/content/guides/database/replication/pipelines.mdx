@@ -14,6 +14,10 @@ Supabase Pipelines is currently in private alpha. Private alpha features can be 
 
 Pipelines is a managed CDC feature for creating replication pipelines from Supabase Postgres to destination systems. It uses **Postgres logical replication** with the open-source [Supabase ETL engine](https://github.com/supabase/etl). You choose a destination in the Dashboard, and Supabase runs the pipeline that streams database changes to that destination.
 
+## Pricing
+
+<$Partial path="billing/pricing/pricing_pipelines.mdx" />
+
 ## Setup overview
 
 Pipelines requires two main components: a **Postgres publication** (defines what to replicate) and a **destination** (where data is sent). Supabase runs the managed pipeline that reads from the publication and writes to the destination. Follow these steps to set up your replication pipeline.

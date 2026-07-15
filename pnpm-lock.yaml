@@ -2194,6 +2194,9 @@ importers:
       '@vitest/ui':
         specifier: 'catalog:'
         version: 4.1.4(vitest@4.1.4)
+      lucide-react:
+        specifier: '*'
+        version: 0.436.0(react@19.2.6)
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig

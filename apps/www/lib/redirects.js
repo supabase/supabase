@@ -27,7 +27,12 @@ module.exports = [
   {
     permanent: true,
     source: '/ui/docs/ai-editors-rules/prompts',
-    destination: '/ui/docs/ai-editors-rules/skills',
+    destination: '/docs/guides/ai-tools/ai-skills',
+  },
+  {
+    permanent: true,
+    source: '/ui/docs/ai-editors-rules/skills',
+    destination: '/docs/guides/ai-tools/ai-skills',
   },
   {
     permanent: true,
@@ -2328,85 +2333,112 @@ module.exports = [
     source: '/blog/flutter-authentication-and-authorization-with-rls',
     destination: '/blog/flutter-authorization-with-rls',
   },
+  // /partners/integrations → /partners/catalog redirects
+  // Wrapper listing slugs → clean partner slugs (open the matching listing tab)
+  {
+    permanent: true,
+    source: '/partners/catalog/bigquery-wrapper',
+    destination: '/partners/catalog/bigquery?tab=bigquery-wrapper',
+  },
+  {
+    permanent: true,
+    source: '/partners/catalog/firebase-wrapper',
+    destination: '/partners/catalog/firebase?tab=firebase-wrapper',
+  },
+  {
+    permanent: true,
+    source: '/partners/catalog/stripe-wrapper',
+    destination: '/partners/catalog/stripe?tab=stripe-wrapper',
+  },
+  {
+    permanent: true,
+    source: '/partners/catalog/aikido-security',
+    destination: '/partners/catalog/aikido',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations',
+    destination: '/partners/catalog',
+  },
   {
     permanent: true,
     source: '/docs/guides/integrations/appsmith',
-    destination: '/partners/integrations/appsmith',
+    destination: '/partners/catalog/appsmith',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/auth0',
-    destination: '/partners/integrations/auth0',
+    destination: '/partners/catalog/auth0',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/authsignal',
-    destination: '/partners/integrations/authsignal',
+    destination: '/partners/catalog/authsignal',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/bracket',
-    destination: '/partners/integrations/bracket',
+    destination: '/partners/catalog/bracket',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/clerk',
-    destination: '/partners/integrations/clerk',
+    destination: '/partners/catalog/clerk',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/cloudflare-workers',
-    destination: '/partners/integrations/cloudflare-workers',
+    destination: '/partners/catalog/cloudflare-workers',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/dhiwise',
-    destination: '/partners/integrations/dhiwise',
+    destination: '/partners/catalog/dhiwise',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/directus',
-    destination: '/partners/integrations/directus',
+    destination: '/partners/catalog/directus',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/draftbit',
-    destination: '/partners/integrations/draftbit',
+    destination: '/partners/catalog/draftbit',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/estuary',
-    destination: '/partners/integrations/estuary',
+    destination: '/partners/catalog/estuary',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/fezto',
-    destination: '/partners/integrations/fezto',
+    destination: '/partners/catalog/fezto',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/flutterflow',
-    destination: '/partners/integrations/flutterflow',
+    destination: '/partners/catalog/flutterflow',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/forestadmin',
-    destination: '/partners/integrations/forestadmin',
+    destination: '/partners/catalog/forestadmin',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/illa',
-    destination: '/partners/integrations/illa',
+    destination: '/partners/catalog/illa',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/integrations',
-    destination: '/partners/integrations',
+    destination: '/partners/catalog',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/keyri',
-    destination: '/partners/integrations/keyri',
+    destination: '/partners/catalog/keyri',
   },
   {
     permanent: true,
@@ -2421,88 +2453,110 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/integrations/onesignal',
-    destination: '/partners/integrations/onesignal',
+    destination: '/partners/catalog/onesignal',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/passage',
-    destination: '/partners/integrations/passage',
+    destination: '/partners/catalog/passage',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/pgmustard',
-    destination: '/partners/integrations/pgmustard',
+    destination: '/partners/catalog/pgmustard',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/picket',
-    destination: '/partners/integrations/picket',
+    destination: '/partners/catalog/picket',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/plasmic',
-    destination: '/partners/integrations/plasmic',
+    destination: '/partners/catalog/plasmic',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/polyscale',
-    destination: '/partners/integrations/polyscale',
+    destination: '/partners/catalog/polyscale',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/prisma',
-    destination: '/partners/integrations/prisma',
+    destination: '/partners/catalog/prisma',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/atomic_crm',
+    destination: '/partners/catalog/atomic-crm',
   },
   {
     permanent: true,
     source: '/partners/integrations/refine_dev',
-    destination: '/partners/integrations/refine',
+    destination: '/partners/catalog/refine',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/supabase_wrapper_bigquery',
+    destination: '/partners/catalog/bigquery?tab=bigquery-wrapper',
+  },
+  {
+    permanent: true,
+    source: '/partners/integrations/supabase_wrapper_firebase',
+    destination: '/partners/catalog/firebase?tab=firebase-wrapper',
   },
   {
     permanent: true,
     source: '/partners/integrations/supabase_wrapper_stripe',
-    destination: '/partners/integrations/stripe-wrapper',
+    destination: '/partners/catalog/stripe?tab=stripe-wrapper',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/sequin',
-    destination: '/partners/integrations/sequin',
+    destination: '/partners/catalog/sequin',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/snaplet',
-    destination: '/partners/integrations/snaplet',
+    destination: '/partners/catalog/snaplet',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/stytch',
-    destination: '/partners/integrations/stytch',
+    destination: '/partners/catalog/stytch',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/supertokens',
-    destination: '/partners/integrations/supertokens',
+    destination: '/partners/catalog/supertokens',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/vercel',
-    destination: '/partners/integrations/vercel',
+    destination: '/partners/catalog/vercel',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/weweb',
-    destination: '/partners/integrations/weweb',
+    destination: '/partners/catalog/weweb',
   },
   {
     permanent: true,
     source: '/docs/guides/integrations/zuplo',
-    destination: '/partners/integrations/zuplo',
+    destination: '/partners/catalog/zuplo',
   },
   // toddle.dev pivoted to nordcraft
   {
     permanent: true,
     source: '/partners/integrations/toddle',
-    destination: '/partners/integrations/nordcraft',
+    destination: '/partners/catalog/nordcraft',
+  },
+  // Catch-all: any other /partners/integrations/<slug> not covered by a specific rule above.
+  // Must come after all specific /partners/integrations/* rules
+  {
+    permanent: true,
+    source: '/partners/integrations/:slug*',
+    destination: '/partners/catalog/:slug*',
   },
   {
     permanent: true,
@@ -2855,7 +2909,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/cli/local-development',
-    destination: '/docs/guides/local-development/overview',
+    destination: '/docs/guides/local-development/database-migrations',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/local-development/overview',
+    destination: '/docs/guides/local-development/database-migrations',
   },
   {
     permanent: true,
@@ -2928,7 +2987,12 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/platform/marketplace',
-    destination: '/docs/guides/integrations/supabase-marketplace',
+    destination: '/docs/guides/integrations/partner-catalog',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/integrations/supabase-marketplace',
+    destination: '/docs/guides/integrations/partner-catalog',
   },
   {
     permanent: true,
