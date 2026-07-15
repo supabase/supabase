@@ -63,9 +63,10 @@ export type UnifiedLogInspectionVariables = {
   logTimestampMs?: number | null
 }
 
-// Generous enough to absorb clock/precision differences between the row data
-// and the stored log, while still being far tighter than an arbitrary search range.
-const INSPECTION_WINDOW_MS = 60 * 60 * 1000
+// The row's timestamp is the exact stored value (parsed from the same
+// `timestamp` column), not an approximate clock reading, so this only needs to
+// absorb millisecond-vs-microsecond rounding — not real clock skew.
+const INSPECTION_WINDOW_MS = 60 * 1000
 
 function getInspectionISOStartEnd(
   search: QuerySearchParamsType,
