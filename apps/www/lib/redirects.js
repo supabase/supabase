@@ -27,7 +27,12 @@ module.exports = [
   {
     permanent: true,
     source: '/ui/docs/ai-editors-rules/prompts',
-    destination: '/ui/docs/ai-editors-rules/skills',
+    destination: '/docs/guides/ai-tools/ai-skills',
+  },
+  {
+    permanent: true,
+    source: '/ui/docs/ai-editors-rules/skills',
+    destination: '/docs/guides/ai-tools/ai-skills',
   },
   {
     permanent: true,
