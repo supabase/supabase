@@ -75,7 +75,23 @@ const AlertDialog = ({
 }
 AlertDialog.displayName = AlertDialogPrimitive.Root.displayName
 
-const AlertDialogTrigger = AlertDialogPrimitive.Trigger
+const AlertDialogTrigger = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Trigger>
+>(({ disabled, tabIndex, ...props }, ref) => {
+  // Set default tabIndex for proper Safari focus handling
+  const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
+
+  return (
+    <AlertDialogPrimitive.Trigger
+      ref={ref}
+      {...props}
+      disabled={disabled}
+      tabIndex={computedTabIndex}
+    />
+  )
+})
+AlertDialogTrigger.displayName = AlertDialogPrimitive.Trigger.displayName
 
 const AlertDialogPortal = ({ children, ...props }: AlertDialogPrimitive.AlertDialogPortalProps) => (
   <AlertDialogPrimitive.Portal {...props}>

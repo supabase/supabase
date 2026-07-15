@@ -69,6 +69,8 @@ const CommandInput = React.forwardRef<
       />
       {showResetIcon && (
         <button
+          type="button"
+          tabIndex={0}
           onClick={handleReset}
           className={cn(
             'text-foreground-lighter hover:text-foreground-light hover:cursor-pointer transition-all opacity-0 duration-100',

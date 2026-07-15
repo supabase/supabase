@@ -7,7 +7,25 @@ import { cn } from '../../../lib/utils/cn'
 import styles from './popover.module.css'
 
 const Popover = PopoverPrimitive.Root
-const PopoverTrigger = PopoverPrimitive.Trigger
+
+const PopoverTrigger = React.forwardRef<
+  React.ElementRef<typeof PopoverPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof PopoverPrimitive.Trigger>
+>(({ disabled, tabIndex, ...props }, ref) => {
+  // Set default tabIndex for proper Safari focus handling
+  const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
+
+  return (
+    <PopoverPrimitive.Trigger
+      ref={ref}
+      {...props}
+      disabled={disabled}
+      tabIndex={computedTabIndex}
+    />
+  )
+})
+PopoverTrigger.displayName = PopoverPrimitive.Trigger.displayName
+
 const PopoverAnchor = PopoverPrimitive.Anchor
 
 export type PopoverContentProps = {

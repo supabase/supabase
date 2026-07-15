@@ -13,7 +13,23 @@ const DropdownMenu = ({
   <DropdownMenuPrimitive.Root modal={modal} {...props} />
 )
 
-const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
+const DropdownMenuTrigger = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Trigger>
+>(({ disabled, tabIndex, ...props }, ref) => {
+  // Set default tabIndex for proper Safari focus handling
+  const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
+
+  return (
+    <DropdownMenuPrimitive.Trigger
+      ref={ref}
+      {...props}
+      disabled={disabled}
+      tabIndex={computedTabIndex}
+    />
+  )
+})
+DropdownMenuTrigger.displayName = DropdownMenuPrimitive.Trigger.displayName
 
 const DropdownMenuGroup = DropdownMenuPrimitive.Group
 

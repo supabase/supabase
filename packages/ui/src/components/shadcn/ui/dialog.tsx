@@ -27,7 +27,18 @@ const DialogPaddingVariants = cva('', {
 
 const Dialog = DialogPrimitive.Root
 
-const DialogTrigger = DialogPrimitive.Trigger
+const DialogTrigger = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Trigger>
+>(({ disabled, tabIndex, ...props }, ref) => {
+  // Set default tabIndex for proper Safari focus handling
+  const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
+
+  return (
+    <DialogPrimitive.Trigger ref={ref} {...props} disabled={disabled} tabIndex={computedTabIndex} />
+  )
+})
+DialogTrigger.displayName = DialogPrimitive.Trigger.displayName
 
 const DialogPortal = (props: DialogPrimitive.DialogPortalProps) => (
   <DialogPrimitive.Portal {...props} />

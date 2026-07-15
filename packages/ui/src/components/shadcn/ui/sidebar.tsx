@@ -445,8 +445,10 @@ SidebarGroupLabel.displayName = 'SidebarGroupLabel'
 const SidebarGroupAction = React.forwardRef<
   HTMLButtonElement,
   React.ComponentProps<'button'> & { asChild?: boolean }
->(({ className, asChild = false, ...props }, ref) => {
+>(({ className, asChild = false, disabled, tabIndex, ...props }, ref) => {
   const Comp = asChild ? SlotPrimitive.Slot : 'button'
+  // Set default tabIndex for proper Safari focus handling
+  const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
 
   return (
     <Comp
@@ -460,6 +462,8 @@ const SidebarGroupAction = React.forwardRef<
         className
       )}
       {...props}
+      disabled={disabled}
+      tabIndex={computedTabIndex}
     />
   )
 })
@@ -563,7 +567,7 @@ const SidebarMenuButton = React.forwardRef<
   ) => {
     const Comp = asChild ? SlotPrimitive.Slot : 'button'
     const { isMobile, state } = useSidebar()
-    const { disabled, tabIndex } = props
+    const { disabled, tabIndex, ...rest } = props
 
     // Set default tabIndex for proper Safari focus handling
     // - Explicit tabIndex prop takes precedence
@@ -578,9 +582,10 @@ const SidebarMenuButton = React.forwardRef<
         data-size={size}
         data-active={isActive}
         data-has-icon={hasIcon}
-        tabIndex={computedTabIndex}
         className={cn(sidebarMenuButtonVariants({ variant, size, hasIcon, isLoading }), className)}
-        {...props}
+        {...rest}
+        disabled={disabled}
+        tabIndex={computedTabIndex}
       />
     )
 
@@ -615,8 +620,10 @@ const SidebarMenuAction = React.forwardRef<
     asChild?: boolean
     showOnHover?: boolean
   }
->(({ className, asChild = false, showOnHover = false, ...props }, ref) => {
+>(({ className, asChild = false, showOnHover = false, disabled, tabIndex, ...props }, ref) => {
   const Comp = asChild ? SlotPrimitive.Slot : 'button'
+  // Set default tabIndex for proper Safari focus handling
+  const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
 
   return (
     <Comp
@@ -635,6 +642,8 @@ const SidebarMenuAction = React.forwardRef<
         className
       )}
       {...props}
+      disabled={disabled}
+      tabIndex={computedTabIndex}
     />
   )
 })
