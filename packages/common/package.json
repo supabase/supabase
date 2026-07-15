@@ -26,6 +26,7 @@
     "valtio": "catalog:"
   },
   "devDependencies": {
+    "lucide-react": "*",
     "@types/lodash": "4.17.5",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
@@ -41,6 +42,7 @@
   "peerDependencies": {
     "@supabase/auth-js": "catalog:",
     "@supabase/supabase-js": "catalog:",
+    "lucide-react": "*",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"

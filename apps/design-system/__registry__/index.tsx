@@ -1677,6 +1677,39 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "success-check-demo": {
+      name: "success-check-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/success-check-demo")),
+      source: "",
+      files: ["registry/default/example/success-check-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "success-check-selected": {
+      name: "success-check-selected",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/success-check-selected")),
+      source: "",
+      files: ["registry/default/example/success-check-selected.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "success-check-progress": {
+      name: "success-check-progress",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/success-check-progress")),
+      source: "",
+      files: ["registry/default/example/success-check-progress.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "switch-demo": {
       name: "switch-demo",
       type: "components:example",

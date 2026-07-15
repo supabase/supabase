@@ -3,6 +3,7 @@ import { useParams } from 'common'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 
+import type { UtilityTab } from './SQLEditor.types'
 import { buildExplainSql } from './SQLEditor.utils'
 import { useSQLEditorContext } from './SQLEditorContext'
 import { splitSqlStatements } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
@@ -20,7 +21,7 @@ import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-sessi
 type UseSqlEditorExplainArgs = {
   id: string
   isDiffOpen: boolean
-  setActiveUtilityTab: (tab: string) => void
+  setActiveUtilityTab: (tab: UtilityTab) => void
 }
 
 export function useSqlEditorExplain({
