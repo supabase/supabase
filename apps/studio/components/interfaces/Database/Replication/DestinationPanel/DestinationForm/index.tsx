@@ -40,6 +40,7 @@ import { getDucklakeValidationIssues } from './DuckLake/DuckLake.utils'
 import { DuckLakeFields } from './DuckLake/Fields'
 import { NewPublicationPanel } from './NewPublicationPanel'
 import { NoDestinationsAvailable } from './NoDestinationsAvailable'
+import { PipelineCostDialog } from './PipelineCostDialog'
 import { PublicationSelection } from './PublicationSelection'
 import { SnowflakeFields } from './Snowflake/Fields'
 import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'
@@ -84,6 +85,7 @@ export const DestinationForm = ({
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
   const [showValidationWarningsDialog, setShowValidationWarningsDialog] = useState(false)
+  const [showCostDialog, setShowCostDialog] = useState(false)
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
   const [newBucketSheetVisible, setNewBucketSheetVisible] = useState(false)
   const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
@@ -231,65 +233,77 @@ export const DestinationForm = ({
     }
   }
 
+  // Stages the form values and opens the cost-estimation dialog, which is the final gate before
+  // a pipeline is created and started.
+  const openCostDialog = (data: z.infer<typeof FormSchema>) => {
+    setPendingFormValues(data)
+    setShowCostDialog(true)
+  }
+
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    if (!editMode) {
-      const previousValidationFailures = allValidationFailures
-      const previousWarnings = previousValidationFailures.filter(
-        (f) => f.failure_type === 'warning'
-      )
-      const previousFailuresAreOnlyWarnings =
-        hasRunValidation &&
-        previousValidationFailures.length > 0 &&
-        previousValidationFailures.every((f) => f.failure_type === 'warning')
-
-      const validationResult = await validateConfiguration({
+    // Editing an existing pipeline doesn't incur a new initial copy, so it skips the cost gate.
+    if (editMode) {
+      await submitPipeline({
         data,
-        onValidationFail: () => {
-          setTimeout(() => {
-            validationSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-          }, 100)
-        },
+        existingDestination,
+        onSuccess: () => form.reset(defaultValues),
+        onClose,
       })
-      if (!validationResult.canContinue) {
-        // Critical failures shown inline — stop so user can fix them
-        return
-      }
-
-      const hasWarnings = validationResult.warnings.length > 0
-      const warningsUnchanged =
-        previousFailuresAreOnlyWarnings &&
-        areValidationFailuresEqual(previousWarnings, validationResult.warnings)
-
-      // Open the confirmation dialog when validation is clean, or when warnings are unchanged on
-      // resubmit. New/changed warnings are shown inline so the user can review and submit again.
-      if (hasWarnings) {
-        if (warningsUnchanged) {
-          setPendingFormValues(data)
-          setShowValidationWarningsDialog(true)
-        }
-        return
-      }
+      return
     }
 
-    await submitPipeline({
+    const previousValidationFailures = allValidationFailures
+    const previousWarnings = previousValidationFailures.filter((f) => f.failure_type === 'warning')
+    const previousFailuresAreOnlyWarnings =
+      hasRunValidation &&
+      previousValidationFailures.length > 0 &&
+      previousValidationFailures.every((f) => f.failure_type === 'warning')
+
+    const validationResult = await validateConfiguration({
       data,
-      existingDestination,
-      onSuccess: () => form.reset(defaultValues),
-      onClose,
+      onValidationFail: () => {
+        setTimeout(() => {
+          validationSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 100)
+      },
     })
+    if (!validationResult.canContinue) {
+      // Critical failures shown inline — stop so user can fix them
+      return
+    }
+
+    const hasWarnings = validationResult.warnings.length > 0
+    const warningsUnchanged =
+      previousFailuresAreOnlyWarnings &&
+      areValidationFailuresEqual(previousWarnings, validationResult.warnings)
+
+    // Open the warnings confirmation when there are warnings (and they're unchanged on resubmit),
+    // otherwise go straight to the cost dialog. New/changed warnings are shown inline so the user
+    // can review and submit again.
+    if (hasWarnings) {
+      if (warningsUnchanged) {
+        setPendingFormValues(data)
+        setShowValidationWarningsDialog(true)
+      }
+      return
+    }
+
+    openCostDialog(data)
   }
 
-  const handleValidationWarningsDialogChange = (open: boolean) => {
-    setShowValidationWarningsDialog(open)
-    if (!open) setPendingFormValues(null)
+  // Confirming the warnings advances to the cost dialog rather than submitting directly, so the
+  // cost estimate is always the last thing shown before the pipeline starts.
+  const handleValidationWarningsConfirm = () => {
+    if (!pendingFormValues) return
+    setShowValidationWarningsDialog(false)
+    openCostDialog(pendingFormValues)
   }
 
-  const handleValidationWarningsConfirm = async () => {
+  const handleCostConfirm = async () => {
     if (!pendingFormValues) return
 
     const values = pendingFormValues
-    setPendingFormValues(null)
-    setShowValidationWarningsDialog(false)
+    setShowCostDialog(false)
 
     await submitPipeline({
       data: values,
@@ -452,10 +466,20 @@ export const DestinationForm = ({
 
       <ValidationWarningsDialog
         open={showValidationWarningsDialog}
-        onOpenChange={handleValidationWarningsDialogChange}
+        onOpenChange={setShowValidationWarningsDialog}
         isLoading={isSaving}
         warningCount={validationWarnings.length}
         onConfirm={handleValidationWarningsConfirm}
+      />
+
+      <PipelineCostDialog
+        open={showCostDialog}
+        isConfirming={isSaving}
+        projectRef={projectRef}
+        sourceId={sourceId}
+        publicationName={pendingFormValues?.publicationName}
+        onOpenChange={setShowCostDialog}
+        onConfirm={handleCostConfirm}
       />
     </>
   )

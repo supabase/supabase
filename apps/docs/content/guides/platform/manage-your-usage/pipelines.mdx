@@ -1,0 +1,77 @@
+---
+id: 'manage-usage-pipelines'
+title: 'Manage Pipelines usage'
+---
+
+## What you are charged for
+
+You are charged for all pipelines configured, initial/backfill data and replicated data. Pipelines are charged by the hour for as long as they are configured.
+
+### Usage on your invoice
+
+Usage is shown as "ETL Pipeline Hours", "ETL Copy Backfill Data GB" and "ETL Replicated Data GB" on your invoice.
+
+## Pricing
+
+<$Partial path="billing/pricing/pricing_pipelines.mdx" />
+
+## Billing examples
+
+### Single project with no backfill
+
+The project has an active pipeline for the entire month.
+
+| Line Item                     | Units     | Costs                        |
+| ----------------------------- | --------- | ---------------------------- |
+| Pro Plan                      | -         | <Price price="25" />         |
+| Compute Hours Small Project 1 | 730 Hours | <Price price="15.04" />      |
+| ETL Pipeline Hours            | 730 Hours | <Price price="38.69" />      |
+| ETL Replicated Data GB        | 150 GB    | <Price price="450" />        |
+| **Subtotal**                  |           | **<Price price="528.73" />** |
+| Compute Credits               |           | -<Price price="10" />        |
+| **Total**                     |           | **<Price price="518.73" />** |
+
+### Multiple projects with backfills
+
+Multiple projects had an active pipeline for the entire month and had initial backfills and replicated data.
+
+| Line Item                           | Units     | Costs                         |
+| ----------------------------------- | --------- | ----------------------------- |
+| Pro Plan                            | -         | <Price price="25" />          |
+|                                     |           |                               |
+| Compute Hours Small Project 1       | 730 Hours | <Price price="15.04" />       |
+| ETL Pipeline Hours Project 1        | 730 Hours | <Price price="38.69" />       |
+| ETL Replicated Data GB Project 1    | 15 GB     | <Price price="45" />          |
+| ETL Copy Backfill Data GB Project 1 | 150 GB    | <Price price="90" />          |
+|                                     |           |                               |
+| Compute Hours Small Project 2       | 730 Hours | <Price price="15.04" />       |
+| ETL Pipeline Hours Project 2        | 730 Hours | <Price price="38.69" />       |
+| ETL Replicated Data GB Project 2    | 70 GB     | <Price price="210" />         |
+| ETL Copy Backfill Data GB Project 2 | 1,500 GB  | <Price price="900" />         |
+|                                     |           |                               |
+| **Subtotal**                        |           | **<Price price="1377.46" />** |
+| Compute Credits                     |           | -<Price price="10" />         |
+| **Total**                           |           | **<Price price="1367.46" />** |
+
+### After disabling an add-on for a day
+
+Project add-ons are billed in arrears based on how many hours you used them.
+If you remove the add-on, you are no longer billed from the time of removal onward.
+
+| Line Item                     | Hours | Costs                       |
+| ----------------------------- | ----- | --------------------------- |
+| Pro Plan                      | -     | <Price price="25" />        |
+|                               |       |                             |
+| Compute Hours Small Project 1 | 730   | <Price price="15.04" />     |
+| ETL Pipeline Hours Project 1  | 24    | <Price price="1.27" />      |
+|                               |       |                             |
+| **Subtotal**                  |       | **<Price price="41.31" />** |
+| Compute Credits               |       | -<Price price="10" />       |
+| **Total**                     |       | **<Price price="31.31" />** |
+
+## Optimize usage
+
+- Only replicate tables you need to replicate
+- If you no longer require replication, remove the pipeline through your [project's replication settings](/dashboard/project/_/database/replication)
+- Reduce the number of writes to your table
+- Exclude columns you do not need from replication - Pipelines let you configure which columns to replicate

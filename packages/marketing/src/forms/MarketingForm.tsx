@@ -246,7 +246,6 @@ export default function MarketingForm({
       )
       return
     }
-
     // Strip values for fields that are currently hidden so stale data doesn't leak.
     const submittedValues = Object.fromEntries(
       Object.entries(values).filter(([name]) => visibleFieldNames.has(name))

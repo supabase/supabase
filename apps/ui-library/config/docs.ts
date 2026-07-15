@@ -24,19 +24,6 @@ export const gettingStarted: SidebarNavGroup = {
   ],
 }
 
-export const aiEditorsRules: SidebarNavGroup = {
-  title: 'AI Skills',
-  items: [
-    {
-      title: 'Skills',
-      href: '/docs/ai-editors-rules/skills',
-      items: [],
-      new: true,
-      commandItemLabel: 'AI Skills',
-    },
-  ],
-}
-
 export const platformBlocks: SidebarNavGroup = {
   title: 'Platform',
   items: [
@@ -139,10 +126,6 @@ export const componentPages: SidebarNavGroup = {
 
 export const COMMAND_ITEMS = [
   ...gettingStarted.items.map((item) => ({
-    label: item.commandItemLabel,
-    href: item.href,
-  })),
-  ...aiEditorsRules.items.map((item) => ({
     label: item.commandItemLabel,
     href: item.href,
   })),

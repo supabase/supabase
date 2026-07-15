@@ -429,11 +429,12 @@ describe('SQLEditor characterization', () => {
     sqlEditorDiffRequestState.requestDiff('select 42;', DiffType.Modification)
 
     await renderEditor()
-    await screen.findByTestId('diff-editor')
+    // The queued request drains on mount and opens a diff, which disables Run.
+    // (Assert via the run button rather than the dynamically-imported diff editor.)
+    await waitFor(() => expect(screen.getByTestId('run-button')).toBeDisabled())
 
     const addResult = vi.spyOn(sqlEditorSessionState, 'addResult')
     // The run button is disabled while diffing; clicking should not execute.
-    expect(screen.getByTestId('run-button')).toBeDisabled()
     fireEvent.click(screen.getByTestId('run-button'))
     // Give any async work a chance to (not) happen.
     await new Promise((r) => setTimeout(r, 20))
