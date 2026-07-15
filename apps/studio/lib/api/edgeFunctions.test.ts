@@ -62,13 +62,6 @@ describe('isEdgeFunctionUrl', () => {
       isPlatform: true,
     },
     {
-      name: 'an unversioned functions URL',
-      url: 'https://uniquetwentychararef.supabase.co/functions/hello-world',
-      projectRef: 'uniquetwentychararef',
-      restUrl: 'https://uniquetwentychararef.supabase.co/rest/v1/',
-      isPlatform: true,
-    },
-    {
       name: "another project's edge function URL",
       url: 'https://anotherprojectref000.supabase.co/functions/v1/hello-world',
       projectRef: 'uniquetwentychararef',

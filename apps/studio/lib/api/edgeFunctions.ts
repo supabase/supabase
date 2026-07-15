@@ -31,7 +31,7 @@ export const isEdgeFunctionUrl = (
   return PLATFORM_TLDS.some(
     (tld) =>
       url.startsWith(`https://${projectRef}.functions.supabase.${tld}/`) ||
-      url.startsWith(`https://${projectRef}.supabase.${tld}/functions/v1/`)
+      url.startsWith(`https://${projectRef}.supabase.${tld}/functions/`)
   )
 }
 
