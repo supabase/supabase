@@ -38,7 +38,7 @@ function getSheetChildren(
   return null
 }
 
-const StudioMobileSheetNav = () => {
+export const StudioMobileSheetNav = () => {
   const isMobile = useBreakpoint('md')
   const { content, setContent } = useMobileSheet()
   const { activeSidebar } = useSidebarManagerSnapshot()
@@ -63,5 +63,3 @@ const StudioMobileSheetNav = () => {
     </MobileSheetNav>
   )
 }
-
-export { StudioMobileSheetNav }
