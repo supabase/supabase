@@ -120,11 +120,11 @@ export function DataTableFilterCheckboxAsync<TData>({
                     type="button"
                     onClick={() => column?.setFilterValue([option.value])}
                     className={cn(
-                      'absolute inset-y-0 right-0 hidden font-normal text-muted-foreground backdrop-blur-xs hover:text-foreground group-hover:block',
+                      'absolute inset-y-0 right-0 hidden font-normal text-[10px] text-muted-foreground bg-background hover:text-foreground group-hover:flex items-center',
                       'rounded-md ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
                     )}
                   >
-                    <span className="px-2">only</span>
+                    <span className="px-2">Only</span>
                   </button>
                 </Label>
               </div>
