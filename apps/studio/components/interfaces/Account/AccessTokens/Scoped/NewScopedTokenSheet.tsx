@@ -1,9 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
-import { ExternalLink } from 'lucide-react'
-import Link from 'next/link'
-import { useCallback, useState } from 'react'
-import { useForm, type SubmitHandler } from 'react-hook-form'
+import { ChevronRight } from 'lucide-react'
+import { useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -17,21 +16,24 @@ import {
   SheetHeader,
   SheetTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 
-import {
-  CUSTOM_EXPIRY_VALUE,
-  EXPIRES_AT_OPTIONS,
-  type ScopedAccessTokenPermission,
-} from '../AccessToken.constants'
-import { TokenSchema, type TokenFormValues } from '../AccessToken.schemas'
-import { getExpirationDate, mapPermissionToFGA } from '../AccessToken.utils'
+import { countConfigured, selectionToScopes, type PermissionMode } from '../AccessToken.permissions'
 import { useOrgAndProjectData } from '../hooks/useOrgAndProjectData'
-import { BasicInfo } from './Form/BasicInfo'
-import { Permissions } from './Form/Permissions/Permissions'
-import { ResourceAccess } from './Form/ResourceAccess/ResourceAccess'
+import { PermissionsAccordion } from './Form/PermissionsAccordion'
+import { ResourceAccessStep } from './Form/ResourceAccessStep'
+import { ReviewStep } from './Form/ReviewStep'
+import { StepIndicator } from './Form/StepIndicator'
+import { TokenDetails } from './Form/TokenDetails'
 import {
-  useAccessTokenCreateMutation,
+  DEFAULT_EXPIRY,
+  EXPIRY_OPTIONS,
+  getExpiryDate,
+  TokenFormSchema,
+  type TokenFormValues,
+} from './Form/tokenForm'
+import { TokenSuccess } from './Form/TokenSuccess'
+import {
+  useScopedAccessTokenCreateMutation,
   type NewScopedAccessToken,
   type ScopedAccessTokenCreateVariables,
 } from '@/data/scoped-access-tokens/scoped-access-token-create-mutation'
@@ -40,287 +42,219 @@ import { useTrack } from '@/lib/telemetry/track'
 export interface NewScopedTokenSheetProps {
   visible: boolean
   onOpenChange: (open: boolean) => void
-  tokenScope: 'V0' | undefined
   onCreateToken: (token: NewScopedAccessToken) => void
+}
+
+const DEFAULT_VALUES: TokenFormValues = {
+  tokenName: '',
+  expiresAt: DEFAULT_EXPIRY,
+  customExpiryDate: undefined,
+  resourceAccess: 'single-project',
+  organizationSlug: undefined,
+  projectRef: undefined,
+  accountConfirmed: false,
+  permissions: {},
 }
 
 export const NewScopedTokenSheet = ({
   visible,
   onOpenChange,
-  tokenScope,
   onCreateToken,
 }: NewScopedTokenSheetProps) => {
-  const [resourceSearchOpen, setResourceSearchOpen] = useState(false)
+  const track = useTrack()
   const { organizations, projects } = useOrgAndProjectData()
+  const { mutate: createToken, isPending } = useScopedAccessTokenCreateMutation()
+
+  const [step, setStep] = useState<1 | 2 | 3>(1)
+  const [resourceError, setResourceError] = useState<string | undefined>()
+  const [showZeroWarning, setShowZeroWarning] = useState(false)
+  const [createdToken, setCreatedToken] = useState<NewScopedAccessToken | undefined>()
+  const resourceSectionRef = useRef<HTMLDivElement>(null)
 
   const form = useForm<TokenFormValues>({
-    resolver: zodResolver(TokenSchema),
-    defaultValues: {
-      tokenName: '',
-      expiresAt: EXPIRES_AT_OPTIONS['month'].value,
-      customExpiryDate: undefined,
-      resourceAccess: 'all-orgs',
-      selectedOrganizations: [],
-      selectedProjects: [],
-      permissionRows: [],
-    },
+    resolver: zodResolver(TokenFormSchema),
+    defaultValues: DEFAULT_VALUES,
     mode: 'onChange',
   })
-  const track = useTrack()
-  const { mutate: createAccessToken, isPending } = useAccessTokenCreateMutation()
 
-  const resourceAccess = form.watch('resourceAccess')
-  const expiresAt = form.watch('expiresAt')
-  const permissionRows = form.watch('permissionRows') || []
+  const values = form.watch()
+  const selection = values.permissions
+  const configuredCount = countConfigured(selection)
 
-  const onSubmit: SubmitHandler<TokenFormValues> = async (values) => {
-    if (!permissionRows || permissionRows.length === 0) {
-      toast.error('Please configure at least one permission.')
+  const validateResource = (): string | undefined => {
+    if (values.resourceAccess === 'single-project') {
+      if (!values.organizationSlug) return 'Please select an organization to continue.'
+      if (!values.projectRef) return 'Please select a project to continue.'
+    } else if (values.resourceAccess === 'organization') {
+      if (!values.organizationSlug) return 'Please select an organization to continue.'
+    } else if (values.resourceAccess === 'account') {
+      if (!values.accountConfirmed) return 'Confirm account-level access to continue.'
+    }
+    return undefined
+  }
+
+  const handleReviewAccess = async () => {
+    const nameValid = await form.trigger(['tokenName', 'customExpiryDate'])
+    const resourceErr = validateResource()
+    setResourceError(resourceErr)
+
+    if (resourceErr) {
+      resourceSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       return
     }
+    if (!nameValid) return
 
-    const hasValidPermissions = permissionRows.every(
-      (row) => row.resource && row.actions && row.actions.length > 0
-    )
-    if (!hasValidPermissions) {
-      toast.error('Please ensure all permissions have both resource and action selected.')
-      return
+    if (configuredCount === 0) setShowZeroWarning(true)
+    setStep(2)
+  }
+
+  const handlePermissionChange = (key: string, mode: PermissionMode) => {
+    form.setValue('permissions', { ...selection, [key]: mode })
+    if (mode !== 'none') setShowZeroWarning(false)
+  }
+
+  const resourceSummary = (): string => {
+    if (values.resourceAccess === 'single-project') {
+      const project = projects.find((p) => p.ref === values.projectRef)
+      return `Project: ${project?.name ?? values.projectRef ?? '—'}`
     }
-
-    if (values.resourceAccess === 'selected-orgs') {
-      const selectedOrgs = values.selectedOrganizations || []
-
-      if (selectedOrgs.length === 0) {
-        toast.error('Please select at least one organization.')
-        return
-      }
-
-      const availableOrgSlugs = organizations.map((org) => org.slug)
-      const invalidOrgs = selectedOrgs.filter((slug) => !availableOrgSlugs.includes(slug))
-
-      if (invalidOrgs.length > 0) {
-        toast.error(
-          `You don't have access to the following organization(s): ${invalidOrgs.join(', ')}`
-        )
-        return
-      }
+    if (values.resourceAccess === 'organization') {
+      const org = organizations.find((o) => o.slug === values.organizationSlug)
+      return `Organization: ${org?.name ?? values.organizationSlug ?? '—'}`
     }
+    return 'Account: Account-level access'
+  }
 
-    if (values.resourceAccess === 'selected-projects') {
-      const selectedProjects = values.selectedProjects || []
-
-      if (selectedProjects.length === 0) {
-        toast.error('Please select at least one project.')
-        return
-      }
-
-      const availableProjectRefs = projects.map((project) => project.ref)
-      const invalidProjects = selectedProjects.filter((ref) => !availableProjectRefs.includes(ref))
-
-      if (invalidProjects.length > 0) {
-        toast.error(
-          `You don't have access to the following project(s): ${invalidProjects.join(', ')}`
-        )
-        return
-      }
+  const expiresSummary = (): string => {
+    if (values.expiresAt === 'custom') {
+      return values.customExpiryDate
+        ? dayjs(values.customExpiryDate).format('DD MMM, YYYY')
+        : 'Custom — no date set'
     }
+    return EXPIRY_OPTIONS.find((o) => o.value === values.expiresAt)?.label ?? values.expiresAt
+  }
 
-    const finalExpiresAt =
-      values.expiresAt === CUSTOM_EXPIRY_VALUE
-        ? values.customExpiryDate
-        : getExpirationDate(values.expiresAt || '')
+  const handleCreate = () => {
+    const permissions = selectionToScopes(selection)
+    if (permissions.length === 0) return
 
-    const permissions = permissionRows
-      .flatMap((row) => {
-        const { resource, actions } = row
-        return actions.flatMap((action) => mapPermissionToFGA(resource, action))
-      })
-      .filter(Boolean) as ScopedAccessTokenPermission[]
+    const expires_at =
+      values.expiresAt === 'custom' ? values.customExpiryDate : getExpiryDate(values.expiresAt)
 
-    if (!permissions || permissions.length === 0) {
-      toast.error('Please configure at least one valid permission.')
-      return
-    }
-
-    const finalPayload: ScopedAccessTokenCreateVariables = {
-      name: values.tokenName,
+    const payload: ScopedAccessTokenCreateVariables = {
+      name: values.tokenName.trim(),
       permissions,
+      ...(expires_at ? { expires_at } : {}),
+      ...(values.resourceAccess === 'single-project' && values.projectRef
+        ? { project_refs: [values.projectRef] }
+        : {}),
+      ...(values.resourceAccess === 'organization' && values.organizationSlug
+        ? { organization_slugs: [values.organizationSlug] }
+        : {}),
     }
 
-    if (finalExpiresAt) {
-      finalPayload.expires_at = finalExpiresAt
-    }
-
-    if (
-      values.resourceAccess === 'selected-orgs' &&
-      values.selectedOrganizations &&
-      values.selectedOrganizations.length > 0
-    ) {
-      finalPayload.organization_slugs = values.selectedOrganizations
-    } else if (
-      values.resourceAccess === 'selected-projects' &&
-      values.selectedProjects &&
-      values.selectedProjects.length > 0
-    ) {
-      finalPayload.project_refs = values.selectedProjects
-    }
-
-    if (!finalPayload.name || finalPayload.name.trim() === '') {
-      toast.error('Please enter a token name.')
-      return
-    }
-
-    if (!finalPayload.permissions || finalPayload.permissions.length === 0) {
-      toast.error('Please configure at least one permission.')
-      return
-    }
-
-    createAccessToken(finalPayload, {
+    createToken(payload, {
       onSuccess: (data) => {
         track('access_token_created', {
           tokenType: 'scoped',
-          expiryPreset: values.expiresAt || 'never',
+          expiryPreset: values.expiresAt,
           resourceAccess: values.resourceAccess,
           permissionCount: permissions.length,
         })
         toast.success('Access token created successfully')
+        setCreatedToken(data)
+        setStep(3)
         onCreateToken(data)
-        handleClose()
-      },
-      onError: (error) => {
-        if (error.message && error.message.includes("don't have access")) {
-          toast.error(
-            `Access Error: ${error.message}. Please verify you have access to the selected resources.`
-          )
-        } else {
-          toast.error(`Failed to create access token: ${error.message}`)
-        }
       },
     })
+  }
+
+  const reset = () => {
+    form.reset(DEFAULT_VALUES)
+    setStep(1)
+    setResourceError(undefined)
+    setShowZeroWarning(false)
+    setCreatedToken(undefined)
   }
 
   const handleClose = () => {
-    form.reset({
-      tokenName: '',
-      expiresAt: EXPIRES_AT_OPTIONS['month'].value,
-      customExpiryDate: undefined,
-      resourceAccess: 'all-orgs',
-      selectedOrganizations: [],
-      selectedProjects: [],
-      permissionRows: [],
-    })
+    reset()
     onOpenChange(false)
   }
 
-  const handleCustomDateChange = useCallback(
-    (date: { date: string } | undefined) => {
-      form.setValue('customExpiryDate', date?.date, { shouldValidate: true })
-    },
-    [form]
-  )
-
-  const handleCustomExpiryChange = useCallback(
-    (isCustom: boolean) => {
-      if (isCustom && !form.getValues('customExpiryDate')) {
-        form.setValue('customExpiryDate', dayjs().endOf('day').toISOString(), {
-          shouldValidate: true,
-        })
-      }
-      if (!isCustom) {
-        form.setValue('customExpiryDate', undefined, { shouldValidate: true })
-      }
-    },
-    [form]
-  )
-
   return (
-    <Sheet
-      open={visible}
-      onOpenChange={(open) => {
-        if (!open) {
-          handleClose()
-        } else {
-          onOpenChange(open)
-        }
-      }}
-    >
+    <Sheet open={visible} onOpenChange={(open) => (open ? onOpenChange(true) : handleClose())}>
       <SheetContent
         showClose={false}
         size="default"
-        className="min-w-[600px]! flex flex-col h-full gap-0"
+        className="flex h-full min-w-[720px]! flex-col gap-0"
       >
         <SheetHeader>
-          <SheetTitle>
-            {tokenScope === 'V0' ? 'Generate token for experimental API' : 'Generate New Token'}
-          </SheetTitle>
+          <SheetTitle>{step === 3 ? 'Token created' : 'Generate token'}</SheetTitle>
           <SheetDescription className="sr-only">
-            A form to generate a new scoped access token.
+            Generate a new scoped access token in two steps: configure, then review.
           </SheetDescription>
         </SheetHeader>
-        <ScrollArea className="flex-1 max-h-[calc(100vh-116px)]">
-          <div className="flex flex-col overflow-visible">
-            {tokenScope === 'V0' && (
-              <div className="px-4 sm:px-5 py-4 pb-4">
-                <Admonition
-                  type="warning"
-                  title="The experimental API provides additional endpoints which allows you to manage your organizations and projects."
-                  description={
-                    <>
-                      <p>
-                        These include deleting organizations and projects which cannot be undone. As
-                        such, be very careful when using this API.
-                      </p>
-                      <div className="mt-4">
-                        <Button asChild variant="default" icon={<ExternalLink />}>
-                          <Link
-                            href="https://api.supabase.com/api/v0"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Experimental API documentation
-                          </Link>
-                        </Button>
-                      </div>
-                    </>
-                  }
-                />
-              </div>
-            )}
 
+        <ScrollArea className="flex-1">
+          {step === 3 && createdToken ? (
+            <TokenSuccess tokenName={createdToken.name} tokenValue={createdToken.token} />
+          ) : step === 2 ? (
+            <ReviewStep
+              values={values}
+              resourceSummary={resourceSummary()}
+              expiresSummary={expiresSummary()}
+            />
+          ) : (
             <Form {...form}>
-              <div className="flex flex-col gap-0 overflow-visible">
-                <BasicInfo
-                  control={form.control}
-                  expirationDate={expiresAt || ''}
-                  onCustomDateChange={handleCustomDateChange}
-                  onCustomExpiryChange={handleCustomExpiryChange}
-                />
-                <Separator />
-                <ResourceAccess
-                  control={form.control}
-                  resourceAccess={resourceAccess}
-                  setValue={form.setValue}
-                />
-                <Separator />
-                <Permissions
-                  setValue={form.setValue}
-                  watch={form.watch}
-                  resourceSearchOpen={resourceSearchOpen}
-                  setResourceSearchOpen={setResourceSearchOpen}
-                />
+              <TokenDetails form={form} />
+              <Separator />
+              <div ref={resourceSectionRef}>
+                <ResourceAccessStep form={form} error={resourceError} />
               </div>
+              <Separator />
+              <PermissionsAccordion
+                selection={selection}
+                onChange={handlePermissionChange}
+                showZeroWarning={showZeroWarning}
+              />
             </Form>
-          </div>
+          )}
         </ScrollArea>
-        <SheetFooter className="justify-end! w-full mt-auto py-4 border-t">
-          <div className="flex gap-2">
-            <Button variant="default" disabled={isPending} onClick={handleClose}>
-              Cancel
+
+        <SheetFooter className="mt-auto flex w-full items-center justify-between! border-t py-4">
+          {step === 3 ? (
+            <Button className="ml-auto" onClick={handleClose}>
+              Done
             </Button>
-            <Button onClick={form.handleSubmit(onSubmit)} loading={isPending}>
-              Generate token
-            </Button>
-          </div>
+          ) : (
+            <>
+              <StepIndicator step={step} total={2} label={step === 1 ? 'Configure' : 'Review'} />
+              <div className="flex gap-2">
+                {step === 2 && (
+                  <Button variant="default" disabled={isPending} onClick={() => setStep(1)}>
+                    Back
+                  </Button>
+                )}
+                <Button variant="default" disabled={isPending} onClick={handleClose}>
+                  Cancel
+                </Button>
+                {step === 1 ? (
+                  <Button iconRight={<ChevronRight />} onClick={handleReviewAccess}>
+                    Review access
+                  </Button>
+                ) : (
+                  <Button
+                    loading={isPending}
+                    disabled={configuredCount === 0}
+                    onClick={handleCreate}
+                  >
+                    Create token
+                  </Button>
+                )}
+              </div>
+            </>
+          )}
         </SheetFooter>
       </SheetContent>
     </Sheet>

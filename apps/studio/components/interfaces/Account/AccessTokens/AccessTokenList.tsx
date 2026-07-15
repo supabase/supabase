@@ -1,4 +1,4 @@
-import { MoreVertical, Trash } from 'lucide-react'
+import { Key, MoreVertical, Trash } from 'lucide-react'
 import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -21,38 +21,62 @@ import { filterAndSortTokens, handleSortChange } from './AccessToken.utils'
 import { RowLoading } from './AccessTokenTable/RowLoading'
 import { TableContainer } from './AccessTokenTable/TableContainer'
 import { ExpiresCell, LastUsedCell, TokenNameCell } from './AccessTokenTable/TokenCells'
+import { useMergedAccessTokens, type MergedAccessToken } from './hooks/useMergedAccessTokens'
+import { ViewTokenSheet } from './Scoped/ViewTokenSheet'
 import { AlertError } from '@/components/ui/AlertError'
 import { useAccessTokenDeleteMutation } from '@/data/access-tokens/access-tokens-delete-mutation'
-import { AccessToken, useAccessTokensQuery } from '@/data/access-tokens/access-tokens-query'
+import { useScopedAccessTokenDeleteMutation } from '@/data/scoped-access-tokens/scoped-access-tokens-delete-mutation'
 import { useTrack } from '@/lib/telemetry/track'
 
 export interface AccessTokenListProps {
   searchString?: string
-  onDeleteSuccess: (id: number) => void
+  scopedEnabled?: boolean
+  onDeleteSuccess?: (id: string | number) => void
 }
 
-export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTokenListProps) => {
+export const AccessTokenList = ({
+  searchString = '',
+  scopedEnabled = true,
+  onDeleteSuccess,
+}: AccessTokenListProps) => {
   const track = useTrack()
-  const [isOpen, setIsOpen] = useState(false)
-  const [token, setToken] = useState<AccessToken | undefined>(undefined)
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+  const [token, setToken] = useState<MergedAccessToken | undefined>(undefined)
+  const [viewToken, setViewToken] = useState<MergedAccessToken | undefined>(undefined)
+  const [isViewSheetOpen, setIsViewSheetOpen] = useState(false)
   const [sort, setSort] = useQueryState(
     'sort',
     parseAsStringLiteral<AccessTokenSort>(ACCESS_TOKEN_SORT_VALUES).withDefault('created_at:desc')
   )
 
-  const { data: tokens, error, isPending: isLoading, isError } = useAccessTokensQuery()
+  const { tokens, error, isLoading, isError } = useMergedAccessTokens({ scopedEnabled })
 
-  const { mutate: deleteToken } = useAccessTokenDeleteMutation({
-    onSuccess: (_, vars) => {
-      track('access_token_removed', { tokenType: 'classic' })
-      onDeleteSuccess(vars.id)
-      toast.success('Successfully deleted access token')
-      setIsOpen(false)
-    },
-    onError: (error) => {
-      toast.error(`Failed to delete access token: ${error.message}`)
-    },
-  })
+  const { mutate: deleteClassicToken, isPending: isDeletingClassic } = useAccessTokenDeleteMutation(
+    {
+      onSuccess: (_, vars) => {
+        track('access_token_removed', { tokenType: 'classic' })
+        onDeleteSuccess?.(vars.id)
+        toast.success('Successfully deleted access token')
+        setIsDeleteOpen(false)
+      },
+      onError: (error) => {
+        toast.error(`Failed to delete access token: ${error.message}`)
+      },
+    }
+  )
+
+  const { mutate: deleteScopedToken, isPending: isDeletingScoped } =
+    useScopedAccessTokenDeleteMutation({
+      onSuccess: (_, vars) => {
+        track('access_token_removed', { tokenType: 'scoped' })
+        onDeleteSuccess?.(vars.id)
+        toast.success('Successfully deleted access token')
+        setIsDeleteOpen(false)
+      },
+      onError: (error) => {
+        toast.error(`Failed to delete access token: ${error.message}`)
+      },
+    })
 
   const onSortChange = (column: AccessTokenSortColumn) => {
     handleSortChange(sort, column, setSort)
@@ -64,6 +88,12 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
   )
 
   const empty = filteredTokens?.length === 0 && !isLoading
+
+  const handleConfirmDelete = () => {
+    if (!token) return
+    if (token.kind === 'classic') deleteClassicToken({ id: token.id as number })
+    else deleteScopedToken({ id: token.id as string })
+  }
 
   if (isError) {
     return (
@@ -109,8 +139,12 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
     <>
       <TableContainer sort={sort} onSortChange={onSortChange}>
         {filteredTokens?.map((x) => (
-          <TableRow key={x.token_alias}>
-            <TokenNameCell name={x.name} tokenAlias={x.token_alias} />
+          <TableRow key={`${x.kind}-${x.id}`}>
+            <TokenNameCell
+              name={x.name}
+              tokenAlias={x.token_alias}
+              isClassic={x.kind === 'classic'}
+            />
             <LastUsedCell lastUsedAt={x.last_used_at} />
             <ExpiresCell expiresAt={x.expires_at} />
             <TableCell>
@@ -125,11 +159,23 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent side="bottom" align="end" className="w-40">
+                    {x.kind === 'scoped' && (
+                      <DropdownMenuItem
+                        className="gap-x-2"
+                        onClick={() => {
+                          setViewToken(x)
+                          setIsViewSheetOpen(true)
+                        }}
+                      >
+                        <Key size={12} />
+                        <p>View permissions</p>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
                       className="gap-x-2"
                       onClick={() => {
                         setToken(x)
-                        setIsOpen(true)
+                        setIsDeleteOpen(true)
                       }}
                     >
                       <Trash size={12} />
@@ -144,20 +190,28 @@ export const AccessTokenList = ({ searchString = '', onDeleteSuccess }: AccessTo
       </TableContainer>
 
       <ConfirmationModal
-        visible={isOpen}
+        visible={isDeleteOpen}
         variant="destructive"
         title="Confirm to delete"
         confirmLabel="Delete"
         confirmLabelLoading="Deleting"
-        onCancel={() => setIsOpen(false)}
-        onConfirm={() => {
-          if (token) deleteToken({ id: token.id })
-        }}
+        loading={isDeletingClassic || isDeletingScoped}
+        onCancel={() => setIsDeleteOpen(false)}
+        onConfirm={handleConfirmDelete}
       >
         <p className="py-4 text-sm text-foreground-light">
           This action cannot be undone. Are you sure you want to delete "{token?.name}" token?
         </p>
       </ConfirmationModal>
+
+      <ViewTokenSheet
+        visible={isViewSheetOpen}
+        tokenId={viewToken ? String(viewToken.id) : undefined}
+        onClose={() => {
+          setIsViewSheetOpen(false)
+          setViewToken(undefined)
+        }}
+      />
     </>
   )
 }

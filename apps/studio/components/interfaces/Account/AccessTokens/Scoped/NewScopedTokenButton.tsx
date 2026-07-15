@@ -25,7 +25,6 @@ export const NewScopedTokenButton = ({ onCreateToken }: NewScopedTokenButtonProp
       <NewScopedTokenSheet
         visible={visible}
         onOpenChange={setVisible}
-        tokenScope={undefined}
         onCreateToken={onCreateToken}
       />
     </>
