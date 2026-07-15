@@ -272,6 +272,8 @@ Both starting points converge here. You have a working `./supabase` directory in
 
 ### Making schema changes
 
+Which approach you use is a project-level decision, set when you first created your schema — not a per-change choice. It depends on whether you keep declarative files in `supabase/schemas/`. Pick the tab that matches your project.
+
 <Tabs
   scrollable
   size="small"
@@ -287,6 +289,12 @@ Both starting points converge here. You have a working `./supabase` directory in
 4. Verify the full chain: `supabase db reset`
 5. Commit the schema file **and** the migration together
 
+<Admonition type="caution">
+
+`db diff` compares your `supabase/schemas/` files against your existing migrations; it does **not** read the live local database. Changes you make directly in Studio or via SQL are ignored, so `db diff` reports "No schema changes found" and silently drops them. Always edit the schema files, then diff.
+
+</Admonition>
+
   </TabPanel>
   <TabPanel id="imperative" label="Imperative migrations">
     
@@ -296,7 +304,7 @@ Both starting points converge here. You have a working `./supabase` directory in
 supabase db diff -f add-due-date-to-todo
 ```
 
-This captures your UI changes as a migration file.
+This captures your UI changes as a migration file. This works only when your project has **no** declarative files in `supabase/schemas/`: `db diff` then compares the live local database against your migrations. If you use declarative schemas, don't edit through Studio expecting `db diff` to catch it — see the **Declarative schemas** tab.
 
 **If you prefer to write SQL directly:**
 
