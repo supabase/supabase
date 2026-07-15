@@ -79,7 +79,7 @@ function transformUrl(source: FederatedContentSource, url: string): string {
       ? `${BASE_PATH}/guides/${source.section}${mapped.slug ? `/${mapped.slug}` : ''}${hash}`
       : `${source.externalSite}/${relativePath}${hash}`
   } catch (err) {
-    throw Error('[DOCS] fetch-federated-content: Error transforming markdown URL', err)
+    throw Error('[DOCS] fetch-federated-content: Error transforming markdown URL', { cause: err })
   }
 }
 
@@ -139,5 +139,5 @@ async function fetchFederatedContent() {
 }
 
 fetchFederatedContent().catch((error) => {
-  throw Error(error)
+  throw error
 })
