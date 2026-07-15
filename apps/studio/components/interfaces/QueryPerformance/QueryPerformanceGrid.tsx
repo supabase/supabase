@@ -11,9 +11,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   Sheet,
+  SheetClose,
   SheetContent,
   SheetDescription,
+  SheetFooter,
   SheetHeader,
+  SheetSection,
   SheetTitle,
   Tabs,
   TabsContent,
@@ -594,7 +597,7 @@ export const QueryPerformanceGrid = ({
       >
         <SheetContent
           side="right"
-          className="flex flex-col h-full bg-studio border-l lg:w-[calc(100vw-802px)]! max-w-[700px] w-full"
+          className="flex flex-col gap-0"
           hasOverlay={false}
           onInteractOutside={(event) => {
             if (dataGridContainerRef.current?.contains(event.target as Node)) {
@@ -602,51 +605,61 @@ export const QueryPerformanceGrid = ({
             }
           }}
         >
-          <SheetHeader>
+          <SheetHeader className="hidden">
             <SheetTitle className="sr-only">Query details</SheetTitle>
             <SheetDescription className="sr-only">
               Query Performance Details &amp; Indexes
             </SheetDescription>
           </SheetHeader>
-          <Tabs
-            value={view}
-            className="flex flex-col h-full"
-            onValueChange={(value: any) => setView(value)}
-          >
-            <div className="px-5 border-b">
-              <TabsList className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
-                <TabsTrigger
-                  value="details"
-                  className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
-                >
-                  Query details
-                </TabsTrigger>
-                {selectedRow !== undefined && canShowIndexesTab && (
-                  <TabsTrigger
-                    value="suggestion"
-                    className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
-                  >
-                    Indexes
-                  </TabsTrigger>
-                )}
-              </TabsList>
-            </div>
 
-            <TabsContent value="details" className="mt-0 grow min-h-0 overflow-y-auto">
-              {selectedRow !== undefined && (
-                <QueryDetail
-                  selectedRow={reportData[selectedRow]}
-                  onClickViewSuggestion={() => setView('suggestion')}
-                  onClose={() => setSelectedRow(undefined)}
-                />
-              )}
-            </TabsContent>
-            {selectedRow !== undefined && canShowIndexesTab && (
-              <TabsContent value="suggestion" className="mt-0 grow min-h-0 overflow-y-auto">
-                <QueryIndexes selectedRow={reportData[selectedRow]} />
-              </TabsContent>
-            )}
-          </Tabs>
+          <div className="overflow-auto grow px-0">
+            <SheetSection>
+              <Tabs
+                value={view}
+                className="flex flex-col h-full"
+                onValueChange={(value: any) => setView(value)}
+              >
+                <div className="px-5 border-b">
+                  <TabsList className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
+                    <TabsTrigger
+                      value="details"
+                      className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
+                    >
+                      Query details
+                    </TabsTrigger>
+                    {selectedRow !== undefined && canShowIndexesTab && (
+                      <TabsTrigger
+                        value="suggestion"
+                        className="px-0 pb-0 data-[state=active]:bg-transparent shadow-none!"
+                      >
+                        Indexes
+                      </TabsTrigger>
+                    )}
+                  </TabsList>
+                </div>
+
+                <TabsContent value="details" className="mt-0 grow min-h-0 overflow-y-auto">
+                  {selectedRow !== undefined && (
+                    <QueryDetail
+                      selectedRow={reportData[selectedRow]}
+                      onClickViewSuggestion={() => setView('suggestion')}
+                      onClose={() => setSelectedRow(undefined)}
+                    />
+                  )}
+                </TabsContent>
+                {selectedRow !== undefined && canShowIndexesTab && (
+                  <TabsContent value="suggestion" className="mt-0 grow min-h-0 overflow-y-auto">
+                    <QueryIndexes selectedRow={reportData[selectedRow]} />
+                  </TabsContent>
+                )}
+              </Tabs>
+            </SheetSection>
+          </div>
+          <SheetFooter>
+            <SheetClose asChild>
+              <Button variant="outline">Close</Button>
+            </SheetClose>
+          </SheetFooter>
         </SheetContent>
       </Sheet>
     </div>
