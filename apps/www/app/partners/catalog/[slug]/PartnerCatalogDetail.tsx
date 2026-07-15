@@ -261,45 +261,49 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
             </div>
           </SectionContainerWithCn>
           <div className="absolute h-full w-full inset-0 z-20 pointer-events-none">
-            <SectionContainerWithCn
-              height="none"
+            <div
               className={cn(
-                'transition-all bg-background/90 -translate-y-3/4 dark:bg-background/95 backdrop-blur-xs border-b sticky top-16 z-20 flex justify-between items-center gap-4 py-2',
+                'transition-all border-b bg-background/90 -translate-y-3/4 dark:bg-background/95 backdrop-blur-xs sticky top-16 z-20',
                 showStickyBar
                   ? 'opacity-100 pointer-events-auto translate-y-0'
                   : 'opacity-0 pointer-events-none'
               )}
             >
-              <div className="flex items-center space-x-2">
-                <Image
-                  width={56}
-                  height={56}
-                  className="hidden sm:block bg-white p-0.5 shrink-0 h-6 w-6 rounded-full border"
-                  src={partner.logo}
-                  alt={partner.title}
-                />
-                <div className="flex flex-col sm:flex-row sm:items-center sm:gap-1">
-                  <span className="sm:text-lg truncate">{partner.title}</span>
-                  {activeListing && (
-                    <>
-                      <span className="text-foreground-lighter text-sm hidden sm:inline">—</span>
-                      <span className="text-foreground-lighter text-sm truncate">
-                        {activeListing.label}
-                      </span>
-                    </>
-                  )}
+              <SectionContainerWithCn
+                height="none"
+                className="flex justify-between items-center gap-4 py-2"
+              >
+                <div className="flex items-center space-x-2">
+                  <Image
+                    width={56}
+                    height={56}
+                    className="hidden sm:block bg-white p-0.5 shrink-0 h-6 w-6 rounded-full border"
+                    src={partner.logo}
+                    alt={partner.title}
+                  />
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:gap-1">
+                    <span className="sm:text-lg truncate">{partner.title}</span>
+                    {activeListing && (
+                      <>
+                        <span className="text-foreground-lighter text-sm hidden sm:inline">—</span>
+                        <span className="text-foreground-lighter text-sm truncate">
+                          {activeListing.label}
+                        </span>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-              {installHref && (
-                <Button asChild>
-                  <a href={installHref} target="_blank" rel="noreferrer">
-                    {activeListing.publishedInMarketplace
-                      ? 'Install integration'
-                      : 'Add integration'}
-                  </a>
-                </Button>
-              )}
-            </SectionContainerWithCn>
+                {installHref && (
+                  <Button asChild>
+                    <a href={installHref} target="_blank" rel="noreferrer">
+                      {activeListing.publishedInMarketplace
+                        ? 'Install integration'
+                        : 'Add integration'}
+                    </a>
+                  </Button>
+                )}
+              </SectionContainerWithCn>
+            </div>
           </div>
         </div>
 
