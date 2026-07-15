@@ -4,13 +4,15 @@ title: 'pgsodium (pending deprecation): Encryption Features'
 description: 'Encryption library for Postgres'
 ---
 
-Supabase **does not recommend** the usage of [pgsodium](https://github.com/michelp/pgsodium). Use [Supabase Vault](/docs/guides/database/vault) instead.
+Supabase **does not recommend** the usage of [pgsodium](https://github.com/michelp/pgsodium) as it will be deprecated. Use [Supabase Vault](/docs/guides/database/vault) instead.
 
-The [`pgsodium`](https://github.com/michelp/pgsodium) extension is expected to go through a deprecation cycle in the near future. We will reach out to owners of impacted projects to assist with migrations away from [`pgsodium`](https://github.com/michelp/pgsodium) once the deprecation process begins.
+We will reach out to owners of impacted projects to assist with migrations away from [pgsodium](https://github.com/michelp/pgsodium) once the deprecation process begins.
+
+Vault and `pgsodium` are **separate** extensions. Vault doesn't depend on `pgsodium` and **is not** affected by this deprecation.
 
 <Admonition type="note">
 
-Vault and `pgsodium` are separate extensions. Vault is **not** affected by this deprecation: it is self-contained and no longer depends on `pgsodium`. It shares the same per-project [root key](/docs/guides/database/vault#encryption-key-location) (same format and location) but exposes its own interface - the `vault.secrets` table and `decrypted_secrets` view - so switching to Vault does not change how your key is managed.
+Vault is self-contained doesn't depends on `pgsodium`. It shares the same per-project [root key](/docs/guides/database/vault#encryption-key-location) (same format and location) but exposes its own interface - the `vault.secrets` table and `decrypted_secrets` view - so switching to Vault does not change how your key is managed.
 
 </Admonition>
 
