@@ -1,5 +1,5 @@
 import { type UntrustedSqlFragment } from '@supabase/pg-meta'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import {
   createContext,
   use,
@@ -24,7 +24,6 @@ import { useSnippetIdentity } from './useSnippetIdentity'
 import { useSnippetTitleGenerator } from './useSnippetTitleGenerator'
 import { useSqlEditorAi } from './useSqlEditorAi'
 import { useSqlEditorExecution } from './useSqlEditorExecution'
-import { useSqlEditorExplain } from './useSqlEditorExplain'
 import { useSqlEditorShortcuts } from './useSqlEditorShortcuts'
 import { isValidConnString } from '@/data/fetchers'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
@@ -44,7 +43,7 @@ import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
  * state.
  *
  * SQL that a user runs is NOT promoted to safety here — the provider only
- * exposes the already-safe `executeQuery` / `executeExplainQuery` pipelines plus
+ * exposes the already-safe `executeQuery` pipeline plus
  * `readEditorSql` (which returns an `UntrustedSqlFragment`). Each user-action
  * site (the toolbar/editor/results components and the shortcut handlers)
  * promotes with `acceptUntrustedSql` right where the user acts, so the promotion
@@ -64,16 +63,13 @@ type AssistantContextValue = {
 }
 
 type SqlEditorExecution = ReturnType<typeof useSqlEditorExecution>
-type SqlEditorExplain = ReturnType<typeof useSqlEditorExplain>
 type SqlEditorMount = ReturnType<typeof useEditorMount>
 
-/** Running SQL: the safe execute pipelines, their status, and formatting. */
+/** Running SQL: the safe execute pipeline, its status, and formatting. */
 type RunContextValue = {
   executeQuery: SqlEditorExecution['executeQuery']
-  executeExplainQuery: SqlEditorExplain['executeExplainQuery']
   readEditorSql: () => UntrustedSqlFragment | undefined
   isExecuting: boolean
-  isExplainExecuting: boolean
   potentialIssues: SqlEditorExecution['potentialIssues']
   resetPotentialIssues: () => void
   prettifyQuery: () => void
@@ -108,7 +104,7 @@ export const useSqlEditorSnippet = () => useGuardedContext(SnippetContext, 'useS
 export const useSqlEditorAssistant = () =>
   useGuardedContext(AssistantContext, 'useSqlEditorAssistant')
 
-/** Run / explain execution, warnings, and query formatting. */
+/** Run execution, warnings, and query formatting. */
 export const useSqlEditorRun = () => useGuardedContext(RunContext, 'useSqlEditorRun')
 
 /** Editor-surface UI state (selection, active results tab, editor mount). */
@@ -123,9 +119,6 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
   const tabs = useTabsStateSnapshot()
   const snapV2 = useSqlEditorV2StateSnapshot()
   const { setSelectedDatabaseId } = useDatabaseSelectorStateSnapshot()
-
-  // [Ali] Kill switch to hide the SQL Editor Explain tab and its entry points
-  const disablePrettyExplain = useFlag('DisablePrettyExplainOnSqlEditor')
 
   const diff = useSqlEditorDiff()
   const { isDiffOpen } = diff
@@ -163,16 +156,8 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
       id,
       isDiffOpen,
       hasSelection,
-      activeUtilityTab,
-      setActiveUtilityTab,
       setAiTitle,
     })
-
-  const { executeExplainQuery, isExplainExecuting } = useSqlEditorExplain({
-    id,
-    isDiffOpen,
-    setActiveUtilityTab,
-  })
 
   const ai = useSqlEditorAi({ id, editorMountCount, diff, prompt })
   const { acceptAiHandler, discardAiHandler } = ai
@@ -180,10 +165,7 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
   useSqlEditorShortcuts({
     isDiffOpen,
     isPromptOpen: promptState.isOpen,
-    disablePrettyExplain,
     prettifyQuery,
-    readEditorSql,
-    executeExplainQuery,
     acceptAiHandler,
     discardAiHandler,
     resetPrompt,
@@ -227,24 +209,13 @@ export const SQLEditorControllersProvider = ({ children }: PropsWithChildren) =>
   const runValue = useMemo<RunContextValue>(
     () => ({
       executeQuery,
-      executeExplainQuery,
       readEditorSql,
       isExecuting,
-      isExplainExecuting,
       potentialIssues,
       resetPotentialIssues,
       prettifyQuery,
     }),
-    [
-      executeQuery,
-      executeExplainQuery,
-      readEditorSql,
-      isExecuting,
-      isExplainExecuting,
-      potentialIssues,
-      resetPotentialIssues,
-      prettifyQuery,
-    ]
+    [executeQuery, readEditorSql, isExecuting, potentialIssues, resetPotentialIssues, prettifyQuery]
   )
 
   const uiValue = useMemo<UiContextValue>(

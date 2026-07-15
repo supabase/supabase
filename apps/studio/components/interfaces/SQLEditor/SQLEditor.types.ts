@@ -39,4 +39,4 @@ export type PotentialIssues = {
 }
 
 /** The tabs available in the SQL editor's results/utility panel. */
-export type UtilityTab = 'results' | 'explain'
+export type UtilityTab = 'results'

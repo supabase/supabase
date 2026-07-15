@@ -1,10 +1,4 @@
-import {
-  safeSql,
-  untrustedSql,
-  type SafeSqlFragment,
-  type UntrustedSqlFragment,
-} from '@supabase/pg-meta'
-import { wrapWithRollback } from '@supabase/pg-meta/src/query'
+import { untrustedSql, type SafeSqlFragment, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { TABLE_EVENT_ACTIONS } from 'common/telemetry-constants'
 
 import {
@@ -15,14 +9,11 @@ import {
   updateWithoutWhereRegex,
 } from './SQLEditor.constants'
 import { ContentDiff, type IStandaloneCodeEditor } from './SQLEditor.types'
-import { isExplainSql } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { removeCommentsFromSql } from '@/lib/helpers'
-import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { sqlEventParser } from '@/lib/sql-event-parser'
-import type { RoleImpersonationState } from '@/state/role-impersonation-state'
 
 export type CreateTableWithoutRLS = {
   schema?: string
@@ -321,22 +312,6 @@ export function assembleCompletionDiff(
     original: beforeSelection + selection + afterSelection,
     modified: beforeSelection + text + afterSelection,
   }
-}
-
-/**
- * Builds the SQL sent for an EXPLAIN run: wraps the query in `EXPLAIN ANALYZE`
- * (unless it is already an EXPLAIN), applies role impersonation, and wraps the
- * whole thing in a rollback transaction so EXPLAIN ANALYZE never mutates data.
- *
- * Takes an already-safe fragment — the untrusted→safe promotion happens at the
- * caller's user-action boundary (see `acceptUntrustedSql`), not in here.
- */
-export function buildExplainSql(
-  sql: SafeSqlFragment,
-  impersonatedRoleState?: RoleImpersonationState
-): SafeSqlFragment {
-  const explainSql = isExplainSql(sql) ? sql : safeSql`EXPLAIN ANALYZE ${sql}`
-  return wrapWithRollback(wrapWithRoleImpersonation(explainSql, impersonatedRoleState))
 }
 
 /**
