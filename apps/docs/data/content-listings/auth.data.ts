@@ -17,7 +17,7 @@ export const authGetStarted: ContentListingGroup = {
       description: 'Create a Supabase client for SSR frameworks like Next.js and SvelteKit.',
     },
     {
-      title: 'Choosing a server-side package',
+      title: 'Which package to use',
       href: '/guides/auth/choosing-a-server-package',
       description: 'supabase-js vs @supabase/ssr vs @supabase/server — which to use on the server.',
     },
