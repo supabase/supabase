@@ -34,6 +34,18 @@ export const SERVICE_FLOW_TYPES = [
 
 export type ServiceFlowType = (typeof SERVICE_FLOW_TYPES)[number]
 
+// The logs table's primary key is (project, source, timestamp) — filtering on
+// source narrows the sorted range ClickHouse has to scan before the timestamp
+// bound even applies, so it matters for performance, not just correctness
+// (mirrors the `type` -> `source` mapping in UnifiedLogs.queries.ts's LOG_TYPE_CONDITION).
+const SERVICE_FLOW_TYPE_SOURCE: Record<ServiceFlowType, SafeLogSqlFragment> = {
+  postgrest: safeSql`'postgrest_logs'`,
+  auth: safeSql`'auth_logs'`,
+  'edge-function': safeSql`'function_edge_logs'`,
+  storage: safeSql`'storage_logs'`,
+  postgres: safeSql`'postgres_logs'`,
+}
+
 export type UnifiedLogInspectionVariables = {
   projectRef?: string
   logId?: string
@@ -219,7 +231,7 @@ export async function getUnifiedLogInspection(
   const sql = safeSql`-- unified logs: inspect single log by id
 SELECT id, timestamp, source, event_message, severity_text, log_attributes
 FROM logs
-WHERE id = ${lit(logId)}
+WHERE id = ${lit(logId)} AND source = ${SERVICE_FLOW_TYPE_SOURCE[type]}
 LIMIT 1
 `
 
