@@ -216,7 +216,7 @@ export const CronJobTableCell = ({
             size="medium"
             disabled={isToggling}
             checked={active}
-            aria-label={active ? `Disable ${jobname}` : `Enable ${jobname}`}
+            aria-label="Cron job active status"
             onClick={(e) => {
               e.stopPropagation()
               setShowToggleModal(true)
