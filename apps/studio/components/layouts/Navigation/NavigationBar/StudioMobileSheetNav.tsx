@@ -1,3 +1,4 @@
+import { useBreakpoint } from 'common'
 import type { ReactNode } from 'react'
 import { CommandWrapper } from 'ui-patterns/CommandMenu'
 import { MobileSheetNav } from 'ui-patterns/MobileSheetNav'
@@ -38,6 +39,7 @@ function getSheetChildren(
 }
 
 const StudioMobileSheetNav = () => {
+  const isMobile = useBreakpoint('md')
   const { content, setContent } = useMobileSheet()
   const { activeSidebar } = useSidebarManagerSnapshot()
   const sheetChildren = getSheetChildren(content, activeSidebar ?? null)
@@ -45,7 +47,7 @@ const StudioMobileSheetNav = () => {
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       setContent(null)
-      sidebarManagerState.closeActive()
+      if (isMobile) sidebarManagerState.closeActive()
     }
   }
 
