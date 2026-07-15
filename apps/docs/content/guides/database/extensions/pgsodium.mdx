@@ -12,7 +12,7 @@ Vault and `pgsodium` are **separate** extensions. Vault doesn't depend on `pgsod
 
 <Admonition type="note">
 
-Vault is self-contained doesn't depends on `pgsodium`. It shares the same per-project [root key](/docs/guides/database/vault#encryption-key-location) (same format and location) but exposes its own interface - the `vault.secrets` table and `decrypted_secrets` view - so switching to Vault does not change how your key is managed.
+Vault is self-contained and doesn't depends on `pgsodium`. It shares the same per-project [root key](/docs/guides/database/vault#encryption-key-location) (same format and location) but exposes its own interface - the `vault.secrets` table and `decrypted_secrets` view - so switching to Vault does not change how your key is managed.
 
 </Admonition>
 
