@@ -418,7 +418,12 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           description:
             'Total amount of backfill/initial copy data processed across all projects.\nBilling is based on the total amount of backfill/initial copy data processed in Gigabyte.',
           chartDescription: 'The data refreshes every hour.',
-          links: [],
+          links: [
+            {
+              name: 'Pipelines',
+              url: `${DOCS_URL}/guides/database/replication/pipelines`,
+            },
+          ],
         },
         {
           anchor: 'pipeline-replicated-data',
@@ -429,7 +434,12 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           description:
             'Total amount of replicated data processed across all projects.\nBilling is based on the total amount of replicated data processed in Gigabyte.',
           chartDescription: 'The data refreshes every hour.',
-          links: [],
+          links: [
+            {
+              name: 'Pipelines',
+              url: `${DOCS_URL}/guides/database/replication/pipelines`,
+            },
+          ],
         },
       ],
     },
