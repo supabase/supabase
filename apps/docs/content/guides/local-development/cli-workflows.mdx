@@ -14,7 +14,7 @@ There are two starting points, both leading to the same place: database schema a
 
 ## Before you begin
 
-You need the Supabase CLI installed and a Docker-compatible runtime running. If you haven't set these up yet, see [Getting started](/docs/guides/local-development/cli/getting-started) for installation across macOS, Windows, and Linux, and for the details of what `supabase start` brings up and how to access each service.
+You need the Supabase CLI installed and a Docker-compatible runtime running. If you haven't set these up yet, see [Install and run the CLI](/docs/guides/local-development/cli/getting-started) for installation across macOS, Windows, and Linux, and for the details of what `supabase start` brings up and how to access each service.
 
 Keep in mind that **the local stack is for development only**. It is not hardened for production use and must never be exposed to external traffic. It has no TLS, no rate limiting, and default credentials. Use it to develop and test, then deploy to the [Supabase Platform](https://supabase.com) or a proper self-hosted setup for anything beyond that.
 
@@ -182,7 +182,7 @@ supabase init
 supabase start
 ```
 
-On first run, Docker images are pulled, which takes a few minutes. Subsequent starts are fast. Once running, the CLI outputs local service URLs and credentials, including the Studio URL for a local instance of the Dashboard. See [Getting started](/docs/guides/local-development/cli/getting-started#access-your-projects-services) for the full output and how to reach each service.
+On first run, Docker images are pulled, which takes a few minutes. Subsequent starts are fast. Once running, the CLI outputs local service URLs and credentials, including the Studio URL for a local instance of the Dashboard. See [Install and run the CLI](/docs/guides/local-development/cli/getting-started#access-your-projects-services) for the full output and how to reach each service.
 
 ### Step 3: Create your schema
 
