@@ -14,9 +14,16 @@ import {
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { STORED_SECRET_PLACEHOLDER } from '../DestinationForm.constants'
 import type { DestinationPanelSchemaType } from '../DestinationForm.schema'
 
-export const ClickHouseFields = ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => {
+export const ClickHouseFields = ({
+  form,
+  editMode,
+}: {
+  form: UseFormReturn<DestinationPanelSchemaType>
+  editMode: boolean
+}) => {
   const [showPassword, setShowPassword] = useState(false)
 
   return (
@@ -67,13 +74,17 @@ export const ClickHouseFields = ({ form }: { form: UseFormReturn<DestinationPane
             <FormItemLayout
               layout="horizontal"
               label="Password"
-              description="Omit for passwordless access"
+              description={
+                editMode
+                  ? 'Stored password is hidden. Enter a new password to replace it.'
+                  : 'Omit for passwordless access'
+              }
             >
               <FormControl>
                 <PasswordInput
                   value={field.value ?? ''}
                   type={showPassword ? 'text' : 'password'}
-                  placeholder="Optional"
+                  placeholder={editMode ? STORED_SECRET_PLACEHOLDER : 'Optional'}
                   onChange={(event) => field.onChange(event.target.value)}
                   actions={
                     <div className="flex items-center justify-center">

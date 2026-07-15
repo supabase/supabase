@@ -394,7 +394,7 @@ export const DestinationForm = ({
               ) : selectedType === 'Snowflake' && etlEnableSnowflake ? (
                 <SnowflakeFields form={form} editMode={editMode} />
               ) : selectedType === 'ClickHouse' && etlEnableClickHouse ? (
-                <ClickHouseFields form={form} />
+                <ClickHouseFields form={form} editMode={editMode} />
               ) : null}
 
               <DialogSectionSeparator />
