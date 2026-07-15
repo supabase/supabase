@@ -58,7 +58,13 @@ The CLI processes seed files in the order they are declared in the `sql_paths` a
 
 ## Generating seed data
 
-You can generate seed data for local development using [Snaplet](https://github.com/snaplet/seed).
+For most projects, a hand-written `supabase/seed.sql` (see [Using seed files](#using-seed-files) above) is the simplest and most reliable approach. If you need large volumes of realistic data, you can generate it with [Snaplet Seed](https://github.com/supabase-community/seed).
+
+<Admonition type="note">
+
+Snaplet wound down as a company in 2024 and open-sourced its tooling. `@snaplet/seed` is now community-maintained at [supabase-community/seed](https://github.com/supabase-community/seed) and receives only occasional fixes, so treat it as an optional convenience rather than a required part of the workflow.
+
+</Admonition>
 
 <Admonition type="tip">
 
@@ -160,23 +166,22 @@ Running `npx tsx seed.ts > supabase/seed.sql` generates the relevant SQL stateme
 
 ```sql
 -- The `Post.createdBy` user with an email address ending in `"@acme.org"`
-INSERT INTO "User" (name, email) VALUES ("John Snow", "snow@acme.org")
+insert into "User" (name, email) values ('John Snow', 'snow@acme.org');
 
---- A `Post` with the title `"There is a lot of snow around here!"`
-INSERT INTO "Post" (title, content, createdBy) VALUES (
-  "There is a lot of snow around here!",
-  "Lorem ipsum dolar",
-  1)
+-- - A `Post` with the title `"There is a lot of snow around here!"`
+insert into "Post" (title, content, createdBy)
+values
+  ('There is a lot of snow around here!', 'Lorem ipsum dolar', 1);
 
---- Three `Post.Comment` from three different users.
-INSERT INTO "User" (name, email) VALUES ("Stephanie Shadow", "shadow@domain.com")
-INSERT INTO "Comment" (text, userId, postId) VALUES ("I love cheese", 2, 1)
+-- - Three `Post.Comment` from three different users.
+insert into "User" (name, email) values ('Stephanie Shadow', 'shadow@domain.com');
+insert into "Comment" (text, userId, postId) values ('I love cheese', 2, 1);
 
-INSERT INTO "User" (name, email) VALUES ("John Rambo", "rambo@trymore.dev")
-INSERT INTO "Comment" (text, userId, postId) VALUES ("Lorem ipsum dolar sit", 3, 1)
+insert into "User" (name, email) values ('John Rambo', 'rambo@trymore.dev');
+insert into "Comment" (text, userId, postId) values ('Lorem ipsum dolar sit', 3, 1);
 
-INSERT INTO "User" (name, email) VALUES ("Steven Plank", "s@plank.org")
-INSERT INTO "Comment" (text, userId, postId) VALUES ("Actually, that's not correct...", 4, 1)
+insert into "User" (name, email) values ('Steven Plank', 's@plank.org');
+insert into "Comment" (text, userId, postId) values ('Actually, that''s not correct...', 4, 1);
 ```
 
 Whenever your database structure changes, you will need to regenerate `@snaplet/seed` to keep it in sync with the new structure. You can do this by running:
@@ -199,4 +204,4 @@ npx @snaplet/seed sync
 npx tsx seed.ts > supabase/seed.sql
 ```
 
-For more information, check out Snaplet's [seed documentation](https://snaplet-seed.netlify.app/seed/integrations/supabase)
+For more information, see the [Snaplet Seed repository](https://github.com/supabase-community/seed).

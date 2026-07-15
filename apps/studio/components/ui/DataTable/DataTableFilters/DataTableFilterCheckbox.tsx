@@ -135,7 +135,7 @@ export function DataTableFilterCheckbox<TData>({
                         {isExpanded ? <Minus size={12} /> : <Plus size={12} />}
                       </button>
                     )}
-                    <span className="shrink-0 flex items-center justify-center font-mono text-xs pr-2">
+                    <span className="shrink-0 flex items-center justify-center font-mono text-xs pr-2 group-hover:opacity-0">
                       {isLoadingCounts ? (
                         <Skeleton className="h-4 w-4" />
                       ) : facetedValue?.has(option.value) ? (
@@ -144,15 +144,17 @@ export function DataTableFilterCheckbox<TData>({
                         '0'
                       ) : null}
                     </span>
+
                     <button
                       type="button"
                       onClick={() => column?.setFilterValue([option.value])}
                       className={cn(
-                        'absolute inset-y-0 right-0 hidden font-normal text-muted-foreground backdrop-blur-xs hover:text-foreground group-hover:block',
-                        'rounded-md ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                        'text-xs text-muted-foreground hover:text-foreground',
+                        'absolute inset-y-0 right-0 hidden bg-surface-100 group-hover:flex items-center cursor-pointer',
+                        'ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
                       )}
                     >
-                      <span className="pl-1 pr-2">only</span>
+                      <span className="pl-1 pr-2">Only</span>
                     </button>
                   </Label>
                 </div>

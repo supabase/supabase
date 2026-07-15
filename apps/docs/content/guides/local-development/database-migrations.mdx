@@ -1,8 +1,8 @@
 ---
-id: 'overview'
-title: 'Local development with schema migrations'
-description: 'Develop locally with the Supabase CLI and schema migrations.'
-subtitle: 'Develop locally with the Supabase CLI and schema migrations.'
+id: 'database-migrations'
+title: 'Database migrations'
+description: 'Track and version your database schema changes with migrations.'
+subtitle: 'Track and version your database schema changes with migrations.'
 video: 'https://www.youtube-nocookie.com/v/vyHyYpvjaks'
 tocVideo: 'vyHyYpvjaks'
 ---
@@ -12,6 +12,12 @@ Supabase is a flexible platform that lets you decide how you want to build your 
 Develop locally using the CLI to run a local Supabase stack. You can use the integrated Studio Dashboard to make changes, then capture your changes in schema migration files, which can be saved in version control.
 
 Alternatively, if you're comfortable with migration files and SQL, you can write your own migrations and push them to the local database for testing before sharing your changes.
+
+<Admonition type="tip" label="Looking for the full end-to-end workflow?">
+
+This page is a focused tutorial on migrations. If you want to move an existing platform project to local development, or set up a reproducible project from scratch and take it all the way to a remote deploy, see the [Local development workflow](/docs/guides/local-development/cli-workflows) guide. It covers both starting points, the daily development loop, pushing to production, cleaning up generated migrations, and troubleshooting.
+
+</Admonition>
 
 ## Database migrations
 
@@ -231,33 +237,23 @@ npx supabase login
 
 ### Link your project
 
-Associate your project with your remote project using [`supabase link`](/docs/reference/cli/usage#supabase-link).
+Associate your local project with your remote project using [`supabase link`](/docs/reference/cli/usage#supabase-link).
 
 ```bash
 supabase link --project-ref <project-id>
 # You can get <project-id> from your project's dashboard URL: https://supabase.com/dashboard/project/<project-id>
-
-supabase db pull
-# Capture any changes that you have made to your remote database before you went through the steps above
-# If you have not made any changes to the remote database, skip this step
-```
-
-`supabase/migrations` is now populated with a migration in `<timestamp>_remote_schema.sql`.
-This migration captures any changes required for your local database to match the schema of your remote Supabase project.
-
-Review the generated migration file and once happy, apply the changes to your local instance:
-
-```bash
-# To apply the new migration to your local database:
-supabase migration up
-
-# To reset your local database completely:
-supabase db reset
 ```
 
 <Admonition type="note">
 
-There are a few commands required to link your project. We are in the process of consolidating these commands into a single command. Bear with us!
+If your remote database already has schema changes that aren't in your local migrations (for example, tables you created directly in the Dashboard), capture them before you push:
+
+```bash
+supabase db pull
+supabase db reset
+```
+
+`db pull` writes those changes to a `<timestamp>_remote_schema.sql` migration so your local and remote histories line up, and `db reset` re-applies your migrations locally to confirm they're consistent. For a brand-new remote project with nothing in it yet, skip this step.
 
 </Admonition>
 
