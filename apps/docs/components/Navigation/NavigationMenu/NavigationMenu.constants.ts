@@ -741,6 +741,10 @@ export const auth: NavMenuConstant = {
       enabled: authFlowsEnabled,
       items: [
         {
+          name: 'Which server-side package?',
+          url: '/guides/auth/choosing-a-server-package',
+        },
+        {
           name: 'Server-Side Rendering',
           url: '/guides/auth/server-side',
           items: [
