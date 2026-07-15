@@ -20,6 +20,7 @@ async function generate() {
     '!pages/api',
     '!pages/404.tsx',
     '.next/server/pages/partners/integrations/*.html',
+    '.next/server/pages/partners/catalog/*.html',
     '.next/server/pages/partners/experts/*.html',
     '.next/server/pages/features/*.html',
   ])
@@ -60,6 +61,7 @@ async function generate() {
       if (route === '/blog/categories/[category]') return null
       if (route === '/partners/experts/[slug]') return null
       if (route === '/partners/integrations/[slug]') return null
+      if (route === '/partners/catalog/[slug]') return null
       if (route === '/launch-week/ticket-image') return null
       if (route === '/launch-week/tickets/[username]') return null
       if (route === '/changelog/[slug]') return null

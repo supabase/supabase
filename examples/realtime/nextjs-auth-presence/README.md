@@ -5,9 +5,9 @@ User get authenticated using Supabase Auth API. Once Logged-in you can see which
 
 - Frontend:
   - Next.js.
-  - [Supabase.js v2 (realtime presence support)](https://supabase.io/docs/library/getting-started)
+  - [Supabase.js v2 (realtime presence support)](https://supabase.com/docs/reference/javascript/introduction)
 - Backend:
-  - [app.supabase.io](https://app.supabase.io/): hosted postgres database with realtime support.
+  - [supabase.com/dashboard](https://supabase.com/dashboard): hosted postgres database with realtime support.
 
 ## Real time Presence APIs used.
 
@@ -17,7 +17,7 @@ This program shows usage of channel presence API calls such as , channel.on('pre
 
 ### 1. Create new project
 
-Sign up to Supabase - [https://app.supabase.io](https://app.supabase.io) and create a new project. Wait for your database to start.
+Sign up to Supabase - [https://supabase.com/dashboard](https://supabase.com/dashboard) and create a new project. Wait for your database to start.
 
 ### 2. Run "User Management Starter" Quickstart
 

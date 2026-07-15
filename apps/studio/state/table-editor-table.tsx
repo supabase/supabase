@@ -17,6 +17,12 @@ import { Entity } from '@/data/table-editor/table-editor-types'
 
 const FALLBACK_TABLE_STATE = proxy({}) as TableEditorTableState
 
+// Helper to extract sensitive data marker from column comment
+const SENSITIVE_DATA_MARKER = '[SENSITIVE]'
+const isSensitiveDataColumn = (comment: string | null | undefined): boolean => {
+  return comment ? comment.includes(SENSITIVE_DATA_MARKER) : false
+}
+
 export const createTableEditorTableState = ({
   projectRef,
   table: originalTable,
@@ -49,6 +55,9 @@ export const createTableEditorTableState = ({
     savedState
   )
 
+  // userToggledColumns: columns user has explicitly toggled OFF (persisted)
+  const userToggledColumns = new Set<string>((savedState as any)?.sensitiveDataColumns ?? [])
+
   const state = proxy({
     /* Table */
     table,
@@ -74,6 +83,14 @@ export const createTableEditorTableState = ({
         { gridColumns: state.gridColumns }
       )
 
+      // Preserve user's toggle choices across table updates
+      // Only clear toggles for columns that no longer exist
+      const currentColumnNames = new Set(table.columns.map((col) => col.name))
+      const preservedToggles = new Set(
+        Array.from(state.userToggledSensitiveColumns).filter((col) => currentColumnNames.has(col))
+      )
+      state.userToggledSensitiveColumns = proxySet(preservedToggles)
+
       state.table = supaTable
       state.gridColumns = gridColumns
       state.originalTable = table
@@ -94,6 +111,29 @@ export const createTableEditorTableState = ({
 
     /* Columns */
     gridColumns,
+    userToggledSensitiveColumns: proxySet<string>(userToggledColumns),
+    temporarilyRevealedColumns: proxySet<string>(),
+    toggleSensitiveDataColumn: (columnKey: string) => {
+      // Track which columns user has toggled OFF from their default masked state
+      if (state.userToggledSensitiveColumns.has(columnKey)) {
+        state.userToggledSensitiveColumns.delete(columnKey)
+      } else {
+        state.userToggledSensitiveColumns.add(columnKey)
+      }
+    },
+    get sensitiveDataColumns() {
+      // Single source of truth: columns marked sensitive = defaults minus user toggles (persistent only)
+      const defaultSensitiveColumns = new Set(
+        state.table.columns
+          .filter((col) => isSensitiveDataColumn(col.comment))
+          .map((col) => col.name)
+      )
+      return new Set(
+        Array.from(defaultSensitiveColumns).filter(
+          (col) => !state.userToggledSensitiveColumns.has(col)
+        )
+      )
+    },
     moveColumn: (fromKey: string, toKey: string) => {
       const fromIdx = state.gridColumns.findIndex((x) => x.key === fromKey)
       const toIdx = state.gridColumns.findIndex((x) => x.key === toKey)
@@ -250,7 +290,8 @@ export const TableEditorTableStateContextProvider = ({
           gridColumns: state.gridColumns,
           projectRef,
           tableId: state.table.id,
-        })
+          sensitiveDataColumns: Array.from(state.userToggledSensitiveColumns),
+        } as any)
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

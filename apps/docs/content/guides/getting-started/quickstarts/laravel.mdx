@@ -6,7 +6,7 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 4. Create a Laravel project
+## 3. Create a Laravel project
 
 Make sure your PHP and Composer versions are up to date, then use `composer create-project` to scaffold a new Laravel project.
 
@@ -14,6 +14,16 @@ See the [Laravel docs](https://laravel.com/docs/10.x/installation#creating-a-lar
 
 ```bash
 composer create-project laravel/laravel example-app
+```
+
+## 4. Install Agent Skills (optional)
+
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+To install, run the following command in the root of your project:
+
+```bash
+npx skills add supabase/agent-skills
 ```
 
 ## 5. Install the authentication template

@@ -135,7 +135,7 @@ function getFieldOptionsFromSource({
         const region = formatDatabaseRegion(db?.region ?? '')
         const id = formatDatabaseID(db.identifier ?? '')
         const label = db.identifier.includes('-rr-')
-          ? `Read Replica (${region} - ${id}}`
+          ? `Read Replica (${region} - ${id})`
           : 'Primary Database'
         return { value: db.identifier, label }
       })

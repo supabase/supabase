@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { keyword } from '@supabase/pg-meta'
 import type { PGTrigger, PGTriggerCreate } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
@@ -15,7 +15,10 @@ import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialo
 import { useDatabaseTriggerCreateMutation } from '@/data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from '@/data/database-triggers/database-trigger-update-transaction-mutation'
 import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
-import { tableEditorQueryOptions } from '@/data/table-editor/table-editor-query'
+import {
+  PG_META_SCOPED_INTROSPECTION_FLAG,
+  tableEditorQueryOptions,
+} from '@/data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { uuidv4 } from '@/lib/helpers'
@@ -80,6 +83,7 @@ export const EditHookPanel = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const [isLoadingTable, setIsLoadingTable] = useState(false)
+  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   const { data: hooks = [], isSuccess } = useDatabaseHooksQuery({
     projectRef: project?.ref,
@@ -212,6 +216,7 @@ export const EditHookPanel = () => {
           id: Number(values.table_id),
           projectRef: project?.ref,
           connectionString: project?.connectionString,
+          scoped,
         })
       )
       if (!selectedTable) {

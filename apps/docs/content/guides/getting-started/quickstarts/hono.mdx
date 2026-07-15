@@ -6,12 +6,22 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 4. Create a Hono app
+## 3. Create a Hono app
 
 Bootstrap the Hono example app from the Supabase Samples using the CLI.
 
 ```bash
 npx supabase@latest bootstrap hono
+```
+
+## 4. Install Agent Skills (optional)
+
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+To install, run the following command in the root of your project:
+
+```bash
+npx skills add supabase/agent-skills
 ```
 
 ## 5. Install the Supabase client library
@@ -22,18 +32,18 @@ The `package.json` file in the project includes the necessary dependencies, incl
 npm install
 ```
 
-{/* TODO: Not ideal for frameworks that have no entry in Connect */}
-<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "frameworks" }} />
-
 ## 6. Set up the required environment variables
 
-Copy the `.env.example` file to `.env` and update the values with your Supabase project URL and publishable key, which you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&tab=frameworks).
+Copy the `.env.example` file to `.env` and update the values with your Supabase project URL and publishable key, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&tab=frameworks).
 
 Lastly, [enable anonymous sign-ins](/dashboard/project/_/auth/providers) in the Auth settings.
 
 ```bash
 cp .env.example .env
 ```
+
+{/* TODO: Not ideal for frameworks that have no entry in Connect */}
+<$Partial path="api_settings.mdx" variables={{ "framework": "", "tab": "frameworks" }} />
 
 ## 7. Start the app
 

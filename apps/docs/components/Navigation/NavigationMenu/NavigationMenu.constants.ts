@@ -2452,25 +2452,14 @@ export const local_development: NavMenuConstant = {
   title: 'Local Dev / CLI',
   url: '/guides/local-development',
   items: [
-    { name: 'Overview', url: '/guides/local-development' },
+    { name: 'Overview & quickstart', url: '/guides/local-development' },
+    { name: 'Install and run the CLI', url: '/guides/local-development/cli/getting-started' },
+    { name: 'Local development workflow', url: '/guides/local-development/cli-workflows' },
     {
-      name: 'CLI',
+      name: 'Guides',
       url: undefined,
       items: [
-        { name: 'Getting started', url: '/guides/local-development/cli/getting-started' },
-        {
-          name: 'Configuration',
-          url: '/guides/local-development/cli/config',
-          enabled: localDevelopmentEnabled,
-        },
-        { name: 'CLI commands', url: '/reference/cli' },
-      ],
-    },
-    {
-      name: 'Local development',
-      url: undefined,
-      items: [
-        { name: 'Getting started', url: '/guides/local-development/overview' },
+        { name: 'Database migrations', url: '/guides/local-development/database-migrations' },
         {
           name: 'Declarative database schemas',
           url: '/guides/local-development/declarative-database-schemas' as `/${string}`,
@@ -2493,6 +2482,18 @@ export const local_development: NavMenuConstant = {
           url: '/guides/local-development/customizing-email-templates' as `/${string}`,
           enabled: localDevelopmentEnabled,
         },
+      ],
+    },
+    {
+      name: 'Reference',
+      url: undefined,
+      items: [
+        {
+          name: 'CLI configuration',
+          url: '/guides/local-development/cli/config',
+          enabled: localDevelopmentEnabled,
+        },
+        { name: 'CLI commands', url: '/reference/cli' },
       ],
     },
     {
@@ -2921,6 +2922,10 @@ export const platform: NavMenuConstant = {
               name: 'Log Drains',
               url: '/guides/platform/manage-your-usage/log-drains' as `/${string}`,
             },
+            {
+              name: 'Pipelines',
+              url: '/guides/platform/manage-your-usage/pipelines' as `/${string}`,
+            },
           ],
         },
         {
@@ -2987,6 +2992,10 @@ export const telemetry: NavMenuConstant = {
         {
           name: 'Logging',
           url: '/guides/telemetry/logs' as `/${string}`,
+        },
+        {
+          name: 'Debugging',
+          url: '/guides/telemetry/debugging' as `/${string}`,
         },
         {
           name: 'Advanced log filtering',
@@ -3225,12 +3234,16 @@ export const integrations: NavMenuConstant = {
       url: '/guides/integrations',
     },
     {
-      name: 'Vercel Marketplace',
-      url: '/guides/integrations/vercel-marketplace',
+      name: 'Dashboard Integrations',
+      url: '/guides/integrations#dashboard-integrations',
     },
     {
-      name: 'Supabase Marketplace',
-      url: '/guides/integrations/supabase-marketplace',
+      name: 'Partner Catalog',
+      url: '/guides/integrations/partner-catalog',
+    },
+    {
+      name: 'Vercel Marketplace',
+      url: '/guides/integrations/vercel-marketplace',
     },
     {
       name: 'Build Your Own',

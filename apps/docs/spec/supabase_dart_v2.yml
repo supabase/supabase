@@ -2589,11 +2589,16 @@ functions:
     notes: |
       Delete a user.
       - The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
+      - When `shouldSoftDelete` is `true`, the user is soft-deleted: their record and associated data are retained but the user is marked as deleted. Defaults to `false`, which permanently removes the user.
     params:
       - name: id
         isOptional: false
         type: String
         description: ID of the user to be deleted.
+      - name: shouldSoftDelete
+        isOptional: true
+        type: bool
+        description: If true, soft-deletes the user (keeps the record but marks it deleted). Defaults to false (permanent delete).
     examples:
       - id: removes-a-user
         name: Removes a user
@@ -2602,6 +2607,16 @@ functions:
           ```dart
           await supabase.auth.admin
               .deleteUser('715ed5db-f090-4b8c-a067-640ecee36aa0');
+          ```
+      - id: soft-delete-a-user
+        name: Soft-delete a user
+        code: |
+          ```dart
+          await supabase.auth.admin
+              .deleteUser(
+                '715ed5db-f090-4b8c-a067-640ecee36aa0',
+                shouldSoftDelete: true,
+              );
           ```
   - id: invite-user-by-email
     title: 'inviteUserByEmail()'
@@ -4634,6 +4649,10 @@ functions:
         isOptional: false
         type: int
         description: The number of seconds until the signed URL expires. For example, 60 for a URL which is valid for one minute.
+      - name: download
+        isOptional: true
+        type: DownloadBehavior
+        description: Triggers the file to be downloaded rather than opened in the browser. Use `DownloadBehavior.withOriginalName` to keep the original file name or `DownloadBehavior.named('custom.png')` to override it.
       - name: transform
         isOptional: true
         type: TransformOptions
@@ -4690,6 +4709,61 @@ functions:
           ```json
           'https://example.supabase.co/storage/v1/object/sign/avatars/folder/avatar1.png?token=<TOKEN>''
           ```
+      - id: create-signed-url-with-download
+        name: With download
+        code: |
+          ```dart
+          final String signedUrl = await supabase
+            .storage
+            .from('avatars')
+            .createSignedUrl(
+              'avatar1.png',
+              60,
+              download: DownloadBehavior.withOriginalName,
+            );
+          ```
+
+  - id: from-create-signed-upload-url
+    description: |
+      Creates a signed upload URL. Signed upload URLs can be used to upload files to a bucket without further authentication. They are valid for 2 hours.
+    title: 'from.createSignedUploadUrl()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `insert`
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The file path, including the current file name. For example folder/image.png.
+      - name: upsert
+        isOptional: true
+        type: bool
+        description: If true, the signed URL allows overwriting an existing file at the path. Defaults to false.
+    examples:
+      - id: create-signed-upload-url
+        name: Create signed upload URL
+        isSpotlight: true
+        code: |
+          ```dart
+          final response = await supabase
+            .storage
+            .from('avatars')
+            .createSignedUploadUrl('folder/avatar1.png');
+          ```
+      - id: create-signed-upload-url-with-upsert
+        name: With upsert
+        code: |
+          ```dart
+          final response = await supabase
+            .storage
+            .from('avatars')
+            .createSignedUploadUrl(
+              'folder/avatar1.png',
+              upsert: true,
+            );
+          ```
 
   - id: from-get-public-url
     description: |
@@ -4706,6 +4780,10 @@ functions:
         isOptional: false
         type: String
         description: The path and name of the file to generate the public URL for. For example folder/image.png.
+      - name: download
+        isOptional: true
+        type: DownloadBehavior
+        description: Triggers the file to be downloaded rather than opened in the browser. Use `DownloadBehavior.withOriginalName` to keep the original file name or `DownloadBehavior.named('custom.png')` to override it.
       - name: transform
         isOptional: true
         type: TransformOptions
@@ -4765,6 +4843,18 @@ functions:
         response: |
           ```json
           'https://example.supabase.co/storage/v1/object/public/public-bucket/folder/avatar1.png'
+          ```
+      - id: returns-the-url-for-an-asset-with-download
+        name: Trigger download
+        code: |
+          ```dart
+          final String publicUrl = supabase
+            .storage
+            .from('public-bucket')
+            .getPublicUrl(
+              'avatar1.png',
+              download: DownloadBehavior.withOriginalName,
+            );
           ```
 
   - id: from-download

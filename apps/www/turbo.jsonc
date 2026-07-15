@@ -2,6 +2,12 @@
   "$schema": "./../../node_modules/turbo/schema.json",
   "extends": ["//"],
   "tasks": {
+    "lint": {
+      "env": ["GITHUB_TOKEN"],
+    },
+    "typecheck": {
+      "env": ["GITHUB_TOKEN"],
+    },
     "build": {
       "dependsOn": ["^build"],
       "env": [
