@@ -36,9 +36,8 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
 
   const { mutateAsync: sendExitSurvey, isPending: isSubmittingFeedback } =
     useSendDowngradeFeedbackMutation({
-      onError: () => {
-        // the user should not get a toast saying "submitting survey failed"
-      },
+      // the user should not get a toast saying "submitting survey failed"
+      onError: () => {},
     })
 
   const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
@@ -64,9 +63,7 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
             reasons: selectedReason.reduce((a, b) => `${a}- ${b}\n`, ''),
             message,
             exitAction: 'downgrade',
-          }).catch(() => {
-            // [Joshen] In this case we don't raise any errors if the exit survey fails to send since it shouldn't block the user
-          })
+          }).catch(() => {})
         }
 
         onClose(true)
@@ -112,8 +109,7 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
     // Update the subscription first, followed by posting the exit survey if successful
     // If compute instance is present within the existing subscription, then a restart will be triggered
     if (!slug) return console.error('Slug is required')
-
-    await updateOrgSubscription({ slug, tier: 'tier_free' })
+    updateOrgSubscription({ slug, tier: 'tier_free' })
   }
 
   return (
