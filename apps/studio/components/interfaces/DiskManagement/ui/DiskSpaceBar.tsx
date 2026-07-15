@@ -91,6 +91,44 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
         </span>
       </div>
       <div className="relative">
+        <AnimatePresence initial={true}>
+          {!showNewSize && (
+            <motion.div
+              key="currentSize"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.1 }}
+              className="absolute bottom-full mb-0 h-8 w-full mx-[-2px]"
+            >
+              <div
+                className="absolute top-0 left-0 h-full flex items-center transition-all duration-500 ease-in-out"
+                style={{ left: `${showNewSize ? newResizePercentage : resizePercentage}%` }}
+              >
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="absolute right-full top-0 border mr-2 px-2 py-1 bg-surface-400 rounded-sm text-xs text-foreground-light whitespace-nowrap flex items-center gap-x-1">
+                      Autoscaling <Info size={12} />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom" className="w-[310px] flex flex-col gap-y-1">
+                    <p>
+                      Supabase expands your disk storage automatically when the database reaches 90%
+                      of the disk size. However, disk modifications, including auto-scaling, are
+                      limited to 4 within a rolling 24-hour window.
+                    </p>
+                    <p>
+                      If you exhaust these modifications and reach 95% of the disk space, your
+                      project{' '}
+                      <span className="text-destructive-600">will enter read-only mode.</span>
+                    </p>
+                  </TooltipContent>
+                </Tooltip>
+                <div className="w-px h-full bg-border" />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         <div
           className={cn(
             'h-[35px] relative border rounded-xs w-full transition overflow-visible',
@@ -167,44 +205,6 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
             )}
           </AnimatePresence>
         </div>
-        <AnimatePresence initial={true}>
-          {!showNewSize && (
-            <motion.div
-              key="currentSize"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.1 }}
-              className="absolute h-8 w-full mx-[-2px]"
-            >
-              <div
-                className="absolute top-0 left-0 h-full flex items-center transition-all duration-500 ease-in-out"
-                style={{ left: `${showNewSize ? newResizePercentage : resizePercentage}%` }}
-              >
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="absolute right-full bottom-0 border mr-2 px-2 py-1 bg-surface-400 rounded-sm text-xs text-foreground-light whitespace-nowrap flex items-center gap-x-1">
-                      Autoscaling <Info size={12} />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" className="w-[310px] flex flex-col gap-y-1">
-                    <p>
-                      Supabase expands your disk storage automatically when the database reaches 90%
-                      of the disk size. However, disk modifications, including auto-scaling, are
-                      limited to 4 within a rolling 24-hour window.
-                    </p>
-                    <p>
-                      If you exhaust these modifications and reach 95% of the disk space, your
-                      project{' '}
-                      <span className="text-destructive-600">will enter read-only mode.</span>
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-                <div className="w-px h-full bg-border" />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
       {!showNewSize && (
         <div className="flex items-center space-x-3 text-xs text-foreground-lighter">
