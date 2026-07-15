@@ -21,7 +21,7 @@ interface SupportAssistantSuccessCardProps {
 
 const SupportAssistantSuccessCardContent = dynamic<SupportAssistantSuccessCardProps>(
   () =>
-    import('@/components/ui/AIAssistantPanel/SupportAssistantSuccessCardContent').then(
+    import('@/components/ui/AIAssistantPanel/AIAssistant').then(
       (mod) => mod.SupportAssistantSuccessCardContent
     ),
   {

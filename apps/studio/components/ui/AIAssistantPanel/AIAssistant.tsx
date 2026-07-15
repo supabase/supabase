@@ -433,7 +433,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
         />
         {hasMessages ? (
           <Conversation className={cn('flex-1')}>
-            <ConversationContent className="w-full px-7 py-8 mb-10 max-w-3xl mx-auto">
+            <ConversationContent className="w-full px-7 py-8 mb-10">
               {renderedMessages}
               {error && (
                 <>
@@ -555,9 +555,9 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           )}
         </AnimatePresence>
 
-        <div className="px-3 pb-3 z-20 relative w-full max-w-3xl mx-auto flex flex-col gap-y-3">
+        <div className="px-3 pb-3 z-20 relative">
           {isSupportChat && !isSupportChatClosed && (
-            <div>
+            <div className="mb-3">
               <div className="mb-3 border-t" />
               <div className="flex items-center gap-2">
                 <Button
@@ -583,7 +583,6 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
               </div>
             </div>
           )}
-
           {disablePrompts && (
             <Admonition
               showIcon={false}
@@ -610,10 +609,7 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
           <AssistantChatForm
             textAreaRef={inputRef}
             className={cn(
-              'z-20',
-              '[&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border',
-              '[&>form>textarea]:rounded-md [&>form>textarea]:outline-hidden!',
-              '[&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
+              'z-20 [&>form>textarea]:text-base [&>form>textarea]:md:text-sm [&>form>textarea]:border [&>form>textarea]:rounded-md [&>form>textarea]:outline-hidden! [&>form>textarea]:ring-offset-0! [&>form>textarea]:ring-0!'
             )}
             loading={isChatLoading}
             isEditing={!!editingMessageId}
@@ -657,3 +653,5 @@ export const AIAssistant = ({ className }: AIAssistantProps) => {
     </ErrorBoundary>
   )
 }
+
+export { SupportAssistantSuccessCardContent } from './SupportAssistantSuccessCardContent'
