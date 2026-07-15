@@ -12,7 +12,6 @@ import { unstable_cache } from 'next/cache'
 
 export default async function IntegrationsLayout({ children }: { children: React.ReactNode }) {
   const additionalNavItems = { integrations: await getPartners() }
-  console.log('IntegrationsLayout additionalNavItems', additionalNavItems)
 
   return <Layout additionalNavItems={additionalNavItems}>{children}</Layout>
 }
