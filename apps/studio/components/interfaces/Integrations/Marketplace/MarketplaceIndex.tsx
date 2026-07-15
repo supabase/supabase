@@ -229,7 +229,7 @@ export const MarketplaceIndex = () => {
             </PageHeaderDescription>
           </PageHeaderSummary>
           <div className="flex shrink-0 items-center gap-2">
-            <DocsButton href={`${DOCS_URL}/guides/integrations/supabase-marketplace`} />
+            <DocsButton href={`${DOCS_URL}/guides/integrations/partner-catalog`} />
           </div>
         </PageHeaderMeta>
       </PageHeader>

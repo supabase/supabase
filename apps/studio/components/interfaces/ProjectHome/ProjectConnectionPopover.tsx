@@ -164,84 +164,89 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
   }, [open])
 
   return (
-    <div className="mt-3 inline-flex max-w-full items-center gap-3 min-w-0">
+    <div className="mt-3 flex items-center gap-3">
       {isLoadingApiUrl ? (
-        <ShimmeringLoader className="w-32 shrink-0" />
+        <ShimmeringLoader className="w-80" />
       ) : (
-        <span className="min-w-0 max-w-[320px] truncate text-left text-foreground-light">
+        <span className="min-w-0 max-w-[400px] truncate text-left text-foreground-light">
           {projectUrl ?? 'Project URL unavailable'}
         </span>
       )}
-      <DropdownMenu open={open} onOpenChange={setOpen}>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="default"
-            size="tiny"
-            className="shrink-0"
-            iconRight={
-              <ChevronDown size={14} className={cn('transition-transform', open && 'rotate-180')} />
-            }
-          >
-            Copy <span className="sr-only">project URL and API keys</span>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent side="bottom" align="end" className="w-80 p-1">
-          {menuItems.map((item) => {
-            const Icon = item.icon
 
-            return (
-              <DropdownMenuItem
-                key={item.label}
-                className="group relative items-center gap-3 pr-10"
-                disabled={item.disabled}
-                onSelect={(event) => {
-                  event.preventDefault()
-                  if (item.disabled) return
+      {!isLoadingApiUrl && (
+        <DropdownMenu open={open} onOpenChange={setOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button
+              size="tiny"
+              variant="default"
+              iconRight={
+                <ChevronDown
+                  size={14}
+                  className={cn('transition-transform', open && 'rotate-180')}
+                />
+              }
+            >
+              Copy <span className="sr-only">project URL and API keys</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent side="bottom" align="center" className="w-80 p-1">
+            {menuItems.map((item) => {
+              const Icon = item.icon
 
-                  copyToClipboard(item.value)
-                  setCopiedItem(item.label)
+              return (
+                <DropdownMenuItem
+                  key={item.label}
+                  className="group relative items-center gap-3 pr-10"
+                  disabled={item.disabled}
+                  onSelect={(event) => {
+                    event.preventDefault()
+                    if (item.disabled) return
+
+                    copyToClipboard(item.value)
+                    setCopiedItem(item.label)
+                  }}
+                >
+                  <Icon size={14} className="mt-0.5 shrink-0 text-foreground-light" />
+                  <div className="min-w-0 flex-1">
+                    <div className="text-sm text-foreground">
+                      {copiedItem !== item.label ? <span className="sr-only">Copy</span> : null}
+                      {item.label}
+                      {copiedItem === item.label ? (
+                        <span className="sr-only">copied to your clipboard</span>
+                      ) : null}
+                    </div>
+                    <div className="truncate text-sm text-foreground-lighter">
+                      {item.displayValue}
+                    </div>
+                  </div>
+                  <div
+                    className={cn(
+                      'absolute right-2 top-1/2 -translate-y-1/2 text-foreground-lighter opacity-0 transition-opacity group-hover:opacity-100',
+                      copiedItem === item.label && 'opacity-100 text-brand'
+                    )}
+                  >
+                    {copiedItem === item.label ? <Check size={14} /> : <Copy size={14} />}
+                  </div>
+                </DropdownMenuItem>
+              )
+            })}
+            <DropdownMenuSeparator />
+            <div className="p-1">
+              <Button
+                variant="default"
+                size="tiny"
+                className="w-full"
+                onClick={() => {
+                  setOpen(false)
+                  setShowConnect(true)
                 }}
               >
-                <Icon size={14} className="mt-0.5 shrink-0 text-foreground-light" />
-                <div className="min-w-0 flex-1">
-                  <div className="text-sm text-foreground">
-                    {copiedItem !== item.label ? <span className="sr-only">Copy</span> : null}
-                    {item.label}
-                    {copiedItem === item.label ? (
-                      <span className="sr-only">copied to your clipboard</span>
-                    ) : null}
-                  </div>
-                  <div className="truncate text-sm text-foreground-lighter">
-                    {item.displayValue}
-                  </div>
-                </div>
-                <div
-                  className={cn(
-                    'absolute right-2 top-1/2 -translate-y-1/2 text-foreground-lighter opacity-0 transition-opacity group-hover:opacity-100',
-                    copiedItem === item.label && 'opacity-100 text-brand'
-                  )}
-                >
-                  {copiedItem === item.label ? <Check size={14} /> : <Copy size={14} />}
-                </div>
-              </DropdownMenuItem>
-            )
-          })}
-          <DropdownMenuSeparator />
-          <div className="p-1">
-            <Button
-              variant="default"
-              size="tiny"
-              className="w-full"
-              onClick={() => {
-                setOpen(false)
-                setShowConnect(true)
-              }}
-            >
-              Get Connected
-            </Button>
-          </div>
-        </DropdownMenuContent>
-      </DropdownMenu>
+                Get Connected
+              </Button>
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </div>
   )
 }

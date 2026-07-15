@@ -5,53 +5,6 @@ subtitle: 'Install and run your own Supabase on your computer, server, or cloud 
 hideToc: true
 ---
 
-## Get started
-
-The fastest and recommended way to self-host Supabase is to use Docker.
-
-<div className="grid md:grid-cols-12 gap-4 not-prose">
-  <div className="md:col-span-6 xl:col-span-4 relative" key="/guides/self-hosting/docker">
-    <Link href="/guides/self-hosting/docker" passHref>
-      <GlassPanel icon={'/docs/img/icons/docker'} hasLightIcon={true}
-        title={
-            <span className="flex items-center gap-2">
-              Docker
-              <Badge variant="success">Official</Badge>
-            </span>
-          }
-        showIconBg={true}
-      >
-      Deploy Supabase within your own infrastructure using Docker Compose.
-      </GlassPanel>
-    </Link>
-
-  </div>
-</div>
-
-## Community-driven projects
-
-{/* supa-mdx-lint-disable-next-line Rule004ExcludeWords */}
-There are several other options to deploy Supabase. If you're interested in helping these projects, visit our [Community](/contribute) page.
-
-<div className="grid md:grid-cols-12 gap-4 not-prose">
-  <div className="md:col-span-6 xl:col-span-3">
-    <Link href="https://github.com/supabase-community/supabase-kubernetes" passHref>
-      <GlassPanel title={<span className="flex items-center gap-2">Kubernetes</span>}>
-        Helm charts to deploy a Supabase on Kubernetes.
-      </GlassPanel>
-    </Link>
-  </div>
-  <div className="md:col-span-6 xl:col-span-3">
-    <Link href="https://github.com/supabase-community/supabase-traefik" passHref>
-      <GlassPanel title={<span className="flex items-center gap-2">Traefik</span>}>
-        A self-hosted Supabase setup with Traefik as a reverse proxy.
-      </GlassPanel>
-    </Link>
-  </div>
-</div>
-
-## About self-hosting
-
 Self-hosting is a good fit if you need full control over your data, have compliance requirements that prevent you from using managed services, or want to run Supabase in an isolated environment.
 
 ### How self-hosted Supabase differs
@@ -81,24 +34,19 @@ Self-hosted Supabase (run via Docker Compose) **does not phone home or collect a
 
 The **Supabase CLI** is a [separate tool](/docs/guides/local-development/cli/getting-started) and collects usage telemetry to help improve the developer experience. See [CLI telemetry](/docs/guides/local-development/cli/getting-started#telemetry) for opt-out methods.
 
+<ContentListings id="self-hosting-get-started" />
+
+<ContentListings id="self-hosting-community" />
+
 ## Support and community
 
 Self-hosted Supabase is community-supported.
 
-For resolving common issues:
+<ContentListings id="self-hosting-resolve-issues" />
 
-- [GitHub Discussions](https://github.com/orgs/supabase/discussions?discussions_q=is%3Aopen+label%3Aself-hosted) - Questions, feature requests, and workarounds
-- [GitHub Issues](https://github.com/supabase/supabase/issues?q=is%3Aissue%20state%3Aopen%20label%3Aself-hosted) - Known issues
+<ContentListings id="self-hosting-get-help" />
 
-Get help and connect with other users:
-
-- [Discord](https://discord.supabase.com) - Real-time chat and community support
-  {/* supa-mdx-lint-disable-next-line Rule003Spelling */}
-- [Reddit](https://www.reddit.com/r/Supabase/) - Official Supabase subreddit
-
-Share your self-hosting experience:
-
-- [GitHub Discussions](https://github.com/orgs/supabase/discussions/39820) - "Self-hosting: What's working (and what's not)?"
+<ContentListings id="self-hosting-share-experience" />
 
 ### Enterprise self-hosting
 

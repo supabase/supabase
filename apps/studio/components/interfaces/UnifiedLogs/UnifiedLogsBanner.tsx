@@ -8,6 +8,7 @@ import {
   useUnifiedLogsPreview,
 } from '../App/FeaturePreview/FeaturePreviewContext'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { IS_PLATFORM } from '@/lib/constants'
 
 interface UnifiedLogsBannerProps {
   className?: string
@@ -19,6 +20,8 @@ export function UnifiedLogsBanner({ className = 'mx-4 mt-4' }: UnifiedLogsBanner
 
   const { selectFeaturePreview } = useFeaturePreviewModal()
   const { enable, disable, isDefaultOptIn, isEnabled } = useUnifiedLogsPreview()
+
+  if (!IS_PLATFORM) return null
 
   const cardClassName = cn(
     'rounded-lg border p-4 space-y-3 text-left',

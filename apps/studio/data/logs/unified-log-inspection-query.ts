@@ -186,7 +186,7 @@ export async function getUnifiedLogInspection(
   if (!/^[0-9a-fA-F-]{1,64}$/.test(logId)) {
     throw new Error('Invalid logId')
   }
-  const sql = safeSql`
+  const sql = safeSql`-- unified logs: inspect single log by id
 SELECT id, timestamp, source, event_message, severity_text, log_attributes
 FROM logs
 WHERE id = ${lit(logId)}
@@ -216,7 +216,7 @@ LIMIT 1
   if (row.source === 'function_edge_logs') {
     const executionId = row.log_attributes?.['execution_id'] ?? row.log_attributes?.['request_id']
     if (typeof executionId === 'string' && /^[0-9a-fA-F-]{1,64}$/.test(executionId)) {
-      const fnSql = safeSql`
+      const fnSql = safeSql`-- unified logs: edge function console logs for execution
 SELECT id, timestamp, source, event_message, severity_text, log_attributes
 FROM logs
 WHERE source = 'function_logs' AND log_attributes['execution_id'] = ${lit(executionId)}
