@@ -293,7 +293,7 @@ Both starting points converge here. You have a working `./supabase` directory in
 **If you made changes through the local Studio UI:**
 
 ```bash
-supabase db diff -f add-due-date-to-todos
+supabase db diff -f add-due-date-to-todo
 ```
 
 This captures your UI changes as a migration file.
@@ -301,7 +301,7 @@ This captures your UI changes as a migration file.
 **If you prefer to write SQL directly:**
 
 ```bash
-supabase migration new add-due-date-to-todos
+supabase migration new add-due-date-to-todo
 ```
 
 Write the SQL in the generated file. Then verify:
@@ -324,6 +324,8 @@ supabase gen types --lang typescript --local > database.types.ts
 ```
 
 Use `--linked` instead of `--local` to generate from your remote project. TypeScript is the default language; pass `--lang go`, `--lang swift`, or `--lang python` for others.
+
+For working with the generated types (helper types, JSON inference, type-safe queries) and automating regeneration in CI, see [Generating types](/docs/guides/api/rest/generating-types).
 
 ### Staying in sync with your team
 
