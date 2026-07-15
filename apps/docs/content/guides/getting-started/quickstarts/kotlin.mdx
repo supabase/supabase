@@ -6,9 +6,19 @@ breadcrumb: 'Framework Quickstarts'
 
 <$Partial path="quickstart_db_setup.mdx" />
 
-## 4. Create an Android app with Android Studio
+## 3. Create an Android app with Android Studio
 
 Select the **Android Studio > New > New Android Project** menu item.
+
+## 4. Install Agent Skills (optional)
+
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+To install, run the following command in the root of your project:
+
+```bash
+npx skills add supabase/agent-skills
+```
 
 ## 5. Install dependencies
 
@@ -46,15 +56,13 @@ Add the following line to the `AndroidManifest.xml` file under the `manifest` ta
 ...
 ```
 
-<$Partial path="api_settings.mdx" variables={{ "framework": "androidkotlin", "tab": "mobiles" }} />
-
 ## 7. Initialize the Supabase client
 
 You can create a Supabase client whenever you need to perform an API call.
 
 For a quick example, create a client at the top of the `MainActivity.kt` file below the imports.
 
-Replace the `supabaseUrl` and `supabaseKey` with your own, which you can get from the helper above, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=androidkotlin&tab=mobiles):
+Replace the `supabaseUrl` and `supabaseKey` with your own, which you can get from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&framework=androidkotlin&tab=mobiles):
 
 <Button variant="primary" asChild>
   <a href="/dashboard/project/_?showConnect=true&connectTab=mobiles&framework=androidkotlin">
@@ -73,6 +81,8 @@ val supabase = createSupabaseClient(
 }
 ...
 ```
+
+<$Partial path="api_settings.mdx" variables={{ "framework": "androidkotlin", "tab": "mobiles" }} />
 
 ## 8. Create a data model for instruments
 

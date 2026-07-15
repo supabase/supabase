@@ -48,7 +48,7 @@ export const ChartHighlightActions = ({
   const formatChartDate = useFormatDateTime()
 
   useEffect(() => {
-    setIsOpen(!!chartHighlight?.popoverPosition && selectedRangeStart !== selectedRangeEnd)
+    setIsOpen(!!chartHighlight?.popoverPosition)
   }, [chartHighlight?.popoverPosition])
 
   const ctx: ChartHighlightActionContext | undefined =
@@ -80,8 +80,12 @@ export const ChartHighlightActions = ({
     return [...defaultActions, ...provided]
   }, [defaultActions, actions])
 
+  const positionKey = chartHighlight?.popoverPosition
+    ? `${chartHighlight.popoverPosition.x}-${chartHighlight.popoverPosition.y}`
+    : 'closed'
+
   return (
-    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+    <DropdownMenu key={positionKey} open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger
         className="w-auto p-0"
         style={{
@@ -91,7 +95,7 @@ export const ChartHighlightActions = ({
         }}
       />
       <DropdownMenuContent
-        className="flex flex-col gap-1 p-1 w-fit text-left"
+        className="flex flex-col gap-1 p-1 w-fit text-left data-[state=open]:animate-none! data-[state=closed]:animate-none!"
         onEscapeKeyDown={() => clearHighlight?.()}
         onInteractOutside={(e) => {
           const target = e.target as Element | null

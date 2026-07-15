@@ -16,7 +16,19 @@ Check the [Rails docs](https://guides.rubyonrails.org/getting_started.html) for 
 rails new blog -d=postgresql
 ```
 
-## 2. Set up the Postgres connection details
+Supabase's [Agent Skills](/docs/guides/ai-tools/ai-skills) is a curated set of instructions that give your AI agent procedural knowledge about working with Supabase.
+
+To install, run the following command in the root of your project:
+
+```bash
+npx skills add supabase/agent-skills
+```
+
+## 3. Install MCP server (optional)
+
+The Supabase MCP server connects AI assistants to Supabase, allowing you to interact with your projects on your behalf. Find out more on how to add it to your client in [the MCP docs](/docs/guides/ai-tools/mcp).
+
+## 4. Set up the Postgres connection details
 
 Go to [database.new](https://database.new) and create a new Supabase project. Save your database password securely.
 
@@ -34,7 +46,7 @@ If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/
 export DATABASE_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
 ```
 
-## 3. Create and run a database migration
+## 5. Create and run a database migration
 
 Rails includes Active Record as the ORM as well as database migration tooling which generates the SQL migration files for you.
 
@@ -45,7 +57,7 @@ bin/rails generate model Article title:string body:text
 bin/rails db:migrate
 ```
 
-## 4. Use the model to interact with the database
+## 6. Use the model to interact with the database
 
 You can use the included Rails console to interact with the database. For example, you can create new entries or list all entries in a Model's table.
 
@@ -60,7 +72,7 @@ article.save # Saves the entry to the database
 Article.all
 ```
 
-## 5. Start the app
+## 7. Start the app
 
 Run the development server. Go to http://127.0.0.1:3000 in a browser to see your application running.
 

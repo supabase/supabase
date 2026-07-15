@@ -74,7 +74,7 @@ export function PublicBucketWarning({ projectRef, bucketId }: PublicBucketWarnin
           queryKey: storageKeys.publicBucketsWithSelectPolicies(projectRef, bucketId),
         }),
         queryClient.invalidateQueries({
-          queryKey: databasePoliciesKeys.list(projectRef, 'storage'),
+          queryKey: databasePoliciesKeys.list(projectRef, ['storage']),
         }),
       ])
       track('storage_public_bucket_select_policy_removed', { bucketId })

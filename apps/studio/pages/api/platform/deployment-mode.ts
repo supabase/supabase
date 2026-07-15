@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import type { DeploymentModeResponse } from '@/data/config/deployment-mode-query'
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 import { IS_CLI } from '@/lib/constants'
 
 export default function deploymentMode(req: NextApiRequest, res: NextApiResponse) {

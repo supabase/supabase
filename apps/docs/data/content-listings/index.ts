@@ -11,6 +11,13 @@ import {
   functionsGetStarted,
 } from './functions.data'
 import { realtimeExamples, realtimeGetStarted, realtimeResources } from './realtime.data'
+import {
+  selfHostingCommunity,
+  selfHostingGetHelp,
+  selfHostingGetStarted,
+  selfHostingResolveIssues,
+  selfHostingShareExperience,
+} from './self-hosting.data'
 import { storageExamples, storageGetStarted, storageResources } from './storage.data'
 
 const ALL_GROUPS: readonly ContentListingGroup[] = [
@@ -28,6 +35,11 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   realtimeGetStarted,
   realtimeExamples,
   realtimeResources,
+  selfHostingGetStarted,
+  selfHostingCommunity,
+  selfHostingResolveIssues,
+  selfHostingGetHelp,
+  selfHostingShareExperience,
   storageGetStarted,
   storageExamples,
   storageResources,

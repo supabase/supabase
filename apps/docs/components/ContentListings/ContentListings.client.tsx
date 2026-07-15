@@ -9,6 +9,7 @@ import {
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import Link from 'next/link'
 import { useCallback } from 'react'
+import { Badge } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { Heading } from 'ui/src/components/CustomHTMLElements'
 
@@ -78,6 +79,7 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
                       title={item.title}
                       icon={item.icon}
                       hasLightIcon={item.hasLightIcon ?? Boolean(item.icon)}
+                      badge={item.badge ? <Badge variant="success">{item.badge}</Badge> : undefined}
                     >
                       {item.description}
                     </GlassPanel>

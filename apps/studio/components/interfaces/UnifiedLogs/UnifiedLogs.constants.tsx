@@ -26,6 +26,7 @@ export const LOG_TYPES_LABELS = {
   realtime: 'Realtime',
   supavisor: 'Supavisor',
   pgbouncer: 'PgBouncer',
+  multigres: 'Multigres',
 }
 
 type LogType = keyof typeof LOG_TYPES_LABELS

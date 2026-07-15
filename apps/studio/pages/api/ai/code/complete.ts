@@ -18,7 +18,7 @@ import {
   SECURITY_PROMPT,
   SQL_COMPLETION_INSTRUCTIONS,
 } from '@/lib/ai/prompts'
-import apiWrapper from '@/lib/api/apiWrapper'
+import { apiWrapper } from '@/lib/api/apiWrapper'
 import { executeQuery } from '@/lib/api/self-hosted/query'
 
 export const maxDuration = 60
