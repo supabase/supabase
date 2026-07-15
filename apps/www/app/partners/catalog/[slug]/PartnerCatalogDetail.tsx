@@ -4,7 +4,6 @@ import 'swiper/css'
 
 import { CH } from '@code-hike/mdx/components'
 import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
 import { type ListingDetail, type Partner } from '~/types/partners'
 import { useBreakpoint } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -134,7 +133,6 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
             <div className="flex mt-6 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center space-x-4">
                 <Image
-                  layout="fixed"
                   width={56}
                   height={56}
                   className="bg-white p-1 shrink-0 h-14 w-14 rounded-full border"
@@ -274,7 +272,6 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
             >
               <div className="flex items-center space-x-2">
                 <Image
-                  layout="fixed"
                   width={56}
                   height={56}
                   className="hidden sm:block bg-white p-0.5 shrink-0 h-6 w-6 rounded-full border"
