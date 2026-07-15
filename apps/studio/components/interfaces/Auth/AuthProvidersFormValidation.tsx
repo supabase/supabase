@@ -181,7 +181,12 @@ const getSmsOtpPhoneProviderSchema = (optional = false) =>
         .number({ required_error: 'This is required', invalid_type_error: 'This is required' })
         .min(6, 'Must be 6 or larger')
     ),
-    SMS_TEMPLATE: optional ? z.string() : z.string().min(1, 'SMS Template is required'),
+    SMS_TEMPLATE: optional
+      ? z.string().transform((val) => val.replace(/\\n/g, '\n'))
+      : z
+          .string()
+          .min(1, 'SMS Template is required')
+          .transform((val) => val.replace(/\\n/g, '\n')),
   })
 
 const getTwilioPhoneProviderSchema = (optional = false) =>
@@ -563,7 +568,8 @@ export const PROVIDER_PHONE = {
     SMS_TEMPLATE: {
       title: 'SMS Message',
       type: 'multiline-string',
-      description: 'To format the OTP code use `{{ .Code }}`',
+      description:
+        'To format the OTP code use `{{ .Code }}`. Use `\\n` for newlines (required for WebOTP API compliance).',
       show: {
         key: 'SMS_PROVIDER',
         matches: ['twilio', 'messagebird', 'textlocal', 'vonage'],

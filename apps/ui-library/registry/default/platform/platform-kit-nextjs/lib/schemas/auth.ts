@@ -205,7 +205,13 @@ export const authPhoneProviderSchema = z
       .optional()
       .describe('Duration before an SMS OTP expires in seconds.'),
     sms_otp_length: z.number().int().optional().describe('Number of digits in OTP.'),
-    sms_template: z.string().optional().describe('To format the OTP code use `{{ .Code }}`'),
+    sms_template: z
+      .string()
+      .optional()
+      .transform((val) => (val ? val.replace(/\\n/g, '\n') : val))
+      .describe(
+        'To format the OTP code use `{{ .Code }}`. Use `\\n` for newlines (required for WebOTP API compliance).'
+      ),
     sms_test_otp: z
       .string()
       .optional()
