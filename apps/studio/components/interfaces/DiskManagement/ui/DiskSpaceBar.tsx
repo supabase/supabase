@@ -76,6 +76,14 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
   const newUsedPercentageSystem = Math.min((usedSizeSystem / newTotalSize) * 100, 100)
 
   const resizePercentage = AUTOSCALING_THRESHOLD * 100
+  // Anchored to the actual right edge of the highlighted "border-r" zone below, rather than
+  // trusting resizePercentage alone, since usedPercentage* are each rounded independently and
+  // can drift a fraction of a percent from usedTotalPercentage.
+  const resizeMarkerLeftPercentage =
+    usedPercentageDatabase +
+    usedPercentageWAL +
+    usedPercentageSystem +
+    Math.max(0, resizePercentage - usedTotalPercentage)
 
   return (
     <div className="flex flex-col gap-2">
@@ -169,9 +177,9 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
             <div
               className="absolute z-10"
               style={{
-                left: `${resizePercentage}%`,
+                left: `${resizeMarkerLeftPercentage}%`,
                 top: '-20px',
-                transform: 'translateX(0)',
+                transform: 'translateX(-50%)',
               }}
             >
               <Tooltip>
