@@ -78,7 +78,7 @@ export const DefaultLayout = ({
     } else {
       panelRef.current.resize(`${contentMaxSizePercentage}%`)
     }
-  }, [isMounted, isMaximised, panelRef])
+  }, [isMounted, isMaximised, panelRef, activeSidebar])
 
   // This is required to prevent layout shift when rendering resizable panels (they initially render at 50%, then shift
   // to whatever is specified).
