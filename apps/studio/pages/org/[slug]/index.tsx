@@ -24,7 +24,7 @@ const ProjectsPage: NextPageWithLayout = () => {
 
   return (
     <ScaffoldContainer className="grow flex">
-      <ScaffoldSection isFullWidth className="pb-0">
+      <ScaffoldSection isFullWidth className="pb-12">
         {disableAccessMfa ? (
           <Admonition
             type="note"
