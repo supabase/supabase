@@ -107,7 +107,7 @@ export function DataTableFilterCheckboxAsync<TData>({
                       <span className="truncate font-normal block">{option.label}</span>
                     )}
                   </div>
-                  <span className="shrink-0 flex items-center justify-center font-mono text-xs">
+                  <span className="shrink-0 flex items-center justify-center font-mono text-xs group-hover:opacity-0">
                     {isLoadingCounts ? (
                       <Skeleton className="h-4 w-4" />
                     ) : facetedValue?.has(option.value) ? (
@@ -120,7 +120,7 @@ export function DataTableFilterCheckboxAsync<TData>({
                     type="button"
                     onClick={() => column?.setFilterValue([option.value])}
                     className={cn(
-                      'absolute inset-y-0 right-0 hidden font-normal text-[10px] text-muted-foreground bg-background hover:text-foreground group-hover:flex items-center',
+                      'absolute inset-y-0 right-0 hidden font-normal text-[10px] text-muted-foreground hover:text-foreground group-hover:flex items-center',
                       'rounded-md ring-offset-background focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
                     )}
                   >
