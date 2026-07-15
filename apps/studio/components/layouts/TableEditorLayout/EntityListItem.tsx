@@ -177,14 +177,6 @@ export const EntityListItem = ({
     totalRows: rowCount,
   })
 
-  const entityKind = {
-    [ENTITY_TYPE.TABLE]: 'table',
-    [ENTITY_TYPE.VIEW]: 'view',
-    [ENTITY_TYPE.MATERIALIZED_VIEW]: 'materialized view',
-    [ENTITY_TYPE.FOREIGN_TABLE]: 'foreign table',
-    [ENTITY_TYPE.PARTITIONED_TABLE]: 'partitioned table',
-  }[entity.type] ?? 'entity'
-
   return (
     <EditorTablePageLink
       title={entity.name}
@@ -252,7 +244,7 @@ export const EntityListItem = ({
                     className="w-6 h-6"
                     icon={<MoreVertical size={14} strokeWidth={2} />}
                     onClick={(e) => e.preventDefault()}
-                    aria-label={`${entity.name} ${entityKind} actions`}
+                    aria-label={`${entity.name} actions`}
                   />
                 </DropdownMenuTrigger>
               </TooltipTrigger>
