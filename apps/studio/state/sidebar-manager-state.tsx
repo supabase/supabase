@@ -17,6 +17,7 @@ type SidebarManagerData = {
   sidebars: Partial<Record<string, ManagedSidebar>>
   activeSidebar: ManagedSidebar | undefined
   pendingSidebarOpen: string | undefined
+  isMaximised: boolean
 }
 
 type SidebarManagerState = SidebarManagerData & {
@@ -32,12 +33,14 @@ type SidebarManagerState = SidebarManagerData & {
   isSidebarOpen: (id: string) => boolean
   closeActive: () => void
   clearActiveSidebar: () => void
+  toggleMaximise: () => void
 }
 
 const INITIAL_SIDEBAR_MANAGER_DATA: SidebarManagerData = {
   sidebars: {},
   activeSidebar: undefined,
   pendingSidebarOpen: undefined,
+  isMaximised: false,
 }
 
 const createSidebarManagerState = () => {
@@ -148,6 +151,10 @@ const createSidebarManagerState = () => {
 
     clearActiveSidebar() {
       state.activeSidebar = undefined
+    },
+
+    toggleMaximise() {
+      state.isMaximised = !state.isMaximised
     },
   })
 

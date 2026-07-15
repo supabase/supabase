@@ -1,6 +1,7 @@
+import { usePrevious } from '@uidotdev/usehooks'
 import { useBreakpoint } from 'common'
 import { useEffect } from 'react'
-import { cn, ResizableHandle, ResizablePanel } from 'ui'
+import { cn, ResizableHandle, ResizablePanel, usePanelRef } from 'ui'
 
 import { SIDEBAR_KEYS, type TYPEOF_SIDEBAR_KEYS } from './LayoutSidebarProvider'
 import { useMobileSheet } from '@/components/layouts/Navigation/NavigationBar/MobileSheetContext'
@@ -24,8 +25,8 @@ export const LayoutSidebar = ({
   maxSize = '50',
   defaultSize = '30',
 }: LayoutSidebarProps) => {
-  const { activeSidebar } = useSidebarManagerSnapshot()
   const isMobile = useBreakpoint('md')
+  const { activeSidebar } = useSidebarManagerSnapshot()
   const { content: sheetContent, setContent: setMobileSheetContent } = useMobileSheet()
 
   useEffect(() => {
