@@ -272,7 +272,7 @@ Both starting points converge here. You have a working `./supabase` directory in
 
 ### Making schema changes
 
-Which approach you use is a project-level decision, set when you first created your schema — not a per-change choice. It depends on whether you keep declarative files in `supabase/schemas/`. Pick the tab that matches your project.
+Which approach you use is a project-level decision, set when you first created your schema - not a per-change choice. It depends on whether you keep declarative files in `supabase/schemas/`. Pick the tab that matches your project.
 
 <Tabs
   scrollable
@@ -304,7 +304,7 @@ Which approach you use is a project-level decision, set when you first created y
 supabase db diff -f add-due-date-to-todo
 ```
 
-This captures your UI changes as a migration file. This works only when your project has **no** declarative files in `supabase/schemas/`: `db diff` then compares the live local database against your migrations. If you use declarative schemas, don't edit through Studio expecting `db diff` to catch it — see the **Declarative schemas** tab.
+This captures your UI changes as a migration file. This works only when your project has **no** declarative files in `supabase/schemas/`: `db diff` then compares the live local database against your migrations. If you use declarative schemas, don't edit through Studio expecting `db diff` to catch it - see the **Declarative schemas** tab.
 
 **If you prefer to write SQL directly:**
 
