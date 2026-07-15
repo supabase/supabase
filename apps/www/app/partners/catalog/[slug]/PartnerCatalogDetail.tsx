@@ -237,7 +237,7 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
           )}
 
           {/* Main content */}
-          <SectionContainerWithCn height="narrow" className="">
+          <SectionContainerWithCn height="narrow">
             <div className="grid gap-y-12 lg:grid-cols-8 lg:gap-x-20">
               {isNarrow && <PartnerDetails partner={partner} activeListing={activeListing} />}
 
@@ -261,26 +261,12 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
 
               {!isNarrow && <PartnerDetails partner={partner} activeListing={activeListing} />}
             </div>
-
-            {installHref && (
-              <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-xs max-w-5xl mx-auto mt-12">
-                <div className="flex flex-row justify-between">
-                  <h1 className="text-2xl self-center">
-                    Get started with {partner.title} and Supabase.
-                  </h1>
-                  <a href={installHref} target="_blank" rel="noreferrer">
-                    <Button size="medium" variant="secondary">
-                      Add integration
-                    </Button>
-                  </a>
-                </div>
-              </div>
-            )}
           </SectionContainerWithCn>
-          <div className="absolute h-full w-full inset-0 z-20 pointer-events-none lg:hidden">
-            <div
+          <div className="absolute h-full w-full inset-0 z-20 pointer-events-none">
+            <SectionContainerWithCn
+              height="none"
               className={cn(
-                'transition-all bg-background/90 -translate-y-3/4 dark:bg-background/95 backdrop-blur-xs border-b sticky top-16 z-20 flex justify-between items-center gap-4 px-6 py-2',
+                'transition-all bg-background/90 -translate-y-3/4 dark:bg-background/95 backdrop-blur-xs border-b sticky top-16 z-20 flex justify-between items-center gap-4 py-2',
                 showStickyBar
                   ? 'opacity-100 pointer-events-auto translate-y-0'
                   : 'opacity-0 pointer-events-none'
@@ -316,7 +302,7 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
                   </a>
                 </Button>
               )}
-            </div>
+            </SectionContainerWithCn>
           </div>
         </div>
 
@@ -342,7 +328,7 @@ function PartnerDetails({
 }) {
   return (
     <div className="lg:col-span-3">
-      <div className="sticky top-20 flex flex-col gap-4">
+      <div className="sticky top-32 flex flex-col gap-4">
         <h2 className="text-foreground font-mono uppercase tracking-wide text-xs">Details</h2>
 
         {activeListing.youtubeId && (
