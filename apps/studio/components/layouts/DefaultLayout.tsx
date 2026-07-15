@@ -9,7 +9,10 @@ import MobileNavigationBar from './Navigation/NavigationBar/MobileNavigationBar'
 import { MobileSheetProvider } from './Navigation/NavigationBar/MobileSheetContext'
 import { StudioMobileSheetNav } from './Navigation/NavigationBar/StudioMobileSheetNav'
 import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
-import { LayoutSidebarProvider } from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import {
+  LayoutSidebarProvider,
+  SIDEBAR_KEYS,
+} from './ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
 import { Sidebar } from '@/components/interfaces/Sidebar'
@@ -46,7 +49,7 @@ export const DefaultLayout = ({
   const panelRef = usePanelRef()
   const isMobile = useBreakpoint('md')
   const appSnap = useAppStateSnapshot()
-  const { isMaximised } = useSidebarManagerSnapshot()
+  const { isMaximised, activeSidebar } = useSidebarManagerSnapshot()
   const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const [isMounted, setIsMounted] = useState(false)
@@ -69,13 +72,13 @@ export const DefaultLayout = ({
   }, [])
 
   useEffect(() => {
-    if (!isMounted) return
+    if (!isMounted || !panelRef.current || !activeSidebar) return
     if (isMaximised) {
-      panelRef.current?.collapse()
+      panelRef.current.collapse()
     } else {
-      panelRef.current?.resize(`${contentMaxSizePercentage}%`)
+      panelRef.current.resize(`${contentMaxSizePercentage}%`)
     }
-  }, [isMounted, isMaximised, contentMaxSizePercentage, panelRef])
+  }, [isMounted, isMaximised, panelRef])
 
   // This is required to prevent layout shift when rendering resizable panels (they initially render at 50%, then shift
   // to whatever is specified).
@@ -117,7 +120,7 @@ export const DefaultLayout = ({
                     id="panel-content"
                     className="w-full"
                     panelRef={panelRef}
-                    collapsible
+                    collapsible={activeSidebar?.id === SIDEBAR_KEYS.AI_ASSISTANT}
                     minSize={`${contentMinSizePercentage}`}
                     maxSize={`${contentMaxSizePercentage}`}
                     defaultSize={`${contentMaxSizePercentage}`}

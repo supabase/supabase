@@ -119,10 +119,11 @@ const createSidebarManagerState = () => {
         return
       }
 
+      if (id !== 'ai-assistant' && state.isMaximised) {
+        state.toggleMaximise()
+      }
+
       if (state.activeSidebar && state.activeSidebar.id !== id) {
-        if (id !== 'ai-assistant' && state.isMaximised) {
-          state.toggleMaximise()
-        }
         const previousPanel = state.activeSidebar
         previousPanel?.onClose?.()
       }
