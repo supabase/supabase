@@ -700,7 +700,7 @@ export interface SqlEditorTemplateClickedEvent {
  *
  * @group Events
  * @source studio
- * @page /project/{ref}/sql/{id}
+ * @page /dashboard/project/{ref}/sql/{id}
  */
 export interface SqlEditorAutosaveDisableClickedEvent {
   action: 'sql_editor_autosave_disable_clicked'
@@ -1776,7 +1776,7 @@ export interface BranchCreateButtonClickedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/branches
+ * @page /dashboard/project/{ref}/branches, /dashboard/project/{ref}/merge or /dashboard/project/{ref}/settings/general
  */
 export interface BranchDeleteButtonClickedEvent {
   action: 'branch_delete_button_clicked'

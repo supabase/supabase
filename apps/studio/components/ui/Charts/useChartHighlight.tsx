@@ -4,7 +4,11 @@ import { useState } from 'react'
 type ChartHighlightMouseEvent = {
   activeLabel?: string
   coordinates?: string
+  chartX?: number
+  chartY?: number
 }
+
+type Pixel = { x: number; y: number }
 
 export interface ChartHighlight {
   left: string | undefined
@@ -28,6 +32,7 @@ export function useChartHighlight(): ChartHighlight {
   const [isSelecting, setIsSelecting] = useState(false)
   const [popoverPosition, setPopoverPosition] = useState<{ x: number; y: number } | null>(null)
   const [initialPoint, setInitialPoint] = useState<string | undefined>(undefined)
+  const [anchorPixel, setAnchorPixel] = useState<Pixel | undefined>(undefined)
 
   const handleMouseDown = (e: ChartHighlightMouseEvent) => {
     clearHighlight()
@@ -37,6 +42,9 @@ export function useChartHighlight(): ChartHighlight {
     setRight(e.activeLabel)
     setInitialPoint(e.activeLabel)
     setCoordinates({ left: e.coordinates, right: e.coordinates })
+    if (typeof e.chartX === 'number' && typeof e.chartY === 'number') {
+      setAnchorPixel({ x: e.chartX, y: e.chartY })
+    }
   }
 
   const handleMouseMove = (e: ChartHighlightMouseEvent) => {
@@ -69,7 +77,11 @@ export function useChartHighlight(): ChartHighlight {
     setIsSelecting(false)
     setInitialPoint(undefined)
 
-    if (
+    // Anchor the popover to where the selection started rather than wherever
+    // the mouse happened to be released.
+    if (anchorPixel) {
+      setPopoverPosition(anchorPixel)
+    } else if (
       typeof e === 'object' &&
       e !== null &&
       'chartX' in e &&
@@ -87,6 +99,7 @@ export function useChartHighlight(): ChartHighlight {
     setCoordinates({ left: undefined, right: undefined })
     setPopoverPosition(null)
     setInitialPoint(undefined)
+    setAnchorPixel(undefined)
   }
 
   return {

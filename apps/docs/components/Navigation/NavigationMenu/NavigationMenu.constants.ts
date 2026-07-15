@@ -2921,6 +2921,10 @@ export const platform: NavMenuConstant = {
               name: 'Log Drains',
               url: '/guides/platform/manage-your-usage/log-drains' as `/${string}`,
             },
+            {
+              name: 'Pipelines',
+              url: '/guides/platform/manage-your-usage/pipelines' as `/${string}`,
+            },
           ],
         },
         {
@@ -3229,12 +3233,16 @@ export const integrations: NavMenuConstant = {
       url: '/guides/integrations',
     },
     {
-      name: 'Vercel Marketplace',
-      url: '/guides/integrations/vercel-marketplace',
+      name: 'Dashboard Integrations',
+      url: '/guides/integrations#dashboard-integrations',
     },
     {
-      name: 'Supabase Marketplace',
-      url: '/guides/integrations/supabase-marketplace',
+      name: 'Partner Catalog',
+      url: '/guides/integrations/partner-catalog',
+    },
+    {
+      name: 'Vercel Marketplace',
+      url: '/guides/integrations/vercel-marketplace',
     },
     {
       name: 'Build Your Own',
