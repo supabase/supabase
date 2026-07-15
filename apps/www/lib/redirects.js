@@ -2347,6 +2347,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/partners/catalog/aikido-security',
+    destination: '/partners/catalog/aikido',
+  },
+  {
+    permanent: true,
     source: '/partners/integrations',
     destination: '/partners/catalog',
   },

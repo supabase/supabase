@@ -7,6 +7,8 @@ import {
 import {
   createMarketplaceClient,
   fullImageUrl,
+  SUPABASE_LISTING_OVERRIDES,
+  SUPABASE_PARTNER_SLUG,
   type CatalogListing,
 } from 'common/marketplace-client'
 
@@ -19,19 +21,6 @@ export const isUseMarketplaceDb =
   process.env.NEXT_PUBLIC_INTEGRATIONS_MARKETPLACE_DB?.toLowerCase() === 'true'
 
 const marketplaceClient = createMarketplaceClient()
-
-// Supabase-owned listings that are remapped to appear as independent partners in the catalog.
-// The key is the listing slug; the value is the partner name to display.
-const SUPABASE_PARTNER_SLUG = 'supabase'
-
-// Key = listing DB slug; Value = { display name, clean URL slug for the catalog page }
-const SUPABASE_LISTING_OVERRIDES: Record<string, { name: string; slug: string }> = {
-  'bigquery-wrapper': { name: 'BigQuery', slug: 'bigquery' },
-  'firebase-wrapper': { name: 'Firebase', slug: 'firebase' },
-  'stripe-wrapper': { name: 'Stripe', slug: 'stripe' },
-  vercel: { name: 'Vercel', slug: 'vercel' },
-  cyberduck: { name: 'Cyberduck', slug: 'cyberduck' },
-}
 
 // URL-facing slugs for overridden listings (e.g. 'bigquery', 'firebase', 'stripe').
 const OVERRIDE_URL_SLUGS = new Set(Object.values(SUPABASE_LISTING_OVERRIDES).map((o) => o.slug))
@@ -247,11 +236,10 @@ async function getPartnerFromMarketplace(slug: string): Promise<Partner | null> 
           slug: listing.slug,
           label: getLabelForListing(listing),
           content: listing.content,
-          publishedInMarketplace:
-            !listing.published_in_marketplace || isMarketplaceListing(listing),
+          publishedInMarketplace: listing.published_in_marketplace || isMarketplaceListing(listing),
           installUrl: listing.marketplace_url ?? null,
           dashboardUrl:
-            !listing.published_in_marketplace || isMarketplaceListing(listing)
+            listing.published_in_marketplace || isMarketplaceListing(listing)
               ? `https://supabase.com/dashboard/project/_/integrations/${isFdwListing(listing) ? listing.slug.replaceAll('-', '_') : listing.slug}/overview`
               : null,
           docsUrl: listing.documentation_url || null,
