@@ -54,6 +54,10 @@ const StudioMobileSheetNav = () => {
       open={content !== null}
       onOpenChange={handleOpenChange}
       shouldCloseOnViewportResize={!activeSidebar}
+      // Sit below the tooltip/portal layer (z-50) so the floating toolbar's tooltips
+      // aren't occluded by the toolbar while the sheet is open (see FloatingMobileToolbar).
+      className="z-40"
+      overlayClassName="z-40"
     >
       {sheetChildren}
     </MobileSheetNav>

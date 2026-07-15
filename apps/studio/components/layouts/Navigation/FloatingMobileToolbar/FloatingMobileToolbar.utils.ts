@@ -72,7 +72,10 @@ export function getToolbarStyle(params: {
     ? 'transform 0ms, z-index 0s'
     : 'transform 300ms cubic-bezier(0.4, 0, 0.2, 1), z-index 0s'
   const base: CSSProperties = {
-    zIndex: isSheetOpen ? 101 : 41,
+    // When the sheet is open the toolbar must sit above the sheet + overlay (z-40) so its
+    // buttons stay clickable, but below the tooltip/portal layer (z-50) so tooltips for those
+    // buttons aren't rendered behind them.
+    zIndex: isSheetOpen ? 45 : 41,
     transition,
     touchAction: 'none',
   }

@@ -93,6 +93,7 @@ describe('getToolbarStyle', () => {
       viewport,
       isDragging: false,
     })
-    expect(style.zIndex).toBe(101)
+    // Above the sheet + overlay (z-40) but below the tooltip/portal layer (z-50).
+    expect(style.zIndex).toBe(45)
   })
 })

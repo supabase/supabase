@@ -12,6 +12,7 @@ const MobileSheetNav: React.FC<{
   open?: boolean
   onOpenChange(open: boolean): void
   className?: string
+  overlayClassName?: string
   shouldCloseOnRouteChange?: boolean
   shouldCloseOnViewportResize?: boolean
 }> = ({
@@ -19,6 +20,7 @@ const MobileSheetNav: React.FC<{
   open = false,
   onOpenChange,
   className,
+  overlayClassName,
   shouldCloseOnRouteChange = true,
   shouldCloseOnViewportResize = true,
 }) => {
@@ -48,6 +50,7 @@ const MobileSheetNav: React.FC<{
         showClose={false}
         size="full"
         side="bottom"
+        overlayClassName={overlayClassName}
         className={cn(
           'rounded-t-lg bg-background overflow-hidden overflow-y-scroll h-[85dvh] md:max-h-[500px]',
           className
