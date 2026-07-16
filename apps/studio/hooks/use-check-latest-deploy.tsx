@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import { Button, StatusIcon } from 'ui'
 
 import { useDeploymentCommitQuery } from '@/data/utils/deployment-commit-query'
-import { BASE_PATH } from '@/lib/constants'
 
 const DeployCheckToast = ({ id }: { id: string | number }) => {
   const router = useRouter()
@@ -27,9 +26,8 @@ const DeployCheckToast = ({ id }: { id: string | number }) => {
         </Button>
         <Button
           onClick={() => {
-            // Clear the deployment pin so the reload lands on the latest
-            // version. No-op on Next (the cookie isn't set there).
-            document.cookie = `__vdpl=; Path=${BASE_PATH || '/'}; Max-Age=0`
+            // router.tsx's clearPinOnUnload drops the deployment pin on any
+            // reload, including this one — this just triggers that reload.
             router.reload()
           }}
         >

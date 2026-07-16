@@ -66,6 +66,13 @@ function routesFor(prefix: string) {
       // Response when a response IS safe to cache.
       routes.cacheControl(`${prefix}/api/(.*)`, { private: true, noStore: true }),
       routes.cacheControl(`${prefix}/_serverFn/(.*)`, { private: true, noStore: true }),
+      // The SPA shell (extensionless paths, rewritten to /_shell above) must
+      // never be served from Vercel's shared edge cache: skew protection's
+      // `__vdpl` cookie pins a session to a specific deployment by having
+      // Vercel re-resolve each document request against that deployment's
+      // build output, but a cached response has no `Vary` on the cookie —
+      // every visitor gets whichever copy is cached, defeating the pin.
+      routes.cacheControl(`${prefix}/((?!.*\\.\\w+$).*)`, { private: true, noStore: true }),
       // Hashed bundles under /assets/* are content-addressed — safe to
       // cache forever.
       routes.cacheControl(`${prefix}/assets/(.*)`, {

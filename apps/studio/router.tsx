@@ -5,22 +5,30 @@ import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query
 import { routeTree } from './routeTree.gen'
 import { initSentryTanStackClient } from './sentry.tanstack'
 import { getQueryClient } from '@/data/query-client'
-import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
+import { IS_PLATFORM } from '@/lib/constants'
 import { parseSearch, stringifySearch } from '@/lib/router-search-params'
 
 export interface RouterContext {
   queryClient: QueryClient
 }
 
-// Skew protection: pin this browser session to the deployment that served it,
-// so a long-lived dashboard session never 404s on a lazily-loaded JS chunk or
-// gets a surprise version change mid-session. It's a session cookie (no
-// expiry) — cleared when the tab/window closes, so the next visit gets the
-// latest deploy. Scoped to BASE_PATH so the version check (hit at the root
-// `/api/...`, outside this Path) stays unpinned and can still detect new
-// deploys; the "Refresh" toast clears it before reloading (see
-// use-check-latest-deploy). No-op unless we're on a Vercel deploy with Skew
-// Protection enabled.
+// Skew protection: pin this browser session to the deployment that served
+// it, so lazily-loaded JS chunks fetched *during* that session always come
+// from the same build as the one already running — never a 404 from a
+// newer deploy's assets replacing the old ones. The pin is deliberately
+// scoped to a single page life: `clearPinOnUnload` (below) drops it right
+// before any reload/navigation, so every fresh document load re-resolves
+// against the latest deployment (Vercel's default, unpinned behavior) and
+// then re-pins to whatever that load actually got — it never replays a
+// stale pin across reloads. Path MUST be `/`, not BASE_PATH: Studio's own
+// redirect chain starts at the bare domain root (`/` → BASE_PATH →
+// BASE_PATH/org, see redirects.shared.ts), and a cookie scoped to BASE_PATH
+// is never sent on that first `/` hop — so it'd resolve against the latest
+// deployment, contaminating the shell HTML with new-deployment chunk hashes
+// before the pin ever kicks in. The version-check request stays unpinned
+// via `credentials: 'omit'` (see deployment-commit-query.ts), not via
+// cookie scoping. No-op unless we're on a Vercel deploy with Skew Protection
+// enabled.
 function pinDeploymentForSession() {
   if (typeof document === 'undefined') return
   if (!IS_PLATFORM) return
@@ -28,7 +36,19 @@ function pinDeploymentForSession() {
   const deploymentId = process.env.NEXT_PUBLIC_VERCEL_DEPLOYMENT_ID
   if (!deploymentId) return
   if (document.cookie.includes('__vdpl=')) return
-  document.cookie = `__vdpl=${deploymentId}; Path=${BASE_PATH || '/'}; SameSite=Lax; Secure`
+  document.cookie = `__vdpl=${deploymentId}; Path=/; SameSite=Lax; Secure`
+}
+
+// Drops the pin right before the page unloads (reload, back/forward,
+// typing a new URL, closing the tab) so the NEXT document request — whatever
+// it is — always resolves against the latest deployment instead of
+// replaying this session's pin. `pagehide` over `beforeunload`: it doesn't
+// block bfcache eligibility and still fires reliably for reloads/navigation.
+function clearPinOnUnload() {
+  if (typeof window === 'undefined') return
+  window.addEventListener('pagehide', () => {
+    document.cookie = `__vdpl=; Path=/; Max-Age=0`
+  })
 }
 
 // Backstop for the pin above: if a lazily-loaded chunk 404s — most likely the
@@ -55,7 +75,7 @@ function registerChunkErrorBackstop() {
     } catch {
       // ignore — worst case we lose loop protection for this reload.
     }
-    document.cookie = `__vdpl=; Path=${BASE_PATH || '/'}; Max-Age=0`
+    document.cookie = `__vdpl=; Path=/; Max-Age=0`
     window.location.reload()
   })
 }
@@ -68,6 +88,7 @@ function getContext(): RouterContext {
 
 export function getRouter() {
   pinDeploymentForSession()
+  clearPinOnUnload()
   registerChunkErrorBackstop()
 
   const context = getContext()
