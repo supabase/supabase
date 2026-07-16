@@ -5,13 +5,13 @@ import { Checkbox as CheckboxPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
+import { getExplicitTabIndex } from '../../../lib/utils/getExplicitTabIndex'
 
 const Checkbox = React.forwardRef<
   React.ElementRef<typeof CheckboxPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
 >(({ className, disabled, tabIndex, ...props }, ref) => {
-  // Explicit tabIndex for keyboard focus (Safari skips buttons otherwise)
-  const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
+  const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
 
   return (
     <CheckboxPrimitive.Root

@@ -3,14 +3,15 @@
 import { Collapsible as CollapsiblePrimitive } from 'radix-ui'
 import * as React from 'react'
 
+import { getExplicitTabIndex } from '../../../lib/utils/getExplicitTabIndex'
+
 const Collapsible = CollapsiblePrimitive.Root
 
 const CollapsibleTrigger = React.forwardRef<
   React.ElementRef<typeof CollapsiblePrimitive.CollapsibleTrigger>,
   React.ComponentPropsWithoutRef<typeof CollapsiblePrimitive.CollapsibleTrigger>
 >(({ disabled, tabIndex, ...props }, ref) => {
-  // Explicit tabIndex for keyboard focus (Safari skips buttons otherwise)
-  const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
+  const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
 
   return (
     <CollapsiblePrimitive.CollapsibleTrigger

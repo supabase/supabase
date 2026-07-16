@@ -6,6 +6,7 @@ import { Dialog as SheetPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
+import { getExplicitTabIndex } from '../../../lib/utils/getExplicitTabIndex'
 
 const Sheet = SheetPrimitive.Root
 
@@ -13,8 +14,7 @@ const SheetTrigger = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Trigger>
 >(({ disabled, tabIndex, ...props }, ref) => {
-  // Explicit tabIndex for keyboard focus (Safari skips buttons otherwise)
-  const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
+  const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
 
   return (
     <SheetPrimitive.Trigger ref={ref} {...props} disabled={disabled} tabIndex={computedTabIndex} />

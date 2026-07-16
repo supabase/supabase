@@ -6,7 +6,7 @@ import { PanelLeft } from 'lucide-react'
 import { Separator as _SeparatorPrimitive, Slot as SlotPrimitive } from 'radix-ui'
 import * as React from 'react'
 
-import { cn } from './../../../lib/utils'
+import { cn, getExplicitTabIndex } from './../../../lib/utils'
 import { useIsMobile } from './../../hooks/use-mobile'
 import { Button } from './button'
 import { Input } from './input'
@@ -447,8 +447,7 @@ const SidebarGroupAction = React.forwardRef<
   React.ComponentProps<'button'> & { asChild?: boolean }
 >(({ className, asChild = false, disabled, tabIndex, ...props }, ref) => {
   const Comp = asChild ? SlotPrimitive.Slot : 'button'
-  // Explicit tabIndex for keyboard focus (Safari skips buttons otherwise)
-  const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
+  const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
 
   return (
     <Comp
@@ -569,11 +568,7 @@ const SidebarMenuButton = React.forwardRef<
     const { isMobile, state } = useSidebar()
     const { disabled, tabIndex, ...rest } = props
 
-    // Explicit tabIndex for keyboard focus (Safari skips buttons otherwise)
-    // - Explicit tabIndex prop takes precedence
-    // - If disabled, default to -1 (unless explicitly set)
-    // - Otherwise, default to 0 for keyboard accessibility
-    const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
+    const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
 
     const button = (
       <Comp
@@ -622,8 +617,7 @@ const SidebarMenuAction = React.forwardRef<
   }
 >(({ className, asChild = false, showOnHover = false, disabled, tabIndex, ...props }, ref) => {
   const Comp = asChild ? SlotPrimitive.Slot : 'button'
-  // Explicit tabIndex for keyboard focus (Safari skips buttons otherwise)
-  const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
+  const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
 
   return (
     <Comp

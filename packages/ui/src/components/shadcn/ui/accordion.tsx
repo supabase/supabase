@@ -5,6 +5,7 @@ import { Accordion as AccordionPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
+import { getExplicitTabIndex } from '../../../lib/utils/getExplicitTabIndex'
 
 const Accordion = AccordionPrimitive.Root
 
@@ -20,8 +21,7 @@ const AccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger> & { hideIcon?: boolean }
 >(({ className, children, hideIcon, disabled, tabIndex, ...props }, ref) => {
-  // Explicit tabIndex for keyboard focus (Safari skips buttons otherwise)
-  const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
+  const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
 
   return (
     <AccordionPrimitive.Header className="flex">

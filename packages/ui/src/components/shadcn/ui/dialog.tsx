@@ -6,6 +6,7 @@ import { Dialog as DialogPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
+import { getExplicitTabIndex } from '../../../lib/utils/getExplicitTabIndex'
 
 export const DIALOG_PADDING_Y_SMALL = 'py-4'
 export const DIALOG_PADDING_X_SMALL = 'px-4 md:px-5'
@@ -31,8 +32,7 @@ const DialogTrigger = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Trigger>
 >(({ disabled, tabIndex, ...props }, ref) => {
-  // Explicit tabIndex for keyboard focus (Safari skips buttons otherwise)
-  const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
+  const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
 
   return (
     <DialogPrimitive.Trigger ref={ref} {...props} disabled={disabled} tabIndex={computedTabIndex} />

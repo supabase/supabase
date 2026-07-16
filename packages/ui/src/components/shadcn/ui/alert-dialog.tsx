@@ -5,6 +5,7 @@ import { AlertDialog as AlertDialogPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
+import { getExplicitTabIndex } from '../../../lib/utils/getExplicitTabIndex'
 import { Button, ButtonVariantProps, buttonVariants } from './../../Button'
 
 type AlertDialogContextValue = {
@@ -79,8 +80,7 @@ const AlertDialogTrigger = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Trigger>
 >(({ disabled, tabIndex, ...props }, ref) => {
-  // Explicit tabIndex for keyboard focus (Safari skips buttons otherwise)
-  const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
+  const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
 
   return (
     <AlertDialogPrimitive.Trigger
