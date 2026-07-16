@@ -80,6 +80,21 @@ interface ProjectCreationFormProps {
   onCreateSuccess?: (ref: string) => void
 }
 
+/**
+ * [Joshen] JFYI am only adding the `isVercelIntegrationFlow` flag to keep the existing
+ * behaviour for project creation via Vercel integration as similar to keep current state
+ * for now, what it controls if `true`:
+ * - Disables organization selection
+ * - Hides the following:
+ *  - "Internal configuration" section
+ *  - "GitHub repository" field
+ *  - "Free project info" at the bottom
+ *  - "Cancel" button
+ * - Shows the following:
+ *  - "Data seeding" section
+ * Eventually we could looking into reducing the differences more, e.g having data seeding
+ * for both ways, and showing GitHub repository field for Vercel integration
+ */
 export const ProjectCreationForm = ({
   isVercelIntegrationFlow = false,
   onCreateSuccess,
