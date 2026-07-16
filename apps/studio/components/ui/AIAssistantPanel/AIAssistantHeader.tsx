@@ -1,4 +1,13 @@
-import { Clipboard, Edit, MessageCirclePlus, MoreVertical, Settings, X } from 'lucide-react'
+import {
+  Clipboard,
+  Edit,
+  Maximize,
+  MessageCirclePlus,
+  Minimize,
+  MoreVertical,
+  Settings,
+  X,
+} from 'lucide-react'
 import { KeyboardEvent, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -20,6 +29,7 @@ import { AIOptInModal } from './AIOptInModal'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AIAssistantHeaderProps {
   isChatLoading: boolean
@@ -41,6 +51,7 @@ export const AIAssistantHeader = ({
   aiOptInLevel,
 }: AIAssistantHeaderProps) => {
   const snap = useAiAssistantStateSnapshot()
+  const { isMaximised, toggleMaximise } = useSidebarManagerSnapshot()
   const [value, setValue] = useState(snap.activeChat?.name)
   const [isEditingName, setIsEditingName] = useState(false)
   const [isOptInModalOpen, setIsOptInModalOpen] = useState(false)
@@ -80,6 +91,10 @@ export const AIAssistantHeader = ({
   })
 
   useShortcut(SHORTCUT_IDS.AI_ASSISTANT_OPEN_PERMISSIONS, () => setIsOptInModalOpen(true), {
+    enabled: !isChatLoading,
+  })
+
+  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE, toggleMaximise, {
     enabled: !isChatLoading,
   })
 
@@ -126,6 +141,21 @@ export const AIAssistantHeader = ({
                 size="tiny"
                 icon={<MessageCirclePlus />}
                 onClick={onNewChat}
+                className="h-7 w-7 p-0"
+              />
+            </ShortcutTooltip>
+
+            <ShortcutTooltip
+              side="bottom"
+              label={isMaximised ? 'Minimize' : 'Maximize'}
+              shortcutId={SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE}
+            >
+              <Button
+                variant="text"
+                aria-label={isMaximised ? 'Minimize' : 'Maximize'}
+                size="tiny"
+                icon={isMaximised ? <Minimize /> : <Maximize />}
+                onClick={toggleMaximise}
                 className="h-7 w-7 p-0"
               />
             </ShortcutTooltip>

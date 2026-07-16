@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useCallback, useContext, useState } from 'react'
+import { snapshot } from 'valtio'
 
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { useSQLEditorContext } from './SQLEditorContext'
-import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
+import { createTabId, TabsStateContext } from '@/state/tabs'
 
 /**
  * Owns the editor `onMount` handler (scroll-position restore + tracking) and the
@@ -11,26 +12,31 @@ import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
  */
 export function useEditorMount({ id }: { id: string }) {
   const { scrollTopRef } = useSQLEditorContext()
-  const tabs = useTabsStateSnapshot()
+  // The proxy store (stable reference), read non-reactively in onMount so the
+  // callback identity doesn't churn on every tab-state change.
+  const tabsState = useContext(TabsStateContext)
 
   // Bumped on every editor mount (including the keyed remount on snippet switch)
   // so a diff request that arrived before the editor was ready gets re-processed.
   const [editorMountCount, setEditorMountCount] = useState(0)
 
-  const onMount = (editor: IStandaloneCodeEditor) => {
-    setEditorMountCount((count) => count + 1)
+  const onMount = useCallback(
+    (editor: IStandaloneCodeEditor) => {
+      setEditorMountCount((count) => count + 1)
 
-    const tabId = createTabId('sql', { id })
-    const tabData = tabs.tabsMap[tabId]
+      const tabId = createTabId('sql', { id })
+      const tabData = snapshot(tabsState).tabsMap[tabId]
 
-    // [Joshen] Tiny timeout to give a bit of time for the content to load before scrolling
-    setTimeout(() => {
-      if (tabData?.metadata?.scrollTop) {
-        editor.setScrollTop(tabData.metadata.scrollTop)
-      }
-    }, 20)
-    editor.onDidScrollChange((e) => (scrollTopRef.current = e.scrollTop))
-  }
+      // [Joshen] Tiny timeout to give a bit of time for the content to load before scrolling
+      setTimeout(() => {
+        if (tabData?.metadata?.scrollTop) {
+          editor.setScrollTop(tabData.metadata.scrollTop)
+        }
+      }, 20)
+      editor.onDidScrollChange((e) => (scrollTopRef.current = e.scrollTop))
+    },
+    [id, scrollTopRef, tabsState]
+  )
 
   return { onMount, editorMountCount }
 }

@@ -28,12 +28,14 @@ import {
 } from '@/components/interfaces/ConnectSheet/ConnectionString.utils'
 import { PasswordEncodingNote } from '@/components/interfaces/ConnectSheet/PasswordEncodingNote'
 import { ResetDbPasswordDialog } from '@/components/interfaces/Settings/Database/DatabaseSettings/ResetDbPasswordDialog'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
 import { useSupavisorConfigurationQuery } from '@/data/database/supavisor-configuration-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -275,14 +277,11 @@ function DirectConnectionContent({ state, deploymentMode }: StepContentProps) {
       {showSelfHostedDirectNotice && (
         <p className="text-sm text-foreground-light">
           Manually{' '}
-          <a
-            href="https://supabase.com/docs/guides/self-hosting/docker#exposing-your-postgres-database"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="underline hover:text-foreground"
+          <InlineLink
+            href={`${DOCS_URL}/guides/self-hosting/docker#exposing-your-postgres-database`}
           >
             configurable
-          </a>{' '}
+          </InlineLink>{' '}
           for self-hosted Supabase.
         </p>
       )}

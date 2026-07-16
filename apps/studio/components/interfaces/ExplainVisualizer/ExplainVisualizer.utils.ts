@@ -133,16 +133,6 @@ export function isExplainQuery(rows: readonly unknown[]): boolean {
   return 'QUERY PLAN' in firstRow && Object.keys(firstRow).length === 1
 }
 
-export function isTextFormatExplain(rows: readonly unknown[]): boolean {
-  if (!isExplainQuery(rows)) return false
-  const firstRow = rows[0] as Record<string, unknown>
-  return typeof firstRow['QUERY PLAN'] === 'string'
-}
-
-export function isExplainSql(sql: string): boolean {
-  return /^\s*explain\b/i.test(sql)
-}
-
 export function formatNodeDuration(ms: number | undefined): string {
   if (ms === undefined) return '-'
   if (ms >= 1000) return `${(ms / 1000).toFixed(2)}s`
@@ -195,36 +185,4 @@ export function getScanBorderColor(operation: string): string {
 
   // Default neutral color for other operations
   return 'border-l-border-muted'
-}
-
-export function splitSqlStatements(sql: string): string[] {
-  // Enhanced tokenizer that handles:
-  // - Single-quoted strings: '...' (with '' escaping)
-  // - Double-quoted strings: "..." (with "" escaping)
-  // - Dollar-quoted strings: $tag$...$tag$
-  // - Line comments: -- (until end of line)
-  // - Block comments: /* ... */ (may be multiline)
-  // - Semicolons: ;
-  const tokens =
-    sql.match(
-      /'([^']|'')*'|"([^"]|"")*"|\$[a-zA-Z0-9_]*\$[\s\S]*?\$[a-zA-Z0-9_]*\$|--[^\r\n]*|\/\*[\s\S]*?\*\/|;|[^'"$;\-\/]+|./g
-    ) || []
-
-  const statements: string[] = []
-  let current = ''
-
-  for (const token of tokens) {
-    if (token === ';') {
-      if (current.trim()) statements.push(current.trim())
-      current = ''
-    } else {
-      current += token
-    }
-  }
-
-  if (current.trim()) {
-    statements.push(current.trim())
-  }
-
-  return statements
 }
