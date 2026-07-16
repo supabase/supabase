@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 
-import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
+import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from './UnifiedLogs.constants'
 import {
   groupLogsFiltersByColumn,
   parseLogsFilterUrlParams,
@@ -54,17 +54,12 @@ const HTTP_STATUS_EXPR: SafeLogSqlFragment = safeSql`if(source = 'auth_logs', lo
  * logs from postgREST / storage-api and are intentionally not part of unified
  * logs; the UI surfaces gateway HTTP traffic for those buckets.
  */
-const LOG_TYPE_CONDITION: Record<string, SafeLogSqlFragment> = {
-  edge: safeSql`source = 'edge_logs'`,
-  postgrest: safeSql`source = 'postgrest_logs'`,
-  storage: safeSql`source = 'storage_logs'`,
-  postgres: safeSql`source = 'postgres_logs'`,
-  'edge function': safeSql`source = 'function_edge_logs'`,
-  auth: safeSql`source = 'auth_logs'`,
-  realtime: safeSql`source = 'realtime_logs'`,
-  supavisor: safeSql`source = 'supavisor_logs'`,
-  pgbouncer: safeSql`source = 'pgbouncer_logs'`,
-}
+const LOG_TYPE_CONDITION: Record<string, SafeLogSqlFragment> = Object.fromEntries(
+  Object.entries(LOG_TYPE_TO_SOURCE).map(([type, source]) => [
+    type,
+    safeSql`source = ${lit(source)}`,
+  ])
+)
 
 // Derived `log_type` column for SELECT / GROUP BY / countIf use.
 // WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%' THEN 'postgrest'
@@ -79,6 +74,7 @@ const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN source = 'realtime_logs' THEN 'realtime'
       WHEN source = 'supavisor_logs' THEN 'supavisor'
       WHEN source = 'pgbouncer_logs' THEN 'pgbouncer'
+      WHEN source = 'multigres_logs' THEN 'multigres'
       ELSE source
     END`
 
@@ -349,7 +345,7 @@ const applySearchParamsFilter = (search: QuerySearchParamsType): SafeLogSqlFragm
  */
 export const getUnifiedLogsQuery = (search: QuerySearchParamsType): SafeLogSqlFragment => {
   const conditions = buildBaseWhere(search)
-  return safeSql`
+  return safeSql`-- unified logs: row list
 SELECT ${rowProjection()}
 FROM logs
 ${whereClause(conditions)}
@@ -395,7 +391,7 @@ export const getFacetCountQuery = ({
     conditions.push(safeSql`(${facetExpr}) LIKE ${lit('%' + facetSearch + '%')}`)
   }
 
-  return safeSql`
+  return safeSql`-- unified logs: single-facet counts (${lit(facet)})
 SELECT ${lit(facet)} AS facet, (${facetExpr}) AS value, count() AS count
 FROM logs
 ${whereClause(conditions)}
@@ -464,7 +460,8 @@ HAVING value != ''
   // rejects LIMIT BY inside the shared arrayJoin).
   blocks.push(safeSql`(${getFacetCountQuery({ search, facet: 'pathname' })})`)
 
-  return joinSqlFragments(blocks, ' UNION ALL ')
+  return safeSql`-- unified logs: sidebar facet counts
+${joinSqlFragments(blocks, ' UNION ALL ')}`
 }
 
 /**
@@ -475,7 +472,7 @@ export const getLogsChartQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
   const truncFn = truncationFunction(truncationLevel)
   const conditions = buildBaseWhere(search)
 
-  return safeSql`
+  return safeSql`-- unified logs: severity chart (${truncFn} buckets)
 SELECT
   ${truncFn}(timestamp) AS time_bucket,
   countIf((${LEVEL_EXPR}) = 'success') AS success,

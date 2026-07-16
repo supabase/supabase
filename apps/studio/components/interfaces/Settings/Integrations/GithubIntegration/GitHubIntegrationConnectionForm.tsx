@@ -102,7 +102,7 @@ export const GitHubIntegrationConnectionForm = ({
   const { mutate: createConnection, isPending: isCreatingConnection } =
     useGitHubConnectionCreateMutation({
       onSuccess: () => {
-        toast.success('GitHub integration successfully updated')
+        toast.success('GitHub connection updated')
       },
       onError: (error) => {
         // Don't show error toast when connection already exists - the branch
@@ -116,7 +116,7 @@ export const GitHubIntegrationConnectionForm = ({
   const { mutateAsync: deleteConnection, isPending: isDeletingConnection } =
     useGitHubConnectionDeleteMutation({
       onSuccess: () => {
-        toast.success('Successfully removed GitHub integration')
+        toast.success('GitHub connection removed')
       },
     })
 
@@ -391,7 +391,7 @@ export const GitHubIntegrationConnectionForm = ({
               <GitHubRepositoryField
                 form={githubSettingsForm}
                 name="repositoryId"
-                label="GitHub Repository"
+                label="GitHub repository"
                 layout="flex-row-reverse"
                 description={
                   connection

@@ -19,7 +19,7 @@ const data = {
           label: 'Join us on Discord',
           link: 'https://discord.supabase.com/',
           target: '_blank',
-          icon: <IconDiscord fill="var(--background-default)" />,
+          icon: <IconDiscord />,
           type: 'secondary',
         },
       ],

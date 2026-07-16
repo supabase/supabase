@@ -3,7 +3,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useMemo } from 'react'
-import { cn, TabsTrigger_Shadcn_ } from 'ui'
+import { cn, TabsTrigger } from 'ui'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
@@ -31,6 +31,11 @@ export const SortableTab = ({
 }) => {
   const editor = useEditorType()
   const tabs = useTabsStateSnapshot()
+  // Reading the registration version subscribes this tab to handler (un)registers,
+  // so an indicator registered after first paint (handlers register in an effect)
+  // is still picked up. The layout stays agnostic of what the indicator shows.
+  void tabs.handlerRegistrationVersion
+  const StatusIndicator = tabs.getTabStatusIndicator(tab.type)
   const { selectedSchema: currentSchema } = useQuerySchemaState()
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: tab.id,
@@ -50,7 +55,7 @@ export const SortableTab = ({
   }, [openTabs, currentSchema, editor])
 
   // Create a motion version of TabsTrigger while preserving all functionality
-  // const MotionTabsTrigger = motion(TabsTrigger_Shadcn_)
+  // const MotionTabsTrigger = motion(TabsTrigger)
 
   return (
     <motion.div
@@ -62,7 +67,7 @@ export const SortableTab = ({
       animate={{ opacity: isDragging ? 0 : 1 }}
       className={cn('flex items-center h-(--header-height) first-of-type:border-l')}
     >
-      <TabsTrigger_Shadcn_
+      <TabsTrigger
         value={tab.id}
         onAuxClick={(e) => {
           // Middle click closes tab
@@ -101,27 +106,37 @@ export const SortableTab = ({
           </AnimatePresence>
           <span>{tab.label || 'Untitled'}</span>
         </div>
-        <span
-          role="button"
-          onClick={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-          }}
-          className="p-0.5 ml-1 opacity-0 group-hover:opacity-100 hover:bg-200 rounded-xs cursor-pointer"
-          onMouseDown={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-          }}
-          onPointerDown={(e) => {
-            e.preventDefault()
-            e.stopPropagation()
-            onClose(tab.id)
-          }}
-        >
-          <X size={12} className="text-foreground-light" />
-        </span>
+        {/* VS Code-style slot: the type's status indicator (e.g. an unsaved dot)
+            shows at rest and swaps to the close button on hover. */}
+        <div className="relative ml-1 flex size-5 items-center justify-center">
+          {StatusIndicator && (
+            <span className="absolute inset-0 flex items-center justify-center group-hover:opacity-0">
+              <StatusIndicator tab={tab} />
+            </span>
+          )}
+          <span
+            role="button"
+            aria-label="Close tab"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+            }}
+            className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-200 rounded-xs cursor-pointer"
+            onMouseDown={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+            }}
+            onPointerDown={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              onClose(tab.id)
+            }}
+          >
+            <X size={12} className="text-foreground-light" />
+          </span>
+        </div>
         <div className="absolute w-full top-0 left-0 right-0 h-px bg-foreground opacity-0 group-data-[state=active]:opacity-100" />
-      </TabsTrigger_Shadcn_>
+      </TabsTrigger>
       {index < openTabs.length && (
         <div role="separator" className="h-full w-px bg-border" key={`separator-${tab.id}`} />
       )}

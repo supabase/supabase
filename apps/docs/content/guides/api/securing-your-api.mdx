@@ -68,6 +68,12 @@ alter default privileges for role postgres in schema public
   revoke execute on functions from public;
 ```
 
+<Admonition type="tip">
+
+These default privileges pose no direct security risk. They appear in [pg_default_acl](https://www.postgresql.org/docs/current/catalog-pg-default-acl.html), granted by [supabase_admin](/docs/guides/database/postgres/roles#supabaseadmin) to `anon`, `authenticated`, and `service_role`. The default privileges are intentional and part of Supabase's standard permission model. The `supabase_admin` role is an internal management role that can't authenticate through the Data API.
+
+</Admonition>
+
 ## Use a dedicated API schema
 
 If you want an extra boundary around your Data API, lock down the `public` schema and expose a dedicated schema, such as `api`, instead. You can control access with grants in any schema, but this can make the surface easier to reason about: objects in `api` represent your Data API, while internal tables and helper functions stay in schemas that are not exposed. See [Using Custom Schemas](/docs/guides/api/using-custom-schemas) for setup steps.

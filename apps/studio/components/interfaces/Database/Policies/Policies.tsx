@@ -4,8 +4,10 @@ import Link from 'next/link'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, Card, CardContent } from 'ui'
+import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
+import { usePoliciesData } from './PoliciesDataContext'
 import {
   PolicyTableRow,
   PolicyTableRowProps,
@@ -13,6 +15,7 @@ import {
 import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
 import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
 import { RLSToggleDialog } from '@/components/interfaces/Database/RLSToggleDialog'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useDatabasePolicyDeleteMutation } from '@/data/database-policies/database-policy-delete-mutation'
 import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
@@ -43,6 +46,9 @@ export const Policies = ({
 }: PoliciesProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { exposedSchemas } = usePoliciesData()
+
+  const isSchemaExposedAPI = exposedSchemas.has(schema)
 
   const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<{
     id: number
@@ -148,6 +154,21 @@ export const Policies = ({
     <>
       <div className="flex flex-col gap-y-4 pb-4">
         {isLocked && <ProtectedSchemaWarning schema={schema} entity="policies" />}
+
+        {!isSchemaExposedAPI && (
+          <Admonition
+            variant="warning"
+            title="No data from any table in this schema will be selectable via Supabase APIs"
+          >
+            This schema is not exposed via the Supabase APIs. You may configure this in your
+            project’s{' '}
+            <InlineLink href={`/project/${ref}/integrations/data_api/settings`}>
+              Data API settings
+            </InlineLink>
+            .
+          </Admonition>
+        )}
+
         {tables.length > 0 ? (
           <>
             {tables.map((table) => {

@@ -106,7 +106,7 @@ There are several authentication-related email templates which can be configured
 **Default subject**: "`{{ .Token }} is your verification code`"
 **When sent**: When a user needs to re-authenticate for sensitive operations
 **Purpose**: Ask users to verify their identity before a sensitive operation
-**Content**: Contains a 6-digit OTP code for verification
+**Content**: Contains a 8-digit OTP code for verification
 
 ## Available security notification email templates
 
@@ -181,7 +181,7 @@ https://project-ref.supabase.co/auth/v1/verify?token={{ .TokenHash }}&type=email
 
 ### `Token`
 
-Contains a 6-digit One-Time-Password (OTP) that can be used instead of the `ConfirmationURL`.
+Contains a 8-digit One-Time-Password (OTP) that can be used instead of the `ConfirmationURL`.
 
 **Usage**
 

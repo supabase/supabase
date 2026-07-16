@@ -1,4 +1,4 @@
-import { untrustedSql, type SafeSqlFragment } from '@supabase/pg-meta'
+import { untrustedSql, type SafeSqlFragment, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { TABLE_EVENT_ACTIONS } from 'common/telemetry-constants'
 
 import {
@@ -8,7 +8,7 @@ import {
   sqlAiDisclaimerComment,
   updateWithoutWhereRegex,
 } from './SQLEditor.constants'
-import { ContentDiff } from './SQLEditor.types'
+import { ContentDiff, type IStandaloneCodeEditor } from './SQLEditor.types'
 import type { SnippetWithContent } from '@/data/content/sql-folders-query'
 import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
 import { generateUuid } from '@/lib/api/snippets.browser'
@@ -249,8 +249,8 @@ export const checkIfAppendLimitRequired = (sql: string, limit: number = 0) => {
     !cleanedSql.toLowerCase().match(/fetch\s+first/i) &&
     !cleanedSql.match(/limit$/i) &&
     !cleanedSql.match(/limit;$/i) &&
-    !cleanedSql.match(/limit [0-9]* offset [0-9]*[;]?$/i) &&
-    !cleanedSql.match(/limit [0-9]*[;]?$/i)
+    !cleanedSql.match(/limit [0-9]* offset [0-9]*\s*[;]?$/i) &&
+    !cleanedSql.match(/limit [0-9]*\s*[;]?$/i)
   return { cleanedSql, appendAutoLimit }
 }
 
@@ -260,4 +260,64 @@ export const suffixWithLimit = (sql: SafeSqlFragment, limit: number = 0): SafeSq
   return (
     cleanedSql.endsWith(';') ? sql.replace(/[;]+$/, ` limit ${limit};`) : `${sql} limit ${limit};`
   ) as SafeSqlFragment
+}
+
+/**
+ * Resolves the SQL to act on from the editor: the current selection if there is
+ * one, otherwise the full editor contents, falling back to the snippet's stored
+ * SQL. Mirrors the logic that used to be duplicated inline across the run,
+ * prettify and explain flows.
+ *
+ * Returns an `UntrustedSqlFragment`: editor contents (and snippet
+ * `unchecked_sql`) can be influenced by third parties (e.g. URL-prefilled
+ * snippets), so the value must only be promoted to executable via
+ * `acceptUntrustedSql` inside an explicit run/explain user action.
+ */
+export function getEditorSql(
+  editor: IStandaloneCodeEditor,
+  snippetContent?: UntrustedSqlFragment
+): UntrustedSqlFragment {
+  const selection = editor.getSelection()
+  const selectedValue = selection ? editor.getModel()?.getValueInRange(selection) : undefined
+  return untrustedSql((selectedValue || editor.getValue()) ?? snippetContent)
+}
+
+/**
+ * Parses a Postgres `formattedError` (e.g. `... LINE 3: ...`) into the 1-based
+ * editor line to highlight, offset by the selection's start line. Returns `NaN`
+ * when the error carries no parseable `LINE` marker; callers guard on that.
+ */
+export function computeErrorHighlightLine(
+  error: { formattedError?: string },
+  startLineNumber: number
+): number {
+  const formattedError = error.formattedError ?? ''
+  const lineError = formattedError.slice(formattedError.indexOf('LINE'))
+  return startLineNumber + Number(lineError.slice(0, lineError.indexOf(':')).split(' ')[1])
+}
+
+/**
+ * Reassembles the original vs. modified SQL for an AI completion diff from the
+ * completion metadata (text before/after the cursor + selection) and the
+ * generated replacement text.
+ */
+export function assembleCompletionDiff(
+  meta: { textBeforeCursor?: string; textAfterCursor?: string; selection?: string },
+  text: string
+): ContentDiff {
+  const beforeSelection = meta.textBeforeCursor ?? ''
+  const afterSelection = meta.textAfterCursor ?? ''
+  const selection = meta.selection ?? ''
+  return {
+    original: beforeSelection + selection + afterSelection,
+    modified: beforeSelection + text + afterSelection,
+  }
+}
+
+/**
+ * Builds the prompt text used to ask the assistant to debug a failing snippet.
+ */
+export function buildDebugPromptText(sql: string, errorMessage: string): string {
+  const prompt = `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`
+  return `${prompt}\n\nSQL Query:\n\`\`\`sql\n${sql}\n\`\`\``
 }

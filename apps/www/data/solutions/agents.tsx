@@ -320,7 +320,7 @@ const data: () => {
       customers: [
         {
           name: 'Hyper',
-          logo: '/images/customers/logos/hyper.svg',
+          logo: '/images/customers/logos/hyper.png',
           highlights: [
             '100x cost reduction by having agents query SQL instead of live platform APIs',
             'Per-customer isolated databases for agencies managing hundreds of clients',

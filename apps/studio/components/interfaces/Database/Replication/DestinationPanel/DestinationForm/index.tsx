@@ -5,7 +5,20 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Button, DialogSectionSeparator, Form, SheetFooter, SheetSection } from 'ui'
+import { AWS_REGIONS } from 'shared-data'
+import {
+  Button,
+  DialogSectionSeparator,
+  Form,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  SheetFooter,
+  SheetSection,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import {
@@ -27,6 +40,7 @@ import { getDucklakeValidationIssues } from './DuckLake/DuckLake.utils'
 import { DuckLakeFields } from './DuckLake/Fields'
 import { NewPublicationPanel } from './NewPublicationPanel'
 import { NoDestinationsAvailable } from './NoDestinationsAvailable'
+import { PipelineCostDialog } from './PipelineCostDialog'
 import { PublicationSelection } from './PublicationSelection'
 import { SnowflakeFields } from './Snowflake/Fields'
 import { getSnowflakeValidationIssues } from './Snowflake/Snowflake.utils'
@@ -41,8 +55,13 @@ import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-
 import { useReplicationPublicationsQuery } from '@/data/replication/publications-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { BASE_PATH, IS_STAGING_OR_LOCAL } from '@/lib/constants'
 
 const formId = 'destination-editor'
+
+// Pipelines always run out of a single fixed region per environment, regardless of the source
+// project's region.
+const PIPELINE_REGION = IS_STAGING_OR_LOCAL ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.CENTRAL_EU
 
 interface DestinationFormProps {
   selectedType: DestinationType
@@ -65,8 +84,8 @@ export const DestinationForm = ({
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
-  const [isFormInteracting, setIsFormInteracting] = useState(false)
   const [showValidationWarningsDialog, setShowValidationWarningsDialog] = useState(false)
+  const [showCostDialog, setShowCostDialog] = useState(false)
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
   const [newBucketSheetVisible, setNewBucketSheetVisible] = useState(false)
   const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
@@ -214,65 +233,77 @@ export const DestinationForm = ({
     }
   }
 
+  // Stages the form values and opens the cost-estimation dialog, which is the final gate before
+  // a pipeline is created and started.
+  const openCostDialog = (data: z.infer<typeof FormSchema>) => {
+    setPendingFormValues(data)
+    setShowCostDialog(true)
+  }
+
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    if (!editMode) {
-      const previousValidationFailures = allValidationFailures
-      const previousWarnings = previousValidationFailures.filter(
-        (f) => f.failure_type === 'warning'
-      )
-      const previousFailuresAreOnlyWarnings =
-        hasRunValidation &&
-        previousValidationFailures.length > 0 &&
-        previousValidationFailures.every((f) => f.failure_type === 'warning')
-
-      const validationResult = await validateConfiguration({
+    // Editing an existing pipeline doesn't incur a new initial copy, so it skips the cost gate.
+    if (editMode) {
+      await submitPipeline({
         data,
-        onValidationFail: () => {
-          setTimeout(() => {
-            validationSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-          }, 100)
-        },
+        existingDestination,
+        onSuccess: () => form.reset(defaultValues),
+        onClose,
       })
-      if (!validationResult.canContinue) {
-        // Critical failures shown inline — stop so user can fix them
-        return
-      }
-
-      const hasWarnings = validationResult.warnings.length > 0
-      const warningsUnchanged =
-        previousFailuresAreOnlyWarnings &&
-        areValidationFailuresEqual(previousWarnings, validationResult.warnings)
-
-      // Open the confirmation dialog when validation is clean, or when warnings are unchanged on
-      // resubmit. New/changed warnings are shown inline so the user can review and submit again.
-      if (hasWarnings) {
-        if (warningsUnchanged) {
-          setPendingFormValues(data)
-          setShowValidationWarningsDialog(true)
-        }
-        return
-      }
+      return
     }
 
-    await submitPipeline({
+    const previousValidationFailures = allValidationFailures
+    const previousWarnings = previousValidationFailures.filter((f) => f.failure_type === 'warning')
+    const previousFailuresAreOnlyWarnings =
+      hasRunValidation &&
+      previousValidationFailures.length > 0 &&
+      previousValidationFailures.every((f) => f.failure_type === 'warning')
+
+    const validationResult = await validateConfiguration({
       data,
-      existingDestination,
-      onSuccess: () => form.reset(defaultValues),
-      onClose,
+      onValidationFail: () => {
+        setTimeout(() => {
+          validationSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }, 100)
+      },
     })
+    if (!validationResult.canContinue) {
+      // Critical failures shown inline — stop so user can fix them
+      return
+    }
+
+    const hasWarnings = validationResult.warnings.length > 0
+    const warningsUnchanged =
+      previousFailuresAreOnlyWarnings &&
+      areValidationFailuresEqual(previousWarnings, validationResult.warnings)
+
+    // Open the warnings confirmation when there are warnings (and they're unchanged on resubmit),
+    // otherwise go straight to the cost dialog. New/changed warnings are shown inline so the user
+    // can review and submit again.
+    if (hasWarnings) {
+      if (warningsUnchanged) {
+        setPendingFormValues(data)
+        setShowValidationWarningsDialog(true)
+      }
+      return
+    }
+
+    openCostDialog(data)
   }
 
-  const handleValidationWarningsDialogChange = (open: boolean) => {
-    setShowValidationWarningsDialog(open)
-    if (!open) setPendingFormValues(null)
+  // Confirming the warnings advances to the cost dialog rather than submitting directly, so the
+  // cost estimate is always the last thing shown before the pipeline starts.
+  const handleValidationWarningsConfirm = () => {
+    if (!pendingFormValues) return
+    setShowValidationWarningsDialog(false)
+    openCostDialog(pendingFormValues)
   }
 
-  const handleValidationWarningsConfirm = async () => {
+  const handleCostConfirm = async () => {
     if (!pendingFormValues) return
 
     const values = pendingFormValues
-    setPendingFormValues(null)
-    setShowValidationWarningsDialog(false)
+    setShowCostDialog(false)
 
     await submitPipeline({
       data: values,
@@ -283,16 +314,8 @@ export const DestinationForm = ({
   }
 
   useEffect(() => {
-    if (editMode && destinationData && pipelineData && !isFormInteracting) {
+    if (visible && !form.formState.isDirty) {
       form.reset(defaultValues)
-    }
-  }, [destinationData, pipelineData, editMode, defaultValues, form, isFormInteracting])
-
-  // Ensure the form always reflects the freshest data whenever the panel opens
-  useEffect(() => {
-    if (visible) {
-      form.reset(defaultValues)
-      setIsFormInteracting(false)
       resetValidation()
     }
   }, [visible, defaultValues, form, resetValidation])
@@ -314,7 +337,7 @@ export const DestinationForm = ({
               <div className="p-5 flex flex-col gap-y-6">
                 <p className="text-sm font-medium text-foreground">Destination details</p>
 
-                <div className="space-y-4">
+                <div className="flex flex-col gap-y-4">
                   <DestinationNameInput form={form} />
                   <PublicationSelection
                     form={form}
@@ -322,6 +345,36 @@ export const DestinationForm = ({
                     visible={visible}
                     onSelectNewPublication={() => setPublicationPanelVisible(true)}
                   />
+                  <FormItemLayout
+                    isReactForm={false}
+                    layout="horizontal"
+                    className="[&>div>p]:text-foreground-lighter"
+                    label="Region"
+                    description="Pipelines run in a fixed region and cannot be changed."
+                  >
+                    <Select disabled value={PIPELINE_REGION.code}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a region" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={PIPELINE_REGION.code}>
+                          <div className="flex gap-x-3 items-center">
+                            <img
+                              alt="region icon"
+                              className="w-5 rounded-xs"
+                              src={`${BASE_PATH}/img/regions/${PIPELINE_REGION.code}.svg`}
+                            />
+                            <p className="flex items-center gap-x-2">
+                              <span>{PIPELINE_REGION.displayName}</span>
+                              <span className="text-xs text-foreground-lighter font-mono">
+                                {PIPELINE_REGION.code}
+                              </span>
+                            </p>
+                          </div>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItemLayout>
                 </div>
               </div>
 
@@ -333,7 +386,6 @@ export const DestinationForm = ({
                 <AnalyticsBucketFields
                   form={form}
                   editMode={editMode}
-                  setIsFormInteracting={setIsFormInteracting}
                   onSelectNewBucket={() => setNewBucketSheetVisible(true)}
                 />
               ) : selectedType === 'DuckLake' && etlEnableDucklake ? (
@@ -414,10 +466,20 @@ export const DestinationForm = ({
 
       <ValidationWarningsDialog
         open={showValidationWarningsDialog}
-        onOpenChange={handleValidationWarningsDialogChange}
+        onOpenChange={setShowValidationWarningsDialog}
         isLoading={isSaving}
         warningCount={validationWarnings.length}
         onConfirm={handleValidationWarningsConfirm}
+      />
+
+      <PipelineCostDialog
+        open={showCostDialog}
+        isConfirming={isSaving}
+        projectRef={projectRef}
+        sourceId={sourceId}
+        publicationName={pendingFormValues?.publicationName}
+        onOpenChange={setShowCostDialog}
+        onConfirm={handleCostConfirm}
       />
     </>
   )

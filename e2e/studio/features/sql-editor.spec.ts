@@ -145,10 +145,14 @@ test.describe('SQL Editor', () => {
     await page.locator('.view-lines').click()
     await page.keyboard.press('ControlOrMeta+KeyA')
     await page.keyboard.type(`select length('hello');`)
+
+    const secondSqlMutationPromise = waitForApiResponse(page, 'pg-meta', ref, 'query?key=', {
+      method: 'POST',
+    })
     await page.getByTestId('sql-run-button').click()
+    await secondSqlMutationPromise
 
     // verify the result is updated.
-    await waitForApiResponse(page, 'pg-meta', ref, 'query?key=', { method: 'POST' })
     await expect(page.getByRole('gridcell', { name: '5' })).toBeVisible()
 
     await expect(page.getByText('Loading...')).not.toBeVisible()
