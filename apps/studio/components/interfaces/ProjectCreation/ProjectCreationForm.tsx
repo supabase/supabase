@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { acceptUntrustedSql, joinSqlFragments, untrustedSql } from '@supabase/pg-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFeatureFlags, useFlag, useParams } from 'common'
 import Link from 'next/link'
@@ -15,6 +16,7 @@ import { z } from 'zod'
 import { AdvancedConfiguration } from './AdvancedConfiguration'
 import { ComputeSizeSelector } from './ComputeSizeSelector'
 import { DatabasePasswordInput } from './DatabasePasswordInput'
+import { DataSeeding } from './DataSeeding'
 import { DisabledWarningDueToIncident } from './DisabledWarningDueToIncident'
 import { FreeProjectLimitWarning } from './FreeProjectLimitWarning'
 import { InternalOnlyConfiguration } from './InternalOnlyConfiguration'
@@ -64,20 +66,32 @@ import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganizat
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { usePHFlag } from '@/hooks/ui/useFlag'
 import { DOCS_URL, PROJECT_STATUS, PROVIDERS, useDefaultProvider } from '@/lib/constants'
+import { getInitialMigrationSQLFromGitHubRepo } from '@/lib/integration-utils'
 import { useProfile } from '@/lib/profile'
+import { trimSafeSqlFragment } from '@/lib/sql'
 import { classifyApiError, classifyValidationError } from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
 import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
 
 const sizesWithNoCostConfirmationRequired: DesiredInstanceSize[] = ['micro', 'small']
 
-export const ProjectCreationForm = () => {
+interface ProjectCreationFormProps {
+  isVercelIntegrationFlow?: boolean
+  onCreateSuccess?: (ref: string) => void
+}
+
+export const ProjectCreationForm = ({
+  isVercelIntegrationFlow = false,
+  onCreateSuccess,
+}: ProjectCreationFormProps) => {
   const track = useTrack()
-  const trackFunnelError = useTrackFunnelError()
   const router = useRouter()
-  const { slug, projectName } = useParams()
-  const defaultProvider = useDefaultProvider()
   const { profile } = useProfile()
+  const { slug, projectName, externalId } = useParams()
+  const trackFunnelError = useTrackFunnelError()
+  const defaultProvider = useDefaultProvider()
+
+  const surface = isVercelIntegrationFlow ? 'vercel' : 'main'
 
   const { data: currentOrg } = useSelectedOrganizationQuery()
   const isFreePlan = currentOrg?.plan?.id === 'free'
@@ -96,7 +110,8 @@ export const ProjectCreationForm = () => {
 
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
-  const showInternalOnlyConfiguration = useFlag('newProjectInternalOnlyConfiguration')
+  const showInternalOnlyConfiguration =
+    useFlag('newProjectInternalOnlyConfiguration') && !isVercelIntegrationFlow
 
   // Read the raw flag for telemetry — coerce-undefined-to-false would record false for
   // users whose flags haven't loaded yet. The raw value preserves undefined (omitted from
@@ -136,6 +151,7 @@ export const ProjectCreationForm = () => {
       enableRlsEventTrigger: false,
       postgresVersionSelection: '',
       useOrioleDb: false,
+      shouldRunMigrations: true,
     },
   })
   const { getFieldState, resetField, setValue } = form
@@ -262,7 +278,8 @@ export const ProjectCreationForm = () => {
         (member) => member.primary_email?.toLowerCase() === userPrimaryEmail
       )
     : false
-  const shouldShowFreeProjectInfo = !!currentOrg && !isFreePlan && !isUserAtFreeProjectLimit
+  const shouldShowFreeProjectInfo =
+    !!currentOrg && !isFreePlan && !isUserAtFreeProjectLimit && !isVercelIntegrationFlow
   const {
     gitHubAuthorization,
     githubRepos,
@@ -280,7 +297,7 @@ export const ProjectCreationForm = () => {
       track(
         'project_creation_simple_version_submitted',
         {
-          surface: 'main',
+          surface,
           instanceSize: form.getValues('instanceSize'),
           enableRlsEventTrigger: form.getValues('enableRlsEventTrigger'),
           dataApiEnabled: form.getValues('dataApi'),
@@ -295,7 +312,8 @@ export const ProjectCreationForm = () => {
           organization: res.organization_slug,
         }
       )
-      router.push(`/project/${res.ref}`)
+      onCreateSuccess?.(res.ref)
+      if (surface === 'main') router.push(`/project/${res.ref}`)
     },
     onError: (error) => {
       const toastId = toast.error(`Failed to create new project: ${error.message}`)
@@ -342,7 +360,14 @@ export const ProjectCreationForm = () => {
       useOrioleDb,
       githubInstallationId,
       githubRepositoryId,
+      shouldRunMigrations,
     } = values
+
+    if (postgresVersion && !postgresVersion.match(/1[2-9]\..*/)) {
+      return toast.error(
+        `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
+      )
+    }
 
     if (useOrioleDb && !availableOrioleVersion) {
       const toastId = toast.error('No available OrioleDB image found, only Postgres is available')
@@ -367,7 +392,24 @@ export const ProjectCreationForm = () => {
     const shouldIncludeGitHubFields =
       githubInstallationId !== undefined && Number.isFinite(parsedGitHubRepositoryId)
 
+    let dbSql = enableRlsEventTrigger ? AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL : undefined
+    if (isVercelIntegrationFlow && shouldRunMigrations && !!externalId) {
+      const id = toast.loading(`Fetching initial migrations from GitHub repository...`)
+      const migrationSql = await getInitialMigrationSQLFromGitHubRepo(externalId)
+      if (migrationSql) {
+        // externalId comes from a URL param, so the fetched SQL is third-party influenceable;
+        // promoting it here (inside the submit handler) reflects the explicit user action of
+        // clicking "Create new project" with migrations enabled.
+        const safeMigrationSql = trimSafeSqlFragment(acceptUntrustedSql(untrustedSql(migrationSql)))
+        dbSql = dbSql
+          ? joinSqlFragments([trimSafeSqlFragment(dbSql), safeMigrationSql], ';\n')
+          : safeMigrationSql
+      }
+      toast.loading(`Migrations fetched! Creating project...`, { id })
+    }
+
     const data: ProjectCreateVariables = {
+      dbSql,
       dbPass,
       cloudProvider,
       organizationSlug: currentOrg.slug,
@@ -383,19 +425,12 @@ export const ProjectCreationForm = () => {
       postgresEngine: useOrioleDb ? availableOrioleVersion?.postgres_engine : postgresEngine,
       releaseChannel: useOrioleDb ? availableOrioleVersion?.release_channel : releaseChannel,
       ...(smartRegionEnabled ? { regionSelection: selectedRegion } : { dbRegion }),
-      dbSql: enableRlsEventTrigger ? AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL : undefined,
       ...(shouldIncludeGitHubFields
         ? {
             githubInstallationId,
             githubRepositoryId: parsedGitHubRepositoryId,
           }
         : {}),
-    }
-
-    if (postgresVersion && !postgresVersion.match(/1[2-9]\..*/)) {
-      return toast.error(
-        `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
-      )
     }
 
     if (postgresVersion || instanceType) {
@@ -413,12 +448,13 @@ export const ProjectCreationForm = () => {
   }
 
   const hasTrackedFormExposed = useRef(false)
+
   useEffect(() => {
     if (hasTrackedFormExposed.current) return
     if (!isOrganizationsSuccess || !canCreateProject || !currentOrg) return
     hasTrackedFormExposed.current = true
-    track('project_creation_form_exposed', { surface: 'main' })
-  }, [isOrganizationsSuccess, canCreateProject, currentOrg, track])
+    track('project_creation_form_exposed', { surface })
+  }, [isOrganizationsSuccess, canCreateProject, currentOrg, track, surface])
 
   useEffect(() => {
     // Only set once to ensure compute credits dont change while project is being created
@@ -429,10 +465,10 @@ export const ProjectCreationForm = () => {
 
   useEffect(() => {
     // Handle no org: redirect to new org route
-    if (isEmptyOrganizations) {
+    if (isEmptyOrganizations && !isVercelIntegrationFlow) {
       router.push(`/new`)
     }
-  }, [isEmptyOrganizations, router])
+  }, [isEmptyOrganizations, isVercelIntegrationFlow, router])
 
   useEffect(() => {
     // [Joshen] Cause slug depends on router which doesnt load immediately on render
@@ -538,6 +574,7 @@ export const ProjectCreationForm = () => {
               organizationProjects={organizationProjects}
               isCreatingNewProject={isCreatingNewProject}
               isSuccessNewProject={isSuccessNewProject}
+              hideCancelButton={isVercelIntegrationFlow}
             />
           }
         >
@@ -546,11 +583,14 @@ export const ProjectCreationForm = () => {
               <DisabledWarningDueToIncident title="Project creation is currently disabled" />
             ) : (
               <div className="divide-y divide-border-border">
-                <OrganizationSelector form={form} />
+                <OrganizationSelector
+                  form={form}
+                  disableOrganizationSelection={isVercelIntegrationFlow}
+                />
 
                 {canCreateProject && (
                   <>
-                    {canConfigureGitHubOnCreate && (
+                    {!isVercelIntegrationFlow && canConfigureGitHubOnCreate && (
                       <Panel.Content>
                         <GitHubRepositoryField
                           form={form}
@@ -593,7 +633,9 @@ export const ProjectCreationForm = () => {
                       instanceSize={instanceSize as DesiredInstanceSize}
                     />
 
-                    <SecurityOptions form={form} />
+                    {isVercelIntegrationFlow && !!externalId && <DataSeeding form={form} />}
+
+                    <SecurityOptions form={form} surface={surface} />
 
                     {showInternalOnlyConfiguration && <InternalOnlyConfiguration form={form} />}
 
