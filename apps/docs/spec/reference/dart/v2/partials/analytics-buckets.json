@@ -1,0 +1,5 @@
+{
+  "id": "analytics-buckets",
+  "title": "Analytics Buckets",
+  "notes": "This section contains methods for working with analytics (Apache Iceberg) buckets.\n"
+}
