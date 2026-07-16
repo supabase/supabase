@@ -338,7 +338,8 @@ function assertNoChunkCycles(): Plugin {
 }
 
 // Skew protection (vercel.com/docs/skew-protection): bake `?dpl=<deployment
-// id>` into every asset URL the client bundle can request. Vercel's edge
+// id>` into every asset URL the client bundle can request, so every hashed
+// chunk resolves against the deployment that referenced it. Vercel's edge
 // routes any request carrying `?dpl=` to that exact deployment, so a
 // long-lived dashboard session keeps loading its own deployment's hashed
 // chunks after a redeploy, while document navigations (which carry no pin)
