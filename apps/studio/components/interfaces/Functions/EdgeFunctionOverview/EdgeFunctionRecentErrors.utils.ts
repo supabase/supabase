@@ -8,6 +8,7 @@ import {
   unixMicroToIsoTimestamp,
 } from '@/components/interfaces/Settings/Logs/Logs.utils'
 import type { AlertErrorProps } from '@/components/ui/AlertError'
+import { DOCS_URL } from '@/lib/constants'
 
 dayjs.extend(relativeTime)
 
@@ -72,7 +73,7 @@ export const getDisplayErrorMessage = (group: RecentErrorGroup): string => {
   return summarizeErrorMessage(group.message)
 }
 
-const TROUBLESHOOTING_DOCS_BASE = 'https://supabase.com/docs/guides/troubleshooting'
+const TROUBLESHOOTING_DOCS_BASE = `${DOCS_URL}/guides/troubleshooting`
 
 export const buildTroubleshootingDocsUrl = ({ statusCode }: { statusCode?: string }): string => {
   const numericStatusCode = Number(statusCode)
