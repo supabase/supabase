@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { ArrowRight } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { cn } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
