@@ -290,6 +290,26 @@ export function buildExecuteParams({
   }
 }
 
+/**
+ * Derives the stable snippet id + loading state for the editor from the URL.
+ */
+export function deriveSnippetIdentity({
+  urlId,
+  generatedId,
+  snippets,
+}: {
+  urlId: string | undefined
+  generatedId: string
+  snippets: Record<string, { snippet: { content?: unknown } }>
+}): { id: string; isLoading: boolean } {
+  const id = !urlId || urlId === 'new' ? generatedId : urlId
+
+  const snippetIsLoading = !(id in snippets && snippets[id].snippet.content !== undefined)
+  const isLoading = urlId === 'new' ? false : snippetIsLoading
+
+  return { id, isLoading }
+}
+
 export const generateMigrationCliCommand = (id: string, name: string, isNpx = false) =>
   `
 ${isNpx ? 'npx ' : ''}supabase snippets download ${id} |

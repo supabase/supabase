@@ -14,6 +14,7 @@ import {
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
   computeErrorHighlightLine,
+  deriveSnippetIdentity,
   filterTablesCoveredByEnsureRLSTrigger,
   getCreateTablesMissingRLS,
   getEditorSql,
@@ -287,6 +288,57 @@ describe('SQLEditor.utils.ts:buildExecuteParams', () => {
     expect(params.isRoleImpersonationEnabled).toBe(false)
     expect(params.isStatementTimeoutDisabled).toBe(true)
     expect(params.contextualInvalidation).toBe(true)
+  })
+})
+
+describe('SQLEditor.utils.ts:deriveSnippetIdentity', () => {
+  test('uses the generated id when there is no url id, loading reflects the snippets map like any other id', () => {
+    const result = deriveSnippetIdentity({
+      urlId: undefined,
+      generatedId: 'generated-id',
+      snippets: {},
+    })
+    expect(result).toEqual({ id: 'generated-id', isLoading: true })
+  })
+  test('uses the generated id and is not loading once it appears in the snippets map', () => {
+    const result = deriveSnippetIdentity({
+      urlId: undefined,
+      generatedId: 'generated-id',
+      snippets: { 'generated-id': { snippet: { content: { some: 'content' } } } },
+    })
+    expect(result).toEqual({ id: 'generated-id', isLoading: false })
+  })
+  test('uses the generated id and is never loading when the url id is "new"', () => {
+    const result = deriveSnippetIdentity({
+      urlId: 'new',
+      generatedId: 'generated-id',
+      snippets: { 'generated-id': { snippet: { content: undefined } } },
+    })
+    expect(result).toEqual({ id: 'generated-id', isLoading: false })
+  })
+  test('uses the url id and is loading when the snippet is not yet in the store', () => {
+    const result = deriveSnippetIdentity({
+      urlId: 'existing-id',
+      generatedId: 'generated-id',
+      snippets: {},
+    })
+    expect(result).toEqual({ id: 'existing-id', isLoading: true })
+  })
+  test('uses the url id and is loading when the snippet has no content yet', () => {
+    const result = deriveSnippetIdentity({
+      urlId: 'existing-id',
+      generatedId: 'generated-id',
+      snippets: { 'existing-id': { snippet: { content: undefined } } },
+    })
+    expect(result).toEqual({ id: 'existing-id', isLoading: true })
+  })
+  test('uses the url id and is not loading once the snippet content has arrived', () => {
+    const result = deriveSnippetIdentity({
+      urlId: 'existing-id',
+      generatedId: 'generated-id',
+      snippets: { 'existing-id': { snippet: { content: { some: 'content' } } } },
+    })
+    expect(result).toEqual({ id: 'existing-id', isLoading: false })
   })
 })
 
