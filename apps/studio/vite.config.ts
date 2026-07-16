@@ -346,8 +346,8 @@ function assertNoChunkCycles(): Plugin {
 // always land on the latest deployment. If the pinned deployment ages out of
 // Skew Protection's Maximum Age, Vercel 404s the chunk and the
 // `vite:preloadError` backstop in router.tsx reloads onto the latest deploy.
-// API / server-function fetches are deliberately unpinned — that's what lets
-// use-check-latest-deploy detect newer deploys mid-session.
+// API / server-function fetches are deliberately unpinned — that is what
+// lets use-check-latest-deploy detect newer deploys mid-session.
 //
 // Three mechanisms are needed for full coverage:
 //   1. `experimental.renderBuiltUrl` (in the config below) — asset and
