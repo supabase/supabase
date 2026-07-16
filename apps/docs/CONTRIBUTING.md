@@ -57,6 +57,12 @@ Keep procedures focused on what the reader must do. Move substantial background 
 - Recommended: `This guide explains how to enable Row Level Security. To learn how Row Level Security controls access, see [Row Level Security](...).`
 - Not recommended: Begin with several paragraphs about how Row Level Security works before stating what the guide helps the reader do.
 
+**Mixed information types:** When a guide contains substantial context or reference material, group sections by information type. Keep contextual and reference sections separate from the procedure group so that background information doesn't interrupt the action path.
+
+**Navigation:** Begin a long guide with a short outline of its major section groups. Link to each group and state when a reader should use it. Don't add section navigation to a short guide when the headings are already easy to scan.
+
+**Cross-references and glue:** Connect contextual sections to their corresponding procedures when the relationship helps readers navigate. Add a brief introduction to each section group, a transition when the information type changes, and an outcome after a procedure. Add links selectively rather than linking every adjacent section.
+
 For inspiration, see [an example of a guide](/docs/guides/auth/auth-email-passwordless).
 
 ### Reference
