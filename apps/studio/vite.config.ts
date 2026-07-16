@@ -375,6 +375,25 @@ function skewProtectionDpl(opts: { dplSearch: string; assetsUrlPrefix: string })
     // matching it keeps THIS plugin sorted after it (same enforce group,
     // registration order wins), which the buildApp hook below relies on.
     enforce: 'post',
+    transform: {
+      handler(code, id) {
+        if (id !== '\0vite/preload-helper.js') return
+        // Vite's preload helper decides stylesheet-vs-modulepreload with
+        // `dep.endsWith(".css")`. The `?dpl=` suffix makes that false for
+        // every CSS dep, so lazy chunks' CSS would be injected as a script
+        // modulepreload — a console MIME error, and the stylesheet never
+        // applies. Make the check query-aware. Hard-fail if the helper's
+        // shape ever changes so a Vite upgrade can't silently regress this.
+        const cssCheck = 'dep.endsWith(".css")'
+        if (!code.includes(cssCheck)) {
+          this.error(
+            `studio-skew-protection-dpl: expected \`${cssCheck}\` in vite's preload helper — ` +
+              `vite changed its preload-helper shape; update this patch to match.`
+          )
+        }
+        return { code: code.replaceAll(cssCheck, '/\\.css(\\?|$)/.test(dep)'), map: null }
+      },
+    },
     generateBundle: {
       // `order: 'post'` so this runs AFTER `vite:build-import-analysis`'s
       // normal-order generateBundle. That hook maps each dynamic-import
