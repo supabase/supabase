@@ -1,4 +1,10 @@
-import { untrustedSql, type SafeSqlFragment, type UntrustedSqlFragment } from '@supabase/pg-meta'
+import {
+  literal,
+  safeSql,
+  untrustedSql,
+  type SafeSqlFragment,
+  type UntrustedSqlFragment,
+} from '@supabase/pg-meta'
 import { TABLE_EVENT_ACTIONS } from 'common/telemetry-constants'
 
 import {
@@ -6,6 +12,7 @@ import {
   destructiveSqlRegex,
   NEW_SQL_SNIPPET_SKELETON,
   sqlAiDisclaimerComment,
+  untitledSnippetTitle,
   updateWithoutWhereRegex,
 } from './SQLEditor.constants'
 import { ContentDiff, type IStandaloneCodeEditor, type PotentialIssues } from './SQLEditor.types'
@@ -14,7 +21,12 @@ import type { DatabaseEventTrigger } from '@/data/database-event-triggers/databa
 import type { Database } from '@/data/read-replicas/replicas-query'
 import { generateUuid } from '@/lib/api/snippets.browser'
 import { removeCommentsFromSql } from '@/lib/helpers'
+import { wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { sqlEventParser } from '@/lib/sql-event-parser'
+import {
+  isRoleImpersonationEnabled,
+  type RoleImpersonationState,
+} from '@/state/role-impersonation-state'
 
 export type CreateTableWithoutRLS = {
   schema?: string
@@ -225,6 +237,59 @@ export function resolveConnectionString(
   )
 }
 
+/**
+ * Whether a query run should lazily kick off AI title generation for the
+ * snippet: only when the org has AI enabled (not disabled/HIPAA — which would
+ * silently forward the query to the AI provider without consent), the
+ * snippet still has its placeholder name, and we're running on the hosted
+ * platform.
+ */
+export function shouldAutoGenerateTitle({
+  aiOptInLevel,
+  snippetName,
+  isPlatform,
+}: {
+  aiOptInLevel: string
+  snippetName: string | undefined
+  isPlatform: boolean
+}): boolean {
+  return (
+    aiOptInLevel !== 'disabled' && !!snippetName?.startsWith(untitledSnippetTitle) && isPlatform
+  )
+}
+
+/**
+ * Builds the params passed to `useExecuteSqlMutation`'s `execute`: applies the
+ * auto-limit suffix and role impersonation to the SQL, and derives the
+ * `autoLimit`/`isRoleImpersonationEnabled` flags. Callers still attach their
+ * own `handleError`.
+ */
+export function buildExecuteParams({
+  sql,
+  limit,
+  connectionString,
+  projectRef,
+  impersonatedRoleState,
+}: {
+  sql: SafeSqlFragment
+  limit: number
+  connectionString: string | undefined
+  projectRef: string
+  impersonatedRoleState: RoleImpersonationState
+}) {
+  const { sql: formattedSql, appendAutoLimit } = applyAutoLimit(sql, limit)
+
+  return {
+    projectRef,
+    connectionString,
+    sql: wrapWithRoleImpersonation(formattedSql, impersonatedRoleState),
+    autoLimit: appendAutoLimit ? limit : undefined,
+    isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
+    isStatementTimeoutDisabled: true as const,
+    contextualInvalidation: true as const,
+  }
+}
+
 export const generateMigrationCliCommand = (id: string, name: string, isNpx = false) =>
   `
 ${isNpx ? 'npx ' : ''}supabase snippets download ${id} |
@@ -270,13 +335,35 @@ export const compareAsNewSnippet = (sqlDiff: ContentDiff) => {
   }
 }
 
+/**
+ * Removes trailing `;` characters from a safe SQL fragment. Only ever removes
+ * existing terminators — never adds text — so the result is exactly as safe
+ * as the input; the brand carries over intentionally. This is the one place
+ * in the file allowed to reassert `SafeSqlFragment` on a derived string —
+ * every other function composes new fragments through `safeSql`/`literal`.
+ */
+export function trimTrailingSemicolons(sql: SafeSqlFragment): SafeSqlFragment {
+  return sql.replace(/;+\s*$/, '') as SafeSqlFragment
+}
+
 // [Joshen] Just FYI as well the checks here on whether to append limit is quite restricted
 // This is to prevent dashboard from accidentally appending limit to the end of a query
 // thats not supposed to have any, since there's too many cases to cover.
 // We can however look into making this logic better in the future
 // i.e It's harder to append the limit param, than just leaving the query as it is
 // Otherwise we'd need a full on parser to do this properly
-export const checkIfAppendLimitRequired = (sql: string, limit: number = 0) => {
+//
+// Only accepts `SafeSqlFragment`: this decides whether to build (and builds)
+// a new SQL fragment that gets executed, so every caller — including ones
+// that only want the `appendAutoLimit` flag for a display hint — must already
+// hold safe SQL. Composes the ` limit N;` suffix through `safeSql`/`literal`
+// rather than gluing raw template-literal text onto the fragment and casting
+// the result, so the only new content this function ever stamps safe is an
+// internally-generated integer literal, never arbitrary concatenated text.
+export function applyAutoLimit(
+  sql: SafeSqlFragment,
+  limit: number = 0
+): { sql: SafeSqlFragment; appendAutoLimit: boolean } {
   // Remove lines and whitespaces to use for checking
   const cleanedSql = sql.trim().replaceAll('\n', ' ').replaceAll(/\s+/g, ' ')
 
@@ -299,15 +386,13 @@ export const checkIfAppendLimitRequired = (sql: string, limit: number = 0) => {
     !cleanedSql.match(/limit;$/i) &&
     !cleanedSql.match(/limit [0-9]* offset [0-9]*\s*[;]?$/i) &&
     !cleanedSql.match(/limit [0-9]*\s*[;]?$/i)
-  return { cleanedSql, appendAutoLimit }
-}
 
-export const suffixWithLimit = (sql: SafeSqlFragment, limit: number = 0): SafeSqlFragment => {
-  const { cleanedSql, appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
-  if (!appendAutoLimit) return sql
-  return (
-    cleanedSql.endsWith(';') ? sql.replace(/[;]+$/, ` limit ${limit};`) : `${sql} limit ${limit};`
-  ) as SafeSqlFragment
+  if (!appendAutoLimit) return { sql, appendAutoLimit: false }
+
+  const core = cleanedSql.endsWith(';') ? trimTrailingSemicolons(sql) : sql
+  const suffixed = safeSql`${core} limit ${literal(limit)};`
+
+  return { sql: suffixed, appendAutoLimit: true }
 }
 
 /**

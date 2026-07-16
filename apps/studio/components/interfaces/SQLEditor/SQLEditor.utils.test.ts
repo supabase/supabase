@@ -2,15 +2,17 @@ import { safeSql, untrustedSql } from '@supabase/pg-meta'
 import { stripIndent } from 'common-tags'
 import { describe, expect, it, test } from 'vitest'
 
+import { untitledSnippetTitle } from './SQLEditor.constants'
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import {
   analyzeQueryIssues,
   appendEnableRLSStatements,
+  applyAutoLimit,
   assembleCompletionDiff,
   buildDebugPromptText,
+  buildExecuteParams,
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
-  checkIfAppendLimitRequired,
   computeErrorHighlightLine,
   filterTablesCoveredByEnsureRLSTrigger,
   getCreateTablesMissingRLS,
@@ -19,10 +21,12 @@ import {
   hasBlockingIssues,
   isUpdateWithoutWhere,
   resolveConnectionString,
-  suffixWithLimit,
+  shouldAutoGenerateTitle,
+  trimTrailingSemicolons,
 } from './SQLEditor.utils'
 import type { DatabaseEventTrigger } from '@/data/database-event-triggers/database-event-triggers-query'
 import type { Database } from '@/data/read-replicas/replicas-query'
+import { createRoleImpersonationState } from '@/state/role-impersonation-state'
 
 const buildTrigger = (overrides: Partial<DatabaseEventTrigger> = {}): DatabaseEventTrigger => ({
   oid: 1,
@@ -37,149 +41,252 @@ const buildTrigger = (overrides: Partial<DatabaseEventTrigger> = {}): DatabaseEv
   ...overrides,
 })
 
-describe('SQLEditor.utils.ts:checkIfAppendLimitRequired', () => {
+describe('SQLEditor.utils.ts:trimTrailingSemicolons', () => {
+  test('removes a single trailing semicolon', () => {
+    const sql = safeSql`select * from countries;`
+    expect(trimTrailingSemicolons(sql)).toBe('select * from countries')
+  })
+  test('removes multiple trailing semicolons', () => {
+    const sql = safeSql`select * from countries;;;;;;;`
+    expect(trimTrailingSemicolons(sql)).toBe('select * from countries')
+  })
+  test('leaves a fragment with no trailing semicolon unchanged', () => {
+    const sql = safeSql`select * from countries`
+    expect(trimTrailingSemicolons(sql)).toBe('select * from countries')
+  })
+  test('does not touch semicolons that are not trailing', () => {
+    const sql = safeSql`select 1; select 2`
+    expect(trimTrailingSemicolons(sql)).toBe('select 1; select 2')
+  })
+})
+
+describe('SQLEditor.utils.ts:applyAutoLimit', () => {
   test('Should return false if limit passed is <= 0', () => {
-    const sql = 'select * from countries;'
+    const sql = safeSql`select * from countries;`
     const limit = -1
-    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
   test('Should return true if limit passed is > 0', () => {
-    const sql = 'select * from countries;'
+    const sql = safeSql`select * from countries;`
     const limit = 100
-    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(true)
   })
   test('Should return false if query already has a limit', () => {
-    const sql = 'select * from countries limit 10;'
+    const sql = safeSql`select * from countries limit 10;`
     const limit = 100
-    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
   test('Should return false if query already has a limit (check for case-insensitiveness)', () => {
-    const sql = 'SELECT * FROM countries LIMIT 10;'
+    const sql = safeSql`SELECT * FROM countries LIMIT 10;`
     const limit = 100
-    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
   test('Should return false if query already has a limit with whitespace before the semi colon', () => {
-    const sql = 'select * from countries limit 10 ;'
+    const sql = safeSql`select * from countries limit 10 ;`
     const limit = 100
-    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
   test('Should return false if query already has a limit and offset', () => {
-    const sql = 'select * from countries limit 10 offset 0;'
+    const sql = safeSql`select * from countries limit 10 offset 0;`
     const limit = 100
-    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
   test('Should return false if query already has a limit and offset with whitespace before the semi colon', () => {
-    const sql = 'select * from countries limit 10 offset 0 ;'
+    const sql = safeSql`select * from countries limit 10 offset 0 ;`
     const limit = 100
-    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
   test('Should return false if query already has a limit and offset (flip order of limit and offset)', () => {
-    const sql = 'select * from countries offset 0 limit 1;'
+    const sql = safeSql`select * from countries offset 0 limit 1;`
     const limit = 100
-    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
   test('Should return false if query already has a limit, even if no value provided for limit', () => {
-    const sql = 'select * from countries limit'
+    const sql = safeSql`select * from countries limit`
     const limit = 100
-    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
   test('Should return false if query uses `FETCH FIRST` instead of limit ', () => {
-    const sql = 'select * from countries FETCH FIRST 5 rows only'
+    const sql = safeSql`select * from countries FETCH FIRST 5 rows only`
     const limit = 100
-    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
   test('Should return false if query uses `fetch first` instead of limit ', () => {
-    const sql = 'select * from countries fetch first 5 rows only'
+    const sql = safeSql`select * from countries fetch first 5 rows only`
     const limit = 100
-    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
   test('Should return false if query uses `fetch   first` (with random spaces) instead of limit ', () => {
-    const sql = 'select * from countries FETCH FIRST 5 rows only'
+    const sql = safeSql`select * from countries FETCH FIRST 5 rows only`
     const limit = 100
-    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
   test('Should return false if query is not a select statement', () => {
-    const sql = 'create table test (id int8 primary key, name varchar);'
+    const sql = safeSql`create table test (id int8 primary key, name varchar);`
     const limit = 100
-    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
   test('Should return false if there are multiple queries I', () => {
-    const sql1 = `
-select * from countries;
-select * from cities;
-`.trim()
+    const sql1 = safeSql`select * from countries;
+select * from cities;`
     const limit = 100
-    const { appendAutoLimit } = checkIfAppendLimitRequired(sql1, limit)
+    const { appendAutoLimit } = applyAutoLimit(sql1, limit)
     expect(appendAutoLimit).toBe(false)
   })
   test('Should return false if there are multiple queries II', () => {
-    const sql1 = `
-select * from countries;
-select * from cities
-`.trim()
+    const sql1 = safeSql`select * from countries;
+select * from cities`
     const limit = 100
-    const { appendAutoLimit } = checkIfAppendLimitRequired(sql1, limit)
+    const { appendAutoLimit } = applyAutoLimit(sql1, limit)
     expect(appendAutoLimit).toBe(false)
   })
   // [Joshen] Opting to just avoid appending in this case to prevent making the logic overly complex atm
   test('Should return false if query has with a comment I', () => {
-    const sql = `
--- This is a comment
-select * from cities
-`.trim()
+    const sql = safeSql`-- This is a comment
+select * from cities`
     const limit = 100
-    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
   test('Should return false if query has with a comment II', () => {
-    const sql = `
-select * from cities
--- This is a comment
-`.trim()
+    const sql = safeSql`select * from cities
+-- This is a comment`
     const limit = 100
-    const { appendAutoLimit } = checkIfAppendLimitRequired(sql, limit)
+    const { appendAutoLimit } = applyAutoLimit(sql, limit)
     expect(appendAutoLimit).toBe(false)
   })
-})
 
-// [Joshen] These will just need to test the cases when appendAutoLimit returns true then
-describe('SQLEditor.utils.ts:suffixWithLimit', () => {
+  // [Joshen] These will just need to test the cases when appendAutoLimit returns true then
   test('Should add the limit param properly if query ends without a semi colon', () => {
     const sql = safeSql`select * from countries`
     const limit = 100
-    const formattedSql = suffixWithLimit(sql, limit)
+    const { sql: formattedSql } = applyAutoLimit(sql, limit)
     expect(formattedSql).toBe('select * from countries limit 100;')
   })
   test('Should add the limit param properly if query ends with a semi colon', () => {
     const sql = safeSql`select * from countries;`
     const limit = 100
-    const formattedSql = suffixWithLimit(sql, limit)
+    const { sql: formattedSql } = applyAutoLimit(sql, limit)
     expect(formattedSql).toBe('select * from countries limit 100;')
   })
   test('Should add the limit param properly if query ends with multiple semi colon', () => {
     const sql = safeSql`select * from countries;;;;;;;`
     const limit = 100
-    const formattedSql = suffixWithLimit(sql, limit)
+    const { sql: formattedSql } = applyAutoLimit(sql, limit)
     expect(formattedSql).toBe('select * from countries limit 100;')
   })
   test('Should not append a limit if query already has one with whitespace before the semi colon', () => {
     const sql = safeSql`select * from countries limit 10 ;`
     const limit = 100
-    const formattedSql = suffixWithLimit(sql, limit)
+    const { sql: formattedSql } = applyAutoLimit(sql, limit)
     expect(formattedSql).toBe('select * from countries limit 10 ;')
+  })
+  test('returns the SafeSqlFragment result unchanged when no limit is appended', () => {
+    const sql = safeSql`select * from countries limit 10;`
+    const { sql: formattedSql } = applyAutoLimit(sql, 100)
+    expect(formattedSql).toBe(sql)
+  })
+})
+
+describe('SQLEditor.utils.ts:shouldAutoGenerateTitle', () => {
+  test('returns true when AI is enabled, the name is still the placeholder, and on platform', () => {
+    expect(
+      shouldAutoGenerateTitle({
+        aiOptInLevel: 'default',
+        snippetName: `${untitledSnippetTitle} 1`,
+        isPlatform: true,
+      })
+    ).toBe(true)
+  })
+  test('returns false when AI opt-in is disabled', () => {
+    expect(
+      shouldAutoGenerateTitle({
+        aiOptInLevel: 'disabled',
+        snippetName: `${untitledSnippetTitle} 1`,
+        isPlatform: true,
+      })
+    ).toBe(false)
+  })
+  test('returns false when the snippet already has a custom name', () => {
+    expect(
+      shouldAutoGenerateTitle({
+        aiOptInLevel: 'default',
+        snippetName: 'My saved query',
+        isPlatform: true,
+      })
+    ).toBe(false)
+  })
+  test('returns false when not running on the hosted platform', () => {
+    expect(
+      shouldAutoGenerateTitle({
+        aiOptInLevel: 'default',
+        snippetName: `${untitledSnippetTitle} 1`,
+        isPlatform: false,
+      })
+    ).toBe(false)
+  })
+  test('returns false when the snippet name is undefined', () => {
+    expect(
+      shouldAutoGenerateTitle({
+        aiOptInLevel: 'default',
+        snippetName: undefined,
+        isPlatform: true,
+      })
+    ).toBe(false)
+  })
+})
+
+describe('SQLEditor.utils.ts:buildExecuteParams', () => {
+  const impersonatedRoleState = createRoleImpersonationState('default', {
+    current: async () => ({}),
+  })
+
+  test('applies the auto-limit suffix when appropriate', () => {
+    const params = buildExecuteParams({
+      sql: safeSql`select * from countries`,
+      limit: 100,
+      connectionString: 'postgresql://example',
+      projectRef: 'default',
+      impersonatedRoleState,
+    })
+    expect(params.sql).toBe('select * from countries limit 100;')
+    expect(params.autoLimit).toBe(100)
+  })
+  test('leaves autoLimit undefined when a limit is already present', () => {
+    const params = buildExecuteParams({
+      sql: safeSql`select * from countries limit 10;`,
+      limit: 100,
+      connectionString: 'postgresql://example',
+      projectRef: 'default',
+      impersonatedRoleState,
+    })
+    expect(params.sql).toBe('select * from countries limit 10;')
+    expect(params.autoLimit).toBeUndefined()
+  })
+  test('reflects isRoleImpersonationEnabled from the impersonation state', () => {
+    const params = buildExecuteParams({
+      sql: safeSql`select * from countries`,
+      limit: 0,
+      connectionString: 'postgresql://example',
+      projectRef: 'default',
+      impersonatedRoleState,
+    })
+    expect(params.isRoleImpersonationEnabled).toBe(false)
+    expect(params.isStatementTimeoutDisabled).toBe(true)
+    expect(params.contextualInvalidation).toBe(true)
   })
 })
 
