@@ -42,7 +42,7 @@ Tutorials are goal-oriented. They help a reader to finish a large, complex goal,
 
 Tutorials mix prose explanations with procedures. Procedures are lists of steps for the reader to follow. Tutorials provide context for why certain instructions are given.
 
-For inspiration, see [an example of a tutorial](/docs/guides/getting-started/tutorials/with-nextjs).
+For inspiration, see [an example of a tutorial](https://supabase.com/docs/guides/getting-started/tutorials/with-nextjs).
 
 ### Guides
 
