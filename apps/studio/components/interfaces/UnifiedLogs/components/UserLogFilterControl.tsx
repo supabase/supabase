@@ -5,6 +5,7 @@ import { Loader2, Search, X } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { AccordionContent, AccordionItem, AccordionTrigger, Button, Checkbox, cn, Label } from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { InputWithAddons } from '@/components/ui/DataTable/primitives/InputWithAddons'
 import { useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
@@ -20,7 +21,7 @@ export const UserLogFilterControl = () => {
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 700)
 
-  const { data, isFetching } = useUsersInfiniteQuery(
+  const { data, isFetching, isPending } = useUsersInfiniteQuery(
     {
       projectRef,
       connectionString: project?.connectionString,
@@ -83,7 +84,11 @@ export const UserLogFilterControl = () => {
           />
 
           <div className="max-h-[215px] overflow-y-auto rounded-sm border border-border empty:border-none">
-            {options.length === 0 ? (
+            {isPending ? (
+              <div className="p-2">
+                <GenericSkeletonLoader />
+              </div>
+            ) : options.length === 0 ? (
               <div className="flex items-center justify-center px-2 py-3 text-center">
                 <p className="text-xs text-foreground-lighter">No users found</p>
               </div>
