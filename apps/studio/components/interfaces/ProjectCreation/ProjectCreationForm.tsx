@@ -109,15 +109,6 @@ export const ProjectCreationForm = () => {
 
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(currentOrg?.plan.id ?? '')
 
-  // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
-  if (slug === 'last-visited-org') {
-    if (lastVisitedOrganization) {
-      router.replace(`/new/${lastVisitedOrganization}`, undefined, { shallow: true })
-    } else {
-      router.replace(`/new/_`, undefined, { shallow: true })
-    }
-  }
-
   const [allProjects, setAllProjects] = useState<OrgProject[] | undefined>(undefined)
   const [isComputeCostsConfirmationModalVisible, setIsComputeCostsConfirmationModalVisible] =
     useState(false)
@@ -245,10 +236,7 @@ export const ProjectCreationForm = () => {
     : ''
 
   const fixedDefaultRegion = PROVIDERS[selectedCloudProvider].default_region.displayName
-  const regionError =
-    smartRegionEnabled && defaultProvider !== 'AWS_NIMBUS'
-      ? availableRegionsError
-      : defaultRegionError
+  const regionError = smartRegionEnabled ? availableRegionsError : defaultRegionError
   const defaultRegion = smartRegionEnabled
     ? availableRegionsData?.recommendations.smartGroup.name
     : (autoDefaultRegion ?? fixedDefaultRegion)
@@ -405,7 +393,7 @@ export const ProjectCreationForm = () => {
     }
 
     if (postgresVersion && !postgresVersion.match(/1[2-9]\..*/)) {
-      toast.error(
+      return toast.error(
         `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
       )
     }
@@ -508,6 +496,17 @@ export const ProjectCreationForm = () => {
       }
     )
   }, [dataApiRevokeOnCreateDefaultFlag, isDataApiDefaultPrivilegesDirty, setValue])
+
+  useEffect(() => {
+    // This is to make the database.new redirect work correctly. The database.new redirect should be set to supabase.com/dashboard/new/last-visited-org
+    if (slug === 'last-visited-org') {
+      if (lastVisitedOrganization) {
+        router.replace(`/new/${lastVisitedOrganization}`, undefined, { shallow: true })
+      } else {
+        router.replace(`/new/_`, undefined, { shallow: true })
+      }
+    }
+  }, [slug, lastVisitedOrganization, router])
 
   return (
     <Form {...form}>
@@ -655,7 +654,8 @@ export const ProjectCreationForm = () => {
 
         <ConfirmationModal
           size="large"
-          loading={false}
+          variant="warning"
+          loading={isCreatingNewProject}
           visible={isComputeCostsConfirmationModalVisible}
           title="Confirm compute costs"
           confirmLabel="I understand"
@@ -665,7 +665,6 @@ export const ProjectCreationForm = () => {
             await onSubmit(values)
             setIsComputeCostsConfirmationModalVisible(false)
           }}
-          variant={'warning'}
         >
           <div className="text-sm text-foreground-light space-y-1">
             <p>
