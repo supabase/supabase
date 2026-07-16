@@ -13,7 +13,8 @@ Docs should be helpful, quick to read, and easy to understand. We have an audien
 To make docs as clear as possible:
 
 - Write for the user. Think about what task they want to complete by reading your doc. Tell them what, and only what, they need to know.
-- Write like you talk. Use words and sentences that sound natural when speaking. Cut unnecessary words. Read your writing out loud to help you choose the clearest and simplest phrases.
+- Write like you talk. Conversational English is easier for a global audience to understand and localize. Many readers who use English as an additional language learn conversational rather than academic English. Use words and sentences that sound natural when speaking. Cut unnecessary words. Read your writing out loud to help you choose the clearest and simplest phrases.
+- Prefer short, direct sentences. Express one relationship at a time, and avoid unnecessary compound structures. This makes each sentence easier to understand, localize, and interpret consistently.
 - Each paragraph should have one topic only. Start a new paragraph whenever you change the topic. Don't worry about paragraphs being too short.
 - Avoid using idioms and colloquialisms, such as `piece of cake`. These phrases are often specific to a region or culture.
 - Refer to the reader as `you`. Don't use `we` to refer to the reader. Use `we` only to refer to the Supabase team.
@@ -48,6 +49,13 @@ For inspiration, see [an example of a tutorial](https://supabase.com/docs/guides
 Guides are also goal-oriented, but they focus on shorter, more targeted tasks. For example, a guide might explain how to set up user login for an app.
 
 Guides contain mostly procedures. Think of an instruction manual for building a desk: it's a list of concise steps that the user can go through quickly.
+
+Begin each guide with a sentence that declares its intent, such as `This guide explains how to set up email login.` This helps readers and agents confirm that the guide matches their goal and expected outcome.
+
+Keep procedures focused on what the reader must do. Move substantial background or conceptual explanations into a separate section or an explainer. Cross-reference the authoritative explanation instead of repeating it in the procedure. This keeps the action path scannable, gives readers optional depth, and maintains one source of truth.
+
+- Recommended: `This guide explains how to enable Row Level Security. To learn how Row Level Security controls access, see [Row Level Security](...).`
+- Not recommended: Begin with several paragraphs about how Row Level Security works before stating what the guide helps the reader do.
 
 For inspiration, see [an example of a guide](https://supabase.com/docs/guides/auth/auth-email).
 
@@ -161,15 +169,24 @@ Here are some guidelines for using elements:
 
 Admonitions (or callouts) draw reader attention to an important point or an aside. They highlight important information, but get less effective if they're overused.
 
-Use admonitions sparingly. Don't stack them on top of each other.
+Use an admonition when a reader might otherwise miss information that affects the outcome of their task, or when you want to separate helpful but optional guidance from the main flow. Don't use an admonition for information that belongs in the main explanation or procedure.
+
+Use admonitions sparingly. Don't stack them on top of each other or use them as decoration.
+
+Begin every admonition with its impact and purpose: the "so what." The first sentence should tell the reader why the information matters, such as what could happen, what changes, or what benefit they gain. Add background or instructions after the impact is clear.
+
+For example:
+
+- Recommended: `Deleting this project permanently removes its database and backups. Export any data that you want to keep before you continue.`
+- Not recommended: `Before you continue, there are a few things that you should know about project deletion.`
 
 Choose the appropriate `type` for your admonition:
 
-- `danger` to warn the user about any missteps that could cause data loss or data leaks
-- `deprecation` to notify the user about features that are (or will soon be) deprecated
-- `caution` to warn about anything that could cause a bug or serious user inconvenience
-- `tip` to point out helpful but optional actions
-- `note` for anything else
+- `danger`: Warn about actions or conditions that could cause data loss, expose sensitive data, or create another severe and difficult-to-reverse outcome. State the consequence first, and then explain how to avoid it.
+- `deprecation`: Identify a deprecated feature or behavior. State how the change affects the reader, and then provide the supported alternative or migration path.
+- `caution`: Warn about behavior that could cause bugs, failed operations, unexpected results, or serious inconvenience but doesn't rise to the severity of `danger`.
+- `tip`: Share an optional shortcut, optimization, or best practice that helps the reader complete the task more effectively. The main procedure must still work without it.
+- `note`: Highlight an important prerequisite, constraint, or clarification that doesn't represent a risk. If the information is essential to completing a step, include it in the procedure instead.
 
 ```
 <Admonition type="note" title="Optional title">
@@ -295,6 +312,19 @@ But link text shouldn't be too long. Use the shortest part of the link that is d
 
 Use relative links when linking within the `supabase.com` domain. For example, `[link to another page in Supabase docs](/docs/guides/getting-started)`.
 
+### Procedures
+
+Use a procedure when a human or agent must perform actions to reach an outcome. The procedural format makes that expectation explicit.
+
+Write sequential actions as an ordered list. Begin each step with an imperative verb, and include one action or a closely related set of actions per step. Give the reader enough context to know where to act.
+
+An apparent one-step procedure can become two steps when there is a real orientation action. For example:
+
+1. Open a terminal in your project directory.
+2. Run `supabase start`.
+
+The first step establishes the operating context for both readers and agents. Don't add a redundant orientation step to a genuinely atomic instruction. For example, write `Click **Save**.` instead of adding `Locate the **Save** button` as a separate step.
+
 ### Lists
 
 Use ordered lists for steps that must be taken one after the other. Use unordered lists when order doesn't matter.
@@ -356,7 +386,9 @@ tocVideo: 'rzglqRdZUQE',
 
 ## Styling, formatting, and grammar
 
-Don't worry too much about grammar rules. Grammar is useful if, and only if, it makes your writing clearer. For example, you can use sentence fragments if they're self-explanatory.
+Grammar is useful when it makes your writing clearer. Use complete sentences by default because they identify the actor and action. This reduces ambiguity for readers, translators, and agents. Use sentence fragments only where they improve scanning, such as headings, labels, or short list items.
+
+Headings guide the reader's eye and organize the page, but they don't carry information by themselves. Make the content beneath a heading understandable without relying on the heading. The first sentence can restate the heading, even if it sounds redundant. Readers often skim headings and then return to the section that interests them, so the opening sentence should confirm the context.
 
 That said, a few rules help keep the docs concise, consistent, and clear:
 
@@ -368,32 +400,7 @@ That said, a few rules help keep the docs concise, consistent, and clear:
 
 Use American English. If in doubt, consult the [Merriam-Webster dictionary](https://www.merriam-webster.com/).
 
-Here are some exceptions and Supabase-specific guidelines.
-
-### General word usage
-
-- **Filler words**: You can often make your writing more concise by removing these words. (Some of these words can also sound patronizing.) Most filler, marketing, and vague-verb phrases are flagged by `supa-mdx-lint` as warnings, with suggested alternatives where a direct replacement exists. Run `pnpm lint:mdx` in `apps/docs` to check your changes.
-  - Actually
-  - Easy, easily
-  - Just
-  - Let's
-  - Please
-  - Simple, simply
-- **UI elements**
-  - Buttons are `click`ed.
-  - Checkboxes are `select`ed.
-  - Toggles are `enable`d and `disable`d.
-  - Labels of UI elements are bolded. For example, `Click **Confirm**.`
-
-### Word list
-
-- `Frontend` isn't hyphenated (not `front-end`).
-- `Backend` isn't hyphenated (not `back-end`).
-- `Login` is a noun. `Log in` is a verb.
-- `Postgres` is capitalized, except in code, and used instead of `PostgreSQL`.
-- `Setup` is a noun. `Set up` is a verb.
-- `Supabase` is capitalized (not `supabase`), except in code.
-- `Supabase Platform` is in title case (not `Supabase platform`).
+Follow the [Supabase documentation word list](./WORD_LIST.md) for preferred spelling, capitalization, and usage. The word list includes the terminology rules checked by `supa-mdx-lint`. Run `pnpm lint:mdx` in `apps/docs` to check your changes.
 
 ## Search
 
