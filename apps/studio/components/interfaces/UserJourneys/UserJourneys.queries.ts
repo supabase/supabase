@@ -9,14 +9,6 @@ export interface JourneyUser {
   lastSignInAt: string | null
 }
 
-// The SQL below is OTEL/ClickHouse-only — the legacy BigQuery path has no
-// auth_event.* / user-correlation fields (phase 1 finding). The endpoint is no
-// longer hardcoded: callers pass `useOtel` (from `useFlag('otelUnifiedLogs')`,
-// the same flag the Unified Logs hooks read) so the two backends never get
-// crossed. When the flag is off there is no BigQuery equivalent to run, which is
-// acceptable while this timeline is parked pending the auth_logs pipeline fix.
-
-/** auth.users keyword search (id/email/phone/name) — same paginated query as the Auth > Users page, capped for a filter dropdown. */
 export async function searchAuthUsers(
   projectRef: string,
   connectionString: string | null,

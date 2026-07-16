@@ -1,5 +1,6 @@
 import { useParams } from 'common'
 import Link from 'next/link'
+import { parseAsString, useQueryState } from 'nuqs'
 import { cloneElement, Dispatch, SetStateAction, useEffect } from 'react'
 import { Badge, Button, cn, ResizablePanel, usePanelRef } from 'ui'
 
@@ -25,6 +26,7 @@ export function FilterSideBar({
 }: FilterSideBarProps) {
   const { ref } = useParams()
   const { table } = useDataTable()
+  const [user, setUser] = useQueryState('user', parseAsString)
 
   const panelRef = usePanelRef()
 
@@ -59,7 +61,9 @@ export function FilterSideBar({
             <p className="text-foreground text-lg">Logs</p>
             <Badge variant="default">Beta</Badge>
           </div>
-          {table.getState().columnFilters.length ? <DataTableResetButton /> : null}
+          {table.getState().columnFilters.length || user ? (
+            <DataTableResetButton onReset={() => setUser(null)} />
+          ) : null}
         </div>
       </div>
 

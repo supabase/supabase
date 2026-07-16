@@ -324,9 +324,7 @@ const userFilterValue = (search: QuerySearchParamsType): string =>
 /**
  * Cross-cutting "attributable to one user" condition. Only the two sources that can
  * be positively tied to a user are eligible, each with its own match:
- *   - auth_logs: structured identity (`auth_event.actor_id` / `traits.user_email`),
- *     plus a raw event_message match so a failed signup (no auth.users row, so the
- *     identifier is an email) still surfaces.
+ *   - auth_logs: structured identity (`auth_event.actor_id`)
  *   - postgres_logs: the identifier appears verbatim in the error text (e.g. a 23502
  *     failing row echoing the id column).
  * edge_logs / storage_logs / realtime_logs carry no per-user field and can't satisfy
@@ -341,11 +339,41 @@ const userAttributionCondition = (search: QuerySearchParamsType): SafeLogSqlFrag
   return safeSql`(
     (source = 'auth_logs' AND (
       log_attributes['auth_event.actor_id'] = ${exact}
-      OR log_attributes['auth_event.traits.user_email'] = ${exact}
       OR event_message ILIKE ${contains}
     ))
     OR (source = 'postgres_logs' AND event_message ILIKE ${contains})
   )`
+}
+
+const USER_ATTRIBUTABLE_SOURCES = new Set([LOG_TYPE_TO_SOURCE.auth, LOG_TYPE_TO_SOURCE.postgres])
+
+/**
+ * True when the user filter is active but an explicit log_type filter restricts the
+ * view to source(s) that can never satisfy `userAttributionCondition` (e.g. `edge`) —
+ * the combination is guaranteed to match zero rows. Consumed by the UI to show a
+ * specific empty state instead of the generic "No results found".
+ *
+ * [Joshen] Basically filtering by user only works on Auth and Postgres logs atm
+ * Refer to userAttributeCondition above
+ */
+export const isUserFilterUnreachable = (search: QuerySearchParamsType): boolean => {
+  if (!userFilterValue(search)) return false
+
+  const logTypeFilter = groupLogsFiltersByColumn(parseLogsFilterUrlParams(search.filter)).log_type
+  if (!logTypeFilter) return false
+
+  const sources = logTypeFilter.values.map(
+    (v) => LOG_TYPE_TO_SOURCE[v as keyof typeof LOG_TYPE_TO_SOURCE] ?? v
+  )
+
+  if (logTypeFilter.operator === '<>') {
+    // Excludes these sources from view — unreachable only if both attributable
+    // sources are excluded (excluding just one still leaves the other eligible).
+    return [...USER_ATTRIBUTABLE_SOURCES].every((source) => sources.includes(source))
+  }
+
+  // Restricts the view to these sources — unreachable unless at least one is attributable.
+  return !sources.some((source) => USER_ATTRIBUTABLE_SOURCES.has(source))
 }
 
 const applySearchParamsFilter = (search: QuerySearchParamsType): SafeLogSqlFragment | null => {

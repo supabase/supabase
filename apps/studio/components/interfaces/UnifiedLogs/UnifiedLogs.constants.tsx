@@ -95,11 +95,8 @@ export const SEARCH_PARAMS_PARSER = {
   edge_storage: parseAsBoolean.withDefault(true),
   edge_postgrest: parseAsBoolean.withDefault(true),
 
-  // Cross-cutting "attributable to one user" filter. A dedicated key (not part of
-  // the eq/neq `filter` array) because it restricts which *sources* are eligible and
-  // applies per-source match logic, rather than being a value filter on one column.
-  // Holds a single identifier (user id, or email for accounts with no auth.users row
-  // yet, e.g. failed signups). See applySearchParamsFilter in UnifiedLogs.queries.ts.
+  // Support searching for user against user ID
+  // See userAttributionCondition in UnifiedLogs.queries.ts.
   user: parseAsString,
 }
 
