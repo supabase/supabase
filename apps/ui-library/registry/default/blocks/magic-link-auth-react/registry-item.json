@@ -1,0 +1,14 @@
+{
+  "name": "magic-link-auth-react",
+  "type": "registry:block",
+  "title": "Magic Link Auth flow for React and Supabase",
+  "description": "Magic Link Auth flow for React and Supabase",
+  "registryDependencies": ["button", "card", "input", "label"],
+  "files": [
+    {
+      "path": "registry/default/blocks/magic-link-auth-react/components/magic-link-form.tsx",
+      "type": "registry:component"
+    }
+  ],
+  "dependencies": ["@supabase/supabase-js@latest"]
+}
