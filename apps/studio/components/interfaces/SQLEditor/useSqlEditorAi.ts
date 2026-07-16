@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useEffectEvent, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 
 import type { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
@@ -55,7 +55,7 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
   } = diff
   const { promptState, setPromptState, resetPrompt } = prompt
 
-  const { editorRef, diffEditorRef } = useSQLEditorContext()
+  const { editorRef, diffEditorRef, refocusEditor } = useSQLEditorContext()
 
   const router = useRouter()
   const { ref } = useParams()
@@ -163,6 +163,7 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
       setSelectedDiffType(DiffType.Modification)
       resetPrompt()
       closeDiff()
+      refocusEditor()
     } finally {
       setIsAcceptDiffLoading(false)
     }
@@ -178,13 +179,15 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
     setSelectedDiffType,
     resetPrompt,
     closeDiff,
+    refocusEditor,
   ])
 
   const discardAiHandler = useCallback(() => {
     track('assistant_sql_diff_handler_evaluated', { handlerAccepted: false })
     resetPrompt()
     closeDiff()
-  }, [closeDiff, resetPrompt, track])
+    refocusEditor()
+  }, [closeDiff, resetPrompt, track, refocusEditor])
 
   const complete = useCallback(
     async (
@@ -244,46 +247,54 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
     ]
   )
 
-  const handlePrompt = async (
-    prompt: string,
-    context: {
-      beforeSelection: string
-      selection: string
-      afterSelection: string
-    }
-  ) => {
-    try {
-      setPromptState((prev) => ({
-        ...prev,
-        selection: context.selection,
-        beforeSelection: context.beforeSelection,
-        afterSelection: context.afterSelection,
-      }))
-      const headerData = await constructHeaders()
+  const handlePrompt = useCallback(
+    async (
+      prompt: string,
+      context: {
+        beforeSelection: string
+        selection: string
+        afterSelection: string
+      }
+    ) => {
+      try {
+        setPromptState((prev) => ({
+          ...prev,
+          selection: context.selection,
+          beforeSelection: context.beforeSelection,
+          afterSelection: context.afterSelection,
+        }))
+        const headerData = await constructHeaders()
 
-      const authorizationHeader = headerData.get('Authorization')
+        const authorizationHeader = headerData.get('Authorization')
 
-      await complete(prompt, {
-        ...(authorizationHeader ? { headers: { Authorization: authorizationHeader } } : undefined),
-        body: {
-          completionMetadata: {
-            textBeforeCursor: context.beforeSelection,
-            textAfterCursor: context.afterSelection,
-            language: 'pgsql',
-            prompt,
-            selection: context.selection,
+        await complete(prompt, {
+          ...(authorizationHeader
+            ? { headers: { Authorization: authorizationHeader } }
+            : undefined),
+          body: {
+            completionMetadata: {
+              textBeforeCursor: context.beforeSelection,
+              textAfterCursor: context.afterSelection,
+              language: 'pgsql',
+              prompt,
+              selection: context.selection,
+            },
           },
-        },
-      })
-    } catch (error) {
-      setPromptState((prev) => ({ ...prev, isLoading: false }))
-    }
-  }
+        })
+      } catch (error) {
+        setPromptState((prev) => ({ ...prev, isLoading: false }))
+      }
+    },
+    [complete, setPromptState]
+  )
 
-  const handleDiffEditorMount = (editor: IStandaloneDiffEditor) => {
-    diffEditorRef.current = editor
-    setIsDiffEditorMounted(true)
-  }
+  const handleDiffEditorMount = useCallback(
+    (editor: IStandaloneDiffEditor) => {
+      diffEditorRef.current = editor
+      setIsDiffEditorMounted(true)
+    },
+    [diffEditorRef]
+  )
 
   const resetDiff = useEffectEvent(() => {
     if (id) {
@@ -360,14 +371,26 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
     }
   }, [diffEditorRef, isDiffOpen, isDiffEditorMounted])
 
-  return {
-    handlePrompt,
-    acceptAiHandler,
-    discardAiHandler,
-    onDebug,
-    buildDebugPrompt,
-    handleDiffEditorMount,
-    isCompletionLoading,
-    showWidget,
-  }
+  return useMemo(
+    () => ({
+      handlePrompt,
+      acceptAiHandler,
+      discardAiHandler,
+      onDebug,
+      buildDebugPrompt,
+      handleDiffEditorMount,
+      isCompletionLoading,
+      showWidget,
+    }),
+    [
+      handlePrompt,
+      acceptAiHandler,
+      discardAiHandler,
+      onDebug,
+      buildDebugPrompt,
+      handleDiffEditorMount,
+      isCompletionLoading,
+      showWidget,
+    ]
+  )
 }

@@ -147,7 +147,7 @@
   --chart-warning: hsl(var(--warning-500));
   --chart-warning-muted: hsl(var(--warning-400));
   --chart-destructive: hsl(var(--destructive-default));
-  --chart-success: color-mix(in oklch, var(--foreground-muted) 65%, white);
+  --chart-success: color-mix(in oklch, var(--foreground-muted) 50%, white);
   --sidebar-background: var(--background-dash-sidebar);
   --sidebar-foreground: var(--foreground-default);
   --sidebar-primary: var(--foreground-default);
@@ -170,7 +170,7 @@
   --chart-warning: hsl(var(--warning-default));
   --chart-warning-muted: hsl(var(--warning-500));
   --chart-destructive: hsl(var(--destructive-default));
-  --chart-success: color-mix(in oklch, var(--foreground-muted) 65%, white);
+  --chart-success: color-mix(in oklch, var(--foreground-muted) 55%, var(--background));
   --sidebar-background: var(--background-dash-sidebar);
   --sidebar-foreground: var(--foreground-default);
   --sidebar-primary: var(--foreground-default);

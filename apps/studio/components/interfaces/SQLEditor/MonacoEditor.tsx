@@ -24,8 +24,6 @@ export type MonacoEditorProps = {
   monacoRef: RefObject<Monaco | null>
   autoFocus?: boolean
   executeQuery: () => void
-  executeExplainQuery: () => void
-  showExplainAction?: boolean
   prettifyQuery: () => void
   onHasSelection: (value: boolean) => void
   onMount?: (editor: IStandaloneCodeEditor) => void
@@ -48,8 +46,6 @@ export const MonacoEditor = ({
   placeholder = '',
   className,
   executeQuery,
-  executeExplainQuery,
-  showExplainAction = true,
   prettifyQuery,
   onHasSelection,
   onPrompt,
@@ -71,9 +67,6 @@ export const MonacoEditor = ({
   // mount-time closure.
   const snippetRef = useRef(snippet)
   snippetRef.current = snippet
-
-  const executeExplainQueryRef = useRef(executeExplainQuery)
-  executeExplainQueryRef.current = executeExplainQuery
 
   const prettifyQueryRef = useRef(prettifyQuery)
   prettifyQueryRef.current = prettifyQuery
@@ -114,19 +107,6 @@ export const MonacoEditor = ({
         '!inlineSuggestionVisible',
       ].join(' && ')
     )
-
-    if (showExplainAction) {
-      editor.addAction({
-        id: 'run-explain-query',
-        label: 'Run EXPLAIN ANALYZE',
-        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.Enter],
-        contextMenuGroupId: 'operation',
-        contextMenuOrder: 1,
-        run: () => {
-          executeExplainQueryRef.current()
-        },
-      })
-    }
 
     editor.addAction({
       id: 'save-query',
