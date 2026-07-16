@@ -4,15 +4,7 @@ import { useParams } from 'common'
 import { Loader2, Search, X } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
-import {
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-  Button,
-  Checkbox,
-  cn,
-  Label,
-} from 'ui'
+import { AccordionContent, AccordionItem, AccordionTrigger, Button, Checkbox, cn, Label } from 'ui'
 
 import { InputWithAddons } from '@/components/ui/DataTable/primitives/InputWithAddons'
 import { useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
