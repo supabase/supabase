@@ -19,5 +19,5 @@
   "jsx-a11y/anchor-is-valid",
   "jsx-a11y/heading-has-content",
   "jsx-a11y/no-distracting-elements",
-  "supabase/require-safari-tabindex"
+  "supabase/require-explicit-tabindex"
 ]

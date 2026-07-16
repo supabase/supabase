@@ -233,7 +233,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     // if loading, button is disabled
     const disabled = loading === true || props.disabled
 
-    // Set default tabIndex for proper Safari focus handling
+    // Explicit tabIndex for keyboard focus (Safari skips buttons otherwise)
     // - Explicit tabIndex prop takes precedence
     // - If disabled, default to -1 (unless explicitly set)
     // - Otherwise, default to 0 for keyboard accessibility

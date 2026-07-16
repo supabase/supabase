@@ -9,7 +9,7 @@ const CollapsibleTrigger = React.forwardRef<
   React.ElementRef<typeof CollapsiblePrimitive.CollapsibleTrigger>,
   React.ComponentPropsWithoutRef<typeof CollapsiblePrimitive.CollapsibleTrigger>
 >(({ disabled, tabIndex, ...props }, ref) => {
-  // Set default tabIndex for proper Safari focus handling
+  // Explicit tabIndex for keyboard focus (Safari skips buttons otherwise)
   const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
 
   return (

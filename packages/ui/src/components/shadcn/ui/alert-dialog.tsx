@@ -79,7 +79,7 @@ const AlertDialogTrigger = React.forwardRef<
   React.ElementRef<typeof AlertDialogPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Trigger>
 >(({ disabled, tabIndex, ...props }, ref) => {
-  // Set default tabIndex for proper Safari focus handling
+  // Explicit tabIndex for keyboard focus (Safari skips buttons otherwise)
   const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
 
   return (

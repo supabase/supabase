@@ -447,7 +447,7 @@ const SidebarGroupAction = React.forwardRef<
   React.ComponentProps<'button'> & { asChild?: boolean }
 >(({ className, asChild = false, disabled, tabIndex, ...props }, ref) => {
   const Comp = asChild ? SlotPrimitive.Slot : 'button'
-  // Set default tabIndex for proper Safari focus handling
+  // Explicit tabIndex for keyboard focus (Safari skips buttons otherwise)
   const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
 
   return (
@@ -569,7 +569,7 @@ const SidebarMenuButton = React.forwardRef<
     const { isMobile, state } = useSidebar()
     const { disabled, tabIndex, ...rest } = props
 
-    // Set default tabIndex for proper Safari focus handling
+    // Explicit tabIndex for keyboard focus (Safari skips buttons otherwise)
     // - Explicit tabIndex prop takes precedence
     // - If disabled, default to -1 (unless explicitly set)
     // - Otherwise, default to 0 for keyboard accessibility
@@ -622,7 +622,7 @@ const SidebarMenuAction = React.forwardRef<
   }
 >(({ className, asChild = false, showOnHover = false, disabled, tabIndex, ...props }, ref) => {
   const Comp = asChild ? SlotPrimitive.Slot : 'button'
-  // Set default tabIndex for proper Safari focus handling
+  // Explicit tabIndex for keyboard focus (Safari skips buttons otherwise)
   const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
 
   return (

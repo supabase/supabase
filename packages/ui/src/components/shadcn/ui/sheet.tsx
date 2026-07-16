@@ -13,7 +13,7 @@ const SheetTrigger = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Trigger>,
   React.ComponentPropsWithoutRef<typeof SheetPrimitive.Trigger>
 >(({ disabled, tabIndex, ...props }, ref) => {
-  // Set default tabIndex for proper Safari focus handling
+  // Explicit tabIndex for keyboard focus (Safari skips buttons otherwise)
   const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
 
   return (

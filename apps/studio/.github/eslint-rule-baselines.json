@@ -20,7 +20,7 @@
     "jsx-a11y/anchor-is-valid": 7,
     "jsx-a11y/heading-has-content": 2,
     "jsx-a11y/no-distracting-elements": 0,
-    "supabase/require-safari-tabindex": 82
+    "supabase/require-explicit-tabindex": 82
   },
   "ruleFiles": {
     "react-hooks/exhaustive-deps": {
@@ -1069,7 +1069,7 @@
       "components/layouts/Scaffold.tsx": 2
     },
     "jsx-a11y/no-distracting-elements": {},
-    "supabase/require-safari-tabindex": {
+    "supabase/require-explicit-tabindex": {
       "components/grid/components/grid/ColumnHeader.tsx": 1,
       "components/grid/components/header/sort/SortRow.tsx": 1,
       "components/interfaces/App/FeaturePreview/FeaturePreviewModal.tsx": 1,

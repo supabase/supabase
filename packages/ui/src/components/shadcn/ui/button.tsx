@@ -40,7 +40,7 @@ export interface ButtonProps
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, disabled, tabIndex, ...props }, ref) => {
     const Comp = asChild ? SlotPrimitive.Slot : 'button'
-    // Set default tabIndex for proper Safari focus handling
+    // Explicit tabIndex for keyboard focus (Safari skips buttons otherwise)
     const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
 
     return (

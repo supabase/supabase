@@ -10,7 +10,7 @@ const Checkbox = React.forwardRef<
   React.ElementRef<typeof CheckboxPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof CheckboxPrimitive.Root>
 >(({ className, disabled, tabIndex, ...props }, ref) => {
-  // Set default tabIndex for proper Safari focus handling
+  // Explicit tabIndex for keyboard focus (Safari skips buttons otherwise)
   const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
 
   return (

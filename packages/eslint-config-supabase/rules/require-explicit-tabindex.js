@@ -1,10 +1,10 @@
 /**
  * ESLint rule requiring an explicit tabIndex on raw interactive elements.
  *
- * Safari skips buttons/links during Tab navigation unless macOS Keyboard
- * Navigation is enabled (or Option+Tab is used). An explicit tabIndex={0}
- * forces Safari to include the element. Prefer Button from `ui`, which sets
- * this by default; when using raw <button> / role="button", set tabIndex.
+ * An explicit tabIndex={0} puts the control in sequential focus order even when
+ * the user agent only tabs to text fields by default (Safari / macOS Keyboard
+ * navigation). Prefer Button from `ui`, which sets this by default; when using
+ * raw <button> / role="button", set tabIndex.
  *
  * BAD:
  *   <button onClick={...}>Save</button>
@@ -22,12 +22,12 @@ module.exports = {
     type: 'suggestion',
     docs: {
       description:
-        'Require explicit tabIndex on raw <button> and role="button" elements for Safari keyboard focus',
+        'Require explicit tabIndex on raw <button> and role="button" elements for keyboard focus',
       recommended: true,
     },
     messages: {
       missingTabIndex:
-        'Add tabIndex={0} (or -1 when disabled) for Safari keyboard focus, or use Button from `ui` which sets it by default.',
+        'Add an explicit tabIndex={0} (or -1 when disabled) for keyboard focus, or use Button from `ui` which sets it by default.',
     },
     schema: [],
   },
