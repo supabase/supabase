@@ -310,7 +310,7 @@ Link text should be descriptive. The reader should understand where the link goe
 
 But link text shouldn't be too long. Use the shortest part of the link that is descriptive enough. For example, `see the [reference section](/link)` rather than `[see the reference section](/link)`.
 
-Use relative links when linking within the `supabase.com` domain. For example, `[link to another page in Supabase docs](/docs/guides/getting-started)`.
+Don't include the `https://supabase.com` origin when linking to Supabase-owned pages. Use a `/docs/...` path for a page in Supabase docs, such as `[getting started](/docs/guides/getting-started)`. Use a site-root path for a page outside docs, such as `[open the Dashboard](/dashboard)`.
 
 ### Procedures
 

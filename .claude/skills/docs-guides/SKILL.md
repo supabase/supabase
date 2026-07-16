@@ -37,8 +37,9 @@ word list.
 7. Add new pages to
    `apps/docs/components/Navigation/NavigationMenu/NavigationMenu.constants.ts`.
    File placement alone doesn't add a page to navigation.
-8. Use relative links for pages on `supabase.com`, descriptive link text, and
-   sparse admonitions with the appropriate severity.
+8. Use `/docs/...` paths for pages in Supabase docs and site-root paths such as
+   `/dashboard` for pages outside docs. Use descriptive link text and sparse
+   admonitions with the appropriate severity.
 
 ## Validation
 
