@@ -101,6 +101,7 @@ export const ReportBlock = ({
     isPending: executeSqlLoading,
     refetch,
   } = useQuery({
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- formattedSql/appendAutoLimit are fully derived from sql/autoLimit, both already in the key
     queryKey: sqlKeys.query(projectRef, [
       item.id,
       sql,
