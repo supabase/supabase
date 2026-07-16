@@ -54,7 +54,11 @@ export const createSQLPolicy = (
   }
 
   if (!isEmpty(fieldsToUpdate)) {
-    return createSQLStatementForUpdatePolicy(formattedPolicyFormFields, fieldsToUpdate)
+    return createSQLStatementForUpdatePolicy(
+      formattedPolicyFormFields,
+      fieldsToUpdate,
+      originalPolicyFormFields.name
+    )
   }
 
   return {}
@@ -77,9 +81,10 @@ const createSQLStatementForCreatePolicy = (policyFormFields: PolicyFormField): P
 
 const createSQLStatementForUpdatePolicy = (
   policyFormFields: PolicyFormField,
-  fieldsToUpdate: Partial<PolicyFormField>
+  fieldsToUpdate: Partial<PolicyFormField>,
+  originalName: string
 ): PolicyForReview => {
-  const { name, schema, table } = policyFormFields
+  const { schema, table } = policyFormFields
 
   const definitionChanged = has(fieldsToUpdate, ['definition'])
   const checkChanged = has(fieldsToUpdate, ['check'])
@@ -97,7 +102,9 @@ const createSQLStatementForUpdatePolicy = (
   const roles =
     (fieldsToUpdate?.roles ?? []).length === 0 ? ['public'] : (fieldsToUpdate.roles as string[])
 
-  const alterStatement = `ALTER POLICY "${name}" ON "${schema}"."${table}"`
+  // Statements run before the RENAME (which is last), so every statement must
+  // reference the policy by its original name.
+  const alterStatement = `ALTER POLICY "${originalName}" ON "${schema}"."${table}"`
   const statement = [
     'BEGIN;',
     ...(definitionChanged ? [`  ${alterStatement} USING (${fieldsToUpdate.definition});`] : []),
