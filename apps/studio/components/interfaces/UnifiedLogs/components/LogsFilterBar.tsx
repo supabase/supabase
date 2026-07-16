@@ -15,7 +15,7 @@ import {
   type LogsFilterOperator,
 } from '../UnifiedLogs.filters'
 import { buildFilterProperties, getUserFilterValue, USER_PROPERTY } from './LogsFilterBar.utils'
-import { searchAuthUserByEmail } from '@/components/interfaces/UserJourneys/UserJourneys.queries'
+import { searchAuthUsers } from '@/components/interfaces/UserJourneys/UserJourneys.queries'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { UUID_REGEX } from '@/lib/constants'
@@ -46,19 +46,36 @@ const buildFilterGroup = (
 }
 
 export const LogsFilterBar = () => {
-  const { table, filterFields, columnFilters, isFetching } = useDataTable()
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const [user, setUser] = useQueryState(USER_PROPERTY, parseAsString)
+  const { table, filterFields, columnFilters, isFetching } = useDataTable()
 
-  const filterBarRef = useRef<FilterBarHandle>(null)
   useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_FOCUS_FILTER, () => filterBarRef.current?.focus(), {
     registerInCommandMenu: true,
   })
 
+  const filterBarRef = useRef<FilterBarHandle>(null)
   const [freeformText, setFreeformText] = useState('')
 
-  const filterProperties = buildFilterProperties(filterFields)
+  // [Joshen] We're separately declaring useQueryState for user here, as there's no "user" column
+  // in the Tanstack table.
+  const [user, setUser] = useQueryState(USER_PROPERTY, parseAsString)
+
+  // A UUID is matched exactly rather than searched (it's already a resolved id, not a keyword).
+  const searchUserOptions = async (search?: string) => {
+    const value = search?.trim() ?? ''
+    if (UUID_REGEX.test(value)) return [{ label: value, value }]
+    if (!projectRef) return []
+    const users = await searchAuthUsers(projectRef, project?.connectionString ?? null, value).catch(
+      () => []
+    )
+    return users.map((u) => ({ label: u.email ?? u.id, value: u.id }))
+  }
+
+  const filterProperties = buildFilterProperties({
+    fields: filterFields,
+    userOptions: searchUserOptions,
+  })
 
   const withUserCondition = (group: FilterGroup): FilterGroup => {
     if (!user) return group
@@ -85,24 +102,9 @@ export const LogsFilterBar = () => {
     setFilters(withUserCondition(buildFilterGroup(columnFilters, columnBackedNames)))
   })
 
-  const applyUser = async (raw: string | undefined) => {
+  const applyUser = (raw: string | undefined) => {
     const value = raw?.trim() ?? ''
-    if (!value) {
-      setUser(null)
-      return
-    }
-    // An email is resolved to a user id where an account exists (so it also matches
-    // postgres error text, which carries the id, not the email); otherwise kept as-is.
-    if (UUID_REGEX.test(value) || !value.includes('@')) {
-      setUser(value)
-      return
-    }
-    const resolved = await searchAuthUserByEmail(
-      projectRef!,
-      project?.connectionString ?? null,
-      value
-    ).catch(() => undefined)
-    setUser(resolved?.id ?? value)
+    setUser(value || null)
   }
 
   // No nested conditions in unified logs — type-cast to FilterCondition on read.

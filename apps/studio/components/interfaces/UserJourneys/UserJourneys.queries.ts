@@ -16,30 +16,26 @@ export interface JourneyUser {
 // crossed. When the flag is off there is no BigQuery equivalent to run, which is
 // acceptable while this timeline is parked pending the auth_logs pipeline fix.
 
-/** auth.users lookup — reuses the exact SQL Studio's Auth > Users page runs, so no hand-written raw SQL against auth.users. */
-export async function searchAuthUserByEmail(
+/** auth.users keyword search (id/email/phone/name) — same paginated query as the Auth > Users page, capped for a filter dropdown. */
+export async function searchAuthUsers(
   projectRef: string,
   connectionString: string | null,
-  email: string,
+  keywords: string,
   signal?: AbortSignal
-): Promise<JourneyUser | undefined> {
-  // `keywords` is a substring match, so over-fetch a little and pick the exact match
-  // client-side rather than trusting result[0] on a possible substring collision.
+): Promise<JourneyUser[]> {
   const sql = getPaginatedUsersSQL({
-    keywords: email,
-    limit: 5,
+    keywords,
+    limit: 20,
     sort: 'id',
     order: 'asc',
   })
   const { result } = await executeSql<
     { id: string; email: string | null; created_at: string; last_sign_in_at: string | null }[]
   >({ projectRef, connectionString, sql }, signal)
-  const row = result.find((r) => r.email?.toLowerCase() === email.toLowerCase()) ?? result[0]
-  if (!row) return undefined
-  return {
+  return result.map((row) => ({
     id: row.id,
     email: row.email,
     createdAt: row.created_at,
     lastSignInAt: row.last_sign_in_at,
-  }
+  }))
 }

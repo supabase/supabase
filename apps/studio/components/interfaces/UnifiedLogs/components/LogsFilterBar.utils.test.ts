@@ -22,18 +22,18 @@ describe('buildFilterProperties', () => {
   ]
 
   it('produces properties that all satisfy the FilterProperty schema', () => {
-    const result = buildFilterProperties(fields)
+    const result = buildFilterProperties({ fields })
     expect(() => filterPropertySchema.array().parse(result)).not.toThrow()
   })
 
   it('drops timerange fields and appends the synthetic user property last', () => {
-    const names = buildFilterProperties(fields).map((property) => property.name)
+    const names = buildFilterProperties({ fields }).map((property) => property.name)
     expect(names).not.toContain('date')
     expect(names).toEqual(['log_type', 'event_message', USER_PROPERTY])
   })
 
   it('gives the event_message column pattern (ILIKE) operators', () => {
-    const eventMessage = buildFilterProperties(fields).find(
+    const eventMessage = buildFilterProperties({ fields }).find(
       (property) => property.name === 'event_message'
     )
     expect(eventMessage?.operators).toEqual([
@@ -43,7 +43,9 @@ describe('buildFilterProperties', () => {
   })
 
   it('gives every other column comparison operators', () => {
-    const logType = buildFilterProperties(fields).find((property) => property.name === 'log_type')
+    const logType = buildFilterProperties({ fields }).find(
+      (property) => property.name === 'log_type'
+    )
     expect(logType?.operators).toEqual([
       { label: 'Equals', value: '=', group: 'comparison' },
       { label: 'Not equal', value: '<>', group: 'comparison' },
@@ -51,14 +53,16 @@ describe('buildFilterProperties', () => {
   })
 
   it('defaults a column without options to an empty array', () => {
-    const eventMessage = buildFilterProperties(fields).find(
+    const eventMessage = buildFilterProperties({ fields }).find(
       (property) => property.name === 'event_message'
     )
     expect(eventMessage?.options).toEqual([])
   })
 
   it('appends a user property limited to the equals operator', () => {
-    const user = buildFilterProperties(fields).find((property) => property.name === USER_PROPERTY)
+    const user = buildFilterProperties({ fields }).find(
+      (property) => property.name === USER_PROPERTY
+    )
     expect(user).toEqual({
       label: 'User',
       name: USER_PROPERTY,
@@ -66,6 +70,14 @@ describe('buildFilterProperties', () => {
       options: [],
       operators: [{ label: 'Equals', value: '=', group: 'comparison' }],
     })
+  })
+
+  it('wires a provided async options function into the user property', () => {
+    const userOptions = async () => []
+    const user = buildFilterProperties({ fields, userOptions }).find(
+      (property) => property.name === USER_PROPERTY
+    )
+    expect(user?.options).toBe(userOptions)
   })
 })
 

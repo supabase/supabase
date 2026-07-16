@@ -1,4 +1,8 @@
-import { type FilterCondition, type FilterProperty } from 'ui-patterns/FilterBar'
+import {
+  type AsyncOptionsFunction,
+  type FilterCondition,
+  type FilterProperty,
+} from 'ui-patterns/FilterBar'
 import { z } from 'zod'
 
 import type { Option } from '@/components/ui/DataTable/DataTable.types'
@@ -22,13 +26,19 @@ export const filterPropertySchema = z.object({
   label: z.string(),
   name: z.string(),
   type: z.enum(['string', 'number', 'date', 'boolean']),
-  options: z.array(z.any()).optional(),
+  options: z.union([z.array(z.any()), z.function()]).optional(),
   operators: z.array(filterOperatorSchema).optional(),
 })
 
-export const buildFilterProperties = (filterFields: FilterableField[]): FilterProperty[] => {
+export const buildFilterProperties = ({
+  fields,
+  userOptions,
+}: {
+  fields: FilterableField[]
+  userOptions?: AsyncOptionsFunction
+}): FilterProperty[] => {
   return [
-    ...filterFields
+    ...fields
       .filter((field) => field.type !== 'timerange')
       .map(
         (field): FilterProperty => ({
@@ -52,7 +62,7 @@ export const buildFilterProperties = (filterFields: FilterableField[]): FilterPr
       label: 'User',
       name: USER_PROPERTY,
       type: 'string',
-      options: [],
+      options: userOptions ?? [],
       operators: [{ label: 'Equals', value: '=', group: 'comparison' }],
     },
   ]

@@ -1,57 +1,59 @@
+import { keepPreviousData } from '@tanstack/react-query'
+import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { User, X } from 'lucide-react'
+import { Loader2, Search, X } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useState, type KeyboardEvent } from 'react'
-import { AccordionContent, AccordionItem, AccordionTrigger, Button } from 'ui'
+import { useMemo, useState } from 'react'
+import {
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+  Button,
+  Checkbox,
+  cn,
+  Label,
+} from 'ui'
 
-import { searchAuthUserByEmail } from '@/components/interfaces/UserJourneys/UserJourneys.queries'
 import { InputWithAddons } from '@/components/ui/DataTable/primitives/InputWithAddons'
+import { useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { UUID_REGEX } from '@/lib/constants'
+
+type UserOption = { id: string; email: string | null }
 
 export const UserLogFilterControl = () => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
 
   const [user, setUser] = useQueryState('user', parseAsString)
-  const [value, setValue] = useState(user ?? '')
-  const [isResolving, setIsResolving] = useState(false)
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 700)
 
-  // Keep the input in sync when the filter is set/cleared elsewhere (deep link, reset).
-  useEffect(() => {
-    setValue(user ?? '')
-  }, [user])
+  const { data, isFetching } = useUsersInfiniteQuery(
+    {
+      projectRef,
+      connectionString: project?.connectionString,
+      keywords: debouncedSearch.trim(),
+      sort: 'id',
+      order: 'asc',
+    },
+    { placeholderData: keepPreviousData }
+  )
 
-  const apply = async () => {
-    const raw = value.trim()
-    if (!raw) {
-      setUser(null)
-      return
-    }
-    if (UUID_REGEX.test(raw) || !raw.includes('@')) {
-      setUser(raw)
-      return
-    }
-    // Email → resolve to id where an account exists; fall back to the raw email otherwise.
-    setIsResolving(true)
-    try {
-      const resolved = await searchAuthUserByEmail(
-        projectRef!,
-        project?.connectionString ?? null,
-        raw
-      ).catch(() => undefined)
-      setUser(resolved?.id ?? raw)
-    } finally {
-      setIsResolving(false)
-    }
-  }
+  const results: UserOption[] = useMemo(
+    () =>
+      (data?.pages[0]?.result ?? [])
+        .filter((u): u is typeof u & { id: string } => !!u.id)
+        .map((u) => ({ id: u.id, email: u.email ?? null })),
+    [data?.pages]
+  )
 
-  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      event.preventDefault()
-      apply()
-    }
-  }
+  // Only one user can be filtered on at a time — keep the current selection visible (and
+  // checked) even if it falls outside the current search results, e.g. right after loading
+  // from a deep link.
+  const options: UserOption[] =
+    user && !results.some((u) => u.id === user) ? [{ id: user, email: null }, ...results] : results
+
+  const toggle = (id: string) => setUser(id === user ? null : id)
 
   return (
     <AccordionItem value="user" className="border-none">
@@ -78,19 +80,51 @@ export const UserLogFilterControl = () => {
         ) : null}
       </div>
       <AccordionContent>
-        <div className="p-1">
+        <div className="p-1 grid gap-2">
           <InputWithAddons
-            placeholder="Email or user id"
-            leading={<User size={14} className="text-foreground-lighter" />}
-            containerClassName="h-9 rounded-sm"
-            name="user"
-            id="user"
-            value={value}
-            disabled={isResolving}
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={onKeyDown}
-            onBlur={apply}
+            placeholder="Search by email or id"
+            leading={<Search size={14} className="text-foreground-lighter" />}
+            containerClassName="h-8 rounded-sm"
+            value={search}
+            trailing={isFetching ? <Loader2 size={12} className="animate-spin" /> : undefined}
+            onChange={(e) => setSearch(e.target.value)}
           />
+
+          <div className="max-h-[215px] overflow-y-auto rounded-sm border border-border empty:border-none">
+            {options.length === 0 ? (
+              <div className="flex items-center justify-center px-2 py-3 text-center">
+                <p className="text-xs text-foreground-lighter">No users found</p>
+              </div>
+            ) : (
+              options.map((option, index) => {
+                const checked = option.id === user
+
+                return (
+                  <div
+                    key={option.id}
+                    className={cn(
+                      'group flex items-center gap-2 px-2 py-2 hover:bg-accent/50',
+                      index !== options.length - 1 ? 'border-b' : undefined
+                    )}
+                  >
+                    <Checkbox
+                      id={`user-${option.id}`}
+                      checked={checked}
+                      onCheckedChange={() => toggle(option.id)}
+                    />
+                    <Label
+                      htmlFor={`user-${option.id}`}
+                      className="flex-1 min-w-0 text-[0.8rem] text-foreground/70 group-hover:text-accent-foreground"
+                    >
+                      <span className="truncate font-normal block">
+                        {option.email ?? option.id}
+                      </span>
+                    </Label>
+                  </div>
+                )
+              })
+            )}
+          </div>
         </div>
       </AccordionContent>
     </AccordionItem>
