@@ -27,6 +27,8 @@ export function UnifiedLogsBanner({ className = 'mx-4 mt-4' }: UnifiedLogsBanner
   )
 
   if (!IS_PLATFORM) return null
+
+  // Keep the "Go back" banner visible even after dismissal so manually opted-in users can switch back
   if (isDismissed && !(isEnabled && !isDefaultOptIn)) return null
 
   const cardClassName = cn(
@@ -71,7 +73,6 @@ export function UnifiedLogsBanner({ className = 'mx-4 mt-4' }: UnifiedLogsBanner
         <Button
           variant="text"
           size="tiny"
-          type="button"
           icon={<X size={14} strokeWidth={1.5} />}
           onClick={() => setIsDismissed(true)}
           className="opacity-75 hover:opacity-100 -mt-1 -mr-1 px-1"
