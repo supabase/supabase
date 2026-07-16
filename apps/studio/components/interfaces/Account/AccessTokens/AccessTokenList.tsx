@@ -1,4 +1,4 @@
-import { MoreVertical, Trash } from 'lucide-react'
+import { Key, MoreVertical, Trash } from 'lucide-react'
 import { parseAsStringLiteral, useQueryState } from 'nuqs'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -22,6 +22,7 @@ import { RowLoading } from './AccessTokenTable/RowLoading'
 import { TableContainer } from './AccessTokenTable/TableContainer'
 import { ExpiresCell, LastUsedCell, TokenNameCell } from './AccessTokenTable/TokenCells'
 import { useMergedAccessTokens, type MergedAccessToken } from './hooks/useMergedAccessTokens'
+import { ViewTokenSheet } from './Scoped/ViewTokenSheet'
 import { AlertError } from '@/components/ui/AlertError'
 import { useAccessTokenDeleteMutation } from '@/data/access-tokens/access-tokens-delete-mutation'
 import { useScopedAccessTokenDeleteMutation } from '@/data/scoped-access-tokens/scoped-access-tokens-delete-mutation'
@@ -37,8 +38,8 @@ export const AccessTokenList = ({
   scopedEnabled = true,
 }: AccessTokenListProps) => {
   const track = useTrack()
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
-  const [token, setToken] = useState<MergedAccessToken | undefined>(undefined)
+  const [tokenToShow, setTokenToShow] = useState<MergedAccessToken | undefined>(undefined)
+  const [tokenToDelete, setTokenToDelete] = useState<MergedAccessToken | undefined>(undefined)
   const [sort, setSort] = useQueryState(
     'sort',
     parseAsStringLiteral<AccessTokenSort>(ACCESS_TOKEN_SORT_VALUES).withDefault('created_at:desc')
@@ -50,7 +51,7 @@ export const AccessTokenList = ({
     onSuccess: () => {
       track('access_token_removed', { tokenType: 'classic' })
       toast.success('Successfully deleted access token')
-      setIsDeleteOpen(false)
+      setTokenToDelete(undefined)
     },
     onError: (error) => {
       toast.error(`Failed to delete access token: ${error.message}`)
@@ -61,7 +62,7 @@ export const AccessTokenList = ({
     onSuccess: () => {
       track('access_token_removed', { tokenType: 'classic' })
       toast.success('Successfully deleted access token')
-      setIsDeleteOpen(false)
+      setTokenToDelete(undefined)
     },
     onError: (error) => {
       toast.error(`Failed to delete access token: ${error.message}`)
@@ -80,9 +81,9 @@ export const AccessTokenList = ({
   const empty = filteredTokens?.length === 0 && !isLoading
 
   const handleConfirmDelete = () => {
-    if (!token) return
-    if (token.kind === 'classic') deleteClassicToken({ id: token.id as number })
-    else deleteScopedToken({ id: token.id as string })
+    if (!tokenToDelete) return
+    if (tokenToDelete.kind === 'classic') deleteClassicToken({ id: tokenToDelete.id as number })
+    else deleteScopedToken({ id: tokenToDelete.id as string })
   }
 
   if (isError) {
@@ -149,13 +150,13 @@ export const AccessTokenList = ({
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent side="bottom" align="end" className="w-40">
-                    <DropdownMenuItem
-                      className="gap-x-2"
-                      onClick={() => {
-                        setToken(x)
-                        setIsDeleteOpen(true)
-                      }}
-                    >
+                    {x.kind === 'scoped' && (
+                      <DropdownMenuItem className="gap-x-2" onClick={() => setTokenToShow(x)}>
+                        <Key size={12} />
+                        <p>View permissions</p>
+                      </DropdownMenuItem>
+                    )}
+                    <DropdownMenuItem className="gap-x-2" onClick={() => setTokenToDelete(x)}>
                       <Trash size={12} />
                       <p>Delete token</p>
                     </DropdownMenuItem>
@@ -168,18 +169,25 @@ export const AccessTokenList = ({
       </TableContainer>
 
       <ConfirmationModal
-        visible={isDeleteOpen}
+        visible={tokenToDelete != null}
         variant="destructive"
         title="Confirm to delete"
         confirmLabel="Delete"
         confirmLabelLoading="Deleting"
-        onCancel={() => setIsDeleteOpen(false)}
+        onCancel={() => setTokenToDelete(undefined)}
         onConfirm={handleConfirmDelete}
       >
         <p className="py-4 text-sm text-foreground-light">
-          This action cannot be undone. Are you sure you want to delete "{token?.name}" token?
+          This action cannot be undone. Are you sure you want to delete "{tokenToDelete?.name}"
+          token?
         </p>
       </ConfirmationModal>
+
+      <ViewTokenSheet
+        visible={tokenToShow != null}
+        onClose={() => setTokenToShow(undefined)}
+        tokenId={tokenToShow ? String(tokenToShow.id) : undefined}
+      />
     </>
   )
 }
