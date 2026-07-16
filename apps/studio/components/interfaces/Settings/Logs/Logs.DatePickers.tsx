@@ -403,7 +403,7 @@ export const LogsDatePicker = ({
           </RadioGroup>
         </div>
 
-        <div>
+        <div className="w-fit max-w-full">
           <div className="flex p-2 gap-2 items-center">
             <div className="flex grow *:grow gap-2 font-mono">
               <TimeSplitInput
@@ -447,7 +447,7 @@ export const LogsDatePicker = ({
               ></ButtonTooltip>
             </div>
           </div>
-          <div className="p-2 border-t">
+          <div className="border-t">
             <Calendar
               mode="range"
               month={currentMonth}
@@ -459,9 +459,9 @@ export const LogsDatePicker = ({
             />
           </div>
           {isLargeRange && !hideWarnings && (
-            <div className="text-xs px-3 py-1.5 border-y bg-warning-300 border-warning-500 text-warning">
-              Large ranges may result in memory errors for <br /> big projects.
-            </div>
+            <p className="w-0 min-w-full px-3 pt-1 pb-4 text-xs text-warning">
+              Large ranges may result in memory errors for big projects.
+            </p>
           )}
           <div className="flex items-center justify-end gap-2 p-2 border-t">
             {startDate && endDate ? (
@@ -470,7 +470,7 @@ export const LogsDatePicker = ({
                 size="tiny"
                 onClick={handleCopy}
                 className={cn({
-                  'text-brand-600': copied || pasted,
+                  'text-brand-link': copied || pasted,
                 })}
               >
                 {copied ? 'Copied!' : pasted ? 'Pasted!' : 'Copy range'}

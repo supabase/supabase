@@ -69,32 +69,35 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         weekday: cn('text-foreground-muted rounded-md w-9 font-normal text-[0.8rem]', weekday),
         week: cn('flex w-full mt-2', week),
         day: cn(
-          'text-center text-sm p-0 relative [&:has([aria-selected])]:bg-accent first:[&:has([aria-selected])]:rounded-l-md',
-          'last:[&:has([aria-selected])]:rounded-r-md focus-within:relative focus-within:z-20',
+          'text-center text-sm p-0 relative',
+          'first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md',
+          'focus-within:relative focus-within:z-20',
           'w-9 box-border',
           day
         ),
         day_button: cn(
           buttonVariants({ variant: 'ghost' }),
-          'h-9 w-9 p-0 font-normal aria-selected:opacity-100',
+          'h-9 w-9 p-0 font-normal rounded-md aria-selected:opacity-100',
           // Keep selected days from picking up ghost hover bg/text
           'aria-selected:hover:bg-transparent aria-selected:hover:text-inherit',
           day_button
         ),
         selected: cn(
-          'bg-brand-400 dark:bg-brand-500 text-foreground',
-          !fullDateRangeSelected && 'rounded-md',
+          !fullDateRangeSelected && 'bg-brand-400 dark:bg-brand-500 text-foreground rounded-md',
           selected
         ),
-        today: cn('bg-accent text-accent-foreground', today),
-        outside: cn('text-foreground-muted opacity-50', outside),
+        today: cn('bg-accent text-accent-foreground has-[[aria-selected]]:bg-transparent', today),
+        outside: cn(
+          'text-foreground-muted opacity-50 has-[[aria-selected]]:opacity-100 has-[[aria-selected]]:text-foreground',
+          outside
+        ),
         disabled: cn('text-foreground-muted opacity-50', disabled),
         range_start: cn(
           fullDateRangeSelected && 'bg-brand-400 dark:bg-brand-500 text-foreground rounded-l-md',
           range_start
         ),
         range_middle: cn(
-          'aria-selected:bg-brand-200 dark:aria-selected:bg-brand-400 aria-selected:text-foreground rounded-none',
+          'bg-brand-200 dark:bg-brand-400 text-foreground rounded-none',
           range_middle
         ),
         range_end: cn(
