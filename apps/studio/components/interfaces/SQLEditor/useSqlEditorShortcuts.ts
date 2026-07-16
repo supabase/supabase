@@ -1,8 +1,3 @@
-import {
-  acceptUntrustedSql,
-  type SafeSqlFragment,
-  type UntrustedSqlFragment,
-} from '@supabase/pg-meta'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect } from 'react'
@@ -15,10 +10,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 type UseSqlEditorShortcutsArgs = {
   isDiffOpen: boolean
   isPromptOpen: boolean
-  disablePrettyExplain: boolean
   prettifyQuery: () => void
-  readEditorSql: () => UntrustedSqlFragment | undefined
-  executeExplainQuery: (sql: SafeSqlFragment) => unknown
   acceptAiHandler: () => void
   discardAiHandler: () => void
   resetPrompt: () => void
@@ -26,16 +18,13 @@ type UseSqlEditorShortcutsArgs = {
 
 /**
  * Registers the SQL editor's keyboard shortcuts (focus editor, new snippet,
- * format, explain) plus the window keydown that accepts/discards an open AI diff
+ * format) plus the window keydown that accepts/discards an open AI diff
  * or dismisses the prompt.
  */
 export function useSqlEditorShortcuts({
   isDiffOpen,
   isPromptOpen,
-  disablePrettyExplain,
   prettifyQuery,
-  readEditorSql,
-  executeExplainQuery,
   acceptAiHandler,
   discardAiHandler,
   resetPrompt,
@@ -53,15 +42,6 @@ export function useSqlEditorShortcuts({
     router.push(`/project/${ref}/sql/new?skip=true`)
   }, [ref, router])
 
-  // The Explain keyboard shortcut is an explicit user action, so the
-  // untrusted→safe promotion (acceptUntrustedSql) happens here in the shortcut
-  // handler itself — right next to where it is registered — before the SQL
-  // reaches the explain pipeline.
-  const runExplainShortcut = useCallback(() => {
-    const sql = readEditorSql()
-    if (sql !== undefined) void executeExplainQuery(acceptUntrustedSql(sql))
-  }, [executeExplainQuery, readEditorSql])
-
   useShortcut(SHORTCUT_IDS.SQL_EDITOR_FOCUS_EDITOR, refocusEditor, {
     registerInCommandMenu: true,
   })
@@ -71,11 +51,6 @@ export function useSqlEditorShortcuts({
   })
 
   useShortcut(SHORTCUT_IDS.SQL_EDITOR_FORMAT, prettifyQuery, {
-    registerInCommandMenu: true,
-  })
-
-  useShortcut(SHORTCUT_IDS.SQL_EDITOR_EXPLAIN, runExplainShortcut, {
-    enabled: !disablePrettyExplain,
     registerInCommandMenu: true,
   })
 

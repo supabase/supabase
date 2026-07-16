@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 
-import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
+import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from './UnifiedLogs.constants'
 import {
   groupLogsFiltersByColumn,
   parseLogsFilterUrlParams,
@@ -54,18 +54,12 @@ const HTTP_STATUS_EXPR: SafeLogSqlFragment = safeSql`if(source = 'auth_logs', lo
  * logs from postgREST / storage-api and are intentionally not part of unified
  * logs; the UI surfaces gateway HTTP traffic for those buckets.
  */
-const LOG_TYPE_CONDITION: Record<string, SafeLogSqlFragment> = {
-  edge: safeSql`source = 'edge_logs'`,
-  postgrest: safeSql`source = 'postgrest_logs'`,
-  storage: safeSql`source = 'storage_logs'`,
-  postgres: safeSql`source = 'postgres_logs'`,
-  'edge function': safeSql`source = 'function_edge_logs'`,
-  auth: safeSql`source = 'auth_logs'`,
-  realtime: safeSql`source = 'realtime_logs'`,
-  supavisor: safeSql`source = 'supavisor_logs'`,
-  pgbouncer: safeSql`source = 'pgbouncer_logs'`,
-  multigres: safeSql`source = 'multigres_logs'`,
-}
+const LOG_TYPE_CONDITION: Record<string, SafeLogSqlFragment> = Object.fromEntries(
+  Object.entries(LOG_TYPE_TO_SOURCE).map(([type, source]) => [
+    type,
+    safeSql`source = ${lit(source)}`,
+  ])
+)
 
 // Derived `log_type` column for SELECT / GROUP BY / countIf use.
 // WHEN source = 'edge_logs' AND ${ATTR.path} LIKE '%/rest/%' THEN 'postgrest'

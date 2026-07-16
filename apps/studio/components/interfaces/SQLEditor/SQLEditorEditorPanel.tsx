@@ -1,5 +1,4 @@
 import { acceptUntrustedSql } from '@supabase/pg-meta'
-import { useFlag } from 'common'
 import { Loader2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useCallback } from 'react'
@@ -125,22 +124,16 @@ const SQLEditorMainView = () => {
   const { diff, prompt } = useSqlEditorAssistant()
   const { isDiffOpen } = diff
   const { promptState, openPrompt } = prompt
-  const { executeQuery, executeExplainQuery, readEditorSql, prettifyQuery } = useSqlEditorRun()
+  const { executeQuery, readEditorSql, prettifyQuery } = useSqlEditorRun()
   const { onMount, setHasSelection } = useSqlEditorUi()
 
   const os = detectOS()
-  const showExplainAction = !useFlag('DisablePrettyExplainOnSqlEditor')
 
-  // Run/explain gestures from the editor — promote here, at the user action.
+  // Run gesture from the editor — promote here, at the user action.
   const runQuery = useCallback(() => {
     const sql = readEditorSql()
     if (sql !== undefined) void executeQuery(acceptUntrustedSql(sql))
   }, [executeQuery, readEditorSql])
-
-  const runExplain = useCallback(() => {
-    const sql = readEditorSql()
-    if (sql !== undefined) void executeExplainQuery(acceptUntrustedSql(sql))
-  }, [executeExplainQuery, readEditorSql])
 
   return (
     <div key={id} className="w-full h-full relative">
@@ -155,8 +148,6 @@ const SQLEditorMainView = () => {
         editorRef={editorRef}
         monacoRef={monacoRef}
         executeQuery={runQuery}
-        executeExplainQuery={runExplain}
-        showExplainAction={showExplainAction}
         prettifyQuery={prettifyQuery}
         onHasSelection={setHasSelection}
         onMount={onMount}

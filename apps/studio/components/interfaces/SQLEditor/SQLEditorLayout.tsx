@@ -1,5 +1,5 @@
 import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
-import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { Loader2 } from 'lucide-react'
 import { useCallback } from 'react'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from 'ui'
@@ -86,16 +86,8 @@ const SQLEditorToolbar = () => {
 const SQLEditorResultsPanel = () => {
   const { id, isLoading } = useSqlEditorSnippet()
   const { diff, ai } = useSqlEditorAssistant()
-  const { executeExplainQuery, readEditorSql, isExecuting, isExplainExecuting } = useSqlEditorRun()
+  const { isExecuting } = useSqlEditorRun()
   const { activeUtilityTab, setActiveUtilityTab } = useSqlEditorUi()
-
-  const showExplainTab = !useFlag('DisablePrettyExplainOnSqlEditor')
-
-  // Explain gesture from the results panel — promote here, at the user action.
-  const runExplain = useCallback(() => {
-    const sql = readEditorSql()
-    if (sql !== undefined) void executeExplainQuery(acceptUntrustedSql(sql))
-  }, [executeExplainQuery, readEditorSql])
 
   return isLoading ? (
     <div className="flex h-full w-full items-center justify-center">
@@ -105,10 +97,7 @@ const SQLEditorResultsPanel = () => {
     <UtilityPanel
       id={id}
       isExecuting={isExecuting}
-      isExplainExecuting={isExplainExecuting}
       isDisabled={diff.isDiffOpen}
-      executeExplainQuery={runExplain}
-      showExplainTab={showExplainTab}
       onDebug={ai.onDebug}
       buildDebugPrompt={ai.buildDebugPrompt}
       activeTab={activeUtilityTab}

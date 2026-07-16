@@ -1,11 +1,11 @@
 import { type SafeSqlFragment } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
-import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 
 import { untitledSnippetTitle } from './SQLEditor.constants'
-import type { PotentialIssues, UtilityTab } from './SQLEditor.types'
+import type { PotentialIssues } from './SQLEditor.types'
 import {
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
@@ -17,7 +17,6 @@ import {
   suffixWithLimit,
 } from './SQLEditor.utils'
 import { useSQLEditorContext } from './SQLEditorContext'
-import { isExplainQuery } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
 import { isValidConnString } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
@@ -39,8 +38,6 @@ type UseSqlEditorExecutionArgs = {
   id: string
   isDiffOpen: boolean
   hasSelection: boolean
-  activeUtilityTab: UtilityTab
-  setActiveUtilityTab: (tab: UtilityTab) => void
   setAiTitle: (id: string, sql: string) => void
 }
 
@@ -48,8 +45,6 @@ export function useSqlEditorExecution({
   id,
   isDiffOpen,
   hasSelection,
-  activeUtilityTab,
-  setActiveUtilityTab,
   setAiTitle,
 }: UseSqlEditorExecutionArgs) {
   const { ref } = useParams()
@@ -69,7 +64,6 @@ export function useSqlEditorExecution({
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
   const { aiOptInLevel } = useOrgAiOptInLevel()
-  const disablePrettyExplain = useFlag('DisablePrettyExplainOnSqlEditor')
 
   const { data: databases } = useReadReplicasQuery(
     { projectRef: ref },
@@ -86,14 +80,6 @@ export function useSqlEditorExecution({
     onSuccess(data, vars) {
       if (id) {
         sessionSnap.addResult(id, data.result, vars.autoLimit)
-
-        if (!disablePrettyExplain && isExplainQuery(data.result)) {
-          sessionSnap.addExplainResult(id, data.result)
-          setActiveUtilityTab('explain')
-        } else if (activeUtilityTab === 'explain') {
-          // If on Explain tab but ran a non-EXPLAIN query, switch to Results tab
-          setActiveUtilityTab('results')
-        }
       }
 
       // revalidate lint query
