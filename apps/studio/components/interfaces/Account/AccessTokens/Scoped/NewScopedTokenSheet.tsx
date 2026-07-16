@@ -66,7 +66,6 @@ export const NewScopedTokenSheet = ({
     },
     mode: 'onChange',
   })
-
   const track = useTrack()
   const { mutate: createAccessToken, isPending } = useAccessTokenCreateMutation()
 
