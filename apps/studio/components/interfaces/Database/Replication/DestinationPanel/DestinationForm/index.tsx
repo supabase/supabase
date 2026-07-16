@@ -349,7 +349,7 @@ export const DestinationForm = ({
                     layout="horizontal"
                     className="[&>div>p]:text-foreground-lighter"
                     label="Region"
-                    description="Pipelines run in AWS eu-central-1 (Frankfurt). Choose destination resources as close as possible to this region."
+                    description="Pipelines run in the region shown above. Choose destination resources as close as possible to this region."
                   >
                     <Select disabled value={PIPELINE_REGION.code}>
                       <SelectTrigger>

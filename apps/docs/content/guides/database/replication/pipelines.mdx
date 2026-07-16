@@ -198,7 +198,14 @@ Follow these steps to configure your destination. Each destination has its own s
 
 7. Click **Create and start pipeline** to begin replication
 
-{/* SCREENSHOT SLOT: pipelines-cost-confirmation.png — Add a sanitized 2x capture of the cost confirmation dialog here. */}
+<Image
+  alt="Pipeline cost confirmation showing the initial sync estimate and ongoing replication prices"
+  caption="Review the estimated initial sync cost and the separate ongoing charges before creating the pipeline."
+  src="/docs/img/database/replication/pipelines-cost-confirmation.png"
+  width={5080}
+  height={2716}
+  zoomable
+/>
 
 The pipeline begins the initial sync from your database to your destination.
 
@@ -212,15 +219,23 @@ For comprehensive monitoring instructions including pipeline states, metrics, an
 
 You can manage your pipeline from the destinations list using the actions menu.
 
-{/* SCREENSHOT SLOT: pipelines-actions-menu.png — Add a sanitized 2x capture of a running BigQuery pipeline row with its actions menu open here. */}
+<Image
+  alt="Destinations list with the actions menu open for a running BigQuery pipeline"
+  caption="Use the actions menu to update, restart, stop, edit, or delete a pipeline destination."
+  src="/docs/img/database/replication/pipelines-actions-menu.png"
+  width={5080}
+  height={2716}
+  zoomable
+/>
 
 Available actions:
 
 - **Start pipeline**: Begin replication for a stopped pipeline
-- **Stop**: Pause replication (changes will queue up in the WAL)
+- **Update available**: Review and apply the latest managed pipeline version when an update is available
+- **Stop pipeline**: Pause replication (changes will queue up in the WAL)
 - **Restart pipeline**: Stop and start the pipeline (required after publication changes)
 - **Edit destination**: Modify destination settings like credentials or advanced options
-- **Delete**: Remove the destination and permanently stop replication
+- **Delete destination**: Remove the destination and permanently stop replication
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
