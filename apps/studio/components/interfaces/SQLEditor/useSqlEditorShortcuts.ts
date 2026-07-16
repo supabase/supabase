@@ -10,9 +10,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 type UseSqlEditorShortcutsArgs = {
   isDiffOpen: boolean
   isPromptOpen: boolean
-  disablePrettyExplain: boolean
   prettifyQuery: () => void
-  runExplain: () => void
   acceptAiHandler: () => void
   discardAiHandler: () => void
   resetPrompt: () => void
@@ -20,15 +18,13 @@ type UseSqlEditorShortcutsArgs = {
 
 /**
  * Registers the SQL editor's keyboard shortcuts (focus editor, new snippet,
- * format, explain) plus the window keydown that accepts/discards an open AI diff
+ * format) plus the window keydown that accepts/discards an open AI diff
  * or dismisses the prompt.
  */
 export function useSqlEditorShortcuts({
   isDiffOpen,
   isPromptOpen,
-  disablePrettyExplain,
   prettifyQuery,
-  runExplain,
   acceptAiHandler,
   discardAiHandler,
   resetPrompt,
@@ -55,11 +51,6 @@ export function useSqlEditorShortcuts({
   })
 
   useShortcut(SHORTCUT_IDS.SQL_EDITOR_FORMAT, prettifyQuery, {
-    registerInCommandMenu: true,
-  })
-
-  useShortcut(SHORTCUT_IDS.SQL_EDITOR_EXPLAIN, runExplain, {
-    enabled: !disablePrettyExplain,
     registerInCommandMenu: true,
   })
 

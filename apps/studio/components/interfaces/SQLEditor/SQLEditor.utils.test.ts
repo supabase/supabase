@@ -7,7 +7,6 @@ import {
   appendEnableRLSStatements,
   assembleCompletionDiff,
   buildDebugPromptText,
-  buildExplainSql,
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
   checkIfAppendLimitRequired,
@@ -1036,22 +1035,6 @@ describe('SQLEditor.utils:assembleCompletionDiff', () => {
 
   it('treats missing metadata fields as empty strings', () => {
     expect(assembleCompletionDiff({}, 'X')).toEqual({ original: '', modified: 'X' })
-  })
-})
-
-describe('SQLEditor.utils:buildExplainSql', () => {
-  it('wraps a non-EXPLAIN query in EXPLAIN ANALYZE and a rollback transaction', () => {
-    const result = buildExplainSql(safeSql`select 1`)
-    expect(result).toMatch(/begin;/i)
-    expect(result).toMatch(/explain analyze select 1/i)
-    expect(result).toMatch(/rollback;/i)
-  })
-
-  it('does not double-wrap a query that is already an EXPLAIN', () => {
-    const result = buildExplainSql(safeSql`explain select 1`)
-    expect(result).toMatch(/explain select 1/i)
-    expect(result).not.toMatch(/analyze/i)
-    expect(result).toMatch(/rollback;/i)
   })
 })
 

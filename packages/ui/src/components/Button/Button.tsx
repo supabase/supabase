@@ -51,7 +51,7 @@ const buttonVariants = cva(
           `,
         secondary: `
           bg-foreground
-          text-background hover:text-border-stronger
+          text-background hover:text-background/80
           focus-visible:text-border-control
           border-foreground-light hover:border-foreground-lighter
           focus-visible:outline-border-strong
@@ -157,7 +157,7 @@ const IconContainerVariants = cva('inline-flex items-center justify-center shrin
     variant: {
       primary: 'text-brand-600',
       default: 'text-foreground-lighter',
-      secondary: 'text-border-muted',
+      secondary: 'text-background',
       alternative: 'text-foreground-lighter',
       outline: 'text-foreground-lighter',
       dashed: 'text-foreground-lighter',
@@ -175,7 +175,7 @@ const loadingVariants = cva('', {
     variant: {
       primary: 'text-brand-600',
       default: 'text-foreground-lighter',
-      secondary: 'text-border-muted',
+      secondary: 'text-background',
       alternative: 'text-foreground-lighter',
       outline: 'text-foreground-lighter',
       dashed: 'text-foreground-lighter',

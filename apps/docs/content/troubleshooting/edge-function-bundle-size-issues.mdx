@@ -1,14 +1,19 @@
 ---
 title = "Edge Function bundle size issues"
 topics = [ "functions" ]
-keywords = [ "bundle", "size", "limit", "dependencies", "edge function", "10MB" ]
+keywords = [ "bundle", "size", "limit", "dependencies", "edge function", "5MB", "20MB" ]
 database_id = "aaf9e673-64ae-460a-88e0-b83ea4963382"
 
 [api]
 cli = [ "supabase-functions-deploy" ]
 ---
 
-Edge Functions have a 20MB source code limit. If your function exceeds this limit, deployment will fail.
+The maximum size of a deployed Edge Function depends on how it's bundled:
+
+- **Local bundling (Supabase CLI):** up to **20 MB**. The CLI bundles your function and its dependencies on your machine before uploading.
+- **Server-side bundling (Management API or Dashboard):** up to **5 MB**. When you deploy without local bundling, bundling runs on the server, which has a lower infrastructure limit.
+
+If your function exceeds the applicable limit, deployment fails with an error such as `Function source code exceeds the maximum deployment size`.
 
 ## Check your bundle size
 
@@ -47,6 +52,10 @@ Consider breaking large functions into smaller, more focused functions. Each fun
 ### Choose lightweight alternatives
 
 Research smaller packages that provide the same functionality. Many NPM packages designed for Node.js include unnecessary polyfills that increase bundle size.
+
+## Deploying larger functions
+
+If your function is under 20 MB but exceeds the 5 MB server-side limit, bundle it locally with the Supabase CLI to get the higher limit. Run `supabase functions deploy` with the `--use-docker` flag to force local bundling.
 
 ## Additional resources
 

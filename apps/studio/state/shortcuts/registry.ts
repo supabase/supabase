@@ -71,6 +71,7 @@ export const SHORTCUT_IDS = {
   COMMAND_MENU_OPEN: 'command-menu.open',
   AI_ASSISTANT_TOGGLE: 'ai-assistant.toggle',
   AI_ASSISTANT_NEW_CHAT: 'ai-assistant.new-chat',
+  AI_ASSISTANT_MAXIMIZE: 'ai-assistant.maximize',
   AI_ASSISTANT_COPY_CHAT_ID: 'ai-assistant.copy-chat-id',
   AI_ASSISTANT_TOGGLE_HISTORY: 'ai-assistant.toggle-history',
   AI_ASSISTANT_OPEN_PERMISSIONS: 'ai-assistant.open-permissions',
@@ -261,6 +262,12 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
     id: SHORTCUT_IDS.AI_ASSISTANT_NEW_CHAT,
     label: 'Start new chat',
     sequence: ['A', 'N'],
+    showInSettings: false,
+  },
+  [SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE]: {
+    id: SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE,
+    label: 'Maximize assistant',
+    sequence: ['A', '='],
     showInSettings: false,
   },
   [SHORTCUT_IDS.AI_ASSISTANT_COPY_CHAT_ID]: {

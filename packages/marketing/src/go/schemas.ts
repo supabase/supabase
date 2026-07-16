@@ -175,6 +175,17 @@ export const checkboxFieldSchema = formFieldBase.extend({
   groupRequired: z.boolean().optional().default(false),
 })
 
+/**
+ * Multi-select rendered as a list of checkboxes. Values are stored as a
+ * semicolon-separated string of the selected option `value`s — the format
+ * HubSpot expects for multi-select properties. Notion's multi_select type
+ * splits on the same delimiter when received.
+ */
+export const checkboxGroupFieldSchema = formFieldBase.extend({
+  type: z.literal('checkbox-group'),
+  options: z.array(z.object({ label: z.string(), value: z.string() })).min(1),
+})
+
 export const formFieldSchema = z.discriminatedUnion('type', [
   textFieldSchema,
   urlFieldSchema,

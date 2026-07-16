@@ -40,18 +40,10 @@ export const EdgeFunctionRenderer = ({
 
   const functionUrl = useMemo(() => {
     const endpoint = settings?.app_config?.endpoint
+    const protocol = settings?.app_config?.protocol ?? 'https'
     if (!endpoint || !ref || !functionName) return undefined
-
-    try {
-      const url = new URL(`https://${endpoint}`)
-      const restUrlTld = url.hostname.split('.').pop()
-      return restUrlTld
-        ? `https://${ref}.supabase.${restUrlTld}/functions/v1/${functionName}`
-        : undefined
-    } catch (error) {
-      return undefined
-    }
-  }, [settings?.app_config?.endpoint, ref, functionName])
+    return `${protocol}://${endpoint}/functions/v1/${functionName}`
+  }, [settings?.app_config?.endpoint, settings?.app_config?.protocol, ref, functionName])
 
   const deploymentDetailsUrl = useMemo(() => {
     if (!ref || !functionName) return undefined

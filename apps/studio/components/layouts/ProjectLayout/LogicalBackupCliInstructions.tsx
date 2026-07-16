@@ -3,6 +3,7 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { cn } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -67,18 +68,58 @@ export const LogicalBackupCliInstructions = ({
   return (
     <div className={cn('space-y-3', className)}>
       <div className="space-y-1">
-        <h4 className="text-sm font-medium">Back up your database with the Supabase CLI</h4>
         <p className="text-sm text-foreground-light">
-          Use your direct connection string — replace {DB_PASSWORD_PLACEHOLDER} with your database
-          password.{' '}
-          <InlineLink href={`${DOCS_URL}/guides/platform/backups`}>Backup documentation</InlineLink>
-          .
+          Use your direct connection string to backup your database, replacing{' '}
+          <code className="text-code-inline !break-keep">{DB_PASSWORD_PLACEHOLDER}</code> with your
+          database password. Percent-encode any reserved character in your password before using it
+          in the URL
+          <span className="inline-flex align-text-bottom ml-2">
+            <InfoTooltip side="bottom" className="max-w-64">
+              <p>Examples:</p>
+              <ul className="list-disc pl-6">
+                <li>
+                  <span className="flex items-center gap-x-1">
+                    <code className="text-code-inline">%</code>
+                    <span>&nbsp;→&nbsp;</span>
+                    <code className="text-code-inline">%25</code>
+                  </span>
+                </li>
+                <li>
+                  <span className="flex items-center gap-x-1">
+                    <code className="text-code-inline">@</code>
+                    <span>&nbsp;→&nbsp;</span>
+                    <code className="text-code-inline">%40</code>
+                  </span>
+                </li>
+                <li>
+                  <span className="flex items-center gap-x-1">
+                    <code className="text-code-inline">:</code>
+                    <span>&nbsp;→&nbsp;</span>
+                    <code className="text-code-inline">%3A</code>
+                  </span>
+                </li>
+                <li>
+                  <span className="flex items-center gap-x-1">
+                    <code className="text-code-inline">/</code>
+                    <span>&nbsp;→&nbsp;</span>
+                    <code className="text-code-inline">%2F</code>
+                  </span>
+                </li>
+                <li>
+                  <span className="flex items-center gap-x-1">
+                    <code className="text-code-inline">#</code>
+                    <span>&nbsp;→&nbsp;</span>
+                    <code className="text-code-inline">%23</code>
+                  </span>
+                </li>
+              </ul>
+            </InfoTooltip>
+          </span>
         </p>
         <p className="text-sm text-foreground-light">
-          Any reserved character in your password must be percent-encoded in the URL (e.g.{' '}
-          <code>@</code>&nbsp;→&nbsp;<code>%40</code>, <code>:</code>&nbsp;→&nbsp;<code>%3A</code>,{' '}
-          <code>/</code>&nbsp;→&nbsp;<code>%2F</code>, <code>#</code>&nbsp;→&nbsp;<code>%23</code>).
-          Encode <code>%</code> as <code>%25</code> first.
+          See the{' '}
+          <InlineLink href={`${DOCS_URL}/guides/platform/backups`}>Backup documentation</InlineLink>{' '}
+          for details.
         </p>
       </div>
 

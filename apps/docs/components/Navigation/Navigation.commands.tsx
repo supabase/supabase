@@ -146,8 +146,8 @@ const navCommands = [
   },
   {
     id: 'nav-integrations',
-    name: 'Go to Integrations',
-    route: 'https://supabase.com/partners/integrations',
+    name: 'Go to Partner Catalog',
+    route: 'https://supabase.com/partners/catalog',
     icon: () => <ArrowRight />,
     enabled: isFeatureEnabled('integrations:partners'),
   },
