@@ -4,12 +4,13 @@ import { useCallback, useEffect, useEffectEvent, useMemo, useState } from 'react
 import { toast } from 'sonner'
 
 import type { useSqlEditorDiff, useSqlEditorPrompt } from './hooks'
-import { sqlAiDisclaimerComment } from './SQLEditor.constants'
 import { DiffType, type IStandaloneDiffEditor } from './SQLEditor.types'
 import {
   assembleCompletionDiff,
+  buildDebugChatArgs,
   buildDebugPromptText,
   createSqlSnippetSkeletonV2,
+  extractDebugContext,
 } from './SQLEditor.utils'
 import { useSQLEditorContext } from './SQLEditorContext'
 import { useSnippetTitleGenerator } from './useSnippetTitleGenerator'
@@ -100,10 +101,7 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
   const buildDebugPrompt = useCallback(() => {
     const snippet = snapV2.snippets[id]
     const result = sessionSnap.results[id]?.[0]
-    const sql = (snippet?.snippet.content?.unchecked_sql ?? '')
-      .replace(sqlAiDisclaimerComment, '')
-      .trim()
-    const errorMessage = result?.error?.message ?? 'Unknown error'
+    const { sql, errorMessage } = extractDebugContext(snippet, result)
 
     return buildDebugPromptText(sql, errorMessage)
   }, [id, sessionSnap.results, snapV2.snippets])
@@ -113,13 +111,7 @@ export function useSqlEditorAi({ id, editorMountCount, diff, prompt }: UseSqlEdi
       const snippet = snapV2.snippets[id]
       const result = sessionSnap.results[id]?.[0]
       openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-      aiSnap.newChat({
-        name: 'Debug SQL snippet',
-        sqlSnippets: [
-          (snippet.snippet.content?.unchecked_sql ?? '').replace(sqlAiDisclaimerComment, '').trim(),
-        ],
-        initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${result.error.message}`,
-      })
+      aiSnap.newChat(buildDebugChatArgs(snippet, result))
     } catch (error: unknown) {
       // [Joshen] There's a tendency for the SQL debug to chuck a lengthy error message
       // that's not relevant for the user - so we prettify it here by avoiding to return the

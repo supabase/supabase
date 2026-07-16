@@ -474,3 +474,38 @@ export function buildDebugPromptText(sql: string, errorMessage: string): string 
   const prompt = `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`
   return `${prompt}\n\nSQL Query:\n\`\`\`sql\n${sql}\n\`\`\``
 }
+
+type DebugSnippet = { snippet: { content?: { unchecked_sql?: UntrustedSqlFragment } } } | undefined
+type DebugResult = { error?: { message?: string } } | undefined
+
+/**
+ * Extracts the SQL (disclaimer stripped) and error message used to debug a
+ * failing snippet, shared by `buildDebugPrompt` and `onDebug`. Falls back to
+ * an empty query / `'Unknown error'` rather than throwing when the snippet or
+ * its last result aren't available yet.
+ */
+export function extractDebugContext(
+  snippet: DebugSnippet,
+  result: DebugResult
+): { sql: string; errorMessage: string } {
+  const sql = (snippet?.snippet.content?.unchecked_sql ?? '')
+    .replace(sqlAiDisclaimerComment, '')
+    .trim()
+  const errorMessage = result?.error?.message ?? 'Unknown error'
+  return { sql, errorMessage }
+}
+
+/**
+ * Builds the `aiSnap.newChat(...)` payload for the debug-this-snippet flow.
+ */
+export function buildDebugChatArgs(
+  snippet: DebugSnippet,
+  result: DebugResult
+): { name: string; sqlSnippets: string[]; initialInput: string } {
+  const { sql, errorMessage } = extractDebugContext(snippet, result)
+  return {
+    name: 'Debug SQL snippet',
+    sqlSnippets: [sql],
+    initialInput: `Help me to debug the attached sql snippet which gives the following error: \n\n${errorMessage}`,
+  }
+}

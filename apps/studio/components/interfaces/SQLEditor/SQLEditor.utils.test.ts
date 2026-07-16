@@ -2,19 +2,21 @@ import { safeSql, untrustedSql } from '@supabase/pg-meta'
 import { stripIndent } from 'common-tags'
 import { describe, expect, it, test } from 'vitest'
 
-import { untitledSnippetTitle } from './SQLEditor.constants'
+import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
 import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import {
   analyzeQueryIssues,
   appendEnableRLSStatements,
   applyAutoLimit,
   assembleCompletionDiff,
+  buildDebugChatArgs,
   buildDebugPromptText,
   buildExecuteParams,
   checkAlterDatabaseConnection,
   checkDestructiveQuery,
   computeErrorHighlightLine,
   deriveSnippetIdentity,
+  extractDebugContext,
   filterTablesCoveredByEnsureRLSTrigger,
   getCreateTablesMissingRLS,
   getEditorSql,
@@ -339,6 +341,59 @@ describe('SQLEditor.utils.ts:deriveSnippetIdentity', () => {
       snippets: { 'existing-id': { snippet: { content: { some: 'content' } } } },
     })
     expect(result).toEqual({ id: 'existing-id', isLoading: false })
+  })
+})
+
+const buildDebugSnippet = (uncheckedSql: string) => ({
+  snippet: { content: { unchecked_sql: untrustedSql(uncheckedSql) } },
+})
+
+describe('SQLEditor.utils.ts:extractDebugContext', () => {
+  test('strips the AI disclaimer comment and trims the sql', () => {
+    const snippet = buildDebugSnippet(`${sqlAiDisclaimerComment}\n\nselect 1;`)
+    const result = { error: { message: 'relation does not exist' } }
+    expect(extractDebugContext(snippet, result)).toEqual({
+      sql: 'select 1;',
+      errorMessage: 'relation does not exist',
+    })
+  })
+  test('falls back to an empty sql when the snippet is undefined', () => {
+    expect(extractDebugContext(undefined, { error: { message: 'boom' } })).toEqual({
+      sql: '',
+      errorMessage: 'boom',
+    })
+  })
+  test('falls back to an empty sql when the snippet has no content yet', () => {
+    expect(
+      extractDebugContext({ snippet: { content: undefined } }, { error: { message: 'boom' } })
+    ).toEqual({ sql: '', errorMessage: 'boom' })
+  })
+  test('falls back to "Unknown error" when the result is undefined', () => {
+    const snippet = buildDebugSnippet('select 1;')
+    expect(extractDebugContext(snippet, undefined)).toEqual({
+      sql: 'select 1;',
+      errorMessage: 'Unknown error',
+    })
+  })
+  test('falls back to "Unknown error" when the result has no error message', () => {
+    const snippet = buildDebugSnippet('select 1;')
+    expect(extractDebugContext(snippet, {})).toEqual({
+      sql: 'select 1;',
+      errorMessage: 'Unknown error',
+    })
+  })
+})
+
+describe('SQLEditor.utils.ts:buildDebugChatArgs', () => {
+  test('builds the newChat payload from the snippet sql and error message', () => {
+    const snippet = buildDebugSnippet('select 1;')
+    const result = { error: { message: 'relation does not exist' } }
+    expect(buildDebugChatArgs(snippet, result)).toEqual({
+      name: 'Debug SQL snippet',
+      sqlSnippets: ['select 1;'],
+      initialInput:
+        'Help me to debug the attached sql snippet which gives the following error: \n\nrelation does not exist',
+    })
   })
 })
 
