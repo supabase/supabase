@@ -177,7 +177,7 @@ export const TableRowComponent = ({ table, schema, namespace }: TableRowComponen
     }
   }
 
-  // [Joshen] For Supabase Pipelines context
+  // [Joshen] For ETL replication context
   const onConfirmRemoveTable = async () => {
     if (!bucketId) return console.error('Bucket ID is required')
     if (!wrapperInstance || !wrapperMeta) return toast.error('Unable to find wrapper')

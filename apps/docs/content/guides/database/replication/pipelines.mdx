@@ -303,7 +303,7 @@ Schema change support depends on the destination. BigQuery is currently the only
 Once configured, a replication pipeline:
 
 1. **Captures** changes from your Postgres database using Postgres publications and logical replication
-2. **Streams** the changes through the managed pipeline
+2. **Sends** the changes through the managed pipeline
 3. **Loads** the data to your destination
 
 Pipelines automatically optimizes how changes are delivered to the destination. It maps published source columns and values to destination-compatible names and types, but doesn't provide user-defined transformations.

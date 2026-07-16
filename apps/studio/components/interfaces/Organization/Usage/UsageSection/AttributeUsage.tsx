@@ -66,6 +66,7 @@ const AttributeUsage = ({
     currentBillingCycleSelected &&
     usageBasedBilling === false &&
     usageRatio >= USAGE_APPROACHING_THRESHOLD
+
   const notAllValuesZero = useMemo(() => {
     return (
       attribute.attributes

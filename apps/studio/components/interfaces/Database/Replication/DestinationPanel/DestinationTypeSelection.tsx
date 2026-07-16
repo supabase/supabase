@@ -17,6 +17,7 @@ import { useDestinationInformation } from '../useDestinationInformation'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLDucklakePrivateAlpha,
+  useIsETLIcebergPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
 } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
@@ -39,6 +40,7 @@ interface DestinationTypeGroup {
 
 export const DestinationTypeSelection = () => {
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
+  const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
@@ -95,14 +97,12 @@ export const DestinationTypeSelection = () => {
           description: 'Write Apache Iceberg tables to Supabase Storage for analytics workflows',
           icon: AnalyticsBucket,
           stage: 'Early Access',
-          // Analytics Bucket replication is no longer available for new destinations. Keep the
-          // option visible only so existing destinations can still be inspected and edited.
-          enabled: editMode && destinationType === 'Analytics Bucket',
+          enabled: isOptionVisible('Analytics Bucket', etlEnableIceberg),
         },
         {
           value: 'BigQuery',
           label: 'BigQuery',
-          description: "Stream changes to Google Cloud's data warehouse for analytics and BI",
+          description: "Replicate changes to Google Cloud's data warehouse for analytics and BI",
           icon: BigQuery,
           stage: 'Public Alpha',
           enabled: isOptionVisible('BigQuery', etlEnableBigQuery),
@@ -110,7 +110,7 @@ export const DestinationTypeSelection = () => {
         {
           value: 'DuckLake',
           label: 'DuckLake',
-          description: 'Stream changes to a DuckLake catalog backed by S3-compatible storage',
+          description: 'Replicate changes to a DuckLake catalog backed by S3-compatible storage',
           icon: Database,
           stage: 'Early Access',
           enabled: isOptionVisible('DuckLake', etlEnableDucklake),
@@ -119,7 +119,7 @@ export const DestinationTypeSelection = () => {
           value: 'Snowflake',
           label: 'Snowflake',
           description:
-            'Stream changes to Snowflake for warehouse analytics and downstream data workflows',
+            'Replicate changes to Snowflake for warehouse analytics and downstream data workflows',
           icon: Snowflake,
           stage: 'Early Access',
           enabled: isOptionVisible('Snowflake', etlEnableSnowflake),
