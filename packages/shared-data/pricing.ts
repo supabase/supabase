@@ -201,12 +201,12 @@ export const pricing: Pricing = {
         plans: {
           free: false,
           pro: [
-            '$39 per pipeline per month',
+            '$0.053 per pipeline per hour',
             '$3.00 per GB ongoing replication data',
             '$0.60 per GB initial sync data',
           ],
           team: [
-            '$39 per pipeline per month',
+            '$0.053 per pipeline per hour',
             '$3.00 per GB ongoing replication data',
             '$0.60 per GB initial sync data',
           ],

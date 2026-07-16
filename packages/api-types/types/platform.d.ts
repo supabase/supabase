@@ -4084,7 +4084,7 @@ export interface paths {
     }
     /**
      * Estimate replication cost for a publication
-     * @description Estimate the cost of replicating a publication's tables. Returns the flat per-pipeline fee, a per-table breakdown of the one-time initial-copy cost derived from the tables’ on-disk size, and the usage-based streaming rate. Requires bearer auth and an active, healthy project.
+     * @description Estimate the cost of replicating a publication's tables. Returns the hourly configured-pipeline rate, a per-table breakdown of the one-time initial sync cost derived from the tables’ on-disk size, and the usage-based ongoing replication rate. Requires bearer auth and an active, healthy project.
      */
     get: operations['ReplicationSourcesController_getCostEstimate']
     put?: never
@@ -10906,35 +10906,35 @@ export interface components {
        * @enum {string}
        */
       currency: 'usd'
-      /** @description Recurring per-pipeline cost */
+      /** @description Hourly configured-pipeline charge */
       pipeline: {
         /**
-         * @description Hourly rate charged per active pipeline
+         * @description Hourly rate charged for each configured pipeline, including while it is stopped
          * @example 0.053
          */
         hourly_cost: number
         /**
-         * @description Projected monthly cost for an active pipeline, based on an average 730-hour month. Pipelines are billed hourly, so this is an estimate, not a metered amount.
+         * @description Derived estimate for 730 configured pipeline-hours. Pipelines are billed at the hourly rate; this estimate is not a separate monthly price or metered amount.
          * @example 38.69
          */
         monthly_cost: number
       }
-      /** @description Usage-based streaming cost, expressed as a rate */
+      /** @description Usage-based ongoing replication data cost, expressed as a rate */
       streaming: {
         /**
-         * @description Usage-based streaming rate per GB. Actual cost depends on the change volume.
+         * @description Ongoing replication data rate per GB. Actual cost depends on the change volume.
          * @example 3
          */
         rate_per_gb: number
       }
-      /** @description One-time cost for the initial table copy */
+      /** @description One-time cost for initial sync data */
       table_copy: {
         /**
-         * @description One-time initial-copy rate per GB
+         * @description One-time initial sync data rate per GB
          * @example 0.6
          */
         rate_per_gb: number
-        /** @description Per-table initial-copy cost estimate */
+        /** @description Per-table initial sync cost estimate */
         tables: {
           /**
            * @description Estimated on-disk size of the table in bytes
@@ -10942,7 +10942,7 @@ export interface components {
            */
           estimated_bytes: number
           /**
-           * @description Estimated one-time initial-copy cost for the table, in the response currency
+           * @description Estimated one-time initial sync cost for the table, in the response currency
            * @example 0.01
            */
           estimated_cost: number
@@ -10968,7 +10968,7 @@ export interface components {
          */
         total_bytes: number
         /**
-         * @description Total estimated one-time initial-copy cost
+         * @description Total estimated one-time initial sync cost
          * @example 0.01
          */
         total_cost: number

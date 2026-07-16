@@ -67,8 +67,7 @@ export const PipelineCostDialog = ({
   const hiddenTableCount = tableCount - visibleTables.length
   const hasRowFilteredTables = tables.some((table) => table.is_row_filtered)
 
-  const firstMonthTotal =
-    (estimate?.table_copy.total_cost ?? 0) + (estimate?.pipeline.monthly_cost ?? 0)
+  const initialSyncTotal = estimate?.table_copy.total_cost ?? 0
 
   useEffect(() => {
     if (open && isError) onConfirmRef.current()
@@ -181,10 +180,7 @@ export const PipelineCostDialog = ({
                   <div className="flex items-center justify-between gap-x-4 text-sm">
                     <span className="text-foreground-light">Configured pipeline</span>
                     <span className="shrink-0 text-right font-mono text-foreground" translate="no">
-                      ${estimate.pipeline.hourly_cost}/hour{' '}
-                      <span className="text-foreground-lighter">
-                        (~{formatCurrency(estimate.pipeline.monthly_cost)}/month)
-                      </span>
+                      ${estimate.pipeline.hourly_cost}/hour
                     </span>
                   </div>
                   <div className="flex items-center justify-between gap-x-4 text-sm">
@@ -202,19 +198,16 @@ export const PipelineCostDialog = ({
                 <div className="flex flex-col gap-y-2">
                   <div className="flex items-center justify-between gap-x-6 rounded-md border bg-surface-100 px-4 py-3">
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-foreground">
-                        Estimated first month total
-                      </p>
+                      <p className="text-sm font-medium text-foreground">Estimated initial sync</p>
                       <p className="text-xs text-foreground-lighter">
-                        Initial sync + estimated first month of pipeline hours, excluding ongoing
-                        replication data
+                        Pipeline hours and ongoing replication data are billed separately
                       </p>
                     </div>
                     <span
                       className="shrink-0 text-right font-mono text-lg font-semibold text-foreground"
                       translate="no"
                     >
-                      {formatCurrency(firstMonthTotal)}
+                      {formatCurrency(initialSyncTotal)}
                       {hasRowFilteredTables ? '*' : null}
                     </span>
                   </div>
