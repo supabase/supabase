@@ -37,8 +37,8 @@ interface PipelineCostDialogProps {
 }
 
 /**
- * Shows an estimate of what the pipeline will cost (one-time initial copy, hourly pipeline
- * fee, and the usage-based streaming rate).
+ * Shows an estimate of what the pipeline will cost (one-time initial sync, hourly pipeline
+ * fee, and the ongoing replication rate).
  *
  * This should be a non-blocking enhancement - so if there's an error while fetching the
  * pricing estimate, we skip this gate rather than block the user from creating pipeline
@@ -115,7 +115,7 @@ export const PipelineCostDialog = ({
                 </p>
 
                 <div className="flex flex-col gap-y-2">
-                  <p className="text-sm font-medium text-foreground">Initial table copy</p>
+                  <p className="text-sm font-medium text-foreground">Initial sync</p>
 
                   {tableCount > 0 ? (
                     <Card>
@@ -179,7 +179,7 @@ export const PipelineCostDialog = ({
                 <div className="flex flex-col gap-y-2">
                   <p className="text-sm font-medium text-foreground">Ongoing</p>
                   <div className="flex items-center justify-between gap-x-4 text-sm">
-                    <span className="text-foreground-light">Active pipeline</span>
+                    <span className="text-foreground-light">Configured pipeline</span>
                     <span className="shrink-0 text-right font-mono text-foreground" translate="no">
                       ${estimate.pipeline.hourly_cost}/hour{' '}
                       <span className="text-foreground-lighter">
@@ -188,14 +188,14 @@ export const PipelineCostDialog = ({
                     </span>
                   </div>
                   <div className="flex items-center justify-between gap-x-4 text-sm">
-                    <span className="text-foreground-light">Streaming changes</span>
+                    <span className="text-foreground-light">Ongoing replication data</span>
                     <span className="shrink-0 text-right font-mono text-foreground" translate="no">
                       {formatCurrency(estimate.streaming.rate_per_gb)}/GB
                     </span>
                   </div>
                   <p className="text-xs text-foreground-lighter">
-                    Streaming is billed on the volume of changes replicated after the initial copy,
-                    so the total depends on how often your data changes.
+                    Ongoing replication is billed on the volume of changes processed after the
+                    initial sync, so the total depends on how often your data changes.
                   </p>
                 </div>
 
@@ -206,7 +206,8 @@ export const PipelineCostDialog = ({
                         Estimated first month total
                       </p>
                       <p className="text-xs text-foreground-lighter">
-                        Initial copy + first pipeline fee, excluding usage-based streaming
+                        Initial sync + estimated first month of pipeline hours, excluding ongoing
+                        replication data
                       </p>
                     </div>
                     <span

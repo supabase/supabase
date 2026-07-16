@@ -57,15 +57,15 @@ const EnablePipelinesModal = () => {
           <Admonition
             type="warning"
             className="rounded-none border-0"
-            title="Pipelines is currently in alpha"
+            title="Pipelines is currently in public alpha"
           >
             <p className="text-sm leading-normal!">
-              Alpha features can be unstable and may introduce breaking changes while we evaluate
-              the product direction, refine the feature set, and incorporate customer feedback.
+              Public alpha features may change as we refine the product and incorporate customer
+              feedback.
             </p>
             <p className="text-sm leading-normal!">
-              Pricing is not finalized. You can enable Pipelines now; we'll announce pricing later
-              and notify you before any charges apply.
+              Pipelines is billed for configured pipeline hours, initial sync data, and ongoing
+              replication data. Review the pricing before enabling it.
             </p>
           </Admonition>
         </DialogSection>
@@ -96,8 +96,7 @@ export const EnablePipelinesCallout = ({
       <div className="flex flex-col gap-y-1">
         <h4>Enable Pipelines</h4>
         <p className="text-sm text-foreground-light">
-          Pipelines creates managed replication pipelines that stream database changes to
-          destination systems.{' '}
+          Supabase Pipelines streams database changes to supported destination systems.{' '}
           {hasAccess ? 'Enable Pipelines for your project' : 'Upgrade to the Pro plan'} to stream
           database changes to {type ?? 'data warehouses and analytics platforms'}.
         </p>

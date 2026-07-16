@@ -104,7 +104,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
               <SheetDescription>
                 {editMode
                   ? 'Update the configuration for this destination.'
-                  : 'A destination can be a read replica or an external destination that receives replicated data in near real time.'}
+                  : 'Choose a read replica or a Supabase Pipelines destination for data replicated in near real time.'}
               </SheetDescription>
             </SheetHeader>
 
@@ -120,9 +120,9 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
                   <div className="flex flex-col gap-y-1">
                     <h4>Request Pipelines access</h4>
                     <p className="text-sm text-foreground-light">
-                      Pipelines is in <span className="text-foreground">alpha</span> and being
-                      rolled out gradually. Request access below to join the waitlist. Read replicas
-                      are available now.
+                      Pipelines is in <span className="text-foreground">public alpha</span> and
+                      being rolled out gradually. Request access below to join the waitlist. Read
+                      replicas are available now.
                     </p>
                   </div>
                   <div className="flex gap-x-2">
@@ -136,7 +136,7 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
                         rel="noreferrer"
                         href="https://forms.supabase.com/pg_replicate"
                       >
-                        Request alpha access
+                        Request Pipelines access
                       </Link>
                     </Button>
                     <DocsButton href={`${DOCS_URL}/guides/database/replication#pipelines`} />

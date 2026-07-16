@@ -202,13 +202,13 @@ export const pricing: Pricing = {
           free: false,
           pro: [
             '$39 per pipeline per month',
-            '$3.00 per GB replicated data',
-            '$0.60 per GB backfill data',
+            '$3.00 per GB ongoing replication data',
+            '$0.60 per GB initial sync data',
           ],
           team: [
             '$39 per pipeline per month',
-            '$3.00 per GB replicated data',
-            '$0.60 per GB backfill data',
+            '$3.00 per GB ongoing replication data',
+            '$0.60 per GB initial sync data',
           ],
           enterprise: 'Custom',
         },

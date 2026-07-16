@@ -65,12 +65,13 @@ export const AdvancedSettings = ({
                   description={
                     <>
                       <p>
-                        Maximum time pipeline waits to collect additional changes before flushing a
-                        batch.
+                        Maximum time after the first buffered initial-sync row or ongoing change
+                        before the pipeline flushes a partially filled batch. Size and memory limits
+                        can cause an earlier flush.
                       </p>
                       <p>
-                        Lower values reduce replication latency, higher values improve batching
-                        efficiency.
+                        Lower values can reduce batching delay; higher values can improve
+                        destination write efficiency.
                       </p>
                     </>
                   }
@@ -102,9 +103,10 @@ export const AdvancedSettings = ({
                   layout="horizontal"
                   description={
                     <>
-                      <p>Number of tables copied in parallel during the initial snapshot phase.</p>
+                      <p>Maximum number of tables synced in parallel during the initial sync.</p>
                       <p>
-                        Each worker uses one replication slot (up to N + 1 total while syncing).
+                        Each active table sync temporarily uses one additional replication slot, for
+                        up to N + 1 slots including the pipeline's main slot.
                       </p>
                     </>
                   }
@@ -137,11 +139,12 @@ export const AdvancedSettings = ({
                   description={
                     <>
                       <p>
-                        Number of parallel connections each table copy can use during initial sync.
+                        Maximum source database connections used to copy one table in parallel
+                        during the initial sync.
                       </p>
                       <p>
-                        More connections speed up large table copies, but use more database
-                        connections.
+                        With multiple table sync workers, source connection usage can scale with
+                        both settings.
                       </p>
                     </>
                   }
@@ -171,7 +174,7 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   label="Invalidated slot behavior"
                   layout="horizontal"
-                  description="Behavior of the pipeline's replication slot when invalidated."
+                  description="What happens when the pipeline's main replication slot can no longer continue from its retained WAL."
                 >
                   <FormControl>
                     <Select value={field.value ?? 'error'} onValueChange={field.onChange}>
@@ -186,7 +189,7 @@ export const AdvancedSettings = ({
                         <SelectItem value="recreate" className="[&>span]:top-2.5">
                           <p>Recreate</p>
                           <p className="text-foreground-lighter">
-                            Rebuilds the slot and restarts replication from scratch.
+                            Replaces destination tables and runs a new, billable initial sync.
                           </p>
                         </SelectItem>
                       </SelectContent>
@@ -214,7 +217,8 @@ export const AdvancedSettings = ({
                         <>
                           <p>Size of the BigQuery Storage Write API connection pool.</p>
                           <p>
-                            More connections allow more parallel writes, but consume more resources.
+                            More connections can increase destination write throughput, but consume
+                            more pipeline and BigQuery resources.
                           </p>
                         </>
                       }
@@ -252,12 +256,18 @@ export const AdvancedSettings = ({
                       description={
                         <>
                           <p>
-                            Maximum allowed age for BigQuery cached metadata before reading base
-                            tables.
+                            Maximum acceptable staleness of table data returned by queries while
+                            BigQuery applies streamed changes in the background.
                           </p>
                           <p>
-                            Lower values improve freshness, higher values can reduce query cost and
-                            latency.
+                            Leave unset for the freshest results. A larger number of minutes allows
+                            BigQuery to return older data, which can reduce query-time CDC merge
+                            cost and latency. For example, 15 allows data to be up to 15 minutes
+                            stale.
+                          </p>
+                          <p>
+                            Applied when a table is created or recreated. Changing this value does
+                            not alter existing destination tables.
                           </p>
                         </>
                       }
@@ -267,9 +277,12 @@ export const AdvancedSettings = ({
                           <FormInputGroupInput
                             {...field}
                             type="number"
+                            min={0}
+                            max={65535}
+                            step={1}
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
-                            placeholder="Default: None (No staleness limit)"
+                            placeholder="Default: None (Freshest results)"
                           />
                           <InputGroupAddon align="inline-end">
                             <InputGroupText>minutes</InputGroupText>

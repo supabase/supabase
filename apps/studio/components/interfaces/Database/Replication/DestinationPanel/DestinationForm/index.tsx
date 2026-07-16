@@ -241,7 +241,6 @@ export const DestinationForm = ({
   }
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    // Editing an existing pipeline doesn't incur a new initial copy, so it skips the cost gate.
     if (editMode) {
       await submitPipeline({
         data,
@@ -350,7 +349,7 @@ export const DestinationForm = ({
                     layout="horizontal"
                     className="[&>div>p]:text-foreground-lighter"
                     label="Region"
-                    description="Pipelines run in a fixed region and cannot be changed."
+                    description="Pipelines run in AWS eu-central-1 (Frankfurt). Choose destination resources as close as possible to this region."
                   >
                     <Select disabled value={PIPELINE_REGION.code}>
                       <SelectTrigger>

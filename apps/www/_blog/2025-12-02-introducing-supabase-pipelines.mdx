@@ -13,7 +13,7 @@ toc_depth: 2
 
 Today we're introducing **Supabase Pipelines**: managed change-data-capture pipelines that replicate your Postgres tables to analytical destinations in near real time.
 
-Pipelines reads changes from your Postgres database and writes them to external destinations. It uses logical replication to capture inserts, updates, deletes, and truncates as they happen. **Setup takes minutes in the Supabase Dashboard.**
+Pipelines reads changes from your Postgres database and writes them to supported destination systems. It uses logical replication to capture inserts, updates, deletes, and truncates as they happen. **Setup takes minutes in the Supabase Dashboard.**
 
 The first supported destination is Google BigQuery.
 
@@ -128,11 +128,11 @@ We're working on schema change support and additional destinations, and evaluati
 
 ## Pricing
 
-Pipelines pricing is still being finalized during alpha. You can request access now; we'll announce pricing later and notify you before any charges apply.
+Pipelines is billed for configured pipeline hours, initial sync data, and ongoing replication data. See [Pipelines pricing](/docs/guides/platform/manage-your-usage/pipelines) for current rates and billing examples. Destination-provider charges, such as BigQuery charges from Google Cloud, are separate.
 
 ## Get started
 
-**Pipelines is currently in alpha.** Alpha features can be unstable and may introduce breaking changes while we evaluate the product direction, refine the feature set, and incorporate customer feedback. To request access, contact your account manager or fill out the form in the Dashboard.
+**Supabase Pipelines is currently in public alpha.** Features and behavior may change as we continue developing the product. If Pipelines isn't available for your organization yet, request access in the Dashboard or contact your account manager.
 
 If you want to dive into the code, **the underlying Supabase ETL engine is open source** and written in Rust. Check out the repository at [github.com/supabase/etl](https://github.com/supabase/etl).
 

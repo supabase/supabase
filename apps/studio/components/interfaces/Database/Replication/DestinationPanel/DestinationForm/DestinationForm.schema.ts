@@ -27,7 +27,12 @@ export const DestinationPanelFormSchema = z.object({
     .int()
     .min(1, 'Connection pool size must be greater than 0')
     .optional(),
-  maxStalenessMins: z.number().nonnegative().optional(),
+  maxStalenessMins: z
+    .number()
+    .int('Maximum staleness must be a whole number of minutes')
+    .min(0, 'Maximum staleness must be 0 or greater')
+    .max(65535, 'Maximum staleness must be 65,535 minutes or less')
+    .optional(),
   // Analytics Bucket fields, only warehouse name and namespace are visible + editable fields
   warehouseName: z.string().optional(),
   namespace: z.string().optional(),

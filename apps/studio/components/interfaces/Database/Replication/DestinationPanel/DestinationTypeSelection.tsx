@@ -29,7 +29,7 @@ interface DestinationTypeOption {
   label: string
   description: string
   icon: typeof Database
-  isAlpha: boolean
+  stage: 'Public Alpha' | 'Early Access' | null
   enabled: boolean
 }
 
@@ -83,7 +83,7 @@ export const DestinationTypeSelection = () => {
           description:
             'Deploy a read-only database in another region for lower latency and workload isolation',
           icon: Database,
-          isAlpha: false,
+          stage: null,
           enabled: isOptionVisible('Read Replica', infrastructureReadReplicas),
         },
       ],
@@ -96,7 +96,7 @@ export const DestinationTypeSelection = () => {
           label: 'Analytics Bucket',
           description: 'Write Apache Iceberg tables to Supabase Storage for analytics workflows',
           icon: AnalyticsBucket,
-          isAlpha: true,
+          stage: 'Early Access',
           enabled: isOptionVisible('Analytics Bucket', etlEnableIceberg),
         },
         {
@@ -104,7 +104,7 @@ export const DestinationTypeSelection = () => {
           label: 'BigQuery',
           description: "Stream changes to Google Cloud's data warehouse for analytics and BI",
           icon: BigQuery,
-          isAlpha: true,
+          stage: 'Public Alpha',
           enabled: isOptionVisible('BigQuery', etlEnableBigQuery),
         },
         {
@@ -112,7 +112,7 @@ export const DestinationTypeSelection = () => {
           label: 'DuckLake',
           description: 'Stream changes to a DuckLake catalog backed by S3-compatible storage',
           icon: Database,
-          isAlpha: true,
+          stage: 'Early Access',
           enabled: isOptionVisible('DuckLake', etlEnableDucklake),
         },
         {
@@ -121,7 +121,7 @@ export const DestinationTypeSelection = () => {
           description:
             'Stream changes to Snowflake for warehouse analytics and downstream data workflows',
           icon: Snowflake,
-          isAlpha: true,
+          stage: 'Early Access',
           enabled: isOptionVisible('Snowflake', etlEnableSnowflake),
         },
       ],
@@ -144,10 +144,11 @@ export const DestinationTypeSelection = () => {
       label="Type"
       labelOptional="Destination type cannot be changed after creation"
       description={
-        selectedOption?.isAlpha && (
+        selectedOption?.stage && (
           <span className="block text-sm text-foreground-light mb-1">
-            This destination type is in alpha and may be unstable or introduce breaking changes
-            while we iterate based on customer feedback.{' '}
+            {selectedOption.stage === 'Public Alpha'
+              ? 'This destination type is in public alpha and may change as we iterate based on customer feedback. '
+              : 'This destination type is available through early access and may change as we iterate based on customer feedback. '}
             <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
               Leave feedback
             </InlineLink>
@@ -166,7 +167,7 @@ export const DestinationTypeSelection = () => {
               <selectedOption.icon size={20} className="shrink-0 text-foreground-light" />
               <div className="flex items-center gap-x-2">
                 <span className="text-sm text-foreground">{selectedOption.label}</span>
-                {selectedOption.isAlpha && <Badge variant="warning">Alpha</Badge>}
+                {selectedOption.stage && <Badge variant="warning">{selectedOption.stage}</Badge>}
               </div>
             </div>
           ) : (
@@ -185,7 +186,7 @@ export const DestinationTypeSelection = () => {
                     <div className="flex flex-col gap-y-0.5">
                       <div className="flex items-center gap-x-2">
                         <span className="text-foreground">{option.label}</span>
-                        {option.isAlpha && <Badge variant="warning">Alpha</Badge>}
+                        {option.stage && <Badge variant="warning">{option.stage}</Badge>}
                       </div>
                       <span className="text-xs text-foreground-lighter">{option.description}</span>
                     </div>

@@ -2,6 +2,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Ca
 import { Admonition } from 'ui-patterns/admonition'
 
 import { Markdown } from '@/components/interfaces/Markdown'
+import { InlineLink } from '@/components/ui/InlineLink'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
 interface ValidationFailuresSectionProps {
@@ -37,6 +38,11 @@ export const ValidationFailuresSection = ({
         {hasCriticalFailures
           ? `Please fix all required issues below${hasWarnings ? ' and review the others' : ''} before continuing.`
           : 'The following issues were identified, although you may still create the pipeline and start replication to the destination.'}
+      </p>
+      <p className="text-sm text-foreground-light mb-2!">
+        Pipeline options are under <strong>Advanced settings</strong> above. Source database
+        settings are under{' '}
+        <InlineLink href="/dashboard/project/_/settings/database">Database settings</InlineLink>.
       </p>
       <Card>
         <Accordion type="multiple">

@@ -2,27 +2,24 @@
 id: 'pipelines-faq'
 title: 'Pipelines FAQ'
 description: 'Frequently asked questions about Supabase Pipelines.'
-subtitle: 'Common questions and answers about managed replication pipelines.'
+subtitle: 'Common questions and answers about Supabase Pipelines.'
 sidebar_label: 'FAQ'
 ---
 
-<Admonition type="caution" title="Private Alpha">
-
-Supabase Pipelines is currently in private alpha. Private alpha features can be unstable and may introduce breaking changes while we evaluate the product direction, refine the feature set, and incorporate customer feedback.
-
-</Admonition>
+<$Partial path="pipelines-public-alpha.mdx" />
 
 ## What destinations are supported?
 
 Pipelines currently supports **BigQuery** as the managed destination. See the [BigQuery destination guide](/docs/guides/database/replication/bigquery) for configuration details.
 
-We are working on new destinations. Supported destinations can be Supabase-managed or third-party systems as support expands. Availability may continue to vary based on the planned roll-out strategy.
+{/* supa-mdx-lint-disable-next-line Rule003Spelling */}
+You can [request early access to ClickHouse, Snowflake, and DuckLake](/go/supabase-pipelines-new-destinations). Supported destinations can be Supabase-managed or third-party systems as support expands.
 
 ## Does the destination's region affect performance?
 
 Yes. The further apart your source database, the pipeline, and your destination are, the more network latency is added to replication, which increases replication lag and reduces throughput.
 
-Pipelines run out of **eu-central-1 (Frankfurt)**. For the best performance, place both your source project and your destination as close to this region as possible.
+Managed Pipelines run in **AWS `eu-central-1` (Frankfurt)**. For the best performance, place both your source project and destination as close to Frankfurt as possible. When configuring a destination provider such as BigQuery, choose its closest available region.
 
 If you can only optimize one side, prioritize placing your **destination** close to the pipeline's region. Replicated data continuously streams out to the destination, so latency on that leg has a bigger impact on overall replication lag than latency between the pipeline and the source.
 
@@ -49,7 +46,7 @@ When you enable Pipelines, Supabase installs database objects that help track re
 - An event trigger that runs on every `ALTER TABLE` statement. Supabase uses this to support schema change handling.
 - A set of tables in the `etl` schema. These tables track replication state for your pipelines.
 
-The replication state tables are not updated very often, especially after the initial copy phase is complete.
+The replication state tables are not updated very often, especially after the initial sync is complete.
 
 ## What schema changes are supported?
 
@@ -57,13 +54,13 @@ Schema change support is currently in beta and limited to the BigQuery destinati
 
 Supported schema changes:
 
-- Adding a nullable column
+- Adding a scalar, top-level column (created as `NULLABLE` in BigQuery)
 - Removing a column
 - Renaming a column
 - Dropping a `NOT NULL` constraint
 - Setting or dropping supported column default metadata
 
-Pipelines does not currently support changing column data types, adding `NOT NULL` with `SET NOT NULL`, or filling existing destination rows for `ADD COLUMN ... DEFAULT`. Supported defaults are applied as destination metadata for future rows where BigQuery can represent them. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for details.
+Initial BigQuery table creation preserves whether each scalar, non-array Postgres column allows `NULL`. Arrays use BigQuery's `REPEATED` mode. For later changes, `DROP NOT NULL` relaxes a BigQuery `REQUIRED` column to `NULLABLE`, while `SET NOT NULL` leaves an existing BigQuery column nullable and logs a warning. Newly added scalar, top-level columns are always nullable in BigQuery. Supported defaults are applied separately as destination metadata and do not populate existing destination rows. Pipelines does not currently support changing column data types. See [BigQuery schema change support](/docs/guides/database/replication/bigquery#schema-change-support) for details.
 
 {/* supa-mdx-lint-disable-next-line Rule001HeadingCase */}
 
@@ -79,7 +76,7 @@ Disabling Pipelines stops Supabase from managing replication for the project. It
 
 Common reasons:
 
-- **Missing primary key**: Tables must have a primary key to be replicated (Postgres logical replication requirement)
+- **Missing primary key**: BigQuery requires each source table to have a primary key and requires the publication to include its columns. This is a BigQuery Pipelines requirement, not a general requirement for publishing Postgres inserts.
 - **Not in publication**: Ensure the table is included in your Postgres publication
 - **Generated columns**: Generated columns are skipped during replication
 
@@ -149,7 +146,7 @@ After modifying your Postgres publication, you must restart the replication pipe
 
 ## Why is a pipeline in failed state?
 
-Pipeline failures occur during the streaming phase when an error happens while replicating live data. This prevents data loss. To recover:
+Pipeline failures occur during ongoing replication when an error happens while replicating changes. The pipeline stops instead of silently skipping the failed change. To recover:
 
 1. Check the error message by hovering over the **Failed** status
 2. Click **View pipeline** for detailed information
@@ -182,13 +179,13 @@ Open [**Database > Replication**](/dashboard/project/_/database/replication), cl
 
 `Lost` means Postgres has already removed WAL files that the pipeline's replication slot needed. The pipeline cannot continue from that slot.
 
-You can recreate the pipeline, or open the pipeline's **Advanced settings**, set **Invalidated slot behavior** to **Recreate**, and restart the pipeline. On restart, the pipeline creates a new replication slot and starts replication from scratch for all tables. This is required for consistency because the old slot can no longer provide every change the pipeline missed.
+You can recreate the pipeline, or open the pipeline's **Advanced settings**, set **Invalidated slot behavior** to **Recreate**, and start the pipeline again. The pipeline resets its saved table-sync state, creates a new replication slot, and replaces each destination table through a new initial sync. This destructive restart is required for consistency because the old slot can no longer provide every change the pipeline missed, and the new initial sync is billed as initial sync data.
 
 See [Slot statuses](/docs/guides/database/replication/pipelines-monitoring#slot-statuses) for all slot states and what to do next.
 
 ## Why is a table in error state?
 
-Table errors occur during the copy phase. To recover, click **View pipeline**, find the affected table, and reset the table state. This will restart the table copy from the beginning.
+Table errors occur during the initial sync. To recover, click **View pipeline**, find the affected table, and reset the table state. This restarts that table's initial sync from the beginning.
 
 ## How to verify replication is working
 
