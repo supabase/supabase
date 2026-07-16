@@ -77,15 +77,30 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         day_button: cn(
           buttonVariants({ variant: 'ghost' }),
           'h-9 w-9 p-0 font-normal aria-selected:opacity-100',
+          // Keep selected days from picking up ghost hover bg/text
+          'aria-selected:hover:bg-transparent aria-selected:hover:text-inherit',
           day_button
         ),
-        selected: cn('bg-brand-500 text-foreground text-foreground', selected),
+        selected: cn(
+          'bg-brand-400 dark:bg-brand-500 text-foreground',
+          !fullDateRangeSelected && 'rounded-md',
+          selected
+        ),
         today: cn('bg-accent text-accent-foreground', today),
         outside: cn('text-foreground-muted opacity-50', outside),
         disabled: cn('text-foreground-muted opacity-50', disabled),
-        range_start: cn(fullDateRangeSelected && 'bg-brand-500 rounded-r-none', range_start),
-        range_middle: cn('aria-selected:bg-brand-400 rounded-none', range_middle),
-        range_end: cn(fullDateRangeSelected && 'bg-brand-500 rounded-l-none', range_end),
+        range_start: cn(
+          fullDateRangeSelected && 'bg-brand-400 dark:bg-brand-500 text-foreground rounded-l-md',
+          range_start
+        ),
+        range_middle: cn(
+          'aria-selected:bg-brand-200 dark:aria-selected:bg-brand-400 aria-selected:text-foreground rounded-none',
+          range_middle
+        ),
+        range_end: cn(
+          fullDateRangeSelected && 'bg-brand-400 dark:bg-brand-500 text-foreground rounded-r-md',
+          range_end
+        ),
         hidden: cn('invisible', hidden),
         ...restClassNames,
       }}
