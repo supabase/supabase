@@ -7,6 +7,10 @@ title: 'Manage Pipelines usage'
 
 You are charged for configured pipelines, initial sync data, and ongoing replication data. Pipelines are charged by the hour for as long as they are configured, including while they are stopped.
 
+- **Pipeline hours** measure how long each pipeline remains configured. Delete a pipeline to end this charge.
+- **Initial sync data** is the volume of destination-write data processed when a table is first synchronized or synchronized again.
+- **Ongoing replication data** is the volume of destination-write data processed for subsequent database changes. It depends on how much your published data changes, not on the source table size, WAL size, or destination's compressed storage size.
+
 Destination-provider charges are separate. For example, Google Cloud can charge for BigQuery ingestion, storage, and CDC compute.
 
 ### Usage on your invoice
@@ -19,7 +23,7 @@ Usage is shown as "Pipeline Hours", "Pipeline Initial Sync Data", and "Pipeline 
 
 ## Billing examples
 
-### Billing period with no initial sync data
+### Billing period without an initial sync
 
 The project has a configured pipeline for the entire month.
 
@@ -72,7 +76,6 @@ Pipeline hours are billed in arrears for as long as a pipeline is configured, in
 
 ## Optimize usage
 
-- Only replicate tables you need to replicate
-- If you no longer require replication, remove the pipeline through your [project's replication settings](/dashboard/project/_/database/replication)
-- Reduce the number of writes to your table
-- Exclude columns you do not need from replication - Pipelines let you configure which columns to replicate
+- Include only the tables and columns that you need at the destination.
+- Keep high-churn tables out of the publication when their changes are not needed for analytics.
+- If you no longer require replication, delete the pipeline through your [project's replication settings](/dashboard/project/_/database/replication) to stop pipeline-hour charges.

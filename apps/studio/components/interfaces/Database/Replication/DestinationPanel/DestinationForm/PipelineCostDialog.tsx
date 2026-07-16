@@ -193,6 +193,10 @@ export const PipelineCostDialog = ({
                     Ongoing replication is billed on the volume of changes processed after the
                     initial sync, so the total depends on how often your data changes.
                   </p>
+                  <p className="text-xs text-foreground-lighter">
+                    Destination-provider charges, such as BigQuery ingestion, storage, and compute,
+                    are separate.
+                  </p>
                 </div>
 
                 <div className="flex flex-col gap-y-2">

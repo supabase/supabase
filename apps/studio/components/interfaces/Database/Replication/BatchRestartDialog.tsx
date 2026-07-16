@@ -100,8 +100,8 @@ export const BatchRestartDialog = ({
               </p>
               <ul className="list-disc list-inside space-y-1.5 pl-2">
                 <li>
-                  <strong>All table copies will be re-initialized.</strong> Every table will be
-                  copied again from the source.
+                  <strong>Every table's initial sync will restart.</strong> All table data will be
+                  copied again from the source and billed as initial sync data.
                 </li>
                 <li>
                   <strong>All downstream data will be deleted.</strong> All replicated data will be
@@ -126,8 +126,8 @@ export const BatchRestartDialog = ({
               </p>
               <ul className="list-disc list-inside space-y-1.5 pl-2">
                 <li>
-                  <strong>Failed table copies will be re-initialized.</strong> These tables will be
-                  copied again from the source.
+                  <strong>Each failed table's initial sync will restart.</strong> These tables will
+                  be copied again from the source and billed as initial sync data.
                 </li>
                 <li>
                   <strong>Existing downstream data will be deleted.</strong> Replicated data for

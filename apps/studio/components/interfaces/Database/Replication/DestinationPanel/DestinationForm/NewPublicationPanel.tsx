@@ -86,8 +86,8 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
         <SheetContent size="default">
           <div className="flex flex-col h-full">
             <SheetHeader>
-              <SheetTitle>Create a new Publication</SheetTitle>
-              <SheetDescription>Replicate table changes to destinations</SheetDescription>
+              <SheetTitle>Create a new publication</SheetTitle>
+              <SheetDescription>Choose which tables to replicate to destinations.</SheetDescription>
             </SheetHeader>
             <SheetSection className="grow overflow-auto">
               <Form {...form}>
@@ -113,7 +113,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
                     render={({ field }) => (
                       <FormItemLayout
                         label="Tables"
-                        description="Which tables to replicate to destinations"
+                        description="Select at least one table to include in the publication."
                       >
                         <FormControl>
                           <MultiSelector

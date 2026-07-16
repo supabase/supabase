@@ -21,6 +21,8 @@ Managed Pipelines run in **AWS `eu-central-1` (Frankfurt)**. Choose a destinatio
 
 <$Partial path="billing/pricing/pricing_pipelines.mdx" />
 
+For billing examples and optimization guidance, see [Manage Pipelines usage](/docs/guides/platform/manage-your-usage/pipelines).
+
 ## Setup overview
 
 Pipelines requires two main components: a **Postgres publication** (defines what to replicate) and a **destination** (where data is sent). Supabase runs the managed pipeline that reads from the publication and writes to the destination. Follow these steps to set up your replication pipeline.
@@ -33,9 +35,12 @@ If you already have a Postgres publication set up, you can skip to [Step 2: Enab
 
 ### Step 1: Create a Postgres publication
 
-A Postgres publication defines which tables and change types will be replicated from your database. You create publications using SQL.
+A Postgres publication defines which tables and change types will be replicated from your database. You can create a basic publication in the Dashboard while configuring the destination, or use SQL when you need column lists, row filters, schema-wide publications, or other advanced options.
 
-#### Creating a publication
+- **Dashboard**: Continue to [Step 2](#step-2-enable-pipelines). In Step 3, open the **Publication** selector, click **New publication**, enter a name, and select at least one table.
+- **SQL**: Create the publication now using one of the examples below, then select it when you configure the destination.
+
+#### Creating a publication with SQL
 
 The following SQL examples assume you have `users` and `orders` tables in your database.
 
@@ -177,7 +182,7 @@ Follow these steps to configure your destination. Each destination has its own s
 
 4. Configure the destination details:
    - **Destination name**: A name to identify this destination
-   - **Publication**: The publication to replicate data from (created in [Step 1](#step-1-create-a-postgres-publication))
+   - **Publication**: Select an existing publication, or click **New publication** to create one by choosing a name and at least one table
    - **Region**: Managed Pipelines run in the fixed **AWS `eu-central-1` (Frankfurt)** region. This can't be changed, so choose destination resources as close as possible to Frankfurt.
 
 5. Configure the destination-specific settings. See the destination guide for required credentials, permissions, and limitations:
@@ -232,7 +237,7 @@ Available actions:
 
 - **Start pipeline**: Begin replication for a stopped pipeline
 - **Update available**: Review and apply the latest managed pipeline version when an update is available
-- **Stop pipeline**: Pause replication (changes will queue up in the WAL)
+- **Stop pipeline**: Request a graceful stop. The pipeline can remain **Stopping** for up to five minutes while in-flight work finishes. New changes queue in the WAL, and configured pipeline-hour billing continues while stopped.
 - **Restart pipeline**: Stop and start the pipeline (required after publication changes)
 - **Edit destination**: Modify destination settings like credentials or advanced options
 - **Delete destination**: Remove the destination and permanently stop replication
@@ -241,7 +246,7 @@ Available actions:
 
 ### Disabling Pipelines
 
-To turn off Pipelines for a project, delete all replication pipelines first. After all pipelines are removed, open the three-dot actions menu on the Replication page and click **Disable Pipelines**.
+To turn off Pipelines for a project, delete all Pipelines destinations first. After all destinations are removed, open the three-dot actions menu on the Replication page and click **Disable Pipelines**.
 
 For cleanup details, see [What happens when you disable Pipelines?](/docs/guides/database/replication/pipelines-faq#what-happens-when-you-disable-pipelines).
 
@@ -285,7 +290,7 @@ If your Postgres publication uses `FOR ALL TABLES` or `FOR TABLES IN SCHEMA`, ne
 
 <Admonition type="note">
 
-When a table is deleted at the destination, the behavior depends on the destination. In general, the pipeline tries to recreate the table so replication can continue. To permanently delete a table, pause the pipeline first or remove it from the publication before deleting. See the [Pipelines FAQ](/docs/guides/database/replication/pipelines-faq#what-happens-if-a-table-is-deleted-at-the-destination) for details.
+When a table is deleted at the destination, the behavior depends on the destination. In general, the pipeline tries to recreate the table so replication can continue. To permanently delete a table, stop the pipeline first or remove it from the publication before deleting. See the [Pipelines FAQ](/docs/guides/database/replication/pipelines-faq#what-happens-if-a-table-is-deleted-at-the-destination) for details.
 
 </Admonition>
 
@@ -324,7 +329,7 @@ Pipelines has the following limitations:
 - **Replica identity**: Requirements are destination-specific. Updates and deletes need enough row identity to apply safely. See [BigQuery source table requirements](/docs/guides/database/replication/bigquery#source-table-requirements) for the supported modes.
 - **Schema changes**: Currently in beta and limited to BigQuery
 - **No user-defined transformations**: Pipelines performs destination-compatible type and name mapping, but doesn't run custom transformations
-- **Data duplicates**: Duplicates can occur when stopping a pipeline if your database has transactions that take longer than a few minutes to complete. See [Can data duplicates occur during pipeline operations?](/docs/guides/database/replication/pipelines-faq#can-data-duplicates-occur-during-pipeline-operations) for details
+- **At-least-once processing**: A retry, restart, or interruption can cause a batch to be processed again. BigQuery uses primary-key-based CDC to converge on the current table state. See [Can data be processed more than once?](/docs/guides/database/replication/pipelines-faq#can-data-be-processed-more-than-once) for details.
 
 Destination-specific limitations, such as BigQuery's row size limits, are documented in each destination guide.
 

@@ -54,7 +54,7 @@ export const PublicationSelection = ({
             <Admonition type="warning" className="mt-2">
               <p className="leading-normal!">
                 The publication <strong className="text-foreground">{publicationName}</strong> was
-                not found, it may have been renamed or deleted, please select another one.
+                not found. It may have been renamed or deleted. Select another publication.
               </p>
             </Admonition>
           )}

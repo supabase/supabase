@@ -410,7 +410,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       description: 'Usage statistics related to your pipelines',
       attributes: [
         {
-          anchor: 'pipeline-backfill-data',
+          anchor: 'pipeline-initial-sync-data',
           key: PricingMetric.ETL_COPY_BACKFILL_DATA,
           attributes: [{ key: PricingMetric.ETL_COPY_BACKFILL_DATA.toLowerCase(), color: 'white' }],
           name: 'Pipeline Initial Sync Data',
@@ -426,7 +426,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           ],
         },
         {
-          anchor: 'pipeline-replicated-data',
+          anchor: 'pipeline-ongoing-replication-data',
           key: PricingMetric.ETL_REPLICATED_DATA,
           attributes: [{ key: PricingMetric.ETL_REPLICATED_DATA.toLowerCase(), color: 'white' }],
           name: 'Pipeline Ongoing Replication Data',

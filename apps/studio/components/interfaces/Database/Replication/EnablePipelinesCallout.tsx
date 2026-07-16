@@ -65,7 +65,16 @@ const EnablePipelinesModal = () => {
             </p>
             <p className="text-sm leading-normal!">
               Pipelines is billed for configured pipeline hours, initial sync data, and ongoing
-              replication data. Review the pricing before enabling it.
+              replication data. Review the{' '}
+              <a
+                className="underline"
+                href={`${DOCS_URL}/guides/platform/manage-your-usage/pipelines`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Pipelines pricing
+              </a>{' '}
+              before enabling it.
             </p>
           </Admonition>
         </DialogSection>

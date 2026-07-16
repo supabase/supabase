@@ -17,7 +17,6 @@ import { useDestinationInformation } from '../useDestinationInformation'
 import {
   useIsETLBigQueryPrivateAlpha,
   useIsETLDucklakePrivateAlpha,
-  useIsETLIcebergPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
 } from '../useIsETLPrivateAlpha'
 import { DestinationType } from './DestinationPanel.types'
@@ -40,7 +39,6 @@ interface DestinationTypeGroup {
 
 export const DestinationTypeSelection = () => {
   const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
-  const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
@@ -97,7 +95,9 @@ export const DestinationTypeSelection = () => {
           description: 'Write Apache Iceberg tables to Supabase Storage for analytics workflows',
           icon: AnalyticsBucket,
           stage: 'Early Access',
-          enabled: isOptionVisible('Analytics Bucket', etlEnableIceberg),
+          // Analytics Bucket replication is no longer available for new destinations. Keep the
+          // option visible only so existing destinations can still be inspected and edited.
+          enabled: editMode && destinationType === 'Analytics Bucket',
         },
         {
           value: 'BigQuery',

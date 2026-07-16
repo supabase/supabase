@@ -264,7 +264,9 @@ export const Destinations = () => {
             </Shortcut>
             {organization?.slug && (
               <Button asChild variant="default" icon={<ChartArea />}>
-                <Link href={`/org/${organization.slug}/usage#pipeline-backfill-data`}>Usage</Link>
+                <Link href={`/org/${organization.slug}/usage#pipeline-initial-sync-data`}>
+                  Usage
+                </Link>
               </Button>
             )}
             <DocsButton href={`${DOCS_URL}/guides/database/replication`} />

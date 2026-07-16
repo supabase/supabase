@@ -17,13 +17,11 @@ mockAnimationsApi()
 // Feature flags are not API calls — mock at the module level so tests can
 // control per-destination-type visibility without hitting PostHog.
 const mockBigQueryEnabled = vi.fn()
-const mockIcebergEnabled = vi.fn()
 const mockDucklakeEnabled = vi.fn()
 const mockSnowflakeEnabled = vi.fn()
 
 vi.mock('../useIsETLPrivateAlpha', () => ({
   useIsETLBigQueryPrivateAlpha: () => mockBigQueryEnabled(),
-  useIsETLIcebergPrivateAlpha: () => mockIcebergEnabled(),
   useIsETLDucklakePrivateAlpha: () => mockDucklakeEnabled(),
   useIsETLSnowflakePrivateAlpha: () => mockSnowflakeEnabled(),
 }))
@@ -54,7 +52,6 @@ const addBackgroundMocks = () => {
 describe('DestinationTypeSelection', () => {
   test('shows placeholder when no type is selected', async () => {
     mockBigQueryEnabled.mockReturnValue(false)
-    mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
     addBackgroundMocks()
@@ -66,7 +63,6 @@ describe('DestinationTypeSelection', () => {
 
   test('renders Read Replica in the Other group when dropdown is opened', async () => {
     mockBigQueryEnabled.mockReturnValue(false)
-    mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
     addBackgroundMocks()
@@ -81,7 +77,6 @@ describe('DestinationTypeSelection', () => {
 
   test('renders the Pipelines group with BigQuery when the flag is enabled', async () => {
     mockBigQueryEnabled.mockReturnValue(true)
-    mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
     addBackgroundMocks()
@@ -96,7 +91,6 @@ describe('DestinationTypeSelection', () => {
 
   test('hides destinations behind disabled feature flags', async () => {
     mockBigQueryEnabled.mockReturnValue(false)
-    mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
     addBackgroundMocks()
@@ -113,9 +107,22 @@ describe('DestinationTypeSelection', () => {
     expect(screen.queryByText('Pipelines')).not.toBeInTheDocument()
   })
 
+  test('does not offer Analytics Bucket for new destinations', async () => {
+    mockBigQueryEnabled.mockReturnValue(true)
+    mockDucklakeEnabled.mockReturnValue(false)
+    mockSnowflakeEnabled.mockReturnValue(false)
+    addBackgroundMocks()
+
+    customRender(<DestinationTypeSelection />)
+
+    fireEvent.click(await screen.findByRole('combobox'))
+
+    expect(await screen.findByText('Pipelines')).toBeInTheDocument()
+    expect(screen.queryByText('Analytics Bucket')).not.toBeInTheDocument()
+  })
+
   test('shows the public alpha warning for a Pipelines destination', async () => {
     mockBigQueryEnabled.mockReturnValue(true)
-    mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
     addBackgroundMocks()
@@ -130,7 +137,6 @@ describe('DestinationTypeSelection', () => {
 
   test('disables the selector in edit mode so the destination type cannot be changed', async () => {
     mockBigQueryEnabled.mockReturnValue(true)
-    mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
     addBackgroundMocks()

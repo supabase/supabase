@@ -101,7 +101,7 @@ Once configured, replication to BigQuery:
 3. Creates destination tables from the replicated source schema using BigQuery-compatible names and types
 4. Streams data to BigQuery
 
-You query a managed view for each replicated source table. Pipelines manages the physical BigQuery tables behind that view and replaces them when a truncate or full initial sync requires it. These internal versions don't provide a change history that you can query.
+Pipelines keeps a current-state table that you can query for each replicated source table and may replace its destination data during a truncate or new initial sync. It does not provide a history of every row version that you can query.
 
 ## Source table requirements
 
@@ -175,8 +175,6 @@ For Postgres `DROP NOT NULL`, Pipelines relaxes an existing BigQuery column from
 
 Column defaults are handled independently from whether the column allows `NULL`. BigQuery does not support `ADD COLUMN ... DEFAULT` on an existing table, so Pipelines first adds the nullable column and then applies supported default metadata with a separate statement. This is destination metadata for future BigQuery writes that omit the column; pipeline writes already contain the value evaluated by Postgres, and the metadata doesn't populate existing destination rows. Unsupported defaults, including defaults on destination primary-key columns, are skipped with a warning instead of failing replication.
 
-These semantics match the behavior implemented in [Supabase ETL PR #899](https://github.com/supabase/etl/pull/899).
-
 ## Limitations
 
 - **Row size**: Limited to 10 MB per row due to BigQuery Storage Write API constraints
@@ -186,6 +184,7 @@ These semantics match the behavior implemented in [Supabase ETL PR #899](https:/
 - **Schema and table names**: Source schema and table names can't start or end with `_` or contain `"` or `;` when replicating to BigQuery
 - **Arrays and numeric values**: Arrays can't contain `NULL` elements. Numeric values with more than 38 fractional digits and exact JSON integer values outside BigQuery's supported range can't be replicated.
 - **BigQuery CDC tables**: While CDC is active, BigQuery doesn't support mutating DML (`UPDATE`, `DELETE`, or `MERGE`), wildcard table queries, or search indexes on the destination table. See [BigQuery CDC limitations](https://cloud.google.com/bigquery/docs/change-data-capture#limitations) for the complete list.
+- **Managed destination objects**: Don't delete or modify tables or views created by Pipelines. Doing so can stop replication and may require a new, billable initial sync.
 - **Schema changes**: Limited to the supported schema changes listed above
 
 ## Additional resources

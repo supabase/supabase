@@ -6,7 +6,7 @@ export const DestinationPanelFormSchema = z.object({
   // Common fields
   name: z.string().min(1, 'Name is required'),
   publicationName: z.string().min(1, 'Publication is required'),
-  maxFillMs: z.number().min(1, 'Max fill milliseconds must be greater than 0').int().optional(),
+  maxFillMs: z.number().int().optional(),
   maxTableSyncWorkers: z
     .number()
     .min(1, 'Max table sync workers must be greater than 0')

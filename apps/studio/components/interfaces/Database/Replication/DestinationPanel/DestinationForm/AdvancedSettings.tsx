@@ -257,7 +257,7 @@ export const AdvancedSettings = ({
                         <>
                           <p>
                             Maximum acceptable staleness of table data returned by queries while
-                            BigQuery applies streamed changes in the background.
+                            BigQuery applies CDC changes in the background.
                           </p>
                           <p>
                             Leave unset for the freshest results. A larger number of minutes allows
