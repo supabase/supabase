@@ -13,7 +13,7 @@ Supabase Pipelines is a managed CDC product for moving data from Supabase Postgr
 Pipelines has two replication phases:
 
 - **Initial sync**: A one-time copy of the existing rows in the published tables.
-- **Ongoing replication**: Change data capture (CDC) for subsequent inserts, updates, deletes, and truncates.
+- **Ongoing replication (CDC)**: Continuously captures and applies subsequent inserts, updates, deletes, and truncates.
 
 Managed Pipelines run in **AWS `eu-central-1` (Frankfurt)**. Choose a destination region as close as possible to Frankfurt to reduce network latency and replication lag.
 

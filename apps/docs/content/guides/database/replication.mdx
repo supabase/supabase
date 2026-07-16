@@ -32,7 +32,7 @@ Read replicas are additional Supabase Postgres databases kept in sync with your 
 
 <$Partial path="pipelines-public-alpha.mdx" />
 
-Supabase Pipelines is a managed CDC product for moving data from Supabase Postgres to supported destination systems. It uses Postgres logical replication with the open-source [Supabase ETL engine](https://github.com/supabase/etl). A destination is where your replicated data is stored; a pipeline is the managed process that continuously sends database changes to that destination.
+Supabase Pipelines is a managed CDC product for moving data from Supabase Postgres to supported destination systems. It uses Postgres logical replication with the open-source [Supabase ETL engine](https://github.com/supabase/etl). A destination is where your replicated data is stored; a pipeline first performs an initial sync of existing rows, then uses ongoing replication (CDC) to send subsequent database changes to that destination.
 
 - [Set up Pipelines](/docs/guides/database/replication/pipelines)
 

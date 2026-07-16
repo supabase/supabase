@@ -8,7 +8,7 @@ sidebar_label: 'Monitoring'
 
 <$Partial path="pipelines-public-alpha.mdx" />
 
-After setting up Supabase Pipelines, you can monitor the status and health of your pipelines directly from the Dashboard. A pipeline is the managed Postgres replication process that continuously sends changes from your database to your destination.
+After setting up Supabase Pipelines, you can monitor the status and health of your pipelines directly from the Dashboard. A pipeline first performs an initial sync of existing rows, then uses ongoing replication (CDC) to send subsequent database changes to your destination.
 
 ### Viewing pipeline status
 
@@ -53,7 +53,7 @@ The detailed status page shows:
 
 Pipelines uses one main pipeline replication slot for ongoing replication. During the initial sync, it can also create temporary table-sync replication slots. These temporary slots let multiple tables sync in parallel, make large initial syncs faster, and allow individual tables to be retried without restarting the whole pipeline.
 
-Temporary table-sync slots show the same kind of lag and slot health metrics while they are active. After a table finishes copying and catches up, its temporary slot is removed and ongoing changes continue through the main pipeline slot. For overall replication health, focus first on the main pipeline slot.
+Temporary table-sync slots show the same kind of lag and slot health metrics while they are active. After a table finishes its initial sync and catches up, its temporary slot is removed and ongoing replication continues through the main pipeline slot. For overall replication health, focus first on the main pipeline slot.
 
 #### Slot statuses
 
