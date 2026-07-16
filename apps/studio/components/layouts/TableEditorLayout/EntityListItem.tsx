@@ -244,7 +244,7 @@ export const EntityListItem = ({
                     className="w-6 h-6"
                     icon={<MoreVertical size={14} strokeWidth={2} />}
                     onClick={(e) => e.preventDefault()}
-                    aria-label={`${entity.name} actions`}
+                    aria-label={`More options for ${entity.name}`}
                   />
                 </DropdownMenuTrigger>
               </TooltipTrigger>
