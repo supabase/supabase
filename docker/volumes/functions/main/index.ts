@@ -4,6 +4,7 @@ console.log('main function started')
 
 const JWT_SECRET = Deno.env.get('JWT_SECRET')
 const SUPABASE_JWKS = parseJwks(Deno.env.get('SUPABASE_JWKS'))
+const LOCAL_JWKS = SUPABASE_JWKS ? jose.createLocalJWKSet(SUPABASE_JWKS) : null
 const VERIFY_JWT = Deno.env.get('VERIFY_JWT') === 'true'
 
 type AuthFailure = {
@@ -91,14 +92,13 @@ async function isValidLegacyJWT(jwt: string): Promise<AuthFailure | null> {
 }
 
 async function isValidJWT(jwt: string): Promise<AuthFailure | null> {
-  if (!SUPABASE_JWKS) {
+  if (!LOCAL_JWKS) {
     console.error('JWKS not available for ES256/RS256 token verification')
     return AUTH_FAILURE.AsymmetricJwt
   }
 
   try {
-    const localJwks = jose.createLocalJWKSet(SUPABASE_JWKS);
-    await jose.jwtVerify(jwt, localJwks);
+    await jose.jwtVerify(jwt, LOCAL_JWKS);
   } catch (e) {
     console.error('Asymmetric JWT verification error', e);
     return AUTH_FAILURE.AsymmetricJwt
