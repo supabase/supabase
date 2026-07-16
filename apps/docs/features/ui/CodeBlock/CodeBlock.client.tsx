@@ -105,23 +105,28 @@ export function CodeCopyButton({ className, content }: { className?: string; con
       <span className="sr-only" aria-live="polite">
         {copied ? 'Code copied' : ''}
       </span>
-      <button
-        onClick={handleCopy}
-        onBlur={resetStatus}
-        className={cn(
-          'border rounded-md p-1',
-          copied && 'bg-selection',
-          'hover:bg-selection transition',
-          className
-        )}
-        aria-label="Copy code"
-      >
-        {copied ? (
-          <Check size={14} className="text-lighter" />
-        ) : (
-          <Copy size={14} className="text-lighter" />
-        )}
-      </button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            onClick={handleCopy}
+            onBlur={resetStatus}
+            className={cn(
+              'border rounded-md p-1',
+              copied && 'bg-selection',
+              'hover:bg-selection transition',
+              className
+            )}
+            aria-label="Copy code"
+          >
+            {copied ? (
+              <Check size={14} className="text-lighter" />
+            ) : (
+              <Copy size={14} className="text-lighter" />
+            )}
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>Copy code</TooltipContent>
+      </Tooltip>
     </>
   )
 }
