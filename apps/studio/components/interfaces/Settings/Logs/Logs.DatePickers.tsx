@@ -90,6 +90,12 @@ export type DatePickerValue = {
   text?: string
 }
 
+const toValidDate = (value?: string): Date | null => {
+  if (!value) return null
+  const date = new Date(value)
+  return isNaN(date.getTime()) ? null : date
+}
+
 interface LogsDatePickerProps {
   value: DatePickerValue
   helpers: DatetimeHelper[]
@@ -139,13 +145,13 @@ export const LogsDatePicker = ({
   useEffect(() => {
     if (!open) {
       setCustomValue('')
-      setStartDate(value.from ? new Date(value.from) : null)
-      const defaultEndDate = value.to ? new Date(value.to) : new Date()
+      setStartDate(toValidDate(value.from))
+      const defaultEndDate = toValidDate(value.to) ?? new Date()
       setEndDate(defaultEndDate)
       setCurrentMonth(new Date(defaultEndDate))
 
-      const fromDate = value.from ? new Date(value.from) : null
-      const toDate = value.to ? new Date(value.to) : null
+      const fromDate = toValidDate(value.from)
+      const toDate = toValidDate(value.to)
 
       setStartTime({
         HH: fromDate?.getHours().toString().padStart(2, '0') || '00',
@@ -180,11 +186,9 @@ export const LogsDatePicker = ({
     setOpen(false)
   }
 
-  const [startDate, setStartDate] = useState<Date | null>(value.from ? new Date(value.from) : null)
-  const [endDate, setEndDate] = useState<Date | null>(value.to ? new Date(value.to) : new Date())
-  const [currentMonth, setCurrentMonth] = useState<Date>(() =>
-    value.to ? new Date(value.to) : new Date()
-  )
+  const [startDate, setStartDate] = useState<Date | null>(toValidDate(value.from))
+  const [endDate, setEndDate] = useState<Date | null>(toValidDate(value.to) ?? new Date())
+  const [currentMonth, setCurrentMonth] = useState<Date>(() => toValidDate(value.to) ?? new Date())
 
   const [startTime, setStartTime] = useState({
     HH: startDate?.getHours().toString() || '00',

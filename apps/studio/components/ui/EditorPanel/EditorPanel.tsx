@@ -46,8 +46,8 @@ import { SaveSnippetDialog } from './SaveSnippetDialog'
 import { isExplainQuery } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.utils'
 import { generateSnippetTitle } from '@/components/interfaces/SQLEditor/SQLEditor.constants'
 import {
+  applyAutoLimit,
   createSqlSnippetSkeletonV2,
-  suffixWithLimit,
 } from '@/components/interfaces/SQLEditor/SQLEditor.utils'
 import { useAddDefinitions } from '@/components/interfaces/SQLEditor/useAddDefinitions'
 import { Results } from '@/components/interfaces/SQLEditor/UtilityPanel/Results'
@@ -231,7 +231,7 @@ export const EditorPanel = () => {
     }
 
     executeSql({
-      sql: suffixWithLimit(acceptUntrustedSql(currentValue), 100),
+      sql: applyAutoLimit(acceptUntrustedSql(currentValue), 100).sql,
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       isStatementTimeoutDisabled: true,

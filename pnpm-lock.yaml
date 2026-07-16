@@ -1246,6 +1246,9 @@ importers:
       '@graphql-typed-document-node/core':
         specifier: ^3.2.0
         version: 3.2.0(graphql@16.11.0)
+      '@jridgewell/remapping':
+        specifier: ^2.3.5
+        version: 2.3.5
       '@radix-ui/react-use-escape-keydown':
         specifier: ^1.1.1
         version: 1.1.1(@types/react@19.2.14)(react@19.2.6)
@@ -1360,6 +1363,9 @@ importers:
       libpg-query:
         specifier: 17.6.0
         version: 17.6.0
+      magic-string:
+        specifier: ^0.30.21
+        version: 0.30.21
       msw:
         specifier: ^2.3.0
         version: 2.11.3(@types/node@22.13.14)(typescript@6.0.2)
