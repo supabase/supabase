@@ -184,7 +184,7 @@ export const DestinationTypeSelection = () => {
             <span className="text-foreground-lighter">Select a destination type</span>
           )}
         </SelectTrigger>
-        <SelectContent align="end">
+        <SelectContent align="end" className="max-h-(--radix-select-content-available-height)">
           {visibleGroups.map((group, index) => (
             <SelectGroup key={group.label}>
               {index > 0 && <SelectSeparator />}
