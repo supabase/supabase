@@ -14,6 +14,11 @@ import {
 import { ChartHighlight } from './useChartHighlight'
 import { useFormatDateTime } from '@/lib/datetime'
 
+const toFormattableDate = (value: string): string | number => {
+  const asNumber = Number(value)
+  return value !== '' && Number.isFinite(asNumber) ? asNumber : value
+}
+
 export type UpdateDateRange = (from: string, to: string) => void
 
 export type ChartHighlightActionContext = {
@@ -106,9 +111,9 @@ export const ChartHighlightActions = ({
         }}
       >
         <DropdownMenuLabel className="flex items-center justify-center text-foreground-light font-mono gap-x-2 text-xs">
-          <span>{formatChartDate(selectedRangeStart!, 'MMM D, H:mm')}</span>
+          <span>{formatChartDate(toFormattableDate(selectedRangeStart!), 'MMM D, H:mm')}</span>
           <ArrowRight size={10} />
-          <span>{formatChartDate(selectedRangeEnd!, 'MMM D, H:mm')}</span>
+          <span>{formatChartDate(toFormattableDate(selectedRangeEnd!), 'MMM D, H:mm')}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="my-0" />
         {allActions.map((action) => {

@@ -45,8 +45,9 @@ const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 // gets HTML for a `.js` request and throws "Failed to load module script …
 // MIME type text/html" (and, because /assets/* is cached immutable, that HTML
 // poisons the edge cache under the asset URL). A clean 404 instead lets skew
-// protection's `__vdpl` routing serve the chunk from the deployment that still
-// has it, or the client's `vite:preloadError` backstop recover.
+// protection's `?dpl=` routing (baked into asset URLs at build time — see
+// skewProtectionDpl in vite.config.ts) serve the chunk from the deployment
+// that still has it, or the client's `vite:preloadError` backstop recover.
 function routesFor(prefix: string) {
   return {
     rewrites: [
