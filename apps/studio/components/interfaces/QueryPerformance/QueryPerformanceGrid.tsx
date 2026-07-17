@@ -605,9 +605,9 @@ export const QueryPerformanceGrid = ({
             }
           }}
         >
-          <SheetHeader className="hidden">
-            <SheetTitle className="sr-only">Query details</SheetTitle>
-            <SheetDescription className="sr-only">
+          <SheetHeader className="sr-only">
+            <SheetTitle>Query details</SheetTitle>
+            <SheetDescription>
               Query Performance Details &amp; Indexes
             </SheetDescription>
           </SheetHeader>
