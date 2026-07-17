@@ -170,6 +170,8 @@ export const PolicyEditorModal = ({
 
   const validatePolicyFormFields = () => {
     const { name, definition, check, command } = policyFormFields
+    const trimmedDefinition = definition?.trim() ?? ''
+    const trimmedCheck = check?.trim() ?? ''
 
     if (name.length === 0) {
       return toast.error('Please provide a name for your policy')
@@ -177,13 +179,13 @@ export const PolicyEditorModal = ({
     if (!command) {
       return toast.error('Please select an operation for your policy')
     }
-    if (['SELECT', 'DELETE'].includes(command) && !definition) {
+    if (['SELECT', 'DELETE'].includes(command) && !trimmedDefinition) {
       return toast.error('Please provide a USING expression for your policy')
     }
-    if (command === 'INSERT' && !check) {
+    if (command === 'INSERT' && !trimmedCheck) {
       return toast.error('Please provide a WITH CHECK expression for your policy')
     }
-    if (command === 'UPDATE' && !definition && !check) {
+    if (command === 'UPDATE' && !trimmedDefinition && !trimmedCheck) {
       return toast.error(
         'Please provide either a USING, or WITH CHECK expression, or both for your policy'
       )
@@ -192,12 +194,12 @@ export const PolicyEditorModal = ({
     // ALTER POLICY can only replace expressions, not remove them, so a cleared
     // field would be silently dropped from the update payload (undefined →
     // omitted in JSON serialization) and the old expression would persist.
-    if (selectedPolicyToEdit?.definition && !definition) {
+    if (selectedPolicyToEdit?.definition && !trimmedDefinition) {
       return toast.error(
         'The USING expression cannot be removed once set. Replace it with a new expression instead.'
       )
     }
-    if (selectedPolicyToEdit?.check && !check) {
+    if (selectedPolicyToEdit?.check && !trimmedCheck) {
       return toast.error(
         'The WITH CHECK expression cannot be removed once set. Replace it with a new expression instead.'
       )
