@@ -410,17 +410,26 @@ export const ProjectCreationForm = ({
     let dbSql = enableRlsEventTrigger ? AUTO_ENABLE_RLS_EVENT_TRIGGER_SQL : undefined
     if (isVercelIntegrationFlow && shouldRunMigrations && !!externalId) {
       const id = toast.loading(`Fetching initial migrations from GitHub repository...`)
-      const migrationSql = await getInitialMigrationSQLFromGitHubRepo(externalId)
-      if (migrationSql) {
-        // externalId comes from a URL param, so the fetched SQL is third-party influenceable;
-        // promoting it here (inside the submit handler) reflects the explicit user action of
-        // clicking "Create new project" with migrations enabled.
-        const safeMigrationSql = trimSafeSqlFragment(acceptUntrustedSql(untrustedSql(migrationSql)))
-        dbSql = dbSql
-          ? joinSqlFragments([trimSafeSqlFragment(dbSql), safeMigrationSql], ';\n')
-          : safeMigrationSql
+
+      try {
+        const migrationSql = await getInitialMigrationSQLFromGitHubRepo(externalId)
+        if (migrationSql) {
+          const safeMigrationSql = trimSafeSqlFragment(
+            acceptUntrustedSql(untrustedSql(migrationSql))
+          )
+          dbSql = dbSql
+            ? joinSqlFragments([trimSafeSqlFragment(dbSql), safeMigrationSql], ';\n')
+            : safeMigrationSql
+          toast.loading(`Migrations fetched! Creating project...`, { id })
+        } else {
+          toast.loading('No migrations found, creating project...')
+        }
+      } catch (error) {
+        toast.loading(
+          `Failed to fetch migrations: ${error instanceof Error ? error.message : ''}. Proceeding to create project...`,
+          { id }
+        )
       }
-      toast.loading(`Migrations fetched! Creating project...`, { id })
     }
 
     const data: ProjectCreateVariables = {
