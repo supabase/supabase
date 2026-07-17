@@ -7,6 +7,7 @@ packages:
 blockExoticSubdeps: true
 engineStrict: true
 updateNotifier: false
+enableGlobalVirtualStore: true
 
 catalog:
   '@monaco-editor/react': ^4.7.0
