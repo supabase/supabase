@@ -4,7 +4,7 @@ Supabase Reference Docs
 
 ## Maintainers
 
-eIf you are a maintainer of any tools in the Supabase ecosystem, you can use this site to provide documentation for the tools & libraries that you maintain.
+If you are a maintainer of any tools in the Supabase ecosystem, you can use this site to provide documentation for the tools & libraries that you maintain.
 
 ## DocSpec
 
