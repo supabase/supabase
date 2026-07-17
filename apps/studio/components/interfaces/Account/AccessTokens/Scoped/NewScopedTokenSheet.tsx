@@ -66,6 +66,7 @@ export const NewScopedTokenSheet = ({
     },
     mode: 'onChange',
   })
+  const { errors } = form.formState
   const track = useTrack()
   const { mutate: createAccessToken, isPending } = useAccessTokenCreateMutation()
 
@@ -303,10 +304,10 @@ export const NewScopedTokenSheet = ({
                 />
                 <Separator />
                 <Permissions
-                  setValue={form.setValue}
-                  watch={form.watch}
+                  control={form.control}
                   resourceSearchOpen={resourceSearchOpen}
                   setResourceSearchOpen={setResourceSearchOpen}
+                  onTriggerValidation={() => form.trigger('permissionRows')}
                 />
               </div>
             </Form>
