@@ -70,7 +70,7 @@ if (typeof window !== 'undefined') {
   abortController = new AbortController()
 }
 
-function createStorageExplorerState({
+export function createStorageExplorerState({
   projectRef,
   connectionString,
   bucket,
@@ -1462,7 +1462,7 @@ function createStorageExplorerState({
       const toastId = toast.loading(`Deleting ${prefixes.length} file(s)...`)
 
       try {
-        await deleteBucketObject({
+        const data = await deleteBucketObject({
           projectRef: state.projectRef,
           bucketId: state.selectedBucket.id,
           paths: prefixes,
@@ -1480,12 +1480,36 @@ function createStorageExplorerState({
             parentFolderPrefixes.map((prefix) => state.validateParentFolderEmpty(prefix))
           )
 
-          toast.success(`Successfully deleted ${prefixes.length} file(s)`, {
-            id: toastId,
-            closeButton: true,
-            duration: SONNER_DEFAULT_DURATION,
-            description: undefined,
-          })
+          // Self-hosted responds with the objects that were actually removed,
+          // while the platform API returns an empty body (its generated type
+          // has no content, hence the widening to unknown). The storage API
+          // silently skips paths that match nothing, so fewer removed objects
+          // than requested paths means some files were not deleted.
+          const deletedObjects: unknown = data
+          const failedCount = Array.isArray(deletedObjects)
+            ? prefixes.length - deletedObjects.length
+            : 0
+
+          if (failedCount > 0) {
+            toast.error(
+              failedCount === prefixes.length
+                ? `Failed to delete ${prefixes.length} file(s)`
+                : `Failed to delete ${failedCount} of ${prefixes.length} file(s)`,
+              {
+                id: toastId,
+                closeButton: true,
+                duration: SONNER_DEFAULT_DURATION,
+                description: 'They may have been renamed, moved, or already deleted elsewhere',
+              }
+            )
+          } else {
+            toast.success(`Successfully deleted ${prefixes.length} file(s)`, {
+              id: toastId,
+              closeButton: true,
+              duration: SONNER_DEFAULT_DURATION,
+              description: undefined,
+            })
+          }
           await state.refetchAllOpenedFolders()
           state.setSelectedItemsToDelete([])
         } else {
