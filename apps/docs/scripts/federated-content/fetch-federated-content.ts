@@ -125,6 +125,8 @@ async function fetchPage(source: FederatedContentSource, page: FederatedPage): P
     editLink: `${source.org}/${source.repo}/blob/${source.branch}/${remotePath(source, page)}`,
   }
   if (page.meta.subtitle) frontmatter.subtitle = page.meta.subtitle
+  if (page.meta.description) frontmatter.description = page.meta.description
+  if (page.meta.tocVideo) frontmatter.tocVideo = page.meta.tocVideo
 
   return matter.stringify(`${content}\n`, frontmatter)
 }

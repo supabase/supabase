@@ -7,6 +7,8 @@ export interface FederatedPage {
   meta: {
     title: string
     subtitle?: string
+    description?: string
+    tocVideo?: string
   }
   /** Path of the file in the remote repo, relative to `docsDir`. */
   remoteFile: string
