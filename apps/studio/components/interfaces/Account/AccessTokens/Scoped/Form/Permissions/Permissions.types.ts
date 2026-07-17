@@ -19,7 +19,6 @@ export interface PermissionsFormValues extends FieldValues {
 
 export interface PermissionsProps {
   control: Control<TokenFormValues>
-  onTriggerValidation: () => void
   resourceSearchOpen: boolean
   setResourceSearchOpen: (open: boolean) => void
 }

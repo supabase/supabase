@@ -1,5 +1,4 @@
 import { ChevronDown, RotateCcw, X } from 'lucide-react'
-import { useRef } from 'react'
 import { useFieldArray, useFormState } from 'react-hook-form'
 import {
   Button,
@@ -23,7 +22,6 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 export const Permissions = ({
   control,
-  onTriggerValidation,
   resourceSearchOpen,
   setResourceSearchOpen,
 }: PermissionsProps) => {
@@ -31,12 +29,11 @@ export const Permissions = ({
     fields: permissionRows,
     append,
     remove,
-    update,
   } = useFieldArray<TokenFormValues>({
     name: 'permissionRows',
     control,
   })
-  const { errors } = useFormState({ control })
+  const { errors } = useFormState({ control, name: 'permissionRows' })
 
   return (
     <div className="space-y-4 px-5 sm:px-6 py-6">
@@ -123,12 +120,12 @@ export const Permissions = ({
                                     }
                                     ref={field.ref}
                                   >
-                                    {row.actions.length === 0 ? (
+                                    {field.value.length === 0 ? (
                                       <span className="text-foreground-lighter">Select access</span>
-                                    ) : row.actions.length === 1 ? (
-                                      formatAccessText(row.actions[0])
+                                    ) : field.value.length === 1 ? (
+                                      formatAccessText(field.value[0])
                                     ) : (
-                                      `${row.actions.length} selected`
+                                      `${field.value.length} selected`
                                     )}
                                   </Button>
                                 </PopoverTrigger>
@@ -141,16 +138,13 @@ export const Permissions = ({
                                       className="flex items-center gap-2 cursor-pointer"
                                     >
                                       <Checkbox
-                                        checked={row.actions.includes(action)}
+                                        checked={field.value.includes(action)}
                                         onCheckedChange={(checked) => {
                                           const newActions = checked
-                                            ? [...row.actions, action]
-                                            : row.actions.filter((a) => a !== action)
-                                          update(index, {
-                                            resource: row.resource,
-                                            actions: newActions,
-                                          })
-                                          onTriggerValidation()
+                                            ? [...field.value, action]
+                                            : field.value.filter((a: string) => a !== action)
+                                          field.onChange(newActions)
+                                          // onTriggerValidation()
                                         }}
                                       />
                                       <span className="text-sm">{formatAccessText(action)}</span>
