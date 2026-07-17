@@ -122,7 +122,11 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
     'extensions'
   )
 
-  const cronJobValues = parseCronJobCommand(selectedCronJob?.command || '', project?.ref!)
+  const cronJobValues = parseCronJobCommand(
+    selectedCronJob?.command || '',
+    project?.ref!,
+    project?.restUrl
+  )
 
   const defaultValues = {
     name: selectedCronJob?.jobname || '',

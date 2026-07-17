@@ -147,8 +147,6 @@ Do not log Personal Identifiable Information (PII) within the `User-Agent` heade
 
 Postgres can log connection lifecycle events to your project's Postgres logs, for example when a client connects or authenticates. By default, Supabase sets `log_connections` to off for new projects and you must enable it first.
 
-<$Partial path="log_connections_default_effective_date.mdx" />
-
 To enable connection logging for audit or compliance, see [Postgres connection logging](/docs/guides/platform/postgres-connection-logging).
 
 In the [Logs Explorer](/dashboard/project/_/logs-explorer), connection lifecycle messages may be hidden by default. Use the connection logs filter in the sidebar to show them.
@@ -265,6 +263,12 @@ You can access the following logs from the **Sources** drop-down:
 
 The Logs Explorer uses BigQuery and supports all [available SQL functions and operators](https://cloud.google.com/bigquery/docs/reference/standard-sql/functions-and-operators).
 
+<Admonition type="caution">
+
+The Logs Explorer now defaults to ClickHouse, where every source shares a single `logs` table and nested fields are read from a `log_attributes` map rather than with `cross join unnest(metadata)`. The examples below still use the legacy BigQuery syntax and are being migrated. Adjust field access accordingly on projects already on ClickHouse.
+
+</Admonition>
+
 ### Timestamp display and behavior
 
 Each log entry is stored with a `timestamp` as a `TIMESTAMP` data type. Use the appropriate [timestamp function](https://cloud.google.com/bigquery/docs/reference/standard-sql/timestamp_functions#timestamp) to use the `timestamp` field in a query.
@@ -324,11 +328,11 @@ The Logs Explorer has a maximum of 1000 rows per run. Use `LIMIT` to optimize yo
 
 ### Best practices
 
-1. Include a filter over **timestamp**
+1. **Include a filter over the timestamp.**
 
 Querying your entire log history might seem appealing. For **Enterprise** customers that have a large retention range, you run the risk of timeouts due additional time required to scan the larger dataset.
 
-2. Avoid selecting large nested objects. Select individual values instead.
+2. **Avoid selecting large nested objects; select individual values instead.**
 
 When querying large objects, the columnar storage engine selects each column associated with each nested key, resulting in a large number of columns being selected. This inadvertently impacts the query speed and may result in timeouts or memory errors, especially for projects with a lot of logs.
 
@@ -352,6 +356,16 @@ from
   cross join unnest(t.metadata) as m
   cross join unnest(m.request) as r;
 ```
+
+3. **Query one source at a time.**
+
+Identify which service owns the problem from the error or status code first, then query only that source. Scanning every source at once buries the signal you need and scans far more data than the investigation requires.
+
+4. **Follow a request across sources with an anchor.** Once a query gives you an anchor such as a timestamp, request id, or SQL state, filter the adjacent source by that anchor to correlate the request across layers (for example `edge_logs` to `postgres_logs`), instead of re-scanning each source from scratch.
+
+5. **Reference only fields you have confirmed.**
+
+A misspelled or non-existent field name either errors or silently returns nothing, which leaves a working query look empty. Confirm field names in the [field reference](#logs-field-reference), or select `event_message` and inspect a sample row first.
 
 ### Examples and templates
 

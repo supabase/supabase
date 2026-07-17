@@ -621,6 +621,17 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
+    "calendar-disabled-days-demo": {
+      name: "calendar-disabled-days-demo",
+      type: "components:example",
+      registryDependencies: ["calendar","form","popover"],
+      component: React.lazy(() => import("@/registry/default/example/calendar-disabled-days-demo")),
+      source: "",
+      files: ["registry/default/example/calendar-disabled-days-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
     "single-value-field-array-demo": {
       name: "single-value-field-array-demo",
       type: "components:example",
@@ -1662,6 +1673,39 @@ export const Index: Record<string, any> = {
       component: React.lazy(() => import("@/registry/default/example/sonner-upload")),
       source: "",
       files: ["registry/default/example/sonner-upload.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "success-check-demo": {
+      name: "success-check-demo",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/success-check-demo")),
+      source: "",
+      files: ["registry/default/example/success-check-demo.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "success-check-selected": {
+      name: "success-check-selected",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/success-check-selected")),
+      source: "",
+      files: ["registry/default/example/success-check-selected.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "success-check-progress": {
+      name: "success-check-progress",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/success-check-progress")),
+      source: "",
+      files: ["registry/default/example/success-check-progress.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

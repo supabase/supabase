@@ -1,6 +1,7 @@
 import { InlineLinkClassName } from './InlineLink'
+import { SpecialSymbolsCallout } from './SpecialSymbolsCallout'
 import { PASSWORD_STRENGTH_COLOR, PASSWORD_STRENGTH_PERCENTAGE } from '@/lib/constants'
-import { PasswordStrengthScore } from '@/lib/password-strength'
+import { passwordNeedsPercentEncoding, PasswordStrengthScore } from '@/lib/password-strength'
 
 interface Props {
   passwordStrengthScore: PasswordStrengthScore
@@ -17,6 +18,7 @@ export const PasswordStrengthBar = ({
 }: Props) => {
   return (
     <>
+      {passwordNeedsPercentEncoding(password) && <SpecialSymbolsCallout />}
       {password && (
         <div
           aria-valuemax={100}

@@ -695,6 +695,19 @@ export interface SqlEditorTemplateClickedEvent {
 }
 
 /**
+ * User clicked the "Disable" button next to the autosave status text in the
+ * SQL Editor, to open the feature preview modal for manual snippet saving.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/sql/{id}
+ */
+export interface SqlEditorAutosaveDisableClickedEvent {
+  action: 'sql_editor_autosave_disable_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * User clicked the "Result download CSV" button in the SQL editor.
  *
  * @group Events
@@ -1763,7 +1776,7 @@ export interface BranchCreateButtonClickedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/branches
+ * @page /dashboard/project/{ref}/branches, /dashboard/project/{ref}/merge or /dashboard/project/{ref}/settings/general
  */
 export interface BranchDeleteButtonClickedEvent {
   action: 'branch_delete_button_clicked'
@@ -1775,7 +1788,7 @@ export interface BranchDeleteButtonClickedEvent {
     /**
      * Where the delete action was initiated from
      */
-    origin: 'branches_page' | 'merge_page'
+    origin: 'branches_page' | 'merge_page' | 'settings_page'
   }
   groups: TelemetryGroups
 }
@@ -2804,7 +2817,6 @@ export type AiAssistantSource =
   | 'log_explorer'
   | 'error_code'
   | 'advisor_signal_detail'
-  | 'rls_tester'
 
 /**
  * User copied an AI prompt to clipboard instead of using the built-in assistant.
@@ -3271,8 +3283,8 @@ export interface AccessTokenRemovedEvent {
 }
 
 /**
- * User clicked the "Upgrade to Pro" CTA in one of the experiment placement surfaces.
- * GROWTH experiment: `upgradeCtaPlacement` (user_dropdown / org_projects_list).
+ * User clicked the "Upgrade to Pro" CTA. Fired from each CTA placement surface, with
+ * `placement` identifying which one (the user dropdown or the org project-list usage card).
  *
  * @group Events
  * @source studio
@@ -3281,25 +3293,6 @@ export interface UpgradeCtaClickedEvent {
   action: 'upgrade_cta_clicked'
   properties: {
     placement: 'user_dropdown' | 'org_projects_list'
-  }
-  groups: Omit<TelemetryGroups, 'project'>
-}
-
-/**
- * User was exposed to the upgrade CTA placement experiment.
- * Fires once per session per free-plan user enrolled in any variant (including control),
- * so the conversion analysis has a baseline cohort.
- *
- * @group Events
- * @source studio
- */
-export interface UpgradeCtaPlacementExperimentExposedEvent {
-  action: 'upgrade_cta_placement_experiment_exposed'
-  properties: {
-    /**
-     * The experiment variant shown to the user
-     */
-    variant: 'control' | 'user_dropdown' | 'org_projects_list'
   }
   groups: Omit<TelemetryGroups, 'project'>
 }
@@ -3357,6 +3350,7 @@ export interface UnifiedLogsRowClickedEvent {
       | 'realtime'
       | 'supavisor'
       | 'pgbouncer'
+      | 'multigres'
   }
   groups: TelemetryGroups
 }
@@ -3533,18 +3527,6 @@ export interface HeaderLocalVersionPopoverOpenedEvent {
 }
 
 /**
- * User ran a query in the RLS tester feature preview.
- *
- * @group Events
- * @source studio
- */
-export interface RlsTesterRunQueryClickedEvent {
-  action: 'rls_tester_run_query_clicked'
-  properties: { type: 'raw' | 'inferred' }
-  groups: Partial<TelemetryGroups>
-}
-
-/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -3583,6 +3565,7 @@ export type TelemetryEvent =
   | TableRealtimeDisabledEvent
   | SqlEditorQuickstartClickedEvent
   | SqlEditorTemplateClickedEvent
+  | SqlEditorAutosaveDisableClickedEvent
   | SqlEditorResultDownloadCsvClickedEvent
   | SqlEditorResultCopyMarkdownClickedEvent
   | SqlEditorResultCopyJsonClickedEvent
@@ -3723,7 +3706,6 @@ export type TelemetryEvent =
   | FreeMicroUpgradeBannerDismissedEvent
   | FreeMicroUpgradeBannerCtaClickedEvent
   | UpgradeCtaClickedEvent
-  | UpgradeCtaPlacementExperimentExposedEvent
   | AccessTokenCreatedEvent
   | AccessTokenRemovedEvent
   | ResourceExhaustionBannerUpgradeClickedEvent
@@ -3744,4 +3726,3 @@ export type TelemetryEvent =
   | HeaderUserDropdownOpenedEvent
   | HeaderLocalDropdownOpenedEvent
   | HeaderLocalVersionPopoverOpenedEvent
-  | RlsTesterRunQueryClickedEvent

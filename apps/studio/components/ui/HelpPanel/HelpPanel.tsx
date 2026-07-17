@@ -109,6 +109,7 @@ export const HelpPanel = ({
                     <Button
                       variant="secondary"
                       size="tiny"
+                      className="bg-white hover:bg-white/90"
                       icon={
                         <SVG src={`${router.basePath}/img/discord-icon.svg`} className="h-4 w-4" />
                       }

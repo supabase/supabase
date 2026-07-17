@@ -14,7 +14,7 @@ export const COMPUTE_LABELS: Record<string, string> = Object.fromEntries(
 )
 
 // Input-parameter columns (only shown in the full/raw table).
-export const THROUGHPUT_PARAM_HEADINGS = ['Filters', 'RLS', 'Connected clients'] as const
+export const THROUGHPUT_PARAM_HEADINGS = ['RLS', 'Connected clients'] as const
 
 // Result columns (shown in both the current-selection table and the raw table).
 export const THROUGHPUT_METRIC_HEADINGS = [

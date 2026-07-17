@@ -64,7 +64,7 @@ export interface CategoryAttribute {
   additionalInfo?: (usage?: OrgUsageResponse) => ReactNode | null
 }
 
-export type CategoryMetaKey = 'egress' | 'sizeCount' | 'activity' | 'compute' | 'logs'
+export type CategoryMetaKey = 'egress' | 'sizeCount' | 'activity' | 'compute' | 'logs' | 'pipelines'
 
 export interface CategoryMeta {
   key: CategoryMetaKey
@@ -400,6 +400,46 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
             'Total amount of logs stored on the platform. Log retention depends on your platform agreement.\nBilling is based on the total amount of logs stored and factors in the retention period.',
           chartDescription: 'The data refreshes every hour.',
           links: [],
+        },
+      ],
+    },
+
+    {
+      key: 'pipelines',
+      name: 'Pipelines',
+      description: 'Usage statistics related to your pipelines',
+      attributes: [
+        {
+          anchor: 'pipeline-initial-sync-data',
+          key: PricingMetric.ETL_COPY_BACKFILL_DATA,
+          attributes: [{ key: PricingMetric.ETL_COPY_BACKFILL_DATA.toLowerCase(), color: 'white' }],
+          name: 'Pipeline Initial Sync Data',
+          unit: 'bytes',
+          description:
+            'Total amount of initial sync data processed across all projects.\nBilling is based on the total amount of initial sync data processed in gigabytes.',
+          chartDescription: 'The data refreshes every hour.',
+          links: [
+            {
+              name: 'Pipelines',
+              url: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
+            },
+          ],
+        },
+        {
+          anchor: 'pipeline-ongoing-replication-data',
+          key: PricingMetric.ETL_REPLICATED_DATA,
+          attributes: [{ key: PricingMetric.ETL_REPLICATED_DATA.toLowerCase(), color: 'white' }],
+          name: 'Pipeline Ongoing Replication Data',
+          unit: 'bytes',
+          description:
+            'Total amount of ongoing replication data processed across all projects.\nBilling is based on the total amount of ongoing replication data processed in gigabytes.',
+          chartDescription: 'The data refreshes every hour.',
+          links: [
+            {
+              name: 'Pipelines',
+              url: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
+            },
+          ],
         },
       ],
     },

@@ -583,6 +583,8 @@ export const ReplicationPipelineStatus = () => {
           onOpenChange={setShowRestartDialog}
           tableId={selectedTableForRestart.tableId}
           tableName={selectedTableForRestart.tableName}
+          sourceId={pipeline?.source_id}
+          publicationName={pipeline?.config.publication_name}
           pipelineStatusName={statusName}
           onRestartStart={() => {
             setRestartingTableIds((prev) => new Set(prev).add(selectedTableForRestart.tableId))
@@ -614,9 +616,9 @@ export const ReplicationPipelineStatus = () => {
           open={showBatchRestartDialog}
           onOpenChange={setShowBatchRestartDialog}
           mode={batchRestartMode}
-          totalTables={tableStatuses.length}
-          erroredTablesCount={erroredTables.length}
           tables={tableStatuses}
+          sourceId={pipeline?.source_id}
+          publicationName={pipeline?.config.publication_name}
           pipelineStatusName={statusName}
           onRestartStart={(tableIds) => {
             setRestartingTableIds((prev) => new Set([...prev, ...tableIds]))

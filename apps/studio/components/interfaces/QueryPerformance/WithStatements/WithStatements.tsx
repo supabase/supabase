@@ -210,6 +210,7 @@ export const WithStatements = ({
               side="top"
             >
               <Button
+                aria-label="Refresh"
                 variant="default"
                 size="tiny"
                 icon={<RefreshCw />}
@@ -223,6 +224,7 @@ export const WithStatements = ({
               side="top"
             >
               <Button
+                aria-label="Reset report"
                 variant="default"
                 size="tiny"
                 icon={<RotateCcw />}

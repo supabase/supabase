@@ -37,3 +37,6 @@ export type PotentialIssues = {
   hasAlterDatabasePreventConnection?: boolean
   createTablesMissingRLS?: { schema?: string; tableName: string }[]
 }
+
+/** The tabs available in the SQL editor's results/utility panel. */
+export type UtilityTab = 'results'

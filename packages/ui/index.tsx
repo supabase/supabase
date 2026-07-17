@@ -107,12 +107,7 @@ export * from './src/components/ShadowScrollArea'
 
 export * from './src/components/shadcn/ui/collapsible'
 
-export {
-  Tabs as Tabs_Shadcn_,
-  TabsContent as TabsContent_Shadcn_,
-  TabsList as TabsList_Shadcn_,
-  TabsTrigger as TabsTrigger_Shadcn_,
-} from './src/components/shadcn/ui/tabs'
+export * from './src/components/shadcn/ui/tabs'
 
 export * from './src/components/shadcn/ui/tooltip'
 
@@ -136,6 +131,7 @@ export * from './src/components/shadcn/ui/sidebar'
 
 // ICONS
 export * from './src/components/StatusIcon'
+export * from './src/components/SuccessCheck'
 
 // export icons
 export * from './src/components/Icon/icons/IconBriefcase2'

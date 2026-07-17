@@ -7,25 +7,18 @@ import { MD_PAGES } from './app/api-v2/md/content.generated'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  if (pathname.endsWith('.md')) {
-    const slug = pathname.slice(1, -3)
-    if (MD_PAGES.has(slug)) {
-      return NextResponse.rewrite(new URL(`/api-v2/md/${slug}`, request.nextUrl))
-    }
-  }
+  const isMarkdownSuffix = pathname.endsWith('.md')
+  const basePathname = isMarkdownSuffix ? pathname.slice(0, -3) : pathname
 
   // Strip trailing slash so /auth/ and /auth resolve to the same allowlist
   // entry — NextURL preserves trailing-slash style on rewrite targets.
-  const slug = (pathname === '/' ? 'homepage' : pathname.slice(1)).replace(/\/$/, '')
+  const slug = (basePathname === '/' ? 'homepage' : basePathname.slice(1)).replace(/\/$/, '')
   const isMdEligible = MD_PAGES.has(slug)
   const isChangelogEntry = slug === 'changelog' || /^changelog\/\d+/.test(slug)
 
   const decision = negotiateMarkdown(
-    {
-      acceptHeader: request.headers.get('accept') ?? '',
-      userAgent: request.headers.get('user-agent') ?? '',
-    },
-    { hasMarkdownVariant: isMdEligible || isChangelogEntry }
+    { acceptHeader: request.headers.get('accept') ?? '' },
+    { hasMarkdownVariant: isMdEligible || isChangelogEntry, isMarkdownSuffix }
   )
 
   if (decision === 'not-acceptable') {

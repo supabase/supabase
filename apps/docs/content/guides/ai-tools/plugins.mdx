@@ -22,7 +22,19 @@ Bundling the [MCP server](/docs/guides/getting-started/mcp) and [agent skills](/
 
 ## Installation
 
-Choose your AI coding agent and follow the installation steps:
+### Quick install
+
+The [`plugins`](https://www.npmjs.com/package/plugins) package installs the Supabase plugin into any supported AI coding agent with a single command. It auto-detects which agent tools you have installed and installs the plugin to all of them.
+
+```bash
+npx plugins add supabase-community/supabase-plugin
+```
+
+Add the `--yes` flag to install the Supabase plugin without the confirmation prompt/UI.
+
+### Manual install
+
+Alternatively, choose your AI coding agent and follow the installation steps:
 
 <AgentPluginsPanel />
 

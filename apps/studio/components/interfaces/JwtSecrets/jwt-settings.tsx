@@ -72,6 +72,7 @@ import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updati
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { DOCS_URL } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
 
 const MAX_JWT_EXP = 604800
@@ -504,9 +505,9 @@ export const JWTSettings = () => {
                     {disableLegacyJwtSecretRotation ? (
                       <Button variant="default" icon={<ExternalLink className="size-4" />} asChild>
                         <Link
-                          href="https://supabase.com/docs/guides/auth/signing-keys#getting-started"
+                          href={`${DOCS_URL}/guides/auth/signing-keys#getting-started`}
                           target="_blank"
-                          rel="noreferrer"
+                          rel="noopener noreferrer"
                         >
                           Read the full migration guide
                         </Link>

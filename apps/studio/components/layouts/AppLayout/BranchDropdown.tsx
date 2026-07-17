@@ -2,7 +2,11 @@ import { useParams } from 'common'
 import { useState } from 'react'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { AppLayoutDropdownError, AppLayoutDropdownWithPopover } from './AppLayoutDropdown'
+import {
+  AppLayoutDropdownError,
+  AppLayoutDropdownTriggerButton,
+  AppLayoutDropdownWithPopover,
+} from './AppLayoutDropdown'
 import { BranchBadge } from './BranchBadge'
 import { BranchDropdownCommandContent } from './BranchDropdownCommandContent'
 import { useEmbeddedCloseHandler } from './useEmbeddedCloseHandler'
@@ -108,6 +112,7 @@ export const BranchDropdown = ({
       commandContent={commandContent}
       open={open}
       onOpenChange={handleOpenChange}
+      triggerButton={<AppLayoutDropdownTriggerButton aria-label="Show project branches" />}
     />
   )
 }
