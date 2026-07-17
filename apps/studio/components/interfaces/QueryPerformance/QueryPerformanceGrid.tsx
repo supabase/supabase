@@ -607,9 +607,7 @@ export const QueryPerformanceGrid = ({
         >
           <SheetHeader className="sr-only">
             <SheetTitle>Query details</SheetTitle>
-            <SheetDescription>
-              Query Performance Details &amp; Indexes
-            </SheetDescription>
+            <SheetDescription>Query Performance Details &amp; Indexes</SheetDescription>
           </SheetHeader>
 
           <div className="overflow-auto grow px-0">
