@@ -4,7 +4,7 @@ export type AdvisorTab = 'all' | 'security' | 'performance' | 'messages'
 export type AdvisorSeverity = 'critical' | 'warning' | 'info'
 export type AdvisorItemSource = 'lint' | 'notification' | 'signal'
 
-const initialState = {
+const createInitialState = () => ({
   activeTab: 'all' as AdvisorTab,
   severityFilters: ['critical', 'warning'] as AdvisorSeverity[],
   selectedItemId: undefined as string | undefined,
@@ -15,10 +15,10 @@ const initialState = {
   get numNotificationFiltersApplied() {
     return [...this.notificationFilterStatuses, ...this.notificationFilterPriorities].length
   },
-}
+})
 
 export const advisorState = proxy({
-  ...initialState,
+  ...createInitialState(),
   setActiveTab(tab: AdvisorTab) {
     advisorState.activeTab = tab
   },
@@ -68,7 +68,7 @@ export const advisorState = proxy({
     advisorState.notificationFilterPriorities = []
   },
   reset() {
-    Object.assign(advisorState, initialState)
+    Object.assign(advisorState, createInitialState())
   },
 })
 
