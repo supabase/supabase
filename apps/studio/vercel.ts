@@ -74,6 +74,13 @@ function routesFor(prefix: string) {
         maxAge: '1year',
         immutable: true,
       }),
+      // Static images and favicons aren't content-hashed, so they can't be
+      // `immutable`, but they change rarely — mirror next.config's
+      // `cache-control` for these paths (img: max-age=2592000 = 30 days,
+      // favicon: max-age=86400 = 1 day). Prefixed like the other rules so
+      // `/dashboard/img/x.png` gets the header too when a basePath is set.
+      routes.cacheControl(`${prefix}/img/(.*)`, { public: true, maxAge: '30days' }),
+      routes.cacheControl(`${prefix}/favicon/(.*)`, { public: true, maxAge: '1day' }),
     ],
   }
 }
@@ -116,13 +123,30 @@ function buildTanstackConfig(): VercelConfig {
   // a fallback for bare-domain traffic).
   const ruleSets = (basePath ? [basePath, ''] : ['']).map(routesFor)
 
+  // Vercel's Flags Explorer probes `/.well-known/vercel/flags` and expects
+  // JSON. next.config.ts proxies it to supabase.com's endpoint and forces
+  // `content-type: application/json`; the TanStack build has no equivalent, so
+  // without these the path falls through to the extensionless catch-all shell
+  // rule and the browser gets HTML. This lives at the domain root (once, NOT
+  // inside routesFor) because next.config's rewrite sets `basePath: false`, so
+  // the path is never basePath-prefixed — well-known URLs are by convention at
+  // the root regardless of the app's basePath. The rewrite must be listed
+  // BEFORE the routesFor rewrites so it wins over the shell catch-all.
+  const wellKnownFlags = '/.well-known/vercel/flags'
+
   return {
     framework: null,
     outputDirectory: 'dist/client',
     cleanUrls: true,
     redirects: buildRedirects(),
-    rewrites: ruleSets.flatMap((r) => r.rewrites),
-    headers: ruleSets.flatMap((r) => r.headers),
+    rewrites: [
+      routes.rewrite(wellKnownFlags, `https://supabase.com${wellKnownFlags}`),
+      ...ruleSets.flatMap((r) => r.rewrites),
+    ],
+    headers: [
+      routes.header(wellKnownFlags, [{ key: 'content-type', value: 'application/json' }]),
+      ...ruleSets.flatMap((r) => r.headers),
+    ],
     // `api/server.js` imports the TanStack SSR bundle via a computed
     // path so Vercel's function bundler doesn't try to statically
     // resolve `dist/server/server.js` during the Next.js prod build
@@ -131,6 +155,16 @@ function buildTanstackConfig(): VercelConfig {
     // runtime import resolves.
     functions: {
       'api/server.js': {
+        // Every API + server-function request is rewritten onto this single
+        // function (see the `/api/*` and `/_serverFn/*` rewrites), so its
+        // timeout must cover the LONGEST per-route `maxDuration` the Next
+        // build declared — otherwise long AI streams and Stripe sync hit the
+        // platform default (~15s) and get killed. Next set these per route via
+        // `export const maxDuration`: generate-attachment-url (120),
+        // ai/code/complete (60), ai/onboarding/design (60), ai/sql/generate-v4
+        // (120), ai/feedback/rate (30), and integrations/stripe-sync (300).
+        // TanStack collapses them into one function, so we take the max: 300s.
+        maxDuration: 300,
         // Ship the SSR output, plus libpg-query's wasm. libpg-query is
         // externalized for SSR and loads its `.wasm` relative to its own
         // dir (`__dirname`) at import time; Vercel's function bundler
