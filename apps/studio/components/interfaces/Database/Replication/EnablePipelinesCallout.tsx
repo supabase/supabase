@@ -17,6 +17,7 @@ import { Admonition } from 'ui-patterns/admonition'
 
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-source-mutation'
 import { DOCS_URL } from '@/lib/constants'
@@ -66,14 +67,9 @@ const EnablePipelinesModal = () => {
             <p className="text-sm leading-normal!">
               Pipelines is billed for configured pipeline hours, initial sync data, and ongoing
               replication data. Review the{' '}
-              <a
-                className="underline"
-                href={`${DOCS_URL}/guides/platform/manage-your-usage/pipelines`}
-                target="_blank"
-                rel="noreferrer"
-              >
+              <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/pipelines`}>
                 Pipelines pricing
-              </a>{' '}
+              </InlineLink>{' '}
               before enabling it.
             </p>
           </Admonition>

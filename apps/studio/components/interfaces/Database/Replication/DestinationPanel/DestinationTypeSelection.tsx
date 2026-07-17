@@ -167,7 +167,11 @@ export const DestinationTypeSelection = () => {
               <selectedOption.icon size={20} className="shrink-0 text-foreground-light" />
               <div className="flex items-center gap-x-2">
                 <span className="text-sm text-foreground">{selectedOption.label}</span>
-                {selectedOption.stage && <Badge variant="warning">{selectedOption.stage}</Badge>}
+                {selectedOption.stage && (
+                  <Badge variant={selectedOption.stage === 'Early Access' ? 'warning' : 'default'}>
+                    {selectedOption.stage}
+                  </Badge>
+                )}
               </div>
             </div>
           ) : (
@@ -186,7 +190,11 @@ export const DestinationTypeSelection = () => {
                     <div className="flex flex-col gap-y-0.5">
                       <div className="flex items-center gap-x-2">
                         <span className="text-foreground">{option.label}</span>
-                        {option.stage && <Badge variant="warning">{option.stage}</Badge>}
+                        {option.stage && (
+                          <Badge variant={option.stage === 'Early Access' ? 'warning' : 'default'}>
+                            {option.stage}
+                          </Badge>
+                        )}
                       </div>
                       <span className="text-xs text-foreground-lighter">{option.description}</span>
                     </div>
