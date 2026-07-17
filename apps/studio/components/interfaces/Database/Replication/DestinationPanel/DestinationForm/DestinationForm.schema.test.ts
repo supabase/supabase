@@ -49,17 +49,14 @@ describe('DestinationPanelFormSchema', () => {
     ).toBe(true)
   })
 
-  it.each([0, 1.5])(
-    'rejects an unsupported copy connections per table count of %s',
-    (value) => {
-      expect(
-        DestinationPanelFormSchema.safeParse({
-          ...requiredFields,
-          maxCopyConnectionsPerTable: value,
-        }).success
-      ).toBe(false)
-    }
-  )
+  it.each([0, 1.5])('rejects an unsupported copy connections per table count of %s', (value) => {
+    expect(
+      DestinationPanelFormSchema.safeParse({
+        ...requiredFields,
+        maxCopyConnectionsPerTable: value,
+      }).success
+    ).toBe(false)
+  })
 
   it('requires the BigQuery connection pool size to be greater than 0', () => {
     expect(
