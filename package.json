@@ -65,8 +65,8 @@
     "url": "git+https://github.com/supabase/supabase.git"
   },
   "engines": {
-    "pnpm": "10.24",
-    "node": ">=22"
+    "pnpm": "11.13",
+    "node": ">=22.13"
   },
   "keywords": [
     "postgres",
@@ -76,5 +76,5 @@
     "database",
     "auth"
   ],
-  "packageManager": "pnpm@10.24.0"
+  "packageManager": "pnpm@11.13.1"
 }

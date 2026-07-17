@@ -5,6 +5,8 @@ packages:
   - e2e/*
 
 blockExoticSubdeps: true
+engineStrict: true
+updateNotifier: false
 
 catalog:
   '@monaco-editor/react': ^4.7.0
@@ -49,17 +51,19 @@ catalog:
   vitest: ^4.1.4
   zod: 3.25.76
 
-ignoredBuiltDependencies:
-  - '@parcel/watcher'
-  - '@sentry/cli'
-  - contentlayer2
-  - core-js
-  - es5-ext
-  - esbuild
-  - libpg-query
-  - msw
-  - protobufjs
-  - sharp
+allowBuilds:
+  '@parcel/watcher': false
+  '@sentry/cli': false
+  contentlayer2: false
+  core-js: false
+  es5-ext: false
+  esbuild: false
+  libpg-query: false
+  msw: false
+  node-pty: true
+  protobufjs: false
+  sharp: false
+  supabase: true
 
 minimumReleaseAge: 4320
 
@@ -73,10 +77,6 @@ minimumReleaseAgeExclude:
   - mdast-jsx
   # The following are excluded to fix vulnerablities.
   - react-use
-
-onlyBuiltDependencies:
-  - node-pty
-  - supabase
 
 overrides:
   '@ardatan/relay-compiler>immutable': ^3.8.3
