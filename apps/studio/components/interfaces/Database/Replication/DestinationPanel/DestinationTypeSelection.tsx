@@ -132,7 +132,7 @@ export const DestinationTypeSelection = () => {
           label: 'ClickHouse',
           description: 'Stream changes to a ClickHouse cluster for fast columnar analytics',
           icon: ClickHouse,
-          isAlpha: true,
+          stage: 'Early Access',
           enabled: isOptionVisible('ClickHouse', etlEnableClickHouse),
         },
       ],
