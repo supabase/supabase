@@ -39,7 +39,7 @@ const SignInPage: NextPageWithLayout = () => {
 
   // [Joshen] This is just for backward compatibility - singular customProvider needs to be deprecated subsequently
   // Just need to remove customProvider and rename customProvidersNew to customProviders
-  const customProviders = customProvidersNew ?? (customProvider ? [customProvider] : null)
+  const customProviders = customProvidersNew ?? (customProvider ? [customProvider] : [])
 
   const { focusProvider } = useInboundBranding('sign-in')
   const signInProviders = useEnabledIdentityProviders().filter((provider) => provider.showOnSignIn)
@@ -49,7 +49,8 @@ const SignInPage: NextPageWithLayout = () => {
     dividerBgClass = 'bg-studio'
   ) => {
     const showOrDivider =
-      (providers.length > 0 || signInWithSsoEnabled || !!customProviders) && signInWithEmailEnabled
+      (providers.length > 0 || signInWithSsoEnabled || customProviders.length > 0) &&
+      signInWithEmailEnabled
 
     return (
       <>
@@ -98,7 +99,7 @@ const SignInPage: NextPageWithLayout = () => {
     const hasOtherOptions =
       otherProviders.length > 0 ||
       signInWithSsoEnabled ||
-      !!customProviders ||
+      customProviders.length > 0 ||
       signInWithEmailEnabled
 
     return (
