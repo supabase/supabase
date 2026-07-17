@@ -100,8 +100,16 @@ const createSQLStatementForUpdatePolicy = (
   const alterStatement = `ALTER POLICY "${name}" ON "${schema}"."${table}"`
   const statement = [
     'BEGIN;',
-    ...(definitionChanged ? [`  ${alterStatement} USING (${fieldsToUpdate.definition});`] : []),
-    ...(checkChanged ? [`  ${alterStatement} WITH CHECK (${fieldsToUpdate.check});`] : []),
+    // ALTER POLICY cannot remove expressions — only replace them. Emitting
+    // `USING ()` or `WITH CHECK ()` for a cleared field produces invalid SQL
+    // that is silently dropped by pg-meta (undefined payload), so guard here
+    // as defense-in-depth.
+    ...(definitionChanged && fieldsToUpdate.definition
+      ? [`  ${alterStatement} USING (${fieldsToUpdate.definition});`]
+      : []),
+    ...(checkChanged && fieldsToUpdate.check
+      ? [`  ${alterStatement} WITH CHECK (${fieldsToUpdate.check});`]
+      : []),
     ...(rolesChanged ? [`  ${alterStatement} TO ${roles.join(', ')};`] : []),
     ...(nameChanged ? [`  ${alterStatement} RENAME TO "${fieldsToUpdate.name}";`] : []),
     'COMMIT;',
@@ -144,10 +152,14 @@ export const createPayloadForUpdatePolicy = (
     payload.name = policyFormFields.name
   }
   if (!isEqual(formattedDefinition, originalPolicyFormFields.definition)) {
-    payload.definition = !formattedDefinition ? undefined : untrustedSql(formattedDefinition)
+    // When a definition is cleared, send null instead of undefined.
+    // `undefined` is stripped during JSON.stringify, so pg-meta's update()
+    // never sees the field and treats it as "no change" — the old expression
+    // silently persists. `null` is preserved in JSON and signals "remove this".
+    payload.definition = !formattedDefinition ? null : untrustedSql(formattedDefinition)
   }
   if (!isEqual(formattedCheck, originalPolicyFormFields.check)) {
-    payload.check = !formattedCheck ? undefined : untrustedSql(formattedCheck)
+    payload.check = !formattedCheck ? null : untrustedSql(formattedCheck)
   }
   if (!isEqual(policyFormFields.roles, originalPolicyFormFields.roles)) {
     if (policyFormFields.roles.length === 0) payload.roles = ['public']

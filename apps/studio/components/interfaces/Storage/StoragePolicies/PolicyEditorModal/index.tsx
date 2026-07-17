@@ -46,8 +46,16 @@ const acceptUpdatePayload = (
   draft: DraftPostgresPolicyUpdatePayload
 ): PostgresPolicyUpdatePayload => ({
   ...draft,
-  definition: draft.definition === undefined ? undefined : acceptUntrustedSql(draft.definition),
-  check: draft.check === undefined ? undefined : acceptUntrustedSql(draft.check),
+  // Preserve `null` (explicit clear) and `undefined` (no change) while
+  // promoting actual SQL fragments to SafeSqlFragment.
+  definition:
+    draft.definition === undefined || draft.definition === null
+      ? draft.definition
+      : acceptUntrustedSql(draft.definition),
+  check:
+    draft.check === undefined || draft.check === null
+      ? draft.check
+      : acceptUntrustedSql(draft.check),
 })
 
 interface PolicyEditorModalProps {
@@ -178,6 +186,20 @@ export const PolicyEditorModal = ({
     if (command === 'UPDATE' && !definition && !check) {
       return toast.error(
         'Please provide either a USING, or WITH CHECK expression, or both for your policy'
+      )
+    }
+    // Prevent clearing an expression that was already set on the existing policy.
+    // ALTER POLICY can only replace expressions, not remove them, so a cleared
+    // field would be silently dropped from the update payload (undefined →
+    // omitted in JSON serialization) and the old expression would persist.
+    if (selectedPolicyToEdit?.definition && !definition) {
+      return toast.error(
+        'The USING expression cannot be removed once set. Replace it with a new expression instead.'
+      )
+    }
+    if (selectedPolicyToEdit?.check && !check) {
+      return toast.error(
+        'The WITH CHECK expression cannot be removed once set. Replace it with a new expression instead.'
       )
     }
     const policySQLStatement = createSQLPolicy(policyFormFields, selectedPolicyToEdit)

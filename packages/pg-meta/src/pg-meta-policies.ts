@@ -134,8 +134,8 @@ create policy ${ident(name)} on ${ident(schema)}.${ident(table)}
 
 type PolicyUpdateParams = {
   name?: string
-  definition?: SafeSqlFragment
-  check?: SafeSqlFragment
+  definition?: SafeSqlFragment | null
+  check?: SafeSqlFragment | null
   roles?: string[]
 }
 
@@ -148,10 +148,18 @@ function update(
   const alter = safeSql`ALTER POLICY ${ident(identifier.name)} ON ${ident(identifier.schema)}.${ident(identifier.table)}`
   const nameSql: SafeSqlFragment =
     name === undefined ? safeSql`` : safeSql`${alter} RENAME TO ${ident(name)};`
+  // `undefined` = no change (omit the clause). `null` = explicit clear, which
+  // ALTER POLICY cannot do (PostgreSQL can only replace, not remove), so we
+  // also omit the clause — the caller's validation should prevent reaching
+  // here with null. Keeping the guard ensures we never emit `USING (null)`.
   const definitionSql: SafeSqlFragment =
-    definition === undefined ? safeSql`` : safeSql`${alter} USING (${definition});`
+    definition === undefined || definition === null
+      ? safeSql``
+      : safeSql`${alter} USING (${definition});`
   const checkSql: SafeSqlFragment =
-    check === undefined ? safeSql`` : safeSql`${alter} WITH CHECK (${check});`
+    check === undefined || check === null
+      ? safeSql``
+      : safeSql`${alter} WITH CHECK (${check});`
   const rolesSql: SafeSqlFragment =
     roles === undefined
       ? safeSql``
