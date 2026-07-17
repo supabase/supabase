@@ -698,22 +698,25 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
 
       const unsubscribe = subscribe(state, () => {
         const snap = snapshot(state)
+
         // Prepare state for IndexedDB
         const stateToSave: StoredAiAssistantState = {
           projectRef: project?.ref,
           activeChatId: snap.activeChatId,
           model: snap.model,
           chats: snap.chats
-            ? Object.entries(snap.chats).reduce((acc, [chatId, chat]) => {
-                // Limit messages before saving
-                return {
-                  ...acc,
-                  [chatId]: {
-                    ...chat,
-                    messages: chat.messages?.slice(-20) || [],
-                  },
-                }
-              }, {})
+            ? (Object.entries(snap.chats) as Array<[string, ChatSession]>).reduce(
+                (acc, [chatId, chat]) => {
+                  return {
+                    ...acc,
+                    [chatId]: {
+                      ...chat,
+                      messages: chat.messages?.slice(-20) || [],
+                    },
+                  }
+                },
+                {} as Record<string, ChatSession>
+              )
             : {},
         }
         debouncedSaveAiState(stateToSave)
