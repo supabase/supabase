@@ -296,6 +296,19 @@ test('passing a value prop shows the correct dates in the label', async () => {
   )
 })
 
+test('opening with an unparseable date value (legacy epoch-ms its/ite) does not crash', async () => {
+  render(
+    <LogsDatePicker
+      helpers={[]}
+      value={{ from: '1784211420000', to: '1784211540000' }}
+      onSubmit={mockFn}
+    />
+  )
+
+  await userEvent.click(await screen.findByRole('button'))
+  expect(await screen.findByText('Apply')).toBeInTheDocument()
+})
+
 test('passing a helper as a value prop shows the helper text in the label', async () => {
   const helper = {
     text: 'Last 7 days',

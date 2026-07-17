@@ -1107,6 +1107,9 @@ importers:
       lodash:
         specifier: ^4.18.1
         version: 4.18.1
+      lodash-es:
+        specifier: ^4.18.1
+        version: 4.18.1
       lucide-react:
         specifier: ^0.436.0
         version: 0.436.0(react@19.2.6)

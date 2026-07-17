@@ -112,6 +112,7 @@
     "ip-num": "^1.5.1",
     "json-logic-js": "^2.0.2",
     "lodash": "catalog:",
+    "lodash-es": "catalog:",
     "lucide-react": "^0.436.0",
     "markdown-table": "^3.0.3",
     "mime-db": "^1.53.0",
