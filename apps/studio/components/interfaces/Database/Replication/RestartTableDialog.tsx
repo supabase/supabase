@@ -12,6 +12,7 @@ import {
 } from 'ui'
 
 import { PipelineStatusName } from './Replication.constants'
+import { RestartCostEstimate } from './RestartCostEstimate'
 import { useRollbackTablesMutation } from '@/data/replication/rollback-tables-mutation'
 
 interface RestartTableDialogProps {
@@ -19,6 +20,8 @@ interface RestartTableDialogProps {
   onOpenChange: (open: boolean) => void
   tableId: number
   tableName: string
+  sourceId?: number
+  publicationName?: string
   pipelineStatusName?: PipelineStatusName
   onRestartStart?: () => void
   onRestartComplete?: () => void
@@ -29,6 +32,8 @@ export const RestartTableDialog = ({
   onOpenChange,
   tableId,
   tableName,
+  sourceId,
+  publicationName,
   pipelineStatusName,
   onRestartStart,
   onRestartComplete,
@@ -80,8 +85,9 @@ export const RestartTableDialog = ({
               </p>
               <ul className="list-disc list-inside space-y-1.5 pl-2">
                 <li>
-                  <strong>The table copy will be re-initialized.</strong> All data will be copied
-                  again from the source.
+                  <strong>The table's initial sync will restart.</strong> All existing data will be
+                  copied again from the source. This initial sync is billed in addition to previous
+                  initial syncs.
                 </li>
                 <li>
                   <strong>Existing downstream data will be deleted.</strong> Any replicated data for
@@ -98,6 +104,13 @@ export const RestartTableDialog = ({
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
+        <RestartCostEstimate
+          open={open}
+          projectRef={projectRef}
+          sourceId={sourceId}
+          publicationName={publicationName}
+          tableNames={[tableName]}
+        />
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isResetting}>Cancel</AlertDialogCancel>
           <AlertDialogAction disabled={isResetting} onClick={handleReset} variant="warning">

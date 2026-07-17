@@ -11,16 +11,20 @@ export type UnifiedLogType = keyof typeof LOG_TYPES_LABELS
 export const buildUnifiedLogsUrl = ({
   projectRef,
   logType,
+  user,
   start,
   end,
 }: {
   projectRef: string
-  logType: UnifiedLogType
+  logType?: UnifiedLogType
+  /** Pre-applies the cross-cutting "filter by user" (?user=) — an id or email. */
+  user?: string
   start?: string | Date
   end?: string | Date
 }) => {
   const params = new URLSearchParams()
-  params.append('filter', `log_type:eq:${logType}`)
+  if (logType) params.append('filter', `log_type:eq:${logType}`)
+  if (user) params.set('user', user)
   if (start && end) {
     params.set('date', `${new Date(start).valueOf()}-${new Date(end).valueOf()}`)
   }

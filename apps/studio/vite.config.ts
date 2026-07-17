@@ -1,17 +1,27 @@
 /* eslint-disable no-restricted-exports */
 
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import remapping, { type SourceMapInput } from '@jridgewell/remapping'
 import { sentryTanstackStart } from '@sentry/tanstackstart-react/vite'
 import tailwindcss from '@tailwindcss/vite'
 import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
+import MagicString from 'magic-string'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url))
 const compatRoot = path.resolve(rootDir, 'compat/next')
+
+// Absolute dir of lodash-es, for the SSR-only lodash alias below. Resolved
+// here (not left as a bare 'lodash-es' replacement) because rollup-alias
+// rewrites the id but resolution still runs from the ORIGINAL importer —
+// under pnpm's strict node_modules, workspace packages that don't declare
+// lodash-es (ui, common) would fail to resolve the bare specifier.
+const lodashEsDir = path.dirname(createRequire(import.meta.url).resolve('lodash-es/package.json'))
 
 // Map of Next imports we've shimmed to their TanStack-backed replacement.
 // Add an entry here + a file under compat/next/ when a new Next surface is
@@ -214,6 +224,30 @@ function umdAmdShortCircuit(): Plugin {
 // exports so Rolldown's static analysis is satisfied. Easier to stub the one
 // internal consumer — `GraphiQL.tsx` only exposes a default-export component,
 // and no SSR-reachable route renders it (the GraphiQL tab is client-only).
+// SSR-only lodash → lodash-es rewrite, for the whole SSR module graph (app
+// source, workspace packages, and node_modules deps alike). The CJS lodash
+// in `ssr.noExternal` evaluates as pure ESM in the dev module runner — no
+// `module`/`exports`/`require` — so its UMD wrapper silently attaches `_` to
+// the global and every named import binds to `undefined`, exploding only when
+// first CALLED during SSR render ("(0, __vite_ssr_import_0__.isEqual) is not
+// a function"). Deep imports (`lodash/isEqual`) fail harder: their plain-CJS
+// `require` throws "require is not defined". lodash-es is the same version as
+// real ESM, so both import styles just work. Client bundles are untouched —
+// resolution is gated on `options.ssr`, and the Next build doesn't read this
+// config.
+function ssrLodashEs(): Plugin {
+  return {
+    name: 'studio-ssr-lodash-es',
+    enforce: 'pre',
+    resolveId(source, _importer, options) {
+      if (!options?.ssr) return
+      if (source === 'lodash') return path.join(lodashEsDir, 'lodash.js')
+      const subpath = source.match(/^lodash\/(.+?)(\.js)?$/)
+      if (subpath) return path.join(lodashEsDir, `${subpath[1]}.js`)
+    },
+  }
+}
+
 function ssrStubGraphiql(): Plugin {
   return {
     name: 'studio-ssr-stub-graphiql',
@@ -335,6 +369,159 @@ function assertNoChunkCycles(): Plugin {
   }
 }
 
+// Skew protection (vercel.com/docs/skew-protection): bake `?dpl=<deployment
+// id>` into every asset URL the client bundle can request, so every hashed
+// chunk resolves against the deployment that referenced it. Vercel's edge
+// routes any request carrying `?dpl=` to that exact deployment, so a
+// long-lived dashboard session keeps loading its own deployment's hashed
+// chunks after a redeploy, while document navigations (which carry no pin)
+// always land on the latest deployment. If the pinned deployment ages out of
+// Skew Protection's Maximum Age, Vercel 404s the chunk and the
+// `vite:preloadError` backstop in router.tsx reloads onto the latest deploy.
+// API / server-function fetches are deliberately unpinned — that is what
+// lets use-check-latest-deploy detect newer deploys mid-session.
+//
+// Three mechanisms are needed for full coverage:
+//   1. `experimental.renderBuiltUrl` (in the config below) — asset and
+//      public-file URLs referenced from JS/CSS/HTML, including the
+//      `__vite__mapDeps` preload lists for dynamic imports.
+//   2. The `generateBundle` hook here — chunk-to-chunk `import`/`from`
+//      specifiers. Rolldown renders these as bare relative paths that
+//      `renderBuiltUrl` never sees (vitejs/vite#13834), and they're what the
+//      browser actually fetches; the preload list alone would just warm a
+//      cache entry under a different URL. Module identity is keyed by URL, so
+//      the rewrite must cover EVERY specifier or a chunk could load twice
+//      (pinned + unpinned) and break singleton module state.
+//   3. The `buildApp` hook here — `_shell.html` is prerendered by TanStack's
+//      own post-order `buildApp` hook from the router manifest, outside
+//      Vite's asset pipeline, so its <script>/<link> URLs and the embedded
+//      route-preload manifest are patched on disk afterwards. Without this,
+//      the shell's unpinned modulepreload URLs and the pinned import URLs are
+//      different cache keys and the whole entry graph downloads twice.
+function skewProtectionDpl(opts: { dplSearch: string; assetsUrlPrefix: string }): Plugin {
+  const { dplSearch, assetsUrlPrefix } = opts
+  return {
+    name: 'studio-skew-protection-dpl',
+    apply: 'build',
+    // TanStack's `tanstack-start-core:post-build` plugin is `enforce: 'post'`;
+    // matching it keeps THIS plugin sorted after it (same enforce group,
+    // registration order wins), which the buildApp hook below relies on.
+    enforce: 'post',
+    transform: {
+      handler(code, id) {
+        if (id !== '\0vite/preload-helper.js') return
+        // Vite's preload helper decides stylesheet-vs-modulepreload with
+        // `dep.endsWith(".css")`. The `?dpl=` suffix makes that false for
+        // every CSS dep, so lazy chunks' CSS would be injected as a script
+        // modulepreload — a console MIME error, and the stylesheet never
+        // applies. Make the check query-aware. Hard-fail if the helper's
+        // shape ever changes so a Vite upgrade can't silently regress this.
+        const cssCheck = 'dep.endsWith(".css")'
+        if (!code.includes(cssCheck)) {
+          this.error(
+            `studio-skew-protection-dpl: expected \`${cssCheck}\` in vite's preload helper — ` +
+              `vite changed its preload-helper shape; update this patch to match.`
+          )
+        }
+        return { code: code.replaceAll(cssCheck, '/\\.css(\\?|$)/.test(dep)'), map: null }
+      },
+    },
+    generateBundle: {
+      // `order: 'post'` so this runs AFTER `vite:build-import-analysis`'s
+      // normal-order generateBundle. That hook maps each dynamic-import
+      // specifier back to a bundle key — with no query stripping — to collect
+      // the chunk's CSS/preload deps; a `?dpl` suffix added any earlier makes
+      // the lookup miss and silently drops CSS preloading for lazy chunks.
+      order: 'post',
+      handler(_options, bundle) {
+        // Server chunks import each other via Node's filesystem resolution —
+        // only the browser-facing client build gets the query pin.
+        if (this.environment.name !== 'client') return
+        for (const chunk of Object.values(bundle)) {
+          if (chunk.type !== 'chunk') continue
+          const importees = new Set([...chunk.imports, ...chunk.dynamicImports])
+          if (importees.size === 0) continue
+          const chunkDir = path.posix.dirname(chunk.fileName)
+          let edits: MagicString | undefined
+          for (const importee of importees) {
+            const rel = path.posix.relative(chunkDir, importee)
+            const spec = rel.startsWith('.') ? rel : `./${rel}`
+            // Rolldown quotes static import specifiers with `"` and dynamic
+            // ones with backticks; cover `'` too for safety. Matching the
+            // exact quoted specifier of a known importee (hashed filename)
+            // can't collide with app string literals.
+            for (const quote of ['"', "'", '`']) {
+              const target = `${quote}${spec}${quote}`
+              for (
+                let at = chunk.code.indexOf(target);
+                at !== -1;
+                at = chunk.code.indexOf(target, at + target.length)
+              ) {
+                edits ??= new MagicString(chunk.code)
+                edits.appendLeft(at + target.length - 1, dplSearch)
+              }
+            }
+          }
+          if (!edits) continue
+          chunk.code = edits.toString()
+          // Recombine the sourcemap so the columns Sentry maps stay accurate
+          // — every insertion shifts the rest of the minified line. Like
+          // vite:build-import-analysis's own generateBundle edits, updating
+          // `chunk.map` isn't enough: the `.js.map` file already exists in
+          // the bundle as an emitted asset by this point, so the combined map
+          // has to be written into that asset too.
+          if (chunk.map) {
+            const editMap = edits.generateMap({ source: chunk.fileName, hires: 'boundary' })
+            const original = chunk.map as unknown as SourceMapInput & {
+              file?: string
+              debugId?: string
+            }
+            const combined = {
+              ...remapping([editMap as SourceMapInput, original], () => null),
+              // Preserve fields remapping drops but the toolchain relies on
+              // (`debugId` is how Sentry pairs the uploaded map to the chunk).
+              file: original.file,
+              ...(original.debugId && { debugId: original.debugId }),
+            }
+            chunk.map = combined as unknown as typeof chunk.map
+            const mapAsset = bundle[`${chunk.fileName}.map`]
+            if (mapAsset && mapAsset.type === 'asset') {
+              mapAsset.source = JSON.stringify(combined)
+            }
+          }
+        }
+      },
+    },
+    buildApp: {
+      // TanStack's `tanstack-start-core:post-build` prerenders `_shell.html`
+      // in its own post-order buildApp hook. This hook must run after it, so
+      // this plugin must sort after that one: same hook order + same plugin
+      // `enforce` group (see above) + registered after `tanstackStart()` in
+      // the plugins array.
+      order: 'post',
+      async handler(builder) {
+        const clientEnv = builder.environments.client
+        if (!clientEnv) return
+        const outDir = path.resolve(builder.config.root, clientEnv.config.build.outDir)
+        const escapedPrefix = assetsUrlPrefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        // Quoted `/assets/...` URLs: <script src>/<link href> attributes and
+        // the serialized router manifest's preload lists. `[^"'`?]` keeps the
+        // match inside one URL and skips any that already carry a query.
+        const assetUrl = new RegExp(`(["'\`])(${escapedPrefix}[^"'\`?]+)\\1`, 'g')
+        for (const entry of fs.readdirSync(outDir, { recursive: true, withFileTypes: true })) {
+          if (!entry.isFile() || !entry.name.endsWith('.html')) continue
+          const filePath = path.join(entry.parentPath, entry.name)
+          const html = fs.readFileSync(filePath, 'utf-8')
+          const patched = html.replace(assetUrl, (_match, quote, url) => {
+            return `${quote}${url}${dplSearch}${quote}`
+          })
+          if (patched !== html) fs.writeFileSync(filePath, patched)
+        }
+      },
+    },
+  }
+}
+
 export default defineConfig(({ command, mode }) => {
   // Match Next's "always production-NODE_ENV during build" behaviour.
   // `pnpm run e2e:setup:selfhosted` invokes the build with a shell
@@ -369,10 +556,6 @@ export default defineConfig(({ command, mode }) => {
   const vercelPublicVars = [
     'VERCEL_ENV',
     'VERCEL_BRANCH_URL',
-    // Skew protection: the client pins its session to this deployment (see
-    // router.tsx). Both are build-time system env vars on Vercel.
-    'VERCEL_DEPLOYMENT_ID',
-    'VERCEL_SKEW_PROTECTION_ENABLED',
     // Sentry release (sentry.tanstack.ts): the SDK silently drops session
     // envelopes when the client has no release, so Release Health would send
     // nothing. The commit SHA is also what withSentryConfig resolves the Next
@@ -424,6 +607,13 @@ export default defineConfig(({ command, mode }) => {
   // Leaving the var empty keeps the app at `/` as today.
   const basePath = env.NEXT_PUBLIC_BASE_PATH || undefined
 
+  // Skew protection — see the skewProtectionDpl comment above. Both are
+  // build-time system env vars on Vercel; unset on local/self-hosted builds,
+  // which disables the whole mechanism.
+  const skewDeploymentId =
+    env.VERCEL_SKEW_PROTECTION_ENABLED === '1' ? env.VERCEL_DEPLOYMENT_ID : undefined
+  const dplSearch = skewDeploymentId ? `?dpl=${encodeURIComponent(skewDeploymentId)}` : ''
+
   // Substitutions that have to apply to *both* our app source (via Vite's
   // `define`) and any pre-bundled dependencies (via esbuild's optimizeDeps).
   // The two pipelines don't share config — Vite's `define` only touches
@@ -468,6 +658,19 @@ export default defineConfig(({ command, mode }) => {
       ],
     },
     ...(basePath && { base: basePath }),
+    // Skew protection part 1 (see skewProtectionDpl above): every asset /
+    // public-file URL rendered into the bundle — CSS url()s, images, worker
+    // URLs, `__vite__mapDeps` preload lists — gets the `?dpl=` pin. Returning
+    // a string opts out of Vite's base handling, so the base path is joined
+    // here. Left unset when the pin is off so Vite keeps its default
+    // base-relative URL rendering.
+    ...(dplSearch && {
+      experimental: {
+        renderBuiltUrl(filename: string) {
+          return `${basePath ?? ''}/${filename}${dplSearch}`
+        },
+      },
+    }),
     optimizeDeps: {
       // graphiql's Vite worker setup (swapped in for the webpack one by the
       // `graphiqlViteWorkers` plugin above) imports Monaco's workers with
@@ -547,7 +750,11 @@ export default defineConfig(({ command, mode }) => {
       postcss: { plugins: [] },
     },
     ssr: {
-      // `lodash` is CJS; its named-export interop fails in Node ESM unless bundled.
+      // `lodash` must stay inlined so its ids flow through the plugin
+      // pipeline, where ssrLodashEs (above) rewrites them to lodash-es.
+      // Externalized bare ids skip user plugins in the dev module runner, so
+      // dropping this entry resurfaces Node's CJS named-export failure
+      // ("Named export 'debounce' not found") on every `from 'lodash'` import.
       // `next/*` must be bundled so our nextCompat shim wins — otherwise Vite's
       // SSR externalizer leaves `next/router` as a runtime package import and
       // Node resolves it to Next's real module.
@@ -578,6 +785,7 @@ export default defineConfig(({ command, mode }) => {
       rawTextLoader(),
       graphiqlViteWorkers(),
       ssrStubGraphiql(),
+      ssrLodashEs(),
       umdAmdShortCircuit(),
       assertNoChunkCycles(),
       devtools(),
@@ -592,6 +800,12 @@ export default defineConfig(({ command, mode }) => {
         ...(basePath && { router: { basepath: basePath } }),
       }),
       viteReact(),
+      // Skew protection parts 2 + 3. Registered after tanstackStart() so the
+      // shell-patching buildApp hook runs after TanStack's prerender — see
+      // the skewProtectionDpl comment.
+      ...(dplSearch
+        ? [skewProtectionDpl({ dplSearch, assetsUrlPrefix: `${basePath ?? ''}/assets/` })]
+        : []),
       // Sentry's TanStack Start plugin(s) MUST be last so source maps reflect
       // every prior transform. `sentryTanstackStart` returns an ARRAY of
       // plugins (route patterns, source-map upload, middleware auto-wrap), so

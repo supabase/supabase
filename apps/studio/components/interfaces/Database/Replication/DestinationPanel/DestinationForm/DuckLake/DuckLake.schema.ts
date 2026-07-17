@@ -4,11 +4,11 @@ import * as z from 'zod'
 // mode keeps the manual PostgreSQL catalog URL + S3-compatible credentials.
 export const DuckLakeFormSchema = z.object({
   ducklakeMode: z.enum(['supabase', 'custom']).optional(),
-  // "Use Supabase" fields
+  // DuckLake "Use Supabase" fields
   ducklakeCatalogProjectRef: z.string().optional(),
   ducklakeStorageProjectRef: z.string().optional(),
   ducklakeStorageBucket: z.string().optional(),
-  // "Custom parameters" fields
+  // DuckLake "Custom parameters" fields
   ducklakeCatalogUrl: z.string().optional(),
   ducklakeDataPath: z.string().optional(),
   ducklakePoolSize: z

@@ -9,11 +9,15 @@ import { SnowflakeFormSchema } from './Snowflake/Snowflake.schema'
 const CommonFormSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   publicationName: z.string().min(1, 'Publication is required'),
-  maxFillMs: z.number().min(1, 'Max fill milliseconds must be greater than 0').int().optional(),
+  maxFillMs: z
+    .number()
+    .int('Batch wait time must be a whole number of milliseconds')
+    .min(0, 'Batch wait time must be 0 or greater')
+    .optional(),
   maxTableSyncWorkers: z
     .number()
     .min(1, 'Max table sync workers must be greater than 0')
-    .int()
+    .int('Max table sync workers must be a whole number')
     .optional(),
   maxCopyConnectionsPerTable: z
     .number()

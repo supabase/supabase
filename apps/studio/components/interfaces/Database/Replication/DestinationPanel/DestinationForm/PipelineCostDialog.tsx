@@ -37,8 +37,8 @@ interface PipelineCostDialogProps {
 }
 
 /**
- * Shows an estimate of what the pipeline will cost (one-time initial copy, hourly pipeline
- * fee, and the usage-based streaming rate).
+ * Shows an estimate of what the pipeline will cost (one-time initial sync, hourly pipeline
+ * fee, and the ongoing replication rate).
  *
  * This should be a non-blocking enhancement - so if there's an error while fetching the
  * pricing estimate, we skip this gate rather than block the user from creating pipeline
@@ -67,8 +67,7 @@ export const PipelineCostDialog = ({
   const hiddenTableCount = tableCount - visibleTables.length
   const hasRowFilteredTables = tables.some((table) => table.is_row_filtered)
 
-  const firstMonthTotal =
-    (estimate?.table_copy.total_cost ?? 0) + (estimate?.pipeline.monthly_cost ?? 0)
+  const initialSyncTotal = estimate?.table_copy.total_cost ?? 0
 
   useEffect(() => {
     if (open && isError) onConfirmRef.current()
@@ -115,7 +114,7 @@ export const PipelineCostDialog = ({
                 </p>
 
                 <div className="flex flex-col gap-y-2">
-                  <p className="text-sm font-medium text-foreground">Initial table copy</p>
+                  <p className="text-sm font-medium text-foreground">Initial sync</p>
 
                   {tableCount > 0 ? (
                     <Card>
@@ -179,41 +178,40 @@ export const PipelineCostDialog = ({
                 <div className="flex flex-col gap-y-2">
                   <p className="text-sm font-medium text-foreground">Ongoing</p>
                   <div className="flex items-center justify-between gap-x-4 text-sm">
-                    <span className="text-foreground-light">Active pipeline</span>
+                    <span className="text-foreground-light">Configured pipeline</span>
                     <span className="shrink-0 text-right font-mono text-foreground" translate="no">
-                      ${estimate.pipeline.hourly_cost}/hour{' '}
-                      <span className="text-foreground-lighter">
-                        (~{formatCurrency(estimate.pipeline.monthly_cost)}/month)
-                      </span>
+                      ${estimate.pipeline.hourly_cost}/hour
                     </span>
                   </div>
                   <div className="flex items-center justify-between gap-x-4 text-sm">
-                    <span className="text-foreground-light">Streaming changes</span>
+                    <span className="text-foreground-light">Ongoing replication data</span>
                     <span className="shrink-0 text-right font-mono text-foreground" translate="no">
                       {formatCurrency(estimate.streaming.rate_per_gb)}/GB
                     </span>
                   </div>
                   <p className="text-xs text-foreground-lighter">
-                    Streaming is billed on the volume of changes replicated after the initial copy,
-                    so the total depends on how often your data changes.
+                    Ongoing replication is billed on the volume of changes processed after the
+                    initial sync, so the total depends on how often your data changes.
+                  </p>
+                  <p className="text-xs text-foreground-lighter">
+                    Destination-provider charges, such as BigQuery ingestion, storage, and compute,
+                    are separate.
                   </p>
                 </div>
 
                 <div className="flex flex-col gap-y-2">
                   <div className="flex items-center justify-between gap-x-6 rounded-md border bg-surface-100 px-4 py-3">
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-foreground">
-                        Estimated first month total
-                      </p>
+                      <p className="text-sm font-medium text-foreground">Estimated initial sync</p>
                       <p className="text-xs text-foreground-lighter">
-                        Initial copy + first pipeline fee, excluding usage-based streaming
+                        Pipeline hours and ongoing replication data are billed separately
                       </p>
                     </div>
                     <span
                       className="shrink-0 text-right font-mono text-lg font-semibold text-foreground"
                       translate="no"
                     >
-                      {formatCurrency(firstMonthTotal)}
+                      {formatCurrency(initialSyncTotal)}
                       {hasRowFilteredTables ? '*' : null}
                     </span>
                   </div>

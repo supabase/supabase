@@ -286,10 +286,7 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
             title="MCP for self-hosted Supabase requires extra setup"
             description="The configuration below points at the hosted Supabase MCP server. To use MCP against your self-hosted instance, follow the self-hosted MCP guide."
             actions={[
-              <DocsButton
-                key="docs"
-                href="https://supabase.com/docs/guides/self-hosting/enable-mcp"
-              />,
+              <DocsButton key="docs" href={`${DOCS_URL}/guides/self-hosting/enable-mcp`} />,
             ]}
           />
         )}

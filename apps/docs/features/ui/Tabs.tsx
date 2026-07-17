@@ -266,6 +266,7 @@ export const TabPanel = ({ children, id, className }: TabPanelProps) => {
     <TabsPrimitive.Content
       value={id}
       className={cn('focus:outline-hidden transition-height', className)}
+      tabIndex={-1}
     >
       {children}
     </TabsPrimitive.Content>

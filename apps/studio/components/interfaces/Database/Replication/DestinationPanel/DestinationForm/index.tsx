@@ -17,6 +17,9 @@ import {
   SelectValue,
   SheetFooter,
   SheetSection,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
@@ -51,6 +54,7 @@ import { useDestinationForm } from './useDestinationForm'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
@@ -256,7 +260,6 @@ export const DestinationForm = ({
   }
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    // Editing an existing pipeline doesn't incur a new initial copy, so it skips the cost gate.
     if (editMode) {
       await submitPipeline({
         data,
@@ -363,9 +366,19 @@ export const DestinationForm = ({
                   <FormItemLayout
                     isReactForm={false}
                     layout="horizontal"
-                    className="[&>div>p]:text-foreground-lighter"
                     label="Region"
-                    description="Pipelines run in a fixed region and cannot be changed."
+                    description={
+                      <span className="text-foreground-lighter">
+                        Pipelines run in{' '}
+                        <Tooltip>
+                          <TooltipTrigger className={InlineLinkClassName}>
+                            {PIPELINE_REGION.displayName}
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">{PIPELINE_REGION.code}</TooltipContent>
+                        </Tooltip>
+                        . In your destination provider, choose the closest available region.
+                      </span>
+                    }
                   >
                     <Select disabled value={PIPELINE_REGION.code}>
                       <SelectTrigger>

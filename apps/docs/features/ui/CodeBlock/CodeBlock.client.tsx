@@ -1,10 +1,11 @@
 'use client'
 
-import { Check, Copy, WrapText, ArrowRightFromLine } from 'lucide-react'
-import { type MouseEvent, useCallback, useEffect, useState, useRef } from 'react'
+import { ArrowRightFromLine, Check, Copy, WrapText } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react'
 import { type ThemedToken } from 'shiki'
 import { type NodeHover } from 'twoslash'
 import { cn, copyToClipboard, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+
 import { getFontStyle } from './CodeBlock.utils'
 
 export function AnnotatedSpan({
@@ -92,26 +93,41 @@ export function CodeCopyButton({ className, content }: { className?: string; con
   const handleCopy = async () => {
     copyToClipboard(content, () => {
       setCopied(true)
-      setTimeout(() => setCopied(false), 1000)
     })
   }
 
+  const resetStatus = () => {
+    setCopied(false)
+  }
+
   return (
-    <button
-      onClick={handleCopy}
-      className={cn(
-        'border rounded-md p-1',
-        copied && 'bg-selection',
-        'hover:bg-selection transition',
-        className
-      )}
-    >
-      {copied ? (
-        <Check size={14} className="text-lighter" />
-      ) : (
-        <Copy size={14} className="text-lighter" />
-      )}
-    </button>
+    <>
+      <span className="sr-only" aria-live="polite">
+        {copied ? 'Code copied' : ''}
+      </span>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button
+            onClick={handleCopy}
+            onBlur={resetStatus}
+            className={cn(
+              'border rounded-md p-1',
+              copied && 'bg-selection',
+              'hover:bg-selection transition',
+              className
+            )}
+            aria-label="Copy code"
+          >
+            {copied ? (
+              <Check size={14} className="text-lighter" />
+            ) : (
+              <Copy size={14} className="text-lighter" />
+            )}
+          </button>
+        </TooltipTrigger>
+        <TooltipContent>Copy code</TooltipContent>
+      </Tooltip>
+    </>
   )
 }
 
@@ -136,7 +152,10 @@ export function CodeBlockControls({ content }: { content: string }) {
   }, [])
 
   return (
-    <div ref={wrapperRef} className="hidden group-hover:flex absolute top-2 right-2 gap-1">
+    <div
+      ref={wrapperRef}
+      className="opacity-0 flex group-hover:opacity-100 focus-within:opacity-100 absolute top-2 right-2 gap-1"
+    >
       <Tooltip>
         <TooltipTrigger asChild>
           <button
