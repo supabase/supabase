@@ -88,92 +88,97 @@ export const Permissions = ({
                 <FormField
                   key={row.id}
                   name={`permissionRows.${index}.actions`}
-                  render={({ field, fieldState }) => (
-                    <div>
-                      <div className="flex items-center gap-3 p-3">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <div className="flex flex-col">
-                              <span className="text-sm font-medium truncate max-w-[36ch] capitalize">
-                                {selectedResource?.title}
-                              </span>
+                  render={({ field, fieldState }) => {
+                    const fieldValue = field.value || []
+
+                    return (
+                      <div>
+                        <div className="flex items-center gap-3 p-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <div className="flex flex-col">
+                                <span className="text-sm font-medium truncate max-w-[36ch] capitalize">
+                                  {selectedResource?.title}
+                                </span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {selectedResource && (
-                            <Popover>
-                              <FormControl>
-                                <PopoverTrigger asChild>
-                                  <Button
-                                    id={`permissionRows.${index}.actions`}
-                                    aria-describedby={
-                                      fieldState.invalid
-                                        ? `permissionRows.${index}.actions.error`
-                                        : undefined
-                                    }
-                                    variant="default"
-                                    size="tiny"
-                                    className="w-[150px] flex text-sm justify-between h-7 "
-                                    iconRight={
-                                      <ChevronDown size={14} className="text-foreground-muted" />
-                                    }
-                                    ref={field.ref}
-                                  >
-                                    {field.value.length === 0 ? (
-                                      <span className="text-foreground-lighter">Select access</span>
-                                    ) : field.value.length === 1 ? (
-                                      formatAccessText(field.value[0])
-                                    ) : (
-                                      `${field.value.length} selected`
-                                    )}
-                                  </Button>
-                                </PopoverTrigger>
-                              </FormControl>
-                              <PopoverContent className="w-[180px] p-2" align="end">
-                                <div className="space-y-2">
-                                  {sortActions(selectedResource.actions).map((action) => (
-                                    <label
-                                      key={action}
-                                      className="flex items-center gap-2 cursor-pointer"
+                          <div className="flex items-center gap-2">
+                            {selectedResource && (
+                              <Popover>
+                                <FormControl>
+                                  <PopoverTrigger asChild>
+                                    <Button
+                                      id={`permissionRows.${index}.actions`}
+                                      aria-describedby={
+                                        fieldState.invalid
+                                          ? `permissionRows.${index}.actions.error`
+                                          : undefined
+                                      }
+                                      variant="default"
+                                      size="tiny"
+                                      className="w-[150px] flex text-sm justify-between h-7 "
+                                      iconRight={
+                                        <ChevronDown size={14} className="text-foreground-muted" />
+                                      }
+                                      ref={field.ref}
                                     >
-                                      <Checkbox
-                                        checked={field.value.includes(action)}
-                                        onCheckedChange={(checked) => {
-                                          const newActions = checked
-                                            ? [...field.value, action]
-                                            : field.value.filter((a: string) => a !== action)
-                                          field.onChange(newActions)
-                                          // onTriggerValidation()
-                                        }}
-                                      />
-                                      <span className="text-sm">{formatAccessText(action)}</span>
-                                    </label>
-                                  ))}
-                                </div>
-                              </PopoverContent>
-                            </Popover>
-                          )}
-                          <Button
-                            variant="text"
-                            size="tiny"
-                            className="p-1"
-                            onClick={() => {
-                              remove(index)
-                            }}
-                            icon={<X size={16} />}
-                            aria-label="Remove"
-                          />
+                                      {fieldValue.length === 0 ? (
+                                        <span className="text-foreground-lighter">
+                                          Select access
+                                        </span>
+                                      ) : fieldValue.length === 1 ? (
+                                        formatAccessText(fieldValue[0])
+                                      ) : (
+                                        `${fieldValue.length} selected`
+                                      )}
+                                    </Button>
+                                  </PopoverTrigger>
+                                </FormControl>
+                                <PopoverContent className="w-[180px] p-2" align="end">
+                                  <div className="space-y-2">
+                                    {sortActions(selectedResource.actions).map((action) => (
+                                      <label
+                                        key={action}
+                                        className="flex items-center gap-2 cursor-pointer"
+                                      >
+                                        <Checkbox
+                                          checked={fieldValue.includes(action)}
+                                          onCheckedChange={(checked) => {
+                                            const newActions = checked
+                                              ? [...fieldValue, action]
+                                              : fieldValue.filter((a: string) => a !== action)
+                                            field.onChange(newActions)
+                                          }}
+                                        />
+                                        <span className="text-sm">{formatAccessText(action)}</span>
+                                      </label>
+                                    ))}
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+                            )}
+                            <Button
+                              variant="text"
+                              size="tiny"
+                              className="p-1"
+                              onClick={() => {
+                                remove(index)
+                              }}
+                              icon={<X size={16} />}
+                              aria-label="Remove"
+                            />
+                          </div>
                         </div>
+                        <div className="p-3 pt-0">
+                          <FormMessage id={`permissionRows.${index}.actions.error`} />
+                        </div>
+                        {index < permissionRows.length - 1 && (
+                          <div className="border-t border-border" />
+                        )}
                       </div>
-                      <div className="p-3 pt-0">
-                        <FormMessage id={`permissionRows.${index}.actions.error`} />
-                      </div>
-                      {index < permissionRows.length - 1 && (
-                        <div className="border-t border-border" />
-                      )}
-                    </div>
-                  )}
+                    )
+                  }}
                 />
               )
             })}
