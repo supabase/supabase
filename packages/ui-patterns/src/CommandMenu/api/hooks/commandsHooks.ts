@@ -1,9 +1,6 @@
 'use client'
 
-// lodash-es rather than lodash — the CJS build's named-export interop yields
-// a non-function under Studio's Vite SSR module runner, which 500s any page
-// that calls useRegisterCommands during server render.
-import { isEqual } from 'lodash-es'
+import { isEqual } from 'lodash'
 import { useEffect, useMemo, useRef } from 'react'
 import { useSnapshot } from 'valtio'
 
