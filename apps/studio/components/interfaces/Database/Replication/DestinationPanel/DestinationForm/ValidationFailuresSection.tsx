@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Card } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
@@ -6,16 +7,15 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
 interface ValidationFailuresSectionProps {
-  projectRef?: string
   destinationFailures: ValidationFailure[]
   pipelineFailures: ValidationFailure[]
 }
 
 export const ValidationFailuresSection = ({
-  projectRef,
   destinationFailures,
   pipelineFailures,
 }: ValidationFailuresSectionProps) => {
+  const { ref: projectRef } = useParams()
   const validationIssues = [...destinationFailures, ...pipelineFailures].sort((a, _b) =>
     a.failure_type === 'critical' ? -1 : 1
   )

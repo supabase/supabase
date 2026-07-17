@@ -27,8 +27,6 @@ import {
   DEFAULT_MAX_TABLE_SYNC_WORKERS,
 } from './DestinationForm.constants'
 import { type DestinationPanelSchemaType } from './DestinationForm.schema'
-import { DocsButton } from '@/components/ui/DocsButton'
-import { DOCS_URL } from '@/lib/constants'
 
 export const AdvancedSettings = ({
   type,
@@ -37,11 +35,6 @@ export const AdvancedSettings = ({
   type: DestinationType
   form: UseFormReturn<DestinationPanelSchemaType>
 }) => {
-  const docsUrl =
-    type === 'BigQuery'
-      ? `${DOCS_URL}/guides/database/replication/bigquery#configure-bigquery-as-a-destination`
-      : `${DOCS_URL}/guides/database/replication/pipelines#step-3-configure-a-destination`
-
   const handleNumberChange =
     (field: { onChange: (value?: number) => void }) => (e: ChangeEvent<HTMLInputElement>) => {
       const val = e.target.value
@@ -61,10 +54,6 @@ export const AdvancedSettings = ({
             </div>
           </AccordionTrigger>
           <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
-            <div className="flex justify-end">
-              <DocsButton href={docsUrl} topic={`${type} pipeline settings`} />
-            </div>
-
             {/* Batch wait time - applies to all destinations */}
             <FormField
               control={form.control}

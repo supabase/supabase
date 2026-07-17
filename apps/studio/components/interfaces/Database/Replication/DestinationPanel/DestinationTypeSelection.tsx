@@ -29,7 +29,7 @@ interface DestinationTypeOption {
   label: string
   description: string
   icon: typeof Database
-  stage: 'Public Alpha' | 'Early Access' | null
+  stage: 'Public Alpha' | 'Early Access' | 'Deprecated' | null
   enabled: boolean
 }
 
@@ -96,7 +96,7 @@ export const DestinationTypeSelection = () => {
           label: 'Analytics Bucket',
           description: 'Write Apache Iceberg tables to Supabase Storage for analytics workflows',
           icon: AnalyticsBucket,
-          stage: 'Early Access',
+          stage: 'Deprecated',
           enabled: isOptionVisible('Analytics Bucket', etlEnableIceberg),
         },
         {
@@ -140,18 +140,22 @@ export const DestinationTypeSelection = () => {
     <FormItemLayout
       isReactForm={false}
       layout="horizontal"
-      className="p-5 [&>div]:gap-y-1 [&>div>span]:text-foreground-lighter"
+      className="p-5 [&>div]:gap-y-1"
       label="Type"
       labelOptional="Destination type cannot be changed after creation"
       description={
         selectedOption?.stage && (
-          <span className="block text-sm text-foreground-light mb-1">
+          <span className="block text-sm text-foreground-lighter mb-1">
             {selectedOption.stage === 'Public Alpha'
               ? 'This destination type is in public alpha and may change as we iterate based on customer feedback. '
-              : 'This destination type is available through early access and may change as we iterate based on customer feedback. '}
-            <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
-              Leave feedback
-            </InlineLink>
+              : selectedOption.stage === 'Deprecated'
+                ? 'This destination type is deprecated.'
+                : 'This destination type is available through early access and may change as we iterate based on customer feedback. '}
+            {selectedOption.stage !== 'Deprecated' && (
+              <InlineLink href="https://github.com/orgs/supabase/discussions/39416">
+                Leave feedback
+              </InlineLink>
+            )}
           </span>
         )
       }
@@ -168,7 +172,15 @@ export const DestinationTypeSelection = () => {
               <div className="flex items-center gap-x-2">
                 <span className="text-sm text-foreground">{selectedOption.label}</span>
                 {selectedOption.stage && (
-                  <Badge variant={selectedOption.stage === 'Early Access' ? 'warning' : 'default'}>
+                  <Badge
+                    variant={
+                      selectedOption.stage === 'Early Access'
+                        ? 'warning'
+                        : selectedOption.stage === 'Deprecated'
+                          ? 'destructive'
+                          : 'default'
+                    }
+                  >
                     {selectedOption.stage}
                   </Badge>
                 )}
@@ -191,7 +203,15 @@ export const DestinationTypeSelection = () => {
                       <div className="flex items-center gap-x-2">
                         <span className="text-foreground">{option.label}</span>
                         {option.stage && (
-                          <Badge variant={option.stage === 'Early Access' ? 'warning' : 'default'}>
+                          <Badge
+                            variant={
+                              option.stage === 'Early Access'
+                                ? 'warning'
+                                : option.stage === 'Deprecated'
+                                  ? 'destructive'
+                                  : 'default'
+                            }
+                          >
                             {option.stage}
                           </Badge>
                         )}

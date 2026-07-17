@@ -87,6 +87,11 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
     setEdit(null)
   }
 
+  const docsUrl =
+    urlDestinationType === 'BigQuery'
+      ? `${DOCS_URL}/guides/database/replication/bigquery#configure-bigquery-as-a-destination`
+      : `${DOCS_URL}/guides/database/replication/pipelines#step-3-configure-a-destination`
+
   useEffect(() => {
     if (edit !== null && invalidExistingDestination) {
       toast(`Unable to find destination ID ${edit}`)
@@ -99,13 +104,16 @@ export const DestinationPanel = ({ onSuccessCreateReadReplica }: DestinationPane
       <Sheet open={visible} onOpenChange={onClose}>
         <SheetContent size="lg" showClose={false}>
           <div className="flex flex-col h-full" tabIndex={-1}>
-            <SheetHeader>
-              <SheetTitle>{editMode ? 'Edit destination' : 'Add destination'}</SheetTitle>
-              <SheetDescription>
-                {editMode
-                  ? 'Update the configuration for this destination.'
-                  : 'Choose a read replica or a Supabase Pipelines destination for data replicated in near real time.'}
-              </SheetDescription>
+            <SheetHeader className="flex items-center justify-between">
+              <div>
+                <SheetTitle>{editMode ? 'Edit destination' : 'Add new destination'}</SheetTitle>
+                <SheetDescription>
+                  {editMode
+                    ? 'Update the configuration for this destination.'
+                    : 'Set up a read replica or Supabase Pipelines destination for near real-time replication'}
+                </SheetDescription>
+              </div>
+              <DocsButton href={docsUrl} topic={`${urlDestinationType} pipeline settings`} />
             </SheetHeader>
 
             <DestinationTypeSelection />
