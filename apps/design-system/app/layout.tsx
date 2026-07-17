@@ -9,7 +9,7 @@ import { Toaster } from './toaster'
 
 const className = `${customFont.variable} ${sourceCodePro.variable}`
 
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '/design-system'
+const BASE_PATH =  z.env.NEXT_PUBLIC_BASE_PATH || '/design-system'
 
 const genFaviconData = (basePath: string): Metadata['icons'] => ({
   icon: {
