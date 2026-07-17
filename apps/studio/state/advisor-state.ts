@@ -12,9 +12,6 @@ const createInitialState = () => ({
   // Notification filters
   notificationFilterStatuses: [] as string[],
   notificationFilterPriorities: [] as string[],
-  get numNotificationFiltersApplied() {
-    return [...this.notificationFilterStatuses, ...this.notificationFilterPriorities].length
-  },
 })
 
 export const advisorState = proxy({
