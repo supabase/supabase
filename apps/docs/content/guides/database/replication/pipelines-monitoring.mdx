@@ -162,7 +162,7 @@ When a table encounters an error during the initial sync, you can reset the tabl
 
 #### Pipeline errors
 
-Pipeline errors occur during ongoing replication (the **Live** state) and affect the entire pipeline. If an error occurs, the entire pipeline stops and enters a **Failed** state instead of silently skipping the failed change.
+Pipeline errors can occur during startup or ongoing replication and affect the entire pipeline. If a non-retryable pipeline-level error occurs, the entire pipeline stops and enters a **Failed** state instead of silently skipping the failure.
 
 **Viewing pipeline error details:**
 

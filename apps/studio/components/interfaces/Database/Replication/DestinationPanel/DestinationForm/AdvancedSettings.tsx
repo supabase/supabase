@@ -27,6 +27,8 @@ import {
   DEFAULT_MAX_TABLE_SYNC_WORKERS,
 } from './DestinationForm.constants'
 import { type DestinationPanelSchemaType } from './DestinationForm.schema'
+import { DocsButton } from '@/components/ui/DocsButton'
+import { DOCS_URL } from '@/lib/constants'
 
 export const AdvancedSettings = ({
   type,
@@ -35,6 +37,11 @@ export const AdvancedSettings = ({
   type: DestinationType
   form: UseFormReturn<DestinationPanelSchemaType>
 }) => {
+  const docsUrl =
+    type === 'BigQuery'
+      ? `${DOCS_URL}/guides/database/replication/bigquery#configure-bigquery-as-a-destination`
+      : `${DOCS_URL}/guides/database/replication/pipelines#step-3-configure-a-destination`
+
   const handleNumberChange =
     (field: { onChange: (value?: number) => void }) => (e: ChangeEvent<HTMLInputElement>) => {
       const val = e.target.value
@@ -54,6 +61,10 @@ export const AdvancedSettings = ({
             </div>
           </AccordionTrigger>
           <AccordionContent className="pb-0! pt-3 [&>div]:flex [&>div]:flex-col [&>div]:gap-y-4">
+            <div className="flex justify-end">
+              <DocsButton href={docsUrl} topic={`${type} pipeline settings`} />
+            </div>
+
             {/* Batch wait time - applies to all destinations */}
             <FormField
               control={form.control}
@@ -62,25 +73,15 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   layout="horizontal"
                   label="Batch wait time"
-                  description={
-                    <>
-                      <p>
-                        Maximum time after the first buffered initial-sync row or ongoing change
-                        before the pipeline flushes a partially filled batch. Size and memory limits
-                        can cause an earlier flush.
-                      </p>
-                      <p>
-                        Lower values can reduce batching delay; higher values can improve
-                        destination write efficiency.
-                      </p>
-                    </>
-                  }
+                  description="How long the pipeline waits before sending a partially filled batch."
                 >
                   <FormControl>
                     <InputGroup>
                       <FormInputGroupInput
                         {...field}
                         type="number"
+                        min={0}
+                        step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
                         placeholder={`Default: ${DEFAULT_MAX_FILL_MS}`}
@@ -101,21 +102,15 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   label="Table sync workers"
                   layout="horizontal"
-                  description={
-                    <>
-                      <p>Maximum number of tables synced in parallel during the initial sync.</p>
-                      <p>
-                        Each active table sync temporarily uses one additional replication slot, for
-                        up to N + 1 slots including the pipeline's main slot.
-                      </p>
-                    </>
-                  }
+                  description="Maximum number of tables synced at the same time."
                 >
                   <FormControl>
                     <InputGroup>
                       <FormInputGroupInput
                         {...field}
                         type="number"
+                        min={1}
+                        step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
                         placeholder={`Default: ${DEFAULT_MAX_TABLE_SYNC_WORKERS}`}
@@ -136,24 +131,15 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   label="Copy connections per table"
                   layout="horizontal"
-                  description={
-                    <>
-                      <p>
-                        Maximum source database connections used to copy one table in parallel
-                        during the initial sync.
-                      </p>
-                      <p>
-                        With multiple table sync workers, source connection usage can scale with
-                        both settings.
-                      </p>
-                    </>
-                  }
+                  description="Maximum number of connections used to sync each table."
                 >
                   <FormControl>
                     <InputGroup>
                       <FormInputGroupInput
                         {...field}
                         type="number"
+                        min={1}
+                        step={1}
                         value={field.value ?? ''}
                         onChange={handleNumberChange(field)}
                         placeholder={`Default: ${DEFAULT_MAX_COPY_CONNECTIONS_PER_TABLE}`}
@@ -174,7 +160,7 @@ export const AdvancedSettings = ({
                 <FormItemLayout
                   label="Invalidated slot behavior"
                   layout="horizontal"
-                  description="What happens when the pipeline's main replication slot can no longer continue from its retained WAL."
+                  description="What the pipeline does when its replication slot becomes invalid."
                 >
                   <FormControl>
                     <Select value={field.value ?? 'error'} onValueChange={field.onChange}>
@@ -213,21 +199,15 @@ export const AdvancedSettings = ({
                         </div>
                       }
                       layout="horizontal"
-                      description={
-                        <>
-                          <p>Size of the BigQuery Storage Write API connection pool.</p>
-                          <p>
-                            More connections can increase destination write throughput, but consume
-                            more pipeline and BigQuery resources.
-                          </p>
-                        </>
-                      }
+                      description="Number of BigQuery connections used for destination writes."
                     >
                       <FormControl>
                         <InputGroup>
                           <FormInputGroupInput
                             {...field}
                             type="number"
+                            min={1}
+                            step={1}
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}
                             placeholder={`Default: ${DEFAULT_CONNECTION_POOL_SIZE}`}
@@ -253,24 +233,7 @@ export const AdvancedSettings = ({
                         </div>
                       }
                       layout="horizontal"
-                      description={
-                        <>
-                          <p>
-                            Maximum acceptable staleness of table data returned by queries while
-                            BigQuery applies CDC changes in the background.
-                          </p>
-                          <p>
-                            Leave unset for the freshest results. A larger number of minutes allows
-                            BigQuery to return older data, which can reduce query-time CDC merge
-                            cost and latency. For example, 15 allows data to be up to 15 minutes
-                            stale.
-                          </p>
-                          <p>
-                            Applied when a table is created or recreated. Changing this value does
-                            not alter existing destination tables.
-                          </p>
-                        </>
-                      }
+                      description="How old query results can be while BigQuery applies ongoing changes."
                     >
                       <FormControl>
                         <InputGroup>
@@ -278,7 +241,6 @@ export const AdvancedSettings = ({
                             {...field}
                             type="number"
                             min={0}
-                            max={65535}
                             step={1}
                             value={field.value ?? ''}
                             onChange={handleNumberChange(field)}

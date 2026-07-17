@@ -421,7 +421,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           links: [
             {
               name: 'Pipelines',
-              url: `${DOCS_URL}/guides/database/replication/pipelines`,
+              url: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
             },
           ],
         },
@@ -437,7 +437,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           links: [
             {
               name: 'Pipelines',
-              url: `${DOCS_URL}/guides/database/replication/pipelines`,
+              url: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
             },
           ],
         },

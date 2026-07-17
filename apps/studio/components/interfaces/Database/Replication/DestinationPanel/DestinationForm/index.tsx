@@ -349,7 +349,7 @@ export const DestinationForm = ({
                     layout="horizontal"
                     className="[&>div>p]:text-foreground-lighter"
                     label="Region"
-                    description="Pipelines run in the region shown above. Choose destination resources as close as possible to this region."
+                    description={`Pipelines run in ${PIPELINE_REGION.displayName} (${PIPELINE_REGION.code}). In your destination provider, choose the closest available region.`}
                   >
                     <Select disabled value={PIPELINE_REGION.code}>
                       <SelectTrigger>
@@ -403,6 +403,7 @@ export const DestinationForm = ({
 
                   <div ref={validationSectionRef}>
                     <ValidationFailuresSection
+                      projectRef={projectRef}
                       destinationFailures={destinationValidationFailures}
                       pipelineFailures={pipelineValidationFailures}
                     />

@@ -6,11 +6,15 @@ export const DestinationPanelFormSchema = z.object({
   // Common fields
   name: z.string().min(1, 'Name is required'),
   publicationName: z.string().min(1, 'Publication is required'),
-  maxFillMs: z.number().int().optional(),
+  maxFillMs: z
+    .number()
+    .int('Batch wait time must be a whole number of milliseconds')
+    .min(0, 'Batch wait time must be 0 or greater')
+    .optional(),
   maxTableSyncWorkers: z
     .number()
     .min(1, 'Max table sync workers must be greater than 0')
-    .int()
+    .int('Max table sync workers must be a whole number')
     .optional(),
   maxCopyConnectionsPerTable: z
     .number()
@@ -31,7 +35,6 @@ export const DestinationPanelFormSchema = z.object({
     .number()
     .int('Maximum staleness must be a whole number of minutes')
     .min(0, 'Maximum staleness must be 0 or greater')
-    .max(65535, 'Maximum staleness must be 65,535 minutes or less')
     .optional(),
   // Analytics Bucket fields, only warehouse name and namespace are visible + editable fields
   warehouseName: z.string().optional(),

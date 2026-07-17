@@ -6,11 +6,13 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
 interface ValidationFailuresSectionProps {
+  projectRef?: string
   destinationFailures: ValidationFailure[]
   pipelineFailures: ValidationFailure[]
 }
 
 export const ValidationFailuresSection = ({
+  projectRef,
   destinationFailures,
   pipelineFailures,
 }: ValidationFailuresSectionProps) => {
@@ -42,7 +44,14 @@ export const ValidationFailuresSection = ({
       <p className="text-sm text-foreground-light mb-2!">
         Pipeline options are under <strong>Advanced settings</strong> above. Source database
         settings are under{' '}
-        <InlineLink href="/dashboard/project/_/settings/database">Database settings</InlineLink>.
+        {projectRef ? (
+          <InlineLink href={`/project/${projectRef}/database/settings`}>
+            Database settings
+          </InlineLink>
+        ) : (
+          'Database settings'
+        )}
+        .
       </p>
       <Card>
         <Accordion type="multiple">

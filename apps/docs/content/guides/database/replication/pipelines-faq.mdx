@@ -102,7 +102,7 @@ Every table sent to BigQuery must have a primary key, and every primary-key colu
 alter table public.your_table replica identity full;
 ```
 
-Full replica identity increases WAL volume. It only affects new WAL records, so fix the setting and restart the pipeline before generating more changes. See [BigQuery source table requirements](/docs/guides/database/replication/bigquery#source-table-requirements) for the supported modes and partial-update troubleshooting.
+Full replica identity increases WAL volume and only affects new WAL records. Fix the setting before generating more changes. If the failing update is already retained in WAL, restarting may fail again; recreate the pipeline or restart the affected table's initial sync. See [BigQuery source table requirements](/docs/guides/database/replication/bigquery#source-table-requirements) for details.
 
 ## Why aren't publication changes reflected after adding or removing tables?
 
@@ -110,7 +110,7 @@ After modifying your Postgres publication, you must restart the replication pipe
 
 ## Why is a pipeline in failed state?
 
-Pipeline failures occur during ongoing replication when an error happens while replicating changes. The pipeline stops instead of silently skipping the failed change. To recover:
+A pipeline enters **Failed** when it encounters a non-retryable pipeline-level error during startup or ongoing replication. The pipeline stops instead of silently skipping the failure. To recover:
 
 1. Check the error message by hovering over the **Failed** status
 2. Click **View pipeline** for detailed information
@@ -191,7 +191,7 @@ Don't delete or modify tables or views managed by Pipelines. For BigQuery, delet
 
 **Option 1: End replication permanently**
 
-1. Stop the pipeline, or delete the destination to end replication and pipeline-hour billing
+1. Delete the destination to permanently end replication and pipeline-hour billing. Stopping the pipeline alone does not end pipeline-hour billing.
 2. Delete the table at your destination
 3. Don't restart the pipeline while the table remains in its publication
 

@@ -8,7 +8,7 @@ const requiredFields = {
 }
 
 describe('DestinationPanelFormSchema', () => {
-  it.each([-1, 0, 1])('does not impose a lower bound on a batch wait time of %i', (value) => {
+  it.each([0, 1])('accepts a batch wait time of %i milliseconds', (value) => {
     const result = DestinationPanelFormSchema.safeParse({
       ...requiredFields,
       maxFillMs: value,
@@ -17,16 +17,60 @@ describe('DestinationPanelFormSchema', () => {
     expect(result.success).toBe(true)
   })
 
-  it('requires batch wait time to be a whole number', () => {
+  it.each([-1, 1.5])('rejects an unsupported batch wait time of %s', (value) => {
     const result = DestinationPanelFormSchema.safeParse({
       ...requiredFields,
-      maxFillMs: 1.5,
+      maxFillMs: value,
     })
 
     expect(result.success).toBe(false)
   })
 
-  it.each([0, 1, 65535])('accepts a maximum staleness of %i whole minutes', (value) => {
+  it.each([1, 65536])('accepts %i table sync workers', (value) => {
+    expect(
+      DestinationPanelFormSchema.safeParse({ ...requiredFields, maxTableSyncWorkers: value })
+        .success
+    ).toBe(true)
+  })
+
+  it.each([0, 1.5])('rejects an unsupported table sync worker count of %s', (value) => {
+    expect(
+      DestinationPanelFormSchema.safeParse({ ...requiredFields, maxTableSyncWorkers: value })
+        .success
+    ).toBe(false)
+  })
+
+  it.each([1, 65536])('accepts %i copy connections per table', (value) => {
+    expect(
+      DestinationPanelFormSchema.safeParse({
+        ...requiredFields,
+        maxCopyConnectionsPerTable: value,
+      }).success
+    ).toBe(true)
+  })
+
+  it.each([0, 1.5])(
+    'rejects an unsupported copy connections per table count of %s',
+    (value) => {
+      expect(
+        DestinationPanelFormSchema.safeParse({
+          ...requiredFields,
+          maxCopyConnectionsPerTable: value,
+        }).success
+      ).toBe(false)
+    }
+  )
+
+  it('requires the BigQuery connection pool size to be greater than 0', () => {
+    expect(
+      DestinationPanelFormSchema.safeParse({ ...requiredFields, connectionPoolSize: 0 }).success
+    ).toBe(false)
+    expect(
+      DestinationPanelFormSchema.safeParse({ ...requiredFields, connectionPoolSize: 1 }).success
+    ).toBe(true)
+  })
+
+  it.each([0, 1, 65536])('accepts a maximum staleness of %i whole minutes', (value) => {
     const result = DestinationPanelFormSchema.safeParse({
       ...requiredFields,
       maxStalenessMins: value,
@@ -35,7 +79,7 @@ describe('DestinationPanelFormSchema', () => {
     expect(result.success).toBe(true)
   })
 
-  it.each([-1, 1.5, 65536])('rejects an unsupported maximum staleness of %s', (value) => {
+  it.each([-1, 1.5])('rejects an unsupported maximum staleness of %s', (value) => {
     const result = DestinationPanelFormSchema.safeParse({
       ...requiredFields,
       maxStalenessMins: value,
