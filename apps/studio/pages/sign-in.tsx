@@ -32,9 +32,14 @@ const SignInPage: NextPageWithLayout = () => {
     'dashboard_auth:sign_up',
   ])
 
-  const { dashboardAuthCustomProviders: customProviders } = useCustomContent([
-    'dashboard_auth:custom_providers',
-  ])
+  const {
+    dashboardAuthCustomProvider: customProvider,
+    dashboardAuthCustomProviders: customProvidersNew,
+  } = useCustomContent(['dashboard_auth:custom_provider', 'dashboard_auth:custom_providers'])
+
+  // [Joshen] This is just for backward compatibility - singular customProvider needs to be deprecated subsequently
+  // Just need to remove customProvider and rename customProvidersNew to customProviders
+  const customProviders = customProvidersNew ?? (customProvider ? [customProvider] : null)
 
   const { focusProvider } = useInboundBranding('sign-in')
   const signInProviders = useEnabledIdentityProviders().filter((provider) => provider.showOnSignIn)
