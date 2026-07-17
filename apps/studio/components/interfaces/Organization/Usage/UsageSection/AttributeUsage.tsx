@@ -139,24 +139,27 @@ const AttributeUsage = ({
                       </div>
                     </div>
 
-                    {currentBillingCycleSelected && usageMeta && !usageMeta.unlimited && (
-                      <SparkBar
-                        type="horizontal"
-                        barClass={cn(
-                          usageRatio >= 1
-                            ? usageBasedBilling
-                              ? 'bg-foreground-light'
-                              : 'bg-red-900'
-                            : usageBasedBilling === false &&
-                                usageRatio >= USAGE_APPROACHING_THRESHOLD
-                              ? 'bg-amber-900'
-                              : 'bg-foreground-light'
-                        )}
-                        bgClass="bg-surface-300"
-                        value={usageMeta?.usage ?? 0}
-                        max={usageMeta?.pricing_free_units || 1}
-                      />
-                    )}
+                    {currentBillingCycleSelected &&
+                      usageMeta &&
+                      usageMeta.capped &&
+                      !usageMeta.unlimited && (
+                        <SparkBar
+                          type="horizontal"
+                          barClass={cn(
+                            usageRatio >= 1
+                              ? usageBasedBilling
+                                ? 'bg-foreground-light'
+                                : 'bg-red-900'
+                              : usageBasedBilling === false &&
+                                  usageRatio >= USAGE_APPROACHING_THRESHOLD
+                                ? 'bg-amber-900'
+                                : 'bg-foreground-light'
+                          )}
+                          bgClass="bg-surface-300"
+                          value={usageMeta?.usage ?? 0}
+                          max={usageMeta?.pricing_free_units || 1}
+                        />
+                      )}
 
                     <div>
                       {usageMeta && usageMeta.pricing_free_units !== 0 && (

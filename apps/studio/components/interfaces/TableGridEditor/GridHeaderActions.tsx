@@ -105,7 +105,7 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: table.schema,
+      schemas: [table.schema],
     },
     { enabled: !!table }
   )

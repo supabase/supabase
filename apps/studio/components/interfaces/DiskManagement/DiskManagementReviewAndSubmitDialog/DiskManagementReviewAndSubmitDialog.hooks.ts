@@ -136,7 +136,7 @@ export function useDiskManagementReviewChanges(
     Number(iopsPrice.newPrice) !== Number(iopsPrice.oldPrice) ||
     Number(throughputPrice.newPrice) !== Number(throughputPrice.oldPrice)
 
-  // Show cooldown warning whenever any disk attribute that enforces the 4-hour lock changes
+  // Show cooldown warning whenever any disk attribute that counts toward the 24-hour modification limit changes
   const anyDiskAttributeChange = hasIOPSChanges || hasStorageTypeChanges || hasTotalSizeChanges
 
   // Show extended downtime warning when resizing to/from a size below large

@@ -178,4 +178,20 @@ export const BILLING_BREAKDOWN_METRICS: Metric[] = [
     category: 'compute',
     anchor: 'active-compute',
   },
+  {
+    key: PricingMetric.ETL_COPY_BACKFILL_DATA,
+    name: 'Pipeline Initial Sync Data',
+    units: 'bytes',
+    unitName: 'GB',
+    category: 'Pipelines',
+    anchor: 'pipeline-initial-sync-data',
+  },
+  {
+    key: PricingMetric.ETL_REPLICATED_DATA,
+    name: 'Pipeline Ongoing Replication Data',
+    units: 'bytes',
+    unitName: 'GB',
+    category: 'Pipelines',
+    anchor: 'pipeline-ongoing-replication-data',
+  },
 ]

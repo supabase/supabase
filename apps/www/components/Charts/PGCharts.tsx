@@ -4,11 +4,7 @@ import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Bar, BarChart, Legend, ResponsiveContainer, XAxis, YAxis } from 'recharts'
 import remarkGfm from 'remark-gfm'
-import {
-  Tabs_Shadcn_ as Tabs,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
-} from 'ui'
+import { Tabs, TabsList, TabsTrigger } from 'ui'
 
 import * as data from '@/data/blog/PostgresFTSComparison'
 

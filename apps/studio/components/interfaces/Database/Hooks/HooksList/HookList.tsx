@@ -19,6 +19,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 import { BASE_PATH } from '@/lib/constants'
 
 export interface HookListProps {
@@ -38,7 +39,6 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
   const [, setSelectedHookIdToDelete] = useQueryState('delete', parseAsString.withDefault(''))
 
   const restUrl = project?.restUrl
-  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
 
   const filteredHooks = (hooks ?? []).filter(
     (x) =>
@@ -54,10 +54,8 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
   return (
     <>
       {filteredHooks.map((x) => {
-        const isEdgeFunction = (url: string) =>
-          url.includes(`https://${ref}.functions.supabase.${restUrlTld}/`) ||
-          url.includes(`https://${ref}.supabase.${restUrlTld}/functions/`)
         const [url, method] = x.function_args
+        const isEdgeFunction = isEdgeFunctionUrl(url, ref ?? '', restUrl)
 
         return (
           <Table.tr key={x.id}>
@@ -66,7 +64,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                 <div>
                   <Image
                     src={
-                      isEdgeFunction(url)
+                      isEdgeFunction
                         ? `${BASE_PATH}/img/function-providers/supabase-severless-function.png`
                         : `${BASE_PATH}/img/function-providers/http-request.png`
                     }
@@ -74,7 +72,7 @@ export const HookList = ({ schema, filterString }: HookListProps) => {
                     layout="fixed"
                     width="20"
                     height="20"
-                    title={isEdgeFunction(url) ? 'Supabase Edge Function' : 'HTTP Request'}
+                    title={isEdgeFunction ? 'Supabase Edge Function' : 'HTTP Request'}
                   />
                 </div>
                 <p title={x.name} className="truncate">

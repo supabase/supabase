@@ -175,6 +175,7 @@ allow_list = [
     "Astro",
     "AsyncStorage",
     "Authn",
+    "AuthRetryableFetchError",
     "Authy",
     "B-tree",
     "Better Stack",
@@ -222,6 +223,7 @@ allow_list = [
     "dotenvx",
     "Drizzle",
     "ElevenLabs",
+    "Elysia",
     "[Ee]nablement",
     "EnterpriseDB",
     "Entra",
@@ -305,6 +307,7 @@ allow_list = [
     "MySQL",
     "[Nn]amespaces?",
     "[Nn]ano",
+    "NestJS",
     "Netlify",
     "Next.js",
     "[Nn]ginx",
@@ -514,6 +517,7 @@ allow_list = [
     "watchOS",
     "WebCrypto",
     "[Xx]min",
+    "[Bb]ackfills?"
 ]
 
 prefixes = ["bi", "over", "pre", "un"]

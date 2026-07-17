@@ -11,10 +11,10 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
-  Tabs_Shadcn_ as Tabs,
-  TabsContent_Shadcn_ as TabsContent,
-  TabsList_Shadcn_ as TabsList,
-  TabsTrigger_Shadcn_ as TabsTrigger,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 

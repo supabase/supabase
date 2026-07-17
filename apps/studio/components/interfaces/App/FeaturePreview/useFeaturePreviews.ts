@@ -23,22 +23,13 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const platformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
   const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
+  const sqlEditorManualSaveEnabled = useFlag('sqlEditorManualSave')
 
   const unifiedLogsDefaultOptIn = useFlag('unifiedLogsDefaultOptIn')
 
   return useMemo(
     () =>
       [
-        {
-          key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_TESTER,
-          name: 'RLS Tester',
-          discussionsUrl: 'https://github.com/orgs/supabase/discussions/45233',
-          enabled: true,
-          isNew: true,
-          isPlatformOnly: false,
-          isDefaultOptIn: false,
-          getRoute: (ref?: string) => `/project/${ref}/auth/policies`,
-        },
         {
           key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
           name: 'Updated Logs interface',
@@ -109,7 +100,22 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
           isDefaultOptIn: false,
           getRoute: (ref?: string) => `/project/${ref}/integrations`,
         },
+        {
+          key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE,
+          name: 'Disable snippet auto-saving',
+          discussionsUrl: undefined,
+          isNew: true,
+          isPlatformOnly: true,
+          isDefaultOptIn: false,
+          enabled: sqlEditorManualSaveEnabled,
+        },
       ].sort((a, b) => Number(b.isNew) - Number(a.isNew)),
-    [unifiedLogsDefaultOptIn, platformWebhooksEnabled, jitDbAccessEnabled, isMarketplaceEnabled]
+    [
+      unifiedLogsDefaultOptIn,
+      platformWebhooksEnabled,
+      jitDbAccessEnabled,
+      isMarketplaceEnabled,
+      sqlEditorManualSaveEnabled,
+    ]
   )
 }

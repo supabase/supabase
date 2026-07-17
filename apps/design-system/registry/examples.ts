@@ -278,6 +278,12 @@ export const examples: Registry = [
     files: ['example/calendar-form.tsx'],
   },
   {
+    name: 'calendar-disabled-days-demo',
+    type: 'components:example',
+    registryDependencies: ['calendar', 'form', 'popover'],
+    files: ['example/calendar-disabled-days-demo.tsx'],
+  },
+  {
     name: 'single-value-field-array-demo',
     type: 'components:example',
     registryDependencies: ['button', 'form', 'input'],
@@ -903,6 +909,21 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['sonner'],
     files: ['example/sonner-upload.tsx'],
+  },
+  {
+    name: 'success-check-demo',
+    type: 'components:example',
+    files: ['example/success-check-demo.tsx'],
+  },
+  {
+    name: 'success-check-selected',
+    type: 'components:example',
+    files: ['example/success-check-selected.tsx'],
+  },
+  {
+    name: 'success-check-progress',
+    type: 'components:example',
+    files: ['example/success-check-progress.tsx'],
   },
   {
     name: 'switch-demo',
