@@ -21,7 +21,7 @@ import { uuidv4 } from '@/lib/helpers'
 
 const GET = async ({ params }: { params: { ref?: string; slug?: string } }) => {
   // Mirrors `apiWrapper`'s global catch (lib/api/apiWrapper.ts): capture to
-  // Sentry and return a 500 `{ error }` body. Only errors thrown before the
+  // Sentry and return a 500 error body. Only errors thrown before the
   // stream `Response` is returned are catchable here — a failure mid-stream
   // (e.g. a file read) can't roll back an already-sent 200 and is left to the
   // stream's own error propagation, which destroys the response.
@@ -97,7 +97,9 @@ const GET = async ({ params }: { params: { ref?: string; slug?: string } }) => {
     })
   } catch (error) {
     Sentry.captureException(error)
-    return new Response(JSON.stringify({ error }), {
+    // Generic message only — echoing the caught error can leak stack/internal
+    // details to the client (CodeQL js/stack-trace-exposure).
+    return new Response(JSON.stringify({ error: { message: 'Internal Server Error' } }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     })
