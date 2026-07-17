@@ -159,15 +159,11 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                     id={name}
                     variant="default"
                     type="button"
-                    className="justify-start h-[34px] w-full"
+                    className="justify-start h-[34px] w-full [&>div:last-child]:ml-auto"
                     disabled={disabled || isLoading}
                     loading={isLoading}
                     icon={GITHUB_ICON}
-                    iconRight={
-                      <span className="grow flex justify-end">
-                        <ChevronDown />
-                      </span>
-                    }
+                    iconRight={<ChevronDown />}
                   >
                     {selectedRepository?.name ||
                       selectedRepositoryName ||
