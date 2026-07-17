@@ -196,6 +196,25 @@ describe('StoragePolicies.utils: createPayloadForUpdatePolicy', () => {
     expect(JSON.parse(JSON.stringify(output))).toHaveProperty('check')
   })
 
+  // Regression for CodeRabbit review: whitespace-only expressions should be
+  // treated as empty, since createPayloadForUpdatePolicy trims them to "" and
+  // would send null — silently clearing the expression.
+  test('should set the definition to null when it is whitespace-only', () => {
+    const output = createPayloadForUpdatePolicy(
+      mockFormFields({ definition: '   ' }),
+      mockOriginalPolicy()
+    )
+    expect(output).toStrictEqual({ id: 1, definition: null })
+  })
+
+  test('should set the check to null when it is whitespace-only', () => {
+    const output = createPayloadForUpdatePolicy(
+      mockFormFields({ check: '   ' }),
+      mockOriginalPolicy({ check: `bucket_id = 'avatars'` })
+    )
+    expect(output).toStrictEqual({ id: 1, check: null })
+  })
+
   test('should default to the public role when roles were cleared', () => {
     const output = createPayloadForUpdatePolicy(
       mockFormFields({ roles: [] }),
