@@ -86,7 +86,10 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
           !fullDateRangeSelected && 'bg-brand-400 dark:bg-brand-500 text-foreground rounded-md',
           selected
         ),
-        today: cn('bg-accent text-accent-foreground has-[[aria-selected]]:bg-transparent', today),
+        today: cn(
+          '[&:not(:has([aria-selected]))]:bg-accent [&:not(:has([aria-selected]))]:text-accent-foreground',
+          today
+        ),
         outside: cn(
           'text-foreground-muted opacity-50 has-[[aria-selected]]:opacity-100 has-[[aria-selected]]:text-foreground',
           outside
