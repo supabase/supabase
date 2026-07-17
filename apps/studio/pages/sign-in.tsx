@@ -32,8 +32,8 @@ const SignInPage: NextPageWithLayout = () => {
     'dashboard_auth:sign_up',
   ])
 
-  const { dashboardAuthCustomProvider: customProvider } = useCustomContent([
-    'dashboard_auth:custom_provider',
+  const { dashboardAuthCustomProviders: customProviders } = useCustomContent([
+    'dashboard_auth:custom_providers',
   ])
 
   const { focusProvider } = useInboundBranding('sign-in')
@@ -44,11 +44,14 @@ const SignInPage: NextPageWithLayout = () => {
     dividerBgClass = 'bg-studio'
   ) => {
     const showOrDivider =
-      (providers.length > 0 || signInWithSsoEnabled || !!customProvider) && signInWithEmailEnabled
+      (providers.length > 0 || signInWithSsoEnabled || !!customProviders) && signInWithEmailEnabled
 
     return (
       <>
-        {customProvider && <SignInWithCustom providerName={customProvider} />}
+        {Array.isArray(customProviders) &&
+          customProviders.map((providerName: string) => (
+            <SignInWithCustom key={providerName} providerName={providerName} />
+          ))}
         {providers.map((provider) => (
           <SignInWithExternalProvider key={provider.id} provider={provider} />
         ))}
@@ -90,7 +93,7 @@ const SignInPage: NextPageWithLayout = () => {
     const hasOtherOptions =
       otherProviders.length > 0 ||
       signInWithSsoEnabled ||
-      !!customProvider ||
+      !!customProviders ||
       signInWithEmailEnabled
 
     return (
