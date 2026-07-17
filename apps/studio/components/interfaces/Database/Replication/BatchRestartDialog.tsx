@@ -64,7 +64,7 @@ export const BatchRestartDialog = ({
     [affectedTables]
   )
 
-  const { mutate: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
+  const { mutateAsync: rollbackTables, isPending: isResetting } = useRollbackTablesMutation({
     onSuccess: (data) => {
       const count = data.tables.length
       toast.success(
@@ -80,18 +80,20 @@ export const BatchRestartDialog = ({
     },
   })
 
-  const handleReset = () => {
+  const handleReset = async () => {
     if (!projectRef) return toast.error('Project ref is required')
 
     onRestartStart?.(affectedTableIds)
 
-    rollbackTables({
-      projectRef,
-      pipelineId,
-      target: mode === 'all' ? { type: 'all_tables' } : { type: 'all_errored_tables' },
-      rollbackType: 'full',
-      pipelineStatusName,
-    })
+    try {
+      await rollbackTables({
+        projectRef,
+        pipelineId,
+        target: mode === 'all' ? { type: 'all_tables' } : { type: 'all_errored_tables' },
+        rollbackType: 'full',
+        pipelineStatusName,
+      })
+    } catch (error) {}
   }
 
   const dialogContent =

@@ -51,7 +51,7 @@ export const RestartCostEstimate = ({
     [estimate, tableNames]
   )
   return (
-    <div className="border-t pt-4">
+    <div className="border-t p-4">
       {isFetching ? (
         <GenericSkeletonLoader className="w-full" />
       ) : restartEstimate?.isComplete ? (
