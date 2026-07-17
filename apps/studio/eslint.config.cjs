@@ -1,6 +1,12 @@
 const { defineConfig } = require('eslint/config')
+const { fixupPluginRules } = require('@eslint/compat')
 const barrelFiles = require('eslint-plugin-barrel-files')
 const jsxA11y = require('eslint-plugin-jsx-a11y')
+const valtio = require('eslint-plugin-valtio')
+// eslint-plugin-react-hook-form@0.3.1 (latest) still calls the ESLint 8
+// `context.getScope()`, which ESLint 9 removed. fixupPluginRules shims the
+// deprecated context methods so the rules run under flat config.
+const reactHookForm = require('eslint-plugin-react-hook-form')
 const supabaseConfig = require('eslint-config-supabase/next')
 
 // Analytics SQL wire boundary — see the block below for context. Shared so the
@@ -41,6 +47,8 @@ module.exports = defineConfig([
     plugins: {
       'barrel-files': barrelFiles,
       'jsx-a11y': jsxA11y,
+      valtio,
+      'react-hook-form': fixupPluginRules(reactHookForm),
     },
     rules: {
       '@next/next/no-img-element': 'off',
@@ -78,6 +86,12 @@ module.exports = defineConfig([
       'jsx-a11y/anchor-is-valid': 'warn',
       'jsx-a11y/heading-has-content': 'warn',
       'jsx-a11y/no-distracting-elements': 'warn',
+      'valtio/state-snapshot-rule': 'warn',
+      'valtio/avoid-this-in-proxy': 'warn',
+      'react-hook-form/destructuring-formstate': 'warn',
+      'react-hook-form/no-access-control': 'warn',
+      'react-hook-form/no-nested-object-setvalue': 'warn',
+      'react-hook-form/no-use-watch': 'warn',
     },
   },
   // Analytics SQL wire boundary: every call to a SQL-bearing analytics
