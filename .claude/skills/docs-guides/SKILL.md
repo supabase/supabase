@@ -68,3 +68,11 @@ are cross-referenced where useful, and transitions make the reading path clear.
 
 Treat lint replacements as suggestions when context matters. Rewrite the sentence
 instead of applying a replacement that changes its technical meaning.
+
+Anchor IDs are generated from heading text at render time, and nothing in CI
+checks that `#anchor` links still resolve. Before renaming, removing, or
+substantially rewording a heading, run
+`grep -rn "#<old-anchor-slug>" apps/docs/content` to find in-page and
+cross-file links that target it, and update every match. If a heading needs a
+stable anchor independent of its wording, pin it with a custom anchor, for
+example `## Some heading [#some-heading]`.

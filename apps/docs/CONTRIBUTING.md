@@ -234,6 +234,16 @@ Optionally highlight lines by using `mark=${lineNumber}`.
 ```
 ````
 
+### Emphasis
+
+Use **bold**, _italics_, and `code` formatting for distinct purposes. Don't use them interchangeably or to add visual emphasis alone.
+
+- **Bold**: Mark UI labels the reader interacts with, such as buttons, menu items, and field names. For example, `Click **Save**.` Also use bold for a term the reader must not miss, such as `**Never** commit your service role key.`
+- _Italics_: Introduce a new term the first time you define it, or reference a title, such as a book or a third-party product name written in italics by convention. Use italics sparingly. Don't use italics for UI labels or for general emphasis.
+- `Code`: Mark anything the reader types or copies verbatim, or anything the system reads literally. This includes filenames, paths, commands, flags, environment variables, function and parameter names, configuration keys, and literal values. For example, `` Set `SUPABASE_URL` in your `.env` file. ``
+
+If a phrase fits more than one category, pick the most specific one. A command name is `code`, not **bold**, even though the reader also interacts with it.
+
 ### Content listings
 
 Overview and index pages use a single `<ContentListings id="..." />` component for curated link sections such as "Get started", "Next steps", "Examples", or "Resources". Refer to [`storage.data.ts`](data/content-listings/storage.data.ts) and [`storage.mdx`](content/guides/storage.mdx) for a full example.
