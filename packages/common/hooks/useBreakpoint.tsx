@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { useIsomorphicLayoutEffect, useWindowSize } from 'react-use'
+import { useIsomorphicLayoutEffect } from 'react-use'
 
 /**
  * Map of Tailwind default breakpoint values. Allows setting a value by
@@ -22,18 +22,33 @@ const twBreakpointMap = {
 }
 
 export function useBreakpoint(breakpoint: number | keyof typeof twBreakpointMap = 'lg') {
-  const [isBreakpoint, setIsBreakpoint] = useState(false)
-  const { width } = useWindowSize()
-
   const _breakpoint = typeof breakpoint === 'string' ? twBreakpointMap[breakpoint] : breakpoint
 
+  const [isBreakpoint, setIsBreakpoint] = useState(false)
+
   useIsomorphicLayoutEffect(() => {
-    if (width <= _breakpoint) {
-      setIsBreakpoint(true)
-    } else {
-      setIsBreakpoint(false)
-    }
-  }, [width])
+    // Queried in rem (not compared as a raw px window width) so this stays in
+    // sync with Tailwind's own rem-based breakpoints regardless of the root
+    // font size. Comparing a raw px window width against this same constant
+    // can drift out of sync with co-located `md:`-style CSS classes whenever
+    // the root font size isn't exactly 16px (e.g. browser zoom/accessibility
+    // text scaling behaving differently across browsers), which can leave an
+    // element with no matching render path — neither the "mobile" nor the
+    // "desktop" variant renders.
+    //
+    // `_breakpoint` is already Tailwind's breakpoint minus 1 (per the offset
+    // noted above), so `_breakpoint + 1` recovers Tailwind's actual
+    // `min-width`. Querying with the Media Queries Level 4 range syntax
+    // (`width < Xrem`) makes this the exact logical complement of that
+    // `min-width` — unlike an approximated `max-width: (X - epsilon)rem`,
+    // there's no sub-pixel gap where a fractional viewport width satisfies
+    // neither query.
+    const mql = window.matchMedia(`(width < ${(_breakpoint + 1) / 16}rem)`)
+    const onChange = () => setIsBreakpoint(mql.matches)
+    onChange()
+    mql.addEventListener('change', onChange)
+    return () => mql.removeEventListener('change', onChange)
+  }, [_breakpoint])
 
   return isBreakpoint
 }
