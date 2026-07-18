@@ -27,22 +27,10 @@ export function useBreakpoint(breakpoint: number | keyof typeof twBreakpointMap 
   const [isBreakpoint, setIsBreakpoint] = useState(false)
 
   useIsomorphicLayoutEffect(() => {
-    // Queried in rem (not compared as a raw px window width) so this stays in
-    // sync with Tailwind's own rem-based breakpoints regardless of the root
-    // font size. Comparing a raw px window width against this same constant
-    // can drift out of sync with co-located `md:`-style CSS classes whenever
-    // the root font size isn't exactly 16px (e.g. browser zoom/accessibility
-    // text scaling behaving differently across browsers), which can leave an
-    // element with no matching render path — neither the "mobile" nor the
-    // "desktop" variant renders.
-    //
-    // `_breakpoint` is already Tailwind's breakpoint minus 1 (per the offset
-    // noted above), so `_breakpoint + 1` recovers Tailwind's actual
-    // `min-width`. Querying with the Media Queries Level 4 range syntax
-    // (`width < Xrem`) makes this the exact logical complement of that
-    // `min-width` — unlike an approximated `max-width: (X - epsilon)rem`,
-    // there's no sub-pixel gap where a fractional viewport width satisfies
-    // neither query.
+    // Rem, not px, to match Tailwind's breakpoints exactly — a px comparison
+    // can drift out of sync with co-located `md:`-style classes. `+1` recovers
+    // Tailwind's actual min-width from our offset value; range syntax keeps
+    // this the exact complement of it.
     const mql = window.matchMedia(`(width < ${(_breakpoint + 1) / 16}rem)`)
     const onChange = () => setIsBreakpoint(mql.matches)
     onChange()
