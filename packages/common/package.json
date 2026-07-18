@@ -9,7 +9,9 @@
     "preinstall": "npx only-allow pnpm",
     "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo",
     "gen:types": "supabase gen types typescript --local >| ./database-types.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:ci": "vitest --run --coverage"
   },
   "dependencies": {
     "@types/dat.gui": "^0.7.12",
@@ -27,12 +29,15 @@
   },
   "devDependencies": {
     "lucide-react": "*",
+    "@testing-library/react": "^16.0.0",
     "@types/lodash": "4.17.5",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
     "tsconfig": "workspace:*",
     "type-fest": "5.6.0",
     "@typescript/native": "catalog:",
