@@ -170,6 +170,7 @@ export const TableEditorMenu = () => {
           >
             <SchemaSelector
               className="mx-4"
+              triggerClassName="text-xs px-2.5 py-1 h-[26px]"
               selectedSchemaName={selectedSchema}
               onSelectSchema={(name: string) => {
                 setSearchText('')
@@ -195,7 +196,7 @@ export const TableEditorMenu = () => {
                 size="tiny"
                 icon={<Plus size={14} strokeWidth={1.5} className="text-foreground-muted" />}
                 variant="default"
-                className="justify-start"
+                className="w-full text-xs px-2.5 py-1 h-[26px] justify-start"
                 onClick={() => snap.onAddTable()}
                 tooltip={{
                   content: {
@@ -245,9 +246,10 @@ export const TableEditorMenu = () => {
             <Popover>
               <PopoverTrigger asChild>
                 <ButtonTooltip
-                  className="h-[32px] md:h-[28px] px-1.5"
+                  size="tiny"
+                  className="text-xs py-1 h-[28px] px-1.5 shrink-0"
                   variant={hasFiltersApplied ? 'default' : 'dashed'}
-                  icon={<Filter />}
+                  icon={<Filter size={14} />}
                   aria-label="Filter"
                   tooltip={{ content: { side: 'bottom', text: 'Filter' } }}
                 />
@@ -321,7 +323,7 @@ export const TableEditorMenu = () => {
                 />
               )}
               {(entityTypes?.length ?? 0) > 0 && (
-                <div className="flex flex-1 min-h-0 w-full" data-testid="tables-list">
+                <div className="flex flex-1 min-h-0 w-full overflow-auto" data-testid="tables-list">
                   <InfiniteListDefault
                     className="h-full w-full"
                     items={entityTypes!}
