@@ -48,8 +48,16 @@ export default defineConfig({
   testDir: './features',
   testMatch: /.*\.spec\.ts/,
   forbidOnly: IS_CI,
-  retries: IS_CI ? 5 : 0,
-  maxFailures: 3,
+  retries: IS_CI
+    ? process.env.PLAYWRIGHT_RETRIES
+      ? Number(process.env.PLAYWRIGHT_RETRIES)
+      : 5
+    : 0,
+  // 0 = run the whole suite regardless of how many specs fail. Defaults to 3
+  // so a normal run bails early; override via env when you want full coverage.
+  maxFailures: process.env.PLAYWRIGHT_MAX_FAILURES
+    ? Number(process.env.PLAYWRIGHT_MAX_FAILURES)
+    : 3,
   expect: {
     timeout: 20_000,
   },
