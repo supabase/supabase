@@ -169,6 +169,15 @@ export const PolicyEditorModal = ({
     if (!command) {
       return toast.error('Please select an operation for your policy')
     }
+    if (
+      selectedPolicyToEdit &&
+      ((selectedPolicyToEdit.definition && !definition) ||
+        (selectedPolicyToEdit.check && !check))
+    ) {
+      return toast.error(
+        'Clearing an existing USING or WITH CHECK expression is not supported yet. Delete and recreate the policy instead, or leave the expression unchanged.'
+      )
+    }
     if (['SELECT', 'DELETE'].includes(command) && !definition) {
       return toast.error('Please provide a USING expression for your policy')
     }
