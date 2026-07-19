@@ -54,7 +54,11 @@ export const createSQLPolicy = (
   }
 
   if (!isEmpty(fieldsToUpdate)) {
-    return createSQLStatementForUpdatePolicy(formattedPolicyFormFields, fieldsToUpdate)
+    return createSQLStatementForUpdatePolicy(
+      formattedPolicyFormFields,
+      fieldsToUpdate,
+      originalPolicyFormFields
+    )
   }
 
   return {}
@@ -77,9 +81,12 @@ const createSQLStatementForCreatePolicy = (policyFormFields: PolicyFormField): P
 
 const createSQLStatementForUpdatePolicy = (
   policyFormFields: PolicyFormField,
-  fieldsToUpdate: Partial<PolicyFormField>
+  fieldsToUpdate: Partial<PolicyFormField>,
+  originalPolicyFormFields: PGPolicy
 ): PolicyForReview => {
   const { name, schema, table } = policyFormFields
+  // Use the original name for the ALTER POLICY target when renaming
+  const targetName = originalPolicyFormFields?.name || name
 
   const definitionChanged = has(fieldsToUpdate, ['definition'])
   const checkChanged = has(fieldsToUpdate, ['check'])
@@ -97,11 +104,15 @@ const createSQLStatementForUpdatePolicy = (
   const roles =
     (fieldsToUpdate?.roles ?? []).length === 0 ? ['public'] : (fieldsToUpdate.roles as string[])
 
-  const alterStatement = `ALTER POLICY "${name}" ON "${schema}"."${table}"`
+  const alterStatement = `ALTER POLICY "${targetName}" ON "${schema}"."${table}"`
   const statement = [
     'BEGIN;',
-    ...(definitionChanged ? [`  ${alterStatement} USING (${fieldsToUpdate.definition});`] : []),
-    ...(checkChanged ? [`  ${alterStatement} WITH CHECK (${fieldsToUpdate.check});`] : []),
+    ...(definitionChanged ? [
+      `  ${alterStatement} USING (${fieldsToUpdate.definition || 'true'});`
+    ] : []),
+    ...(checkChanged ? [
+      `  ${alterStatement} WITH CHECK (${fieldsToUpdate.check || 'true'});`
+    ] : []),
     ...(rolesChanged ? [`  ${alterStatement} TO ${roles.join(', ')};`] : []),
     ...(nameChanged ? [`  ${alterStatement} RENAME TO "${fieldsToUpdate.name}";`] : []),
     'COMMIT;',
@@ -110,7 +121,7 @@ const createSQLStatementForUpdatePolicy = (
   return { description, statement }
 }
 
-// These constructors return DRAFT payloads — `definition`/`check` are still
+// These constructors return DRAFT payloads â€” `definition`/`check` are still
 // `DisplayableSqlFragment`. Promotion to `SafeSqlFragment` must happen at the user gesture
 // (the Save click in `PolicyEditorModal`), not here, since this module has no guarantee that
 // it was reached via a deliberate user action.
@@ -144,10 +155,10 @@ export const createPayloadForUpdatePolicy = (
     payload.name = policyFormFields.name
   }
   if (!isEqual(formattedDefinition, originalPolicyFormFields.definition)) {
-    payload.definition = !formattedDefinition ? undefined : untrustedSql(formattedDefinition)
+    payload.definition = !formattedDefinition ? null : untrustedSql(formattedDefinition)
   }
   if (!isEqual(formattedCheck, originalPolicyFormFields.check)) {
-    payload.check = !formattedCheck ? undefined : untrustedSql(formattedCheck)
+    payload.check = !formattedCheck ? null : untrustedSql(formattedCheck)
   }
   if (!isEqual(policyFormFields.roles, originalPolicyFormFields.roles)) {
     if (policyFormFields.roles.length === 0) payload.roles = ['public']
