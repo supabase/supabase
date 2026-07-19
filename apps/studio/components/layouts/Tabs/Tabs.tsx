@@ -179,8 +179,8 @@ export const EditorTabs = () => {
           <TabsList
             ref={tabsListRef}
             className={cn(
-              'rounded-b-none gap-0 min-h-(--header-height) flex items-center w-full z-1',
-              'bg-surface-200 dark:bg-alternative border-none text-clip overflow-x-auto'
+              'rounded-b-none gap-0 min-h-12 flex items-center w-full z-1',
+              'bg-surface-200 border-none text-clip overflow-x-auto'
             )}
           >
             <SortableContext
@@ -254,7 +254,7 @@ export const EditorTabs = () => {
             <AnimatePresence initial={false}>
               {!hasNewTab && (
                 <motion.button
-                  className="flex items-center justify-center w-10 min-h-(--header-height) hover:bg-surface-100 shrink-0 border-b"
+                  className="flex items-center justify-center w-10 min-h-12 hover:bg-surface-100 shrink-0 border-b border-default"
                   onClick={() =>
                     router.push(
                       `/project/${router.query.ref}/${editor === 'table' ? 'editor' : 'sql'}/new?skip=true`
@@ -272,7 +272,7 @@ export const EditorTabs = () => {
                 </motion.button>
               )}
             </AnimatePresence>
-            <div className="grow h-full border-b pr-6" />
+            <div className="grow h-full border-b border-default pr-6" />
           </TabsList>
         </Tabs>
 

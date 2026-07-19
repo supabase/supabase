@@ -13,12 +13,14 @@ export const getTableRowsCountSql = ({
   filters = [],
   enforceExactCount = false,
   isReadOnlyContext = false,
+  quickFilter,
 }: {
   table: any
   filters?: Filter[]
   enforceExactCount?: boolean
   /** Skips using the count estimate function if true and fallsback to checking reltuples from pg_class  */
   isReadOnlyContext?: boolean
+  quickFilter?: { columns: string[]; value: string }
 }): SafeSqlFragment => {
   if (!table) return safeSql``
 
@@ -30,6 +32,9 @@ export const getTableRowsCountSql = ({
       .forEach((x) => {
         queryChains = queryChains.filter(x.column, x.operator, x.value)
       })
+    if (quickFilter) {
+      queryChains = queryChains.applyQuickFilter(quickFilter.columns, quickFilter.value)
+    }
     const queryChainsSql = queryChains.toSql()
     const queryChainsSqlWithoutSemicolon = queryChainsSql.endsWith(';')
       ? (queryChainsSql.slice(0, -1) as SafeSqlFragment)
@@ -43,6 +48,9 @@ export const getTableRowsCountSql = ({
       .forEach((x) => {
         selectQueryChains = selectQueryChains.filter(x.column, x.operator, x.value)
       })
+    if (quickFilter) {
+      selectQueryChains = selectQueryChains.applyQuickFilter(quickFilter.columns, quickFilter.value)
+    }
     const selectBaseSql = selectQueryChains.toSql()
     const selectBaseSqlWithoutSemicolon = selectBaseSql.endsWith(';')
       ? (selectBaseSql.slice(0, -1) as SafeSqlFragment)
@@ -55,6 +63,9 @@ export const getTableRowsCountSql = ({
       .forEach((x) => {
         countQueryChains = countQueryChains.filter(x.column, x.operator, x.value)
       })
+    if (quickFilter) {
+      countQueryChains = countQueryChains.applyQuickFilter(quickFilter.columns, quickFilter.value)
+    }
     const countBaseSql = countQueryChains.toSql()
     const countBaseSqlWithoutSemicolon = countBaseSql.endsWith(';')
       ? (countBaseSql.slice(0, -1) as SafeSqlFragment)

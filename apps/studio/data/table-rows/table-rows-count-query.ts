@@ -21,6 +21,7 @@ import { ResponseError, UseCustomQueryOptions } from '@/types'
 export type GetTableRowsCountArgs = {
   table?: SupaTable
   filters?: Filter[]
+  quickFilter?: { columns: string[]; value: string } | null
   enforceExactCount?: boolean
 }
 
@@ -48,6 +49,7 @@ export async function getTableRowsCount(
     connectionString,
     tableId,
     filters,
+    quickFilter,
     roleImpersonationState,
     enforceExactCount,
     isReadOnlyContext = false,
@@ -72,6 +74,7 @@ export async function getTableRowsCount(
     getTableRowsCountSql({
       table,
       filters: formattedFilters,
+      quickFilter: quickFilter ?? undefined,
       enforceExactCount,
       isReadOnlyContext,
     }),

@@ -20,10 +20,14 @@ export const TABLE_EVENT_ACTIONS = {
   TableCreated: 'table_created',
   TableDataAdded: 'table_data_added',
   TableRLSEnabled: 'table_rls_enabled',
+  TableEditorFilterApplied: 'table_editor_filter_applied',
+  TableEditorFilterChipRemoved: 'table_editor_filter_chip_removed',
 } as const satisfies {
   TableCreated: TableCreatedEvent['action']
   TableDataAdded: TableDataAddedEvent['action']
   TableRLSEnabled: TableRlsEnabledEvent['action']
+  TableEditorFilterApplied: TableEditorFilterAppliedEvent['action']
+  TableEditorFilterChipRemoved: TableEditorFilterChipRemovedEvent['action']
 }
 
 export type TableEventAction = (typeof TABLE_EVENT_ACTIONS)[keyof typeof TABLE_EVENT_ACTIONS]
@@ -2275,6 +2279,38 @@ export interface TableRlsEnabledEvent {
 }
 
 /**
+ * User applied a quick filter in the table editor toolbar.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface TableEditorFilterAppliedEvent {
+  action: 'table_editor_filter_applied'
+  properties: {
+    schema_name?: string
+    table_name?: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User removed an active quick filter chip in the table editor toolbar.
+ *
+ * @group Events
+ * @source studio
+ * @page /dashboard/project/{ref}/editor
+ */
+export interface TableEditorFilterChipRemovedEvent {
+  action: 'table_editor_filter_chip_removed'
+  properties: {
+    schema_name?: string
+    table_name?: string
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
  * User clicked the generate policies button in the table editor.
  *
  * @group Events
@@ -3665,6 +3701,8 @@ export type TelemetryEvent =
   | TableCreatedEvent
   | TableDataAddedEvent
   | TableRlsEnabledEvent
+  | TableEditorFilterAppliedEvent
+  | TableEditorFilterChipRemovedEvent
   | RlsGeneratePoliciesClickedEvent
   | RlsGeneratedPolicyRemovedEvent
   | RlsGeneratedPoliciesCreatedEvent

@@ -41,6 +41,7 @@ export const SupabaseGrid = ({
   const gridRef = useRef<DataGridHandle>(null)
 
   const filters = snap.filters
+  const quickFilter = snap.quickFilter
   const { sorts, onApplySorts } = useTableSort()
 
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
@@ -63,6 +64,7 @@ export const SupabaseGrid = ({
       tableId,
       sorts,
       filters,
+      quickFilter,
       page: snap.page,
       preflightCheck,
       limit: tableEditorSnap.rowsPerPage,

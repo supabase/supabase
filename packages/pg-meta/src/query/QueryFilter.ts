@@ -7,9 +7,15 @@ export interface IQueryFilter {
   order: (table: string, column: string, ascending?: boolean, nullsFirst?: boolean) => IQueryFilter
 }
 
+export type QuickFilter = {
+  columns: string[]
+  value: string
+}
+
 export class QueryFilter implements IQueryFilter, IQueryModifier {
   protected filters: Array<Filter> = []
   protected sorts: Array<Sort> = []
+  protected quickFilter?: QuickFilter
 
   constructor(
     protected table: QueryTable,
@@ -19,6 +25,16 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
 
   filter(column: string | string[], operator: FilterOperator, value: any) {
     this.filters.push({ column, operator, value })
+    return this
+  }
+
+  applyQuickFilter(columns: string[], value: string) {
+    const trimmed = value.trim()
+    if (trimmed && columns.length > 0) {
+      this.quickFilter = { columns, value: trimmed }
+    } else {
+      this.quickFilter = undefined
+    }
     return this
   }
 
@@ -50,6 +66,7 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
       actionOptions: this.actionOptions,
       filters: this.filters,
       sorts: this.sorts,
+      quickFilter: this.quickFilter,
     })
 
     const cloned = new QueryFilter(
@@ -60,6 +77,7 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
 
     cloned.filters = clonedData.filters
     cloned.sorts = clonedData.sorts
+    cloned.quickFilter = clonedData.quickFilter
 
     return cloned
   }
@@ -73,6 +91,7 @@ export class QueryFilter implements IQueryFilter, IQueryModifier {
       actionOptions: this.actionOptions,
       filters: this.filters,
       sorts: this.sorts,
+      quickFilter: this.quickFilter,
     })
   }
 }

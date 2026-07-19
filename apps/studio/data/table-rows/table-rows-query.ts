@@ -25,6 +25,7 @@ import { ResponseError, UseCustomQueryOptions } from '@/types'
 interface GetTableRowsArgs {
   table?: SupaTable
   filters?: Filter[]
+  quickFilter?: { columns: string[]; value: string } | null
   sorts?: Sort[]
   limit?: number
   page?: number
@@ -122,10 +123,12 @@ const checkIfCtidAvailable = (table: SupaTable): boolean =>
 export const getAllTableRowsSql = ({
   table,
   filters = [],
+  quickFilter,
   sorts = [],
 }: {
   table: SupaTable
   filters?: Filter[]
+  quickFilter?: { columns: string[]; value: string } | null
   sorts?: Sort[]
 }): { sql: QueryFilter; cursorColumns: string[] | false } => {
   const query = new Query()
@@ -150,6 +153,10 @@ export const getAllTableRowsSql = ({
       const value = formatFilterValue(table, filter)
       queryChains = queryChains.filter(filter.column, filter.operator, value)
     })
+
+  if (quickFilter) {
+    queryChains = queryChains.applyQuickFilter(quickFilter.columns, quickFilter.value)
+  }
 
   let cursorColumns: string[] | false = false
   const { cursorPaginationEligible, cursorPaginationNonEligible } =
@@ -330,6 +337,7 @@ async function getTableRows(
     tableId,
     roleImpersonationState,
     filters,
+    quickFilter,
     sorts,
     limit,
     page,
@@ -366,6 +374,7 @@ async function getTableRows(
     getTableRowsSql({
       table: entity,
       filters,
+      quickFilter: quickFilter ?? undefined,
       sorts,
       limit,
       page,

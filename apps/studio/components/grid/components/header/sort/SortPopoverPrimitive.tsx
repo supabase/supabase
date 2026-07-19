@@ -233,7 +233,12 @@ export const SortPopoverPrimitive = ({
     <>
       <Popover modal={false} open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant={localSorts.length > 0 ? 'link' : 'text'} icon={<List />}>
+          <Button
+            variant={localSorts.length > 0 ? 'link' : 'text'}
+            size="tiny"
+            className="text-xs px-2.5 py-1 h-[26px]"
+            icon={<List size={14} />}
+          >
             {displayButtonText}
           </Button>
         </PopoverTrigger>

@@ -182,9 +182,9 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
   }
 
   return (
-    <div className="flex items-center space-x-2">
+    <div className="flex items-center gap-2">
       {showHeaderActions && (
-        <div className="flex items-center gap-x-2">
+        <div className="flex items-center gap-2">
           {isReadOnly && (
             <Tooltip>
               <TooltipTrigger asChild>
@@ -202,11 +202,12 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
             table.rls_enabled ? (
               <>
                 {policies.length < 1 && !isSchemaLocked ? (
-                  <ButtonTooltip
-                    asChild
-                    variant="default"
-                    className="group"
-                    icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
+              <ButtonTooltip
+                asChild
+                variant="default"
+                size="tiny"
+                className="text-xs px-2.5 py-1 h-[26px]"
+                icon={<PlusCircle strokeWidth={1.5} className="text-foreground-muted" />}
                     tooltip={{
                       content: {
                         side: 'bottom',
@@ -223,7 +224,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   <Button
                     asChild
                     variant={policies.length < 1 && !isSchemaLocked ? 'warning' : 'default'}
-                    className="group"
+                    size="tiny"
+                    className="text-xs px-2.5 py-1 h-[26px] group"
                     icon={
                       isSchemaLocked || policies.length > 0 ? (
                         <div
@@ -251,7 +253,12 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
             ) : tableHasLints ? (
               <Popover modal={false} open={showWarning} onOpenChange={setShowWarning}>
                 <PopoverTrigger asChild>
-                  <Button variant="danger" icon={<Lock strokeWidth={1.5} />}>
+                  <Button
+                    variant="danger"
+                    size="tiny"
+                    className="text-xs px-2.5 py-1 h-[26px]"
+                    icon={<Lock strokeWidth={1.5} className="text-destructive" />}
+                  >
                     RLS disabled
                   </Button>
                 </PopoverTrigger>
@@ -335,8 +342,9 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
             <DropdownMenuTrigger asChild>
               <Button
                 variant="default"
-                icon={<MoreVertical />}
-                className="h-7 w-7"
+                size="tiny"
+                className="text-xs h-7 w-7 p-0"
+                icon={<MoreVertical size={14} strokeWidth={2} />}
                 aria-label="More actions"
               />
             </DropdownMenuTrigger>

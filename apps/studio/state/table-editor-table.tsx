@@ -11,6 +11,11 @@ import {
   saveTableEditorStateToLocalStorageDebounced,
 } from '@/components/grid/SupabaseGrid.utils'
 import { Filter, SupaRow } from '@/components/grid/types'
+import {
+  buildTableEditorActiveFilter,
+  buildTableEditorQuickFilter,
+  type TableEditorActiveFilter,
+} from '@/components/grid/utils/table-editor-quick-filter.utils'
 import { getInitialGridColumns } from '@/components/grid/utils/column'
 import { getGridColumns } from '@/components/grid/utils/gridColumns'
 import { Entity } from '@/data/table-editor/table-editor-types'
@@ -234,6 +239,32 @@ export const createTableEditorTableState = ({
 
     /* Filters (NOTE: this is only for the new AI filter bar) */
     filters: [] as Filter[],
+    filterInput: '',
+    activeFilter: null as TableEditorActiveFilter | null,
+    quickFilter: null as { columns: string[]; value: string } | null,
+    setFilterInput: (filterInput: string) => {
+      state.filterInput = filterInput
+    },
+    applyQuickFilter: (filterText: string) => {
+      const trimmed = filterText.trim()
+      if (!trimmed) {
+        state.filterInput = ''
+        state.activeFilter = null
+        state.quickFilter = null
+        return
+      }
+
+      state.filterInput = trimmed
+      state.activeFilter = buildTableEditorActiveFilter(state.table, trimmed)
+      state.quickFilter = buildTableEditorQuickFilter(state.table, trimmed)
+      state.setPage(1)
+    },
+    removeQuickFilter: () => {
+      state.filterInput = ''
+      state.activeFilter = null
+      state.quickFilter = null
+      state.setPage(1)
+    },
     setFilters: (filters: Filter[]) => {
       state.filters = filters
     },

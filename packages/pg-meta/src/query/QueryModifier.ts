@@ -8,6 +8,7 @@ import {
   updateQuery,
 } from './Query.utils'
 import type { ActionConfig, Filter, QueryPagination, QueryTable, Sort } from './types'
+import type { QuickFilter } from './QueryFilter'
 
 export interface IQueryModifier {
   range: (from: number, to: number) => QueryModifier
@@ -24,6 +25,7 @@ export class QueryModifier implements IQueryModifier {
       actionOptions?: { returning?: boolean; cascade?: boolean; enumArrayColumns?: Array<string> }
       filters?: Array<Filter>
       sorts?: Array<Sort>
+      quickFilter?: QuickFilter
     }
   ) {}
 
@@ -45,10 +47,10 @@ export class QueryModifier implements IQueryModifier {
     options: { isCTE: boolean; isFinal: boolean } = { isCTE: false, isFinal: true }
   ): SafeSqlFragment {
     try {
-      const { actionOptions, filters, sorts } = this.options ?? {}
+      const { actionOptions, filters, sorts, quickFilter } = this.options ?? {}
       switch (this.actionConfig.action) {
         case 'count': {
-          return countQuery(this.table, { filters })
+          return countQuery(this.table, { filters, quickFilter })
         }
         case 'delete': {
           return deleteQuery(this.table, filters, {
@@ -70,6 +72,7 @@ export class QueryModifier implements IQueryModifier {
               filters,
               pagination: this.pagination,
               sorts,
+              quickFilter,
             },
             options.isFinal,
             options.isCTE
