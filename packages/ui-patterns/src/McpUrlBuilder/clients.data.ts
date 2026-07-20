@@ -386,7 +386,7 @@ export const MCP_CLI_COMMANDS: Record<string, McpCliCommands> = {
 export const MCP_CLIENT_GROUPS = [
   {
     heading: 'AI Agent CLI',
-    keys: ['claude-code', 'codex', 'kimi', 'gemini-cli', 'copilot-cli', 'opencode', 'factory'],
+    keys: ['claude-code', 'codex', 'gemini-cli', 'copilot-cli', 'opencode', 'factory'],
   },
   {
     heading: 'Web Clients',
@@ -394,7 +394,7 @@ export const MCP_CLIENT_GROUPS = [
   },
   {
     heading: 'IDE',
-    keys: ['cursor', 'vscode', 'antigravity', 'kiro', 'windsurf'],
+    keys: ['cursor', 'vscode', 'antigravity', 'kiro', 'windsurf', 'kimi'],
   },
 ] as const
 
