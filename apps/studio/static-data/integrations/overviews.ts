@@ -44,6 +44,7 @@ const INTEGRATION_OVERVIEWS = {
   stripe_sync_engine: () => import('@/static-data/integrations/stripe_sync_engine/overview.md'),
   stripe_wrapper: () => import('@/static-data/integrations/stripe_wrapper/overview.md'),
   vault: () => import('@/static-data/integrations/vault/overview.md'),
+  warehouse_catalog: () => import('@/static-data/integrations/warehouse_catalog/overview.md'),
   webhooks: () => import('@/static-data/integrations/webhooks/overview.md'),
 } satisfies Record<string, () => Promise<{ default: string }>>
 

@@ -95,6 +95,7 @@ export const createTableEditorTableState = ({
       state.gridColumns = gridColumns
       state.originalTable = table
       state._originalTableRef = ref(table)
+      if (!supaTable.schema?.endsWith('_warehouse')) state.warehouseSnapshotTime = null
     },
 
     /* Rows */
@@ -212,6 +213,13 @@ export const createTableEditorTableState = ({
       state.page = page
 
       // reset selected row state
+      state.setSelectedRows(new Set())
+    },
+
+    warehouseSnapshotTime: null as string | null,
+    setWarehouseSnapshotTime: (value: string | null) => {
+      state.warehouseSnapshotTime = value
+      state.page = 1
       state.setSelectedRows(new Set())
     },
 

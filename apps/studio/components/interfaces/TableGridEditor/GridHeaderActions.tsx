@@ -1,9 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Realtime } from 'icons'
-import { BookOpenText, Lightbulb, Lock, MoreVertical, PlusCircle, Unlock } from 'lucide-react'
+import {
+  BookOpenText,
+  Clock,
+  Lightbulb,
+  Lock,
+  MoreVertical,
+  PlusCircle,
+  RefreshCw,
+  Unlock,
+} from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -13,6 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Input,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -45,7 +55,9 @@ import {
   isMaterializedView as isTableLikeMaterializedView,
   isView as isTableLikeView,
 } from '@/data/table-editor/table-editor-types'
+import { isWarehouseSchema } from '@/data/table-rows/warehouse-time-travel'
 import { useTableUpdateMutation } from '@/data/tables/table-update-mutation'
+import { useWarehouseRefreshSchemaMutation } from '@/data/warehouse/refresh-schema-mutation'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -59,6 +71,99 @@ export interface GridHeaderActionsProps {
   table: Entity
   isRefetching: boolean
 }
+
+function formatSnapshotInputValue(value?: string | null) {
+  if (!value) return ''
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ''
+
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return (
+    [date.getFullYear(), pad(date.getMonth() + 1), pad(date.getDate())].join('-') +
+    `T${pad(date.getHours())}:${pad(date.getMinutes())}`
+  )
+}
+
+function parseSnapshotInputValue(value: string) {
+  if (!value) return null
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return null
+
+  return date.toISOString()
+}
+
+const WarehouseTimeTravelPopover = ({ table }: { table: Entity }) => {
+  const snap = useTableEditorTableStateSnapshot()
+  const [open, setOpen] = useState(false)
+  const [draft, setDraft] = useState(formatSnapshotInputValue(snap.warehouseSnapshotTime))
+
+  useEffect(() => {
+    if (open) setDraft(formatSnapshotInputValue(snap.warehouseSnapshotTime))
+  }, [open, snap.warehouseSnapshotTime])
+
+  if (!isWarehouseSchema(table.schema)) return null
+
+  const isActive = !!snap.warehouseSnapshotTime
+  const inputId = `warehouse-snapshot-time-${table.id}`
+
+  const onApply = () => {
+    const snapshotTime = parseSnapshotInputValue(draft)
+    if (!snapshotTime) {
+      toast.error('Invalid snapshot time')
+      return
+    }
+
+    snap.setWarehouseSnapshotTime(snapshotTime)
+    setOpen(false)
+  }
+
+  const onReset = () => {
+    snap.setWarehouseSnapshotTime(null)
+    setDraft('')
+    setOpen(false)
+  }
+
+  return (
+    <Popover modal={false} open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          variant={isActive ? 'default' : 'outline'}
+          icon={<Clock strokeWidth={1.5} />}
+          className="h-7"
+        >
+          Time travel
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-72 p-3" align="end">
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <label htmlFor={inputId} className="text-xs text-foreground-light">
+              Snapshot time
+            </label>
+            <Input
+              id={inputId}
+              type="datetime-local"
+              value={draft}
+              step={60}
+              onChange={(event) => setDraft(event.target.value)}
+            />
+          </div>
+          <div className="flex items-center justify-end gap-2">
+            <Button variant="outline" type="button" disabled={!isActive} onClick={onReset}>
+              Reset
+            </Button>
+            <Button type="button" disabled={!draft} onClick={onApply}>
+              Apply
+            </Button>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+}
+
 export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProps) => {
   const track = useTrack()
   const appSnap = useAppStateSnapshot()
@@ -97,6 +202,11 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
       toast.error(`Failed to toggle RLS: ${error.message}`)
     },
   })
+
+  const { mutate: refreshWarehouseSchema, isPending: isRefreshingWarehouseSchema } =
+    useWarehouseRefreshSchemaMutation({
+      onSuccess: () => toast.success('Warehouse schema refreshed'),
+    })
 
   const showHeaderActions = snap.selectedRows.size === 0
 
@@ -331,6 +441,8 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
 
           <RoleImpersonationPopover header="View data as a role" align="center" />
 
+          <WarehouseTimeTravelPopover table={table} />
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -362,6 +474,22 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                   >
                     <Lightbulb size={14} />
                     <span>Enable Index Advisor</span>
+                  </DropdownMenuItem>
+                </>
+              )}
+              {isWarehouseSchema(table.schema) && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    className="gap-x-2"
+                    disabled={!projectRef || isRefreshingWarehouseSchema}
+                    onClick={() => projectRef && refreshWarehouseSchema({ projectRef })}
+                  >
+                    <RefreshCw
+                      size={14}
+                      className={isRefreshingWarehouseSchema ? 'animate-spin' : ''}
+                    />
+                    <span>Refresh Warehouse schema</span>
                   </DropdownMenuItem>
                 </>
               )}

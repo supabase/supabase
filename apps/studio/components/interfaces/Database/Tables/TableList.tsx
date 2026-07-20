@@ -5,19 +5,21 @@ import { noop } from 'lodash'
 import {
   Check,
   ChevronDown,
+  ChevronRight,
   Copy,
   Edit,
   Eye,
   MoreVertical,
   Plus,
   Search,
+  Settings,
   Trash,
   X,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
 import {
   Button,
   Card,
@@ -37,6 +39,7 @@ import {
   TableFooter,
   TableHead,
   TableHeader,
+  TableHeadSort,
   TableRow,
   Tooltip,
   TooltipContent,
@@ -46,6 +49,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ProtectedSchemaWarning } from '../ProtectedSchemaWarning'
+import { WarehouseSyncChip } from '../Warehouse/WarehouseSyncChip'
 import { formatAllEntities } from './Tables.utils'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { AlertError } from '@/components/ui/AlertError'
@@ -61,14 +65,23 @@ import { useMaterializedViewsQuery } from '@/data/materialized-views/materialize
 import { usePrefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.$id'
 import { useInfiniteTablesQuery } from '@/data/tables/tables-query'
 import { useViewsQuery } from '@/data/views/views-query'
+import { useWarehouseTableStates } from '@/data/warehouse/warehouse-tables-query'
+import {
+  getWarehouseStorageSummaryLabel,
+  type WarehouseMode,
+} from '@/data/warehouse/warehouse-types'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { createNavigationHandler } from '@/lib/navigation'
 import type { SafePostgresTable } from '@/lib/postgres-types'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
+
+type TableListSortColumn = 'name' | 'columns' | 'rows' | 'storage' | 'realtime'
+type TableListSort = `${TableListSortColumn}:asc` | `${TableListSortColumn}:desc`
 
 interface TableListProps {
   onAddTable: () => void
@@ -95,8 +108,10 @@ export const TableList = ({
   const debouncedFilterString = useDebounce(filterString, 300)
   const [visibleTypes, setVisibleTypes] = useState<string[]>(Object.values(ENTITY_TYPE))
   const [schemaSelectorOpen, setSchemaSelectorOpen] = useState(false)
+  const [sort, setSort] = useState<TableListSort>('name:asc')
   const searchInputRef = useRef<HTMLInputElement>(null)
 
+  const warehouseStates = useWarehouseTableStates()
   const { can: canUpdateTables } = useAsyncCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'tables'
@@ -216,6 +231,76 @@ export const TableList = ({
   const entities = formatAllEntities({ tables, views, materializedViews, foreignTables }).filter(
     (x) => visibleTypes.includes(x.type)
   )
+
+  const [sortColumn, sortDirection] = sort.split(':') as [TableListSortColumn, 'asc' | 'desc']
+
+  const getAriaSort = (column: TableListSortColumn) => {
+    if (sortColumn !== column) return 'none'
+    return sortDirection === 'asc' ? 'ascending' : 'descending'
+  }
+
+  const handleSortChange = (column: TableListSortColumn) => {
+    if (sortColumn !== column) {
+      setSort(`${column}:asc`)
+      return
+    }
+
+    setSort(`${column}:${sortDirection === 'asc' ? 'desc' : 'asc'}`)
+  }
+
+  const sortedEntities = useMemo(() => {
+    const items = [...entities]
+
+    const isRealtimeEnabled = (entity: (typeof entities)[number]) =>
+      (realtimePublication?.tables ?? []).some((table) => table.id === entity.id)
+
+    const getBytes = (entity: (typeof entities)[number]) =>
+      'bytes' in entity && typeof entity.bytes === 'number' ? entity.bytes : undefined
+
+    items.sort((a, b) => {
+      let comparison = 0
+
+      if (sortColumn === 'name') {
+        comparison = a.name.localeCompare(b.name)
+      } else if (sortColumn === 'columns') {
+        comparison = a.columns.length - b.columns.length
+      } else if (sortColumn === 'rows') {
+        if (a.rows === undefined && b.rows === undefined) {
+          comparison = 0
+        } else if (a.rows === undefined) {
+          return 1
+        } else if (b.rows === undefined) {
+          return -1
+        } else {
+          comparison = a.rows - b.rows
+        }
+      } else if (sortColumn === 'storage') {
+        const bytesA = getBytes(a)
+        const bytesB = getBytes(b)
+
+        if (bytesA === undefined && bytesB === undefined) {
+          comparison = 0
+        } else if (bytesA === undefined) {
+          return 1
+        } else if (bytesB === undefined) {
+          return -1
+        } else {
+          comparison = bytesA - bytesB
+        }
+      } else if (sortColumn === 'realtime') {
+        comparison = Number(isRealtimeEnabled(a)) - Number(isRealtimeEnabled(b))
+      }
+
+      if (comparison !== 0) {
+        return sortDirection === 'asc' ? comparison : -comparison
+      }
+
+      return a.name.localeCompare(b.name)
+    })
+
+    return items
+  }, [entities, sortColumn, sortDirection, realtimePublication])
+
   const footerCount = hasNextTablesPage ? tables.length : entities.length
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedSchema })
@@ -376,13 +461,47 @@ export const TableList = ({
               <TableHeader>
                 <TableRow>
                   <TableHead key="icon" className="w-0 px-0!" />
-                  <TableHead key="name" className="max-w-[160px] sm:max-w-[280px]">
-                    Name
+                  <TableHead
+                    key="name"
+                    aria-sort={getAriaSort('name')}
+                    className="max-w-[160px] sm:max-w-[280px]"
+                  >
+                    <TableHeadSort column="name" currentSort={sort} onSortChange={handleSortChange}>
+                      Name
+                    </TableHeadSort>
                   </TableHead>
-                  <TableHead key="columns">Columns</TableHead>
-                  <TableHead key="rows">Rows (Estimated)</TableHead>
-                  <TableHead key="size">Size (Estimated)</TableHead>
-                  <TableHead key="realtime">Realtime</TableHead>
+                  <TableHead key="columns" aria-sort={getAriaSort('columns')}>
+                    <TableHeadSort
+                      column="columns"
+                      currentSort={sort}
+                      onSortChange={handleSortChange}
+                    >
+                      Columns
+                    </TableHeadSort>
+                  </TableHead>
+                  <TableHead key="rows" aria-sort={getAriaSort('rows')}>
+                    <TableHeadSort column="rows" currentSort={sort} onSortChange={handleSortChange}>
+                      Rows (Est)
+                    </TableHeadSort>
+                  </TableHead>
+                  <TableHead key="storage" aria-sort={getAriaSort('storage')}>
+                    <TableHeadSort
+                      column="storage"
+                      currentSort={sort}
+                      onSortChange={handleSortChange}
+                    >
+                      Storage
+                    </TableHeadSort>
+                  </TableHead>
+                  <TableHead key="realtime" aria-sort={getAriaSort('realtime')}>
+                    <TableHeadSort
+                      column="realtime"
+                      currentSort={sort}
+                      onSortChange={handleSortChange}
+                    >
+                      Realtime
+                    </TableHeadSort>
+                  </TableHead>
                   <TableHead key="buttons"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -433,98 +552,140 @@ export const TableList = ({
                       </TableCell>
                     </TableRow>
                   )}
-                  {entities.length > 0 &&
-                    entities.map((x) => (
-                      <TableRow key={x.id}>
-                        <TableCell className="w-0 pl-5! pr-1!">
-                          <Tooltip>
-                            <TooltipTrigger asChild className="cursor-default">
-                              <div className="flex w-4 justify-center">
-                                <EntityTypeIcon type={x.type} />
-                              </div>
-                            </TooltipTrigger>
-                            <TooltipContent side="bottom">
-                              {formatTooltipText(x.type)}
-                            </TooltipContent>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell className="max-w-[160px] sm:max-w-[280px]">
-                          <div className="flex min-w-0 flex-col">
-                            {/* only show tooltips if required, to reduce noise */}
-                            {x.name.length > 20 ? (
-                              <Tooltip disableHoverableContent={true}>
-                                <TooltipTrigger
-                                  asChild
-                                  className="max-w-[95%] overflow-hidden text-ellipsis whitespace-nowrap"
+                  {sortedEntities.length > 0 &&
+                    sortedEntities.map((x) => {
+                      const tableDetailUrl = `/project/${ref}/database/tables/${x.id}`
+                      const handleRowNavigation = createNavigationHandler(tableDetailUrl, router)
+
+                      return (
+                        <TableRow
+                          key={x.id}
+                          className="group relative cursor-pointer inset-focus"
+                          onClick={handleRowNavigation}
+                          onAuxClick={handleRowNavigation}
+                          onKeyDown={handleRowNavigation}
+                          tabIndex={0}
+                        >
+                          <TableCell className="w-0 pl-5! pr-1!">
+                            <Tooltip>
+                              <TooltipTrigger asChild className="cursor-default">
+                                <div className="flex w-4 justify-center">
+                                  <EntityTypeIcon type={x.type} />
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent side="bottom">
+                                {formatTooltipText(x.type)}
+                              </TooltipContent>
+                            </Tooltip>
+                          </TableCell>
+                          <TableCell className="max-w-[160px] sm:max-w-[280px]">
+                            <div className="flex min-w-0 flex-col">
+                              {/* only show tooltips if required, to reduce noise */}
+                              {x.name.length > 20 ? (
+                                <Tooltip disableHoverableContent={true}>
+                                  <TooltipTrigger
+                                    asChild
+                                    className="max-w-[95%] overflow-hidden text-ellipsis whitespace-nowrap"
+                                  >
+                                    <p>{x.name}</p>
+                                  </TooltipTrigger>
+
+                                  <TooltipContent side="bottom">{x.name}</TooltipContent>
+                                </Tooltip>
+                              ) : (
+                                <p>{x.name}</p>
+                              )}
+                              {x.comment !== null ? (
+                                <span
+                                  className="max-w-md truncate text-foreground-lighter"
+                                  title={x.comment}
                                 >
-                                  <p>{x.name}</p>
-                                </TooltipTrigger>
-
-                                <TooltipContent side="bottom">{x.name}</TooltipContent>
-                              </Tooltip>
+                                  {x.comment}
+                                </span>
+                              ) : null}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <p className="text-foreground-light">
+                              {x.columns.length.toLocaleString()}
+                            </p>
+                          </TableCell>
+                          <TableCell>
+                            {x.rows !== undefined ? (
+                              <p className="text-foreground-light">{x.rows.toLocaleString()}</p>
                             ) : (
-                              <p>{x.name}</p>
+                              <p className="text-foreground-muted">–</p>
                             )}
-                            {x.comment !== null ? (
-                              <span
-                                className="max-w-md truncate text-foreground-lighter"
-                                title={x.comment}
-                              >
-                                {x.comment}
-                              </span>
-                            ) : null}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <p className="text-foreground-light">
-                            {x.columns.length.toLocaleString()}
-                          </p>
-                        </TableCell>
-                        <TableCell>
-                          {x.rows !== undefined ? (
-                            <p className="text-foreground-light">{x.rows.toLocaleString()}</p>
-                          ) : (
-                            <p className="text-foreground-muted">–</p>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {x.size !== undefined ? (
-                            <p className="text-foreground-light">{x.size}</p>
-                          ) : (
-                            <p className="text-foreground-muted">–</p>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {(realtimePublication?.tables ?? []).find(
-                            (table) => table.id === x.id
-                          ) ? (
-                            <div className="flex items-center gap-x-2">
-                              <Check size={16} strokeWidth={2} className="text-brand-link" />
-                              <p className="text-foreground-light">Enabled</p>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-x-2">
-                              <X size={16} strokeWidth={2} className="text-foreground-muted" />
-                              <p className="text-foreground-lighter">Disabled</p>
-                            </div>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex justify-end gap-2">
-                            <Button asChild variant="default">
-                              <Link href={`/project/${ref}/database/tables/${x.id}`}>
-                                View columns
-                              </Link>
-                            </Button>
+                          </TableCell>
+                          <TableCell>
+                            {x.type === ENTITY_TYPE.TABLE ? (
+                              (() => {
+                                const tableKey = `${selectedSchema}.${x.name}`
+                                const wState = warehouseStates.get(tableKey) ?? {
+                                  mode: 'postgres' as const,
+                                }
+                                const mode = wState.mode as WarehouseMode
+                                const storageSummary = getWarehouseStorageSummaryLabel(
+                                  wState,
+                                  x.size
+                                )
+                                const storageUrl = `${tableDetailUrl}/settings`
+                                const showSyncChip =
+                                  wState.syncState === 'syncing' || wState.syncState === 'error'
 
-                            {!isSchemaLocked && (
+                                if (mode === 'postgres') {
+                                  return (
+                                    <p className="text-sm text-foreground-light">{x.size ?? '—'}</p>
+                                  )
+                                }
+
+                                return (
+                                  <Link
+                                    href={storageUrl}
+                                    onClick={(event: MouseEvent) => event.stopPropagation()}
+                                    className="inline-flex max-w-full items-center gap-2 rounded-sm hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground-lighter"
+                                  >
+                                    <span className="text-sm text-foreground-light">
+                                      {storageSummary}
+                                    </span>
+                                    {showSyncChip && (
+                                      <WarehouseSyncChip syncState={wState.syncState!} />
+                                    )}
+                                  </Link>
+                                )
+                              })()
+                            ) : (
+                              <p className="text-foreground-muted">–</p>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            {(realtimePublication?.tables ?? []).find(
+                              (table) => table.id === x.id
+                            ) ? (
+                              <div className="flex items-center gap-x-2">
+                                <Check size={16} strokeWidth={2} className="text-brand-link" />
+                                <p className="text-foreground-light">Enabled</p>
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-x-2">
+                                <X size={16} strokeWidth={2} className="text-foreground-muted" />
+                                <p className="text-foreground-lighter">Disabled</p>
+                              </div>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div
+                              className="flex items-center justify-end gap-3"
+                              onClick={(event) => event.stopPropagation()}
+                              onKeyDown={(event) => event.stopPropagation()}
+                            >
                               <DropdownMenu>
                                 <Tooltip>
                                   <TooltipTrigger asChild>
                                     <DropdownMenuTrigger asChild>
                                       <Button
                                         variant="default"
-                                        className="px-1"
+                                        className="h-[28px] w-7 hit-area-2"
                                         icon={<MoreVertical />}
                                         aria-label={`Table ${x.name} actions`}
                                       />
@@ -532,7 +693,7 @@ export const TableList = ({
                                   </TooltipTrigger>
                                   <TooltipContent side="bottom">More options</TooltipContent>
                                 </Tooltip>
-                                <DropdownMenuContent side="bottom" align="end" className="w-40">
+                                <DropdownMenuContent side="bottom" align="end" className="w-48">
                                   <DropdownMenuItem
                                     className="flex items-center space-x-2"
                                     onClick={() =>
@@ -571,8 +732,17 @@ export const TableList = ({
                                         }}
                                       >
                                         <Edit size={12} />
-                                        <p>Edit table</p>
+                                        <p>Edit definitions</p>
                                       </DropdownMenuItemTooltip>
+                                      <DropdownMenuItem
+                                        className="flex items-center space-x-2"
+                                        asChild
+                                      >
+                                        <Link href={`${tableDetailUrl}/settings`}>
+                                          <Settings size={12} />
+                                          <p>Edit settings</p>
+                                        </Link>
+                                      </DropdownMenuItem>
                                       <DropdownMenuItemTooltip
                                         key="duplicate-table"
                                         className="gap-x-2"
@@ -588,8 +758,9 @@ export const TableList = ({
                                         }}
                                       >
                                         <Copy size={12} />
-                                        <span>Duplicate Table</span>
+                                        <span>Duplicate table</span>
                                       </DropdownMenuItemTooltip>
+
                                       <DropdownMenuSeparator />
                                       <DropdownMenuItemTooltip
                                         disabled={!canUpdateTables || isSchemaLocked}
@@ -613,11 +784,16 @@ export const TableList = ({
                                   )}
                                 </DropdownMenuContent>
                               </DropdownMenu>
-                            )}
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                              <ChevronRight
+                                aria-hidden
+                                size={14}
+                                className="text-foreground-muted/60"
+                              />
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
                 </>
               </TableBody>
               <TableFooter className="font-normal">

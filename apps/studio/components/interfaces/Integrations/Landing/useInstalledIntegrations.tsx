@@ -11,11 +11,13 @@ import { useAvailableIntegrations } from './useAvailableIntegrations'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
+import { useIsWarehouseEnabled } from '@/hooks/misc/useIsWarehouseEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { EMPTY_ARR } from '@/lib/void'
 
 export const useInstalledIntegrations = () => {
   const { data: project } = useSelectedProjectQuery()
+  const isWarehouseEnabled = useIsWarehouseEnabled()
 
   const {
     data: allIntegrations = EMPTY_ARR,
@@ -76,6 +78,7 @@ export const useInstalledIntegrations = () => {
       .filter((integration) => {
         if (integration.id === 'webhooks') return isHooksEnabled
         if (integration.id === 'data_api') return true
+        if (integration.id === 'warehouse_catalog') return isWarehouseEnabled
         if (integration.id === 'stripe_sync_engine') {
           return isStripeSyncEngineInstalled(schemas)
         }
@@ -94,7 +97,15 @@ export const useInstalledIntegrations = () => {
         return false
       })
       .sort((a, b) => a.name.localeCompare(b.name))
-  }, [allIntegrations, wrappers, extensions, schemas, isHooksEnabled, oauthData])
+  }, [
+    allIntegrations,
+    wrappers,
+    extensions,
+    schemas,
+    isHooksEnabled,
+    oauthData,
+    isWarehouseEnabled,
+  ])
 
   const error =
     fdwError ||

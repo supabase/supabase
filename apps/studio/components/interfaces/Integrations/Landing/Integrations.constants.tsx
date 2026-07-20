@@ -1,6 +1,6 @@
 import { getEnableWebhooksSQL } from '@supabase/pg-meta'
 import type { Tables } from 'common/marketplace.types'
-import { Clock5, Code2, Layers, Timer, Vault, Webhook } from 'lucide-react'
+import { Clock5, Code2, Layers, Timer, Vault, Warehouse, Webhook } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
@@ -414,6 +414,38 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     },
   },
   {
+    id: 'warehouse_catalog',
+    type: 'custom' as const,
+    source: 'Official' as const,
+    requiredExtensions: [],
+    name: 'Warehouse Catalog',
+    icon: ({ className, ...props } = {}) => (
+      <Warehouse className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+    ),
+    description: 'Connect analytics tools directly to your Warehouse tables',
+    docsUrl: `${DOCS_URL}/guides/warehouse`,
+    author: authorSupabase,
+    navigation: [
+      {
+        route: 'overview',
+        label: 'Overview',
+      },
+    ],
+    navigate: ({ pageId = 'overview' }) => {
+      switch (pageId) {
+        case 'overview':
+          return dynamic(
+            () =>
+              import('@/components/interfaces/Integrations/WarehouseCatalog/OverviewTab').then(
+                (mod) => mod.WarehouseCatalogOverviewTab
+              ),
+            { loading: Loading }
+          )
+      }
+      return null
+    },
+  },
+  {
     id: 'graphiql',
     type: 'postgres_extension' as const,
     source: 'Official' as const,
@@ -651,6 +683,7 @@ const INTEGRATIONS_WITH_CATEGORIES = [
       vault: ['security'],
       webhooks: ['api'],
       data_api: ['api', 'data-platform'],
+      warehouse_catalog: ['api', 'data-platform'],
       graphiql: ['api', 'devtools'],
     }
     return {

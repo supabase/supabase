@@ -1,7 +1,17 @@
 import { useParams } from 'common'
-import { Copy, Download, Edit, Globe, Lock, MoreVertical, Trash } from 'lucide-react'
+import {
+  Columns2,
+  Copy,
+  Download,
+  Edit,
+  Globe,
+  Lock,
+  MoreVertical,
+  Settings,
+  Trash,
+} from 'lucide-react'
 import Link from 'next/link'
-import { type CSSProperties } from 'react'
+import { type CSSProperties, type MouseEvent } from 'react'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -192,7 +202,7 @@ export const EntityListItem = ({
         }),
         'pl-4 pr-1'
       )}
-      onDoubleClick={(e) => {
+      onDoubleClick={(e: MouseEvent) => {
         e.preventDefault()
         const tabId = createTabId(entity.type, { id: entity.id })
         tabs.makeTabPermanent(tabId)
@@ -349,7 +359,13 @@ export const EntityListItem = ({
                     }}
                   >
                     <Edit size={12} className="shrink-0" />
-                    <span>Edit table</span>
+                    <span>Edit definitions</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem key="edit-settings" className="space-x-2" asChild>
+                    <Link href={`/project/${projectRef}/database/tables/${entity.id}/settings`}>
+                      <Settings size={12} className="shrink-0" />
+                      <span>Edit settings</span>
+                    </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     key="duplicate-table"
@@ -428,6 +444,13 @@ export const EntityListItem = ({
 
               {entity.type === ENTITY_TYPE.VIEW && (
                 <>
+                  <DropdownMenuItem key="view-details" className="space-x-2" asChild>
+                    <Link href={`/project/${projectRef}/database/tables/${entity.id}`}>
+                      <Columns2 size={12} className="shrink-0" />
+                      <span>View details</span>
+                    </Link>
+                  </DropdownMenuItem>
+
                   <DropdownMenuSeparator />
 
                   <DropdownMenuSub>
@@ -476,6 +499,13 @@ export const EntityListItem = ({
 
               {entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && (
                 <>
+                  <DropdownMenuItem key="view-details" className="space-x-2" asChild>
+                    <Link href={`/project/${projectRef}/database/tables/${entity.id}`}>
+                      <Columns2 size={12} className="shrink-0" />
+                      <span>View details</span>
+                    </Link>
+                  </DropdownMenuItem>
+
                   <DropdownMenuSeparator />
 
                   <DropdownMenuSub>

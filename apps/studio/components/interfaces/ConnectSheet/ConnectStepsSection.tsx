@@ -6,6 +6,7 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { connectSchema } from './connect.schema'
 import type {
   ConnectionStringPooler,
   ConnectState,
@@ -220,6 +221,11 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
     mode: state.mode,
   })
 
+  const customPrompt = useMemo(
+    () => connectSchema.modes.find((m) => m.id === state.mode)?.prompt,
+    [state.mode]
+  )
+
   const shouldFetchDataApiStatus = shouldFetchDataApiConfig({
     mode: state.mode,
   })
@@ -291,7 +297,7 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
           />
         )}
 
-        <CopyPromptAdmonition stepsContainerRef={stepsContainerRef} />
+        <CopyPromptAdmonition stepsContainerRef={stepsContainerRef} customPrompt={customPrompt} />
 
         <div className="mt-6" ref={stepsContainerRef}>
           {steps.map((step, index) => (

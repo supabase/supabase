@@ -12,9 +12,16 @@ import {
 
 import { ChartConfig } from './ChartConfig'
 import { UtilityTabResults } from './UtilityTabResults'
+import {
+  getSqlWarehouseFooterLabel,
+  getSqlWarehouseRouting,
+  SQL_WAREHOUSE_ROUTING_TOOLTIPS,
+} from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { useContentUpsertMutation } from '@/data/content/content-upsert-mutation'
 import { Snippet } from '@/data/content/sql-folders-query'
+import { useSqlWarehouseLagSeconds } from '@/data/warehouse/use-sql-warehouse-lag'
+import { useIsWarehouseEnabled } from '@/hooks/misc/useIsWarehouseEnabled'
 import { useTrack } from '@/lib/telemetry/track'
 import { useSqlEditorSessionSnapshot } from '@/state/sql-editor/sql-editor-session-state'
 import { useSqlEditorV2StateSnapshot } from '@/state/sql-editor/sql-editor-state'
@@ -56,6 +63,18 @@ export const UtilityPanel = ({
 
   const snippet = snapV2.snippets[id]?.snippet
   const result = sessionSnap.results[id]?.[0]
+
+  // Surface (but never change) where the current query runs, gated behind the warehouse flag.
+  const isWarehouseEnabled = useIsWarehouseEnabled()
+  // Read-only inspection of the snippet text for routing detection (never executed here).
+  const sql = String(snippet?.content?.unchecked_sql ?? '')
+  const sqlWarehouseLagSeconds = useSqlWarehouseLagSeconds(sql)
+  const resultWarehouseRouting =
+    isWarehouseEnabled && Boolean(result) && !result?.error && !isExecuting
+      ? getSqlWarehouseRouting(sql)
+      : 'postgres'
+  const resultWarehouseLagSeconds =
+    resultWarehouseRouting !== 'postgres' ? sqlWarehouseLagSeconds : undefined
 
   const { mutate: upsertContent } = useContentUpsertMutation({
     invalidateQueriesOnSuccess: false,
@@ -154,6 +173,19 @@ export const UtilityPanel = ({
                     You may change or remove this limit from the toolbar above.
                   </span>
                 </p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+
+          {resultWarehouseRouting !== 'postgres' && resultWarehouseLagSeconds !== undefined && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="text-foreground-lighter text-xs cursor-default">
+                  {getSqlWarehouseFooterLabel(resultWarehouseRouting, resultWarehouseLagSeconds)}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                {SQL_WAREHOUSE_ROUTING_TOOLTIPS[resultWarehouseRouting]}
               </TooltipContent>
             </Tooltip>
           )}

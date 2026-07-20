@@ -52,7 +52,7 @@ import { privilegeKeys } from '@/data/privileges/keys'
 import { useTableApiAccessPrivilegesMutation } from '@/data/privileges/table-api-access-mutation'
 import { tableEditorKeys } from '@/data/table-editor/keys'
 import { PG_META_SCOPED_INTROSPECTION_FLAG } from '@/data/table-editor/table-editor-query'
-import { isTableLike, type Entity } from '@/data/table-editor/table-editor-types'
+import { type Entity } from '@/data/table-editor/table-editor-types'
 import { tableRowKeys } from '@/data/table-rows/keys'
 import { tableKeys } from '@/data/tables/keys'
 import { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
@@ -208,11 +208,12 @@ export const SidePanelEditor = ({
     snap,
     selectedTable,
   })
+  const isTableDefinitionEdit = tableApiAccessParams?.type === 'edit'
   const apiAccessToggleHandler = useTableApiAccessHandlerWithHistory(
     // Dummy params used to appease TypeScript, actually gated by enabled flag
     tableApiAccessParams ?? DUMMY_TABLE_API_ACCESS_PARAMS,
     {
-      enabled: tableApiAccessParams !== undefined,
+      enabled: tableApiAccessParams !== undefined && !isTableDefinitionEdit,
     }
   )
 
@@ -600,7 +601,7 @@ export const SidePanelEditor = ({
     let toastId
     let saveTableError = false
 
-    if (!apiAccessToggleHandler.isSuccess) {
+    if (action !== 'update' && !apiAccessToggleHandler.isSuccess) {
       if (apiAccessToggleHandler.isPending) {
         toast.info(
           'Cannot save table yet because Data API settings are still loading. Please try again in a moment.'
@@ -794,15 +795,7 @@ export const SidePanelEditor = ({
         if (table === undefined) {
           return toast.error('Failed to update table')
         }
-        if (isTableLike(table)) {
-          await updateTableRealtime(table, isRealtimeEnabled)
-          const privilegesToSet = apiAccessToggleHandler.data?.schemaExposed
-            ? apiAccessToggleHandler.data.privileges
-            : undefined
-          if (privilegesToSet) {
-            await updateTableApiAccess(table, privilegesToSet)
-          }
-        }
+        // Realtime and Data API access are managed on the table details Settings tab.
 
         if (hasError) {
           toast.warning(

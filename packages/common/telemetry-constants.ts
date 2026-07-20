@@ -1404,7 +1404,7 @@ export interface UnifiedLogsBannerDismissButtonClickedEvent {
 export interface IndexAdvisorEnableButtonClickedEvent {
   action: 'index_advisor_enable_button_clicked'
   properties: {
-    origin: 'banner' | 'dialog'
+    origin: 'banner' | 'dialog' | 'table_settings'
   }
   groups: TelemetryGroups
 }
@@ -2099,7 +2099,7 @@ export interface HomeConnectActionClickedEvent {
     /**
      * The connect action/tile that was clicked
      */
-    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'server' | 'api_keys'
+    mode: 'framework' | 'direct' | 'orm' | 'mcp' | 'server' | 'api_keys' | 'catalog'
   }
   groups: TelemetryGroups
 }

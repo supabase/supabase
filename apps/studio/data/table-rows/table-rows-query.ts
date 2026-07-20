@@ -6,6 +6,10 @@ import { IS_PLATFORM, useFlag } from 'common'
 
 import { tableRowKeys } from './keys'
 import { formatFilterValue } from './utils'
+import {
+  isWarehouseTimeTravelEnabled,
+  wrapWithWarehouseSnapshotTime,
+} from './warehouse-time-travel'
 import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from '@/components/grid/types'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
@@ -30,6 +34,7 @@ interface GetTableRowsArgs {
   page?: number
   roleImpersonationState?: RoleImpersonationState
   scoped?: boolean
+  warehouseSnapshotTime?: string | null
 }
 
 /**
@@ -335,6 +340,7 @@ async function getTableRows(
     page,
     preflightCheck = false,
     scoped,
+    warehouseSnapshotTime,
   }: TableRowsVariables,
   signal?: AbortSignal
 ) {
@@ -362,7 +368,7 @@ async function getTableRows(
     ? Array.from(new Set(equalityFilterColumns))
     : undefined
 
-  const sql = wrapWithRoleImpersonation(
+  const roleAwareSql = wrapWithRoleImpersonation(
     getTableRowsSql({
       table: entity,
       filters,
@@ -373,6 +379,15 @@ async function getTableRows(
     }),
     roleImpersonationState
   )
+  const isWarehouseTimeTravelActive = isWarehouseTimeTravelEnabled(
+    table.schema,
+    warehouseSnapshotTime
+  )
+  const sql = wrapWithWarehouseSnapshotTime({
+    schema: table.schema,
+    snapshotTime: warehouseSnapshotTime,
+    sql: roleAwareSql,
+  })
 
   try {
     const { result } = await executeSql(
@@ -382,7 +397,7 @@ async function getTableRows(
         sql,
         queryKey: ['table-rows', table?.id],
         isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
-        preflightCheck,
+        preflightCheck: preflightCheck && !isWarehouseTimeTravelActive,
       },
       signal
     )

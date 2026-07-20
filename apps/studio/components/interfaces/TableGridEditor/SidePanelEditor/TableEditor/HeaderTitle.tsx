@@ -21,7 +21,7 @@ export const HeaderTitle = ({ schema, table, isDuplicating }: HeaderTitleProps) 
   }
   return (
     <span>
-      Update table <code className="text-code-inline text-sm!">{table?.name}</code>
+      Edit definitions for <code className="text-code-inline text-sm!">{table?.name}</code>
     </span>
   )
 }

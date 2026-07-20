@@ -241,7 +241,7 @@ export const connectSchema: ConnectSchema = {
     {
       id: 'framework',
       label: 'Framework',
-      description: 'Use a client library',
+      description: 'Client library',
       fields: ['framework', 'frameworkVariant', 'library', 'frameworkUi'],
     },
     {
@@ -260,14 +260,20 @@ export const connectSchema: ConnectSchema = {
     {
       id: 'orm',
       label: 'ORM',
-      description: 'Third-party library',
+      description: 'Query builder',
       fields: ['orm'],
     },
     {
       id: 'mcp',
       label: 'MCP',
-      description: 'Connect your agent',
+      description: 'AI agent',
       fields: ['mcpClient', 'mcpReadonly', 'mcpFeatures'],
+    },
+    {
+      id: 'catalog',
+      label: 'Catalog',
+      description: 'Query engine',
+      fields: ['queryEngine'],
     },
   ],
 
@@ -318,7 +324,7 @@ export const connectSchema: ConnectSchema = {
     connectionMethod: {
       id: 'connectionMethod',
       type: 'radio-list',
-      label: 'Connection Method',
+      label: 'Connection method',
       options: { source: 'connectionMethods' },
       // Default is set per deployment mode by useConnectState.setMode('direct'):
       // platform/CLI → 'direct', self-hosted → 'session'.
@@ -371,6 +377,14 @@ export const connectSchema: ConnectSchema = {
       description:
         'Only enable a subset of features. Helps keep the number of tools within MCP client limits.',
       options: { source: 'mcpFeatures' },
+    },
+
+    queryEngine: {
+      id: 'queryEngine',
+      type: 'select',
+      label: 'Query engine',
+      options: { source: 'queryEngines' },
+      defaultValue: 'env',
     },
   },
 

@@ -26,6 +26,7 @@ import type {
   ResolvedStep,
 } from './Connect.types'
 import { resolveFrameworkLibraryKey } from './Connect.utils'
+import { WAREHOUSE_CATALOG_ENGINES } from '@/components/interfaces/Integrations/WarehouseCatalog/warehouseCatalog.constants'
 import { Database, useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from '@/data/read-replicas/replicas.utils'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
@@ -165,6 +166,12 @@ function getFieldOptionsFromSource({
         value: f.id,
         label: f.name,
         description: f.description,
+      }))
+
+    case 'queryEngines':
+      return WAREHOUSE_CATALOG_ENGINES.map((engine) => ({
+        value: engine.key,
+        label: engine.label,
       }))
 
     default:
@@ -339,6 +346,10 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
 
         if (mode === 'mcp' && !next.mcpClient) {
           next.mcpClient = MCP_CLIENTS[0]?.key ?? ''
+        }
+
+        if (mode === 'catalog' && !next.queryEngine) {
+          next.queryEngine = WAREHOUSE_CATALOG_ENGINES[0]?.key ?? 'env'
         }
 
         return next

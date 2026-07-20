@@ -67,6 +67,7 @@ export const SupabaseGrid = ({
       preflightCheck,
       limit: tableEditorSnap.rowsPerPage,
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
+      warehouseSnapshotTime: snap.warehouseSnapshotTime,
     },
     {
       placeholderData: keepPreviousData,

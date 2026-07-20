@@ -1,6 +1,8 @@
+import { safeSql } from '@supabase/pg-meta'
 import { describe, expect, it, vi } from 'vitest'
 
 import { executeWithRetry } from './table-rows-query'
+import { wrapWithWarehouseSnapshotTime } from './warehouse-time-travel'
 
 describe('executeWithRetry', () => {
   it('should return the result of the function when successful', async () => {
@@ -34,5 +36,30 @@ describe('executeWithRetry', () => {
 
     await expect(executeWithRetry(mockFn)).rejects.toThrow('Some other error')
     expect(mockFn).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('wrapWithWarehouseSnapshotTime', () => {
+  it('adds the warehouse snapshot setting for warehouse schemas', () => {
+    const sql = safeSql`select * from public_warehouse.orders`
+    const result = wrapWithWarehouseSnapshotTime({
+      schema: 'public_warehouse',
+      snapshotTime: '2026-06-24T08:00:00.000Z',
+      sql,
+    })
+
+    expect(result).toContain("SET LOCAL warehouse.snapshot_time = '2026-06-24T08:00:00.000Z'")
+    expect(result).toContain(sql)
+  })
+
+  it('does not wrap non-warehouse schemas', () => {
+    const sql = safeSql`select * from public.orders`
+    const result = wrapWithWarehouseSnapshotTime({
+      schema: 'public',
+      snapshotTime: '2026-06-24T08:00:00.000Z',
+      sql,
+    })
+
+    expect(result).toBe(sql)
   })
 })

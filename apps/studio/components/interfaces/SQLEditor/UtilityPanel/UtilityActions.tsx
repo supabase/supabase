@@ -24,8 +24,10 @@ import { SqlRunButton } from './RunButton'
 import { SqlSaveButton } from './SaveButton'
 import SavingIndicator from './SavingIndicator'
 import { useIsSqlEditorManualSaveEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { getSqlWarehouseRouting } from '@/components/interfaces/Database/Warehouse/warehouseNaming.utils'
 import { RoleImpersonationPopover } from '@/components/interfaces/RoleImpersonationSelector/RoleImpersonationPopover'
 import { DatabaseSelector } from '@/components/ui/DatabaseSelector'
+import { useIsWarehouseEnabled } from '@/hooks/misc/useIsWarehouseEnabled'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { IS_PLATFORM } from '@/lib/constants'
 import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
@@ -69,6 +71,13 @@ export const UtilityActions = ({
 
   const snippet = snapV2.snippets[id]
   const isFavorite = snippet !== undefined ? snippet.snippet.favorite : false
+
+  // Reflect (but don't change) where the current query would run, gated behind the warehouse flag.
+  const isWarehouseEnabled = useIsWarehouseEnabled()
+  const sql = String(snippet?.snippet?.content?.unchecked_sql ?? '')
+  const warehouseRouting = getSqlWarehouseRouting(sql)
+  const warehouseRoutingOverride =
+    isWarehouseEnabled && warehouseRouting !== 'postgres' ? warehouseRouting : undefined
 
   const hotkeySequnece: Hotkey | undefined =
     SHORTCUT_DEFINITIONS[SHORTCUT_IDS.SQL_EDITOR_FORMAT].sequence[0]
@@ -228,6 +237,7 @@ export const UtilityActions = ({
             <DatabaseSelector
               selectedDatabaseId={lastSelectedDb.length === 0 ? undefined : lastSelectedDb}
               variant="connected-on-right"
+              warehouseRouting={warehouseRoutingOverride}
               onSelectId={onSelectDatabase}
             />
           )}
