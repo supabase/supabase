@@ -8,22 +8,19 @@ const LOCAL_JWKS = SUPABASE_JWKS ? jose.createLocalJWKSet(SUPABASE_JWKS) : null
 const VERIFY_JWT = Deno.env.get('VERIFY_JWT') === 'true'
 
 type AuthFailure = {
-  code: string
-  message: string
+  code: RequestErrors
+  message?: string
 }
 
-const authFailure = (code: string, message: string): AuthFailure => ({ code, message })
-
-const AUTH_FAILURE = {
-  MissingAuthHeader: authFailure('UNAUTHORIZED_NO_AUTH_HEADER', 'Missing authorization header'),
-  InvalidJwtFormat: authFailure('UNAUTHORIZED_INVALID_JWT_FORMAT', 'Invalid JWT format'),
-  LegacyJwt: authFailure('UNAUTHORIZED_LEGACY_JWT', 'Invalid JWT'),
-  AsymmetricJwt: authFailure('UNAUTHORIZED_ASYMMETRIC_JWT', 'Invalid JWT'),
-  UnsupportedTokenAlgorithm: (algorithm: string) =>
-    authFailure(
-      'UNAUTHORIZED_UNSUPPORTED_TOKEN_ALGORITHM',
-      `Unsupported JWT algorithm ${algorithm}`
-    ),
+export enum RequestErrors {
+  RateLimitExceeded = 'RATE_LIMIT_EXCEEDED',
+  InvalidDenoSubhost = 'INVALID_DENO_SUBHOST',
+  InvalidLegacyJWT = 'UNAUTHORIZED_LEGACY_JWT',
+  InvalidAsymmetricJWT = 'UNAUTHORIZED_ASYMMETRIC_JWT',
+  InvalidTokenFormat = 'UNAUTHORIZED_INVALID_JWT_FORMAT',
+  UnsupportedTokenAlgorithm = 'UNAUTHORIZED_UNSUPPORTED_TOKEN_ALGORITHM',
+  MissingAuthHeader = 'UNAUTHORIZED_NO_AUTH_HEADER',
+  InvalidUrl = 'INVALID_URL',
 }
 
 // NOTE:(kallebysantos) We don't check for valid keys but just the bare array parsing,
@@ -53,30 +50,44 @@ export function parseJwks(raw: string | undefined): jose.JSONWebKeySet | null {
 function getAuthToken(req: Request): string | AuthFailure {
   const authHeader = req.headers.get('authorization')
   if (!authHeader) {
-    return AUTH_FAILURE.MissingAuthHeader
+    return {
+      code: RequestErrors.MissingAuthHeader,
+      message: 'Missing authorization header',
+    }
   }
   const tokenParts = authHeader.split(' ')
   const [bearer, token] = tokenParts
   if (bearer !== 'Bearer' || tokenParts.length !== 2 || !token) {
-    return AUTH_FAILURE.InvalidJwtFormat
+    return {
+      code: RequestErrors.InvalidTokenFormat,
+      message: 'Invalid JWT format',
+    }
   }
   return token
 }
 
-function getAuthErrorResponse({ code, message }: AuthFailure) {
-  return new Response(JSON.stringify({ code, message, msg: message }), {
-    status: 401,
-    headers: {
-      'Content-Type': 'application/json',
-      'sb-error-code': code,
+function getAuthErrorResponse({ code, message = 'Invalid JWT' }: AuthFailure) {
+  return Response.json(
+    {
+      code,
+      message,
+      // DEPRECATED: Retained for backward compatibility.
+      msg: message,
     },
-  })
+    {
+      status: 401,
+      headers: {
+        'sb-error-code': code,
+        'Access-Control-Expose-Headers': 'sb-error-code',
+      },
+    }
+  )
 }
 
 async function isValidLegacyJWT(jwt: string): Promise<AuthFailure | null> {
   if (!JWT_SECRET) {
     console.error('JWT_SECRET not available for HS256 token verification')
-    return AUTH_FAILURE.LegacyJwt
+    return { code: RequestErrors.InvalidLegacyJWT }
   }
 
   const encoder = new TextEncoder();
@@ -86,7 +97,7 @@ async function isValidLegacyJWT(jwt: string): Promise<AuthFailure | null> {
     await jose.jwtVerify(jwt, secretKey);
   } catch (e) {
     console.error('Symmetric Legacy JWT verification error', e);
-    return AUTH_FAILURE.LegacyJwt
+    return { code: RequestErrors.InvalidLegacyJWT }
   }
   return null
 }
@@ -94,14 +105,14 @@ async function isValidLegacyJWT(jwt: string): Promise<AuthFailure | null> {
 async function isValidJWT(jwt: string): Promise<AuthFailure | null> {
   if (!LOCAL_JWKS) {
     console.error('JWKS not available for ES256/RS256 token verification')
-    return AUTH_FAILURE.AsymmetricJwt
+    return { code: RequestErrors.InvalidAsymmetricJWT }
   }
 
   try {
     await jose.jwtVerify(jwt, LOCAL_JWKS);
   } catch (e) {
     console.error('Asymmetric JWT verification error', e);
-    return AUTH_FAILURE.AsymmetricJwt
+    return { code: RequestErrors.InvalidAsymmetricJWT }
   }
 
   return null
@@ -127,11 +138,17 @@ async function isValidHybridJWT(jwt: string): Promise<AuthFailure | null> {
     jwtAlgorithm = jose.decodeProtectedHeader(jwt).alg
   } catch (e) {
     console.error('JWT format error', e)
-    return AUTH_FAILURE.InvalidJwtFormat
+    return {
+      code: RequestErrors.InvalidTokenFormat,
+      message: 'Invalid JWT format',
+    }
   }
 
   if (!jwtAlgorithm) {
-    return AUTH_FAILURE.InvalidJwtFormat
+    return {
+      code: RequestErrors.InvalidTokenFormat,
+      message: 'Invalid JWT format',
+    }
   }
 
   if (jwtAlgorithm === 'HS256') {
@@ -144,7 +161,10 @@ async function isValidHybridJWT(jwt: string): Promise<AuthFailure | null> {
     return await isValidJWT(jwt)
   }
 
-  return AUTH_FAILURE.UnsupportedTokenAlgorithm(jwtAlgorithm)
+  return {
+    code: RequestErrors.UnsupportedTokenAlgorithm,
+    message: `Unsupported JWT algorithm ${jwtAlgorithm}`,
+  }
 }
 
 Deno.serve(async (req: Request) => {
@@ -160,7 +180,10 @@ Deno.serve(async (req: Request) => {
       }
     } catch (e) {
       console.error(e)
-      return getAuthErrorResponse(AUTH_FAILURE.InvalidJwtFormat)
+      return getAuthErrorResponse({
+        code: RequestErrors.InvalidTokenFormat,
+        message: 'Invalid JWT format',
+      })
     }
   }
 
