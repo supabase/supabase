@@ -23,7 +23,7 @@ export const sqlEditorSessionState = proxy({
   /**
    * UI-imposed limit for the number of rows a query can return (a safeguard
    * against accidentally taking down the database with a huge SELECT). Related
-   * to `autoLimit` in `results`; see `checkIfAppendLimitRequired`/`suffixWithLimit`.
+   * to `autoLimit` in `results`; see `applyAutoLimit`.
    */
   limit: 100,
 

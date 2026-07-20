@@ -51,10 +51,13 @@ export const PublicationSelection = ({
             />
           </FormControl>
           {isSelectedPublicationMissing && (
-            <Admonition type="warning" className="mt-2">
+            <Admonition
+              type="warning"
+              className="mt-2"
+              title={`The publication ${publicationName} was not found.`}
+            >
               <p className="leading-normal!">
-                The publication <strong className="text-foreground">{publicationName}</strong> was
-                not found, it may have been renamed or deleted, please select another one.
+                It may have been renamed or deleted. Select another publication.
               </p>
             </Admonition>
           )}

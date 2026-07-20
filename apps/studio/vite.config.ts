@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-exports */
 
 import fs from 'node:fs'
+import { createRequire } from 'node:module'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import remapping, { type SourceMapInput } from '@jridgewell/remapping'
@@ -14,6 +15,13 @@ import { defineConfig, loadEnv, type Plugin } from 'vite'
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url))
 const compatRoot = path.resolve(rootDir, 'compat/next')
+
+// Absolute dir of lodash-es, for the SSR-only lodash alias below. Resolved
+// here (not left as a bare 'lodash-es' replacement) because rollup-alias
+// rewrites the id but resolution still runs from the ORIGINAL importer —
+// under pnpm's strict node_modules, workspace packages that don't declare
+// lodash-es (ui, common) would fail to resolve the bare specifier.
+const lodashEsDir = path.dirname(createRequire(import.meta.url).resolve('lodash-es/package.json'))
 
 // Map of Next imports we've shimmed to their TanStack-backed replacement.
 // Add an entry here + a file under compat/next/ when a new Next surface is
@@ -216,6 +224,30 @@ function umdAmdShortCircuit(): Plugin {
 // exports so Rolldown's static analysis is satisfied. Easier to stub the one
 // internal consumer — `GraphiQL.tsx` only exposes a default-export component,
 // and no SSR-reachable route renders it (the GraphiQL tab is client-only).
+// SSR-only lodash → lodash-es rewrite, for the whole SSR module graph (app
+// source, workspace packages, and node_modules deps alike). The CJS lodash
+// in `ssr.noExternal` evaluates as pure ESM in the dev module runner — no
+// `module`/`exports`/`require` — so its UMD wrapper silently attaches `_` to
+// the global and every named import binds to `undefined`, exploding only when
+// first CALLED during SSR render ("(0, __vite_ssr_import_0__.isEqual) is not
+// a function"). Deep imports (`lodash/isEqual`) fail harder: their plain-CJS
+// `require` throws "require is not defined". lodash-es is the same version as
+// real ESM, so both import styles just work. Client bundles are untouched —
+// resolution is gated on `options.ssr`, and the Next build doesn't read this
+// config.
+function ssrLodashEs(): Plugin {
+  return {
+    name: 'studio-ssr-lodash-es',
+    enforce: 'pre',
+    resolveId(source, _importer, options) {
+      if (!options?.ssr) return
+      if (source === 'lodash') return path.join(lodashEsDir, 'lodash.js')
+      const subpath = source.match(/^lodash\/(.+?)(\.js)?$/)
+      if (subpath) return path.join(lodashEsDir, `${subpath[1]}.js`)
+    },
+  }
+}
+
 function ssrStubGraphiql(): Plugin {
   return {
     name: 'studio-ssr-stub-graphiql',
@@ -718,7 +750,11 @@ export default defineConfig(({ command, mode }) => {
       postcss: { plugins: [] },
     },
     ssr: {
-      // `lodash` is CJS; its named-export interop fails in Node ESM unless bundled.
+      // `lodash` must stay inlined so its ids flow through the plugin
+      // pipeline, where ssrLodashEs (above) rewrites them to lodash-es.
+      // Externalized bare ids skip user plugins in the dev module runner, so
+      // dropping this entry resurfaces Node's CJS named-export failure
+      // ("Named export 'debounce' not found") on every `from 'lodash'` import.
       // `next/*` must be bundled so our nextCompat shim wins — otherwise Vite's
       // SSR externalizer leaves `next/router` as a runtime package import and
       // Node resolves it to Next's real module.
@@ -749,6 +785,7 @@ export default defineConfig(({ command, mode }) => {
       rawTextLoader(),
       graphiqlViteWorkers(),
       ssrStubGraphiql(),
+      ssrLodashEs(),
       umdAmdShortCircuit(),
       assertNoChunkCycles(),
       devtools(),
