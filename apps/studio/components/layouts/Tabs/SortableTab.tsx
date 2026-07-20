@@ -2,7 +2,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
-import { useMemo } from 'react'
+import { useMemo, type KeyboardEvent } from 'react'
 import { cn, TabsTrigger } from 'ui'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
@@ -22,6 +22,9 @@ import { useTabsStateSnapshot, type Tab } from '@/state/tabs'
  * dnd-kit `attributes` are intentionally not spread on the shell — they inject
  * `role="button"` / `tabIndex={0}`, which nested a second button around the tab.
  * Only PointerSensor is used for reorder, so those attributes are not required.
+ *
+ * Keyboard: ←/→ move between tabs (Radix). Delete/Backspace on a focused tab
+ * closes it. The active tab's close button is in the tab order.
  */
 export const SortableTab = ({
   tab,
@@ -59,6 +62,15 @@ export const SortableTab = ({
     return openTabs.some((t) => editor === 'table' && t.metadata?.schema !== currentSchema)
   }, [openTabs, currentSchema, editor])
 
+  const isActive = tabs.activeTab === tab.id
+
+  const closeTabFromKeyboard = (event: KeyboardEvent) => {
+    if (event.key !== 'Delete' && event.key !== 'Backspace') return
+    event.preventDefault()
+    event.stopPropagation()
+    onClose(tab.id)
+  }
+
   return (
     <motion.div
       ref={setNodeRef}
@@ -79,6 +91,7 @@ export const SortableTab = ({
             }
           }}
           onDoubleClick={() => tabs.makeTabPermanent(tab.id)}
+          onKeyDown={closeTabFromKeyboard}
           className={cn(
             'flex items-center gap-2 pl-3 pr-2.5 text-xs',
             'bg-dash-sidebar/50 dark:bg-surface-100/50',
@@ -114,17 +127,19 @@ export const SortableTab = ({
             aria-hidden
           >
             {StatusIndicator && (
-              <span className="absolute inset-0 flex items-center justify-center group-hover/tab:opacity-0">
+              <span className="absolute inset-0 flex items-center justify-center group-hover/tab:opacity-0 group-focus-within/tab:opacity-0">
                 <StatusIndicator tab={tab} />
               </span>
             )}
           </div>
           <div className="absolute w-full top-0 left-0 right-0 h-px bg-foreground opacity-0 group-data-[state=active]:opacity-100" />
         </TabsTrigger>
-        {/* Sibling of TabsTrigger — not nested inside the tab button. */}
+        {/* Sibling of TabsTrigger — not nested inside the tab button.
+            Only the active tab's close is in the tab order (roving tabs). Delete/Backspace
+            on the focused tab also closes. */}
         <button
           type="button"
-          tabIndex={-1}
+          tabIndex={isActive ? 0 : -1}
           aria-label="Close tab"
           onClick={(e) => {
             e.preventDefault()
@@ -142,7 +157,9 @@ export const SortableTab = ({
           className={cn(
             'absolute top-1/2 right-2.5 z-10 -translate-y-1/2',
             'flex size-5 items-center justify-center rounded-xs',
-            'opacity-0 group-hover/tab:opacity-100 hover:bg-200 cursor-pointer'
+            'opacity-0 group-hover/tab:opacity-100 group-focus-within/tab:opacity-100 focus-visible:opacity-100',
+            'hover:bg-200 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+            'cursor-pointer'
           )}
         >
           <X size={12} className="text-foreground-light" />

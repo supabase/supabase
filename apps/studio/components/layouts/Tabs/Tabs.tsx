@@ -217,6 +217,12 @@ export const EditorTabs = () => {
               <div className="group/new-tab relative flex h-full items-center">
                 <TabsTrigger
                   value="new"
+                  onKeyDown={(e) => {
+                    if (e.key !== 'Delete' && e.key !== 'Backspace') return
+                    e.preventDefault()
+                    e.stopPropagation()
+                    handleClose('new')
+                  }}
                   className={cn(
                     'flex items-center gap-2 px-3 text-xs',
                     'bg-dash-sidebar/50 dark:bg-surface-100/50',
@@ -235,7 +241,7 @@ export const EditorTabs = () => {
                 </TabsTrigger>
                 <button
                   type="button"
-                  tabIndex={-1}
+                  tabIndex={0}
                   aria-label="Close new tab"
                   onClick={(e) => {
                     e.preventDefault()
@@ -250,7 +256,12 @@ export const EditorTabs = () => {
                     e.preventDefault()
                     e.stopPropagation()
                   }}
-                  className="absolute top-1/2 right-3 z-10 flex -translate-y-1/2 items-center justify-center rounded-xs opacity-0 group-hover/new-tab:opacity-100 hover:bg-200 cursor-pointer"
+                  className={cn(
+                    'absolute top-1/2 right-3 z-10 flex -translate-y-1/2 items-center justify-center rounded-xs',
+                    'opacity-0 group-hover/new-tab:opacity-100 group-focus-within/new-tab:opacity-100 focus-visible:opacity-100',
+                    'hover:bg-200 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+                    'cursor-pointer'
+                  )}
                 >
                   <X size={12} className="text-foreground-light" />
                 </button>
