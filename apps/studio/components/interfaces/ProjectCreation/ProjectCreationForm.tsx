@@ -92,7 +92,8 @@ interface ProjectCreationFormProps {
  *  - "Cancel" button
  * - Shows the following:
  *  - "Data seeding" section
- *  - Sandwiched note that the integration can be removed anytime
+ * - When embedded in the Vercel interstitial, flattens Panel chrome so the shared
+ *   form fields sit inside InterstitialLayout without a nested card
  * Eventually we could looking into reducing the differences more, e.g having data seeding
  * for both ways, and showing GitHub repository field for Vercel integration
  */
@@ -582,14 +583,22 @@ export const ProjectCreationForm = ({
       >
         <Panel
           loading={!isOrganizationsSuccess}
+          noMargin={isVercelIntegrationFlow}
+          className={
+            isVercelIntegrationFlow ? 'border-0 shadow-none rounded-none bg-transparent' : undefined
+          }
           title={
-            <div key="panel-title">
-              <h3>Create a new project</h3>
-              <p className="text-sm text-foreground-lighter text-balance">
-                Your project will have its own dedicated instance and full Postgres database. An API
-                will be set up so you can easily interact with your new database.
-              </p>
-            </div>
+            isVercelIntegrationFlow ? (
+              false
+            ) : (
+              <div key="panel-title">
+                <h3>Create a new project</h3>
+                <p className="text-sm text-foreground-lighter text-balance">
+                  Your project will have its own dedicated instance and full Postgres database. An
+                  API will be set up so you can easily interact with your new database.
+                </p>
+              </div>
+            )
           }
           footer={
             <ProjectCreationFooter
@@ -668,13 +677,7 @@ export const ProjectCreationForm = ({
                       <AdvancedConfiguration form={form} />
                     )}
 
-                    {isVercelIntegrationFlow ? (
-                      <Admonition
-                        className="rounded-none border-0"
-                        type="note"
-                        description="You can remove this integration at any time from Vercel or the Supabase dashboard."
-                      />
-                    ) : shouldShowFreeProjectInfo ? (
+                    {shouldShowFreeProjectInfo ? (
                       <Admonition
                         className="rounded-none border-0"
                         type="note"

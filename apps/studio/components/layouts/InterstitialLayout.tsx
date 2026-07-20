@@ -16,6 +16,8 @@ interface InterstitialLayoutProps {
   footer?: ReactNode
   containerClassName?: string
   cardClassName?: string
+  /** Shared max-width for the card and footer column. Defaults to `max-w-[400px]`. */
+  widthClassName?: string
   titleClassName?: string
   descriptionClassName?: string
 }
@@ -34,6 +36,7 @@ export const InterstitialLayout = ({
   footer,
   containerClassName,
   cardClassName,
+  widthClassName = 'max-w-[400px]',
   titleClassName,
   descriptionClassName,
   children,
@@ -67,7 +70,7 @@ export const InterstitialLayout = ({
     <MotionCard
       layout="size"
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-      className={cn('overflow-hidden max-w-[400px] w-full mx-auto', cardClassName)}
+      className={cn('overflow-hidden w-full mx-auto', widthClassName, cardClassName)}
     >
       {(logo || title || description) && (
         <CardHeader className="font-normal items-center gap-0 space-y-0 px-6 py-6 text-center [--card-padding-x:1.5rem] border-0">
@@ -92,7 +95,7 @@ export const InterstitialLayout = ({
       )}
     >
       {footer ? (
-        <div className="flex w-full max-w-[400px] flex-col items-center gap-4">
+        <div className={cn('flex w-full flex-col items-center gap-4', widthClassName)}>
           {card}
           <div className="px-2 text-center text-balance">{footer}</div>
         </div>
