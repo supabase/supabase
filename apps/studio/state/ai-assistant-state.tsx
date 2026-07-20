@@ -329,10 +329,7 @@ function createChatInstance(
         const messages = chatInstance.messages
         const chat = state.chats[options.id]
         if (chat) {
-          // Assign a sanitized copy, not the SDK's live array — valtio's proxy() mutates
-          // an object's own nested properties in place when wrapping it, which would
-          // corrupt the Chat instance's internal message state with Proxies and break
-          // its own structuredClone-based updates (e.g. addToolApprovalResponse).
+          // Clone first — valtio's proxy() mutates nested properties in place and would corrupt the SDK's live array
           chat.messages = messages.map((message) => sanitizeForCloning(message))
           chat.updatedAt = new Date()
         }
