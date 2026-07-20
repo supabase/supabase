@@ -43,7 +43,7 @@ catalog:
   tailwindcss: ^4.2.4
   tsx: ^4.22.0
   typescript: ~6.0.2
-  valtio: ^1.12.0
+  valtio: ^2.3.2
   vite: ^8.0.16
   vite-tsconfig-paths: ^6.1.1
   vitest: ^4.1.4

@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Checkbox,
@@ -24,9 +25,11 @@ import { DOCS_URL } from '@/lib/constants'
 interface SecurityOptionsProps {
   form: UseFormReturn<CreateProjectForm>
   layout?: 'vertical' | 'horizontal'
+  surface: 'main' | 'vercel'
 }
 
-export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptionsProps) => {
+export const SecurityOptions = ({ form, layout = 'horizontal', surface }: SecurityOptionsProps) => {
+  const { slug } = useParams()
   const dataApi = useWatch({ control: form.control, name: 'dataApi' })
   const dataApiDefaultPrivileges = useWatch({
     control: form.control,
@@ -34,11 +37,20 @@ export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptions
   })
   const hasUserModified = form.getFieldState('dataApiDefaultPrivileges', form.formState).isDirty
 
-  useTrackDefaultPrivilegesExposure({
-    surface: 'main',
-    dataApiDefaultPrivileges: dataApiDefaultPrivileges ?? true,
-    hasUserModified,
-  })
+  useTrackDefaultPrivilegesExposure(
+    surface === 'main'
+      ? {
+          surface: 'main',
+          dataApiDefaultPrivileges: dataApiDefaultPrivileges ?? true,
+          hasUserModified,
+        }
+      : {
+          surface: 'vercel',
+          orgSlug: slug,
+          dataApiDefaultPrivileges: dataApiDefaultPrivileges ?? true,
+          hasUserModified,
+        }
+  )
 
   return (
     <Panel.Content className="pb-8">

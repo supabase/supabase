@@ -1196,12 +1196,10 @@ export const database: NavMenuConstant = {
             {
               name: 'Setting up',
               url: '/guides/database/replication/pipelines' as `/${string}`,
-              items: [
-                {
-                  name: 'BigQuery',
-                  url: '/guides/database/replication/bigquery' as `/${string}`,
-                },
-              ],
+            },
+            {
+              name: 'BigQuery',
+              url: '/guides/database/replication/bigquery' as `/${string}`,
             },
             {
               name: 'Monitoring',
