@@ -96,8 +96,8 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
           prompt you to complete the Supabase OAuth flow the first time it connects.
         </paragraph>
         <paragraph>
-          Place the file at <inlineCode value="<cwd>/.kimi-code/mcp.json" /> for the current project,
-          or under <inlineCode value="$KIMI_CODE_HOME" /> (defaults to{' '}
+          Place the file at <inlineCode value="<cwd>/.kimi-code/mcp.json" /> for the current
+          project, or under <inlineCode value="$KIMI_CODE_HOME" /> (defaults to{' '}
           <inlineCode value="~/.kimi-code" />) to make it available globally.
         </paragraph>
       </>
