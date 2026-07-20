@@ -109,13 +109,7 @@ function ToolDisplayExecuteSqlFailure() {
   return <div className="text-xs text-danger">Failed to execute SQL.</div>
 }
 
-function MessagePartExecuteSql({
-  toolPart,
-  isLastPart,
-}: {
-  toolPart: ToolUIPart
-  isLastPart?: boolean
-}) {
+function MessagePartExecuteSql({ toolPart }: { toolPart: ToolUIPart }) {
   const { id, isLastMessage } = useMessageInfoContext()
   const { addToolApprovalResponse } = useMessageActionsContext()
 
@@ -156,7 +150,6 @@ function MessagePartExecuteSql({
           initialResults={output}
           toolState={state}
           toolApprovalRespondedApproved={toolPart.approval?.approved}
-          isLastPart={isLastPart}
           isLastMessage={isLastMessage}
           onApprove={
             approvalId
@@ -243,10 +236,8 @@ const MessagePart = {
 
 export function MessagePartSwitcher({
   part,
-  isLastPart,
 }: {
   part: NonNullable<VercelMessage['parts']>[number]
-  isLastPart?: boolean
 }) {
   switch (part.type) {
     case 'dynamic-tool': {
@@ -264,7 +255,7 @@ export function MessagePartSwitcher({
       return <MessagePart.Text textPart={part} />
 
     case 'tool-execute_sql': {
-      return <MessagePart.ExecuteSql toolPart={part} isLastPart={isLastPart} />
+      return <MessagePart.ExecuteSql toolPart={part} />
     }
     case 'tool-deploy_edge_function': {
       return <MessagePart.DeployEdgeFunction toolPart={part} />
