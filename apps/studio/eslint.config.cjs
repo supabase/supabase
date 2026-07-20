@@ -74,7 +74,10 @@ module.exports = defineConfig([
       'jsx-a11y/aria-proptypes': 'warn',
       'jsx-a11y/role-supports-aria-props': 'warn',
       'jsx-a11y/anchor-has-content': 'warn',
-      'jsx-a11y/control-has-associated-label': ['warn', { controlComponents: ['Button', 'Switch'] }],
+      'jsx-a11y/control-has-associated-label': [
+        'warn',
+        { controlComponents: ['Button', 'Switch'] },
+      ],
       'jsx-a11y/label-has-associated-control': [
         'warn',
         { labelComponents: ['Label'], controlComponents: ['Input', 'Switch'] },
@@ -87,7 +90,7 @@ module.exports = defineConfig([
       'jsx-a11y/heading-has-content': 'warn',
       'jsx-a11y/no-distracting-elements': 'warn',
       'valtio/state-snapshot-rule': 'warn',
-      'valtio/avoid-this-in-proxy': 'warn',
+      'valtio/avoid-this-in-proxy': 'error',
       'react-hook-form/destructuring-formstate': 'error',
       'react-hook-form/no-access-control': 'error',
       'react-hook-form/no-nested-object-setvalue': 'error',
