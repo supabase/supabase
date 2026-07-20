@@ -68,7 +68,7 @@ export const HttpRequestSection = ({ form }: HttpRequestSectionProps) => {
         render={({ field: { ref, ...rest } }) => (
           <FormItemLayout label="Timeout" className="gap-1">
             <InputGroup>
-              <InputGroupInput {...rest} type="number" placeholder="1000" />
+              <InputGroupInput {...rest} type="number" placeholder="1000" defaultValue={1000} />
               <InputGroupAddon align="inline-end">
                 <InputGroupText> ms</InputGroupText>
               </InputGroupAddon>

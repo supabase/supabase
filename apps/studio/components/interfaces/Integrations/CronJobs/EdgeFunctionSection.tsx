@@ -195,7 +195,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
         render={({ field: { ref, ...rest } }) => (
           <FormItemLayout label="Timeout" layout="vertical" className="gap-1">
             <InputGroup>
-              <InputGroupInput {...rest} type="number" placeholder="1000" />
+              <InputGroupInput {...rest} type="number" placeholder="1000" defaultValue={1000} />
               <InputGroupAddon align="inline-end">
                 <InputGroupText> ms</InputGroupText>
               </InputGroupAddon>
