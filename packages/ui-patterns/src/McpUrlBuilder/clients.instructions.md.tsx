@@ -92,8 +92,8 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
     alternate: () => (
       <>
         <paragraph>
-          Place the file at <inlineCode value="<cwd>/.kimi-code/mcp.json" /> for the current
-          project. To make it available globally, place it under{' '}
+          Kimi Code reads <inlineCode value=".kimi-code/mcp.json" /> from your current working
+          directory. To make the server available in every project, place the file under{' '}
           <inlineCode value="$KIMI_CODE_HOME" /> instead, which defaults to{' '}
           <inlineCode value="~/.kimi-code" />.
         </paragraph>
@@ -102,9 +102,7 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
           running:
         </paragraph>
         <code lang="bash" value="/mcp" />
-        <paragraph>
-          To configure MCP servers and complete the Supabase OAuth login interactively, run:
-        </paragraph>
+        <paragraph>To configure MCP servers and complete the Supabase OAuth login, run:</paragraph>
         <code lang="bash" value="/mcp-config" />
       </>
     ),

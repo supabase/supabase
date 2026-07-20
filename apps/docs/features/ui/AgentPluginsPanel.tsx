@@ -186,7 +186,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
         <p className="text-sm text-foreground-light">Open Kimi Code by running</p>
         <CodeBlock value="kimi" language="bash" focusable={false} className="block" />
         <p className="text-sm text-foreground-light">
-          Then install the Supabase plugin from inside the session:
+          Then install the Supabase plugin from within the session:
         </p>
         <CodeBlock
           value="/plugins install https://github.com/supabase-community/supabase-plugin"
@@ -196,7 +196,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
         />
         <p className="text-xs text-foreground-lighter">
           Confirm the trust prompt to install. Kimi adds the plugin to its native plugin store. Run{' '}
-          <code>/plugins</code> anytime to view or reload installed plugins.
+          <code>/plugins</code> at any time to view or reload installed plugins.
         </p>
       </div>
     )
