@@ -741,6 +741,10 @@ export const auth: NavMenuConstant = {
       enabled: authFlowsEnabled,
       items: [
         {
+          name: 'Which package to use',
+          url: '/guides/auth/choosing-a-server-package',
+        },
+        {
           name: 'Server-Side Rendering',
           url: '/guides/auth/server-side',
           items: [
@@ -1192,12 +1196,10 @@ export const database: NavMenuConstant = {
             {
               name: 'Setting up',
               url: '/guides/database/replication/pipelines' as `/${string}`,
-              items: [
-                {
-                  name: 'BigQuery',
-                  url: '/guides/database/replication/bigquery' as `/${string}`,
-                },
-              ],
+            },
+            {
+              name: 'BigQuery',
+              url: '/guides/database/replication/bigquery' as `/${string}`,
             },
             {
               name: 'Monitoring',

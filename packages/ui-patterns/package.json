@@ -8,7 +8,7 @@
     "preinstall": "npx only-allow pnpm",
     "test": "vitest",
     "test:coverage": "vitest --run --coverage",
-    "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo",
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo",
     "typecheck": "tsc --noEmit",
     "gen:exports": "tsx ./scripts/update-exports.ts"
   },

@@ -115,6 +115,16 @@ export const Index: Record<string, any> = [
   jsx: "import { Claude } from \"icons\"\n  <Claude/>\n  "
 },
 {
+  name: "click-house",
+  componentName: "ClickHouse",
+  deprecated: false,
+  raw: "import createSupabaseIcon from '../createSupabaseIcon';\n\n/**\n * @component @name ClickHouse\n * @description Supabase SVG icon component, renders SVG Element with children.\n *\n * @preview ![img](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMyAzVjIxTTcuNSAzVjIxTTEyIDNWMjFNMTYuNSAzVjIxTTIxIDEwVjE0IiBzdHJva2U9IiMwMDAiIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiAjZmZmOyBib3JkZXItcmFkaXVzOiAycHgiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+Cg==)\n *\n * @param {Object} props - Supabase icons props and any valid SVG attribute\n * @returns {JSX.Element} JSX Element\n *\n */\nconst ClickHouse = createSupabaseIcon(\n  'ClickHouse',\n  [\n    [\n      'path',\n      {\n        d: 'M3 3V21M7.5 3V21M12 3V21M16.5 3V21M21 10V14',\n        stroke: 'currentColor',\n        'stroke-width': '1.5',\n        'stroke-linecap': 'round',\n        key: '1ho44o',\n      },\n    ],\n  ],\n  { fill: 'none' },\n);\n\nexport default ClickHouse;\n",
+  component: React.lazy(() => import('icons/src/icons/click-house')),
+  import: "import { ClickHouse } from 'icons'",
+  svg: "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\">\n<path d=\"M3 3V21M7.5 3V21M12 3V21M16.5 3V21M21 10V14\" stroke=\"currentColor\" stroke-width=\"1.5\" stroke-linecap=\"round\"/>\n</svg>\n",
+  jsx: "import { ClickHouse } from \"icons\"\n  <ClickHouse/>\n  "
+},
+{
   name: "database",
   componentName: "Database",
   deprecated: false,

@@ -30,12 +30,12 @@ const SLOT_LAG_FIELDS: SlotLagField[] = [
   },
   {
     key: 'safe_wal_size_bytes',
-    label: 'Room before pausing',
+    label: 'WAL retention remaining',
     type: 'bytes',
     description: (
       <>
-        How much more can pile up before the pipeline has to be set up again. Controlled by the{' '}
-        <code className="text-code-inline">max_slot_wal_keep_size</code> setting.
+        How much more WAL can accumulate before the replication slot is at risk of being lost.
+        Controlled by the <code className="text-code-inline">max_slot_wal_keep_size</code> setting.
       </>
     ),
     nullLabel: 'Unlimited',

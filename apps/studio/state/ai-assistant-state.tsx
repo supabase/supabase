@@ -88,7 +88,7 @@ type StoredAiAssistantState = {
   model?: AssistantModel
 }
 
-const INITIAL_AI_ASSISTANT: AiAssistantData = {
+const createInitialAiAssistantData = (): AiAssistantData => ({
   initialInput: '',
   sqlSnippets: undefined,
   suggestions: undefined,
@@ -97,7 +97,7 @@ const INITIAL_AI_ASSISTANT: AiAssistantData = {
   activeChatId: undefined,
   model: undefined,
   context: {},
-}
+})
 
 const DB_NAME = 'ai-assistant-db'
 const DB_VERSION = 1
@@ -210,7 +210,7 @@ async function tryMigrateFromLocalStorage(
         projectRef: projectRef,
         activeChatId: parsedFromLocalStorage.activeChatId,
         chats: parsedFromLocalStorage.chats,
-        model: parsedFromLocalStorage.model ?? INITIAL_AI_ASSISTANT.model,
+        model: parsedFromLocalStorage.model ?? createInitialAiAssistantData().model,
       }
     } else {
       console.warn('Data in localStorage is not in the expected format, ignoring.')
@@ -356,7 +356,7 @@ function createChatInstance(
 
 export const createAiAssistantState = (): AiAssistantState => {
   // Initialize with defaults, loading happens asynchronously in the provider
-  const initialState = { ...INITIAL_AI_ASSISTANT }
+  const initialState = createInitialAiAssistantData()
 
   const state: AiAssistantState = proxy({
     ...initialState, // Spread initial values directly
@@ -369,7 +369,7 @@ export const createAiAssistantState = (): AiAssistantState => {
     },
 
     resetAiAssistantPanel: () => {
-      Object.assign(state, INITIAL_AI_ASSISTANT)
+      Object.assign(state, createInitialAiAssistantData())
     },
 
     setModel: (model: AssistantModel) => {
@@ -414,10 +414,11 @@ export const createAiAssistantState = (): AiAssistantState => {
       }
 
       // Update non-chat related state based on options, falling back to current state, then initial
-      state.initialInput = options?.initialInput ?? INITIAL_AI_ASSISTANT.initialInput
-      state.sqlSnippets = options?.sqlSnippets ?? INITIAL_AI_ASSISTANT.sqlSnippets
-      state.suggestions = options?.suggestions ?? INITIAL_AI_ASSISTANT.suggestions
-      state.tables = options?.tables ?? INITIAL_AI_ASSISTANT.tables
+      const initialAiAssistantData = createInitialAiAssistantData()
+      state.initialInput = options?.initialInput ?? initialAiAssistantData.initialInput
+      state.sqlSnippets = options?.sqlSnippets ?? initialAiAssistantData.sqlSnippets
+      state.suggestions = options?.suggestions ?? initialAiAssistantData.suggestions
+      state.tables = options?.tables ?? initialAiAssistantData.tables
 
       return chatId
     },
@@ -561,7 +562,7 @@ export const createAiAssistantState = (): AiAssistantState => {
       state.model =
         storedModel && isKnownAssistantModelId(storedModel)
           ? storedModel
-          : INITIAL_AI_ASSISTANT.model
+          : createInitialAiAssistantData().model
 
       // Reset sync guards on any support chats (can't be mid-sync after reload)
       Object.values(state.chats).forEach((chat) => {
@@ -698,22 +699,25 @@ export const AiAssistantStateContextProvider = ({ children }: PropsWithChildren)
 
       const unsubscribe = subscribe(state, () => {
         const snap = snapshot(state)
+
         // Prepare state for IndexedDB
         const stateToSave: StoredAiAssistantState = {
           projectRef: project?.ref,
           activeChatId: snap.activeChatId,
           model: snap.model,
           chats: snap.chats
-            ? Object.entries(snap.chats).reduce((acc, [chatId, chat]) => {
-                // Limit messages before saving
-                return {
-                  ...acc,
-                  [chatId]: {
-                    ...chat,
-                    messages: chat.messages?.slice(-20) || [],
-                  },
-                }
-              }, {})
+            ? (Object.entries(snap.chats) as Array<[string, ChatSession]>).reduce(
+                (acc, [chatId, chat]) => {
+                  return {
+                    ...acc,
+                    [chatId]: {
+                      ...chat,
+                      messages: chat.messages?.slice(-20) || [],
+                    },
+                  }
+                },
+                {} as Record<string, ChatSession>
+              )
             : {},
         }
         debouncedSaveAiState(stateToSave)

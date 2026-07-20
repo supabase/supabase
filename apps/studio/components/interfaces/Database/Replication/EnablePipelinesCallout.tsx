@@ -17,6 +17,7 @@ import { Admonition } from 'ui-patterns/admonition'
 
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-source-mutation'
 import { DOCS_URL } from '@/lib/constants'
@@ -57,15 +58,19 @@ const EnablePipelinesModal = () => {
           <Admonition
             type="warning"
             className="rounded-none border-0"
-            title="Pipelines is currently in alpha"
+            title="Pipelines is currently in public alpha"
           >
             <p className="text-sm leading-normal!">
-              Alpha features can be unstable and may introduce breaking changes while we evaluate
-              the product direction, refine the feature set, and incorporate customer feedback.
+              Public alpha features may change as we refine the product and incorporate customer
+              feedback.
             </p>
             <p className="text-sm leading-normal!">
-              Pricing is not finalized. You can enable Pipelines now; we'll announce pricing later
-              and notify you before any charges apply.
+              Pipelines is billed for configured pipeline hours, initial sync data, and ongoing
+              replication data. Review the{' '}
+              <InlineLink href={`${DOCS_URL}/guides/platform/manage-your-usage/pipelines`}>
+                Pipelines pricing
+              </InlineLink>{' '}
+              before enabling it.
             </p>
           </Admonition>
         </DialogSection>
@@ -96,9 +101,8 @@ export const EnablePipelinesCallout = ({
       <div className="flex flex-col gap-y-1">
         <h4>Enable Pipelines</h4>
         <p className="text-sm text-foreground-light">
-          Pipelines creates managed replication pipelines that stream database changes to
-          destination systems.{' '}
-          {hasAccess ? 'Enable Pipelines for your project' : 'Upgrade to the Pro plan'} to stream
+          Supabase Pipelines replicates database changes to supported destination systems.{' '}
+          {hasAccess ? 'Enable Pipelines for your project' : 'Upgrade to the Pro plan'} to replicate
           database changes to {type ?? 'data warehouses and analytics platforms'}.
         </p>
       </div>

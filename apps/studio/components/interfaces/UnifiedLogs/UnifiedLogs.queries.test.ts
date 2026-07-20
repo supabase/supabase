@@ -5,6 +5,7 @@ import {
   getLogsChartQuery,
   getLogsCountQuery,
   getUnifiedLogsQuery,
+  isUserFilterUnreachable,
 } from './UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBQ } from './UnifiedLogs.queries.bq'
 
@@ -14,6 +15,10 @@ const baseSearch = {
 
 // Helper: build a search with extra `filter` URL entries on top of the base.
 const withFilters = (...entries: string[]) => ({ ...baseSearch, filter: entries }) as any
+
+// Helper: build a search with the cross-cutting `user` filter set, plus optional `filter` entries.
+const withUser = (user: string, ...entries: string[]) =>
+  ({ ...baseSearch, user, filter: entries }) as any
 
 describe('UnifiedLogs.queries (OTEL flat)', () => {
   describe('getUnifiedLogsQuery', () => {
@@ -273,6 +278,77 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       expect(sql).toMatch(/END\) IN \('200'\)/)
       expect(sql).toContain('GROUP BY value')
       expect(sql).toContain('LIMIT 20')
+    })
+  })
+
+  describe('user filter', () => {
+    it('restricts to auth_logs/postgres_logs and skips the default postgres+edge restriction', () => {
+      const sql = getUnifiedLogsQuery(withUser('user-123'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`log_attributes['auth_event.actor_id'] = 'user-123'`)
+      expect(where).toContain(`source = 'postgres_logs'`)
+      // The unfiltered default (postgres_logs OR edge_logs) would incorrectly exclude
+      // auth_logs, the primary attributable source, so it must not appear here.
+      expect(where).not.toContain(`(source = 'postgres_logs') OR (source = 'edge_logs')`)
+    })
+
+    it('does not restrict sources when the user filter is inactive', () => {
+      const sql = getUnifiedLogsQuery(baseSearch)
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).not.toContain(`auth_event.actor_id`)
+    })
+
+    it('ANDs an explicit non-attributable log_type filter with the user condition (edge case: always zero rows)', () => {
+      // Locks in the exact shape `isUserFilterUnreachable` detects — `source = 'edge_logs'`
+      // AND `(source = 'auth_logs' ...) OR (source = 'postgres_logs' ...)` can never both hold.
+      const sql = getUnifiedLogsQuery(withUser('user-123', 'log_type:eq:edge'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`source = 'edge_logs'`)
+      expect(where).toContain(`log_attributes['auth_event.actor_id'] = 'user-123'`)
+    })
+  })
+
+  describe('isUserFilterUnreachable', () => {
+    it('is false when no user filter is active', () => {
+      expect(isUserFilterUnreachable(withFilters('log_type:eq:edge'))).toBe(false)
+    })
+
+    it('is false when the user filter is active with no explicit log_type filter', () => {
+      expect(isUserFilterUnreachable(withUser('user-123'))).toBe(false)
+    })
+
+    it('is false when the explicit log_type filter includes an attributable source (auth)', () => {
+      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:auth'))).toBe(false)
+    })
+
+    it('is false when the explicit log_type filter includes an attributable source (postgres)', () => {
+      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:postgres'))).toBe(false)
+    })
+
+    it('is false when at least one of several selected log types is attributable', () => {
+      expect(
+        isUserFilterUnreachable(withUser('user-123', 'log_type:eq:edge', 'log_type:eq:auth'))
+      ).toBe(false)
+    })
+
+    it('is true when the explicit log_type filter restricts to a single non-attributable source', () => {
+      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:eq:edge'))).toBe(true)
+    })
+
+    it('is true when every selected log type is non-attributable', () => {
+      expect(
+        isUserFilterUnreachable(withUser('user-123', 'log_type:eq:edge', 'log_type:eq:storage'))
+      ).toBe(true)
+    })
+
+    it('(neq) is false when excluding a non-attributable source — the attributable sources remain eligible', () => {
+      expect(isUserFilterUnreachable(withUser('user-123', 'log_type:neq:edge'))).toBe(false)
+    })
+
+    it('(neq) is true only when both attributable sources are excluded', () => {
+      expect(
+        isUserFilterUnreachable(withUser('user-123', 'log_type:neq:auth', 'log_type:neq:postgres'))
+      ).toBe(true)
     })
   })
 

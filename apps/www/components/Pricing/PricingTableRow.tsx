@@ -40,7 +40,7 @@ export const pricingTooltips: PricingTooltips = {
     main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor, Log Drains) in GB throughout your billing period. Excludes cache hits.',
   },
   'database.replication': {
-    main: 'Supabase Pipelines is available as an add-on for paid plans. It provides change-data-capture pipelines that replicate your Postgres tables to analytical destinations in near real time.\nYou are billed for each active pipeline, the replicated bytes, and initial copies/backfills. Initial copies/backfills are billed at a lower rate.',
+    main: 'Supabase Pipelines is available as an add-on for paid plans. It provides change-data-capture pipelines that replicate your Postgres tables to analytical destinations in near real time.\nYou are billed for configured pipeline hours, initial sync data, and ongoing replication data. Pipeline hours continue while a pipeline is stopped and end when the pipeline is deleted.',
   },
   'storage.cachedEgress': {
     main: 'Billing is based on the total sum of outgoing Storage traffic in GB throughout your billing period that is served from our CDN cache.',
