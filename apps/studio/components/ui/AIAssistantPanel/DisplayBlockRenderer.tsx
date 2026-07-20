@@ -40,6 +40,7 @@ interface DisplayBlockRendererProps {
   /** AI SDK tool state used to show approval UI for pending tool calls. */
   toolState?: ToolUIPart['state']
   toolApprovalRespondedApproved?: boolean
+  isLastPart?: boolean
   isLastMessage?: boolean
   showConfirmFooter?: boolean
   onChartConfigChange?: (chartConfig: ChartConfig) => void
@@ -57,6 +58,7 @@ export const DisplayBlockRenderer = ({
   onDeny,
   toolState,
   toolApprovalRespondedApproved,
+  isLastPart = false,
   isLastMessage = false,
   showConfirmFooter = true,
   onChartConfigChange,
@@ -222,6 +224,7 @@ export const DisplayBlockRenderer = ({
   const shouldShowConfirmFooter =
     showConfirmFooter &&
     (isApprovalRequested || (isApprovalResponded && !isApprovalDenied)) &&
+    isLastPart &&
     isLastMessage &&
     (isApprovalResponded || (!!onApprove && !!onDeny))
   const isRunningApprovedTool = (isApprovalResponded && !isApprovalDenied) || executeSqlLoading
