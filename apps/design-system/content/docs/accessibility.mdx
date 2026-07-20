@@ -27,7 +27,7 @@ Chromium-based browsers and Firefox handle this automatically via the Tab key. S
 
 Interactive page elements should also provide visual feedback upon selection via a `focus-visible` state. We use consistent focus styles such as `inset-focus` so users recognize this state instantly.
 
-[Button](components/button) has all of the above built-in. Bespoke interactive elements however, such as the below interactive [Table Row](components/table#examples), require these props to be added manually:
+[Button](components/button) has all of the above built-in. The same explicit `tabIndex` default is also baked into Checkbox, Switch, Select Trigger, Toggle, Accordion Trigger, Collapsible Trigger, Dropdown Menu Trigger, Popover Trigger, Dialog Trigger, Sheet Trigger, Alert Dialog Trigger, and the Sidebar Menu and action buttons. Bespoke interactive elements however, such as the below interactive [Table Row](components/table#examples), require these props to be added manually:
 
 ```tsx showLineNumbers {4-14}
 <TableRow

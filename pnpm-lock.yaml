@@ -88,8 +88,8 @@ catalogs:
       specifier: ~6.0.2
       version: 6.0.2
     valtio:
-      specifier: ^1.12.0
-      version: 1.12.0
+      specifier: ^2.3.2
+      version: 2.3.2
     vite:
       specifier: ^8.0.16
       version: 8.0.16
@@ -129,9 +129,7 @@ overrides:
   webpack: ^5.104.1
 
 patchedDependencies:
-  react-data-grid:
-    hash: 803f02d6cede565990ab9675326b93195b98bcc6477a4811715405892c257488
-    path: patches/react-data-grid.patch
+  react-data-grid: 803f02d6cede565990ab9675326b93195b98bcc6477a4811715405892c257488
 
 importers:
 
@@ -581,7 +579,7 @@ importers:
         version: 14.0.0
       valtio:
         specifier: 'catalog:'
-        version: 1.12.0(@types/react@19.2.14)(react@19.2.6)
+        version: 2.3.2(@types/react@19.2.14)(react@19.2.6)
       yaml:
         specifier: ^2.8.1
         version: 2.9.0
@@ -1107,6 +1105,9 @@ importers:
       lodash:
         specifier: ^4.18.1
         version: 4.18.1
+      lodash-es:
+        specifier: ^4.18.1
+        version: 4.18.1
       lucide-react:
         specifier: ^0.436.0
         version: 0.436.0(react@19.2.6)
@@ -1226,7 +1227,7 @@ importers:
         version: 14.0.0
       valtio:
         specifier: 'catalog:'
-        version: 1.12.0(@types/react@19.2.14)(react@19.2.6)
+        version: 2.3.2(@types/react@19.2.14)(react@19.2.6)
       zod:
         specifier: 'catalog:'
         version: 3.25.76
@@ -2177,7 +2178,7 @@ importers:
         version: 17.6.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       valtio:
         specifier: 'catalog:'
-        version: 1.12.0(@types/react@19.2.14)(react@19.2.6)
+        version: 2.3.2(@types/react@19.2.14)(react@19.2.6)
     devDependencies:
       '@types/lodash':
         specifier: 4.17.5
@@ -2739,7 +2740,7 @@ importers:
         version: 5.0.0
       valtio:
         specifier: 'catalog:'
-        version: 1.12.0(@types/react@19.2.14)(react@19.2.6)
+        version: 2.3.2(@types/react@19.2.14)(react@19.2.6)
       zod:
         specifier: 'catalog:'
         version: 3.25.76
@@ -10602,11 +10603,6 @@ packages:
     resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
     engines: {node: '>=6'}
 
-  derive-valtio@0.1.0:
-    resolution: {integrity: sha512-OCg2UsLbXK7GmmpzMXhYkdO64vhJ1ROUUGaTFyHjVwEdMEcTTRj7W1TxLbSBxdY8QLBPCcp66MTyaSy0RpO17A==}
-    peerDependencies:
-      valtio: '*'
-
   destr@2.0.5:
     resolution: {integrity: sha512-ugFTXCtDZunbzasqBxrK93Ik/DRYsO6S/fedkWEMKqt04xZ4csmnmwGDBAb07QWNaGMAmnTIemsYZCksjATwsA==}
 
@@ -14985,8 +14981,8 @@ packages:
     resolution: {integrity: sha512-llQsMLSUDUPT44jdrU/O37qlnifitDP+ZwrmmZcoSKyLKvtZxpyV0n2/bD/N4tBAAZ/gJEdZU7KMraoK1+XYAg==}
     engines: {node: '>= 0.10'}
 
-  proxy-compare@2.5.1:
-    resolution: {integrity: sha512-oyfc0Tx87Cpwva5ZXezSp5V9vht1c7dZBhvuV/y3ctkgMVUmiAGDVeeB0dKhGSyT0v1ZTEQYpe/RXlBVBNuCLA==}
+  proxy-compare@3.0.1:
+    resolution: {integrity: sha512-V9plBAt3qjMlS1+nC8771KNf6oJ12gExvaxnNzN/9yVRLdTv/lc+oJlnSzrdYDAvBfTStPCoiaCOTmTs0adv7Q==}
 
   proxy-from-env@1.1.0:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
@@ -17039,12 +17035,12 @@ packages:
   validate.io-function@1.0.2:
     resolution: {integrity: sha512-LlFybRJEriSuBnUhQyG5bwglhh50EpTL2ul23MPIuR1odjO7XaMLFV8vHGwp7AZciFxtYOeiSCT5st+XSPONiQ==}
 
-  valtio@1.12.0:
-    resolution: {integrity: sha512-co8NkCHeY0NsL0XsL/cSICt5VhTjwZlYT8mi50dYY5thx3r3w1D15A04Lvs9WL/y/Rf98vUKY5PAAJCTLHvkJw==}
+  valtio@2.3.2:
+    resolution: {integrity: sha512-YXhWQei9IN/ZDce9rhL3trCq9+vVq8M1gWmKVdP3YSZ2gxsmmNWVbxXwf9yG6ffu/dAvAD91nevg8xirGr4Dhg==}
     engines: {node: '>=12.20.0'}
     peerDependencies:
-      '@types/react': '>=16.8'
-      react: '>=16.8'
+      '@types/react': '>=18.0.0'
+      react: '>=18.0.0'
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -24140,7 +24136,7 @@ snapshots:
       srvx: 0.11.16
       tinyglobby: 0.2.17
       ufo: 1.6.4
-      vitefu: 1.1.1(vite@8.0.16(@types/node@22.13.14)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))
+      vitefu: 1.1.1(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))
       xmlbuilder2: 4.0.3
       zod: 4.4.3
     optionalDependencies:
@@ -24173,7 +24169,7 @@ snapshots:
       srvx: 0.11.16
       tinyglobby: 0.2.17
       ufo: 1.6.4
-      vitefu: 1.1.1(vite@8.0.16(@types/node@22.13.14)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))
+      vitefu: 1.1.1(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0))
       xmlbuilder2: 4.0.3
       zod: 4.4.3
     optionalDependencies:
@@ -26882,10 +26878,6 @@ snapshots:
   dependency-graph@0.11.0: {}
 
   dequal@2.0.3: {}
-
-  derive-valtio@0.1.0(valtio@1.12.0(@types/react@19.2.14)(react@19.2.6)):
-    dependencies:
-      valtio: 1.12.0(@types/react@19.2.14)(react@19.2.6)
 
   destr@2.0.5: {}
 
@@ -32409,7 +32401,7 @@ snapshots:
       forwarded: 0.2.0
       ipaddr.js: 1.9.1
 
-  proxy-compare@2.5.1: {}
+  proxy-compare@3.0.1: {}
 
   proxy-from-env@1.1.0: {}
 
@@ -34890,11 +34882,9 @@ snapshots:
 
   validate.io-function@1.0.2: {}
 
-  valtio@1.12.0(@types/react@19.2.14)(react@19.2.6):
+  valtio@2.3.2(@types/react@19.2.14)(react@19.2.6):
     dependencies:
-      derive-valtio: 0.1.0(valtio@1.12.0(@types/react@19.2.14)(react@19.2.6))
-      proxy-compare: 2.5.1
-      use-sync-external-store: 1.2.0(react@19.2.6)
+      proxy-compare: 3.0.1
     optionalDependencies:
       '@types/react': 19.2.14
       react: 19.2.6
@@ -35126,7 +35116,7 @@ snapshots:
       tsx: 4.22.4
       yaml: 2.9.0
 
-  vitefu@1.1.1(vite@8.0.16(@types/node@22.13.14)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0)):
+  vitefu@1.1.1(vite@8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0)):
     optionalDependencies:
       vite: 8.0.16(@types/node@22.13.14)(esbuild@0.28.1)(jiti@2.7.0)(sass@1.77.4)(terser@5.39.0)(tsx@4.22.4)(yaml@2.9.0)
 

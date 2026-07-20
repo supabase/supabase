@@ -5,11 +5,17 @@ title: 'Manage Pipelines usage'
 
 ## What you are charged for
 
-You are charged for all pipelines configured, initial/backfill data and replicated data. Pipelines are charged by the hour for as long as they are configured.
+You are charged for configured pipelines, initial sync data, and ongoing replication data. Pipelines are charged by the hour for as long as they are configured, including while they are stopped.
+
+- **Pipeline hours** measure how long each pipeline remains configured. Delete a pipeline to end this charge.
+- **Initial sync data** is the volume of destination-write data processed when a table is first synchronized or synchronized again.
+- **Ongoing replication data** is the volume of destination-write data processed for subsequent database changes. It depends on how much your published data changes, not on the source table size, WAL size, or destination's compressed storage size.
+
+Destination-provider charges are separate. For example, Google Cloud can charge for BigQuery ingestion, storage, and CDC compute.
 
 ### Usage on your invoice
 
-Usage is shown as "ETL Pipeline Hours", "ETL Copy Backfill Data GB" and "ETL Replicated Data GB" on your invoice.
+Usage is shown as "ETL Pipeline Hours", "ETL Copy Backfill Data GB", and "ETL Replicated Data GB" on your invoice.
 
 ## Pricing
 
@@ -17,9 +23,9 @@ Usage is shown as "ETL Pipeline Hours", "ETL Copy Backfill Data GB" and "ETL Rep
 
 ## Billing examples
 
-### Single project with no backfill
+### Billing period without an initial sync
 
-The project has an active pipeline for the entire month.
+The project has a configured pipeline for the entire month.
 
 | Line Item                     | Units     | Costs                        |
 | ----------------------------- | --------- | ---------------------------- |
@@ -31,9 +37,9 @@ The project has an active pipeline for the entire month.
 | Compute Credits               |           | -<Price price="10" />        |
 | **Total**                     |           | **<Price price="518.73" />** |
 
-### Multiple projects with backfills
+### Multiple projects with initial syncs
 
-Multiple projects had an active pipeline for the entire month and had initial backfills and replicated data.
+Multiple projects had a configured pipeline for the entire month and processed initial sync data and ongoing replication data.
 
 | Line Item                           | Units     | Costs                         |
 | ----------------------------------- | --------- | ----------------------------- |
@@ -53,10 +59,9 @@ Multiple projects had an active pipeline for the entire month and had initial ba
 | Compute Credits                     |           | -<Price price="10" />         |
 | **Total**                           |           | **<Price price="1367.46" />** |
 
-### After disabling an add-on for a day
+### After deleting a pipeline after one day
 
-Project add-ons are billed in arrears based on how many hours you used them.
-If you remove the add-on, you are no longer billed from the time of removal onward.
+Pipeline hours are billed in arrears for as long as a pipeline is configured, including while it is stopped. After you delete the pipeline, pipeline-hour billing ends.
 
 | Line Item                     | Hours | Costs                       |
 | ----------------------------- | ----- | --------------------------- |
@@ -71,7 +76,6 @@ If you remove the add-on, you are no longer billed from the time of removal onwa
 
 ## Optimize usage
 
-- Only replicate tables you need to replicate
-- If you no longer require replication, remove the pipeline through your [project's replication settings](/dashboard/project/_/database/replication)
-- Reduce the number of writes to your table
-- Exclude columns you do not need from replication - Pipelines let you configure which columns to replicate
+- Include only the tables and columns that you need at the destination.
+- Keep high-churn tables out of the publication when their changes are not needed for analytics.
+- If you no longer require replication, delete the pipeline through your [project's replication settings](/dashboard/project/_/database/replication) to stop pipeline-hour charges.

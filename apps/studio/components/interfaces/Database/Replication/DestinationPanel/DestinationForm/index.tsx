@@ -17,12 +17,16 @@ import {
   SelectValue,
   SheetFooter,
   SheetSection,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import {
   useIsETLBigQueryPrivateAlpha,
+  useIsETLClickHousePrivateAlpha,
   useIsETLDucklakePrivateAlpha,
   useIsETLIcebergPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
@@ -33,6 +37,8 @@ import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsB
 import { AnalyticsBucketFields } from './AnalyticsBucket/Fields'
 import { getBigQueryValidationIssues } from './BigQuery/BigQuery.utils'
 import { BigQueryFields } from './BigQuery/Fields'
+import { getClickHouseValidationIssues } from './ClickHouse/ClickHouse.utils'
+import { ClickHouseFields } from './ClickHouse/Fields'
 import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.schema'
 import { areValidationFailuresEqual, generateDefaultValues } from './DestinationForm.utils'
 import { DestinationNameInput } from './DestinationNameInput'
@@ -48,6 +54,7 @@ import { useDestinationForm } from './useDestinationForm'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
@@ -82,6 +89,7 @@ export const DestinationForm = ({
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
+  const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
   const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
 
   const [showValidationWarningsDialog, setShowValidationWarningsDialog] = useState(false)
@@ -104,8 +112,15 @@ export const DestinationForm = ({
       destinations.push({ value: 'Analytics Bucket', label: 'Analytics Bucket' })
     if (etlEnableDucklake) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
     if (etlEnableSnowflake) destinations.push({ value: 'Snowflake', label: 'Snowflake' })
+    if (etlEnableClickHouse) destinations.push({ value: 'ClickHouse', label: 'ClickHouse' })
     return destinations
-  }, [etlEnableBigQuery, etlEnableDucklake, etlEnableIceberg, etlEnableSnowflake])
+  }, [
+    etlEnableBigQuery,
+    etlEnableDucklake,
+    etlEnableIceberg,
+    etlEnableSnowflake,
+    etlEnableClickHouse,
+  ])
   const hasNoAvailableDestinations = availableDestinations.length === 0
 
   const { data: sourcesData } = useReplicationSourcesQuery({ projectRef })
@@ -200,6 +215,10 @@ export const DestinationForm = ({
               addRequiredFieldError(path, message)
             }
           )
+        } else if (selectedType === 'ClickHouse') {
+          getClickHouseValidationIssues(data).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
         }
       })
     ),
@@ -241,7 +260,6 @@ export const DestinationForm = ({
   }
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    // Editing an existing pipeline doesn't incur a new initial copy, so it skips the cost gate.
     if (editMode) {
       await submitPipeline({
         data,
@@ -348,9 +366,19 @@ export const DestinationForm = ({
                   <FormItemLayout
                     isReactForm={false}
                     layout="horizontal"
-                    className="[&>div>p]:text-foreground-lighter"
                     label="Region"
-                    description="Pipelines run in a fixed region and cannot be changed."
+                    description={
+                      <span className="text-foreground-lighter">
+                        Pipelines run in{' '}
+                        <Tooltip>
+                          <TooltipTrigger className={InlineLinkClassName}>
+                            {PIPELINE_REGION.displayName}
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom">{PIPELINE_REGION.code}</TooltipContent>
+                        </Tooltip>
+                        . In your destination provider, choose the closest available region.
+                      </span>
+                    }
                   >
                     <Select disabled value={PIPELINE_REGION.code}>
                       <SelectTrigger>
@@ -391,7 +419,18 @@ export const DestinationForm = ({
               ) : selectedType === 'DuckLake' && etlEnableDucklake ? (
                 <DuckLakeFields form={form} editMode={editMode} />
               ) : selectedType === 'Snowflake' && etlEnableSnowflake ? (
-                <SnowflakeFields form={form} editMode={editMode} />
+                <SnowflakeFields
+                  form={form}
+                  editMode={editMode}
+                  hasStoredPrivateKeyPassphrase={
+                    editMode && !!defaultValues.snowflakePrivateKeyPassphrase
+                  }
+                />
+              ) : selectedType === 'ClickHouse' && etlEnableClickHouse ? (
+                <ClickHouseFields
+                  form={form}
+                  hasStoredPassword={editMode && !!defaultValues.clickhousePassword}
+                />
               ) : null}
 
               <DialogSectionSeparator />

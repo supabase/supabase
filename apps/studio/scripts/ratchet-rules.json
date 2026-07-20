@@ -18,5 +18,6 @@
   "jsx-a11y/tabindex-no-positive",
   "jsx-a11y/anchor-is-valid",
   "jsx-a11y/heading-has-content",
-  "jsx-a11y/no-distracting-elements"
+  "jsx-a11y/no-distracting-elements",
+  "supabase/require-explicit-tabindex"
 ]

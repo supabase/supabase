@@ -1,4 +1,6 @@
-import { FieldValues, UseFormSetValue, UseFormWatch } from 'react-hook-form'
+import { Control, FieldValues } from 'react-hook-form'
+
+import { TokenFormValues } from '../../../AccessToken.schemas'
 
 export interface PermissionResource {
   resource: string
@@ -15,19 +17,16 @@ export interface PermissionsFormValues extends FieldValues {
   permissionRows?: PermissionRow[]
 }
 
-export interface PermissionsProps<
-  TFormValues extends PermissionsFormValues = PermissionsFormValues,
-> {
-  setValue: UseFormSetValue<TFormValues>
-  watch: UseFormWatch<TFormValues>
+export interface PermissionsProps {
+  control: Control<TokenFormValues>
   resourceSearchOpen: boolean
   setResourceSearchOpen: (open: boolean) => void
 }
 
-export interface PermissionResourceSelectorProps<TFormValues extends PermissionsFormValues> {
+export interface PermissionResourceSelectorProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   permissionRows: PermissionRow[]
-  setValue: UseFormSetValue<TFormValues>
+  onResourceToggled: (resource: PermissionResource) => void
   align?: 'center' | 'end' | 'start'
 }

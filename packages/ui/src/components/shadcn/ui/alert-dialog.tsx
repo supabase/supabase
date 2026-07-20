@@ -5,6 +5,7 @@ import { AlertDialog as AlertDialogPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
+import { getExplicitTabIndex } from '../../../lib/utils/getExplicitTabIndex'
 import { Button, ButtonVariantProps, buttonVariants } from './../../Button'
 
 type AlertDialogContextValue = {
@@ -75,7 +76,22 @@ const AlertDialog = ({
 }
 AlertDialog.displayName = AlertDialogPrimitive.Root.displayName
 
-const AlertDialogTrigger = AlertDialogPrimitive.Trigger
+const AlertDialogTrigger = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Trigger>
+>(({ disabled, tabIndex, ...props }, ref) => {
+  const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
+
+  return (
+    <AlertDialogPrimitive.Trigger
+      ref={ref}
+      {...props}
+      disabled={disabled}
+      tabIndex={computedTabIndex}
+    />
+  )
+})
+AlertDialogTrigger.displayName = AlertDialogPrimitive.Trigger.displayName
 
 const AlertDialogPortal = ({ children, ...props }: AlertDialogPrimitive.AlertDialogPortalProps) => (
   <AlertDialogPrimitive.Portal {...props}>

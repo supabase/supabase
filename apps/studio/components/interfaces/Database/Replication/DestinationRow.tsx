@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { AnalyticsBucket, BigQuery, Database } from 'icons'
+import { AnalyticsBucket, BigQuery, ClickHouse, Database } from 'icons'
 import { Minus, Snowflake } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -158,6 +158,8 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
               <Database size={18} className="text-foreground-light" />
             ) : type === 'Snowflake' ? (
               <Snowflake size={18} className="text-foreground-light" />
+            ) : type === 'ClickHouse' ? (
+              <ClickHouse size={18} className="text-foreground-light" />
             ) : (
               <Database size={18} className="text-foreground-light" />
             )}

@@ -11,7 +11,7 @@
     "export": "next export",
     "start": "next start",
     "lint": "eslint .",
-    "clean": "rimraf node_modules",
+    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo",
     "pretypecheck": "next typegen",
     "typecheck": "pnpm run content:build:core && tsc --noEmit",
     "content:build:core": "node scripts/generateStaticContent.mjs && node scripts/generateMdContent.mjs",
