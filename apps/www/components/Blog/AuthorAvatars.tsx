@@ -27,32 +27,33 @@ export default function AuthorAvatars({ authors, showName = true, size = 'sm' }:
     <div className="flex items-center gap-2 min-w-0">
       <div className="flex items-center -space-x-1.5 shrink-0">
         {visibleAvatars.map((author, i) => (
-          <div
-            key={i}
-            className={`relative ${px} rounded-full ring-2 ring-background border border-foreground/20 overflow-hidden shrink-0`}
-          >
-            {author.author_image_url && (
-              <Image
-                src={
-                  typeof author.author_image_url === 'string'
-                    ? author.author_image_url
-                    : (author.author_image_url as { url: string }).url
-                }
-                fill
-                className="object-cover"
-                alt={showName ? '' : author.author}
-              />
-            )}
+          <div key={i} className={`relative ${px} rounded-full bg-background shrink-0 p-px`}>
+            <div className="relative w-full h-full rounded-full border border-foreground/20 overflow-hidden">
+              {author.author_image_url && (
+                <Image
+                  src={
+                    typeof author.author_image_url === 'string'
+                      ? author.author_image_url
+                      : (author.author_image_url as { url: string }).url
+                  }
+                  fill
+                  className="object-cover"
+                  alt={showName ? '' : author.author}
+                />
+              )}
+            </div>
           </div>
         ))}
         {hiddenCount > 0 && (
           <div
-            className={`relative ${px} rounded-full ring-2 ring-background border border-foreground/20 shrink-0 bg-surface-300 flex items-center justify-center`}
+            className={`relative ${px} rounded-full bg-background shrink-0 p-px`}
             aria-hidden="true"
           >
-            <span className="text-foreground-lighter text-[9px] leading-none">
-              +{hiddenCount}
-            </span>
+            <div className="w-full h-full rounded-full border border-foreground/20 bg-surface-300 flex items-center justify-center">
+              <span className="text-foreground-lighter text-[9px] leading-none">
+                +{hiddenCount}
+              </span>
+            </div>
           </div>
         )}
       </div>
