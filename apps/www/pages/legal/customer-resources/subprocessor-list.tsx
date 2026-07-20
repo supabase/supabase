@@ -55,7 +55,12 @@ export default function SubprocessorListPage() {
             </span>
           </div>
 
-          <p className="mt-0">Download the current list of Supabase sub-processors below.</p>
+          <p className="mt-0">
+            The third-party sub-processors Supabase engages to help provide its services are
+            indicated in the latest linked Subprocessor List available below. This page is updated
+            with an updated Subprocessor List as our sub-processors change. You can subscribe to
+            receive notifications of updates to this page, below.
+          </p>
 
           <div className="not-prose">
             <Button asChild variant="default" icon={<Download />}>
