@@ -150,7 +150,7 @@ export const NewPublicationPanel = ({ visible, sourceId, onClose }: NewPublicati
               <Button variant="default" disabled={creatingPublication} onClick={() => onClose()}>
                 Cancel
               </Button>
-              <Button variant="primary" disabled={creatingPublication} form={formId} type="submit">
+              <Button variant="primary" loading={creatingPublication} form={formId} type="submit">
                 Create publication
               </Button>
             </SheetFooter>

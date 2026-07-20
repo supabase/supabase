@@ -1,4 +1,4 @@
-import { AnalyticsBucket, BigQuery, Database } from 'icons'
+import { AnalyticsBucket, BigQuery, ClickHouse, Database } from 'icons'
 import { Snowflake } from 'lucide-react'
 import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
 import {
@@ -16,6 +16,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { useDestinationInformation } from '../useDestinationInformation'
 import {
   useIsETLBigQueryPrivateAlpha,
+  useIsETLClickHousePrivateAlpha,
   useIsETLDucklakePrivateAlpha,
   useIsETLIcebergPrivateAlpha,
   useIsETLSnowflakePrivateAlpha,
@@ -43,6 +44,7 @@ export const DestinationTypeSelection = () => {
   const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
   const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
   const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
+  const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
   const { infrastructureReadReplicas } = useIsFeatureEnabled(['infrastructure:read_replicas'])
 
   const [urlDestinationType, setDestinationType] = useQueryState(
@@ -53,6 +55,7 @@ export const DestinationTypeSelection = () => {
       'Analytics Bucket',
       'DuckLake',
       'Snowflake',
+      'ClickHouse',
     ]).withOptions({
       history: 'push',
       clearOnDefault: true,
@@ -123,6 +126,14 @@ export const DestinationTypeSelection = () => {
           icon: Snowflake,
           stage: 'Early Access',
           enabled: isOptionVisible('Snowflake', etlEnableSnowflake),
+        },
+        {
+          value: 'ClickHouse',
+          label: 'ClickHouse',
+          description: 'Stream changes to a ClickHouse cluster for fast columnar analytics',
+          icon: ClickHouse,
+          stage: 'Early Access',
+          enabled: isOptionVisible('ClickHouse', etlEnableClickHouse),
         },
       ],
     },

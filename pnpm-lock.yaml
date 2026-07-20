@@ -129,9 +129,7 @@ overrides:
   webpack: ^5.104.1
 
 patchedDependencies:
-  react-data-grid:
-    hash: 803f02d6cede565990ab9675326b93195b98bcc6477a4811715405892c257488
-    path: patches/react-data-grid.patch
+  react-data-grid: 803f02d6cede565990ab9675326b93195b98bcc6477a4811715405892c257488
 
 importers:
 

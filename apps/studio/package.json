@@ -19,7 +19,7 @@
     "start:tanstack": "node scripts/serve.js",
     "lint": "eslint .",
     "lint:ratchet": "tsx scripts/ratchet-eslint-rules.ts --rules-file scripts/ratchet-rules.json",
-    "clean": "rimraf node_modules tsconfig.tsbuildinfo .next .turbo",
+    "clean": "rimraf .next .turbo tsconfig.tsbuildinfo",
     "test": "vitest --run --coverage",
     "test:watch": "vitest watch",
     "test:ui": "vitest --ui",
