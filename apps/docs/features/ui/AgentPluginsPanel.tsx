@@ -58,6 +58,13 @@ const PLUGIN_CLIENTS: PluginClient[] = [
     repoUrl: 'https://github.com/supabase-community/supabase-plugin',
     docsUrl: 'https://www.kimi.com/code/docs/en/kimi-code-cli/customization/plugins.html',
   },
+  {
+    key: 'vscode',
+    label: 'VS Code',
+    icon: 'vscode',
+    repoUrl: 'https://github.com/supabase-community/supabase-plugin',
+    docsUrl: 'https://code.visualstudio.com/docs/agent-customization/agent-plugins',
+  },
 ]
 
 function PluginInstructions({ client }: { client: PluginClient }) {
@@ -197,6 +204,36 @@ function PluginInstructions({ client }: { client: PluginClient }) {
         <p className="text-xs text-foreground-lighter">
           Confirm the trust prompt to install. Kimi adds the plugin to its native plugin store. Run{' '}
           <code>/plugins</code> at any time to view or reload installed plugins.
+        </p>
+      </div>
+    )
+  }
+
+  if (client.key === 'vscode') {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-foreground-light">
+          Open the Command Palette (<code>Cmd/Ctrl+Shift+P</code>) and run{' '}
+          <strong>Chat: Install Plugin From Source</strong>, then paste the Supabase plugin
+          repository URL:
+        </p>
+        <CodeBlock
+          value="https://github.com/supabase-community/supabase-plugin"
+          language="bash"
+          focusable={false}
+          className="block"
+        />
+        <p className="text-xs text-foreground-lighter">
+          VS Code auto-detects the vendor-neutral{' '}
+          <a
+            href="https://github.com/vercel-labs/open-plugin-spec"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-link hover:underline"
+          >
+            Open Plugin
+          </a>{' '}
+          manifest in the repo. Review the trust prompt to finish installing.
         </p>
       </div>
     )
