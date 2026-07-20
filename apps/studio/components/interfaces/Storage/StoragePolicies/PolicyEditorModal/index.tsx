@@ -194,12 +194,15 @@ export const PolicyEditorModal = ({
     // ALTER POLICY can only replace expressions, not remove them, so a cleared
     // field would be silently dropped from the update payload (undefined →
     // omitted in JSON serialization) and the old expression would persist.
-    if (selectedPolicyToEdit?.definition && !trimmedDefinition) {
+    // Trim the stored expressions too so whitespace-only values are treated as empty.
+    const storedDefinition = selectedPolicyToEdit?.definition?.trim()
+    const storedCheck = selectedPolicyToEdit?.check?.trim()
+    if (storedDefinition && !trimmedDefinition) {
       return toast.error(
         'The USING expression cannot be removed once set. Replace it with a new expression instead.'
       )
     }
-    if (selectedPolicyToEdit?.check && !trimmedCheck) {
+    if (storedCheck && !trimmedCheck) {
       return toast.error(
         'The WITH CHECK expression cannot be removed once set. Replace it with a new expression instead.'
       )
