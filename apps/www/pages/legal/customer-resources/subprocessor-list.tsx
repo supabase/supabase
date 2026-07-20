@@ -51,7 +51,7 @@ export default function SubprocessorListPage() {
           <div className="not-prose">
             <Button asChild variant="default" icon={<Download />}>
               <a href={PDF_PATH} download target="_blank" rel="noopener noreferrer">
-                Download the current sub-processor list ({CURRENT_PDF.displayDate})
+                Subprocessor List - Updated {CURRENT_PDF.displayDate}
               </a>
             </Button>
           </div>
