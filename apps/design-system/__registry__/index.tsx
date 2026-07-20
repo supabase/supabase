@@ -2612,13 +2612,24 @@ export const Index: Record<string, any> = {
       subcategory: "undefined",
       chunks: []
     },
-    "connect-interstitial-logos": {
-      name: "connect-interstitial-logos",
+    "connect-interstitial-logo-pair": {
+      name: "connect-interstitial-logo-pair",
       type: "components:example",
       registryDependencies: undefined,
-      component: React.lazy(() => import("@/registry/default/example/connect-interstitial-logos")),
+      component: React.lazy(() => import("@/registry/default/example/connect-interstitial-logo-pair")),
       source: "",
-      files: ["registry/default/example/connect-interstitial-logos.tsx"],
+      files: ["registry/default/example/connect-interstitial-logo-pair.tsx"],
+      category: "undefined",
+      subcategory: "undefined",
+      chunks: []
+    },
+    "connect-interstitial-logo-single": {
+      name: "connect-interstitial-logo-single",
+      type: "components:example",
+      registryDependencies: undefined,
+      component: React.lazy(() => import("@/registry/default/example/connect-interstitial-logo-single")),
+      source: "",
+      files: ["registry/default/example/connect-interstitial-logo-single.tsx"],
       category: "undefined",
       subcategory: "undefined",
       chunks: []

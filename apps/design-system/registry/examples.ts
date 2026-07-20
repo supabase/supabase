@@ -1404,9 +1404,14 @@ export const examples: Registry = [
     files: ['example/connect-interstitial-demo.tsx'],
   },
   {
-    name: 'connect-interstitial-logos',
+    name: 'connect-interstitial-logo-pair',
     type: 'components:example',
-    files: ['example/connect-interstitial-logos.tsx'],
+    files: ['example/connect-interstitial-logo-pair.tsx'],
+  },
+  {
+    name: 'connect-interstitial-logo-single',
+    type: 'components:example',
+    files: ['example/connect-interstitial-logo-single.tsx'],
   },
   {
     name: 'page-layout-auth-emails',
