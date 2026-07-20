@@ -50,6 +50,14 @@ const PLUGIN_CLIENTS: PluginClient[] = [
     docsUrl:
       'https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/plugins-finding-installing',
   },
+  {
+    key: 'kimi',
+    label: 'Kimi Code',
+    icon: 'kimi',
+    hasDistinctDarkIcon: true,
+    repoUrl: 'https://github.com/supabase-community/supabase-plugin',
+    docsUrl: 'https://www.kimi.com/code/docs/en/kimi-code-cli/customization/plugins.html',
+  },
 ]
 
 function PluginInstructions({ client }: { client: PluginClient }) {
@@ -167,6 +175,28 @@ function PluginInstructions({ client }: { client: PluginClient }) {
             Gemini CLI extensions directory
           </a>
           .
+        </p>
+      </div>
+    )
+  }
+
+  if (client.key === 'kimi') {
+    return (
+      <div className="space-y-3">
+        <p className="text-sm text-foreground-light">Open Kimi Code by running</p>
+        <CodeBlock value="kimi" language="bash" focusable={false} className="block" />
+        <p className="text-sm text-foreground-light">
+          Then install the Supabase plugin from within the session:
+        </p>
+        <CodeBlock
+          value="/plugins install https://github.com/supabase-community/supabase-plugin"
+          language="bash"
+          focusable={false}
+          className="block"
+        />
+        <p className="text-xs text-foreground-lighter">
+          Confirm the trust prompt to install. Kimi adds the plugin to its native plugin store. Run{' '}
+          <code>/plugins</code> at any time to view or reload installed plugins.
         </p>
       </div>
     )
