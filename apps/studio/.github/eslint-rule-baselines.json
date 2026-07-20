@@ -22,10 +22,6 @@
     "jsx-a11y/no-distracting-elements": 0,
     "supabase/require-explicit-tabindex": 0,
     "valtio/state-snapshot-rule": 1,
-    "valtio/avoid-this-in-proxy": 0,
-    "react-hook-form/destructuring-formstate": 0,
-    "react-hook-form/no-access-control": 0,
-    "react-hook-form/no-nested-object-setvalue": 0,
     "react-hook-form/no-use-watch": 76
   },
   "ruleFiles": {
@@ -1070,10 +1066,6 @@
     "valtio/state-snapshot-rule": {
       "state/storage-explorer.tsx": 1
     },
-    "valtio/avoid-this-in-proxy": {},
-    "react-hook-form/destructuring-formstate": {},
-    "react-hook-form/no-access-control": {},
-    "react-hook-form/no-nested-object-setvalue": {},
     "react-hook-form/no-use-watch": {
       "components/interfaces/Account/AccessTokens/Scoped/NewScopedTokenSheet.tsx": 3,
       "components/interfaces/Account/Preferences/DeleteAccountButton.tsx": 1,

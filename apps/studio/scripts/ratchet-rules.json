@@ -21,8 +21,5 @@
   "jsx-a11y/no-distracting-elements",
   "supabase/require-explicit-tabindex",
   "valtio/state-snapshot-rule",
-  "react-hook-form/destructuring-formstate",
-  "react-hook-form/no-access-control",
-  "react-hook-form/no-nested-object-setvalue",
   "react-hook-form/no-use-watch"
 ]
