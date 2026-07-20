@@ -121,13 +121,13 @@ export default function ConnectInterstitialDemo() {
           <AccountRow
             displayName="danny@supabase.io"
             action={
-              <Button type="default" icon={<LogOut />} className="px-2" aria-label="Sign out" />
+              <Button variant="default" icon={<LogOut />} className="px-2" aria-label="Sign out" />
             }
           />
-          <Button type="primary" block>
+          <Button variant="primary" block>
             Authorize Stripe Projects
           </Button>
-          <Button type="text" block>
+          <Button variant="text" block>
             Cancel
           </Button>
         </div>
@@ -145,7 +145,7 @@ export default function ConnectInterstitialDemo() {
             description="Sign in with the Supabase account that received this invite, then open the link again."
           />
           <AccountRow displayName="other@example.com" />
-          <Button type="primary" block>
+          <Button variant="primary" block>
             Sign out and continue
           </Button>
         </div>

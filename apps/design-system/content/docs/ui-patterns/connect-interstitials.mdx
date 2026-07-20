@@ -68,7 +68,7 @@ Use `InterstitialLayout` for the outer card, then put route-specific content in
 <InterstitialLayout
   logo={
     <LogoPair
-      left={<PartnerLogo src="/img/icons/stripe-icon.svg" alt="Stripe" />}
+      left={<PartnerLogo src={`${BASE_PATH}/img/icons/stripe-icon.svg`} alt="Stripe" />}
       right={<SupabaseLogo />}
     />
   }
@@ -77,7 +77,7 @@ Use `InterstitialLayout` for the outer card, then put route-specific content in
 >
   <div className="px-6 pb-6">
     <InterstitialAccountRow displayName={displayName} />
-    <Button type="primary" block>
+    <Button variant="primary" block>
       Continue
     </Button>
   </div>
@@ -122,7 +122,7 @@ a Vercel project, keep the same interstitial shell and widen only the card.
 ```tsx
 const AwsLogo = () => (
   <LogoBox className="border-[#232f3e] bg-[#232f3e]">
-    <img alt="AWS" src="/img/icons/aws-icon.svg" className="w-8" />
+    <img alt="AWS" src={`${BASE_PATH}/img/icons/aws-icon.svg`} className="w-8" />
   </LogoBox>
 )
 
