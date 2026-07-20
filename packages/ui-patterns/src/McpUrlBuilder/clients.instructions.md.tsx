@@ -93,11 +93,12 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
       <>
         <paragraph>
           Place the file at <inlineCode value="<cwd>/.kimi-code/mcp.json" /> for the current
-          project, or under <inlineCode value="$KIMI_CODE_HOME" /> (defaults to{' '}
-          <inlineCode value="~/.kimi-code" />) to make it available globally.
+          project. To make it available globally, place it under{' '}
+          <inlineCode value="$KIMI_CODE_HOME" /> instead, which defaults to{' '}
+          <inlineCode value="~/.kimi-code" />.
         </paragraph>
         <paragraph>
-          Restart Kimi Code (or start a new session) to load the server, then check its status by
+          Restart Kimi Code or start a new session to load the server, then check its status by
           running:
         </paragraph>
         <code lang="bash" value="/mcp" />

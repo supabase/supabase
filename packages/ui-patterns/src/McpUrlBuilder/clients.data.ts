@@ -156,6 +156,8 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
   {
     key: 'kimi',
     label: 'Kimi Code',
+    icon: 'kimi',
+    hasDistinctDarkIcon: true,
     configFile: '.kimi-code/mcp.json',
     externalDocsUrl: 'https://www.kimi.com/code/docs/en/kimi-code-cli/customization/mcp.html',
     transformConfig: (config): KimiMcpConfig => {

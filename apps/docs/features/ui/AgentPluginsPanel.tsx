@@ -53,6 +53,8 @@ const PLUGIN_CLIENTS: PluginClient[] = [
   {
     key: 'kimi',
     label: 'Kimi Code',
+    icon: 'kimi',
+    hasDistinctDarkIcon: true,
     repoUrl: 'https://github.com/supabase-community/supabase-plugin',
     docsUrl: 'https://www.kimi.com/code/docs/en/kimi-code-cli/customization/plugins.html',
   },
@@ -193,7 +195,7 @@ function PluginInstructions({ client }: { client: PluginClient }) {
           className="block"
         />
         <p className="text-xs text-foreground-lighter">
-          Confirm the trust prompt to install. Kimi adds the plugin to its native plugin store — run{' '}
+          Confirm the trust prompt to install. Kimi adds the plugin to its native plugin store. Run{' '}
           <code>/plugins</code> anytime to view or reload installed plugins.
         </p>
       </div>
