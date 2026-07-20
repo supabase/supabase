@@ -181,27 +181,20 @@ function PluginInstructions({ client }: { client: PluginClient }) {
   if (client.key === 'kimi') {
     return (
       <div className="space-y-3">
+        <p className="text-sm text-foreground-light">Open Kimi Code by running</p>
+        <CodeBlock value="kimi" language="bash" focusable={false} className="block" />
         <p className="text-sm text-foreground-light">
-          Install the Supabase plugin into Kimi Code with the{' '}
-          <a
-            href="https://www.npmjs.com/package/plugins"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-brand-link hover:underline"
-          >
-            plugins
-          </a>{' '}
-          CLI:
+          Then install the Supabase plugin from inside the session:
         </p>
         <CodeBlock
-          value="npx plugins add supabase-community/supabase-plugin --target kimi"
+          value="/plugins install https://github.com/supabase-community/supabase-plugin"
           language="bash"
           focusable={false}
           className="block"
         />
         <p className="text-xs text-foreground-lighter">
-          Kimi installs the plugin into its native plugin store. Open <code>/plugins</code> inside
-          Kimi Code to view or reload installed plugins.
+          Confirm the trust prompt to install. Kimi adds the plugin to its native plugin store — run{' '}
+          <code>/plugins</code> anytime to view or reload installed plugins.
         </p>
       </div>
     )
