@@ -13,7 +13,7 @@
     "build:markdown": "pnpm build:guides-markdown && pnpm build:reference-markdown",
     "build:gz-archive": "tsx ./internals/generate-gz-archive.ts",
     "build:sitemap": "tsx ./internals/generate-sitemap.ts",
-    "clean": "rimraf .next .turbo node_modules features/docs/generated examples __generated__",
+    "clean": "rimraf .next .turbo features/docs/generated examples __generated__ tsconfig.tsbuildinfo",
     "codegen:examples": "shx cp -r ../../examples ./examples",
     "codegen:graphql": "tsx --conditions=react-server ./scripts/graphqlSchema.ts && graphql-codegen --config codegen.ts",
     "codegen:references:new:ensure": "(test -f spec/reference/javascript/v2/supabase.json || (cd spec && make download.tsdoc.v2)) && (test -f spec/reference/server/v1/server.json || (cd spec && make download.server.v1))",

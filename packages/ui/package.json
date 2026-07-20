@@ -9,7 +9,7 @@
     "preinstall": "npx only-allow pnpm",
     "typecheck": "tsc --noEmit",
     "generate-tailwind-classes": "tsx ./scripts/generate-tailwind-classes.ts",
-    "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo",
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo",
     "test": "vitest",
     "test:ci": "vitest --run --coverage",
     "test:report": "open coverage/lcov-report/index.html"

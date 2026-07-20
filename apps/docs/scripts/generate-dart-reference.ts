@@ -4,9 +4,13 @@
  *
  * Dart has no upstream TypeDoc output, so this script is the "pre-step" the
  * reference README describes: it adapts the hand-authored legacy spec
- * (`spec/supabase_dart_v2.yml`) plus the shared section tree
- * (`spec/common-client-libs-sections.json`) into a TypeDoc-shaped JSON dump at
+ * (`spec/supabase_dart_v2.yml`) into a TypeDoc-shaped JSON dump at
  * `spec/reference/dart/v2/supabase_flutter.json`.
+ *
+ * Each method's section comes from `category` / `subcategory` fields on its own
+ * YAML entry, so adding or moving a method only ever touches this one file. The
+ * `build-reference-content.ts` "barebone" step then generates the navigation
+ * tree from those tags — no separate section list to maintain.
  *
  * Each Dart method becomes a `variant: 'declaration'` node tagged with
  * `@category` / `@subcategory` (so the build groups it into the right section)
@@ -36,83 +40,54 @@ import { parse } from 'yaml'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const DOCS_DIR = join(__dirname, '..')
 const YAML_PATH = join(DOCS_DIR, 'spec/supabase_dart_v2.yml')
-const SECTIONS_PATH = join(DOCS_DIR, 'spec/common-client-libs-sections.json')
 const VERSION_DIR = join(DOCS_DIR, 'spec/reference/dart/v2')
 const CONFIG_PATH = join(VERSION_DIR, 'config.json')
 const OUT_PATH = join(VERSION_DIR, 'supabase_flutter.json')
 
-const LIB_ID = 'reference_dart_v2'
-
 /**
- * Ids whose YAML entry is a category/subcategory overview rather than a method.
- * They are rendered through committed JSON partials (keyed by the subcategory
- * title slug), so they are skipped when building method declarations.
+ * Ids whose YAML entry is a section header rather than a method. Each header
+ * carries the `category` (and optional `subcategory`) that every method after
+ * it inherits, up to the next header. This is what lets individual methods omit
+ * section metadata entirely: authoring a new method just means placing it in the
+ * right section. Headers are skipped when building method declarations; their
+ * overview text is rendered from the committed JSON partials (keyed by the
+ * category/subcategory title slug).
+ *
+ * Listed in file order for readability.
  */
 const HEADER_IDS = new Set([
-  'using-filters',
-  'using-modifiers',
+  'auth-api',
   'auth-mfa-api',
   'passkey-api',
   'admin-api',
   'admin-passkey-api',
+  'oauth-server-api',
+  'admin-custom-providers-api',
+  'functions-api',
+  'database-api',
+  'realtime-api',
   'file-buckets',
+  'using-modifiers',
+  'using-filters',
 ])
 
 /** Top-level entries handled by markdown / top-level JSON partials, not methods. */
 const SKIP_IDS = new Set(['introduction', 'installing', 'upgrade-guide', 'initializing'])
-
-/**
- * Dart-specific ids that are absent from the shared (JS-centric) section tree.
- * Map them to the category/subcategory they belong to.
- */
-const SECTION_OVERRIDE: Record<string, { category: string; subcategory: string | null }> = {
-  'max-affected': { category: 'Database', subcategory: 'Using modifiers' },
-  'link-identity-with-id-token': { category: 'Auth', subcategory: null },
-  'auth-reset-password-for-email': { category: 'Auth', subcategory: null },
-}
 
 /** Method-name overrides for titles that don't yield a clean identifier. */
 const NAME_OVERRIDE: Record<string, string> = {
   explain: 'explain',
 }
 
-interface SectionNode {
-  id?: string
-  title?: string
-  type?: string
-  excludes?: string[]
-  items?: SectionNode[]
-}
-
 interface DartFunction {
   id: string
   title: string
+  category?: string
+  subcategory?: string | null
   description?: string
   notes?: string
   params?: unknown[]
   examples?: unknown[]
-}
-
-/** Walk the shared section tree, recording each id's category/subcategory for dart v2. */
-function buildSectionMap(
-  sections: SectionNode[]
-): Map<string, { category: string; subcategory: string | null }> {
-  const map = new Map<string, { category: string; subcategory: string | null }>()
-  const included = (n: SectionNode) => !(n.excludes ?? []).includes(LIB_ID)
-  const walk = (nodes: SectionNode[], category: string | null, subcategory: string | null) => {
-    for (const node of nodes) {
-      if (!included(node)) continue
-      if (node.type === 'category') {
-        walk(node.items ?? [], node.title ?? '', null)
-      } else if (node.items && node.items.length) {
-        walk(node.items, category, node.title ?? null)
-      } else if (node.id) {
-        map.set(node.id, { category: category ?? '', subcategory })
-      }
-    }
-  }
-  walk(sections, null, null)
-  return map
 }
 
 /**
@@ -164,26 +139,53 @@ function slugify(value: string): string {
 
 export async function generateDartReferenceDump(): Promise<{ methodCount: number }> {
   const doc = parse(await readFile(YAML_PATH, 'utf-8')) as { functions: DartFunction[] }
-  const sections = JSON.parse(await readFile(SECTIONS_PATH, 'utf-8')) as SectionNode[]
   const config = JSON.parse(await readFile(CONFIG_PATH, 'utf-8')) as {
     navigationPrefixes?: NavigationPrefixes
   }
   const navigationPrefixes = config.navigationPrefixes ?? {}
-  const sectionMap = buildSectionMap(sections)
 
   let nextId = 1
   const children: unknown[] = []
   const slugOwners = new Map<string, string>()
-  const skipped: string[] = []
+  const orphaned: string[] = []
+
+  // The section a method belongs to is the one opened by the nearest preceding
+  // header entry. We walk the spec in order, updating the current section each
+  // time we hit a header, so methods themselves carry no section metadata.
+  let currentCategory: string | null = null
+  let currentSubcategory: string | null = null
 
   for (const fn of doc.functions) {
-    if (SKIP_IDS.has(fn.id) || HEADER_IDS.has(fn.id)) continue
+    if (SKIP_IDS.has(fn.id)) continue
 
-    const section = SECTION_OVERRIDE[fn.id] ?? sectionMap.get(fn.id)
-    if (!section) {
-      skipped.push(fn.id)
+    if (HEADER_IDS.has(fn.id)) {
+      if (!fn.category) {
+        throw new Error(
+          `Dart converter: header "${fn.id}" needs a "category" field; it defines the ` +
+            `section that the methods after it inherit.`
+        )
+      }
+      currentCategory = fn.category
+      currentSubcategory = fn.subcategory ?? null
       continue
     }
+
+    // A method inherits the current section. It may still override either field
+    // independently: an explicit `subcategory` always wins, an explicit
+    // `category` (with no subcategory) starts a fresh, subcategory-less section,
+    // and anything left unset is inherited from the current header.
+    const category = fn.category ?? currentCategory
+    const subcategory =
+      fn.subcategory !== undefined
+        ? fn.subcategory
+        : fn.category !== undefined
+          ? null
+          : currentSubcategory
+    if (!category) {
+      orphaned.push(fn.id)
+      continue
+    }
+    const section = { category, subcategory }
 
     const name = NAME_OVERRIDE[fn.id] ?? deriveName(fn.title)
     if (!/^[A-Za-z][A-Za-z0-9]*$/.test(name)) {
@@ -229,10 +231,11 @@ export async function generateDartReferenceDump(): Promise<{ methodCount: number
   await mkdir(dirname(OUT_PATH), { recursive: true })
   await writeFile(OUT_PATH, JSON.stringify(dump, null, 2))
 
-  if (skipped.length) {
+  if (orphaned.length) {
     throw new Error(
-      `Dart converter: ${skipped.length} ids have no section mapping (add them to ` +
-        `common-client-libs-sections.json or SECTION_OVERRIDE): ${skipped.join(', ')}`
+      `Dart converter: ${orphaned.length} ids have no section (they appear before any ` +
+        `section header in supabase_dart_v2.yml). Move them under a header, add a header ` +
+        `before them, or list them in SKIP_IDS if they are not methods: ${orphaned.join(', ')}`
     )
   }
 
