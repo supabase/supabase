@@ -15,7 +15,7 @@
     "clean": "turbo run clean --parallel && rimraf -G node_modules/{*,.bin,.modules.yaml} .turbo/cache",
     "dev": "turbo run dev --parallel",
     "dev:studio": "turbo run dev --filter=studio --parallel",
-    "dev:studio-local": "pnpm setup:cli && NODE_ENV=test pnpm --prefix ./apps/studio dev",
+    "dev:studio-local": "pnpm setup:cli && NODE_ENV=test MODE=test pnpm --prefix ./apps/studio dev",
     "dev:docs": "turbo run dev --filter=docs --parallel",
     "dev:www": "turbo run dev --filter=www --parallel",
     "dev:design-system": "turbo run dev --filter=design-system --parallel",
