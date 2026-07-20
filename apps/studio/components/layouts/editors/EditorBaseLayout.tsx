@@ -68,8 +68,8 @@ export const EditorBaseLayout = ({
       <div className="flex flex-col h-full">
         <div
           className={cn(
-            'h-10 md:min-h-(--header-height) flex items-center',
-            !hideTabs ? 'bg-surface-200 dark:bg-alternative' : 'bg-surface-100'
+            'h-10 md:min-h-12 flex items-center',
+            !hideTabs ? 'bg-surface-200' : 'bg-surface-100'
           )}
         >
           {hideTabs ? <CollapseButton hideTabs={hideTabs} /> : <EditorTabs />}

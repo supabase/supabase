@@ -6,6 +6,7 @@ import {
   AlertDescription,
   AlertTitle,
   Button,
+  cn,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -38,6 +39,7 @@ type SchemaSelectorProps = Omit<ComponentPropsWithoutRef<'div'>, 'onSelect'> & {
   align?: 'start' | 'end'
   open?: boolean
   onOpenChange?: (open: boolean) => void
+  triggerClassName?: string
 }
 
 export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
@@ -57,6 +59,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
       align = 'start',
       open: openProp,
       onOpenChange,
+      triggerClassName,
       ...rest
     },
     ref
@@ -124,7 +127,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
                 disabled={disabled}
                 variant="default"
                 data-testid="schema-selector"
-                className={`w-full [&>span]:w-full pr-1! space-x-1`}
+                className={cn('w-full [&>span]:w-full pr-1! space-x-1', triggerClassName)}
                 iconRight={
                   <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
                 }

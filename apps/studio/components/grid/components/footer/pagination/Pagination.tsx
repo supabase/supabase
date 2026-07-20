@@ -58,6 +58,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
 
   const { sorts } = useTableSort()
   const { filters } = useTableFilter()
+  const quickFilter = snap.quickFilter
 
   const { data: project } = useSelectedProjectQuery()
   const tableEditorSnap = useTableEditorStateSnapshot()
@@ -92,6 +93,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
       projectRef: project?.ref,
       tableId: snap.table.id,
       filters,
+      quickFilter,
       enforceExactCount: snap.enforceExactCount,
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
@@ -116,6 +118,7 @@ export const Pagination = ({ enableForeignRowsQuery = true }: PaginationProps) =
       tableId: id,
       sorts,
       filters,
+      quickFilter,
       page: snap.page,
       preflightCheck,
       limit: tableEditorSnap.rowsPerPage,

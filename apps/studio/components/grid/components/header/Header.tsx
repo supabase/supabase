@@ -1,8 +1,7 @@
 import { keepPreviousData } from '@tanstack/react-query'
-import { useBreakpoint, useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
+import { useParams } from 'common'
 import { ChevronDown, Trash } from 'lucide-react'
-import { ReactNode, useEffect, useRef, useState } from 'react'
+import { ReactNode, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -16,13 +15,11 @@ import {
 
 import { useInitializeFiltersFromUrl, useSyncFiltersToUrl } from '../../hooks/useFilterLifeCycle'
 import { ExportDialog } from './ExportDialog'
-import { FilterPopoverNew } from './filter/FilterPopoverNew'
+import { TableEditorToolbar } from './TableEditorToolbar'
 import { formatRowsForCSV, hydrateTruncatedRows } from './Header.utils'
-import { SortPopover } from './sort/SortPopover'
 import { useTableRowOperations } from '@/components/grid/hooks/useTableRowOperations'
 import { useTableSort } from '@/components/grid/hooks/useTableSort'
 import type { SupaRow } from '@/components/grid/types'
-import { GridHeaderActions } from '@/components/interfaces/TableGridEditor/GridHeaderActions'
 import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 import { formatTableRowsToSQL } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
 import {
@@ -60,29 +57,10 @@ export const Header = ({
   useInitializeFiltersFromUrl()
   useSyncFiltersToUrl()
 
-  const isMobile = useBreakpoint('md')
   const snap = useTableEditorTableStateSnapshot()
-  const [isInputFocus, setIsInputFocus] = useState(false)
-  const filterContainerRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    if (!isInputFocus) return
-
-    const handleMouseDown = (e: MouseEvent) => {
-      const target = e.target as Element
-      const withinFilter = filterContainerRef.current?.contains(target)
-      const withinPortal = target?.closest?.('[data-radix-popper-content-wrapper]')
-      if (!withinFilter && !withinPortal) {
-        setIsInputFocus(false)
-      }
-    }
-
-    document.addEventListener('mousedown', handleMouseDown)
-    return () => document.removeEventListener('mousedown', handleMouseDown)
-  }, [isInputFocus])
 
   return (
-    <div className="flex flex-wrap md:min-h-10 items-center bg-dash-sidebar dark:bg-surface-100">
+    <div className="flex flex-wrap md:min-h-10 items-center bg-dash-sidebar">
       {customHeader ? (
         <div className="flex-1 px-1.5">{customHeader}</div>
       ) : snap.selectedRows.size > 0 ? (
@@ -90,45 +68,10 @@ export const Header = ({
           <RowHeader rows={rows} tableQueriesEnabled={tableQueriesEnabled} />
         </div>
       ) : (
-        <div
-          ref={filterContainerRef}
-          className="w-full flex items-center justify-between gap-2 pr-1.5 border-b border-border md:border-none pt-1 md:pt-0"
-        >
-          <FilterPopoverNew
-            isRefetching={isRefetching}
-            onInputFocus={() => setIsInputFocus(true)}
-            onInputBlur={() => setIsInputFocus(false)}
-          />
-
-          {!isMobile && (
-            <AnimatePresence>
-              {!isInputFocus && (
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{
-                    type: 'spring',
-                    stiffness: 420,
-                    damping: 30,
-                    mass: 0.4,
-                  }}
-                  className="hidden md:flex items-center gap-2 overflow-x-auto"
-                >
-                  <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
-                  <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          )}
-        </div>
-      )}
-
-      {isMobile && (
-        <div className="flex items-center gap-2 overflow-x-auto px-1.5 py-1.5">
-          <SortPopover tableQueriesEnabled={tableQueriesEnabled} />
-          <GridHeaderActions table={snap.originalTable} isRefetching={isRefetching} />
-        </div>
+        <TableEditorToolbar
+          isRefetching={isRefetching}
+          tableQueriesEnabled={tableQueriesEnabled}
+        />
       )}
     </div>
   )
@@ -152,6 +95,7 @@ const RowHeader = ({ rows: visibleRows, tableQueriesEnabled = true }: RowHeaderP
   const isImpersonatingRole = roleImpersonationState.role !== undefined
 
   const filters = snap.filters
+  const quickFilter = snap.quickFilter
   const { sorts } = useTableSort()
 
   const [isCopying, setIsCopying] = useState(false)
@@ -166,6 +110,7 @@ const RowHeader = ({ rows: visibleRows, tableQueriesEnabled = true }: RowHeaderP
       tableId: snap.table.id,
       sorts,
       filters,
+      quickFilter,
       page: snap.page,
       preflightCheck,
       limit: tableEditorSnap.rowsPerPage,
@@ -179,6 +124,7 @@ const RowHeader = ({ rows: visibleRows, tableQueriesEnabled = true }: RowHeaderP
       projectRef: project?.ref,
       tableId: snap.table.id,
       filters,
+      quickFilter,
       enforceExactCount: snap.enforceExactCount,
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },

@@ -138,7 +138,10 @@ export const getTableRowsSql = ({
   maxCharacters = MAX_CHARACTERS,
   maxArraySize = MAX_ARRAY_SIZE,
   sortExcludedColumns = [],
-}: BuildTableRowsQueryArgs): SafeSqlFragment => {
+  quickFilter,
+}: BuildTableRowsQueryArgs & {
+  quickFilter?: { columns: string[]; value: string }
+}): SafeSqlFragment => {
   if (!table || !table.columns) return safeSql``
 
   const query = new Query()
@@ -155,6 +158,10 @@ export const getTableRowsSql = ({
       !isStringTypeColumn && x.value === '' ? null : x.value
     )
   })
+
+  if (quickFilter) {
+    queryChains = queryChains.applyQuickFilter(quickFilter.columns, quickFilter.value)
+  }
 
   // If sorts is empty and table row count is within threshold, use the primary key as the default sort.
   // Only apply for selections over a Table, not View, MaterializedViews, ...

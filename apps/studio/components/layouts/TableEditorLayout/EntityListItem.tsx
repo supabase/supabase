@@ -208,14 +208,14 @@ export const EntityListItem = ({
         </Tooltip>
         <div
           className={cn(
-            'truncate overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-2 relative w-full',
+            'overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-2 relative w-full min-w-0',
             isActive && 'text-foreground'
           )}
         >
           <span
             className={cn(
               isActive ? 'text-foreground' : 'text-foreground-light group-hover:text-foreground',
-              'text-sm transition truncate'
+              'text-sm transition truncate min-w-0'
             )}
           >
             {entity.name}
@@ -239,7 +239,8 @@ export const EntityListItem = ({
             >
               <Button
                 variant="text"
-                className="w-6 h-6"
+                size="tiny"
+                className="border-transparent text-xs px-2.5 py-1 w-6 h-6 shrink-0"
                 icon={<MoreVertical size={14} strokeWidth={2} />}
                 onClick={(e) => e.preventDefault()}
               />
@@ -606,7 +607,12 @@ const EntityTooltipTrigger = ({
     return (
       <Tooltip>
         <TooltipTrigger className="min-w-4">
-          <Badge variant="destructive">Unrestricted</Badge>
+          <Badge
+            variant="destructive"
+            className="inline-flex items-center gap-1 justify-center rounded-full whitespace-nowrap tracking-[0.07em] uppercase font-medium text-[9px] leading-none px-[5.5px] py-[3px] bg-destructive/10 text-destructive border border-border-destructive shrink-0"
+          >
+            Unrestricted
+          </Badge>
         </TooltipTrigger>
         <TooltipContent side="right" className="max-w-52">
           {tooltipContent}
@@ -623,7 +629,7 @@ const EntityTooltipTrigger = ({
     return (
       <Tooltip>
         <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
-          <Globe size={14} strokeWidth={1} className="text-foreground-lighter" />
+          <Globe size={14} strokeWidth={1} className="text-foreground-lighter shrink-0" />
         </TooltipTrigger>
         <TooltipContent side="right" className="max-w-52">
           This table can be accessed via the Data API but no RLS policies exist so no data will be
@@ -639,7 +645,7 @@ const EntityTooltipTrigger = ({
     return (
       <Tooltip>
         <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
-          <Globe size={14} strokeWidth={1} className="text-foreground-lighter" />
+          <Globe size={14} strokeWidth={1} className="text-foreground-lighter shrink-0" />
         </TooltipTrigger>
         <TooltipContent side="right">This table can be accessed via the Data API</TooltipContent>
       </Tooltip>

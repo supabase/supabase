@@ -12,13 +12,12 @@ export function countQuery(
   table: QueryTable,
   options?: {
     filters?: Filter[]
+    quickFilter?: { columns: string[]; value: string }
   }
 ) {
   let query = safeSql`select count(*) from ${queryTable(table)}`
-  const { filters } = options ?? {}
-  if (filters) {
-    query = applyFilters(query, filters)
-  }
+  const { filters, quickFilter } = options ?? {}
+  query = applyAllFilters(query, filters, quickFilter)
   return safeSql`${query};`
 }
 
@@ -117,6 +116,7 @@ export function selectQuery(
     filters?: Filter[]
     pagination?: QueryPagination
     sorts?: Sort[]
+    quickFilter?: { columns: string[]; value: string }
   },
   isFinal = true,
   isCTE = false
@@ -125,10 +125,8 @@ export function selectQuery(
   const queryColumn = columns ?? safeSql`*`
   query = safeSql`select ${queryColumn} from ${isCTE ? queryCTE(table) : queryTable(table)}`
 
-  const { filters, pagination, sorts } = options ?? {}
-  if (filters) {
-    query = applyFilters(query, filters)
-  }
+  const { filters, pagination, sorts, quickFilter } = options ?? {}
+  query = applyAllFilters(query, filters, quickFilter)
   if (sorts) {
     query = applySorts(query, sorts)
   }
@@ -182,6 +180,38 @@ export function updateQuery(
 //============================================================
 // Filter Utils
 //============================================================
+
+function applyAllFilters(
+  query: SafeSqlFragment,
+  filters?: Filter[],
+  quickFilter?: { columns: string[]; value: string }
+) {
+  if (filters && filters.length > 0) {
+    query = applyFilters(query, filters)
+  }
+
+  const quickFilterClause = buildQuickFilterClause(quickFilter)
+  if (!quickFilterClause) return query
+
+  if (filters && filters.length > 0) {
+    return safeSql`${query} and ${quickFilterClause}`
+  }
+
+  return safeSql`${query} where ${quickFilterClause}`
+}
+
+function buildQuickFilterClause(quickFilter?: { columns: string[]; value: string }) {
+  if (!quickFilter || quickFilter.columns.length === 0 || !quickFilter.value.trim()) {
+    return null
+  }
+
+  const pattern = `%${quickFilter.value.trim()}%`
+  const conditions = quickFilter.columns.map((column) =>
+    safeSql`${ident(column)}::text ilike ${literal(pattern)}`
+  )
+
+  return safeSql`(${joinSqlFragments(conditions, ' or ')})`
+}
 
 function applyFilters(query: SafeSqlFragment, filters: Filter[]) {
   if (filters.length === 0) return query

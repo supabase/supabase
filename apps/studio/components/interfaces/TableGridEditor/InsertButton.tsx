@@ -56,7 +56,8 @@ export const InsertButton = () => {
           data-testid="table-editor-insert-new-row"
           variant="primary"
           size="tiny"
-          icon={<ChevronDown strokeWidth={1.5} />}
+          className="text-xs px-2.5 py-1 h-[26px]"
+          icon={<ChevronDown strokeWidth={1.5} className="text-brand-600" />}
         >
           Insert
         </Button>

@@ -65,7 +65,7 @@ export const SortableTab = ({
       layoutId={tab.id}
       transition={{ duration: 0.045 }}
       animate={{ opacity: isDragging ? 0 : 1 }}
-      className={cn('flex items-center h-(--header-height) first-of-type:border-l')}
+      className={cn('flex items-center h-12 first-of-type:border-l border-default')}
     >
       <TabsTrigger
         value={tab.id}
@@ -79,13 +79,13 @@ export const SortableTab = ({
         onDoubleClick={() => tabs.makeTabPermanent(tab.id)}
         className={cn(
           'flex items-center gap-2 pl-3 pr-2.5 text-xs',
-          'bg-dash-sidebar/50 dark:bg-surface-100/50',
-          'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
+          'bg-dash-sidebar/50',
+          'data-[state=active]:bg-dash-sidebar',
           'border-b border-default',
-          'data-[state=active]:border-b-background-dash-sidebar dark:data-[state=active]:border-b-background-surface-100',
+          'data-[state=active]:border-b-background-dash-sidebar',
           'relative group h-full',
-          'hover:bg-surface-300 dark:hover:bg-surface-100',
-          tab.isPreview && 'italic font-light' // Optional: style preview tabs differently
+          'hover:bg-surface-300',
+          tab.isPreview && 'italic font-light'
         )}
         {...listeners}
       >
