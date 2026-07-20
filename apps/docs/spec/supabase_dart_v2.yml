@@ -989,6 +989,10 @@ functions:
         isOptional: false
         type: PasskeyAuthenticatorInterface
         description: Performs the platform passkey ceremony (FaceID/TouchID/security key). For example, a `PasskeyAuthenticator` from the `passkeys` package.
+      - name: friendlyName
+        isOptional: true
+        type: String
+        description: Human readable name for the passkey. Used as a fallback for the WebAuthn `user.name`/`displayName` when the server omits them, and stored as the passkey's friendly name. Defaults to `Passkey` when not provided.
     examples:
       - id: register-passkey
         name: Register a passkey for the current user
@@ -999,7 +1003,10 @@ functions:
 
           final authenticator = PasskeyAuthenticator();
 
-          final Passkey passkey = await supabase.auth.registerPasskey(authenticator);
+          final Passkey passkey = await supabase.auth.registerPasskey(
+            authenticator,
+            friendlyName: 'Work laptop',
+          );
           ```
   - id: sign-out
     title: 'signOut()'
@@ -2350,6 +2357,12 @@ functions:
       Starts the registration of a new passkey for the signed in user.
       - Requires a signed in (non-anonymous) user.
       - Pass the returned `options` to the platform's passkey API to create the credential, then call [`passkey.verifyRegistration()`](/docs/reference/dart/auth-passkey-verifyregistration) with the result.
+      - When the server omits `user.name`/`displayName` in the registration options, they are backfilled with `friendlyName` (or a generic `Passkey` default) before the platform ceremony.
+    params:
+      - name: friendlyName
+        isOptional: true
+        type: String
+        description: Human readable name used as a fallback for the WebAuthn `user.name`/`displayName` when the server omits them. Defaults to `Passkey` when not provided.
     examples:
       - id: start-passkey-registration
         name: Start a passkey registration
@@ -2357,7 +2370,9 @@ functions:
         code: |
           ```dart
           final PasskeyRegistrationOptionsResponse registration =
-              await supabase.auth.passkey.startRegistration();
+              await supabase.auth.passkey.startRegistration(
+            friendlyName: 'Work laptop',
+          );
 
           // Hand registration.options to the platform passkey API.
           ```
@@ -4919,6 +4934,37 @@ functions:
           'Successfully deleted'
           ```
 
+  - id: purge-bucket-cache
+    description: |
+      Invalidates the CDN cache for every object in a bucket.
+    title: 'purgeBucketCache()'
+    notes: |
+      - Requires the `secret` key and the `purgeCache` feature enabled for your project on the storage server.
+      - When `transformations` is `true`, only the resized/formatted variants are purged, leaving the original cached objects intact. Otherwise the bucket's object cache is purged.
+      - Policy permissions required:
+        - `buckets` permissions: `select`
+        - `objects` permissions: none
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: String
+        description: The unique identifier of the bucket whose CDN cache should be purged.
+      - name: transformations
+        isOptional: true
+        type: bool
+        description: When true, only the transformed (resized/formatted) variants are purged, leaving the original cached objects intact. Defaults to false.
+    examples:
+      - id: purge-bucket-cache
+        name: Purge the CDN cache for a bucket
+        isSpotlight: true
+        code: |
+          ```dart
+          final String res = await supabase
+            .storage
+            .purgeBucketCache('avatars');
+          ```
+
   - id: from-upload
     description: |
       Uploads a file to an existing bucket.
@@ -5459,6 +5505,108 @@ functions:
         response: |
           ```json
           <Blob>
+          ```
+
+  - id: from-download-stream
+    description: |
+      Downloads a file as a lazy `Stream<Uint8List>`, streaming the bytes instead of buffering the whole file into memory like `download()`.
+    title: 'from.downloadStream()'
+    notes: |
+      - The request is sent when the stream is listened to. A non-success response surfaces as a `StorageException` on the stream before any bytes are emitted.
+      - Prefer this over [`download()`](/docs/reference/dart/storage-from-download) for large files to keep memory usage low.
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `select`
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The full path and file name of the file to be downloaded. For example folder/image.png.
+      - name: cacheNonce
+        isOptional: true
+        type: String
+        description: Adds a `cacheNonce` query parameter to bypass CDN caching for a specific file version.
+      - name: transform
+        isOptional: true
+        type: TransformOptions
+        description: Transform the asset before serving it to the client.
+        subContent:
+          - name: width
+            isOptional: true
+            type: int
+            description: The width of the image in pixels.
+          - name: height
+            isOptional: true
+            type: int
+            description: The height of the image in pixels.
+          - name: resize
+            isOptional: true
+            type: ResizeMode
+            description: Specifies how image cropping should be handled when performing image transformations. Defaults to `ResizeMode.cover`.
+          - name: quality
+            isOptional: true
+            type: int
+            description: Set the quality of the returned image. A number from 20 to 100, with 100 being the highest quality. Defaults to 80
+          - name: format
+            isOptional: true
+            type: RequestImageFormat
+            description: Specify the format of the image requested. When using 'origin' we force the format to be the same as the original image. When this option is not passed in, images are optimized to modern image formats like Webp.
+    examples:
+      - id: download-file-as-stream
+        name: Download a file as a stream
+        isSpotlight: true
+        code: |
+          ```dart
+          final Stream<Uint8List> stream = supabase
+            .storage
+            .from('avatars')
+            .downloadStream('avatar1.png');
+
+          await for (final chunk in stream) {
+            // Handle each chunk of bytes as it arrives
+          }
+          ```
+
+  - id: from-purge-cache
+    description: |
+      Invalidates the CDN cache for a single object in a bucket.
+    title: 'from.purgeCache()'
+    notes: |
+      - Requires the `secret` key and the `purgeCache` feature enabled for your project on the storage server.
+      - When `transformations` is `true`, only the resized/formatted variants are purged, leaving the original cached object intact. Otherwise the object's cache is purged.
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `select`
+      - Refer to the [Storage guide](https://supabase.com/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The path and name of the object to purge from the CDN cache. For example folder/image.png.
+      - name: transformations
+        isOptional: true
+        type: bool
+        description: When true, only the transformed (resized/formatted) variants are purged, leaving the original cached object intact. Defaults to false.
+    examples:
+      - id: purge-object-cache
+        name: Purge the CDN cache for an object
+        isSpotlight: true
+        code: |
+          ```dart
+          final String res = await supabase
+            .storage
+            .from('avatars')
+            .purgeCache('avatar1.png');
+          ```
+      - id: purge-object-transformations-cache
+        name: Purge only the transformed variants
+        code: |
+          ```dart
+          final String res = await supabase
+            .storage
+            .from('avatars')
+            .purgeCache('avatar1.png', transformations: true);
           ```
 
   - id: from-remove
