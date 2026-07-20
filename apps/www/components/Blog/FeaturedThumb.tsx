@@ -69,8 +69,10 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
                 <span className="sr-only">Published </span>
                 {blog.formattedDate}
               </span>
-              <span aria-hidden="true">·</span>
-              <span>{blog.readingTime}</span>
+              <span aria-hidden="true" className="hidden sm:inline">
+                ·
+              </span>
+              <span className="hidden sm:inline">{blog.readingTime}</span>
             </div>
           </div>
         </div>
