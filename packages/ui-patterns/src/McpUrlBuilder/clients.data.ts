@@ -6,6 +6,7 @@ import type {
   FactoryMcpConfig,
   GeminiMcpConfig,
   GooseMcpConfig,
+  KimiMcpConfig,
   McpClientBaseConfig,
   McpClientConfig,
   McpClientDeepLinkOptions,
@@ -146,6 +147,22 @@ export const MCP_CLIENT_DATA: McpClientData[] = [
       return {
         mcp_servers: {
           supabase: {
+            url: config.mcpServers.supabase.url,
+          },
+        },
+      }
+    },
+  },
+  {
+    key: 'kimi',
+    label: 'Kimi Code',
+    configFile: '.kimi-code/mcp.json',
+    externalDocsUrl: 'https://www.kimi.com/code/docs/en/kimi-code-cli/customization/mcp.html',
+    transformConfig: (config): KimiMcpConfig => {
+      return {
+        mcpServers: {
+          supabase: {
+            transport: 'http',
             url: config.mcpServers.supabase.url,
           },
         },
@@ -367,7 +384,7 @@ export const MCP_CLI_COMMANDS: Record<string, McpCliCommands> = {
 export const MCP_CLIENT_GROUPS = [
   {
     heading: 'AI Agent CLI',
-    keys: ['claude-code', 'codex', 'gemini-cli', 'copilot-cli', 'opencode', 'factory'],
+    keys: ['claude-code', 'codex', 'kimi', 'gemini-cli', 'copilot-cli', 'opencode', 'factory'],
   },
   {
     heading: 'Web Clients',

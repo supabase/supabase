@@ -88,6 +88,21 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
       </>
     ),
   },
+  kimi: {
+    alternate: () => (
+      <>
+        <paragraph>
+          Restart Kimi Code (or reload MCP servers) to pick up the new configuration. Kimi will
+          prompt you to complete the Supabase OAuth flow the first time it connects.
+        </paragraph>
+        <paragraph>
+          Place the file at <inlineCode value="<cwd>/.kimi-code/mcp.json" /> for the current project,
+          or under <inlineCode value="$KIMI_CODE_HOME" /> (defaults to{' '}
+          <inlineCode value="~/.kimi-code" />) to make it available globally.
+        </paragraph>
+      </>
+    ),
+  },
   'gemini-cli': {
     primary: ({ isPlatform, url }) => (
       <>
