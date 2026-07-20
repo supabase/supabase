@@ -152,7 +152,7 @@ async function clearStorage(): Promise<void> {
 
 // Helper function to sanitize objects to ensure they're cloneable
 // Issue due to addToolResult
-function sanitizeForCloning(obj: any): any {
+export function sanitizeForCloning(obj: any): any {
   if (obj === null || obj === undefined) return obj
   if (typeof obj !== 'object') return obj
   return JSON.parse(JSON.stringify(obj))
@@ -329,7 +329,11 @@ function createChatInstance(
         const messages = chatInstance.messages
         const chat = state.chats[options.id]
         if (chat) {
-          chat.messages = messages
+          // Assign a sanitized copy, not the SDK's live array — valtio's proxy() mutates
+          // an object's own nested properties in place when wrapping it, which would
+          // corrupt the Chat instance's internal message state with Proxies and break
+          // its own structuredClone-based updates (e.g. addToolApprovalResponse).
+          chat.messages = messages.map((message) => sanitizeForCloning(message))
           chat.updatedAt = new Date()
         }
 
