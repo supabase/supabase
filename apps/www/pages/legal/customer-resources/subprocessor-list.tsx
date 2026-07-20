@@ -48,20 +48,6 @@ export default function SubprocessorListPage() {
       />
       <SectionContainer className="prose">
         <div className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <h2 className="mt-0 mb-0">Current sub-processors</h2>
-            <span className="text-sm text-foreground-lighter">
-              Effective {CURRENT_PDF.displayDate}
-            </span>
-          </div>
-
-          <p className="mt-0">
-            The third-party sub-processors Supabase engages to help provide its services are
-            indicated in the latest linked Subprocessor List available below. This page is updated
-            with an updated Subprocessor List as our sub-processors change. You can subscribe to
-            receive notifications of updates to this page, below.
-          </p>
-
           <div className="not-prose">
             <Button asChild variant="default" icon={<Download />}>
               <a href={PDF_PATH} download target="_blank" rel="noopener noreferrer">
