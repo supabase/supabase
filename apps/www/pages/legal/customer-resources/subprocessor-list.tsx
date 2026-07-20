@@ -44,7 +44,7 @@ export default function SubprocessorListPage() {
           />
         }
         h1="Subprocessor List"
-        subheader="The third-party sub-processors Supabase engages to help provide its services. This list is updated as our sub-processors change."
+        subheader="The third-party sub-processors Supabase engages to help provide its services are indicated in the latest linked Subprocessor List available below. This page is updated with an updated Subprocessor List as our sub-processors change. You can subscribe to receive notifications of updates to this page, below."
       />
       <SectionContainer className="prose">
         <div className="flex flex-col gap-4">
