@@ -19,13 +19,13 @@ bespoke centered cards, logos, account rows, or organisation selectors.
 
 ## Use this pattern for
 
-- Partner authorisation and consent (OAuth, MCP, Stripe Projects)
-- Organisation invites and account-gated accept flows
-- Marketplace and billing connections (AWS Marketplace, Vercel install, credit redemption)
-- CLI or device-code sign-in
-- Loading, error, success, and wrong-account states for these routes
+This pattern fits short-lived connect flows: partner authorisation and consent
+(OAuth, MCP, Stripe Projects), organisation invites, marketplace and billing
+connections (AWS Marketplace, Vercel install, credit redemption), and CLI or
+device-code sign-in. Use the same shell for their loading, error, success, and
+wrong-account states.
 
-Do not use this for normal authenticated Studio pages. Those should use the
+Do not use it for normal authenticated Studio pages. Those should use the
 standard [page layout](./layout) patterns.
 
 ## Source of truth
@@ -81,11 +81,10 @@ project linking.
 
 ## Logos
 
-- Use `LogoPair` when connecting two services.
-- Use `SupabaseLogo` alone for first-party flows.
-- Use `PartnerLogo` for partner icons that should fill the 48px box.
-- Use `LogoBox` for custom inset marks or logos that need their own background.
-- Store new partner icons in `apps/studio/public/img/icons`.
+Use `LogoPair` when the user is connecting two services, and `SupabaseLogo`
+alone for first-party flows. `PartnerLogo` fills the 48px box edge-to-edge;
+`LogoBox` is for custom inset marks or logos that need their own background.
+Store new partner icons in `apps/studio/public/img/icons`.
 
 <ComponentPreview
   name="connect-interstitial-logo-pair"
@@ -140,13 +139,23 @@ for new states instead of inventing a parallel card style.
 />
 ```
 
-## Actions, states, and copy
+## Actions
 
-- Prefer one full-width primary action.
-- Use `Admonition` for warning, error, note, and success copy.
-- Use `ShimmeringLoader` inside the same layout for loading states.
-- Keep invalid and error states in the card when the route can explain them.
-- Sentence case. Prefer `sign in` over `login`.
-- Use `Verb -> Thing` titles and actions (`Authorize Stripe Projects`, `Install Vercel`).
-- Keep the layout title static across states; put state-specific copy in the body.
-- Do not end header descriptions with a full stop.
+Prefer one full-width primary action. A full-width text button is fine for a
+secondary action that still belongs in the flow.
+
+## States
+
+Keep loading, invalid, error, and success states inside the same card when the
+route can explain them. Use `ShimmeringLoader` for loading, and `Admonition`
+for warning, error, note, and success copy.
+
+## Copy
+
+Use sentence case. Prefer `sign in` over `login`. Titles and primary actions
+should follow `Verb -> Thing`, for example `Authorize Stripe Projects` or
+`Install Vercel`.
+
+Keep the layout title static across states and put state-specific copy in the
+body. Header descriptions should stay short and should not end with a full
+stop.
