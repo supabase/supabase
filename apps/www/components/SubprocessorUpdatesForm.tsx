@@ -59,8 +59,8 @@ const SubprocessorUpdatesForm = () => {
       <p className="text-foreground-light text-sm text-pretty mb-6">
         <strong className="text-foreground">Subscribe to updates</strong>. Receive an email
         notification when Supabase updates its sub-processors. By submitting this form, you
-        acknowledge and agree that Supabase will process your personal information in accordance with
-        our{' '}
+        acknowledge and agree that Supabase will process your personal information in accordance
+        with our{' '}
         <Link
           href="https://supabase.com/privacy"
           className="text-brand-link hover:underline"
