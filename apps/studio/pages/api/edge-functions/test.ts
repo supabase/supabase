@@ -3,6 +3,13 @@ import { NextApiRequest, NextApiResponse } from 'next'
 
 import { isValidEdgeFunctionURL } from '@/lib/api/edgeFunctions'
 
+/**
+ * Main API route handler for testing Edge Functions.
+ * Routes requests based on HTTP method.
+ *
+ * @param {NextApiRequest} req - The incoming HTTP request
+ * @param {NextApiResponse} res - The outgoing HTTP response
+ */
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
 
@@ -20,6 +27,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 }
 
+/**
+ * Handles POST requests to test an Edge Function.
+ * Parses the URL, merges custom headers, executes the fetch call to the function,
+ * and robustly extracts JSON error messages from failed executions.
+ *
+ * @param {NextApiRequest} req - The incoming HTTP request with function test payload
+ * @param {NextApiResponse} res - The outgoing HTTP response forwarding the function result
+ */
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { url: requestUrl, method, body: requestBody, headers: customHeaders } = req.body
@@ -93,10 +108,21 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       // Try to parse error response if it's JSON
       try {
         const errorBody = JSON.parse(responseBody)
+        let errorMessage = 'Edge function returned an error'
+
+        if (typeof errorBody?.error === 'string') {
+          errorMessage = errorBody.error
+        } else if (typeof errorBody?.error?.message === 'string') {
+          errorMessage = errorBody.error.message
+        } else if (typeof errorBody?.message === 'string') {
+          errorMessage = errorBody.message
+        } else if (typeof errorBody?.msg === 'string') {
+          errorMessage = errorBody.msg
+        }
 
         return res.status(response.status).json({
           status: response.status,
-          error: { message: errorBody?.error || 'Edge function returned an error' },
+          error: { message: errorMessage },
         })
       } catch (parseError) {
         // If not JSON, return the raw error
