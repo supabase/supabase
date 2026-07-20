@@ -55,29 +55,14 @@ export default function SubprocessorListPage() {
             </span>
           </div>
 
-          <p className="mt-0">
-            Review the current list of Supabase sub-processors below, or{' '}
-            <a href={PDF_PATH} target="_blank" rel="noopener noreferrer">
-              download the PDF
-            </a>
-            .
-          </p>
+          <p className="mt-0">Download the current list of Supabase sub-processors below.</p>
 
           <div className="not-prose">
             <Button asChild variant="default" icon={<Download />}>
               <a href={PDF_PATH} download target="_blank" rel="noopener noreferrer">
-                Download PDF ({CURRENT_PDF.displayDate})
+                Download the current sub-processor list ({CURRENT_PDF.displayDate})
               </a>
             </Button>
-          </div>
-
-          {/* Inline PDF preview. Download link above is the accessible fallback. */}
-          <div className="not-prose w-full overflow-hidden rounded-lg border bg-surface-75">
-            <iframe
-              src={PDF_PATH}
-              title={`Supabase Subprocessor List (${CURRENT_PDF.displayDate})`}
-              className="h-[70vh] w-full"
-            />
           </div>
         </div>
 
