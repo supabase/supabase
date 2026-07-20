@@ -72,13 +72,16 @@ export const DefaultLayout = ({
   }, [])
 
   useEffect(() => {
-    if (!isMounted || !panelRef.current || !activeSidebar) return
+    // On mobile, LayoutSidebar doesn't render its ResizablePanel (the sidebar is shown in a
+    // sheet instead), leaving panel-content as the group's only panel. Calling collapse()/resize()
+    // on it then throws in react-resizable-panels since there's no sibling panel to resize against.
+    if (!isMounted || !panelRef.current || !activeSidebar || isMobile) return
     if (isMaximised) {
       panelRef.current.collapse()
     } else {
       panelRef.current.resize(`${contentMaxSizePercentage}%`)
     }
-  }, [isMounted, isMaximised, panelRef, activeSidebar])
+  }, [isMounted, isMaximised, panelRef, activeSidebar, isMobile])
 
   // This is required to prevent layout shift when rendering resizable panels (they initially render at 50%, then shift
   // to whatever is specified).
