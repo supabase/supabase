@@ -4,13 +4,12 @@ description: Shared layout guidance for focused authorisation, invite, marketpla
 ---
 
 Connect interstitials are focused, single-card flows that sit outside the main
-Studio shell. Use the shared `InterstitialLayout` family for these surfaces
-instead of building bespoke centered cards, logos, account rows, organisation
-selectors, or transition behaviour.
+Studio shell. Use the shared `InterstitialLayout` family instead of building
+bespoke centered cards, logos, account rows, or organisation selectors.
 
 <ComponentPreview
   name="connect-interstitial-demo"
-  description="Partner authorisation and invite / wrong-account states share the same centered 400px card"
+  description="Centered 400px card with partner branding, account row, and a single primary action"
   align="start"
   className="p-0"
   padded={false}
@@ -20,29 +19,19 @@ selectors, or transition behaviour.
 
 ## Use this pattern for
 
-- Partner authorisation and consent, such as OAuth, MCP, Stripe Projects, or similar handoffs.
-- Organisation invites and lightweight account-gated accept flows.
-- Marketplace and billing connection flows, such as AWS Marketplace, Vercel install, and credit redemption.
-- CLI or device-code sign-in flows that need a verification code and a single next action.
-- Invalid, loading, error, success, and wrong-account states for these routes.
+- Partner authorisation and consent (OAuth, MCP, Stripe Projects)
+- Organisation invites and account-gated accept flows
+- Marketplace and billing connections (AWS Marketplace, Vercel install, credit redemption)
+- CLI or device-code sign-in
+- Loading, error, success, and wrong-account states for these routes
 
-Do not use this pattern for normal authenticated Studio pages. If the route
-belongs in the Studio navigation, use the standard page layout patterns instead.
-
-## For agents
-
-If you are asked to update `/authorize`, `/join`, `/redeem`,
-`/aws-marketplace-onboarding`, `/integrations/vercel/install`, `/cli/login`,
-Stripe Projects, or another short-lived connect flow, start from this pattern
-and the existing Studio helpers. Do not create new local card, logo,
-account-row, or organisation-selector components unless the shared helper is
-missing a real state.
+Do not use this for normal authenticated Studio pages. Those should use the
+standard [page layout](./layout) patterns.
 
 ## Source of truth
 
-The shared implementation lives in Studio:
-
 ```tsx
+import { OrganizationSelector } from '@/components/interfaces/Connect/OrganizationSelector'
 import {
   InterstitialAccountRow,
   InterstitialLayout,
@@ -53,16 +42,11 @@ import {
 } from '@/components/layouts/InterstitialLayout'
 ```
 
-Organisation selection for connect surfaces lives beside the connect helpers:
-
-```tsx
-import { OrganizationSelector } from '@/components/interfaces/Connect/OrganizationSelector'
-```
-
 ## Basic shape
 
 Use `InterstitialLayout` for the outer card, then put route-specific content in
-`px-6 pb-6`.
+`px-6 pb-6`. Widen the card only when the flow embeds a real tool, such as
+project linking.
 
 ```tsx
 <InterstitialLayout
@@ -84,26 +68,10 @@ Use `InterstitialLayout` for the outer card, then put route-specific content in
 </InterstitialLayout>
 ```
 
-For first-party Supabase flows, use the Supabase logo by itself.
-
-```tsx
-<InterstitialLayout
-  logo={<SupabaseLogo />}
-  title="Redeem credits"
-  description="Select the organization that should receive these credits."
->
-  <div className="px-6 pb-6">{children}</div>
-</InterstitialLayout>
-```
-
-For connect flows that need a real embedded tool, such as choosing or creating
-a Vercel project, keep the same interstitial shell and widen only the card.
-
 ```tsx
 <InterstitialLayout
   logo={<LogoPair left={<VercelLogo />} right={<SupabaseLogo />} />}
   title="Connect Vercel project"
-  description="Choose the Supabase project that should receive Vercel environment variables."
   containerClassName="items-start"
   cardClassName="max-w-[900px]"
 >
@@ -113,11 +81,21 @@ a Vercel project, keep the same interstitial shell and widen only the card.
 
 ## Logos
 
-- Use `SupabaseLogo` for Supabase.
-- Use `LogoPair` when the user is connecting two services.
-- Use `PartnerLogo` for partner icons that should fill the 48px logo box.
-- Use `LogoBox` for custom inset marks, Lucide icons, or partner logos that need their own background.
-- Store new partner icons in `apps/studio/public/img/icons` and reference them from the route.
+- Use `LogoPair` when connecting two services.
+- Use `SupabaseLogo` alone for first-party flows.
+- Use `PartnerLogo` for partner icons that should fill the 48px box.
+- Use `LogoBox` for custom inset marks or logos that need their own background.
+- Store new partner icons in `apps/studio/public/img/icons`.
+
+<ComponentPreview
+  name="connect-interstitial-logos"
+  description="LogoPair for partner connect flows vs SupabaseLogo alone for first-party flows"
+  align="start"
+  className="p-0"
+  padded={false}
+  peekCode
+  wide
+/>
 
 ```tsx
 const AwsLogo = () => (
@@ -131,79 +109,34 @@ const AwsLogo = () => (
 
 ## Account row
 
-Use `InterstitialAccountRow` for the signed-in account context. It already uses
-the shared profile image and compact card style.
+Use `InterstitialAccountRow` for signed-in context. Do not recreate it locally.
 
 ```tsx
 <InterstitialAccountRow avatarUrl={avatarUrl} displayName={displayName} action={signOutButton} />
 ```
 
-Only add a custom `className` when the surface needs a subtle state-specific
-background. Do not recreate the account row locally.
-
 ## Organisation selection
 
-Use `OrganizationSelector` when a connect surface needs users to choose an
-organisation. It reuses `OrganizationCard`, keeps selected/unavailable/create
-states consistent, hides unnecessary project-count queries, and supports
-collapsed overflow.
+Use `OrganizationSelector` when the flow needs an organisation pick. Extend it
+for new states instead of inventing a parallel card style.
 
 ```tsx
 <OrganizationSelector
-  description="AWS manages billing and plan changes for the linked organization."
   organizations={linkableOrganizations}
-  unavailableOrganizations={unavailableOrganizations}
   selectedSlug={selectedOrgSlug}
   onSelect={setSelectedOrgSlug}
-  disabled={isSubmitting}
-  getOrganizationDescription={() => 'Organization'}
-  getUnavailableOrganizationDescription={(organization) => getUnavailableReason(organization.slug)}
   createLabel="Create new organization"
   onCreate={() => setShowOrgCreationDialog(true)}
 />
 ```
 
-Do not make a new organisation-card component for these flows. If the selector
-needs a new state, extend `OrganizationSelector` rather than creating a
-parallel card style.
-
-## Actions and states
+## Actions, states, and copy
 
 - Prefer one full-width primary action.
-- Use a full-width text button only for a secondary action that belongs in the flow.
 - Use `Admonition` for warning, error, note, and success copy.
-- Use `success` only for completed states.
 - Use `ShimmeringLoader` inside the same layout for loading states.
-- Keep error and invalid states inside the card instead of redirecting to `/404` or `/500` when the route has enough context to explain the problem.
-
-```tsx
-<Admonition
-  type="warning"
-  title="Wrong account"
-  description="Sign in with the Supabase account that owns this organization, then open the link again."
-/>
-```
-
-## Copy
-
-- Use sentence case.
-- Prefer `sign in` and `sign-in`; avoid `login` in user-facing copy.
-- Use `Verb -> Thing` for route titles and primary actions, for example `Authorize CLI`, `Authorize Stripe Projects`, `Link AWS Marketplace`, `Install Vercel`, or `Redeem credits`.
-- Keep the layout title static across loading, error, and success states. Put state-specific copy in the body with `Admonition`, helper text, or actions.
-- Avoid repeating `Supabase` in the route title when the browser title already ends with `Supabase`.
-- Keep descriptions short and literal.
-- Do not end `InterstitialLayout` header descriptions with a full stop. Treat them like compact UI subtitles, not body paragraphs.
-- Use `organization` in UI strings where the product surface already uses that spelling.
-- Avoid explaining the layout or how to use the page inside the page itself.
-
-## Checklist
-
-Before shipping a new connect surface:
-
-- Does it use `InterstitialLayout` instead of a bespoke centered card?
-- Does it use `LogoBox`, `LogoPair`, `PartnerLogo`, or `SupabaseLogo` for branding?
-- Does it use `InterstitialAccountRow` for signed-in context?
-- If organisations are selectable, does it use `OrganizationSelector` and `OrganizationCard`?
-- Are loading, invalid, error, wrong-account, and success states represented?
-- Is the primary action full-width and singular?
-- Is copy short, sentence-case, and free of `login`?
+- Keep invalid and error states in the card when the route can explain them.
+- Sentence case. Prefer `sign in` over `login`.
+- Use `Verb -> Thing` titles and actions (`Authorize Stripe Projects`, `Install Vercel`).
+- Keep the layout title static across states; put state-specific copy in the body.
+- Do not end header descriptions with a full stop.
