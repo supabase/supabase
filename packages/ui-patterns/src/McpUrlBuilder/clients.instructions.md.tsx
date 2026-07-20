@@ -92,14 +92,19 @@ export const MCP_CLIENT_INSTRUCTIONS: Record<string, McpClientInstructions> = {
     alternate: () => (
       <>
         <paragraph>
-          Restart Kimi Code (or reload MCP servers) to pick up the new configuration. Kimi will
-          prompt you to complete the Supabase OAuth flow the first time it connects.
-        </paragraph>
-        <paragraph>
           Place the file at <inlineCode value="<cwd>/.kimi-code/mcp.json" /> for the current
           project, or under <inlineCode value="$KIMI_CODE_HOME" /> (defaults to{' '}
           <inlineCode value="~/.kimi-code" />) to make it available globally.
         </paragraph>
+        <paragraph>
+          Restart Kimi Code (or start a new session) to load the server, then check its status by
+          running:
+        </paragraph>
+        <code lang="bash" value="/mcp" />
+        <paragraph>
+          To configure MCP servers and complete the Supabase OAuth login interactively, run:
+        </paragraph>
+        <code lang="bash" value="/mcp-config" />
       </>
     ),
   },
