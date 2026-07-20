@@ -92,6 +92,7 @@ interface ProjectCreationFormProps {
  *  - "Cancel" button
  * - Shows the following:
  *  - "Data seeding" section
+ *  - Sandwiched note that the integration can be removed anytime
  * Eventually we could looking into reducing the differences more, e.g having data seeding
  * for both ways, and showing GitHub repository field for Vercel integration
  */
@@ -667,7 +668,13 @@ export const ProjectCreationForm = ({
                       <AdvancedConfiguration form={form} />
                     )}
 
-                    {shouldShowFreeProjectInfo ? (
+                    {isVercelIntegrationFlow ? (
+                      <Admonition
+                        className="rounded-none border-0"
+                        type="note"
+                        description="You can remove this integration at any time from Vercel or the Supabase dashboard."
+                      />
+                    ) : shouldShowFreeProjectInfo ? (
                       <Admonition
                         className="rounded-none border-0"
                         type="note"

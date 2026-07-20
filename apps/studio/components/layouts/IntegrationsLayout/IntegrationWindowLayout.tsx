@@ -1,5 +1,4 @@
-import { Book, LifeBuoy, X } from 'lucide-react'
-import Link from 'next/link'
+import { X } from 'lucide-react'
 import { forwardRef, PropsWithChildren, ReactNode } from 'react'
 import { cn, LoadingLine } from 'ui'
 
@@ -11,7 +10,6 @@ export type IntegrationWindowLayoutProps = {
   title: string
   integrationIcon: ReactNode
   loading?: boolean
-  docsHref?: string
 }
 
 const IntegrationWindowLayout = ({
@@ -19,35 +17,12 @@ const IntegrationWindowLayout = ({
   integrationIcon,
   children,
   loading = false,
-  docsHref,
 }: PropsWithChildren<IntegrationWindowLayoutProps>) => {
   return (
     <div className="flex w-full flex-col">
       <Header title={title} integrationIcon={integrationIcon} />
       <LoadingLine loading={loading} />
       <main className="overflow-auto flex flex-col h-full bg">{children}</main>
-      <ScaffoldContainer className="bg-studio flex flex-row gap-6 py-6 border-t">
-        {docsHref && (
-          <Link
-            href={docsHref}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-xs text-foreground-light hover:text"
-          >
-            <Book size={16} />
-            Docs
-          </Link>
-        )}
-        <Link
-          href={'https://supabase.com/support'}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 text-xs text-light hover:text"
-        >
-          <LifeBuoy size={16} />
-          Support
-        </Link>
-      </ScaffoldContainer>
     </div>
   )
 }

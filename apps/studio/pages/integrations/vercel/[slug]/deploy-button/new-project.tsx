@@ -1,6 +1,5 @@
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
-import { Admonition } from 'ui-patterns/admonition'
 
 import { isVercelUrl } from '@/components/interfaces/Integrations/Vercel/VercelIntegration.utils'
 import { ProjectCreationForm } from '@/components/interfaces/ProjectCreation/ProjectCreationForm'
@@ -93,13 +92,6 @@ const VercelIntegration: NextPageWithLayout = () => {
   return (
     <ScaffoldContainer className="flex flex-col gap-6 grow py-8">
       <ScaffoldColumn className="mx-auto w-full max-w-2xl">
-        <Admonition
-          type="default"
-          layout="horizontal"
-          title="You can uninstall this Integration at any time."
-          description="You can remove this integration at any time via Vercel or the Supabase dashboard"
-        />
-
         <ProjectCreationForm isVercelIntegrationFlow onCreateSuccess={setNewProjectRef} />
       </ScaffoldColumn>
     </ScaffoldContainer>

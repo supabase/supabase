@@ -22,12 +22,7 @@ const VercelIntegrationWindowLayout = ({ children }: PropsWithChildren<{}>) => {
     : 'Supabase + Vercel Integration Marketplace Connector'
 
   return (
-    <IntegrationWindowLayout
-      title={title}
-      integrationIcon={VERCEL_ICON}
-      loading={snapshot.loading}
-      docsHref="https://supabase.com/partners/integrations/vercel"
-    >
+    <IntegrationWindowLayout title={title} integrationIcon={VERCEL_ICON} loading={snapshot.loading}>
       {children}
     </IntegrationWindowLayout>
   )
