@@ -1399,6 +1399,11 @@ export const examples: Registry = [
     files: ['example/page-layout-settings.tsx'],
   },
   {
+    name: 'connect-interstitial-demo',
+    type: 'components:example',
+    files: ['example/connect-interstitial-demo.tsx'],
+  },
+  {
     name: 'page-layout-auth-emails',
     type: 'components:example',
     files: ['example/page-layout-auth-emails.tsx'],
