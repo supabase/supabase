@@ -14,7 +14,7 @@ export const QueryPanelSection = ({
   children,
   className,
 }: PropsWithChildren<{ className?: string }>) => (
-  <div className={cn('px-6 flex flex-col gap-y-0', className)}>{children}</div>
+  <div className={cn('flex flex-col gap-y-0', className)}>{children}</div>
 )
 
 export const QueryPanelScoreSection = ({

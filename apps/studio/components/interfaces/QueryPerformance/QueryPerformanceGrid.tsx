@@ -617,7 +617,7 @@ export const QueryPerformanceGrid = ({
                 className="flex flex-col h-full"
                 onValueChange={(value: any) => setView(value)}
               >
-                <div className="px-5 border-b">
+                <div className="border-b">
                   <TabsList className="px-0 flex gap-x-4 min-h-[46px] border-b-0 [&>button]:h-[47px]">
                     <TabsTrigger
                       value="details"
