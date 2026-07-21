@@ -256,7 +256,7 @@ const VercelIntegration: NextPageWithLayout = () => {
 
       <InterstitialLayout
         logo={<VercelIntegrationLogo />}
-        title="Install Vercel Integration"
+        title="Install Vercel integration"
         description="Choose the Supabase organization Vercel can connect to"
         footer={<VercelIntegrationFooter />}
       >
