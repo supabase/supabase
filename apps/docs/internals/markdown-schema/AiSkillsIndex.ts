@@ -15,7 +15,13 @@ export const AiSkillsIndex = (): string => {
   return skills
     .map(
       (skill) =>
-        `### ${skill.name}\n\n${skill.description}\n\n\`\`\`sh\n${skill.installCommand}\n\`\`\``
+        `### ${skill.name}
+      
+${skill.description}
+      
+\`\`\`sh
+${skill.installCommand}
+\`\`\``
     )
     .join('\n\n')
 }
