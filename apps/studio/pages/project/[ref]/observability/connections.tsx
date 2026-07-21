@@ -48,7 +48,7 @@ export const DatabaseConnections: NextPageWithLayout = () => {
 
 DatabaseConnections.getLayout = (page) => (
   <DefaultLayout>
-    <ObservabilityLayout title="API Gateway">{page}</ObservabilityLayout>
+    <ObservabilityLayout title="Database Connections">{page}</ObservabilityLayout>
   </DefaultLayout>
 )
 
