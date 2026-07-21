@@ -9,7 +9,7 @@ interface Props {
   size?: 'sm' | 'md'
 }
 
-const MAX_VISIBLE_AVATARS = 3
+const MAX_VISIBLE_AVATARS = 4
 
 export default function AuthorAvatars({ authors, showName = true, size = 'sm' }: Props) {
   const valid = authors.filter(Boolean) as Author[]
@@ -21,11 +21,11 @@ export default function AuthorAvatars({ authors, showName = true, size = 'sm' }:
 
   const nameLabel =
     valid.length > 2
-      ? `${valid[0].author} +${valid.length - 1} other${valid.length - 1 > 1 ? 's' : ''}`
+      ? `${valid[0].author}, +${valid.length - 1} other${valid.length - 1 > 1 ? 's' : ''}`
       : allNames
 
   const content = (
-    <div className="flex items-center gap-2 min-w-0" tabIndex={valid.length >= 2 ? 0 : undefined}>
+    <div className="flex items-center gap-2 min-w-0" tabIndex={0}>
       <div className="flex items-center -space-x-1.5 shrink-0">
         {visibleAvatars.map((author, i) => (
           <div key={i} className={`relative ${px} rounded-full bg-background shrink-0 p-px`}>
@@ -50,12 +50,10 @@ export default function AuthorAvatars({ authors, showName = true, size = 'sm' }:
     </div>
   )
 
-  if (valid.length < 2) return content
-
   return (
     <Tooltip>
       <TooltipTrigger asChild>{content}</TooltipTrigger>
-      <TooltipContent side="bottom" className="max-w-[300px]">
+      <TooltipContent side="bottom" className="max-w-[260px]">
         {allNames}
       </TooltipContent>
     </Tooltip>
