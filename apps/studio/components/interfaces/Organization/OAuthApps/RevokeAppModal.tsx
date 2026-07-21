@@ -13,6 +13,7 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useAuthorizedAppRevokeMutation } from '@/data/oauth/authorized-app-revoke-mutation'
 import type { AuthorizedApp } from '@/data/oauth/authorized-apps-query'
 
@@ -75,8 +76,13 @@ export const RevokeAppModal = ({
                       </li>
                       <li className="list-disc ml-4">
                         The application may also have a <strong>Secret API key</strong> with access.
-                        Go to the project where it was installed, open Integrations, and remove any
-                        listed Secret API key to fully revoke its access.
+                        Go to the{' '}
+                        <InlineLink
+                          href={`/dashboard/project/_/integrations/${selectedApp?.id}/settings`}
+                        >
+                          Integration's page
+                        </InlineLink>
+                        , and remove any listed Secret API key to fully revoke its access.
                       </li>
                     </ul>
                   </div>
