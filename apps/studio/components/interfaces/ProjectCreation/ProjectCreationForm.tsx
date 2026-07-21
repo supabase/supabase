@@ -8,7 +8,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useForm, useFormState } from 'react-hook-form'
 import { type CloudProvider } from 'shared-data'
 import { toast } from 'sonner'
-import { Button, Form, useWatch } from 'ui'
+import { Button, cn, Form, useWatch } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { z } from 'zod'
@@ -584,13 +584,11 @@ export const ProjectCreationForm = ({
         <Panel
           loading={!isOrganizationsSuccess}
           noMargin={isVercelIntegrationFlow}
-          className={
-            isVercelIntegrationFlow ? 'border-0 shadow-none rounded-none bg-transparent' : undefined
-          }
+          className={cn(
+            !isVercelIntegrationFlow && 'border-0 shadow-none rounded-none bg-transparent'
+          )}
           title={
-            isVercelIntegrationFlow ? (
-              false
-            ) : (
+            !isVercelIntegrationFlow && (
               <div key="panel-title">
                 <h3>Create a new project</h3>
                 <p className="text-sm text-foreground-lighter text-balance">
