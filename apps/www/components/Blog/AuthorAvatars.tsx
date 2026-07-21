@@ -1,5 +1,6 @@
 import Image from 'next/image'
 
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import type Author from '@/types/author'
 
 interface Props {
@@ -16,14 +17,14 @@ export default function AuthorAvatars({ authors, showName = true, size = 'sm' }:
 
   const px = size === 'md' ? 'w-6 h-6' : 'w-5 h-5'
   const visibleAvatars = valid.slice(0, MAX_VISIBLE_AVATARS)
-  const hiddenCount = valid.length - visibleAvatars.length
+  const allNames = valid.map((a) => a.author).join(', ')
 
   const nameLabel =
     valid.length > 2
       ? `${valid[0].author} +${valid.length - 1} other${valid.length - 1 > 1 ? 's' : ''}`
-      : valid.map((a) => a.author).join(', ')
+      : allNames
 
-  return (
+  const content = (
     <div className="flex items-center gap-2 min-w-0">
       <div className="flex items-center -space-x-1.5 shrink-0">
         {visibleAvatars.map((author, i) => (
@@ -44,22 +45,21 @@ export default function AuthorAvatars({ authors, showName = true, size = 'sm' }:
             </div>
           </div>
         ))}
-        {hiddenCount > 0 && (
-          <div
-            className={`relative ${px} rounded-full bg-background shrink-0 p-px`}
-            aria-hidden="true"
-          >
-            <div className="w-full h-full rounded-full border border-foreground/20 bg-surface-300 flex items-center justify-center">
-              <span className="text-foreground-lighter text-[9px] leading-none">
-                +{hiddenCount}
-              </span>
-            </div>
-          </div>
-        )}
       </div>
       {showName && (
         <p className="text-foreground-lighter text-xs truncate min-w-0">{nameLabel}</p>
       )}
     </div>
+  )
+
+  if (valid.length < 2) return content
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{content}</TooltipTrigger>
+      <TooltipContent side="bottom" className="max-w-[300px]">
+        {allNames}
+      </TooltipContent>
+    </Tooltip>
   )
 }
