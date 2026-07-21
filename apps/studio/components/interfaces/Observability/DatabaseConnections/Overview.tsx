@@ -209,7 +209,7 @@ export const Overview = ({ live, refreshTimestamp }: OverviewProps) => {
             <MetricCardValue
               className={cn(
                 longestRunningQuery === null && 'text-foreground-lighter',
-                queryRunningLongWarning && 'text-warning'
+                queryRunningLongWarning && longestRunningQuery.activity.state === 'active' ? 'text-warning' : 'text-destructive'
               )}
             >
               {longestRunningQuery === null ? '-' : `${longestRunningQuery.duration}s`}
