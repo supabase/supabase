@@ -105,6 +105,7 @@ export const PolicyEditorPanelHeader = ({
       <Tooltip>
         <TooltipTrigger asChild>
           <button
+            tabIndex={0}
             aria-expanded={showTools}
             aria-controls="ai-chat-assistant"
             className={cn(

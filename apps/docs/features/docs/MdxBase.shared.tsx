@@ -5,8 +5,8 @@ import AuthProviders from '~/components/AuthProviders'
 import { AuthSmsProviderConfig } from '~/components/AuthSmsProviderConfig'
 import ButtonCard from '~/components/ButtonCard'
 import { ComputeDiskLimitsTable } from '~/components/ComputeDiskLimitsTable'
-import { CustomContent } from '~/components/CustomContent'
 import { ContentListings } from '~/components/ContentListings'
+import { CustomContent } from '~/components/CustomContent'
 import { Extensions } from '~/components/Extensions'
 import Image, { type ImageProps } from '~/components/Image'
 import { McpCiConfigBlock } from '~/components/McpCiConfigBlock'
@@ -40,6 +40,7 @@ import { Heading } from 'ui/src/components/CustomHTMLElements'
 import { AgentPluginsPanel } from '../ui/AgentPluginsPanel'
 import { ErrorCodes } from '../ui/ErrorCodes'
 import { McpConfigPanel } from '../ui/McpConfigPanel'
+import { Prompt, PromptContent, PromptCopy, PromptPanel, PromptTitle } from '../ui/PromptPanel'
 
 // Wrap Admonition for Docs-specific styling (within MDX prose, requires a margin-bottom)
 const AdmonitionWithMargin = (props: AdmonitionProps) => {
@@ -96,6 +97,11 @@ const components = {
   NamedCodeBlock,
   NavData,
   ProjectConfigVariables,
+  Prompt,
+  PromptContent,
+  PromptCopy,
+  PromptPanel,
+  PromptTitle,
   RealtimeLimitsEstimator,
   RegionsList,
   SmartRegionsList,

@@ -77,6 +77,15 @@ export const ConnectSection = () => {
               <button
                 key={action.id}
                 type="button"
+                tabIndex={
+                  (action.requiresActiveProject ?? true)
+                    ? !isActiveHealthy
+                      ? -1
+                      : 0
+                    : !selectedProject?.ref
+                      ? -1
+                      : 0
+                }
                 disabled={
                   (action.requiresActiveProject ?? true) ? !isActiveHealthy : !selectedProject?.ref
                 }

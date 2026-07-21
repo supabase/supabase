@@ -28,6 +28,7 @@ import { MetricsStackCards } from './markdown-schema/MetricsStackCards'
 import { NavData } from './markdown-schema/NavData'
 import { Panel } from './markdown-schema/Panel'
 import { Price } from './markdown-schema/Price'
+import { PromptPanel } from './markdown-schema/PromptPanel'
 import { RealtimeLimitsEstimator } from './markdown-schema/RealtimeLimitsEstimator'
 import { RegionsList, SmartRegionsList } from './markdown-schema/RegionsList'
 import { SharedData } from './markdown-schema/SharedData'
@@ -174,6 +175,7 @@ const SCHEMA: ComponentSchema = {
   McpCiConfigBlock,
   McpConfigPanel,
   Price,
+  ...PromptPanel,
   GlassPanel: Panel,
   IconPanel: Panel,
   RealtimeLimitsEstimator,

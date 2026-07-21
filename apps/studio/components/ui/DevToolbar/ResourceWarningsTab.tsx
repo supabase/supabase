@@ -138,6 +138,7 @@ export const ResourceWarningsTab = () => {
         <button
           onClick={handleReset}
           disabled={isDisabled}
+          tabIndex={isDisabled ? -1 : 0}
           className="text-xs text-foreground-lighter hover:text-foreground transition underline disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Reset to real data
@@ -157,6 +158,7 @@ export const ResourceWarningsTab = () => {
             <SeverityButton
               active={!isReadOnly}
               variant="off"
+              disabled={isDisabled}
               onClick={() => handleReadOnlyChange(false)}
             >
               Off
@@ -164,6 +166,7 @@ export const ResourceWarningsTab = () => {
             <SeverityButton
               active={isReadOnly}
               variant="critical"
+              disabled={isDisabled}
               onClick={() => handleReadOnlyChange(true)}
             >
               On
@@ -178,6 +181,7 @@ export const ResourceWarningsTab = () => {
               <SeverityButton
                 active={severities[key] === null}
                 variant="off"
+                disabled={isDisabled}
                 onClick={() => handleSeverityChange(key, null)}
               >
                 Off
@@ -185,6 +189,7 @@ export const ResourceWarningsTab = () => {
               <SeverityButton
                 active={severities[key] === 'warning'}
                 variant="warning"
+                disabled={isDisabled}
                 onClick={() => handleSeverityChange(key, 'warning')}
               >
                 Warn
@@ -193,6 +198,7 @@ export const ResourceWarningsTab = () => {
                 <SeverityButton
                   active={severities[key] === 'critical'}
                   variant="critical"
+                  disabled={isDisabled}
                   onClick={() => handleSeverityChange(key, 'critical')}
                 >
                   Crit
@@ -209,13 +215,17 @@ export const ResourceWarningsTab = () => {
 interface SeverityButtonProps {
   active: boolean
   variant: 'off' | 'warning' | 'critical'
+  disabled?: boolean
   onClick: () => void
   children: React.ReactNode
 }
 
-const SeverityButton = ({ active, variant, onClick, children }: SeverityButtonProps) => (
+const SeverityButton = ({ active, variant, disabled, onClick, children }: SeverityButtonProps) => (
   <button
+    type="button"
     onClick={onClick}
+    disabled={disabled}
+    tabIndex={disabled ? -1 : 0}
     className={cn(
       'px-1.5 py-0.5 rounded-sm text-xs font-mono transition border',
       active
@@ -224,7 +234,8 @@ const SeverityButton = ({ active, variant, onClick, children }: SeverityButtonPr
           : variant === 'warning'
             ? 'bg-warning/20 text-warning border-warning'
             : 'bg-destructive/20 text-destructive border-destructive'
-        : 'bg-transparent text-foreground-muted border-transparent hover:border-border'
+        : 'bg-transparent text-foreground-muted border-transparent hover:border-border',
+      disabled && 'opacity-50 cursor-not-allowed'
     )}
   >
     {children}

@@ -1,19 +1,14 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
-import VercelIntegrationWindowLayout from '@/components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
-
 export const Route = createFileRoute('/integrations/vercel')({
-  component: VercelIntegrationShell,
+  component: VercelIntegrationPassthrough,
 })
 
-// Placed at top-level rather than under _app — Next getLayout for all
-// three leaves only wraps in VercelIntegrationWindowLayout (no AppLayout
-// or DefaultLayout), so adding _app's chrome here would be a behaviour
-// change.
-function VercelIntegrationShell() {
-  return (
-    <VercelIntegrationWindowLayout>
-      <Outlet />
-    </VercelIntegrationWindowLayout>
-  )
+// No shared layout here. Since #47623, the install and
+// marketplace/choose-project pages render their own InterstitialLayout and
+// have no Next getLayout, so the Next runtime shows them without any window
+// chrome. Only deploy-button/new-project still uses
+// VercelIntegrationWindowLayout, and its route wraps it at the leaf.
+function VercelIntegrationPassthrough() {
+  return <Outlet />
 }

@@ -1,7 +1,9 @@
+import { useParams } from 'common'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Badge, Card } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { Markdown } from '@/components/interfaces/Markdown'
+import { InlineLink } from '@/components/ui/InlineLink'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
 interface ValidationFailuresSectionProps {
@@ -13,6 +15,7 @@ export const ValidationFailuresSection = ({
   destinationFailures,
   pipelineFailures,
 }: ValidationFailuresSectionProps) => {
+  const { ref: projectRef } = useParams()
   const validationIssues = [...destinationFailures, ...pipelineFailures].sort((a, _b) =>
     a.failure_type === 'critical' ? -1 : 1
   )
@@ -37,6 +40,18 @@ export const ValidationFailuresSection = ({
         {hasCriticalFailures
           ? `Please fix all required issues below${hasWarnings ? ' and review the others' : ''} before continuing.`
           : 'The following issues were identified, although you may still create the pipeline and start replication to the destination.'}
+      </p>
+      <p className="text-sm text-foreground-light mb-2!">
+        Pipeline options are under <strong>Advanced settings</strong> above. Source database
+        settings are under{' '}
+        {projectRef ? (
+          <InlineLink href={`/project/${projectRef}/database/settings`}>
+            Database settings
+          </InlineLink>
+        ) : (
+          'Database settings'
+        )}
+        .
       </p>
       <Card>
         <Accordion type="multiple">

@@ -274,7 +274,10 @@ const buildBaseWhere = (
     if (logTypeFilter) {
       const condition = translateFilter('log_type', logTypeFilter.values, logTypeFilter.operator)
       if (condition) parts.push(condition)
-    } else {
+    } else if (!userFilterValue(search)) {
+      // Skip the default (postgres|edge) source restriction while the user filter is
+      // active — the user clause governs which sources are eligible (auth + postgres),
+      // and the default would otherwise exclude auth_logs, the primary attributable source.
       parts.push(logTypeWhereCondition([...DEFAULT_LOG_TYPES]))
     }
   }
@@ -314,8 +317,70 @@ const EDGE_SERVICE_PATH_FILTER: Record<'edge_auth' | 'edge_storage' | 'edge_post
  * so the row list, chart and sidebar facet counts stay in sync (otherwise the
  * badges over-count by the rows the list hides).
  */
+/** Trimmed value of the cross-cutting user filter, or '' when inactive. */
+const userFilterValue = (search: QuerySearchParamsType): string =>
+  typeof search.user === 'string' ? search.user.trim() : ''
+
+/**
+ * Cross-cutting "attributable to one user" condition. Only the two sources that can
+ * be positively tied to a user are eligible, each with its own match:
+ *   - auth_logs: structured identity (`auth_event.actor_id`)
+ *   - postgres_logs: the identifier appears verbatim in the error text (e.g. a 23502
+ *     failing row echoing the id column).
+ * edge_logs / storage_logs / realtime_logs carry no per-user field and can't satisfy
+ * either branch, so they're auto-excluded while the filter is active — never guessed
+ * at via IP or timestamp proximity.
+ */
+const userAttributionCondition = (search: QuerySearchParamsType): SafeLogSqlFragment | null => {
+  const value = userFilterValue(search)
+  if (!value) return null
+  const exact = lit(value)
+  const contains = lit('%' + value + '%')
+  return safeSql`(
+    (source = 'auth_logs' AND (
+      log_attributes['auth_event.actor_id'] = ${exact}
+      OR event_message ILIKE ${contains}
+    ))
+    OR (source = 'postgres_logs' AND event_message ILIKE ${contains})
+  )`
+}
+
+const USER_ATTRIBUTABLE_SOURCES = new Set([LOG_TYPE_TO_SOURCE.auth, LOG_TYPE_TO_SOURCE.postgres])
+
+/**
+ * True when the user filter is active but an explicit log_type filter restricts the
+ * view to source(s) that can never satisfy `userAttributionCondition` (e.g. `edge`) —
+ * the combination is guaranteed to match zero rows. Consumed by the UI to show a
+ * specific empty state instead of the generic "No results found".
+ *
+ * [Joshen] Basically filtering by user only works on Auth and Postgres logs atm
+ * Refer to userAttributeCondition above
+ */
+export const isUserFilterUnreachable = (search: QuerySearchParamsType): boolean => {
+  if (!userFilterValue(search)) return false
+
+  const logTypeFilter = groupLogsFiltersByColumn(parseLogsFilterUrlParams(search.filter)).log_type
+  if (!logTypeFilter) return false
+
+  const sources = logTypeFilter.values.map(
+    (v) => LOG_TYPE_TO_SOURCE[v as keyof typeof LOG_TYPE_TO_SOURCE] ?? v
+  )
+
+  if (logTypeFilter.operator === '<>') {
+    // Excludes these sources from view — unreachable only if both attributable
+    // sources are excluded (excluding just one still leaves the other eligible).
+    return [...USER_ATTRIBUTABLE_SOURCES].every((source) => sources.includes(source))
+  }
+
+  // Restricts the view to these sources — unreachable unless at least one is attributable.
+  return !sources.some((source) => USER_ATTRIBUTABLE_SOURCES.has(source))
+}
+
 const applySearchParamsFilter = (search: QuerySearchParamsType): SafeLogSqlFragment | null => {
   const conditions: SafeLogSqlFragment[] = []
+
+  const userCondition = userAttributionCondition(search)
+  if (userCondition) conditions.push(userCondition)
 
   // Visible by default — only an explicit `false` hides connection logs.
   if (search.show_connection_logs === false) {

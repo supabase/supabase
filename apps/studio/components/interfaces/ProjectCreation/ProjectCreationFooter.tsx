@@ -29,6 +29,7 @@ interface ProjectCreationFooterProps {
   organizationProjects: OrgProject[]
   isCreatingNewProject: boolean
   isSuccessNewProject: boolean
+  hideCancelButton: boolean
 }
 
 export const ProjectCreationFooter = ({
@@ -38,6 +39,7 @@ export const ProjectCreationFooter = ({
   organizationProjects,
   isCreatingNewProject,
   isSuccessNewProject,
+  hideCancelButton,
 }: ProjectCreationFooterProps) => {
   const router = useRouter()
   const { data: currentOrg } = useSelectedOrganizationQuery()
@@ -167,16 +169,18 @@ export const ProjectCreationFooter = ({
       </div>
 
       <div className="flex items-end col-span-8 space-x-2 ml-auto">
-        <Button
-          variant="default"
-          disabled={isCreatingNewProject || isSuccessNewProject}
-          onClick={() => {
-            if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
-            else router.push('/organizations')
-          }}
-        >
-          Cancel
-        </Button>
+        {!hideCancelButton && (
+          <Button
+            variant="default"
+            disabled={isCreatingNewProject || isSuccessNewProject}
+            onClick={() => {
+              if (!!lastVisitedOrganization) router.push(`/org/${lastVisitedOrganization}`)
+              else router.push('/organizations')
+            }}
+          >
+            Cancel
+          </Button>
+        )}
         <Button
           type="submit"
           loading={isCreatingNewProject || isSuccessNewProject}
