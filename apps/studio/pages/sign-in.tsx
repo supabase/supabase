@@ -14,6 +14,7 @@ import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useEnabledIdentityProviders } from '@/hooks/misc/useEnabledIdentityProviders'
 import { useInboundBranding } from '@/hooks/misc/useInboundBranding'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSiwcQueryParamOptIn } from '@/hooks/misc/useSiwcQueryParamOptIn'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ExternalIdentityProviderConfig } from '@/lib/external-identity-providers'
 import type { NextPageWithLayout } from '@/types'
@@ -42,6 +43,7 @@ const SignInPage: NextPageWithLayout = () => {
   const customProviders = customProvidersNew ?? (customProvider ? [customProvider] : [])
 
   const { focusProvider } = useInboundBranding('sign-in')
+  useSiwcQueryParamOptIn()
   const signInProviders = useEnabledIdentityProviders().filter((provider) => provider.showOnSignIn)
 
   const renderAuthOptions = (
