@@ -25,7 +25,6 @@ import { IconCheck, IconX } from './markdown-schema/Icons'
 import { Image } from './markdown-schema/Image'
 import { Link } from './markdown-schema/Link'
 import { McpCiConfigBlock } from './markdown-schema/McpCiConfigBlock'
-import { LogDrainDestinationCards } from './markdown-schema/LogDrainDestinationCards'
 import { MetricsStackCards } from './markdown-schema/MetricsStackCards'
 import { NavData } from './markdown-schema/NavData'
 import { Panel } from './markdown-schema/Panel'
@@ -187,7 +186,6 @@ const SCHEMA: ComponentSchema = {
   SmartRegionsList,
   ...StepHike,
   TabPanel,
-  LogDrainDestinationCards,
   MetricsStackCards,
   ContentListings,
   NavData,
