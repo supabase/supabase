@@ -337,11 +337,6 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
                               value={field.value}
                               disabled={field.disabled}
                               onValueChange={(value) => {
-                                // Reset the snippet field when the function type changes, otherwise users might
-                                // see SQL to call an edge_function, database function or http function and this
-                                // SQL might be incomplete or full of undefined depending on how far they went
-                                // in configuring the previous type inputs
-                                form.setValue('values.snippet', '')
                                 field.onChange(value)
 
                                 if (value === 'http_request' || value === 'edge_function') {
