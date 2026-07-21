@@ -892,9 +892,9 @@ functions:
       Signs in a user by verifying a message signed with their Web3 wallet.
     notes: |
       - Supports Ethereum (Sign-In with Ethereum) and Solana (Sign-In with Solana), both of which derive from the [EIP-4361](https://eips.ethereum.org/EIPS/eip-4361) standard.
-      - Wallet interaction and message signing are performed by the caller using their wallet library of choice. Provide the signed `message` together with its `signature`.
+      - Handle the wallet interaction and message signing yourself with the wallet library of your choice, then provide the signed `message` together with its `signature`.
       - For `Web3Chain.ethereum` the signature is a hex encoded string. For `Web3Chain.solana` it is a base64url encoded string.
-      - On success a session is returned and the user is signed in. On failure an `AuthException` is thrown.
+      - On success, it signs the user in and returns a session. On failure, it throws an `AuthException`.
     params:
       - name: chain
         isOptional: false
@@ -3256,7 +3256,7 @@ functions:
       - name: abortSignal
         isOptional: true
         type: Future<void>
-        description: Cancels the in-flight request when the provided `Future` completes. It must not complete with an error. On abort, a `RequestAbortedException` is thrown. Useful for cancelling a request in response to an event or for setting a request timeout.
+        description: Cancels the in-flight request when the provided `Future` completes. It must not complete with an error. On abort, an `http.RequestAbortedException` (from `package:http`) is thrown. Useful for cancelling a request in response to an event or for setting a request timeout.
     examples:
       - id: basic-invocation
         name: Basic invocation.
@@ -3284,9 +3284,11 @@ functions:
       - id: aborting-a-request
         name: Aborting a request
         description: |
-          Pass an `abortSignal` to cancel the in-flight request. When the `Future` completes the request is aborted and a `RequestAbortedException` is thrown. A `Future.delayed` gives you a per-invocation timeout.
+          Pass an `abortSignal` to cancel the in-flight request. When the `Future` completes the request is aborted and an `http.RequestAbortedException` (from `package:http`) is thrown. A `Future.delayed` gives you a per-invocation timeout.
         code: |
           ```dart
+          import 'package:http/http.dart' as http;
+
           try {
             final res = await supabase.functions.invoke(
               'hello',
@@ -3294,7 +3296,7 @@ functions:
               abortSignal: Future.delayed(const Duration(seconds: 5)),
             );
             final data = res.data;
-          } on RequestAbortedException catch (error) {
+          } on http.RequestAbortedException catch (error) {
             print('Request was aborted: $error');
           }
           ```
