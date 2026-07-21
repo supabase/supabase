@@ -97,7 +97,7 @@ export async function getDatabaseActivity(
   )
 
   return (result ?? []).filter(
-    (x: DatabaseActivity) => !x.query.startsWith(sql)
+    (x: DatabaseActivity) => !x.query?.startsWith(sql)
   ) as DatabaseActivity[]
 }
 
