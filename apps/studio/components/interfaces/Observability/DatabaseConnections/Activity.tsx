@@ -1,8 +1,8 @@
 import dayjs from 'dayjs'
 import { isEqual } from 'lodash'
 import { Minus, MoreVertical, StopCircle } from 'lucide-react'
-import { parseAsArrayOf, parseAsJson, parseAsString, useQueryState } from 'nuqs'
-import { useEffect, useState } from 'react'
+import { parseAsArrayOf, parseAsInteger, parseAsJson, parseAsString, useQueryState } from 'nuqs'
+import { Fragment, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
   AlertDialog,
@@ -29,6 +29,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -36,6 +39,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { ReportsSelectFilter, selectFilterSchema } from '../../Reports/v2/ReportsSelectFilter'
 import { formatDuration } from '@/components/interfaces/QueryPerformance/QueryPerformance.utils'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useDatabaseActivityQuery, type DatabaseActivity } from '@/data/database/activity-query'
 import { useQueryAbortMutation } from '@/data/sql/abort-query-mutation'
@@ -66,6 +70,7 @@ export const Activity = ({ live }: ActivityProps) => {
   const { data: project } = useSelectedProjectQuery()
 
   const [, setNow] = useState(() => dayjs())
+  const [selectedPid] = useQueryState('pid', parseAsInteger)
   const [stateFilter, setStateFilter] = useQueryState(
     'state',
     parseAsJson(selectFilterSchema.parse).withDefault([])
@@ -77,7 +82,7 @@ export const Activity = ({ live }: ActivityProps) => {
 
   const hasNoFiltersApplied = stateFilter.length === 0 && isEqual(rolesFilter, DEFAULT_ROLES_FILTER)
 
-  const { data, isPending } = useDatabaseActivityQuery(
+  const { data, isPending, isSuccess } = useDatabaseActivityQuery(
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -144,6 +149,14 @@ export const Activity = ({ live }: ActivityProps) => {
     const interval = setInterval(() => setNow(dayjs()), 1000)
     return () => clearInterval(interval)
   }, [])
+
+  useEffect(() => {
+    if (selectedPid && isSuccess) {
+      document
+        .getElementById(selectedPid.toString())
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [selectedPid, isSuccess])
 
   return (
     <div className="flex flex-col gap-y-4">
@@ -245,6 +258,12 @@ export const Activity = ({ live }: ActivityProps) => {
 const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
   const { data: project } = useSelectedProjectQuery()
   const [showTerminateConfirmDialog, setShowTerminateConfirmDialog] = useState(false)
+  const [selectedPid, setSelectedPid] = useQueryState('pid', parseAsInteger)
+
+  const { data } = useDatabaseActivityQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const { data: roles } = useDatabaseRolesQuery({
     projectRef: project?.ref,
@@ -288,7 +307,10 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
   return (
     <>
       <TableRow id={activity.pid.toString()} key={activity.pid}>
-        <TableCell>
+        <TableCell className="relative">
+          {selectedPid === activity.pid && (
+            <div className="absolute h-full bg-brand top-0 left-0 w-1 bg-foreground-lighter"></div>
+          )}
           <Badge variant={getBadgeVariant(activity.state)}>{activity.state}</Badge>
         </TableCell>
         <TableCell className="max-w-[300px]">
@@ -339,13 +361,45 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
 
         <TableCell>
           {activity.blocked_by.length > 0 ? (
-            activity.blocked_by.join(', ')
+            activity.blocked_by.map((pid, index) => {
+              const blockedProcess = data?.find((x) => x.pid === pid)
+
+              return (
+                <Fragment key={pid}>
+                  {index > 0 && ', '}
+                  <Tooltip>
+                    <TooltipTrigger
+                      className={cn(InlineLinkClassName, 'cursor-pointer')}
+                      onClick={() => setSelectedPid(pid)}
+                    >
+                      {pid}
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom" className="min-w-64 max-w-80">
+                      <p className="truncate">
+                        <code className="tracking-tighter">{blockedProcess?.query}</code>
+                      </p>
+                      <p className="text-xs text-foreground-lighter flex items-center gap-x-0.5 mt-0.5 truncate">
+                        <span>PID: {blockedProcess?.pid}</span>
+                        <span>·</span>
+                        <span>{blockedProcess?.role_name}</span>
+                        {blockedProcess?.application_name && (
+                          <>
+                            <span>·</span>
+                            <span>{blockedProcess?.application_name}</span>
+                          </>
+                        )}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </Fragment>
+              )
+            })
           ) : (
             <Minus size={12} className="text-foreground-lighter" />
           )}
         </TableCell>
 
-        <TableCell>
+        <TableCell className="text-right">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
