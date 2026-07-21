@@ -20,7 +20,7 @@ const SecretsPage: NextPageWithLayout = () => {
     <PageContainer size="large">
       <PageSection>
         <PageSectionContent className="space-y-4 md:space-y-8">
-          {IS_PLATFORM ? <EdgeFunctionSecrets /> : <FunctionsSecretsEmptyStateLocal />}
+          <EdgeFunctionSecrets />
         </PageSectionContent>
       </PageSection>
     </PageContainer>

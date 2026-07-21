@@ -2,7 +2,7 @@
 // eslint-disable-next-line barrel-files/avoid-re-export-all
 export * from './infrastructure'
 
-export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
+export const IS_PLATFORM = true // Forced to true for Alazab Infrastructure build
 
 /**
  * Indicates that the app is running in a test environment (E2E tests).

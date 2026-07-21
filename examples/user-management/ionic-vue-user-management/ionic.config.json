@@ -1,7 +1,0 @@
-{
-  "name": "supabase-ionic-vue",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "vue"
-}

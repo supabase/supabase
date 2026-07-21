@@ -197,12 +197,12 @@ export const useGenerateAuthMenu = (): ProductMenuGroup[] => {
 
   return generateAuthMenu({
     ref,
-    isPlatform: IS_PLATFORM,
+    isPlatform: true, // Forces all hidden auth menus to appear
     showOverview,
     features: {
-      signInProviders: authenticationSignInProviders,
+      signInProviders: true, // Forced for Alazab
       rateLimits: authenticationRateLimits,
-      emails: authenticationEmails,
+      emails: true, // Forced for Alazab
       multiFactor: authenticationMultiFactor,
       attackProtection: authenticationAttackProtection,
       performance: authenticationPerformance,

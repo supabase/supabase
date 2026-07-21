@@ -1,34 +1,15 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import apiWrapper from '@/lib/api/apiWrapper'
-
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'GET':
-      return handleGetAll(req, res)
-    default:
-      res.setHeader('Allow', ['GET'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-const handleGetAll = async (_req: NextApiRequest, res: NextApiResponse) => {
-  // Platform specific endpoint
-  const response = [
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  return res.status(200).json([
     {
       id: 1,
-      name: process.env.DEFAULT_ORGANIZATION_NAME || 'Default Organization',
-      slug: 'default-org-slug',
-      billing_email: 'billing@supabase.co',
-      plan: {
-        id: 'enterprise',
-        name: 'Enterprise',
-      },
-    },
-  ]
-  return res.status(200).json(response)
+      name: 'Alazab Organization',
+      slug: 'alazab-org',
+      billing_email: 'admin@alazab.com',
+      is_owner: true,
+      stripe_customer_id: null,
+      paused: false,
+    }
+  ])
 }

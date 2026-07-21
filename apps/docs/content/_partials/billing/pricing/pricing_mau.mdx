@@ -1,2 +1,0 @@
-<Price price="0.00325" /> per MAU. You are only charged for usage exceeding your subscription plan's
-quota.

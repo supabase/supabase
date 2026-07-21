@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="22px" height="19px" viewBox="0 0 22 19" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard" transform="translate(-967.000000, -2846.000000)" stroke="currentColor" stroke-width="2">
+            <g id="table-editor" transform="translate(968.000000, 2847.000000)">
+                <rect id="Rectangle" x="0" y="0" width="20" height="17" rx="2"></rect>
+                <line x1="0" y1="11" x2="21" y2="11" id="Path"></line>
+                <line x1="0" y1="5.5" x2="21" y2="5.5" id="Path"></line>
+                <line x1="7" y1="0" x2="7" y2="16" id="Path"></line>
+            </g>
+        </g>
+    </g>
+</svg>

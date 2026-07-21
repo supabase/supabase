@@ -166,3 +166,11 @@ keys.json
 examples/**/package-lock.json
 examples/**/yarn.lock
 examples/**/pnpm-lock.yaml
+supabase-data/
+alazab_modifications.zip
+docker/volumes/db/pre_upgrade_dump_all.sql
+
+
+docker/.env.unified-auth
+docker/auth.env
+

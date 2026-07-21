@@ -1,3 +1,0 @@
-This is a test file for e2e storage testing.
-It contains some sample content to verify file uploads work correctly.
-

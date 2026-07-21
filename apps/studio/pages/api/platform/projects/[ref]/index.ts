@@ -1,29 +1,15 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import apiWrapper from '@/lib/api/apiWrapper'
-import { DEFAULT_PROJECT, PROJECT_REST_URL } from '@/lib/constants/api'
-
-export default (req: NextApiRequest, res: NextApiResponse) => apiWrapper(req, res, handler)
-
-async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { method } = req
-
-  switch (method) {
-    case 'GET':
-      return handleGet(req, res)
-    default:
-      res.setHeader('Allow', ['GET'])
-      res.status(405).json({ data: null, error: { message: `Method ${method} Not Allowed` } })
-  }
-}
-
-const handleGet = async (_req: NextApiRequest, res: NextApiResponse) => {
-  // Platform specific endpoint
-  const response = {
-    ...DEFAULT_PROJECT,
-    connectionString: '',
-    restUrl: PROJECT_REST_URL,
-  }
-
-  return res.status(200).json(response)
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { ref } = req.query
+  return res.status(200).json({
+    id: 1,
+    ref: ref,
+    name: 'Alazab Project',
+    organization_id: 1,
+    cloud_provider: 'self-hosted',
+    region: 'local',
+    status: 'ACTIVE_HEALTHY',
+    inserted_at: new Date().toISOString(),
+  })
 }
