@@ -61,12 +61,7 @@ export const UNGROUPED_POLICY_SYMBOL = createWrappedSymbol('ungrouped-policy', '
 const formatStoragePolicies = (buckets: Bucket[], policies: Policy[]) => {
   const availableBuckets = buckets.map((bucket) => bucket.name)
   const formattedPolicies = policies.map((policy) => {
-    const { definition: policyDefinition, check: policyCheck } = policy
-
-    const bucketNames =
-      policyDefinition !== null
-        ? extractBucketNamesFromDefinition(policyDefinition)
-        : extractBucketNamesFromDefinition(policyCheck)
+    const bucketNames = getPolicyBucketNames(policy)
 
     if (bucketNames.length === 0) {
       return { ...policy, buckets: [UNGROUPED_POLICY_SYMBOL] }
@@ -108,6 +103,22 @@ export const extractBucketNamesFromDefinition = (definition: string | null): str
   }
 
   return Array.from(names)
+}
+
+/**
+ * Collects every bucket name a policy references across both its USING (definition)
+ * and WITH CHECK (check) clauses.
+ */
+export const getPolicyBucketNames = (policy: {
+  definition: string | null
+  check: string | null
+}): string[] => {
+  return Array.from(
+    new Set([
+      ...extractBucketNamesFromDefinition(policy.definition),
+      ...extractBucketNamesFromDefinition(policy.check),
+    ])
+  )
 }
 
 const groupPoliciesByBucket = (policies: (Policy & { buckets: (string | Symbol)[] })[]) => {
