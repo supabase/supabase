@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
-import { extractBucketNamesFromDefinition } from './Storage.utils'
+import { getPolicyBucketNames } from './Storage.utils'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from '@/data/database-policies/database-policy-delete-mutation'
@@ -44,8 +44,10 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
       const bucketPolicies = (policies ?? []).filter((policy) => {
         if (policy.table !== 'objects') return false
 
-        const policyBuckets = extractBucketNamesFromDefinition(policy.definition ?? policy.check)
-        return policyBuckets.includes(bucket.name)
+        // Only auto-delete policies exclusively tied to this bucket; a policy shared
+        // with other buckets must keep protecting them.
+        const policyBuckets = getPolicyBucketNames(policy)
+        return policyBuckets.length === 1 && policyBuckets[0] === bucket.name
       })
 
       if (bucketPolicies.length === 0) return

@@ -5,6 +5,7 @@ import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTab
 import {
   extractBucketNamesFromDefinition,
   formatPoliciesForStorage,
+  getPolicyBucketNames,
   UNGROUPED_POLICY_SYMBOL,
   UNKNOWN_BUCKET_SYMBOL,
 } from '@/components/interfaces/Storage/Storage.utils'
@@ -89,7 +90,55 @@ describe('Storage.utils: extractBucketNamesFromDefinition', () => {
   })
 })
 
+describe('Storage.utils: getPolicyBucketNames', () => {
+  test('should union bucket names from the definition and check clauses', () => {
+    expect(
+      getPolicyBucketNames({
+        definition: `(bucket_id = 'avatars'::text)`,
+        check: `(bucket_id = 'logos'::text)`,
+      })
+    ).toStrictEqual(['avatars', 'logos'])
+  })
+
+  test('should find a bucket in the check clause when the definition has no bucket condition', () => {
+    expect(
+      getPolicyBucketNames({
+        definition: `((select auth.uid()::text) = owner)`,
+        check: `(bucket_id = 'avatars'::text)`,
+      })
+    ).toStrictEqual(['avatars'])
+  })
+
+  test('should deduplicate buckets referenced in both clauses', () => {
+    expect(
+      getPolicyBucketNames({
+        definition: `(bucket_id = 'avatars'::text)`,
+        check: `(bucket_id = 'avatars'::text)`,
+      })
+    ).toStrictEqual(['avatars'])
+  })
+
+  test('should return no buckets when neither clause references bucket_id', () => {
+    expect(
+      getPolicyBucketNames({ definition: '(auth.uid() IS NOT NULL)', check: null })
+    ).toStrictEqual([])
+  })
+})
+
 describe('Storage.utils: formatPoliciesForStorage', () => {
+  test('should group a policy under a bucket referenced only in its check clause', () => {
+    const policies = [
+      mockPolicy({
+        definition: rawSql(`((select auth.uid()::text) = owner)`),
+        check: rawSql(`(bucket_id = 'avatars'::text)`),
+      }),
+    ]
+    const output = formatPoliciesForStorage([mockBucket('avatars')], policies)
+
+    expect(output).toHaveLength(1)
+    expect(output[0].name).toBe('avatars')
+  })
+
   test('should return an empty array when there are no policies', () => {
     expect(formatPoliciesForStorage([mockBucket('avatars')], [])).toStrictEqual([])
   })
