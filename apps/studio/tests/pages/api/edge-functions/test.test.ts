@@ -138,4 +138,37 @@ describe('/api/edge-functions/test', () => {
       error: { message: 'Connection refused' },
     })
   })
+
+  it('lets a custom Content-Type replace the default whatever its casing', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('ok', { status: 200 }))
+    vi.stubGlobal('fetch', fetchMock)
+    const { req, res } = createMocks({
+      method: 'POST',
+      body: {
+        url: 'https://abcdefghijklmnopqrst.supabase.co/functions/v1/test',
+        method: 'POST',
+        body: 'plain text payload',
+        headers: { 'content-type': 'text/plain' },
+      },
+    })
+
+    await handler(req, res)
+
+    const sentHeaders = fetchMock.mock.calls[0][1].headers
+    expect(new Headers(sentHeaders).get('content-type')).toBe('text/plain')
+    // The body is only JSON-encoded when the request is actually JSON.
+    expect(fetchMock.mock.calls[0][1].body).toBe('plain text payload')
+  })
+
+  it('still applies the default Content-Type when none is supplied', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response('ok', { status: 200 }))
+    vi.stubGlobal('fetch', fetchMock)
+    const { req, res } = createRequest()
+
+    await handler(req, res)
+
+    expect(new Headers(fetchMock.mock.calls[0][1].headers).get('content-type')).toBe(
+      'application/json'
+    )
+  })
 })
