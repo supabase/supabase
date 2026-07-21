@@ -171,6 +171,9 @@ the pair should use the dark set together.
 - Published organisation OAuth app icons uploaded in Studio remain trusted
   remote images, paired with forced-light tiles on both sides.
 - Everything else falls back to `SupabaseLogo` alone.
+- If the requester name looks like a known partner but `redirect_uri` is a
+  remote host outside that partner's allowlist, show a caution admonition.
+  Localhost MCP redirects are excluded.
 
 ## Account row
 

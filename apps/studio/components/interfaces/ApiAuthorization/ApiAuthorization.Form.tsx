@@ -21,8 +21,10 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import type { ApprovalState, IApprovalFormSchema } from './ApiAuthorization.Schema'
 import {
   AuthorizeConnectLogo,
+  AuthorizeImpersonationWarning,
   AuthorizeRequesterDetails,
 } from '@/components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
+import { getOAuthImpersonationWarning } from '@/components/interfaces/Organization/OAuthApps/OAuthApps.utils'
 import { InterstitialLayout } from '@/components/layouts/InterstitialLayout'
 import type { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
 import type { Organization, ResponseError } from '@/types'
@@ -104,6 +106,10 @@ export function ApiAuthorizationMainView({
       <div className="px-6 pb-6">
         <span className="sr-only">Authorize API access for {requester.name}</span>
         <div className="flex flex-col gap-5">
+          <AuthorizeImpersonationWarning
+            name={requester.name}
+            redirectUri={requester.redirect_uri}
+          />
           {isExpired ? (
             <ExpiredNotice />
           ) : (
@@ -298,6 +304,13 @@ function FormFooter({
   onDecline,
   onApprove,
 }: FormFooterProps): ReactNode {
+  const hasImpersonationWarning = Boolean(
+    getOAuthImpersonationWarning({
+      name: requester.name,
+      redirectUri: requester.redirect_uri,
+    })
+  )
+
   return (
     <div className="flex flex-col gap-2">
       <ApprovalButton
@@ -318,7 +331,10 @@ function FormFooter({
       {redirectUrl && (
         <div className="mt-3 border-t border-muted pt-5">
           <p className="text-center text-xs text-foreground-lighter text-balance">
-            Authorizing will redirect you to <span className="text-foreground">{redirectUrl}</span>
+            Authorizing will redirect you to{' '}
+            <span className={hasImpersonationWarning ? 'text-warning' : 'text-foreground'}>
+              {redirectUrl}
+            </span>
           </p>
         </div>
       )}

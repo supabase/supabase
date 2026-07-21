@@ -346,9 +346,12 @@ describe('ApiAuthorizationScreen', () => {
           await screen.findByText('Authorize API access for Cursor')
           expect(screen.getByAltText('Cursor')).toBeInTheDocument()
           expect(screen.getByAltText('Supabase')).toBeInTheDocument()
+          expect(
+            screen.queryByText('Redirect does not match this app name')
+          ).not.toBeInTheDocument()
         })
 
-        test('shows Supabase alone when name looks trusted but redirect host is not allowlisted', async () => {
+        test('warns when a trusted name redirects to a non-allowlisted host', async () => {
           mockBothEndpoints(
             createMockAuthResponse({
               name: 'Claude',
@@ -357,7 +360,14 @@ describe('ApiAuthorizationScreen', () => {
             })
           )
           renderScreen()
-          await screen.findByText('Authorize API access for Claude')
+          expect(
+            await screen.findByText('Redirect does not match this app name')
+          ).toBeInTheDocument()
+          expect(
+            screen.getByText(
+              'This request uses the name Claude, but after you authorize you will be redirected to evil.com, not Claude.'
+            )
+          ).toBeInTheDocument()
           expect(screen.queryByAltText('Claude')).not.toBeInTheDocument()
           expect(screen.getByAltText('Supabase')).toBeInTheDocument()
         })

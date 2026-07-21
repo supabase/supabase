@@ -1,6 +1,8 @@
 import { getMcpClientIconSrc } from 'ui-patterns/McpUrlBuilder'
 
 export type TrustedOAuthPartner = {
+  /** Substrings matched against the requester name (case-insensitive). */
+  nameMatchers: readonly string[]
   displayName: string
   icon: string
   hasDistinctDarkIcon: boolean
@@ -14,24 +16,28 @@ export type TrustedOAuthPartner = {
  */
 export const TRUSTED_OAUTH_PARTNERS: readonly TrustedOAuthPartner[] = [
   {
+    nameMatchers: ['claude'],
     displayName: 'Claude',
     icon: 'claude',
     hasDistinctDarkIcon: false,
     redirectHosts: ['claude.ai', 'anthropic.com'],
   },
   {
+    nameMatchers: ['cursor'],
     displayName: 'Cursor',
     icon: 'cursor',
     hasDistinctDarkIcon: true,
     redirectHosts: ['cursor.com', 'cursor.sh'],
   },
   {
+    nameMatchers: ['chatgpt', 'openai'],
     displayName: 'ChatGPT',
     icon: 'openai',
     hasDistinctDarkIcon: true,
     redirectHosts: ['chatgpt.com', 'openai.com'],
   },
   {
+    nameMatchers: ['perplexity'],
     displayName: 'Perplexity',
     icon: 'perplexity',
     hasDistinctDarkIcon: true,
@@ -78,6 +84,15 @@ export function findTrustedPartnerByRedirectUri(
   )
 }
 
+export function findTrustedPartnerByName(name: string): TrustedOAuthPartner | null {
+  const searchable = name.toLowerCase()
+  return (
+    TRUSTED_OAUTH_PARTNERS.find((partner) =>
+      partner.nameMatchers.some((matcher) => searchable.includes(matcher))
+    ) ?? null
+  )
+}
+
 export function getRequesterLogo({
   icon,
   redirectUri,
@@ -98,4 +113,37 @@ export function getRequesterLogo({
   }
 
   return { src: icon || '', isKnownClient: false }
+}
+
+export type OAuthImpersonationWarning = {
+  brandDisplayName: string
+  redirectHost: string
+}
+
+/**
+ * Warn when the requester name looks like a known partner but redirect_uri is a
+ * remote host outside that partner's allowlist. Localhost redirects are skipped
+ * (common for local MCP clients).
+ */
+export function getOAuthImpersonationWarning({
+  name,
+  redirectUri,
+}: {
+  name: string
+  redirectUri: string | null | undefined
+}): OAuthImpersonationWarning | null {
+  const namedPartner = findTrustedPartnerByName(name)
+  if (!namedPartner) return null
+
+  const hostname = getRedirectHostname(redirectUri)
+  if (isLocalRedirectHost(hostname)) return null
+
+  if (hostname && hostMatchesAllowlist(hostname, namedPartner.redirectHosts)) {
+    return null
+  }
+
+  return {
+    brandDisplayName: namedPartner.displayName,
+    redirectHost: hostname ?? 'an unexpected address',
+  }
 }

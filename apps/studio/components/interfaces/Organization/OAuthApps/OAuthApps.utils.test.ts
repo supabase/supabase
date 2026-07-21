@@ -3,6 +3,7 @@ import { describe, expect, test } from 'vitest'
 
 import {
   findTrustedPartnerByRedirectUri,
+  getOAuthImpersonationWarning,
   getRedirectHostname,
   getRequesterLogo,
   hostMatchesAllowlist,
@@ -87,5 +88,43 @@ describe('getRequesterLogo', () => {
         useDarkVariant: false,
       })
     ).toEqual({ src: 'https://example.com/icon.png', isKnownClient: false })
+  })
+})
+
+describe('getOAuthImpersonationWarning', () => {
+  test('warns when a trusted name redirects to a remote non-allowlisted host', () => {
+    expect(
+      getOAuthImpersonationWarning({
+        name: 'Claude Desktop',
+        redirectUri: 'https://evil.com/callback',
+      })
+    ).toEqual({ brandDisplayName: 'Claude', redirectHost: 'evil.com' })
+  })
+
+  test('skips localhost MCP redirects', () => {
+    expect(
+      getOAuthImpersonationWarning({
+        name: 'Claude',
+        redirectUri: 'http://127.0.0.1:42813/callback',
+      })
+    ).toBe(null)
+  })
+
+  test('skips when redirect host matches the named partner', () => {
+    expect(
+      getOAuthImpersonationWarning({
+        name: 'Claude',
+        redirectUri: 'https://claude.ai/api/mcp/auth_callback',
+      })
+    ).toBe(null)
+  })
+
+  test('skips when the name does not match a trusted partner', () => {
+    expect(
+      getOAuthImpersonationWarning({
+        name: 'Acme Tools',
+        redirectUri: 'https://evil.com/callback',
+      })
+    ).toBe(null)
   })
 })
