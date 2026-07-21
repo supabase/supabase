@@ -20,6 +20,8 @@ import type { ExternalIdentityProviderConfig } from '@/lib/external-identity-pro
 import type { NextPageWithLayout } from '@/types'
 
 const SignInPage: NextPageWithLayout = () => {
+  useSiwcQueryParamOptIn()
+
   const router = useRouter()
   const [showOtherOptions, setShowOtherOptions] = useState(false)
 
@@ -43,7 +45,6 @@ const SignInPage: NextPageWithLayout = () => {
   const customProviders = customProvidersNew ?? (customProvider ? [customProvider] : [])
 
   const { focusProvider } = useInboundBranding('sign-in')
-  useSiwcQueryParamOptIn()
   const signInProviders = useEnabledIdentityProviders().filter((provider) => provider.showOnSignIn)
 
   const renderAuthOptions = (

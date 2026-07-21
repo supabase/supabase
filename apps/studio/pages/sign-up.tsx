@@ -14,11 +14,12 @@ import type { ExternalIdentityProviderConfig } from '@/lib/external-identity-pro
 import type { NextPageWithLayout } from '@/types'
 
 const SignUpPage: NextPageWithLayout = () => {
+  useSiwcQueryParamOptIn()
+
   const [showOtherOptions, setShowOtherOptions] = useState(false)
   const { dashboardAuthSignUp: signUpEnabled } = useIsFeatureEnabled(['dashboard_auth:sign_up'])
 
   const { focusProvider } = useInboundBranding('sign-up')
-  useSiwcQueryParamOptIn()
   const signUpProviders = useEnabledIdentityProviders().filter((provider) => provider.showOnSignUp)
 
   if (!signUpEnabled) {

@@ -1,5 +1,4 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { useRouter } from 'next/router'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { useEffect } from 'react'
 
 import { useLocalStorageQuery } from './useLocalStorage'
@@ -14,17 +13,15 @@ import { useLocalStorageQuery } from './useLocalStorage'
  * it persists once set.
  */
 export function useSiwcQueryParamOptIn() {
-  const router = useRouter()
+  const { siwcEnabled } = useParams()
   const [, setChatgptLocalStorageEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SIGN_IN_CHATGPT_ENABLED,
     false
   )
 
-  const siwcParam = router.isReady ? router.query['siwc-enabled'] : undefined
-
   useEffect(() => {
-    if (siwcParam === '1') {
+    if (siwcEnabled === '1') {
       setChatgptLocalStorageEnabled(true)
     }
-  }, [siwcParam, setChatgptLocalStorageEnabled])
+  }, [siwcEnabled, setChatgptLocalStorageEnabled])
 }
