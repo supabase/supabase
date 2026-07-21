@@ -17,6 +17,7 @@ import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { WARN_DURATION_ACTIVE_QUERY, WARN_DURATION_IDLE_TXN } from './DatabaseConnections.constants'
 
 const LONG_RUNNING_STATES: (DatabaseActivity['state'] | undefined)[] = [
   'active',
@@ -55,7 +56,7 @@ export const Overview = ({ live, refreshTimestamp }: OverviewProps) => {
     const isIdleInTransaction =
       x.state === 'idle in transaction' || x.state === 'idle in transaction (aborted)'
     if (!isIdleInTransaction || !x.transaction_start) return false
-    return dayjs().utc().diff(dayjs(x.transaction_start).utc(), 'second') > 10
+    return dayjs().utc().diff(dayjs(x.transaction_start).utc(), 'second') > WARN_DURATION_IDLE_TXN
   })
 
   const longestRunningQuery = (data ?? [])
@@ -68,9 +69,10 @@ export const Overview = ({ live, refreshTimestamp }: OverviewProps) => {
     }, null)
   const queryRunningLongWarning =
     !!longestRunningQuery &&
-    ((longestRunningQuery.activity.state === 'active' && longestRunningQuery.duration >= 30) ||
-      (longestRunningQuery.activity.state === 'idle in transaction' &&
-        longestRunningQuery.duration >= 10))
+    ((longestRunningQuery.activity.state === 'active' && longestRunningQuery.duration >= WARN_DURATION_ACTIVE_QUERY) ||
+      ((longestRunningQuery.activity.state === 'idle in transaction' ||
+        longestRunningQuery.activity.state === 'idle in transaction (aborted)') &&
+        longestRunningQuery.duration >= WARN_DURATION_IDLE_TXN))
 
   const { data: roles, isPending: isLoadingRoles } = useDatabaseRolesQuery(
     {
@@ -209,7 +211,10 @@ export const Overview = ({ live, refreshTimestamp }: OverviewProps) => {
             <MetricCardValue
               className={cn(
                 longestRunningQuery === null && 'text-foreground-lighter',
-                queryRunningLongWarning && longestRunningQuery.activity.state === 'active' ? 'text-warning' : 'text-destructive'
+                queryRunningLongWarning &&
+                  (longestRunningQuery?.activity.state === 'active'
+                    ? 'text-warning'
+                    : 'text-destructive')
               )}
             >
               {longestRunningQuery === null ? '-' : `${longestRunningQuery.duration}s`}

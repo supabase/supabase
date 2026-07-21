@@ -45,6 +45,7 @@ import { useDatabaseActivityQuery, type DatabaseActivity } from '@/data/database
 import { useQueryAbortMutation } from '@/data/sql/abort-query-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { formatSql } from '@/lib/formatSql'
+import { WARN_DURATION_ACTIVE_QUERY, WARN_DURATION_IDLE_TXN } from './DatabaseConnections.constants'
 
 const getDuration = (activity: DatabaseActivity) => {
   const { state } = activity
@@ -289,10 +290,10 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
    */
   const queryRunningLongWarning =
     !!durationSeconds &&
-    ((activity.state === 'active' && durationSeconds >= 30) ||
+    ((activity.state === 'active' && durationSeconds >= WARN_DURATION_ACTIVE_QUERY) ||
       ((activity.state === 'idle in transaction' ||
         activity.state === 'idle in transaction (aborted)') &&
-        durationSeconds >= 10))
+        durationSeconds >= WARN_DURATION_IDLE_TXN))
 
   const onConfirmTerminate = async () => {
     try {
