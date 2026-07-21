@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { motion } from 'framer-motion'
 import { BarChart, FileText, Shield } from 'lucide-react'
-import { Button, Skeleton } from 'ui'
+import { AiIconAnimation, Button, Skeleton } from 'ui'
 
 import { codeSnippetPrompts, defaultPrompts } from './AIAssistant.prompts'
 import type { SqlSnippet } from './AIAssistant.types'
@@ -44,16 +44,17 @@ export const AIOnboarding = ({
   const performanceErrorLints = errorLints.filter((lint) => lint.categories?.[0] !== 'SECURITY')
 
   return (
-    <div className="flex-1 overflow-y-auto">
+    <div className="flex-1 overflow-y-auto max-w-3xl mx-auto w-full">
       <div className="w-full flex-1 max-h-full min-h-full px-4 flex flex-col gap-0">
         <div className="mt-auto w-full space-y-6 py-8 ">
           <motion.h2
-            className="heading-section text-foreground mx-4"
+            className="heading-section text-foreground mx-4 flex items-center gap-x-3"
             initial={{ y: 5, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.3 }}
           >
             How can I assist you?
+            <AiIconAnimation size={18} allowHoverEffect={false} />
           </motion.h2>
           {suggestions?.prompts?.length ? (
             <div>

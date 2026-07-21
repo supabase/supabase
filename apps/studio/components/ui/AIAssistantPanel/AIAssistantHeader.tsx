@@ -1,23 +1,35 @@
-import { Clipboard, Ellipsis, Plus, Settings, X } from 'lucide-react'
-import { useState } from 'react'
 import {
-  AiIconAnimation,
+  Clipboard,
+  Edit,
+  Maximize,
+  MessageCirclePlus,
+  Minimize,
+  MoreVertical,
+  Settings,
+  X,
+} from 'lucide-react'
+import { KeyboardEvent, useState } from 'react'
+import { toast } from 'sonner'
+import {
   Button,
   copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  Input,
 } from 'ui'
 import { Admonition } from 'ui-patterns/admonition'
 
 import { ButtonTooltip } from '../ButtonTooltip'
-import { ShortcutTooltip } from '../ShortcutTooltip'
+import { ShortcutPills, ShortcutTooltip } from '../ShortcutTooltip'
 import { AIAssistantChatSelector } from './AIAssistantChatSelector'
 import { AIOptInModal } from './AIOptInModal'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
-import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
 interface AIAssistantHeaderProps {
   isChatLoading: boolean
@@ -39,36 +51,85 @@ export const AIAssistantHeader = ({
   aiOptInLevel,
 }: AIAssistantHeaderProps) => {
   const snap = useAiAssistantStateSnapshot()
+  const { isMaximised, toggleMaximise } = useSidebarManagerSnapshot()
+  const [value, setValue] = useState(snap.activeChat?.name)
+  const [isEditingName, setIsEditingName] = useState(false)
   const [isOptInModalOpen, setIsOptInModalOpen] = useState(false)
+
+  const handleCopyChatId = () => {
+    copyToClipboard(snap.activeChatId ?? '', () => {
+      toast.success(`Copied chat ID for ${snap.activeChat?.name}`)
+    })
+  }
+
+  const handleSaveName = () => {
+    if (snap.activeChatId && value?.trim()) {
+      snap.renameChat(snap.activeChatId, value.trim())
+    }
+    setIsEditingName(false)
+  }
+
+  const handleKeyDownInput = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Escape') {
+      e.preventDefault()
+      e.stopPropagation()
+      setIsEditingName(false)
+      setValue(snap.activeChat?.name)
+    } else if (e.key === 'Enter') {
+      e.preventDefault()
+      e.stopPropagation()
+      handleSaveName()
+    }
+  }
+
+  const handleBlurInput = () => {
+    if (isEditingName) handleSaveName()
+  }
+
+  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_COPY_CHAT_ID, handleCopyChatId, {
+    enabled: !isChatLoading,
+  })
 
   useShortcut(SHORTCUT_IDS.AI_ASSISTANT_OPEN_PERMISSIONS, () => setIsOptInModalOpen(true), {
     enabled: !isChatLoading,
   })
 
+  useShortcut(SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE, toggleMaximise, {
+    enabled: !isChatLoading,
+  })
+
   return (
     <div className="z-30 sticky top-0">
-      <div className="border-b border-b-muted flex items-center bg-card gap-x-4 pl-4 pr-3 min-h-(--header-height)">
-        <div className="text-sm flex-1 flex items-center">
-          <AiIconAnimation size={18} allowHoverEffect={false} />
-          <span className="text-border-stronger dark:text-border-strong ml-2">
-            <svg
-              viewBox="0 0 24 24"
-              width="16"
-              height="16"
-              stroke="currentColor"
-              strokeWidth="1"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              fill="none"
-              shapeRendering="geometricPrecision"
+      <div className="border-b border-b-muted flex items-center bg-card gap-x-4 px-3 min-h-(--header-height)">
+        <div className="text-sm flex-1 min-w-0 flex items-center gap-x-1">
+          {isEditingName ? (
+            <Input
+              autoFocus
+              value={value}
+              size="tiny"
+              onChange={(e) => setValue(e.target.value)}
+              onKeyDown={handleKeyDownInput}
+              onBlur={handleBlurInput}
+            />
+          ) : (
+            <Button
+              variant="text"
+              className="group min-w-0"
+              iconRight={<Edit className="transition opacity-0 group-hover:opacity-100" />}
+              onClick={() => {
+                setValue(snap.activeChat?.name)
+                setIsEditingName(true)
+              }}
             >
-              <path d="M16 3.549L7.12 20.600" />
-            </svg>
-          </span>
-          <AIAssistantChatSelector />
+              {snap.activeChat?.name}
+            </Button>
+          )}
         </div>
-        <div className="flex items-center gap-x-4">
+
+        <div className="flex items-center gap-x-4 shrink-0">
           <div className="flex items-center">
+            <AIAssistantChatSelector />
+
             <ShortcutTooltip
               side="bottom"
               label="New chat"
@@ -78,21 +139,24 @@ export const AIAssistantHeader = ({
                 variant="text"
                 aria-label="New chat"
                 size="tiny"
-                icon={<Plus strokeWidth={1.5} />}
+                icon={<MessageCirclePlus />}
                 onClick={onNewChat}
                 className="h-7 w-7 p-0"
               />
             </ShortcutTooltip>
 
-            <ShortcutTooltip side="bottom" shortcutId={SHORTCUT_IDS.AI_ASSISTANT_OPEN_PERMISSIONS}>
+            <ShortcutTooltip
+              side="bottom"
+              label={isMaximised ? 'Minimize' : 'Maximize'}
+              shortcutId={SHORTCUT_IDS.AI_ASSISTANT_MAXIMIZE}
+            >
               <Button
                 variant="text"
-                aria-label="Permission settings"
+                aria-label={isMaximised ? 'Minimize' : 'Maximize'}
                 size="tiny"
-                icon={<Settings strokeWidth={1.5} />}
-                onClick={() => setIsOptInModalOpen(true)}
+                icon={isMaximised ? <Minimize /> : <Maximize />}
+                onClick={toggleMaximise}
                 className="h-7 w-7 p-0"
-                disabled={isChatLoading}
               />
             </ShortcutTooltip>
 
@@ -101,18 +165,36 @@ export const AIAssistantHeader = ({
                 <ButtonTooltip
                   variant="text"
                   size="tiny"
-                  icon={<Ellipsis strokeWidth={1.5} />}
+                  icon={<MoreVertical />}
                   className="h-7 w-7 p-0"
+                  disabled={isChatLoading}
                   tooltip={{ content: { side: 'bottom', text: 'More options' } }}
                 />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuContent align="end" className="w-60">
+                <DropdownMenuItem className="justify-between" onClick={handleCopyChatId}>
+                  <div className="flex items-center gap-x-2">
+                    <Clipboard size={14} />
+                    <span>Copy chat ID</span>
+                  </div>
+                  <ShortcutPills
+                    sequence={SHORTCUT_DEFINITIONS[SHORTCUT_IDS.AI_ASSISTANT_COPY_CHAT_ID].sequence}
+                  />
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  className="gap-x-2"
-                  onClick={() => copyToClipboard(snap.activeChatId ?? '')}
+                  className="justify-between"
+                  onClick={() => setIsOptInModalOpen(true)}
                 >
-                  <Clipboard size={14} strokeWidth={1.5} />
-                  <span>Copy chat ID</span>
+                  <div className="flex items-center gap-x-2">
+                    <Settings size={14} />
+                    <span>Permission settings</span>
+                  </div>
+                  <ShortcutPills
+                    sequence={
+                      SHORTCUT_DEFINITIONS[SHORTCUT_IDS.AI_ASSISTANT_OPEN_PERMISSIONS].sequence
+                    }
+                  />
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -133,6 +215,7 @@ export const AIAssistantHeader = ({
           </div>
         </div>
       </div>
+
       {showMetadataWarning && (
         <Admonition
           type="default"

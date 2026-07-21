@@ -76,7 +76,14 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
   const newUsedPercentageSystem = Math.min((usedSizeSystem / newTotalSize) * 100, 100)
 
   const resizePercentage = AUTOSCALING_THRESHOLD * 100
-  const newResizePercentage = AUTOSCALING_THRESHOLD * 100
+  // Anchored to the actual right edge of the highlighted "border-r" zone below, rather than
+  // trusting resizePercentage alone, since usedPercentage* are each rounded independently and
+  // can drift a fraction of a percent from usedTotalPercentage.
+  const resizeMarkerLeftPercentage =
+    usedPercentageDatabase +
+    usedPercentageWAL +
+    usedPercentageSystem +
+    Math.max(0, resizePercentage - usedTotalPercentage)
 
   return (
     <div className="flex flex-col gap-2">
@@ -166,45 +173,40 @@ export const DiskSpaceBar = ({ form }: DiskSpaceBarProps) => {
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
-        <AnimatePresence initial={true}>
           {!showNewSize && (
-            <motion.div
-              key="currentSize"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-              transition={{ duration: 0.1 }}
-              className="absolute h-8 w-full mx-[-2px]"
+            <div
+              className="absolute z-10"
+              style={{
+                left: `${resizeMarkerLeftPercentage}%`,
+                top: '-20px',
+                transform: 'translateX(-50%)',
+              }}
             >
-              <div
-                className="absolute top-0 left-0 h-full flex items-center transition-all duration-500 ease-in-out"
-                style={{ left: `${showNewSize ? newResizePercentage : resizePercentage}%` }}
-              >
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="absolute right-full bottom-0 border mr-2 px-2 py-1 bg-surface-400 rounded-sm text-xs text-foreground-light whitespace-nowrap flex items-center gap-x-1">
-                      Autoscaling <Info size={12} />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom" className="w-[310px] flex flex-col gap-y-1">
-                    <p>
-                      Supabase expands your disk storage automatically when the database reaches 90%
-                      of the disk size. However, disk modifications, including auto-scaling, are
-                      limited to 4 within a rolling 24-hour window.
-                    </p>
-                    <p>
-                      If you exhaust these modifications and reach 95% of the disk space, your
-                      project{' '}
-                      <span className="text-destructive-600">will enter read-only mode.</span>
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-                <div className="w-px h-full bg-border" />
-              </div>
-            </motion.div>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center justify-center cursor-help text-foreground-lighter hover:text-foreground transition-colors">
+                    <Info size={14} />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="top"
+                  className="w-[310px] flex flex-col gap-y-1 leading-relaxed text-foreground-light"
+                >
+                  <h3 className="text-sm font-medium text-foreground">Autoscaling</h3>
+                  <p>
+                    Supabase expands your disk storage automatically when the database reaches 90%
+                    of the disk size. However, disk modifications, including auto-scaling, are
+                    limited to 4 within a rolling 24-hour window.
+                  </p>
+                  <p>
+                    If you exhaust these modifications and reach 95% of the disk space, your project{' '}
+                    <span className="text-destructive-600">will enter read-only mode.</span>
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
           )}
-        </AnimatePresence>
+        </div>
       </div>
       {!showNewSize && (
         <div className="flex items-center space-x-3 text-xs text-foreground-lighter">

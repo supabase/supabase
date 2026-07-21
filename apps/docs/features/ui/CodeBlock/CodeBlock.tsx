@@ -72,7 +72,10 @@ export async function CodeBlock({
         'text-sm',
         className
       )}
+      role="group"
+      aria-roledescription="code block"
     >
+      {!hideControls && <CodeBlockControls content={code.trim()} />}
       <pre>
         <code className={lineNumbers ? 'grid grid-cols-[auto_1fr]' : ''}>
           {lineNumbers ? (
@@ -109,7 +112,6 @@ export async function CodeBlock({
           )}
         </code>
       </pre>
-      {!hideControls && <CodeBlockControls content={code.trim()} />}
     </div>
   )
 }

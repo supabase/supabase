@@ -81,7 +81,11 @@ export const TableReplicationRow = ({
             <div className="text-sm text-foreground">
               {statusConfig.description}{' '}
               {isErrorState && 'reason' in table.state && (
-                <button className={InlineLinkClassName} onClick={() => onSelectShowError()}>
+                <button
+                  tabIndex={0}
+                  className={InlineLinkClassName}
+                  onClick={() => onSelectShowError()}
+                >
                   View error.
                 </button>
               )}

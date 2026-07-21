@@ -34,6 +34,12 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
   const [message, setMessage] = useState('')
   const [selectedReason, setSelectedReason] = useState<string[]>([])
 
+  const { mutateAsync: sendExitSurvey, isPending: isSubmittingFeedback } =
+    useSendDowngradeFeedbackMutation({
+      // the user should not get a toast saying "submitting survey failed"
+      onError: () => {},
+    })
+
   const subscriptionUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { mutate: updateOrgSubscription, isPending: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
@@ -43,10 +49,28 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
           dismissible: true,
         })
       },
+      onSuccess: async () => {
+        toast.success(
+          hasProjectsWithComputeDowngrade
+            ? 'Successfully downgraded organization to the Free Plan. Your projects are currently restarting to update their compute instances.'
+            : 'Successfully downgraded organization to the Free Plan',
+          { duration: hasProjectsWithComputeDowngrade ? 8000 : 4000 }
+        )
+
+        if (slug) {
+          sendExitSurvey({
+            orgSlug: slug,
+            reasons: selectedReason.reduce((a, b) => `${a}- ${b}\n`, ''),
+            message,
+            exitAction: 'downgrade',
+          }).catch(() => {})
+        }
+
+        onClose(true)
+        window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+      },
     }
   )
-  const { mutateAsync: sendExitSurvey, isPending: isSubmittingFeedback } =
-    useSendDowngradeFeedbackMutation()
   const isSubmitting = isUpdating || isSubmittingFeedback
 
   const projectsWithComputeDowngrade = projects.filter((project) => {
@@ -85,33 +109,7 @@ export const ExitSurveyModal = ({ visible, projects, onClose }: ExitSurveyModalP
     // Update the subscription first, followed by posting the exit survey if successful
     // If compute instance is present within the existing subscription, then a restart will be triggered
     if (!slug) return console.error('Slug is required')
-
-    updateOrgSubscription(
-      { slug, tier: 'tier_free' },
-      {
-        onSuccess: async () => {
-          try {
-            await sendExitSurvey({
-              orgSlug: slug,
-              reasons: selectedReason.reduce((a, b) => `${a}- ${b}\n`, ''),
-              message,
-              exitAction: 'downgrade',
-            })
-          } catch (error) {
-            // [Joshen] In this case we don't raise any errors if the exit survey fails to send since it shouldn't block the user
-          } finally {
-            toast.success(
-              hasProjectsWithComputeDowngrade
-                ? 'Successfully downgraded organization to the Free Plan. Your projects are currently restarting to update their compute instances.'
-                : 'Successfully downgraded organization to the Free Plan',
-              { duration: hasProjectsWithComputeDowngrade ? 8000 : 4000 }
-            )
-            onClose(true)
-            window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
-          }
-        },
-      }
-    )
+    updateOrgSubscription({ slug, tier: 'tier_free' })
   }
 
   return (

@@ -7,6 +7,7 @@ import { cloneElement, forwardRef, isValidElement, ReactNode } from 'react'
 
 import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../lib/constants'
 import { cn } from '../../lib/utils/cn'
+import { getExplicitTabIndex } from '../../lib/utils/getExplicitTabIndex'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
@@ -51,7 +52,7 @@ const buttonVariants = cva(
           `,
         secondary: `
           bg-foreground
-          text-background hover:text-border-stronger
+          text-background hover:text-background/80
           focus-visible:text-border-control
           border-foreground-light hover:border-foreground-lighter
           focus-visible:outline-border-strong
@@ -157,7 +158,7 @@ const IconContainerVariants = cva('inline-flex items-center justify-center shrin
     variant: {
       primary: 'text-brand-600',
       default: 'text-foreground-lighter',
-      secondary: 'text-border-muted',
+      secondary: 'text-background',
       alternative: 'text-foreground-lighter',
       outline: 'text-foreground-lighter',
       dashed: 'text-foreground-lighter',
@@ -175,7 +176,7 @@ const loadingVariants = cva('', {
     variant: {
       primary: 'text-brand-600',
       default: 'text-foreground-lighter',
-      secondary: 'text-border-muted',
+      secondary: 'text-background',
       alternative: 'text-foreground-lighter',
       outline: 'text-foreground-lighter',
       dashed: 'text-foreground-lighter',
@@ -233,11 +234,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     // if loading, button is disabled
     const disabled = loading === true || props.disabled
 
-    // Set default tabIndex for proper Safari focus handling
-    // - Explicit tabIndex prop takes precedence
-    // - If disabled, default to -1 (unless explicitly set)
-    // - Otherwise, default to 0 for keyboard accessibility
-    const computedTabIndex = tabIndex !== undefined ? tabIndex : disabled ? -1 : 0
+    const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
 
     const renderIconContainer = (content: ReactNode) => (
       <div aria-hidden className={cn(IconContainerVariants({ size, variant }))}>

@@ -1,0 +1,5 @@
+{
+  "id": "oauth-server",
+  "title": "OAuth Server",
+  "notes": "Methods under the `supabase.auth.oauth` namespace are used when your Supabase project acts as an OAuth 2.1 server. They drive the user-facing consent flow and require a signed-in user. The OAuth 2.1 server feature must be enabled in your Supabase Auth configuration.\n"
+}

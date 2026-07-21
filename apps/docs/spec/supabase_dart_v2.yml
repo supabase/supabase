@@ -113,6 +113,9 @@ functions:
           );
           ```
 
+  - id: auth-api
+    title: 'Auth'
+    category: Auth
   - id: sign-up
     title: 'signUp()'
     description: |
@@ -1847,6 +1850,8 @@ functions:
           ```
   - id: auth-mfa-api
     title: 'Overview'
+    category: Auth
+    subcategory: Auth MFA
     notes: |
       This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
 
@@ -2174,6 +2179,8 @@ functions:
           ```
   - id: passkey-api
     title: 'Auth Passkey'
+    category: Auth
+    subcategory: Auth Passkey
     notes: |
       This section contains methods for WebAuthn passkey registration, authentication, and management. Methods are invoked behind the `supabase.auth.passkey` namespace.
 
@@ -2328,8 +2335,85 @@ functions:
           final Session? session = res.session;
           final User? user = res.user;
           ```
+  - id: oauth-server-api
+    title: 'OAuth Server'
+    category: Auth
+    subcategory: OAuth Server
+    notes: |
+      Methods under the `supabase.auth.oauth` namespace are used when your Supabase project acts as an OAuth 2.1 server. They drive the user-facing consent flow and require a signed-in user. The OAuth 2.1 server feature must be enabled in your Supabase Auth configuration.
+  - id: oauth-get-authorization-details
+    title: 'oauth.getAuthorizationDetails()'
+    notes: |
+      Retrieves details about a pending OAuth authorization request so you can render a consent screen. The `authorizationId` is provided as a query parameter on the redirect URL that starts the flow.
+      - Returns a sealed `OAuthAuthorizationResponse`. Handle both variants: `OAuthAuthorizationDetailsResponse` carries the requesting `client` and requested `scope` for the consent screen, while `OAuthAuthorizationRedirectResponse` is returned when the user has already granted consent and only carries a `redirectUrl` to forward to.
+    params:
+      - name: authorizationId
+        isOptional: false
+        type: String
+        description: The unique identifier of the pending authorization request.
+    examples:
+      - id: get-authorization-details
+        name: Get authorization details
+        isSpotlight: true
+        code: |
+          ```dart
+          final authorizationId =
+              Uri.parse(currentUrl).queryParameters['authorization_id']!;
+
+          final response =
+              await supabase.auth.oauth.getAuthorizationDetails(authorizationId);
+
+          switch (response) {
+            case OAuthAuthorizationRedirectResponse(:final redirectUrl):
+              // The user already consented; forward them without a consent screen.
+              break;
+            case OAuthAuthorizationDetailsResponse(:final client, :final scope):
+              // Render a consent screen for `client` requesting `scope`.
+              break;
+          }
+          ```
+  - id: oauth-approve-authorization
+    title: 'oauth.approveAuthorization()'
+    notes: |
+      Approves a pending OAuth authorization request on behalf of the signed-in user. The response contains the redirect URL the user should be sent to.
+    params:
+      - name: authorizationId
+        isOptional: false
+        type: String
+        description: The unique identifier of the pending authorization request.
+    examples:
+      - id: approve-authorization
+        name: Approve authorization
+        isSpotlight: true
+        code: |
+          ```dart
+          final consent =
+              await supabase.auth.oauth.approveAuthorization(authorizationId);
+          // Redirect the user to consent.redirectUrl
+          ```
+  - id: oauth-deny-authorization
+    title: 'oauth.denyAuthorization()'
+    notes: |
+      Denies a pending OAuth authorization request on behalf of the signed-in user. The response contains the redirect URL the user should be sent to.
+    params:
+      - name: authorizationId
+        isOptional: false
+        type: String
+        description: The unique identifier of the pending authorization request.
+    examples:
+      - id: deny-authorization
+        name: Deny authorization
+        isSpotlight: true
+        code: |
+          ```dart
+          final consent =
+              await supabase.auth.oauth.denyAuthorization(authorizationId);
+          // Redirect the user to consent.redirectUrl
+          ```
   - id: admin-api
     title: 'Overview'
+    category: Auth
+    subcategory: Auth Admin
     notes: |
       - Any method under the `supabase.auth.admin` namespace requires a `secret` key.
       - These methods are considered admin methods and should be called on a trusted server. Never expose your `secret` key in the Flutter app.
@@ -2828,6 +2912,8 @@ functions:
           ```
   - id: admin-passkey-api
     title: 'Passkey Admin API'
+    category: Auth
+    subcategory: Passkey Admin
     notes: |
       Contains passkey administration methods, accessed under the `supabase.auth.admin.passkey` namespace. Requires a `secret` key.
 
@@ -2875,6 +2961,125 @@ functions:
             passkeyId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
           );
           ```
+  - id: admin-custom-providers-api
+    title: 'Custom OIDC/OAuth Provider Admin API'
+    category: Auth
+    subcategory: Custom Provider Admin
+    notes: |
+      - Methods under the `supabase.auth.admin.customProviders` namespace manage custom OIDC/OAuth providers programmatically. Requires a `secret` key.
+      - These are admin methods and should be called on a trusted server. Never expose your `secret` key in the Flutter app.
+      - Custom providers are referenced with a `custom:` prefix when signing in (for example `custom:mycompany`), and are distinct from the OAuth 2.1 server clients managed through `supabase.auth.admin.oauth`.
+  - id: admin-custom-providers-list
+    title: 'admin.customProviders.listProviders()'
+    notes: |
+      Lists all custom providers, optionally filtered by provider type.
+    params:
+      - name: type
+        isOptional: true
+        type: CustomProviderType
+        description: When set, only providers of this type are returned. Either `CustomProviderType.oauth2` or `CustomProviderType.oidc`.
+    examples:
+      - id: list-custom-providers
+        name: List custom providers
+        isSpotlight: true
+        code: |
+          ```dart
+          final List<CustomOAuthProvider> providers =
+              await supabase.auth.admin.customProviders.listProviders();
+          ```
+  - id: admin-custom-providers-create
+    title: 'admin.customProviders.createProvider()'
+    notes: |
+      Creates a new custom OIDC/OAuth provider. For OIDC providers, the server fetches and validates the discovery document at creation time and throws an `AuthException` with code `validation_failed` if it is unreachable or invalid.
+    params:
+      - name: params
+        isOptional: false
+        type: CreateCustomProviderParams
+        description: The provider configuration, including `providerType`, `identifier`, `name`, `clientId`, `clientSecret`, and optional fields such as `customClaimsAllowlist`.
+    examples:
+      - id: create-custom-provider
+        name: Create a custom provider
+        isSpotlight: true
+        code: |
+          ```dart
+          final CustomOAuthProvider provider =
+              await supabase.auth.admin.customProviders.createProvider(
+            CreateCustomProviderParams(
+              providerType: CustomProviderType.oidc,
+              identifier: 'custom:mycompany',
+              name: 'My Company',
+              clientId: 'client-id',
+              clientSecret: 'client-secret',
+              issuer: 'https://auth.mycompany.com',
+              customClaimsAllowlist: ['groups', 'org_id'],
+            ),
+          );
+          ```
+  - id: admin-custom-providers-get
+    title: 'admin.customProviders.getProvider()'
+    notes: |
+      Gets details of a specific custom provider by its identifier.
+    params:
+      - name: identifier
+        isOptional: false
+        type: String
+        description: The provider identifier, for example `custom:mycompany`.
+    examples:
+      - id: get-custom-provider
+        name: Get a custom provider
+        isSpotlight: true
+        code: |
+          ```dart
+          final CustomOAuthProvider provider =
+              await supabase.auth.admin.customProviders.getProvider('custom:mycompany');
+          ```
+  - id: admin-custom-providers-update
+    title: 'admin.customProviders.updateProvider()'
+    notes: |
+      Updates an existing custom provider. When `issuer` or `discoveryUrl` changes on an OIDC provider, the server re-fetches and validates the discovery document before persisting.
+    params:
+      - name: identifier
+        isOptional: false
+        type: String
+        description: The provider identifier, for example `custom:mycompany`.
+      - name: params
+        isOptional: false
+        type: UpdateCustomProviderParams
+        description: The fields to update on the provider.
+    examples:
+      - id: update-custom-provider
+        name: Update a custom provider
+        isSpotlight: true
+        code: |
+          ```dart
+          final CustomOAuthProvider provider =
+              await supabase.auth.admin.customProviders.updateProvider(
+            'custom:mycompany',
+            UpdateCustomProviderParams(
+              customClaimsAllowlist: ['groups', 'org_id', 'mail'],
+            ),
+          );
+          ```
+  - id: admin-custom-providers-delete
+    title: 'admin.customProviders.deleteProvider()'
+    notes: |
+      Deletes a custom provider by its identifier.
+    params:
+      - name: identifier
+        isOptional: false
+        type: String
+        description: The provider identifier, for example `custom:mycompany`.
+    examples:
+      - id: delete-custom-provider
+        name: Delete a custom provider
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.admin.customProviders.deleteProvider('custom:mycompany');
+          ```
+  - id: functions-api
+    title: 'Edge Functions'
+    category: Edge Functions
   - id: invoke
     title: 'invoke()'
     description: |
@@ -2923,6 +3128,9 @@ functions:
             },
           );
           ```
+  - id: database-api
+    title: 'Database'
+    category: Database
   - id: select
     description: |
       Perform a SELECT query on the table or view.
@@ -3929,6 +4137,9 @@ functions:
           Postgres functions that return tables can also be combined with [Filters](/docs/reference/dart/using-filters) and [Modifiers](/docs/reference/dart/using-modifiers).
         hideCodeBlock: true
 
+  - id: realtime-api
+    title: 'Realtime'
+    category: Realtime
   - id: subscribe
     description: |
       Subscribe to realtime changes in your database.
@@ -4056,6 +4267,58 @@ functions:
                   })
               .subscribe();
           ```
+      - id: listen-with-pattern-and-negated-filters
+        name: Listen with pattern and negated filters
+        description: |
+          Besides equality, `PostgresChangeFilterType` supports `neq`, `lt`, `lte`, `gt`, `gte`, `inFilter`, `like`, `ilike`, `isFilter`, `match`, `imatch`, and `isDistinct`. Set `negate: true` to prefix the operator with `not.`.
+        code: |
+          ```dart
+          supabase
+              .channel('public:countries')
+              .onPostgresChanges(
+                  event: PostgresChangeEvent.all,
+                  schema: 'public',
+                  table: 'countries',
+                  filter: PostgresChangeFilter(
+                    type: PostgresChangeFilterType.ilike,
+                    column: 'name',
+                    value: '%land%',
+                    negate: true,
+                  ),
+                  callback: (payload) {
+                    print('Change received: ${payload.toString()}');
+                  })
+              .subscribe();
+          ```
+      - id: listen-with-multiple-filters
+        name: Listen with multiple filters
+        description: Pass a list of filters to `filters` to combine several conditions with `AND`. Use `select` to limit the change payload to a subset of columns.
+        code: |
+          ```dart
+          supabase
+              .channel('public:countries')
+              .onPostgresChanges(
+                  event: PostgresChangeEvent.update,
+                  schema: 'public',
+                  table: 'countries',
+                  filters: [
+                    PostgresChangeFilter(
+                      type: PostgresChangeFilterType.gte,
+                      column: 'population',
+                      value: 1000000,
+                    ),
+                    PostgresChangeFilter(
+                      type: PostgresChangeFilterType.eq,
+                      column: 'continent',
+                      value: 'Europe',
+                    ),
+                  ],
+                  select: ['id', 'name', 'population'],
+                  callback: (payload) {
+                    print('Change received: ${payload.toString()}');
+                  })
+              .subscribe();
+          ```
       - id: listen-to-broadcast
         name: Listen to broadcast messages
         code: |
@@ -4128,6 +4391,24 @@ functions:
         code: |
           ```dart
           final channels = supabase.getChannels();
+          ```
+
+  - id: on-heartbeat
+    description: |
+      A `Stream` that emits a status every time the Realtime client sends a heartbeat, receives an acknowledgement, or when a heartbeat goes unanswered.
+    title: 'onHeartbeat()'
+    notes: |
+      - Each event is a `RealtimeHeartbeatStatus`: `sent` when a heartbeat is pushed, `ok` or `error` when the server acknowledges it, and `timeout` when a prior heartbeat is not answered in time.
+      - Useful for observing connection health, for example to surface a reconnecting indicator in your UI.
+    examples:
+      - id: listen-to-heartbeat
+        name: Listen to heartbeat status
+        isSpotlight: true
+        code: |
+          ```dart
+          final subscription = supabase.realtime.onHeartbeat.listen((status) {
+            print('Heartbeat status: $status');
+          });
           ```
 
   - id: stream
@@ -4211,6 +4492,8 @@ functions:
           ```
   - id: file-buckets
     title: 'Overview'
+    category: Storage
+    subcategory: File Buckets
     notes: |
       This section contains methods for working with File Buckets.
   # - id: analytics-buckets
@@ -5053,6 +5336,8 @@ functions:
           ```
   - id: using-modifiers
     title: Using Modifiers
+    category: Database
+    subcategory: Using modifiers
     description: |
       Filters work on the row level. That is, they allow you to return rows that
       only match certain conditions without changing the shape of the rows.
@@ -5597,6 +5882,10 @@ functions:
         isOptional: true
         type: bool
         description: If `true`, include information on WAL record generation.
+      - name: format
+        isOptional: true
+        type: ExplainFormat
+        description: The output format of the execution plan. Either `ExplainFormat.text` (default) or `ExplainFormat.json`, in which case the plan is returned as a JSON string.
     examples:
       - id: get-execution-plan
         name: Get the execution plan
@@ -5671,6 +5960,8 @@ functions:
         isSpotlight: false
   - id: using-filters
     title: Using Filters
+    category: Database
+    subcategory: Using filters
     description: |
       Filters allow you to only return rows that match certain conditions.
 

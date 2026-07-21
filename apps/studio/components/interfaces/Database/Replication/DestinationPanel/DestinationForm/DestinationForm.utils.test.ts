@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
 import { getBigQueryValidationIssues } from './BigQuery/BigQuery.utils'
+import { getClickHouseValidationIssues } from './ClickHouse/ClickHouse.utils'
 import { CREATE_NEW_KEY, CREATE_NEW_NAMESPACE } from './DestinationForm.constants'
 import {
   buildDestinationConfig,
@@ -79,6 +80,42 @@ const baseSnowflakeFormData = {
   snowflakeRole: ' PIPELINES_ROLE ',
 }
 
+const baseClickHouseFormData = {
+  name: 'ClickHouse Destination',
+  publicationName: 'pub',
+  maxFillMs: undefined,
+  maxTableSyncWorkers: undefined,
+  maxCopyConnectionsPerTable: undefined,
+  invalidatedSlotBehavior: undefined,
+  projectId: undefined,
+  datasetId: undefined,
+  serviceAccountKey: undefined,
+  connectionPoolSize: undefined,
+  maxStalenessMins: undefined,
+  warehouseName: undefined,
+  namespace: undefined,
+  newNamespaceName: undefined,
+  catalogToken: undefined,
+  s3AccessKeyId: undefined,
+  s3SecretAccessKey: undefined,
+  s3Region: undefined,
+  ducklakeCatalogUrl: undefined,
+  ducklakeDataPath: undefined,
+  ducklakePoolSize: undefined,
+  ducklakeS3AccessKeyId: undefined,
+  ducklakeS3SecretAccessKey: undefined,
+  ducklakeS3Region: undefined,
+  ducklakeS3Endpoint: undefined,
+  ducklakeS3UrlStyle: undefined,
+  ducklakeS3UseSsl: undefined,
+  ducklakeMetadataSchema: undefined,
+  clickhouseUrl: ' https://your-cluster.clickhouse.cloud:8443 ',
+  clickhouseUser: ' default ',
+  clickhousePassword: ' secret password ',
+  clickhouseDatabase: ' analytics ',
+  clickhouseEngine: 'replacing_merge_tree' as const,
+}
+
 describe('DestinationForm.utils DuckLake', () => {
   it('builds DuckLake validation config with required fields trimmed and blank optionals removed', () => {
     const config = buildDestinationConfigForValidation({
@@ -150,10 +187,10 @@ describe('DestinationForm.utils DuckLake', () => {
     expect(issues).toEqual([
       { path: 'ducklakeCatalogUrl', message: 'Catalog URL is required' },
       { path: 'ducklakeDataPath', message: 'Data path is required' },
-      { path: 'ducklakeS3AccessKeyId', message: 'S3 Access Key ID is required' },
-      { path: 'ducklakeS3SecretAccessKey', message: 'S3 Secret Access Key is required' },
-      { path: 'ducklakeS3Region', message: 'S3 Region is required' },
-      { path: 'ducklakeS3Endpoint', message: 'S3 Endpoint is required' },
+      { path: 'ducklakeS3AccessKeyId', message: 'S3 access key ID is required' },
+      { path: 'ducklakeS3SecretAccessKey', message: 'S3 secret access key is required' },
+      { path: 'ducklakeS3Region', message: 'S3 region is required' },
+      { path: 'ducklakeS3Endpoint', message: 'S3 endpoint is required' },
     ])
   })
 
@@ -189,7 +226,7 @@ describe('DestinationForm.utils DuckLake', () => {
     )
 
     expect(issues).toEqual([
-      { path: 'ducklakeS3SecretAccessKey', message: 'S3 Secret Access Key is required' },
+      { path: 'ducklakeS3SecretAccessKey', message: 'S3 secret access key is required' },
     ])
   })
 
@@ -207,10 +244,10 @@ describe('DestinationForm.utils DuckLake', () => {
     expect(issues).toEqual([
       { path: 'ducklakeCatalogUrl', message: 'Catalog URL is required' },
       { path: 'ducklakeDataPath', message: 'Data path is required' },
-      { path: 'ducklakeS3AccessKeyId', message: 'S3 Access Key ID is required' },
-      { path: 'ducklakeS3SecretAccessKey', message: 'S3 Secret Access Key is required' },
-      { path: 'ducklakeS3Region', message: 'S3 Region is required' },
-      { path: 'ducklakeS3Endpoint', message: 'S3 Endpoint is required' },
+      { path: 'ducklakeS3AccessKeyId', message: 'S3 access key ID is required' },
+      { path: 'ducklakeS3SecretAccessKey', message: 'S3 secret access key is required' },
+      { path: 'ducklakeS3Region', message: 'S3 region is required' },
+      { path: 'ducklakeS3Endpoint', message: 'S3 endpoint is required' },
     ])
   })
 
@@ -236,7 +273,7 @@ describe('DestinationForm.utils DuckLake', () => {
       },
       {
         path: 'ducklakeS3Endpoint',
-        message: 'S3 endpoint should not contain the protocol scheme',
+        message: 'S3 endpoint must not contain the protocol scheme',
       },
       {
         path: 'ducklakeMetadataSchema',
@@ -440,6 +477,138 @@ describe('DestinationForm.utils Snowflake', () => {
   })
 })
 
+describe('DestinationForm.utils ClickHouse', () => {
+  it('builds ClickHouse validation config with required fields trimmed and blank optionals removed', () => {
+    const config = buildDestinationConfigForValidation({
+      projectRef: 'project-ref',
+      selectedType: 'ClickHouse',
+      data: {
+        ...baseClickHouseFormData,
+        clickhousePassword: '',
+      },
+    })
+
+    expect(config).toEqual({
+      clickHouse: {
+        url: 'https://your-cluster.clickhouse.cloud:8443',
+        user: 'default',
+        password: undefined,
+        database: 'analytics',
+        engine: 'replacing_merge_tree',
+      },
+    })
+  })
+
+  it('builds ClickHouse submit config with normalized values', async () => {
+    const createS3AccessKey = vi.fn()
+    const resolveNamespace = vi.fn()
+
+    const config = await buildDestinationConfig({
+      projectRef: 'project-ref',
+      selectedType: 'ClickHouse',
+      data: baseClickHouseFormData,
+      createS3AccessKey,
+      resolveNamespace,
+    })
+
+    expect(config).toEqual({
+      clickHouse: {
+        url: 'https://your-cluster.clickhouse.cloud:8443',
+        user: 'default',
+        password: ' secret password ',
+        database: 'analytics',
+        engine: 'replacing_merge_tree',
+      },
+    })
+    expect(createS3AccessKey).not.toHaveBeenCalled()
+    expect(resolveNamespace).not.toHaveBeenCalled()
+  })
+
+  it('returns required-field errors for missing ClickHouse settings', () => {
+    const issues = getClickHouseValidationIssues({
+      clickhouseUrl: '',
+      clickhouseUser: '',
+      clickhouseDatabase: '',
+    })
+
+    expect(issues).toEqual([
+      { path: 'clickhouseUrl', message: 'URL is required' },
+      { path: 'clickhouseUser', message: 'User is required' },
+      { path: 'clickhouseDatabase', message: 'Database is required' },
+    ])
+  })
+
+  it('rejects ClickHouse URLs that are not https or target internal addresses', () => {
+    expect(
+      getClickHouseValidationIssues({
+        clickhouseUrl: 'http://example.clickhouse.cloud:8443',
+        clickhouseUser: 'default',
+        clickhouseDatabase: 'analytics',
+      })
+    ).toEqual([{ path: 'clickhouseUrl', message: 'ClickHouse URL must use https://' }])
+
+    expect(
+      getClickHouseValidationIssues({
+        clickhouseUrl: 'https://127.0.0.1:8443',
+        clickhouseUser: 'default',
+        clickhouseDatabase: 'analytics',
+      })
+    ).toEqual([
+      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
+    ])
+  })
+
+  it.each([
+    ['loopback hostname', 'https://localhost:8443'],
+    ['loopback subdomain', 'https://foo.localhost:8443'],
+    ['IPv4 loopback', 'https://127.0.0.1:8443'],
+    ['IPv4 unspecified', 'https://0.0.0.0:8443'],
+    ['RFC 1918 10.0.0.0/8', 'https://10.1.2.3:8443'],
+    ['RFC 1918 172.16.0.0/12', 'https://172.16.0.1:8443'],
+    ['RFC 1918 172.16.0.0/12 upper bound', 'https://172.31.255.254:8443'],
+    ['RFC 1918 192.168.0.0/16', 'https://192.168.1.1:8443'],
+    ['link-local 169.254.0.0/16', 'https://169.254.1.1:8443'],
+    ['CGNAT 100.64.0.0/10', 'https://100.64.0.1:8443'],
+    ['CGNAT 100.64.0.0/10 upper bound', 'https://100.127.255.254:8443'],
+    ['benchmarking 198.18.0.0/15', 'https://198.18.0.1:8443'],
+    ['multicast/reserved 224.0.0.0/4+', 'https://224.0.0.1:8443'],
+    ['broadcast', 'https://255.255.255.255:8443'],
+    ['IPv6 loopback', 'https://[::1]:8443'],
+    ['IPv6 unspecified', 'https://[::]:8443'],
+    ['IPv6 link-local', 'https://[fe80::1]:8443'],
+    ['IPv6 unique local (fc00::/7)', 'https://[fc00::1]:8443'],
+    ['IPv6 unique local (fd00::/8)', 'https://[fd12:3456::1]:8443'],
+    ['IPv4-mapped IPv6', 'https://[::ffff:127.0.0.1]:8443'],
+    ['NAT64', 'https://[64:ff9b::127.0.0.1]:8443'],
+    ['decimal-encoded IPv4 loopback', 'https://2130706433:8443'],
+    ['hex-encoded IPv4 loopback', 'https://0x7f000001:8443'],
+  ])('rejects ClickHouse URLs targeting an internal address: %s', (_label, clickhouseUrl) => {
+    expect(
+      getClickHouseValidationIssues({
+        clickhouseUrl,
+        clickhouseUser: 'default',
+        clickhouseDatabase: 'analytics',
+      })
+    ).toEqual([
+      { path: 'clickhouseUrl', message: 'ClickHouse URL must not target an internal address' },
+    ])
+  })
+
+  it.each([
+    ['public IPv4 address', 'https://8.8.8.8:8443'],
+    ['public hostname', 'https://your-cluster.clickhouse.cloud:8443'],
+    ['public IPv6 address', 'https://[2606:4700:4700::1111]:8443'],
+  ])('accepts ClickHouse URLs targeting a public address: %s', (_label, clickhouseUrl) => {
+    expect(
+      getClickHouseValidationIssues({
+        clickhouseUrl,
+        clickhouseUser: 'default',
+        clickhouseDatabase: 'analytics',
+      })
+    ).toEqual([])
+  })
+})
+
 describe('DestinationForm.utils BigQuery', () => {
   it('returns required-field errors for missing BigQuery settings', () => {
     const issues = getBigQueryValidationIssues({
@@ -451,7 +620,7 @@ describe('DestinationForm.utils BigQuery', () => {
     expect(issues).toEqual([
       { path: 'projectId', message: 'Project ID is required' },
       { path: 'datasetId', message: 'Dataset ID is required' },
-      { path: 'serviceAccountKey', message: 'Service Account Key is required' },
+      { path: 'serviceAccountKey', message: 'Service account key is required' },
     ])
   })
 
@@ -465,7 +634,7 @@ describe('DestinationForm.utils BigQuery', () => {
     expect(issues).toEqual([
       { path: 'projectId', message: 'Project ID is required' },
       { path: 'datasetId', message: 'Dataset ID is required' },
-      { path: 'serviceAccountKey', message: 'Service Account Key is required' },
+      { path: 'serviceAccountKey', message: 'Service account key is required' },
     ])
   })
 
@@ -506,10 +675,10 @@ describe('DestinationForm.utils Analytics Bucket', () => {
 
     expect(issues).toEqual([
       { path: 'warehouseName', message: 'Bucket is required' },
-      { path: 's3Region', message: 'S3 Region is required' },
-      { path: 's3AccessKeyId', message: 'S3 Access Key ID is required' },
+      { path: 's3Region', message: 'S3 region is required' },
+      { path: 's3AccessKeyId', message: 'S3 access key ID is required' },
       { path: 'namespace', message: 'Namespace is required' },
-      { path: 's3SecretAccessKey', message: 'S3 Secret Access Key is required' },
+      { path: 's3SecretAccessKey', message: 'S3 secret access key is required' },
     ])
   })
 
@@ -525,10 +694,10 @@ describe('DestinationForm.utils Analytics Bucket', () => {
 
     expect(issues).toEqual([
       { path: 'warehouseName', message: 'Bucket is required' },
-      { path: 's3Region', message: 'S3 Region is required' },
-      { path: 's3AccessKeyId', message: 'S3 Access Key ID is required' },
+      { path: 's3Region', message: 'S3 region is required' },
+      { path: 's3AccessKeyId', message: 'S3 access key ID is required' },
       { path: 'namespace', message: 'Namespace is required' },
-      { path: 's3SecretAccessKey', message: 'S3 Secret Access Key is required' },
+      { path: 's3SecretAccessKey', message: 'S3 secret access key is required' },
     ])
   })
 
@@ -604,7 +773,7 @@ describe('DestinationForm.utils Analytics Bucket', () => {
     )
 
     expect(issues).toEqual([
-      { path: 's3SecretAccessKey', message: 'S3 Secret Access Key is required' },
+      { path: 's3SecretAccessKey', message: 'S3 secret access key is required' },
     ])
   })
 

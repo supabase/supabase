@@ -2,7 +2,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
-import { useMemo } from 'react'
+import { useMemo, type KeyboardEvent } from 'react'
 import { cn, TabsTrigger } from 'ui'
 
 import { useEditorType } from '../editors/EditorsLayout.hooks'
@@ -17,6 +17,14 @@ import { useTabsStateSnapshot, type Tab } from '@/state/tabs'
  * - Dynamic schema name display
  * - Tab label animations
  * - Close button interactions
+ *
+ * Markup: sortable shell (plain div) → TabsTrigger + close as siblings.
+ * dnd-kit `attributes` are intentionally not spread on the shell — they inject
+ * `role="button"` / `tabIndex={0}`, which nested a second button around the tab.
+ * Only PointerSensor is used for reorder, so those attributes are not required.
+ *
+ * Keyboard: ←/→ move between tabs (Radix). Delete/Backspace on a focused tab
+ * closes it. The active tab's close button is in the tab order.
  */
 export const SortableTab = ({
   tab,
@@ -37,7 +45,7 @@ export const SortableTab = ({
   void tabs.handlerRegistrationVersion
   const StatusIndicator = tabs.getTabStatusIndicator(tab.type)
   const { selectedSchema: currentSchema } = useQuerySchemaState()
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const { setNodeRef, listeners, transform, transition, isDragging } = useSortable({
     id: tab.id,
   })
 
@@ -54,89 +62,109 @@ export const SortableTab = ({
     return openTabs.some((t) => editor === 'table' && t.metadata?.schema !== currentSchema)
   }, [openTabs, currentSchema, editor])
 
-  // Create a motion version of TabsTrigger while preserving all functionality
-  // const MotionTabsTrigger = motion(TabsTrigger)
+  const isActive = tabs.activeTab === tab.id
+
+  const closeTabFromKeyboard = (event: KeyboardEvent) => {
+    if (event.key !== 'Delete' && event.key !== 'Backspace') return
+    event.preventDefault()
+    event.stopPropagation()
+    onClose(tab.id)
+  }
 
   return (
     <motion.div
       ref={setNodeRef}
       style={style}
-      {...attributes}
       layoutId={tab.id}
       transition={{ duration: 0.045 }}
       animate={{ opacity: isDragging ? 0 : 1 }}
       className={cn('flex items-center h-(--header-height) first-of-type:border-l')}
     >
-      <TabsTrigger
-        value={tab.id}
-        onAuxClick={(e) => {
-          // Middle click closes tab
-          if (e.button === 1) {
-            e.preventDefault()
-            onClose(tab.id)
-          }
-        }}
-        onDoubleClick={() => tabs.makeTabPermanent(tab.id)}
-        className={cn(
-          'flex items-center gap-2 pl-3 pr-2.5 text-xs',
-          'bg-dash-sidebar/50 dark:bg-surface-100/50',
-          'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
-          'border-b border-default',
-          'data-[state=active]:border-b-background-dash-sidebar dark:data-[state=active]:border-b-background-surface-100',
-          'relative group h-full',
-          'hover:bg-surface-300 dark:hover:bg-surface-100',
-          tab.isPreview && 'italic font-light' // Optional: style preview tabs differently
-        )}
-        {...listeners}
-      >
-        <EntityTypeIcon type={tab.type} />
-        <div className="flex items-center gap-0">
-          <AnimatePresence mode="popLayout" initial>
-            {shouldShowSchema && (
-              <motion.span
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: 'auto' }}
-                exit={{ opacity: 0, width: 0 }}
-                transition={{ duration: 0.15 }}
-                className="text-foreground-muted group-data-[state=active]:text-foreground-lighter"
-              >
-                {tab?.metadata?.schema}.
-              </motion.span>
-            )}
-          </AnimatePresence>
-          <span>{tab.label || 'Untitled'}</span>
-        </div>
-        {/* VS Code-style slot: the type's status indicator (e.g. an unsaved dot)
-            shows at rest and swaps to the close button on hover. */}
-        <div className="relative ml-1 flex size-5 items-center justify-center">
-          {StatusIndicator && (
-            <span className="absolute inset-0 flex items-center justify-center group-hover:opacity-0">
-              <StatusIndicator tab={tab} />
-            </span>
-          )}
-          <span
-            role="button"
-            aria-label="Close tab"
-            onClick={(e) => {
+      <div className="group/tab relative flex h-full min-w-0 items-center">
+        <TabsTrigger
+          value={tab.id}
+          onAuxClick={(e) => {
+            // Middle click closes tab
+            if (e.button === 1) {
               e.preventDefault()
-              e.stopPropagation()
-            }}
-            className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 hover:bg-200 rounded-xs cursor-pointer"
-            onMouseDown={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-            }}
-            onPointerDown={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
               onClose(tab.id)
-            }}
+            }
+          }}
+          onDoubleClick={() => tabs.makeTabPermanent(tab.id)}
+          onKeyDown={closeTabFromKeyboard}
+          className={cn(
+            'flex items-center gap-2 pl-3 pr-2.5 text-xs',
+            'bg-dash-sidebar/50 dark:bg-surface-100/50',
+            'data-[state=active]:bg-dash-sidebar dark:data-[state=active]:bg-surface-100',
+            'border-b border-default',
+            'data-[state=active]:border-b-background-dash-sidebar dark:data-[state=active]:border-b-background-surface-100',
+            'relative group h-full',
+            'hover:bg-surface-300 dark:hover:bg-surface-100',
+            tab.isPreview && 'italic font-light' // Optional: style preview tabs differently
+          )}
+          {...listeners}
+        >
+          <EntityTypeIcon type={tab.type} />
+          <div className="flex items-center gap-0">
+            <AnimatePresence mode="popLayout" initial>
+              {shouldShowSchema && (
+                <motion.span
+                  initial={{ opacity: 0, width: 0 }}
+                  animate={{ opacity: 1, width: 'auto' }}
+                  exit={{ opacity: 0, width: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="text-foreground-muted group-data-[state=active]:text-foreground-lighter"
+                >
+                  {tab?.metadata?.schema}.
+                </motion.span>
+              )}
+            </AnimatePresence>
+            <span>{tab.label || 'Untitled'}</span>
+          </div>
+          {/* Reserve status/close slot width; close is a sibling overlay, not nested. */}
+          <div
+            className="relative ml-1 flex size-5 shrink-0 items-center justify-center"
+            aria-hidden
           >
-            <X size={12} className="text-foreground-light" />
-          </span>
-        </div>
-        <div className="absolute w-full top-0 left-0 right-0 h-px bg-foreground opacity-0 group-data-[state=active]:opacity-100" />
-      </TabsTrigger>
+            {StatusIndicator && (
+              <span className="absolute inset-0 flex items-center justify-center group-hover/tab:opacity-0 group-focus-within/tab:opacity-0">
+                <StatusIndicator tab={tab} />
+              </span>
+            )}
+          </div>
+          <div className="absolute w-full top-0 left-0 right-0 h-px bg-foreground opacity-0 group-data-[state=active]:opacity-100" />
+        </TabsTrigger>
+        {/* Sibling of TabsTrigger — not nested inside the tab button.
+            Only the active tab's close is in the tab order (roving tabs). Delete/Backspace
+            on the focused tab also closes. */}
+        <button
+          type="button"
+          tabIndex={isActive ? 0 : -1}
+          aria-label="Close tab"
+          onClick={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+            onClose(tab.id)
+          }}
+          onMouseDown={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+          }}
+          onPointerDown={(e) => {
+            e.preventDefault()
+            e.stopPropagation()
+          }}
+          className={cn(
+            'absolute top-1/2 right-2.5 z-10 -translate-y-1/2',
+            'flex size-5 items-center justify-center rounded-xs',
+            'opacity-0 group-hover/tab:opacity-100 group-focus-within/tab:opacity-100 focus-visible:opacity-100',
+            'hover:bg-200 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+            'cursor-pointer'
+          )}
+        >
+          <X size={12} className="text-foreground-light" />
+        </button>
+      </div>
       {index < openTabs.length && (
         <div role="separator" className="h-full w-px bg-border" key={`separator-${tab.id}`} />
       )}

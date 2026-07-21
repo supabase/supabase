@@ -4075,6 +4075,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/replication/{ref}/sources/{source_id}/publications/{publication_name}/cost-estimate': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Estimate replication cost for a publication
+     * @description Estimate the cost of replicating a publication's tables. Returns the flat per-pipeline fee, a per-table breakdown of the one-time initial-copy cost derived from the tables’ on-disk size, and the usage-based streaming rate. Requires bearer auth and an active, healthy project.
+     */
+    get: operations['ReplicationSourcesController_getCostEstimate']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/replication/{ref}/sources/{source_id}/tables': {
     parameters: {
       query?: never
@@ -10877,6 +10897,81 @@ export interface components {
          * @example v0.3.0
          */
         name: string
+      }
+    }
+    CostEstimateResponse: {
+      /**
+       * @description Currency of all amounts
+       * @example usd
+       * @enum {string}
+       */
+      currency: 'usd'
+      /** @description Recurring per-pipeline cost */
+      pipeline: {
+        /**
+         * @description Hourly rate charged per active pipeline
+         * @example 0.053
+         */
+        hourly_cost: number
+        /**
+         * @description Projected monthly cost for an active pipeline, based on an average 730-hour month. Pipelines are billed hourly, so this is an estimate, not a metered amount.
+         * @example 38.69
+         */
+        monthly_cost: number
+      }
+      /** @description Usage-based streaming cost, expressed as a rate */
+      streaming: {
+        /**
+         * @description Usage-based streaming rate per GB. Actual cost depends on the change volume.
+         * @example 3
+         */
+        rate_per_gb: number
+      }
+      /** @description One-time cost for the initial table copy */
+      table_copy: {
+        /**
+         * @description One-time initial-copy rate per GB
+         * @example 0.6
+         */
+        rate_per_gb: number
+        /** @description Per-table initial-copy cost estimate */
+        tables: {
+          /**
+           * @description Estimated on-disk size of the table in bytes
+           * @example 10960896
+           */
+          estimated_bytes: number
+          /**
+           * @description Estimated one-time initial-copy cost for the table, in the response currency
+           * @example 0.01
+           */
+          estimated_cost: number
+          /**
+           * @description Whether this table has a row filter. The estimate does not account for how many rows the filter excludes, so the actual replicated volume may be lower than shown.
+           * @example false
+           */
+          is_row_filtered: boolean
+          /**
+           * @description Table name
+           * @example orders
+           */
+          name: string
+          /**
+           * @description Table schema
+           * @example public
+           */
+          schema: string
+        }[]
+        /**
+         * @description Total estimated bytes across all tables
+         * @example 11911168
+         */
+        total_bytes: number
+        /**
+         * @description Total estimated one-time initial-copy cost
+         * @example 0.01
+         */
+        total_cost: number
       }
     }
     ReplicationPublicationsResponse: {
@@ -28209,6 +28304,61 @@ export interface operations {
         content?: never
       }
       /** @description Unexpected error while listing publications. */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  ReplicationSourcesController_getCostEstimate: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Publication name */
+        publication_name: string
+        /** @description Project ref */
+        ref: string
+        /** @description Source id */
+        source_id: number
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Cost estimate for replicating the publication. */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CostEstimateResponse']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unexpected error while estimating replication cost. */
       500: {
         headers: {
           [name: string]: unknown

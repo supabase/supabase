@@ -23,6 +23,40 @@ import { breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
 
 type ViewMode = 'grid' | 'matrix'
 
+// Relevance weights used to rank search results. Title matches are considered
+// far more important than body content, so a feature whose title matches the
+// query surfaces above features where the term only appears in the description.
+// Title weights are deliberately larger than the maximum combined body score
+// (SUBTITLE_INCLUDES + DESCRIPTION_INCLUDES), so any title match always ranks
+// above a feature that only matches in its subtitle and/or description.
+const SEARCH_WEIGHT = {
+  TITLE_STARTS_WITH: 5,
+  TITLE_INCLUDES: 4,
+  SUBTITLE_INCLUDES: 2,
+  DESCRIPTION_INCLUDES: 1,
+} as const
+
+// Score a feature against a (lowercased) search term. Higher is more relevant.
+// Returns 0 when nothing matches.
+function getSearchScore(feature: (typeof features)[number], term: string): number {
+  if (!term) return 0
+
+  const title = feature.title.toLowerCase()
+  const subtitle = feature.subtitle.toLowerCase()
+  const description = feature.description.toLowerCase()
+
+  let score = 0
+  if (title.startsWith(term)) {
+    score += SEARCH_WEIGHT.TITLE_STARTS_WITH
+  } else if (title.includes(term)) {
+    score += SEARCH_WEIGHT.TITLE_INCLUDES
+  }
+  if (subtitle.includes(term)) score += SEARCH_WEIGHT.SUBTITLE_INCLUDES
+  if (description.includes(term)) score += SEARCH_WEIGHT.DESCRIPTION_INCLUDES
+
+  return score
+}
+
 function FeaturesPage() {
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState<string>((router?.query.q as string) || '')
@@ -89,20 +123,31 @@ function FeaturesPage() {
   }
 
   // Filter features based on search term and selected products
-  const filteredFeatures = features.filter((feature) => {
-    const matchesSearch =
-      feature.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      feature.subtitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      feature.description.toLowerCase().includes(searchTerm.toLowerCase())
+  const normalizedSearchTerm = searchTerm.toLowerCase()
+  const filteredFeatures = features
+    .filter((feature) => {
+      const matchesSearch =
+        !normalizedSearchTerm || getSearchScore(feature, normalizedSearchTerm) > 0
 
-    const matchesProduct =
-      selectedProducts.length === 0 ||
-      feature.products.some((product) => selectedProducts.includes(product))
+      const matchesProduct =
+        selectedProducts.length === 0 ||
+        feature.products.some((product) => selectedProducts.includes(product))
 
-    const matchesSelfHosted = !showSelfHostedOnly || feature.status?.availableOnSelfHosted === true
+      const matchesSelfHosted =
+        !showSelfHostedOnly || feature.status?.availableOnSelfHosted === true
 
-    return matchesSearch && matchesProduct && matchesSelfHosted
-  })
+      return matchesSearch && matchesProduct && matchesSelfHosted
+    })
+    // When searching, rank by relevance (title matches weigh more than body
+    // content), falling back to alphabetical order for ties and no search.
+    .sort((a, b) => {
+      if (normalizedSearchTerm) {
+        const scoreDiff =
+          getSearchScore(b, normalizedSearchTerm) - getSearchScore(a, normalizedSearchTerm)
+        if (scoreDiff !== 0) return scoreDiff
+      }
+      return a.title > b.title ? 1 : -1
+    })
 
   const meta = {
     title: 'Supabase Features',
@@ -265,61 +310,59 @@ function FeaturesPage() {
               </p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-4">
-                {filteredFeatures
-                  .sort((a, b) => (a.title > b.title ? 1 : -1))
-                  .map((feature) => (
-                    <Link
-                      key={`feat-${feature.title}`}
-                      href={`/features/${feature.slug}`}
-                      className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
+                {filteredFeatures.map((feature) => (
+                  <Link
+                    key={`feat-${feature.title}`}
+                    href={`/features/${feature.slug}`}
+                    className="flex flex-col justify-start items-stretch group cursor-pointer transition rounded-xl focus-visible:ring-2 focus-visible:ring-foreground-lighter outline-hidden outline-0 focus-visible:outline-4 focus-visible:outline-offset-1 focus-visible:outline-foreground-lighter"
+                  >
+                    <Panel
+                      hasActiveOnHover
+                      outerClassName="h-full"
+                      innerClassName="flex md:flex-col gap-3 sm:gap-2 h-full items-start p-2"
                     >
-                      <Panel
-                        hasActiveOnHover
-                        outerClassName="h-full"
-                        innerClassName="flex md:flex-col gap-3 sm:gap-2 h-full items-start p-2"
-                      >
-                        <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:aspect-video! bg-alternative flex items-center justify-center shadow-inner border border-muted">
-                          <feature.icon className="w-5 h-5 text-foreground-light group-hover:text-foreground transition-colors" />
-                          {feature.status && (
-                            <div className="hidden md:block absolute bottom-1.5 left-1.5">
-                              <Badge
-                                variant={stageBadgeVariant(feature.status.stage)}
-                                className="text-[10px] py-0 px-1.5 h-4 rounded-sm"
-                              >
-                                {stageLabel(feature.status.stage)}
-                              </Badge>
-                            </div>
-                          )}
-                        </div>
-                        <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
-                          <h3 className="text-sm md:text-base text-foreground leading-5!">
-                            {feature.title}
-                          </h3>
-                          <p className="text-foreground-light text-sm line-clamp-2">
-                            {feature.subtitle}
-                          </p>
-                          <div className="flex flex-wrap items-center gap-1 mb-0.5">
-                            {feature.status && (
-                              <Badge
-                                variant={stageBadgeVariant(feature.status.stage)}
-                                className="md:hidden text-[10px] py-0 px-1.5 h-4 rounded-sm"
-                              >
-                                {stageLabel(feature.status.stage)}
-                              </Badge>
-                            )}
-                            {feature.products.map((product) => (
-                              <span
-                                key={product}
-                                className="inline-flex items-center text-[10px] font-medium px-1.5 py-0 h-4 rounded bg-surface-200 text-foreground-light border border-muted capitalize"
-                              >
-                                {productLabel(product)}
-                              </span>
-                            ))}
+                      <div className="relative rounded-lg min-h-[80px] max-h-[80px] md:max-h-[140px] h-full md:h-auto aspect-square md:w-full md:aspect-video! bg-alternative flex items-center justify-center shadow-inner border border-muted">
+                        <feature.icon className="w-5 h-5 text-foreground-light group-hover:text-foreground transition-colors" />
+                        {feature.status && (
+                          <div className="hidden md:block absolute bottom-1.5 left-1.5">
+                            <Badge
+                              variant={stageBadgeVariant(feature.status.stage)}
+                              className="text-[10px] py-0 px-1.5 h-4 rounded-sm"
+                            >
+                              {stageLabel(feature.status.stage)}
+                            </Badge>
                           </div>
+                        )}
+                      </div>
+                      <div className="md:p-2 md:pt-1 flex flex-col h-full md:h-auto grow gap-0.5 md:gap-1.5 justify-center md:justify-start">
+                        <h3 className="text-sm md:text-base text-foreground leading-5!">
+                          {feature.title}
+                        </h3>
+                        <p className="text-foreground-light text-sm line-clamp-2">
+                          {feature.subtitle}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-1 mb-0.5">
+                          {feature.status && (
+                            <Badge
+                              variant={stageBadgeVariant(feature.status.stage)}
+                              className="md:hidden text-[10px] py-0 px-1.5 h-4 rounded-sm"
+                            >
+                              {stageLabel(feature.status.stage)}
+                            </Badge>
+                          )}
+                          {feature.products.map((product) => (
+                            <span
+                              key={product}
+                              className="inline-flex items-center text-[10px] font-medium px-1.5 py-0 h-4 rounded bg-surface-200 text-foreground-light border border-muted capitalize"
+                            >
+                              {productLabel(product)}
+                            </span>
+                          ))}
                         </div>
-                      </Panel>
-                    </Link>
-                  ))}
+                      </div>
+                    </Panel>
+                  </Link>
+                ))}
               </div>
             )}
           </div>

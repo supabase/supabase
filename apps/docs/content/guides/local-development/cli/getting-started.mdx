@@ -9,6 +9,19 @@ The Supabase CLI enables you to run the entire Supabase stack locally, on your m
 1. `supabase init` to create a new local project
 2. `supabase start` to launch the Supabase services
 
+<Admonition type="note" label="Global command vs. project dependency">
+
+There are two ways to install the CLI, and they change the command you type:
+
+- **Project dependency** with `npm`, `pnpm`, or `yarn` installs the CLI into a single project (there is no global `supabase` command with this method). Run it through your package runner instead, for example `npx supabase <command>`.
+- **Global install** with Homebrew, Scoop, or Linux packages. Run commands as `supabase <command>`.
+
+Either way, the CLI is **project-scoped**: most commands (including `start`) expect to run inside a directory that has been initialized with `supabase init`, which creates the `supabase/` folder and `config.toml`. Run `init` first, then the other commands from the same directory.
+
+The rest of this page writes examples as `supabase <command>`; translate them to `npx supabase <command>` if you installed the CLI as a project dependency.
+
+</Admonition>
+
 ## Installing the Supabase CLI
 
 <Tabs
@@ -16,8 +29,30 @@ The Supabase CLI enables you to run the entire Supabase stack locally, on your m
   size="small"
   type="underlined"
   defaultActiveId="npm"
-  queryGroup="platform"
 >
+<TabPanel id="npm" label="npm">
+
+Install the CLI as a project dev dependency. This adds it to a single project rather than installing a global command:
+
+```sh
+npm install supabase --save-dev
+# or: pnpm add -D supabase / yarn add -D supabase / bun add -D supabase
+```
+
+Pin the version in `package.json` so your whole team uses the same CLI version. Then run every command through your package runner:
+
+```sh
+npx supabase --help
+# or: pnpm supabase / yarn supabase / bunx supabase
+```
+
+<Admonition type="caution">
+
+The Supabase CLI requires **Node.js 20 or later** when run via `npx` or `npm`. Older Node.js versions, such as 16, are not supported and fail to start the CLI.
+
+</Admonition>
+
+</TabPanel>
 <TabPanel id="macos" label="macOS">
 
 Install the CLI with [Homebrew](https://brew.sh):
@@ -39,7 +74,7 @@ scoop install supabase
 </TabPanel>
 <TabPanel id="linux" label="Linux">
 
-The CLI is available through [Homebrew](https://brew.sh) and Linux packages.
+The CLI is available via [Homebrew](https://brew.sh) and Linux packages.
 
 #### Homebrew
 
@@ -58,27 +93,6 @@ and run one of the following:
 - `sudo rpm -i <...>.rpm`
 
 </TabPanel>
-<TabPanel id="npm" label="Node.js">
-
-Run the CLI by prefixing each command with `npx` or `bunx`:
-
-```sh
-npx supabase --help
-```
-
-<Admonition type="caution">
-
-The Supabase CLI requires **Node.js 20 or later** when run via `npx` or `npm`. Older Node.js versions, such as 16, are not supported and fail to start the CLI.
-
-</Admonition>
-
-You can also install the CLI as dev dependency via [npm](https://www.npmjs.com/package/supabase):
-
-```sh
-npm install supabase --save-dev
-```
-
-</TabPanel>
 </Tabs>
 
 ## Beta channel
@@ -90,8 +104,22 @@ Pre-release CLI builds ship from the development branch (`X.Y.Z-beta.N` versions
   size="small"
   type="underlined"
   defaultActiveId="npm"
-  queryGroup="platform"
 >
+<TabPanel id="npm" label="npm">
+
+Install as a dev dependency:
+
+```sh
+npm install supabase@beta --save-dev
+```
+
+Or run without installing:
+
+```sh
+npx supabase@beta --help
+```
+
+</TabPanel>
 <TabPanel id="macos" label="macOS">
 
 ```sh
@@ -122,21 +150,6 @@ brew link --overwrite supabase-beta
 Beta builds are attached to [GitHub pre-releases](https://github.com/supabase/cli/releases). Download the `.apk`, `.deb`, or `.rpm` for your platform and install with the same commands as [Linux packages](#linux-packages) above.
 
 </TabPanel>
-<TabPanel id="npm" label="Node.js">
-
-Install as a dev dependency:
-
-```sh
-npm install supabase@beta --save-dev
-```
-
-Or run without installing:
-
-```sh
-npx supabase@beta --help
-```
-
-</TabPanel>
 </Tabs>
 
 ## Updating the Supabase CLI
@@ -147,8 +160,7 @@ When a new [version](https://github.com/supabase/cli/releases) is released, you 
   scrollable
   size="small"
   type="underlined"
-  defaultActiveId="npm"
-  queryGroup="platform"
+  defaultActiveId="macos"
 >
 <TabPanel id="macos" label="macOS">
 
@@ -199,7 +211,7 @@ brew upgrade supabase-beta
    - `sudo rpm -i <...>.rpm`
 
 </TabPanel>
-<TabPanel id="npm" label="Node.js">
+<TabPanel id="npm" label="npm">
 
 If you have installed the CLI as dev dependency via [npm](https://www.npmjs.com/package/supabase), you can update it with:
 
@@ -230,9 +242,9 @@ supabase stop --no-backup
 
 </Admonition>
 
-## Running Supabase locally
+## Running a local Supabase project
 
-The Supabase CLI uses Docker containers to manage the local development stack. Follow the official guide to install and configure [Docker Desktop](https://docs.docker.com/desktop) on your machine.
+The most common thing you'll do with the CLI is run the full Supabase stack (Postgres, Auth, Storage, and the rest) on your own machine. That stack runs in Docker containers, so you need a container runtime installed first. Follow the official guide to install and configure [Docker Desktop](https://docs.docker.com/desktop) on your machine.
 
 Alternately, you can use a different container tool that offers Docker compatible APIs.
 
@@ -241,7 +253,7 @@ Alternately, you can use a different container tool that offers Docker compatibl
 - [OrbStack](https://orbstack.dev/) (macOS)
 - [colima](https://github.com/abiosoft/colima) (macOS)
 
-Inside the folder where you want to create your project, run:
+With a container runtime running, go to the folder where you want to create your project and initialize it:
 
 ```bash
 supabase init
@@ -249,11 +261,17 @@ supabase init
 
 This creates a new `supabase` folder. It's safe to commit this folder to version control.
 
-Now, to start the Supabase stack, run:
+Now, from the same folder, start the Supabase stack:
 
 ```bash
 supabase start
 ```
+
+<Admonition type="note">
+
+If you installed the CLI as a project dependency (npm, pnpm, yarn, or bun), run these as `npx supabase init` and `npx supabase start` instead. See the [note above](#installing-the-supabase-cli).
+
+</Admonition>
 
 This takes time on your first run because the CLI needs to download the Docker images to your local machine. The CLI includes the entire Supabase stack, and a few additional images useful for local development (like a local SMTP server and a database diff tool).
 
@@ -362,7 +380,7 @@ http://localhost:54321/auth/v1/           # Auth (GoTrue)
 </TabPanel>
 <TabPanel id="analytics" label="Analytics">
 
-Local logs rely on the Supabase Analytics Server which accesses the docker logging driver by either volume mounting `/var/run/docker.sock` domain socket on Linux and macOS, or exposing `tcp://localhost:2375` daemon socket on Windows. These settings must be configured manually after [installing](/docs/guides/cli/getting-started#installing-the-supabase-cli) the Supabase CLI.
+Local logs rely on the Supabase Analytics Server which accesses the docker logging driver by either volume mounting `/var/run/docker.sock` domain socket on Linux and macOS, or exposing `tcp://localhost:2375` daemon socket on Windows. These settings must be configured manually after [installing](/docs/guides/local-development/cli/getting-started#installing-the-supabase-cli) the Supabase CLI.
 
 <Admonition type="note">
 

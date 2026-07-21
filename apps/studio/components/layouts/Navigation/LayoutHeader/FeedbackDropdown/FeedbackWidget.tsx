@@ -252,6 +252,9 @@ export const FeedbackWidget = ({ onClose, onSwitchToIssueOptions }: FeedbackWidg
               className="cursor-pointer rounded-sm h-[26px] w-[26px] border border-control relative bg-cover bg-center bg-no-repeat"
             >
               <button
+                type="button"
+                tabIndex={0}
+                aria-label="Remove screenshot"
                 className={[
                   'cursor-pointer rounded-full bg-red-900 h-3 w-3',
                   'flex items-center justify-center absolute -top-1 -right-1',

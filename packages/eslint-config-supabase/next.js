@@ -9,6 +9,7 @@ const tsparser = require('@typescript-eslint/parser')
 
 // Custom Supabase rules
 const noAwaitBeforeCopyToClipboard = require('./rules/no-await-before-copy-to-clipboard')
+const requireExplicitTabIndex = require('./rules/require-explicit-tabindex')
 
 const compat = new FlatCompat({
   baseDirectory: __dirname,
@@ -20,6 +21,7 @@ const compat = new FlatCompat({
 const supabasePlugin = {
   rules: {
     'no-await-before-copy-to-clipboard': noAwaitBeforeCopyToClipboard,
+    'require-explicit-tabindex': requireExplicitTabIndex,
   },
 }
 
@@ -41,6 +43,7 @@ const typescriptConfig = {
   rules: {
     '@typescript-eslint/no-explicit-any': 'warn',
     'supabase/no-await-before-copy-to-clipboard': 'error',
+    'supabase/require-explicit-tabindex': 'warn',
   },
 }
 

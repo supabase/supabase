@@ -251,6 +251,7 @@ const FeaturePreviewItem = ({
   return (
     <button
       type="button"
+      tabIndex={0}
       key={feature.key}
       onClick={() => selectFeaturePreview(feature.key)}
       className={cn(

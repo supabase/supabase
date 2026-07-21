@@ -8,6 +8,7 @@ import { Admonition } from 'ui-patterns/admonition'
 import { InlineLink } from './InlineLink'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { useProjectUpgradingStatusQuery } from '@/data/config/project-upgrade-status-query'
+import { useShowPostgresUpgradeLogs } from '@/hooks/misc/useShowPostgresUpgradeLogs'
 import { IS_PLATFORM } from '@/lib/constants'
 import { guessLocalTimezone } from '@/lib/dayjs'
 
@@ -17,6 +18,7 @@ export const ProjectUpgradeFailedBanner = () => {
   const { ref } = useParams()
   const { data } = useProjectUpgradingStatusQuery({ projectRef: ref }, { enabled: IS_PLATFORM })
   const { status, initiated_at, latest_status_at, error } = data?.databaseUpgradeStatus ?? {}
+  const showPostgresUpgradeLogs = useShowPostgresUpgradeLogs()
 
   const isFailed = status === DatabaseUpgradeStatus.Failed
   const initiatedAt = dayjs
@@ -64,13 +66,15 @@ export const ProjectUpgradeFailedBanner = () => {
           Your project and its data are not affected. Please reach out to us via our support form
           for assistance with the upgrade.
         </div>
-        <div>
-          You may also view logs related to the failed upgrade in your{' '}
-          <InlineLink href={`/project/${ref}/logs/pg-upgrade-logs?${timestampFilter}`}>
-            project's logs
-          </InlineLink>
-          .
-        </div>
+        {showPostgresUpgradeLogs && (
+          <div>
+            You may also view logs related to the failed upgrade in your{' '}
+            <InlineLink href={`/project/${ref}/logs/pg-upgrade-logs?${timestampFilter}`}>
+              project's logs
+            </InlineLink>
+            .
+          </div>
+        )}
       </Admonition>
     </div>
   )

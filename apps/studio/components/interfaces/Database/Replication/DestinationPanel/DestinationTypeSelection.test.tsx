@@ -20,12 +20,14 @@ const mockBigQueryEnabled = vi.fn()
 const mockIcebergEnabled = vi.fn()
 const mockDucklakeEnabled = vi.fn()
 const mockSnowflakeEnabled = vi.fn()
+const mockClickHouseEnabled = vi.fn()
 
 vi.mock('../useIsETLPrivateAlpha', () => ({
   useIsETLBigQueryPrivateAlpha: () => mockBigQueryEnabled(),
   useIsETLIcebergPrivateAlpha: () => mockIcebergEnabled(),
   useIsETLDucklakePrivateAlpha: () => mockDucklakeEnabled(),
   useIsETLSnowflakePrivateAlpha: () => mockSnowflakeEnabled(),
+  useIsETLClickHousePrivateAlpha: () => mockClickHouseEnabled(),
 }))
 
 vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
@@ -57,6 +59,7 @@ describe('DestinationTypeSelection', () => {
     mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
+    mockClickHouseEnabled.mockReturnValue(false)
     addBackgroundMocks()
 
     customRender(<DestinationTypeSelection />)
@@ -69,6 +72,7 @@ describe('DestinationTypeSelection', () => {
     mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
+    mockClickHouseEnabled.mockReturnValue(false)
     addBackgroundMocks()
 
     customRender(<DestinationTypeSelection />)
@@ -84,6 +88,7 @@ describe('DestinationTypeSelection', () => {
     mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
+    mockClickHouseEnabled.mockReturnValue(false)
     addBackgroundMocks()
 
     customRender(<DestinationTypeSelection />)
@@ -99,6 +104,7 @@ describe('DestinationTypeSelection', () => {
     mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
+    mockClickHouseEnabled.mockReturnValue(false)
     addBackgroundMocks()
 
     customRender(<DestinationTypeSelection />)
@@ -113,11 +119,12 @@ describe('DestinationTypeSelection', () => {
     expect(screen.queryByText('Pipelines')).not.toBeInTheDocument()
   })
 
-  test('shows alpha warning when an alpha destination type is selected', async () => {
+  test('shows the public alpha warning for a Pipelines destination', async () => {
     mockBigQueryEnabled.mockReturnValue(true)
     mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
+    mockClickHouseEnabled.mockReturnValue(false)
     addBackgroundMocks()
 
     customRender(<DestinationTypeSelection />)
@@ -125,7 +132,7 @@ describe('DestinationTypeSelection', () => {
     fireEvent.click(await screen.findByRole('combobox'))
     fireEvent.click(await screen.findByText('BigQuery'))
 
-    expect(await screen.findByText(/This destination type is in alpha/)).toBeInTheDocument()
+    expect(await screen.findByText(/This destination type is in public alpha/)).toBeInTheDocument()
   })
 
   test('disables the selector in edit mode so the destination type cannot be changed', async () => {
@@ -133,6 +140,7 @@ describe('DestinationTypeSelection', () => {
     mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
+    mockClickHouseEnabled.mockReturnValue(false)
     addBackgroundMocks()
     // Edit mode triggers useDestinationInformation({ id: 1 }) which fires destination-by-id
     addAPIMock({

@@ -1,7 +1,6 @@
-import MotionNumber from '@number-flow/react'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { Alert, AlertDescription, AlertTitle, Button, CriticalIcon } from 'ui'
+import { Alert, AlertDescription, AlertTitle, Button, cn, CriticalIcon } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -119,8 +118,8 @@ export const DiskUsage = ({
                 <p className="text-xs">8 GB GP3 disk per project</p>
               </div>
 
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-foreground-light">Overages in period</p>
+              <div className="flex items-center justify-between py-1">
+                <p className="text-xs text-foreground-light">Overage in period</p>
                 <p className="text-xs">
                   {(gp3UsageInPeriod?.usage ?? 0).toLocaleString()} GP3 GB-Hrs
                   {io2UsageInPeriod?.usage
@@ -153,65 +152,62 @@ export const DiskUsage = ({
                   </Panel>
                 )}
 
-                {relevantProjects.map((project, idx) => {
-                  const primaryDiskUsage = project.databases
-                    .filter((it) => it.type === 'PRIMARY')
-                    .reduce((acc, curr) => acc + (curr.disk_volume_size_gb ?? 8), 0)
-                  const replicaDbs = project.databases.filter((it) => it.type !== 'PRIMARY')
-                  const replicaDiskUsage = replicaDbs.reduce(
-                    (acc, curr) => acc + (curr.disk_volume_size_gb ?? 8),
-                    0
-                  )
+                <div className="flex flex-col gap-y-2">
+                  {relevantProjects.map((project, idx) => {
+                    const primaryDiskUsage = project.databases
+                      .filter((it) => it.type === 'PRIMARY')
+                      .reduce((acc, curr) => acc + (curr.disk_volume_size_gb ?? 8), 0)
+                    const replicaDbs = project.databases.filter((it) => it.type !== 'PRIMARY')
+                    const replicaDiskUsage = replicaDbs.reduce(
+                      (acc, curr) => acc + (curr.disk_volume_size_gb ?? 8),
+                      0
+                    )
 
-                  const totalDiskUsage = primaryDiskUsage + replicaDiskUsage
+                    const totalDiskUsage = primaryDiskUsage + replicaDiskUsage
 
-                  return (
-                    <div
-                      key={`usage-project-${project.ref}`}
-                      className={idx !== relevantProjects.length - 1 ? 'border-b pb-2' : ''}
-                    >
-                      <div className="flex justify-between">
-                        <span className="text-foreground-light flex items-center gap-2">
-                          {project.name}
-                        </span>
-                        <Button asChild variant="default" size={'tiny'}>
+                    return (
+                      <div
+                        key={`usage-project-${project.ref}`}
+                        className={cn(
+                          'flex items-center justify-between',
+                          idx !== relevantProjects.length - 1 && 'border-b pb-2'
+                        )}
+                      >
+                        <div>
+                          <p className="text-foreground-light text-sm flex items-center gap-2">
+                            {project.name}
+                          </p>
+                          <div className="flex items-center gap-x-2">
+                            <span className="text-foreground-lighter text-sm flex items-center gap-2">
+                              {totalDiskUsage} GB Disk provisioned
+                            </span>
+                            <InfoTooltip side="right">
+                              <p>{primaryDiskUsage} GB for Primary Database</p>
+                              {replicaDbs.length > 0 && (
+                                <>
+                                  <p>
+                                    {replicaDiskUsage} GB for {replicaDbs.length} Read{' '}
+                                    {replicaDbs.length === 1 ? 'Replica' : 'Replicas'}
+                                  </p>
+                                  <p className="mt-1">
+                                    Read replicas have their own disk and use 25% more disk to
+                                    account for WAL files.
+                                  </p>
+                                </>
+                              )}
+                            </InfoTooltip>
+                          </div>
+                        </div>
+
+                        <Button asChild variant="default" size="tiny">
                           <Link href={`/project/${project.ref}/settings/compute-and-disk`}>
                             Manage Disk
                           </Link>
                         </Button>
                       </div>
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center h-6 gap-3">
-                          <span className="text-foreground-light text-sm font-mono flex items-center gap-2">
-                            <span className="text-foreground font-semibold mt-[-2px]">
-                              <MotionNumber
-                                value={totalDiskUsage}
-                                style={{ lineHeight: 0.8 }}
-                                className="font-mono"
-                              />
-                            </span>{' '}
-                            GB Disk provisioned
-                          </span>
-                          <InfoTooltip side="top">
-                            <p>{primaryDiskUsage} GB for Primary Database</p>
-                            {replicaDbs.length > 0 && (
-                              <>
-                                <p>
-                                  {replicaDiskUsage} GB for {replicaDbs.length} Read{' '}
-                                  {replicaDbs.length === 1 ? 'Replica' : 'Replicas'}
-                                </p>
-                                <p className="mt-1">
-                                  Read replicas have their own disk and use 25% more disk to account
-                                  for WAL files.
-                                </p>
-                              </>
-                            )}
-                          </InfoTooltip>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
+                </div>
               </div>
             ) : (
               <Panel>

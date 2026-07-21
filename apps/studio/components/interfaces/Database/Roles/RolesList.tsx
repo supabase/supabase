@@ -149,6 +149,7 @@ export const RolesList = () => {
           />
           <div className="flex items-center border border-strong rounded-full w-min h-[26px]">
             <button
+              tabIndex={0}
               className={cn(
                 'text-xs w-[80px] h-full text-center rounded-l-full flex items-center justify-center transition',
                 filterType === 'all'
@@ -161,6 +162,7 @@ export const RolesList = () => {
             </button>
             <div className="h-full w-px border-r border-strong"></div>
             <button
+              tabIndex={0}
               className={cn(
                 'text-xs w-[80px] h-full text-center rounded-r-full flex items-center justify-center transition',
                 filterType === 'active'

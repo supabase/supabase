@@ -90,6 +90,12 @@ breadcrumb: 'Migrations'
 
 ### Restore backup using CLI
 
+<Admonition type="note">
+
+These steps cover a manual logical restore (`pg_dump` / `psql`) into a project you create yourself. The [Restore to a new project](/docs/guides/platform/clone-project) and [Branching](/docs/guides/deployment/branching) flows copy your encryption root key to the new project automatically, so the key-copy step below does not apply to them.
+
+</Admonition>
+
 <StepHikeCompact>
     <StepHikeCompact.Step step={1}>
         <StepHikeCompact.Details title="Create project" fullWidth>
@@ -147,7 +153,7 @@ breadcrumb: 'Migrations'
           type="underlined"
           defaultActiveId="no-column-encryption"
         >
-          <TabPanel id="no-column-encryption" label="Column encryption disabled">
+          <TabPanel id="no-column-encryption" label="No Vault or column encryption">
 
           Run these commands after replacing ```[CONNECTION_STRING]``` with your connection string from the previous steps:
 
@@ -163,8 +169,17 @@ breadcrumb: 'Migrations'
           ```
 
           </TabPanel>
-          <TabPanel id="column-encryption" label="Column encryption enabled">
-          If you use [column encryption](/docs/guides/database/column-encryption), copy the root encryption key to your new project using your [Personal Access Token](/dashboard/account/tokens).
+          <TabPanel id="column-encryption" label="Supabase Vault or column encryption">
+
+          <Admonition type="caution">
+
+          Retrieve the root encryption key from the **old** project _before_ you pause or delete it. The API below only returns the key for active projects - once the old project is paused or removed, the key (and any data encrypted with it) can no longer be retrieved.
+
+          Backup files never contain the root key; they hold only encrypted data. A newly created project is initialized with its own fresh root key, so Vault secrets and encrypted columns restored from the old project cannot be decrypted until you copy the old key across. Overwriting a project's root key makes any data encrypted under a different key inaccessible.
+
+          </Admonition>
+
+          If you use [Supabase Vault](/docs/guides/database/vault) or [pgsodium](/docs/guides/database/extensions/pgsodium), copy the root encryption key to your new project using your [Personal Access Token](/dashboard/account/tokens). Both rely on the same per-project root key.
 
           You can restore the project using both the old and new project ref (the project ref is the value between "https://" and ".supabase.co" in the URL) instead of the URL.
 
@@ -179,6 +194,8 @@ breadcrumb: 'Migrations'
             -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
             -X PUT --json @-
           ```
+
+          The endpoint both returns and expects the 64-character hex root key.
           </TabPanel>
         </Tabs>
       </StepHikeCompact.Details>

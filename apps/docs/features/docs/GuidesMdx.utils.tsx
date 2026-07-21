@@ -30,7 +30,7 @@ const PUBLISHED_SECTIONS = [
   'deployment',
   'functions',
   'getting-started',
-  // 'graphql', -- technically published, but completely federated
+  'graphql',
   'integrations',
   'local-development',
   'platform',
@@ -77,13 +77,14 @@ const getGuidesMarkdownInternal = async (slug: string[]) => {
       throw Error(`Type of frontmatter is not valid for path: ${fullPath}`)
     }
 
+    const { editLink: editLinkOverride, ...restMeta } = meta
     const editLink = newEditLink(
-      `supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
+      editLinkOverride ?? `supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
     )
 
     return {
       pathname: `/guides/${slug.join('/')}` satisfies `/${string}`,
-      meta,
+      meta: restMeta,
       content,
       editLink,
     }
