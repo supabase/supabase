@@ -85,6 +85,24 @@ describe('sanitizeArrayOfObjects', () => {
     expect(result.name).toBe('loop')
   })
 
+  it('does not report a shared (non-circular) reference as circular', () => {
+    const shared = { name: 'world' }
+
+    const [result] = sanitizeArrayOfObjects([{ a: shared, b: shared }]) as Array<any>
+
+    expect(result.a).toEqual({ name: 'world' })
+    expect(result.b).toEqual({ name: 'world' })
+  })
+
+  it('sanitizes a reference reused across sibling items independently', () => {
+    const shared = { name: 'world' }
+
+    const result = sanitizeArrayOfObjects([{ ref: shared }, { ref: shared }]) as Array<any>
+
+    expect(result[0].ref).toEqual({ name: 'world' })
+    expect(result[1].ref).toEqual({ name: 'world' })
+  })
+
   it('sanitizes complex types consistently', () => {
     const date = new Date('2024-01-01T00:00:00.000Z')
     const regex = /abc/gi
