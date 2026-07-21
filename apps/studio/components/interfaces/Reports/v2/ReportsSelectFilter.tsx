@@ -50,7 +50,7 @@ export const ReportsSelectFilter = ({
   }, [open, value])
 
   const handleApply = () => {
-    onChange(tempValue)
+    onChange([...tempValue].sort())
     setOpen(false)
   }
 
@@ -85,7 +85,7 @@ export const ReportsSelectFilter = ({
       </PopoverTrigger>
       <PopoverContent align="start" className={cn('p-0 w-72', popoverClassName)}>
         <Command>
-          {showSearch && <CommandInput placeholder="Search..." />}
+          {showSearch && <CommandInput placeholder="Search..." className="text-xs" />}
           <CommandList className="max-h-72">
             <CommandEmpty>No options found.</CommandEmpty>
             <CommandGroup>
@@ -115,7 +115,7 @@ export const ReportsSelectFilter = ({
                         )}
                       </div>
                       {!!option.quantity && (
-                        <code className="text-code-inline">{option.quantity}</code>
+                        <code className="p-0 px-1 text-code-inline">{option.quantity}</code>
                       )}
                     </div>
                   </Label>

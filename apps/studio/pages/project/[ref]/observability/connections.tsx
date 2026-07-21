@@ -36,7 +36,7 @@ export const DatabaseConnections: NextPageWithLayout = () => {
             onClick={() => setLive((prev) => !prev)}
             icon={live ? <Pause /> : <Play />}
           >
-            {live ? 'Pause' : 'Resume'}
+            {live ? 'Pause' : 'Live'}
           </Button>
         </div>
       </div>

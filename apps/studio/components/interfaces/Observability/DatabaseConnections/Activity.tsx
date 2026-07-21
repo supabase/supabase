@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
+import { isEqual } from 'lodash'
 import { Minus, MoreVertical, StopCircle } from 'lucide-react'
-import { parseAsJson, useQueryState } from 'nuqs'
+import { parseAsArrayOf, parseAsJson, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -18,7 +19,6 @@ import {
   cn,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
   HoverCard,
   HoverCardContent,
@@ -31,12 +31,16 @@ import {
   TableRow,
 } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ReportsSelectFilter, selectFilterSchema } from '../../Reports/v2/ReportsSelectFilter'
 import { formatDuration } from '@/components/interfaces/QueryPerformance/QueryPerformance.utils'
+import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
+import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
 import { useDatabaseActivityQuery, type DatabaseActivity } from '@/data/database/activity-query'
 import { useQueryAbortMutation } from '@/data/sql/abort-query-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { formatSql } from '@/lib/formatSql'
 
 const getDuration = (activity: DatabaseActivity) => {
   const { state } = activity
@@ -52,6 +56,8 @@ const getDuration = (activity: DatabaseActivity) => {
   return null
 }
 
+const DEFAULT_ROLES_FILTER = ['anon', 'authenticated', 'postgres']
+
 interface ActivityProps {
   live?: boolean
 }
@@ -61,9 +67,15 @@ export const Activity = ({ live }: ActivityProps) => {
 
   const [, setNow] = useState(() => dayjs())
   const [stateFilter, setStateFilter] = useQueryState(
-    'functions',
-    parseAsJson(selectFilterSchema.parse)
+    'state',
+    parseAsJson(selectFilterSchema.parse).withDefault([])
   )
+  const [rolesFilter, setRolesFilter] = useQueryState(
+    'roles',
+    parseAsArrayOf(parseAsString, ',').withDefault(DEFAULT_ROLES_FILTER)
+  )
+
+  const hasNoFiltersApplied = stateFilter.length === 0 && isEqual(rolesFilter, DEFAULT_ROLES_FILTER)
 
   const { data, isPending } = useDatabaseActivityQuery(
     {
@@ -73,10 +85,19 @@ export const Activity = ({ live }: ActivityProps) => {
     { refetchInterval: live ? 3000 : false }
   )
 
-  const activities =
-    stateFilter && stateFilter.length > 0
-      ? data?.filter((activity) => activity.state !== null && stateFilter.includes(activity.state))
-      : data
+  const { data: roles } = useDatabaseRolesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const activities = data?.filter((activity) => {
+    const matchesState =
+      !stateFilter ||
+      stateFilter.length === 0 ||
+      (activity.state !== null && stateFilter.includes(activity.state))
+    const matchesRole = rolesFilter.length === 0 || rolesFilter.includes(activity.role_name)
+    return matchesState && matchesRole
+  })
 
   const stateOptions = [
     'Idle',
@@ -88,8 +109,35 @@ export const Activity = ({ live }: ActivityProps) => {
   ].map((x) => ({
     label: x,
     value: x.toLowerCase(),
-    quantity: data?.filter((y) => y.state === x.toLowerCase()).length,
+    quantity: data?.filter(
+      (y) =>
+        y.state === x.toLowerCase() &&
+        (rolesFilter.length === 0 || rolesFilter.includes(y.role_name))
+    ).length,
   }))
+
+  const priorityRoles = ['anon', 'authenticated', 'postgres']
+
+  const roleOptions = (roles ?? [])
+    .map((x) => ({
+      label: x.name,
+      value: x.name,
+      quantity: data?.filter(
+        (y) =>
+          y.role_name === x.name &&
+          (!stateFilter ||
+            stateFilter.length === 0 ||
+            (y.state !== null && stateFilter.includes(y.state)))
+      ).length,
+    }))
+    .sort((a, b) => {
+      const aIndex = priorityRoles.indexOf(a.value)
+      const bIndex = priorityRoles.indexOf(b.value)
+      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex
+      if (aIndex !== -1) return -1
+      if (bIndex !== -1) return 1
+      return 0
+    })
 
   // [Joshen] Just to trigger a UI re-render for the duration to be "live"
   useEffect(() => {
@@ -101,14 +149,25 @@ export const Activity = ({ live }: ActivityProps) => {
     <div className="flex flex-col gap-y-4">
       <div className="flex gap-x-4">
         <h2>Sessions</h2>
-        <ReportsSelectFilter
-          label="State"
-          options={stateOptions}
-          value={stateFilter ?? []}
-          onChange={setStateFilter}
-          isLoading={isPending}
-          popoverClassName="w-60"
-        />
+        <div className="flex gap-x-2">
+          <ReportsSelectFilter
+            showSearch
+            label="Roles"
+            options={roleOptions}
+            value={rolesFilter ?? []}
+            onChange={setRolesFilter}
+            isLoading={isPending}
+            popoverClassName="w-72"
+          />
+          <ReportsSelectFilter
+            label="State"
+            options={stateOptions}
+            value={stateFilter ?? []}
+            onChange={setStateFilter}
+            isLoading={isPending}
+            popoverClassName="w-60"
+          />
+        </div>
       </div>
 
       <Card>
@@ -124,6 +183,55 @@ export const Activity = ({ live }: ActivityProps) => {
           </TableHeader>
 
           <TableBody>
+            {isPending ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell>
+                    <ShimmeringLoader />
+                  </TableCell>
+                  <TableCell>
+                    <ShimmeringLoader />
+                  </TableCell>
+                  <TableCell>
+                    <ShimmeringLoader />
+                  </TableCell>
+                  <TableCell colSpan={2}>
+                    <ShimmeringLoader />
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (activities ?? []).length === 0 ? (
+              <TableRow>
+                {hasNoFiltersApplied ? (
+                  <TableCell colSpan={5}>
+                    <p className="text-sm text-foreground">No active sessions</p>
+                    <p className="text-sm text-foreground-lighter mt-1">
+                      There are currently no active database connections for the anon,
+                      authenticated, and postgres roles.
+                    </p>
+                  </TableCell>
+                ) : (
+                  <TableCell colSpan={5}>
+                    <p className="text-sm text-foreground">No results found</p>
+                    <p className="text-sm text-foreground-lighter mt-1">
+                      There are no sessions that match the selected filters. Try adjusting or
+                      clearing them.
+                    </p>
+                    <Button
+                      variant="default"
+                      className="mt-2"
+                      onClick={() => {
+                        setStateFilter([])
+                        setRolesFilter(DEFAULT_ROLES_FILTER)
+                      }}
+                    >
+                      Reset filters
+                    </Button>
+                  </TableCell>
+                )}
+              </TableRow>
+            ) : null}
+
             {activities?.map((activity) => (
               <ActivityRow key={activity.pid} activity={activity} />
             ))}
@@ -137,6 +245,12 @@ export const Activity = ({ live }: ActivityProps) => {
 const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
   const { data: project } = useSelectedProjectQuery()
   const [showTerminateConfirmDialog, setShowTerminateConfirmDialog] = useState(false)
+
+  const { data: roles } = useDatabaseRolesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const superuserRoles = roles?.filter((role) => role.isSuperuser).map((role) => role.name)
 
   const { mutateAsync: abortQuery } = useQueryAbortMutation({
     onSuccess: () => {
@@ -186,12 +300,12 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
               <CodeBlock
                 hideLineNumbers
                 className={cn(
-                  'max-w-96 border-none [&>code]:text-xs',
+                  'max-w-96 border-none [&>code]:text-xs max-h-64',
                   '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap min-h-11'
                 )}
                 wrapperClassName={cn('[&_pre]:px-4 [&_pre]:py-0')}
                 language="pgsql"
-                value={activity.query}
+                value={formatSql(activity.query)}
               />
             </HoverCardContent>
           </HoverCard>
@@ -242,13 +356,20 @@ const ActivityRow = ({ activity }: { activity: DatabaseActivity }) => {
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
-              <DropdownMenuItem
+              <DropdownMenuItemTooltip
                 className="gap-x-2"
+                disabled={superuserRoles?.includes(activity.role_name)}
                 onClick={() => setShowTerminateConfirmDialog(true)}
+                tooltip={{
+                  content: {
+                    side: 'left',
+                    text: 'Unable to terminate queries run by superuser roles',
+                  },
+                }}
               >
                 <StopCircle size={12} />
                 <span>Terminate</span>
-              </DropdownMenuItem>
+              </DropdownMenuItemTooltip>
             </DropdownMenuContent>
           </DropdownMenu>
         </TableCell>
