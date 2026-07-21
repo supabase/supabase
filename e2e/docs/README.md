@@ -32,6 +32,10 @@ local docs dev server at `http://localhost:3001`.
 If the target is a protected Vercel preview, also set
 `VERCEL_AUTOMATION_BYPASS_SECRET` so the tests can bypass deployment protection.
 
+The local docs server requires a full monorepo install and credentials for some
+content, so the quickest way to run the suite is against a deployed site. Reach
+for the local server only when you need to test unpublished content changes.
+
 ## Running the tests
 
 From the repo root:
