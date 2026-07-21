@@ -27,6 +27,7 @@ permissions:
   contents: read
   deployments: read
   statuses: read
+  pull-requests: read
 
 env:
   CI: true
@@ -46,8 +47,19 @@ jobs:
             e2e/docs
             patches
 
-      - name: Wait for Vercel docs preview
+      # Vercel skips the docs preview when a PR only changes the harness
+      # (e2e/docs, workflow). Wait for a preview only when apps/docs changed.
+      - name: Detect docs app changes
         if: github.event_name == 'pull_request'
+        id: filter
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        with:
+          filters: |
+            docs_app:
+              - 'apps/docs/**'
+
+      - name: Wait for Vercel docs preview
+        if: github.event_name == 'pull_request' && steps.filter.outputs.docs_app == 'true'
         id: deployment
         uses: vercel/wait-for-deployment-action@0e2b0c5c5cce31f1648108aeec56467187aca037
         with:
@@ -57,11 +69,22 @@ jobs:
 
       - name: Resolve base URL
         id: base-url
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_URL_INPUT: ${{ inputs.base_url }}
+          DEPLOYMENT_URL: ${{ steps.deployment.outputs.deployment-url }}
+          DOCS_APP_CHANGED: ${{ steps.filter.outputs.docs_app }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "url=${{ inputs.base_url }}" >> "$GITHUB_OUTPUT"
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            printf 'url=%s\n' "$BASE_URL_INPUT" >> "$GITHUB_OUTPUT"
+            echo "use_bypass=false" >> "$GITHUB_OUTPUT"
+          elif [ "$DOCS_APP_CHANGED" = "true" ] && [ -n "$DEPLOYMENT_URL" ]; then
+            printf 'url=%s\n' "$DEPLOYMENT_URL" >> "$GITHUB_OUTPUT"
+            echo "use_bypass=true" >> "$GITHUB_OUTPUT"
           else
-            echo "url=${{ steps.deployment.outputs.deployment-url }}" >> "$GITHUB_OUTPUT"
+            # Harness-only PRs have no docs preview; test against production.
+            echo "url=https://supabase.com" >> "$GITHUB_OUTPUT"
+            echo "use_bypass=false" >> "$GITHUB_OUTPUT"
           fi
 
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
@@ -86,7 +109,7 @@ jobs:
         run: pnpm run e2e:docs
         env:
           PLAYWRIGHT_BASE_URL: ${{ steps.base-url.outputs.url }}
-          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_DOCS }}
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ steps.base-url.outputs.use_bypass == 'true' && secrets.VERCEL_AUTOMATION_BYPASS_DOCS || '' }}
 
       - name: Upload Playwright report
         if: failure()

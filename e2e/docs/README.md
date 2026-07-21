@@ -75,7 +75,9 @@ pnpm run e2e:docs -- features/<name>.spec.ts
 ## CI
 
 `.github/workflows/docs-e2e.yml` runs this suite on pull requests that touch the
-tested docs pages or `e2e/docs`, waiting for the matching Vercel preview and
-pointing `PLAYWRIGHT_BASE_URL` at it. Draft PRs are skipped until marked ready
+tested docs pages or `e2e/docs`. When the PR changes `apps/docs`, the workflow
+waits for the matching Vercel preview and points `PLAYWRIGHT_BASE_URL` at it.
+When only the harness or workflow changes, Vercel skips the docs preview, so
+the suite falls back to production. Draft PRs are skipped until marked ready
 for review. The workflow can also be triggered manually with an optional
 `base_url` input that defaults to production.
