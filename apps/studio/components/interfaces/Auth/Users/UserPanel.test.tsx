@@ -4,12 +4,11 @@ import { ResizablePanelGroup } from 'ui'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { UserPanel } from './UserPanel'
+import type { User } from '@/data/auth/users-infinite-query'
 import { BASE_PATH } from '@/lib/constants'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
-import { mswServer } from '@/tests/lib/msw'
+import { addAPIMock, mswServer } from '@/tests/lib/msw'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
-import type { User } from '@/data/auth/users-infinite-query'
 
 const { mockUser } = vi.hoisted(() => ({
   mockUser: {
@@ -55,7 +54,7 @@ const renderPanel = (disabledFeatures: string[] = []) => {
   )
 
   return customRender(
-    <ResizablePanelGroup direction="horizontal">
+    <ResizablePanelGroup orientation="horizontal">
       <UserPanel />
     </ResizablePanelGroup>,
     {
