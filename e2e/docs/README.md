@@ -67,7 +67,7 @@ pnpm run e2e:docs -- features/<name>.spec.ts
 - View the HTML report after a run:
 
   ```bash
-  pnpm exec playwright show-report
+  pnpm -C e2e/docs exec playwright show-report
   ```
 
 - Traces and screenshots for failures are saved in `test-results/`.
