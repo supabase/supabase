@@ -64,7 +64,7 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
               <span className="sr-only">Author: </span>
               <AuthorAvatars authors={author} size="md" />
             </div>
-            <div className="text-foreground-lighter flex shrink-0 space-x-2 text-sm">
+            <div className="text-foreground-lighter flex shrink-0 space-x-2 text-xs">
               <span>
                 <span className="sr-only">Published </span>
                 {blog.formattedDate}
