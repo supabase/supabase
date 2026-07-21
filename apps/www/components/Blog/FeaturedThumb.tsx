@@ -51,7 +51,7 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
         </div>
 
         {/* Text */}
-        <div className="flex flex-col lg:col-span-6 md:justify-center">
+        <div className="flex flex-col lg:col-span-6 md:justify-center lg:pr-8">
           <div>
             <h2 className="h2 lg:text-2xl! xl:text-3xl! mb-2! group-hover:underline">
               {blog.title}
